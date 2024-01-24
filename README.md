@@ -4,7 +4,7 @@
 
 This repository contains specifications for the [Vac](https://vac.dev), [Waku](https://waku.org/), [Nomos](https://nomos.tech/), [Codex](https://codex.storage/), and [Status](https://status.app/) projects.
 The RFCs, ([Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments)), 
-included in this repository will be managed by Vac after the specifcations have reached a rough consensus within the working groups.
+included in this repository will be managed by the Vac team after the specifcations have reached a rough consensus within the working groups.
 
 Vac is an R&D org creating modular p2p protocols for private, secure, and censorship-resistant communication.
 A detailed, albeit slightly outdated (2019), explanation of Vac and its design goals can be found [here](https://vac.dev/vac-overview).
