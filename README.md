@@ -1,6 +1,6 @@
 # Vac RFC Index
 
-# RFCs
+# RFC Process
 
 This repository contains specifications for the [Vac](https://vac.dev), [Waku](https://waku.org/), [Nomos](https://nomos.tech/), [Codex](https://codex.storage/), and [Status](https://status.app/) projects.
 The RFCs, ([Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments)), 
