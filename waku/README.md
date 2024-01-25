@@ -1,3 +1,4 @@
 # Waku RFCs
 
-Specifications [Waku RFC](https://github.com/waku-org/specs)
+Visit [Waku RFCs](https://github.com/waku-org/specs) for current discussion of the new Waku specifications.
+
