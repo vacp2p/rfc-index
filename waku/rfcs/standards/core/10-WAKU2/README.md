@@ -236,7 +236,7 @@ and due to the modular design of Waku there may be other protocols here that pro
 
 See the sequence diagram below for an overview of how different protocols interact.
 
-![Overview of how protocols interact in Waku v2.](../../../../rfcs/10/overview.png)
+![Overview of how protocols interact in Waku v2.](./images/overview.png)
 
 0. We have six nodes, A-F.
 The protocols initially mounted are indicated as such.
