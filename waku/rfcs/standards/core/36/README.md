@@ -1,0 +1,1286 @@
+---
+slug: 36
+title: 36/WAKU2-BINDINGS-API
+name: Waku v2 C Bindings API
+status: draft
+tags: waku-core
+editor: Richard Ramos <richard@status.im>
+contributors:
+- Franck Royer <franck@status.im>
+---
+
+# Introduction
+
+Native applications that wish to integrate Waku may not be able to use nwaku and its JSON RPC API due to constraints
+on packaging, performance or executables.
+
+An alternative is to link existing Waku implementation as a static or dynamic library in their application.
+
+This specification describes the C API that SHOULD be implemented by native Waku library and that SHOULD be used to
+consume them.
+
+# Design requirements
+
+The API should be generic enough, so:
+
+- it can be implemented by both nwaku and go-waku C-Bindings,
+- it can be consumed from a variety of languages such as C#, Kotlin, Swift, Rust, C++, etc.
+
+The selected format to pass data to and from the API is `JSON`.
+
+It has been selected due to its widespread usage and easiness of use. Other alternatives MAY replace it in the future (C
+structure, protobuf) if it brings limitations that need to be lifted.
+
+# The API
+
+## General
+
+### `JsonResponse` type
+
+All the API functions return a `JsonResponse` unless specified otherwise. The returned `JsonResponse` is a `char *` whose format depends on whether the function was executed successfully or not. And it is important to notice that this returned `JsonReponse` is returned from the latest argument, instead of from the actual function's returned value.
+
+On failure:
+
+```ts
+{
+    error: string;
+}
+```
+
+For example: 
+
+```json
+{
+  "error": "the error message"
+}
+```
+
+On success:
+
+```ts
+{
+    result: any
+}
+```
+
+The type of the `result` object depends on the function it was returned by. 
+
+### `JsonMessage` type
+
+A Waku Message in JSON Format:
+
+```ts
+{
+    payload: string;
+    contentTopic: string;
+    version: number;
+    timestamp: number;
+}
+```
+
+Fields:
+
+- `payload`: base64 encoded payload, [`waku_utils_base64_encode`](#extern-char-waku_utils_base64_encodechar-data) can be used for this.
+- `contentTopic`: The content topic to be set on the message.
+- `version`: The Waku Message version number.
+- `timestamp`: Unix timestamp in nanoseconds.
+
+### `DecodedPayload` type
+
+A payload once decoded, used when a received Waku Message is encrypted:
+
+```ts
+interface DecodedPayload {
+    pubkey?: string;
+    signature?: string;
+    data: string;
+    padding: string;
+  }
+```
+
+Fields:
+
+- `pubkey`: Public key that signed the message (optional), hex encoded with `0x` prefix,
+- `signature`: Message signature (optional), hex encoded with `0x` prefix,
+- `data`: Decrypted message payload base64 encoded,
+- `padding`: Padding base64 encoded.
+
+### `FilterSubscription` type
+
+The criteria to create subscription to a light node in JSON Format:
+
+```ts
+{
+    contentFilters: ContentFilter[];
+    pubsubTopic: string?;
+}
+```
+
+Fields:
+
+- `contentFilters`: Array of [`ContentFilter`](#contentfilter-type) being subscribed to / unsubscribed from.
+- `topic`: Optional pubsub topic.
+
+
+### `ContentFilter` type
+
+```ts
+{
+    contentTopic: string;
+}
+```
+
+Fields:
+
+- `contentTopic`: The content topic of a Waku message.
+
+### `StoreQuery` type
+
+Criteria used to retrieve historical messages
+
+```ts
+interface StoreQuery {
+    pubsubTopic?: string;
+    contentFilters?: ContentFilter[];
+    startTime?: number;
+    endTime?: number;
+    pagingOptions?: PagingOptions
+  }
+```
+
+Fields:
+
+- `pubsubTopic`: The pubsub topic on which messages are published.
+- `contentFilters`: Array of [`ContentFilter`](#contentfilter-type) to query for historical messages,
+- `startTime`: The inclusive lower bound on the timestamp of queried messages. This field holds the Unix epoch time in nanoseconds.
+- `endTime`: The inclusive upper bound on the timestamp of queried messages. This field holds the Unix epoch time in nanoseconds.
+- `pagingOptions`: Paging information in [`PagingOptions`](#pagingoptions-type) format.
+
+### `StoreResponse` type
+
+The response received after doing a query to a store node:
+
+```ts
+interface StoreResponse {
+    messages: JsonMessage[];
+    pagingOptions?: PagingOptions;
+  }
+```
+Fields:
+
+- `messages`: Array of retrieved historical messages in [`JsonMessage`](#jsonmessage-type) format.
+- `pagingOption`: Paging information in [`PagingOptions`](#pagingoptions-type) format from which to resume further historical queries
+
+### `PagingOptions` type
+
+```ts
+interface PagingOptions {
+    pageSize: number;
+    cursor?: Index;
+    forward: bool;
+  }
+```
+Fields:
+
+- `pageSize`: Number of messages to retrieve per page.
+- `cursor`: Message Index from which to perform pagination. If not included and forward is set to true, paging will be performed from the beginning of the list. If not included and forward is set to false, paging will be performed from the end of the list.
+- `forward`:  `true` if paging forward, `false` if paging backward
+
+### `Index` type
+
+```ts
+interface Index {
+    digest: string;
+    receiverTime: number;
+    senderTime: number;
+    pubsubTopic: string;
+  }
+```
+
+Fields:
+
+- `digest`: Hash of the message at this [`Index`](#index-type).
+- `receiverTime`: UNIX timestamp in nanoseconds at which the message at this [`Index`](#index-type) was received.
+- `senderTime`: UNIX timestamp in nanoseconds at which the message is generated by its sender.
+- `pubsubTopic`: The pubsub topic of the message at this [`Index`](#index-type).
+
+## Events
+
+Asynchronous events require a callback to be registered.
+An example of an asynchronous event that might be emitted is receiving a message.
+When an event is emitted, this callback will be triggered receiving a JSON string of type `JsonSignal`.
+
+### `JsonSignal` type
+
+```ts
+{
+    type: string;
+    event: any;
+}
+```
+
+Fields:
+
+- `type`: Type of signal being emitted. Currently, only `message` is available.
+- `event`: Format depends on the type of signal.
+
+For example:
+
+```json
+{
+  "type": "message",
+  "event": {
+    "subscriptionId": 1,
+    "pubsubTopic": "/waku/2/default-waku/proto",
+    "messageId": "0x6496491e40dbe0b6c3a2198c2426b16301688a2daebc4f57ad7706115eac3ad1",
+    "wakuMessage": {
+      "payload": "TODO",
+      "contentTopic": "/my-app/1/notification/proto",
+      "version": 1,
+      "timestamp": 1647826358000000000
+    }
+  }
+}
+```
+
+| `type`    | `event` Type       |
+|:----------|--------------------|
+| `message` | `JsonMessageEvent` | 
+
+### `JsonMessageEvent` type
+
+Type of `event` field for a `message` event:
+
+```ts
+{
+    pubsubTopic: string;
+    messageId: string;
+    wakuMessage: JsonMessage;
+}
+```
+
+- `pubsubTopic`: The pubsub topic on which the message was received.
+- `messageId`: The message id.
+- `wakuMessage`: The message in [`JsonMessage`](#jsonmessage-type) format.
+
+### `extern void waku_set_event_callback(void* cb)`
+
+Register callback to act as event handler and receive application signals,
+which are used to react to asynchronous events in Waku.
+
+**Parameters**
+
+1. `void* cb`: callback that will be executed when an async event is emitted.
+  The function signature for the callback should be `void myCallback(char* jsonSignal)`
+
+## Node management
+
+### `JsonConfig` type
+
+Type holding a node configuration:
+
+```ts
+interface JsonConfig {
+    host?: string;
+    port?: number;
+    advertiseAddr?: string;
+    nodeKey?: string;
+    keepAliveInterval?: number;
+    relay?: boolean;
+    relayTopics?: Array<string>;
+    gossipsubParameters?: GossipSubParameters;
+    minPeersToPublish?: number
+    filter?: boolean;
+    discV5?: boolean;
+    discV5BootstrapNodes?: Array<string>;
+    discV5UDPPort?: number;
+    store?: boolean;
+    databaseURL?: string;
+    storeRetentionMaxMessages?: number;
+    storeRetentionTimeSeconds?: number;
+}
+```
+
+Fields: 
+
+All fields are optional.
+If a key is `undefined`, or `null`, a default value will be set.
+
+- `host`: Listening IP address.
+  Default `0.0.0.0`.
+- `port`: Libp2p TCP listening port.
+  Default `60000`. 
+  Use `0` for random.
+- `advertiseAddr`: External address to advertise to other nodes.
+  Can be ip4, ip6 or dns4, dns6.
+  If `null`, the multiaddress(es) generated from the ip and port specified in the config (or default ones) will be used.
+  Default: `null`.
+- `nodeKey`: Secp256k1 private key in Hex format (`0x123...abc`).
+  Default random.
+- `keepAliveInterval`: Interval in seconds for pinging peers to keep the connection alive.
+  Default `20`.
+- `relay`: Enable relay protocol.
+  Default `true`.
+- `relayTopics`:  Array of pubsub topics that WakuRelay will automatically subscribe to when the node 
+  starts
+  Default `[]`
+- `gossipSubParameters`: custom gossipsub parameters. See `GossipSubParameters` section for defaults
+- `minPeersToPublish`: The minimum number of peers required on a topic to allow broadcasting a message.
+  Default `0`.
+- `filter`: Enable filter protocol.
+  Default `false`.
+- `discV5`: Enable DiscoveryV5.
+  Default `false`
+- `discV5BootstrapNodes`: Array of bootstrap nodes ENR
+- `discV5UDPPort`: UDP port for DiscoveryV5
+  Default `9000`
+- `store`: Enable store protocol to persist message history
+  Default `false`
+- `databaseURL`: url connection string. Accepts SQLite and PostgreSQL connection strings
+  Default: `sqlite3://store.db`
+- `storeRetentionMaxMessages`: max number of messages to store in the database.
+  Default `10000`
+- `storeRetentionTimeSeconds`: max number of seconds that a message will be persisted in the database.
+  Default `2592000` (30d)
+For example:
+```json
+{
+  "host": "0.0.0.0",
+  "port": 60000,
+  "advertiseAddr": "1.2.3.4",
+  "nodeKey": "0x123...567",
+  "keepAliveInterval": 20,
+  "relay": true,
+  "minPeersToPublish": 0
+}
+```
+
+
+### `GossipsubParameters` type
+
+Type holding custom gossipsub configuration:
+
+```ts
+interface GossipSubParameters {
+    D?: number;
+    D_low?: number;
+    D_high?: number;
+    D_score?: number;
+    D_out?: number;
+    HistoryLength?: number;
+    HistoryGossip?: number;
+    D_lazy?: number;
+    GossipFactor?: number;
+    GossipRetransmission?: number;
+    HeartbeatInitialDelayMs?: number;
+    HeartbeatIntervalSeconds?: number;
+    SlowHeartbeatWarning?: number;
+    FanoutTTLSeconds?: number;
+    PrunePeers?: number;
+    PruneBackoffSeconds?: number;
+    UnsubscribeBackoffSeconds?: number;
+    Connectors?: number;
+    MaxPendingConnections?: number;
+    ConnectionTimeoutSeconds?: number;
+    DirectConnectTicks?: number;
+    DirectConnectInitialDelaySeconds?: number;
+    OpportunisticGraftTicks?: number;
+    OpportunisticGraftPeers?: number;
+    GraftFloodThresholdSeconds?: number;
+    MaxIHaveLength?: number;
+    MaxIHaveMessages?: number;
+    IWantFollowupTimeSeconds?: number;
+}
+```
+
+Fields: 
+
+All fields are optional.
+If a key is `undefined`, or `null`, a default value will be set.
+
+- `d`: optimal degree for a GossipSub topic mesh. 
+  Default `6`
+- `dLow`: lower bound on the number of peers we keep in a GossipSub topic mesh
+  Default `5`
+- `dHigh`: upper bound on the number of peers we keep in a GossipSub topic mesh.
+  Default `12`
+- `dScore`: affects how peers are selected when pruning a mesh due to over subscription.
+  Default `4`
+- `dOut`: sets the quota for the number of outbound connections to maintain in a topic mesh.
+  Default `2`
+- `historyLength`: controls the size of the message cache used for gossip.
+  Default `5`
+- `historyGossip`: controls how many cached message ids we will advertise in IHAVE gossip messages.
+  Default `3`
+- `dLazy`: affects how many peers we will emit gossip to at each heartbeat.
+  Default `6`
+- `gossipFactor`: affects how many peers we will emit gossip to at each heartbeat.
+  Default `0.25`
+- `gossipRetransmission`: controls how many times we will allow a peer to request the same message id through IWANT gossip before we start ignoring them.
+  Default `3`
+- `heartbeatInitialDelayMs`: short delay in milliseconds before the heartbeat timer begins after the router is initialized.
+  Default `100` milliseconds
+- `heartbeatIntervalSeconds`: controls the time between heartbeats.
+  Default `1` second
+- `slowHeartbeatWarning`: duration threshold for heartbeat processing before emitting a warning.
+  Default `0.1`
+- `fanoutTTLSeconds`: controls how long we keep track of the fanout state.
+  Default `60` seconds
+- `prunePeers`: controls the number of peers to include in prune Peer eXchange.
+  Default `16`
+- `pruneBackoffSeconds`: controls the backoff time for pruned peers.
+  Default `60` seconds
+- `unsubscribeBackoffSeconds`: controls the backoff time to use when unsuscribing from a topic.
+  Default `10` seconds
+- `connectors`: number of active connection attempts for peers obtained through PX.
+  Default `8`
+- `maxPendingConnections`: maximum number of pending connections for peers attempted through px. 
+  Default `128`
+- `connectionTimeoutSeconds`: timeout in seconds for connection attempts.
+  Default `30` seconds
+- `directConnectTicks`: the number of heartbeat ticks for attempting to reconnect direct peers that are not currently connected.
+  Default `300`
+- `directConnectInitialDelaySeconds`: initial delay before opening connections to direct peers.
+  Default `1` second
+- `opportunisticGraftTicks`: number of heartbeat ticks for attempting to improve the mesh with opportunistic grafting.
+  Default `60`
+- `opportunisticGraftPeers`: the number of peers to opportunistically graft.
+  Default `2`
+- `graftFloodThresholdSeconds`: If a GRAFT comes before GraftFloodThresholdSeconds has elapsed since the last PRUNE, then there is an extra score penalty applied to the peer through P7. 
+  Default `10` seconds
+- `maxIHaveLength`: max number of messages to include in an IHAVE message, also controls the max number of IHAVE ids we will accept and request with IWANT from a peer within a heartbeat.
+  Default `5000`
+- `maxIHaveMessages`: max number of IHAVE messages to accept from a peer within a heartbeat.
+  Default `10`
+- `iWantFollowupTimeSeconds`: Time to wait for a message requested through IWANT following an IHAVE advertisement.
+  Default `3` seconds
+- `seenMessagesTTLSeconds`: configures when a previously seen message ID can be forgotten about.
+  Default `120` seconds
+
+### `extern unsigned int waku_new(char* jsonConfig, char* jsonResp)`
+
+Instantiates a Waku node.
+
+**Parameters**
+
+1. **[input]** `char* jsonConfig`: JSON string containing the options used to initialize a waku node.
+   Type [`JsonConfig`](#jsonconfig-type).
+   It can be `NULL` to use defaults.
+2. **[output]** `char* jsonResp`: [`JsonResponse`](#jsonresponse-type). Provides information indicating whether the operation succeded or not. In case or error, it tries to give as much detail as possible.
+
+   Ex1:
+
+   ```json
+   {
+     "result": true
+   }
+   ```
+   Ex2:
+   ```json
+   {
+     "error": "The node key is missing."
+   }
+   ```
+
+
+**Returns**
+
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+
+
+### `extern unsigned int waku_start(char* jsonResp)`
+
+Starts a Waku node mounting all the protocols that were enabled during the Waku node instantiation.
+
+**Parameters**
+1. **[output]** `char* jsonResp`: [`JsonResponse`](#jsonresponse-type). Provides information indicating whether the operation succeded or not. In case or error, it tries to give as much detail as possible.
+
+   Ex:
+
+   ```json
+   {
+     "result": true
+   }
+   ```
+
+**Returns**
+
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+### `extern unsigned int waku_stop(char* jsonResp)`
+
+Stops a Waku node.
+
+**Parameters**
+1. **[output]** `char* jsonResp`: [`JsonResponse`](#jsonresponse-type). Provides information indicating whether the operation succeded or not. In case or error, it tries to give as much detail as possible.
+
+   Ex:
+
+   ```json
+   {
+     "result": true
+   }
+   ```
+
+**Returns**
+
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+### `extern char* waku_peerid()`
+
+Get the peer ID of the waku node.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the peer ID as a `string` (base58 encoded).
+
+For example:
+
+```json
+{
+  "result": "QmWjHKUrXDHPCwoWXpUZ77E8o6UbAoTTZwf1AD1tDC4KNP"
+}
+```
+
+### `extern char* waku_listen_addresses()`
+
+Get the multiaddresses the Waku node is listening to.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains an array of multiaddresses.
+The multiaddresses are `string`s.
+
+For example:
+
+```json
+{
+  "result": [
+    "/ip4/127.0.0.1/tcp/30303",
+    "/ip4/1.2.3.4/tcp/30303",
+    "/dns4/waku.node.example/tcp/8000/wss"
+  ]
+}
+```
+
+## Connecting to peers
+
+### `extern char* waku_add_peer(char* address, char* protocolId)`
+
+Add a node multiaddress and protocol to the waku node's peerstore.
+
+**Parameters**
+
+1. `char* address`: A multiaddress (with peer id) to reach the peer being added.
+2. `char* protocolId`: A protocol we expect the peer to support.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the peer ID as a base58 `string` of the peer that was added.
+
+For example:
+
+```json
+{
+  "result": "QmWjHKUrXDHPCwoWXpUZ77E8o6UbAoTTZwf1AD1tDC4KNP"
+}
+```
+
+### `extern unsigned int waku_connect(char* address, int timeoutMs, char* jsonResp)`
+
+Dial peer using a multiaddress.
+
+**Parameters**
+
+1. **[input]** `char* address`: A multiaddress to reach the peer being dialed.
+2. **[input]** `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+3. **[output]** [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+   Ex1:
+
+   ```json
+   {
+      "result": true
+   }
+   ```
+   Ex2:
+
+   ```json
+   {
+      "error": "Timeout expired."
+   }
+   ```
+
+**Returns**
+
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+
+### `extern char* waku_connect_peerid(char* peerId, int timeoutMs)`
+
+Dial peer using its peer ID.
+
+**Parameters**
+
+1`char* peerID`: Peer ID to dial.
+   The peer must be already known.
+   It must have been added before with [`waku_add_peer`](#extern-char-waku_add_peerchar-address-char-protocolid)
+   or previously dialed with [`waku_connect`](#extern-char-waku_connectchar-address-int-timeoutms).
+2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+For example:
+
+```json
+{
+   "result": true
+}
+```
+
+### `extern char* waku_disconnect(char* peerId)`
+
+Disconnect a peer using its peerID
+
+**Parameters**
+
+1. `char* peerID`: Peer ID to disconnect.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+For example:
+
+```json
+{
+   "result": true
+}
+```
+
+### `extern char* waku_peer_count()`
+
+Get number of connected peers.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains an `integer` which represents the number of connected peers.
+
+For example:
+
+```json
+{
+  "result": 0
+}
+```
+
+### `extern char* waku_peers()`
+
+Retrieve the list of peers known by the Waku node.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type) containing a list of peers.
+The list of peers has this format:
+
+```json
+{
+  "result": [
+    {
+      "peerID": "16Uiu2HAmJb2e28qLXxT5kZxVUUoJt72EMzNGXB47RedcBafeDCBA",
+      "protocols": [
+        "/ipfs/id/1.0.0",
+        "/vac/waku/relay/2.0.0",
+        "/ipfs/ping/1.0.0"
+      ],
+      "addrs": [
+        "/ip4/1.2.3.4/tcp/30303"
+      ],
+      "connected": true
+    }
+  ]
+}
+```
+
+## Waku Relay
+
+### `extern void waku_content_topic(char* applicationName, unsigned int applicationVersion, char* contentTopicName, char* encoding, char* outContentTopic)`
+
+Create a content topic string according to [RFC 23](https://rfc.vac.dev/spec/23/).
+
+**Parameters**
+
+1. **[input]** `char* applicationName`
+2. **[input]** `unsigned int applicationVersion`
+3. **[input]** `char* contentTopicName`
+4. **[input]** `char* encoding`: depending on the payload, use `proto`, `rlp` or `rfc26`
+5. **[output]** `char* outContentTopic`. Gets populated with a content topic formatted according to [RFC 23](https://rfc.vac.dev/spec/23/).
+   ```
+   /{application-name}/{version-of-the-application}/{content-topic-name}/{encoding}
+   ```
+
+
+
+### `extern char* waku_pubsub_topic(char* name, char* encoding, char* outPubsubTopic)`
+
+Create a pubsub topic string according to [RFC 23](https://rfc.vac.dev/spec/23/).
+
+**Parameters**
+
+1. **[input]** `char* name`
+2. **[input]** `char* encoding`: depending on the payload, use `proto`, `rlp` or `rfc26`
+3. **[output]** `char* outPubsubTopic`. Gets populated with a pubsub topic formatted according to [RFC 23](https://rfc.vac.dev/spec/23/).
+   ```
+   /waku/2/{topic-name}/{encoding}
+   ```
+
+
+### `extern void waku_default_pubsub_topic(char* defaultPubsubTopic)`
+
+Returns the default pubsub topic used for exchanging waku messages defined in [RFC 10](https://rfc.vac.dev/spec/10/).
+
+**Parameters**
+1. **[output]** `char* defaultPubsubTopic`. Gets populated with  `/waku/2/default-waku/proto`
+
+
+### `extern unsinged int waku_relay_publish(char* messageJson, char* pubsubTopic, int timeoutMs, char* jsonResp)`
+
+Publish a message using Waku Relay.
+
+**Parameters**
+
+1. **[input]** `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. **[input]** `char* pubsubTopic`: pubsub topic on which to publish the message.
+   If `NULL`, it uses the default pubsub topic.
+3. **[input]** `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+4. **[output]**: A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the message ID.
+
+Note: `messageJson.version` is overwritten to `0`.
+
+**Returns**
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+
+
+### `extern char* waku_relay_publish_enc_asymmetric(char* messageJson, char* pubsubTopic, char* publicKey, char* optionalSigningKey, int timeoutMs)`
+
+Optionally sign,
+encrypt using asymmetric encryption
+and publish a message using Waku Relay.
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* pubsubTopic`: pubsub topic on which to publish the message.
+   If `NULL`, it uses the default pubsub topic.
+3. `char* publicKey`: hex encoded public key to be used for encryption.
+4. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
+5. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+Note: `messageJson.version` is overwritten to `1`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the message ID.
+
+### `extern char* waku_relay_publish_enc_symmetric(char* messageJson, char* pubsubTopic, char* symmetricKey, char* optionalSigningKey, int timeoutMs)`
+
+Optionally sign,
+encrypt using symmetric encryption
+and publish a message using Waku Relay.
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* pubsubTopic`: pubsub topic on which to publish the message.
+   If `NULL`, it uses the default pubsub topic.
+3. `char* symmetricKey`: hex encoded secret key to be used for encryption.
+4. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
+5. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+Note: `messageJson.version` is overwritten to `1`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the message ID.
+
+### `extern char* waku_relay_enough_peers(char* pubsubTopic)`
+
+Determine if there are enough peers to publish a message on a given pubsub topic.
+
+**Parameters**
+
+1. `char* pubsubTopic`: Pubsub topic to verify.
+   If `NULL`, it verifies the number of peers in the default pubsub topic.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains a `boolean` indicating whether there are enough peers.
+
+For example:
+
+```json
+{
+  "result": true
+}
+```
+
+### `extern unsigned int waku_relay_subscribe(char* topic, char* jsonResp)`
+
+Subscribe to a Waku Relay pubsub topic to receive messages.
+
+**Parameters**
+
+1. **[input]** `char* topic`: Pubsub topic to subscribe to.
+   If `NULL`, it subscribes to the default pubsub topic.
+2. **[output]** `char* jsonResp`: A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+   Ex1:
+
+   ```json
+   {
+     "result": true
+   }
+   ```
+   ```json
+   {
+     "error": "Cannot subscribe without Waku Relay enabled."
+   }
+   ```
+
+**Returns**
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+
+**Events**
+
+When a message is received, a ``"message"` event` is emitted containing the message, pubsub topic, and node ID in which
+the message was received.
+
+The `event` type is [`JsonMessageEvent`](#jsonmessageevent-type).
+
+For Example:
+
+```json
+{
+  "type": "message",
+  "event": {
+    "pubsubTopic": "/waku/2/default-waku/proto",
+    "messageId": "0x6496491e40dbe0b6c3a2198c2426b16301688a2daebc4f57ad7706115eac3ad1",
+    "wakuMessage": {
+      "payload": "TODO",
+      "contentTopic": "/my-app/1/notification/proto",
+      "version": 1,
+      "timestamp": 1647826358000000000
+    }
+  }
+}
+```
+
+### `extern unsigned int waku_relay_unsubscribe(char* topic, char* jsonResp)`
+
+Closes the pubsub subscription to a pubsub topic. No more messages will be received
+from this pubsub topic.
+
+**Parameters**
+
+1. **[input]** `char* pusubTopic`: Pubsub topic to unsubscribe from.
+  If `NULL`, unsubscribes from the default pubsub topic.
+2. **[output]** A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+   For example:
+
+   ```json
+   {
+      "result": true
+   }
+   ```
+
+**Returns**
+Unsigned int. Possible values:
+   - 1 - The operation was completed successfuly.
+   - 0 - The operation failed for any reason. It worth checking the value of `jsonResp` in this case.
+
+
+### `extern char* waku_relay_topics()`
+
+Get the list of subscribed pubsub topics in Waku Relay.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field will contain an array of pubsub topics.
+
+For example:
+
+```json
+{
+  "result": ["pubsubTopic1", "pubsubTopic2"]
+}
+```
+
+## Waku Filter
+
+### `extern char* waku_filter_subscribe(char* filterJSON, char* peerID, int timeoutMs)`
+
+Creates a subscription in a lightnode for messages that matches a content filter and optionally a [PubSub `topic`](https://github.com/libp2p/specs/blob/master/pubsub/README.md#the-topic-descriptor).
+
+**Parameters**
+
+1. `char* filterJSON`: JSON string containing the [`FilterSubscription`](#filtersubscription-type) to subscribe to.
+2. `char* peerID`: Peer ID to subscribe to.
+   The peer must be already known.
+   It must have been added before with [`waku_add_peer`](#extern-char-waku_add_peerchar-address-char-protocolid)
+   or previously dialed with [`waku_connect_peer`](#extern-char-waku_connect_peerchar-address-int-timeoutms).
+   Use `NULL` to automatically select a node.
+3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+For example:
+
+```json
+{
+  "result": true
+}
+```
+
+**Events**
+
+When a message is received, a ``"message"` event` is emitted containing the message, pubsub topic, and node ID in which
+the message was received.
+
+The `event` type is [`JsonMessageEvent`](#jsonmessageevent-type).
+
+For Example:
+
+```json
+{
+  "type": "message",
+  "event": {
+    "pubsubTopic": "/waku/2/default-waku/proto",
+    "messageId": "0x6496491e40dbe0b6c3a2198c2426b16301688a2daebc4f57ad7706115eac3ad1",
+    "wakuMessage": {
+      "payload": "TODO",
+      "contentTopic": "/my-app/1/notification/proto",
+      "version": 1,
+      "timestamp": 1647826358000000000
+    }
+  }
+}
+```
+
+### `extern char* waku_filter_unsubscribe(char* filterJSON, int timeoutMs)`
+
+Removes subscriptions in a light node matching a content filter and, optionally, a [PubSub `topic`](https://github.com/libp2p/specs/blob/master/pubsub/README.md#the-topic-descriptor).
+
+**Parameters**
+
+1. `char* filterJSON`: JSON string containing the [`FilterSubscription`](#filtersubscription-type).
+2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field is set to `true`.
+
+For example:
+
+```json
+{
+  "result": true
+}
+```
+
+## Waku Lightpush
+
+### `extern char* waku_lightpush_publish(char* messageJSON, char* topic, char* peerID, int timeoutMs)`
+
+Publish a message using Waku Lightpush.
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* pubsubTopic`: pubsub topic on which to publish the message.
+   If `NULL`, it uses the default pubsub topic.
+3. `char* peerID`: Peer ID supporting the lightpush protocol.
+   The peer must be already known.
+   It must have been added before with [`waku_add_peer`](#extern-char-waku_add_peerchar-address-char-protocolid)
+   or previously dialed with [`waku_connect_peer`](#extern-char-waku_connect_peerchar-address-int-timeoutms).
+   Use `NULL` to automatically select a node.
+3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+Note: `messageJson.version` is overwritten to `0`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the message ID.
+
+### `extern char* waku_lightpush_publish_enc_asymmetric(char* messageJson, char* pubsubTopic, char* peerID, char* publicKey, char* optionalSigningKey, int timeoutMs)`
+
+Optionally sign,
+encrypt using asymmetric encryption
+and publish a message using Waku Lightpush.
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* pubsubTopic`: pubsub topic on which to publish the message.
+   If `NULL`, it uses the default pubsub topic.
+3. `char* peerID`: Peer ID supporting the lightpush protocol.
+   The peer must be already known.
+   It must have been added before with [`waku_add_peer`](#extern-char-waku_add_peerchar-address-char-protocolid)
+   or previously dialed with [`waku_connect_peer`](#extern-char-waku_connect_peerchar-address-int-timeoutms).
+4. `char* publicKey`: hex encoded public key to be used for encryption.
+5. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
+6. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+Note: `messageJson.version` is overwritten to `1`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the message ID.
+
+### `extern char* waku_lightpush_publish_enc_symmetric(char* messageJson, char* pubsubTopic, char* peerID, char* symmetricKey, char* optionalSigningKey, int timeoutMs)`
+
+Optionally sign,
+encrypt using symmetric encryption
+and publish a message using Waku Lightpush.
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* pubsubTopic`: pubsub topic on which to publish the message.
+   If `NULL`, it uses the default pubsub topic.
+3. `char* peerID`: Peer ID supporting the lightpush protocol.
+   The peer must be already known.
+   It must have been added before with [`waku_add_peer`](#extern-char-waku_add_peerchar-address-char-protocolid)
+   or previously dialed with [`waku_connect_peer`](#extern-char-waku_connect_peerchar-address-int-timeoutms).
+4. `char* symmetricKey`: hex encoded secret key to be used for encryption.
+5. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
+6. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+Note: `messageJson.version` is overwritten to `1`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the message ID.
+
+## Waku Store
+
+### `extern char* waku_store_query(char* queryJSON, char* peerID, int timeoutMs)`
+
+Retrieves historical messages on specific content topics. This method may be called with [`PagingOptions`](#pagingoptions-type), 
+to retrieve historical messages on a per-page basis. If the request included [`PagingOptions`](#pagingoptions-type), the node 
+must return messages on a per-page basis and include [`PagingOptions`](#pagingoptions-type) in the response. These [`PagingOptions`](#pagingoptions-type) 
+must contain a cursor pointing to the Index from which a new page can be requested.
+
+**Parameters**
+
+1. `char* queryJSON`: JSON string containing the [`StoreQuery`](#storequery-type).
+2. `char* peerID`: Peer ID supporting the store protocol.
+   The peer must be already known.
+   It must have been added before with [`waku_add_peer`](#extern-char-waku_add_peerchar-address-char-protocolid)
+   or previously dialed with [`waku_connect_peer`](#extern-char-waku_connect_peerchar-address-int-timeoutms).
+3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains a [`StoreResponse`](#storeresponse-type)..
+
+
+## Decrypting messages
+
+### `extern char* waku_decode_symmetric(char* messageJson, char* symmetricKey)`
+Decrypt a message using a symmetric key
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* symmetricKey`: 32 byte symmetric key hex encoded.
+
+Note: `messageJson.version` is expected to be `1`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the decoded payload as a [`DecodedPayload`](#decodedpayload-type).
+An `error` message otherwise.
+
+```json
+{
+  "result": {
+    "pubkey": "0x......",
+    "signature": "0x....",
+    "data": "...",
+    "padding": "..."
+  }
+}
+```
+
+### `extern char* waku_decode_asymmetric(char* messageJson, char* privateKey)`
+Decrypt a message using a secp256k1 private key 
+
+**Parameters**
+
+1. `char* messageJson`: JSON string containing the [Waku Message](https://rfc.vac.dev/spec/14/) as [`JsonMessage`](#jsonmessage-type).
+2. `char* privateKey`: secp256k1 private key hex encoded.
+
+Note: `messageJson.version` is expected to be `1`.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the decoded payload as a [`DecodedPayload`](#decodedpayload-type).
+An `error` message otherwise.
+
+```json
+{
+  "result": {
+    "pubkey": "0x......",
+    "signature": "0x....",
+    "data": "...",
+    "padding": "..."
+  }
+}
+```
+
+
+## DNS Discovery
+
+### `extern char* waku_dns_discovery(char* url, char* nameserver, int timeoutMs)`
+Returns a list of multiaddress given a url to a DNS discoverable ENR tree
+
+**Parameters**
+
+1. `char* url`: URL containing a discoverable ENR tree
+2. `char* nameserver`: The nameserver to resolve the ENR tree url. 
+   If `NULL` or empty, it will automatically use the default system dns.
+3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
+   If the function execution takes longer than this value,
+   the execution will be canceled and an error returned.
+   Use `0` for no timeout.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains an array objects describing the multiaddresses, enr and peerID each node found.
+An `error` message otherwise.
+
+```json
+{
+  "result":[
+    {
+        "peerID":"16Uiu2HAmPLe7Mzm8TsYUubgCAW1aJoeFScxrLj8ppHFivPo97bUZ",
+        "multiaddrs":[
+            "/ip4/134.209.139.210/tcp/30303/p2p/16Uiu2HAmPLe7Mzm8TsYUubgCAW1aJoeFScxrLj8ppHFivPo97bUZ",
+            "/dns4/node-01.do-ams3.wakuv2.test.statusim.net/tcp/8000/wss/p2p/16Uiu2HAmPLe7Mzm8TsYUubgCAW1aJoeFScxrLj8ppHFivPo97bUZ"
+        ],
+        "enr":"enr:-M-4QCtJKX2WDloRYDT4yjeMGKUCRRcMlsNiZP3cnPO0HZn6IdJ035RPCqsQ5NvTyjqHzKnTM6pc2LoKliV4CeV0WrgBgmlkgnY0gmlwhIbRi9KKbXVsdGlhZGRyc7EALzYobm9kZS0wMS5kby1hbXMzLndha3V2Mi50ZXN0LnN0YXR1c2ltLm5ldAYfQN4DiXNlY3AyNTZrMaEDnr03Tuo77930a7sYLikftxnuG3BbC3gCFhA4632ooDaDdGNwgnZfg3VkcIIjKIV3YWt1Mg8"
+    },
+    ...
+}
+```
+
+
+
+## Utils
+
+### `extern char* waku_utils_base64_encode(char* data)`
+
+Encode a byte array to base64.
+Useful for creating the payload of a Waku Message in the format understood by [`waku_relay_publish`](#extern-char-waku_relay_publishchar-messagejson-char-pubsubtopic-int-timeoutms)
+
+**Parameters**
+
+1. `char* data`: Byte array to encode
+
+**Returns**
+
+A `char *` containing the base64 encoded byte array.
+
+### `extern char* waku_utils_base64_decode(char* data)`
+
+Decode a base64 string (useful for reading the payload from Waku Messages).
+
+**Parameters**
+
+1. `char* data`: base64 encoded byte array to decode.
+
+**Returns**
+
+A [`JsonResponse`](#jsonresponse-type).
+If the execution is successful, the `result` field contains the decoded payload.
+
+# Copyright
+
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
