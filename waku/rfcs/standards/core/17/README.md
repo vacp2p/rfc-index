@@ -57,7 +57,7 @@ The peer who has the secret key `sk` associated with a registered `pk` would be 
 Note that  `sk` is initially only known to its owning peer however, it may get exposed to other peers in case the owner attempts spamming the system i.e., sending more than one message per `epoch`.
 An overview of registration is illustrated in Figure 1.
 
-![Figure 1: Registration.](../../../../rfcs/17/rln-relay.png)
+![Figure 1: Registration.](./images/rln-relay.png)
 
 
 ## Publishing
@@ -147,7 +147,7 @@ An overview of the routing procedure and slashing is provided in Figure 2.
 
 <!-- TODO: may consider [validator functions](https://github.com/libp2p/specs/tree/master/pubsub#topic-validation) or [extended validators](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators) for the spam detection -->
 
-![Figure 2: Publishing, Routing and Slashing workflow.](../../../../rfcs/17/rln-message-verification.png)
+![Figure 2: Publishing, Routing and Slashing workflow.](./images/rln-message-verification.png)
 
 -------
 
