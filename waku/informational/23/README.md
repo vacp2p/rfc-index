@@ -11,7 +11,7 @@ contributors:
 ---
 
 This document outlines recommended usage of topic names in Waku v2.
-In [10/WAKU2 spec](/spec/10) there are two types of topics:
+In [10/WAKU2 spec](../../standards/core/10/WAKU2.md) there are two types of topics:
 
 - pubsub topics, used for routing
 - Content topics, used for content-based filtering
@@ -19,7 +19,7 @@ In [10/WAKU2 spec](/spec/10) there are two types of topics:
 
 ## Pubsub Topics
 
-Pubsub topics are used for routing of messages (see [11/WAKU2-RELAY](/spec/11)),
+Pubsub topics are used for routing of messages (see [11/WAKU2-RELAY](../../standards/core/11/RELAY.md)),
 and can be named implicitly by Waku sharding (see [51/WAKU2-RELAY-SHARDING](/spec/51)).
 This document comprises recommendations for explicitly naming pubsub topics (e.g. when choosing *named sharding* as specified in [51/WAKU2-RELAY-SHARDING](/spec/51)).
 
@@ -43,7 +43,7 @@ The now deprecated `/{encoding}` was always set to `/proto`,
 which indicated that the [data field](/spec/11/#protobuf-definition) in pubsub is serialized/encoded as protobuf.
 The inspiration for this format was taken from
 [Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages).
-However, because the payload of messages transmitted over [11/WAKU2-RELAY](/spec/11) must be a [14/WAKU2-MESSAGE](/spec/14),
+However, because the payload of messages transmitted over [11/WAKU2-RELAY](../../standards/core/11/RELAY.md) must be a [14/WAKU2-MESSAGE](/spec/14),
 which specifies the wire format as protobuf,`/proto` is the only valid encoding.
 This makes the `/proto` indication obsolete.
 The encoding of the `payload` field of a Waku Message is indicated by the `/{encoding}` part of the content topic name.
@@ -158,8 +158,8 @@ Copyright and related rights waived via
 
 # References
 
-* [10/WAKU2 spec](/spec/10)
-* [11/WAKU2-RELAY](/spec/11)
+* [10/WAKU2 spec](../../standards/core/10/WAKU2.md)
+* [11/WAKU2-RELAY](../../standards/core/11/RELAY.md)
 * [51/WAKU2-RELAY-SHARDING](/spec/51)
 * [Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages)
 * [14/WAKU2-MESSAGE spec](/spec/14)
