@@ -16,13 +16,13 @@ or the ability to store peer data on disk to resume state after a client restart
 Peer _management_ is a closely related concept and refers to the set of actions a client MAY choose to perform based on its knowledge of its connected peers,
 e.g. triggering reconnects/disconnects, keeping certain connections alive, etc.
 
-# Peer store
+## Peer store
 
 The peer store SHOULD be an in-memory data structure where information about discovered or configured peers are stored.
 It SHOULD be considered the main source of truth for peer-related information in a Waku v2 client.
 Clients MAY choose to persist this store on-disk.
 
-## Tracked peer metadata
+### Tracked peer metadata
 
 It is RECOMMENDED that a Waku v2 client tracks at least the following information about each of its peers in a peer store:
 
@@ -34,7 +34,7 @@ It is RECOMMENDED that a Waku v2 client tracks at least the following informatio
 | _Connectivity_ | Tracks the peer's current connectedness state. See [**Peer connectivity**](#peer-connectivity) below. |
 | _Disconnect time_ | The timestamp at which this peer last disconnected. This becomes important when managing [peer reconnections](#reconnecting-peers) |
 
-## Peer connectivity
+### Peer connectivity
 
 A Waku v2 client SHOULD track _at least_ the following connectivity states for each of its peers:
  - **`NotConnected`**: The peer has been discovered or configured on this client,
@@ -47,20 +47,20 @@ A Waku v2 client SHOULD track _at least_ the following connectivity states for e
 This list does not preclude clients from tracking more advanced connectivity metadata,
 such as a peer's blacklist status (see [`18/WAKU2-SWAP`](../../standards/application/18/SWAP.md)).
 
-## Persistence
+### Persistence
 
 A Waku v2 client MAY choose to persist peers across restarts,
 using any offline storage technology, such as an on-disk database.
 Peer persistence MAY be used to resume peer connections after a client restart.
 
-# Peer management
+## Peer management
 
 Waku v2 clients will have different requirements when it comes to managing the peers tracked in the [**peer store**](#peer-store).
 It is RECOMMENDED that clients support:
 - [automatic reconnection](#reconnecting-peers) to peers under certain conditions
 - [connection keep-alive](#connection-keep-alive)
 
-## Reconnecting peers
+### Reconnecting peers
 
 A Waku v2 client MAY choose to reconnect to previously connected, managed peers under certain conditions.
 Such conditions include, but are not limited to:
@@ -70,7 +70,7 @@ If a client chooses to automatically reconnect to previous peers,
 it MUST respect the [backing off period](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#prune-backoff-and-peer-exchange) specified for GossipSub v1.1 before attempting to reconnect.
 This requires keeping track of the [last time each peer was disconnected](#tracked-peer-metadata).
 
-## Connection keep-alive
+### Connection keep-alive
 
 A Waku v2 client MAY choose to implement a keep-alive mechanism to certain peers.
 If a client chooses to implement keep-alive on a connection,
@@ -81,18 +81,19 @@ For example, idle TCP connections often times out after 10 to 15 minutes.
 > **Implementation note:** the `nim-waku` client currently implements a keep-alive mechanism every `5 minutes`,
 in response to a TCP connection timeout of `10 minutes`.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
+- [`Peer ID`](https://docs.libp2p.io/concepts/peer-id/)
+- [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/)
+- [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids)
 - [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md)
 - [`13/WAKU2-STORE`](../../standards/core/13/STORE.md)
 - [`18/WAKU2-SWAP`](../../standards/application/18/SWAP.md)
-- [`libp2p` peer ID](https://docs.libp2p.io/concepts/peer-id/)
-- [`libp2p` ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
-- [`libp2p` protocol IDs](https://docs.libp2p.io/concepts/protocols/#protocol-ids)
-- [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/)
+- [backing off period](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#prune-backoff-and-peer-exchange)
+- [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping)
 - [`10/WAKU2` client recommendations](https://rfc.vac.dev/spec/10/#recommendations-for-clients)
