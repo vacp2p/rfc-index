@@ -30,7 +30,7 @@ It is RECOMMENDED that a Waku v2 client tracks at least the following informatio
 | --- | --- |
 | _Public key_  | The public key for this peer. This is related to the libp2p [`Peer ID`](https://docs.libp2p.io/concepts/peer-id/). |
 | _Addresses_ | Known transport layer [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/) for this peer. |
-| _Protocols_ | The libp2p [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids) supported by this peer. This can be used to track the client's connectivity to peers supporting different Waku v2 protocols, e.g. [`11/WAKU2-RELAY`](https://rfc.vac.dev/spec/11/) or [`13/WAKU2-STORE`](https://rfc.vac.dev/spec/13/). |
+| _Protocols_ | The libp2p [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids) supported by this peer. This can be used to track the client's connectivity to peers supporting different Waku v2 protocols, e.g. [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md) or [`13/WAKU2-STORE`](../../standards/core/13/STORE.md). |
 | _Connectivity_ | Tracks the peer's current connectedness state. See [**Peer connectivity**](#peer-connectivity) below. |
 | _Disconnect time_ | The timestamp at which this peer last disconnected. This becomes important when managing [peer reconnections](#reconnecting-peers) |
 
@@ -45,7 +45,7 @@ A Waku v2 client SHOULD track _at least_ the following connectivity states for e
  - **`Connected`**: The client is actively connected to this peer.
 
 This list does not preclude clients from tracking more advanced connectivity metadata,
-such as a peer's blacklist status (see (`18/WAKU2-SWAP`)[https://rfc.vac.dev/spec/18/]).
+such as a peer's blacklist status (see [`18/WAKU2-SWAP`](../../standards/application/18/SWAP.md)).
 
 ## Persistence
 
@@ -74,7 +74,7 @@ This requires keeping track of the [last time each peer was disconnected](#track
 
 A Waku v2 client MAY choose to implement a keep-alive mechanism to certain peers.
 If a client chooses to implement keep-alive on a connection,
-it SHOULD do so by sending periodic [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping) as per `10/WAKU2` [client recommendations](https://rfc.vac.dev/spec/10/#recommendations-for-clients).
+it SHOULD do so by sending periodic [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping) as per `10/WAKU2` [client recommendations](../../standards/core/10/WAKU2.md/#recommendations-for-clients).
 The recommended period between pings SHOULD be _at most_ 50% of the shortest idle connection timeout for the specific client and transport.
 For example, idle TCP connections often times out after 10 to 15 minutes.
 
@@ -88,10 +88,11 @@ Copyright and related rights waived via
 
 # References
 
-1. [`10/WAKU2` client recommendations](https://rfc.vac.dev/spec/10/#recommendations-for-clients)
-1. [`11/WAKU2-RELAY`](https://rfc.vac.dev/spec/11/)
-1. [`13/WAKU2-STORE`](https://rfc.vac.dev/spec/13/)
-1. [`libp2p` peer ID](https://docs.libp2p.io/concepts/peer-id/)
-1. [`libp2p` ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
-1. [`libp2p` protocol IDs](https://docs.libp2p.io/concepts/protocols/#protocol-ids)
-1. [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/)
+- [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md)
+- [`13/WAKU2-STORE`](../../standards/core/13/STORE.md)
+- [`18/WAKU2-SWAP`](../../standards/application/18/SWAP.md)
+- [`libp2p` peer ID](https://docs.libp2p.io/concepts/peer-id/)
+- [`libp2p` ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+- [`libp2p` protocol IDs](https://docs.libp2p.io/concepts/protocols/#protocol-ids)
+- [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/)
+- [`10/WAKU2` client recommendations](https://rfc.vac.dev/spec/10/#recommendations-for-clients)
