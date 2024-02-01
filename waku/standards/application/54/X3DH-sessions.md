@@ -14,19 +14,19 @@ contributors:
 - Dean Eigenmann <dean@status.im>
 ---
 
-# Abstract
+## Abstract
 
 This document specifies how to manage sessions based on an X3DH key exchange.
 This includes how to establish new sessions, how to re-establish them, how to maintain them, and how to close them.
 
-[53/WAKU2-X3DH](/spec/53) specifies the Waku `X3DH` protocol for end-to-end encryption. 
+[53/WAKU2-X3DH](../../standards/application/53/X3DH.md) specifies the Waku `X3DH` protocol for end-to-end encryption. 
 Once two peers complete an X3DH handshake, they SHOULD establish an X3DH session.
 
-# Session Establishment
+## Session Establishment
 
 A node identifies a peer by their `installation-id` which MAY be interpreted as a device identifier.
 
-## Discovery of pre-key bundles
+### Discovery of pre-key bundles
 
 The node's pre-key bundle MUST be broadcast on a content topic derived from the node's public key, so that the first message may be PFS-encrypted.
 Each peer MUST publish their pre-key bundle periodically to this topic, otherwise they risk not being able to perform key-exchanges with other peers.
@@ -38,6 +38,7 @@ Partitioned topics have been used to balance privacy and efficiency of broadcast
 The number of partitions that MUST be used is 5000.
 
 The topic MUST be derived as follows:
+
 ```
 var partitionsNum *big.Int = big.NewInt(5000)
 var partition *big.Int = big.NewInt(0).Mod(peerBPublicKey, partitionsNum)
@@ -57,11 +58,11 @@ for i = 0; i < topicLen; i++ {
 }
 ```
 
-## Initialization
+### Initialization
 A node initializes a new session once a successful X3DH exchange has taken place. 
 Subsequent messages will use the established session until re-keying is necessary.
 
-## Negotiated topic to be used for the session
+### Negotiated topic to be used for the session
 
 After the peers have performed the initial key exchange, they MUST derive a topic from their shared secret to send messages on.
 To obtain this value, take the first four bytes of the keccak256 hash of the shared secret encoded in hexadecimal format.
@@ -96,15 +97,15 @@ To summarize, following is the process for peer B to establish a session with pe
 3. The negotiated topic is derived from the shared secret
 4. Peers A & B exchange messages on the negotiated topic
 
-## Concurrent sessions
+### Concurrent sessions
 
 If a node creates two sessions concurrently between two peers, the one with the symmetric key first in byte order SHOULD be used, this marks that the other has expired.
 
-## Re-keying
+### Re-keying
 
 On receiving a bundle from a given peer with a higher version, the old bundle SHOULD be marked as expired and a new session SHOULD be established on the next message sent.
 
-## Multi-device support
+### Multi-device support
 
 Multi-device support is quite challenging as there is not a central place where information on which and how many devices (identified by their respective `installation-id`) a peer has, is stored.
 
@@ -114,7 +115,7 @@ This means that every time a new device is paired, the bundle needs to be update
 
 The method is loosely based on [Signal's Sesame Algorithm](https://signal.org/docs/specifications/sesame/).
 
-## Pairing
+### Pairing
 
 A new `installation-id` MUST be generated on a per-device basis. 
 The device should be paired as soon as possible if other devices are present. 
@@ -134,30 +135,30 @@ The node sends messages using pairwise encryption, including their own devices.
 
 Where `n` is the maximum number of devices that can be paired.
 
-## Account recovery
+### Account recovery
 
 Account recovery is the same as adding a new device, and it MUST be handled the same way.
 
-## Partitioned devices
+### Partitioned devices
 
 In some cases (i.e. account recovery when no other pairing device is available, device not paired), it is possible that a device will receive a message that is not targeted to its own `installation-id`.
 In this case an empty message containing bundle information MUST be sent back, which will notify the receiving end not to include the device in any further communication.
 
-# Security Considerations
+## Security Considerations
 
-1. Inherits all security considerations from [53/WAKU2-X3DH](/spec/53).
+1. Inherits all security considerations from [53/WAKU2-X3DH](../../standards/application/53/X3DH.md).
 
-# Recommendations
+### Recommendations
 
 1. The value of `n` SHOULD be configured by the app-protocol.
     - The default value SHOULD be 3, since a larger number of devices will result in a larger bundle size, which may not be desirable in a peer-to-peer network.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-1. [53/WAKU2-X3DH](/spec/53)
+1. [53/WAKU2-X3DH](../../standards/application/53/X3DH.md)
 2. [Signal's Sesame Algorithm](https://signal.org/docs/specifications/sesame/)
-3. [5/SECURE-TRANSPORT](https://specs.status.im/spec/5)
+
