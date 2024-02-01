@@ -23,7 +23,7 @@ These capabilities are things such as:
 
 This makes Waku ideal for running a p2p protocol on mobile and in similarly restricted environments.
 
-Historically, it has its roots in [Waku v1](/spec/6),
+Historically, it has its roots in [6/WAKU1](../../standards/core/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627), originally part of the Ethereum stack.
 However, Waku v2 acts more as a thin wrapper for PubSub and has a different API.
 It is implemented in an iterative manner where initial focus is on porting essential functionality to libp2p.
@@ -74,7 +74,7 @@ For example:
 - Stronger guarantees for spam protection vs economic registration cost
 
 For more on the concept of adaptive nodes and what this means in practice,
-please see the [30/ADAPTIVE-NODES](/spec/30) spec.
+please see the [30/ADAPTIVE-NODES](../../informational/30/adaptive-nodes.md) spec.
 
 ## Network interaction domains
 
@@ -98,8 +98,8 @@ This is in addition to protocols that specify messages, payloads, and recommende
 Since these aren't negotiated libp2p protocols, they are referred to by their RFC ID.
 For example:
 
-- [14/WAKU2-MESSAGE](/spec/14)and [26/WAKU2-PAYLOAD](/spec/26) for message payloads
-- [23/WAKU2-TOPICS](/spec/23) and [27/WAKU2-PEERS](/spec/27) for recommendations around usage
+- [14/WAKU2-MESSAGE](../standards/core/14/message.md) and [26/WAKU-PAYLOAD](../../standards/application/26/payload.md) for message payloads
+- [23/WAKU2-TOPICS](../../../informational/23/topics.md) and [27/WAKU2-PEERS](../../../informational/27/peers.md) for recommendations around usage
 
 There are also more experimental libp2p protocols such as:
 
@@ -126,7 +126,7 @@ See [11/WAKU2-RELAY](/spec/11) spec for more details.
 
 For an experimental privacy-preserving economic spam protection mechanism, see [17/WAKU2-RLN-RELAY](/spec/17).
 
-See [23/WAKU2-TOPICS](/spec/23) for more information about recommended topic usage.
+See [23/WAKU2-TOPICS](../../informational/23/topics.md) for more information about recommended topic usage.
 
 ### Direct use of libp2p protocols
 
@@ -244,7 +244,7 @@ The PubSub topics `pubtopic1` and `pubtopic2` is used for routing and indicates 
 Ditto for [13/WAKU2-STORE](/spec/13) where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
-See [14/WAKU2-MESSAGE](/spec/14) for more details.
+See [14/WAKU2-MESSAGE](../../standards/core/14/message.md) for more details.
 If WakuMessage version is set to 1, we use the [6/WAKU1](/spec/6) compatible `data` field with encryption.
 See [7/WAKU-DATA](/spec/7) for more details.
 
@@ -332,7 +332,7 @@ At a high level, peers utilize a scoring function to locally score the behavior 
 ### Data confidentiality, Integrity, and Authenticity
 
 Confidentiality can be addressed through data encryption whereas integrity and authenticity are achievable through digital signatures.
-These features are provided for in [14/WAKU2-MESSAGE (version 1)](/spec/14#version-1)` through payload encryption as well as encrypted signatures.
+These features are provided for in [14/WAKU2-MESSAGE (version 1)](../../standards/core/14/message.md/#version-1)` through payload encryption as well as encrypted signatures.
 
 ## Security Considerations
 
@@ -370,7 +370,7 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 |[11/WAKU2-RELAY](/spec/11)|✔|✔|✔|✔|
 |[12/WAKU2-FILTER](/spec/12)|✔|✔||
 |[13/WAKU2-STORE](/spec/13)|✔|✔|✔\*|✔\*|
-|[14/WAKU2-MESSAGE](/spec/14)|✔|✔|✔|✔|
+|[14/WAKU2-MESSAGE](../../standards/core/14/message.md))|✔|✔|✔|✔|
 |[15/WAKU2-BRIDGE](/spec/15)|✔|||
 |[16/WAKU2-RPC](/spec/16)|✔|||
 |[17/WAKU2-RLN-RELAY](/spec/17)|🚧|||
@@ -429,43 +429,53 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [libp2p specs](https://github.com/libp2p/specs)
 
-2. [6/WAKU1 spec](/spec/6)
+2. [6/WAKU1](../../standards/core/6/waku1.md)
 
 3. [Whisper spec (EIP627)](https://eips.ethereum.org/EIPS/eip-627)
 
 4. [Waku v2 plan](https://vac.dev/waku-v2-plan)
 
-5. [Protocol Identifiers](https://docs.libp2p.io/concepts/protocols/)
+5. [30/ADAPTIVE-NODES](../../informational/30/adaptive-nodes.md)
 
-6. [Protobuf varint encoding](https://developers.google.com/protocol-buffers/docs/encoding#varints)
+6. [Protocol Identifiers](https://docs.libp2p.io/concepts/protocols/)
 
-7. [7/WAKU-DATA spec](/spec/7)
+7. [14/WAKU2-MESSAGE](../../standards/core/14/message.md)
 
-8. [11/WAKU2-RELAY spec](/spec/11)
+8. [26/WAKU-PAYLOAD](../../standards/application/26/payload.md)
 
-9. [13/WAKU2-STORE spec](/spec/13)
+9. [23/WAKU2-TOPICS](../../informational/23/topics.md)
 
-10. [12/WAKU2-FILTER spec](/spec/12)
+10. [27/WAKU2-PEERS](../../informational/27/peers.md)
 
-11. [15/WAKU2-BRIDGE spec](/spec/15)
+11. [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/) 
 
-12. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
+12. [Protobuf varint encoding](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 
-13. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
+13. [7/WAKU-DATA spec](/spec/7)
 
-14. [14/WAKU2-MESSAGE spec](/spec/14)
+14. [11/WAKU2-RELAY spec](/spec/11)
 
-15. [17/WAKU2-RLN-RELAY spec](/spec/17)
+15. [13/WAKU2-STORE spec](/spec/13)
 
-16. [18/WAKU2-SWAP spec](/spec/18)
+16. [12/WAKU2-FILTER spec](/spec/12)
 
-17. [Ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+17. [15/WAKU2-BRIDGE spec](/spec/15)
 
-18. [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459)
+18. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
 
-19. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
+19. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 
-20. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
+20. [17/WAKU2-RLN-RELAY spec](/spec/17)
+
+21. [18/WAKU2-SWAP spec](/spec/18)
+
+22. [Ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+
+23. [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459)
+
+24. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
+
+25. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
 
 31. [31/WAKU2-ENR spec](/spec/31)
 
