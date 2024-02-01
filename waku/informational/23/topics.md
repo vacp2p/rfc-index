@@ -20,8 +20,8 @@ In [10/WAKU2 spec](../../standards/core/10/waku2.md) there are two types of topi
 ## Pubsub Topics
 
 Pubsub topics are used for routing of messages (see [11/WAKU2-RELAY](../../standards/core/11/relay.md)),
-and can be named implicitly by Waku sharding (see [51/WAKU2-RELAY-SHARDING](/spec/51)).
-This document comprises recommendations for explicitly naming pubsub topics (e.g. when choosing *named sharding* as specified in [51/WAKU2-RELAY-SHARDING](/spec/51)).
+and can be named implicitly by Waku sharding (see [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)).
+This document comprises recommendations for explicitly naming pubsub topics (e.g. when choosing *named sharding* as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)).
 
 ### Pubsub Topic Format
 
@@ -72,7 +72,7 @@ This indicates that these networks carry WakuMessages, but for different domains
 
 ### Named Topic Sharding Example
 
-The following is an example of named sharding, as specified in [51/WAKU2-RELAY-SHARDING](/spec/51).
+The following is an example of named sharding, as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md).
 
 ```
 waku/2/waku-9_shard-0/
@@ -119,7 +119,7 @@ The encoding field indicates the serialization/encoding scheme for the [WakuMess
 
 ## Differences with Waku v1
 
-In [6/WAKU1](../../deprecated/5/WAKU0.md) there is no actual routing.
+In [6/WAKU1](../../deprecated/5/waku0.md) there is no actual routing.
 All messages are sent to all other nodes.
 This means that we are implicitly using the same pubsub topic that would be something like:
 
@@ -141,7 +141,7 @@ the following structure for the content topic SHOULD be used:
 
 The `<4bytes-waku-v1-topic>` SHOULD be the lowercase hex representation of the 4-byte Waku v1 topic.
 A `0x` prefix SHOULD be used.
-`/rfc26` indicates that the bridged content is encoded according to RFC [26/WAKU-PAYLOAD](../../standards/application/26/readme.md).
+`/rfc26` indicates that the bridged content is encoded according to RFC [26/WAKU2-PAYLOAD](../../standards/application/26/payload.md).
 See [15/WAKU-BRIDGE](../../standards/core/15/bridge.md) for a description of the bridged fields.
 
 This creates a direct mapping between the two protocols.
@@ -158,13 +158,13 @@ Copyright and related rights waived via
 
 ## References
 
-* [10/WAKU2 spec](../../standards/core/10/WAKU2.md)
-* [11/WAKU2-RELAY](../../standards/core/11/RELAY.md)
-* [51/WAKU2-RELAY-SHARDING](/spec/51)
+* [10/WAKU2 spec](../../standards/core/10/waku2.md)
+* [11/WAKU2-RELAY](../../standards/core/11/relay.md)
+* [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
 * [Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages)
 * [14/WAKU2-MESSAGE](../../standards/core/14/message.md)
 * [12/WAKU2-FILTER](../../standards/core/14/filter.md)
 * [13/WAKU2-STORE](../../standards/core/13/store.md)
-* [6/WAKU1](../../deprecated/5/WAKU0.md)
+* [6/WAKU1](../../deprecated/5/waku0.md)
 * [15/WAKU-BRIDGE](../../standards/core/15/bridge.md)
-* [26/WAKU-PAYLOAD](../../standards/application/26/readme.md)
+* [26/WAKU-PAYLOAD](../../standards/application/26/payload.md)
