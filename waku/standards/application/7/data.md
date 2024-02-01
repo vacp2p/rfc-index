@@ -9,7 +9,7 @@ contributors:
   - Kim De Mey <kimdemey@status.im>
 ---
 
-This specification describes the encryption, decryption and signing of the content in the [data field used in Waku](/spec/6/#abnf-specification).
+This specification describes the encryption, decryption and signing of the content in the [data field used in Waku](../../standards/core/6/waku1.md/#abnf-specification).
 
 ## Specification
 
