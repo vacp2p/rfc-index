@@ -11,7 +11,7 @@ contributors:
 Since Waku v2 is built on [libp2p](https://github.com/libp2p/specs),
 most of the parameters and reasonable defaults are derived from there.
 
-Waku v2 relay messaging is specified in [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md),
+Waku v2 relay messaging is specified in [`11/WAKU2-RELAY`](../../standards/core/11/relay.md),
 a minor extension of the [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md).
 GossipSub behaviour is controlled by a series of adjustable parameters.
 Waku v2 clients SHOULD configure these parameters to the recommended values below.
@@ -68,7 +68,7 @@ Copyright and related rights waived via
 ## References
 
 - [libp2p](https://github.com/libp2p/specs)
-- [11/WAKU2-RELAY](../../standards/core/11/RELAY.md)
+- [11/WAKU2-RELAY](../../standards/core/11/relay.md)
 - [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
 - [corresponding libp2p specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md#parameters)
 - [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters)
