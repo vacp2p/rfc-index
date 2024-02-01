@@ -46,10 +46,10 @@ The proposed protocol MUST adhere to the following design requirements:
 2. Bob is willing to participate to Eth-PM, and publishes `B'`,
 3. Bob's ownership of `B'` MUST be verifiable,
 4. Alice wants to send message `M` to Bob,
-5. Bob SHOULD be able to get `M` using [10/WAKU2 spec](../../standards/core/10/WAKU2.md),
+5. Bob SHOULD be able to get `M` using [10/WAKU2 spec](../../standards/core/10/waku2.md),
 6. Participants only have access to their Ethereum Wallet via the Web3 API,
 7. Carole MUST NOT be able to read `M`'s content even if she is storing it or relaying it,
-8. [Waku Message Version 1](../../standards/application/26) Asymmetric Encryption is used for encryption purposes.
+8. [Waku Message Version 1](../../standards/application/26/payload.md) Asymmetric Encryption is used for encryption purposes.
 
 ## Limitations
 
@@ -202,7 +202,7 @@ Alice MAY monitor the Waku v2 to collect Ethereum Address and Encryption Public 
 Alice SHOULD verify that the `signature`s of `PublicKeyMessage`s she receives are valid as per EIP-712.
 She SHOULD drop any message without a signature or with an invalid signature.
 
-Using Bob's Encryption Public Key, retrieved via [10/WAKU2](../../standards/core/10/WAKU2.md), Alice MAY now send an encrypted message to Bob.
+Using Bob's Encryption Public Key, retrieved via [10/WAKU2](../../standards/core/10/waku2.md), Alice MAY now send an encrypted message to Bob.
 
 If she wishes to do so, Alice MUST encrypt her message `M` using Bob's Encryption Public Key `B'`,
 as per [26/WAKU-PAYLOAD Asymmetric Encryption specs](../../standards/application/26/payload.md/#asymmetric).
@@ -214,6 +214,12 @@ Alice SHOULD now publish this message on the Private Message content topic.
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
-- [10/WAKU2 spec](../../standards/core/10/WAKU2.md)
-- [Waku Message Version 1](../../standards/application/26)
-- 
+- [10/WAKU2 spec](../../standards/core/10/waku2.md)
+- [Waku Message Version 1](../../standards/application/26/payload.md)
+- [X3DH](https://www.signal.org/docs/specifications/x3dh/)
+- [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
+- [Status secure transport spec](https://specs.status.im/spec/5)
+- [EIP-712](https://eips.ethereum.org/EIPS/eip-712)
+- [13/WAKU2-STORE](../../standards/core/13/store.md))
+- [The Graph](https://thegraph.com/)
+  
