@@ -11,12 +11,12 @@ contributors:
 Since Waku v2 is built on [libp2p](https://github.com/libp2p/specs),
 most of the parameters and reasonable defaults are derived from there.
 
-Waku v2 relay messaging is specified in [`11/WAKU2-RELAY`](/spec/11),
+Waku v2 relay messaging is specified in [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md),
 a minor extension of the [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md).
 GossipSub behaviour is controlled by a series of adjustable parameters.
 Waku v2 clients SHOULD configure these parameters to the recommended values below.
 
-# GossipSub v1.0 parameters
+## GossipSub v1.0 parameters
 
 GossipSub v1.0 parameters are defined in the [corresponding libp2p specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md#parameters).
 We repeat them here with RECOMMMENDED values for `11/WAKU2-RELAY` implementations.
@@ -33,7 +33,7 @@ We repeat them here with RECOMMMENDED values for `11/WAKU2-RELAY` implementation
 | `mcache_gossip`      | Number of history windows to use when emitting gossip | 3                 |
 | `seen_ttl`           | Expiry time for cache of seen message ids             | 2 minutes         |
 
-# GossipSub v1.1 parameters
+## GossipSub v1.1 parameters
 
 GossipSub v1.1 extended GossipSub v1.0 and introduced [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
 We repeat the global parameters here with RECOMMMENDED values for `11/WAKU2-RELAY` implementations.
@@ -48,7 +48,7 @@ We repeat the global parameters here with RECOMMMENDED values for `11/WAKU2-RELA
 
 `11/WAKU2-RELAY` clients SHOULD implement a peer scoring mechanism with the parameter constraints as [specified by libp2p](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
 
-# Other configuration
+## Other configuration
 
 The following behavioural parameters are not specified by `libp2p`,
 but nevertheless describes constraints that `11/WAKU2-RELAY` clients MAY choose to implement.
@@ -60,15 +60,15 @@ but nevertheless describes constraints that `11/WAKU2-RELAY` clients MAY choose 
 | `IHavePeerBudget`  | Maximum number of IHAVE messages to accept from a peer within a heartbeat | 10                |
 | `IHaveMaxLength`   | Maximum number of messages to include in an IHAVE message                 | 5000              |
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-1. [`11/WAKU2-RELAY`](/spec/11)
-1. [GossipSub v1.0 parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md#parameters)
-1. [GossipSub v1.1 parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters)
-1. [libp2p](https://github.com/libp2p/specs)
-1. [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
+- [libp2p](https://github.com/libp2p/specs)
+- [11/WAKU2-RELAY](../../standards/core/11/RELAY.md)
+- [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
+- [corresponding libp2p specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md#parameters)
+- [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters)
