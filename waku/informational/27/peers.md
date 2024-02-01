@@ -30,7 +30,7 @@ It is RECOMMENDED that a Waku v2 client tracks at least the following informatio
 | --- | --- |
 | _Public key_  | The public key for this peer. This is related to the libp2p [`Peer ID`](https://docs.libp2p.io/concepts/peer-id/). |
 | _Addresses_ | Known transport layer [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/) for this peer. |
-| _Protocols_ | The libp2p [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids) supported by this peer. This can be used to track the client's connectivity to peers supporting different Waku v2 protocols, e.g. [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md) or [`13/WAKU2-STORE`](../../standards/core/13/STORE.md). |
+| _Protocols_ | The libp2p [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids) supported by this peer. This can be used to track the client's connectivity to peers supporting different Waku v2 protocols, e.g. [`11/WAKU2-RELAY`](../../standards/core/11/relay.md) or [`13/WAKU2-STORE`](../../standards/core/13/store.md). |
 | _Connectivity_ | Tracks the peer's current connectedness state. See [**Peer connectivity**](#peer-connectivity) below. |
 | _Disconnect time_ | The timestamp at which this peer last disconnected. This becomes important when managing [peer reconnections](#reconnecting-peers) |
 
@@ -45,7 +45,7 @@ A Waku v2 client SHOULD track _at least_ the following connectivity states for e
  - **`Connected`**: The client is actively connected to this peer.
 
 This list does not preclude clients from tracking more advanced connectivity metadata,
-such as a peer's blacklist status (see [`18/WAKU2-SWAP`](../../standards/application/18/SWAP.md)).
+such as a peer's blacklist status (see [`18/WAKU2-SWAP`](../../standards/application/18/swap.md)).
 
 ### Persistence
 
@@ -91,9 +91,9 @@ Copyright and related rights waived via
 - [`Peer ID`](https://docs.libp2p.io/concepts/peer-id/)
 - [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/)
 - [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids)
-- [`11/WAKU2-RELAY`](../../standards/core/11/RELAY.md)
-- [`13/WAKU2-STORE`](../../standards/core/13/STORE.md)
-- [`18/WAKU2-SWAP`](../../standards/application/18/SWAP.md)
+- [`11/WAKU2-RELAY`](../../standards/core/11/relay.md)
+- [`13/WAKU2-STORE`](../../standards/core/13/store.md)
+- [`18/WAKU2-SWAP`](../../standards/application/18/swap.md)
 - [backing off period](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#prune-backoff-and-peer-exchange)
 - [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping)
 - [`10/WAKU2` client recommendations](https://rfc.vac.dev/spec/10/#recommendations-for-clients)
