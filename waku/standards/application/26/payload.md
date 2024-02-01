@@ -8,9 +8,9 @@ contributors:
 ---
 
 This specification describes how Waku provides confidentiality, authenticity, and integrity, as well as some form of unlinkability.
-Specifically, it describes how encryption, decryption and signing works in [6/WAKU1](/spec/6) and in [10/WAKU2](/spec/10) with [14/WAKU-MESSAGE version 1](/spec/14/#version1).
+Specifically, it describes how encryption, decryption and signing works in [6/WAKU1](../../standards/core/6/waku1.md) and in [10/WAKU2 spec](../../standards/core/10/waku2.md) with [14/WAKU-MESSAGE version 1](../../standards/core/14/message.md/#version1).
 
-This specification effectively replaces [7/WAKU-DATA](/spec/7) as well as [6/WAKU1 Payload encryption](/spec/6/#payload-encryption) but written in a way that is agnostic and self-contained for Waku v1 and Waku v2.
+This specification effectively replaces [7/WAKU-DATA](../../standards/application/7/DATA.md) as well as [6/WAKU1 Payload encryption](../../standards/core/6/waku1.md/#payload-encryption) but written in a way that is agnostic and self-contained for Waku v1 and Waku v2.
 
 Large sections of the specification originate from [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627) as well from [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption) with some modifications.
 
@@ -136,20 +136,19 @@ However, it is recommended that the size of Data Field (excluding the IV and tag
 In order to decode a message, a node SHOULD try to apply both symmetric and asymmetric decryption operations.
 This is because the type of encryption is not included in the message.
 
-## References
-
-1. [6/WAKU1](/spec/6)
-2. [10/WAKU2](/spec/10)
-3. [14/WAKU-MESSAGE version 1](/spec/14/#version1)
-4. [7/WAKU-DATA](/spec/7)
-5. [6/WAKU1 Payload encryption](/spec/6/#payload-encryption)
-6. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
-7. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
-8. [Status 5/SECURE-TRANSPORT](https://specs.status.im/spec/5)
-9. [Augmented Backus-Naur form (ABNF)](https://tools.ietf.org/html/rfc5234)
-10. [Ethereum "Yellow paper": Appendix F Signing transactions](https://ethereum.github.io/yellowpaper/paper.pdf)
-11. [Authenticated encryption](https://en.wikipedia.org/wiki/Authenticated_encryption)
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+1. [6/WAKU1](../../standards/core/6/waku1.md)
+2. [10/WAKU2 spec](../../standards/core/10/waku2.md)
+3. [14/WAKU-MESSAGE version 1](../../standards/core/14/message.md/#version1)
+4. [7/WAKU-DATA](../../standards/application/7/DATA.md)
+5. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
+6. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
+7. [Status 5/SECURE-TRANSPORT](https://specs.status.im/spec/5)
+8. [Augmented Backus-Naur form (ABNF)](https://tools.ietf.org/html/rfc5234)
+9. [Ethereum "Yellow paper": Appendix F Signing transactions](https://ethereum.github.io/yellowpaper/paper.pdf)
+10. [authenticated encryption](https://en.wikipedia.org/wiki/Authenticated_encryption)
