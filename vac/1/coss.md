@@ -45,7 +45,7 @@ if not, see http://www.gnu.org/licenses.
 
 ## Change Process
 
-This document is governed by the [1/COSS](spec/1) (COSS).
+This document is governed by the [1/COSS](./coss.md) (COSS).
 
 ## Language
 
@@ -104,7 +104,7 @@ Every specification has an independent lifecycle that documents clearly its curr
 
 A specification has six possible states that reflect its maturity and contractual weight:
 
-![Lifecycle diagram](../../../../rfcs/1/lifecycle.png)
+![Lifecycle diagram](./images/lifecycle.png)
 
 ### Raw Specifications
 
@@ -205,7 +205,7 @@ This will enable programmatic access to specification metadata.
 
 ### Specification Template
 
-Standards Track specifications SHOULD be based on the [Vac RFC template](https://github.com/vacp2p/rfc/blob/master/content/docs/rfcs/template/README.md).
+Standards Track specifications SHOULD be based on the [Vac RFC template](./images/template.md).
 
 ## Conventions
 
