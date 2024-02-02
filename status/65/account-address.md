@@ -12,11 +12,11 @@ contributors:
 - Samuel Hawksby-Robinson <samuel@status.im>
 ---
 
-# Abstract
+## Abstract
 
 This specification details what a Status account address is and how account addresses are created and used.
 
-# Background
+## Background
 
 The core concept of an account in Status is a set of cryptographic keypairs. Namely, the combination of the following:
 1. a Waku chat identity keypair
@@ -27,8 +27,8 @@ The Status node verifies or derives everything else associated with the contact 
 - identicon
 - message signatures
 
-# Initial Key Generation
-## Public/Private Keypairs 
+## Initial Key Generation
+### Public/Private Keypairs 
 - An ECDSA (secp256k1 curve) public/private keypair MUST be generated via a [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki) derived path from a [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed phrase.
 - The default paths are defined as such:
     - Waku Chat Key (`IK`): `m/43'/60'/1581'/0'/0`  (post Multiaccount integration)
@@ -37,23 +37,23 @@ The Status node verifies or derives everything else associated with the contact 
         - following [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
         - NOTE: this (`i=0`) is also the current (and only) path for Waku key before Multiaccount integration
 
-# Account Broadcasting
+## Account Broadcasting
 - A user is responsible for broadcasting certain information publicly so that others may contact them.
 
-## X3DH Prekey bundles
-- Refer to [53/WAKU2-X3DH](/spec/53) for details on the X3DH prekey bundle broadcasting, as well as regeneration.
+### X3DH Prekey bundles
+- Refer to [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) for details on the X3DH prekey bundle broadcasting, as well as regeneration.
 
-# Optional Account additions
+## Optional Account additions
 
-## ENS Username
+### ENS Username
 - A user MAY register a public username on the Ethereum Name System (ENS).  This username is a user-chosen subdomain of the `stateofus.eth` ENS registration that maps to their Waku identity key (`IK`). 
 
-## User Profile Picture
+### User Profile Picture
 - An account MAY edit the `IK` generated identicon with a chosen picture.  This picture will become part of the publicly broadcasted profile of the account.
 
 <!-- TODO: Elaborate on wallet account and multiaccount -->
 
-# Wire Format
+## Wire Format
 
 Below is the wire format for the account information that is broadcasted publicly.
 An Account is referred to as a Multiaccount in the wire format.
@@ -90,21 +90,21 @@ message MultiAccount {
 
 The above payload is broadcasted when 2 devices that belong to a user need to be paired.
 
-# Security Considerations
+## Security Considerations
 
-- This specification inherits security considerations of [53/WAKU2-X3DH](/spec/53) and [54/WAKU2-X3DH-SESSIONS](/spec/54).
+- This specification inherits security considerations of [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and [54/WAKU2-X3DH-SESSIONS](/spec/54/x3dh-sessions.md).
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-## normative
+### normative
 
-- [53/WAKU2-X3DH](/spec/53)
-- [54/WAKU2-X3DH-SESSIONS](/spec/54)
-- [55/STATUS-1TO1-CHAT](/spec/55)
+- [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+- [54/WAKU2-X3DH-SESSIONS](/spec/54/x3dh-sessions.md)
+- [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 
 ## informative
 
