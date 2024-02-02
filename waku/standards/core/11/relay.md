@@ -17,7 +17,7 @@ As such the scope is limited to defining a separate [`protocol id`](https://gith
 
 **Protocol identifier**: `/vac/waku/relay/2.0.0`
 
-# Security Requirements
+## Security Requirements
 
 The `11/WAKU2-RELAY` protocol is designed to provide the following security properties under a static [Adversarial Model](#adversarial-model).
 Note that data confidentiality, integrity, and authenticity are currently considered out of scope for `11/WAKU2-RELAY` and must be handled by higher layer protocols such as [`14/WAKU2-MESSAGE`](../14/message.md).
@@ -36,12 +36,12 @@ This feature stands for the inability of any adversarial entity from linking a s
 
 <!-- TODO: more requirements can be added, but that needs further and deeper investigation-->
 
-## Terminology
+### Terminology
 
 _Personally identifiable information_ (PII) refers to any piece of data that can be used to uniquely identify a user.
 For example, the signature verification key, and the hash of one's static IP address are unique for each user and hence count as PII.
 
-# Adversarial Model
+## Adversarial Model
 
 -  Any entity running the `11/WAKU2-RELAY` protocol is considered an adversary.
 This includes publishers, subscribers, and all the peers' direct connections. 
@@ -53,12 +53,12 @@ However, a malicious subscriber may learn which topics are subscribed to by whic
   -  An adversary that can eavesdrop on communication links between arbitrary pairs of peers (unless the adversary is one end of the communication).
   In other words, the communication channels are assumed to be secure.
 
-# Wire Specification
+## Wire Specification
 
 The [PubSub interface specification](https://github.com/libp2p/specs/blob/master/pubsub/README.md) defines the protobuf RPC messages exchanged between peers participating in a GossipSub network.
 We republish these messages here for ease of reference and define how `11/WAKU2-RELAY` uses and interprets each field.
 
-## Protobuf definitions
+### Protobuf definitions
 
 The PubSub RPC messages are specified using [protocol buffers v2](https://developers.google.com/protocol-buffers/)
 
@@ -91,7 +91,7 @@ The various [control messages](https://github.com/libp2p/specs/blob/master/pubsu
 > **_NOTE:_**
 The [`TopicDescriptor`](https://github.com/libp2p/specs/blob/master/pubsub/README.md#the-topic-descriptor) is not currently used by `11/WAKU2-RELAY`.
 
-## Message fields
+### Message fields
 
 The `Message` protobuf defines the format in which content is relayed between peers.
 `11/WAKU2-RELAY` specifies the following usage requirements for each field:
@@ -109,7 +109,7 @@ See [`14/WAKU2-MESSAGE`](../14/message.md) for more details.
 
 - The `key` field MUST NOT be used, following the [`StrictNoSign` signature policy](#signature-solicy).
 
-## SubOpts fields
+### SubOpts fields
 
 The `SubOpts` protobuf defines the format in which subscription options are relayed between peers.
 A `11/WAKU2-RELAY` node MAY decide to subscribe or unsubscribe from topics by sending updates using `SubOpts`.
@@ -122,12 +122,12 @@ The following usage requirements apply:
 > Note: The `topicid` refering to pubsub topic and
 `topicId` refering to content-topic are detailed in [23/WAKU2-TOPICS](../../../informational/23/topics.md).
 
-## Signature Policy
+### Signature Policy
 
 The [`StrictNoSign` option](https://github.com/libp2p/specs/blob/master/pubsub/README.md#signature-policy-options) MUST be used, to ensure that messages are built without the `signature`, `key`, `from` and `seqno` fields.
 Note that this does not merely imply that these fields be empty, but that they MUST be _absent_ from the marshalled message.
 
-# Security Analysis
+## Security Analysis
 
 <!-- TODO: realized that the prime security objective of the `WakuRelay` protocol is to provide peers unlinkability as such this feature is prioritized over other features e.g., unlinkability is preferred over authenticity and integrity. It might be good to motivate unlinkability and its impact on the relay protocol or other protocols invoking relay protocol.-->
 
@@ -146,7 +146,7 @@ This level of unlinkability / anonymity is known as [k-anonymity](https://www.pr
 However, note that `11/WAKU2-RELAY` supports the use of more than one topic.
 In case that more than one topic id is utilized, preserving unlinkability is the responsibility of the upper-level protocols which MAY adopt [partitioned topics technique](https://specs.status.im/spec/10#partitioned-topic) to achieve K-anonymity for the subscribed peers.
 
-# Future work
+## Future work
 
 - **Economic spam resistance**:
 In the spam-protected `11/WAKU2-RELAY` protocol, no adversary can flood the system with spam messages (i.e., publishing a large number of messages in a short amount of time).
@@ -163,12 +163,12 @@ As such, integrity and authenticity are missing features in `11/WAKU2-RELAY` in 
 In future work, advanced signature schemes like group signatures can be utilized to enable authenticity, integrity, and unlinkability simultaneously.
 In a group signature scheme, a member of a group can anonymously sign a message on behalf of the group as such the true signer is indistinguishable from other group members. <!-- TODO: shall I add a reference for group signatures?-->
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
 1. [`10/WAKU2`](../10/waku2.md)
 
