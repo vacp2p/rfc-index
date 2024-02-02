@@ -10,7 +10,7 @@ contributors:
   - Oskar Thorén <oskarth@titanproxy.com>
 ---
 
-In this specification, we describe a method to construct message history that will aid the consistency guarantees of [2/MVDS](/spec/2). Additionally, we explain how data sync can be used for more lightweight messages that do not require full synchronization.
+In this specification, we describe a method to construct message history that will aid the consistency guarantees of [2/MVDS](../2/mvds.md). Additionally, we explain how data sync can be used for more lightweight messages that do not require full synchronization.
 
 ## Motivation
 
@@ -29,7 +29,7 @@ message Metadata {
 }
 ```
 
-Nodes MAY transmit a `Metadata` message by extending the MVDS [message](/spec/2#payloads) with a `metadata` field.
+Nodes MAY transmit a `Metadata` message by extending the MVDS [message](../2/mvds.md/#payloads) with a `metadata` field.
 
 ```diff
 message Message {
@@ -44,16 +44,16 @@ message Message {
 
 | Name                   |   Description                                                                                                                    |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `parents`               |   list of parent [`message identifier`s](/spec/2#payloads) for the specific message. |            
+| `parents`               |   list of parent [`message identifier`s](../2/mvds.md/#payloads) for the specific message. |            
 | `ephemeral`         |   indicates whether a message is ephemeral or not.                                                             |
 
 ## Usage
 
 ### `parents`
 
-This field contains a list of parent [`message identifier`s](/spec/2#payloads) for the specific message. It MUST NOT contain any messages as parent whose `ack` flag was set to `false`. This establishes a directed acyclic graph (DAG)[^1] of persistent messages.
+This field contains a list of parent [`message identifier`s](../2/mvds.md/#payloads) for the specific message. It MUST NOT contain any messages as parent whose `ack` flag was set to `false`. This establishes a directed acyclic graph (DAG)[^2] of persistent messages.
 
-Nodes MAY buffer messages until dependencies are satisfied for causal consistency[^2], they MAY also pass the messages straight away for eventual consistency[^3].
+Nodes MAY buffer messages until dependencies are satisfied for causal consistency[^3], they MAY also pass the messages straight away for eventual consistency[^4].
 
 A parent is any message before a new message that a node is aware of that has no children.
 
@@ -74,7 +74,7 @@ Nodes SHOULD send ephemeral messages in batch mode. As their delivery is not nee
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## Footnotes
-
-[^1]: <https://en.wikipedia.org/wiki/Directed_acyclic_graph>
-[^2]: Jepsen. [Causal Consistency](https://jepsen.io/consistency/models/causal). Jepsen, LLC.
-[^3]: <https://en.wikipedia.org/wiki/Eventual_consistency>
+[^1]: [2/MVDS](../2/mvds.md)
+[^2]: <https://en.wikipedia.org/wiki/Directed_acyclic_graph>
+[^3]: Jepsen. [Causal Consistency](https://jepsen.io/consistency/models/causal). Jepsen, LLC.
+[^4]: <https://en.wikipedia.org/wiki/Eventual_consistency>
