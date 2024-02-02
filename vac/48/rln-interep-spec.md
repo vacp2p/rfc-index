@@ -11,7 +11,7 @@ contributors:
 
 ## Abstract
 
-This spec integrates [Interep](https://interep.link) into the [RLN](https://rlnp2p.vac.dev/) spec. 
+This spec integrates [Interep](https://interep.link) into the [RLN](../32/rln-v1.md) spec. 
 Interep is a group management protocol that allows for the creation of groups of users and the management of their membership. 
 It is used to manage the membership of the RLN group.
 
@@ -79,11 +79,11 @@ Following is the modified signature of the register function in the RLN contract
 
 ## Verification of messages
 
-Messages are verified the same way as in the [RLN spec](../32/rln-v1/#verification).
+Messages are verified the same way as in the [RLN spec](../32/rln-v1.md/#verification).
 
 ## Slashing
 
-The slashing mechanism is the same as in the [RLN spec](https://rfc.vac.dev/spec/32/#slashing).
+The slashing mechanism is the same as in the [RLN spec](../32/rln-v1.md/#slashing).
 It is important to note that the slashing may not have the intended effect on the user, since the only consequence is that they cannot send messages.
 This is due to the fact that the user can send a identity commitment in the registration to the RLN contract, which is different than the one used in the Interep group.
 
@@ -94,13 +94,13 @@ A proof of concept is available at [vacp2p/rln-interp-contract](https://github.c
 ## Security Considerations
 
 1. As mentioned in [Slashing](#slashing), the slashing mechanism may not have the intended effect on the user.
-2. This spec inherits the security considerations of the [RLN spec](../32/rln-v1/#security-considerations).
+2. This spec inherits the security considerations of the [RLN spec](../32/rln-v1.md/#security-considerations).
 3. This spec inherits the security considerations of [Interep](https://docs.interep.link/).
 4. A user may make multiple registrations using the same Interep proofs but different identity commitments. The way to mitigate this is to check if the nullifier hash has been detected previously in proof verification.
 
 ## References
 
-1. [RLN spec](https://rfc.vac.dev/spec/32/)
+1. [RLN spec](../32/rln-v1.md)
 2. [Interep](https://interep.link)
 3. [Semaphore](https://semaphore.appliedzkp.org/)
 4. [Decentralized cloudflare using Interep](https://ethresear.ch/t/decentralised-cloudflare-using-rln-and-rich-user-identities/10774)
