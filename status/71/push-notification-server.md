@@ -62,11 +62,11 @@ The party releasing the app MUST run its own [gorush](https://github.com/applebo
 ## Push Notification Server Flow
 ### Registration Process:
 
-![registration](../../../../static/rfcs/71/registration.png)
+![registration](./images/registration.png)
 
 ### Sending and Receiving Notification Process:
 
-![notification](../../../../static/rfcs/71/notification.png)
+![notification](./images/notification.png)
 
 
 ## Registering Client
