@@ -23,7 +23,7 @@ These capabilities are things such as:
 
 This makes Waku ideal for running a p2p protocol on mobile and in similarly restricted environments.
 
-Historically, it has its roots in [6/WAKU1](../../standards/core/6/waku1.md),
+Historically, it has its roots in [6/WAKU1](../6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627), originally part of the Ethereum stack.
 However, Waku v2 acts more as a thin wrapper for PubSub and has a different API.
 It is implemented in an iterative manner where initial focus is on porting essential functionality to libp2p.
@@ -74,7 +74,7 @@ For example:
 - Stronger guarantees for spam protection vs economic registration cost
 
 For more on the concept of adaptive nodes and what this means in practice,
-please see the [30/ADAPTIVE-NODES](../../informational/30/adaptive-nodes.md) spec.
+please see the [30/ADAPTIVE-NODES](../../../informational/30/adaptive-nodes.md) spec.
 
 ## Network interaction domains
 
@@ -98,7 +98,7 @@ This is in addition to protocols that specify messages, payloads, and recommende
 Since these aren't negotiated libp2p protocols, they are referred to by their RFC ID.
 For example:
 
-- [14/WAKU2-MESSAGE](../standards/core/14/message.md) and [26/WAKU-PAYLOAD](../../standards/application/26/payload.md) for message payloads
+- [14/WAKU2-MESSAGE](../14/message.md) and [26/WAKU-PAYLOAD](../../application/26/payload.md) for message payloads
 - [23/WAKU2-TOPICS](../../../informational/23/topics.md) and [27/WAKU2-PEERS](../../../informational/27/peers.md) for recommendations around usage
 
 There are also more experimental libp2p protocols such as:
@@ -122,9 +122,9 @@ Waku is using gossiping to disseminate messages throughout the network.
 
 **Protocol identifier**: `/vac/waku/relay/2.0.0`
 
-See [11/WAKU2-RELAY](/spec/11) spec for more details.
+See [11/WAKU2-RELAY](../11/relay.md) spec for more details.
 
-For an experimental privacy-preserving economic spam protection mechanism, see [17/WAKU2-RLN-RELAY](/spec/17).
+For an experimental privacy-preserving economic spam protection mechanism, see [17/WAKU2-RLN-RELAY](../17/rln-relay.md).
 
 See [23/WAKU2-TOPICS](../../informational/23/topics.md) for more information about recommended topic usage.
 
@@ -240,11 +240,11 @@ See the sequence diagram below for an overview of how different protocols intera
 
 0. We have six nodes, A-F.
 The protocols initially mounted are indicated as such.
-The PubSub topics `pubtopic1` and `pubtopic2` is used for routing and indicates that it is subscribed to messages on that topic for relay, see [11/WAKU2-RELAY](/spec/11) for details.
+The PubSub topics `pubtopic1` and `pubtopic2` is used for routing and indicates that it is subscribed to messages on that topic for relay, see [11/WAKU2-RELAY](../11/relay.md) for details.
 Ditto for [13/WAKU2-STORE](/spec/13) where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
-See [14/WAKU2-MESSAGE](../../standards/core/14/message.md) for more details.
+See [14/WAKU2-MESSAGE](../core/14/message.md) for more details.
 If WakuMessage version is set to 1, we use the [6/WAKU1](/spec/6) compatible `data` field with encryption.
 See [7/WAKU-DATA](/spec/7) for more details.
 
@@ -254,7 +254,7 @@ See [12/WAKU2-FILTER](/spec/12) for more details.
 
 3. Node A publishes `msg1` on `pubtopic1` and subscribes to that relay topic pick it up.
 It then gets relayed further from B to D, but not C since it doesn't subscribe to that topic.
-See [11/WAKU2-RELAY](/spec/11).
+See [11/WAKU2-RELAY](../11/relay.md).
 
 4. Node D saves `msg1` for possible later retrieval by other nodes.
 See [13/WAKU2-STORE](/spec/13).
@@ -314,11 +314,11 @@ As such, we seek anonymity by avoiding linkability between actions and the actor
 
 **Publisher-Message Unlinkability**:
 This feature signifies the unlinkability of a publisher to its published messages in the 11/WAKU2-RELAY protocol.
-The [Publisher-Message Unlinkability](/spec/11#security-analysis) is enforced through the `StrictNoSign` policy due to which the data fields of pubsub messages that count as PII for the publisher must be left unspecified.
+The [Publisher-Message Unlinkability](../11/relay.md/#security-analysis) is enforced through the `StrictNoSign` policy due to which the data fields of pubsub messages that count as PII for the publisher must be left unspecified.
 
 **Subscriber-Topic Unlinkability**:
 This feature stands for the unlinkability of the subscriber to its subscribed topics in the 11/WAKU2-RELAY protocol.
-The [Subscriber-Topic Unlinkability](/spec/11/#security-analysis) is achieved through the utilization of a single PubSub topic.
+The [Subscriber-Topic Unlinkability](../11/relay.md/#security-analysis) is achieved through the utilization of a single PubSub topic.
 As such, subscribers are not re-identifiable from their subscribed topic IDs as the entire network is linked to the same topic ID.
 This level of unlinkability / anonymity is known as [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/) where k is proportional to the system size (number of subscribers).
 Note that there is no hard limit on the number of the pubsub topics, however, the use of one topic is recommended for the sake of anonymity. 
@@ -332,7 +332,7 @@ At a high level, peers utilize a scoring function to locally score the behavior 
 ### Data confidentiality, Integrity, and Authenticity
 
 Confidentiality can be addressed through data encryption whereas integrity and authenticity are achievable through digital signatures.
-These features are provided for in [14/WAKU2-MESSAGE (version 1)](../../standards/core/14/message.md/#version-1)` through payload encryption as well as encrypted signatures.
+These features are provided for in [14/WAKU2-MESSAGE (version 1)](../14/message.md/#version-1)` through payload encryption as well as encrypted signatures.
 
 ## Security Considerations
 
@@ -362,18 +362,18 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 
 | Spec | nim-waku (Nim) | go-waku (Go) | js-waku (Node JS) | js-waku (Browser JS) |
 | ---- | -------------- | ------------ | ----------------- | -------------------- |
-|[6/WAKU1](/spec/6)|✔|||
+|[6/WAKU1](../6/waku1.md)|✔|||
 |[7/WAKU-DATA](/spec/7)|✔|✔||
 |[8/WAKU-MAIL](/spec/8)|✔|||
 |[9/WAKU-RPC](/spec/9)|✔|||
 |[10/WAKU2](/spec/10)|✔|🚧|🚧|🚧|
-|[11/WAKU2-RELAY](/spec/11)|✔|✔|✔|✔|
+|[11/WAKU2-RELAY](../11/relay.md)|✔|✔|✔|✔|
 |[12/WAKU2-FILTER](/spec/12)|✔|✔||
 |[13/WAKU2-STORE](/spec/13)|✔|✔|✔\*|✔\*|
-|[14/WAKU2-MESSAGE](../../standards/core/14/message.md))|✔|✔|✔|✔|
+|[14/WAKU2-MESSAGE](../14/message.md))|✔|✔|✔|✔|
 |[15/WAKU2-BRIDGE](/spec/15)|✔|||
 |[16/WAKU2-RPC](/spec/16)|✔|||
-|[17/WAKU2-RLN-RELAY](/spec/17)|🚧|||
+|[17/WAKU2-RLN-RELAY](../17/rln-relay.md)|🚧|||
 |[18/WAKU2-SWAP](/spec/18)|🚧|||
 |[19/WAKU2-LIGHTPUSH](/spec/19)|✔|✔|✔\**|✔\**|
 |[21/WAKU2-FAULT-TOLERANT-STORE](/spec/21)|✔|✔||
@@ -387,14 +387,14 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 To implement a minimal Waku v2 client, we recommend implementing the following subset in the following order:
 
 - [10/WAKU2](/spec/10) - this spec
-- [11/WAKU2-RELAY](/spec/11) - for basic operation
+- [11/WAKU2-RELAY](../11/relay.md) - for basic operation
 - [14/WAKU2-MESSAGE](/spec/14) - version 0 (unencrypted)
 - [13/WAKU2-STORE](/spec/13) - for historical messaging (query mode only)
 
 To get compatibility with Waku v1:
 
 - [7/WAKU-DATA](/spec/7)
-- [14/WAKU2-MESSAGE](/spec/14) - version 1 (encrypted with `7/WAKU-DATA`)
+- [14/WAKU2-MESSAGE](../14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
 
 For an interoperable keep-alive mechanism:
 
@@ -429,54 +429,71 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [libp2p specs](https://github.com/libp2p/specs)
 
-2. [6/WAKU1](../../standards/core/6/waku1.md)
+2. [6/WAKU1](../6/waku1.md)
 
 3. [Whisper spec (EIP627)](https://eips.ethereum.org/EIPS/eip-627)
 
 4. [Waku v2 plan](https://vac.dev/waku-v2-plan)
 
-5. [30/ADAPTIVE-NODES](../../informational/30/adaptive-nodes.md)
+5. [30/ADAPTIVE-NODES](../../../informational/30/adaptive-nodes.md)
 
 6. [Protocol Identifiers](https://docs.libp2p.io/concepts/protocols/)
 
-7. [14/WAKU2-MESSAGE](../../standards/core/14/message.md)
+7. [14/WAKU2-MESSAGE](../14/message.md)
 
-8. [26/WAKU-PAYLOAD](../../standards/application/26/payload.md)
+8. [26/WAKU-PAYLOAD](../../application/26/payload.md)
 
-9. [23/WAKU2-TOPICS](../../informational/23/topics.md)
+9. [23/WAKU2-TOPICS](../../../informational/23/topics.md)
 
-10. [27/WAKU2-PEERS](../../informational/27/peers.md)
+10. [27/WAKU2-PEERS](../../../informational/27/peers.md)
 
 11. [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/) 
 
 12. [Protobuf varint encoding](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 
-13. [7/WAKU-DATA spec](/spec/7)
+13. [11/WAKU2-RELAY spec](../11/relay.md)
 
-14. [11/WAKU2-RELAY spec](/spec/11)
+14. [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
 
-15. [13/WAKU2-STORE spec](/spec/13)
+15. [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459)
 
-16. [12/WAKU2-FILTER spec](/spec/12)
+16. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
 
-17. [15/WAKU2-BRIDGE spec](/spec/15)
+17. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
+18. [31/WAKU2-ENR](../31)
 
-18. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
+19. [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778)
 
-19. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
+20. [13/WAKU2-STORE spec](../13/store.md)
 
-20. [17/WAKU2-RLN-RELAY spec](/spec/17)
+21. [7/WAKU-DATA](../7/data.md)
 
-21. [18/WAKU2-SWAP spec](/spec/18)
+22. [12/WAKU2-FILTER](../12/filter.md)  
 
-22. [Ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+23. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
 
-23. [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459)
+24. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 
-24. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
+25. [15/WAKU2-BRIDGE spec](/spec/15)
 
-25. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
+26. 
 
-31. [31/WAKU2-ENR spec](/spec/31)
+27. 
 
-32. [EIP-778](https://eips.ethereum.org/EIPS/eip-778)
+28. 
+
+29.  
+
+30. [18/WAKU2-SWAP spec](/spec/18)
+
+31. [Ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+
+32. 
+
+33. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
+
+34. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
+
+35. [31/WAKU2-ENR spec](/spec/31)
+
+36. [EIP-778](https://eips.ethereum.org/EIPS/eip-778)
