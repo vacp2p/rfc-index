@@ -126,7 +126,7 @@ See [11/WAKU2-RELAY](../11/relay.md) spec for more details.
 
 For an experimental privacy-preserving economic spam protection mechanism, see [17/WAKU2-RLN-RELAY](../17/rln-relay.md).
 
-See [23/WAKU2-TOPICS](../../informational/23/topics.md) for more information about recommended topic usage.
+See [23/WAKU2-TOPICS](../../../informational/23/topics.md) for more information about recommended topic usage.
 
 ### Direct use of libp2p protocols
 
@@ -189,7 +189,7 @@ It is possible to bypass the discovery domain by specifying static nodes.
 
 #### Use of ENR
 
-[31/WAKU2-ENR](/spec/31) describes the usage of [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778) for Waku v2 discovery purposes.
+[31/WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md) describes the usage of [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778) for Waku v2 discovery purposes.
 It introduces two new ENR fields, `multiaddrs` and `waku2`, that a Waku v2 node MAY use for discovery purposes.
 These fields MUST be used under certain conditions, as set out in the spec.
 Both EIP-1459 DNS-based discovery and Node Discovery v5 operates on ENR,
@@ -208,24 +208,24 @@ such as low bandwidth or being mostly offline.
 **Protocol identifier***: `/vac/waku/store/2.0.0-beta4`
 
 This is used to fetch historical messages for mostly offline devices.
-See [13/WAKU2-STORE](/spec/13) spec for more details.
+See [13/WAKU2-STORE spec](../13/store.md) spec for more details.
 
 There is also an experimental fault-tolerant addition to the store protocol that relaxes the high availability requirement.
-See [21/WAKU2-FT-STORE](/spec/21)
+See [21/WAKU2-FT-STORE](../../application/21/ft-store.md)
 
 #### Content filtering
 
 **Protocol identifier***: `/vac/waku/filter/2.0.0-beta1`
 
 This is used to make fetching of a subset of messages more bandwidth preserving.
-See [12/WAKU2-FILTER](/spec/12) spec for more details.
+See [12/WAKU2-FILTER](../12/filter.md) spec for more details.
 
 #### Light push
 
 **Protocol identifier***: `/vac/waku/lightpush/2.0.0-beta1`
 
 This is used for nodes with short connection windows and limited bandwidth to publish messages into the Waku network.
-See [19/WAKU2-LIGHTPUSH](/spec/19) spec for more details.
+See [19/WAKU2-LIGHTPUSH](../19/lightpush.md) spec for more details.
 
 #### Other protocols
 
@@ -241,30 +241,30 @@ See the sequence diagram below for an overview of how different protocols intera
 0. We have six nodes, A-F.
 The protocols initially mounted are indicated as such.
 The PubSub topics `pubtopic1` and `pubtopic2` is used for routing and indicates that it is subscribed to messages on that topic for relay, see [11/WAKU2-RELAY](../11/relay.md) for details.
-Ditto for [13/WAKU2-STORE](/spec/13) where it indicates that these messages are persisted on that node.
+Ditto for [13/WAKU2-STORE](../13/store.md) where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
 See [14/WAKU2-MESSAGE](../core/14/message.md) for more details.
-If WakuMessage version is set to 1, we use the [6/WAKU1](/spec/6) compatible `data` field with encryption.
-See [7/WAKU-DATA](/spec/7) for more details.
+If WakuMessage version is set to 1, we use the [6/WAKU1](../6/waku1.md) compatible `data` field with encryption.
+See [7/WAKU-DATA](../../application/7/data.md) for more details.
 
 2. Node F requests to get messages filtered by PubSub topic `pubtopic1` and ContentTopic `contentTopic1`.
 Node D subscribes F to this filter and will in the future forward messages that match that filter.
-See [12/WAKU2-FILTER](/spec/12) for more details.
+See [12/WAKU2-FILTER](../12/filter.md) for more details.
 
 3. Node A publishes `msg1` on `pubtopic1` and subscribes to that relay topic pick it up.
 It then gets relayed further from B to D, but not C since it doesn't subscribe to that topic.
 See [11/WAKU2-RELAY](../11/relay.md).
 
 4. Node D saves `msg1` for possible later retrieval by other nodes.
-See [13/WAKU2-STORE](/spec/13).
+See [13/WAKU2-STORE](../13/store.md).
 
 5. Node D also pushes `msg1` to F, as it has previously subscribed F to this filter.
-See [12/WAKU2-FILTER](/spec/12).
+See [12/WAKU2-FILTER](../12/filter.md).
 
 6. At a later time, Node E comes online.
 It then requests messages matching `pubtopic1` and `contentTopic1` from Node D.
-Node D responds with messages meeting this (and possibly other) criteria. See [13/WAKU2-STORE](/spec/13).
+Node D responds with messages meeting this (and possibly other) criteria. See [13/WAKU2-STORE](../13/store.md).
 
 ## Appendix A: Upgradability and Compatibility
 
@@ -275,7 +275,7 @@ They use a different transport protocol underneath; Waku v1 is devp2p RLPx based
 The protocols themselves also differ as does their data format.
 Compatibility can be achieved only by using a bridge that not only talks both devp2p RLPx and libp2p, but that also transfers (partially) the content of a packet from one version to the other.
 
-See [15/WAKU-BRIDGE](/spec/15) for details on a bidirectional bridge mode.
+See [15/WAKU-BRIDGE](../15/bridge.md) for details on a bidirectional bridge mode.
 
 # Appendix B: Security 
 
@@ -363,37 +363,37 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 | Spec | nim-waku (Nim) | go-waku (Go) | js-waku (Node JS) | js-waku (Browser JS) |
 | ---- | -------------- | ------------ | ----------------- | -------------------- |
 |[6/WAKU1](../6/waku1.md)|✔|||
-|[7/WAKU-DATA](/spec/7)|✔|✔||
-|[8/WAKU-MAIL](/spec/8)|✔|||
-|[9/WAKU-RPC](/spec/9)|✔|||
-|[10/WAKU2](/spec/10)|✔|🚧|🚧|🚧|
+|[7/WAKU-DATA](../7/data.md)|✔|✔||
+|[8/WAKU-MAIL](../../application/8/mail.md)|✔|||
+|[9/WAKU-RPC](../9/waku2-rpc.md)|✔|||
+|[10/WAKU2](../10/waku2.md)|✔|🚧|🚧|🚧|
 |[11/WAKU2-RELAY](../11/relay.md)|✔|✔|✔|✔|
-|[12/WAKU2-FILTER](/spec/12)|✔|✔||
-|[13/WAKU2-STORE](/spec/13)|✔|✔|✔\*|✔\*|
+|[12/WAKU2-FILTER](../12/filter.md)|✔|✔||
+|[13/WAKU2-STORE](../13/store.md)|✔|✔|✔\*|✔\*|
 |[14/WAKU2-MESSAGE](../14/message.md))|✔|✔|✔|✔|
-|[15/WAKU2-BRIDGE](/spec/15)|✔|||
-|[16/WAKU2-RPC](/spec/16)|✔|||
+|[15/WAKU2-BRIDGE](../15/bridge.md)|✔|||
+|[16/WAKU2-RPC](../16/rpc.md)|✔|||
 |[17/WAKU2-RLN-RELAY](../17/rln-relay.md)|🚧|||
-|[18/WAKU2-SWAP](/spec/18)|🚧|||
-|[19/WAKU2-LIGHTPUSH](/spec/19)|✔|✔|✔\**|✔\**|
-|[21/WAKU2-FAULT-TOLERANT-STORE](/spec/21)|✔|✔||
+|[18/WAKU2-SWAP](../../application/18/swap.md)|🚧|||
+|[19/WAKU2-LIGHTPUSH](../19/lightpush.md)|✔|✔|✔\**|✔\**|
+|[21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)|✔|✔||
 
-*js-waku implements [13/WAKU2-STORE](/spec/13) as a querying node only.
-**js-waku only implements [19/WAKU2-LIGHTPUSH](/spec/19) requests.
+*js-waku implements [13/WAKU2-STORE](../13/store.md) as a querying node only.
+**js-waku only implements [19/WAKU2-LIGHTPUSH](../19/lightpush.md) requests.
 
 
 ### Recommendations for clients
 
 To implement a minimal Waku v2 client, we recommend implementing the following subset in the following order:
 
-- [10/WAKU2](/spec/10) - this spec
+- [10/WAKU2](../10/waku2.md) - this spec
 - [11/WAKU2-RELAY](../11/relay.md) - for basic operation
-- [14/WAKU2-MESSAGE](/spec/14) - version 0 (unencrypted)
-- [13/WAKU2-STORE](/spec/13) - for historical messaging (query mode only)
+- [14/WAKU2-MESSAGE](../14/message.md) - version 0 (unencrypted)
+- [13/WAKU2-STORE](../13/store.md) - for historical messaging (query mode only)
 
 To get compatibility with Waku v1:
 
-- [7/WAKU-DATA](/spec/7)
+- [7/WAKU-DATA](../7/data.md)
 - [14/WAKU2-MESSAGE](../14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
 
 For an interoperable keep-alive mechanism:
@@ -407,18 +407,18 @@ The following features are currently experimental and under research and initial
 
 **Economic Spam resistance**:
 We aim to enable an incentivized spam protection technique to enhance `11/WAKU2-RELAY` by using rate limiting nullifiers.
-More details on this can be found in [17/WAKU2-RLN-RELAY](/spec/17).
+More details on this can be found in [17/WAKU2-RLN-RELAY](../17/rln-relay.md).
 In this advanced method, peers are limited to a certain rate of messaging per epoch and an immediate financial penalty is enforced for spammers who break this rate.
 
 **Prevention of Denial of Service (DoS) and Node Incentivization**:
 Denial of service signifies the case where an adversarial node exhausts another node's service capacity (e.g., by making a large number of requests) and makes it unavailable to the rest of the system.
-DoS attack is to be mitigated through the accounting model as described in [18/WAKU2-SWAP](/spec/18).
+DoS attack is to be mitigated through the accounting model as described in [18/WAKU2-SWAP](../../application/18/swap.md).
 In a nutshell, peers have to pay for the service they obtain from each other.
 In addition to incentivizing the service provider, accounting also makes DoS attacks costly for malicious peers.
 The accounting model can be used in `13/WAKU2-STORE` and `12/WAKU2-FILTER` to protect against DoS attacks.
 
 Additionally, this gives node operators who provide a useful service to the network an incentive to perform that service.
-See [18/WAKU2-SWAP](/spec/18) for more details on this piece of work.
+See [18/WAKU2-SWAP](../../application/18/swap.md) for more details on this piece of work.
 
 
 ## Copyright
@@ -461,7 +461,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 17. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
 
-18. [31/WAKU2-ENR](../31/enr.md)
+18. [31/WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
 
 19. [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778)
 
@@ -473,7 +473,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 23. [19/WAKU2-LIGHTPUSH](../19/lightpush.md)
 
-24. [7/WAKU-DATA](../7/data.md)
+24. [7/WAKU-DATA](../../application/7/data.md)
 
 25. [15/WAKU-BRIDGE](../15/bridge.md)
 
@@ -489,13 +489,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 31. [8/WAKU-MAIL](../../application/8/mail.md)
 
-32. [9/WAKU-RPC](/spec/9)
+32. [9/WAKU-RPC](../9/waku2-rpc.md)
 
-33. [10/WAKU2](../10/waku2.md)
+33. [16/WAKU2-RPC](../16/rpc.md)
 
-34. [16/WAKU2-RPC](../16/rpc.md)
+34. [18/WAKU2-SWAP spec](../../application/18/swap.md)
 
-35. [18/WAKU2-SWAP spec](../../application/18/swap.md)
-
-36. [21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)
+35. [21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)
 
