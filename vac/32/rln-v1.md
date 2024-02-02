@@ -12,22 +12,22 @@ contributors:
 - Blagoj Dimovski <blagoj.dimovski@yandex.com>
 ---
 
-# Abstract
+## Abstract
 
 The following specification covers the RLN construct as well as some auxiliary libraries useful for interacting with it.
 Rate limiting nullifier (RLN) is a construct based on zero-knowledge proofs that provides an anonymous rate-limited signaling/messaging framework suitable for decentralized (and centralized) environments.
 Anonymity refers to the unlinkability of messages to their owner.
 
-# Motivation
+## Motivation
 
 RLN guarantees a messaging rate is enforced cryptographically while preserving the anonymity of the message owners.
 A wide range of applications can benefit from RLN and provide desirable security features.
 For example, an e-voting system can integrate RLN to contain the voting rate while protecting the voters-vote unlinkability.
 Another use case is to protect an anonymous messaging system against DDoS and spam attacks by containing messaging rate of users.
-This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](/spec/17).
+This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](../../../17/rln-relay.md).
 
 
-# Flow
+## Flow
 
 The users participate in the protocol by first registering to an application-defined group referred by the _membership group_.
 Registration to the group is mandatory for signaling in the application.
@@ -285,14 +285,14 @@ After the secret is retreived,
 the user's `identity_commitment` can be generated from the secret and it can be used for removing the user from the membership Merkle tree (zeroing out the leaf that contains the user's `identity_commitment`).
 Additionally, depending on the application the `identity_secret_hash` can be used for taking the user's provided stake.
 
-# Technical overview
+## Technical overview
 
 The main RLN construct is implemented using a [ZK-SNARK](https://z.cash/technology/zksnarks/) circuit.
 However, it is helpful to describe the other necessary outside components for interaction with the circuit,
 which together with the ZK-SNARK circuit enable the above mentioned features.
 
 
-## Terminology
+### Terminology
 
 | Term                      | Description                                                                         |
 |---------------------------|-------------------------------------------------------------------------------------|
@@ -310,7 +310,7 @@ which together with the ZK-SNARK circuit enable the above mentioned features.
 | **Merkle proof**          | Proof that a user is member of the RLN membership tree.    |
 
 
-## RLN ZK-Circuit specific terms
+### RLN ZK-Circuit specific terms
 
 | Term           | Description                                                       |
 |---------------------------|-------------------------------------------------------------------------------------|
@@ -323,7 +323,7 @@ which together with the ZK-SNARK circuit enable the above mentioned features.
 
 
 
-## ZK Circuits specification
+### ZK Circuits specification
 
 Anonymous signaling with a controlled rate limit is enabled by proving that the user is part of a group which has high barriers to entry (form of stake) and
 enabling secret reveal if more than 1 unique signal is produced per external nullifier.
@@ -339,12 +339,12 @@ The ZK Circuit is implemented using a [Groth-16 ZK-SNARK](https://eprint.iacr.or
 using the [circomlib](https://docs.circom.io/) library.
 
 
-### System parameters
+#### System parameters
 
 - `DEPTH` - Merkle tree depth
 
 
-### Circuit parameters
+#### Circuit parameters
 
 **Public Inputs**
 - `x`
@@ -360,7 +360,7 @@ using the [circomlib](https://docs.circom.io/) library.
 - `root` - the rln membership tree root
 - `internal_nullifier`
 
-### Hash function
+#### Hash function
 
 Canonical [Poseidon hash implementation](https://eprint.iacr.org/2019/458.pdf) is used,
 as implemented in the [circomlib library](https://github.com/iden3/circomlib/blob/master/circuits/poseidon.circom), according to the Poseidon paper.
@@ -378,7 +378,7 @@ This Poseidon hash version (canonical implementation) uses the following paramet
 |8 | 9 | 8 | 63|
  
 
-### Membership implementation
+#### Membership implementation
 
 For a valid signal, a user's `identity_commitment` (more on identity commitments below) must exist in identity membership tree.
 Membership is proven by providing a membership proof (witness).
@@ -422,7 +422,7 @@ This is because two separate signals under the same `internal_nullifier` can be 
 With adding the `rln_identifier` field we obscure the `internal_nullifier`,
 so this kind of attack can be hardened because we don't have the same `internal_nullifier` anymore.
 
-## Identity credentials generation
+### Identity credentials generation
 
 In order to be able to generate valid proofs, the users need to be part of the identity membership Merkle tree.
 They are part of the identity membership Merkle tree if their `identity_commitment` is placed in a leaf in the tree.
@@ -433,7 +433,7 @@ The identity credentials of a user are composed of:
 - `identity_secret_hash`
 - `identity_commitment`
 
-### `identity_secret`
+#### `identity_secret`
 
 The `identity_secret` is generated in the following way:
 
@@ -446,7 +446,7 @@ identity_secret = [identity_nullifier, identity_trapdoor]
 The same secret should not be used accross different protocols,
 because revealing the secret at one protocol could break privacy for the user in the other protocols.
 
-### `identity_secret_hash`
+#### `identity_secret_hash`
 
 The `identity_secret_hash` is generated by obtaining a Poseidon hash of the `identity_secret` array:
 
@@ -454,7 +454,7 @@ The `identity_secret_hash` is generated by obtaining a Poseidon hash of the `ide
 identity_secret_hash = poseidonHash(identity_secret)
 ```
 
-### `identity_commitment`
+#### `identity_commitment`
 
 The `identity_commitment` is generated by obtaining a Poseidon hash of the `identity_secret_hash`:
 
@@ -463,7 +463,7 @@ identity_commitment = poseidonHash([identity_secret_hash])
 ```
 
 
-# Appendix A: Security considerations
+## Appendix A: Security considerations
 
 RLN is an experimental and still un-audited technology. This means that the circuits have not been yet audited.
 Another consideration is the security of the underlying primitives.
@@ -472,7 +472,7 @@ The standard for this is to use trusted [Multi-Party Computation (MPC)](https://
 which requires two phases.
 Trusted MPC ceremony has not yet been performed for the RLN circuits.
 
-## SSS security assumptions
+### SSS security assumptions
 
 Shamir-Secret Sharing requires polynomial coefficients to be independent of each other.
 However, `a_1` depends on `a_0` through the Poseidon hash algorithm. 
@@ -482,7 +482,7 @@ Possible improvements:
 * [change the circuit](https://github.com/Rate-Limiting-Nullifier/rln-circuits/pull/7#issuecomment-1416085627) to make coefficients independent;
 * switch to other hash function (Keccak, SHA);
 
-# Appendix B: Identity scheme choice
+## Appendix B: Identity scheme choice
 
 The hashing scheme used is based on the design decisions which also include the Semaphore circuits.
 Our goal was to ensure compatibility of the secrets for apps that use Semaphore and
@@ -536,7 +536,7 @@ Also for RLN we do a single secret component input for the circuit.
 Thus we need to hash the secret array (two components) to a secret hash,
 and we use that as a secret component input.
 
-# Appendix C: Auxiliary tooling
+## Appendix C: Auxiliary tooling
 
 There are few additional tools implemented for easier integrations and usage of the RLN protocol.
 
@@ -551,12 +551,12 @@ It supports various protocols (`Semaphore`, `RLN`).
 You can think of MetaMask for ZK-Proofs.
 It uses `zk-kit` under the hood.
 
-# Appendix D: Example usage
+## Appendix D: Example usage
 
 The following examples are code snippets using the `zerokit` RLN module.
 The examples are written in [rust](https://www.rust-lang.org/).
 
-## Creating a RLN object
+### Creating a RLN object
 
 ```rust
 use rln::protocol::*;
@@ -571,7 +571,7 @@ let resources = Cursor::new("../zerokit/rln/resources/tree_height_20/");
 let mut rln = RLN::new(tree_height, resources);
 ```
 
-## Generating identity credentials
+### Generating identity credentials
 
 ```rust
 // We generate an identity tuple
@@ -582,7 +582,7 @@ rln.extended_key_gen(&mut buffer).unwrap();
 let (identity_trapdoor, identity_nullifier, identity_secret_hash, id_commitment) = deserialize_identity_tuple(buffer.into_inner());
 ```
 
-## Adding ID commitment to the RLN Merkle tree
+### Adding ID commitment to the RLN Merkle tree
 
 ```rust
 // We define the tree index where id_commitment will be added
@@ -592,7 +592,7 @@ let mut buffer = Cursor::new(serialize_field_element(id_commitment));
 rln.set_leaf(id_index, &mut buffer).unwrap();
 ```
 
-## Setting epoch and signal
+### Setting epoch and signal
 
 ```rust
 // We generate epoch from a date seed and we ensure is
@@ -602,7 +602,7 @@ let epoch = hash_to_field(b"Today at noon, this year");
 let signal = b"RLN is awesome";
 ```
 
-## Generating proof
+### Generating proof
 
 ```rust
 // We prepare input to the proof generation routine
@@ -616,7 +616,7 @@ rln.generate_rln_proof(&mut in_buffer, &mut out_buffer)
 let proof_data = out_buffer.into_inner();
 ```
 
-## Verifiying proof
+### Verifiying proof
 
 ```rust
 // We prepare input to the proof verification routine
@@ -630,11 +630,11 @@ assert!(verified);
 
 For more details please visit the [`zerokit`](https://github.com/vacp2p/zerokit) library.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 
-# References
+## References
 
 - [1] https://medium.com/privacy-scaling-explorations/rate-limiting-nullifier-a-spam-protection-mechanism-for-anonymous-environments-bbe4006a57d
 - [2] https://github.com/appliedzkp/zk-kit
