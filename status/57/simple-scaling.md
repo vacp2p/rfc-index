@@ -11,9 +11,9 @@ contributors:
 - Alvaro Revuelta <alrevuelta@status.im>
 ---
 
-# Abstract
+## Abstract
 
-This document describes how to scale [56/STATUS-COMMUNITIES](/spec/56/) as well as [55/STATUS-1TO1-CHAT](/spec/55/)
+This document describes how to scale [56/STATUS-COMMUNITIES](../56/communities.md) as well as [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 using Waku v2 protocol and components.
 It also adds a few new aspects, where more sophisticated components are not yet researched and evaluated.
 
@@ -23,10 +23,10 @@ This document informs about scaling at the current stage of research and shows i
 Practical feasibility is also a core goal for us.
 We believe in incremental improvement, i.e. having a working decentralized scaling solution with trade-offs is better than a fully centralized solution.
 
-# Background and Motivation
+## Background and Motivation
 
-[56/STATUS-COMMUNITIES](/spec/56/) as well as [55/STATUS-1TO1-CHAT](/spec/55/) use Waku v2 protocols.
-Both use Waku content topics (see [23/WAKU2-TOPICS](/spec/23/)) for content based filtering.
+[56/STATUS-COMMUNITIES](../56/communities.md) as well as [55/STATUS-1TO1-CHAT](../55/1to1-chat.md) use Waku v2 protocols.
+Both use Waku content topics (see [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)) for content based filtering.
 
 Waku v2 currently has scaling limitations in two dimensions:
 
@@ -44,22 +44,22 @@ each content topics can have a large set of active users, but still has to fit i
 each node that is interested in this content topic has to be subscribed to all respective shards, which does not scale.
 Splitting content topics in a more sophisticated and efficient way will be part of a future document.
 
-# Relay Shards
+## Relay Shards
 
-Sharding the [Waku Relay](/spec/11/) network is an integral part of scaling the Status app.
+Sharding the [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) network is an integral part of scaling the Status app.
 
-[51/WAKU2-RELAY-SHARDING](/spec/51/) specifies shards clusters, which are sets of `1024` shards (separate pubsub mesh networks).
+[51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md) specifies shards clusters, which are sets of `1024` shards (separate pubsub mesh networks).
 Content topics specified by application protocols can be distributed over these shards.
 The Status app protocols are assigned to shard cluster `16`,
-as defined in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](/spec/52/).
+as defined in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md).
 
-[51/WAKU2-RELAY-SHARDING](/spec/51/) specifies three sharding methods.
+[51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md) specifies three sharding methods.
 This document uses *static sharding*, which leaves the distribution of content topics to application protocols,
 but takes care of shard discovery.
 
 The 1024 shards within the main Status shard cluster are allocated as follows.
 
-## Shard Allocation
+### Shard Allocation
 
 | shard index   |    usage                         |
 |    ---        |    ---                           |
@@ -69,7 +69,7 @@ The 1024 shards within the main Status shard cluster are allocated as follows.
 |    768 - 895  |   1:1 chat                       |
 |   896 - 1023  |   media and control msgs         |
 
-Shard indices are mapped to pubsub topic names as follows (specified in [51/WAKU2-RELAY-SHARDING](/spec/51/)).
+Shard indices are mapped to pubsub topic names as follows (specified in [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)).
 
 `/waku/2/rs/<cluster_id>/<shard_number>`
 
@@ -79,7 +79,7 @@ an example for the shard with index `18` in the Status shard cluster:
 
 In other words, the mesh network with the pubsub topic name `/waku/2/rs/16/18` carries messages associated with shard `18` in the Status shard cluster.
 
-### Implementation Suggestion
+#### Implementation Suggestion
 
 The Waku implementation should offer an interface that allows Status nodes to subscribe to Status specific content topics like
 
@@ -96,7 +96,7 @@ subscribe("/status/xyz", 18)
 
 which means: connect to the `"status/xyz"` content topic on shard `18` within the Status shard cluster.
 
-## Status Communities
+### Status Communities
 
 In order to associate a community with a shard,
 the community description protobuf is extended by the field
@@ -132,31 +132,31 @@ message CommunityDescription {
 }
 ```
 
-> *Note*: Currently, Status app has allocated shared cluster `16` in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](/spec/52/).
+> *Note*: Currently, Status app has allocated shared cluster `16` in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md).
 Status app could allocate more shard clusters, for instance to establish a test net.
 We could add the shard cluster index to the community description as well.
 The recommendation for now is to keep it as a configuration option of the Status app.
 
-> *Note*: Once this RFC moves forward, the new community description protobuf fields should be mentioned in [56/STATUS-COMMUNITIES](/spec/56/).
+> *Note*: Once this RFC moves forward, the new community description protobuf fields should be mentioned in [56/STATUS-COMMUNITIES](../56/communities.md).
 
 Status communities can be mapped to shards in two ways: static, and owner-based.
 
-### Static Mapping
+#### Static Mapping
 
 With static mapping, communities are assigned a specific shard index within the Status shard cluster.
-This mapping is similar in nature to the shard cluster allocation in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](/spec/52/).
+This mapping is similar in nature to the shard cluster allocation in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md).
 Shard indices allocated in that way are in the range `16 - 127`.
 The Status CC community uses index `16` (not to confuse with shard cluster index `16`, which is the Status shard cluster).
 
-### Owner Mapping
+#### Owner Mapping
 
 > *Note*: This way of mapping will be specified post-MVP.
 
 Community owners can choose to map their communities to any shard within the index range `128 - 767`.
 
-## 1:1 Chat
+### 1:1 Chat
 
-[55/STATUS-1TO1-CHAT](/spec/55) uses partitioned topics to map 1:1 chats to a set of 5000 content topics.
+[55/STATUS-1TO1-CHAT](../55/1to1-chat.md) uses partitioned topics to map 1:1 chats to a set of 5000 content topics.
 This document extends this mapping to 8192 content topics that are, in turn, mapped to 128 shards in the index range of `768 - 895`.
 
 ```
@@ -171,7 +171,7 @@ shardIndex = 768 + mod(publicKey, shardNum)
 
 ```
 
-# Infrastructure Nodes
+## Infrastructure Nodes
 
 As described in [30/ADAPTIVE-NODES](/spec/30/),
 Waku supports a continuum of node types with respect to available resources.
@@ -184,18 +184,18 @@ Infrastructure nodes are especially important for providing connectivity in the 
 Infrastructure nodes are not limited to Status fleets, or nodes run by community owners.
 Anybody can run infrastructure nodes.
 
-## Statically-Mapped Communities
+### Statically-Mapped Communities
 
 Infrastructure nodes are provided by the community owner, or by members of the respective community.
 
-## Owner-Mapped Communities
+### Owner-Mapped Communities
 
 Infrastructure nodes are part of a subset of the shards in the range `128 - 767`.
 Recommendations on choosing this subset will be added in a future version of this document.
 
 Status fleet nodes make up a part of these infrastructure nodes.
 
-## 1:1 chat
+### 1:1 chat
 
 Infrastructure nodes are part of a subset of the shards in the range `768 - 985` (similar to owner-mapped communities).
 Recommendations on choosing this subset will be added in a future version of this document.
@@ -209,9 +209,9 @@ but can significantly improve scaling.
 We still have k-anonymity because several chat pairs are mapped into one content topic.
 We could improve on this in the future, and research the applicability of PIR (private information retrieval) techniques in the future.
 
-# Infrastructure Shards
+## Infrastructure Shards
 
-Waku messages are typically relayed in larger mesh networks comprised of nodes with varying resource profiles (see [30/ADAPTIVE-NODES](/spec/30/)).
+Waku messages are typically relayed in larger mesh networks comprised of nodes with varying resource profiles (see [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md).
 To maximise scaling, relaying of specific message types can be dedicated to shards where only infrastructure nodes with very strong resource profiles relay messages.
 This comes as a trade-off to decentralization.
 
@@ -289,7 +289,7 @@ To make nodes behind restrictive NATs discoverable,
 this document suggests using [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md).
 Nodes can check whether they are behind a restrictive NAT using the [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md).
 
-> *Note:* The following will move into [51/WAKU2-RELAY-SHARDING](/spec/51/), or [33/WAKU2-DISCV5](/spec/33/):
+> *Note:* The following will move into [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md), or [33/WAKU2-DISCV5](/spec/33/):
 Nodes behind restrictive NATs SHOULD not announce their publicly unreachable address via [33/WAKU2-DISCV5](/spec/33/) discovery.
 
 It is RECOMMENDED that nodes that are part of the relay network also act as rendezvous points.
@@ -331,7 +331,7 @@ The app name, `my-app` is used to encode a single shard in the form:
 <rs (utf8 encoded)> | <2-byte shard cluster index> | <2-byte shard index>
 ```
 
-Registering shard 2 in the Status shard cluster (with shard cluster index 16, see [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](/spec/52/)),
+Registering shard 2 in the Status shard cluster (with shard cluster index 16, see [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](52),
 the register query would look like
 
 ```
@@ -463,7 +463,7 @@ It could be rate-limited with RLN.
 
 This document makes several trade-offs to privacy and anonymity.
 Todo: elaborate.
-See [45/WAKU2-ADVERSARIAL-MODELS](/spec/45) for information on Waku Anonymity.
+See [45/WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md) for information on Waku Anonymity.
 
 # Copyright
 
@@ -474,14 +474,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [56/STATUS-COMMUNITIES](/spec/56/)
 * [55/STATUS-1TO1-CHAT](/spec/55/)
 * [23/WAKU2-TOPICS](/spec/23/)
-* [11/WAKU2-RELAY](/spec/11/)
-* [51/WAKU2-RELAY-SHARDING](/spec/51/)
-* [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](/spec/52/)
-* [30/ADAPTIVE-NODES](/spec/30/)
-* [19/WAKU2-LIGHTPUSH](/spec/19/)
-* [12/WAKU2-FILTER](/spec/12/)
+* [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+* [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
+* [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](52)
+* [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md)
+* [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+* [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
 * [34/WAKU2-PEER-EXCHANGE](/spec/34/)
-* [13/WAKU2-STORE](/spec/13/)
+* [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
 * [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md)
 * [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
 * [33/WAKU2-DISCV5](/spec/33/)
@@ -489,7 +489,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [limiting](https://github.com/libp2p/specs/blob/6634ca7abb2f955645243d48d1cd2fd02a8e8880/relay/circuit-v2.md#reservation)
 * [DCUtR](https://github.com/libp2p/specs/blob/master/relay/DCUtR.md)
 * [scoring](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
-* [45/WAKU2-ADVERSARIAL-MODELS](/spec/45/)
+* [Circuit Relay](https://docs.libp2p.io/concepts/nat/circuit-relay/)
+* [45/WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md)
 
 ## Informative
 * [Circuit Relay](https://docs.libp2p.io/concepts/nat/circuit-relay/)
