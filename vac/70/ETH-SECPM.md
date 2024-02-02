@@ -9,20 +9,20 @@ editor: Ramses Fernandez <ramses@status.im>
 contributors:
 ---
 
-# Abstract
+## Abstract
 This document specifies an Ethereum-based private messaging service. 
-This proposal is built upon this [model](https://rfc.vac.dev/spec/20/) and 
+This proposal is built upon this [model](../../waku/standards/application/20/toy-eth-pm.md) and 
 amends the limitations of the latter concerning forward privacy and authentication. 
 The document is still work in progress. 
 Next steps will include a description of how to implement the different functions and algorithms in terms of the Noise framework.
 
-# Background
+## Background
 
 Alice wants to send an encrypted message to Bob. 
 Here Bob is the only individual able to decrypt the message.
 Alice has access to Bob’s Ethereum address.
 
-# Theory and Description of the Protocol
+## Theory and Description of the Protocol
 
 The proposed protocol must adhere to the following design requirements:
 -   Alice knows Bob’s Ethereum address.
@@ -134,14 +134,14 @@ SHA256 for the KDF and AES256 for AEAD encryption.
 
 Consequently, according to the Noise framework specifications, the X3DH algorithm is encoded as  **Noise_IX_448_AES256GCM_SHA256**
 
-# Retrieving information
+## Retrieving information
 
-## Static data
+### Static data
 
 Some data, such as the key pairs (ik, IK) for Alice and Bob, do not need to be regenerated after a period of time. 
 Therefore the public keys IK can be stored in long-term storage solutions, such as a dedicated smart contract which outputs such a key pair when receiving an Ethereum wallet address.
 
-## Ephemeral data
+### Ephemeral data
 
 Storing ephemeral data on Ethereum can be done using a combination of on-chain and off-chain solutions. 
 This approach provides an efficient solution to the problem of storing updatable data in Ethereum.
@@ -151,7 +151,7 @@ In any case, the user stores the associated IPFS hash, URL or reference in Ether
 
 The fact of a user not updating the ephemeral information can be understood as Bob not willing to participate in any communication.
 
-## Interaction with Ethereum
+### Interaction with Ethereum
 
 Storing static data is done using a dedicated smart contract *PublicKeyStorage* which associates the Ethereum wallet address of a user with his public key.
 This mapping is done by PublicKeyStorage using a *publicKeys* function, or a *setPublicKey* function.
@@ -160,9 +160,9 @@ A user who wants to retrieve a public key associated with a specific wallet addr
 The user provides the wallet address as the only input parameter for *getPublicKey*.
 The function outputs the associated public key from the smart contract.
 
-# Extension to group chat
+## Extension to group chat
 
-## 1-to-1 version
+### 1-to-1 version
 
 In order to extend the protocol to a group chat, this document specifies using an Asynchronous Distributed Key Generation (ADKG) to replace the X3DH step in the previous combination X3DH + Double Ratchet.
 
@@ -203,7 +203,7 @@ the communication in this group is 1-to-1,
 meaning that group member C cannot see the messages between group members A and B. 
 The fact of defining a room key makes impossible for outsiders to communicate with group members if the latter are not willing to.
 
-## n-to-n version
+### n-to-n version
 
 Using the above approach leads to a situation where a group of users can set a group for 1-to-1 messages,
 meaning that any group member external to a communication between any other two members will not be able to read the contents of the messages.
@@ -212,20 +212,20 @@ An approach to generalize this situation to the setting of a group of users exch
 The proposal suggested provides both forward secrecy and post-compromise security. 
 The shared key can be then used in any symmetric encryption scheme, such as AES256.
 
-# Privacy and Security Considerations
+## Privacy and Security Considerations
 
 - For the information retrieval, the algorithm MUST include a access control mechanisms to restrict who can call the set and get functions.
 - One SHOULD include event logs to track changes in public keys.
 - The curve X448 MUST be chosen as the elliptic curve, since it offers a higher security level: 224-bit security instead of the 128-bit security provided by X25519.
 - Concerning the hardness of the ADKG, the proposal lies on the Discrete Logarithm assumption.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-- https://rfc.vac.dev/spec/20/
+- [model](../../waku/standards/application/20/toy-eth-pm.md)
 - https://signal.org/docs/specifications/x3dh/
 - https://signal.org/docs/specifications/doubleratchet/
 - https://eprint.iacr.org/2022/1389
