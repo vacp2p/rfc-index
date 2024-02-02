@@ -14,7 +14,7 @@ contributors:
     - Mark Evenson
 ---
 
-# Abstract
+## Abstract
 
 This document specifies Claro: a Byzantine, fault-tolerant, binary decision
 agreement algorithm that utilizes bounded memory for its execution.
@@ -28,7 +28,7 @@ publication.
 
 NOTE: We have renamed this variant to `Claro` from `Glacier` in order to disambiguate from a previously released research endeavor by [Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf). Their naming was coincidentally named the same as our work but is sufficiently differentiated from how ours works. 
 
-# Motivation 
+## Motivation 
 This work is a part of a larger research endeavor to explore highly scalable Byzantine Fault Tolerant (BFT) consensus protocols. Consensus lies at the heart of many decentralized protocols, and thus its characteristics and properties are inherited by applications built on top. Thus, we seek to improve upon the current state of the art in two main directions: base-layer scalability and censorship resistance. 
 
 Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto consensus and other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies. We aim to understand its limitations and improve upon them.
@@ -54,7 +54,7 @@ We have identified a shortcoming of the Snowball algorithm that was a perfect st
 
 This document only outlines the specification to Claro. Subsequent analysis work on Claro (both on its performance and how it differentiates with Snowball) will be published shortly and this document will be updated. 
 
-# Claro Algorithm Specification
+## Claro Algorithm Specification
 
 The Claro consensus algorithm computes a boolean decision on a
 proposition via a set of distributed computational nodes.  Claro is
@@ -62,7 +62,7 @@ a leaderless, probabilistic, binary consensus algorithm with fast
 finality that provides good reliability for network and Byzantine
 fault tolerance.
 
-## Algorithmic concept
+### Algorithmic concept
 Claro is an evolution of the Snowball Byzantine Binary Agreement (BBA) algorithm, in which we tackle specifically the perceived weakness described above. The main focus is going to be the counter and the triggering of the reset. Following, we elaborate the different modifications and features that have been added to the reference algorithm:
 
 1. Instead of allowing the latest evidence to change the opinion completely, we take into account all accumulated evidence, to reduce the impact of high variability when there is already a large amount of evidence collected.
@@ -453,13 +453,13 @@ weighting will not be a probability distribution normalized to 1.
 
 The current algorithm doesn't describe how the initial opinions are formed.
 
-# Implementation status
+## Implementation status
 The following implementations have been created for various testing and simulation purposes:
 - [Rust](https://github.com/logos-co/consensus-research)
 - [Python]() - FILL THIS IN WITH NEWLY CREATED REPO
 - [Common Lisp]() - FILL THIS IN WITH NEWLY CREATED REPO
 
-# Wire Protocol 
+## Wire Protocol 
 
 For interoperability we present a wire protocol semantics by requiring
 the validity of the following statements expressed in Notation3 (aka
@@ -524,17 +524,17 @@ When represented via integers, such as choosing
 the parity summations across network invariants often become easier to
 manipulate.
 
-# Security Considerations
+## Security Considerations
 
 
-## Privacy
+### Privacy
 
 In practice, each honest node gossips its current opinion which
 reduces the number of messages that need to be gossiped for a given
 proposal.  The resulting impact on the privacy of the node's opinion
 is not currently analyzed.
 
-## Security with respect to various Adversarial Models 
+### Security with respect to various Adversarial Models 
 
 Adversarial models have been tested for which the values for current
 parameters of Claro have been tuned.  Exposition of the
@@ -579,7 +579,7 @@ decisions to ones favorable to itself.  This adversary will, of
 course, choose to participate in an honest manner until defecting is
 most advantageous.
 
-# Future Directions
+### Future Directions
 
 Although we have proposed a normative description of the
 implementation of the underlying binary consensus algorithm (Claro),
@@ -596,7 +596,7 @@ presupposition has some justification.  We can envision a need for
 tooling abstraction that allow one to just program the DAG itself, as
 they should be of stable interest no matter if Claro isn't. 
 
-# Informative References
+## Informative References
 
 0. [Logos](<https://logos.co/>)
 
