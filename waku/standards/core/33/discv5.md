@@ -171,6 +171,6 @@ Properly protecting against eclipse attacks is challenging and raises research q
 1. [implementation: Nim](https://github.com/kaiserd/nim-eth/blob/add-selectable-protocol-id-static/eth/p2p/discoveryv5/encoding.nim)
 1. [implementation: Go](https://github.com/status-im/go-waku/blob/master/waku/v2/discv5/discover.go)
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
