@@ -13,7 +13,7 @@ contributors:
   - Abhimanyu Rawat <abhi@status.im>
 ---
 
-# Abstract
+## Abstract
 
 Waku v2 is a family of modular peer-to-peer protocols for secure communication.
 These protocols are designed to be secure, privacy-preserving, and censorship-resistant and can run in resource-restricted environments.
@@ -22,22 +22,22 @@ At a high level, Waku v2 implements a Pub/Sub messaging pattern over libp2p and 
 The present document specifies the Waku v2 message format, a way to encapsulate the messages sent with specific information security goals, and Whisper/Waku v1 backward compatibility.
 
 
-# Motivation
+## Motivation
 
 When sending messages over Waku, there are multiple requirements:
 
 - One may have a separate encryption layer as part of the application.
 - One may want to provide efficient routing for resource-restricted devices.
-- One may want to provide compatibility with [Waku v1 envelopes](/spec/6/).
+- One may want to provide compatibility with [Waku v1 envelopes](../6/waku1.md).
 - One may want encrypted payloads by default.
 - One may want to provide unlinkability to get metadata protection.
 
 This specification attempts to provide for these various requirements.
 
 
-# Semantics
+## Semantics
 
-## Waku Message
+### Waku Message
 
 A Waku message is constituted by the combination of data payload and attributes that, for example, a *publisher* sends to a *topic* and is eventually delivered to *subscribers*.
 
@@ -45,12 +45,12 @@ Waku message attributes are key-value pairs of metadata associated with a messag
 And the message data payload is the part of the transmitted Waku message that is the actual message information.
 The data payload is also treated as a Waku message attribute for convenience.
 
-## Message Attributes
+### Message Attributes
 
 * The `payload` attribute MUST contain the message data payload to be sent.
 
 * The `content_topic` attribute MUST specify a string identifier that can be used for content-based filtering,
-as described in [23/WAKU2-TOPICS](https://rfc.vac.dev/spec/23/).
+as described in [23/WAKU2-TOPICS](../../../informational/23/topics.md).
 
 * The `meta` attribute, if present, contains an arbitrary application-specific variable-length byte array with a maximum length limit of 64 bytes.
 This attribute can be utilized to convey supplementary details to various Waku protocols, thereby enabling customized processing based on its contents.
@@ -67,7 +67,7 @@ For example, an ephemeral message SHOULD not be persisted by the Waku network.
 If this attribute is set to `true`, the message SHOULD be interpreted as ephemeral.
 If, instead, the attribute is omitted or set to `false`, the message SHOULD be interpreted as non-ephemeral.
 
-# Wire Format
+## Wire Format
 
 The Waku message wire format is specified using [protocol buffers v3](https://developers.google.com/protocol-buffers/).
 
@@ -87,7 +87,7 @@ message WakuMessage {
 An example proto file following this specification can be found [here (vacp2p/waku)](https://github.com/vacp2p/waku/blob/main/waku/message/v1/message.proto).
 
 
-# Payload encryption
+## Payload encryption
 
 The Waku message payload MAY be encrypted.
 The message `version` attribute indicates the schema used to encrypt the payload data.
@@ -96,20 +96,20 @@ The message `version` attribute indicates the schema used to encrypt the payload
   The payload SHOULD be interpreted as unencrypted; additionally, it CAN indicate that the message payload has been encrypted at the application layer.
 
 - **Version 1:**
-The payload SHOULD be encrypted using Waku v1 payload encryption specified in [26/WAKU-PAYLOAD](/spec/26).
+The payload SHOULD be encrypted using Waku v1 payload encryption specified in [26/WAKU-PAYLOAD](../../application/26/payload.md).
 This provides asymmetric and symmetric encryption.
 The key agreement is performed out of band.
 And provides an encrypted signature and padding for some form of unlinkability.
 
 - **Version 2:**
-The payload SHOULD be encoded according to [35/WAKU2-NOISE](/spec/35).
+The payload SHOULD be encoded according to [35/WAKU2-NOISE]([/spec/35](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)).
 Waku Noise protocol provides symmetric encryption and asymmetric key exchange.
 
 Any `version` value not included in this list is reserved for future specification.
 And, in this case, the payload SHOULD be interpreted as unencrypted by the Waku layer.
 
 
-# Whisper/Waku v1 envelope compatibility
+## Whisper/Waku v1 envelope compatibility
 
 Whisper/Waku v1 envelopes are compatible with Waku v2 messages format.
 
@@ -119,7 +119,7 @@ Whisper/Waku v1 envelopes are compatible with Waku v2 messages format.
 Waku v2 implements a pub/sub messaging pattern over libp2p.
 This makes redundant some Whisper/Waku v1 envelope fields (e.g., `expiry`, `ttl`, `topic`, etc.), so they can be ignored.
 
-# Deterministic message hashing
+## Deterministic message hashing
 
 In Protocol Buffers v3, the deterministic serialization is not canonical across the different implementations and languages.
 It is also unstable across different builds with schema changes due to unknown fields. 
@@ -134,7 +134,7 @@ If an optional attribute, such as `meta`, is absent, the concatenation of attrib
 
 This hashing schema is deemed appropriate for use cases where a cross-implementation deterministic hash is needed, such as message deduplication and integrity validation. The collision probability offered by this hashing schema can be considered negligible. This is due to the deterministic concatenation order of the message attributes, coupled with using a SHA-2 (256-bit) hashing algorithm.
 
-## Test vectors
+### Test vectors
 
 Waku message hash computation (`meta` size of 12 bytes):
 ```
@@ -181,23 +181,23 @@ message.timestamp = 0x175789bfa23f8400
 message_hash = 0x483ea950cb63f9b9d6926b262bb36194d3f40a0463ce8446228350bd44e96de4
 ```
 
-# Security Considerations
+## Security Considerations
 
-## Confidentiality, integrity, and authenticity
+### Confidentiality, integrity, and authenticity
 
 The level of confidentiality, integrity, and authenticity of the Waku message payload is discretionary.
 Accordingly, the application layer shall utilize the encryption and signature schemes supported by Waku v2 to meet the application-specific privacy needs.
 
-## Reliability of the `timestamp` attribute
+### Reliability of the `timestamp` attribute
 
 The Waku message `timestamp` attribute is set by the sender.
 Therefore, because message timestamps aren’t independently verified, this attribute is prone to exploitation and misuse.
 It should not solely be relied upon for operations such as message ordering.
 For example, a malicious actor can arbitrarily set the `timestamp` of a Waku message to a high value so that it always shows up as the most recent message in a chat application.
 Applications using Waku messages’ `timestamp` attribute are recommended to use additional methods for more robust message ordering.
-An example of how to deal with message ordering against adversarial message timestamps can be found in the Status protocol, see [6/PAYLOADS](https://specs.status.im/spec/6#clock-vs-timestamp-and-message-ordering).
+An example of how to deal with message ordering against adversarial message timestamps can be found in the Status protocol, see [6/PAYLOADS](../6/waku1.md/#clock-vs-timestamp-and-message-ordering).
 
-## Reliability of the `ephemeral` attribute
+### Reliability of the `ephemeral` attribute
 
 The Waku message `ephemeral` attribute is set by the sender.
 Since there is currently no incentive mechanism for network participants to behave correctly, this attribute is inherently insecure.
@@ -208,10 +208,10 @@ A malicious actor can tamper with the value of a Waku message’s `ephemeral` at
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 
-# References
+## References
 
 - [6/WAKU1](/spec/6/)
 - [Google Protocol buffers v3](https://developers.google.com/protocol-buffers/)
-- [26/WAKU-PAYLOAD](/spec/26)
-- [35/WAKU2-NOISE](/spec/35)
+- [26/WAKU-PAYLOAD](../../application/26/payload.md)
+- [35/WAKU2-NOISE]([/spec/35](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md))
 - [6/PAYLOADS](https://specs.status.im/spec/6#clock-vs-timestamp-and-message-ordering)
