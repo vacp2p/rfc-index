@@ -8,23 +8,23 @@ contributors:
 - Lev Soukhanov <0xdeadfae@gmail.com>
 ---
 
-# Abstract
+## Abstract
 
-The protocol specified in this document is an improvement of [32/RLN-V1](/spec/32), being more general construct, that allows to set various limits for an epoch (it's 1 message per epoch in [32/RLN-V1](/spec/32)) while remaining almost as simple as it predecessor. 
+The protocol specified in this document is an improvement of [32/RLN-V1](../32/rln-v1.md), being more general construct, that allows to set various limits for an epoch (it's 1 message per epoch in [32/RLN-V1](../32/rln-v1.md)) while remaining almost as simple as it predecessor. 
 Moreover, it allows to set different rate-limits for different RLN app users based on some public data, e.g. stake or reputation.
 
-# Motivation
+## Motivation
 
-The main goal of this RFC is to generalize [32/RLN-V1](/spec/32) and expand its applications. 
+The main goal of this RFC is to generalize [32/RLN-V1](../32/rln-v1.md) and expand its applications. 
 There are two different subprotocols based on this protocol:
 * RLN-Same - RLN with the same rate-limit for all users;
 * RLN-Diff - RLN that allows to set different rate-limits for different users.
 
 It is important to note that by using a large epoch limit value, users will be able to remain anonymous, because their `internal_nullifiers` will not be repeated until they exceed the limit.
 
-# Flow
+## Flow
 
-As in [32/RLN-V1](/spec/32), the general flow can be described by three steps:
+As in [32/RLN-V1](../32/rln-v1.md), the general flow can be described by three steps:
 
 1. Registration
 2. Signaling
@@ -32,15 +32,15 @@ As in [32/RLN-V1](/spec/32), the general flow can be described by three steps:
 
 The two sub-protocols have different flows, and hence are defined separately.
 
-## Important note
+### Important note
 
-All terms and parameters used remain the same as in [32/RLN-V1](/spec/32), more details [here](/spec/32/#technical-overview)
+All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md), more details [here](../32/rln-v1.md/#technical-overview)
 
 ## RLN-Same flow
 
 ### Registration
 
-The registration process in the RLN-Same subprotocol does not differ from [32/RLN-V1](/spec/32).
+The registration process in the RLN-Same subprotocol does not differ from [32/RLN-V1](../32/rln-v1.md).
 
 ### Signalling
 
@@ -88,13 +88,13 @@ internal_nullifier = poseidonHash([a_1])
 
 ### Registration
 
-**id_commitment** in [32/RLN-V1](/spec/32) is equal to `poseidonHash(identity_secret)`. 
+**id_commitment** in [32/RLN-V1](../32/rln-v1.md) is equal to `poseidonHash(identity_secret)`. 
 The goal of RLN-Diff is to set different rate-limits for different users. 
 It follows that **id_commitment** must somehow depend on the `user_message_limit` parameter, where 0 <= `user_message_limit` <= `message_limit`. 
 There are few ways to do that:
 1. Sending `identity_secret_hash` = `poseidonHash(identity_secret, userMessageLimit)` and zk proof that `user_message_limit` is valid (is in the right range). 
 This approach requires zkSNARK verification, which is an expensive operation on the blockchain.
-2. Sending the same `identity_secret_hash` as in [32/RLN-V1](/spec/32) (`poseidonHash(identity_secret)`) and a user_message_limit publicly to a server or smart-contract where `rate_commitment` = `poseidonHash(identity_secret_hash, userMessageLimit)` is calculated. 
+2. Sending the same `identity_secret_hash` as in [32/RLN-V1](../32/rln-v1.md) (`poseidonHash(identity_secret)`) and a user_message_limit publicly to a server or smart-contract where `rate_commitment` = `poseidonHash(identity_secret_hash, userMessageLimit)` is calculated. 
 The leaves in the membership Merkle tree would be the rate_commitments of the users. 
 This approach requires additional hashing in the Circuit, but it eliminates the need for zk proof verification for the registration.
 
@@ -124,14 +124,14 @@ For proof generation, the user need to submit the following fields to the circui
 
 The Output is calculated in the same way as the RLN-Same sub-protocol.
 
-## Verification and slashing
+### Verification and slashing
 
-Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](/spec/32).
+Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](../32/rln-v1.md).
 The only difference that may arise is the `message_limit` check in RLN-Same, since it is now a public input of the Circuit.
 
-## ZK Circuits specification
+### ZK Circuits specification
 
-The design of the [32/RLN-V1](/spec/32) circuits is different from the circuits of this protocol. 
+The design of the [32/RLN-V1](../32/rln-v1.md) circuits is different from the circuits of this protocol. 
 RLN-v2 requires additional algebraic constraints.
 The membership proof and Shamir's Secret Sharing constraints remain unchanged.
 
@@ -187,16 +187,16 @@ In the RLN-Diff scheme, instead of the public parameter `message_limit`, a param
 - `root`
 - `internal_nullifier`
 
-# Appendix A: Security considerations
+## Appendix A: Security considerations
 
-Although there are changes in the circuits, this spec inherits all the security considerations of [32/RLN-V1](/spec/32).
+Although there are changes in the circuits, this spec inherits all the security considerations of [32/RLN-V1](../32/rln-v1.md).
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-- [1] https://zkresear.ch/t/rate-limit-nullifier-v2-circuits/102
-- [2] https://github.com/Rate-Limiting-Nullifier/rln-circuits-v2
-- [3] https://rfc.vac.dev/spec/32/#technical-overview
+- [1](https://zkresear.ch/t/rate-limit-nullifier-v2-circuits/102)
+- [2](https://github.com/Rate-Limiting-Nullifier/rln-circuits-v2)
+- [3](../32/rln-v1.md/#technical-overview)
