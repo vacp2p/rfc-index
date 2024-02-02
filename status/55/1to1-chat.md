@@ -15,12 +15,12 @@ contributors:
 - Dean Eigenmann <dean@status.im>
 ---
 
-# Abstract
+## Abstract
 
 This specification describes how the Status 1-to-1 chat protocol is implemented on top of the Waku v2 protocol. 
 This protocol can be used to send messages to a single recipient.
 
-# Terminology
+## Terminology
 
 - **Participant**: A participant is a user that is able to send and receive messages.
 - **1-to-1 chat**: A chat between two participants.
@@ -29,18 +29,18 @@ This protocol can be used to send messages to a single recipient.
 - **Group chat**: A chat where multiple select participants can join and read messages.
 - **Group admin**: A participant that is able to add/remove participants from a group chat.
 
-# Background
+## Background
 
 This document describes how 2 peers communicate with each other to send messages in a 1-to-1 chat, with privacy and authenticity guarantees.
 
-# Specification
+## Specification
 
-## Overview
+### Overview
 
 This protocol MAY use any key-exchange mechanism previously discussed -
 
-1. [53/WAKU2-X3DH](/spec/53/) 
-2. [35/WAKU2-NOISE](/spec/35/)
+1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) 
+2. [35/WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)
 
 This protocol can provide end-to-end encryption to give peers a strong degree of privacy and security. 
 Public chat messages are publicly readable by anyone since there's no permission model for who is participating in a public chat.
@@ -54,7 +54,7 @@ There are two phases in the initial negotiation of a 1:1 chat:
 A QR code serves two purposes simultaneously - identity verification and initial key material retrieval;
 1. **Asynchronous initial key exchange**
 
-For more information on account generation and trust establishment, see [2/ACCOUNT](https://specs.status.im/spec/2)
+For more information on account generation and trust establishment, see [65/ACCOUNT-ADDRESS](../65/account-address.md)
 
 ### Post Negotiation
 
@@ -65,9 +65,9 @@ After the peers have shared their public key material, a 1:1 chat can be establi
 The 1:1 chat is made robust by having sessions between peers.
 It is handled by the key-exchange protocol used. For example,
 
-1. [53/WAKU2-X3DH](/spec/53/), the session management is described in [54/WAKU2-X3DH-SESSIONS](/spec/54/)
+1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md), the session management is described in [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
 
-2. [35/WAKU2-NOISE](/spec/35/), the session management is described in [37/WAKU2-NOISE-SESSIONS](/spec/37/)
+2. [35/WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md), the session management is described in [37/WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise-sessions/noise-sessions.md)
 
 ## Negotiation of a 1:1 chat amongst multiple participants (group chat)
 
@@ -79,7 +79,7 @@ However, this method does not scale as the number of participants increases, for
 1. The number of messages sent over the network increases with the number of participants.
 2. Handling the X3DH key exchange for each participant is computationally expensive.
 
-The above issues are addressed in [56/STATUS-COMMUNITIES](/spec/56/), with other trade-offs.
+The above issues are addressed in [56/STATUS-COMMUNITIES](../56/communities.md), with other trade-offs.
 
 ### Flow
 
@@ -201,21 +201,21 @@ To change the text color of the group chat name, group admins MUST use a `COLOR_
 
 To change the display image of the group chat, group admins MUST use an `IMAGE_CHANGED` event.
 
-# Security Considerations
+## Security Considerations
 
-1. Inherits the security considerations of the key-exchange mechanism used, e.g., [53/WAKU2-X3DH](/spec/53/) or [35/WAKU2-NOISE](/spec/35/)
+1. Inherits the security considerations of the key-exchange mechanism used, e.g., [[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) or [35/WAKU2-NOISE](/spec/35/)
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-1. [53/WAKU2-X3DH](/spec/53/)
-2. [35/WAKU2-NOISE](/spec/35/)
-3. [65/STATUS-ACCOUNT](/spec/65/)
-4. [54/WAKU2-X3DH-SESSIONS](/spec/54/)
-5. [37/WAKU2-NOISE-SESSIONS](/spec/37/)
-6. [56/STATUS-COMMUNITIES](/spec/56/)
+1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+2. [35/WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)
+3. [65/STATUS-ACCOUNT](../65/account-address.md)
+4. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
+5. [37/WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise-sessions/noise-sessions.md)
+6. [56/STATUS-COMMUNITIES](../56/communities.md)
 7. [chat_message.proto](https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/chat_message.proto#L1)
 8. [emoji_reaction.proto](https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/emoji_reaction.proto)
