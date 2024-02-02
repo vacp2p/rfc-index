@@ -9,7 +9,7 @@ editor: Hanno Cornelius <hanno@status.im>
 
 A bridge between Waku v1 and Waku v2.
 
-# Bridge
+## Bridge
 
 A bridge requires supporting both Waku versions:
 
@@ -61,7 +61,7 @@ Bridging functionality SHOULD also be carefully implemented so that messages do
 not bounce back and forth between the two networks. The bridge SHOULD properly
 track messages with a seen filter so that no amplification can be achieved here.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
