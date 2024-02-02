@@ -460,40 +460,42 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 16. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
 
 17. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
-18. [31/WAKU2-ENR](../31)
+
+18. [31/WAKU2-ENR](../31/enr.md)
 
 19. [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778)
 
 20. [13/WAKU2-STORE spec](../13/store.md)
 
-21. [7/WAKU-DATA](../7/data.md)
+21. [21/WAKU2-FT-STORE](../../application/21/ft-store.md)
 
-22. [12/WAKU2-FILTER](../12/filter.md)  
+22. [12/WAKU2-FILTER](../12/filter.md)
 
-23. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
+23. [19/WAKU2-LIGHTPUSH](../19/lightpush.md)
 
-24. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
+24. [7/WAKU-DATA](../7/data.md)
 
-25. [15/WAKU2-BRIDGE spec](/spec/15)
+25. [15/WAKU-BRIDGE](../15/bridge.md)
 
-26. 
+26. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
 
-27. 
+27. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 
-28. 
+28. [nim-waku (Nim)](https://github.com/status-im/nim-waku/)
 
-29.  
+29. [go-waku (Go)](https://github.com/status-im/go-waku/)
 
-30. [18/WAKU2-SWAP spec](/spec/18)
+30. [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
 
-31. [Ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+31. [8/WAKU-MAIL](../../application/8/mail.md)
 
-32. 
+32. [9/WAKU-RPC](/spec/9)
 
-33. [Ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
+33. [10/WAKU2](../10/waku2.md)
 
-34. [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md)
+34. [16/WAKU2-RPC](../16/rpc.md)
 
-35. [31/WAKU2-ENR spec](/spec/31)
+35. [18/WAKU2-SWAP spec](../../application/18/swap.md)
 
-36. [EIP-778](https://eips.ethereum.org/EIPS/eip-778)
+36. [21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)
+
