@@ -2,7 +2,7 @@
 slug: 63
 title: 63/STATUS-Keycard-Usage
 name: Status Keycard Usage
-status: raw
+status: draft
 category: Standards Track
 description: Describes how an application can use the Status Keycard to create, store and transact with different account addresses.
 editor: Aaryamann Challani <aaryamann@status.im>
