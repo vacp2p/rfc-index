@@ -92,7 +92,7 @@ The above payload is broadcasted when 2 devices that belong to a user need to be
 
 ## Security Considerations
 
-- This specification inherits security considerations of [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and [54/WAKU2-X3DH-SESSIONS](/spec/54/x3dh-sessions.md).
+- This specification inherits security considerations of [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md).
 
 ## Copyright
 
@@ -103,7 +103,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ### normative
 
 - [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
-- [54/WAKU2-X3DH-SESSIONS](/spec/54/x3dh-sessions.md)
+- [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
 - [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 
 ## informative
@@ -113,4 +113,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
 - [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
 - [Ethereum Name System](https://ens.domains/)
-- [Status Multiaccount](/spec/63)
+- [Status Multiaccount](../63/account-address.md)
