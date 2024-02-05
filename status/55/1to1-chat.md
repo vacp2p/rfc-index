@@ -203,7 +203,7 @@ To change the display image of the group chat, group admins MUST use an `IMAGE_C
 
 ## Security Considerations
 
-1. Inherits the security considerations of the key-exchange mechanism used, e.g., [[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) or [35/WAKU2-NOISE](/spec/35/)
+1. Inherits the security considerations of the key-exchange mechanism used, e.g., [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) or [35/WAKU2-NOISE](/spec/35/)
 
 ## Copyright
 
