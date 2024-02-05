@@ -2,7 +2,7 @@
 slug: 57
 title: 57/STATUS-Simple-Scaling
 name: Status Simple Scaling
-status: raw
+status: draft
 category: Informational
 tags: waku/application
 description: Describes how to scale Status Communities and Status 1-to-1 chats using Waku v2 protocol and components.
@@ -173,7 +173,7 @@ shardIndex = 768 + mod(publicKey, shardNum)
 
 ## Infrastructure Nodes
 
-As described in [30/ADAPTIVE-NODES](/spec/30/),
+As described in [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md),
 Waku supports a continuum of node types with respect to available resources.
 Infrastructure nodes are powerful nodes that have a high bandwidth connection and a high up-time.
 
@@ -248,7 +248,7 @@ Strong Desktop clients MAY opt in to support the relay network.
 
 > *Note*: This is not planned for the MVP.
 
-# Light Protocols
+## Light Protocols
 
 Light protocols may be used to save bandwidth,
 at the (global) cost of not contributing to the network.
@@ -258,15 +258,15 @@ and devices that (temporarily) have a low bandwidth connection or a connection w
 
 Light protocols comprise
 
-* [19/WAKU2-LIGHTPUSH](/spec/19/) for sending messages
-* [12/WAKU2-FILTER](/spec/12/) for requesting messages with specific attributes
-* [34/WAKU2-PEER-EXCHANGE](/spec/34/) for discovering peers
+* [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) for sending messages
+* [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md) for requesting messages with specific attributes
+* [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md) for discovering peers
 
-# Waku Archive
+## Waku Archive
 
-Archive nodes are Waku nodes that offer the Waku archive service via the Waku store protocol ([13/WAKU2-STORE](/spec/13/)).
+Archive nodes are Waku nodes that offer the Waku archive service via the Waku store protocol ([13/WAKU2-STORE](../../waku/standards/core/13/store.md)).
 They are part of a set of shards and store all messages disseminated in these shards.
-Nodes can request history messages via the [13/WAKU2-STORE](/spec/13/).
+Nodes can request history messages via the [13/WAKU2-STORE](../../waku/standards/core/13/store.md).
 
 The store service is not limited to a Status fleet.
 Anybody can run a Waku Archive node in the Status shards.
@@ -278,19 +278,19 @@ The recommendation for the allocation of archive nodes to shards is similar to t
 allocation of infrastructure nodes to shards described above.
 In fact, the archive service can be offered by infrastructure nodes.
 
-# Discovery
+## Discovery
 
-Shard discovery is covered by [51/WAKU2-RELAY-SHARDING](/spec/51/).
+Shard discovery is covered by [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md).
 This allows the Status app to abstract from the discovery process and simply address shards by their index.
 
-## Libp2p Rendezvous and Circuit-Relay
+### Libp2p Rendezvous and Circuit-Relay
 
 To make nodes behind restrictive NATs discoverable,
 this document suggests using [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md).
 Nodes can check whether they are behind a restrictive NAT using the [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md).
 
-> *Note:* The following will move into [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md), or [33/WAKU2-DISCV5](/spec/33/):
-Nodes behind restrictive NATs SHOULD not announce their publicly unreachable address via [33/WAKU2-DISCV5](/spec/33/) discovery.
+> *Note:* The following will move into [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md), or [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md):
+Nodes behind restrictive NATs SHOULD not announce their publicly unreachable address via [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) discovery.
 
 It is RECOMMENDED that nodes that are part of the relay network also act as rendezvous points.
 This includes accepting register queries from peers, as well as answering rendezvous discover queries.
@@ -307,8 +307,8 @@ functionality offered by the libp2p circuit relay protocols, and
 2) use [DCUtR](https://github.com/libp2p/specs/blob/master/relay/DCUtR.md) to upgrade to a direct connection.
 
 Nodes that do not announce themselves at all and only plan to use light protocols,
-MAY use rendezvous discovery instead of or along-side [34/WAKU2-PEER-EXCHANGE](/specs/34/).
-For these nodes, rendezvous and [34/WAKU2-PEER-EXCHANGE](/specs/34/) offer the same functionality,
+MAY use rendezvous discovery instead of or along-side [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md).
+For these nodes, rendezvous and [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md) offer the same functionality,
 but return node sets sampled in different ways.
 Using both can help increasing connectivity.
 
@@ -331,7 +331,7 @@ The app name, `my-app` is used to encode a single shard in the form:
 <rs (utf8 encoded)> | <2-byte shard cluster index> | <2-byte shard index>
 ```
 
-Registering shard 2 in the Status shard cluster (with shard cluster index 16, see [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](52),
+Registering shard 2 in the Status shard cluster (with shard cluster index 16, see [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md),
 the register query would look like
 
 ```
@@ -347,7 +347,7 @@ A discovery query for nodes that are part of this shard would look like
 DISCOVER{ns: 0x727300100002}
 ```
 
-# DoS Protection
+## DoS Protection
 
 Hereunder we describe the "opt-in message signing for DoS prevention" solution, designed *ad hoc* for Status MVP.
 
@@ -373,7 +373,7 @@ This solution introduces two roles:
 * Publisher: A node that knows the `private-key-topic` associated to `public-key-topic`, that can publish messages with a valid `message-signature` that are accepted and relayed by the nodes implementing this feature.
 * Relayer: A node that knows the `public-key-topic`, which can be used to verify if the messages were signed with the equivalent `private-key-topic`. It allows distinguishing valid from invalid messages which protect the node against DoS attacks, assuming that the users of the key send messages of a reasonable size and rate. Note that a node can validate messages and relay them or not without knowing the private key.
 
-## Design requirements (publisher)
+### Design requirements (publisher)
 
 A publisher that wants to send messages that are relayed in the network for a given `protected-pubsub-topic` shall:
 * be able to sign messages with the `private-key-topic` configured for that topic, producing a ECDSA signature of 64 bytes using deterministic signing complying with RFC 6979.
@@ -387,7 +387,7 @@ sha256(concat(pubsubTopic, payload, contentTopic, timestamp, ephemeral))
 
 Where fields are serialized into bytes using little-endian. Note that `ephemeral` is a boolean that is serialized to `0` if `false` and `1` if `true`.
 
-## Design requirements (relay)
+### Design requirements (relay)
 
 Requirements for the relay are listed below:
 
@@ -409,14 +409,14 @@ Other requirements:
 This protects each peer from DoS, since this score is used to trigger disconnections from nodes attempting to DoS them.
 
 
-## Required changes
+### Required changes
 
 This solution is designed to be backward compatible so that nodes validating messages can coexist in the same topic with other nodes that don't perform validation. But note that only nodes that perform message validation will be protected against DoS. Nodes wishing to opt-in this DoS protection feature shall:
 * Generate a `private-key-topic` and distribute it to a curated list of users, that are trusted to send messages at a reasonable rate.
 * Redeploy the nodes, adding a new configuration where a `protected-pubsub-topic` is configured with a `public-key-topic`, used to verify the messages being relayed.
 
 
-## Test vectors
+### Test vectors
 
 Relay nodes complying with this specification shall accept the following message in the configured pubsub topic.
 
@@ -452,39 +452,39 @@ Using `message.meta`, the relay node shall calculate the `app-message-hash` of t
 Basic idea:
 Tokenized load.
 
-## 1:1 Chat
+### 1:1 Chat
 
 An idea we plan to explore in the future:
 Map 1:1 chats to community shards, if both A and B are part of the respective community.
 This increases k-anonymity and benefits from community DoS protection.
 It could be rate-limited with RLN.
 
-# Security/Privacy Considerations
+## Security/Privacy Considerations
 
 This document makes several trade-offs to privacy and anonymity.
 Todo: elaborate.
 See [45/WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md) for information on Waku Anonymity.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
-* [56/STATUS-COMMUNITIES](/spec/56/)
-* [55/STATUS-1TO1-CHAT](/spec/55/)
-* [23/WAKU2-TOPICS](/spec/23/)
+* [56/STATUS-COMMUNITIES](../56/communities.md)
+* [55/STATUS-1TO1-CHAT](.../55/1to1-chat.md)
+* [23/WAKU2-TOPICS](../../waku/informational/23/)
 * [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
 * [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
-* [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](52)
+* [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md)
 * [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md)
 * [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
 * [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
-* [34/WAKU2-PEER-EXCHANGE](/spec/34/)
+* [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
 * [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
 * [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md)
 * [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
-* [33/WAKU2-DISCV5](/spec/33/)
+* [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md)
 * [libp2p circuit relay](https://github.com/libp2p/specs/blob/6634ca7abb2f955645243d48d1cd2fd02a8e8880/relay/circuit-v2.md)
 * [limiting](https://github.com/libp2p/specs/blob/6634ca7abb2f955645243d48d1cd2fd02a8e8880/relay/circuit-v2.md#reservation)
 * [DCUtR](https://github.com/libp2p/specs/blob/master/relay/DCUtR.md)
