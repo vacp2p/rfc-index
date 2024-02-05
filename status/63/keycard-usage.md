@@ -10,12 +10,12 @@ contributors:
   - Jimmy Debe <jimmy@status.im>
 ---
 
-# Terminology
+## Terminology
 
 - **Account**: A valid [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) compliant key.
 - **Multiaccount**: An account from which multiple Accounts can be derived.
 
-# Abstract
+## Abstract
 
 This specification describes how an application can use the Status Keycard to -
 
@@ -26,16 +26,16 @@ This specification describes how an application can use the Status Keycard to -
 
 More documentation on the Status Keycard can be found [here](https://keycard.tech/docs/)
 
-# Motivation
+## Motivation
 
 The Status Keycard is a hardware wallet that can be used to store and sign transactions.
 For the purpose of the Status App, this specification describes how the Keycard SHOULD be used to store and sign transactions.
 
-# Usage
+## Usage
 
-## Endpoints
+### Endpoints
 
-### 1. Initialize Keycard (`/init-keycard`)
+#### 1. Initialize Keycard (`/init-keycard`)
 
 To initialize the keycard for use with the application.
 The keycard is locked with a 6 digit pin.
@@ -336,20 +336,20 @@ Any application that uses the Status Keycard MAY implement the following flows a
 1. The user unblocks the Keycard using the `/unblock-pin` endpoint.
 
 
-# Security Considerations
+## Security Considerations
 
 Inherits the security considerations of [Status Keycard](https://keycard.tech/docs/)
 
-# Privacy Considerations
+## Privacy Considerations
 
 Inherits the privacy considerations of [Status Keycard](https://keycard.tech/docs/)
 
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
 1. [BIP-32 specification](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
 2. [Keycard documentation](https://keycard.tech/docs/)
