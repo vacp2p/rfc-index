@@ -402,7 +402,7 @@ The following Waku protocols SHOULD be used to implement Status Communities -
 
 1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) - To send and receive messages
 2. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) - To encrypt and decrypt messages
-3. [54/WAKU2-X3DH-SESSIONS](/spec/54/x3dh-sessions.md) - To handle session keys
+3. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md) - To handle session keys
 4. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) - To wrap community messages in a Waku message
 5. [13/WAKU2-STORE](../../waku/standards/core/13/store.md) - To store and retrieve messages for offline devices
 
@@ -450,7 +450,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
 - [10/WAKU2](../../waku/standards/core/10/waku2.md)
 - [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
-- [54/WAKU2-X3DH-SESSIONS](/spec/54/x3dh-sessions.md)
+- [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
 - [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
 - [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
 
