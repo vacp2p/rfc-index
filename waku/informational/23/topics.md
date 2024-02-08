@@ -119,7 +119,7 @@ The encoding field indicates the serialization/encoding scheme for the [WakuMess
 
 ## Differences with Waku v1
 
-In [6/WAKU1](../../deprecated/5/waku0.md) there is no actual routing.
+In [5/WAKU1](../../deprecated/5/waku0.md) there is no actual routing.
 All messages are sent to all other nodes.
 This means that we are implicitly using the same pubsub topic that would be something like:
 
