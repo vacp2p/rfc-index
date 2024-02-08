@@ -436,7 +436,7 @@ This specification RECOMMENDS that the UI/UX implementation of retracting an `Em
 ### MembershipUpdateMessage and MembershipUpdateEvent
 
 `MembershipUpdateEvent` is a message used to propagate information about group membership changes in a group chat.
-The details are in the [Group chats specs](./7-group-chat.md).
+The details are in the [Group chats specs](../56/communities.md).
 
 
 ```protobuf
@@ -822,7 +822,7 @@ message DeleteMessage {
 
 ### CommunityMessageArchiveLink
 
-A `CommunityMessageArchiveLink` contains a magnet uri for a community's message archive, created using [61/STATUS-Community-History-Archives](/spec/61/).
+A `CommunityMessageArchiveLink` contains a magnet uri for a community's message archive, created using [61/STATUS-Community-History-Archives](../61/community-history-service.md).
 
 ```protobuf
 message CommunityMessageArchiveMagnetlink {
