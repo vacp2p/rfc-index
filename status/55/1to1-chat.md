@@ -40,7 +40,7 @@ This document describes how 2 peers communicate with each other to send messages
 This protocol MAY use any key-exchange mechanism previously discussed -
 
 1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) 
-2. [35/WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)
+2. [WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)
 
 This protocol can provide end-to-end encryption to give peers a strong degree of privacy and security. 
 Public chat messages are publicly readable by anyone since there's no permission model for who is participating in a public chat.
@@ -67,7 +67,7 @@ It is handled by the key-exchange protocol used. For example,
 
 1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md), the session management is described in [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
 
-2. [35/WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md), the session management is described in [37/WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise-sessions/noise-sessions.md)
+2. [WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md), the session management is described in [WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise-sessions/noise-sessions.md)
 
 ## Negotiation of a 1:1 chat amongst multiple participants (group chat)
 
@@ -203,7 +203,7 @@ To change the display image of the group chat, group admins MUST use an `IMAGE_C
 
 ## Security Considerations
 
-1. Inherits the security considerations of the key-exchange mechanism used, e.g., [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) or [35/WAKU2-NOISE](/spec/35/)
+1. Inherits the security considerations of the key-exchange mechanism used, e.g., [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) or [WAKU2-NOISE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)
 
 ## Copyright
 
