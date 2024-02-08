@@ -79,7 +79,7 @@ Registering a client with a push notification service.
 - A `PNR message` (Push Notification Registration) MUST be sent to the
 [partitioned topic](../../waku/standards/application/54/x3dh-sessions.md) for the public key of the node, encrypted with this key.
 
-- The message MUST be wrapped in a [`ApplicationMetadataMessage`](../62/payloads) with type set to `PUSH_NOTIFICATION_REGISTRATION`.
+- The message MUST be wrapped in a [`ApplicationMetadataMessage`](../62/payloads.md) with type set to `PUSH_NOTIFICATION_REGISTRATION`.
 
 - The marshaled protobuf payload MUST also be encrypted with AES-GCM using the Diffie–Hellman key generated from the client and server identity.
 This is done in order to ensure that the extracted key from the signature will be considered invalid if it can’t decrypt the payload.
@@ -127,7 +127,7 @@ A push notification server will handle the message according to the following ru
 
 - it MUST verify that `apn_topic` is set if token_type is APN_TOKEN.
 
-- The message MUST be wrapped in a [`ApplicationMetadataMessage`](../62/payloads) with type set to `PUSH_NOTIFICATION_REGISTRATION_RESPONSE`.
+- The message MUST be wrapped in a [`ApplicationMetadataMessage`](../62/payloads.md) with type set to `PUSH_NOTIFICATION_REGISTRATION_RESPONSE`.
 
 The payload of the response is:
 
@@ -560,7 +560,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 4. [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
 5. [gorush](https://github.com/appleboy/gorush)
 6. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
-7. [62/PAYLOAD](../62/payload.md)
+7. [62/PAYLOAD](../62/payloads.md)
 8. [SHAKE-256](https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.202.pdf)
 9. [Protocol Buffers](https://developers.google.com/protocol-buffers)
 10. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
