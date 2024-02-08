@@ -13,7 +13,7 @@ contributors:
 
 ## Abstract
 
-Messages are stored permanently by store nodes ([13/WAKU2-STORE](../../waku/standards/core/13/store.md) for up to a certain configurable period of time, limited by the overall storage provided by a store node.
+Messages are stored permanently by store nodes ([13/WAKU2-STORE](../../waku/standards/core/13/store.md)) for up to a certain configurable period of time, limited by the overall storage provided by a store node.
 Messages older than that period are no longer provided by store nodes, making it impossible for other nodes to request historical messages that go beyond that time range. 
 This raises issues in the case of Status communities, where recently joined members of a community are not able to request complete message histories of the community channels.
 
