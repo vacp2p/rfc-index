@@ -11,9 +11,6 @@ This repository will track specifications that adhere to 1/COSS.
 RFCs will be managed by the Vac team when specifcations have reached a rough consensus towards stabilization within each team.
 
 Vac is an R&D org creating modular p2p protocols for private, secure, and censorship-resistant communication.
-A detailed, albeit slightly outdated (2019), explanation of Vac and its design goals can be found [here](https://vac.dev/vac-overview).
-
-Vac, while having a core team of maintainers and contributors, is an open and permission-less organization.
 
 **See [rfc.vac.dev](https://rfc.vac.dev) for an easy to browse index of all RFCs.**
 
