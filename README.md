@@ -1,5 +1,7 @@
 # Vac Request For Comments(RFC)
 
+*NOTE*: This repo is WIP. We are currently restructuring the RFC process.
+
 ## RFC Process
 
 This repository contains specifications from the [Vac](https://vac.dev), [Waku](https://waku.org/), [Nomos](https://nomos.tech/), [Codex](https://codex.storage/), and [Status](https://status.app/) software teams.
