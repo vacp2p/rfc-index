@@ -4,8 +4,9 @@ title: 1/COSS
 name: Consensus-Oriented Specification System
 status: draft
 category: Best Current Practice
-editor: Oskar Thoren <oskarth@titanproxy.com>
+editor: Jimmy Debe <jimmy@status.>
 contributors:
+  - Oskar Thoren <oskarth@titanproxy.com>
   - Pieter Hintjens <ph@imatix.com>
   - André Rebentisch <andre@openstandards.de>
   - Alberto Barrionuevo <abarrio@opentia.es>
@@ -22,7 +23,7 @@ It is equivalent except for some areas:
 
 - recommending the use of a permissive licenses, such as CC0 (with the exception of this document);
 - miscellaneous metadata, editor, and format/link updates;
-- more inheritance from the [IETF Standards Process][https://www.rfc-editor.org/rfc/rfc2026.txt],
+- more inheritance from the [IETF Standards Process](https://www.rfc-editor.org/rfc/rfc2026.txt),
   e.g. using RFC categories: Standards Track, Informational, and Best Common Practice;
 - standards track specifications SHOULD follow a specific structure that both streamlines editing,
   and helps implementers to quickly comprehend the specification
@@ -30,7 +31,7 @@ It is equivalent except for some areas:
 
 ## License
 
-Copyright (c) 2008-22 the Editor and Contributors.
+Copyright (c) 2008-24 the Editor and Contributors.
 
 This Specification is free software;
 you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -86,7 +87,10 @@ Primarily, COSS uses a wiki model for editing and publishing specifications text
 Individuals can become members of the domain by completing the necessary legal clearance.
 The copyright, patent, and trademark policies of the domain must be clarified in an Intellectual Property policy that applies to the domain.
 
-Specifications exist as multiple pages, one page per version of the specification (see "Branching and Merging", below), which may be assigned URIs that include an incremental number.
+Specifications exist as multiple pages, one page per version,
+(discussed below in "Branching and Merging"). 
+Specifications MUST be promoted to draft status to be assigned URIs that include an incremental number.
+
 Thus, we refer to a specification by specifying its domain, number, and short name.
 New versions of the same specification will have new numbers.
 The syntax for a specification reference is:
@@ -101,14 +105,17 @@ Every specification (including branches) carries a different number.
 ## COSS Lifecycle
 
 Every specification has an independent lifecycle that documents clearly its current status.
-
-A specification has six possible states that reflect its maturity and contractual weight:
+In order for a specification to receive a lifecycle status,
+it MUST be presented by the project team.
+After discussion amongst the contributors,
+the specification MAY be begin the process to obtain the draft status.
+A specification has five possible states that reflect its maturity and contractual weight:
 
 ![Lifecycle diagram](./images/lifecycle.png)
 
 ### Raw Specifications
 
-All new specifications are **raw** specifications.
+All new specifications are **raw** specifications. 
 Changes to raw specifications can be unilateral and arbitrary.
 Those seeking to implement a raw specification should ask for it to be made a draft specification.
 Raw specifications have no contractual weight.
