@@ -2,7 +2,7 @@
 slug: 57
 title: 57/STATUS-Simple-Scaling
 name: Status Simple Scaling
-status: draft
+status: raw
 category: Informational
 tags: waku/application
 description: Describes how to scale Status Communities and Status 1-to-1 chats using Waku v2 protocol and components.
