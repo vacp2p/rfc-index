@@ -4,13 +4,12 @@
 
 ## RFC Process
 
-This repository contains specifications from the [Vac](https://vac.dev), [Waku](https://waku.org/), [Nomos](https://nomos.tech/), [Codex](https://codex.storage/), and [Status](https://status.app/) software teams.
+This repository contains specifications from the [Waku](https://waku.org/), [Nomos](https://nomos.tech/), 
+[Codex](https://codex.storage/), and [Status](https://status.app/) projects that are apart of the [IFT portfolio](https://free.technology/).
+[Vac](https://vac.dev) is an [IFT service](https://free.technology/services) that will manage the RFC process within this repository.
 The goal of the RFC, [Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments),
 process is to standardize techincal specification. 
-This repository will track specifications that adhere to 1/COSS.
-RFCs will be managed by the Vac team when specifcations have reached a rough consensus towards stabilization within each team.
-
-Vac is an R&D org creating modular p2p protocols for private, secure, and censorship-resistant communication.
+Specifications will adhere to 1/COSS by obtianing rough consensus within each project.
 
 **See [rfc.vac.dev](https://rfc.vac.dev) for an easy to browse index of all RFCs.**
 
