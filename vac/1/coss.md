@@ -132,25 +132,20 @@ When draft specifications are used by third parties, they become **stable** spec
 Changes to stable specifications should be restricted to cosmetic ones, errata and clarifications.
 Stable specifications are contracts between editors, implementers, and end-users.
 
+### Stagnant Specifications
+
+Stagnant specifications have no activity and no desire to reach techinal maturity.
+Specifications with raw and draft can receieve a stagnant status.
+They MAY be kept for their historical value but
+it is RECOMMENDED to not implement them.
+
 ### Deprecated Specifications
 
 When stable specifications are replaced by newer draft specifications, they become **deprecated** specifications.
-Deprecated specifications should not be changed except to indicate their replacements, if any.
-Deprecated specifications are contracts between editors, implementers and end-users.
-
-### Retired Specifications
-
-When deprecated specifications are no longer used in products, they become **retired** specifications.
-Retired specifications are part of the historical record.
-They should not be changed except to indicate their replacements, if any.
-Retired specifications have no contractual weight.
-
-### Deleted Specifications
-
-Deleted specifications are those that have not reached maturity (stable) and were discarded.
-They should not be used and are only kept for their historical value.
-Only Raw and Draft specifications can be deleted.
-
+Deprecated specifications SHOULD not be changed except to indicate their replacements, if any.
+Deprecated specifications MAY be contracts between editors, implementers and end-users,
+while others MAY have no contractual weight.
+ 
 ## Editorial control
 
 A specification MUST have a single responsible editor,
