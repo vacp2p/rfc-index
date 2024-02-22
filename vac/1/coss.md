@@ -71,7 +71,6 @@ Principles:
 * The process should allow deprecation of old specifications.
 
 Specifications should take minutes to explain, hours to design, days to write, weeks to prove, months to become mature, and years to replace.
-
 Specifications have no special status except that accorded by the community.
 
 ## Architecture
@@ -89,7 +88,7 @@ The copyright, patent, and trademark policies of the domain must be clarified in
 
 Specifications exist as multiple pages, one page per version,
 (discussed below in "Branching and Merging"). 
-Specifications MUST be promoted to draft status to be assigned URIs that include an incremental number.
+which may be assigned URIs that include an incremental number.
 
 Thus, we refer to a specification by specifying its domain, number, and short name.
 New versions of the same specification will have new numbers.
@@ -108,14 +107,14 @@ Every specification has an independent lifecycle that documents clearly its curr
 In order for a specification to receive a lifecycle status,
 it MUST be presented by the project team.
 After discussion amongst the contributors,
-the specification MAY be begin the process to obtain the draft status.
+the specification MAY begin the process to obtain a status.
 A specification has five possible states that reflect its maturity and contractual weight:
 
 ![Lifecycle diagram](./images/lifecycle.png)
 
 ### Raw Specifications
 
-All new specifications are **raw** specifications. 
+New specifications are considered to be **raw** specifications. 
 Changes to raw specifications can be unilateral and arbitrary.
 Those seeking to implement a raw specification should ask for it to be made a draft specification.
 Raw specifications have no contractual weight.
@@ -134,8 +133,9 @@ Stable specifications are contracts between editors, implementers, and end-users
 
 ### Stagnant Specifications
 
-Stagnant specifications have no activity and no desire to reach techinal maturity.
-Specifications with raw and draft can receieve a stagnant status.
+When raw or draft specifications have no activity and/or no desire to reach techinal maturity, 
+they become **stagnant** specifications.
+After a non-specified time, the editor can propose sta.
 They MAY be kept for their historical value but
 it is RECOMMENDED to not implement them.
 
