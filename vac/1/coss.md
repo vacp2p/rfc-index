@@ -4,7 +4,7 @@ title: 1/COSS
 name: Consensus-Oriented Specification System
 status: draft
 category: Best Current Practice
-editor: Jimmy Debe <jimmy@status.>
+editor: Daniel Kaiser <danielkaiser@status.im>
 contributors:
   - Oskar Thoren <oskarth@titanproxy.com>
   - Pieter Hintjens <ph@imatix.com>
@@ -12,7 +12,7 @@ contributors:
   - Alberto Barrionuevo <abarrio@opentia.es>
   - Chris Puttick <chris.puttick@thehumanjourney.net>
   - Yurii Rashkovskii <yrashk@gmail.com>
-  - Daniel Kaiser <danielkaiser@status.im>
+  - Jimmy Debe <jimmy@status.im>
 ---
 
 This document describes a consensus-oriented specification system (COSS) for building interoperable technical specifications.
