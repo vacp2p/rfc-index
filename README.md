@@ -18,6 +18,5 @@ Specifications will adhere to [1/COSS](./vac/1/coss.md) by obtaining a rough con
 Please see [1/COSS](https://rfc.vac.dev/spec/1/) for general guidelines and specification lifecycle.
 
 Feel free to join the [Vac discord](https://discord.gg/Vy54fEWuqC). 
-There's a channel specifically for RFC discussions.
 
 Here's the project board used by core contributors and maintainers: [Projects](https://github.com/orgs/vacp2p/projects/5)
