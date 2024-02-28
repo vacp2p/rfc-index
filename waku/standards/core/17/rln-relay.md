@@ -1,16 +1,15 @@
 ---
 slug: 17
-title: 17/WAKU2-RLN-RELAY
+title: 17/WAKU-RLN-RELAY
 name: Waku v2 RLN Relay
 status: draft
 tags: waku-core
 editor: Sanaz Taheri <sanaz@status.im>
 contributors:
-  - Oskar Thorén <oskarth@titanproxy.com>
-  - Aaryamann Challani <aaryamann@status.im>
+  - Oskar Thorén <oskar@status.im>
 ---
 
-The `17/WAKU2-RLN-RELAY` protocol is an extension of `11/WAKU2-RELAY` which additionally provides spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
+The `17/WAKU-RLN-RELAY` protocol is an extension of `11/WAKU-RELAY` which additionally provides spam protection using [Rate Limiting Nullifiers (RLN)](/spec/32). 
 
 The security objective is to contain spam activity in a GossipSub network by enforcing a global messaging rate to all the peers.
 Peers that violate the messaging rate are considered spammers and their message is considered spam.
@@ -32,11 +31,11 @@ We augment the [`11/WAKU2-RELAY`](/spec/11) protocol with a novel construct of [
 
 
 The messaging rate is defined by the `period` which indicates how many messages can be sent in a given period.
-We define an `epoch` as $\lceil$ `unix_time` / `period` $\rceil$. For example, if `unix_time` is `1644810116` and we set `period` to `30`, then `epoch` is  $\lceil$`(unix_time/period)`$\rceil$ `= 54827003`.
+We define an `epoch` as $$\lceil unix\\_time/period \rceil$$. For example, if `unix_time` is `1644810116` and we set `period` to `30`, then `epoch` is  $$\lceil(unix\\_time/period)\rceil = 54827003$$.
 Note that `epoch` refers to epoch in RLN and not Unix epoch. This means a message can only be sent every period, where period is up to the application.
 See see section [Recommended System Parameters](#recommended-system-parameters) for some recommended ways to set a sensible `period` value depending on the application.
 Peers subscribed to a spam-protected `pubsubTopic` are only allowed to send one message per `epoch`.
-The higher-level layers adopting `17/WAKU2-RLN-RELAY` MAY choose to enforce the messaging rate for  `WakuMessages` with a specific `contentTopic` published on a `pubsubTopic`.
+The higher-level layers adopting `17/WAKU-RLN-RELAY` MAY choose to enforce the messaging rate for  `WakuMessages` with a specific `contentTopic` published on a `pubsubTopic`.
 
 
 
@@ -57,7 +56,7 @@ The peer who has the secret key `sk` associated with a registered `pk` would be 
 Note that  `sk` is initially only known to its owning peer however, it may get exposed to other peers in case the owner attempts spamming the system i.e., sending more than one message per `epoch`.
 An overview of registration is illustrated in Figure 1.
 
-![Figure 1: Registration.](./images/rln-relay.png)
+![Figure 1: Registration.](../../../../rfcs/17/rln-relay.png)
 
 
 ## Publishing
@@ -86,7 +85,7 @@ For more details about the proof generation check [RLN](/spec/32)
 The proof generation relies on the knowledge of two pieces of private information i.e., `sk` and `authPath`.
 The `authPath` is a subset of Merkle tree nodes by which a peer can prove the inclusion of its `pk` in the group. <!-- TODO refer to RLN RFC for authPath def -->
 The proof generation also requires a set of public inputs which are: the Merkle tree root `merkle_root`, the current `epoch`, and the message for which the proof is going to be generated. 
-In `17/WAKU2-RLN-RELAY`, the message is the concatenation of `WakuMessage`'s  `payload` filed and its `contentTopic` i.e., `payload||contentTopic`. 
+In `17/WAKU-RLN-RELAY`, the message is the concatenation of `WakuMessage`'s  `payload` filed and its `contentTopic` i.e., `payload||contentTopic`. 
 
 ## Group Synchronization
 
@@ -94,9 +93,6 @@ Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `
 Getting access to the Merkle tree can be done in various ways. 
 One way is that all the peers construct the tree locally.
 This can be done by listening to the registration and deletion events emitted by the membership contract.
-Peers MUST update the local Merkle tree on a per-block basis.
-This is discussed further in the [Merkle Root Validation](#merkle-root-validation) section.
-
 Another approach for synchronizing the state of slashed `pk`s is to disseminate such information through a p2p GossipSub network to which all peers are subscribed. 
 This is in addition to sending the deletion transaction to the membership contract.
 The benefit of an off-chain slashing is that it allows real-time removal of spammers as opposed to on-chain slashing in which peers get informed with a delay,
@@ -109,31 +105,17 @@ The reason is that using an old root can allow inference about the index of the 
 Upon the receipt of a PubSub message via [`11/WAKU2-RELAY`](/spec/11) protocol, the routing peer parses the `data` field as a `WakuMessage` and gets access to the `RateLimitProof` field.  
 The peer then validates the `RateLimitProof`  as explained next.
 
-### Epoch Validation
+**Epoch Validation**
 If the `epoch` attached to the message is more than `max_epoch_gap` apart from the routing peer's current `epoch` then the message is discarded and considered invalid.
 This is to prevent a newly registered peer from spamming the system by messaging for all the past epochs. 
 `max_epoch_gap` is a system parameter for which we provide some recommendations in section [Recommended System Parameters](#recommended-system-parameters).
 
-### Merkle Root Validation
-The routing peers MUST check whether the provided Merkle root in the `RateLimitProof` is valid.
-It can do so by maintaining a local set of valid Merkle roots, which consist of `acceptable_root_window_size` past roots.
-These roots refer to the final state of the Merkle tree after a whole block consisting of group changes is processed.
-The Merkle roots are updated on a per-block basis instead of a per-event basis.
-This is done because if Merkle roots are updated on a per-event basis, some peers could send messages with a root that refers to a Merkle tree state that might get invalidated while the message is still propagating in the network, due to many registrations happening during this time frame.
-By updating roots on a per-block basis instead, we will have only one root update per-block processed, regardless on how many registrations happened in a block, and peers will be able to successfully propagate messages in a time frame corresponding to roughly the size of the roots window times the block mining time. 
-
-Atomic processing of the blocks are necessary so that even if the peer is unable to process one event, the previous roots remain valid, and can be used to generate valid RateLimitProof's.
-
-This also allows peers which are not well connected to the network to be able to send messages, accounting for network delay.
-This network delay is related to the nature of asynchronous network conditions, which means that peers see membership changes asynchronously, and therefore may have differing local Merkle trees.
-See [Recommended System Parameters](#recommended-system-parameters) on choosing an appropriate `acceptable_root_window_size`. 
-
-### Proof Verification
+**Proof Verification**
 The routing peers MUST check whether the zero-knowledge proof `proof` is valid.
 It does so by running the zk verification algorithm as explained in [RLN](/spec/32). 
 If `proof` is invalid then the message is discarded. 
 
-### Spam detection
+**Spam detection**
 To enable local spam detection and slashing, routing peers MUST record the `nullifier`, `share_x`, and `share_y` of incoming messages which are not discarded i.e., not found spam or with invalid proof or epoch.
 To spot spam messages, the peer checks whether a message with an identical `nullifier` has already been relayed. 
 1. If such a message exists and its `share_x` and `share_y` components are different from the incoming message, then slashing takes place.
@@ -147,7 +129,7 @@ An overview of the routing procedure and slashing is provided in Figure 2.
 
 <!-- TODO: may consider [validator functions](https://github.com/libp2p/specs/tree/master/pubsub#topic-validation) or [extended validators](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators) for the spam detection -->
 
-![Figure 2: Publishing, Routing and Slashing workflow.](./images/rln-message-verification.png)
+![Figure 2: Publishing, Routing and Slashing workflow.](../../../../rfcs/17/rln-message-verification.png)
 
 -------
 
@@ -171,11 +153,10 @@ message RateLimitProof {
 
 message WakuMessage {
   bytes payload = 1;
-  string content_topic = 2;
-  optional uint32 version = 3;
-  optional sint64 timestamp = 10;
-  optional bool ephemeral = 31;
-+  optional bytes rate_limit_proof = 21;
+  string contentTopic = 2;
+  uint32 version = 3;
+  double timestamp = 4;
++ RateLimitProof rate_limit_proof = 21;
 }
 
 ```
@@ -200,16 +181,15 @@ The system parameters are summarized in the following table, and the recommended
 | Parameter | Description |
 | ----: |----------- |
 |  `period`  | the length of `epoch` in seconds |
-| `staked_fund` | the amount of wei to be staked by peers at the registration |
+| `staked_fund` | the amount of ether to be staked by peers at the registration |
 | `reward_portion` | the percentage of `staked_fund` to be rewarded to the slashers |
 | `max_epoch_gap` | the maximum allowed gap between the `epoch` of a routing peer and the incoming message |
-| `acceptable_root_window_size` | The maximum number of past Merkle roots to store |
 
 ## Epoch Length
 A sensible value for the `period` depends on the application for which the spam protection is going to be used.
 For example, while the `period` of `1` second i.e., messaging rate of `1` per second, might be acceptable for a chat application, might be too low for communication among Ethereum network validators.
 One should look at the desired throughput of the application to decide on a proper `period` value.
-In the proof of concept implementation of `17/WAKU2-RLN-RELAY` protocol which is available in [nim-waku](https://github.com/status-im/nim-waku), the `period` is set to `1` second.
+In the proof of concept implementation of `17/WAKU-RLN-RELAY` protocol which is available in [nim-waku](https://github.com/status-im/nim-waku), the `period` is set to `1` second.
 Nevertheless, this value is also subject to change depending on user experience.
 
 ## Maximum Epoch Gap
@@ -219,21 +199,9 @@ The value of  `max_epoch_gap`  can be measured based on the following factors.
 - Clock asynchrony `Clock_Asynchrony`: The maximum difference between the Unix epoch clocks perceived by network peers which can be due to clock drifts.
   
 With a reasonable approximation of the preceding values, one can set  `max_epoch_gap`   as 
-`max_epoch_gap` $= \lceil \frac{\text{Network Delay} + \text{Clock Asynchrony}}{\text{Epoch Length}}\rceil$   where  `period`  is the length of the `epoch` in seconds.
+$$max\\_epoch\\_gap = \lceil \frac{\text{Network Delay} + \text{Clock Asynchrony}}{\text{Epoch Length}}\rceil$$   where  `period`  is the length of the `epoch` in seconds.
 `Network_Delay` and `Clock_Asynchrony` MUST have the same resolution as  `period` .
 By this formulation,  `max_epoch_gap`  indeed measures the maximum number of `epoch`s that can elapse since a message gets routed from its origin to all the other peers in the network.
-
-`acceptable_root_window_size` depends upon the underlying chain's average blocktime, `block_time`
-
-The lower bound for the `acceptable_root_window_size` SHOULD be set as $acceptable_root_window_size=(Network_Delay)/block_time$
-
-`Network_Delay` MUST have the same resolution as `block_time`.
-
-By this formulation, `acceptable_root_window_size` will provide a lower bound of how many roots can be acceptable by a routing peer.
-
-The `acceptable_root_window_size` should indicate how many blocks may have been mined during the time it takes for a peer to receive a message. 
-This formula represents a lower bound of the number of acceptable roots. 
-
 
 # Copyright
 
