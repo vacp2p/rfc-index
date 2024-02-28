@@ -1,6 +1,13 @@
-# Build a Waku Node: Waku Relay
+---
 
-## Introduction
+title: Build a Waku Relay Node
+name: Build a node
+status: draft
+editor: Jimmy Debe <jimmy@status.im>
+contributors:
+  
+---
+## Building a Waku Node: Waku Relay
 
 This is a tutorial demonstatraing how to build your own Waku node using python. 
 Waku provides a collection of protocols on top of libp2p providing messaging anonymity,.
@@ -34,9 +41,13 @@ In your new directory, download the supported py-libp2p from the github reposito
 > git clone git@github.com:libp2p/py-libp2p.git
 
 ```
+## Test Configuration
+The py-libp2p is packaged with a a `chat.py` as an example of sending a message between two libp2p. 
+We will modify this later to help use send Waku messages.
+## Publish/Subsrcibe Method
 
-## Publish Subsrcibe Method
-
+Now that the we have a simple libp2p node running,
+lets add more components to our node.
 A Waku node uses Publish/Subscribe (pubsub) to allow peers to communicate with each other.
 Peers are able to join topics, within a network,
 that they are interseted in using pubsub.
@@ -54,11 +65,19 @@ from libp2p.pubsub import pubsub
 from libp2p.pubsub import gossipsub
 from libp2p.peer.id import ID
 
+
+```
+The main functions needed to use gossipsub in a Waku node will be:
+- publish
+- run
+- subscribe
+- unsubscribe
+- s
+
+``` python
 class WakuNode():
 
 def start() -> None:
   
-
 ```
-
 
