@@ -6,11 +6,12 @@ status: draft
 tags: waku-core
 editor: Sanaz Taheri <sanaz@status.im>
 contributors:
-  - Oskar Thorén <oskarth@titanproxy.com>
+  - Oskar Thorén <oskar@status.im>
   - Aaryamann Challani <aaryamann@status.im>
+  - Giuseppe <giuseppe@status.im>
 ---
 
-The `17/WAKU2-RLN-RELAY` protocol is an extension of `11/WAKU2-RELAY` which additionally provides spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
+The `17/WAKU2-RLN-RELAY` protocol is an extension of `11/WAKU2-RELAY` which additionally provides spam protection using [Rate Limiting Nullifiers (RLN)](/spec/32). 
 
 The security objective is to contain spam activity in a GossipSub network by enforcing a global messaging rate to all the peers.
 Peers that violate the messaging rate are considered spammers and their message is considered spam.
@@ -57,7 +58,7 @@ The peer who has the secret key `sk` associated with a registered `pk` would be 
 Note that  `sk` is initially only known to its owning peer however, it may get exposed to other peers in case the owner attempts spamming the system i.e., sending more than one message per `epoch`.
 An overview of registration is illustrated in Figure 1.
 
-![Figure 1: Registration.](./images/rln-relay.png)
+![Figure 1: Registration.](../../../../rfcs/17/rln-relay.png)
 
 
 ## Publishing
@@ -94,9 +95,6 @@ Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `
 Getting access to the Merkle tree can be done in various ways. 
 One way is that all the peers construct the tree locally.
 This can be done by listening to the registration and deletion events emitted by the membership contract.
-Peers MUST update the local Merkle tree on a per-block basis.
-This is discussed further in the [Merkle Root Validation](#merkle-root-validation) section.
-
 Another approach for synchronizing the state of slashed `pk`s is to disseminate such information through a p2p GossipSub network to which all peers are subscribed. 
 This is in addition to sending the deletion transaction to the membership contract.
 The benefit of an off-chain slashing is that it allows real-time removal of spammers as opposed to on-chain slashing in which peers get informed with a delay,
@@ -109,31 +107,24 @@ The reason is that using an old root can allow inference about the index of the 
 Upon the receipt of a PubSub message via [`11/WAKU2-RELAY`](/spec/11) protocol, the routing peer parses the `data` field as a `WakuMessage` and gets access to the `RateLimitProof` field.  
 The peer then validates the `RateLimitProof`  as explained next.
 
-### Epoch Validation
+**Epoch Validation**
 If the `epoch` attached to the message is more than `max_epoch_gap` apart from the routing peer's current `epoch` then the message is discarded and considered invalid.
 This is to prevent a newly registered peer from spamming the system by messaging for all the past epochs. 
 `max_epoch_gap` is a system parameter for which we provide some recommendations in section [Recommended System Parameters](#recommended-system-parameters).
 
-### Merkle Root Validation
+**Merkle Root Validation**
 The routing peers MUST check whether the provided Merkle root in the `RateLimitProof` is valid.
 It can do so by maintaining a local set of valid Merkle roots, which consist of `acceptable_root_window_size` past roots.
-These roots refer to the final state of the Merkle tree after a whole block consisting of group changes is processed.
-The Merkle roots are updated on a per-block basis instead of a per-event basis.
-This is done because if Merkle roots are updated on a per-event basis, some peers could send messages with a root that refers to a Merkle tree state that might get invalidated while the message is still propagating in the network, due to many registrations happening during this time frame.
-By updating roots on a per-block basis instead, we will have only one root update per-block processed, regardless on how many registrations happened in a block, and peers will be able to successfully propagate messages in a time frame corresponding to roughly the size of the roots window times the block mining time. 
-
-Atomic processing of the blocks are necessary so that even if the peer is unable to process one event, the previous roots remain valid, and can be used to generate valid RateLimitProof's.
-
-This also allows peers which are not well connected to the network to be able to send messages, accounting for network delay.
+This allows peers which are not well connected to the network to be able to send messages, accounting for network delay.
 This network delay is related to the nature of asynchronous network conditions, which means that peers see membership changes asynchronously, and therefore may have differing local Merkle trees.
 See [Recommended System Parameters](#recommended-system-parameters) on choosing an appropriate `acceptable_root_window_size`. 
 
-### Proof Verification
+**Proof Verification**
 The routing peers MUST check whether the zero-knowledge proof `proof` is valid.
 It does so by running the zk verification algorithm as explained in [RLN](/spec/32). 
 If `proof` is invalid then the message is discarded. 
 
-### Spam detection
+**Spam detection**
 To enable local spam detection and slashing, routing peers MUST record the `nullifier`, `share_x`, and `share_y` of incoming messages which are not discarded i.e., not found spam or with invalid proof or epoch.
 To spot spam messages, the peer checks whether a message with an identical `nullifier` has already been relayed. 
 1. If such a message exists and its `share_x` and `share_y` components are different from the incoming message, then slashing takes place.
@@ -147,7 +138,7 @@ An overview of the routing procedure and slashing is provided in Figure 2.
 
 <!-- TODO: may consider [validator functions](https://github.com/libp2p/specs/tree/master/pubsub#topic-validation) or [extended validators](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators) for the spam detection -->
 
-![Figure 2: Publishing, Routing and Slashing workflow.](./images/rln-message-verification.png)
+![Figure 2: Publishing, Routing and Slashing workflow.](../../../../rfcs/17/rln-message-verification.png)
 
 -------
 
@@ -171,11 +162,10 @@ message RateLimitProof {
 
 message WakuMessage {
   bytes payload = 1;
-  string content_topic = 2;
-  optional uint32 version = 3;
-  optional sint64 timestamp = 10;
-  optional bool ephemeral = 31;
-+  optional bytes rate_limit_proof = 21;
+  string contentTopic = 2;
+  uint32 version = 3;
+  double timestamp = 4;
++ RateLimitProof rate_limit_proof = 21;
 }
 
 ```
@@ -193,6 +183,43 @@ Below is the description of the fields of `RateLimitProof` and their types.
 | `share_x` and `share_y`| array of 32 bytes each | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the Poseidon hash of the `WakuMessage`'s `payload` concatenated with its `contentTopic` . `share_y` is calculated using [Shamir secret sharing scheme](/spec/32) | <!-- todo specify the poseidon hash setting -->
 | `nullifier`  | array of 32 bytes | internal nullifier derived from `epoch` and peer's `sk` as explained in [RLN construct](/spec/32)|
 
+## RLN Credentials format
+A RLN credential collects all the relevant fields that allow generation of valid RLN proofs with respect to an onchain membership contract.
+
+To make it compatible across different clients and platforms, RLN credentials will be encoded in JSON. 
+This further allows to validate credentials using [JSON schema](https://json-schema.org/).
+
+```
+{
+  "application": string,
+  "appIdentifier": string,
+  "credentials": [{
+    "key": string,
+    "commitment": string,
+    "membershipGroups" : [{
+      "chainId": number,
+      "contract": string,
+      "treeIndex": string
+    }]
+  }],
+  "version": number
+}
+```
+Fields are specified as follow:
+
+- `application` : the application name within which credential(s) refer to.
+- `appIdentifier` : a unique identifier for the application. In RLN-RELAY, this SHOULD corresond to the application-specific [RLN identifier](https://rfc.vac.dev/spec/32/#terminology).
+- `credentials`: the array containing the actual RLN credentials used to generate proofs. Each node consists of:
+  - `key`: the identity secret key as `uint256`. It is encoded as a 64-characters left 0-padded hex string with a leading `0x` prefix (66 chars in total).
+  - `commitment`: the Poseidon hash of the secret key as `uint256`. It is encoded as a 64-characters left 0-padded hex string with a leading `0x` prefix (66 chars in total).
+- `membershipGroups`: the array containing information for membership groups registrations for the pair (`key`, `commitment`). Each node consists of:
+  - `chainId`: the integer corresponding to the [unique chain-id](https://github.com/ethereum-lists/chains) identifying the chain where the membership contract is deployed.
+  - `contract`: the smart contract address of the membership contract. It is encoded as a 40-characters left 0-padded hex string with a leading "0x" prefix (42 chars in total).
+  - `treeIndex`: the Merkle tree index assigned when registering `commitment` to `contract`. It is encoded as a 64-characters left 0-padded hex string with a leading `0x` prefix (10 chars in total).
+- `version`: a unique and progressive integer that can be used to uniquely identify the RLN credential encoding format.
+
+JSON RLN credentials SHOULD be persisted in encrypted form. 
+We recommend to use the [Web3 Secret Storage](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) to password-protect credentials and to allow cross-client support for RLN credentials decryption and decoding.
 
 # Recommended System Parameters
 The system parameters are summarized in the following table, and the recommended values for a subset of them are presented next.
