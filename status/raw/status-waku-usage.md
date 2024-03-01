@@ -1,6 +1,5 @@
 ---
-slug: 67
-title: 67/STATUS-WAKU2-USAGE
+title: STATUS-WAKU2-USAGE
 name: Status Waku2 Usage
 status: raw
 category: Best Current Practice
