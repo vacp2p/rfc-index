@@ -12,7 +12,7 @@ This repository replaces the previous `rfc.vac.dev` resource.
 Each project will maintain initial specifications in separate repositories, 
 which may be considered as a **raw** specification.
 All [Vac](https://vac.dev) **raw** specifications and discussions will live in the Vac subdirectory.
-When projects have reached a rough consensus for a specification living in their repository,
+When projects have reached some level of maturity for a specification living in their repository,
 the process of updating the status to **draft** may begin in this repository.
 Specifications will adhere to [1/COSS](./vac/1/coss.md) before obtaining **draft** status.
 
@@ -31,4 +31,9 @@ Here's the project board used by core contributors and maintainers: [Projects](h
 
 ## IFT Project's Raw Specifications
 
-(TBD)
+The repository for each project **raw** specifications:
+- [Vac Raw Specifications](./vac/raw)
+- [Status Raw Specifications](./status/raw)
+- [Waku Raw Specificiations](https://github.com/waku-org/specs/tree/master)
+- [Codex Raw Specifications]()
+- [Nomos Raw Specifications](https://github.com/logos-co/nomos-specs)
