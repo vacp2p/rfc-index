@@ -29,7 +29,7 @@ Feel free to join the [Vac discord](https://discord.gg/Vy54fEWuqC).
 
 Here's the project board used by core contributors and maintainers: [Projects](https://github.com/orgs/vacp2p/projects/5)
 
-## IFT Project's Raw Specifications
+## IFT Projects' Raw Specifications
 
 The repository for each project **raw** specifications:
 - [Vac Raw Specifications](./vac/raw)
