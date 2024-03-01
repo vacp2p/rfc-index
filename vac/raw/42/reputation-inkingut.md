@@ -1,6 +1,5 @@
 ---
-slug: 42
-title: 42/LOGOS-REPUTATION-INKINGUT
+title: LOGOS-REPUTATION-INKINGUT
 name: Logos Node Reputation 
 status: raw
 category: Informational
