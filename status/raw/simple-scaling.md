@@ -1,5 +1,5 @@
 ---
-slug: 57
+
 title: 57/STATUS-Simple-Scaling
 name: Status Simple Scaling
 status: raw
