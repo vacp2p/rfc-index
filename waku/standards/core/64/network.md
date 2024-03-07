@@ -4,6 +4,7 @@ title: 64/WAKU2-NETWORK
 name: Waku v2 Network
 status: draft
 category: Best Current Practice
+tags: waku/application
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
 ---
