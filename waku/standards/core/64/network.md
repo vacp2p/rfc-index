@@ -10,12 +10,9 @@ contributors:
 
 ## Abstract
 
-This RFC specifies an opinionated deployment of [10/WAKU2](../10/waku2.md) protocols
-to form a coherent and shared decentralized messaging network
-that is open-access,
-useful for generalized messaging,
-privacy-preserving,
-scalable and
+This specification describes an opinionated deployment of [10/WAKU2](../10/waku2.md) protocols to form a coherent and 
+shared decentralized messaging network that is open-access,
+useful for generalized messaging, privacy-preserving, scalable and
 accessible even to resource-restricted devices.
 We'll refer to this opinionated deployment simply as
 _the public Waku Network_, _the Waku Network_ or, if the context is clear, _the network_
@@ -32,7 +29,7 @@ which in turn is an extension of [11/WAKU2-RELAY](../11/relay.md) with spam prot
 
 Traffic in the Waku Network is sharded into eight [17/WAKU2-RLN-RELAY](../17/rln-relay.md) pubsub topics.
 Each pubsub topic is named according to the static shard naming format
-defined in [WAKU2-RELAY-SHARDING](../../core/relay-sharding.md)
+defined in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 with:
 * `<cluster_id>` set to `1`
 * `<shard_number>` occupying the range `0` to `7`.
@@ -45,11 +42,11 @@ routed on the combination of the eight pubsub topics:
 /waku/2/rs/1/7
 ```
 
-A node MUST use [WAKU-METADATA](./metadata.md) protocol to identify the `<cluster_id>` that every
+A node MUST use [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md) protocol to identify the `<cluster_id>` that every
 inbound/outbound peer that attempts to connect supports. In any of the following cases, the node MUST trigger a disconnection:
-* [WAKU-METADATA](./metadata.md) dial fails.
-* [WAKU-METADATA](./metadata.md) reports an empty `<cluster_id>`.
-* [WAKU-METADATA](./metadata.md) reports a `<cluster_id>` different than `1`.
+* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md) dial fails.
+* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md) reports an empty `<cluster_id>`.
+* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md) reports a `<cluster_id>` different than `1`.
 
 ## Roles
 
@@ -62,7 +59,8 @@ There are two distinct roles evident in the network, those of:
 Nodes are the individual software units
 using [10/WAKU2](../10/waku2.md) protocols to form a p2p messaging network.
 Nodes, in turn, can participate in a shard as full relayers, i.e. _relay nodes_,
-or by running a combination of protocols suitable for resource-restricted environments, i.e. _non-relay nodes_.
+or by running a combination of protocols suitable for resource-restricted environments, 
+i.e. _non-relay nodes_.
 Nodes can also provide various services to the network,
 such as storing historical messages or protecting the network against spam.
 See the section on [default services](#default-services) for more.
@@ -85,8 +83,8 @@ it MAY choose to support some shards as a non-relay node.
 Nodes MAY use any method to bootstrap connection to the network,
 but it is RECOMMENDED that each node retrieves a list of bootstrap peers to connect to using [EIP-1459 DNS-based discovery](https://eips.ethereum.org/EIPS/eip-1459).
 Relay nodes SHOULD use [33/WAKU2-DISCV5](../33/discv5.md) to continually discover other peers in the network.
-Each relay node MUST encode its supported shards into its discoverable ENR
-as described in [WAKU2-RELAY-SHARDING](../../core/relay-sharding.md#discovery).
+Each relay node MUST encode its supported shards into its discoverable ENR,
+as described in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md/#discovery).
 The ENR MUST be updated if the set of supported shards change.
 A node MAY choose to ignore discovered peers that do not support any of the shards in its own subscribed set.
 
@@ -105,7 +103,7 @@ each relay node SHOULD enable and support the following protocols as a service n
 1. [12/WAKU2-FILTER](../12/filter.md) to allow resource-restricted peers to subscribe to messages matching a specific content filter.
 2. [13/WAKU2-STORE](../13/store.md) to allow other peers to request historical messages from this node.
 3. [19/WAKU2-LIGHTPUSH](../19/lightpush.md) to allow resource-restricted peers to request publishing a message to the network on their behalf.
-4. [34/WAKU2-PEER-EXCHANGE](../../core/peer-exchange.md) to allow resource-restricted peers to discover more peers in a resource efficient way.
+4. [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md) to allow resource-restricted peers to discover more peers in a resource efficient way.
 
 #### Store service nodes
 
@@ -122,7 +120,7 @@ using any of the defined service protocols:
 1. [12/WAKU2-FILTER](../12/filter.md) to subscribe to messages matching a specific content filter.
 2. [13/WAKU2-STORE](../13/store.md) to request historical messages matching a specific content filter.
 3. [19/WAKU2-LIGHTPUSH](../19/lightpush.md) to request publishing a message to the network.
-4. [34/WAKU2-PEER-EXCHANGE](../../core/peer-exchange.md) to discover more peers in a resource efficient way.
+4. [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md) to discover more peers in a resource efficient way.
 
 #### Store client nodes
 
@@ -137,16 +135,18 @@ Applications are the higher-layer projects or platforms that make use of the gen
 In other words, an application defines a payload used in the various [10/WAKU2](../10/waku2.md) protocols.
 Any participant in an application SHOULD make use of an underlying node in order to communicate on the network.
 Applications SHOULD make use of an [autosharding](#autosharding) API
-to allow the underlying node to automatically select the target shard on the Waku Network. See the section on [autosharding](#autosharding) for more.
+to allow the underlying node to automatically select the target shard on the Waku Network. 
+See the section on [autosharding](#autosharding) for more.
 
 ## RLN rate-limiting
 
-The [17/WAKU2-RLN-RELAY](../17/rln-relay.md) network uses [32/RLN-V1](../../../../vac/32/rln-v1.md) proofs
+The [17/WAKU2-RLN-RELAY](../17/rln-relay.md) protocol uses [32/RLN-V1](../../../../vac/32/rln-v1.md) proofs
 to ensure that a pre-agreed rate limit is not exceeded by any publisher.
 While the network is under capacity,
 individual relayers MAY choose to freely route messages without RLN proofs
-up to a discretionary bandwidth limit after which messages without proofs MUST be discarded.
-This bandwidth limit SHOULD be enforced using [bandwidth validation mechanism](#free-bandwidth-exceeded) separate from RLN rate-limiting.
+up to a discretionary bandwidth limit,
+after which messages without proofs MUST be discarded by relay nodes.
+This bandwidth limit SHOULD be enforced using a [bandwidth validation mechanism](#free-bandwidth-exceeded) separate from a RLN rate-limiting.
 This implies that quality of service and reliability is significantly lower for messages without proofs
 and at times of high network utilization these messages may not be relayed at all.
 
@@ -156,10 +156,13 @@ For the Waku Network,
 the `epoch` is set to `1` second
 and the maximum number of messages published per `epoch` is limited to `1` per publisher.
 The `max_epoch_gap` is set to `20` seconds,
-meaning that validators MUST _reject_ messages with an `epoch` more than 20 seconds into the past or future compared to the validator's own clock.
+meaning that validators (relay nodes),
+MUST _reject_ messages with an `epoch` more than 20 seconds into the past or 
+future compared to the validator's own clock.
 All nodes, validators and publishers,
 SHOULD use Network Time Protocol (NTP) to synchronize their own clocks,
 thereby ensuring valid timestamps for proof generation and validation.
+
 
 ### Memberships
 
@@ -167,7 +170,7 @@ Each publisher to the Waku Network SHOULD register an RLN membership
 with one of the RLN storage contracts
 moderated in the Sepolia registry contract with address [0xF1935b338321013f11068abCafC548A7B0db732C](https://sepolia.etherscan.io/address/0xF1935b338321013f11068abCafC548A7B0db732C#code).
 Initial memberships are registered in the Sepolia RLN storage contract with address [0x58322513A35a8f747AF5A385bA14C2AbE602AA59](https://sepolia.etherscan.io/address/0x58322513A35a8f747AF5A385bA14C2AbE602AA59#code).
-RLN membership setup and registration MUST follow [[17/WAKU2-RLN-RELAY](../17/rln-relay.md/#setup-and-registration),
+RLN membership setup and registration MUST follow [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#setup-and-registration),
 with the `staked_fund` set to `0`.
 In other words, the Waku Network does not use RLN staking. 
 
@@ -178,7 +181,7 @@ as described in [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#publishing).
 Slashing is not implemented for the Waku Network.
 Instead, validators will penalise peers forwarding messages exceeding the rate limit
 as specified for [the rate-limiting validation mechanism](#rate-limit-exceeded).
-This incentivizes all nodes to validate RLN proofs
+This incentivizes all relay nodes to validate RLN proofs
 and reject messages violating rate limits
 in order to continue participating in the network.
 
@@ -192,18 +195,25 @@ according to the rules discussed under [message validation](#message-validation)
 ### Message Attributes
 
 - The mandatory `payload` attribute MUST contain the message data payload as crafted by the application.
-- The mandatory `content_topic` attribute MUST specify a string identifier that can be used for content-based filtering. This is also crafted by the application. See [Autosharding](#autosharding) for more on the content topic format.
-- The optional `meta` attribute MAY be omitted. If present this will form part of the message uniqueness vector described in [14/WAKU2-MESSAGE](../14/message.md).
+- The mandatory `content_topic` attribute MUST specify a string identifier that can be used for content-based filtering.
+This is also crafted by the application.
+See [Autosharding](#autosharding) for more on the content topic format.
+- The optional `meta` attribute MAY be omitted.
+If present, will form part of the message uniqueness vector described in [14/WAKU2-MESSAGE](../14/message.md).
 - The optional `version` attribute SHOULD be set to `0`. It MUST be interpreted as `0` if not present.
-- The mandatory `timestamp` attribute MUST contain the Unix epoch time at which the message was generated by the application. The value MUST be in nanoseconds. It MAY contain a fudge factor of up to 1 seconds in either direction to improve resistance to timing attacks.
+- The mandatory `timestamp` attribute MUST contain the Unix epoch time at which the message was generated by the application.
+The value MUST be in nanoseconds.
+It MAY contain a fudge factor of up to 1 seconds in either direction to improve resistance to timing attacks.
 - The optional `ephemeral` attribute MUST be set to `true` if the message should not be persisted by the Waku Network.
-- The optional `rate_limit_proof` attribute SHOULD be populated with the RLN proof as set out in [RLN Proofs](#rln-proofs). Messages with this field unpopulated MAY be discarded from the network by relayers. This field MUST be populated if the message should be persisted by the Waku Network.
+- The optional `rate_limit_proof` attribute SHOULD be populated with the RLN proof as set out in [RLN Proofs](#rln-proofs).
+Messages with this field unpopulated MAY be discarded from the network by relayers.
+This field MUST be populated if the message should be persisted by the Waku Network.
 
 ### Message Size
 
-Any Waku Message published to the network MUST NOT exceed an absolute maximum size of `150` kilobytes.
+Any [14/WAKU2-MESSAGE](../14/message.md) published to the network MUST NOT exceed an absolute maximum size of `150` kilobytes.
 This limit applies to the entire message after protobuf serialization, including attributes.
-It is RECOMMENDED not to exceed an average size of `4` kilobytes for Waku Messages published to the network.
+It is RECOMMENDED not to exceed an average size of `4` kilobytes for [14/WAKU2-MESSAGE](../14/message.md) published to the network.
 
 ### Message Validation
 
@@ -219,7 +229,7 @@ The following validation rules are defined:
 
 #### Decoding failure
 
-If a message fails to decode as a valid [14/WAKU2-MESSAGE](../14/message.md).
+If a message fails to decode as a valid [14/WAKU2-MESSAGE](../14/message.md),
 the relay node MUST _reject_ the message.
 This SHOULD trigger a penalty against the transmitting peer.
 
@@ -285,7 +295,6 @@ the underlying node MUST determine the target pubsub topic(s)
 from the content topics provided by the application
 using the hashing mechanism defined in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md/#automatic-sharding).
 
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -296,7 +305,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
 * [11/WAKU2-RELAY](../11/relay.md)
 * [WAKU2-RELAY-SHARDING](../../core/relay-sharding.md)
-* [WAKU-METADATA](./metadata.md)
+* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md)
 * [EIP-1459 DNS-based discovery](https://eips.ethereum.org/EIPS/eip-1459)
 * [33/WAKU2-DISCV5](../33/discv5.md)
 * [12/WAKU2-FILTER](../12/filter.md)
@@ -306,5 +315,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [32/RLN-V1](../../../../vac/32/rln-v1.md)
 * [14/WAKU2-MESSAGE](../14/message.md)
 * [gossipsub v1.1 validation](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
-* [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md/#automatic-sharding)
+* [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md/)
 * 
