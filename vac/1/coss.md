@@ -106,8 +106,8 @@ Every specification (including branches) carries a different number.
 Every specification has an independent lifecycle that documents clearly its current status.
 In order for a specification to receive a lifecycle status,
 it MUST be presented by the project team.
-After discussion amongst the contributors,
-the specification MAY begin the process to obtain a status.
+After discussion amongst the contributors have occured for an unspecific amount of time,
+the specification MAY begin the process to upgrade a status.
 A specification has five possible states that reflect its maturity and contractual weight:
 
 ![Lifecycle diagram](./images/lifecycle.png)
@@ -116,7 +116,7 @@ A specification has five possible states that reflect its maturity and contractu
 
 New specifications are considered to be **raw** specifications. 
 Changes to raw specifications can be unilateral and arbitrary.
-Those seeking to implement a raw specification should ask for it to be made a draft specification.
+Those who implement a raw specification MAY ask to obtain a **draft** status.
 Raw specifications have no contractual weight.
 
 ### Draft Specifications
@@ -133,11 +133,13 @@ Stable specifications are contracts between editors, implementers, and end-users
 
 ### Stagnant Specifications
 
-When raw or draft specifications have no activity and/or no desire to reach techinal maturity, 
+When raw or draft specifications have no activity and/or no desire to reach technical maturity, 
 they become **stagnant** specifications.
-After a non-specified time, the editor can propose sta.
-They MAY be kept for their historical value but
+After a non-specified time, the specification can be asked to be downgraded to **stagnant**.
+They SHOULD be kept for their historical value but
 it is RECOMMENDED to not implement them.
+The editor MAY choose to reinstate the previous status at any time.
+Stagnant specifications have no contractual weight.
 
 ### Deprecated Specifications
 
@@ -159,7 +161,9 @@ Unlike the original C4 process however, it is RECOMMENDED to use CC0 as a more p
 We SHOULD NOT use GPL or GPL-like license.
 One exception is this specification, as this was the original license for this specification.
 
-The editor is responsible for accurately maintaining the state of specifications and for handling all comments on the specification.
+The editor is responsible for accurately maintaining the state of specifications, 
+for retiring different versions that may live in other places and 
+for handling all comments on the specification.
 
 ## Branching and Merging
 
@@ -202,12 +206,12 @@ This will enable programmatic access to specification metadata.
 | **status**       | status               | string | draft                                                                                                                                                                                                                               |
 | **category**     | category             | string | Best Current Practice                                                                                                                                                                                                                            |
 | **tags**         | 0 or several tags    | list   | waku-application, waku-core-protocol                                                                                                                                                                                                |
-| **editor**       | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
+| **editor**       | editor name/@handle    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
 | **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com><br> - André Rebentisch <andre@openstandards.de><br> - Alberto Barrionuevo <abarrio@opentia.es><br> - Chris Puttick <chris.puttick@thehumanjourney.net><br> - Yurii Rashkovskii <yrashk@gmail.com> |
 
 ### Specification Template
 
-Standards Track specifications SHOULD be based on the [Vac RFC template](./images/template.md).
+Standards Track specifications SHOULD be based on the [Vac RFC template](../template.md).
 
 ## Conventions
 
@@ -226,5 +230,4 @@ It is RECOMMENDED to use color coding to indicate specification's status. Color 
 * ![draft](https://raw.githubusercontent.com/unprotocols/rfc/master/2/draft.svg)
 * ![stable](https://raw.githubusercontent.com/unprotocols/rfc/master/2/stable.svg)
 * ![deprecated](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deprecated.svg)
-* ![retired](https://raw.githubusercontent.com/unprotocols/rfc/master/2/retired.svg)
-* ![deleted](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deleted.svg)
+* ![stagnant](https://raw.githubusercontent.com/unprotocols/rfc/master/2/retired.svg)
