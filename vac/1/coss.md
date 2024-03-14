@@ -230,4 +230,3 @@ It is RECOMMENDED to use color coding to indicate specification's status. Color 
 * ![draft](https://raw.githubusercontent.com/unprotocols/rfc/master/2/draft.svg)
 * ![stable](https://raw.githubusercontent.com/unprotocols/rfc/master/2/stable.svg)
 * ![deprecated](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deprecated.svg)
-* ![stagnant](https://raw.githubusercontent.com/unprotocols/rfc/master/2/retired.svg)
