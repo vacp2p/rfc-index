@@ -25,4 +25,4 @@ jobs:
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          args: ${{ steps.changed_files.outputs.stdout }}
+          files: ${{ steps.changed_files.outputs.stdout }}
