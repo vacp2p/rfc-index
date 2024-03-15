@@ -14,9 +14,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
+        
+      - name: New Files
+        id: update_files
+        run: echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})"
+        
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          globs: '/*.md'
+          globs: ${{ steps.update_files.outputs.files }}
