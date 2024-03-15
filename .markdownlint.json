@@ -1,7 +1,7 @@
 {
   "default": true,
   "MD013": false,
-  "files": "steps.get_files_changed.outputs.stdout",
+  "files": "steps.chagned_files.outputs.stdout",
   "code-block-style": {
     "style": "fenced"
   },
