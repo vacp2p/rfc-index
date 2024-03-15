@@ -19,7 +19,7 @@ jobs:
         id: changed_files
         run: |
           git diff --name-only -r HEAD^1 HEAD | while read -r file; do
-            echo "./${file}"
+            echo "*/${file}"
           done
       
       - name: Markdown Linter
