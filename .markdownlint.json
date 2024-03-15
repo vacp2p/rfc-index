@@ -1,4 +1,7 @@
 {
+  "default": true,
+  "MD013": false,
+  "files": "steps.filter_files.outputs.markdown_files",
   "code-block-style": {
     "style": "fenced"
   },
