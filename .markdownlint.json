@@ -1,7 +1,7 @@
 {
   "default": true,
   "MD013": false,
-  "files": "steps.filter_files.outputs.markdown_files",
+  "files": "steps.get_files_changed.outputs.stdout",
   "code-block-style": {
     "style": "fenced"
   },
