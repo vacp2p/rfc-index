@@ -13,12 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: New Files
+        uses: actions/checkout@v2
+      
+      - name: Get changed files
+        id: changed_files
         run: echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})"
-        
+
+      - name: Filter Markdown files
+        id: filter_files
+        run: echo "::set-output name=markdown_files::$(echo '${{ steps.changed_files.outputs.files }}' | grep '\.md$')"
+
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          globs: '**/*.md'
+          globs: ${{ steps.filter_files.outputs.markdown_files }}
