@@ -5,12 +5,13 @@ name: Waku v2 Message
 status: draft
 category: Standards Track
 tags: waku/core-protocol
-editor: Oskar Thorén <oskarth@titanproxy.com>
+editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Sanaz Taheri <sanaz@status.im>
   - Aaryamann Challani <aaryamann@status.im>
   - Lorenzo Delgado <lorenzo@status.im>
   - Abhimanyu Rawat <abhi@status.im>
+  - Oskar Thorén <oskarth@titanproxy.com>
 ---
 
 ## Abstract
@@ -28,7 +29,7 @@ When sending messages over Waku, there are multiple requirements:
 
 - One may have a separate encryption layer as part of the application.
 - One may want to provide efficient routing for resource-restricted devices.
-- One may want to provide compatibility with [Waku v1 envelopes](../6/waku1.md).
+- One may want to provide compatibility with [Waku v1 envelopes](../../legacy/6/waku1.md).
 - One may want encrypted payloads by default.
 - One may want to provide unlinkability to get metadata protection.
 
@@ -195,7 +196,7 @@ Therefore, because message timestamps aren’t independently verified, this attr
 It should not solely be relied upon for operations such as message ordering.
 For example, a malicious actor can arbitrarily set the `timestamp` of a Waku message to a high value so that it always shows up as the most recent message in a chat application.
 Applications using Waku messages’ `timestamp` attribute are recommended to use additional methods for more robust message ordering.
-An example of how to deal with message ordering against adversarial message timestamps can be found in the Status protocol, see [6/PAYLOADS](../6/waku1.md/#clock-vs-timestamp-and-message-ordering).
+An example of how to deal with message ordering against adversarial message timestamps can be found in the Status protocol, see [62/STATUS-PAYLOADS](../../../../status/62/payloads.md/#clock-vs-timestamp-and-message-ordering).
 
 ### Reliability of the `ephemeral` attribute
 
@@ -210,8 +211,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [6/WAKU1](/spec/6/)
+- [6/WAKU1](../../legacy/6/waku1.md)
 - [Google Protocol buffers v3](https://developers.google.com/protocol-buffers/)
 - [26/WAKU-PAYLOAD](../../application/26/payload.md)
 - [35/WAKU2-NOISE]([/spec/35](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md))
-- [6/PAYLOADS](https://specs.status.im/spec/6#clock-vs-timestamp-and-message-ordering)
+- [62/STATUS-PAYLOADS](../../../../status/62/payloads.md/#clock-vs-timestamp-and-message-ordering)
