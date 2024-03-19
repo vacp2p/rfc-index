@@ -4,11 +4,12 @@ title: 17/WAKU2-RLN-RELAY
 name: Waku v2 RLN Relay
 status: draft
 tags: waku-core
-editor: Hanno Cornelius <hanno@status.im>
+editor: Alvaro Revuelta <alvaro@status.im>
 contributors:
   - Oskar Thorén <oskarth@titanproxy.com>
   - Aaryamann Challani <aaryamann@status.im>
   - Sanaz Taheri <sanaz@status.im>
+  - Hanno Cornelius <hanno@status.im>
 ---
 
 The `17/WAKU2-RLN-RELAY` protocol is an extension of `11/WAKU2-RELAY` which additionally provides spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
