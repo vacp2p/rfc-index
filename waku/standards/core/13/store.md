@@ -4,7 +4,7 @@ title: 13/WAKU2-STORE
 name: Waku v2 Store
 status: draft
 tags: waku-core
-editor: Hanno Cornelius <hanno@status.im> Sanaz Taheri <sanaz@status.im>
+editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
   - Oskar Thorén <oskarth@titanproxy.com>
