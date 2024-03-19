@@ -74,7 +74,7 @@ This requires keeping track of the [last time each peer was disconnected](#track
 
 A Waku v2 client MAY choose to implement a keep-alive mechanism to certain peers.
 If a client chooses to implement keep-alive on a connection,
-it SHOULD do so by sending periodic [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping) as per `10/WAKU2` [client recommendations](../../standards/core/10/WAKU2.md/#recommendations-for-clients).
+it SHOULD do so by sending periodic [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping) as per `10/WAKU2` [client recommendations](../../standards/core/10/waku2.md/#recommendations-for-clients).
 The recommended period between pings SHOULD be _at most_ 50% of the shortest idle connection timeout for the specific client and transport.
 For example, idle TCP connections often times out after 10 to 15 minutes.
 
@@ -96,4 +96,4 @@ Copyright and related rights waived via
 - [`18/WAKU2-SWAP`](../../standards/application/18/swap.md)
 - [backing off period](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#prune-backoff-and-peer-exchange)
 - [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping)
-- [`10/WAKU2` client recommendations](https://rfc.vac.dev/spec/10/#recommendations-for-clients)
+- [`10/WAKU2` client recommendations](../../standards/core/10/waku2.md/#recommendations-for-clients)
