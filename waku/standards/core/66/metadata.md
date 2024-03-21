@@ -20,9 +20,9 @@ The parameters are the following:
 * `clusterId`: Unique identifier of the cluster that the node is running in.
 * `shards`: Shard indexes that the node is subscribed to.
 
-### Protocol id
+***Protocol Identifier***
 
-`/vac/waku/metadata/1.0.0`
+    /vac/waku/metadata/1.0.0
 
 ### Request
 
