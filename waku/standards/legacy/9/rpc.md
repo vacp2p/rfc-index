@@ -46,7 +46,7 @@ In this section you will find objects used throughout the JSON RPC API.
 
 #### Message
 
-The message object represents a Waku message. Below you will find the description of the attributes contained in the message object. A message is the decrypted payload and padding of an [envelope](/spec/7) along with all of its metadata and other extra information such as the hash.
+The message object represents a Waku message. Below you will find the description of the attributes contained in the message object. A message is the decrypted payload and padding of an [envelope](../7/data.md) along with all of its metadata and other extra information such as the hash.
 
 | Field | Type | Description |
 | ----: | :--: | ----------- |
