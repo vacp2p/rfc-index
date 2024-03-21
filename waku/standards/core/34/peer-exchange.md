@@ -1,10 +1,13 @@
 ---
-title: WAKU2-PEER-EXCHANGE
+slug: 34
+title: 34/WAKU2-PEER-EXCHANGE
 name: Waku v2 Peer Exchange
+status: draft
 category: Standards Track
 tags: waku/core-protocol
-editor: Daniel Kaiser <danielkaiser@status.im>
+editor: Hanno Cornelius <hanno@status.im> 
 contributors:
+- Daniel Kaiser <danielkaiser@status.im>
 ---
 
 ## Abstract
@@ -13,11 +16,13 @@ This document specifies a simple request-response peer exchange protocol.
 Responders send information about a requested number of peers.
 The main purpose of this protocol is providing resource restricted devices with peers.
 
-**Protocol identifier**: /vac/waku/peer-exchange/2.0.0-alpha1
+***Protocol Identifier*** 
+
+    /vac/waku/peer-exchange/2.0.0-alpha1
 
 ## Background and Motivation
 
-It may not be feasible on resource restricted devices to take part in distributed random sampling ambient peer discovery protocols such as [33/WAKU2-DISCV5](https://rfc.vac.dev/spec/33/).
+It may not be feasible on resource restricted devices to take part in distributed random sampling ambient peer discovery protocols such as [33/WAKU2-DISCV5](../33/discv5.md).
 The Waku peer discovery protocol specified in this document allows resource restricted devices to request a list of peers from a service node.
 Network parameters necessary to connect to this service node COULD be learned from a static bootstrapping method or using [EIP-1459: Node Discovery via DNS](https://eips.ethereum.org/EIPS/eip-1459).
 The advantage of using Waku peer exchange to discover new peers over using a static peer list or DNS discovery is a more even load distribution.
@@ -25,7 +30,7 @@ If a lot of (resource restricted) nodes would use the same service nodes as rela
 Heavily used static nodes also add a centralized element. Downtime of such a node might significantly impact the network.
 
 However, the resource efficiency of this protocol comes at an anonymity cost, which is explained in the [Security/Privacy Considerations](#securityprivacy-considerations) section.
-This protocol SHOULD only be used if [33/WAKU2-DISCV5](https://rfc.vac.dev/spec/33/) is infeasible.
+This protocol SHOULD only be used if [33/WAKU2-DISCV5](../33/discv5.md) is infeasible.
 
 ## Theory and Protocol Semantics
 
@@ -38,7 +43,7 @@ The [multiaddresses](https://docs.libp2p.io/concepts/addressing/) used to connec
 
 In order to protect its anonymity, the responder MUST NOT provide peers from its actively used peer list as this opens pathways to *Neighbourhood Surveillance* attacks, as described in the
 [Security/Privacy Considerations Section](#securityprivacy-considerations).
-The responder SHOULD provide a set of peers that has been retrieved using ambient peer discovery methods supporting random sampling, e.g. [33/WAKU2-DISCV5](https://rfc.vac.dev/spec/33/).
+The responder SHOULD provide a set of peers that has been retrieved using ambient peer discovery methods supporting random sampling, e.g. [33/WAKU2-DISCV5](../33/discv5.md).
 This both protects the responder's anonymity as well as helps distributing load.
 
 To allow for fast responses, responders SHOULD retrieve peers unsolicited (before receiving a query)
@@ -134,7 +139,7 @@ As a weak mitigation the requester MAY ask several peers and select a subset of 
 Responders that answer with active mesh peers are more vulnerable to a *neighbourhood surveillance* attack.
 Responding with the set of active mesh peers allows a malicious requester to get into the required position more easily.
 It takes away the first hurdle of the *neighbourhood surveillance* attack: The attacker knows which peers to try to connect to.
-This increased vulnerability can be avoided by only responding with randomly sampled sets of peers, e.g. by requesting a random peer set via [33/WAKU2-DISCV5](https://rfc.vac.dev/spec/33/).
+This increased vulnerability can be avoided by only responding with randomly sampled sets of peers, e.g. by requesting a random peer set via [33/WAKU2-DISCV5](../33/discv5.md).
 (As stated in the [Theory and Protocol Semantics Section](#theory-and-protocol-semantics),
 these peer sets SHOULD be retrieved unsolicitedly before receiving requests to achieve faster response times.)
 
@@ -159,7 +164,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-* [33/WAKU2-DISCV5](https://rfc.vac.dev/spec/33/)
+* [33/WAKU2-DISCV5](../33/discv5.md)
 * [WAKU2-ENR](../enr.md)
 * [multiaddress](https://docs.libp2p.io/concepts/addressing/)
 * [libp2p discovery interface](https://github.com/status-im/nim-libp2p/issues/140)
