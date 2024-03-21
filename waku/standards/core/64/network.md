@@ -288,7 +288,7 @@ defined in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/
 and SHOULD use the short length format:
 
 ```
-/{application-name}/{version-of-the-application}/{content-topic-name}/{encoding}`
+/{application-name}/{version-of-the-application}/{content-topic-name}/{encoding}
 ```
 
 When an encapsulating application makes use of autosharding
