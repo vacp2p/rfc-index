@@ -1,0 +1,43 @@
+name: Website Sync
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    actions:
+      - closed
+
+jobs:
+  sync:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Clone Repository B
+        run: |
+          git clone git@github.com:vacp2p/rfc-website.git
+          cd rfc-website
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: List of changed files
+        id: changed_files
+        run: |
+          echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})"
+      
+      - name: Copy changed files to Website
+        run: |
+          for file in ${{ steps.changed_files.outputs.files }}; do
+            cp --parents "$file" rfc-website/
+          done
+
+      - name: Push changes to Repository B
+        run: |
+          cd rfc-website
+          git add .
+          git commit -m "Sync website"
+          git push origin main
