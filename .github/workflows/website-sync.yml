@@ -5,8 +5,6 @@ on:
     types: [closed]
     branches:
       - main
-    actions:
-      - closed
 
 jobs:
   sync:
@@ -17,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Clone Repository B
+      - name: Clone Website Repo
         run: |
           git clone git@github.com:vacp2p/rfc-website.git
           cd rfc-website
@@ -29,13 +27,13 @@ jobs:
         run: |
           echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})"
       
-      - name: Copy changed files to Website
+      - name: Copy changed files to Website Repo
         run: |
           for file in ${{ steps.changed_files.outputs.files }}; do
             cp --parents "$file" rfc-website/
           done
 
-      - name: Push changes to Repository B
+      - name: Push changes to Website Repo
         run: |
           cd rfc-website
           git add .
