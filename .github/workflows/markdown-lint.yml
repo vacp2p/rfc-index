@@ -29,4 +29,4 @@ jobs:
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          globs: ${{ env.CHANGED_FILES}}
+          globs: ${{ env.CHANGED_FILES }}
