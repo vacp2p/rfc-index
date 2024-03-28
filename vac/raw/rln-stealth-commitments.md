@@ -81,7 +81,7 @@ message Response {
 
 ```
 
-- The receiver MUST generate an `ephemeral_public_key`, `view_tag` and `stealth_commitment`.
+The receiver MUST generate an `ephemeral_public_key`, `view_tag` and `stealth_commitment`.
 This will be used to check the stealth commitment used to register to the membership set,
 and the user MUST be able to check ownership with their `viewing_public_key`.
 
