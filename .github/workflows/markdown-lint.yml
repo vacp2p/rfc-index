@@ -19,7 +19,7 @@ jobs:
       - name: Get changed files
         continue-on-error: true
         run: |
-          echo "CHANGED_FILES=$(gh pr diff ${{ github.event.number }} --name-only | grep '\.md$' | xargs)" >> $GITHUB_ENV
+          echo "CHANGED_FILES=$(gh pr diff ${{ github.event.number }} --name-only | grep '\.md$' | xargs -I {} echo "{}")" >> $GITHUB_ENV
 
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
