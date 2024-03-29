@@ -32,10 +32,19 @@ jobs:
           for file in ${{ steps.changed_files.outputs.files }}; do
             cp --parents "$file" rfc-website/
           done
+      
+      - name: Add frontmatter
+        run: |
+          for file in ${{ steps.changed_files.outputs.files }}; do
+            frontmatter=$(awk '/^---$/ {c++; next} c==2 {print; exit}' "$file")
+            sed -i "/^---$/ {n; a$frontmatter\n\n}" "$file"
+          done
 
       - name: Push changes to Website Repo
         run: |
           cd rfc-website
           git add .
           git commit -m "Sync website"
-          git push origin main
+          git push origin master
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
