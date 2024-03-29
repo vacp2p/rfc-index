@@ -24,3 +24,9 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Markdown Linter
+        uses: DavidAnson/markdownlint-cli2-action@v15
+        with:
+          globs: ${{ env.CHANGED_FILES}}
