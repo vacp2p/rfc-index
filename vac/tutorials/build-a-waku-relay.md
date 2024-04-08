@@ -18,12 +18,10 @@ To start, we will implement the [11/WAKU2-RELAY](https://rfc.vac.dev/spec/11/) p
 ## Configuration
 
 Your node must use configurations detailed in [11/WAKU2-RELAY](https://rfc.vac.dev/spec/11/).
-The [11/WAKU2-RELAY](https://rfc.vac.dev/spec/11/) is the most important protocol to implement,
-as all Waku nodes should be a running a relay.
+The [11/WAKU2-RELAY](https://rfc.vac.dev/spec/11/) should be the first protocol to implement when building your Waku node.
  
-
-Let's set up the basic libp2p modules that are need for a Waku Relay. 
-First, lets create a directory for our new project:
+Let's set up the required libp2p modules first. 
+Create a directory for our new project:
 
 ``` bash
 
@@ -41,13 +39,10 @@ In your new directory, download the supported py-libp2p from the github reposito
 > git clone git@github.com:libp2p/py-libp2p.git
 
 ```
-## Test Configuration
-The py-libp2p is packaged with a a `chat.py` as an example of sending a message between two libp2p. 
-We will modify this later to help use send Waku messages.
 ## Publish/Subsrcibe Method
 
-Now that the we have a simple libp2p node running,
-lets add more components to our node.
+Now that the we have a py-libp2p modules installed lets create our relay.py file.
+Below is the components we will add: be lets add more components to our node.
 A Waku node uses Publish/Subscribe (pubsub) to allow peers to communicate with each other.
 Peers are able to join topics, within a network,
 that they are interseted in using pubsub.
