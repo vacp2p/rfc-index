@@ -51,28 +51,33 @@ receive messages within the topic.
 
 The gossipsub protocol is the pubsub protocol used in a Waku node.
 To implement gossipsub on your Waku node,
-first we will import the proper packages. 
+we will import the proper packages. 
 
 ``` python
 
 # import the necessary py-libp2p
-from libp2p.pubsub import pubsub
-from libp2p.pubsub import gossipsub
+from libp2p.pubsub.abc import IPubsubRouter
+from libp2p.pubsub.pubsub import Pubsub
+from libp2p.pubsub.gossipsub import GossipSub
 from libp2p.peer.id import ID
+from libp2p.typing import TProtocol
 
 
 ```
-The main functions needed to use gossipsub in a Waku node will be:
-- publish
-- run
-- subscribe
-- unsubscribe
-- s
+A few more packages will be needed which can be view in the the excutable example scipt.
+Above is the important pubsub packages provided by py-libp2p.
 
+- Pubsub : this is the main pubsub packages that enables the interface for the routing mech of the system
+- Gossipsub : is the proposed routing mech using the pubsub interface
+- IPubsubRouter : a python interface provided by py-libp2p
+- TProtocol : interface provided by py-libp2p for simple pubsub rpc use
+
+> Note: This is not a RECCOMMENDED python implementation for production.
+
+We will need a `run` function that will be use to start our node. 
+The run will interact with the four 
 ``` python
-class WakuNode():
 
-def start() -> None:
   
 ```
 
