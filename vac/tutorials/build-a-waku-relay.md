@@ -2,7 +2,7 @@
 
 title: Build a Waku Relay Node
 name: Build a node
-status: draft
+status: raw
 editor: Jimmy Debe <jimmy@status.im>
 contributors:
   
@@ -30,7 +30,9 @@ Create a directory for our new project:
 > cd waku-node
 
 ```
-In your new directory, download the supported py-libp2p from the github repository.
+In your new directory, create a new file named `relay.py`.
+Make sure that your envirnoment has the 3.8 python version.
+Then, download the supported py-libp2p from the github repository.
 
 > Note: py-libp2p is still under development and should not be used for production envirnoments.
 
@@ -41,7 +43,7 @@ In your new directory, download the supported py-libp2p from the github reposito
 ```
 ## Publish/Subsrcibe Method
 
-Now that the we have a py-libp2p modules installed lets create our relay.py file.
+Now that the we have a py-libp2p modules installed lets create our `relay.py` file.
 Below is the components we will add: be lets add more components to our node.
 A Waku node uses Publish/Subscribe (pubsub) to allow peers to communicate with each other.
 Peers are able to join topics, within a network,
@@ -70,14 +72,57 @@ Above is the important pubsub packages provided by py-libp2p.
 - Pubsub : this is the main pubsub packages that enables the interface for the routing mech of the system
 - Gossipsub : is the proposed routing mech using the pubsub interface
 - IPubsubRouter : a python interface provided by py-libp2p
-- TProtocol : interface provided by py-libp2p for simple pubsub rpc use
+- TProtocol : interface provided by py-libp2p for simple pubsub rpc use( identify the pubsub `protocol_id` to be used )
 
 > Note: This is not a RECCOMMENDED python implementation for production.
 
-We will need a `run` function that will be use to start our node. 
-The run will interact with the four 
-``` python
+- Initialize the pubsub `protocol_id`
 
-  
+``` python
+  PROTOCOL_ID = TProtocol("/relay/1.0.0")
+  topics = waku_Test
 ```
 
+We will need a `run` function that will be use to start our node. 
+This `run` will interact with the four packages mentioned above and
+will be used locally for testing purposes. 
+When testing the `run` function will include a method to open multiple node pointing to different port numbers.
+
+To do this run the `relay.py` with the following command:
+> python relay.py -p 8001
+
+The next command should have a different port number
+> python relay.py -p 8002
+
+Depending on the testing, multiple node may need to be running.
+
+``` python
+    async def run(port: int, pubsubTopic: str) -> None:
+      localhost_ip = "127.0.0.1"
+      listen_addr = multiaddr.Multiaddr(f"/ip4/0.0.0.0/tcp/{port}")
+      
+      router = pubsubRouter()
+      host = new_host()
+      pubsub = Pubsub(host, router)
+      gossip = GossipSub(PROTOCOL_ID, 6, 4, 8, 7000)
+
+      async with host.run(listen_addrs=[listen_addr]), trio.open_nursery() as nursery:
+        info = info_from_p2p_addr(maddr)
+        await host.connect(info)
+
+      async def stream_handler(stream: INetStream) -> None:
+          nursery.start_soon(read_data, stream)
+          nursery.start_soon(write_data, stream)
+            
+          host.set_stream_handler(PROTOCOL_ID, stream_handler)
+  
+```
+`run` Parameters:
+ - `port` = The port number the node will use.
+Will be using a local address for testing purpose.
+- `pubsubTopic` = Used for when a node will like to send a message to a topic
+
+  Initalize pubsub object:
+  - `router` = Will be used to interact with the pubsub rpc interface
+  - `host` = the main libp2p host object
+  - `pubsub` = the pubsub interface object
