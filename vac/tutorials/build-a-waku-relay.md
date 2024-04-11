@@ -109,11 +109,11 @@ Depending on the testing, multiple node may need to be running.
       async with host.run(listen_addrs=[listen_addr]), trio.open_nursery() as nursery:
         info = info_from_p2p_addr(maddr)
         await host.connect(info)
-
+      # Used to test sending a message to a topic
       async def stream_handler(stream: INetStream) -> None:
           nursery.start_soon(read_data, stream)
           nursery.start_soon(write_data, stream)
-            
+      
           host.set_stream_handler(PROTOCOL_ID, stream_handler)
   
 ```
