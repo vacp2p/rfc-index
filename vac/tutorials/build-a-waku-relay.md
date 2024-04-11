@@ -9,11 +9,10 @@ contributors:
 ---
 ## Building a Waku Node: Waku Relay
 
-This is a tutorial demonstatraing how to build your own Waku node using python. 
+This is a tutorial will be a series on how to build your own Waku node using python. 
 Waku provides a collection of protocols on top of libp2p providing messaging anonymity,.
-This guide will use the core protocols of Waku v2, as described in [10/WAKU2](https://rfc.vac.dev/spec/10/), 
-other protocols can be added to your node after completing the tutorial.
-To start, we will implement the [11/WAKU2-RELAY](https://rfc.vac.dev/spec/11/) protocol.
+We will start with [11/WAKU2-RELAY](https://rfc.vac.dev/spec/11/),
+which is a stable specification that describes how every Waku nodes must run the a libp2p node based on the [Pubsub interface](https://github.com/libp2p/specs/blob/master/pubsub/README.md). 
 
 ## Configuration
 
@@ -97,7 +96,7 @@ The next command should have a different port number
 Depending on the testing, multiple node may need to be running.
 
 ``` python
-    async def run(port: int, pubsubTopic: str) -> None:
+    async def run(port: int, pubsub_topic: str) -> None:
       localhost_ip = "127.0.0.1"
       listen_addr = multiaddr.Multiaddr(f"/ip4/0.0.0.0/tcp/{port}")
       
@@ -109,20 +108,51 @@ Depending on the testing, multiple node may need to be running.
       async with host.run(listen_addrs=[listen_addr]), trio.open_nursery() as nursery:
         info = info_from_p2p_addr(maddr)
         await host.connect(info)
-      # Used to test sending a message to a topic
-      async def stream_handler(stream: INetStream) -> None:
-          nursery.start_soon(read_data, stream)
-          nursery.start_soon(write_data, stream)
       
-          host.set_stream_handler(PROTOCOL_ID, stream_handler)
-  
+          host.set_stream_handler(PROTOCOL_ID, stream_handler) 
 ```
 `run` Parameters:
  - `port` = The port number the node will use.
 Will be using a local address for testing purpose.
-- `pubsubTopic` = Used for when a node will like to send a message to a topic
+- `pubsub_topic` = Used for when a node will like to send a message to a topic
 
   Initalize pubsub object:
   - `router` = Will be used to interact with the pubsub rpc interface
   - `host` = the main libp2p host object
   - `pubsub` = the pubsub interface object
+
+ ## Subscribe to Pubsub Topics
+ Every node that is subscribe to a `pubsub_topic` will recieve all messages.
+ 
+```python
+async def subscribe(self, topic_id: str) -> ISubscriptionAPI:
+    try:
+        await gossip.join(topic_id)
+    except Exception as e:
+        print("Error joining {e}")
+```
+  
+This will allow the program to subscribe to one topic everytime we run.
+In the `run` function, the program will subscribe to one topic.
+
+```python
+  res = subscribe(topic_id)
+```
+
+### Publishing to Pubsub Topics
+
+```python
+async def write_data(stream: INetStream, gossip: Gossipsub, topic_id: str) -> None:
+    async_f = trio.wrap_file(sys.stdin)
+    while True:
+        line = await async_f.readline()
+        await gossip.publish(topic_id, line.encode())
+
+# Located in the run() function
+
+async def stream_handler(stream: INetStream) -> None:
+      nursery.start_soon(write_data, stream, gossip, topic_id)
+```
+The `write_data` function will let the user to write to publish a message to the topics with the command-line.
+
+### 
