@@ -12,35 +12,38 @@ contributors:
   - Hanno Cornelius <hanno@status.im>
 ---
 
-The `17/WAKU2-RLN-RELAY` protocol is an extension of `11/WAKU2-RELAY` which additionally provides spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
+## Abstract
+This specification describes the `17/WAKU2-RLN-RELAY` protocol,
+which is an extension of `11/WAKU2-RELAY` to provide spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
 
 The security objective is to contain spam activity in a GossipSub network by enforcing a global messaging rate to all the peers.
-Peers that violate the messaging rate are considered spammers and their message is considered spam.
+Peers that violate the messaging rate are considered spammers and 
+their message is considered spam.
 Spammers are also financially punished and removed from the system. 
 
-
-<!-- **Protocol identifier***: `/vac/waku/waku-rln-relay/2.0.0-alpha1` -->
+**Protocol identifier***: `/waku/waku-rln-relay/2.0.0-alpha1`
 
 ## Motivation
 
-In open and anonymous p2p messaging networks, one big problem is spam resistance. 
-Existing solutions, such as Whisper’s proof of work are computationally expensive hence not suitable for resource-limited nodes. 
-Other reputation-based approaches might not be desirable, due to issues around arbitrary exclusion and privacy.
+In open and anonymous p2p messaging networks, 
+one big problem is spam resistance. 
+Existing solutions, such as Whisper’s proof of work,
+are computationally expensive hence not suitable for resource-limited nodes. 
+Other reputation-based approaches might not be desirable, 
+due to issues around arbitrary exclusion and privacy.
 
 We augment the [`11/WAKU2-RELAY`](../11/relay.md) protocol with a novel construct of [RLN](../../../../vac/32/rln-v1.md) to enable an efficient economic spam prevention mechanism that can be run in resource-constrained environments.
 
-
 ## Flow
 
-
 The messaging rate is defined by the `period` which indicates how many messages can be sent in a given period.
-We define an `epoch` as $\lceil$ `unix_time` / `period` $\rceil$. For example, if `unix_time` is `1644810116` and we set `period` to `30`, then `epoch` is  $\lceil$`(unix_time/period)`$\rceil$ `= 54827003`.
+We define an `epoch` as $\lceil$ `unix_time` / `period` $\rceil$. 
+For example, if `unix_time` is `1644810116` and we set `period` to `30`, 
+then `epoch` is  $\lceil$ `(unix_time/period)` $\rceil$ `= 54827003`.
 Note that `epoch` refers to epoch in RLN and not Unix epoch. This means a message can only be sent every period, where period is up to the application.
 See see section [Recommended System Parameters](#recommended-system-parameters) for some recommended ways to set a sensible `period` value depending on the application.
 Peers subscribed to a spam-protected `pubsubTopic` are only allowed to send one message per `epoch`.
 The higher-level layers adopting `17/WAKU2-RLN-RELAY` MAY choose to enforce the messaging rate for  `WakuMessages` with a specific `contentTopic` published on a `pubsubTopic`.
-
-
 
 ### Setup and Registration
 Peers subscribed to a specific `pubsubTopic` form a [RLN group](../../../../vac/32/rln-v1.md).
