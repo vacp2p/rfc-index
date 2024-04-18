@@ -111,38 +111,50 @@ is part of the membership group Merkle tree with the root `merkle_root`.
 For more details about the proof generation check [RLN](../../../../vac/32/rln-v1.md)
 The proof generation relies on the knowledge of two pieces of private information i.e., `sk` and `authPath`.
 The `authPath` is a subset of Merkle tree nodes by which a peer can prove the inclusion of its `pk` in the group. <!-- TODO refer to RLN RFC for authPath def -->
-The proof generation also requires a set of public inputs which are: the Merkle tree root `merkle_root`, the current `epoch`, and the message for which the proof is going to be generated. 
-In `17/WAKU2-RLN-RELAY`, the message is the concatenation of `WakuMessage`'s  `payload` filed and its `contentTopic` i.e., `payload||contentTopic`. 
+The proof generation also requires a set of public inputs which are:
+the Merkle tree root `merkle_root`, the current `epoch`, and
+the message for which the proof is going to be generated. 
+In `17/WAKU2-RLN-RELAY`, the message is the concatenation of `WakuMessage`'s  `payload` filed and
+its `contentTopic` i.e., `payload||contentTopic`. 
 
 #### Group Synchronization
 
 Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `authPath` which both require access to the membership Merkle tree. 
-Getting access to the Merkle tree can be done in various ways. 
-One way is that all the peers construct the tree locally.
-This can be done by listening to the registration and deletion events emitted by the membership contract.
+Getting access to the Merkle tree can be done in various ways: 
+
+1. Peers construct the tree locally.
+This can be done by listening to the registration and 
+deletion events emitted by the membership contract.
 Peers MUST update the local Merkle tree on a per-block basis.
 This is discussed further in the [Merkle Root Validation](#merkle-root-validation) section.
 
-Another approach for synchronizing the state of slashed `pk`s is to disseminate such information through a p2p GossipSub network to which all peers are subscribed. 
-This is in addition to sending the deletion transaction to the membership contract.
+2. For synchronizing the state of slashed `pk`s,
+disseminate such information through a `pubsubTopic` to which all peers are subscribed. 
+A deletion transaction SHOULD occur on the membership contract.
 The benefit of an off-chain slashing is that it allows real-time removal of spammers as opposed to on-chain slashing in which peers get informed with a delay,
 where the delay is due to mining the slashing transaction.
-For the group synchronization, one important security consideration is that peers MUST make sure they always use the most recent Merkle tree root in their proof generation.
+
+For the group synchronization, 
+one important security consideration is that peers MUST make sure they always use the most recent Merkle tree root in their proof generation.
 The reason is that using an old root can allow inference about the index of the user's `pk` in the membership tree hence compromising user privacy and breaking message unlinkability.
 
 #### Routing
 
-Upon the receipt of a PubSub message via [`11/WAKU2-RELAY`](../11/relay.md) protocol, the routing peer parses the `data` field as a `WakuMessage` and gets access to the `RateLimitProof` field.  
+Upon the receipt of a PubSub message via [`11/WAKU2-RELAY`](../11/relay.md) protocol, 
+the routing peer parses the `data` field as a `WakuMessage` and gets access to the `RateLimitProof` field.  
 The peer then validates the `RateLimitProof`  as explained next.
 
 ##### Epoch Validation
-If the `epoch` attached to the message is more than `max_epoch_gap` apart from the routing peer's current `epoch` then the message is discarded and considered invalid.
+If the `epoch` attached to the `WakuMessage` is more than `max_epoch_gap`,
+apart from the routing peer's current `epoch`,
+then the `WakuMessage` MUST be discarded and considered invalid.
 This is to prevent a newly registered peer from spamming the system by messaging for all the past epochs. 
 `max_epoch_gap` is a system parameter for which we provide some recommendations in section [Recommended System Parameters](#recommended-system-parameters).
 
 ##### Merkle Root Validation
 The routing peers MUST check whether the provided Merkle root in the `RateLimitProof` is valid.
-It can do so by maintaining a local set of valid Merkle roots, which consist of `acceptable_root_window_size` past roots.
+It can do so by maintaining a local set of valid Merkle roots, 
+which consist of `acceptable_root_window_size` past roots.
 These roots refer to the final state of the Merkle tree after a whole block consisting of group changes is processed.
 The Merkle roots are updated on a per-block basis instead of a per-event basis.
 This is done because if Merkle roots are updated on a per-event basis, some peers could send messages with a root that refers to a Merkle tree state that might get invalidated while the message is still propagating in the network, due to many registrations happening during this time frame.
@@ -157,16 +169,23 @@ See [Recommended System Parameters](#recommended-system-parameters) on choosing 
 ##### Proof Verification
 The routing peers MUST check whether the zero-knowledge proof `proof` is valid.
 It does so by running the zk verification algorithm as explained in [RLN](../../../../vac/32/rln-v1.md). 
-If `proof` is invalid then the message is discarded. 
+If `proof` is invalid then the message MUST be discarded. 
 
 ##### Spam detection
-To enable local spam detection and slashing, routing peers MUST record the `nullifier`, `share_x`, and `share_y` of incoming messages which are not discarded i.e., not found spam or with invalid proof or epoch.
+To enable local spam detection and slashing, 
+routing peers MUST record the `nullifier`, `share_x`, and `share_y` 
+of incoming messages which are not discarded i.e., not found spam or with invalid proof or epoch.
 To spot spam messages, the peer checks whether a message with an identical `nullifier` has already been relayed. 
-1. If such a message exists and its `share_x` and `share_y` components are different from the incoming message, then slashing takes place.
-That is, the peer uses the  `share_x` and `share_y`  of the new message and the  `share'_x` and `share'_y` of the old record to reconstruct the `sk` of the message owner.
-The `sk` then can be used to delete the spammer from the group and withdraw a portion `reward_portion` of its staked fund.
-2. If the `share_x` and `share_y` fields of the previously relayed message are identical to the incoming message, then the message is a duplicate and shall be discarded.
-3. If none is found, then the message gets relayed.
+
+1. If such a message exists and its `share_x` and `share_y`
+components are different from the incoming message, then slashing takes place.
+That is, the peer uses the  `share_x` and `share_y`
+of the new message and the `share'_x` and `share'_y`
+of the old record to reconstruct the `sk` of the message owner.
+The `sk` then MAY be used to delete the spammer from the group and
+withdraw a portion `reward_portion` of its staked funds.
+3. If the `share_x` and `share_y` fields of the previously relayed message are identical to the incoming message, then the message is a duplicate and MUST be discarded.
+4. If none is found, then the message gets relayed.
 
 An overview of the routing procedure and slashing is provided in Figure 2.
 
@@ -179,7 +198,7 @@ An overview of the routing procedure and slashing is provided in Figure 2.
 ### Payloads
 
 Payloads are protobuf messages implemented using [protocol buffers v3](https://developers.google.com/protocol-buffers/).
-Nodes MAY extend the  [14/WAKU2-MESSAGE](../14/message.md) with a `rate_limit_proof` field to indicate that their message is not spam.
+Nodes MAY extend the [14/WAKU2-MESSAGE](../14/message.md) with a `rate_limit_proof` field to indicate that their message is not spam.
 
 ```diff 
 
@@ -218,28 +237,30 @@ Below is the description of the fields of `RateLimitProof` and their types.
 | `share_x` and `share_y`| array of 32 bytes each | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the Poseidon hash of the `WakuMessage`'s `payload` concatenated with its `contentTopic` . `share_y` is calculated using [Shamir secret sharing scheme](../../../../vac/32/rln-v1.md) | <!-- todo specify the poseidon hash setting -->
 | `nullifier`  | array of 32 bytes | internal nullifier derived from `epoch` and peer's `sk` as explained in [RLN construct](../../../../vac/32/rln-v1.md)|
 
-
 ### Recommended System Parameters
-The system parameters are summarized in the following table, and the recommended values for a subset of them are presented next.
+The system parameters are summarized in the following table, and the RECOMMENDED values for a subset of them are presented next.
 
 | Parameter | Description |
 | ----: |----------- |
 |  `period`  | the length of `epoch` in seconds |
-| `staked_fund` | the amount of wei to be staked by peers at the registration |
+| `staked_fund` | the amount of funds to be staked by peers at the registration |
 | `reward_portion` | the percentage of `staked_fund` to be rewarded to the slashers |
 | `max_epoch_gap` | the maximum allowed gap between the `epoch` of a routing peer and the incoming message |
 | `acceptable_root_window_size` | The maximum number of past Merkle roots to store |
 
 #### Epoch Length
 A sensible value for the `period` depends on the application for which the spam protection is going to be used.
-For example, while the `period` of `1` second i.e., messaging rate of `1` per second, might be acceptable for a chat application, might be too low for communication among Ethereum network validators.
+For example, while the `period` of `1` second i.e., 
+messaging rate of `1` per second, might be acceptable for a chat application, 
+might be too low for communication among Ethereum network validators.
 One should look at the desired throughput of the application to decide on a proper `period` value.
-In the proof of concept implementation of `17/WAKU2-RLN-RELAY` protocol which is available in [nim-waku](https://github.com/status-im/nim-waku), the `period` is set to `1` second.
-Nevertheless, this value is also subject to change depending on user experience.
+
 
 #### Maximum Epoch Gap
-We discussed in the [Routing](#routing) section that the gap between the epoch observed by the routing peer and the one attached to the incoming message should not exceed a threshold denoted by  `max_epoch_gap` .
-The value of  `max_epoch_gap`  can be measured based on the following factors.
+We discussed in the [Routing](#routing) section that the gap between the epoch observed by the routing peer and
+the one attached to the incoming message should not exceed a threshold denoted by `max_epoch_gap`.
+The value of `max_epoch_gap` can be measured based on the following factors.
+
 - Network transmission delay `Network_Delay`: the maximum time that it takes for a message to be fully disseminated in the GossipSub network.
 - Clock asynchrony `Clock_Asynchrony`: The maximum difference between the Unix epoch clocks perceived by network peers which can be due to clock drifts.
   
