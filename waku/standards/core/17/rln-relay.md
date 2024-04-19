@@ -2,7 +2,7 @@
 slug: 17
 title: 17/WAKU2-RLN-RELAY
 name: Waku v2 RLN Relay
-status: draft
+status: stable
 tags: waku-core
 editor: Alvaro Revuelta <alvaro@status.im>
 contributors:
