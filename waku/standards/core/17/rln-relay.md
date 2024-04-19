@@ -14,9 +14,9 @@ contributors:
 
 ## Abstract
 This specification describes the `17/WAKU2-RLN-RELAY` protocol,
-which is an extension of `11/WAKU2-RELAY` to provide spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
+which is an extension of [`11/WAKU2-RELAY`](../11/relay.md) to provide spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md). 
 
-The security objective is to contain spam activity in a GossipSub network by enforcing a global messaging rate to all the peers.
+The security objective is to contain spam activity in the (64/WAKU-NETWORK)[] by enforcing a global messaging rate to all the peers.
 Peers that violate the messaging rate are considered spammers and 
 their message is considered spam.
 Spammers are also financially punished and removed from the system. 
@@ -35,6 +35,7 @@ due to issues around arbitrary exclusion and privacy.
 We augment the [`11/WAKU2-RELAY`](../11/relay.md) protocol with a novel construct of [RLN](../../../../vac/32/rln-v1.md) to enable an efficient economic spam prevention mechanism that can be run in resource-constrained environments.
 
 ## Specification
+
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ### Flow
@@ -184,7 +185,8 @@ of the new message and the `share'_x` and `share'_y`
 of the old record to reconstruct the `sk` of the message owner.
 The `sk` then MAY be used to delete the spammer from the group and
 withdraw a portion `reward_portion` of its staked funds.
-3. If the `share_x` and `share_y` fields of the previously relayed message are identical to the incoming message, then the message is a duplicate and MUST be discarded.
+3. If the `share_x` and `share_y` fields of the previously relayed message are identical to the incoming message,
+then the message is a duplicate and MUST be discarded.
 4. If none is found, then the message gets relayed.
 
 An overview of the routing procedure and slashing is provided in Figure 2.
@@ -234,7 +236,7 @@ Below is the description of the fields of `RateLimitProof` and their types.
 | ----: | ----------- | ----------- |
 | `proof` | array of 256 bytes | the zkSNARK proof as explained in the [Publishing process](##Publishing) |
 | `merkle_root` | array of 32 bytes in little-endian order | the root of membership group Merkle tree at the time of publishing the message |
-| `share_x` and `share_y`| array of 32 bytes each | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the Poseidon hash of the `WakuMessage`'s `payload` concatenated with its `contentTopic` . `share_y` is calculated using [Shamir secret sharing scheme](../../../../vac/32/rln-v1.md) | <!-- todo specify the poseidon hash setting -->
+| `share_x` and `share_y`| array of 32 bytes each | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the Poseidon hash of the `WakuMessage`'s `payload` concatenated with its `contentTopic` . `share_y` is calculated using [Shamir secret sharing scheme](../../../../vac/32/rln-v1.md) |
 | `nullifier`  | array of 32 bytes | internal nullifier derived from `epoch` and peer's `sk` as explained in [RLN construct](../../../../vac/32/rln-v1.md)|
 
 ### Recommended System Parameters
@@ -255,7 +257,6 @@ messaging rate of `1` per second, might be acceptable for a chat application,
 might be too low for communication among Ethereum network validators.
 One should look at the desired throughput of the application to decide on a proper `period` value.
 
-
 #### Maximum Epoch Gap
 We discussed in the [Routing](#routing) section that the gap between the epoch observed by the routing peer and
 the one attached to the incoming message should not exceed a threshold denoted by `max_epoch_gap`.
@@ -264,8 +265,8 @@ The value of `max_epoch_gap` can be measured based on the following factors.
 - Network transmission delay `Network_Delay`: the maximum time that it takes for a message to be fully disseminated in the GossipSub network.
 - Clock asynchrony `Clock_Asynchrony`: The maximum difference between the Unix epoch clocks perceived by network peers which can be due to clock drifts.
   
-With a reasonable approximation of the preceding values, one can set  `max_epoch_gap`   as 
-`max_epoch_gap` $= \lceil \frac{\text{Network Delay} + \text{Clock Asynchrony}}{\text{Epoch Length}}\rceil$   where  `period`  is the length of the `epoch` in seconds.
+With a reasonable approximation of the preceding values, one can set  `max_epoch_gap`  as 
+`max_epoch_gap` $= \lceil \frac{\text{Network Delay} + \text{Clock Asynchrony}}{\text{Epoch Length}}\rceil$  where  `period`  is the length of the `epoch` in seconds.
 `Network_Delay` and `Clock_Asynchrony` MUST have the same resolution as  `period` .
 By this formulation,  `max_epoch_gap`  indeed measures the maximum number of `epoch`s that can elapse since a message gets routed from its origin to all the other peers in the network.
 
@@ -286,7 +287,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [RLN documentation](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view)
-2. [Public inputs to the RLN circuit](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Public-Inputs)
-3. [Shamir secret sharing scheme used in RLN](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Linear-Equation-amp-SSS)
-4. [RLN internal nullifier](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Nullifiers)
+1. [`11/WAKU2-RELAY`](../11/relay.md)
+2. [RLN](../../../../vac/32/rln-v1.md)
+3. [14/WAKU2-MESSAGE](../14/message.md)
+4. [RLN documentation](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view)
+5. [Public inputs to the RLN circuit](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Public-Inputs)
+6. [Shamir secret sharing scheme used in RLN](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Linear-Equation-amp-SSS)
+7. [RLN internal nullifier](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Nullifiers)
