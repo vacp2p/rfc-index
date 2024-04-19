@@ -191,8 +191,6 @@ then the message is a duplicate and MUST be discarded.
 
 An overview of the routing procedure and slashing is provided in Figure 2.
 
-<!-- TODO: may consider [validator functions](https://github.com/libp2p/specs/tree/master/pubsub#topic-validation) or [extended validators](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators) for the spam detection -->
-
 ![Figure 2: Publishing, Routing and Slashing workflow.](./images/rln-message-verification.png)
 
 -------
