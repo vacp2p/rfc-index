@@ -42,44 +42,34 @@ The requester SHOULD include the following:
 requestStorage {
   // content identifier
   byte cid = 1
-
   // Tokens from the requester to reward storage nodes
   byte reward = 2
-
   // Amount of tokens required for collateral by storage nodes
   byte collateral = 3
-
   // Frequency that proofs are checked by validator nodes
   byte proofProbability = 4
-
   //
   proofParameters = 5
-
-  //
-  erasureCoding = 6
-
-  //
+  // Amount of desired time for stoageRequest
+  uint64 duration = 6
+  //The requester can choose amount of spreading of data to storage nodes
   dispersal = 7
-
   //
   repair = 8
-
   // Number of storage hosts 
-  nodes = 9
-
+  uint nodes = 9
   //
-  duratioin = 10
-
-  //
-  tolerance = 11
-
+  uint tolerance = 10
   // Timeout set for slots to be filled
-  expire = 12
+  expire = 11
 }
 
 ```
-- cid MUST be a sha2-256 hash (length 32 bytes, base58) of the data being stored
 
-The contract will be open to any storage node willing to accepting to store the data.
-### Filling Slots
+- `cid` MUST be a sha2-256 hash (length 32 bytes, base58) of the data being stored
+- 
+
+The contract will be open to any storage node willing to accept to store the data.
+
+### Slots
 
