@@ -89,9 +89,13 @@ and a portion SHOULD be offered as reward to storage nodes that repair [slots](#
 
 ### Slots
 After a storage request is made, 
-the requester's Codex node will create slots from the blocks that are generated from the `cid`.
-Each slot will contain a sub-block of the data being stored.
-- Storage Nodes MUST provide token collateral
+the requester's Codex node will create slots using erasure coding.
+Each slot will contain a data block being stored.
+- Storage Nodes MUST provide token collateral and proof of storage to fill a slot
+- If storage nodes fails to provide proof of storage in a given period,
+the slot will become empty.
+- 
+
 
 -----------
 
