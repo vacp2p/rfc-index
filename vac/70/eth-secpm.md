@@ -287,7 +287,7 @@ Credentials MUST follow the specifications of section 5.3 of [RFC9420](https://d
 
 Below follows the flow diagram for the generation of credentials. 
 Users MUST generate key pairs by themselves.
-![credentials](https://github.com/vacp2p/rfc-index/assets/74050285/04011f8f-db01-4ae1-a720-1865d4c4d143)
+![figure1](./images/eth-secpm_credential.png)
 
 ### Message framing
 Handshake and application messages use a common framing structure providing encryption to ensure confidentiality within the group, and signing to authenticate the sender.
@@ -504,10 +504,10 @@ CredentialType credential_types<V>;
 }
 ```
 The flow diagram shows the procedure to fetch key material from other users:
-![fetching](https://github.com/vacp2p/rfc-index/assets/74050285/a74a648c-ae18-4b38-9df4-b347949997d9)
+![figure2](./images/eth-secpm_fetching.png)
 
 Below follows the flow diagram for the creation of a group:
-![group_creation](https://github.com/vacp2p/rfc-index/assets/74050285/ce8bc861-f3be-4e93-80c9-b0f07c758c71)
+![figure3](./images/eth-secpm_creation.png)
 
 ### Group evolution
 Group membership can change, and existing members can change their keys in order to achieve post-compromise security. 
@@ -553,15 +553,15 @@ When creating or processing a Commit, a client applies a list of proposals to th
 The client MUST apply the proposals in the list in the order described in Section 12.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Below follows the flow diagram for the addition of a member to a group:
-![group_addition](https://github.com/vacp2p/rfc-index/assets/74050285/b6ac69b1-5c0a-49de-b8f5-67d85711bfe3)
+![figure4](./images/eth-secpm_add.png)
 
 The diagram below shows the procedure to remove a group member:
 <br>
-![group_removal](https://github.com/vacp2p/rfc-index/assets/74050285/f7bb8761-e971-4b04-abc6-f42027965503)
+![figure5](./images/eth-secpm_remove.png)
 
 The flow diagram below shows an update procedure:
 <br>
-![update](https://github.com/vacp2p/rfc-index/assets/74050285/6a37eda4-d9cb-4e02-946a-821481cb3397)
+![figure6](./images/eth-secpm_update.png)
 
 
 ### Commit messages
