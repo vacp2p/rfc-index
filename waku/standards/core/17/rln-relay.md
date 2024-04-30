@@ -2,7 +2,7 @@
 slug: 17
 title: 17/WAKU2-RLN-RELAY
 name: Waku v2 RLN Relay
-status: stable
+status: draft
 tags: waku-core
 editor: Alvaro Revuelta <alvaro@status.im>
 contributors:
@@ -20,8 +20,6 @@ The security objective is to contain spam activity in the (64/WAKU-NETWORK)[] by
 Peers that violate the messaging rate are considered spammers and 
 their message is considered spam.
 Spammers are also financially punished and removed from the system. 
-
-**Protocol identifier***: `/waku/waku-rln-relay/2.0.0-alpha1`
 
 ## Motivation
 
@@ -68,7 +66,7 @@ which registers its `pk` in the RLN group.
 - The transaction MUST transfer additional tokens to the contract to be staked. 
 This amount is denoted by `staked_fund` and is a system parameter.
 The peer who has the secret key `sk` associated with a registered `pk` would be able to withdraw a portion `reward_portion` of the staked fund by providing valid proof.
-<!-- a secure way to prove the possession of a pk is yet under discussion, maybe via commit and reveal -->
+
 `reward_portion` is also a system parameter.
 
 > **NOTE:** Initially `sk` is only known to its owning peer however,
