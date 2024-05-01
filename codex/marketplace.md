@@ -22,6 +22,8 @@ simplify incentive mechanism.
 
 ## Semantics 
 
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+
 ### Definitions
 
 | Terminology  | Description |
@@ -37,13 +39,14 @@ simplify incentive mechanism.
 A Codex regular node can request storage of data by opening a storage contract on the blockchain. 
 The storage contract is opened on the marketplace via the blockchain, and 
 the data is split into blocks with erasure coding and placed in to slots for the request,
-slots discussed below. 
+see [slots](##Slots) discussed below. 
 
 The requester MUST provide `duration` of the storage request along with the appropriate `reward`,
 payment for request, before the contract is created. 
 Once a contract is created, 
 all slots MUST be filled by storage nodes before the request is officially started.
 If the request does not attract enough storage nodes after a pre-defined network timeout,
+which is defined by a Codex node as `expire`,
 the request SHOULD be canceled.
 If canceled, `collateral` SHOULD be returned to any storage nodes and 
 `reward` retruned to the requester.
@@ -65,11 +68,9 @@ proc requestStorage (): {} =
   # Amount of desired time for stoageRequest
   UInt256 duration = 5
   # The requester can choose amount of spreading of data to storage nodes
-  dispersal = 6
-  # Number of storage hosts 
+  uint dispersal = 6
+  # Minimum Number of storage hosts 
   uint nodes = 7
-  # 
-  uint tolerance = 8
 
 }
 
@@ -92,18 +93,21 @@ The collateral will be taken to punish a storage node when it does not follow th
 The following conditions MUST be fullfilled in a Codex storage contract
 - failing to provide proof of storage periodically, the RECOMMENDED method for proofs is [Proof-of-Data-Possession](https://hackmd.io/2uRBltuIT7yX0CyczJevYg?view).
 - a portion of `collateral` MUST be offered as rewards vaildator nodes,
-and a portion SHOULD be offered as reward to storage nodes that repair [slots](##slots)
+and a portion SHOULD be offered as reward to storage nodes that repair [slots](##Slots).
 
 `proofProbability`
 
 `duration`
 
-- Once the `reward` has depleted from steady storage node payment,
+- Once the `reward` has depleted from periodic storage node payment,
 the storage request SHOULD end.
-The requester MAY renew the storage request by creating a new request with the same `cid`.
-- 
+The requester MAY renew the storage request by creating a new request with the same `cid` value.
+- Data MAY be considered lost during contract `duration` if stroage nodes fail to provide storage proofs and
+no other storage nodes decide to fill empty slots, see [slots](##slots) below.
 
-
+`dispersal`
+- Storage nodes MUST not allowed to fill all slots in a request.
+- Requester SHOULD provide dispersal value
 
 ### Slots
 
@@ -112,9 +116,9 @@ the requester's Codex node will create slots using erasure coding.
 Each slot will contain a data block being stored.
 - Storage Nodes MUST provide token collateral and proof of storage to fill a slot
 - If storage nodes fails to provide proof of storage in a given period,
-the slot will become empty.
-- 
-
+the slot will become empty and the host assigned to that slot MUST forfeit its `collateral`.
+Other storage nodes can earn the forfeited `collateral` by providing new proof of storage and `collateral`,
+this is refered to as repairing the empty slot.
 
 -----------
 
@@ -134,4 +138,14 @@ the slot will become empty.
 
             ---------------- time ---------------->
 
+## Reference Implementation
+[Market](https://github.com/codex-storage/nim-codex/blob/master/codex/market.nim)
+[Node](https://github.com/codex-storage/nim-codex/blob/master/codex/node.nim)
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References 
+
+- [Proof-of-Data-Possession](https://hackmd.io/2uRBltuIT7yX0CyczJevYg?view)
 
