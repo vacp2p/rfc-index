@@ -15,7 +15,7 @@ This specification describes a method for Codex hosts and client nodes to partic
 The goal is to create a storage marketplace that promotes durability.
 
 ## Motivation
-The Codex network aims to create a peer-to-peer storage engine with strong data availability, 
+The Codex network aims to create a peer-to-peer storage engine with strong data durability, 
 data persistence guarantees and node storage incentives.
 To reach this goal, a data availability and retrieval mechanism is needed.
 Support for light clients, like mobile devices should also be embraced.
