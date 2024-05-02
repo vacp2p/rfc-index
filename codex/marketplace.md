@@ -117,13 +117,14 @@ no other storage nodes decide to fill empty slots, see [slots](#slots) below.
 
 ### Slots
 
-After a storage request is made, 
-the requester's Codex node will create slots using erasure coding.
-Each slot will contain a data block being stored.
+Before a storage request is made, 
+the requester's Codex client node will erasure code the dataset and 
+then split it up into chunks.
+Each slot represents a chunk of that data that needs to be stored by a storage provider.
 - Storage Nodes MUST provide token collateral and proof of storage to fill a slot
-- If storage nodes fail to provide proof of storage in a given period,
+- If storage nodes fail to provide enough proofs of storage,
 the slot will become empty and the host assigned to that slot MUST forfeit its `collateral`.
-Other storage nodes can earn the forfeited `collateral` by providing new proof of storage and `collateral`,
+Other storage nodes can earn a small portion of the forfeited `collateral` by providing new proof of storage and `collateral`,
 this is referred to as repairing the empty slot.
 
 -----------
@@ -137,8 +138,8 @@ this is referred to as repairing the empty slot.
             -------------------------------------------------------------------
                                     |                                    |
                                     v                                    v
-                                collateral                           collateral
-                                  lost                                 lost
+                                Update slashCriterion                collateral
+                                                                   lost
 
 
 
