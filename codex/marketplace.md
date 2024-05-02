@@ -31,23 +31,22 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 | Terminology  | Description |
 | --------------- | --------- |
 | Storage Nodes | A Codex node that provides storage services to the marketplace.|
-| Validator Nodes | A Codex node that collects, validates and submits proofs to reward or penalize other storage nodes or validator nodes. |
+| Validator Nodes | A Codex node that collects, validates and submits missing storage proofs for a reward |
 | Regular Nodes | The main Codex client that interacts with other nodes to locate and retrieve data. Also considered to be an ephemeral node (light client) |
 | Slots | An agreement between storage nodes and regular nodes to store data |
 
 ### Storage Request
 
-A regular node can request storage of data by opening a storage contract on the Codex blockchain. 
-The storage contract is opened in the marketplace via the blockchain, and 
-the requested data is split into blocks with erasure coding.
-Blocks of data are placed into slots to begin the request,
-see [slots](#slots) discussed below. 
+A regular node can request data storage from the marketplace smart contract on the blockchain. 
+Using erasure codeing, the dataset is split it into chunks and 
+placed into slots, see [slots](#slots) discussed below. 
+The requester SHOULD submit a transaction with the desired request parameters.
 
-The requester MUST provide `duration` of the storage request along with the appropriate `reward`,
-payment for request, before the contract is created. 
-Once a contract is created, 
-all slots MUST be filled by storage nodes before the request is officially started.
-If the request does not attract enough storage nodes after a pre-defined network timeout,
+The requester MUST provide `duration` value for the storage request along with the appropriate `reward`,
+payment for request. 
+Once a request is created via the transaction, 
+all slots MUST be filled by storage providers before the request is officially started.
+If the request does not attract enough storage providers after a pre-defined network timeout,
 which is defined by a Codex node as `expire`,
 the request SHOULD be canceled.
 If canceled, `collateral` SHOULD be returned to any storage nodes and 
