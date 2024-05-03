@@ -1,6 +1,5 @@
 ---
-slug: 70
-title: 70/ETH-SECPM
+title: ETH-SECPM
 name: Secure channel setup using Ethereum accounts
 status: raw
 category: Standards Track
