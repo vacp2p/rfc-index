@@ -810,6 +810,20 @@ After successfully parsing the message into ABNF terms, translation MAY happen a
 - The curve vurve448 MUST be chosen due to its higher security level: 224-bit security instead of the 128-bit security provided by X25519.
 - It is important that Bob MUST NOT reuse `SPK`.
 
+## Considerations related to the use of Ethereum addresses
+### With respect to the Authentication Service
+- If users used their Ethereum addresses as identifiers, they MUST generate their own credentials.
+These credentials MUST use the digital signature key pair associated to the Ethereum address.
+- Other users can verify credentials.
+- With this approach, there is no need to have a dedicated Authentication Service responsible for the issuance and verification of credentials.
+- The interaction diagram showing the generation of credentials becomes obsolete.
+
+### With respect to the Delivery Service
+- Users MUST generate their own KeyPackage.
+- Other users can verify KeyPackages when required.
+- A Delivery Service storage system MUST verify KeyPackages before storing them.
+- Interaction diagrams involving the DS do not change.
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
