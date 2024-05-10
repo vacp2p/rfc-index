@@ -1,17 +1,15 @@
 ---
-slug: 
 title: CODEX-MARKETPLACE
 name: Codex Storage Marketplace
 status: raw
 tags: codex
-editor: 
+editor: Dmitriy <dryajov@status.im>
 contributors:
-  
 ---
 
 ## Abstract
 
-This specification describes a method for Codex hosts and client nodes to participate in a storage marketplace. 
+This specification describes a method for Codex storage providers and client nodes to participate in a storage marketplace. 
 The goal is to create a storage marketplace that promotes durability.
 
 ## Motivation
@@ -30,28 +28,31 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 | Terminology  | Description |
 | --------------- | --------- |
-| Storage Nodes | A Codex node that provides storage services to the marketplace.|
-| Validator Nodes | A Codex node that collects, validates and submits missing storage proofs for a reward |
-| Regular Nodes | The main Codex client that interacts with other nodes to locate and retrieve data. Also considered to be an ephemeral node (light client) |
-| Slots | An agreement between storage nodes and regular nodes to store data |
+| Storage Providers | A Codex node that provides storage services to the marketplace. |
+| Validator Nodes | A Codex node that collects, validates and submits missing storage proofs for a reward. |
+| Client Nodes | The most common Codex node that interacts with other nodes to locate and retrieve data. Also considered to be an ephemeral node (light client). |
+| Slots | Created by client nodes when a new dataset is requested to be stored. Discussed further in the [slots section](#slots).  |
 
 ### Storage Request
 
-A regular node can request data storage from the marketplace smart contract on the blockchain. 
-Using erasure codeing, the dataset is split it into chunks and 
-placed into slots, see [slots](#slots) discussed below. 
-The requester SHOULD submit a transaction with the desired request parameters.
+Client nodes can create storage requests on the Codex marketplace via a smart contract on a EVM compatiable blockchain. 
+Client nodes MUST split the dataset into data chunks, (C1,C2,C3...C20).
 
-The requester MUST provide `duration` value for the storage request along with the appropriate `reward`,
+Using a erasure coding technique, 
+the data chunks are encoded and placed into separate slots.
+The RECCOMENDED erasure coding technique used for the Codex network is a [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA).
+
+The requester, client node, SHOULD submit a transaction with the desired request parameters.
+The requester MUST provide a `duration` value for the storage request along with the appropriate `reward`,
 payment for request. 
 Once a request is created via the transaction, 
 all slots MUST be filled by storage providers before the request is officially started.
 If the request does not attract enough storage providers after a pre-defined network timeout,
-which is defined by a Codex node as `expire`,
-the request SHOULD be canceled.
+which is defined by the Codex node as `expire`,
+the request MUST be canceled.
 If canceled, `collateral` SHOULD be returned to any storage nodes and 
 `reward` returned to the requester.
-The requester MAY create a new request with different values to attract storage nodes.
+The requester MAY create a new request with different values to restart the process.
 
 The requester SHOULD initiate the contract with the following values:
 
@@ -90,12 +91,12 @@ is a content identifier for the requested data to be stored
 
 `collateral`
 
-All storage nodes MUST provide token collateral before being able to fulfill a storage contract.
+All storage nodes MUST provide token collateral before being able to fill a storage slot in the contract.
 The collateral will be taken to punish a storage node when it does not follow the contract.
-The following conditions MUST be fulfilled in a Codex storage contract
-- failing to provide proof of storage periodically, the RECOMMENDED method for proofs is [Proof-of-Data-Possession](https://hackmd.io/2uRBltuIT7yX0CyczJevYg?view).
-- a portion of `collateral` MUST be offered as a reward to validator nodes,
-and a portion SHOULD be offered as a reward to storage nodes that repair [slots](#slots).
+The following conditions related to a storage providers `collateral` MUST be fulfilled during a storage contract
+- Failing to provide a periodic proof of storage,
+a portion of the `collateral` MUST be offered as a reward to validator nodes,
+and a portion SHOULD be offered as a reward to storage nodes that repair empty [slots](#slots).
 
 `proofProbability`
 
@@ -115,16 +116,22 @@ no other storage nodes decide to fill empty slots, see [slots](#slots) below.
 - Storage nodes MUST not allowed to fill all slots in a request.
 - Requester SHOULD provide dispersal value
 
-### Slots
+### Fulfilling Requests
+In order a storage request to begin,
+storage nodes MUST enter a storage contract with the requester via the marketplace smart contract.
+When storage providers are choosen to participate in the contract,
+storage providers MUST NOT leave the contract, unless the request is canceled, complete or forfiet of `collateral`.
 
-Before a storage request is made, 
-the requester's Codex client node will erasure code the dataset and 
-then split it up into chunks.
+
+#### Slots
+Slots is a method used by the Codex network to distribute data chucks amongst storage providers.
+Data chucks, created by clients nodes, MUST use a method of distributing for data resiliency.
+
 Each slot represents a chunk of that data that needs to be stored by a storage provider.
-- Storage Nodes MUST provide token collateral and proof of storage to fill a slot
+- Storage nodes MUST provide token collateral and proof of storage to fill a slot
 - If storage nodes fail to provide enough proofs of storage,
 the slot will become empty and the host assigned to that slot MUST forfeit its `collateral`.
-Other storage nodes can earn a small portion of the forfeited `collateral` by providing new proof of storage and `collateral`,
+Other storage nodes can earn a small portion of the forfeited `collateral` by providing a new proof of storage and `collateral`,
 this is referred to as repairing the empty slot.
 
 -----------
@@ -145,6 +152,8 @@ this is referred to as repairing the empty slot.
 
             ---------------- time ---------------->
 
+- Client nodes MAY decide how many nodes should fill the slots of a storage contract.
+How nodes are choosen are random based on Kadelima, as discussed here
 
 ## Copyright
 
@@ -152,6 +161,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References 
 
-1. [Proof-of-Data-Possession](https://hackmd.io/2uRBltuIT7yX0CyczJevYg?view)
-2. [Codex market implementation](https://github.com/codex-storage/nim-codex/blob/master/codex/market.nim)
+1. [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA)
+2. [Proof-of-Data-Possession](https://hackmd.io/2uRBltuIT7yX0CyczJevYg?view)
+3. [Codex market implementation](https://github.com/codex-storage/nim-codex/blob/master/codex/market.nim)
 
