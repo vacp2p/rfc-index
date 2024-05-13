@@ -424,7 +424,7 @@ which is used to track group membership changes. Then, it proceeds to call `proc
 
 ```
 op = (”create”, sender, seq, IDs)
-gamma$.history = gamma.history + {op}
+gamma.history = gamma.history + {op}
 return (process-seed(gamma, sender, seq, dmsg))
 ```
 
