@@ -373,7 +373,7 @@ This function initially employs `member-view` to identify the users who were par
 Then, it attempts to acquire the seed secret through the following steps:
 
 1. If the control message was dispatched by the local user,
-it uses the most recent invocation of `generate-seed` stored the seed secret in gamma.nextSeed.
+it uses the most recent invocation of `generate-seed` stored the seed secret in `gamma.nextSeed`.
 2. If the *control* message was dispatched by another user, and
 the local user is among its recipients, 
 the function utilizes `decrypt-from` to decrypt the direct message that includes the seed secret.
