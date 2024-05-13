@@ -462,7 +462,7 @@ The functions `update` and `remove` share similarities with `create`:
 they both call the function `generate-seed` to encrypt a new seed secret for each group member. 
 The distinction lies in the determination of the group members using `member-view`. 
 In the case of `remove`, the user being removed is excluded from the recipients of the seed secret. 
-Additionally, the control message they construct is designated with type *update* or *remove* respectively.
+Additionally, the control message they construct is designated with type `update` or `remove` respectively.
 
 Likewise, `process-update` and `process-remove` are akin to `process-create`. 
 The function `process-update` skips the update of gamma.history, 
