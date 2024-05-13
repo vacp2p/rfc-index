@@ -335,7 +335,7 @@ return DGM(ops)
 This functions generates a random bit string and 
 sends it encrypted to each member of the group using the `2SM` mechanism. 
 It returns the updated protocol state and 
-the set of direct messages to send.
+the set of direct messages (denoted as `dmsgs`) to send.
 
 ```
 gamma.nextSeed = random.randbytes()
