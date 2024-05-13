@@ -465,7 +465,7 @@ In the case of `remove`, the user being removed is excluded from the recipients 
 Additionally, the control message they construct is designated with type `update` or `remove` respectively.
 
 Likewise, `process-update` and `process-remove` are akin to `process-create`. 
-The function `process-update` skips the update of gamma.history, 
+The function `process-update` skips the update of `gamma.history`, 
 whereas `process-remove` includes a removal operation in the history.
 
 #### update
