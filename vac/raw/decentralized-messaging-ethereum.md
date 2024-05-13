@@ -265,7 +265,7 @@ return ((mu * delta) % p)
 
 There exist 6 functions that are auxiliary for the rest of components of the protocol, namely:
 
-##### init
+#### init
 
 This function takes an `ID` as input and returns its associated initial state, denoted by `gamma`:
 
