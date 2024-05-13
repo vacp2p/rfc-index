@@ -418,7 +418,7 @@ return (gamma, control, forward, I_sender, I_me)
 ```
 
 #### process-create
-This function is called by the sender and each of the receivers of the *create* control message. 
+This function is called by the sender and each of the receivers of the `create` control message. 
 First, it records the information from the create message in the `gamma.history+`, 
 which is used to track group membership changes. Then, it proceeds to call `process-seed`.
 
