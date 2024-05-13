@@ -547,7 +547,7 @@ if added = gamma.myId then return process-welcome(gamma, sender, seq, dmsg)
 op = ("add", sender, seq, added)
 gamma.history = gamma.history + {op}
 if gamma.myId in member-view(gamma, sender) then
-	(gamma, s) = update-ratchet(\gamma, sender, "welcome")
+	(gamma, s) = update-ratchet(gamma, sender, "welcome")
 	gamma.memberSecret[sender, seq, added] = s
 	(gamma, I_sender) = update-ratchet(gamma, sender, "add")
 else I_sender = empty_string
