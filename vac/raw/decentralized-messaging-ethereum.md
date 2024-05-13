@@ -607,7 +607,7 @@ The function `process-ack` reads from `gamma.memberSecret` and
 passes it to `update-ratchet`. 
 The previous ratchet state for the new member is the empty string `empty`, as established by `init`, 
 thereby initializing the new member’s ratchet. 
-Upon receiving the new member’s *ack*, 
+Upon receiving the new member’s `ack`, 
 every other group member initializes their copy of the new member’s ratchet in a similar manner.
 
 By the conclusion of `process-welcome`, 
