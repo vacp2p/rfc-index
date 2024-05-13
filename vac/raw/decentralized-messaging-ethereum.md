@@ -512,7 +512,7 @@ control = ("add", ++gamma.mySeq, ID)
 (gamma, c) = encrypt-to(gamma, ID, gamma.ratchet[gamma.myId])
 op = ("add", gamma.myId, gamma.mySeq, ID)
 welcome = (gamma.history + {op}, c)
-(gamma, _, _, $I$, _) = process-add(gamma, gamma.myId, gamma.mySeq, ID, empty_string)
+(gamma, _, _, I, _) = process-add(gamma, gamma.myId, gamma.mySeq, ID, empty_string)
 return (gamma, control, {(ID, welcome)}, $I$)
 ```
 
