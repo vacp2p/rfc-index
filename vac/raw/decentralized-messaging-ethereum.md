@@ -126,7 +126,7 @@ as well as its causal ordering metadata, using a digital signature under the sen
 This prevents a passive adversary from impersonating users or affecting causally ordered delivery.
 
 #### Decentralized group membership
-This protocol assumes the existence of a DGM function (denoted as DGM) 
+This protocol assumes the existence of a decentralized group membership function (denoted as DGM) 
 that takes a set of membership change messages and their causal order relantionships, 
 and returns the current set of group members’ IDs. 
 It needs to be deterministic and depend only on causal order, and not exact order.
