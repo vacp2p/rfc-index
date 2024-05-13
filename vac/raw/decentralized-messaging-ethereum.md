@@ -446,7 +446,7 @@ if (ackID, ackSeq) was a create / add / remove then
 op = ("ack", sender, seq, ackID, ackSeq)
 gamma.history = gamma.history + {op}`
 s = gamma.memberSecret[ackID, ackSeq, sender]
-gamma$.memberSecret[ackID, ackSeq, sender] = empty_string
+gamma.memberSecret[ackID, ackSeq, sender] = empty_string
 if (s = empty_string) & (dmsg = empty_string) then return (gamma, empty_string, empty_string, empty_string, empty_string)
 if (s = empty_string) then (gamma, s) = decrypt-from(gamma, sender, dmsg)
 (gamma, I) = update-ratchet(gamma, sender, s)
