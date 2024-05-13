@@ -590,7 +590,7 @@ else return (gamma, empty_string, empty_string, empty_string, empty_string)
 
 #### process-welcome
 This function serves as the second step called by a newly added group member. 
-In this context, *adderHistory* represents the adding user’s copy of `gamma.history` sent in their welcome message, 
+In this context, `adderHistory` represents the adding user’s copy of `gamma.history` sent in their welcome message, 
 which is utilized to initialize the added user’s history. 
 Here, `c` denotes the ciphertext of the adding user’s ratchet state, 
 which is decrypted on line 2 using `decrypt-from`.
