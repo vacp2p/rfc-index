@@ -137,7 +137,7 @@ which consist of 3 algorithms: `2SM-Init`, `2SM-Send` and `2SM-Receive`.
 
 ##### 2SM-Init
 This function takes two IDs as inputs: 
-ID1 representing the local user and ID2 representing the other party. 
+`ID1` representing the local user and `ID2` representing the other party. 
 It returns an initial protocol state sigma`.
 The 2SM protocol relies on a Public Key Infrastructure (PKI) or 
 a key server to map these IDs to their corresponding public keys. 
