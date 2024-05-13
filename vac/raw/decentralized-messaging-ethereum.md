@@ -711,7 +711,7 @@ for example: one of the devices may not participate in the required updating pro
 The other approach to managing the group of devices is using each device’s keypair, 
 but it would require each device updating these materia frequently, something that may not happens. 
 
-[Updatable public-key encryption](https://eprint.iacr.org/2022/068) is a form of asymetric cryptography 
+[UPKE](https://eprint.iacr.org/2022/068) is a form of asymetric cryptography 
 where any user can update any other user’s key pair by running an update algorithm with (high-entropy) private coins. 
 Any sender can initiate a *key update* by sending a special update ciphertext. 
 This ciphertext updates the receiver’s public key and also, once processed by the receiver, will update their secret key.
