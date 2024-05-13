@@ -403,7 +403,7 @@ return (gamma, (ack, ++gamma.mySeq, (sender, seq)), empty_string , empty_string 
 for ID in recipients do gamma.memberSecret[sender, seq, ID] = HKDF(seed, ID)
 
 senderSecret = HKDF(seed, sender)
-(gamma, $I_{sender}$) = update-ratchet(gamma, sender, senderSecret)
+(gamma, I_sender) = update-ratchet(gamma, sender, senderSecret)
 if sender = gamma.myId then return (gamma, empty_string , empty_string , I_sender, empty_string)
 control = (ack, ++gamma.mySeq, (sender, seq))
 members = member-view(gamma, gamma.myId)
