@@ -532,7 +532,7 @@ a constant string is used as the ratchet input instead of a random seed secret.
 
 The value returned by the first ratchet update is stored in `gamma.memberSecret` as the added user’s initial member secret. 
 The result of the second ratchet update becomes `I_sender`, 
-the update secret for the sender of the *add* message. 
+the update secret for the sender of the `add` message. 
 On line 10, if the local user is the sender, the update secret is returned.
 
 If the local user is not the sender, an acknowledgment for the *add* message is required. 
