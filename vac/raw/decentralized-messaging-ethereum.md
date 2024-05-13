@@ -718,7 +718,7 @@ This ciphertext updates the receiver’s public key and also, once processed by 
 
 To the best of my knowledge, 
 there exists several efficient constructions both [UPKE from ElGamal](https://eprint.iacr.org/2019/1189) (based in the DH assumption) and 
-[postquantum]((https://eprint.iacr.org/2023/1400)) (based in lattices). 
+[UPKE from Lattices]((https://eprint.iacr.org/2023/1400)) (based in lattices). 
 None of them have been implemented in a secure messaging protocol, and this opens the door to some novel research.
 
 ## Copyright
