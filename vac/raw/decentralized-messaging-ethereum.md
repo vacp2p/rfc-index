@@ -559,20 +559,20 @@ return (gamma, control, {(added, c)}, I_sender, I_me)
 ```
 
 #### process-add-ack
-This function is invoked by both the sender and each recipient of an *add-ack* message, 
+This function is invoked by both the sender and each recipient of an `add-ack` message, 
 including the new group member. 
 Upon lines 1–2, the acknowledgment is added to `gamma.history`, 
 mirroring the process in `process-ack`. 
 If the current user is the new group member, 
-the *add-ack* message includes the direct message constructed in `process-add`; 
-this direct message contains the encrypted ratchet state of the sender of the *add-ack*, 
+the `add-ack` message includes the direct message constructed in `process-add`; 
+this direct message contains the encrypted ratchet state of the sender of the `add-ack`, 
 then it is decrypted on lines 3–5.
 
-Upon line 6, a check is performed to check if the local user was already a group member at the time the *add-ack* was sent. 
-If affirmative, a new update secret `I` for the sender of the *add-ack* is computed on line 7 by invoking `update-ratchet` with the constant string *add*.
+Upon line 6, a check is performed to check if the local user was already a group member at the time the `add-ack` was sent. 
+If affirmative, a new update secret `I` for the sender of the `add-ack` is computed on line 7 by invoking `update-ratchet` with the constant string `add`.
 
 In the scenario involving the new member, 
-the ratchet state was recently initialized on line 5. T
+the ratchet state was recently initialized on line 5.
 This ratchet update facilitates all group members, including the new addition, 
 to derive each member’s update by obtaining any update secret from before their inclusion.
 
