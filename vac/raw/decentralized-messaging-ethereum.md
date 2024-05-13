@@ -536,7 +536,7 @@ the update secret for the sender of the `add` message.
 On line 10, if the local user is the sender, the update secret is returned.
 
 If the local user is not the sender, an acknowledgment for the `add` message is required. 
-Therefore, on line 11, a control message of type *add-ack* is constructed for broadcast. 
+Therefore, on line 11, a control message of type `add-ack` is constructed for broadcast. 
 Subsequently, in line 12 the current ratchet state is encrypted using `2SM` to generate a direct message intended for the added user, 
 allowing them to decrypt subsequent messages sent by the sender. 
 Finally, in lines 13 to 15, `process-add-ack` is called to calculate the local user’s update secret (I_me), 
