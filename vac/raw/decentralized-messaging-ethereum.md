@@ -523,7 +523,7 @@ If the local user is the newly added member,
 the function proceeds to call `process-welcome` and then exits. 
 Otherwise, it extends `gamma.history` with the `add` operation.
 
-Line 5 determines whether the local user was already a group member at the time the "add" message was sent; 
+Line 5 determines whether the local user was already a group member at the time the `add` message was sent; 
 this condition is typically true but may be false if multiple users were added concurrently.
 
 On lines 6 to 8, the ratchet for the sender of the *add* message is updated twice. 
