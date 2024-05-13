@@ -599,7 +599,7 @@ Once `gamma.ratchet[sender]` is initialized,
 `update-ratchet` is invoked twice on lines 3 to 5 with the constant strings `welcome` and `add` respectively. 
 These operations mirror the ratchet operations performed by every other group member in `process-add`. 
 The outcome of the first `update-ratchet` call becomes the first member secret for the added user, 
-while the second call returns I_sender, the update secret for the sender of the add operation.
+while the second call returns `I_sender`, the update secret for the sender of the add operation.
 
 Subsequently, the new group member constructs an *ack* control message to broadcast on line 6 and 
 calls `process-ack` to compute their initial update secret I_me. 
