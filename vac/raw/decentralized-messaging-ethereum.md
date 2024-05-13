@@ -408,7 +408,7 @@ if sender = gamma.myId then return (gamma, empty_string , empty_string , I_sende
 control = (ack, ++gamma.mySeq, (sender, seq))
 members = member-view(gamma, gamma.myId)
 forward = empty
-for ID in {members - (recipients + {sender})}`
+for ID in {members - (recipients + {sender})}
 	s = gamma.memberSecret[sender, seq, gamma.myId]
 	(gamma, msg) = encrypt-to(gamma, ID, s)
 	forward = forward + {(ID, msg)}
