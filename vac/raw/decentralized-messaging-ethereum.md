@@ -539,8 +539,8 @@ If the local user is not the sender, an acknowledgment for the `add` message is 
 Therefore, on line 11, a control message of type `add-ack` is constructed for broadcast. 
 Subsequently, in line 12 the current ratchet state is encrypted using `2SM` to generate a direct message intended for the added user, 
 allowing them to decrypt subsequent messages sent by the sender. 
-Finally, in lines 13 to 15, `process-add-ack` is called to calculate the local user’s update secret (I_me), 
-which is then returned along with I_sender.
+Finally, in lines 13 to 15, `process-add-ack` is called to calculate the local user’s update secret (`I_me`), 
+which is then returned along with `I_sender`.
 
 ```
 if added = gamma.myId then return process-welcome(gamma, sender, seq, dmsg)
