@@ -513,7 +513,7 @@ control = ("add", ++gamma.mySeq, ID)
 op = ("add", gamma.myId, gamma.mySeq, ID)
 welcome = (gamma.history + {op}, c)
 (gamma, _, _, I, _) = process-add(gamma, gamma.myId, gamma.mySeq, ID, empty_string)
-return (gamma, control, {(ID, welcome)}, $I$)
+return (gamma, control, (ID, welcome), I)
 ```
 
 #### process-add
