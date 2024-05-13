@@ -257,7 +257,7 @@ The user `u` recovers a message `m` from a ciphertext `c` by performing the foll
 ```
 PKE-Dec(sk):
 mu = eta^(p-1-sk) % p
-return ((mu` * delta) % p)
+return ((mu * delta) % p)
 ```
 
 ### DCGKA Syntax
