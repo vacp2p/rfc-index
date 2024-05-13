@@ -583,7 +583,7 @@ if dmsg != empty_string then
 	(gamma, s) = decrypt-from(gamma, sender, dmsg)
 	gamma.ratchet[sender] = s
 if gamma.myId in member-view(gamma, sender) then
-	(gamma, $I$) = update-ratchet(gamma, sender, "add")
+	(gamma, I) = update-ratchet(gamma, sender, "add")
 	return (gamma, empty_string, empty_string, I, empty_string)
 else return (gamma, empty_string, empty_string, empty_string, empty_string)
 ```
