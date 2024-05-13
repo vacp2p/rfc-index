@@ -518,7 +518,7 @@ return (gamma, control, (ID, welcome), I)
 
 #### process-add
 This function is invoked by both the sender and 
-each recipient of an *add* message, which includes the new group member. 
+each recipient of an `add` message, which includes the new group member. 
 If the local user is the newly added member, 
 the function proceeds to call `process-welcome` and then exits. 
 Otherwise, it extends `gamma.history` with the `add` operation.
