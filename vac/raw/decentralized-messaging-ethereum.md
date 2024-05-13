@@ -504,7 +504,7 @@ an existing member initiates the process by invoking the `add` function and
 providing the ID of the user to be added.
 This function prepares a control message marked as `add` for broadcast to the group. 
 Simultaneously, it creates a welcome message intended for the new member as a direct message. 
-This *welcome* message includes the current state of the sender's KDF ratchet, 
+This `welcome` message includes the current state of the sender's KDF ratchet, 
 encrypted using `2SM`, along with the history of group membership operations conducted so far.
 
 ```
