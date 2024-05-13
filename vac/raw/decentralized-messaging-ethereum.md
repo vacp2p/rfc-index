@@ -596,7 +596,7 @@ Here, `c` denotes the ciphertext of the adding user’s ratchet state,
 which is decrypted on line 2 using `decrypt-from`.
 
 Once `gamma.ratchet[sender]` is initialized, 
-`update-ratchet` is invoked twice on lines 3 to 5 with the constant strings *welcome* and *add* respectively. 
+`update-ratchet` is invoked twice on lines 3 to 5 with the constant strings `welcome` and `add` respectively. 
 These operations mirror the ratchet operations performed by every other group member in `process-add`. 
 The outcome of the first `update-ratchet` call becomes the first member secret for the added user, 
 while the second call returns I_sender, the update secret for the sender of the add operation.
