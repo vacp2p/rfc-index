@@ -663,7 +663,7 @@ One may see the set of devices as a group and create a group key for internal co
 One may use treeKEM for instance, 
 since it provides interesting properties like forward secrecy and post-compromise security. 
 All devices share the same `ID`, 
-which is hold by one of them, and from other user’s point of view, they would look as a single user.
+which is held by one of them, and from other user’s point of view, they would look as a single user.
 
 Using servers, like in the paper [Multi-Device for Signal](https://eprint.iacr.org/2019/1363), should be avoided; 
 but this would imply using a particular device as receiver and broadcaster within the group. 
