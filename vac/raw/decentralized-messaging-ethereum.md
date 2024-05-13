@@ -438,7 +438,7 @@ it records the acknowledgement in `gamma.history`.
 Following this, the function retrieves the relevant member secret from `gamma.memberSecret`,
 which was previously obtained from the seed secret contained in the acknowledged message.
 
-Finally, it updates the ratchet for the sender of the *ack* and 
+Finally, it updates the ratchet for the sender of the `ack` and 
 returns the resulting update secret.
 
 ```
