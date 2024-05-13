@@ -388,7 +388,7 @@ compute their update secret `I_sender` using `update-ratchet`.
 If the local user is the sender of the control message, 
 the process is completed, and the update secret is returned. 
 However, if the seed secret is received from another user, 
-an *ack* control message is constructed for broadcast, 
+an `ack` control message is constructed for broadcast, 
 including the sender ID and sequence number of the message being acknowledged.
 
 The final step computes an update secret `I_me` for the local user invoking the `process-ack` function.
