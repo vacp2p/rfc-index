@@ -618,7 +618,7 @@ The ratchets for other group members are initialized by `process-add-ack`.
 gamma.history = adderHistory
 (gamma, gamma.ratchet[sender]) = decrypt-from(gamma, sender, c)
 (gamma, s) = update-ratchet(gamma, sender, "welcome")
-gamma$.memberSecret[sender, seq, gamma.myId] = s
+gamma.memberSecret[sender, seq, gamma.myId] = s
 (gamma, I_sender) = update-ratchet(gamma, sender, "add")
 control = ("ack", ++gamma.mySeq, (sender, seq))
 (gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, (sender, seq), empty_string)
