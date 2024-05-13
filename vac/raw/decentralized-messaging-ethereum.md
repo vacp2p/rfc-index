@@ -292,7 +292,7 @@ One then uses `2SM_Send` to encrypt the message and store the updated protocol i
 if gamma.2sm[recipient_ID] = empty_string then
 gamma.2sm[recipient_ID] = 2SM_Init(gamma.myID, recipient_ID)
 (gamma.2sm[recipient_ID], ciphertext) = 2SM_Send(gamma.2sm[recipient_ID], plaintext)
-return (\gamma, ciphertext)
+return (gamma, ciphertext)
 ```
 
 #### decrypt-from
