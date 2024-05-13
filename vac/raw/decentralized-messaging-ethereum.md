@@ -377,7 +377,7 @@ it uses the most recent invocation of `generate-seed` stored the seed secret in 
 2. If the *control* message was dispatched by another user, and
 the local user is among its recipients, 
 the function utilizes `decrypt-from` to decrypt the direct message that includes the seed secret.
-3. Otherwise, it returns an *ack* message without deriving an update secret.
+3. Otherwise, it returns an `ack` message without deriving an update secret.
 
 Afterwards, `process-seed` generates separate member secrets for each group member from the seed secret by combining the seed secret and 
 each user ID using HKDF. 
