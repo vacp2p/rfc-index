@@ -382,7 +382,7 @@ the function utilizes `decrypt-from` to decrypt the direct message that includes
 Afterwards, `process-seed` generates separate member secrets for each group member from the seed secret by combining the seed secret and 
 each user ID using HKDF. 
 The secret for the sender of the message is stored in `senderSecret`, 
-while those for the other group members are stored in gamma.memberSecret. 
+while those for the other group members are stored in `gamma.memberSecret`. 
 The sender's member secret is immediately utilized to update their KDF ratchet and 
 compute their update secret `I_sender` using `update-ratchet`. 
 If the local user is the sender of the control message, 
