@@ -359,7 +359,7 @@ This function generates a *create* control message and
 calls `generate-seed` to define the set of direct messages that need to be sent. 
 Then it calls `process-create` to process the control message for this user. 
 The function `process-create` returns a tuple including an updated state gamma and 
-an update secret $I$.
+an update secret `I`.
 
 ```
 control = (“create”, gamma.mySeq, IDs)
