@@ -88,15 +88,23 @@ The copyright, patent, and trademark policies of the domain must be clarified in
 
 Specifications exist as multiple pages, one page per version,
 (discussed below in "Branching and Merging"). 
-which may be assigned URIs that include an incremental number.
+which may be assigned URIs that MAY include an incremental number.
 
-Thus, we refer to a specification by specifying its domain, number, and short name.
+Thus, we refer to new specifications by specifying its domain and short name.
+The syntax for a new specification reference is:
+
+    <domain>/project/<shortname>
+
+For example, this specification is **rfc.vac.dev/vac/COSS**, 
+if the current status is **raw**.
+    
+When awarded **draft** status, a number will be assigned to the specification. 
 New versions of the same specification will have new numbers.
 The syntax for a specification reference is:
 
-    <domain>/spec/<number>/<shortname>
+    <domain>/project/<number>/<shortname>
 
-For example, this specification is **rfc.vac.dev/spec/1/COSS**.
+For example, this specification is **rfc.vac.dev/vac/1/COSS**.
 The short form **1/COSS** may be used when referring to the specification from other specifications in the same domain.
 
 Every specification (including branches) carries a different number.
@@ -104,9 +112,9 @@ Every specification (including branches) carries a different number.
 ## COSS Lifecycle
 
 Every specification has an independent lifecycle that documents clearly its current status.
-In order for a specification to receive a lifecycle status,
-it MUST be presented by the project team.
-After discussion amongst the contributors have occured for an unspecific amount of time,
+For a specification to receive a lifecycle status,
+a new specification SHOULD be presented by the project team.
+After discussion amongst the contributors has occurred for an unspecific amount of time,
 the specification MAY begin the process to upgrade a status.
 A specification has five possible states that reflect its maturity and contractual weight:
 
@@ -114,9 +122,9 @@ A specification has five possible states that reflect its maturity and contractu
 
 ### Raw Specifications
 
-New specifications are considered to be **raw** specifications. 
+All new specifications are **raw** specifications.
 Changes to raw specifications can be unilateral and arbitrary.
-Those who implement a raw specification MAY ask to obtain a **draft** status.
+Those seeking to implement a raw specification should ask for it to be made a draft specification.
 Raw specifications have no contractual weight.
 
 ### Draft Specifications
@@ -131,22 +139,24 @@ When draft specifications are used by third parties, they become **stable** spec
 Changes to stable specifications should be restricted to cosmetic ones, errata and clarifications.
 Stable specifications are contracts between editors, implementers, and end-users.
 
-### Stagnant Specifications
-
-When raw or draft specifications have no activity and/or no desire to reach technical maturity, 
-they become **stagnant** specifications.
-After a non-specified time, the specification can be asked to be downgraded to **stagnant**.
-They SHOULD be kept for their historical value but
-it is RECOMMENDED to not implement them.
-The editor MAY choose to reinstate the previous status at any time.
-Stagnant specifications have no contractual weight.
-
 ### Deprecated Specifications
 
 When stable specifications are replaced by newer draft specifications, they become **deprecated** specifications.
-Deprecated specifications SHOULD not be changed except to indicate their replacements, if any.
-Deprecated specifications MAY be contracts between editors, implementers and end-users,
-while others MAY have no contractual weight.
+Deprecated specifications should not be changed except to indicate their replacements, if any.
+Deprecated specifications are contracts between editors, implementers and end-users.
+
+### Retired Specifications
+
+When deprecated specifications are no longer used in products, they become **retired** specifications.
+Retired specifications are part of the historical record.
+They should not be changed except to indicate their replacements, if any.
+Retired specifications have no contractual weight.
+
+### Deleted Specifications
+
+Deleted specifications are those that have not reached maturity (stable) and were discarded.
+They should not be used and are only kept for their historical value.
+Only Raw and Draft specifications can be deleted.
  
 ## Editorial control
 
@@ -206,7 +216,7 @@ This will enable programmatic access to specification metadata.
 | **status**       | status               | string | draft                                                                                                                                                                                                                               |
 | **category**     | category             | string | Best Current Practice                                                                                                                                                                                                                            |
 | **tags**         | 0 or several tags    | list   | waku-application, waku-core-protocol                                                                                                                                                                                                |
-| **editor**       | editor name/@handle    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
+| **editor**       | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
 | **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com><br> - André Rebentisch <andre@openstandards.de><br> - Alberto Barrionuevo <abarrio@opentia.es><br> - Chris Puttick <chris.puttick@thehumanjourney.net><br> - Yurii Rashkovskii <yrashk@gmail.com> |
 
 ### Specification Template
