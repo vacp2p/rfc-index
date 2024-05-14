@@ -309,7 +309,7 @@ return (gamma, plaintext)
 
 #### update-ratchet
 
-This function generates the next update secret `I` for the group member `ID`. 
+This function generates the next update secret `I_update` for the group member `ID`. 
 The ratchet state is stored in `gamma.ratchet[ID]`. 
 It is required to use a HMAC-based key derivation function HKDF to combine the ratchet state with an input, 
 returning an update secret and a new ratchet state.
