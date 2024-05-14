@@ -232,7 +232,7 @@ Each user `u` MUST do the following:
 
 ```
 PKE-KGen():
-a = randint(1, p-2)
+a = randint(2, p-2)
 pk = (p, g, g^a)
 sk = a
 return (pk, sk)
@@ -244,7 +244,7 @@ A user `v` encrypting a message `m` for `u` MUST follow these steps:
 
 ```
 PKE-Enc(pk):
-k = randint(1, p-2)
+k = randint(2, p-2)
 eta = g^k % p
 delta = m * (g^a)^k % p
 return ((eta, delta))
