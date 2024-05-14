@@ -60,10 +60,7 @@ even when multiple users concurrently modify the group state.
 ## Theory
 ### Protocol overview
 
-This protocol makes use of ratchets to provide FS by encrypting each message with a different key, 
-as shown in the figure below:
-
-![ratchet](ratchet.png)
+This protocol makes use of ratchets to provide FS by encrypting each message with a different key.
 
 In the figure one can see the ratchet for encrypting a sequence of messages. 
 The sender requires an initial update secret `I_1`, which is introduced in a PRG. 
@@ -675,8 +672,6 @@ This could open the door to use UPKE, since keypairs should be regenerated frequ
 
 Each time a device sends a message, either an internal message or an external message, 
 it needs to replicate and broadcast it to all devices in the group.
-
-![Captura de pantalla 2024-03-21 a les 12.07.23.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/1518abd9-c08f-4989-93c1-96525e62bce5/9144c2dd-aa6c-4f7c-9acc-f9dc7f18661d/Captura_de_pantalla_2024-03-21_a_les_12.07.23.png)
 
 The mechanism for the substitution of misbehaving leader devices follows:
 
