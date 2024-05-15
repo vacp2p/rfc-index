@@ -122,17 +122,26 @@ storage nodes MUST enter a storage contract with the requester via the marketpla
 When storage providers are choosen to participate in the contract,
 storage providers MUST NOT leave the contract, unless the request is canceled, complete or forfiet of `collateral`.
 
-
 #### Slots
 Slots is a method used by the Codex network to distribute data chucks amongst storage providers.
 Data chucks, created by clients nodes, MUST use a method of distributing for data resiliency.
+- Client nodes MAY decide how many nodes should fill the slots of a storage contract.
+- Storage providers MUST be selected by the Codex Network to fill a slot
 
 Each slot represents a chunk of that data that needs to be stored by a storage provider.
-- Storage nodes MUST provide token collateral and proof of storage to fill a slot
-- If storage nodes fail to provide enough proofs of storage,
-the slot will become empty and the host assigned to that slot MUST forfeit its `collateral`.
+The first state of a slot is reserved, meaning that the slot is waiting to be reserved by a storage provider.
+The Codex network selects storage providers by using a variation of the Kademila distance function, 
+as described in [dispersal](#dispersal).
+After a slot reservation is secured, the storage provider MUST:
+- provide token collateral and proof of storage to fill the slot
+- provide pericaioc proofs of storage
+
+A slot MUST become empty after the storage provider fails to provide enough proofs of storage to validator nodes.
+The storage provider assigned to that slot MUST forfeit its `collateral`.
 Other storage nodes can earn a small portion of the forfeited `collateral` by providing a new proof of storage and `collateral`,
 this is referred to as repairing the empty slot.
+
+The slot lifecycle is demonstrated below:
 
 -----------
 
@@ -145,15 +154,14 @@ this is referred to as repairing the empty slot.
             -------------------------------------------------------------------
                                     |                                    |
                                     v                                    v
-                                Update slashCriterion                collateral
+                                Update slashCriterion                 collateral
                                                                    lost
 
 
 
             ---------------- time ---------------->
 
-- Client nodes MAY decide how many nodes should fill the slots of a storage contract.
-How nodes are choosen are random based on Kadelima, as discussed here
+
 
 ## Copyright
 
