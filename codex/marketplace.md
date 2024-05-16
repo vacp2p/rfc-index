@@ -72,10 +72,10 @@ function requestStorage() public {
   // merkle root of the dataset, used to verify storage proofs
   byte32 merkleRoot;
 
-  // tokens from the requester to reward storage nodes
+  // tokens from the requester to reward storage providers
   uint256 reward;
 
-  // amount of tokens required for collateral by storage nodes
+  // amount of tokens required for collateral by storage providers
   UInt256 collateral;
 
   // frequency that proofs are checked by validator nodes
@@ -109,7 +109,7 @@ An identifier used to locate the dataset
 `reward`
 
 - SHOULD be a token known to the network.
-- it MUST be paid directly to storage nodes who fill slots for the `duration` of the request
+- it MUST be paid directly to storage providers who fill slots for the `duration` of the request
 
 `collateral`
 
@@ -118,7 +118,7 @@ The collateral is used to punish a storage provider for being an malicious or un
 The following is related to storage provider who has offered `collateral`
 
 If a storage provider, filling a slot,
-fails to provide a periodic proof of storage, the `collateral` MUST be forfeited.
+fails to provide enough proofs of storage, the `collateral` MUST be forfeited.
 The storage provider MAY be able to fill the same failed slot,
 but MUST replace any `collateral` that was already forfeited.
 
@@ -136,8 +136,8 @@ The requester SHOULD provide the value for the frequency of proofs provided by s
 - Once the `reward` has depleted from periodic storage provider payments,
 the storage request SHOULD end.
 The requester MAY renew the storage request by creating a new request with the same `cid` value.
-- Data MAY be considered lost during contract `duration` if storage nodes fail to provide storage proofs and
-no other storage nodes decide to fill empty slots, see [slots](#slots) below.
+- Data MAY be considered lost during contract `duration` if storage providers fail to provide storage proofs and
+no other storage providers decide to fill empty slots, see [slots](#slots) below.
 
 ### Fulfilling Requests
 In order a storage request to begin,
@@ -170,7 +170,7 @@ A slot MUST become empty after the storage provider fails to provide proofs of s
 The state of the slot SHOULD change from filled to free.
 
 The storage provider assigned to that slot MUST forfeit its `collateral`.
-Other storage nodes can earn a small portion of the forfeited `collateral` by providing a new proof of storage and `collateral`,
+Other storage providers can earn a small portion of the forfeited `collateral` by providing a new proof of storage and `collateral`,
 this is referred to as repairing the empty slot.
 
 The slot lifecycle of a storage provider that has filled a slot is demonstrated below:
