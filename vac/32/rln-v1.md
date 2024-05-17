@@ -3,13 +3,14 @@ slug: 32
 title: 32/RLN-V1
 name: Rate Limit Nullifier
 status: draft
-editor: Rasul Ibragimov <curryrasul@gmail.com>
+editor: Aaryamann Challani <aaryamann@status.im>
 contributors:
 - Barry Whitehat <barrywhitehat@protonmail.com>
 - Sanaz Taheri <sanaz@status.im>
 - Oskar Thorén <oskarth@titanproxy.com>
 - Onur Kilic <onurkilic1004@gmail.com>
 - Blagoj Dimovski <blagoj.dimovski@yandex.com>
+- Rasul Ibragimov <curryrasul@gmail.com>
 ---
 
 ## Abstract
