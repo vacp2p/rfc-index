@@ -37,7 +37,7 @@ This Specification is free software;
 you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
 either version 3 of the License, or (at your option) any later version.
 
-This Specification is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+This specification is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
@@ -82,27 +82,33 @@ Primarily, COSS uses a wiki model for editing and publishing specifications text
 * Each domain is implemented as an Internet domain, hosting a wiki and optionally other communications tools.
 * Each specification is a set of wiki pages, together with comments, attached files, and other resources.
 * Important specifications may also exist as subdomains, i.e. child wikis.
+* A *project* SHOULD consist of team memebers of a working group under a specific domain.
+Non-project application MAY be considered a project if the working group has not established a formal domain.
 
-Individuals can become members of the domain by completing the necessary legal clearance.
+ 
+Individuals can become members of the domain or project by completing the necessary legal clearance.
 The copyright, patent, and trademark policies of the domain must be clarified in an Intellectual Property policy that applies to the domain.
 
 Specifications exist as multiple pages, one page per version,
 (discussed below in "Branching and Merging"). 
 which may be assigned URIs that MAY include an incremental number.
 
-Thus, we refer to new specifications by specifying its domain and short name.
+Thus, we refer to new specifications by specifying its domain, project name and short name.
 The syntax for a new specification reference is:
 
-    <domain>/project/<shortname>
+    <domain>/projectName/<shortname>
 
 For example, this specification is **rfc.vac.dev/vac/COSS**, 
 if the current status is **raw**.
+Note that Vac is not a project, but a service that support projects that live under IFT.
+In this case, 
+a service like Vac MAY be used as the project name if the service is generally applicable rather than a specific project team.
     
 When awarded **draft** status, a number will be assigned to the specification. 
-New versions of the same specification will have new numbers.
+New versions of the same specification will be assigned a number.
 The syntax for a specification reference is:
 
-    <domain>/project/<number>/<shortname>
+    <domain>/projectName/<number>/<shortname>
 
 For example, this specification is **rfc.vac.dev/vac/1/COSS**.
 The short form **1/COSS** may be used when referring to the specification from other specifications in the same domain.
