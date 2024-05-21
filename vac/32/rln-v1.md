@@ -85,9 +85,9 @@ The user's identity is composed of:
 
 ```
 
-For registration, the user needs to submit their `identity_commitment` 
+For registration, the user SHOULD submit their `identity_commitment` 
 (along with any additional registration requirements) to the registry.
-Upon registration, they should receive `leaf_index` value which represents their position in the Merkle tree.
+Upon registration, they SHOULD receive `leaf_index` value which represents their position in the Merkle tree.
 Receiving a `leaf_index` is not a hard requirement and is application specific.
 The other way around is the users calculating the `leaf_index` themselves upon successful registration.
 
@@ -97,12 +97,12 @@ After registration,
 the users can participate in the application by sending signals to the other participants in a decentralised manner or 
 to a centralised server.
 Along with their signal,
-they need to generate a ZK-Proof by using the circuit with the specification described above.
+they MUST generate a ZK-Proof by using the circuit with the specification described above.
 
 For generating a proof,
 the users need to obtain the required parameters or compute them themselves,
 depending on the application implementation and client libraries supported by the application.
-For example the users can store the membership Merkle tree on their end and
+For example, the users MAY store the membership Merkle tree on their end and
 generate a Merkle proof whenever they want to generate a signal.
 
 #### Implementation notes
@@ -125,7 +125,7 @@ external_nullifier = poseidonHash([epoch, rln_identifier]);
 
 #####  Obtaining Merkle proof
 
-The Merkle proof should be obtained locally or from a trusted third party.
+The Merkle proof SHOULD be obtained locally or from a trusted third party.
 By using the [incremental Merkle tree algorithm](https://github.com/appliedzkp/incrementalquintree/blob/master/ts/IncrementalQuinTree.ts),
 the Merkle can be obtained by providing the `leaf_index` of the `identity_commitment`.
 The proof (`Merkle_proof`) is composed of the following fields:
@@ -149,7 +149,7 @@ used by the Merkle proof algorithm for verificaton
 ##### Generating proof
 
 For proof generation,
-the user needs to submit the following fields to the circuit:
+the user MUST submit the following fields to the circuit:
 
 ```js
 
@@ -198,7 +198,7 @@ It relies on the properties of the [Shamir's Secret sharing scheme](https://en.w
 ##### Sending the output message
 
 The user's output message (`output_message`),
-containing the signal should contain the following fields at minimum:
+containing the signal SHOULD contain the following fields at minimum:
 
 ```js
 
@@ -214,7 +214,7 @@ containing the signal should contain the following fields at minimum:
 ```
 
 Additionally depending on the application,
-the following fields might be required:
+the following fields MAY be required:
 
 ```js
 
@@ -237,10 +237,10 @@ the slashing will be implemented on each user's client.
 #### Implementation notes
 
 Each user of the protocol 
-(server or otherwise) will need to store metadata for each message received by each user,
+(server or otherwise) MUST store metadata for each message received by each user,
 for the given `epoch`.
 The data can be deleted when the `epoch` passes.
-Storing metadata is required, so that if a user sends more than one unique signal per `epoch`,
+Storing metadata is REQUIRED, so that if a user sends more than one unique signal per `epoch`,
 they can be slashed and removed from the protocol.
 The metadata stored contains the `x`, `y` shares and 
 the `internal_nullifier` for the user for each message.
@@ -696,17 +696,27 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
+- [17/WAKU2-RLN-RELAY RFC](../../waku/standards/core/17/rln-relay.md)
+- [incremental Merkle tree algorithm](https://github.com/appliedzkp/incrementalquintree/blob/master/ts/IncrementalQuinTree.ts)
+- [Shamir's Secret sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)
+- [Lagrange polynomials](https://en.wikipedia.org/wiki/Lagrange_polynomial)
+- [ZK-SNARK](https://z.cash/technology/zksnarks/)
+- [Merkle trees](https://en.wikipedia.org/wiki/Merkle_tree)
+- [Groth-16 ZK-SNARK](https://eprint.iacr.org/2016/260.pdf)
+- [circomlib](https://docs.circom.io/)
+- [Poseidon hash implementation](https://eprint.iacr.org/2019/458.pdf)
+- [circomlib library](https://github.com/iden3/circomlib/blob/master/circuits/poseidon.circom)
+- [IncrementalQuinTree](https://github.com/appliedzkp/incrementalquintree)
+- [IncrementalQuinTree algorithm](https://ethresear.ch/t/gas-and-circuit-constraint-benchmarks-of-binary-and-quinary-incremental-Merkle-trees-using-the-poseidon-hash-function/7446)
+- [Multi-Party Computation (MPC)](https://en.wikipedia.org/wiki/Secure_multi-party_computation)
+- [Poseidon hash attack](https://github.com/Rate-Limiting-Nullifier/rln-circuits/pull/7#issuecomment-1416085627)
+- [zerokit](https://github.com/vacp2p/zerokit)
+- [zk-kit](https://github.com/appliedzkp/zk-kit)
+- [zk-keeper](https://github.com/akinovak/zk-keeper)
+- [rust](https://www.rust-lang.org/)
+
+### Informative
 - [1] https://medium.com/privacy-scaling-explorations/rate-limiting-nullifier-a-spam-protection-mechanism-for-anonymous-environments-bbe4006a57d
-- [2] https://github.com/appliedzkp/zk-kit
-- [3] https://github.com/akinovak/zk-keeper
-- [4] https://z.cash/technology/zksnarks/
-- [5] https://en.wikipedia.org/wiki/Merkle_tree
-- [6] https://eprint.iacr.org/2016/260.pdf
-- [7] https://docs.circom.io/
-- [8] https://eprint.iacr.org/2019/458.pdf
-- [9] https://github.com/appliedzkp/incrementalquintree
-- [10] https://ethresear.ch/t/gas-and-circuit-constraint-benchmarks-of-binary-and-quinary-incremental-merkle-trees-using-the-poseidon-hash-function/7446
-- [11] https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
-- [12] https://research.nccgroup.com/2020/06/24/security-considerations-of-zk-snark-parameter-multi-party-computation/
-- [13] https://github.com/Rate-Limiting-Nullifier/rln-circuits/
-- [14] https://rate-limiting-nullifier.github.io/rln-docs/
+- [2] https://research.nccgroup.com/2020/06/24/security-considerations-of-zk-snark-parameter-multi-party-computation/
+- [3] https://github.com/Rate-Limiting-Nullifier/rln-circuits/
+- [4] https://rate-limiting-nullifier.github.io/rln-docs/
