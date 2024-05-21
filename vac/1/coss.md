@@ -96,19 +96,19 @@ which may be assigned URIs that MAY include an incremental number.
 Thus, we refer to new specifications by specifying its domain, project name and short name.
 The syntax for a new specification reference is:
 
-    <domain>/projectName/<shortname>
+    <domain>/project/<shortname>
 
 For example, this specification is **rfc.vac.dev/vac/COSS**, 
-if the current status is **raw**.
-Note that Vac is not a project, but a service that support projects that live under IFT.
+if the status were **raw**.
+Note that **vac** is not a project, but a service that supports a project that could live under [IFT](https://free.technology/).
 In this case, 
-a service like Vac MAY be used as the project name if the service is generally applicable rather than a specific project team.
+a service MAY be used as the project if generally applicable rather than a specific project.
     
 When awarded **draft** status, a number will be assigned to the specification. 
 New versions of the same specification will be assigned a number.
 The syntax for a specification reference is:
 
-    <domain>/projectName/<number>/<shortname>
+    <domain>/project/<number>/<shortname>
 
 For example, this specification is **rfc.vac.dev/vac/1/COSS**.
 The short form **1/COSS** may be used when referring to the specification from other specifications in the same domain.
@@ -119,9 +119,17 @@ Every specification (including branches) carries a different number.
 
 Every specification has an independent lifecycle that documents clearly its current status.
 For a specification to receive a lifecycle status,
-a new specification SHOULD be presented by the project team.
-After discussion amongst the contributors has occurred for an unspecific amount of time,
+a new specification SHOULD be presented by the team of the project.
+After discussion amongst the contributors has reached a rough consensus,
+as described in [RFC7282](https://www.rfc-editor.org/rfc/rfc7282.html),
 the specification MAY begin the process to upgrade a status.
+
+For example, the Vac RFC service MAY assistant a project in creating a new specification.
+When the specification reaches some level of maturity,
+the specification SHOULD enter the VAC RFC process.
+Similar to the the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html), 
+the VAC RFC process SHOULD facilitate all updates to the specification.
+
 A specification has five possible states that reflect its maturity and contractual weight:
 
 ![Lifecycle diagram](./images/lifecycle.png)
@@ -130,7 +138,7 @@ A specification has five possible states that reflect its maturity and contractu
 
 All new specifications are **raw** specifications.
 Changes to raw specifications can be unilateral and arbitrary.
-Those seeking to implement a raw specification should ask for it to be made a draft specification.
+Projects MAY use the **raw** status for new specifications that live under their domain.
 Raw specifications have no contractual weight.
 
 ### Draft Specifications
