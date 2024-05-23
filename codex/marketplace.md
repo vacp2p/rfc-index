@@ -36,15 +36,15 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 ### Storage Request
 
 Client nodes can create storage requests on the Codex network via the Codex marketplace.
-The marketplace is a a smart contract on a EVM compatiable blockchain.
-The smart contract SHOULD handle storage request, storage slot state, 
+The marketplace is a smart contract deployed on a EVM-compatiable blockchain.
+The smart contract MUST handle storage request, storage slot state, 
 storage provider rewards, storage provider collateral, and storage proof state. 
 
 To create a request to store a dataset on the Codex network,
-client nodes MUST split the dataset into data chunks, $(c_1, c_2, c_3, \ldots, c_{20})$.
+client nodes MUST split the dataset into data chunks, $(c_1, c_2, c_3, \ldots, c_{n})$.
 Using a erasure coding technique, 
 the data chunks are encoded and placed into separate slots.
-The RECCOMENDED erasure coding technique is a [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA).
+The erasure coding technique MUST be the [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA).
 
 The requester, client node, SHOULD submit a transaction with the desired request parameters.
 The requester MUST provide a `duration` value for the storage request along with the appropriate `reward`,
@@ -114,7 +114,6 @@ An identifier used to locate the dataset
 `collateral`
 
 All storage providers MUST provide token collateral before being able to fill a storage slot.
-The collateral is used to punish a storage provider for being an malicious or unreliable.
 The following is related to storage provider who has offered `collateral`
 
 If a storage provider, filling a slot,
