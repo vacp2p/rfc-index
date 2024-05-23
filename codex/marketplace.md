@@ -5,6 +5,9 @@ status: raw
 tags: codex
 editor: Dmitriy <dryajov@status.im>
 contributors:
+- Mark <mark@status.im>
+- Adam <adam.u@status.im>
+- Eric <ericmastro@status.im>
 ---
 
 ## Abstract
@@ -30,7 +33,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 | --------------- | --------- |
 | storage providers | A Codex node that provides storage services to the marketplace. |
 | validator nodes | A Codex node that collects, validates and submits missing storage proofs for a reward. |
-| client nodes | The most common Codex node that interacts with other nodes to store, locate and retrieve data. Also considered to be an ephemeral node (light client). |
+| client nodes | The most common Codex node that interacts with other nodes to store, locate and retrieve data. Also considered to be an ephemeral node. |
 | slots | Created by client nodes when a new dataset is requested to be stored. Discussed further in the [slots section](#slots).  |
 
 ### Storage Request
@@ -108,7 +111,7 @@ An identifier used to locate the dataset
 
 `reward`
 
-- SHOULD be a token known to the network.
+- it MUST be a token known to the network.
 - it MUST be paid directly to storage providers who fill slots for the `duration` of the request
 
 `collateral`
