@@ -1,6 +1,5 @@
 ---
-slug: 70
-title: 70/ETH-SECPM
+title: ETH-SECPM
 name: Secure channel setup using Ethereum accounts
 status: raw
 category: Standards Track
@@ -283,7 +282,11 @@ These identifiers MUST be computed according to Section 5.2 of [RFC9420](https:/
 Each member of a group presents a credential that provides one or more identities for the member and associates them with the member's signing key. 
 The identities and signing key are verified by the Authentication Service in use for a group.
 
-Credentials MUST follow the specifications of section 5.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).  
+Credentials MUST follow the specifications of section 5.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+
+Below follows the flow diagram for the generation of credentials. 
+Users MUST generate key pairs by themselves.
+![figure1](./images/eth-secpm_credential.png)
 
 ### Message framing
 Handshake and application messages use a common framing structure providing encryption to ensure confidentiality within the group, and signing to authenticate the sender.
@@ -499,6 +502,11 @@ ProposalType proposal_types<V>;
 CredentialType credential_types<V>;
 }
 ```
+The flow diagram shows the procedure to fetch key material from other users:
+![figure2](./images/eth-secpm_fetching.png)
+
+Below follows the flow diagram for the creation of a group:
+![figure3](./images/eth-secpm_creation.png)
 
 ### Group evolution
 Group membership can change, and existing members can change their keys in order to achieve post-compromise security. 
@@ -542,6 +550,18 @@ The validation MUST be done according to one of the procedures described in Sect
 
 When creating or processing a Commit, a client applies a list of proposals to the ratchet tree and `GroupContext`. 
 The client MUST apply the proposals in the list in the order described in Section 12.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+
+Below follows the flow diagram for the addition of a member to a group:
+![figure4](./images/eth-secpm_add.png)
+
+The diagram below shows the procedure to remove a group member:
+<br>
+![figure5](./images/eth-secpm_remove.png)
+
+The flow diagram below shows an update procedure:
+<br>
+![figure6](./images/eth-secpm_update.png)
+
 
 ### Commit messages
 Commit messages initiate new group epochs. 
@@ -789,6 +809,20 @@ After successfully parsing the message into ABNF terms, translation MAY happen a
 - One SHOULD include event logs to track changes in public keys.
 - The curve vurve448 MUST be chosen due to its higher security level: 224-bit security instead of the 128-bit security provided by X25519.
 - It is important that Bob MUST NOT reuse `SPK`.
+
+## Considerations related to the use of Ethereum addresses
+### With respect to the Authentication Service
+- If users used their Ethereum addresses as identifiers, they MUST generate their own credentials.
+These credentials MUST use the digital signature key pair associated to the Ethereum address.
+- Other users can verify credentials.
+- With this approach, there is no need to have a dedicated Authentication Service responsible for the issuance and verification of credentials.
+- The interaction diagram showing the generation of credentials becomes obsolete.
+
+### With respect to the Delivery Service
+- Users MUST generate their own KeyPackage.
+- Other users can verify KeyPackages when required.
+- A Delivery Service storage system MUST verify KeyPackages before storing them.
+- Interaction diagrams involving the DS do not change.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
