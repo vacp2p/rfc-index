@@ -1,6 +1,5 @@
 ---
-slug: 46
-title: 46/GOSSIPSUB-TOR-PUSH
+title: GOSSIPSUB-TOR-PUSH
 name: Gossipsub Tor Push
 status: raw
 category: Standards Track
