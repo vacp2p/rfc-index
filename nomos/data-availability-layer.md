@@ -1,9 +1,9 @@
 ---
 slug: 
-title: NOMOS-DATA-AVAILABILITY
-name: Nomos Data Availability
+title: NOMOS-DATA-AVAILABILITY-LAYER
+name: Nomos Data Availability Protocol
 status: raw
-tags: Nomos
+tags: nomos
 editor: 
 contributors:
   
@@ -25,7 +25,17 @@ To achieve this,
 the data availbilty mechanism within Nomos provides guarantees that transaction data within Nomos Zones to be vaild.
 
 ## Motivation
+Decentralized blockchains require full nodes to verify network transactions by downloading all the data of the network.
+Light nodes on the other do not download the entire network data,
+but require strong data availibility guarantees. 
+There is a need for any node to prove the validity of some transaction data being added to the blockchain,
+without the need for the node to download all the transaction data.
+Downloading all the data does not allow the blockchain network to have light nodes,
+requiring all node roles to be limited to full nodes, and
+linimiting the scalability of the network.
 
+The Nomos data availability layer includes a data availability sampling mechanism, 
+and privacy-perserving mechanism to solve the data availability problem. 
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
@@ -36,7 +46,10 @@ light nodes verify data availibity through sharding.
 
 Light Nodes
 
-### Data Availability Flow 
+### Nomos Data Availability Layer 
+
+NomosDA nodes join a memebrship based list, on-chain or off-chain,
+to announce participation as data availability node role.
 
 Zones create block builder roles, send block data to base layer to verify the data.
 - Data is chucked into blobs using an algorithm prefered by the Zone
@@ -52,6 +65,13 @@ Zone block builder waits for signed data to be returned
 - Verifies data chucks are are hashed and signed
 - Includes hash in next/current block
 
-Data included in hash for next block
-- 
+Data included in hash for next block in Zone
+- Zone block builders create certificates, a Verifiable Information Dispersal Certificate,
+- Zone send certificates to DA nodes to store in the NomosDA node's mempool
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
 
