@@ -1,6 +1,5 @@
 ---
-slug: 59
-title: 59/STATUS-URL-DATA
+title: STATUS-URL-DATA
 name: Status URL Data
 status: raw
 category: Standards Track
