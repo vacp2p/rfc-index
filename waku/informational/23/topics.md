@@ -89,7 +89,7 @@ This is used for content based filtering.
 See [14/WAKU2-MESSAGE spec](../../standards/core/14/message.md) for where this is specified.
 Note that this doesn't impact routing of messages between relaying nodes,
 but it does impact how request/reply protocols such as 
-[12/WAKU2-FILTER](../../standards/core/14/filter.md) and [13/WAKU2-STORE](../../standards/core/13/store.md) are used.
+[12/WAKU2-FILTER](../../standards/core/12/filter.md) and [13/WAKU2-STORE](../../standards/core/13/store.md) are used.
 
 This is especially useful for nodes that have limited bandwidth,
 and only want to pull down messages that match this given content topic.
@@ -163,7 +163,7 @@ Copyright and related rights waived via
 * [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
 * [Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages)
 * [14/WAKU2-MESSAGE](../../standards/core/14/message.md)
-* [12/WAKU2-FILTER](../../standards/core/14/filter.md)
+* [12/WAKU2-FILTER](../../standards/core/12/filter.md)
 * [13/WAKU2-STORE](../../standards/core/13/store.md)
 * [6/WAKU1](../../deprecated/5/waku0.md)
 * [15/WAKU-BRIDGE](../../standards/core/15/bridge.md)

@@ -52,7 +52,7 @@ This also increases decentralization.
 
 `33/WAKU2-DISCV5` spans a discovery network isolated from the Ethereum Discovery v5 network.
 
-Another simple solution would be taking part in the Ethereum Discovery network, and filtering Waku nodes based on whether they support [31/WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md).
+Another simple solution would be taking part in the Ethereum Discovery network, and filtering Waku nodes based on whether they support [WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md).
 This solution is more resilient towards eclipse attacks.
 However, this discovery method is very inefficient for small percentages of Waku nodes (see [estimation](https://forum.vac.dev/t/waku-v2-discv5-roadmap-discussion/121/8)).
 It boils down to random walk discovery and does not offer a O(log(n)) hop bound.
@@ -157,7 +157,7 @@ Properly protecting against eclipse attacks is challenging and raises research q
 
 1. [10/WAKU2](../10/waku2.md)
 1. [11/WAKU2-RELAY](../11/relay.md)
-1. [`31/WAKU2-ENR`](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
+1. [`WAKU2-ENR`](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
 1. [Node Discovery Protocol v5 (`discv5`)](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md) 
 1. [`discv5` semantics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md).
 1. [`discv5` wire protocol](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-wire.md) 

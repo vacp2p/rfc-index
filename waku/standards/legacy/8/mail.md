@@ -100,7 +100,7 @@ A mailserver client fetches archival envelopes from a mailserver through a direc
 In this direct connection, the client discloses its IP/ID as well as the topics/ bloom filter it is interested in to the mailserver.
 The collection of such information allows the mailserver to link clients' IP/IDs to their topic interests and build a profile for each client over time.
 As such, the mailserver client has to trust the mailserver with this level of information.
-A similar concern exists for the light nodes and their direct peers which is discussed in the security considerations of [6/WAKU1](/spec/7).
+A similar concern exists for the light nodes and their direct peers which is discussed in the security considerations of [6/WAKU1](../6/waku1.md).
 
 **Mailserver trusted connection:**
 

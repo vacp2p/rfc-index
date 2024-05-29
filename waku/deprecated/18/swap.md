@@ -2,7 +2,7 @@
 slug: 18
 title: 18/WAKU2-SWAP
 name: Waku SWAP Accounting
-status: draft
+status: deprecated
 editor: Oskar Thorén <oskarth@titanproxy.com>
 contributor: Ebube Ud <ebube@status.im>
 ---
@@ -141,7 +141,7 @@ In the soft phase only accounting is performed, without consequence for the
 peers. No disconnect or sending of cheques is performed at this tage.
 
 SWAP protocol is performed in conjunction with another request-reply protocol to account for its usage.
-It SHOULD be done for [13/WAKU2-STORE](../../standards/core/13/store.md)
+It SHOULD be done for [13/WAKU2-STORE](../../core/13/store.md)
 and it MAY be done for other request/reply protocols.
 
 A client SHOULD log accounting state per peer
@@ -173,7 +173,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 1. [Prisoner's Dilemma](https://en.wikipedia.org/wiki/Prisoner%27s_dilemma)
 2. [Axelrod - Evolution of Cooperation (book)](https://en.wikipedia.org/wiki/The_Evolution_of_Cooperation)
 3. [Book of Swarm](https://web.archive.org/web/20210126130038/https://gateway.ethswarm.org/bzz/latest.bookofswarm.eth)
-4. [13/WAKU2-STORE](../../standards/core/13/store.md)
+4. [13/WAKU2-STORE](../../core/13/store.md)
 
 <!--
 

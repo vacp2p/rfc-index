@@ -2,7 +2,7 @@
 slug: 16
 title: 16/WAKU2-RPC
 name: Waku v2 RPC API
-status: draft
+status: deprecated
 tags: waku-core
 editor: Hanno Cornelius <hanno@status.im>
 ---
@@ -176,7 +176,7 @@ The `get_waku_v2_relay_v1_messages` method returns a list of messages that were 
 
 ## Relay Private API
 
-The Private API provides functionality to encrypt/decrypt `WakuMessage` payloads using either symmetric or asymmetric cryptography. This allows backwards compatibility with [Waku v1 nodes](../6/waku1.md).
+The Private API provides functionality to encrypt/decrypt `WakuMessage` payloads using either symmetric or asymmetric cryptography. This allows backwards compatibility with [Waku v1 nodes](../../legacy/6/waku1.md).
 It is the API client's responsibility to keep track of the keys used for encrypted communication. Since keys must be cached by the client and provided to the node to encrypt/decrypt payloads, a Private API SHOULD NOT be exposed on non-local or untrusted nodes.
 
 ### Types

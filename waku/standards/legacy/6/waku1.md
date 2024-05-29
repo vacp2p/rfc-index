@@ -36,7 +36,7 @@ This protocol needs to advertise the `waku/1` [capability](https://ethereum.gitb
 
 ### Gossip based routing
 
-In Whisper, envelopes are gossiped between peers. Whisper is a form of rumor-mongering protocol that works by flooding to its connected peers based on some factors. Envelopes are eligible for retransmission until their TTL expires. A node SHOULD relay envelopes to all connected nodes if an envelope matches their PoW and bloom filter settings. If a node works in light mode, it MAY choose not to forward envelopes. A node MUST NOT send expired envelopes, unless the envelopes are sent as a [8/WAKU-MAIL](../../application/8/mail.md) response. A node SHOULD NOT send an envelope to a peer that it has already sent before.
+In Whisper, envelopes are gossiped between peers. Whisper is a form of rumor-mongering protocol that works by flooding to its connected peers based on some factors. Envelopes are eligible for retransmission until their TTL expires. A node SHOULD relay envelopes to all connected nodes if an envelope matches their PoW and bloom filter settings. If a node works in light mode, it MAY choose not to forward envelopes. A node MUST NOT send expired envelopes, unless the envelopes are sent as a [8/WAKU-MAIL](../8/mail.md) response. A node SHOULD NOT send an envelope to a peer that it has already sent before.
 
 ### Maximum Packet Size
 
@@ -343,7 +343,7 @@ The drawback of sending message confirmations is that it increases the noise in 
 
 #### P2P Request
 
-This packet is used for sending Dapp-level peer-to-peer requests, e.g. Waku Mail Client requesting historic (expired) envelopes from the [Waku Mail Server](../../application/8/mail.md).
+This packet is used for sending Dapp-level peer-to-peer requests, e.g. Waku Mail Client requesting historic (expired) envelopes from the [Waku Mail Server](../8/mail.md).
 
 #### P2P Message
 
@@ -353,7 +353,7 @@ This packet is used for sending the peer-to-peer envelopes, which are not suppos
 
 This packet is used to indicate that all envelopes, requested earlier with a P2P Request packet (`0x7E`), have been sent via one or more P2P Message packets (`0x7F`).
 
-The content of the packet is explained in the [Waku Mail Server](../../application/8/mail.md) specification.
+The content of the packet is explained in the [Waku Mail Server](../8/mail.md) specification.
 
 ### Payload Encryption
 
@@ -373,7 +373,7 @@ Packet codes `0x7E` and `0x7F` may be used to implement Waku Mail Server and Cli
 
 Waku supports multiple capabilities. These include light node, rate limiting and bridging of traffic. Here we list these capabilities, how they are identified, what properties they have and what invariants they must maintain.
 
-Additionally there is the capability of a mailserver which is documented in its on [specification](../../application/8/mail.md).
+Additionally there is the capability of a mailserver which is documented in its on [specification](../8/mail.md).
 
 ### Light node
 
@@ -452,7 +452,7 @@ It is desirable to have a strategy for maintaining forward compatibility between
 
 ## Appendix A: Security considerations
 
-There are several security considerations to take into account when running Waku. Chief among them are: scalability, DDoS-resistance and privacy. These also vary depending on what capabilities are used. The security considerations for extra capabilities such as [mailservers](../../application/8/mail.md#security-considerations) can be found in their respective specifications.
+There are several security considerations to take into account when running Waku. Chief among them are: scalability, DDoS-resistance and privacy. These also vary depending on what capabilities are used. The security considerations for extra capabilities such as [mailservers](../8/mail.md#security-considerations) can be found in their respective specifications.
 
 ### Scalability and UX
 

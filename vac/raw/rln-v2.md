@@ -1,6 +1,5 @@
 ---
-slug: 58
-title: 58/RLN-V2
+title: RLN-V2
 name: Rate Limit Nullifier V2
 status: raw
 editor: Rasul Ibragimov <curryrasul@gmail.com>
