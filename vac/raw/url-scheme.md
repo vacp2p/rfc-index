@@ -1,6 +1,5 @@
 ---
-slug: 60
-title: 60/STATUS-URL-SCHEME
+title: STATUS-URL-SCHEME
 name: Status URL Scheme
 status: draft
 category: Standards Track
@@ -67,4 +66,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [59/STATUS-URL-DATA](/spec/59/)
+- [STATUS-URL-DATA](./url-data.md)
