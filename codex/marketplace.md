@@ -32,7 +32,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 | Terminology  | Description |
 | --------------- | --------- |
 | storage providers | A Codex node that provides storage services to the marketplace. |
-| validator nodes | A Codex node that collects, validates and submits missing storage proofs for a reward. |
+| validator nodes | A Codex node that checks for missing storage proofs and triggers for a reward. |
 | client nodes | The most common Codex node that interacts with other nodes to store, locate and retrieve data. Also considered to be an ephemeral node. |
 | slots | Created by client nodes when a new dataset is requested to be stored. Discussed further in the [slots section](#slots).  |
 
@@ -47,16 +47,16 @@ To create a request to store a dataset on the Codex network,
 client nodes MUST split the dataset into data chunks, $(c_1, c_2, c_3, \ldots, c_{n})$.
 Using a erasure coding technique, 
 the data chunks are encoded and placed into separate slots.
-The erasure coding technique MUST be the [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA).
+The erasure coding technique SHOULD be the [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA).
 
 The requester, client node, SHOULD submit a transaction with the desired request parameters.
 The requester MUST provide a `duration` value for the storage request along with the appropriate `reward`,
 payment for request. 
 Once a request is created via the transaction, 
 all slots MUST be filled by storage providers before the request is officially started.
-If the request does not attract enough storage providers after a pre-defined network timeout,
-which is defined by the Codex node as `expiry`,
-the request MUST be canceled.
+If the request does not attract enough storage providers after a time set by the requester,
+which is defined by as `expiry`,
+the request MUST be `canceled`.
 If canceled, `collateral` SHOULD be returned to any storage providers and 
 `reward` returned to the requester.
 The requester MAY create a new request with different values to restart the process.
@@ -146,30 +146,30 @@ In order a storage request to begin,
 storage providers MUST enter a storage contract with the requester via the marketplace smart contract.
 
 When storage providers are selected to fill a slot for the request,
-storage providers MUST NOT abandon the slot, unless the request is canceled or complete.
-If canceled, the slot state SHOULD be changed to cancelled or failed.
+storage providers MUST NOT abandon the slot, unless the slot state is `cancelled` or `complete`.
+If cancelled, the slot state SHOULD be changed to `cancelled` or `failed`.
 
 #### Slots
 Slots is a method used by the Codex network to distribute data chucks amongst storage providers.
 Data chucks, created by clients nodes, MUST use a method of distributing the dataset for data resiliency.
 - Client nodes SHOULD decide how many nodes should fill the slots of a storage contract.
-- Storage providers MUST be selected to fill a slot,
+- Storage providers MUST be selected before filling a slot,
 
-Each slot represents a chunk of a dataset provided during storage request.
-The first state of a slot is reserved, meaning that the slot is waiting to be reserved by a storage provider.
+Each slot represents a chunk of a dataset provided during the storage request.
+The first state of a slot is `reserved`, meaning that the slot is waiting to be reserved by a storage provider.
 The Codex network selects storage providers by using a variation of the Kademila distance function, 
 as described in [CODEX/NODE-DISPERSAL](https://github.com/vacp2p/rfc-index/blob/codex-disperal/codex/slot-dispersal.md).
 
 After a slot reservation is secured, the storage provider MUST:
 - provide token collateral and proof of storage to fill the slot
 - provide proofs of storage periodically
-Once filled, the slot state SHOULD be changed from reserved to filled.
+Once filled, the slot state SHOULD be changed from `reserved` to `filled`.
 
 The `reward` payout SHOULD occur periodically until the request `duration` is complete.
-Once complete, the slot state SHOULD be changed to finished.
+Once complete, the slot state SHOULD be changed to `finished`.
 
-A slot MUST become empty after the storage provider fails to provide proofs of storage to validator nodes.
-The state of the slot SHOULD change from filled to free.
+A slot MUST become empty after the storage provider fails to provide proofs of storage to the marketplace.
+The state of the slot SHOULD change from `filled` to `free` when validator nodes see the slot is missing proofs.
 
 The storage provider assigned to that slot MUST forfeit its `collateral`.
 Other storage providers can earn a small portion of the forfeited `collateral` by providing a new proof of storage and `collateral`,
