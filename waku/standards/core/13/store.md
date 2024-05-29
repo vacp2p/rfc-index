@@ -105,6 +105,8 @@ message HistoryResponse {
   enum Error {
     NONE = 0;
     INVALID_CURSOR = 1;
+    TOO_MANY_REQUESTS = 429;
+    SERVICE_UNAVAILABLE = 503;
   }
   Error error = 4;
 }
