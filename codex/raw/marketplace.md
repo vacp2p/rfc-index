@@ -149,7 +149,11 @@ When storage providers are selected to fill a slot for the request,
 storage providers MUST NOT abandon the slot, unless the slot state is `cancelled` or `complete`.
 If cancelled, the slot state SHOULD be changed to `cancelled` or `failed`.
 
-#### Slots
+Below is the smart contract lifecycle for a storage request:
+
+![image](../images/request-contract.png)
+
+### Slots
 Slots is a method used by the Codex network to distribute data chucks amongst storage providers.
 Data chucks, created by clients nodes, MUST use a method of distributing the dataset for data resiliency.
 - Client nodes SHOULD decide how many nodes should fill the slots of a storage contract.
@@ -196,7 +200,55 @@ The slot lifecycle of a storage provider that has filled a slot is demonstrated 
 
             ---------------- time ---------------->
 
+#### Slot Dispersal
 
+Storage providers compete with one another to store data from storage request. 
+Before a storage provider can download the data, they MUST be selected to obtain a reseversation of a slot.
+The Codex network handles selection by using Kademlia distance function to select eligible storage providers per slot.
+
+This starts with a random source address hash function that can be contructed as:
+
+    hash(blockHash, requestId, slotIndex, reservationIndex);
+
+`blockHash`: unique identifier for a specific block
+
+`requestId`: unique identifier for storage request
+
+`slotIndex`: index of current empty slot
+
+`reservationIndex`: index of current slot reservation
+
+The source address is used along with the storage provider's blockchain address to calculate the Kademlia distance.
+This is represented by:
+
+$$ XOR(A,A_0) $$
+
+The allowed distance over time $t_1$, can be defined as $2^{256} * F(t_1)$.
+When the storage provider's distance is greater than the allowed distance,
+the storage provider SHOULD be eligible to to obtain a slot reservation.
+
+- Note after eligiblity, the storage provider MUST provide `collateral` and
+storage proofs to make slot state change `reserved` to `filled`.
+
+### Filling Slot
+
+When the value of the allowed distance increases,
+more storage providers SHOULD be elgiblable to participate in reserving a slot.
+The Codex network allows a storage provider is allowed to fill a slot after calculating the storage provider's Kademlia distance is less than the allowed distance.
+The total value storage providers MUST obtain can be defined as:
+
+$$ XOR(A,A_0) < 2^{256} * F(t_1) $$
+
+Eligible storage providers represented below:
+
+                             start point
+                                  |           Kademlia distance
+            t=3    t=2    t=1     v
+      <------(------(------(------·------)------)------)------>
+                      ^                            ^
+                      |                            |
+                 this provider is               this provider is
+                  allowed at t=2                 allowed at t=3
 
 ## Copyright
 
