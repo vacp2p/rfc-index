@@ -1,6 +1,5 @@
 ---
-slug: 48
-title: 48/RLN-INTEREP-SPEC
+title: RLN-INTEREP-SPEC
 name: Interep as group management for RLN
 status: raw
 category:  
