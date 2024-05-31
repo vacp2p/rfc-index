@@ -191,18 +191,18 @@ The slot lifecycle of a storage provider that has filled a slot is demonstrated 
 
 -----------
 
-        proof &                                 proof &
-      collateral   proof          missed      collateral               missed
-            |        |              |               |                    |
-            v        v              v               v                    v
-            -------------------------------------------------------------------
-     slot:  |///////////////////////|               |////////////////////|
-            -------------------------------------------------------------------
-                                    |                                    |
-                                    v                                    v
-                                Update                      Check maxNumOfSlash is reached -  Lost Collateral 
-                            slashCriterion
-                          (number of proofs missed)           
+        proof &                                           proof &
+      collateral   reserved    proof       missed      collateral                 missed
+            |        |          |            |               |                      |
+            v        v          v            v               v                      v
+            -------------------------------------------------------------------------
+     slot:  |///////////////////////////////|               |///////////////////////|
+            ------------------------------------------------------------------------
+                                            |                                       |
+                                            v                                       v
+                                        Update                          Check maxNumOfSlash 
+                                    slashCriterion                 is reached -  Lost Collateral
+                                (number of proofs missed)           
 
 
 
