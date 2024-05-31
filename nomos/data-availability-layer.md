@@ -59,7 +59,7 @@ Zones create block builder roles, send block data to base layer to verify the da
 
 Data availbility nodes download data and prove that data was downloaded
 - Hash is created by DA node
-- k
+- 
 
 Zone block builder waits for signed data to be returned
 - Verifies data chucks are are hashed and signed
@@ -68,6 +68,21 @@ Zone block builder waits for signed data to be returned
 Data included in hash for next block in Zone
 - Zone block builders create certificates, a Verifiable Information Dispersal Certificate,
 - Zone send certificates to DA nodes to store in the NomosDA node's mempool
+
+### Certificate
+A verifiable information dispersal certificate is a list of signutures from DA nodes.
+- They contain values that verifies data chucks from the zone
+- Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and a column commitment for the data chuck
+- DA nodes check commitments and signs commitments once verified
+- The VID certificate is a list of signatures
+- Block producers receive certificates and verify
+- Block producer hash aggregate commitments and include it in the block
+
+### Data Stored in the Blockchain
+
+- CertificateID
+- AppID
+- Index
 
 ## Copyright
 
