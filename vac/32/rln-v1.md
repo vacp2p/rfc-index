@@ -26,7 +26,7 @@ A wide range of applications can benefit from RLN and provide desirable security
 For example, 
 an e-voting system can integrate RLN to contain the voting rate while protecting the voters-vote unlinkability.
 Another use case is to protect an anonymous messaging system against DDoS and 
-spam attacks by containing messaging rate of users.
+spam attacks by constraining messaging rate of users.
 This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](../../waku/standards/core/17/rln-relay.md).
 
 ## Wire Format Specification
