@@ -39,7 +39,7 @@ Registration to the group is mandatory for signaling in the application.
 After registration, group members can generate a zero-knowledge proof of membership for their signals and 
 can participate in the application.
 Usually, the membership requires a financial or 
-social stake which is beneficial for the prevention of Sybil attacks and double-signaling.
+social stake which is beneficial for the prevention of inclusion of Sybils within the _membership group_.
 Group members are allowed to send one signal per external nullifier 
 (an identifier that groups signals and can be thought of as a voting booth).
 If a user generates more signals than allowed,
