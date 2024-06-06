@@ -230,7 +230,7 @@ Below is the description of the fields of `RateLimitProof` and their types.
 
 | Parameter | Type | Description | 
 | ----: | ----------- | ----------- |
-| `proof` | array of 256 bytes | the zkSNARK proof as explained in the [Publishing process](##Publishing) |
+| `proof` | array of 256 bytes uncompressed or 128 bytes compressed | the zkSNARK proof as explained in the [Publishing process](##Publishing) |
 | `merkle_root` | array of 32 bytes in little-endian order | the root of membership group Merkle tree at the time of publishing the message |
 | `share_x` and `share_y`| array of 32 bytes each | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the Poseidon hash of the `WakuMessage`'s `payload` concatenated with its `contentTopic` . `share_y` is calculated using [Shamir secret sharing scheme](../../../../vac/32/rln-v1.md) |
 | `nullifier`  | array of 32 bytes | internal nullifier derived from `epoch` and peer's `sk` as explained in [RLN construct](../../../../vac/32/rln-v1.md)|
