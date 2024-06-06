@@ -1,5 +1,4 @@
----
-slug: 
+--- 
 title: NOMOS-DATA-AVAILABILITY-LAYER
 name: Nomos Data Availability Protocol
 status: raw
@@ -40,16 +39,27 @@ and privacy-perserving mechanism to solve the data availability problem.
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-NomosDA, Nomos data availibity layer, consist of two type of nodes.
+NomosDA, Nomos data availibity, consist of two type of nodes.
 Storage nodes store column data and commitments, and 
 light nodes verify data availibity through sharding.
+Light nodes are utilized in Nomos zones to verify the data associated with the zone,
+like transactions.
+NomosDA nodes can be used to verify transaction when a Nomos zone is not provide valid data.
 
 Light Nodes
 
-### Nomos Data Availability Layer 
+### Storage Nodes 
 
-NomosDA nodes join a memebrship based list, on-chain or off-chain,
+NomosDA storage nodes join a membership based list using libp2p,
 to announce participation as data availability node role.
+The list SHOULD be used by light nodes and 
+Nomos zones to find nodes provide data availability.
+- storage nodes SHOULD be the only node assigned to a data availability `pubsub-topic`.
+
+Data originates from zones and sent to NomosDA nodes to be verified, 
+see [data verification section](#data verification).
+
+### Zones Sending Data
 
 Zones create block builder roles, send block data to base layer to verify the data.
 - Data is chucked into blobs using an algorithm prefered by the Zone
@@ -60,6 +70,8 @@ Zones create block builder roles, send block data to base layer to verify the da
 Data availbility nodes download data and prove that data was downloaded
 - Hash is created by DA node
 - 
+ 
+All NomosDA nodes have 
 
 Zone block builder waits for signed data to be returned
 - Verifies data chucks are are hashed and signed
@@ -71,6 +83,7 @@ Data included in hash for next block in Zone
 
 ### Certificate
 A verifiable information dispersal certificate is a list of signutures from DA nodes.
+ 
 - They contain values that verifies data chucks from the zone
 - Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and a column commitment for the data chuck
 - DA nodes check commitments and signs commitments once verified
@@ -78,11 +91,14 @@ A verifiable information dispersal certificate is a list of signutures from DA n
 - Block producers receive certificates and verify
 - Block producer hash aggregate commitments and include it in the block
 
-### Data Stored in the Blockchain
+### Data Stored on the Blockchain
+Block producers receive certificates (VID) from Zones with the following values:
+After block producer verify VID certificates,
+the following data is store on the blockchain:
 
-- CertificateID
-- AppID
-- Index
+- CertificateID: A hash of the VID Certificate (including the C_agg and signatures from DA Nodes 
+- AppID: The application identification for the specific application(zone) for the data chunk
+- Index: A number for a particular sequence or position of the data chunk within the context of its AppID
 
 ## Copyright
 
