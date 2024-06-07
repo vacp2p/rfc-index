@@ -3,7 +3,7 @@ title: STATUS-URL-DATA
 name: Status URL Data
 status: raw
 category: Standards Track
-tags: waku-application
+tags:
 editor: Felicio Mununga <felicio@status.im>
 contributors:
   - Aaryamann Challani <aaryamann@status.im>
