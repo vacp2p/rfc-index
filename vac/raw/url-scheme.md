@@ -1,7 +1,7 @@
 ---
 title: STATUS-URL-SCHEME
 name: Status URL Scheme
-status: draft
+status: raw
 category: Standards Track
 tags: waku-application
 editor: Felicio Mununga <felicio@status.im>
