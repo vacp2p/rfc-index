@@ -3,7 +3,7 @@ title: STATUS-URL-SCHEME
 name: Status URL Scheme
 status: raw
 category: Standards Track
-tags: waku-application
+tags:
 editor: Felicio Mununga <felicio@status.im>
 contributors:
 ---
