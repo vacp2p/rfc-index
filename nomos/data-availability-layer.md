@@ -69,12 +69,23 @@ pubsub-topic = 'DA_TOPIC'
 ```
 ### Message Passing
 
-Communication occurs between Zone [Data Availability Committees](#) directly.
-Nomos nodes, `peerId`
-
+Communication occurs between different zones with [Data Availability Committees](#) directly.
+Nomos nodes use a libp2p swarm to read data from other nodes participating in a zone as a validator.
+It is the responsibility of zones to maintain the swarm.
+When a node in the swarm does not provide access to data,
+light nodes MAY use the Nomos data availbilty layer.
 
 ### Storage Nodes 
-Storage nodes which store column data and commitments.
+
+The main activity of the data availability layer is to store data blobs from all Nomos zones in the network.
+Storage nodes MUST NOT process data, 
+but only provide data availability guarantees for a limit amount of time.
+The role of a storage node is to store polynimal commitment schemes for Nomos zones.
+As described in [blockchain data](#BlockchainData) section,
+zones are responisble for creating data blobs that are to be stored on the blockchain. 
+The data blobs SHOULD be dispersed to Nomos data availability node to be stored in the node mempool.
+
+column data and commitments.
 NomosDA storage nodes join a membership based list using libp2p,
 to announce participation as data availability node role.
 The list SHOULD be used by light nodes and 
@@ -92,7 +103,7 @@ Data originate from Nomos zones by light nodes looking to store data on chain.
 - Light clients send data to block builders,
 block builders send data to be verified by the data availibilty layer.
 
-### Zones Sending Data
+### Blockchain Data
 
 Zones SHOULD assign block builders to handle the creation of new blocks on-chain.
 Zones create block builder roles, send block data to base layer to verify the data.
