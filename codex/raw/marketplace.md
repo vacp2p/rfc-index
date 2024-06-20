@@ -52,9 +52,7 @@ the data chunks are encoded and placed into separate slots.
 The erasure coding technique SHOULD be the [Reed-Soloman algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA).
 
 When the client node is prompted by the user to create a storage request, 
-it MUST submit a transaction with the desired request parameters.
-The requester MUST provide a `duration` value for the storage request along with the appropriate `reward`,
-payment for request. 
+it MUST submit a transaction with the desired request parameters. 
 Once a request is created via the transaction, 
 all slots MUST be filled by storage providers before the request is officially started.
 If the request does not attract enough storage providers after a time defined by `expiry` runs out, 
@@ -115,7 +113,7 @@ An identifier used to locate the dataset
 - it SHOULD be amount of tokens offered per byte per second
 - it MUST be a token known to the network.
 After tokens are recevied by the Codex Marketplace,
-it MUST released to storage providers who successfully fill slots and the storage request is complete.
+it MUST be released to storage providers who successfully fill slots until the storage request is complete.
 
 `collateral`
 
