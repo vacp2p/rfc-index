@@ -61,6 +61,7 @@ in the event that light nodes can not access data from a zone,
 light nodess MAY utilize the Nomos data avilability of the base layer.
 
 Nodes that participate in a Nomos zone MUST also be a Nomos data availibility node.
+Nomos base layer uses libp2p publish/subscribe protocol to handle message passing between nodes in the network.
 Using gossipsub, nodes configuations SHOULD define a `pubsub-topic` shared by all Nomos data availiability nodes:
 
 ```
@@ -75,15 +76,55 @@ It is the responsibility of zones to maintain the swarm.
 When a node in the swarm does not provide access to data,
 light nodes MAY use the Nomos data availbilty layer.
 
+#### Sending Data
+
+Zones are responisble for creating data chunks that need to be stored on the blockchain.
+The data chunks are encoded using a Reed-Solomon encoding.
+Once encoded, 
+the data is is dispersed to different Nomos data availibilty nodes on the base layer.
+When a node receives a data chunks from a zone,
+the data chunk is stored in memory.
+The data availability node sends an attestation back to the zone block builder confirming the data has been received.
+The attesstation is created with the following values:
+
+```
+// Nomos node hash using Blake2 algorithm
+attestation_hash = hash(blob_hash, DAnode);
+
+```
+This attestation MUST be included in the [VID certificate](#),
+which is included in the block.
+The certificate is sent to the Nomos base layer mempool.
+
+### Blockchain Data
+
+The block producer assigned by the zone, which MAY also be a Nomos data availibility node,
+MUST pick the certificate to be added to a block from the mempool in the order it was received.
+A block contains a list of certificates.
+Once a new block from a zone is created, 
+it MUST be sent to the base layer to be persisted.
+A data availibilty node will verifiy that it has the data chuck in memory as same.
+ 
+Zones MAY utilize the data availability of the base layer and
+pay for the resouce they consume with the native token.
+
+- Nodes in Nomos zones are only REQUIRED to download data related to zones they prefer.
+
+Zone block builder waits for signed data to be returned
+- Verifies data chucks are are hashed and signed
+- Includes hash in next/current block
+
+Data included in hash for next block in Zone
+- Zone block builders create certificates, a Verifiable Information Dispersal Certificate,
+- Zone send certificates to DA nodes to store in the NomosDA node's mempool
+
 ### Storage Nodes 
 
-The main activity of the data availability layer is to store data blobs from all Nomos zones in the network.
 Storage nodes MUST NOT process data, 
 but only provide data availability guarantees for a limit amount of time.
 The role of a storage node is to store polynimal commitment schemes for Nomos zones.
-As described in [blockchain data](#BlockchainData) section,
-zones are responisble for creating data blobs that are to be stored on the blockchain. 
-The data blobs SHOULD be dispersed to Nomos data availability node to be stored in the node mempool.
+
+The storage node will encode the data chunks recieved with:
 
 column data and commitments.
 NomosDA storage nodes join a membership based list using libp2p,
@@ -103,31 +144,6 @@ Data originate from Nomos zones by light nodes looking to store data on chain.
 - Light clients send data to block builders,
 block builders send data to be verified by the data availibilty layer.
 
-### Blockchain Data
-
-Zones SHOULD assign block builders to handle the creation of new blocks on-chain.
-Zones create block builder roles, send block data to base layer to verify the data.
-
-- Data is chucked into blobs using an algorithm prefered by the Zone
-- The blobs are encoded by method preferred by the Zone
-- Each blob will not be greater than 32mb?
-
-Data availbility nodes download data and prove that data was downloaded
-- Hash is created by DA node
-- 
- 
-zones MAY utilize the data availability of the base layer and
-pay for the resouce they consume with the native token.
-
-- Nodes in Nomos zones are only REQUIRED to download data related to zones they prefer.
-
-Zone block builder waits for signed data to be returned
-- Verifies data chucks are are hashed and signed
-- Includes hash in next/current block
-
-Data included in hash for next block in Zone
-- Zone block builders create certificates, a Verifiable Information Dispersal Certificate,
-- Zone send certificates to DA nodes to store in the NomosDA node's mempool
 
 ### Certificate
 A verifiable information dispersal certificate is a list of signutures from DA nodes.
