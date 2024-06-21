@@ -131,18 +131,15 @@ When stable specifications are replaced by newer draft specifications, they beco
 Deprecated specifications should not be changed except to indicate their replacements, if any.
 Deprecated specifications are contracts between editors, implementers and end-users.
 
-### Retired Specifications
+### Stagnant Specifications
 
-When deprecated specifications are no longer used in products, they become **retired** specifications.
-Retired specifications are part of the historical record.
-They should not be changed except to indicate their replacements, if any.
-Retired specifications have no contractual weight.
-
-### Deleted Specifications
-
-Deleted specifications are those that have not reached maturity (stable) and were discarded.
-They should not be used and are only kept for their historical value.
-Only Raw and Draft specifications can be deleted.
+When raw or draft specifications have no activity and/or no desire to reach technical maturity, 
+they become **stagnant** specifications.
+After a non-specified time, the specification can be asked to be downgraded to **stagnant**.
+They SHOULD be kept for their historical value but
+it is RECOMMENDED to not implement them.
+The editor MAY choose to reinstate the previous status at any time.
+Stagnant specifications have no contractual weight.
 
 ## Editorial control
 
@@ -224,5 +221,4 @@ It is RECOMMENDED to use color coding to indicate specification's status. Color 
 * ![draft](https://raw.githubusercontent.com/unprotocols/rfc/master/2/draft.svg)
 * ![stable](https://raw.githubusercontent.com/unprotocols/rfc/master/2/stable.svg)
 * ![deprecated](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deprecated.svg)
-* ![retired](https://raw.githubusercontent.com/unprotocols/rfc/master/2/retired.svg)
-* ![deleted](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deleted.svg)
+* ![stagnant](./images/stagnant.svg)
