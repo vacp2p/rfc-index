@@ -60,64 +60,6 @@ Zones SHOULD provide data availability for the zone blockchain,
 in the event that light nodes can not access data from a zone,
 light nodess MAY utilize the Nomos data avilability of the base layer.
 
-Nodes that participate in a Nomos zone MUST also be a Nomos data availibility node.
-Nomos base layer uses libp2p publish/subscribe protocol to handle message passing between nodes in the network.
-Using gossipsub, nodes configuations SHOULD define a `pubsub-topic` shared by all Nomos data availiability nodes:
-
-```
-pubsub-topic = 'DA_TOPIC'
-
-```
-### Message Passing
-
-Communication occurs between different zones with [Data Availability Committees](#) directly.
-Nomos nodes use a libp2p swarm to read data from other nodes participating in a zone as a validator.
-It is the responsibility of zones to maintain the swarm.
-When a node in the swarm does not provide access to data,
-light nodes MAY use the Nomos data availbilty layer.
-
-#### Sending Data
-
-Zones are responisble for creating data chunks that need to be stored on the blockchain.
-The data chunks are encoded using a Reed-Solomon encoding.
-Once encoded, 
-the data is is dispersed to different Nomos data availibilty nodes on the base layer.
-When a node receives a data chunks from a zone,
-the data chunk is stored in memory.
-The data availability node sends an attestation back to the zone block builder confirming the data has been received.
-The attesstation is created with the following values:
-
-```
-// Nomos node hash using Blake2 algorithm
-attestation_hash = hash(blob_hash, DAnode);
-
-```
-This attestation MUST be included in the [VID certificate](#),
-which is included in the block.
-The certificate is sent to the Nomos base layer mempool.
-
-### Blockchain Data
-
-The block producer assigned by the zone, which MAY also be a Nomos data availibility node,
-MUST pick the certificate to be added to a block from the mempool in the order it was received.
-A block contains a list of certificates.
-Once a new block from a zone is created, 
-it MUST be sent to the base layer to be persisted.
-A data availibilty node will verifiy that it has the data chuck in memory as same.
- 
-Zones MAY utilize the data availability of the base layer and
-pay for the resouce they consume with the native token.
-
-- Nodes in Nomos zones are only REQUIRED to download data related to zones they prefer.
-
-Zone block builder waits for signed data to be returned
-- Verifies data chucks are are hashed and signed
-- Includes hash in next/current block
-
-Data included in hash for next block in Zone
-- Zone block builders create certificates, a Verifiable Information Dispersal Certificate,
-- Zone send certificates to DA nodes to store in the NomosDA node's mempool
-
 ### Storage Nodes 
 
 Storage nodes MUST NOT process data, 
@@ -125,8 +67,9 @@ but only provide data availability guarantees for a limit amount of time.
 The role of a storage node is to store polynimal commitment schemes for Nomos zones.
 
 The storage node will encode the data chunks recieved with:
+-
 
-column data and commitments.
+- column data and commitments.
 NomosDA storage nodes join a membership based list using libp2p,
 to announce participation as data availability node role.
 The list SHOULD be used by light nodes and 
@@ -145,29 +88,110 @@ Data originate from Nomos zones by light nodes looking to store data on chain.
 block builders send data to be verified by the data availibilty layer.
 
 
-### Certificate
-A verifiable information dispersal certificate is a list of signutures from DA nodes.
- 
-- They contain values that verifies data chucks from the zone
-- Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and a column commitment for the data chuck
-- DA nodes check commitments and signs commitments once verified
-- The VID certificate is a list of signatures
-- Block producers receive certificates and verify
-- Block producer hash aggregate commitments and include it in the block
+### Message Passing
 
-### Data Stored on the Blockchain
-Block producers receive certificates (VID) from Zones with the following values:
+Nodes that participate in a Nomos zone MUST also be a Nomos data availibility node.
+Nomos base layer uses libp2p publish/subscribe protocol to handle message passing between nodes in the network.
+Using gossipsub, nodes configuations SHOULD define a `pubsub-topic` shared by all Nomos data availiability nodes:
+
+```rs
+pubsub-topic = 'DA_TOPIC';
+```
+
+Communication occurs between different zones with [Data Availability Committees](#) directly.
+Nomos nodes use a libp2p swarm to read data from other nodes participating in a zone as a validator.
+It is the responsibility of zones to maintain the swarm.
+When a node in the swarm does not provide access to data,
+light nodes MAY use the Nomos data availbilty layer.
+
+#### Sending Data
+
+Zones are responisble for creating data chunks that need to be stored on the blockchain.
+The data chunks are encoded using a one d encoding.
+Once encoded, 
+the data is is dispersed to different Nomos data availibilty nodes on the base layer.
+When a node receives a data chunks from a zone,
+the data chunk is stored in memory.
+The data availability node sends an attestation back to the zone block builder confirming the data has been received.
+The attesstation is created with the following values:
+
+```rs
+// Nomos node hash using Blake2 algorithm
+// DA-node signature
+fn sendAsstation () {
+  attestation_hash = hash(blob_hash, DAnode);
+}
+```
+This attestation MUST be included in the [VID certificate](#),
+which is included in the block.
+Once a block builder verifies data chucks are hashed and signed,
+the VID certificate can be created.
+A list of certificates is sent to the Nomos base layer mempool .
+
+### VID Certificate
+
+A verifiable information dispersal certificate is a list of attestation from data availibility nodes.
+It is used to verify that the data chucks have been dispersed properly amongst nodes in the base layer.
+When data chuncks are created, 
+the chuncks are placed into a two-dimensional array, also known as a matrices,
+where data is organized into row and columns.
+For example, a matrix **C** represents a chunk:
+
+$$C = \begin{bmatrix} c_{11} & c_{12} & c_{13} \cr c_{21} & c_{22} & c_{23} \cr c_{31} & c_{32} & c_{33} \end{bmatrix}$$
+
+Each row is represented as a polynomial and 
+a commitment is created for each polynomial. 
+Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and 
+a column commitment for the specific data chuck.
+
+- Block producer send data chunks with aggregate commitments
+
+#### Metadata
+
+Block producers receive certificates (VID) from Zones with metdata, `AppId` and 
+`Index`. 
+The metadat values are also stored in the blockchain, see [Blockchain Data](#BlockchainData) bellow.
+
+### Blockchain Data
+
+The block data is stored by nodes within zones and can be retreived using the [read api](#).
+A block producer, which MAY also be a Nomos data availibility node,
+MUST choose certificates that need to be added to a new block from the NomosDA mempool in the order it was received.
+- A block will contain a list of certificates.
+Once a new block for a zone is created, 
+it MUST be sent to the base layer to be persisted for a short period of time.
+A zone MAY choose to use alternative methods to persist block data, like decentralized storage solutions.
+A data availibilty node will verifiy the certificates of a block recieved is stored in its node memory.
+If the node has the same data,
+the block SHOULD be persisted.
+If the node does not have the data,
+the block SHOULD be skipped.
+
+Light nodes are not REQUIRED to download all the blockchain data belonging to a zone. 
+To fulfill this requirement, 
+zone partipants MAY utilize the data availability of the base layer to retrieve block data and
+pay for this resource with the native token.
+Other nodes within the a zone are REQUIRED to download block data only related to prefered zones.
+
+Data included in hash for next block in Zone
+
 After block producer verify VID certificates,
 the following data is store on the blockchain:
 
-- CertificateID: A hash of the VID Certificate (including the C_agg and signatures from DA Nodes 
+- CertificateID: A hash of the VID Certificate (including the C_agg and signatures from DA Nodes) 
 - AppID: The application identification for the specific application(zone) for the data chunk
 - Index: A number for a particular sequence or position of the data chunk within the context of its AppID
 
-### Data Availbilty Committees
+### Data Availability Committees
+Zones create data availability committees for their own block data.
 
 ### Data Sampling
 Light nodes sample data from zones for it's validity.
+
+### Data Availability Core API
+
+Data availiablity nodes utilize read and write API functions.
+
 
 ## Copyright
 
