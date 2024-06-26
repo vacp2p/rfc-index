@@ -107,7 +107,39 @@ light nodes MAY use the Nomos data availbilty layer.
 #### Sending Data
 
 Zones are responisble for creating data chunks that need to be stored on the blockchain.
-The data chunks are encoded using a one d encoding.
+The data SHOULD be sent to Nomos data availibity nodes.
+
+#### Encoding and Verification
+
+Nomos protocol allows nodes within a zone to encode data chucks using Reed Solomon and KGZ commitments. 
+Data chunks are divided into a finite field element, 
+a two-dimensional array also known as a matrices,
+where data is organized into rows and columns.
+
+For example: a matrix represented as $Data_{}$ for block data divided into chunks, which is represented as ${ \Large c_{jk} }$:
+
+$${ \Large Data = \begin{bmatrix} c_{11} & c_{12} & c_{13} & c_{...} & c_{1k} \cr c_{21} & c_{22} & c_{23} & c_{...} & c_{2k}  \cr c_{31} & c_{32} & c_{33} & c_{...} & c_{3k} \cr c_{...} & c_{...} & c_{...} & c_{...} & c_{...} \cr c_{j1} & c_{j2} & c_{j3} & c_{...} & c_{jk} \end{bmatrix}}$$
+
+Each row is a chunk of data and each column is considered a piece.
+So there are ${ \Large k_{} }$ pieces which include ${ \Large j_{} }$ chucks of data.
+- Each chuck SHOULD limit byte size of data
+
+For every row ${ \Large i_{} }$,
+a unique polynomial ${ \Large f_{i} }$ such that ${ \Large c_{ig} = f_{i}(w^{(g-1)}) }$,
+for ${ \Large i_{} = 1,...,k }$ and ${ \Large g_{} = 1,...,j }$.
+
+Random KGZ commitment values for the polynomials compute to:
+
+$${ \Large f_{i} = Interpolate(c_{i1}, & c_{i2}, & c_{i3}, ... , c_{ik})} and compute ${ \Large r_{i} = com(f_{i} }$.
+
+
+ 
+Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and 
+a column commitment for the specific data chuck.
+
+- Block producer send data chunks with aggregate commitments
+
+
 Once encoded, 
 the data is is dispersed to different Nomos data availibilty nodes on the base layer.
 When a node receives a data chunks from a zone,
@@ -132,19 +164,7 @@ A list of certificates is sent to the Nomos base layer mempool .
 
 A verifiable information dispersal certificate is a list of attestation from data availibility nodes.
 It is used to verify that the data chucks have been dispersed properly amongst nodes in the base layer.
-When data chuncks are created, 
-the chuncks are placed into a two-dimensional array, also known as a matrices,
-where data is organized into row and columns.
-For example, a matrix **C** represents a chunk:
 
-$$C = \begin{bmatrix} c_{11} & c_{12} & c_{13} \cr c_{21} & c_{22} & c_{23} \cr c_{31} & c_{32} & c_{33} \end{bmatrix}$$
-
-Each row is represented as a polynomial and 
-a commitment is created for each polynomial. 
-Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and 
-a column commitment for the specific data chuck.
-
-- Block producer send data chunks with aggregate commitments
 
 #### Metadata
 
@@ -190,8 +210,70 @@ Light nodes sample data from zones for it's validity.
 
 ### Data Availability Core API
 
-Data availiablity nodes utilize read and write API functions.
+Data availiablity nodes utilize `read` and `write` API functions.
+The `read` function allow node to query for information and
+`write` function for communication for multiple services.
+Data chuck is encoded as described above in [Encoding and Verification](#) and
+delivered using the message passing protocol described above in [Message Passing](#).
 
+The API functions are detailed below:
+
+```python
+
+class Chunk:
+  def __init__(self, data, app_id, index):
+    self.data = data
+    self.app_id = app_id
+    self.index = index
+
+class Metadata:
+  def __init__(self, app_id, index):
+    self.app_id = app_id
+    self.index = index
+
+class Certificate:
+  def __init__(self, proof, chunks_info):
+    self.proof = proof
+    self.chunks_info = chunks_info
+
+class Block:
+  def __init__(self, certificates):
+    self.certificates = certificates
+
+def receive_chunk():
+      # Receives from network new chunks to be processed
+      # Returns a tuple of (Chunk, Metadata)
+      chunk = Chunk(data = "chunk_data", app_id = "app_id", index = "index")
+      metadata = Metadata(app_id = "app_id", index = "index")
+      return chunk, metadata
+
+  def receive_block():
+      # Read from blockchain latest blocks added
+      # Returns a Block
+      certificate = Certificate(proof = "proof", chunks_info = "chunks_info")
+      block = Block(certificates = [certificate])
+      return block
+
+  def write_to_cache(chunk, metadata):
+    # Logic to write the chunk {metadata.index} to cache
+
+  def write_to_storage(certificate):
+    # Logic to write data to storage based on the certificate.proof
+
+  def da_node():
+      while True:
+          # Receiving chunk and metadata
+          chunk, metadata = receive_chunk()
+          write_to_cache(chunk, metadata)
+
+          # Receiving a block
+          block = receive_block()
+
+          for certificate in block.certificates:
+            write_to_storage(certificate)
+
+```
+- 
 
 ## Copyright
 
