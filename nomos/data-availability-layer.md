@@ -72,6 +72,7 @@ The storage node will encode the data chunks recieved with:
 - column data and commitments.
 NomosDA storage nodes join a membership based list using libp2p,
 to announce participation as data availability node role.
+Nodes must register during a proof of prossion stage where private keys are verified?****
 The list SHOULD be used by light nodes and 
 Nomos zones to find nodes provide data availability.
 - storage nodes SHOULD be the only node assigned to a data availability `pubsub-topic`.
@@ -182,9 +183,9 @@ To link each column to one another, we will calculate a new commitment value.
 Each $\{H_j, C_j\}$ can be considered the new vector and assume they are in evaluation form. 
 In this case, calculate a new polynomial $\Phi$ and vector commitment value $C_{agg}$ as follows:
     
-    $\Phi=\text{Interpolate}(H_1, C_1,H_2, C_2,\dots,H_n, C_n)$
+$\Phi=\text{Interpolate}(H_1, C_1,H_2, C_2,\dots,H_n, C_n)$
     
-    $C_{agg}=com(\Phi)$
+$C_{agg}=com(\Phi)$
     
 Also calculate the proof value $\pi_{H_j,C_j}$ for each column.
 
@@ -197,36 +198,123 @@ a column commitment for the specific data chuck.
 ###### Verification Process
 
 Once encoded, 
-the data is is dispersed to different Nomos data availibilty nodes on the base layer.
-When a node receives a data chunks from a zone,
-the data chunk is stored in memory.
-The data availability node sends an attestation back to the zone block builder confirming the data has been received.
+the data is dispersed to different Nomos data availibilty provider nodes that have joined a subnet on the base layer.
+It is RECCOMENDED that the dispersal client sends a column to 4096 provider nodes for better bandwidth optimization.
+A dispersal client sends the following:
+
+```python
+
+class EncodedData:
+  column_data: 
+  extended_matrix: ChuckMatrix
+  row_commitments: List[Commitments]
+  row_proofs: List[List[Proof]]
+  column_commitment: List[Commitment]
+  aggregated_column_commitment: Commitment
+  aggregated_column_proofs: List[Proof]
+```
+These values are represented as:
+
+- `extended_matrix` : 
+- `row_commitments` : ${ \Large \{r_1,r_2,\dots,r_{\ell}\} }$
+- `row_proofs` : ${ \Large \{\pi^j_{r_1},\pi^j_{r_2}, \dots,\pi^j_{r_\ell}\} }$
+- `column_data` : ${ \Large \{data_1^j,data_2^j,\dots,data_\ell^j\} }$
+- `column_commitment` : ${ \Large C_{j} }$
+- `aggregated_column_commitment` : ${ \Large C_{agg} }$
+- `aggregated_column_proofs` : ${ \Large \pi_{H_j,C_j} }$
+
+When a provider node receives data chunks from dispersal nodes,
+the data chunk is stored in the provider's node memory.
+The following steps SHOULD occur once data is received by a provider node:
+
+1. Checks the `aggregated_column_proofs` and verify the proofs.
+Zone calculates the $eval$ value and sends it to $node_j$.
+
+${ \Large eval(\Phi,w^{j-1})\to H_j, C_j }$, ${ \Large \pi_{H_j,C_j} }$
+
+2. Calculates the `column_commitment` data.
+
+${ \Large \theta'_j=\text{Interpolate}(data_1^j,data_2^j,\...\ell^j) }$
+
+This value SHOULD be equal to ${ \Large C_j }$ : ${ \Large C_j\stackrel{?}{=}com(\theta'_j) }$
+
+3. Calulates the hash of `column_data` :
+
+${ \Large H_j=Hash(01data_j^1||02data_j^2||\dots||0\ell data_\ell^j)}$
+
+Then verifies the proof :
+
+${ \Large verify(r_i, data_i^j, \pi_{r_i}^j)\to true/false }$
+
+4. For each `row_commitment`, verifies the proof of every chunk against its corresponding row commitment:
+
+${ \Large verify(r_i, data_i^j, \pi_{r_i}^j)\to true/false }$
+
+If all verification steps are true, this proves that the data has been encoded correctly.
+ 
+### VID Certificate
+
+A verifiable information dispersal certificate, VID certificate,
+is a list of attestation from data availibility nodes.
+It is used to verify that the data chucks have been dispersed properly amongst nodes in the base layer.
+The provider node signs an attestation that contain the hash value of the `row_commitment` and 
+of the `aggregated_column_commitment`.
+Signitures are verified by dispersal clients and
+valid signitures SHOULD be added to the VID certificate
+
+For every provider node $j$, assuming $sk_j$ is the private key, a signature is generated as follows:
+    
+${ \Large \sigma_j=Sign(sk_j, hash(C_{agg}, r_1,r_2,\dots,r_{\ell})) }$
+
+The provider node sends the signed attestation back to the zone dispersal clients confirming the data has been received and
+verified.
+Once a dispersal client verifies data chucks have been hashed and signed by the base layer,
+the VID certificate SHOULD be created.
+
 The attesstation is created with the following values:
 
+
 ```rs
-// Nomos node hash using Blake2 algorithm
-// DA-node signature
+// Provider node SHOULD hash using Blake2 algorithm
+// blob_hash : Hash of row_commitment and column_commitiment
 fn sendAsstation () {
   attestation_hash = hash(blob_hash, DAnode);
 }
 ```
-This attestation MUST be included in the [VID certificate](#),
-which is included in the block.
-Once a block builder verifies data chucks are hashed and signed,
-the VID certificate can be created.
-A list of certificates is sent to the Nomos base layer mempool .
 
-### VID Certificate
+The VID certificate is then sent to block builder to be accepted through concensus, 
+as desirbed in [Cryptarchia](#).
 
-A verifiable information dispersal certificate is a list of attestation from data availibility nodes.
-It is used to verify that the data chucks have been dispersed properly amongst nodes in the base layer.
+### Data Availability Sampling
+
+Light nodes MAY choose to be a data availability sampling node.
+This node can participate in any other NOMOS service while providing verification of data dispersal services.
+For example, a dispersal client can send data to be available through the base layer and
+decide to perform data availability sampling to have a great assurance that the data is available.
+This would reduce the potential threats from malicious or 
+faulty nodes not replicating data in their subnets.
+
+The following steps are REQUIRED by a data availability sampling node to verify data dispersal:
+
+1. Choose a random column value and row value from base layer provider nodes.
+2. Assuming provider node $node_t$, it calculates the $eval$ value for the `column_commitment`.
+Also calculates the `row_commitment` value $r_{t'}$ and the proof of it.
+Then sends these values to the sampling node.
+
+${ \Large eval(\Phi,w^{t-1})\to C_t$, $\pi_{C_t} }$
+    
+3. Sampling nodes verifies the `row_commitment` and the `column_commitment` as follows:
+
+${ \Large verify(C_{agg},C_r, \pi_{C_r})\to true/false }$
+
+${ \Large verify(C_{agg},C_r, \pi_{C_r})\to true/false}$
+    
+4. Also, $node_t$ sends to  to the light nodes.
 
 
-#### Metadata
-
-Block producers receive certificates (VID) from Zones with metdata, `AppId` and 
-`Index`. 
-The metadat values are also stored in the blockchain, see [Blockchain Data](#BlockchainData) bellow.
+#### Data Availability Committees
+Zones create data availability committees for their own block data.
+, see [Blockchain Data](#BlockchainData) bellow.
 
 ### Blockchain Data
 
@@ -243,6 +331,7 @@ the block SHOULD be persisted.
 If the node does not have the data,
 the block SHOULD be skipped.
 
+
 Light nodes are not REQUIRED to download all the blockchain data belonging to a zone. 
 To fulfill this requirement, 
 zone partipants MAY utilize the data availability of the base layer to retrieve block data and
@@ -258,11 +347,11 @@ the following data is store on the blockchain:
 - AppID: The application identification for the specific application(zone) for the data chunk
 - Index: A number for a particular sequence or position of the data chunk within the context of its AppID
 
-### Data Availability Committees
-Zones create data availability committees for their own block data.
+#### Metadata
 
-### Data Sampling
-Light nodes sample data from zones for it's validity.
+Block producers receive certificates (VID) from Zones with metdata, `AppId` and 
+`Index`. 
+The metadat values are also stored in the blockchain
 
 ### Data Availability Core API
 
@@ -329,7 +418,9 @@ def receive_chunk():
             write_to_storage(certificate)
 
 ```
-- 
+- d
+
+### Security Consideration
 
 ## Copyright
 
