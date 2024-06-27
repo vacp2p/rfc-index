@@ -10,74 +10,82 @@ contributors:
 
 ## Abstract
 
-This specification describes the varies components for the data availability portion for the Nomos base layer.
+This specification describes the protocol for the data availability for the Nomos network.
+Nomos provides several services for network states to create efficient ecosystems.
+Data availabilty is an important problem that network states need to solved. 
 
 ## Background
+
 Nomos is a cluster of blockchains known as zones.
 Zones are layer 2 blockchains that utilize Nomos to maintain sovereignty.
-They are initialized by the Nomos network and can utilize the Nomos services, but 
+They are initialized by the Nomos network and can utilize Nomos services, but 
 provide resources on their own.
-Nomos blockchain has two layers that are the most important components for zones. 
-One important layer is the base layer which provides a data availibility guarantees to the network. 
+They can define their own state as they are sovreign networks.
+Nomos provides tools at the global layer that allow zones to define arbitrary configurations.
+Nomos has two global layers offering services to Zones. 
+The base layer provides data availibility guarantees to zones that choose to utilize it. 
 The second layer is the coordination layer which enables state transition verification through zero-knowledge validity proofs. 
-Nomos zones can to utilize the base layer so users, light clients, 
-have the ability to obtain all block data and process it locally.
+The base layer allows users with resource-limiting devices, also known as light clients, 
+the ability to obtain all block data and process it locally.
+Light clients should be able to access blockchain data similar to a full node.
 To achieve this, 
-the data availbilty mechanism within Nomos provides guarantees that transaction data within Nomos Zones to be vaild.
+the Nomos data availbilty protocol provides guarantees that transaction data within Nomos zones are vaild.
 
 ## Motivation and Goal
-Decentralized blockchains require full nodes to verify network transactions by downloading all the data of the network.
-Light nodes on the other do not download the entire network data,
-but require strong data availibility guarantees. 
-There is a need for any node to prove the validity of some transaction data being added to the blockchain,
-without the need for the node to download all the transaction data.
-Downloading all the data does not allow the blockchain network to have light nodes,
-requiring all node roles to be limited to full nodes, and
-linimiting the scalability of the network.
 
-The Nomos data availability layer is a service that used by Zones for data guarantees.
-This includes a data availability sampling mechanism, 
-and privacy-perserving mechanism to solve the data availability problem.
-The base layer provides guarantees of data availability to Nomos zones for a limit amount of time.
+Decentralized blockchains require full nodes to verify network transactions by downloading all the data of the network.
+This becomes a problem as the blockchain data grows, full nodes will need more resources to download and 
+store the data while maintaining connection to the network.
+Light nodes on the other hand do not download the entire network data because of it's resource limiting nature.
+This retricts the network from scaling as the network is reliant on full nodes to process transactions.
+and requires light nodes to rely on centralized parties. 
+A blockchain can have light nodes prove the validity of transaction data,
+without the light node to downloading all the blockchain data.
+
+The data availability service on the Nomos base layer is a service that is used by zones for data availability guarantees.
+This allows participants of a zone to access blockchain data in the event that nodes within a zone does not make the data available.
+The service includes data encoding, verification, data availability sampling mechanism, 
+and data retrieval API to solve the data availability problem.
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-The data availability service of the Nomos base layer consist of two roles, light nodes and storage nodes,
-who interact with the service.
-Nodes who decide to provide resources to the data availibilty service are considered to be a Nomos base-layer node, or storage node.
-Light nodes are utilized within Nomos zones and is not a extensive resource role.
-In other words based on other roles of the Nomos network, a light node SHOULD NOT download large amounts of block data owned by Zones,
-MAY selectivly vailidate zk-proofs from the Nomos coordination layer, but
-SHOULD verify data availibility of the base layer.
+The data availability service of the Nomos base layer consist of different node roles, dispersal clients, 
+data availibity sampling nodes, and data availability provider nodes.
+All network partipants have a choice in which node role they choose to run.
+
+Nodes MAY decide to provide resources to the data availibilty service of the Nomos base-layer or 
+join a Data Availibility Committee within a zone.
+Light nodes are limited resource roles, 
+like a dispersal client or sampling node which utilize Nomos zones to create or retrieve blockchain transactions.
+Compared to other node roles within the network, 
+a light node SHOULD NOT download large amounts of block data owned by zones,
+MAY selectivly vailidate zk-proofs from the Nomos coordination layer,
+MAY verify data availibility of the base layer for zones they prefer.
 
 Data availibity on the base layer is only a temporary guarantee.
 The data can only be verified for a predetermined time, based on the Nomos network.
 The base layer MUST NOT provide long term incentives or 
 allocate resources to repair missing data.
 Zones act as [Data Availability Committees](#) for their own blockchain state.
-Zones SHOULD provide data availability for the zone blockchain,
-in the event that light nodes can not access data from a zone,
-light nodess MAY utilize the Nomos data avilability of the base layer.
+Zones SHOULD provide data availability for their blockchain in the event that light nodes can not access data,
+light nodess MAY utilize the data avilability of the Nomos base layer.
 
-### Storage Nodes 
+### Base-Layer Nodes 
 
-Storage nodes MUST NOT process data, 
+All light node are considered to be Nomos base layer nodes.
+Base-layer nodes MUST NOT process data, 
 but only provide data availability guarantees for a limit amount of time.
-The role of a storage node is to store polynimal commitment schemes for Nomos zones.
-
-The storage node will encode the data chunks recieved with:
--
-
-- column data and commitments.
-NomosDA storage nodes join a membership based list using libp2p,
-to announce participation as data availability node role.
-Nodes must register during a proof of prossion stage where private keys are verified?****
-The list SHOULD be used by light nodes and 
-Nomos zones to find nodes provide data availability.
-- storage nodes SHOULD be the only node assigned to a data availability `pubsub-topic`.
-Storage of data,
-the data MUST not be interpeted or accessed, except for [data availability sampling](#data-sampling), or
+The role of a provider node is to store polynomial commitment schemes for Nomos zones.
+They MUST join a membership based list using libp2p,
+to announce participation in a subnet, a group of provider nodes.
+Nodes must register during a proof-of-validator stage where public keys are verified and 
+a node enters a subnet.
+Nodes registered within a subnet are connected with each other for data passing.
+The list MUST be used by light nodes and 
+zones to connect to a node within a subnet to send data chunk to.
+The data stored by provider nodes MUST not be interpeted or accessed,
+except when sending data for [data availability sampling](#data-sampling), or
 block reconstruction by light clients.
 
 ### Light Nodes
@@ -88,19 +96,20 @@ Data originate from Nomos zones by light nodes looking to store data on chain.
 - Light clients send data to block builders,
 block builders send data to be verified by the data availibilty layer.
 
-
 ### Message Passing
 
-Nodes that participate in a Nomos zone MUST also be a Nomos data availibility node.
-Nomos base layer uses libp2p publish/subscribe protocol to handle message passing between nodes in the network.
-Using gossipsub, nodes configuations SHOULD define a `pubsub-topic` shared by all Nomos data availiability nodes:
+Nodes that participate in a Nomos zone are considered to be a Nomos base-layer nodes.
+Nomos base-layer utilizes a libp2p publish/subscribe implementation to handle message passing between nodes in the network.
+All base-layer nodes MUST be assigned to a data availability `pubsub-topic`.
+Node configuations SHOULD define a `pubsub-topic` that is shared by all data availiability nodes:
 
 ```rs
 pubsub-topic = 'DA_TOPIC';
 ```
 
-Communication occurs between different zones with [Data Availability Committees](#) directly.
-Nomos nodes use a libp2p swarm to read data from other nodes participating in a zone as a validator.
+Communication between different zones with [Data Availability Committees](#) occur directly.
+Zones use a libp2p swarm to connect to different nodes participating in a zone as a validator,
+.
 It is the responsibility of zones to maintain the swarm.
 When a node in the swarm does not provide access to data,
 light nodes MAY use the Nomos data availbilty layer.
@@ -189,7 +198,6 @@ $C_{agg}=com(\Phi)$
     
 Also calculate the proof value $\pi_{H_j,C_j}$ for each column.
 
-
 Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and 
 a column commitment for the specific data chuck.
 
@@ -215,7 +223,7 @@ class EncodedData:
 ```
 These values are represented as:
 
-- `extended_matrix` : 
+- `extended_matrix` : ${ \Large data_i^j }$
 - `row_commitments` : ${ \Large \{r_1,r_2,\dots,r_{\ell}\} }$
 - `row_proofs` : ${ \Large \{\pi^j_{r_1},\pi^j_{r_2}, \dots,\pi^j_{r_\ell}\} }$
 - `column_data` : ${ \Large \{data_1^j,data_2^j,\dots,data_\ell^j\} }$
@@ -297,24 +305,28 @@ faulty nodes not replicating data in their subnets.
 The following steps are REQUIRED by a data availability sampling node to verify data dispersal:
 
 1. Choose a random column value and row value from base layer provider nodes.
+Light node wants to opening of $C_t$ and $r_{t'}$. 
+
 2. Assuming provider node $node_t$, it calculates the $eval$ value for the `column_commitment`.
 Also calculates the `row_commitment` value $r_{t'}$ and the proof of it.
 Then sends these values to the sampling node.
 
-${ \Large eval(\Phi,w^{t-1})\to C_t$, $\pi_{C_t} }$
+${ \Large eval(\Phi,w^{t-1})\to C_t,\pi_{C_t} }$
     
 3. Sampling nodes verifies the `row_commitment` and the `column_commitment` as follows:
 
-${ \Large verify(C_{agg},C_r, \pi_{C_r})\to true/false }$
+${ \Large verify(C_{agg},C_{r},\pi_{C_r}) \to true/false }$
 
 ${ \Large verify(C_{agg},C_r, \pi_{C_r})\to true/false}$
     
-4. Also, $node_t$ sends to  to the light nodes.
+4. If this proof is true, then light nodes wants to opening of the column commitment.
+$node_r$ calculates the $eval$ value and sends it to the light node to be verified.
 
+${ \Large eval(\theta_t,w^{t'-1})\to data_{t'}^{t},\pi_{data_{t'}^{t}} }$
+    
+${ \Large verify(C_t, data_{t'}^t, \pi_{data_{t'}^t})\to true/false }$
 
-#### Data Availability Committees
-Zones create data availability committees for their own block data.
-, see [Blockchain Data](#BlockchainData) bellow.
+If this is true, then this proves that the data chuck has been encoded correctly.
 
 ### Blockchain Data
 
@@ -330,7 +342,6 @@ If the node has the same data,
 the block SHOULD be persisted.
 If the node does not have the data,
 the block SHOULD be skipped.
-
 
 Light nodes are not REQUIRED to download all the blockchain data belonging to a zone. 
 To fulfill this requirement, 
