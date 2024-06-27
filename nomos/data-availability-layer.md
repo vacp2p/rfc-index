@@ -150,11 +150,51 @@ $${ \Large Extended Data = \begin{bmatrix} c_{11} & c_{12} & c_{...} & c_{1k} & 
 
 ##### Hash and Commitment Value of Colunms
 
+Next, a dispersal client calculates the commitment for the inputs of each column using KGZ commitments.
+Assume, ${ \Large j = 1,...,2k }$:
+
+Each column contains ${ \Large j_{} }$ data chucks. 
+Using Lagrange interpolation, we can calculate the unique polynomial defined by these chunks. 
+Let's denote this polynomial as $\theta$
+
+The commitment values for each column are calculated as follows:
+
+${\Large \theta_j=\text{Interpolate}(data_1^j,data_2^j,\dots,data_\ell^j)}$
+
+${ \Large C_j=com(\theta_j)}$
+
+- In this protocol, we use elliptic curve as a group,
+thus the entries of $C_j$’s are also elliptic curve points.
+Let’s represent the $x$-coordinate of $C_j$ as $C_j^x$ and the $y $-coordinate of $C_j$ as $C_1^y$.
+If you have just $C_j^x$ and one bit of $C_j^y$ then you can construct $C_j$.
+Therefore, there is no need to use both coordinates of $C_j$.
+However, for the sake of simplicity in the representation, we use only the value $C_j$ for now.
+
+- We also calculate the hash of column data such that;
+    
+    $H_j=Hash(01data_j^1||02data_j^2||\dots||0\ell data_\ell^j)$
+
 ##### Aggregate Column Commitment
+
+The position integrity of each column for all data can be provided by a new column commitments. 
+To link each column to one another, we will calculate a new commitment value.
+
+Each $\{H_j, C_j\}$ can be considered the new vector and assume they are in evaluation form. 
+In this case, calculate a new polynomial $\Phi$ and vector commitment value $C_{agg}$ as follows:
+    
+    $\Phi=\text{Interpolate}(H_1, C_1,H_2, C_2,\dots,H_n, C_n)$
+    
+    $C_{agg}=com(\Phi)$
+    
+Also calculate the proof value $\pi_{H_j,C_j}$ for each column.
+
+
 Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and 
 a column commitment for the specific data chuck.
 
 ##### Dispersal
+
+###### Verification Process
 
 Once encoded, 
 the data is is dispersed to different Nomos data availibilty nodes on the base layer.
