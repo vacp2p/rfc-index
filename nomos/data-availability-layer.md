@@ -115,13 +115,13 @@ Nomos protocol allows nodes within a zone to encode data chucks using Reed Solom
 Data chunks are divided into a finite field element, 
 a two-dimensional array also known as a matrices,
 where data is organized into rows and columns.
-
-For example: a matrix represented as $Data_{}$ for block data divided into chunks, which is represented as ${ \Large c_{jk} }$:
+For example: a matrix represented as $Data_{}$ for block data divided into chunks, 
+which is represented as ${ \Large c_{jk} }$:
 
 $${ \Large Data = \begin{bmatrix} c_{11} & c_{12} & c_{13} & c_{...} & c_{1k} \cr c_{21} & c_{22} & c_{23} & c_{...} & c_{2k}  \cr c_{31} & c_{32} & c_{33} & c_{...} & c_{3k} \cr c_{...} & c_{...} & c_{...} & c_{...} & c_{...} \cr c_{j1} & c_{j2} & c_{j3} & c_{...} & c_{jk} \end{bmatrix}}$$
 
 Each row is a chunk of data and each column is considered a piece.
-So there are ${ \Large k_{} }$ pieces which include ${ \Large j_{} }$ chucks of data.
+So there are ${ \Large k_{} }$ data pieces which include ${ \Large j_{} }$ data chucks.
 - Each chuck SHOULD limit byte size of data
 
 For every row ${ \Large i_{} }$,
@@ -130,15 +130,31 @@ for ${ \Large i_{} = 1,...,k }$ and ${ \Large g_{} = 1,...,j }$.
 
 Random KGZ commitment values for the polynomials compute to:
 
-$${ \Large f_{i} = Interpolate(c_{i1}, & c_{i2}, & c_{i3}, ... , c_{ik})} and compute ${ \Large r_{i} = com(f_{i} }$.
+$${ \Large f_{i} = (c_{i1}, c_{i2}, c_{i3},..., c_{ik}) }$$ and compute ${ \Large r_{i} = com(f_{i}) }$.
 
+##### Reed Solomon Encoding
 
- 
+Nomos protocol REQUIRES data to be encoded using Reed-Solomon encoding after the data blob is divided into chucks,
+placed into a matrix of row and columns, and
+KZG commitments are computed for each data piece.
+Encoding allows zones to ensure the security and integity of its blockchain data.
+Using Reed-Solomon encoding, the martix from the previous step is expanded by the rows for redundancy.
+
+The polynomial ${ \Large c_{ig} = f_{i}(w^{(g-1)}) }$ at new points ${ \Large w_{j} }$ where ${ \Large j_{} = k+1, k+2, ..., n }$.
+The extended data can be demonstrated:
+
+$${ \Large Extended Data = \begin{bmatrix} c_{11} & c_{12} & c_{...} & c_{1k} & c_{1(k+1)} & c_{1(k+2)} & c_{...} & c_{1(2k)} \cr c_{21} & c_{22} & c_{...} & c_{2k} & c_{...} & c_{...} & c_{...} & c_{...} \cr c_{31} & c_{32} & c_{...} & c_{3k} & c_{...} & c_{...} & c_{...} & c_{...} \cr c_{...} & c_{...} & c_{...} & c_{...} & c_{...} & c_{...} & c_{...} & c_{...} \cr c_{j1} & c_{j2} & c_{...} & c_{jk} & c_{j(k+1)} & c_{j(k+2)} & c_{...} & c_{j(2k)} \end{bmatrix}}$$
+
+- There is an expansion factor of 1/2, so ${ \Large n_{} = 2k }$
+- Calculate the row chuck: ${ \Large eval(f_{i}, w^{(j-1)}) \rightarrow c_{ji}, \pi_{c_{ji}} }$
+
+##### Hash and Commitment Value of Colunms
+
+##### Aggregate Column Commitment
 Data chucks are sent with aggregate commitments, a list of row commitments for entire data blob, and 
 a column commitment for the specific data chuck.
 
-- Block producer send data chunks with aggregate commitments
-
+##### Dispersal
 
 Once encoded, 
 the data is is dispersed to different Nomos data availibilty nodes on the base layer.
