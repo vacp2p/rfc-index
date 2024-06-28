@@ -1,5 +1,5 @@
 --- 
-title: NOMOS-DATA-AVAILABILITY-LAYER
+title: NOMOS-DATA-AVAILABILITY-PROTOCOL
 name: Nomos Data Availability Protocol
 status: raw
 tags: nomos
@@ -88,14 +88,6 @@ The data stored by provider nodes MUST not be interpeted or accessed,
 except when sending data for [data availability sampling](#data-sampling), or
 block reconstruction by light clients.
 
-### Light Nodes
-
-Light nodes verify block data with data availibity through sharding.
-Data originate from Nomos zones by light nodes looking to store data on chain.
-
-- Light clients send data to block builders,
-block builders send data to be verified by the data availibilty layer.
-
 ### Message Passing
 
 Nodes that participate in a Nomos zone are considered to be a Nomos base-layer nodes.
@@ -117,7 +109,7 @@ light nodes MAY use the Nomos data availbilty layer.
 #### Sending Data
 
 Zones are responisble for creating data chunks that need to be stored on the blockchain.
-The data SHOULD be sent to Nomos data availibity nodes.
+The data SHOULD be sent to provider nodes.
 
 #### Encoding and Verification
 
@@ -331,13 +323,13 @@ If this is true, then this proves that the data chuck has been encoded correctly
 ### Blockchain Data
 
 The block data is stored by nodes within zones and can be retreived using the [read api](#).
-A block producer, which MAY also be a Nomos data availibility node,
-MUST choose certificates that need to be added to a new block from the NomosDA mempool in the order it was received.
-- A block will contain a list of certificates.
+A block producer, which is also be a base-layer provider node,
+MUST choose certificates that need to be added to a new block from the base-layer mempool in the order it was received.
+A block contains a list of VID certificates.
 Once a new block for a zone is created, 
 it MUST be sent to the base layer to be persisted for a short period of time.
 A zone MAY choose to use alternative methods to persist block data, like decentralized storage solutions.
-A data availibilty node will verifiy the certificates of a block recieved is stored in its node memory.
+A provider node will verify the signtures within the block are is also stored in the node memory.
 If the node has the same data,
 the block SHOULD be persisted.
 If the node does not have the data,
@@ -347,7 +339,7 @@ Light nodes are not REQUIRED to download all the blockchain data belonging to a 
 To fulfill this requirement, 
 zone partipants MAY utilize the data availability of the base layer to retrieve block data and
 pay for this resource with the native token.
-Other nodes within the a zone are REQUIRED to download block data only related to prefered zones.
+Other nodes within the zones are REQUIRED to download block data for all prefered zones.
 
 Data included in hash for next block in Zone
 
@@ -358,11 +350,9 @@ the following data is store on the blockchain:
 - AppID: The application identification for the specific application(zone) for the data chunk
 - Index: A number for a particular sequence or position of the data chunk within the context of its AppID
 
-#### Metadata
-
-Block producers receive certificates (VID) from Zones with metdata, `AppId` and 
+Block producers receive certificates from zones along with metadata, `AppId` and 
 `Index`. 
-The metadat values are also stored in the blockchain
+The metadata values are also stored in the block.
 
 ### Data Availability Core API
 
@@ -429,9 +419,12 @@ def receive_chunk():
             write_to_storage(certificate)
 
 ```
-- d
+- `receive_chunk` - Receives new chunks to be processed
+- `receive_block` - Receives latest blocks added to the blockchain
+- `write_to_cache` - Function to store newly recieved chunk in cache
+- `write_to_storage` - Used when a certificate for Zone's data is observed in a blockchain
 
-### Security Consideration
+### Security Considerations
 
 ## Copyright
 
