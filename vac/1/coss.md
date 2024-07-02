@@ -78,37 +78,31 @@ Specifications have no special status except that accorded by the community.
 COSS is designed around fast, easy to use communications tools.
 Primarily, COSS uses a wiki model for editing and publishing specifications texts.
 
-* The *domain* is the conservancy for a set of specifications in a certain area.
-* Each domain is implemented as an Internet domain, hosting a wiki and optionally other communications tools.
-* Each specification is a set of wiki pages, together with comments, attached files, and other resources.
-* Important specifications may also exist as subdomains, i.e. child wikis.
-* A *project* SHOULD consist of team memebers of a working group under a specific domain.
-Non-project application MAY be considered a project if the working group has not established a formal domain.
+* The *domain* is the conservancy for a set of specifications.
+* The *domain* is implemented as an Internet domain. 
+* Each specification is a document together with references and attached resources.
+* A *sub-domain* consists of a members within a team under a specific domain.
 
- 
-Individuals can become members of the domain or project by completing the necessary legal clearance.
+Individuals can become members of the *sub-domain* by completing the necessary legal clearance.
 The copyright, patent, and trademark policies of the domain must be clarified in an Intellectual Property policy that applies to the domain.
 
 Specifications exist as multiple pages, one page per version,
 (discussed below in "Branching and Merging"). 
 which may be assigned URIs that MAY include an incremental number.
 
-Thus, we refer to new specifications by specifying its domain, project name and short name.
+Thus, we refer to new specifications by specifying its domain, sub-domain and short name.
 The syntax for a new specification reference is:
 
-    <domain>/project/<shortname>
+    <domain>/<sub-domain>/<shortname>
 
 For example, this specification is **rfc.vac.dev/vac/COSS**, 
 if the status were **raw**.
-Note that **vac** is not a project, but a service that supports a project that could live under [IFT](https://free.technology/).
-In this case, 
-a service MAY be used as the project if generally applicable rather than a specific project.
     
 When awarded **draft** status, a number will be assigned to the specification. 
-New versions of the same specification will be assigned a number.
+New versions of the same specification will be assigned a new number.
 The syntax for a specification reference is:
 
-    <domain>/project/<number>/<shortname>
+    <domain>/<sub-domain>/<number>/<shortname>
 
 For example, this specification is **rfc.vac.dev/vac/1/COSS**.
 The short form **1/COSS** may be used when referring to the specification from other specifications in the same domain.
@@ -119,16 +113,16 @@ Every specification (including branches) carries a different number.
 
 Every specification has an independent lifecycle that documents clearly its current status.
 For a specification to receive a lifecycle status,
-a new specification SHOULD be presented by the team of the project.
+a new specification SHOULD be presented by the team of the sub-domain.
 After discussion amongst the contributors has reached a rough consensus,
 as described in [RFC7282](https://www.rfc-editor.org/rfc/rfc7282.html),
-the specification MAY begin the process to upgrade a status.
+the specification MAY begin the process to upgrade it's status.
 
-For example, the Vac RFC service MAY assistant a project in creating a new specification.
+For example, the Vac RFC service MAY assistant a sub-domain in creating a new specification.
 When the specification reaches some level of maturity,
 the specification SHOULD enter the VAC RFC process.
 Similar to the the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html), 
-the VAC RFC process SHOULD facilitate all updates to the specification.
+the Vac RFC process SHOULD facilitate all updates to the specification.
 
 A specification has five possible states that reflect its maturity and contractual weight:
 
@@ -138,7 +132,7 @@ A specification has five possible states that reflect its maturity and contractu
 
 All new specifications are **raw** specifications.
 Changes to raw specifications can be unilateral and arbitrary.
-Projects MAY use the **raw** status for new specifications that live under their domain.
+A sub-domain MAY use the **raw** status for new specifications that live under their domain.
 Raw specifications have no contractual weight.
 
 ### Draft Specifications
