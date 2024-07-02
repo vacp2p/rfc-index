@@ -28,6 +28,7 @@ It is equivalent except for some areas:
 - standards track specifications SHOULD follow a specific structure that both streamlines editing,
   and helps implementers to quickly comprehend the specification
 - specifications MUST feature a header providing specific meta information
+- domain relate to [IFT](https://free.technology/) projects and teams
 
 ## License
 
@@ -139,6 +140,7 @@ Raw specifications have no contractual weight.
 
 When raw specifications can be demonstrated, they become **draft** specifications.
 Changes to draft specifications should be done in consultation with users.
+A number will be assigned to indicate the specification has entered the [Vac RFC](rfc.vac.dev) process.
 Draft specifications are contracts between the editors and implementers.
 
 ### Stable Specifications
@@ -187,6 +189,9 @@ for handling all comments on the specification.
 
 Any member of the domain MAY branch a specification at any point.
 This is done by copying the existing text, and creating a new specification with the same name and content, but a new number.
+Since **raw** specifications are not assigned a number,
+branching by any member of a sub-domain MAY differentiate specifications based on date, contributors, or 
+version number within the document.
 The ability to branch a specification is necessary in these circumstances:
 
 * To change the responsible editor for a specification, with or without the cooperation of the current responsible editor.
@@ -226,10 +231,17 @@ This will enable programmatic access to specification metadata.
 | **tags**         | 0 or several tags    | list   | waku-application, waku-core-protocol                                                                                                                                                                                                |
 | **editor**       | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
 | **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com><br> - André Rebentisch <andre@openstandards.de><br> - Alberto Barrionuevo <abarrio@opentia.es><br> - Chris Puttick <chris.puttick@thehumanjourney.net><br> - Yurii Rashkovskii <yrashk@gmail.com> |
+| **date**     | time             | string | July, 1 2024                                                                                                                                                                                                                            |
 
-### Specification Template
+### Specification RFC Process
 
+Request for comments (RFC) specifcations are introduced by teams, 
+under a specific domain, with the intentions of becoming technically mature documents.
 Standards Track specifications SHOULD be based on the [Vac RFC template](../template.md).
+The RFC process will ensure that standards are met before assigning a new specification status.
+All changes, comments, and contributions SHOULD be documented.
+A service under a **domain**, [Vac RFC](rfc.vac.dev), 
+SHOULD faciliate the RFC process to assure standards are followed.
 
 ## Conventions
 
