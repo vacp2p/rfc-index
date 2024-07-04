@@ -28,7 +28,7 @@ It is equivalent except for some areas:
 - standards track specifications SHOULD follow a specific structure that both streamlines editing,
   and helps implementers to quickly comprehend the specification
 - specifications MUST feature a header providing specific meta information
-- domain relate to [IFT](https://free.technology/) projects and teams
+- section explaining the [IFT](https://free.technology/) Vac RFC specification process
 
 ## License
 
@@ -82,9 +82,9 @@ Primarily, COSS uses a wiki model for editing and publishing specifications text
 * The *domain* is the conservancy for a set of specifications.
 * The *domain* is implemented as an Internet domain. 
 * Each specification is a document together with references and attached resources.
-* A *sub-domain* consists of a members within a team under a specific domain.
+* A *sub-domain* is a initiative under a specific domain.
 
-Individuals can become members of the *sub-domain* by completing the necessary legal clearance.
+Individuals can become members of the *domain* by completing the necessary legal clearance.
 The copyright, patent, and trademark policies of the domain must be clarified in an Intellectual Property policy that applies to the domain.
 
 Specifications exist as multiple pages, one page per version,
@@ -119,12 +119,6 @@ After discussion amongst the contributors has reached a rough consensus,
 as described in [RFC7282](https://www.rfc-editor.org/rfc/rfc7282.html),
 the specification MAY begin the process to upgrade it's status.
 
-For example, the Vac RFC service MAY assistant a sub-domain in creating a new specification.
-When the specification reaches some level of maturity,
-the specification SHOULD enter the VAC RFC process.
-Similar to the the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html), 
-the Vac RFC process SHOULD facilitate all updates to the specification.
-
 A specification has five possible states that reflect its maturity and contractual weight:
 
 ![Lifecycle diagram](./images/lifecycle.png)
@@ -140,7 +134,6 @@ Raw specifications have no contractual weight.
 
 When raw specifications can be demonstrated, they become **draft** specifications.
 Changes to draft specifications should be done in consultation with users.
-A number will be assigned to indicate the specification has entered the [Vac RFC](rfc.vac.dev) process.
 Draft specifications are contracts between the editors and implementers.
 
 ### Stable Specifications
@@ -233,15 +226,33 @@ This will enable programmatic access to specification metadata.
 | **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com><br> - André Rebentisch <andre@openstandards.de><br> - Alberto Barrionuevo <abarrio@opentia.es><br> - Chris Puttick <chris.puttick@thehumanjourney.net><br> - Yurii Rashkovskii <yrashk@gmail.com> |
 | **date**     | time             | string | July, 1 2024                                                                                                                                                                                                                            |
 
-### Specification RFC Process
+### IFT/Vac RFC Process
 
-Request for comments (RFC) specifcations are introduced by teams, 
-under a specific domain, with the intentions of becoming technically mature documents.
-Standards Track specifications SHOULD be based on the [Vac RFC template](../template.md).
-The RFC process will ensure that standards are met before assigning a new specification status.
+---
+*** Note: ***
+This section is introduced to allow contributors to understand the IFT 
+(Institute of Free Technology) Vac RFC specification process.
+Other orgranziations may make changes to this section according to their needs.
+---
+
+Vac is a department under the IFT organization that provides RFC (Request For Comments) specification services.
+This service works to help faciliate the RFC process, assuring standards are followed.
+Contributors within the service SHOULD assistant a *sub-domain* in creating a new specification, 
+editing a specification, promoting the status of a specification along with other tasks.
+When a specification reaches some level of maturity,
+the specification SHOULD enter the [Vac RFC](rfc.vac.dev) process.
+Similar to the the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html), 
+the Vac RFC process SHOULD facilitate all updates to the specification.
+
+RFC specifcations are introduced by teams, 
+under a specific *domain*, with the intentions of becoming technically mature documents.
+When specification has obtained draft status a new number wil be assigned.
+Standards track specifications SHOULD be based on the [Vac RFC template](../template.md).
+
 All changes, comments, and contributions SHOULD be documented.
-A service under a **domain**, [Vac RFC](rfc.vac.dev), 
-SHOULD faciliate the RFC process to assure standards are followed.
+
+
+A number will be assigned to indicate the specification has entered the [Vac RFC](rfc.vac.dev) process.
 
 ## Conventions
 
