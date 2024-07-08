@@ -17,7 +17,7 @@ useful for generalized messaging, privacy-preserving, scalable and
 accessible even to resource-restricted devices.
 We'll refer to this opinionated deployment simply as
 _the public Waku Network_, _the Waku Network_ or, if the context is clear, _the network_
-in the rest of this document.
+in the rest of this document. All The Waku Network configuration parameters are listed [here](https://github.com/waku-org/nwaku/blob/master/waku/factory/networks_config.nim#L31).
 
 ## Theory / Semantics
 
@@ -141,8 +141,8 @@ See the section on [autosharding](#autosharding) for more.
 
 ## RLN rate-limiting
 
-The [17/WAKU2-RLN-RELAY](../17/rln-relay.md) protocol uses [32/RLN-V1](../../../../vac/32/rln-v1.md) proofs
-to ensure that a pre-agreed rate limit is not exceeded by any publisher.
+The [17/WAKU2-RLN-RELAY](../17/rln-relay.md) protocol uses [32/RLN-V1](../../../../vac/32/rln-v1.md), extended with [RLN-V2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md) proofs
+to ensure that a pre-agreed rate limit is not exceeded by any publisher. The addition of RLNv2 allows to rate-limit with more granularity, `x` amount of messages every `y` seconds.
 While the network is under capacity,
 individual relayers MAY choose to freely route messages without RLN proofs
 up to a discretionary bandwidth limit,
@@ -153,32 +153,25 @@ and at times of high network utilization these messages may not be relayed at al
 
 ### RLN Parameters
 
-For the Waku Network,
-the `epoch` is set to `1` second
-and the maximum number of messages published per `epoch` is limited to `1` per publisher.
-The `max_epoch_gap` is set to `20` seconds,
-meaning that validators (relay nodes),
-MUST _reject_ messages with an `epoch` more than 20 seconds into the past or 
-future compared to the validator's own clock.
-All nodes, validators and publishers,
-SHOULD use Network Time Protocol (NTP) to synchronize their own clocks,
+The Waku Network uses the following RLN parameters:
+
+* `rlnRelayUserMessageLimit=100`: Amount of messages that a membership is allowed to publish per epoch. Configurable between `0` and `MAX_MESSAGE_LIMIT`.
+* `rlnEpochSizeSec=600`: Size of the epoch in seconds.
+* `rlnRelayChainId=11155111`: Network in which the RLN contract is deployed, aka Sepolia.
+* `rlnRelayEthContractAddress=0xCB33Aa5B38d79E3D9Fa8B10afF38AA201399a7e3`: Network address where RLN memberships are stored.
+* `staked_fund=0`: In other words, the Waku Network does not use RLN staking. Registering a membership just requires to pay gas.
+* `MAX_MESSAGE_LIMIT=100`: Maximum amount of messages allowed per epoch for any membership. Enforced in the contract.
+* `max_epoch_gap=20`: Maximum allowed gap in seconds into the past or future compared to the validator's clock.
+
+Nodes MUST _reject_ messages not respecting any of these parameters.
+Nodes SHOULD use Network Time Protocol (NTP) to synchronize their own clocks,
 thereby ensuring valid timestamps for proof generation and validation.
-
-
-### Memberships
-
-Each publisher to the Waku Network SHOULD register an RLN membership
-with one of the RLN storage contracts
-moderated in the Sepolia registry contract with address [0xF1935b338321013f11068abCafC548A7B0db732C](https://sepolia.etherscan.io/address/0xF1935b338321013f11068abCafC548A7B0db732C#code).
-Initial memberships are registered in the Sepolia RLN storage contract with address [0x58322513A35a8f747AF5A385bA14C2AbE602AA59](https://sepolia.etherscan.io/address/0x58322513A35a8f747AF5A385bA14C2AbE602AA59#code).
-RLN membership setup and registration MUST follow [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#setup-and-registration),
-with the `staked_fund` set to `0`.
-In other words, the Waku Network does not use RLN staking. 
+Publishers to the Waku Network SHOULD register an RLN membership.
 
 ### RLN Proofs
 
 Each RLN member MUST generate and attach an RLN proof to every published message
-as described in [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#publishing).
+as described in [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#publishing) and [RLNV2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md).
 Slashing is not implemented for the Waku Network.
 Instead, validators will penalise peers forwarding messages exceeding the rate limit
 as specified for [the rate-limiting validation mechanism](#rate-limit-exceeded).
@@ -263,16 +256,16 @@ the relay node MUST _reject_ the message.
 
 If a message contains an RLN proof
 and the zero-knowledge proof is invalid
-according to the verification process described in [32/RLN-V1](../../../../vac/32/rln-v1.md),
+according to the verification process described in [32/RLN-V1](../../../../vac/32/rln-v1.md)/[RLN-V2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md?plain=1),
 the relay node MUST _ignore_ the message.
 
 #### Rate limit exceeded
 
 If a message contains an RLN proof
 and the relay node detects double signaling
-according to the verification process described in [32/RLN-V1](../../../../vac/32/rln-v1.md),
+according to the verification process described in [32/RLN-V1](../../../../vac/32/rln-v1.md)/[RLN-V2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md?plain=1),
 the relay node MUST _reject_ the message
-for violating the agreed rate limit of `1` message every `1` second.
+for violating the agreed rate limit of `rlnRelayUserMessageLimit` messages every `rlnEpochSizeSec` second.
 This SHOULD trigger a penalty against the transmitting peer.
 
 ## Autosharding
@@ -317,4 +310,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [14/WAKU2-MESSAGE](../14/message.md)
 * [gossipsub v1.1 validation](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
 * [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md/)
-* 
+* [The Waku Network Config](https://github.com/waku-org/nwaku/blob/master/waku/factory/networks_config.nim#L31)
