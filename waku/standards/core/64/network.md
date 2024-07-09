@@ -17,7 +17,8 @@ useful for generalized messaging, privacy-preserving, scalable and
 accessible even to resource-restricted devices.
 We'll refer to this opinionated deployment simply as
 _the public Waku Network_, _the Waku Network_ or, if the context is clear, _the network_
-in the rest of this document. All The Waku Network configuration parameters are listed [here](https://github.com/waku-org/nwaku/blob/master/waku/factory/networks_config.nim#L31).
+in the rest of this document.
+All The Waku Network configuration parameters are listed [here](https://github.com/waku-org/nwaku/blob/8bfad3ab453f96ac545c7cb0af06d0c0f34d1356/waku/factory/networks_config.nim#L31).
 
 ## Theory / Semantics
 
@@ -141,8 +142,8 @@ See the section on [autosharding](#autosharding) for more.
 
 ## RLN rate-limiting
 
-The [17/WAKU2-RLN-RELAY](../17/rln-relay.md) protocol uses [32/RLN-V1](../../../../vac/32/rln-v1.md), extended with [RLN-V2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md) proofs
-to ensure that a pre-agreed rate limit is not exceeded by any publisher. The addition of RLNv2 allows to rate-limit with more granularity, `x` amount of messages every `y` seconds.
+The [17/WAKU2-RLN-RELAY](../17/rln-relay.md) protocol uses [RLN-V2](https://github.com/vacp2p/rfc-index/blob/a5b24ac0a27da361312260f9da372a0e6e812212/vac/raw/rln-v2.md) proofs
+to ensure that a pre-agreed rate limit of `x` messages every `y` seconds is not exceeded by any publisher.
 While the network is under capacity,
 individual relayers MAY choose to freely route messages without RLN proofs
 up to a discretionary bandwidth limit,
@@ -171,7 +172,7 @@ Publishers to the Waku Network SHOULD register an RLN membership.
 ### RLN Proofs
 
 Each RLN member MUST generate and attach an RLN proof to every published message
-as described in [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#publishing) and [RLNV2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md).
+as described in [17/WAKU2-RLN-RELAY](../17/rln-relay.md/#publishing) and [RLN-V2](https://github.com/vacp2p/rfc-index/blob/a5b24ac0a27da361312260f9da372a0e6e812212/vac/raw/rln-v2.md).
 Slashing is not implemented for the Waku Network.
 Instead, validators will penalise peers forwarding messages exceeding the rate limit
 as specified for [the rate-limiting validation mechanism](#rate-limit-exceeded).
@@ -256,14 +257,14 @@ the relay node MUST _reject_ the message.
 
 If a message contains an RLN proof
 and the zero-knowledge proof is invalid
-according to the verification process described in [32/RLN-V1](../../../../vac/32/rln-v1.md)/[RLN-V2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md?plain=1),
+according to the verification process described in [RLN-V2](https://github.com/vacp2p/rfc-index/blob/a5b24ac0a27da361312260f9da372a0e6e812212/vac/raw/rln-v2.md),
 the relay node MUST _ignore_ the message.
 
 #### Rate limit exceeded
 
 If a message contains an RLN proof
 and the relay node detects double signaling
-according to the verification process described in [32/RLN-V1](../../../../vac/32/rln-v1.md)/[RLN-V2](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/rln-v2.md?plain=1),
+according to the verification process described in [RLN-V2](https://github.com/vacp2p/rfc-index/blob/a5b24ac0a27da361312260f9da372a0e6e812212/vac/raw/rln-v2.md),
 the relay node MUST _reject_ the message
 for violating the agreed rate limit of `rlnRelayUserMessageLimit` messages every `rlnEpochSizeSec` second.
 This SHOULD trigger a penalty against the transmitting peer.
@@ -307,6 +308,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [19/WAKU2-LIGHTPUSH](../19/lightpush.md)
 * [34/WAKU2-PEER-EXCHANGE](../../core/peer-exchange.md)
 * [32/RLN-V1](../../../../vac/32/rln-v1.md)
+* [RLN-V2](https://github.com/vacp2p/rfc-index/blob/a5b24ac0a27da361312260f9da372a0e6e812212/vac/raw/rln-v2.md)
 * [14/WAKU2-MESSAGE](../14/message.md)
 * [gossipsub v1.1 validation](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
 * [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md/)
