@@ -28,7 +28,8 @@ It is equivalent except for some areas:
 - standards track specifications SHOULD follow a specific structure that both streamlines editing,
   and helps implementers to quickly comprehend the specification
 - specifications MUST feature a header providing specific meta information
-- section explaining the [IFT](https://free.technology/) Vac RFC specification process
+- raw specifications will not be assigned numbers
+- section explaining the [IFT](https://free.technology/) Request For Comments specification process managed by the Vac service department
 
 ## License
 
@@ -81,25 +82,25 @@ Primarily, COSS uses a wiki model for editing and publishing specifications text
 
 * The *domain* is the conservancy for a set of specifications.
 * The *domain* is implemented as an Internet domain. 
-* Each specification is a document together with references and attached resources.
+* Each specification is a text document together with references and attached resources.
 * A *sub-domain* is a initiative under a specific domain.
 
 Individuals can become members of the *domain* by completing the necessary legal clearance.
 The copyright, patent, and trademark policies of the domain must be clarified in an Intellectual Property policy that applies to the domain.
 
 Specifications exist as multiple pages, one page per version,
-(discussed below in "Branching and Merging"). 
-which may be assigned URIs that MAY include an incremental number.
+(discussed below in "Branching and Merging"),
+which should be assigned URIs that MAY include an number identifier.
 
-Thus, we refer to new specifications by specifying its domain, sub-domain and short name.
+Thus, we refer to new specifications by specifying its domain, its sub-domain and short name.
 The syntax for a new specification reference is:
 
     <domain>/<sub-domain>/<shortname>
 
-For example, this specification is **rfc.vac.dev/vac/COSS**, 
+For example, this specification should be **rfc.vac.dev/vac/COSS**, 
 if the status were **raw**.
     
-When awarded **draft** status, a number will be assigned to the specification. 
+A number will be assigned to the specification when obtaining **draft** status. 
 New versions of the same specification will be assigned a new number.
 The syntax for a specification reference is:
 
@@ -108,7 +109,7 @@ The syntax for a specification reference is:
 For example, this specification is **rfc.vac.dev/vac/1/COSS**.
 The short form **1/COSS** may be used when referring to the specification from other specifications in the same domain.
 
-Every specification (including branches) carries a different number.
+Specifications (excluding raw specifications) carries a different number including branches.
 
 ## COSS Lifecycle
 
@@ -132,7 +133,8 @@ Raw specifications have no contractual weight.
 
 ### Draft Specifications
 
-When raw specifications can be demonstrated, they become **draft** specifications.
+When raw specifications can be demonstrated, 
+they become **draft** specifications and are assigned numbers.
 Changes to draft specifications should be done in consultation with users.
 Draft specifications are contracts between the editors and implementers.
 
@@ -224,16 +226,14 @@ This will enable programmatic access to specification metadata.
 | **tags**         | 0 or several tags    | list   | waku-application, waku-core-protocol                                                                                                                                                                                                |
 | **editor**       | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
 | **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com><br> - André Rebentisch <andre@openstandards.de><br> - Alberto Barrionuevo <abarrio@opentia.es><br> - Chris Puttick <chris.puttick@thehumanjourney.net><br> - Yurii Rashkovskii <yrashk@gmail.com> |
-| **date**     | time             | string | July, 1 2024                                                                                                                                                                                                                            |
 
 ### IFT/Vac RFC Process
 
----
-*** Note: ***
+
+> [!Note]
 This section is introduced to allow contributors to understand the IFT 
 (Institute of Free Technology) Vac RFC specification process.
 Other orgranziations may make changes to this section according to their needs.
----
 
 Vac is a department under the IFT organization that provides RFC (Request For Comments) specification services.
 This service works to help faciliate the RFC process, assuring standards are followed.
@@ -246,13 +246,11 @@ the Vac RFC process SHOULD facilitate all updates to the specification.
 
 RFC specifcations are introduced by teams, 
 under a specific *domain*, with the intentions of becoming technically mature documents.
-When specification has obtained draft status a new number wil be assigned.
-Standards track specifications SHOULD be based on the [Vac RFC template](../template.md).
-
+When a specification is promoted to *draft* status, 
+the number that is assigned MAY be incremental in nature 
+or random based on other factors.
+Standards track specifications MUST be based on the [Vac RFC template](../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
-
-
-A number will be assigned to indicate the specification has entered the [Vac RFC](rfc.vac.dev) process.
 
 ## Conventions
 
