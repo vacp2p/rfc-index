@@ -37,10 +37,10 @@ Decentralized blockchains require full nodes to verify network transactions by d
 This becomes a problem as the blockchain data grows, full nodes will need more resources to download and 
 store the data while maintaining connection to the network.
 Light nodes on the other hand do not download the entire network data because of it's resource limiting nature.
-This retricts the network from scaling as the network is reliant on full nodes to process transactions.
+This retricts the network from scaling as the network is reliant on full nodes to process transactions,
 and requires light nodes to rely on centralized parties. 
-A blockchain can have light nodes prove the validity of transaction data,
-without the light node to downloading all the blockchain data.
+A blockchain should allow light nodes to prove the validity of transaction data,
+without requiring light nodes downloading all the blockchain data.
 
 The data availability service on the Nomos base layer is a service that is used by zones for data availability guarantees.
 This allows participants of a zone to access blockchain data in the event that nodes within a zone does not make the data available.
