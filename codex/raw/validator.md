@@ -32,9 +32,34 @@ Malicious storage providers also need an disincentive to not store data and brea
 
 ## Wire Format
 
-Data discussed in this document refers to a client node that has successfully created a storage request, 
-see [CODEX-MARKETPLACE](#) for more information. 
+Before a validator node can validate a proof of storage for a slot,
+a storage request MUST be complete.
 
 ### Flow
-- Data is signed before being placed into slots.
+
+- Validators choose a random slot to download from a storage provider
+- If the validator must create a proof of the data to match the proof already in the slot
+    - If the proof does not match, the slot is empty and validator marks it as `proofMissing`
+    - If the data cannot be downloaded,
+    the storage provider may be disconnected, the validator MAY mark slot as `proofMissing`
+    - If the data downloaded matchs the proof, the validator MAY makr slot as `correctProof`
+The validator must make a blockchain transaction to state the current status of a slot.
+- When a slot is missing and the validator marks it as `proofMissing`,
+the slot MUST enter into repair, see [slot repair](CODEX-MARKETPLACE).
+    - The validator will recieve a reward for marking a `proofMissing`
+A validator can continue this process for any duration.
+
+### Validator Creating Proofs
+
+
+### Validator Repair
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+1. [CODEX-MARKETPLACE](#)
+
 
