@@ -82,7 +82,7 @@ Primarily, COSS uses a wiki model for editing and publishing specifications text
 
 * The *domain* is the conservancy for a set of specifications.
 * The *domain* is implemented as an Internet domain. 
-* Each specification is a text document together with references and attached resources.
+* Each specification is a document together with references and attached resources.
 * A *sub-domain* is a initiative under a specific domain.
 
 Individuals can become members of the *domain* by completing the necessary legal clearance.
@@ -229,26 +229,32 @@ This will enable programmatic access to specification metadata.
 
 ### IFT/Vac RFC Process
 
-
 > [!Note]
 This section is introduced to allow contributors to understand the IFT 
 (Institute of Free Technology) Vac RFC specification process.
-Other orgranziations may make changes to this section according to their needs.
+Other organizations may make changes to this section according to their needs.
 
 Vac is a department under the IFT organization that provides RFC (Request For Comments) specification services.
-This service works to help faciliate the RFC process, assuring standards are followed.
-Contributors within the service SHOULD assistant a *sub-domain* in creating a new specification, 
-editing a specification, promoting the status of a specification along with other tasks.
-When a specification reaches some level of maturity,
+This service works to help facilitate the RFC process, assuring standards are followed.
+Contributors within the service SHOULD assist a *sub-domain* in creating a new specification, 
+editing a specification, and promoting the status of a specification along with other tasks.
+Once a specification reaches some level of maturity by rough consensus,
 the specification SHOULD enter the [Vac RFC](rfc.vac.dev) process.
-Similar to the the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html), 
+Similar to the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html), 
 the Vac RFC process SHOULD facilitate all updates to the specification.
 
-RFC specifcations are introduced by teams, 
-under a specific *domain*, with the intentions of becoming technically mature documents.
+Specifications are introduced by projects, 
+under a specific *domain*, with the intention of becoming technically mature documents.
+The IFT domain currently houses the following projects:
+- [Status](status.app)
+- [Waku](https://waku.org/)
+- [Codex](https://codex.storage/)
+- [Nimbus](https://nimbus.team/)
+- [Nomos](https://nomos.tech/)
+
 When a specification is promoted to *draft* status, 
-the number that is assigned MAY be incremental in nature 
-or random based on other factors.
+the number that is assigned MAY be incremental 
+or by the *sub-domain*.
 Standards track specifications MUST be based on the [Vac RFC template](../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
