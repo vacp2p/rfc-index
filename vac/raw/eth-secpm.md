@@ -824,6 +824,33 @@ These credentials MUST use the digital signature key pair associated to the Ethe
 - A Delivery Service storage system MUST verify KeyPackages before storing them.
 - Interaction diagrams involving the DS do not change.
 
+## Consideration related to the onchain component of the protocol
+- Each group is managed by a separate smart contract.
+
+- Below follows a description of Alice adding Bob as a member of a new group.
+    1. Alice creates the smart contract associated to the group. This smart contract MUST include an ACL.
+    2. Alice adds Bob’s Ethereum address to the ACL. 
+    3. Off-chain: Alice and Bob set a secure communication channel. This MUST be done following section *Private 1-to-1 communications protocol*
+    4. Off-chain: Bob sends a request to Alice so he can be included in the group. This request is a digitally signed message. **The signature MUST be generated using Bob’s secret key, associated to his Ethereum address.
+    5. Off-chain: Upon reception of the message, Alice verifies the signature and checks that it corresponds to an address contained in the ACL.
+    6. Off-chain: Alice sends a welcome message to Bob.
+    7. Off-chain: Once Bob gets the welcome message from Alice, he MUST send his keypackage and credentials to Alice.
+    8. Upon reception of Bob’s data, Alice registers it with the smart contract.
+    9. Off-chain: Alice SHOULD broadcasts a message anouncing the addition of Bob to other users of the group.
+
+- The role of the smart contract is:
+    1. Register user information and key pacakges.
+    2. Updates of key material in ACL.
+    3. Deletion of key material from ACL.
+    4. Used keys.
+    5. Queries of existing users.
+  
+- The role of the smart contract is combined with some off-chain actions:
+	1. In the event of adding a member, there exist and off-chain interaction, via delivery service, between the user responsible for the addition (user A), and the prospective new user.
+	2. Then there exist the interaction of user A with the smart contract (see description above for this situation)
+	3. Upon addition, there is an interaction of user A and the other members of the group, to announce a need for updates in the group key. This computations is then made locally.
+	4. The same happens with other operations such as: removing a member and updating keys.
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
