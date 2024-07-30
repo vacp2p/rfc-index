@@ -395,14 +395,14 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
      - Derive the AES key and IV:
 
-       $\text{φ\_aes\_key}_{i-1} = KDF(\text{"φ\_aes\_key"}\ |\ s_{i-1})$
+       $`\text{φ\_aes\_key}_{i-1} = KDF(\text{"φ\_aes\_key"}\ |\ s_{i-1})`$
 
-       $\text{φ\_iv}_{i-1} = H(\text{"φ\_iv"}\ |\ s_{i-1})$ (truncated to 128 bits)
+       $`\text{φ\_iv}_{i-1} = H(\text{"φ\_iv"}\ |\ s_{i-1})`$ (truncated to 128 bits)
 
      - Compute the filler string using AES-CTR:
 
-       $\phi_i = \text{AES-CTR}(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
-       \ \phi_{i-1}\ |\ 0_{2\kappa})$, where $0_{2\kappa}$ is the string of $0$
+       $`\phi_i = \text{AES-CTR}(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
+       \ \phi_{i-1}\ |\ 0_{2\kappa})`$, where $0_{2\kappa}$ is the string of $0$
        bits of length $2\kappa$.
 
    Note that the length of $\phi_i$ is $2i\kappa$.
@@ -413,13 +413,13 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - Derive the AES key, MAC key, and IV:
 
-     $\text{β\_aes\_key}_{i} = KDF(\text{"β\_aes\_key"}\ |\ s_{i})$
+     $`\text{β\_aes\_key}_{i} = KDF(\text{"β\_aes\_key"}\ |\ s_{i})`$
 
-     $\text{mac\_key}_{i} = KDF(\text{"mac\_key"}\ |\ s_{i})$
+     $`\text{mac\_key}_{i} = KDF(\text{"mac\_key"}\ |\ s_{i})`$
 
-     $\text{β\_iv}_{i} = H(\text{"β\_iv"}\ |\ s_{i})$ (truncated to 128 bits)
+     $`\text{β\_iv}_{i} = H(\text{"β\_iv"}\ |\ s_{i})`$ (truncated to 128 bits)
 
-   - Generate random $\text{delay\_i}$, a 16-bit unsigned integer (0-65535 milliseconds).
+   - Generate random $`\text{delay\_i}`$, a 16-bit unsigned integer (0-65535 milliseconds).
 
      Note that top-level applications can use other probability distributions,
      such as an exponential distribution, where shorter delays are more likely
@@ -430,19 +430,19 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - If $i = L-1$ (_i.e.,_ exit node):
 
-     $\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ 0_{(2
-     (r-L)+t+2)\kappa})\ |\ \phi_{L-1}$
+     $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ 0_{(2
+     (r-L)+t+2)\kappa})\ |\ \phi_{L-1}`$
 
    - Otherwise (_i.e.,_ intermediary node):
 
-     $\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ \text
+     $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ \text
      {addr}_{i+1} \ |\ \text{delay}_{i+1}\ | \ \gamma_{i+1}\ |\ {\beta_{i+1}}_
-     {[0\ldots(2r−1)\kappa−1]})$
+     {[0\ldots(2r−1)\kappa−1]})`$
 
      Note that the length of $\beta_i$ is $(2r+t)\kappa$, $0 \leq i \leq L-1$,
      where $t$ is the combined length of next hop address and delay.
 
-   - $\gamma_i = \text{HMAC-SHA-256}(\text{mac\_key}_i,\ β_i)$\
+   - $`\gamma_i = \text{HMAC-SHA-256}(\text{mac\_key}_i,\ β_i)`$\
       Note that the length of $\gamma_i$ is $\kappa$.
 
    d. **Compute** **Deltas (**$\delta_i$, **$i=0$** to **$L-1$)**
@@ -451,18 +451,18 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - Derive the AES key and IV:
 
-     $\text{δ\_aes\_key}_{i} = KDF(\text{"δ\_aes\_key"}\ |\ s_{i})$
+     $`\text{δ\_aes\_key}_{i} = KDF(\text{"δ\_aes\_key"}\ |\ s_{i})`$
 
-     $\text{δ\_iv}_{i} = H(\text{"δ\_iv"}\ |\ s_{i})$ (truncated to 128 bits)
+     $`\text{δ\_iv}_{i} = H(\text{"δ\_iv"}\ |\ s_{i})`$ (truncated to 128 bits)
 
    - If $i = L-1$ (_i.e.,_ exit node):
 
-     $\delta_i = \text{AES-CTR}(\text{δ\_aes\_key}_{i},\ \text{δ\_iv}_{i},
-     \ 0_{\kappa}\ |\ m)$, where $m$ is the `message`.
+     $`\delta_i = \text{AES-CTR}(\text{δ\_aes\_key}_{i},\ \text{δ\_iv}_{i},
+     \ 0_{\kappa}\ |\ m)`$, where $m$ is the `message`.
 
    - Otherwise (_i.e.,_ intermediary node):
 
-     $\delta_i = \text{AES-CTR}(\text{δ\_aes\_key}_{i},\ \text{δ\_iv}_{i},\ \delta_{i+1})$
+     $`\delta_i = \text{AES-CTR}(\text{δ\_aes\_key}_{i},\ \text{δ\_iv}_{i},\ \delta_{i+1})`$
 
      Note that the length of $\delta$ is $|m| + \kappa$.
 
@@ -498,7 +498,7 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
 #### 5.2 Intermediary Mix Node
 
-Let $x_i \in \mathbb{Z}_q^*$ be the intermediary node’s private key
+Let $`x_i \in \mathbb{Z}_q^*`$ be the intermediary node’s private key
 corresponding to the public key $y_i \in G^*$. It performs the following steps
 to relay a message:
 
@@ -517,9 +517,9 @@ to relay a message:
 
    a. Derive MAC key
 
-   $\text{mac\_key} = KDF(\text{"mac\_key"}\ |\ s)$
+   $`\text{mac\_key} = KDF(\text{"mac\_key"}\ |\ s)`$
 
-   b. Check if $\gamma = \text{HMAC-SHA-256}(\text{mac\_key},\ β)$ . If not,
+   b. Check if $`\gamma = \text{HMAC-SHA-256}(\text{mac\_key},\ β)`$ . If not,
    discard the message.
 
    c. Otherwise, store tag $H(s)$ in the list of seen message tags.
@@ -528,11 +528,11 @@ to relay a message:
 
    a. Derive the AES key, MAC key, and IV:
 
-   $\text{β\_aes\_key} = KDF(\text{"β\_aes\_key"}\ |\ s)$
+   $`\text{β\_aes\_key} = KDF(\text{"β\_aes\_key"}\ |\ s)`$
 
-   $\text{β\_iv} = H(\text{"β\_iv"}\ |\ s)$ (truncated to 128 bits)
+   $`\text{β\_iv} = H(\text{"β\_iv"}\ |\ s)`$ (truncated to 128 bits)
 
-   b. Compute $B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta)$.
+   b. Compute $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta)`$.
 
    c. Uniquely parse prefix of $B$
 
@@ -544,19 +544,19 @@ to relay a message:
 
    d. **Extract Routing Information**
 
-   $\text{next\_hop} = B_{[0\ldots(t\kappa-17)]}$ (first $t\kappa-2$ bytes).
+   $`\text{next\_hop} = B_{[0\ldots(t\kappa-17)]}`$ (first $t\kappa-2$ bytes).
 
    e. **Extract Delay**
 
-   $\text{delay} = B_{[(t\kappa-16)\ldots(t\kappa-1)]}$ (following $2$ bytes).
+   $`\text{delay} = B_{[(t\kappa-16)\ldots(t\kappa-1)]}`$ (following $2$ bytes).
 
    f. **Extract Gamma**
 
-   ${\gamma}' = B_{[t\kappa\ldots(t\kappa+\kappa-1)]}$ (following $\kappa$ bytes).
+   $`{\gamma}' = B_{[t\kappa\ldots(t\kappa+\kappa-1)]}`$ (following $\kappa$ bytes).
 
    g. **Extract Beta**
 
-   $\beta' = B_{[(t\kappa+\kappa)\ldots(2r + t )\kappa-1]}$ (following $(2r-1)
+   $`\beta' = B_{[(t\kappa+\kappa)\ldots(2r + t )\kappa-1]}`$ (following $(2r-1)
    \kappa$ bytes).
 
    h. **Compute Alpha**
@@ -568,9 +568,9 @@ to relay a message:
    i. **Compute Delta**
 
    - Derive the AES key and IV:
-     $\text{δ\_aes\_key} = KDF(\text{"δ\_aes\_key"}\ |\ s)$
-     $\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)$ (truncated to 128 bits)
-   - Compute $\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)$
+     $`\text{δ\_aes\_key} = KDF(\text{"δ\_aes\_key"}\ |\ s)`$
+     $`\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)$` (truncated to 128 bits)
+   - Compute $`\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)`$
 
 6. **Construct Final Sphinx Packet**
 
@@ -587,8 +587,8 @@ to relay a message:
    `delta = delta' // 2157 bytes`
 
 7. **Serialize the Sphinx Packet** using Protocol Buffers.
-8. **Introduce A Delay** of $\text{delay}$ milliseconds.
-9. **Send the Serialized Packet** to $\text{next\_hop}$ using the
+8. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
+9. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
     `"/mix/1.0.0"` protocol.
 
 #### 5.3 Exit Node
@@ -602,11 +602,11 @@ to relay a message:
 
    - Derive the AES key and IV:
 
-     $\text{δ\_aes\_key} = KDF(\text{"δ\_aes\_key"}\ |\ s)$
+     $`\text{δ\_aes\_key} = KDF(\text{"δ\_aes\_key"}\ |\ s)`$
 
-     $\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)$ (truncated to 128 bits)
+     $`\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)`$ (truncated to 128 bits)
 
-   - Compute $\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)$.
+   - Compute $`\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)`$.
 
 3. **Extract Message**
 
@@ -640,3 +640,19 @@ to relay a message:
 
 7. **Disseminate the message** via the respective libp2p protocol (_e.g.,_
    GossipSub).
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+### normative
+
+[libp2p](https://libp2p.io)\
+[Sphinx](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
+
+### informative
+[PoW](https://bitcoin.org/bitcoin.pdf)\
+[Sphinx packet size](https://petsymposium.org/popets/2024/popets-2024-0050.pdf)
+
