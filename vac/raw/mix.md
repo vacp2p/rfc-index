@@ -111,7 +111,7 @@ A single mix node can play different roles in different paths:
 #### 2.3 Incentives
 
 To publish an anonymous libp2p message (_e.g.,_ GossipSub, Ping, etc.), nodes
-must run a mix node instance. This requirement serves as an incentive for nodes
+MUST run a mix node instance. This requirement serves as an incentive for nodes
 to participate in the mix network, as it allows them to benefit from the
 anonymity features while also contributing to the network's overall anonymity
 and robustness.
