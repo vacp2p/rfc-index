@@ -153,7 +153,7 @@ discovered nodes.
     node (_e.g.,_ Ping, GossipSub, etc.).
   - Additional fields may be included based on the node's requirements.
   
-  ii. The mix nodes use a peer discovery protocol like WAKU/Discv5:
+  ii. The mix nodes use a peer discovery protocol like [WAKU](https://waku.org)/[Discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md):
   
   - Connect to a set of bootstrap nodes when joining the network.
   - Regularly update their list of known peers.
