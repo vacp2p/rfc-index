@@ -62,12 +62,13 @@ The Mix protocol is identified by the string `"/mix/1.0.0"`.
 
 ### 2. Custom Mix Protocol
 
-The Mix protocol is designed as a standalone protocol, identified by the
-protocol identifier `"/mix/1.0.0"`. This approach allows the Mix protocol to
-operate independently, decoupled from specific applications, providing greater
-flexibility and reusability across various libp2p protocols. By doing so, the
-Mix protocol can evolve independently, focusing on its core functionality
-without being tied to the development and maintenance cycles of other protocols.
+The Mix protocol is designed as a standalone protocol, 
+identified by the protocol identifier `"/mix/1.0.0"`. 
+This approach allows the Mix protocol to operate independently,
+decoupled from specific applications, 
+providing greater flexibility and reusability across various libp2p protocols. 
+By doing so, the Mix protocol can evolve independently, 
+focusing on its core functionality without being tied to the development and maintenance cycles of other protocols.
 
 #### 2.1 Mix Nodes Roles
 
