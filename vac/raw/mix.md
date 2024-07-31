@@ -187,7 +187,7 @@ protocol between libp2p peers.
 #### 2.6 Transport Layer
 
 The Mix protocol uses secure transport protocols to ensure confidentiality and
-integrity of communications. The recommended transport protocols are QUIC or
+integrity of communications. The recommended transport protocols are [QUIC](https://datatracker.ietf.org/doc/rfc9000/) or
 TLS (preferably QUIC due to its performance benefits and built-in features such
 as low latency and efficient multiplexing).
 
