@@ -31,7 +31,7 @@ iv. Delayed message forwarding to thwart timing analysis attacks.
 Note: The Mix Protocol is designed to work alongside existing libp2p protocols,
 allowing for seamless integration with current libp2p applications while
 providing enhanced privacy features. For example, it can encapsulate messages
-from protocols like GossipSub to ensure sender anonymity.
+from protocols like [GossipSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.2.md) to ensure sender anonymity.
 
 ## Background
 
