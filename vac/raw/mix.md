@@ -14,7 +14,7 @@ This document specifies the Mix protocol, a custom protocol within the
 [libp2p](https://libp2p.io) framework designed to enable anonymous communication
 in peer-to-peer networks. The Mix protocol allows libp2p nodes to send messages
 without revealing the sender's identity to intermediary nodes or the recipient.
-It achieves this by using the Sphinx packet format, which encrypts and routes
+It achieves this by using the [Sphinx packet format](https://www.researchgate.net/publication/220713667_Sphinx_A_Compact_and_Provably_Secure_Mix_Format), which encrypts and routes
 messages through a series of nodes (mix nodes) before reaching the recipient.
 
 Key features of the protocol include:
