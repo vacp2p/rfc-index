@@ -254,7 +254,7 @@ The IFT domain currently houses the following projects:
 
 When a specification is promoted to *draft* status, 
 the number that is assigned MAY be incremental 
-or by the *sub-domain*.
+or by the *sub-domain* and the Vac RFC process.
 Standards track specifications MUST be based on the [Vac RFC template](../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
