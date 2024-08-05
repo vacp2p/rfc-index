@@ -3,7 +3,7 @@ slug: 32
 title: 32/RLN-V1
 name: Rate Limit Nullifier
 status: draft
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Barry Whitehat <barrywhitehat@protonmail.com>
 - Sanaz Taheri <sanaz@status.im>
