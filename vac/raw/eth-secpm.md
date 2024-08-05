@@ -825,31 +825,47 @@ These credentials MUST use the digital signature key pair associated to the Ethe
 - Interaction diagrams involving the DS do not change.
 
 ## Consideration related to the onchain component of the protocol
+### Assumptions
+
+- Users have set a secure 1-1 communication channel.
 - Each group is managed by a separate smart contract.
 
-- Below follows a description of Alice adding Bob as a member of a new group.
-    1. Alice creates the smart contract associated to the group. This smart contract MUST include an ACL.
-    2. Alice adds Bob’s Ethereum address to the ACL. 
-    3. Off-chain: Alice and Bob set a secure communication channel. This MUST be done following section *Private 1-to-1 communications protocol*
-    4. Off-chain: Bob sends a request to Alice so he can be included in the group. This request is a digitally signed message. **The signature MUST be generated using Bob’s secret key, associated to his Ethereum address.
-    5. Off-chain: Upon reception of the message, Alice verifies the signature and checks that it corresponds to an address contained in the ACL.
-    6. Off-chain: Alice sends a welcome message to Bob.
-    7. Off-chain: Once Bob gets the welcome message from Alice, he MUST send his keypackage and credentials to Alice.
-    8. Upon reception of Bob’s data, Alice registers it with the smart contract.
-    9. Off-chain: Alice SHOULD broadcasts a message anouncing the addition of Bob to other users of the group.
+### Addition of members to a group
+#### Alice knows Bob’s Ethereum address
 
-- The role of the smart contract is:
-    1. Register user information and key pacakges.
-    2. Updates of key material in ACL.
-    3. Deletion of key material from ACL.
-    4. Used keys.
-    5. Queries of existing users.
-  
-- The role of the smart contract is combined with some off-chain actions:
-	1. In the event of adding a member, there exist and off-chain interaction, via delivery service, between the user responsible for the addition (user A), and the prospective new user.
-	2. Then there exist the interaction of user A with the smart contract (see description above for this situation)
-	3. Upon addition, there is an interaction of user A and the other members of the group, to announce a need for updates in the group key. This computations is then made locally.
-	4. The same happens with other operations such as: removing a member and updating keys.
+1. Off-chain - Alice and Bob set a secure communication channel.
+2. Alice creates the smart contract associated to the group. This smart contract MUST include an ACL.
+3. Alice adds Bob’s Ethereum address to the ACL.
+4. Off-chain - Alice sends a request to join the group to Bob. The request MUST include the contract’s address: `RequestMLSPayload {"You are joining the group with smart contract: 0xabcd"}`
+5. Off-chain - Bob responds the request with a digitally signed response. This response includes Bob’s credentials and key package: `ResponseMLSPayload {sig: signature(ethereum_sk, message_to_sign), address: ethereum_address, credentials, keypackage}`
+6. Off-chain - Alice verifies the signature, using Bob’s `ethereum_pk` and checks that it corresponds to an address contained in the ACL.
+7. Off-chain - Alice sends a welcome message to Bob.
+8. Off-chain - Alice SHOULD broadcasts a message announcing the addition of Bob to other users of the group.
+
+#### Alice does not know Bob’s Ethereum address
+1. Off-chain - Alice and Bob set a secure communication channel.
+2. Alice creates the smart contract associated to the group. This smart contract MUST include an ACL.
+3. Off-chain - Alice sends a request to join the group to Bob. The request MUST include the contract’s address: `RequestMLSPayload {"You are joining the group with smart contract: 0xabcd"}`
+4. Off-chain - Bob responds the request with a digitally signed response. This response includes Bob’s credentials, his Ethereum address and key package: `ResponseMLSPayload {sig: signature(ethereum_sk, message_to_sign), address: ethereum_address, credentials, keypackage}`
+5. Off-chain - Alice verifies the signature using Bob’s `ethereum_pk`. 
+6. Upon reception of Bob’s data, Alice registers data with the smart contract.
+7. Off-chain - Alice sends a welcome message to Bob.
+8. Off-chain - Alice SHOULD broadcasts a message announcing the addition of Bob to other users of the group.
+
+### Considerations regarding smart contracts
+
+The role of the smart contract includes:
+1. Register user information and key packages.
+2. Updates of key material.
+    - Users MUST send any update in their key material to the other users of the group via off-chain messages.
+    - Upon reception of the new key material, the creator of the contract will update the state in the smart contract.
+3. Deletion of users.
+    - Any user can submit a proposal for the removal of a user via off-chain message.
+    - This proposal MUST be sent to the creator of the contract.
+    - The creator of the contract MUST update the ACL, and send messages to the group for key update.
+4. Queries of existing users.
+    - Any user can query the smart contract to know the state of the group, including existing users and removed ones.
+    - This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
