@@ -2,7 +2,7 @@
 title: RLN-STEALTH-COMMITMENTS
 name: RLN Stealth Commitment Usage
 category: Standards Track
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Jimmy Debe <jimmy@status.im>
 ---
