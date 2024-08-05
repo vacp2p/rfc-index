@@ -841,6 +841,7 @@ These credentials MUST use the digital signature key pair associated to the Ethe
 6. Off-chain - Alice verifies the signature, using Bob’s `ethereum_pk` and checks that it corresponds to an address contained in the ACL.
 7. Off-chain - Alice sends a welcome message to Bob.
 8. Off-chain - Alice SHOULD broadcasts a message announcing the addition of Bob to other users of the group.
+![figure7](./images/eth-secpm_onchain-register-1.png)
 
 #### Alice does not know Bob’s Ethereum address
 1. Off-chain - Alice and Bob set a secure communication channel.
@@ -851,6 +852,7 @@ These credentials MUST use the digital signature key pair associated to the Ethe
 6. Upon reception of Bob’s data, Alice registers data with the smart contract.
 7. Off-chain - Alice sends a welcome message to Bob.
 8. Off-chain - Alice SHOULD broadcasts a message announcing the addition of Bob to other users of the group.
+![figure8](./images/eth-secpm_onchain-register-2.png)
 
 ### Considerations regarding smart contracts
 
