@@ -1,6 +1,6 @@
 ---
-title: MIX
-name: Mix
+title: MIX-PROTOCOL
+name: The Mix Protocol
 status: raw
 category: Standards Track
 tags:
@@ -383,7 +383,7 @@ sender, intermediary, and exit node) is detailed in the following subsections.
       _[Section 3](#3-cryptographic-primitives-and-security-parameter)_ for details).
    - For each node $i$ (from $1$ to $L-1$):
      - $α_i = α_{i-1}^{b_{i-1}}$ using Curve25519 scalar multiplication.
-     - $s_i = y_{i}^{\prod_{\text{j=0}}^{\text{i-1}} b_{j}}$, where $y_{i}$ is
+     - $s_i = y_{i}^{x\prod_{\text{j=0}}^{\text{i-1}} b_{j}}$, where $y_{i}$ is
       the public key of the i-th hop.
      - $b_i = H(α_i\ |\ s_i)$, where $H$ is the SHA-256 hash function.
 
