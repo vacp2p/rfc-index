@@ -852,19 +852,30 @@ These credentials MUST use the digital signature key pair associated to the Ethe
 6. Upon reception of Bob’s data, Alice registers data with the smart contract.
 7. Off-chain - Alice sends a welcome message to Bob.
 8. Off-chain - Alice SHOULD broadcasts a message announcing the addition of Bob to other users of the group.
+
 ![figure8](./images/eth-secpm_onchain-register-2.png)
 
 ### Considerations regarding smart contracts
 
 The role of the smart contract includes:
-1. Register user information and key packages.
+
+1. Register user information and key packages → As described in the previous section.
 2. Updates of key material.
     - Users MUST send any update in their key material to the other users of the group via off-chain messages.
-    - Upon reception of the new key material, the creator of the contract will update the state in the smart contract.
+    - Upon reception of the new key material, the creator of the contract MUST update the state of the smart contract.
 3. Deletion of users.
     - Any user can submit a proposal for the removal of a user via off-chain message.
     - This proposal MUST be sent to the creator of the contract.
     - The creator of the contract MUST update the ACL, and send messages to the group for key update.
+
+![figure9](./images/eth-secpm_onchain-update.png)
+
+> It is important to note that both user removal and updates of any kind have a similar interaction flow.
+
+4. Queries of existing users.
+    - Any user can query the smart contract to know the state of the group, including existing users and removed ones.
+    - This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
+
 4. Queries of existing users.
     - Any user can query the smart contract to know the state of the group, including existing users and removed ones.
     - This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
