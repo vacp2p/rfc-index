@@ -876,10 +876,6 @@ The role of the smart contract includes:
     - Any user can query the smart contract to know the state of the group, including existing users and removed ones.
     - This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
 
-4. Queries of existing users.
-    - Any user can query the smart contract to know the state of the group, including existing users and removed ones.
-    - This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
-
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
