@@ -32,9 +32,17 @@ Malicious storage providers also need an disincentive to not store data and brea
 
 ## Wire Format
 
-Before a validator node can validate a proof of storage for a slot,
-a storage request MUST be complete.
+Validator nodes choose
+Before a validator node can validate a proof of storage,
+a storage request MUST be active, and
+each slot state MUST be `filled`.
+While a slot is in `filled` state,
+a validator has the ability to change the state to `empty`.
+Slot state are SHOULD be stored on a EVM compatiable blockchain.
+Validators MUST manually update state through the Codex Marketplace smart contract.
 
+
+The following must be fulfilled before a state can be updated to `empty`.
 ### Flow
 
 - Validators choose a random slot to download from a storage provider
@@ -49,10 +57,10 @@ the slot MUST enter into repair, see [slot repair](CODEX-MARKETPLACE).
     - The validator will recieve a reward for marking a `proofMissing`
 A validator can continue this process for any duration.
 
-### Validator Creating Proofs
+### Validator Verifing Proofs
 
+Each slot SHOULD contain the following:
 
-### Validator Repair
 
 ## Copyright
 
