@@ -5,7 +5,7 @@ name: Session management for Waku X3DH
 status: draft
 category: Standards Track
 tags: waku-application
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Andrea Piana <andreap@status.im>
 - Pedro Pombeiro <pedro@status.im>
@@ -19,7 +19,7 @@ contributors:
 This document specifies how to manage sessions based on an X3DH key exchange.
 This includes how to establish new sessions, how to re-establish them, how to maintain them, and how to close them.
 
-[53/WAKU2-X3DH](../../standards/application/53/X3DH.md) specifies the Waku `X3DH` protocol for end-to-end encryption. 
+[53/WAKU2-X3DH](../53/x3dh.md) specifies the Waku `X3DH` protocol for end-to-end encryption. 
 Once two peers complete an X3DH handshake, they SHOULD establish an X3DH session.
 
 ## Session Establishment
@@ -146,7 +146,7 @@ In this case an empty message containing bundle information MUST be sent back, w
 
 ## Security Considerations
 
-1. Inherits all security considerations from [53/WAKU2-X3DH](../../standards/application/53/X3DH.md).
+1. Inherits all security considerations from [53/WAKU2-X3DH](../53/x3dh.md).
 
 ### Recommendations
 
@@ -159,6 +159,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [53/WAKU2-X3DH](../../standards/application/53/X3DH.md)
+1. [53/WAKU2-X3DH](../53/x3dh.md)
 2. [Signal's Sesame Algorithm](https://signal.org/docs/specifications/sesame/)
 

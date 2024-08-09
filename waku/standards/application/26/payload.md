@@ -8,9 +8,9 @@ contributors:
 ---
 
 This specification describes how Waku provides confidentiality, authenticity, and integrity, as well as some form of unlinkability.
-Specifically, it describes how encryption, decryption and signing works in [6/WAKU1](../../standards/core/6/waku1.md) and in [10/WAKU2 spec](../../standards/core/10/waku2.md) with [14/WAKU-MESSAGE version 1](../../standards/core/14/message.md/#version1).
+Specifically, it describes how encryption, decryption and signing works in [6/WAKU1](../../legacy/6/waku1.md) and in [10/WAKU2 spec](../../core/10/waku2.md) with [14/WAKU-MESSAGE version 1](../../core/14/message.md/#version1).
 
-This specification effectively replaces [7/WAKU-DATA](../../standards/application/7/DATA.md) as well as [6/WAKU1 Payload encryption](../../standards/core/6/waku1.md/#payload-encryption) but written in a way that is agnostic and self-contained for Waku v1 and Waku v2.
+This specification effectively replaces [7/WAKU-DATA](../../legacy/7/data.md) as well as [6/WAKU1 Payload encryption](../../legacy/6/waku1.md/#payload-encryption) but written in a way that is agnostic and self-contained for Waku v1 and Waku v2.
 
 Large sections of the specification originate from [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627) as well from [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption) with some modifications.
 
@@ -42,9 +42,9 @@ ECIES is using the following cryptosystem:
 
 ## Specification
 
-For 6/WAKU1, the `data` field is used in the `waku envelope`, and the field MAY contain the encrypted payload.
+For [6/WAKU1](../../legacy/6/waku1.md), the `data` field is used in the `waku envelope`, and the field MAY contain the encrypted payload.
 
-For 10/WAKU2, the `payload` field is used in `WakuMessage` and MAY contain the encrypted payload.
+For [10/WAKU2 spec](../../core/10/waku2.md), the `payload` field is used in `WakuMessage` and MAY contain the encrypted payload.
 
 The fields that are concatenated and encrypted as part of the `data` (Waku v1) / `payload` (Waku v2) field are:
  - flags
@@ -142,10 +142,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [6/WAKU1](../../standards/core/6/waku1.md)
-2. [10/WAKU2 spec](../../standards/core/10/waku2.md)
-3. [14/WAKU-MESSAGE version 1](../../standards/core/14/message.md/#version1)
-4. [7/WAKU-DATA](../../standards/application/7/DATA.md)
+1. [6/WAKU1](../../legacy/6/waku1.md)
+2. [10/WAKU2 spec](../../core/10/waku2.md)
+3. [14/WAKU-MESSAGE version 1](../../core/14/message.md/#version1)
+4. [7/WAKU-DATA](../../legacy/7/data.md)
 5. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
 6. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
 7. [Status 5/SECURE-TRANSPORT](https://specs.status.im/spec/5)

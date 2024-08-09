@@ -4,11 +4,13 @@ title: 13/WAKU2-STORE
 name: Waku v2 Store
 status: draft
 tags: waku-core
-editor: Sanaz Taheri <sanaz@status.im>
+editor: Simon-Pierre Vivier <simvivier@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
   - Oskar Thorén <oskarth@titanproxy.com>
-  - Aaryamann Challani <aaryamann@status.im>
+  - Aaryamann Challani <p1ge0nh8er@proton.me>
+  - Sanaz Taheri <sanaz@status.im>
+  - Hanno Cornelius <hanno@status.im>
 ---
 
 ## Abstract

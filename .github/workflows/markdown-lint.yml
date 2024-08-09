@@ -1,0 +1,32 @@
+name: markdown-linting
+
+on:
+
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Get changed files
+        continue-on-error: true
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      
+      - name: Markdown Linter
+        uses: DavidAnson/markdownlint-cli2-action@v15
+        with:
+          globs: ${{ env.CHANGED_FILES }}

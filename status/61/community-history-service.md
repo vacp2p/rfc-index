@@ -321,7 +321,7 @@ There are two scenarios in which member nodes can receive such a magnet link mes
 2. The member node requests messages for a time range of up to 30 days from store nodes (this is the case when a new community member joins a community)
 
 ### Downloading message archives
-When member nodes receive a message with a `CommunityMessageHistoryArchive` ([62/STATUS-PAYLOAD](../62/payload.md)) from the aforementioned channnel, they MUST extract the `magnet_uri` and pass it to their underlying BitTorrent client so they can fetch the latest message history archive index, which is the `index` file of the torrent (see [Creating message archive torrents](#creating-message-archive-torrents)).
+When member nodes receive a message with a `CommunityMessageHistoryArchive` ([62/STATUS-PAYLOADS](../62/payloads.md)) from the aforementioned channnel, they MUST extract the `magnet_uri` and pass it to their underlying BitTorrent client so they can fetch the latest message history archive index, which is the `index` file of the torrent (see [Creating message archive torrents](#creating-message-archive-torrents)).
 
 Due to the nature of distributed systems, there's no guarantee that a received message is the "last" message. This is especially true when member nodes request historical messages from store nodes. 
 
@@ -389,4 +389,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [Extensions for Peers to Send Metadata Files](https://www.bittorrent.org/beps/bep_0009.html)
 * [org channels spec](../56/communities.md)
 * [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
-* [62/STATUS-PAYLOAD](../62/payload.md)
+* [62/STATUS-PAYLOADS](../62/payloads.md)

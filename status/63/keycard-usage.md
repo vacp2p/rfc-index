@@ -5,7 +5,7 @@ name: Status Keycard Usage
 status: draft
 category: Standards Track
 description: Describes how an application can use the Status Keycard to create, store and transact with different account addresses.
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
   - Jimmy Debe <jimmy@status.im>
 ---

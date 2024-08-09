@@ -5,7 +5,7 @@ name: X3DH usage for Waku payload encryption
 status: draft
 category: Standards Track
 tags: waku-application
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Andrea Piana <andreap@status.im>
 - Pedro Pombeiro <pedro@status.im>
@@ -54,7 +54,7 @@ Types used in this specification are defined using the [Protobuf](https://develo
 
 End-to-end encryption (E2EE) takes place between two clients. 
 The main cryptographic protocol is a Double Ratchet protocol, which is derived from the [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html), using a different ratchet. 
-[The Waku v2 protocol](../../standards/core/10/waku2.md) subsequently encrypts the message payload, using symmetric key encryption. 
+[The Waku v2 protocol](../../core/10/waku2.md) subsequently encrypts the message payload, using symmetric key encryption. 
 Furthermore, the concept of prekeys (through the use of [X3DH](https://signal.org/docs/specifications/x3dh/)) is used to allow the protocol to operate in an asynchronous environment.
 It is not necessary for two parties to be online at the same time to initiate an encrypted conversation.
 
@@ -230,7 +230,7 @@ The message key MUST be used to encrypt the next message to be sent.
 
 1. Inherits the security considerations of [X3DH](https://signal.org/docs/specifications/x3dh/#security-considerations) and [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/#security-considerations).
 
-2. Inherits the security considerations of the [Waku v2 protocol](../../standards/core/10/waku2.md).
+2. Inherits the security considerations of the [Waku v2 protocol](../../core/10/waku2.md).
 
 3. The protocol is designed to be used in a decentralized manner, however, it is possible to use a centralized server to serve prekey bundles. In this case, the server is trusted.
 
@@ -249,7 +249,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Signal's Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Protobuf](https://developers.google.com/protocol-buffers/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
-- [The Waku v2 protocol](../../standards/core/10/waku2.md)
+- [The Waku v2 protocol](../../core/10/waku2.md)
 - [HKDF](https://www.rfc-editor.org/rfc/rfc5869)
 - [2/ACCOUNT](https://specs.status.im/spec/2#x3dh-prekey-bundles)
 - [reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L12)

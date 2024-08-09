@@ -3,12 +3,13 @@ slug: 10
 title: 10/WAKU2
 name: Waku v2
 status: draft
-editor: Oskar Thorén <oskarth@titanproxy.com>
+editor: Hanno Cornelius <hanno@status.im> 
 contributors:
   - Sanaz Taheri <sanaz@status.im>
   - Hanno Cornelius <hanno@status.im>
   - Reeshav Khan <reeshav@status.im>
   - Daniel Kaiser <danielkaiser@status.im>
+  - Oskar Thorén <oskarth@titanproxy.com>
 ---
 
 ## Abstract
@@ -23,7 +24,7 @@ These capabilities are things such as:
 
 This makes Waku ideal for running a p2p protocol on mobile and in similarly restricted environments.
 
-Historically, it has its roots in [6/WAKU1](../6/waku1.md),
+Historically, it has its roots in [6/WAKU1](../../legacy/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627), originally part of the Ethereum stack.
 However, Waku v2 acts more as a thin wrapper for PubSub and has a different API.
 It is implemented in an iterative manner where initial focus is on porting essential functionality to libp2p.
@@ -211,7 +212,7 @@ This is used to fetch historical messages for mostly offline devices.
 See [13/WAKU2-STORE spec](../13/store.md) spec for more details.
 
 There is also an experimental fault-tolerant addition to the store protocol that relaxes the high availability requirement.
-See [21/WAKU2-FT-STORE](../../application/21/ft-store.md)
+See [21/WAKU2-FT-STORE](../../application/21/fault-tolerant-store.md)
 
 #### Content filtering
 
@@ -244,9 +245,9 @@ The PubSub topics `pubtopic1` and `pubtopic2` is used for routing and indicates 
 Ditto for [13/WAKU2-STORE](../13/store.md) where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
-See [14/WAKU2-MESSAGE](../core/14/message.md) for more details.
-If WakuMessage version is set to 1, we use the [6/WAKU1](../6/waku1.md) compatible `data` field with encryption.
-See [7/WAKU-DATA](../../application/7/data.md) for more details.
+See [14/WAKU2-MESSAGE](../14/message.md) for more details.
+If WakuMessage version is set to 1, we use the [6/WAKU1](../../legacy/6/waku1.md) compatible `data` field with encryption.
+See [7/WAKU-DATA](../../legacy/7/data.md) for more details.
 
 2. Node F requests to get messages filtered by PubSub topic `pubtopic1` and ContentTopic `contentTopic1`.
 Node D subscribes F to this filter and will in the future forward messages that match that filter.
@@ -362,10 +363,10 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 
 | Spec | nim-waku (Nim) | go-waku (Go) | js-waku (Node JS) | js-waku (Browser JS) |
 | ---- | -------------- | ------------ | ----------------- | -------------------- |
-|[6/WAKU1](../6/waku1.md)|✔|||
-|[7/WAKU-DATA](../7/data.md)|✔|✔||
-|[8/WAKU-MAIL](../../application/8/mail.md)|✔|||
-|[9/WAKU-RPC](../9/waku2-rpc.md)|✔|||
+|[6/WAKU1](../../legacy/6/waku1.md)|✔|||
+|[7/WAKU-DATA](../../legacy/7/data.md)|✔|✔||
+|[8/WAKU-MAIL](../../legacy/8/mail.md)|✔|||
+|[9/WAKU-RPC](../../legacy/9/rpc.md)|✔|||
 |[10/WAKU2](../10/waku2.md)|✔|🚧|🚧|🚧|
 |[11/WAKU2-RELAY](../11/relay.md)|✔|✔|✔|✔|
 |[12/WAKU2-FILTER](../12/filter.md)|✔|✔||
@@ -393,7 +394,7 @@ To implement a minimal Waku v2 client, we recommend implementing the following s
 
 To get compatibility with Waku v1:
 
-- [7/WAKU-DATA](../7/data.md)
+- [7/WAKU-DATA](../../legacy/7/data.md)
 - [14/WAKU2-MESSAGE](../14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
 
 For an interoperable keep-alive mechanism:
@@ -429,7 +430,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [libp2p specs](https://github.com/libp2p/specs)
 
-2. [6/WAKU1](../6/waku1.md)
+2. [6/WAKU1](../../legacy/6/waku1.md)
 
 3. [Whisper spec (EIP627)](https://eips.ethereum.org/EIPS/eip-627)
 
@@ -473,7 +474,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 23. [19/WAKU2-LIGHTPUSH](../19/lightpush.md)
 
-24. [7/WAKU-DATA](../../application/7/data.md)
+24. [7/WAKU-DATA](../../legacy/7/data.md)
 
 25. [15/WAKU-BRIDGE](../15/bridge.md)
 
@@ -487,9 +488,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 30. [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
 
-31. [8/WAKU-MAIL](../../application/8/mail.md)
+31. [8/WAKU-MAIL](../../legacy/8/mail.md)
 
-32. [9/WAKU-RPC](../9/waku2-rpc.md)
+32. [9/WAKU-RPC](../../legacy/9/rpc.md)
 
 33. [16/WAKU2-RPC](../16/rpc.md)
 
