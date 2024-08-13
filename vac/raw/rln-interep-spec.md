@@ -4,7 +4,7 @@ name: Interep as group management for RLN
 status: raw
 category:  
 tags: rln
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 ---
 

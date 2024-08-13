@@ -5,7 +5,7 @@ name: Session management for Waku X3DH
 status: draft
 category: Standards Track
 tags: waku-application
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Andrea Piana <andreap@status.im>
 - Pedro Pombeiro <pedro@status.im>
