@@ -52,28 +52,27 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 The data availability service of the Nomos base layer consist of different node roles, dispersal clients, 
 data availibity sampling nodes, and data availability provider nodes.
-All network partipants have a choice in which node role they choose to run.
+All network participants do data sampling and verification.
 
 Nodes MAY decide to provide resources to the data availibilty service of the Nomos base-layer or 
-join a Data Availibility Committee within a zone.
-Light nodes are limited resource roles, 
-like a dispersal client or sampling node which utilize Nomos zones to create or retrieve blockchain transactions.
-Compared to other node roles within the network, 
-a light node SHOULD NOT download large amounts of block data owned by zones,
-MAY selectivly vailidate zk-proofs from the Nomos coordination layer,
-MAY verify data availibility of the base layer for zones they prefer.
+join a zone provide resources based on different requirements determined by the zone.
+Light clients are limited resource roles, 
+like a dispersal client or sampling node they utilize Nomos zones to create or retrieve blockchain transactions.
+A light node SHOULD NOT download large amounts of block data owned by zones.
+- it MAY selectively vailidate zero knowledge proofs from the [Nomos Coordination Layer](#TODO),
+- it MAY verify data availibility of the base layer for zones they prefer.
 
 Data availibity on the base layer is only a temporary guarantee.
 The data can only be verified for a predetermined time, based on the Nomos network.
 The base layer MUST NOT provide long term incentives or 
 allocate resources to repair missing data.
-Zones act as [Data Availability Committees](#) for their own blockchain state.
-Zones SHOULD provide data availability for their blockchain in the event that light nodes can not access data,
-light nodess MAY utilize the data avilability of the Nomos base layer.
+It is the resposiblity of Zones to make blockchain data availible. 
+In the event that light clients can not access data,
+it MAY utilize the data avilability of the Nomos base layer.
 
 ### Base-Layer Nodes 
 
-All light node are considered to be Nomos base layer nodes.
+All light clients MAY also be Nomos base layer nodes.
 Base-layer nodes MUST NOT process data, 
 but only provide data availability guarantees for a limit amount of time.
 The role of a provider node is to store polynomial commitment schemes for Nomos zones.
@@ -99,12 +98,6 @@ Node configuations SHOULD define a `pubsub-topic` that is shared by all data ava
 pubsub-topic = 'DA_TOPIC';
 ```
 
-Communication between different zones with [Data Availability Committees](#) occur directly.
-Zones use a libp2p swarm to connect to different nodes participating in a zone as a validator,
-.
-It is the responsibility of zones to maintain the swarm.
-When a node in the swarm does not provide access to data,
-light nodes MAY use the Nomos data availbilty layer.
 
 #### Sending Data
 
