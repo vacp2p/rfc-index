@@ -1,4 +1,4 @@
-# Codex RFCs
+# Codex RFC (Request For Comments)
 
-Codex specifications related to a decentralised data storage platform.
-New specifications, 
+Specifications related the Codex decentralised data storage platform.
+Visit [Codex specs](https://github.com/codex-storage/codex-spec) to view the new Codex specifications currently under discussion.
