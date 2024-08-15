@@ -1,4 +1,4 @@
-# Waku RFCs
+# Waku RFC (Request For Comments)
 
 Waku builds a family of privacy-preserving, censorship-resistant communication protocols for web3 applications.
 
