@@ -19,6 +19,12 @@ Status app uses MVDS to ensure messages going through Waku are acknolwedged by t
 
 ## Message types
 
+Various Message Types contain distinct information defined by the app to facilitate convenient serialization and deserialization.
+
+E2E reliability is a feature that ensures messages are delivered to the recipient. This is initially achieved by using MVDS in Status.
+
+Chat Type specifies the category of chat that a message belongs to. It can be OneToOne (aka Direct Message), GroupChat, or CommunityChat. These are the three main types of chats in Status.
+
 | Message Type                                                               | Use MVDS                            | Need e2e reliability | Chat Type               |
 |----------------------------------------------------------------------------|-------------------------------------|----------------------|-------------------------|
 | ApplicationMetadataMessage_UNKNOWN                                         | No                                  | No                   | Not Applied             |
