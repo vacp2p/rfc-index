@@ -279,8 +279,8 @@ or $3$).
     - Peer ID (32 bytes for Ed25519 or Secp256k1).
 
 The entire Sphinx packet header ($α$, $β$, and $γ$) can fit within a fixed size
-of $32 + (2r+t)\kappa + 16 = 256$ bytes, leaving ample room for a large $δ$ of
-up to $2413 - 256 = 2157$ bytes.
+of $32 + (r(t+1)+1)\kappa + 16 = 384$ bytes, leaving ample room for a large $δ$ of
+up to $2413 - 384 = 2029$ bytes.
 
 #### 4.3 Message Format
 
@@ -290,9 +290,9 @@ routing information.
 ```proto
 message SphinxPacket {
   bytes alpha = 1; // 32 bytes
-  bytes beta = 2; // 192 - 208 bytes
+  bytes beta = 2; // 304 - 384 bytes
   bytes gamma = 3; // 16 bytes
-  bytes delta = 4; // variable size, max 2157 bytes
+  bytes delta = 4; // variable size, max 2029 bytes
 }
 ```
 
@@ -403,10 +403,10 @@ sender, intermediary, and exit node) is detailed in the following subsections.
      - Compute the filler string using AES-CTR:
 
        $`\phi_i = \text{AES-CTR}(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
-       \ \phi_{i-1}\ |\ 0_{2\kappa})`$, where $0_{2\kappa}$ is the string of $0$
-       bits of length $2\kappa$.
+       \ \phi_{i-1}\ |\ 0_{(t+1)\kappa})`$, where $0_{(t+1)\kappa}$ is the string of $0$
+       bits of length $(t+1)\kappa$.
 
-   Note that the length of $\phi_i$ is $2i\kappa$.
+   Note that the length of $\phi_i$ is $(t+1)i\kappa$.
 
    c. **Compute** **Betas and Gammas ($\beta_i$**, $\gamma_i$, **$i=0$** to **$L-1$)**
 
@@ -431,16 +431,16 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - If $i = L-1$ (_i.e.,_ exit node):
 
-     $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ 0_{(2
+     $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ 0_{((t+1)
      (r-L)+t+2)\kappa})\ |\ \phi_{L-1}`$
 
    - Otherwise (_i.e.,_ intermediary node):
 
      $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ \text
      {addr}_{i+1} \ |\ \text{delay}_{i+1}\ | \ \gamma_{i+1}\ |\ {\beta_{i+1}}_
-     {[0\ldots(2r−1)\kappa−1]})`$
+     {[0\ldots(r(t+1)-t)\kappa−1]})`$
 
-     Note that the length of $\beta_i$ is $(2r+t)\kappa$, $0 \leq i \leq L-1$,
+     Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$,
      where $t$ is the combined length of next hop address and delay.
 
    - $`\gamma_i = \text{HMAC-SHA-256}(\text{mac\_key}_i,\ β_i)`$\
@@ -467,9 +467,9 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
      Note that the length of $\delta$ is $|m| + \kappa$.
 
-     Given that the derived size of $\delta$ is $2157$ bytes, this allows
-     messages to be of length $2157-16 =2141 $ bytes. This means smaller
-     messages may need to be padded up to $2141$ bytes (e.g., using PKCS#7
+     Given that the derived size of $\delta$ is $2029$ bytes, this allows
+     messages to be of length $2029-16 = 2013$ bytes. This means smaller
+     messages may need to be padded up to $2013$ bytes (e.g., using PKCS#7
      padding).
 
    e. **Construct Final Sphinx Packet**
@@ -478,19 +478,19 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
      ```pseudocode
      alpha = alpha_0 // 32 bytes
-     beta = beta_0 // $(2r+t)\kappa$ bytes
+     beta = beta_0 // $(r(t+1)+1)\kappa$ bytes
      gamma = gamma_0 // 16 bytes
      ```
 
      As discussed earlier, for a maximum path length of $r = 5$, and combined
      length of address and delay $t = 3\kappa = 48$ bytes, the header size is
-     just $256$ bytes.
+     just $384$ bytes.
    - Initialize payload
 
-     `delta = delta_0 // 2157 bytes`
+     `delta = delta_0 // variable size, max 2029 bytes`
 
      For a fixed Sphinx packet size of $2413$ bytes and given the header length
-     of $256$ bytes, `delta` size is $2157$ bytes.
+     of $384$ bytes, `delta` size is $2029$ bytes.
 
 6. **Serialize the Sphinx Packet** using Protocol Buffers.
 
@@ -533,11 +533,11 @@ to relay a message:
 
    $`\text{β\_iv} = H(\text{"β\_iv"}\ |\ s)`$ (truncated to 128 bits)
 
-   b. Compute $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta)`$.
+   b. Compute $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta\ |\ 0_{(t+1)k})`$.
 
    c. Uniquely parse prefix of $B$
 
-   If $B$ has a prefix of **$0_{(2(r-L)+t+2)\kappa}$,** the current node is the
+   If $B$ has a prefix of **$0_{((t+1)(r-L)+t+2)\kappa}$,** the current node is the
    exit node (refer exit node operations below).
 
    Otherwise, it is an intermediary node and it performs the followings steps
@@ -557,8 +557,8 @@ to relay a message:
 
    g. **Extract Beta**
 
-   $`\beta' = B_{[(t\kappa+\kappa)\ldots(2r + t )\kappa-1]}`$ (following $(2r-1)
-   \kappa$ bytes).
+   $`\beta' = B_{[(t\kappa+\kappa)\ldots(r(t+1)+t+2)\kappa-1]}`$ (following
+   $((t+1)r + 1)\kappa$ bytes).
 
    h. **Compute Alpha**
 
@@ -573,29 +573,29 @@ to relay a message:
      $`\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)$` (truncated to 128 bits)
    - Compute $`\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)`$
 
-6. **Construct Final Sphinx Packet**
+7. **Construct Final Sphinx Packet**
 
    a. Initialize header
 
    ```pseudocode
     alpha = alpha' // 32 bytes
-    beta = beta' // $(2r+t)\kappa$ bytes
+    beta = beta' // $((t+1)r + 1)\kappa$ bytes
     gamma = gamma' // 16 bytes
    ```
 
    b. Initialize payload
 
-   `delta = delta' // 2157 bytes`
+   `delta = delta' // variable size, max 2029 bytes`
 
-7. **Serialize the Sphinx Packet** using Protocol Buffers.
-8. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
-9. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
+8. **Serialize the Sphinx Packet** using Protocol Buffers.
+9. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
+10. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
     `"/mix/1.0.0"` protocol.
 
 #### 5.3 Exit Node
 
 1. **Perform _Steps i. to v. b._ Above**, similar to an intermediary node. If
-   $B$ has a prefix of $0_{(2(r-L)+t+2)\kappa}$ (in _step 5. c._ above), the
+   $B$ has a prefix of $0_{((t+1)(r-L)+t+2)\kappa}$ (in _step 5. c._ above), the
    current node is the exit node. It performs the following steps to
    disseminate the message via the respective libp2p protocol.
 
@@ -611,7 +611,7 @@ to relay a message:
 
 3. **Extract Message**
 
-   $m = \delta'_{[(\kappa-1)\ldots]}$ (remove first $\kappa$ bytes).
+   $m = \delta'_{[\kappa\ldots]}$ (remove first $\kappa$ bytes).
 
 4. **Remove Any Padding** from $m$ to obtain the `message` appended with PoW.
 
