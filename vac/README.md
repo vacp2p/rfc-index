@@ -1,4 +1,4 @@
-# Vac RFC
+# Vac RFCs
 
 Vac builds public good protocols for the decentralise web.
 Vac acts as a custodian for the protocols that live in the RFC-Index repository.
