@@ -237,13 +237,13 @@ as low latency and efficient multiplexing).
    - Represents a Curve25519 group element (x-coordinate in GF(2^255 - 19)).
    - Used by mix nodes to extract shared session key using their private key.
 
-2. **Beta ($β$)**: $(2r + 1)\kappa$ bytes typically, where $r$ is the maximum
+2. **Beta ($β$)**: $((t+1)r + 1)\kappa$ bytes typically, where $r$ is the maximum
    path length.
 
    - Contains the encrypted routing information.
    - We recommend a reasonable maximum path length of $r=5$, considering
     latency/anonymity trade-offs.
-   - This gives a reasonable size of 176 bytes.
+   - This gives a reasonable size of $336$ bytes, when $t = 3$ (refer Section 5.2.10 for the choice of $t$).
    - We extend $β$ to accommodate next hop address and delay below.
 
 3. **Gamma ($γ$)**: $\kappa$ bytes (16 bytes)
