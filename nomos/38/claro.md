@@ -26,12 +26,22 @@ consensus mechanism.  We outline a simple taxonomy of Byzantine
 adversaries, leaving explicit explorations of to subsequent
 publication.
 
-NOTE: We have renamed this variant to `Claro` from `Glacier` in order to disambiguate from a previously released research endeavor by [Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf). Their naming was coincidentally named the same as our work but is sufficiently differentiated from how ours works. 
+NOTE: We have renamed this variant to `Claro` from `Glacier` in order to disambiguate from a previously released 
+research endeavor by [Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf). 
+Their naming was coincidentally named the same as our work but is sufficiently differentiated from how ours works. 
 
-## Motivation 
-This work is a part of a larger research endeavor to explore highly scalable Byzantine Fault Tolerant (BFT) consensus protocols. Consensus lies at the heart of many decentralized protocols, and thus its characteristics and properties are inherited by applications built on top. Thus, we seek to improve upon the current state of the art in two main directions: base-layer scalability and censorship resistance. 
+## Motivation
 
-Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto consensus and other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies. We aim to understand its limitations and improve upon them.
+This work is a part of a larger research endeavor to explore highly scalable 
+Byzantine Fault Tolerant (BFT) consensus protocols. 
+Consensus lies at the heart of many decentralized protocols, and 
+thus its characteristics and properties are inherited by applications built on top. 
+Thus, we seek to improve upon the current state of the art in two main directions: 
+base-layer scalability and censorship resistance. 
+
+Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto 
+consensus and other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies. 
+We aim to understand its limitations and improve upon them.
 
 ## Background
 Our starting point is Avalanche’s Binary Byzantine Agreement algorithm, called Snowball. As long as modifications allow a DAG to be constructed later on, this simplifies the design significantly. The DAG stays the same in principle: it supports confidence, but the core algorithm can be modeled without.
