@@ -41,13 +41,20 @@ thus its characteristics and properties are inherited by applications built on t
 Thus, we seek to improve upon the current state of the art in two main directions:
 base-layer scalability and censorship resistance.
 
-Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto consensus and
-other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies.
+Avalanche has shown to exibit the former in a production environment in a way
+that is differentiated from Nakamoto consensus and
+other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant
+(pBFT) methodologies.
 We aim to understand its limitations and improve upon them.
 
 ## Background
 
-Our starting point is Avalanche’s Binary Byzantine Agreement algorithm, called Snowball. As long as modifications allow a DAG to be constructed later on, this simplifies the design significantly. The DAG stays the same in principle: it supports confidence, but the core algorithm can be modeled without.
+Our starting point is Avalanche’s Binary Byzantine Agreement algorithm,
+called Snowball.
+As long as modifications allow a DAG to be constructed later on,
+this simplifies the design significantly.
+The DAG stays the same in principle: it supports confidence,
+but the core algorithm can be modeled without.
 
 The concept of the Snowball algorithm is relatively simple.
 Following is a simplified description (lacking some details, but giving an overview).
@@ -76,7 +83,8 @@ The scenario is as follows:
 
 - There is a powerful adversary in the network,
 that controls a large percentage of the node population: 10% to ~50%.
-- This adversary follows a strategy that allows them to rapidly change the decision bit
+- This adversary follows a strategy that allows them to
+rapidly change the decision bit
 (possibly even in a coordinated way) so as to maximally confuse the honest nodes.
 - Under normal conditions,
 honest nodes will accumulate supermajorities soon enough, and
@@ -111,22 +119,28 @@ features that have been added to the reference algorithm:
 
 1. Instead of allowing the latest evidence to change the opinion completely,
 we take into account all accumulated evidence,
-to reduce the impact of high variability when there is already a large amount of evidence collected.
+to reduce the impact of high variability when there is already a
+large amount of evidence collected.
 2. Eliminate the counter and threshold scheme,
 and introduce instead two regimes of operation:
-    - One focused on grabbing opinions and reacting as soon as possible. 
+    - One focused on grabbing opinions and reacting as soon as possible.
     This part is somewhat closer conceptually to the reference algorithm.
-    - Another one focused on interpreting the accumulated data instead of reacting to the latest information gathered.
+    - Another one focused on interpreting the accumulated data
+    instead of reacting to the latest information gathered.
 3. Finally, combine those two phases via a transition function.
-This avoids the creation of a step function, or a sudden change in behavior that could complicate analysis and understanding of the dynamics.
-Instead, we can have a single algorithm that transfers weight from one operation to the other as more evidence is gathered.
+This avoids the creation of a step function, or
+a sudden change in behavior that could complicate analysis and
+understanding of the dynamics.
+Instead, we can have a single algorithm that transfers weight
+from one operation to the other as more evidence is gathered.
 4. Additionally, we introduce a function for weighted sampling.
 This will allow the combination of different forms of weighting:
     - Staking
     - Heuristic reputation
     - Manual reputation.
 
-It’s worth delving a bit into the way the data is interpreted in order to reach a decision.
+It’s worth delving a bit into the way the data is interpreted
+in order to reach a decision.
 Our approach is based conceptually on the paper [Confidence as Higher-Order Uncertainty](https://cis.temple.edu/~pwang/Publication/confidence.pdf),
 which describes a frequentist approach to decision certainty.
 The first-order certainty, measured by frequency,
@@ -348,9 +362,9 @@ $$
 \begin{array}{lc}
 \text{Confidence}                & c_{accum} \impliedby \frac{total\ votes}
 {total\ votes + l} \newline
-\text{Total accumulated evidence}& e_{accum} \impliedby \frac{total\ positive\ 
+\text{Total accumulated evidence}& e_{accum} \impliedby \frac{total\ positive\
 votes}{total\ votes} \newline
-\text{Evidence per round}        & e_{round} \impliedby \frac{round\ positive\ 
+\text{Evidence per round}        & e_{round} \impliedby \frac{round\ positive\
 votes}{round\ votes} \newline
 \end{array}
 $$
