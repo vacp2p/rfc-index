@@ -26,35 +26,72 @@ consensus mechanism.  We outline a simple taxonomy of Byzantine
 adversaries, leaving explicit explorations of to subsequent
 publication.
 
-NOTE: We have renamed this variant to `Claro` from `Glacier` in order to disambiguate from a previously released research endeavor by [Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf). Their naming was coincidentally named the same as our work but is sufficiently differentiated from how ours works.
+NOTE: We have renamed this variant to `Claro` from `Glacier`
+in order to disambiguate from a previously released research endeavor by
+[Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf).
+Their naming was coincidentally named the same as our work but
+is sufficiently differentiated from how ours works.
 
 ## Motivation
 
-This work is a part of a larger research endeavor to explore highly scalable Byzantine Fault Tolerant (BFT) consensus protocols. Consensus lies at the heart of many decentralized protocols, and thus its characteristics and properties are inherited by applications built on top. Thus, we seek to improve upon the current state of the art in two main directions: base-layer scalability and censorship resistance.
+This work is a part of a larger research endeavor to
+explore highly scalable Byzantine Fault Tolerant (BFT) consensus protocols.
+Consensus lies at the heart of many decentralized protocols, and
+thus its characteristics and properties are inherited by applications built on top.
+Thus, we seek to improve upon the current state of the art in two main directions:
+base-layer scalability and censorship resistance.
 
-Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto consensus and other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies. We aim to understand its limitations and improve upon them.
+Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto consensus and
+other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies.
+We aim to understand its limitations and improve upon them.
 
 ## Background
 
 Our starting point is Avalanche’s Binary Byzantine Agreement algorithm, called Snowball. As long as modifications allow a DAG to be constructed later on, this simplifies the design significantly. The DAG stays the same in principle: it supports confidence, but the core algorithm can be modeled without.
 
-The concept of the Snowball algorithm is relatively simple. Following is a simplified description (lacking some details, but giving an overview). For further details, please refer to the [Avalanche paper](https://assets.website-files.com/5d80307810123f5ffbb34d6e/6009805681b416f34dcae012_Avalanche%20Consensus%20Whitepaper.pdf).
+The concept of the Snowball algorithm is relatively simple.
+Following is a simplified description (lacking some details, but giving an overview).
+For further details, please refer to the [Avalanche paper](https://assets.website-files.com/5d80307810123f5ffbb34d6e/6009805681b416f34dcae012_Avalanche%20Consensus%20Whitepaper.pdf).
 
-1. The objective is to vote yes/no on a decision (this decision could be a single bit, or, in our DAG use case, whether a vertex should be included or not).
-2. Every node has an eventually-consistent complete view of the network. It will select at random k nodes, and will ask their opinion on the decision (yes/no).
-3. After this sampling is finished, if there is a vote that has more than an `alpha` threshold, it accumulates one count for this opinion, as well as changes its opinion to this one. But, if a different opinion is received, the counter is reset to 1. If no threshold `alpha` is reached, the counter is reset to 0 instead.
-4. After several iterations of this algorithm, we will reach a threshold `beta`, and decide on that as final.
+1. The objective is to vote yes/no on a decision
+(this decision could be a single bit or,
+in our DAG use case, whether a vertex should be included or not).
+2. Every node has an eventually-consistent complete view of the network.
+It will select at random k nodes, and
+will ask their opinion on the decision (yes/no).
+3. After this sampling is finished,
+if there is a vote that has more than an `alpha` threshold,
+it accumulates one count for this opinion,
+as well as changes its opinion to this one.
+But, if a different opinion is received, the counter is reset to 1.
+If no threshold `alpha` is reached, the counter is reset to 0 instead.
+4. After several iterations of this algorithm,
+we will reach a threshold `beta`, and decide on that as final.
 
 Next, we will proceed to describe our new algorithm, based on Snowball.
 
-We have identified a shortcoming of the Snowball algorithm that was a perfect starting point for devising improvements. The scenario is as follows:
+We have identified a shortcoming of the Snowball algorithm
+that was a perfect starting point for devising improvements.
+The scenario is as follows:
 
-- There is a powerful adversary in the network, that controls a large percentage of the node population: 10% to ~50%.
-- This adversary follows a strategy that allows them to rapidly change the decision bit (possibly even in a coordinated way) so as to maximally confuse the honest nodes.
-- Under normal conditions, honest nodes will accumulate supermajorities soon enough, and reach the `beta` threshold. However, when an honest node performs a query and does not reach the threshold `alpha` of responses, the counter will be set to 0.
-- The highest threat to Snowball is an adversary that keeps it from reaching the `beta` threshold, managing to continuously reset the counter, and steering Snowball away from making a decision.
+- There is a powerful adversary in the network,
+that controls a large percentage of the node population: 10% to ~50%.
+- This adversary follows a strategy that allows them to rapidly change the decision bit
+(possibly even in a coordinated way) so as to maximally confuse the honest nodes.
+- Under normal conditions,
+honest nodes will accumulate supermajorities soon enough, and
+reach the `beta` threshold.
+However, when an honest node performs a query and does not reach the threshold
+`alpha` of responses, the counter will be set to 0.
+- The highest threat to Snowball is an adversary
+that keeps it from reaching the `beta` threshold,
+managing to continuously reset the counter, and
+steering Snowball away from making a decision.
 
-This document only outlines the specification to Claro. Subsequent analysis work on Claro (both on its performance and how it differentiates with Snowball) will be published shortly and this document will be updated.
+This document only outlines the specification to Claro.
+Subsequent analysis work on Claro
+(both on its performance and how it differentiates with Snowball)
+will be published shortly and this document will be updated.
 
 ## Claro Algorithm Specification
 
@@ -66,27 +103,54 @@ fault tolerance.
 
 ### Algorithmic concept
 
-Claro is an evolution of the Snowball Byzantine Binary Agreement (BBA) algorithm, in which we tackle specifically the perceived weakness described above. The main focus is going to be the counter and the triggering of the reset. Following, we elaborate the different modifications and features that have been added to the reference algorithm:
+Claro is an evolution of the Snowball Byzantine Binary Agreement (BBA) algorithm,
+in which we tackle specifically the perceived weakness described above.
+The main focus is going to be the counter and the triggering of the reset.
+Following, we elaborate the different modifications and
+features that have been added to the reference algorithm:
 
-1. Instead of allowing the latest evidence to change the opinion completely, we take into account all accumulated evidence, to reduce the impact of high variability when there is already a large amount of evidence collected.
-2. Eliminate the counter and threshold scheme, and introduce instead two regimes of operation:
-    - One focused on grabbing opinions and reacting as soon as possible. This part is somewhat closer conceptually to the reference algorithm.
+1. Instead of allowing the latest evidence to change the opinion completely,
+we take into account all accumulated evidence,
+to reduce the impact of high variability when there is already a large amount of evidence collected.
+2. Eliminate the counter and threshold scheme,
+and introduce instead two regimes of operation:
+    - One focused on grabbing opinions and reacting as soon as possible. 
+    This part is somewhat closer conceptually to the reference algorithm.
     - Another one focused on interpreting the accumulated data instead of reacting to the latest information gathered.
-3. Finally, combine those two phases via a transition function. This avoids the creation of a step function, or a sudden change in behavior that could complicate analysis and understanding of the dynamics. Instead, we can have a single algorithm that transfers weight from one operation to the other as more evidence is gathered.
-4. Additionally, we introduce a function for weighted sampling. This will allow the combination of different forms of weighting:
+3. Finally, combine those two phases via a transition function.
+This avoids the creation of a step function, or a sudden change in behavior that could complicate analysis and understanding of the dynamics.
+Instead, we can have a single algorithm that transfers weight from one operation to the other as more evidence is gathered.
+4. Additionally, we introduce a function for weighted sampling.
+This will allow the combination of different forms of weighting:
     - Staking
     - Heuristic reputation
     - Manual reputation.
 
-It’s worth delving a bit into the way the data is interpreted in order to reach a decision. Our approach is based conceptually on the paper [Confidence as Higher-Order Uncertainty](https://cis.temple.edu/~pwang/Publication/confidence.pdf), which describes a frequentist approach to decision certainty. The first-order certainty, measured by frequency, is caused by known positive evidence, and the higher-order certainty is caused by potential positive evidence. Because confidence is a relative measurement defined on evidence, it naturally follows comparing the amount of evidence the system knows with the amount that it will know in the near future (defining “near” as a constant).
+It’s worth delving a bit into the way the data is interpreted in order to reach a decision.
+Our approach is based conceptually on the paper [Confidence as Higher-Order Uncertainty](https://cis.temple.edu/~pwang/Publication/confidence.pdf),
+which describes a frequentist approach to decision certainty.
+The first-order certainty, measured by frequency,
+is caused by known positive evidence, and
+the higher-order certainty is caused by potential positive evidence.
+Because confidence is a relative measurement defined on evidence,
+it naturally follows comparing the amount of evidence the system knows
+with the amount that it will know in the near future (defining “near” as a constant).
 
-Intuitively, we are looking for a function of evidence, **`w`**, call it **`c`** for confidence, that satisfies the following conditions:
+Intuitively, we are looking for a function of evidence, **`w`**,
+call it **`c`** for confidence, that satisfies the following conditions:
 
-1. Confidence `c` is a continuous and monotonically increasing function of `w`. (More evidence, higher confidence.)
+1. Confidence `c` is a continuous and monotonically increasing function of `w`.
+(More evidence, higher confidence.)
 2. When `w = 0`, `c = 0`. (Without any evidence, confidence is minimum.)
-3. When `w` goes to infinity, `c` converges to 1. (With infinite evidence, confidence is maximum.)
+3. When `w` goes to infinity, `c` converges to 1.
+(With infinite evidence, confidence is maximum.)
 
-The paper describes also a set of operations for the evidence/confidence pairs, so that different sources of knowledge could be combined. However, we leave here the suggestion of a possible research line in the future combining an algebra of evidence/confidence pairs with swarm-propagation algorithm like the one described in [this paper](http://replicated.cc/files/schmebulock.pdf).
+The paper describes also a set of operations for the evidence/confidence pairs,
+so that different sources of knowledge could be combined.
+However, we leave here the suggestion of a possible research line in the future
+combining an algebra of evidence/confidence pairs with
+swarm-propagation algorithm like the one described in
+[this paper](http://replicated.cc/files/schmebulock.pdf).
 
 ### Initial opinion
 
@@ -101,7 +165,11 @@ compute a justification of the proposal, it sets its opinion to one of
 `YES` or `NO`.  If it cannot form an opinion, it leaves its opinion as
 `NONE`.
 
-For now, we will ignore the proposal dissemination process and assume all nodes participating have an initial opinion to respond to within a given request. Further research will relax this assumption and analyze timing attacks on proposal propagation through the network.
+For now, we will ignore the proposal dissemination process and
+assume all nodes participating have an initial opinion
+to respond to within a given request.
+Further research will relax this assumption and
+analyze timing attacks on proposal propagation through the network.
 
 The node then participates in a number of query rounds in which it
 solicits other node's opinion in query rounds.  Given a set of `N`
@@ -212,8 +280,9 @@ $$
 P(i) = \frac{w_i}{\sum_{j=0}^{j=N} w_j}
 $$
 
-where `w` is evidence. The list of nodes is maintained by a separate protocol (the network
-layer), and eventual consistency of this knowledge in the network
+where `w` is evidence.
+The list of nodes is maintained by a separate protocol (the network layer),
+and eventual consistency of this knowledge in the network
 suffices. Even if there are slight divergences in the network view
 from different nodes, the algorithm is resilient to those.
 
@@ -248,7 +317,7 @@ nodes queried is too high.
 When the query finishes, the node now initializes the following two
 values:
 
-```php
+```markdown
     new_votes 
       <-- |total vote replies received in this round to the current query|
     positive_votes 
@@ -277,16 +346,19 @@ $$
 Computation
 $$
 \begin{array}{lc}
-\text{Confidence}                & c_{accum} \impliedby \frac{total\ votes}{total\ votes + l} \newline
-\text{Total accumulated evidence}& e_{accum} \impliedby \frac{total\ positive\ votes}{total\ votes} \newline
-\text{Evidence per round}        & e_{round} \impliedby \frac{round\ positive\ votes}{round\ votes} \newline
+\text{Confidence}                & c_{accum} \impliedby \frac{total\ votes}
+{total\ votes + l} \newline
+\text{Total accumulated evidence}& e_{accum} \impliedby \frac{total\ positive\ 
+votes}{total\ votes} \newline
+\text{Evidence per round}        & e_{round} \impliedby \frac{round\ positive\ 
+votes}{round\ votes} \newline
 \end{array}
 $$
 
 The node runs the `new_votes` and `positive_votes` parameters received
 in the query round through the following algorithm:
 
-```php
+```markdown
 
     total_votes 
       +== new_votes
@@ -476,7 +548,8 @@ The current algorithm doesn't describe how the initial opinions are formed.
 
 ## Implementation status
 
-The following implementations have been created for various testing and simulation purposes:
+The following implementations have been created for various testing and
+simulation purposes:
 
 - [Rust](https://github.com/logos-co/consensus-research)
 - [Python](none) - FILL THIS IN WITH NEWLY CREATED REPO
