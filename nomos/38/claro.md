@@ -26,24 +26,16 @@ consensus mechanism.  We outline a simple taxonomy of Byzantine
 adversaries, leaving explicit explorations of to subsequent
 publication.
 
-NOTE: We have renamed this variant to `Claro` from `Glacier` in order to disambiguate from a previously released 
-research endeavor by [Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf). 
-Their naming was coincidentally named the same as our work but is sufficiently differentiated from how ours works. 
+NOTE: We have renamed this variant to `Claro` from `Glacier` in order to disambiguate from a previously released research endeavor by [Amores-Sesar, Cachin, and Tedeschi](https://arxiv.org/pdf/2210.03423.pdf). Their naming was coincidentally named the same as our work but is sufficiently differentiated from how ours works.
 
 ## Motivation
 
-This work is a part of a larger research endeavor to explore highly scalable 
-Byzantine Fault Tolerant (BFT) consensus protocols. 
-Consensus lies at the heart of many decentralized protocols, and 
-thus its characteristics and properties are inherited by applications built on top. 
-Thus, we seek to improve upon the current state of the art in two main directions: 
-base-layer scalability and censorship resistance. 
+This work is a part of a larger research endeavor to explore highly scalable Byzantine Fault Tolerant (BFT) consensus protocols. Consensus lies at the heart of many decentralized protocols, and thus its characteristics and properties are inherited by applications built on top. Thus, we seek to improve upon the current state of the art in two main directions: base-layer scalability and censorship resistance.
 
-Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto 
-consensus and other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies. 
-We aim to understand its limitations and improve upon them.
+Avalanche has shown to exibit the former in a production environment in a way that is differentiated from Nakamoto consensus and other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant (pBFT) methodologies. We aim to understand its limitations and improve upon them.
 
 ## Background
+
 Our starting point is Avalanche’s Binary Byzantine Agreement algorithm, called Snowball. As long as modifications allow a DAG to be constructed later on, this simplifies the design significantly. The DAG stays the same in principle: it supports confidence, but the core algorithm can be modeled without.
 
 The concept of the Snowball algorithm is relatively simple. Following is a simplified description (lacking some details, but giving an overview). For further details, please refer to the [Avalanche paper](https://assets.website-files.com/5d80307810123f5ffbb34d6e/6009805681b416f34dcae012_Avalanche%20Consensus%20Whitepaper.pdf).
@@ -53,7 +45,7 @@ The concept of the Snowball algorithm is relatively simple. Following is a simpl
 3. After this sampling is finished, if there is a vote that has more than an `alpha` threshold, it accumulates one count for this opinion, as well as changes its opinion to this one. But, if a different opinion is received, the counter is reset to 1. If no threshold `alpha` is reached, the counter is reset to 0 instead.
 4. After several iterations of this algorithm, we will reach a threshold `beta`, and decide on that as final.
 
-Next, we will proceed to describe our new algorithm, based on Snowball. 
+Next, we will proceed to describe our new algorithm, based on Snowball.
 
 We have identified a shortcoming of the Snowball algorithm that was a perfect starting point for devising improvements. The scenario is as follows:
 
@@ -62,7 +54,7 @@ We have identified a shortcoming of the Snowball algorithm that was a perfect st
 - Under normal conditions, honest nodes will accumulate supermajorities soon enough, and reach the `beta` threshold. However, when an honest node performs a query and does not reach the threshold `alpha` of responses, the counter will be set to 0.
 - The highest threat to Snowball is an adversary that keeps it from reaching the `beta` threshold, managing to continuously reset the counter, and steering Snowball away from making a decision.
 
-This document only outlines the specification to Claro. Subsequent analysis work on Claro (both on its performance and how it differentiates with Snowball) will be published shortly and this document will be updated. 
+This document only outlines the specification to Claro. Subsequent analysis work on Claro (both on its performance and how it differentiates with Snowball) will be published shortly and this document will be updated.
 
 ## Claro Algorithm Specification
 
@@ -73,6 +65,7 @@ finality that provides good reliability for network and Byzantine
 fault tolerance.
 
 ### Algorithmic concept
+
 Claro is an evolution of the Snowball Byzantine Binary Agreement (BBA) algorithm, in which we tackle specifically the perceived weakness described above. The main focus is going to be the counter and the triggering of the reset. Following, we elaborate the different modifications and features that have been added to the reference algorithm:
 
 1. Instead of allowing the latest evidence to change the opinion completely, we take into account all accumulated evidence, to reduce the impact of high variability when there is already a large amount of evidence collected.
@@ -85,7 +78,7 @@ Claro is an evolution of the Snowball Byzantine Binary Agreement (BBA) algorithm
     - Heuristic reputation
     - Manual reputation.
 
-It’s worth delving a bit into the way the data is interpreted in order to reach a decision. Our approach is based conceptually on the paper [Confidence as Higher-Order Uncertainty](https://cis.temple.edu/~pwang/Publication/confidence.pdf), which describes a frequentist approach to decision certainty. The first-order certainty, measured by frequency, is caused by known positive evidence, and the higher-order certainty is caused by potential positive evidence. Because confidence is a relative measurement defined on evidence, it naturally follows comparing the amount of evidence the system knows with the amount that it will know in the near future (defining “near” as a constant). 
+It’s worth delving a bit into the way the data is interpreted in order to reach a decision. Our approach is based conceptually on the paper [Confidence as Higher-Order Uncertainty](https://cis.temple.edu/~pwang/Publication/confidence.pdf), which describes a frequentist approach to decision certainty. The first-order certainty, measured by frequency, is caused by known positive evidence, and the higher-order certainty is caused by potential positive evidence. Because confidence is a relative measurement defined on evidence, it naturally follows comparing the amount of evidence the system knows with the amount that it will know in the near future (defining “near” as a constant).
 
 Intuitively, we are looking for a function of evidence, **`w`**, call it **`c`** for confidence, that satisfies the following conditions:
 
@@ -96,6 +89,7 @@ Intuitively, we are looking for a function of evidence, **`w`**, call it **`c`**
 The paper describes also a set of operations for the evidence/confidence pairs, so that different sources of knowledge could be combined. However, we leave here the suggestion of a possible research line in the future combining an algebra of evidence/confidence pairs with swarm-propagation algorithm like the one described in [this paper](http://replicated.cc/files/schmebulock.pdf).
 
 ### Initial opinion
+
 A proposal is formulated to which consensus of truth or falsity is
 desired.  Each node that participates starts the protocol with an
 opinion on the proposal, represented in the sequel as `NO`, `NONE`,
@@ -107,8 +101,7 @@ compute a justification of the proposal, it sets its opinion to one of
 `YES` or `NO`.  If it cannot form an opinion, it leaves its opinion as
 `NONE`.
 
-For now, we will ignore the proposal dissemination process and assume all nodes participating have an initial opinion to respond to within a given request. Further research will relax this assumption and analyze timing attacks on proposal propagation through the network. 
-
+For now, we will ignore the proposal dissemination process and assume all nodes participating have an initial opinion to respond to within a given request. Further research will relax this assumption and analyze timing attacks on proposal propagation through the network.
 
 The node then participates in a number of query rounds in which it
 solicits other node's opinion in query rounds.  Given a set of `N`
@@ -124,6 +117,7 @@ may not have a view on the complete members participating in the
 consensus on a proposal in a given round.
 
 The algorithm is divided into 4 phases:
+
 1. Querying
 2. Computing `confidence`, `evidence`, and `accumulated evidence`
 3. Transition function
@@ -151,7 +145,8 @@ final opinion on the truth of the proposal. -->
 ### Setup Parameters
 
 The node initializes the following integer ratios as constants:
-```
+
+``` markdown
 # The following values are constants chosen with justification from experiments
 # performed with the adversarial models
 
@@ -187,10 +182,10 @@ k_initial
 max_rounds ;; placeholder for simulation work, no justification yet
    <-- 100 
 ```
-      
+
 The following variables are needed to keep the state of Claro:
 
-```
+``` markdown
 ;; current number of nodes to attempt to query in a round
 k 
   <-- k_original
@@ -206,16 +201,15 @@ round
   <-- 0
 ```
 
-
-###  Phase One: Query 
+### Phase One: Query
 
 A node selects `k` nodes randomly from the complete pool of peers in the
 network. This query is can optionally be weighted, so the probability
-of selecting nodes is proportional to their 
+of selecting nodes is proportional to their
 
 Node Weighting
-$$ 
-P(i) = \frac{w_i}{\sum_{j=0}^{j=N} w_j} 
+$$
+P(i) = \frac{w_i}{\sum_{j=0}^{j=N} w_j}
 $$
 
 where `w` is evidence. The list of nodes is maintained by a separate protocol (the network
@@ -254,12 +248,15 @@ nodes queried is too high.
 When the query finishes, the node now initializes the following two
 values:
 
+```php
     new_votes 
       <-- |total vote replies received in this round to the current query|
     positive_votes 
       <-- |YES votes received from the query| 
-    
+```
+  
 ### Phase Two: Computation
+
 When the query returns, three ratios are used later on to compute the
 transition function and the opinion forming. Confidence encapsulates
 the notion of how much we know (as a node) in relation to how much we
@@ -289,6 +286,8 @@ $$
 The node runs the `new_votes` and `positive_votes` parameters received
 in the query round through the following algorithm:
 
+```php
+
     total_votes 
       +== new_votes
     total_positive 
@@ -303,8 +302,10 @@ in the query round through the following algorithm:
       <-- new_evidence * ( 1 - confidence ) + total_evidence * confidence 
     alpha 
       <-- doubt * ( 1 - confidence ) + certainty * confidence 
-    
+```
+
 ### Phase Three: Computation
+
 In order to eliminate the need for a step function (a conditional in
 the code), we introduce a transition function from one regime to the
 other. Our interest in removing the step function is twofold:
@@ -324,9 +325,9 @@ $$
 \begin{array}{cl}
 evidence & \impliedby e_{round} (1 - c_{accum}) + e_{accum} c_{accum} \newline
 \alpha &  \impliedby \alpha_1 (1 - c_{accum}) + \alpha_2 c_{accum} \newline
-\end{array} 
+\end{array}
 $$
-    
+
 Since the confidence is modeled as a ratio that depends on the
 constant *`l`*, we can visualize the transition function at
 different values of *`l`*. Recall that this constant encapsulates
@@ -337,11 +338,11 @@ valuable input of evidence to happen.
 We have observed via experiment that for a transition function to be
 useful, we need establish two requirements:
 
-1.  The change has to be balanced and smooth, giving an
+1. The change has to be balanced and smooth, giving an
     opportunity to the first regime to operate and not jump directly
     to the second regime.
 
-2.  The convergence to 1.0 (fully operating in the second regime)
+2. The convergence to 1.0 (fully operating in the second regime)
     should happen within a reasonable time-frame. We’ve set this
     time-frame experimentally at 1000 votes, which is in the order of
     ~100 queries given a *`k`* of 9.
@@ -354,6 +355,7 @@ The node updates its local opinion on the consensus proposal by
 examining the relationship between the evidence accumulated for a
 proposal with the confidence encoded in the `alpha` parameter:
 
+```php
     IF
       evidence > alpha
     THEN 
@@ -362,12 +364,15 @@ proposal with the confidence encoded in the `alpha` parameter:
       evidence < 1 - alpha
     THEN 
       opinion <-- NO
-       
+```
+
 If the opinion of the node is `NONE` after evaluating the relation
 between `evidence` and `alpha`, adjust the number of uniform randomly
 queried nodes by multiplying the neighbors `k` by the `k_multiplier`
 up to the limit of `k_max_multiplier_power` query size increases.
-    
+
+```php
+
     ;; possibly increase number nodes to uniformly randomly query in next round
     WHEN
          opinion is NONE
@@ -375,8 +380,10 @@ up to the limit of `k_max_multiplier_power` query size increases.
          k < k_original * k_multiplier ^ max_k_multiplier_power
     THEN 
        k <-- k * k_multiplier
+```
 
-###  Decision 
+### Decision
+
 The next step is a simple one: change our opinion if the threshold
 *`alpha`* is reached. This needs to be done separately for the `YES/NO`
 decision, checking both boundaries. The last step is then to *`decide`*
@@ -399,7 +406,9 @@ network size and directly related to the total votes received, an
 honest node marks the decision as final, and always returns this
 opinion is response to further queries from other nodes on the
 network.
- 
+
+```php
+
     IF 
       confidence > confidence_threshold
     OR 
@@ -410,27 +419,27 @@ network.
     ELSE 
       round +== 1
       QUERY LOOP CONTINUES
+```
 
 Thus, after the decision phase, either a decision has been finalized
 and the local node becomes quiescent never initiating a new query, or
-it initiates a [new query](#query).
+it initiates a [new query](query).
 
 ### Termination
 
 A local round of Claro terminates in one of the following
 execution model considerations:
 
-
-1.  No queries are received for any newly initiated round for temporal
+1. No queries are received for any newly initiated round for temporal
     periods observed via a locally computed passage of time.  See [the
     following point on local time](#clock).
 
-2.  The `confidence` on the proposal exceeds our threshold for
+2. The `confidence` on the proposal exceeds our threshold for
     finalization.
-    
-3.  The number of `rounds` executed would be greater than
-    `max_rounds`. 
-    
+
+3. The number of `rounds` executed would be greater than
+    `max_rounds`.
+
 #### Quiescence
 
 After a local node has finalized an `opinion` into a `decision`, it enters a quiescent
@@ -448,6 +457,7 @@ of a phase locked-loop feedback to measure local clock drift see
 ## Further points
 
 ### Node receives information during round
+
 In the query step, the node is envisioned as packing information into
 the query to cut down on the communication overhead a query to each of
 this `k` nodes containing the node's own current opinion on the
@@ -458,23 +468,25 @@ active round, and discard the information if the node is in a
 quiescent state.
 
 #### Problems with Weighting Node Value of Opinions
+
 If the view of other nodes is incomplete, then the sum of the optional
 weighting will not be a probability distribution normalized to 1.
 
 The current algorithm doesn't describe how the initial opinions are formed.
 
 ## Implementation status
-The following implementations have been created for various testing and simulation purposes:
-- [Rust](https://github.com/logos-co/consensus-research)
-- [Python]() - FILL THIS IN WITH NEWLY CREATED REPO
-- [Common Lisp]() - FILL THIS IN WITH NEWLY CREATED REPO
 
-## Wire Protocol 
+The following implementations have been created for various testing and simulation purposes:
+
+- [Rust](https://github.com/logos-co/consensus-research)
+- [Python](none) - FILL THIS IN WITH NEWLY CREATED REPO
+- [Common Lisp](none) - FILL THIS IN WITH NEWLY CREATED REPO
+
+## Wire Protocol
 
 For interoperability we present a wire protocol semantics by requiring
 the validity of the following statements expressed in Notation3 (aka
 `n3`) about any query performed by a query node:
-
 
 ```n3
 @prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -525,17 +537,16 @@ canonical mapping to UTF-8 JSON.
 At their core, the query messages are a simple enumeration of the
 three possible values of the opinion:
 
-    { NO, NONE, YES }
+> { NO, NONE, YES }
 
-When represented via integers, such as choosing 
- 
-     { -1, 0, +1 }
+When represented via integers, such as choosing
+
+> { -1, 0, +1 }
 
 the parity summations across network invariants often become easier to
 manipulate.
 
 ## Security Considerations
-
 
 ### Privacy
 
@@ -544,7 +555,7 @@ reduces the number of messages that need to be gossiped for a given
 proposal.  The resulting impact on the privacy of the node's opinion
 is not currently analyzed.
 
-### Security with respect to various Adversarial Models 
+### Security with respect to various Adversarial Models
 
 Adversarial models have been tested for which the values for current
 parameters of Claro have been tuned.  Exposition of the
@@ -595,7 +606,7 @@ Although we have proposed a normative description of the
 implementation of the underlying binary consensus algorithm (Claro),
 we believe we have prepared for analysis its adversarial performance
 in a manner that is amenable to replacement by another member of the
-[snow*](#snow*) family.
+[snow*](snow) family.
 
 We have presumed the existence of a general family of algorithms that
 can be counted on to vote on nodes in the DAG in a fair manner.
@@ -604,7 +615,7 @@ transactions.  One can express all state machine, i.e. account-based
 models as checkpoints anchored in UTXO trust, so we believe that this
 presupposition has some justification.  We can envision a need for
 tooling abstraction that allow one to just program the DAG itself, as
-they should be of stable interest no matter if Claro isn't. 
+they should be of stable interest no matter if Claro isn't.
 
 ## Informative References
 
@@ -617,15 +628,15 @@ they should be of stable interest no matter if Claro isn't.
 
 3. [snow*](<https://www.avalabs.org/whitepapers>) The Snow family of
    algorithms
-   
+
 4. [Move](<https://cloud.google.com/composer/docs/how-to/using/writing-dags>)
-    Move: a Language for Writing DAG Abstractions 
+    Move: a Language for Writing DAG Abstractions
 
 5. [rdf](<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 
 6. [rdfs](<http://www.w3.org/2000/01/rdf-schema#>)
 
-7. [xsd](<http://www.w3.org/2001/XMLSchema#>) 
+7. [xsd](<http://www.w3.org/2001/XMLSchema#>)
 
 8. [n3-w3c-notes](<https://www.w3.org/TeamSubmission/n3/>)
 
@@ -642,4 +653,4 @@ they should be of stable interest no matter if Claro isn't.
 ## Copyright
 
 Copyright and related rights waived via
-[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+[CC0](https://creativecommons.org/public)
