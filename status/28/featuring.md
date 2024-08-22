@@ -9,26 +9,32 @@ editor: Szymon Szlachtowicz <szymon.s@ethworks.io>
 ---
 
 ## Abstract
+
 This specification describes a voting method to feature different active Status Communities.
 
 ## Overview
 
-When there is a active community that is seeking new members, current users of community should be able to feature their community so that it will be accessible to larger audience.
+When there is a active community that is seeking new members,
+current users of community should be able to feature their community so
+that it will be accessible to larger audience.
 Status community curation DApp should provide such a tool.
 
 Rules of featuring:
     - Given community can't be featured twice in a row.
     - Only one vote per user per community (single user can vote on multiple communities)
     - Voting will be done off-chain
-    - If community hasn't been featured votes for given community are still valid for the next 4 weeks
+    - If community hasn't been featured
+    votes for given community are still valid for the next 4 weeks
 
-Since voting for featuring is similar to polling solutions proposed in this spec could be also used for different applications.
+Since voting for featuring is similar to polling solutions proposed
+in this spec could be also used for different applications.
 
 ### Voting
 
-Voting for featuring will be done through waku v2. 
+Voting for featuring will be done through waku v2.
 
 Payload of waku message will be :
+
 ```ts
 type FeatureVote = {
     voter: string // address of a voter
@@ -44,12 +50,16 @@ timestamp is necessary so that votes can't be reused after 4 week period
 ### Counting Votes
 
 Votes will be counted by the DApp itself.
-DApp will aggregate all the votes in the last 4 weeks and calculate which communities should be displayed in the Featured tab of DApp.
+DApp will aggregate all the votes in the last 4 weeks and
+calculate which communities should be displayed in the Featured tab of DApp.
 
 Rules of counting:
-    - When multiple votes from the same address on the same community are encountered only the vote with highest timestamp is considered valid.
-    - If a community has been featured in a previous week it can't be featured in current week.
-    - In a current week top 5 (or 10) communities with highest amount of SNT votes up to previous Sunday 23:59:59 UTC are considered featured.
+    - When multiple votes from the same address on the same community are encountered
+    only the vote with highest timestamp is considered valid.
+    - If a community has been featured in a previous week
+    it can't be featured in current week.
+    - In a current week top 5 (or 10) communities with highest amount of SNT votes
+    up to previous Sunday 23:59:59 UTC are considered featured.
 
 ## Copyright
 
