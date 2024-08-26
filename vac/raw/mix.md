@@ -396,13 +396,14 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
      - Derive the AES key and IV:
 
-       $`\text{φ\_aes\_key}_{i-1} = KDF(\text{"φ\_aes\_key"}\ |\ s_{i-1})`$
+       $`\text{φ\_aes\_key}_{i-1} = KDF(\text{"aes\_key"}\ |\ s_{i-1})`$
 
-       $`\text{φ\_iv}_{i-1} = H(\text{"φ\_iv"}\ |\ s_{i-1})`$ (truncated to 128 bits)
+       $`\text{φ\_iv}_{i-1} = H(\text{"iv"}\ |\ s_{i-1})`$ (truncated to 128 bits)
 
-     - Compute the filler string using AES-CTR:
+     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$, which is AES-CTR
+       encryption with the keystream starting from index $((t+1)(r-i)+t+2)\kappa$ :
 
-       $`\phi_i = \text{AES-CTR}(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
+       $`\phi_i = \text{AES-CTR}^\prime_i(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
        \ \phi_{i-1}\ |\ 0_{(t+1)\kappa})`$, where $0_{(t+1)\kappa}$ is the string of $0$
        bits of length $(t+1)\kappa$.
 
@@ -414,11 +415,11 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - Derive the AES key, MAC key, and IV:
 
-     $`\text{β\_aes\_key}_{i} = KDF(\text{"β\_aes\_key"}\ |\ s_{i})`$
+     $`\text{β\_aes\_key}_{i} = KDF(\text{"aes\_key"}\ |\ s_{i})`$
 
      $`\text{mac\_key}_{i} = KDF(\text{"mac\_key"}\ |\ s_{i})`$
 
-     $`\text{β\_iv}_{i} = H(\text{"β\_iv"}\ |\ s_{i})`$ (truncated to 128 bits)
+     $`\text{β\_iv}_{i} = H(\text{"iv"}\ |\ s_{i})`$ (truncated to 128 bits)
 
    - Generate random $`\text{delay\_i}`$, a 16-bit unsigned integer (0-65535 milliseconds).
 
@@ -529,9 +530,9 @@ to relay a message:
 
    a. Derive the AES key, MAC key, and IV:
 
-   $`\text{β\_aes\_key} = KDF(\text{"β\_aes\_key"}\ |\ s)`$
+   $`\text{β\_aes\_key} = KDF(\text{"aes\_key"}\ |\ s)`$
 
-   $`\text{β\_iv} = H(\text{"β\_iv"}\ |\ s)`$ (truncated to 128 bits)
+   $`\text{β\_iv} = H(\text{"iv"}\ |\ s)`$ (truncated to 128 bits)
 
    b. Compute $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta\ |\ 0_{(t+1)k})`$.
 
