@@ -26,8 +26,8 @@ The specification is divided into 3 sections:
 
 - Private 1-to-1 communications protocol, based on [Signal's double
 ratchet](https://signal.org/docs/specifications/doubleratchet/).
-- Private group messaging protocol, based on the [MLS protocol]
-(https://datatracker.ietf.org/doc/rfc9420/).
+- Private group messaging protocol, based on the
+[MLS protocol](https://datatracker.ietf.org/doc/rfc9420/).
 - Description of an Ethereum-based authentication protocol, based on
 [SIWE](https://eips.ethereum.org/EIPS/eip-4361).
 
@@ -163,8 +163,8 @@ with X3DH using the following data as initialization for the former:
 
 - The `SK` output from X3DH becomes the `SK`
 input of the double ratchet. See section 3.3 of
-[Signal Specification]
-(https://signal.org/docs/specifications/doubleratchet/) for a detailed description.
+[Signal Specification](https://signal.org/docs/specifications/doubleratchet/)
+for a detailed description.
 - The `AD` output from X3DH becomes the `AD`
 input of the double ratchet. See sections 3.4 and 3.5 of
 [Signal Specification](https://signal.org/docs/specifications/doubleratchet/)
@@ -313,7 +313,7 @@ Some data, such as the key pairs `(ik, IK)` for Alice and Bob,
 MAY NOT be regenerated after a period of time.
 Therefore the prekey bundle MAY be stored in long-term
 storage solutions, such as a dedicated smart contract
-which outputs such a key pair when receiving an Ethereum wallet 
+which outputs such a key pair when receiving an Ethereum wallet
 address.
 
 Storing static data is done using a dedicated
@@ -340,18 +340,18 @@ the problem of storing updatable data in Ethereum.
 that points to the off-chain data.
 2. Off-chain solutions can include systems like IPFS,
 traditional cloud storage solutions, or
-decentralized storage networks such as a 
+decentralized storage networks such as a
 [Swarm](https://www.ethswarm.org).
 
 In any case, the user stores the associated
 IPFS hash, URL or reference in Ethereum.
 
 The fact of a user not updating the ephemeral information
-can be understood as Bob not willing to participate in any 
+can be understood as Bob not willing to participate in any
 communication.
 
 This applies to `KeyPackage`,
-which in the MLS specification are meant 
+which in the MLS specification are meant
 o be stored in a directory provided by the delivery service.
 If such an element does not exist,
 `KeyPackage` MUST be stored according
@@ -367,18 +367,18 @@ end-to-end encryption in an authenticated and asynchronous way.
 The main security characteristics of the protocol are:
 Message confidentiality and authentication, sender authentication,
 membership agreement, post-remove
-and post-update security, and forward secrecy and 
+and post-update security, and forward secrecy and
 post-compromise security.
-The MLS protocol achieves: low-complexity, group integrity, 
+The MLS protocol achieves: low-complexity, group integrity,
 synchronization and extensibility.
 
-The extension to group chat described in forthcoming sections is built upon the 
+The extension to group chat described in forthcoming sections is built upon the
 [MLS](https://datatracker.ietf.org/doc/rfc9420/) protocol.
 
 ### Structure
 
-Each MLS session uses a single cipher suite that specifies the 
-primitives to be used in group key computations. The cipher suite MUST 
+Each MLS session uses a single cipher suite that specifies the
+primitives to be used in group key computations. The cipher suite MUST
 use:
 
 - `X488` as Diffie-Hellman function.
@@ -387,8 +387,8 @@ use:
 - `SHA512` as hash function.
 - `XEd448` for digital signatures.
 
-Formats for public keys, signatures and public-key encryption MUST 
-follow Section 5.1 of 
+Formats for public keys, signatures and public-key encryption MUST
+follow Section 5.1 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Hash-based identifiers
@@ -406,8 +406,8 @@ The identities and signing key are verified by the Authentication
 Service in use for a
 group.
 
-Credentials MUST follow the specifications of section 5.3 of [RFC9420]
-(https://datatracker.ietf.org/doc/rfc9420/).
+Credentials MUST follow the specifications of section 5.3 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Below follows the flow diagram for the generation of credentials.
 Users MUST generate key pairs by themselves.
@@ -430,7 +430,7 @@ in section 6.2 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 - `PrivateMessage`: represents a signed and encrypted message, with
 protections for both the content of the message and related metadata.
 
-The definition, and the encoding/decoding of a `PrivateMessage` MUST 
+The definition, and the encoding/decoding of a `PrivateMessage` MUST
 follow the  specification in section 6.3 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
@@ -632,7 +632,9 @@ asynchronously.
 A KeyPackage object specifies:
 
 - Protocol version and cipher suite supported by the client.
-- Public keys that can be used to encrypt Welcome messages. Welcome messages provide new members with the information to initialize their
+- Public keys that can be used to encrypt Welcome messages.
+Welcome messages provide new members with the information
+to initialize their
 state for the epoch in which they were added or in which they want to
 add themselves to the group
 - The content of the leaf node that should be added to the tree to
@@ -901,11 +903,13 @@ Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 The MLS protocol assumes the existence on a (central, untrusted)
 *delivery service*, whose responsabilites include:
 
-- Acting as a directory service providing the initial keying material for clients to use.
+- Acting as a directory service providing the initial
+keying material for clients to use.
 - Routing MLS messages among clients.
 
 The central delivery service can be avoided in protocols using the
-publish/gossip approach, such as [gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub).
+publish/gossip approach, such as
+[gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub).
 
 Concerning keys, each node can generate and disseminate their
 encryption key among the other nodes, so they can create a local
