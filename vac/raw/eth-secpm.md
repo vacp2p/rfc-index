@@ -31,15 +31,15 @@ The specification is divided into 3 sections:
 ### Theory
 
 The specification is based on the noise protocol framework.
-It corresponds to the double ratchet scheme combined with the X3DH algorithm, which will be used to initialize the former. 
+It corresponds to the double ratchet scheme combined with the X3DH algorithm, which will be used to initialize the former.
 We chose to express the protocol in noise to be be able to use the noise streamlined implementation and proving features.
 The X3DH algorithm provides both authentication and forward secrecy, as stated in the [X3DH specification](https://signal.org/docs/specifications/x3dh/).
 
 This protocol will consist of several stages:
 
-1.  Key setting for X3DH: this step will produce prekey bundles for Bob which will be fed into X3DH. It will also allow Alice to generate the keys required to run the X3DH algorithm correctly.
-2.  Execution of X3DH: This step will output a common secret key `SK` together with an additional data vector `AD`. Both will be used in the double ratchet algorithm initialization.
-3.  Execution of the double ratchet algorithm for forward secure, authenticated communications, using the common secret key `SK`, obtained from X3DH, as a root key.
+1. Key setting for X3DH: this step will produce prekey bundles for Bob which will be fed into X3DH. It will also allow Alice to generate the keys required to run the X3DH algorithm correctly.
+2. Execution of X3DH: This step will output a common secret key `SK` together with an additional data vector `AD`. Both will be used in the double ratchet algorithm initialization.
+3. Execution of the double ratchet algorithm for forward secure, authenticated communications, using the common secret key `SK`, obtained from X3DH, as a root key.
 
 The protocol assumes the following requirements:
 - Alice knows Bob’s Ethereum address.
@@ -72,11 +72,11 @@ Bob MUST generate new keys using `(ik_B, IK_B) = GENERATE_KEYPAIR(curve = curve4
 
 Bob MUST also generate a public key pair `(spk_B, SPK_B) = GENERATE_KEYPAIR(curve = curve448)`.
 
-`SPK` is a public key generated and stored at medium-term. 
+`SPK` is a public key generated and stored at medium-term.
 Both signed prekey and the certificate MUST undergo periodic replacement.
-After replacing the key, 
+After replacing the key,
 Bob keeps the old private key of `SPK` for some interval, dependant on the implementation.
-This allows Bob to decrypt delayed messages. 
+This allows Bob to decrypt delayed messages.
 
 Bob MUST sign `SPK` for authentication:
 `SigSPK = XEd448(ik, Encode(SPK))`
@@ -91,11 +91,13 @@ Before sending an initial message to Bob, Alice MUST generate an AD: `AD = Encod
 
 Alice MUST generate ephemeral key pairs `(ek, EK) = GENERATE_KEYPAIR(curve = curve448)`.
 
-The function `Encode()` transforms an curve448 public key into a byte sequence. 
+The function `Encode()` transforms an curve448 public key into a byte sequence.
 This is specified in the [RFC 7748](http://www.ietf.org/rfc/rfc7748.txt) on elliptic curves for security.
 
 One MUST consider `q = 2^446 - 13818066809895115352007386748515426880336692474882178609894547503885` for digital signatures with `(XEd448_sign, XEd448_verify)`:
+
 ```
+
 XEd448_sign((ik, IK), message):
     Z = randbytes(64)  
     r = SHA512(2^456 - 2 || ik || message || Z )
@@ -104,7 +106,9 @@ XEd448_sign((ik, IK), message):
     s = (r + h * ik) % q
     return (R || s)
 ```
+
 ```
+
 XEd448_verify(u, message, (R || s)):
     if (R.y >= 2^448) or (s >= 2^446): return FALSE
     h = (SHA512(R || 156326 || message)) % q
@@ -112,7 +116,9 @@ XEd448_verify(u, message, (R || s)):
     if R == R_check: return TRUE
     return FALSE 
 ```
+
 ```
+
 convert_mont(u):
     u_masked = u % mod 2^448
     inv = ((1 - u_masked)^(2^448 - 2^224 - 3)) % (2^448 - 2^224 - 1)
@@ -125,28 +131,31 @@ convert_mont(u):
 
 This specification combines the double ratchet with X3DH using the following data as initialization for the former:
 
--   The `SK` output from X3DH becomes the `SK` input of the double ratchet. See section 3.3 of [Signal Specification](https://signal.org/docs/specifications/doubleratchet/) for a detailed description.
--   The `AD` output from X3DH becomes the `AD` input of the double ratchet. See sections 3.4 and 3.5 of  [Signal Specification](https://signal.org/docs/specifications/doubleratchet/)  for a detailed description.
--   Bob’s signed prekey `SigSPKB` from X3DH is used as Bob’s initial ratchet public key of the double ratchet.
+-  The `SK` output from X3DH becomes the `SK` input of the double ratchet. See section 3.3 of [Signal Specification](https://signal.org/docs/specifications/doubleratchet/) for a detailed description.
+-  The `AD` output from X3DH becomes the `AD` input of the double ratchet. See sections 3.4 and 3.5 of  [Signal Specification](https://signal.org/docs/specifications/doubleratchet/)  for a detailed description.
+-  Bob’s signed prekey `SigSPKB` from X3DH is used as Bob’s initial ratchet public key of the double ratchet.
 
 X3DH has three phases:
 
-1.  Bob publishes his identity key and prekeys to a server, a network, or dedicated smart contract.
-2.  Alice fetches a prekey bundle from the server, and uses it to send an initial message to Bob.
-3.  Bob receives and processes Alice's initial message.
+1. Bob publishes his identity key and prekeys to a server, a network, or dedicated smart contract.
+2. Alice fetches a prekey bundle from the server, and uses it to send an initial message to Bob.
+3. Bob receives and processes Alice's initial message.
 
 Alice MUST perform the following computations:
+
 ```
+
 dh1 = DH(IK_A, SPK_B, curve = curve448)
 dh2 = DH(EK_A, IK_B, curve = curve448)
 dh3 = DH(EK_A, SPK_B)
 SK = KDF(dh1 || dh2 || dh3)
 ```
+
 Alice MUST send to Bob a message containing: 
 
--  `IK_A, EK_A`.
--  An identifier to Bob's prekeys used.
--  A message encrypted with AES256-GCM using `AD` and `SK`.
+- `IK_A, EK_A`.
+- An identifier to Bob's prekeys used.
+- A message encrypted with AES256-GCM using `AD` and `SK`.
 
 Upon reception of the initial message, Bob MUST:
 1. Perform the same computations above with the `DH()` function.
@@ -159,7 +168,9 @@ Upon reception of the initial message, Bob MUST:
 In this stage Bob and Alice have generated key pairs and agreed a shared secret `SK` using X3DH.
 
 Alice calls `RatchetInitAlice()` defined below:
+
 ```
+
 RatchetInitAlice(SK, IK_B):
     state.DHs = GENERATE_KEYPAIR(curve = curve448)
     state.DHr = IK_B
@@ -168,11 +179,14 @@ RatchetInitAlice(SK, IK_B):
     state.Ns, state.Nr, state.PN = 0
     state.MKSKIPPED = {}
 ```
+
 The HKDF function MUST be the proposal by [Krawczyk and Eronen](http://www.ietf.org/rfc/rfc5869.txt).
 In this proposal `chaining_key` and `input_key_material` MUST be replaced with `SK` and the output of `DH` respectively.
 
 Similarly, Bob calls the function `RatchetInitBob()` defined below:
+
 ```
+
 RatchetInitBob(SK, (ik_B,IK_B)):
     state.DHs = (ik_B, IK_B)
     state.Dhr = None
@@ -181,17 +195,21 @@ RatchetInitBob(SK, (ik_B,IK_B)):
     state.Ns, state.Nr, state.PN = 0
     state.MKSKIPPED = {}
 ```
+
 #### Encryption
 
 This function performs the symmetric key ratchet.
 
+
 ```
+
 RatchetEncrypt(state, plaintext, AD):
     state.CKs, mk = HMAC-SHA256(state.CKs)
     header = HEADER(state.DHs, state.PN, state.Ns)
     state.Ns = state.Ns + 1
 	return header, AES256-GCM_Enc(mk, plaintext, AD || header)
 ```
+
 The `HEADER` function creates a new message header containing the public key from the key pair output of the `DH`function.  
 It outputs the previous chain length `pn`, and the message number `n`. 
 The returned header object contains ratchet public key `dh` and integers `pn` and `n`.
@@ -199,7 +217,9 @@ The returned header object contains ratchet public key `dh` and integers `pn` an
 #### Decryption
 
 The function `RatchetDecrypt()` decrypts incoming messages:
+
 ```
+
 RatchetDecrypt(state, header, ciphertext, AD):
     plaintext = TrySkippedMessageKeys(state, header, ciphertext, AD)
     if plaintext != None:
@@ -212,9 +232,12 @@ RatchetDecrypt(state, header, ciphertext, AD):
     state.Nr = state.Nr + 1
     return AES256-GCM_Dec(mk, ciphertext, AD || header)
 ```
+
 Auxiliary functions follow:
 
+
 ```
+
 DHRatchet(state, header):
     state.PN = state.Ns
     state.Ns = state.Nr = 0
@@ -223,7 +246,9 @@ DHRatchet(state, header):
     state.DHs = GENERATE_KEYPAIR(curve = curve448)
     state.RK, state.CKs = HKDF(state.RK, DH(state.DHs, state.DHr))
 ```
+
 ```
+
 SkipMessageKeys(state, until):
     if state.NR + MAX_SKIP < until:
         raise Error
@@ -233,7 +258,9 @@ SkipMessageKeys(state, until):
             state.MKSKIPPED[state.DHr, state.Nr] = mk
             state.Nr = state.Nr + 1
 ```
+
 ```
+
 TrySkippedMessageKey(state, header, ciphertext, AD):
     if (header.dh, header.n) in state.MKSKIPPED:
         mk = state.MKSKIPPED[header.dh, header.n]
