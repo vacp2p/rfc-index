@@ -16,7 +16,8 @@ including unauthorized access, data breaches, and single points of failure.
 Therefore a decentralized approach to secure communication becomes increasingly relevant,
 offering a robust solution to address these challenges.  
 
-This specification outlines a private messaging service using the Ethereum blockchain as authentication service.
+This specification outlines a private messaging service using the Ethereum blockchain 
+as authentication service.
 Rooted in the existing [model](../../waku/standards/application/20/toy-eth-pm.md),
 this proposal addresses the deficiencies related to forward privacy and authentication inherent in the current framework.
 The specification is divided into 3 sections:
