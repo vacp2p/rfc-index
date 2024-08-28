@@ -42,22 +42,22 @@ This protocol will consist of several stages:
 3.  Execution of the double ratchet algorithm for forward secure, authenticated communications, using the common secret key `SK`, obtained from X3DH, as a root key.
 
 The protocol assumes the following requirements:
--   Alice knows Bob’s Ethereum address.
--   Bob is willing to participate in the protocol, and publishes his public key.
--   Bob’s ownership of his public key is verifiable,
--   Alice wants to send message M to Bob.
--   An eavesdropper cannot read M’s content even if she is storing it or relaying it.
+- Alice knows Bob’s Ethereum address.
+- Bob is willing to participate in the protocol, and publishes his public key.
+- Bob’s ownership of his public key is verifiable,
+- Alice wants to send message M to Bob.
+- An eavesdropper cannot read M’s content even if she is storing it or relaying it.
 
 ### Syntax
 
 #### Cryptographic suite
 
 The following cryptographic functions MUST be used:
--   `X488` as Diffie-Hellman function `DH`.
--   `SHA256` as KDF.
--   `AES256-GCM` as AEAD algorithm.
--   `SHA512` as hash function.
--   `XEd448` for digital signatures.
+- `X488` as Diffie-Hellman function `DH`.
+- `SHA256` as KDF.
+- `AES256-GCM` as AEAD algorithm.
+- `SHA512` as hash function.
+- `XEd448` for digital signatures.
 
 #### X3DH initialization
 
@@ -65,8 +65,8 @@ This scheme MUST work on the curve curve448.
 The X3DH algorithm corresponds to the IX pattern in Noise.
 
 Bob and Alice MUST define personal key pairs `(ik_B, IK_B)` and `(ik_A, IK_A)` respectively where:
--   The key `ik` must be kept secret,
--   and the key `IK` is public.
+- The key `ik` must be kept secret,
+- and the key `IK` is public.
 
 Bob MUST generate new keys using `(ik_B, IK_B) = GENERATE_KEYPAIR(curve = curve448)`.
 
@@ -78,11 +78,14 @@ After replacing the key,
 Bob keeps the old private key of `SPK` for some interval, dependant on the implementation.
 This allows Bob to decrypt delayed messages. 
 
-Bob MUST sign `SPK` for authentication: `SigSPK = XEd448(ik, Encode(SPK))`
+Bob MUST sign `SPK` for authentication:
+`SigSPK = XEd448(ik, Encode(SPK))`
 
-A final step requires the definition of `prekey_bundle = (IK, SPK, SigSPK, OPK_i)`
+A final step requires the definition of
+`prekey_bundle = (IK, SPK, SigSPK, OPK_i)`
 
-One-time keys `OPK` MUST be generated as `(opk_B, OPK_B) = GENERATE_KEYPAIR(curve = curve448)`.
+One-time keys `OPK` MUST be generated as
+`(opk_B, OPK_B) = GENERATE_KEYPAIR(curve = curve448)`.
 
 Before sending an initial message to Bob, Alice MUST generate an AD: `AD = Encode(IK_A) || Encode(IK_B)`.
 
