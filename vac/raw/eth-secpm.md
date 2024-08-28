@@ -10,10 +10,10 @@ contributors:
 
 ## Motivation
 
-The need for secure communications has become paramount. 
-Traditional centralized messaging protocols are susceptible to various security threats, 
-including unauthorized access, data breaches, and single points of failure. 
-Therefore a decentralized approach to secure communication becomes increasingly relevant, 
+The need for secure communications has become paramount.
+Traditional centralized messaging protocols are susceptible to various security threats,
+including unauthorized access, data breaches, and single points of failure.
+Therefore a decentralized approach to secure communication becomes increasingly relevant,
 offering a robust solution to address these challenges.
 
 This specification outlines a private messaging service using the Ethereum blockchain as authentication service. 
