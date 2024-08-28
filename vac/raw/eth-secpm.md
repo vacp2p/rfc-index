@@ -25,7 +25,6 @@ The specification is divided into 3 sections:
 - Private group messaging protocol, based on the [MLS protocol](https://datatracker.ietf.org/doc/rfc9420/).
 - Description of an Ethereum-based authentication protocol, based on [SIWE](https://eips.ethereum.org/EIPS/eip-4361).
 
-
 ## Private 1-to-1 communications protocol
 
 ### Theory
@@ -42,6 +41,7 @@ This protocol will consist of several stages:
 3. Execution of the double ratchet algorithm for forward secure, authenticated communications, using the common secret key `SK`, obtained from X3DH, as a root key.
 
 The protocol assumes the following requirements:
+
 - Alice knows Bob’s Ethereum address.
 - Bob is willing to participate in the protocol, and publishes his public key.
 - Bob’s ownership of his public key is verifiable,
@@ -53,6 +53,7 @@ The protocol assumes the following requirements:
 #### Cryptographic suite
 
 The following cryptographic functions MUST be used:
+
 - `X488` as Diffie-Hellman function `DH`.
 - `SHA256` as KDF.
 - `AES256-GCM` as AEAD algorithm.
@@ -65,6 +66,7 @@ This scheme MUST work on the curve curve448.
 The X3DH algorithm corresponds to the IX pattern in Noise.
 
 Bob and Alice MUST define personal key pairs `(ik_B, IK_B)` and `(ik_A, IK_A)` respectively where:
+
 - The key `ik` must be kept secret,
 - and the key `IK` is public.
 
@@ -96,8 +98,7 @@ This is specified in the [RFC 7748](http://www.ietf.org/rfc/rfc7748.txt) on elli
 
 One MUST consider `q = 2^446 - 13818066809895115352007386748515426880336692474882178609894547503885` for digital signatures with `(XEd448_sign, XEd448_verify)`:
 
-```
-
+```text
 XEd448_sign((ik, IK), message):
     Z = randbytes(64)  
     r = SHA512(2^456 - 2 || ik || message || Z )
@@ -107,8 +108,7 @@ XEd448_sign((ik, IK), message):
     return (R || s)
 ```
 
-```
-
+```text
 XEd448_verify(u, message, (R || s)):
     if (R.y >= 2^448) or (s >= 2^446): return FALSE
     h = (SHA512(R || 156326 || message)) % q
@@ -117,8 +117,7 @@ XEd448_verify(u, message, (R || s)):
     return FALSE 
 ```
 
-```
-
+```text
 convert_mont(u):
     u_masked = u % mod 2^448
     inv = ((1 - u_masked)^(2^448 - 2^224 - 3)) % (2^448 - 2^224 - 1)
@@ -143,8 +142,7 @@ X3DH has three phases:
 
 Alice MUST perform the following computations:
 
-```
-
+```text
 dh1 = DH(IK_A, SPK_B, curve = curve448)
 dh2 = DH(EK_A, IK_B, curve = curve448)
 dh3 = DH(EK_A, SPK_B)
@@ -158,6 +156,7 @@ Alice MUST send to Bob a message containing:
 - A message encrypted with AES256-GCM using `AD` and `SK`.
 
 Upon reception of the initial message, Bob MUST:
+
 1. Perform the same computations above with the `DH()` function.
 2. Derive `SK` and construct `AD`.
 3. Decrypt the initial message encrypted with `AES256-GCM`.
@@ -169,8 +168,7 @@ In this stage Bob and Alice have generated key pairs and agreed a shared secret 
 
 Alice calls `RatchetInitAlice()` defined below:
 
-```
-
+```text
 RatchetInitAlice(SK, IK_B):
     state.DHs = GENERATE_KEYPAIR(curve = curve448)
     state.DHr = IK_B
@@ -185,8 +183,7 @@ In this proposal `chaining_key` and `input_key_material` MUST be replaced with `
 
 Similarly, Bob calls the function `RatchetInitBob()` defined below:
 
-```
-
+```text
 RatchetInitBob(SK, (ik_B,IK_B)):
     state.DHs = (ik_B, IK_B)
     state.Dhr = None
@@ -201,8 +198,7 @@ RatchetInitBob(SK, (ik_B,IK_B)):
 This function performs the symmetric key ratchet.
 
 
-```
-
+```text
 RatchetEncrypt(state, plaintext, AD):
     state.CKs, mk = HMAC-SHA256(state.CKs)
     header = HEADER(state.DHs, state.PN, state.Ns)
@@ -218,8 +214,7 @@ The returned header object contains ratchet public key `dh` and integers `pn` an
 
 The function `RatchetDecrypt()` decrypts incoming messages:
 
-```
-
+```text
 RatchetDecrypt(state, header, ciphertext, AD):
     plaintext = TrySkippedMessageKeys(state, header, ciphertext, AD)
     if plaintext != None:
@@ -236,8 +231,7 @@ RatchetDecrypt(state, header, ciphertext, AD):
 Auxiliary functions follow:
 
 
-```
-
+```text
 DHRatchet(state, header):
     state.PN = state.Ns
     state.Ns = state.Nr = 0
@@ -247,8 +241,7 @@ DHRatchet(state, header):
     state.RK, state.CKs = HKDF(state.RK, DH(state.DHs, state.DHr))
 ```
 
-```
-
+```text
 SkipMessageKeys(state, until):
     if state.NR + MAX_SKIP < until:
         raise Error
@@ -259,8 +252,7 @@ SkipMessageKeys(state, until):
             state.Nr = state.Nr + 1
 ```
 
-```
-
+```text
 TrySkippedMessageKey(state, header, ciphertext, AD):
     if (header.dh, header.n) in state.MKSKIPPED:
         mk = state.MKSKIPPED[header.dh, header.n]
@@ -287,8 +279,10 @@ The function outputs the associated public key from the smart contract.
 
 Storing ephemeral data on Ethereum MAY be done using a combination of on-chain and off-chain solutions. 
 This approach provides an efficient solution to the problem of storing updatable data in Ethereum.
+
 1. Ethereum stores a reference or a hash that points to the off-chain data.
 2. Off-chain solutions can include systems like IPFS, traditional cloud storage solutions, or decentralized storage networks such as a [Swarm](https://www.ethswarm.org). 
+
 In any case, the user stores the associated IPFS hash, URL or reference in Ethereum.
 
 The fact of a user not updating the ephemeral information can be understood as Bob not willing to participate in any communication.
@@ -310,6 +304,7 @@ The extension to group chat described in forthcoming sections is built upon the 
 ### Syntax
 
 Each MLS session uses a single cipher suite that specifies the primitives to be used in group key computations. The cipher suite MUST use:
+
 - `X488` as Diffie-Hellman function.
 - `SHA256` as KDF.
 - `AES256-GCM` as AEAD algorithm.
@@ -339,9 +334,11 @@ Users MUST generate key pairs by themselves.
 Handshake and application messages use a common framing structure providing encryption to ensure confidentiality within the group, and signing to authenticate the sender.
 
 The structure is:
+
 - `PublicMessage`: represents a message that is only signed, and not encrypted.
 The definition and the encoding/decoding of a `PublicMessage` MUST follow the specification in section 6.2 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 - `PrivateMessage`: represents a signed and encrypted message, with protections for both the content of the message and related metadata.
+
 The definition, and the encoding/decoding of a `PrivateMessage` MUST follow the specification in section 6.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Applications MUST use `PrivateMessage` to encrypt application messages. 
@@ -366,6 +363,7 @@ Contents of each kind of node, and its structure MUST follow the indications des
 `KeyPackage` objects describe the client's capabilities and provides keys that can be used to add the client to a group.
 
 The validity of a leaf node needs to be verified at the following stages:
+
 - When a leaf node is downloaded in a `KeyPackage`, before it is used to add the client to the group.
 - When a leaf node is received by a group member in an Add, Update, or Commit message.
 - When a client validates a ratchet tree.
@@ -377,11 +375,15 @@ A client MUST verify the validity of a leaf node following the instructions of s
 Whenever a member initiates an epoch change, they MAY need to refresh the key pairs of their leaf and of the nodes on their direct path. This is done to keep forward secrecy and post-compromise security.
 The member initiating the epoch change MUST follow this procedure procedure.
 A member updates the nodes along its direct path as follows:
+
 - Blank all the nodes on the direct path from the leaf to the root.
 - Generate a fresh HPKE key pair for the leaf.
 - Generate a sequence of path secrets, one for each node on the leaf's filtered direct path.
+
 It MUST follow the procedure described in section 7.4 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+
 - Compute the sequence of HPKE key pairs `(node_priv,node_pub)`, one for each node on the leaf's direct path.
+
 It MUST follow the procedure described in section 7.4 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Views of the tree synchronization
@@ -410,29 +412,37 @@ Tree and parent hashing MUST follow the directions in Sections 7.8 and 7.9 of [R
 
 Group keys are derived using the `Extract` and `Expand` functions from the KDF for the group's cipher suite, as well as the functions defined below:
 
-```
+
+```text
 ExpandWithLabel(Secret, Label, Context, Length) = KDF.Expand(Secret, KDFLabel, Length)
 DeriveSecret(Secret, Label) = ExpandWithLabel(Secret, Label, "", KDF.Nh)
+
 ```
+
 `KDFLabel` MUST be specified as:
-```
+
+```text
 struct {
     uint16 length;
     opaque label<V>;
     opaque context<V>;
 } KDFLabel;
+
 ```
+
 The fields of `KDFLabel` MUST be:
-```
+
+```text
 length = Length;
 label = "MLS 1.0 " + Label;
 context = Context;
+
 ```
 
 Each member of the group MUST maintaint a `GroupContext` object summarizing the state of the group. 
 The sturcture of such object MUST be:
 
-```
+```text
 struct {
 ProtocolVersion version = mls10;
 CipherSuite cipher_suite;
@@ -442,6 +452,7 @@ opaque tree_hash<V>;
 opaque confirmed_trasncript_hash<V>;
 Extension extension<V>;
 } GroupContext;
+
 ```
 
 The use of key scheduling MUST follow the indications in sections 8.1 - 8.7 in [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
@@ -456,6 +467,7 @@ If `N` is a parent node in the secret tree, the secrets of the children of `N` M
 #### Encryption keys
 
 MLS encrypts three different types of information:
+
 - Metadata (sender information).
 - Handshake messages (Proposal and Commit).
 - Application messages.
@@ -487,7 +499,8 @@ KeyPackages are intended to be used only once and SHOULD NOT be reused.
 Clients MAY generate and publish multiple KeyPackages to support multiple cipher suites.
 
 The structure of the object MUST be:
-```
+
+```text
 struct {
 ProtocolVersion version;
 CipherSuite cipher_suite;
@@ -497,8 +510,10 @@ Extension extensions<V>;
 /* SignWithLabel(., "KeyPackageTBS", KeyPackageTBS) */
 opaque signature<V>;
 }
+
 ```
-```
+
+```text
 struct {
 ProtocolVersion version;
 CipheSuite cipher_suite;
@@ -506,12 +521,16 @@ HPKEPublicKey init_key;
 LeafNode leaf_node;
 Extension extensions<V>;
 }
+
 ```
+
 `KeyPackage` object MUST be verified when:
+
 - A `KeyPackage` is downloaded by a group member, before it is used to add the client to the group.
 - When a `KeyPackage` is received by a group member in an `Add` message.
 
 Verification MUST be done as follows:
+
 - Verify that the cipher suite and protocol version of the `KeyPackage` match those in the `GroupContext`.
 - Verify that the `leaf_node` of the `KeyPackage` is valid for a `KeyPackage`.
 - Verify that the signature on the `KeyPackage` is valid.
@@ -526,6 +545,7 @@ Signature public keys are represented as opaque values in a format defined by th
 A group is always created with a single member. 
 Other members are then added to the group using the usual Add/Commit mechanism.
 The creator of a group MUST set:
+
 - the group ID. 
 - cipher suite.
 - initial extensions for the group. 
@@ -537,6 +557,7 @@ The creator MUST use the capabilities information in these `KeyPackages` to veri
 Group IDs SHOULD be constructed so they are unique with high probability. 
 
 To initialize a group, the creator of the group MUST initialize a one-member group with the following initial values:
+
 - Ratchet tree: A tree with a single node, a leaf node containing an HPKE public key and credential for the creator.
 - Group ID: A value set by the creator.
 - Epoch: `0`.
@@ -546,19 +567,22 @@ To initialize a group, the creator of the group MUST initialize a one-member gro
 - Extensions: Any values of the creator's choosing.
 
 The creator MUST also calculate the interim transcript hash:
+
 - Derive the `confirmation_key` for the epoch according to Section 8 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 - Compute a `confirmation_tag` over the empty `confirmed_transcript_hash` using the `confirmation_key` as described in Section 8.1 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 - Compute the updated `interim_transcript_hash` from the `confirmed_transcript_hash` and the `confirmation_tag` as described in Section 8.2 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 All members of a group MUST support the cipher suite and protocol version in use. Additional requirements MAY be imposed by including a `required_capabilities` extension in the `GroupContext`.
 
-```
+```text
 struct {
 ExtensionType extension_types<V>;
 ProposalType proposal_types<V>;
 CredentialType credential_types<V>;
 }
+
 ```
+
 The flow diagram shows the procedure to fetch key material from other users:
 ![figure2](./images/eth-secpm_fetching.png)
 
@@ -569,6 +593,7 @@ Below follows the flow diagram for the creation of a group:
 
 Group membership can change, and existing members can change their keys in order to achieve post-compromise security. 
 In MLS, each such change is accomplished by a two-step process:
+
 - A proposal to make the change is broadcast to the group in a Proposal message.
 - A member of the group or a new member broadcasts a Commit message that causes one or more proposed changes to enter into effect.
 
@@ -577,7 +602,7 @@ These states are called epochs and are uniquely identified among states of the g
 
 Proposals are included in a `FramedContent` by way of a `Proposal` structure that indicates their type:
 
-```
+```text
 struct {
 ProposalType proposal_type;
 select (Proposal.proposal_type) {
@@ -589,11 +614,14 @@ case reinit:			ReInit;
 case external_init:		ExternalInit;
 case group_context_extensions:	GroupContextExtensions;
 }
+
 ```
+
 On receiving a `FramedContent` containing a `Proposal`, a client MUST verify the signature inside `FramedContentAuthData` and that the epoch field of the enclosing FramedContent is equal to the epoch field of the current GroupContext object. 
 If the verification is successful, then the Proposal SHOULD be cached in such a way that it can be retrieved by hash in a later Commit message.
 
 Proposals are organized as follows:
+
 - `Add`: requests that a client with a specified KeyPackage be added to the group.
 - `Update`: similar to Add, it replaces the sender's LeafNode in the tree instead of adding a new leaf to the tree.
 - `Remove`: requests that the member with the leaf index removed be removed from the group.
@@ -669,6 +697,7 @@ Another important component is the *authentication service*, which is replaced w
 ## Ethereum-based authentication protocol
 
 ### Theory
+
 Sign-in with Ethereum describes how Ethereum accounts authenticate with off-chain services by signing a standard message format 
 parameterized by scope, session details, and security mechanisms.
 Sign-in with Ethereum (SIWE), which is described in the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361), MUST be the authentication method required. 
@@ -676,9 +705,11 @@ Sign-in with Ethereum (SIWE), which is described in the [EIP 4361](https://eips.
 ### Syntax
 
 #### Message format (ABNF)
+
 A SIWE Message MUST conform with the following Augmented Backus–Naur Form ([RFC 5234](https://datatracker.ietf.org/doc/html/rfc5234)) expression.
 
-```
+
+```text
 sign-in-with-ethereum =
     [ scheme "://" ] domain %s" wants you to sign in with your Ethereum account:" LF
     address LF
@@ -740,6 +771,7 @@ request-id = *pchar
 resources = *( LF resource )
 
 resource = "- " URI
+
 ```
 
 This specification defines the following SIWE Message fields that can be parsed from a SIWE Message by following the rules in ABNF Message Format:
@@ -797,6 +829,7 @@ This can affect the security model and session validation rules.
 
 - The relying party or wallet MAY additionally perform resolution of ENS data, as this can improve the user experience by displaying human-friendly information that is related to the `address`. 
 Resolvable ENS data include:
+
 	- The primary ENS name.
 	- The ENS avatar.
 	- Any other resolvable resources specified in the ENS documentation.
