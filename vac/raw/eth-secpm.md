@@ -12,9 +12,9 @@ contributors:
 
 The need for secure communications has become paramount.  
 Traditional centralized messaging protocols are susceptible to various security threats,
-including unauthorized access, data breaches, and single points of failure.  
+including unauthorized access, data breaches, and single points of failure.
 Therefore a decentralized approach to secure communication becomes increasingly relevant,
-offering a robust solution to address these challenges.  
+offering a robust solution to address these challenges.
 
 This specification outlines a private messaging service using the
 Ethereum blockchain as authentication service.
@@ -24,11 +24,11 @@ to forward privacy and authentication inherent
 in the current framework.
 The specification is divided into 3 sections:
 
-- Private 1-to-1 communications protocol, based on [Signal's double 
+- Private 1-to-1 communications protocol, based on [Signal's double
 ratchet](https://signal.org/docs/specifications/doubleratchet/).
 - Private group messaging protocol, based on the [MLS protocol]
 (https://datatracker.ietf.org/doc/rfc9420/).
-- Description of an Ethereum-based authentication protocol, based on 
+- Description of an Ethereum-based authentication protocol, based on
 [SIWE](https://eips.ethereum.org/EIPS/eip-4361).
 
 ## Private 1-to-1 communications protocol
@@ -41,7 +41,7 @@ the X3DH algorithm, which will be used to initialize the former.
 We chose to express the protocol in noise to be be able to use
 the noise streamlined implementation and proving features.
 The X3DH algorithm provides both authentication and forward
-secrecy, as stated in the 
+secrecy, as stated in the
 [X3DH specification](https://signal.org/docs/specifications/x3dh/).
 
 This protocol will consist of several stages:
@@ -163,7 +163,8 @@ with X3DH using the following data as initialization for the former:
 
 - The `SK` output from X3DH becomes the `SK`
 input of the double ratchet. See section 3.3 of
-[Signal Specification](https://signal.org/docs/specifications/doubleratchet/) for a detailed description.
+[Signal Specification]
+(https://signal.org/docs/specifications/doubleratchet/) for a detailed description.
 - The `AD` output from X3DH becomes the `AD`
 input of the double ratchet. See sections 3.4 and 3.5 of
 [Signal Specification](https://signal.org/docs/specifications/doubleratchet/)
@@ -371,8 +372,8 @@ post-compromise security.
 The MLS protocol achieves: low-complexity, group integrity, 
 synchronization and extensibility.
 
-The extension to group chat described in forthcoming sections is built upon the [MLS]
-(https://datatracker.ietf.org/doc/rfc9420/) protocol.
+The extension to group chat described in forthcoming sections is built upon the 
+[MLS](https://datatracker.ietf.org/doc/rfc9420/) protocol.
 
 ### Structure
 
@@ -393,16 +394,16 @@ follow Section 5.1 of
 ### Hash-based identifiers
 
 Some MLS messages refer to other MLS objects by hash.
-These identifiers MUST be computed according to Section 5.2 of 
+These identifiers MUST be computed according to Section 5.2 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Credentials
 
-Each member of a group presents a credential that provides one or more 
-identities for the 
+Each member of a group presents a credential that provides one or more
+identities for the
 member and associates them with the member's signing key.
-The identities and signing key are verified by the Authentication 
-Service in use for a 
+The identities and signing key are verified by the Authentication
+Service in use for a
 group.
 
 Credentials MUST follow the specifications of section 5.3 of [RFC9420]
@@ -414,22 +415,23 @@ Users MUST generate key pairs by themselves.
 
 ### Message framing
 
-Handshake and application messages use a common framing structure 
-providing encryption to 
-ensure confidentiality within the group, and signing to authenticate 
+Handshake and application messages use a common framing structure
+providing encryption to
+ensure confidentiality within the group, and signing to authenticate
 the sender.
 
 The structure is:
 
-- `PublicMessage`: represents a message that is only signed, and not 
+- `PublicMessage`: represents a message that is only signed, and not
 encrypted.
-The definition and the encoding/decoding of a `PublicMessage` MUST 
-follow the specification 
+The definition and the encoding/decoding of a `PublicMessage` MUST
+follow the specification
 in section 6.2 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 - `PrivateMessage`: represents a signed and encrypted message, with
 protections for both the content of the message and related metadata.
 
-The definition, and the encoding/decoding of a `PrivateMessage` MUST follow the  specification in section 6.3 of
+The definition, and the encoding/decoding of a `PrivateMessage` MUST 
+follow the  specification in section 6.3 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Applications MUST use `PrivateMessage` to encrypt application messages.
@@ -450,8 +452,8 @@ The nodes of a ratchet tree contain several types of data:
 - Parent nodes describe subgroups.
 
 Contents of each kind of node, and its structure MUST follow the
-indications described in 
-sections 7.1 and 7.2 of 
+indications described in
+sections 7.1 and 7.2 of
 [RFC9420](https://datatracker.ietf.org/docrfc9420/).
 
 ### Leaf node validation
