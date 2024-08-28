@@ -53,11 +53,11 @@ The protocol assumes the following requirements:
 #### Cryptographic suite
 
 The following cryptographic functions MUST be used:
--  `X488` as Diffie-Hellman function `DH`.
--  `SHA256` as KDF.
--  `AES256-GCM` as AEAD algorithm.
--  `SHA512` as hash function.
--  `XEd448` for digital signatures.
+-   `X488` as Diffie-Hellman function `DH`.
+-   `SHA256` as KDF.
+-   `AES256-GCM` as AEAD algorithm.
+-   `SHA512` as hash function.
+-   `XEd448` for digital signatures.
 
 #### X3DH initialization
 
@@ -65,15 +65,15 @@ This scheme MUST work on the curve curve448.
 The X3DH algorithm corresponds to the IX pattern in Noise.
 
 Bob and Alice MUST define personal key pairs `(ik_B, IK_B)` and `(ik_A, IK_A)` respectively where:
--  The key `ik` must be kept secret,
--  and the key `IK` is public.
+-   The key `ik` must be kept secret,
+-   and the key `IK` is public.
 
 Bob MUST generate new keys using `(ik_B, IK_B) = GENERATE_KEYPAIR(curve = curve448)`.
 
 Bob MUST also generate a public key pair `(spk_B, SPK_B) = GENERATE_KEYPAIR(curve = curve448)`.
 
 `SPK` is a public key generated and stored at medium-term. 
-Both signed prekey and the certificate MUST undergo periodic replacement. 
+Both signed prekey and the certificate MUST undergo periodic replacement.
 After replacing the key, 
 Bob keeps the old private key of `SPK` for some interval, dependant on the implementation.
 This allows Bob to decrypt delayed messages. 
