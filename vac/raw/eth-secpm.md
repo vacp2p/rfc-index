@@ -290,7 +290,7 @@ If such an element does not exist, `KeyPackage` MUST be stored according to one 
 
 ## Private group messaging protocol
 
-### Theory
+### Theoretical content
 
 The [Messaging Layer Security](https://datatracker.ietf.org/doc/rfc9420/)(MLS) protocol aims at providing a group of users with end-to-end encryption in an authenticated and asynchronous way.
 The main security characteristics of the protocol are: Message confidentiality and authentication, sender authentication,
@@ -299,7 +299,7 @@ The MLS protocol achieves: low-complexity, group integrity, synchronization and 
 
 The extension to group chat described in forthcoming sections is built upon the [MLS](https://datatracker.ietf.org/doc/rfc9420/) protocol.
 
-### Syntax
+### Structure
 
 Each MLS session uses a single cipher suite that specifies the primitives to be used in group key computations. The cipher suite MUST use:
 
@@ -318,12 +318,12 @@ These identifiers MUST be computed according to Section 5.2 of [RFC9420](https:/
 
 ### Credentials
 
-Each member of a group presents a credential that provides one or more identities for the member and associates them with the member's signing key. 
+Each member of a group presents a credential that provides one or more identities for the member and associates them with the member's signing key.
 The identities and signing key are verified by the Authentication Service in use for a group.
 
 Credentials MUST follow the specifications of section 5.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-Below follows the flow diagram for the generation of credentials. 
+Below follows the flow diagram for the generation of credentials.
 Users MUST generate key pairs by themselves.
 ![figure1](./images/eth-secpm_credential.png)
 
@@ -436,7 +436,7 @@ context = Context;
 
 ```
 
-Each member of the group MUST maintaint a `GroupContext` object summarizing the state of the group. 
+Each member of the group MUST maintaint a `GroupContext` object summarizing the state of the group.
 The sturcture of such object MUST be:
 
 ```text
@@ -543,11 +543,11 @@ A group is always created with a single member.
 Other members are then added to the group using the usual Add/Commit mechanism.
 The creator of a group MUST set:
 
-- the group ID. 
+- the group ID.
 - cipher suite.
-- initial extensions for the group. 
+- initial extensions for the group.
 
-If the creator intends to add other members at the time of creation, then it SHOULD fetch `KeyPackages` for those members, and select a cipher suite and extensions according to their capabilities. 
+If the creator intends to add other members at the time of creation, then it SHOULD fetch `KeyPackages` for those members, and select a cipher suite and extensions according to their capabilities.
 
 The creator MUST use the capabilities information in these `KeyPackages` to verify that the chosen version and cipher suite is the best option supported by all members.
 
@@ -693,13 +693,13 @@ Another important component is the *authentication service*, which is replaced w
 
 ## Ethereum-based authentication protocol
 
-### Theory
+### Introduction
 
 Sign-in with Ethereum describes how Ethereum accounts authenticate with off-chain services by signing a standard message format
 parameterized by scope, session details, and security mechanisms.
 Sign-in with Ethereum (SIWE), which is described in the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361), MUST be the authentication method required.
 
-### Syntax
+### Pattern
 
 #### Message format (ABNF)
 
@@ -780,6 +780,7 @@ Its value MUST be a [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) au
 If the port is not specified, the default port for the provided scheme is assumed.
 
 If scheme is not specified, HTTPS is assumed by default.
+
 - `address` REQUIRED. The Ethereum address performing the signing.
 Its value SHOULD be conformant to mixed-case checksum address encoding specified in ERC-55 where applicable.
 
@@ -973,26 +974,26 @@ The role of the smart contract includes:
 
 1. Register user information and key packages → As described in the previous section.
 2. Updates of key material.
-    - Users MUST send any update in their key material to the other users of the group via off-chain messages.
-    - Upon reception of the new key material, the creator of the contract MUST update the state of the smart contract.
+    1. Users MUST send any update in their key material to the other users of the group via off-chain messages.
+    2. Upon reception of the new key material, the creator of the contract MUST update the state of the smart contract.
 3. Deletion of users.
-    - Any user can submit a proposal for the removal of a user via off-chain message.
-    - This proposal MUST be sent to the creator of the contract.
-    - The creator of the contract MUST update the ACL, and send messages to the group for key update.
+    1. Any user can submit a proposal for the removal of a user via off-chain message.
+    2. This proposal MUST be sent to the creator of the contract.
+    3. The creator of the contract MUST update the ACL, and send messages to the group for key update.
 
 ![figure9](./images/eth-secpm_onchain-update.png)
 
 > It is important to note that both user removal and updates of any kind have a similar interaction flow.
 
 4. Queries of existing users.
-    - Any user can query the smart contract to know the state of the group, including existing users and removed ones.
-    - This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
+    1. Any user can query the smart contract to know the state of the group, including existing users and removed ones.
+    2. This aspect MUST be used when adding new members to verify that the prospective key package has not been already used.
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
 - [Augmented BNF for Syntax Specifications](https://datatracker.ietf.org/doc/html/rfc5234)
 - [Gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub)
