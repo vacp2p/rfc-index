@@ -823,7 +823,7 @@ Any list of commited proposals MUST be validated either by a the group
 member who created the commit, or any group member processing such
 commit.
 The validation MUST be done according to one of the procedures
-described in Section 12.2 of 
+described in Section 12.2 of
 [RFC9420](https://datatracker.ietf.orgdoc/rfc9420/).
 
 When creating or processing a Commit, a client applies a list of
@@ -939,8 +939,8 @@ expression.
 
 ```text
 sign-in-with-ethereum =
-    [ scheme "://" ] domain %s" wants you to sign in with your Ethereum account:" LF
-    address LF
+    [ scheme "://" ] domain %s" wants you to sign in with your 
+    Ethereum account:" LF address LF
     LF
     [ statement LF ]
     LF
@@ -1007,13 +1007,16 @@ be parsed from a SIWE Message by following the rules in ABNF Message
 Format:
 
 - `scheme` OPTIONAL. The URI scheme of the origin of the request.
-Its value MUST be a [RFC 3986](https://datatracker.ietf.org/doc/html
-rfc3986) URI scheme.
+Its value MUST be a
+[RFC 3986](https://datatracker.ietf.org/doc/htmlrfc3986)
+URI scheme.
 
-- `domain` REQUIRED. The domain that is requesting the signing.
-Its value MUST be a [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) authority. The authority includes an OPTIONAL port.
-If the port is not specified, the default port for the provided scheme
-is assumed.
+- `domain` REQUIRED.
+The domain that is requesting the signing.
+Its value MUST be a [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986)
+authority. The authority includes an OPTIONAL port.
+If the port is not specified, the default
+port for the provided scheme is assumed.
 
 If scheme is not specified, HTTPS is assumed by default.
 
@@ -1023,8 +1026,9 @@ specified in ERC-55 where applicable.
 
 - `statement` OPTIONAL. A human-readable ASCII assertion that the user
 will sign which MUST NOT include '\n' (the byte 0x0a).
-- `uri` REQUIRED. An [RFC 3986](https://datatracker.ietf.org/doc/html
-rfc3986) URI referring to the resource that is the subject of the
+- `uri` REQUIRED. An
+[RFC 3986](https://datatracker.ietf.org/doc/htmlrfc3986)
+URI referring to the resource that is the subject of the
 signing.
 
 - `version` REQUIRED. The current version of the SIWE Message, which
@@ -1064,7 +1068,8 @@ the byte 0x0a.
 #### Signing and Verifying Messages with Ethereum Accounts
 
 - For Externally Owned Accounts, the verification method specified in
-[ERC-191](https://eips.ethereum.org/EIPS/eip-191) MUST be used.
+[ERC-191](https://eips.ethereum.org/EIPS/eip-191)
+MUST be used.
 
 - For Contract Accounts,
 
@@ -1279,10 +1284,12 @@ addition of Bob to other users of the group.
 #### Alice does not know Bob’s Ethereum address
 
 1. Off-chain - Alice and Bob set a secure communication channel.
-2. Alice creates the smart contract associated to the group. This smart
-contract MUST include an ACL.
+2. Alice creates the smart contract associated to the group.
+This smart contract MUST include an ACL.
 3. Off-chain - Alice sends a request to join the group to Bob. The
-request MUST include the contract’s address: `RequestMLSPayload {"You are joining the group with smart contract: 0xabcd"}`
+request MUST include the contract’s address:
+`RequestMLSPayload{"You are joining the group
+with smart contract: 0xabcd"}`
 4. Off-chain - Bob responds the request with a digitally signed
 response. This response includes Bob’s credentials, his Ethereum
 address and key package: `ResponseMLSPayload {sig:
@@ -1301,8 +1308,8 @@ addition of Bob to other users of the group.
 
 The role of the smart contract includes:
 
-1. Register user information and key packages → As described in the
-previous section.
+1. Register user information and key packages:
+As described in the previous section.
 2. Updates of key material.
     1. Users MUST send any update in their key material to the other
 users of the group via off-chain messages.
@@ -1317,7 +1324,9 @@ messages to the group for key update.
 
 ![figure9](./images/eth-secpm_onchain-update.png)
 
-> It is important to note that both user removal and updates of any kind have a similar interaction flow.
+> It is important to note that both
+user removal and updates of any kind
+have a similar interaction flow.
 
 4. Queries of existing users.
     1. Any user can query the smart contract to know the state of the
