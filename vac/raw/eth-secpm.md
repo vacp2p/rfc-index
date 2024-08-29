@@ -823,8 +823,8 @@ Any list of commited proposals MUST be validated either by a the group
 member who created the commit, or any group member processing such
 commit.
 The validation MUST be done according to one of the procedures
-described in Section 12.2 of [RFC9420](https://datatracker.ietf.org
-doc/rfc9420/).
+described in Section 12.2 of 
+[RFC9420](https://datatracker.ietf.orgdoc/rfc9420/).
 
 When creating or processing a Commit, a client applies a list of
 proposals to the ratchet tree and `GroupContext`.
