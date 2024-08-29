@@ -1073,10 +1073,13 @@ MUST be used.
 
 - For Contract Accounts,
 
-  - The verification method specified in [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271) SHOULD be used.
-Otherwise, the implementer MUST clearly define the verification method
-to attain security and interoperability for both wallets and relying
-parties.
+  - The verification method specified in
+[ERC-1271](https://eips.ethereum.org/EIPS/eip-1271)
+SHOULD be used.
+Otherwise, the implementer MUST clearly define the
+verification method
+to attain security and interoperability for both
+wallets and relying parties.
 
   - When performing [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271)
 signature verification, the contract performing the verification MUST
@@ -1308,18 +1311,18 @@ addition of Bob to other users of the group.
 
 The role of the smart contract includes:
 
-1. Register user information and key packages:
+- Register user information and key packages:
 As described in the previous section.
-2. Updates of key material.
-    1. Users MUST send any update in their key material to the other
+- Updates of key material.
+    - Users MUST send any update in their key material to the other
 users of the group via off-chain messages.
-    2. Upon reception of the new key material, the creator of the
+    - Upon reception of the new key material, the creator of the
 contract MUST update the state of the smart contract.
-3. Deletion of users.
-    1. Any user can submit a proposal for the removal of a user via
+- Deletion of users.
+    - Any user can submit a proposal for the removal of a user via
 off-chain message.
-    2. This proposal MUST be sent to the creator of the contract.
-    3. The creator of the contract MUST update the ACL, and send
+    - This proposal MUST be sent to the creator of the contract.
+    - The creator of the contract MUST update the ACL, and send
 messages to the group for key update.
 
 ![figure9](./images/eth-secpm_onchain-update.png)
@@ -1328,10 +1331,10 @@ messages to the group for key update.
 user removal and updates of any kind
 have a similar interaction flow.
 
-4. Queries of existing users.
-    1. Any user can query the smart contract to know the state of the
+- Queries of existing users.
+    - Any user can query the smart contract to know the state of the
 group, including existing users and removed ones.
-    2. This aspect MUST be used when adding new members to verify that
+    - This aspect MUST be used when adding new members to verify that
 the prospective key package has not been already used.
 
 ## Copyright
