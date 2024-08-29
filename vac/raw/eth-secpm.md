@@ -68,6 +68,11 @@ and publishes his public key.
 - An eavesdropper cannot read M’s content
 even if she is storing it or relaying it.
 
+> The inclusion of this first section devoted to secure 1-to-1
+communications between users is motivated by the fact certain
+interactions between existing group members and prospective new
+members require secure communication channels.
+
 ### Syntax
 
 #### Cryptographic suite
