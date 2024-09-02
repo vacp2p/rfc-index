@@ -10,30 +10,15 @@ contributors:
 
 ## Motivation
 
-The need for secure communications has become paramount.  
-Traditional centralized messaging protocols are susceptible to various security threats,
-including unauthorized access, data breaches, and single points of failure.
-Therefore a decentralized approach to secure communication becomes increasingly relevant,
-offering a robust solution to address these challenges.
+The need for secure communications has become paramount. 
+This specification outlines a protocol describing a
+secure 1-to-1 comunication channel between 2 users. The
+main components are the X3DH key establishment mechanism,
+combined with the double ratchet. The aim of this
+combination of schemes is providing a protocol with both
+forward secrecy and post-compromise security.
 
-This specification outlines a private messaging service using the
-Ethereum blockchain as authentication service.
-Rooted in the existing [model](../../waku/standards/application/20/toy-eth-pm.md),
-this proposal addresses the deficiencies related
-to forward privacy and authentication inherent
-in the current framework.
-The specification is divided into 3 sections:
-
-- Private 1-to-1 communications protocol, based on [Signal's double
-ratchet](https://signal.org/docs/specifications/doubleratchet/).
-- Private group messaging protocol, based on the
-[MLS protocol](https://datatracker.ietf.org/doc/rfc9420/).
-- Description of an Ethereum-based authentication protocol, based on
-[SIWE](https://eips.ethereum.org/EIPS/eip-4361).
-
-## Private 1-to-1 communications protocol
-
-### Theory
+## Theory
 
 The specification is based on the noise protocol framework.
 It corresponds to the double ratchet scheme combined with
@@ -68,14 +53,9 @@ and publishes his public key.
 - An eavesdropper cannot read M’s content
 even if she is storing it or relaying it.
 
-> The inclusion of this first section devoted to secure 1-to-1
-communications between users is motivated by the fact certain
-interactions between existing group members and prospective new
-members require secure communication channels.
+## Syntax
 
-### Syntax
-
-#### Cryptographic suite
+### Cryptographic suite
 
 The following cryptographic functions MUST be used:
 
@@ -85,7 +65,7 @@ The following cryptographic functions MUST be used:
 - `SHA512` as hash function.
 - `XEd448` for digital signatures.
 
-#### X3DH initialization
+### X3DH initialization
 
 This scheme MUST work on the curve curve448.
 The X3DH algorithm corresponds to the IX pattern in Noise.
@@ -161,7 +141,7 @@ convert_mont(u):
     return P
 ```
 
-#### Use of X3DH
+### Use of X3DH
 
 This specification combines the double ratchet
 with X3DH using the following data as initialization for the former:
@@ -207,7 +187,7 @@ Upon reception of the initial message, Bob MUST:
 3. Decrypt the initial message encrypted with `AES256-GCM`.
 4. If decryption fails, abort the protocol.
 
-#### Initialization of the double datchet
+### Initialization of the double datchet
 
 In this stage Bob and Alice have generated key pairs
 and agreed a shared secret `SK` using X3DH.
@@ -241,7 +221,7 @@ RatchetInitBob(SK, (ik_B,IK_B)):
     state.MKSKIPPED = {}
 ```
 
-#### Encryption
+### Encryption
 
 This function performs the symmetric key ratchet.
 
@@ -260,7 +240,7 @@ and the message number `n`.
 The returned header object contains ratchet public key
 `dh` and integers `pn` and `n`.
 
-#### Decryption
+### Decryption
 
 The function `RatchetDecrypt()` decrypts incoming messages:
 
@@ -310,9 +290,9 @@ TrySkippedMessageKey(state, header, ciphertext, AD):
     else: return None
 ```
 
-## Information retrieval
+# Information retrieval
 
-### Static data
+## Static data
 
 Some data, such as the key pairs `(ik, IK)` for Alice and Bob,
 MAY NOT be regenerated after a period of time.
@@ -334,7 +314,7 @@ input parameter for `getPublicKey`.
 The function outputs the associated public key
 from the smart contract.
 
-### Ephemeral data
+## Ephemeral data
 
 Storing ephemeral data on Ethereum MAY be done using
 a combination of on-chain and off-chain solutions.
@@ -355,30 +335,11 @@ The fact of a user not updating the ephemeral information
 can be understood as Bob not willing to participate in any
 communication.
 
-This applies to `KeyPackage`,
-which in the MLS specification are meant
-o be stored in a directory provided by the delivery service.
-If such an element does not exist,
-`KeyPackage` MUST be stored according
-to one of the two options outlined above.
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
 
-- [Augmented BNF for Syntax Specifications](https://datatracker.ietf.org/doc/html/rfc5234)
-- [Gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub)
-- [HMAC-based Extract-and-Expand Key Derivation Function](https://www.ietf.org/rfc/rfc5869.txt)
-- [Hybrid Public Key Encryption](https://datatracker.ietf.org/doc/rfc9180/)
-- [Security Analysis and Improvements for the IETF MLS Standard for Group Messaging](https://eprint.iacr.org/2019/1189.pdf)
-- [Signed Data Standard](https://eips.ethereum.org/EIPS/eip-191)
-- [Sign-In with Ethereum](https://eips.ethereum.org/EIPS/eip-4361)
-- [Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271)
 - [The Double Ratchet Algorithm](https://signal.org/docs/specifications/doubleratchet/)
-- [The Messaging Layer Security Protocol](https://datatracker.ietf.org/doc/rfc9420/)
 - [The X3DH Key Agreement Protocol](https://signal.org/docs/specifications/x3dh/)
-- [Toy Ethereum Private Messaging Protocol](https://rfc.vac.dev/spec/20/)
-- [Uniform Resource Identifier](https://datatracker.ietf.org/doc/html/rfc3986)
-- [WalletConnect URI Format](https://eips.ethereum.org/EIPS/eip-1328)
