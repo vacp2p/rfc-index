@@ -223,7 +223,6 @@ struct {
     opaque label<V>;
     opaque context<V>;
 } KDFLabel;
-
 ```
 
 The fields of `KDFLabel` MUST be:
