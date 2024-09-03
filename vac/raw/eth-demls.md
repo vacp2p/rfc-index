@@ -317,15 +317,14 @@ The structure of the object MUST be:
 
 ```text
 struct {
-ProtocolVersion version;
-CipherSuite cipher_suite;
-HPKEPublicKey init_key;
-LeafNode leaf_node;
-Extension extensions<V>;
-/* SignWithLabel(., "KeyPackageTBS", KeyPackageTBS) */
-opaque signature<V>;
+      ProtocolVersion version;
+      CipherSuite cipher_suite;
+      HPKEPublicKey init_key;
+      LeafNode leaf_node;
+      Extension extensions<V>;
+      /* SignWithLabel(., "KeyPackageTBS", KeyPackageTBS) */
+      opaque signature<V>;
 }
-
 ```
 
 ```text
