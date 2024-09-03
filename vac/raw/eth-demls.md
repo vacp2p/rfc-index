@@ -241,15 +241,14 @@ The sturcture of such object MUST be:
 
 ```text
 struct {
-ProtocolVersion version = mls10;
-CipherSuite cipher_suite;
-opaque group_id<V>;
-uint64 epoch;
-opaque tree_hash<V>;
-opaque confirmed_trasncript_hash<V>;
-Extension extension<V>;
+      ProtocolVersion version = mls10;
+      CipherSuite cipher_suite;
+      opaque group_id<V>;
+      uint64 epoch;
+      opaque tree_hash<V>;
+      opaque confirmed_trasncript_hash<V>;
+      Extension extension<V>;
 } GroupContext;
-
 ```
 
 The use of key scheduling MUST follow the indications in sections 8.1 -
