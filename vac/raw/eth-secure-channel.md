@@ -10,7 +10,7 @@ contributors:
 
 ## Motivation
 
-The need for secure communications has become paramount. 
+The need for secure communications has become paramount.
 This specification outlines a protocol describing a
 secure 1-to-1 comunication channel between 2 users. The
 main components are the X3DH key establishment mechanism,
@@ -290,9 +290,9 @@ TrySkippedMessageKey(state, header, ciphertext, AD):
     else: return None
 ```
 
-# Information retrieval
+## Information retrieval
 
-## Static data
+### Static data
 
 Some data, such as the key pairs `(ik, IK)` for Alice and Bob,
 MAY NOT be regenerated after a period of time.
@@ -314,7 +314,7 @@ input parameter for `getPublicKey`.
 The function outputs the associated public key
 from the smart contract.
 
-## Ephemeral data
+### Ephemeral data
 
 Storing ephemeral data on Ethereum MAY be done using
 a combination of on-chain and off-chain solutions.
