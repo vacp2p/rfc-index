@@ -103,7 +103,7 @@ own.
 Additionally, the recipient sends an unencrypted acknowledgment to the group
 confirming the update. Every member who receives the acknowledgment updates not
 only the ratchet for the original sender but also the ratchet for the sender of
-the acknowledgment. 
+the acknowledgment.
 Consequently, after sharing the seed secret through `n - 1` two-party messages
 and confirming it with `n - 1` broadcast acknowledgments, every group member
 has derived an update secret and updated their ratchet accordingly.
@@ -184,7 +184,7 @@ state `sigma’` and a plaintext `m`.
 
 The variable `sigma` denotes the state consisting in the variables below:
 
-```
+```text
 sigma.mySks[0] = sk
 sigma.nextIndex = 1 
 sigma.receivedSk = empty_string
@@ -200,11 +200,12 @@ On input a key pair `(sk, pk)`, this functions otuputs a state `sigma`.
 
 #### 2SM-Send
 
-This function encrypts the message `m` using `sigma.otherPk`, which represents the other party’s current public key.
+This function encrypts the message `m` using `sigma.otherPk`, which represents
+the other party’s current public key.
 This key is determined based on the last public key generated for the other
-party or the last public key received from the other party, 
+party or the last public key received from the other party,
 whichever is more recent. `sigma.otherPkSender` is set to `me` in the former
-case and `other` in the latter case. 
+case and `other` in the latter case.
 
 Metadata including `otherPkSender` and `otherPkIndex` are included in the
 message to indicate which of the recipient’s public keys is being utilized.
@@ -215,7 +216,7 @@ Similarly, it generates a new key pair for the other party,
 sending the secret key (encrypted) and storing the public key in
 `sigma.otherPk`.
 
-```
+```text
 sigma.mySks[sigma.nextIndex], myNewPk) = PKE-Gen()
 (otherNewSk, otherNewPk) = PKE-Gen()
 plaintext = (m, otherNewSk, sigma`.nextIndex, myNewPk)
@@ -236,7 +237,7 @@ This deletion is indicated by `sigma.mySks[≤ keyIndex] = empty_string`.
 Subsequently, the new public and secret keys contained in the message are
 stored.
 
-```
+```text
 (ciphertext, keySender, keyIndex) = c
 if keySender = "other" then 
 sk = sigma.mySks[keyIndex] 
@@ -250,13 +251,13 @@ return (sigma, m)
 
 ### PKE Syntax
 
-The required PKE that MUST be used is ElGamal with a 2048-bit modulus `p`. 
+The required PKE that MUST be used is ElGamal with a 2048-bit modulus `p`.
 
 #### Parameters
 
 The following parameters must be used:
 
-```
+```text
 p = 308920927247127345254346920820166145569
 g = 2
 
@@ -266,7 +267,7 @@ g = 2
 
 Each user `u` MUST do the following:
 
-```
+```text
 PKE-KGen():
 a = randint(2, p-2)
 pk = (p, g, g^a)
@@ -279,7 +280,7 @@ return (pk, sk)
 
 A user `v` encrypting a message `m` for `u` MUST follow these steps:
 
-```
+```text
 PKE-Enc(pk):
 k = randint(2, p-2)
 eta = g^k % p
@@ -290,9 +291,10 @@ return ((eta, delta))
 
 #### PKE-Dec
 
-The user `u` recovers a message `m` from a ciphertext `c` by performing the following operations:
+The user `u` recovers a message `m` from a ciphertext `c` by performing the
+following operations:
 
-```
+```text
 PKE-Dec(sk):
 mu = eta^(p-1-sk) % p
 return ((mu * delta) % p)
@@ -311,7 +313,7 @@ protocol, namely:
 This function takes an `ID` as input and returns its associated initial state,
 denoted by `gamma`:
 
-```
+```text
 gamma.myId = ID
 gamma.mySeq = 0
 gamma.history = empty
@@ -333,9 +335,9 @@ then the `2SM` protocol state is initialized and stored in
 One then uses `2SM_Send` to encrypt the message and store the updated protocol
 in `gamma`.
 
-```
+```text
 if gamma.2sm[recipient_ID] = empty_string then
-	gamma.2sm[recipient_ID] = 2SM_Init(gamma.myID, recipient_ID)
+    gamma.2sm[recipient_ID] = 2SM_Init(gamma.myID, recipient_ID)
 (gamma.2sm[recipient_ID], ciphertext) = 2SM_Send(gamma.2sm[recipient_ID], plaintext)
 return (gamma, ciphertext)
 
@@ -346,7 +348,7 @@ return (gamma, ciphertext)
 After receiving the sender’s `ID` and a ciphertext, it behaves as the reverse
 function of `encrypt-to` and has a similar initialization:
 
-```
+```text
 if gamma.2sm[sender_ID] = empty_string then
 gamma.2sm[sender_ID] = 2SM_Init(gamma.myID, sender_ID)
 (gamma.2sm[sender_ID], plaintext) = 2SM_Receive(gamma.2sm[sender_ID], ciphertext)
@@ -363,7 +365,7 @@ It is required to use a HMAC-based key derivation function HKDF to combine the
 ratchet state with an input, returning an update secret and a new ratchet
 state.
 
-```
+```text
 (updateSecret, gamma.ratchet[ID]) = HKDF(gamma.ratchet[ID], input)
 return (gamma, updateSecret)
 
@@ -371,11 +373,13 @@ return (gamma, updateSecret)
 
 #### member-view
 
-This function calculates the set of group members based on the most recent control message sent by the specified user `ID`. 
-It filters the group membership operations to include only those observed by the specified `ID`, and 
-then invokes the DGM function to generate the group membership.
+This function calculates the set of group members based on the most recent
+control message sent by the specified user `ID`.
+It filters the group membership operations to include only those observed by
+the specified `ID`, and then invokes the DGM function to generate the group
+membership.
 
-```
+```text
 ops = {m in gamma.history st. m was sent or acknowledged by ID}
 return DGM(ops)
 
@@ -383,12 +387,11 @@ return DGM(ops)
 
 #### generate-seed
 
-This functions generates a random bit string and 
-sends it encrypted to each member of the group using the `2SM` mechanism. 
-It returns the updated protocol state and 
-the set of direct messages (denoted as `dmsgs`) to send.
+This functions generates a random bit string and sends it encrypted to each
+member of the group using the `2SM` mechanism. It returns the updated protocol
+state and the set of direct messages (denoted as `dmsgs`) to send.
 
-```
+```text
 gamma.nextSeed = random.randbytes()
 dmsgs = empty
 for each ID in recipients:
@@ -411,12 +414,12 @@ control message.
 #### create
 
 This function generates a *create* control message and calls `generate-seed` to
-define the set of direct messages that need to be sent. 
-Then it calls `process-create` to process the control message for this user. 
+define the set of direct messages that need to be sent.
+Then it calls `process-create` to process the control message for this user.
 The function `process-create` returns a tuple including an updated state gamma
 and an update secret `I`.
 
-```
+```text
 control = (“create”, gamma.mySeq, IDs)
 (gamma, dmsgs) = generate-seed(gamma, IDs)
 (gamma, _, _, I, _) = process-create(gamma, gamma.myId, gamma.mySeq, IDs, empty_string)
@@ -439,7 +442,7 @@ direct message that includes the seed secret.
 3. Otherwise, it returns an `ack` message without deriving an update secret.
 
 Afterwards, `process-seed` generates separate member secrets for each group
-member from the seed secret by combining the seed secret and 
+member from the seed secret by combining the seed secret and
 each user ID using HKDF.
 The secret for the sender of the message is stored in `senderSecret`, while
 those for the other group members are stored in `gamma.memberSecret`.
@@ -454,7 +457,7 @@ number of the message being acknowledged.
 The final step computes an update secret `I_me` for the local user invoking the
 `process-ack` function.
 
-```
+```text
 recipients = member-view(gamma, sender) - {sender}
 if sender =  gamma.myId then seed = gamma.nextSeed; gamma.nextSeed = empty_string
 else if  gamma.myId in recipients then (gamma, seed) = decrypt-from(gamma, sender, dmsg)
@@ -487,7 +490,7 @@ First, it records the information from the create message in the
 `gamma.history+ {op}`, which is used to track group membership changes. Then,
 it proceeds to call `process-seed`.
 
-```
+```text
 op = (”create”, sender, seq, IDs)
 gamma.history = gamma.history + {op}
 return (process-seed(gamma, sender, seq, dmsg))
@@ -510,7 +513,7 @@ contained in the acknowledged message.
 Finally, it updates the ratchet for the sender of the `ack` and returns the
 resulting update secret.
 
-```
+```text
 if (ackID, ackSeq) was a create / add / remove then
 op = ("ack", sender, seq, ackID, ackSeq)
 gamma.history = gamma.history + {op}`
@@ -543,7 +546,7 @@ whereas `process-remove` includes a removal operation in the history.
 
 #### update
 
-```
+```text
 control = ("update", ++gamma.mySeq, empty_string)
 recipients = member-view(gamma, gamma.myId) - {gamma.myId}
 (gamma, dmsgs) = generate-seed(gamma, recipients)
@@ -555,7 +558,7 @@ return (gamma, control, dmsgs, I)
 
 #### remove
 
-```
+```text
 control = ("remove", ++gamma.mySeq, empty)
 recipients = member-view(gamma, gamma.myId) - {ID, gamma.myId}
 (gamma, dmsgs) = generate-seed(gamma, recipients)
@@ -571,7 +574,7 @@ return (gamma, control, dmsgs, I)
 
 #### process-remove
 
-```
+```text
 op = ("remove", sender, seq, removed)
 gamma.history = gamma.history + {op}
 return process-seed(gamma, sender, seq, dmsg)
@@ -591,7 +594,7 @@ This `welcome` message includes the current state of the sender's KDF ratchet,
 encrypted using `2SM`, along with the history of group membership operations
 conducted so far.
 
-```
+```text
 control = ("add", ++gamma.mySeq, ID)
 (gamma, c) = encrypt-to(gamma, ID, gamma.ratchet[gamma.myId])
 op = ("add", gamma.myId, gamma.mySeq, ID)
@@ -630,7 +633,7 @@ generate a direct message intended for the added user, allowing them to decrypt 
 Finally, in lines 13 to 15, `process-add-ack` is called to calculate the local
 user’s update secret (`I_me`), which is then returned along with `I_sender`.
 
-```
+```text
 if added = gamma.myId then return process-welcome(gamma, sender, seq, dmsg)
 op = ("add", sender, seq, added)
 gamma.history = gamma.history + {op}
@@ -666,7 +669,7 @@ In the scenario involving the new member,  the ratchet state was recently
 initialized on line 5. This ratchet update facilitates all group members,
 including the new addition, to derive each member’s update by obtaining any update secret from before their inclusion.
 
-```
+```text
 op = ("ack", sender, seq, ackID, ackSeq)
 gamma$.history = gamma.history + {op}
 if dmsg != empty_string then
@@ -710,7 +713,7 @@ By the conclusion of `process-welcome`, the new group member has acquired
 update secrets for themselves and the user who added them. 
 The ratchets for other group members are initialized by `process-add-ack`.
 
-```
+```text
 gamma.history = adderHistory
 (gamma, gamma.ratchet[sender]) = decrypt-from(gamma, sender, c)
 (gamma, s) = update-ratchet(gamma, sender, "welcome")
