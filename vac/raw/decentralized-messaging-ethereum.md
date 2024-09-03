@@ -459,25 +459,29 @@ The final step computes an update secret `I_me` for the local user invoking the
 
 ```text
 recipients = member-view(gamma, sender) - {sender}
-if sender =  gamma.myId then seed = gamma.nextSeed; gamma.nextSeed = empty_string
-else if  gamma.myId in recipients then (gamma, seed) = decrypt-from(gamma, sender, dmsg)
+if sender =  gamma.myId then seed = gamma.nextSeed; gamma.nextSeed =
+empty_string
+else if  gamma.myId in recipients then (gamma, seed) = decrypt-from(gamma,
+sender, dmsg)
 else
-return (gamma, (ack, ++gamma.mySeq, (sender, seq)), empty_string , empty_string , empty_string)
+return (gamma, (ack, ++gamma.mySeq, (sender, seq)), empty_string ,
+empty_string , empty_string)
 
 for ID in recipients do gamma.memberSecret[sender, seq, ID] = HKDF(seed, ID)
-
 senderSecret = HKDF(seed, sender)
 (gamma, I_sender) = update-ratchet(gamma, sender, senderSecret)
-if sender = gamma.myId then return (gamma, empty_string , empty_string , I_sender, empty_string)
+if sender = gamma.myId then return (gamma, empty_string , empty_string ,
+I_sender, empty_string)
 control = (ack, ++gamma.mySeq, (sender, seq))
 members = member-view(gamma, gamma.myId)
 forward = empty
 for ID in {members - (recipients + {sender})}
-	s = gamma.memberSecret[sender, seq, gamma.myId]
-	(gamma, msg) = encrypt-to(gamma, ID, s)
-	forward = forward + {(ID, msg)}
+    s = gamma.memberSecret[sender, seq, gamma.myId]
+    (gamma, msg) = encrypt-to(gamma, ID, s)
+    forward = forward + {(ID, msg)}
 
-(gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, (sender, seq), empty_string)
+(gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, (sender,
+seq), empty_string)
 return (gamma, control, forward, I_sender, I_me)
 
 ```
@@ -504,7 +508,7 @@ message.
 In `process-ack`, `ackID` and `ackSeq` are the sender and sequence number of
 the acknowledged message.
 Firstly, if the acknowledged message is a group membership operation, it
-records the acknowledgement in `gamma.history`. 
+records the acknowledgement in `gamma.history`.
 
 Following this, the function retrieves the relevant member secret from
 `gamma.memberSecret`, which was previously obtained from the seed secret
@@ -519,7 +523,8 @@ op = ("ack", sender, seq, ackID, ackSeq)
 gamma.history = gamma.history + {op}`
 s = gamma.memberSecret[ackID, ackSeq, sender]
 gamma.memberSecret[ackID, ackSeq, sender] = empty_string
-if (s = empty_string) & (dmsg = empty_string) then return (gamma, empty_string, empty_string, empty_string, empty_string)
+if (s = empty_string) & (dmsg = empty_string) then return (gamma, empty_string,
+empty_string, empty_string, empty_string)
 if (s = empty_string) then (gamma, s) = decrypt-from(gamma, sender, dmsg)
 (gamma, I) = update-ratchet(gamma, sender, s)
 return (gamma, empty_string, empty_string, I, empty_string)
@@ -534,7 +539,8 @@ The HKDF function MUST follow RFC 5869 using the hash function SHA256.
 The functions `update` and `remove` share similarities with `create`:
 they both call the function `generate-seed` to encrypt a new seed secret for
 each group member.
-The distinction lies in the determination of the group members using `member view`.
+The distinction lies in the determination of the group members using `member
+view`.
 In the case of `remove`, the user being removed is excluded from the recipients
 of the seed secret.
 Additionally, the control message they construct is designated with type
@@ -638,14 +644,16 @@ if added = gamma.myId then return process-welcome(gamma, sender, seq, dmsg)
 op = ("add", sender, seq, added)
 gamma.history = gamma.history + {op}
 if gamma.myId in member-view(gamma, sender) then
-	(gamma, s) = update-ratchet(gamma, sender, "welcome")
-	gamma.memberSecret[sender, seq, added] = s
-	(gamma, I_sender) = update-ratchet(gamma, sender, "add")
+    (gamma, s) = update-ratchet(gamma, sender, "welcome")
+    gamma.memberSecret[sender, seq, added] = s
+    (gamma, I_sender) = update-ratchet(gamma, sender, "add")
 else I_sender = empty_string
-if sender = gamma.myId then return (gamma, empty_string, empty_string, I_sender, empty_string)
+if sender = gamma.myId then return (gamma, empty_string, empty_string,
+I_sender, empty_string)
 control = ("add-ack", ++gamma.mySeq, (sender, seq))
 (gamma, c) = encrypt-to(gamma, added, ratchet[gamma.myId])
-(gamma, _, _, I_me, _) = process-add-ack(gamma, gamma.myId, gamma.mySeq, (sender, seq), empty_string)
+(gamma, _, _, I_me, _) = process-add-ack(gamma, gamma.myId, gamma.mySeq,
+(sender, seq), empty_string)
 return (gamma, control, {(added, c)}, I_sender, I_me)
 
 ```
@@ -667,17 +675,18 @@ secret `I` for the sender of the `add-ack` is computed on line 7 by invoking
 
 In the scenario involving the new member,  the ratchet state was recently
 initialized on line 5. This ratchet update facilitates all group members,
-including the new addition, to derive each member’s update by obtaining any update secret from before their inclusion.
+including the new addition, to derive each member’s update by obtaining any
+update secret from before their inclusion.
 
 ```text
 op = ("ack", sender, seq, ackID, ackSeq)
 gamma$.history = gamma.history + {op}
 if dmsg != empty_string then
-	(gamma, s) = decrypt-from(gamma, sender, dmsg)
-	gamma.ratchet[sender] = s
+    (gamma, s) = decrypt-from(gamma, sender, dmsg)
+    gamma.ratchet[sender] = s
 if gamma.myId in member-view(gamma, sender) then
-	(gamma, I) = update-ratchet(gamma, sender, "add")
-	return (gamma, empty_string, empty_string, I, empty_string)
+    (gamma, I) = update-ratchet(gamma, sender, "add")
+    return (gamma, empty_string, empty_string, I, empty_string)
 else return (gamma, empty_string, empty_string, empty_string, empty_string)
 
 ```
@@ -710,7 +719,7 @@ Upon receiving the new member’s `ack`, every other group member initializes
 their copy of the new member’s ratchet in a similar manner.
 
 By the conclusion of `process-welcome`, the new group member has acquired
-update secrets for themselves and the user who added them. 
+update secrets for themselves and the user who added them.
 The ratchets for other group members are initialized by `process-add-ack`.
 
 ```text
@@ -720,7 +729,8 @@ gamma.history = adderHistory
 gamma.memberSecret[sender, seq, gamma.myId] = s
 (gamma, I_sender) = update-ratchet(gamma, sender, "add")
 control = ("ack", ++gamma.mySeq, (sender, seq))
-(gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, (sender, seq), empty_string)
+(gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, (sender,
+seq), empty_string)
 return (gamma, control, empty_string , I_sender, I_me)
 
 ```
@@ -762,15 +772,15 @@ approved.
 #### Our approach
 
 The idea in the [DCGKA](https://eprint.iacr.org/2020/1281) setting closely
-resembles the procedure outlined in SIWE. Here: 
+resembles the procedure outlined in SIWE. Here:
 
 1. The server corresponds to user D1,who initiates a request (instead of
-generating a nonce) to obtain the public key of user D2. 
-2. Upon receiving the request, the wallet of D2 send the request to the user, 
+generating a nonce) to obtain the public key of user D2.
+2. Upon receiving the request, the wallet of D2 send the request to the user,
 3. User D2 receives the request from the wallet, and decides whether accepts or
 rejects.
 4. The wallet and responds with a message containing the requested public key
-in case of acceptance by D2. 
+in case of acceptance by D2.
 
 This message may be signed, allowing D1 to verify that the owner of the
 received public key is indeed D2.
@@ -806,12 +816,14 @@ information may come from metadata in received messages, and is replicated by
 the leader device.
 2. To replace a leader, the user should select any other device within its
 group and use it to send a signed message to all other users.
-3. To get the ability to sign messages, this new leader should request the keypair associated to the ID to the wallet.
-4. Once the leader has been changed, it revocates access from DCGKA to the former leader using the DCGKA protocol.
+3. To get the ability to sign messages, this new leader should request the
+keypair associated to the ID to the wallet.
+4. Once the leader has been changed, it revocates access from DCGKA to the
+former leader using the DCGKA protocol.
 5. The new leader starts a key update in DCGKA.
 
 Not all devices in a group should be able to send messages to other users. Only
-the leader device should be in charge of sending and receiving messages. 
+the leader device should be in charge of sending and receiving messages.
 To prevent other devices from sending messages outside their group, a
 requirement should be signing each message. The keys associated to the `ID`
 should only be in control of the leader device.
@@ -825,18 +837,18 @@ counter.
 ### Using UPKE
 
 Managing the group of devices of a user can be done either using a group key
-protocol such as treeKEM or using the keypair of each device. 
+protocol such as treeKEM or using the keypair of each device.
 Setting a common key for a group of devices under the control of the same actor
 might be excessive, furthermore it may imply some of the problems one can find
-in the usual setting of a group of different users; 
+in the usual setting of a group of different users;
 for example: one of the devices may not participate in the required updating
 processes, representing a threat for the group.
 
 The other approach to managing the group of devices is using each device’s
 keypair, but it would require each device updating these materia frequently,
-something that may not happens. 
+something that may not happens.
 
-[UPKE](https://eprint.iacr.org/2022/068) is a form of asymetric cryptography 
+[UPKE](https://eprint.iacr.org/2022/068) is a form of asymetric cryptography
 where any user can update any other user’s key pair by running an update
 algorithm with (high-entropy) private coins. Any sender can initiate a *key
 update* by sending a special update ciphertext.
@@ -845,7 +857,8 @@ the receiver, will update their secret key.
 
 To the best of my knowledge, there exists several efficient constructions both
 [UPKE from ElGamal](https://eprint.iacr.org/2019/1189) (based in the DH
-assumption) and [UPKE from Lattices]((https://eprint.iacr.org/2023/1400)) (based in lattices).
+assumption) and [UPKE from Lattices]((https://eprint.iacr.org/2023/1400))
+(based in lattices).
 None of them have been implemented in a secure messaging protocol, and this
 opens the door to some novel research.
 
