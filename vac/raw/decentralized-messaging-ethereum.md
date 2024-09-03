@@ -12,7 +12,7 @@ contributors:
 This document introduces a decentralized group messaging protocol using
 Ethereum adresses as identifiers.
 It is based in the proposal [DCGKA](https://eprint.iacr.org/2020/1281) by
-Weidner et al. 
+Weidner et al.
 It includes also approximations to overcome limitations related to using PKI
 and the multi-device setting.
 
@@ -20,29 +20,29 @@ and the multi-device setting.
 
 The need for secure communications has become paramount.
 Traditional centralized messaging protocols are susceptible to various security
-threats,
-including unauthorized access, data breaches, and single points of failure. 
+threats, including unauthorized access, data breaches, and single points of
+failure.
 Therefore a decentralized approach to secure communication becomes increasingly
-relevant,
-offering a robust solution to address these challenges.
+relevant, offering a robust solution to address these challenges.
 
 Secure messaging protocols used should have the following key features:
-1. **Asynchronous Messaging:** Users can send messages even if the recipients are not online at the moment.
+
+1. **Asynchronous Messaging:** Users can send messages even if the recipients
+are not online at the moment.
+
 2. **Resilience to Compromise:** If a user's security is compromised,
 the protocol ensures that previous messages remain secure through forward
-secrecy (FS).
-This means that messages sent before the compromise cannot be decrypted by
-adversaries.
-Additionally, the protocol maintains post-compromise security (PCS) by
-regularly updating keys,
-making it difficult for adversaries to decrypt future communication.
+secrecy (FS). This means that messages sent before the compromise cannot be
+decrypted by adversaries. Additionally, the protocol maintains post-compromise
+security (PCS) by regularly updating keys, making it difficult for adversaries
+to decrypt future communication.
+
 3. **Dynamic Group Management:** Users can easily add or remove group members
-at any time,
-reflecting the flexible nature of communication within the app.
+at any time, reflecting the flexible nature of communication within the app.
 
 In this field, there exists a *trilemma*, similar to what one observes in
-blockchain,
-involving three key aspects:
+blockchain, involving three key aspects:
+
 1. security,
 2. scalability, and
 3. decentralization.
@@ -83,21 +83,23 @@ with a different key.
 
 In the figure one can see the ratchet for encrypting a sequence of messages.
 The sender requires an initial update secret `I_1`, which is introduced in a
-PRG. 
+PRG.
 The PRG will produce two outputs, namely a symmetric key for AEAD encryption,
-and a seed for the next ratchet state. 
+and a seed for the next ratchet state.
 The associated data needed in the AEAD encryption includes the message index
 `i`. The ciphertext `c_i` associated to message `m_i` is then broadcasted to
-all group members. The next step requires deleting `I_1`, `k_i` and any old ratchet state.
+all group members. The next step requires deleting `I_1`, `k_i` and any old
+ratchet state.
 
 After a period of time the sender may replace the ratchet state with new update
-secrets `I_2`, `I_3`, and so on. 
+secrets `I_2`, `I_3`, and so on.
 
 To start a post-compromise security update, a user creates a new random value
 known as a seed secret and shares it with every other group member through a
 secure two-party channel. Upon receiving the seed secret, each group member
 uses it to calculate an update secret for both the sender's ratchet and their
-own. 
+own.
+
 Additionally, the recipient sends an unencrypted acknowledgment to the group
 confirming the update. Every member who receives the acknowledgment updates not
 only the ratchet for the original sender but also the ratchet for the sender of
@@ -108,8 +110,8 @@ has derived an update secret and updated their ratchet accordingly.
 
 When removing a group member, the user who initiates the removal conducts a
 post-compromise security update by sending the update secret to all group
-members except the one being removed. To add a new group member, 
-each existing group member shares the necessary state with the new user, 
+members except the one being removed. To add a new group member,
+each existing group member shares the necessary state with the new user,
 enabling them to derive their future update secrets.
 
 Since group members may receive messages in various orders, it's important to
@@ -125,6 +127,7 @@ This protocol relies in 3 components: authenticated causal broadcast (ACB),
 decentralized group membership (DGM) and 2-party secure messaging (2SM).
 
 #### Authenticated causal broadcast
+
 A causal order is a partial order relation `<` on messages. Two messages `m_1`
 and `m_2` are causally ordered, or `m_1` causally precedes `m_2` (denoted by
 `m_1 < m_2`), if one of the following contiditions hold:
@@ -140,7 +143,7 @@ process all preceding messages `{m' | m' < m}`.
 
 The causal broadcast module used in this protocol authenticates the sender of
 each message, as well as its causal ordering metadata, using a digital
-signature under the sender’s identity key. 
+signature under the sender’s identity key.
 This prevents a passive adversary from impersonating users or affecting
 causally ordered delivery.
 
@@ -148,7 +151,8 @@ causally ordered delivery.
 
 This protocol assumes the existence of a decentralized group membership
 function (denoted as DGM) that takes a set of membership change messages and
-their causal order relantionships, and returns the current set of group members’ IDs. It needs to be deterministic and depend only on causal order, and
+their causal order relantionships, and returns the current set of group
+members’ IDs. It needs to be deterministic and depend only on causal order, and
 not exact order.
 
 #### 2-party secure messaging (2SM)
@@ -156,7 +160,7 @@ not exact order.
 This protocol makes use of bidirectional 2-party secure messaging schemes,
 which consist of 3 algorithms: `2SM-Init`, `2SM-Send` and `2SM-Receive`.
 
-##### 2SM-Init
+##### Function 2SM-Init
 
 This function takes two IDs as inputs: `ID1` representing the local user and
 `ID2` representing the other party. It returns an initial protocol state
@@ -166,17 +170,17 @@ In practice, the PKI should incorporate ephemeral prekeys.
 This allows users to send messages to a new group member,
 even if that member is currently offline.
 
-##### 2SM-Send
+##### Function 2SM-Send
 
 This function takes a state `sigma` and a plaintext `m` as inputs, and returns
 a new state `sigma’` and a ciphertext `c`.
 
-##### 2SM-Receive
+##### Function 2SM-Receive
 
 This function takes a state `sigma` and a ciphertext `c`, and returns a new
 state `sigma’` and a plaintext `m`.
 
-#### 2SM Syntax
+#### Function 2SM Syntax
 
 The variable `sigma` denotes the state consisting in the variables below:
 
