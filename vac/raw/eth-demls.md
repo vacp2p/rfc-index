@@ -885,6 +885,16 @@ The display rules above still apply to custom interfaces.
 After successfully parsing the message into ABNF terms, translation MAY
 happen at the UX level per human language.
 
+## Consideration to secure 1-to-1 channels
+
+There exist situations where users need to set one-to-one communication 
+channels in a secure way. One of these situations is when a user A
+wants to add a new user B to an existing group.
+In such situations communications between users MUST be done following
+the instructions in this
+[specification](https://github.com/vacp2p/rfc-index/blob/eth-secpm-splitted/vac/raw/eth-secure-channel.md)
+describing the use of X3DH in combination with the double ratchet mechanism.
+
 ## Privacy and Security Considerations
 
 - For the information retrieval, the algorithm MUST include a access
