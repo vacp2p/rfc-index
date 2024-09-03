@@ -210,10 +210,8 @@ the KDF for the group's cipher suite, as well as the functions defined
 below:
 
 ```text
-ExpandWithLabel(Secret, Label, Context, Length) = KDF.Expand(Secret,
-KDFLabel, Length)
-DeriveSecret(Secret, Label) = ExpandWithLabel(Secret, Label, "",
-KDF.Nh)
+ExpandWithLabel(Secret, Label, Context, Length) = KDF.Expand(Secret, KDFLabel, Length)
+DeriveSecret(Secret, Label) = ExpandWithLabel(Secret, Label, "", KDF.Nh)
 
 ```
 
