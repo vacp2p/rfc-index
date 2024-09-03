@@ -887,7 +887,7 @@ happen at the UX level per human language.
 
 ## Consideration to secure 1-to-1 channels
 
-There exist situations where users need to set one-to-one communication 
+There are situations where users need to set one-to-one communication 
 channels in a secure way. One of these situations is when a user A
 wants to add a new user B to an existing group.
 In such situations communications between users MUST be done following
