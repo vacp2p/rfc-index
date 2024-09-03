@@ -33,7 +33,7 @@ The specification is divided into the following sections:
 
 ### Theoretical content
 
-The [Messaging Layer Security](https://datatracker.ietf.org/doc/rfc9420/)(MLS)
+The [Messaging Layer Security](https://datatracker.ietf.org/doc/rfc9420/) (MLS)
 protocol aims at providing a group of users with
 end-to-end encryption in an authenticated and asynchronous way.
 The main security characteristics of the protocol are:
@@ -160,14 +160,14 @@ A member updates the nodes along its direct path as follows:
 - Generate a sequence of path secrets, one for each node on the leaf's
 filtered direct path.
 
-It MUST follow the procedure described in section 7.4 of [RFC9420
-(https://datatracker.ietf.org/doc/rfc9420/).
+It MUST follow the procedure described in section 7.4 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 - Compute the sequence of HPKE key pairs `(node_priv,node_pub)`, one
 for each node on the leaf's direct path.
 
-It MUST follow the procedure described in section 7.4 of [RFC9420
-(https://datatracker.ietf.org/doc/rfc9420/).
+It MUST follow the procedure described in section 7.4 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Views of the tree synchronization
 
@@ -183,8 +183,8 @@ Changes to group memberships MUST be represented by adding and removing
 leaves of the tree.
 This corresponds to increasing or decreasing the depth of the tree,
 resulting in the number of leaves being doubled or halved.
-These operations MUST be done as described in section 7.7 of [RFC9420
-(https://datatracker.ietf.org/doc/rfc9420/).
+These operations MUST be done as described in section 7.7 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Tree and parent hashing
 
@@ -597,9 +597,9 @@ replaced with SIWE in this specification.
 Sign-in with Ethereum describes how Ethereum accounts authenticate with
 off-chain services by signing a standard message format
 parameterized by scope, session details, and security mechanisms.
-Sign-in with Ethereum (SIWE), which is described in the [EIP 4361
-(https://eips.ethereum.org/EIPS/eip-4361), MUST be the authentication
-method required.
+Sign-in with Ethereum (SIWE), which is described in the
+[EIP 4361](https://eips.ethereum.org/EIPS/eip-4361),
+MUST be the authentication method required.
 
 ### Pattern
 
@@ -757,9 +757,9 @@ wallets and relying parties.
 signature verification, the contract performing the verification MUST
 be resolved from the specified `chain-id`.
 
-  - Implementers SHOULD take into consideration that [ERC-1271
-(https://eips.ethereum.org/EIPS/eip-1271) implementations are not
-required to be pure functions.
+  - Implementers SHOULD take into consideration that
+[ERC-1271](https://eips.ethereum.org/EIPS/eip-1271)
+implementations are not required to be pure functions.
 They can return different results for the same inputs depending on
 blockchain state.
 This can affect the security model and session validation rules.
@@ -807,9 +807,10 @@ The full SIWE message MUST be checked for conformance to the ABNF
 defined in ABNF Message Format.
 
 Wallet implementers SHOULD warn users if the substring `"wants you to
-sign in with your Ethereum account"` appears anywhere in an [ERC-191
-(https://eips.ethereum.org/EIPS/eip-191) message signing request unless
-the message fully conforms to the format defined ABNF Message Format.
+sign in with your Ethereum account"` appears anywhere in an
+[ERC-191](https://eips.ethereum.org/EIPS/eip-191)
+message signing request unless the message fully conforms to the format
+defined ABNF Message Format.
 
 #### Wallet implementer steps: verifying the request origin
 
