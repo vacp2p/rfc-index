@@ -329,13 +329,12 @@ struct {
 
 ```text
 struct {
-ProtocolVersion version;
-CipheSuite cipher_suite;
-HPKEPublicKey init_key;
-LeafNode leaf_node;
-Extension extensions<V>;
+      ProtocolVersion version;
+      CipheSuite cipher_suite;
+      HPKEPublicKey init_key;
+      LeafNode leaf_node;
+      Extension extensions<V>;
 }
-
 ```
 
 `KeyPackage` object MUST be verified when:
