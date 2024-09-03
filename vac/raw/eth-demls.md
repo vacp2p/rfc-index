@@ -664,7 +664,6 @@ request-id = *pchar
 resources = *( LF resource )
 
 resource = "- " URI
-
 ```
 
 This specification defines the following SIWE Message fields that can
