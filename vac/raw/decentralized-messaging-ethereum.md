@@ -712,7 +712,7 @@ the add operation.
 
 Subsequently, the new group member constructs an *ack* control message to
 broadcast on line 6 and calls `process-ack` to compute their initial update
-secret I_me. The function `process-ack` reads from `gamma.memberSecret` and 
+secret I_me. The function `process-ack` reads from `gamma.memberSecret` and
 passes it to `update-ratchet`. The previous ratchet state for the new member is
 the empty string `empty`, as established by `init`, thereby initializing the
 new member’s ratchet.
