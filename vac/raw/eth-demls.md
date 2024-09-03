@@ -411,11 +411,10 @@ version in use. Additional requirements MAY be imposed by including a
 
 ```text
 struct {
-ExtensionType extension_types<V>;
-ProposalType proposal_types<V>;
-CredentialType credential_types<V>;
+      ExtensionType extension_types<V>;
+      ProposalType proposal_types<V>;
+      CredentialType credential_types<V>;
 }
-
 ```
 
 The flow diagram shows the procedure to fetch key material from other
