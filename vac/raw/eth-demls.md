@@ -445,17 +445,17 @@ structure that indicates their type:
 
 ```text
 struct {
-ProposalType proposal_type;
-select (Proposal.proposal_type) {
-case add:                      Add:
-case update:                   Update;
-case remove:                   Remove;
-case psk:                      PreSharedKey;
-case reinit:                   ReInit;
-case external_init:            ExternalInit;
-case group_context_extensions: GroupContextExtensions;
+      ProposalType proposal_type;
+      select (Proposal.proposal_type) {
+            case add:                      Add:
+            case update:                   Update;
+            case remove:                   Remove;
+            case psk:                      PreSharedKey;
+            case reinit:                   ReInit;
+            case external_init:            ExternalInit;
+            case group_context_extensions: GroupContextExtensions;
+      }
 }
-
 ```
 
 On receiving a `FramedContent` containing a `Proposal`, a client MUST
