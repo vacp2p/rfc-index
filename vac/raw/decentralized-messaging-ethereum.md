@@ -533,7 +533,6 @@ return (gamma, empty_string, empty_string, I, empty_string)
 
 The HKDF function MUST follow RFC 5869 using the hash function SHA256.
 
-
 ### Post-compromise security updates and group member removal
 
 The functions `update` and `remove` share similarities with `create`:
@@ -613,7 +612,8 @@ return (gamma, control, (ID, welcome), I)
 #### process-add
 
 This function is invoked by both the sender and each recipient of an `add`
-message, which includes the new group member. If the local user is the newly added member, the function proceeds to call `process-welcome` and then exits.
+message, which includes the new group member. If the local user is the newly
+added member, the function proceeds to call `process-welcome` and then exits.
 Otherwise, it extends `gamma.history` with the `add` operation.
 
 Line 5 determines whether the local user was already a group member at the time
@@ -635,7 +635,8 @@ required.
 Therefore, on line 11, a control message of type `add-ack` is constructed for
 broadcast.
 Subsequently, in line 12 the current ratchet state is encrypted using `2SM` to
-generate a direct message intended for the added user, allowing them to decrypt subsequent messages sent by the sender.
+generate a direct message intended for the added user, allowing them to decrypt
+subsequent messages sent by the sender.
 Finally, in lines 13 to 15, `process-add-ack` is called to calculate the local
 user’s update secret (`I_me`), which is then returned along with `I_sender`.
 
@@ -662,7 +663,7 @@ return (gamma, control, {(added, c)}, I_sender, I_me)
 
 This function is invoked by both the sender and each recipient of an `add-ack`
 message, including the new group member. Upon lines 1–2, the acknowledgment is
-added to `gamma.history`, mirroring the process in `process-ack`. 
+added to `gamma.history`, mirroring the process in `process-ack`.
 If the current user is the new group member, the `add-ack` message includes the
 direct message constructed in `process-add`; this direct message contains the
 encrypted ratchet state of the sender of the `add-ack`, then it is decrypted on
@@ -868,6 +869,7 @@ Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
+
 - [DCGKA](https://eprint.iacr.org/2020/1281)
 - [MLS](https://messaginglayersecurity.rocks)
 - [CoCoa](https://eprint.iacr.org/2022/251)
