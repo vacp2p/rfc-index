@@ -29,9 +29,9 @@ The specification is divided into the following sections:
 - Description of an Ethereum-based authentication protocol, based on
 [SIWE](https://eips.ethereum.org/EIPS/eip-4361).
 
-# Private group messaging protocol
+## Private group messaging protocol
 
-## Theoretical content
+### Theoretical content
 
 The [Messaging Layer Security](https://datatracker.ietf.org/doc/rfc9420/)(MLS)
 protocol aims at providing a group of users with
@@ -47,7 +47,7 @@ synchronization and extensibility.
 The extension to group chat described in forthcoming sections is built upon the
 [MLS](https://datatracker.ietf.org/doc/rfc9420/) protocol.
 
-## Structure
+### Structure
 
 Each MLS session uses a single cipher suite that specifies the
 primitives to be used in group key computations. The cipher suite MUST
@@ -63,13 +63,13 @@ Formats for public keys, signatures and public-key encryption MUST
 follow Section 5.1 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Hash-based identifiers
+### Hash-based identifiers
 
 Some MLS messages refer to other MLS objects by hash.
 These identifiers MUST be computed according to Section 5.2 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Credentials
+### Credentials
 
 Each member of a group presents a credential that provides one or more
 identities for the
@@ -85,7 +85,7 @@ Below follows the flow diagram for the generation of credentials.
 Users MUST generate key pairs by themselves.
 ![figure1](./images/eth-secpm_credential.png)
 
-## Message framing
+### Message framing
 
 Handshake and application messages use a common framing structure
 providing encryption to
@@ -116,7 +116,7 @@ If a group member observes a gap in the generation sequence for a
 sender, then they know that they have missed a message from that
 sender.
 
-## Nodes contents
+### Nodes contents
 
 The nodes of a ratchet tree contain several types of data:
 
@@ -128,7 +128,7 @@ indications described in
 sections 7.1 and 7.2 of
 [RFC9420](https://datatracker.ietf.org/docrfc9420/).
 
-## Leaf node validation
+### Leaf node validation
 
 `KeyPackage` objects describe the client's capabilities and provides
 keys that can be used  to add the client to a group.
@@ -146,7 +146,7 @@ A client MUST verify the validity of a leaf node following the
 instructions of section 7.3 in
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Ratchet tree evolution
+### Ratchet tree evolution
 
 Whenever a member initiates an epoch change, they MAY need to refresh
 the key pairs of their leaf and of the nodes on their direct path. This
@@ -169,7 +169,7 @@ for each node on the leaf's direct path.
 It MUST follow the procedure described in section 7.4 of [RFC9420
 (https://datatracker.ietf.org/doc/rfc9420/).
 
-## Views of the tree synchronization
+### Views of the tree synchronization
 
 After generating fresh key material and applying it to update their
 local tree state, the generator broadcasts this update to other members
@@ -177,7 +177,7 @@ of the group.
 This operation MUST be done according to section 7.5 of [RFC9420
 (https://datatracker.ietf.org/doc/rfc9420/).
 
-## Leaf synchronization
+### Leaf synchronization
 
 Changes to group memberships MUST be represented by adding and removing
 leaves of the tree.
@@ -186,7 +186,7 @@ resulting in the number of leaves being doubled or halved.
 These operations MUST be done as described in section 7.7 of [RFC9420
 (https://datatracker.ietf.org/doc/rfc9420/).
 
-## Tree and parent hashing
+### Tree and parent hashing
 
 Group members can agree on the cryptographic state of the group by
 generating a hash value that represents the contents of the group
@@ -203,7 +203,7 @@ populated.
 Tree and parent hashing MUST follow the directions in Sections 7.8 and
 7.9 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Key schedule
+### Key schedule
 
 Group keys are derived using the `Extract` and `Expand` functions from
 the KDF for the group's cipher suite, as well as the functions defined
@@ -258,7 +258,7 @@ Extension extension<V>;
 The use of key scheduling MUST follow the indications in sections 8.1 -
 8.7 in [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Secret trees
+### Secret trees
 
 For the generation of encryption keys and nonces, the key schedule
 begins with the `encryption_secret` at the root and derives a tree of
@@ -270,7 +270,7 @@ If `N` is a parent node in the secret tree, the secrets of the children
 of `N` MUST be defined following section 9 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-### Encryption keys
+#### Encryption keys
 
 MLS encrypts three different types of information:
 
@@ -284,7 +284,7 @@ Each sender has their own sender ratchet, and each step along the
 ratchet is called a generation. These procedures MUST follow section
 9.1 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-### Deletion schedule
+#### Deletion schedule
 
 All security-sensitive values MUST be deleted as soon as they are
 consumed.
@@ -297,7 +297,7 @@ A sensitive value S is consumed if:
 The deletion procedure MUST follow the instruction described in section
 9.2 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Key packages
+### Key packages
 
 KeyPackage objects are used to ease the addition of clients to a group
 asynchronously.
@@ -366,7 +366,7 @@ HPKE public keys are opaque values in a format defined by Section 4 of
 Signature public keys are represented as opaque values in a format
 defined by the cipher suite's signature scheme.
 
-## Group creation
+### Group creation
 
 A group is always created with a single member.
 Other members are then added to the group using the usual Add/Commit
@@ -431,7 +431,7 @@ users:
 Below follows the flow diagram for the creation of a group:
 ![figure3](./images/eth-secpm_creation.png)
 
-## Group evolution
+### Group evolution
 
 Group membership can change, and existing members can change their keys
 in order to achieve post-compromise security.
@@ -514,7 +514,7 @@ The flow diagram below shows an update procedure:
 
 ![figure6](./images/eth-secpm_update.png)
 
-## Commit messages
+### Commit messages
 
 Commit messages initiate new group epochs.
 It informs group members to update their representation of the state of
@@ -541,7 +541,7 @@ during the current epoch.
 Functioning of commits MUST follow the instructions of Section 12.4 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Application messages
+### Application messages
 
 Handshake messages provide an authenticated group key exchange to
 clients.
@@ -590,9 +590,9 @@ version of the tree that allows for the generation of the group key.
 Another important component is the *authentication service*, which is
 replaced with SIWE in this specification.
 
-# Ethereum-based authentication protocol
+## Ethereum-based authentication protocol
 
-## Introduction
+### Introduction
 
 Sign-in with Ethereum describes how Ethereum accounts authenticate with
 off-chain services by signing a standard message format
@@ -601,9 +601,9 @@ Sign-in with Ethereum (SIWE), which is described in the [EIP 4361
 (https://eips.ethereum.org/EIPS/eip-4361), MUST be the authentication
 method required.
 
-## Pattern
+### Pattern
 
-### Message format (ABNF)
+#### Message format (ABNF)
 
 A SIWE Message MUST conform with the following Augmented Backus–Naur
 Form ([RFC 5234](https://datatracker.ietf.org/doc/html/rfc5234))
@@ -737,7 +737,7 @@ by the relying party.
 Every resource MUST be a RFC 3986 URI separated by "\n- " where \n is
 the byte 0x0a.
 
-### Signing and Verifying Messages with Ethereum Accounts
+#### Signing and Verifying Messages with Ethereum Accounts
 
 - For Externally Owned Accounts, the verification method specified in
 [ERC-191](https://eips.ethereum.org/EIPS/eip-191)
@@ -764,7 +764,7 @@ They can return different results for the same inputs depending on
 blockchain state.
 This can affect the security model and session validation rules.
 
-### Resolving Ethereum Name Service (ENS) Data
+#### Resolving Ethereum Name Service (ENS) Data
 
 - The relying party or wallet MAY additionally perform resolution of
 ENS data, as this can improve the user experience by displaying human
@@ -780,28 +780,28 @@ precautions to preserve user privacy and consent.
 Their `address` could be forwarded to third party services as part of
 the resolution process.
 
-### Implementer steps: specifying the request origin
+#### Implementer steps: specifying the request origin
 
 The `domain` and, if present, the `scheme`, in the SIWE Message MUST
 correspond to the origin from where the signing request was made.
 
-### Implementer steps: verifying a signed message
+#### Implementer steps: verifying a signed message
 
 The SIWE Message MUST be checked for conformance to the ABNF Message
 Format and its signature MUST be checked as defined in Signing and
 Verifying Messages with Ethereum Accounts.
 
-### Implementer steps: creating sessions
+#### Implementer steps: creating sessions
 
 Sessions MUST be bound to the address and not to further resolved
 resources that can change.
 
-### Implementer steps: interpreting and resolving resources
+#### Implementer steps: interpreting and resolving resources
 
 Implementers SHOULD ensure that that URIs in the listed resources are
 human-friendly when expressed in plaintext form.
 
-### Wallet implementer steps: verifying the message format
+#### Wallet implementer steps: verifying the message format
 
 The full SIWE message MUST be checked for conformance to the ABNF
 defined in ABNF Message Format.
@@ -811,7 +811,7 @@ sign in with your Ethereum account"` appears anywhere in an [ERC-191
 (https://eips.ethereum.org/EIPS/eip-191) message signing request unless
 the message fully conforms to the format defined ABNF Message Format.
 
-### Wallet implementer steps: verifying the request origin
+#### Wallet implementer steps: verifying the request origin
 
 Wallet implementers MUST prevent phishing attacks by verifying the
 origin of the request against the `scheme` and `domain` fields in the
@@ -871,7 +871,7 @@ scheme.
 contains a specific port.
 - Return request origin verification completed.
 
-### Wallet implementer steps: creating SIWE interfaces
+#### Wallet implementer steps: creating SIWE interfaces
 
 Wallet implementers MUST display to the user the following fields from
 the SIWE Message request by default and prior to signing, if they are
@@ -887,12 +887,12 @@ Wallet implementers MAY construct a custom SIWE user interface by
 parsing the ABNF terms into data elements for use in the interface.
 The display rules above still apply to custom interfaces.
 
-### Wallet implementer steps: supporting internationalization (i18n)
+#### Wallet implementer steps: supporting internationalization (i18n)
 
 After successfully parsing the message into ABNF terms, translation MAY
 happen at the UX level per human language.
 
-# Privacy and Security Considerations
+## Privacy and Security Considerations
 
 - For the information retrieval, the algorithm MUST include a access
 control mechanisms to restrict who can call the set and get functions.
@@ -901,9 +901,9 @@ control mechanisms to restrict who can call the set and get functions.
 224-bit security instead of the 128-bit security provided by X25519.
 - It is important that Bob MUST NOT reuse `SPK`.
 
-# Considerations related to the use of Ethereum addresses
+## Considerations related to the use of Ethereum addresses
 
-## With respect to the Authentication Service
+### With respect to the Authentication Service
 
 - If users used their Ethereum addresses as identifiers, they MUST
 generate their own credentials.
@@ -916,7 +916,7 @@ credentials.
 - The interaction diagram showing the generation of credentials becomes
 obsolete.
 
-## With respect to the Delivery Service
+### With respect to the Delivery Service
 
 - Users MUST generate their own KeyPackage.
 - Other users can verify KeyPackages when required.
@@ -924,16 +924,16 @@ obsolete.
 storing them.
 - Interaction diagrams involving the DS do not change.
 
-# Consideration related to the onchain component of the protocol
+## Consideration related to the onchain component of the protocol
 
-## Assumptions
+### Assumptions
 
 - Users have set a secure 1-1 communication channel.
 - Each group is managed by a separate smart contract.
 
-## Addition of members to a group
+### Addition of members to a group
 
-### Alice knows Bob’s Ethereum address
+#### Alice knows Bob’s Ethereum address
 
 1. Off-chain - Alice and Bob set a secure communication channel.
 2. Alice creates the smart contract associated to the group. This smart
@@ -953,7 +953,7 @@ and checks that it corresponds to an address contained in the ACL.
 addition of Bob to other users of the group.
 ![figure7](./images/eth-secpm_onchain-register-1.png)
 
-### Alice does not know Bob’s Ethereum address
+#### Alice does not know Bob’s Ethereum address
 
 1. Off-chain - Alice and Bob set a secure communication channel.
 2. Alice creates the smart contract associated to the group.
@@ -976,7 +976,7 @@ addition of Bob to other users of the group.
 
 ![figure8](./images/eth-secpm_onchain-register-2.png)
 
-## Considerations regarding smart contracts
+### Considerations regarding smart contracts
 
 The role of the smart contract includes:
 
@@ -1006,11 +1006,11 @@ group, including existing users and removed ones.
   - This aspect MUST be used when adding new members to verify that
 the prospective key package has not been already used.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
+## References
 
 - [Augmented BNF for Syntax Specifications](https://datatracker.ietf.org/doc/html/rfc5234)
 - [Gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub)
