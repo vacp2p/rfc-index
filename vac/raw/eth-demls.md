@@ -1,5 +1,5 @@
 ---
-title: ETH-SECPM
+title: ETH-DEMLS
 name: Secure channel setup using Ethereum accounts
 status: raw
 category: Standards Track
