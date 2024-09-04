@@ -563,26 +563,6 @@ encryption.
 Functioning of application messages MUST follow the instructions of
 Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-## Considerations with respect to decentralization
-
-The MLS protocol assumes the existence on a (central, untrusted)
-*delivery service*, whose responsabilites include:
-
-- Acting as a directory service providing the initial
-keying material for clients to use.
-- Routing MLS messages among clients.
-
-The central delivery service can be avoided in protocols using the
-publish/gossip approach, such as
-[gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub).
-
-Concerning keys, each node can generate and disseminate their
-encryption key among the other nodes, so they can create a local
-version of the tree that allows for the generation of the group key.
-
-Another important component is the *authentication service*, which is
-replaced with SIWE in this specification.
-
 ## Ethereum-based authentication protocol
 
 ### Introduction
@@ -926,6 +906,26 @@ obsolete.
 - A Delivery Service storage system MUST verify KeyPackages before
 storing them.
 - Interaction diagrams involving the DS do not change.
+
+## Considerations with respect to decentralization
+
+The MLS protocol assumes the existence on a (central, untrusted)
+*delivery service*, whose responsabilites include:
+
+- Acting as a directory service providing the initial
+keying material for clients to use.
+- Routing MLS messages among clients.
+
+The central delivery service can be avoided in protocols using the
+publish/gossip approach, such as
+[gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub).
+
+Concerning keys, each node can generate and disseminate their
+encryption key among the other nodes, so they can create a local
+version of the tree that allows for the generation of the group key.
+
+Another important component is the *authentication service*, which is
+replaced with SIWE in this specification.
 
 ## Consideration related to the onchain component of the protocol
 
