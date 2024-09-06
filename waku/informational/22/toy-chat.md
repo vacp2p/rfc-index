@@ -19,12 +19,14 @@ This protocol is mainly used to:
 
 Currently, all main Waku v2 implementations support the toy chat protocol:
 [nim-waku](https://github.com/status-im/nim-waku/blob/master/examples/v2/chat2.nim),
-js-waku ([NodeJS](https://github.com/status-im/js-waku/tree/main/examples/cli-chat) and [web](https://github.com/status-im/js-waku/tree/main/examples/web-chat))
+js-waku ([NodeJS](https://github.com/status-im/js-waku/tree/main/examples/cli-chat)
+ and [web](https://github.com/status-im/js-waku/tree/main/examples/web-chat))
 and [go-waku](https://github.com/status-im/go-waku/tree/master/examples/chat2).
 
-Note that this is completely separate from the protocol the Status app is using for its chat functionality.
+Note that this is completely separate from the protocol the Status app
+is using for its chat functionality.
 
-# Design
+## Design
 
 The chat protocol enables sending and receiving messages in a chat room.
 There is currently only one chat room, which is tied to the content topic.
@@ -32,7 +34,7 @@ The messages SHOULD NOT be encrypted.
 
 The `contentTopic` MUST be set to `/toy-chat/2/huilong/proto`.
 
-# Payloads
+## Payloads
 
 ```protobuf
 syntax = "proto3";
@@ -48,6 +50,6 @@ message Chat2Message {
 - `nick`: The nickname of the user sending the message,
 - `payload`: The text of the messages, UTF-8 encoded.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

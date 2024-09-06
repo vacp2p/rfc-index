@@ -43,13 +43,15 @@ Waku is designed to work for all these scenarios.
 2. **Peer-to-peer.**
 
 Applications sometimes have requirements that make them suitable for peer-to-peer solutions:
-- Censorship-resistant with no single point of failure 
+
+- Censorship-resistant with no single point of failure
 - Adaptive and scalable network
 - Shared infrastructure
 
 3. **Runs anywhere.**
 
-Applications often run in restricted environments, where resources or the environment is restricted in some fashion.
+Applications often run in restricted environments,
+where resources or the environment is restricted in some fashion.
 For example:
 
 - Limited bandwidth, CPU, memory, disk, battery, etc
@@ -59,17 +61,21 @@ For example:
 4. **Privacy-preserving.**
 
  Applications often have a desire for some privacy guarantees, such as:
- - Pseudonymity and not being tied to any personally identifiable information (PII)
- - Metadata protection in transit
- - Various forms of unlinkability, etc
+
+- Pseudonymity and not being tied to any personally identifiable information (PII)
+- Metadata protection in transit
+- Various forms of unlinkability, etc
 
 5. **Modular design.**
 
-Applications often have different trade-offs when it comes to what properties they and their users value.
-Waku is designed in a modular fashion where an application protocol or node can choose what protocols they run.
+Applications often have different trade-offs when it comes to what properties they
+and their users value.
+Waku is designed in a modular fashion where an application protocol or
+node can choose what protocols they run.
 We call this concept *adaptive nodes*.
 
 For example:
+
 - Resource usage vs metadata protection
 - Providing useful services to the network vs mostly using it
 - Stronger guarantees for spam protection vs economic registration cost
@@ -79,7 +85,8 @@ please see the [30/ADAPTIVE-NODES](../../../informational/30/adaptive-nodes.md) 
 
 ## Network interaction domains
 
-While Waku is best thought of as a single cohesive thing, there are three network interaction domains:
+While Waku is best thought of as a single cohesive thing,
+there are three network interaction domains:
 
 (a) gossip domain
 (b) discovery domain
@@ -95,12 +102,16 @@ The current main [protocol identifiers](https://docs.libp2p.io/concepts/protocol
 3. `/vac/waku/filter/2.0.0-beta1`
 4. `/vac/waku/lightpush/2.0.0-beta1`
 
-This is in addition to protocols that specify messages, payloads, and recommended usages.
-Since these aren't negotiated libp2p protocols, they are referred to by their RFC ID.
+This is in addition to protocols that specify messages, payloads, and
+recommended usages.
+Since these aren't negotiated libp2p protocols,
+they are referred to by their RFC ID.
 For example:
 
-- [14/WAKU2-MESSAGE](../14/message.md) and [26/WAKU-PAYLOAD](../../application/26/payload.md) for message payloads
-- [23/WAKU2-TOPICS](../../../informational/23/topics.md) and [27/WAKU2-PEERS](../../../informational/27/peers.md) for recommendations around usage
+- [14/WAKU2-MESSAGE](../14/message.md) and
+[26/WAKU-PAYLOAD](../../application/26/payload.md) for message payloads
+- [23/WAKU2-TOPICS](../../../informational/23/topics.md) and
+[27/WAKU2-PEERS](../../../informational/27/peers.md) for recommendations around usage
 
 There are also more experimental libp2p protocols such as:
 
@@ -109,12 +120,13 @@ There are also more experimental libp2p protocols such as:
 
 These protocols and their semantics are elaborated on in their own specs.
 
-
 ### Use of libp2p and protobuf
 
-Unless otherwise specified, all protocols are implemented over libp2p and use Protobuf by default.
+Unless otherwise specified,
+all protocols are implemented over libp2p and use Protobuf by default.
 Since messages are exchanged over a [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/),
-as a convention, libp2p protocols prefix binary message payloads with the length of the message in bytes.
+as a convention,
+libp2p protocols prefix binary message payloads with the length of the message in bytes.
 This length integer is encoded as a [protobuf varint](https://developers.google.com/protocol-buffers/docs/encoding#varints).
 
 ### Gossip domain
@@ -127,36 +139,42 @@ See [11/WAKU2-RELAY](../11/relay.md) spec for more details.
 
 For an experimental privacy-preserving economic spam protection mechanism, see [17/WAKU2-RLN-RELAY](../17/rln-relay.md).
 
-See [23/WAKU2-TOPICS](../../../informational/23/topics.md) for more information about recommended topic usage.
+See [23/WAKU2-TOPICS](../../../informational/23/topics.md)
+for more information about recommended topic usage.
 
 ### Direct use of libp2p protocols
 
-In addition to `/vac/waku/*` protocols, Waku v2 MAY directly use the following libp2p protocols:
+In addition to `/vac/waku/*` protocols,
+Waku v2 MAY directly use the following libp2p protocols:
 
-* [libp2p ping protocol](https://docs.libp2p.io/concepts/protocols/#ping) with protocol id
+- [libp2p ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
+with protocol id
 
-```
+```text
 /ipfs/ping/1.0.0
 ```
 
 for liveness checks between peers, or to keep peer-to-peer connections alive.
 
-* [libp2p identity and identity/push](https://docs.libp2p.io/concepts/protocols/#identify) with protocol IDs
+- [libp2p identity and identity/push](https://docs.libp2p.io/concepts/protocols/#identify)
+with protocol IDs
 
-```
+```text
 /ipfs/id/1.0.0
 
 ```
 
 and
 
-```
+```text
 /ipfs/id/push/1.0.0
 ```
 
 respectively, as basic means for capability discovery.
-These protocols are anyway used by the libp2p connection establishment layer Waku v2 is built on.
-We plan to introduce a new Vac capability discovery protocol with better anonymity properties and more functionality.
+These protocols are anyway used by the libp2p connection
+establishment layer Waku v2 is built on.
+We plan to introduce a new Vac capability discovery protocol
+with better anonymity properties and more functionality.
 
 # Transports
 
@@ -169,12 +187,12 @@ Waku client implementations SHOULD support the TCP transport.
 
 Where TCP is supported it MUST be enabled for both dialing and listening, even if other transports are available.
 
-Waku v2 nodes where the environment do not allow to use TCP directly, MAY use other transports. 
+Waku v2 nodes where the environment do not allow to use TCP directly, MAY use other transports.
 
 A Waku v2 node SHOULD support secure websockets for bidirectional communication streams, for example in a web browser context.
 
-A node MAY support unsecure websockets if required by the application or running environment.
-
+A node MAY support unsecure websockets if required by the application or
+running environment.
 
 ### Discovery domain
 
@@ -195,7 +213,6 @@ It introduces two new ENR fields, `multiaddrs` and `waku2`, that a Waku v2 node 
 These fields MUST be used under certain conditions, as set out in the spec.
 Both EIP-1459 DNS-based discovery and Node Discovery v5 operates on ENR,
 and it's reasonable to expect even wider utility for ENR in Waku v2 networks in future.
-
 
 ### Request/Reply domain
 
@@ -225,13 +242,15 @@ See [12/WAKU2-FILTER](../12/filter.md) spec for more details.
 
 **Protocol identifier***: `/vac/waku/lightpush/2.0.0-beta1`
 
-This is used for nodes with short connection windows and limited bandwidth to publish messages into the Waku network.
+This is used for nodes with short connection windows and
+limited bandwidth to publish messages into the Waku network.
 See [19/WAKU2-LIGHTPUSH](../19/lightpush.md) spec for more details.
 
 #### Other protocols
 
 The above is a non-exhaustive list,
-and due to the modular design of Waku there may be other protocols here that provide a useful service to the Waku network.
+and due to the modular design of Waku,
+there may be other protocols here that provide a useful service to the Waku network.
 
 ### Overview of protocol interaction
 
@@ -241,20 +260,29 @@ See the sequence diagram below for an overview of how different protocols intera
 
 0. We have six nodes, A-F.
 The protocols initially mounted are indicated as such.
-The PubSub topics `pubtopic1` and `pubtopic2` is used for routing and indicates that it is subscribed to messages on that topic for relay, see [11/WAKU2-RELAY](../11/relay.md) for details.
-Ditto for [13/WAKU2-STORE](../13/store.md) where it indicates that these messages are persisted on that node.
+The PubSub topics `pubtopic1` and
+`pubtopic2` is used for routing and
+indicates that it is subscribed to messages on that topic for relay,
+see [11/WAKU2-RELAY](../11/relay.md) for details.
+Ditto for [13/WAKU2-STORE](../13/store.md)
+where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
 See [14/WAKU2-MESSAGE](../14/message.md) for more details.
-If WakuMessage version is set to 1, we use the [6/WAKU1](../../legacy/6/waku1.md) compatible `data` field with encryption.
+If WakuMessage version is set to 1,
+we use the [6/WAKU1](../../legacy/6/waku1.md) compatible `data` field with encryption.
 See [7/WAKU-DATA](../../legacy/7/data.md) for more details.
 
-2. Node F requests to get messages filtered by PubSub topic `pubtopic1` and ContentTopic `contentTopic1`.
-Node D subscribes F to this filter and will in the future forward messages that match that filter.
+2. Node F requests to get messages filtered by PubSub topic `pubtopic1` and
+ContentTopic `contentTopic1`.
+Node D subscribes F to this filter and
+will in the future forward messages that match that filter.
 See [12/WAKU2-FILTER](../12/filter.md) for more details.
 
-3. Node A publishes `msg1` on `pubtopic1` and subscribes to that relay topic pick it up.
-It then gets relayed further from B to D, but not C since it doesn't subscribe to that topic.
+3. Node A publishes `msg1` on `pubtopic1` and
+subscribes to that relay topic pick it up.
+It then gets relayed further from B to D, but
+not C since it doesn't subscribe to that topic.
 See [11/WAKU2-RELAY](../11/relay.md).
 
 4. Node D saves `msg1` for possible later retrieval by other nodes.
@@ -272,46 +300,65 @@ Node D responds with messages meeting this (and possibly other) criteria. See [1
 ### Compatibility with Waku v1
 
 Waku v1 and Waku v2 are different protocols all together.
-They use a different transport protocol underneath; Waku v1 is devp2p RLPx based while Waku v2 uses libp2p.
+They use a different transport protocol underneath;
+Waku v1 is devp2p RLPx based while Waku v2 uses libp2p.
 The protocols themselves also differ as does their data format.
 Compatibility can be achieved only by using a bridge that not only talks both devp2p RLPx and libp2p, but that also transfers (partially) the content of a packet from one version to the other.
 
 See [15/WAKU-BRIDGE](../15/bridge.md) for details on a bidirectional bridge mode.
 
-# Appendix B: Security 
+## Appendix B: Security
 
-Each protocol layer of Waku v2 provides a distinct service and is associated with a separate set of security features and concerns.
+Each protocol layer of Waku v2 provides a distinct service and
+is associated with a separate set of security features and concerns.
 Therefore, the overall security of Waku v2 depends on how the different layers are utilized.
-In this section, we overview the security properties of Waku v2 protocols against a static adversarial model which is described below.
-Note that a more detailed security analysis of each Waku protocol is supplied in its respective specification as well.
+In this section,
+we overview the security properties of Waku v2 protocols
+against a static adversarial model which is described below.
+Note that a more detailed security analysis of each Waku protocol
+is supplied in its respective specification as well.
 
 ## Primary Adversarial Model
 
-In the primary adversarial model, we consider adversary as a passive entity that attempts to collect information from others to conduct an attack,
+In the primary adversarial model,
+we consider adversary as a passive entity that attempts to collect information
+from others to conduct an attack,
 but it does so without violating protocol definitions and instructions.
 
-The following are **not** considered as part of the adversarial model: 
-  -  An adversary with a global view of all the peers and their connections. 
-  -  An adversary that can eavesdrop on communication links between arbitrary pairs of peers
-  (unless the adversary is one end of the communication).
-  Specifically, the communication channels are assumed to be secure.
+The following are **not** considered as part of the adversarial model:
+
+- An adversary with a global view of all the peers and their connections.
+- An adversary that can eavesdrop on communication links
+between arbitrary pairs of peers
+(unless the adversary is one end of the communication).
+Specifically, the communication channels are assumed to be secure.
 
 ## Security Features
 
-### Pseudonymity 
+### Pseudonymity
 
-Waku v2 by default guarantees pseudonymity for all of the protocol layers since parties do not have to disclose their true identity
+Waku v2 by default guarantees pseudonymity for all of the protocol layers
+since parties do not have to disclose their true identity
 and instead they utilize libp2p `PeerID` as their identifiers.
-While pseudonymity is an appealing security feature, it does not guarantee full anonymity since the actions taken under the same pseudonym
-i.e., `PeerID` can be linked together and potentially result in the re-identification of the true actor. 
+While pseudonymity is an appealing security feature,
+it does not guarantee full anonymity since the actions taken under the same pseudonym
+i.e., `PeerID` can be linked together and
+potentially result in the re-identification of the true actor.
   
 ### Anonymity / Unlinkability
 
 At a high level, anonymity is the inability of an adversary in linking an actor to its data/performed action (the actor and action are context-dependent).
-To be precise about linkability, we use the term Personally Identifiable Information (PII) to refer to any piece of data that could potentially be used to uniquely identify a party.
-For example, the signature verification key, and the hash of one's static IP address are unique for each user and hence count as PII.
-Notice that users' actions can be traced through their PIIs (e.g., signatures) and hence result in their re-identification risk.
-As such, we seek anonymity by avoiding linkability between actions and the actors / actors' PII. Concerning anonymity, Waku v2 provides the following features:
+To be precise about linkability,
+we use the term Personally Identifiable Information (PII)
+to refer to any piece of data that could potentially
+be used to uniquely identify a party.
+For example, the signature verification key, and
+the hash of one's static IP address are unique for each user and
+hence count as PII.
+Notice that users' actions can be traced through their PIIs
+(e.g., signatures) and hence result in their re-identification risk.
+As such, we seek anonymity by avoiding linkability between actions and
+the actors / actors' PII. Concerning anonymity, Waku v2 provides the following features:
 
 **Publisher-Message Unlinkability**:
 This feature signifies the unlinkability of a publisher to its published messages in the 11/WAKU2-RELAY protocol.
@@ -322,7 +369,7 @@ This feature stands for the unlinkability of the subscriber to its subscribed to
 The [Subscriber-Topic Unlinkability](../11/relay.md/#security-analysis) is achieved through the utilization of a single PubSub topic.
 As such, subscribers are not re-identifiable from their subscribed topic IDs as the entire network is linked to the same topic ID.
 This level of unlinkability / anonymity is known as [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/) where k is proportional to the system size (number of subscribers).
-Note that there is no hard limit on the number of the pubsub topics, however, the use of one topic is recommended for the sake of anonymity. 
+Note that there is no hard limit on the number of the pubsub topics, however, the use of one topic is recommended for the sake of anonymity.
 
 ### Spam protection
 
@@ -382,7 +429,6 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 *js-waku implements [13/WAKU2-STORE](../13/store.md) as a querying node only.
 **js-waku only implements [19/WAKU2-LIGHTPUSH](../19/lightpush.md) requests.
 
-
 ### Recommendations for clients
 
 To implement a minimal Waku v2 client, we recommend implementing the following subset in the following order:
@@ -421,7 +467,6 @@ The accounting model can be used in `13/WAKU2-STORE` and `12/WAKU2-FILTER` to pr
 Additionally, this gives node operators who provide a useful service to the network an incentive to perform that service.
 See [18/WAKU2-SWAP](../../application/18/swap.md) for more details on this piece of work.
 
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -448,7 +493,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 10. [27/WAKU2-PEERS](../../../informational/27/peers.md)
 
-11. [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/) 
+11. [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/)
 
 12. [Protobuf varint encoding](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 
@@ -497,4 +542,3 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 34. [18/WAKU2-SWAP spec](../../application/18/swap.md)
 
 35. [21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)
-
