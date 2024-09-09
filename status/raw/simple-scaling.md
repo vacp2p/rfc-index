@@ -1,6 +1,6 @@
 ---
 
-title: 57/STATUS-Simple-Scaling
+title: STATUS-Simple-Scaling
 name: Status Simple Scaling
 status: raw
 category: Informational
