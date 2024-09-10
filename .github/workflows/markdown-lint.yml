@@ -19,5 +19,5 @@ jobs:
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          configFile: .github/workflows/markdownlint.json
+          config: .github/workflows/markdownlint.json
           globs: '**/*.md'
