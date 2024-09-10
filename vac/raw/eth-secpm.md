@@ -1362,4 +1362,3 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Toy Ethereum Private Messaging Protocol](https://rfc.vac.dev/spec/20/)
 - [Uniform Resource Identifier](https://datatracker.ietf.org/doc/html/rfc3986)
 - [WalletConnect URI Format](https://eips.ethereum.org/EIPS/eip-1328)
-  
