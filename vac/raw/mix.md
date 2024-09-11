@@ -39,7 +39,7 @@ libp2p protocols do not inherently protect sender identities.
 
 The Mix protocol enhances anonymity in libp2p by implementing a mix network,
 where messages are anonymized through multiple relay nodes before reaching the
-intended recipient. The Sphinx packet format is a well-researched method for
+intended recipient. The Sphinx packet format is a well-researched component which this specification leverages to
 achieving this, offering strong anonymity properties by concealing sender and
 recipient information at each relay.
 
