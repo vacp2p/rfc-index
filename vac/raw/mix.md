@@ -298,7 +298,8 @@ message SphinxPacket {
 
 ### 5. Handler Function
 
-The handler function is responsible for processing connections and messages for
+The [handler function](https://docs.libp2p.io/concepts/fundamentals/protocols/#handler-functions)
+is responsible for processing connections and messages for
 the Mix protocol. It operates according to the mix node roles (_i.e.,_ sender,
 intermediary mix node, or exit node) defined in
 [Section 2.1](#21-mix-nodes-roles). This function is crucial for implementing
@@ -651,10 +652,12 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
+[Handler function](https://docs.libp2p.io/concepts/fundamentals/protocols/#handler-functions)
 [libp2p](https://libp2p.io)\
 [Sphinx](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
 
 ### informative
+
 [PoW](https://bitcoin.org/bitcoin.pdf)\
 [Sphinx packet size](https://petsymposium.org/popets/2024/popets-2024-0050.pdf)
 
