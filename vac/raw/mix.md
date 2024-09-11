@@ -660,7 +660,7 @@ This section details the specific steps for attaching and verifying the PoW.
 ### Structure
 
 The sender appends the PoW to the serialized libp2p message, `libp2p_message`, in a structured format,
-making it easy to parse and verify by the exit node. The sender include the PoW as follows:
+making it easy to parse and verify by the exit node. The sender includes the PoW as follows:
 
  `message = <libp2p_message_bytes | timestamp | nonce>`
 
@@ -672,9 +672,16 @@ where:
 
 `<nonce>`: The nonce that satisfies the PoW difficulty criterion (4 bytes).
 
-**Nonce Size:** The nonce size should be large enough to ensure a sufficiently large search space. It should be chosen so that the range of possible nonce values allows for the difficulty target to be met. However, larger nonce sizes can increase the time and computational effort required to find a valid nonce. We use an 4-byte nonce to ensure sufficiently large search space with reasonable computational effort.
+**Nonce Size:** The nonce size should be large enough to ensure a sufficiently large search space.
+It should be chosen so that the range of possible nonce values allows for the difficulty target to be met.
+However, larger nonce sizes can increase the time and computational effort required to find a valid nonce.
+We use an 4-byte nonce to ensure sufficiently large search space with reasonable computational effort.
 
-**Difficulty Level:** The difficulty level is usually expressed as the number of leading zeros required in the hash output. It is chosen such that the computational effort required is significant but not prohibitive. We recommend a reasonable difficulty level that requires around 16-18 leading zeros in the SHA-256 hash. This would roughly take 0.65 to 2.62 seconds to compute in a low-grade CPU, capable of computing 100,000 hashes per second.
+**Difficulty Level:** The difficulty level is usually expressed as the number of leading zeros
+required in the hash output. It is chosen such that the computational effort required is significant
+but not prohibitive. We recommend a reasonable difficulty level that requires around 16-18 leading
+zeros in the SHA-256 hash. This would roughly take 0.65 to 2.62 seconds to compute in a
+low-grade CPU, capable of computing 100,000 hashes per second.
 
 ### Calculate Proof of Work (PoW)
 
