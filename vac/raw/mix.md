@@ -1,6 +1,6 @@
 ---
 title: LIBP2P-MIX
-name: The Mix Protocol
+name:  Libp2p Mix Protocol
 status: raw
 category: Standards Track
 tags:
