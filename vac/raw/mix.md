@@ -1,5 +1,5 @@
 ---
-title: MIX-PROTOCOL
+title: LIBP2P-MIX
 name: The Mix Protocol
 status: raw
 category: Standards Track
