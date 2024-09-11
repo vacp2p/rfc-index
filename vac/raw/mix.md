@@ -23,7 +23,7 @@ i. Path selection for choosing a random route through the network via multiple
 mix nodes.\
 ii. Sphinx packet construction and processing, providing cryptographic
 guarantees of anonymity and security.\
-iii. Proof of Work mechanism to prevent spamming of the mix network.\
+iii. Pluggable spam protection mechanism to prevent abuse of the mix network.\
 iv. Delayed message forwarding to thwart timing analysis attacks.
 
 **Protocol identifier:** `"/mix/1.0.0"`
@@ -39,16 +39,22 @@ libp2p protocols do not inherently protect sender identities.
 
 The Mix protocol enhances anonymity in libp2p by implementing a mix network,
 where messages are anonymized through multiple relay nodes before reaching the
-intended recipient. The Sphinx packet format is a well-researched component which this specification leverages to
-offer strong anonymity properties by concealing sender and
-recipient information at each relay.
+intended recipient. The Sphinx packet format is a well-researched component which
+this specification leverages to offer strong anonymity properties by concealing
+sender and recipient information at each relay.
 
 Using this approach, even the nodes relaying messages cannot determine the
 sender or final recipient, within a robust adversarial model. This decentralized
 solution distributes trust among participants, eliminating single points of
-failure and enhancing overall network resilience. Additionally, mechanisms such
-as Proof of Work and delayed forwarding address common attacks on anonymity
-networks, such as spam and timing analysis.
+failure and enhancing overall network resilience. Additionally, pluggable
+spam protection mechanism and delayed forwarding address common attacks on
+anonymity networks, such as spam and timing analysis.
+
+The Mix protocol is designed with flexibility in mind, allowing for
+pluggable components such as spam protection, peer discovery, and
+incentivization mechanisms. This design choice enables the protocol to evolve
+and adapt to different network requirements and constraints. This also leaves
+room for future enhancements such as cover traffic generation.
 
 By incorporating these features, the Mix protocol aims to provide a robust
 anonymity layer within the libp2p ecosystem, enabling developers to easily
@@ -344,34 +350,32 @@ sender, intermediary, and exit node) is detailed in the following subsections.
    `libp2p_message`. This can be done using Protocol Buffers or another
    serialization method.
 
-2. **Calculate Proof of Work (PoW)**
+2. **Apply Spam Protection**
 
-   Perform the following steps to compute the PoW challenge and response:
+   Apply the chosen spam protection mechanism to the `libp2p_message`.
+   This could be Proof of Work (PoW), Verifiable Delay Function (VDF),
+   Rate Limiting Nullifier (RLN), or other suitable approaches.
 
-   i. **Create Challenge**
+   Refer to [Appendix A](#appendix-a-example-spam-protection-using-proof-of-work)
+   for details on the current implementation using PoW.
 
-   Retrieve the current Unix timestamp, `timestamp`, in seconds (4 bytes).
+3. **Prepare the Message**
 
-   ii. **Find A Valid Nonce**
-   - Initialize the `nonce` to a 4-byte value (initially zero).
-   - Increment the `nonce` until the SHA-256 hash of
-    `<libp2p_message_bytes | timestamp | nonce>` has at least
-    18 leading zeros.
-   - The final value of the `nonce` is considered valid.
+   Prepare the `message` by combining the `libp2p_message` with any necessary data
+   from the spam protection mechanism. The exact format of `message` will depend on
+   the chosen spam protection method.
 
-3. **Attach the PoW to the libp2p Message**
+   Note: The spam protection mechanism is designed as a pluggable interface,
+   allowing for different methods to be implemented based on network requirements.
+   This flexibility extends to other components such as peer discovery and incentivization,
+   which are not specified in detail to allow for future optimizations and adaptations.
 
-   Append the 4-byte `timestamp` and the valid `nonce` to
-   the `libp2p_message` to form the `message`.
-
-   `message = <libp2p_message | timestamp | nonce>`
-
-4. **Perform Path Selection** (refer [Section 2.4](#24-node-discovery))
+5. **Perform Path Selection** (refer [Section 2.4](#24-node-discovery))
 
    - Let the Ed25519 public keys of the mix nodes in the path be
     $y_0,\ y_1,\ \ldots,\ y_{L-1}$.
 
-5. **Wrap Final Message in Sphinx Packet**
+6. **Wrap Final Message in Sphinx Packet**
    Perform the following steps to wrap `message` in a Sphinx packet:
 
    a. **Compute** **Alphas ($α_i$**, **$i=0$** to **$L-1$)**
@@ -470,7 +474,7 @@ sender, intermediary, and exit node) is detailed in the following subsections.
      Note that the length of $\delta$ is $|m| + \kappa$.
 
      Given that the derived size of $\delta$ is $2029$ bytes, this allows
-     messages to be of length $2029-16 = 2013$ bytes. This means smaller
+     `message` to be of length $2029-16 = 2013$ bytes. This means smaller
      messages may need to be padded up to $2013$ bytes (e.g., using PKCS#7
      padding).
 
@@ -494,9 +498,9 @@ sender, intermediary, and exit node) is detailed in the following subsections.
      For a fixed Sphinx packet size of $2413$ bytes and given the header length
      of $384$ bytes, `delta` size is $2029$ bytes.
 
-6. **Serialize the Sphinx Packet** using Protocol Buffers.
+7. **Serialize the Sphinx Packet** using Protocol Buffers.
 
-7. **Send the Serialized Packet** to the first mix node using the
+8. **Send the Serialized Packet** to the first mix node using the
    `"/mix/1.0.0"` protocol.
 
 #### 5.2 Intermediary Mix Node
@@ -615,28 +619,15 @@ to relay a message:
 
    $m = \delta'_{[\kappa\ldots]}$ (remove first $\kappa$ bytes).
 
-4. **Remove Any Padding** from $m$ to obtain the `message` appended with PoW.
+4. **Remove Any Padding** from $m$ to obtain the `message` including any
+   necessary spam protection data.
 
-5. **Verify PoW**
+5. **Verify Spam Protection**
 
-   a. **Extract Timestamp and Nonce**
-
-   - Splits `data` into 4-byte `nonce` (last 4 bytes), 4-byte `timestamp` (the
-      4 bytes before the nonce), and the `libp2p_message`  to be published (the
-      remaining bytes).
-
-   b. **Verifies Timestamp**
-
-   - Checks the `timestamp` is within the last 5 minutes.
-   - If the timestamp is outside the acceptable window, the exit node discards
-    the message.
-
-   c. **Verifies Response**
-
-   - Computes the SHA-256 hash of the `message` and checks if the hash meets
-    the difficulty requirement, _i.e._, has at least 18 leading zeros.
-   - If the hash is not valid, the exit node discards the message. Otherwise,
-    it follows the next steps to publish the message.
+   Verify the spam protection mechanism applied to the `message`.
+   If the verification fails, discard the `message`.
+   Refer to [Appendix A](#appendix-a-example-spam-protection-using-proof-of-work)
+   for details on the current implementation using PoW.
 
 6. **Deserialize the extracted message** using the respective libp2p protocol's
    definition.
@@ -650,14 +641,85 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-### normative
+### Normative
 
 [Handler function](https://docs.libp2p.io/concepts/fundamentals/protocols/#handler-functions)
 [libp2p](https://libp2p.io)\
 [Sphinx](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
 
-### informative
+### Informative
 
 [PoW](https://bitcoin.org/bitcoin.pdf)\
 [Sphinx packet size](https://petsymposium.org/popets/2024/popets-2024-0050.pdf)
 
+## Appendix A. Example Spam Protection using Proof of Work
+
+The current implementation uses a Proof of Work mechanism for spam protection.
+This section details the specific steps for attaching and verifying the PoW.
+
+### Structure
+
+The sender appends the PoW to the serialized libp2p message, `libp2p_message`, in a structured format,
+making it easy to parse and verify by the exit node. The sender include the PoW as follows:
+
+ `message = <libp2p_message_bytes | timestamp | nonce>`
+
+where:
+
+ `<libp2p_message_bytes>`: Serialized libp2p message (variable length).
+
+`<timestamp>`: The current Unix timestamp in seconds (4 bytes).
+
+`<nonce>`: The nonce that satisfies the PoW difficulty criterion (4 bytes).
+
+**Nonce Size:** The nonce size should be large enough to ensure a sufficiently large search space. It should be chosen so that the range of possible nonce values allows for the difficulty target to be met. However, larger nonce sizes can increase the time and computational effort required to find a valid nonce. We use an 4-byte nonce to ensure sufficiently large search space with reasonable computational effort.
+
+**Difficulty Level:** The difficulty level is usually expressed as the number of leading zeros required in the hash output. It is chosen such that the computational effort required is significant but not prohibitive. We recommend a reasonable difficulty level that requires around 16-18 leading zeros in the SHA-256 hash. This would roughly take 0.65 to 2.62 seconds to compute in a low-grade CPU, capable of computing 100,000 hashes per second.
+
+### Calculate Proof of Work (PoW)
+
+The sender performs the following steps to compute the PoW challenge and response:
+
+i. **Create Challenge**
+
+Retrieves the current Unix timestamp, `timestamp`, in seconds (4 bytes).
+
+ii. **Find A Valid Nonce**
+
+- Initializes the `nonce` to a 4-byte value (initially zero).
+  
+- Increments the `nonce` until the SHA-256 hash of
+  `<libp2p_message_bytes | timestamp | nonce>` has at least
+  18 leading zeros.
+
+- The final value of the `nonce` is considered valid.
+
+### Attach the PoW to the libp2p Message
+
+  Append the 4-byte `timestamp` and the valid `nonce` to
+  the `libp2p_message_bytes` to form the `message`.
+
+  `message = <libp2p_message_bytes | timestamp | nonce>`
+
+### Verify PoW
+  
+i. **Extract Timestamp and Nonce**
+
+  Split `message` into 4-byte `nonce` (last 4 bytes), 4-byte `timestamp`
+  (the 4 bytes before the nonce), and the serialized libp2p message
+  to be published, `libp2p_message_bytes` (the remaining bytes).
+
+ii. **Verify Timestamp**
+  
+- Check the `timestamp` is within the last 5 minutes.
+  
+- If the timestamp is outside the acceptable window, the exit node
+  discards the message.
+
+iii. **Verifiy Response**
+
+- Compute the SHA-256 hash of the `message` and check if the hash
+  meets the difficulty requirement, _i.e._, has at least 18 leading zeros.
+  
+- If the hash is not valid, the exit node discards the message. Otherwise,
+  it follows the steps to publish the message.
