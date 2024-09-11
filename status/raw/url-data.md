@@ -20,10 +20,10 @@ To reduce reliance on external servers for providing appropriate link previews, 
 
 ## Terminology
 
-- Community: Refer to [56/STATUS-COMMUNITIES](/spec/56)
-- Channel: Refer to terminology in [56/STATUS-COMMUNITIES](/spec/56)
-- User: Refer to terminology in [56/STATUS-COMMUNITIES](/spec/56)
-- Shard Refer to terminology in [51/WAKU2-RELAY-SHARDING](/spec/51)
+- Community: Refer to [STATUS-COMMUNITIES](../56/communities.md)
+- Channel: Refer to terminology in [STATUS-COMMUNITIES](../56/communities.md)
+- User: Refer to terminology in [STATUS-COMMUNITIES](../56/communities.md)
+- Shard Refer to terminology in [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 
 ## Wire Format
 
