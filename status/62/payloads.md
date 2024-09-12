@@ -1,6 +1,6 @@
 ---
 slug: 62
-title: 62/STATUS-Payloads
+title: 62/STATUS-PAYLOADS
 name: Status Message Payloads
 status: draft
 editor: r4bbit <r4bbit@status.im>
@@ -344,7 +344,7 @@ it's only meant to order causally related events.
 The status client therefore makes a "bid",
 speculating that it will beat the current chat-timestamp,
 s.t. the status client's Lamport timestamp format is:
-`clock =`max({timestamp}, chat_clock + 1)`
+`clock = max({timestamp}, chat_clock + 1)`
 
 This will satisfy the Lamport requirement, namely: a -> b then T(a) < T(b)
 
