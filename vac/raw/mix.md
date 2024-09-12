@@ -14,8 +14,9 @@ This document specifies the Mix protocol, a custom protocol within the
 [libp2p](https://libp2p.io) framework designed to enable anonymous communication
 in peer-to-peer networks. The Mix protocol allows libp2p nodes to send messages
 without revealing the sender's identity to intermediary nodes or the recipient.
-It achieves this by using the [Sphinx packet format](https://www.researchgate.net/publication/220713667_Sphinx_A_Compact_and_Provably_Secure_Mix_Format), which encrypts and routes
-messages through a series of nodes (mix nodes) before reaching the recipient.
+It achieves this by using the [Sphinx packet format](https://www.researchgate.net/publication/220713667_Sphinx_A_Compact_and_Provably_Secure_Mix_Format),
+which encrypts and routes messages through a series of nodes (mix nodes)
+before reaching the recipient.
 
 Key features of the protocol include:
 
@@ -31,7 +32,8 @@ iv. Delayed message forwarding to thwart timing analysis attacks.
 Note: The Mix Protocol is designed to work alongside existing libp2p protocols,
 allowing for seamless integration with current libp2p applications while
 providing enhanced privacy features. For example, it can encapsulate messages
-from protocols like [GossipSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.2.md) to ensure sender anonymity.
+from protocols like [GossipSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.2.md)
+to ensure sender anonymity.
 
 ## Background
 
@@ -68,13 +70,14 @@ The Mix protocol is identified by the string `"/mix/1.0.0"`.
 
 ### 2. Custom Mix Protocol
 
-The Mix protocol is designed as a standalone protocol, 
-identified by the protocol identifier `"/mix/1.0.0"`. 
+The Mix protocol is designed as a standalone protocol,
+identified by the protocol identifier `"/mix/1.0.0"`.
 This approach allows the Mix protocol to operate independently,
-decoupled from specific applications, 
-providing greater flexibility and reusability across various libp2p protocols. 
-By doing so, the Mix protocol can evolve independently, 
-focusing on its core functionality without being tied to the development and maintenance cycles of other protocols.
+decoupled from specific applications,
+providing greater flexibility and reusability across various libp2p protocols.
+By doing so, the Mix protocol can evolve independently,
+focusing on its core functionality without being tied to the development
+and maintenance cycles of other protocols.
 
 #### 2.1 Mix Nodes Roles
 
@@ -193,9 +196,10 @@ protocol between libp2p peers.
 #### 2.6 Transport Layer
 
 The Mix protocol uses secure transport protocols to ensure confidentiality and
-integrity of communications. The recommended transport protocols are [QUIC](https://datatracker.ietf.org/doc/rfc9000/) or
-TLS (preferably QUIC due to its performance benefits and built-in features such
-as low latency and efficient multiplexing).
+integrity of communications. The recommended transport protocols are
+[QUIC](https://datatracker.ietf.org/doc/rfc9000/) or TLS (preferably QUIC
+due to its performance benefits and built-in features
+such as low latency and efficient multiplexing).
 
 #### 2.7 Connection Establishment
 
@@ -249,7 +253,8 @@ as low latency and efficient multiplexing).
    - Contains the encrypted routing information.
    - We recommend a reasonable maximum path length of $r=5$, considering
     latency/anonymity trade-offs.
-   - This gives a reasonable size of $336$ bytes, when $t = 3$ (refer Section 5.2.10 for the choice of $t$).
+   - This gives a reasonable size of $336$ bytes, when $t = 3$ (refer
+     Section 5.2.10 for the choice of $t$).
    - We extend $β$ to accommodate next hop address and delay below.
 
 3. **Gamma ($γ$)**: $\kappa$ bytes (16 bytes)
@@ -362,20 +367,20 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 3. **Prepare the Message**
 
    Prepare the `message` by combining the `libp2p_message` with any necessary data
-   from the spam protection mechanism. The exact format of `message` will depend on
-   the chosen spam protection method.
+   from the spam protection mechanism. The exact format of `message` will depend
+   on the chosen spam protection method.
 
    Note: The spam protection mechanism is designed as a pluggable interface,
    allowing for different methods to be implemented based on network requirements.
    This flexibility extends to other components such as peer discovery and incentivization,
    which are not specified in detail to allow for future optimizations and adaptations.
 
-5. **Perform Path Selection** (refer [Section 2.4](#24-node-discovery))
+4. **Perform Path Selection** (refer [Section 2.4](#24-node-discovery))
 
    - Let the Ed25519 public keys of the mix nodes in the path be
     $y_0,\ y_1,\ \ldots,\ y_{L-1}$.
 
-6. **Wrap Final Message in Sphinx Packet**
+5. **Wrap Final Message in Sphinx Packet**
    Perform the following steps to wrap `message` in a Sphinx packet:
 
    a. **Compute** **Alphas ($α_i$**, **$i=0$** to **$L-1$)**
@@ -405,12 +410,13 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
        $`\text{φ\_iv}_{i-1} = H(\text{"iv"}\ |\ s_{i-1})`$ (truncated to 128 bits)
 
-     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$, which is AES-CTR
-       encryption with the keystream starting from index $((t+1)(r-i)+t+2)\kappa$ :
+     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$, which is
+       AES-CTR encryption with the keystream starting from
+       index $((t+1)(r-i)+t+2)\kappa$ :
 
        $`\phi_i = \text{AES-CTR}^\prime_i(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
-       \ \phi_{i-1}\ |\ 0_{(t+1)\kappa})`$, where $0_{(t+1)\kappa}$ is the string of $0$
-       bits of length $(t+1)\kappa$.
+       \ \phi_{i-1}\ |\ 0_{(t+1)\kappa})`$,
+       where $0_{(t+1)\kappa}$ is the string of $0$ bits of length $(t+1)\kappa$.
 
    Note that the length of $\phi_i$ is $(t+1)i\kappa$.
 
@@ -498,9 +504,9 @@ sender, intermediary, and exit node) is detailed in the following subsections.
      For a fixed Sphinx packet size of $2413$ bytes and given the header length
      of $384$ bytes, `delta` size is $2029$ bytes.
 
-7. **Serialize the Sphinx Packet** using Protocol Buffers.
+6. **Serialize the Sphinx Packet** using Protocol Buffers.
 
-8. **Send the Serialized Packet** to the first mix node using the
+7. **Send the Serialized Packet** to the first mix node using the
    `"/mix/1.0.0"` protocol.
 
 #### 5.2 Intermediary Mix Node
@@ -539,7 +545,8 @@ to relay a message:
 
    $`\text{β\_iv} = H(\text{"iv"}\ |\ s)`$ (truncated to 128 bits)
 
-   b. Compute $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta\ |\ 0_{(t+1)k})`$.
+   b. Compute
+   $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta\ |\ 0_{(t+1)k})`$.
 
    c. Uniquely parse prefix of $B$
 
@@ -579,7 +586,7 @@ to relay a message:
      $`\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)$` (truncated to 128 bits)
    - Compute $`\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)`$
 
-7. **Construct Final Sphinx Packet**
+6. **Construct Final Sphinx Packet**
 
    a. Initialize header
 
@@ -593,9 +600,9 @@ to relay a message:
 
    `delta = delta' // variable size, max 2029 bytes`
 
-8. **Serialize the Sphinx Packet** using Protocol Buffers.
-9. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
-10. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
+7. **Serialize the Sphinx Packet** using Protocol Buffers.
+8. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
+9. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
     `"/mix/1.0.0"` protocol.
 
 #### 5.3 Exit Node
@@ -659,8 +666,9 @@ This section details the specific steps for attaching and verifying the PoW.
 
 ### Structure
 
-The sender appends the PoW to the serialized libp2p message, `libp2p_message`, in a structured format,
-making it easy to parse and verify by the exit node. The sender includes the PoW as follows:
+The sender appends the PoW to the serialized libp2p message, `libp2p_message`,
+in a structured format, making it easy to parse and verify by the exit node.
+The sender includes the PoW as follows:
 
  `message = <libp2p_message_bytes | timestamp | nonce>`
 
@@ -672,16 +680,20 @@ where:
 
 `<nonce>`: The nonce that satisfies the PoW difficulty criterion (4 bytes).
 
-**Nonce Size:** The nonce size should be large enough to ensure a sufficiently large search space.
-It should be chosen so that the range of possible nonce values allows for the difficulty target to be met.
-However, larger nonce sizes can increase the time and computational effort required to find a valid nonce.
-We use an 4-byte nonce to ensure sufficiently large search space with reasonable computational effort.
+**Nonce Size:** The nonce size should be large enough to ensure a sufficiently large
+search space. It should be chosen so that the range of possible nonce values
+allows for the difficulty target to be met. However, larger nonce sizes can increase
+the time and computational effort required to find a valid nonce. We use
+a 4-byte nonce to ensure sufficiently large search space with reasonable
+computational effort.
 
-**Difficulty Level:** The difficulty level is usually expressed as the number of leading zeros
-required in the hash output. It is chosen such that the computational effort required is significant
-but not prohibitive. We recommend a reasonable difficulty level that requires around 16-18 leading
-zeros in the SHA-256 hash. This would roughly take 0.65 to 2.62 seconds to compute in a
-low-grade CPU, capable of computing 100,000 hashes per second.
+**Difficulty Level:** The difficulty level is usually expressed as the number of
+leading zeros required in the hash output. It is chosen such that the
+computational effort required is significant but not prohibitive.
+We recommend a reasonable difficulty level that requires around
+16-18 leading zeros in the SHA-256 hash. This would roughly take
+0.65 to 2.62 seconds to compute in a low-grade CPU,
+capable of computing 100,000 hashes per second.
 
 ### Calculate Proof of Work (PoW)
 
