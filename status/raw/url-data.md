@@ -11,12 +11,15 @@ contributors:
 
 ## Abstract
 
-This document specifies serialization, compression, and encoding techniques used to transmit data within URLs in the context of Status protocols.
+This document specifies serialization, compression, and
+encoding techniques used to transmit data within URLs in the context of Status protocols.
 
 ## Motivation
 
-When sharing URLs, link previews often expose metadata to the websites behind those links.
-To reduce reliance on external servers for providing appropriate link previews, this specification proposes a standard method for encoding data within URLs.
+When sharing URLs,
+link previews often expose metadata to the websites behind those links.
+To reduce reliance on external servers for providing appropriate link previews,
+this specification proposes a standard method for encoding data within URLs.
 
 ## Terminology
 
@@ -80,7 +83,7 @@ message URLData {
 The above wire format describes the data encoded in the URL.
 The data MUST be serialized, compressed, and encoded using the following standards:
 
-### Encoding
+Encoding
 
 - [Base64url](https://datatracker.ietf.org/doc/html/rfc4648)
 
@@ -94,11 +97,11 @@ The data MUST be serialized, compressed, and encoded using the following standar
 
 ### Implementation Pseudocode
 
-#### Encoding
+Encoding
 
 Encoding the URL MUST be done in the following order:
 
-```
+```protobuf
 raw_data = {User | Channel | Community}
 serialized_data = protobuf_serialize(raw_data)
 compressed_data = brotli_compress(serialized_data)
@@ -111,14 +114,15 @@ The `encoded_url_data` is then used to generate a signature using the private ke
 
 Decoding the URL MUST be done in the following order:
 
-```
+```protobuf
 url_data = base64url_decode(encoded_url_data)
 decompressed_data = brotli_decompress(url_data)
 deserialized_data = protobuf_deserialize(decompressed_data)
 raw_data = deserialized_data.content
 ```
 
-The `raw_data` is then used to construct the appropriate data structure (User, Channel, or Community).
+The `raw_data` is then used to construct the appropriate data structure
+(User, Channel, or Community).
 
 ### Example
 
