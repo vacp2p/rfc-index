@@ -129,7 +129,7 @@ Message history archives are implemented using the following protocol buffer.
 ### WakuMessageHistoryArchive
 
 The `from` field SHOULD contain a timestamp of the time range's lower bound.
-The type parallels the `timestamp` of [WakuMessage](../../waku/standards/core/14/message.md/#payloads).
+The type parallels the `timestamp` of [WakuMessage](../../waku/standards/core/14/message.md).
 
 The `to` field SHOULD contain a timestamp of the time range's the higher bound.
 
@@ -289,7 +289,7 @@ The topic of that special channel follows the following format:
 /{application-name}/{version-of-the-application}/{content-topic-name}/{encoding}
 ```
 
-All messages sent with this topic MUST be instances of `ApplicationMetadataMessage` ([62/STATUS-PAYLOAD](../62/payload.md)) with a `payload` of `CommunityMessageArchiveIndex`.
+All messages sent with this topic MUST be instances of `ApplicationMetadataMessage` ([62/STATUS-PAYLOAD](../62/payloads.md)) with a `payload` of `CommunityMessageArchiveIndex`.
 
 Only the control node MAY post to the special channel. Other messages on this specified channel MUST be ignored by clients.
 Community members MUST NOT have permission to send messages to the special channel.

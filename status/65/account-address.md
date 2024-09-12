@@ -113,4 +113,3 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
 - [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
 - [Ethereum Name System](https://ens.domains/)
-- [Status Multiaccount](../63/account-address.md)

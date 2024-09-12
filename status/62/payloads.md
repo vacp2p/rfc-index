@@ -1,8 +1,9 @@
 ---
 slug: 62
-title: 62/STATUS-Payloads
+title: 62/STATUS-PAYLOADS
 name: Status Message Payloads
 status: draft
+description: Describes structure of chat-related messages.
 editor: r4bbit <r4bbit@status.im>
 contributors: 
 - Adam Babik <adam@status.im>
@@ -310,7 +311,7 @@ enum MessageType {
 If a user sends a new message before the messages sent while the user was offline are received, the new message is supposed to be displayed last in a chat.
 This is where the basic algorithm of Lamport timestamp would fall short as it's only meant to order causally related events.
 
-The status client therefore makes a "bid", speculating that it will beat the current chat-timestamp, s.t. the status client's Lamport timestamp format is: `clock = `max({timestamp}, chat_clock + 1)`
+The status client therefore makes a "bid", speculating that it will beat the current chat-timestamp, s.t. the status client's Lamport timestamp format is: `clock = max({timestamp}, chat_clock + 1)`
 
 This will satisfy the Lamport requirement, namely: a -> b then T(a) < T(b)
 

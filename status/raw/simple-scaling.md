@@ -475,7 +475,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 * [56/STATUS-COMMUNITIES](../56/communities.md)
-* [55/STATUS-1TO1-CHAT](.../55/1to1-chat.md)
+* [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 * [23/WAKU2-TOPICS](../../waku/informational/23/)
 * [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
 * [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
