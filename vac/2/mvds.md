@@ -131,11 +131,9 @@ the `MESSAGE` is removed from the state for the given peer.
 - All records that require retransmission are added to the payload,
 given `Send Epoch` has been reached.
 
-<p align="center">
-    <img src="./images/interactive.png" />
-    <br />
-    Figure 1: Delivery without retransmissions in interactive mode.
-</p>
+![notification](./images/interactive.png)
+
+Figure 1: Delivery without retransmissions in interactive mode.
 
 #### Batch Mode
 
@@ -150,11 +148,9 @@ given `Send Epoch` has been reached.
 
 <!-- diagram -->
 
-<p align="center">
-    <img src="./images/batch.png" />
-    <br />
-    Figure 2: Delivery without retransmissions in batch mode.
-</p>
+![notification](./images/batch.png)
+
+Figure 2: Delivery without retransmissions in batch mode.
 
 > ***NOTE:** Batch mode is higher bandwidth whereas interactive mode is higher latency.*
 
@@ -171,7 +167,8 @@ it SHOULD be exponentially increased until reaching an upper bound
 where it then goes back to a lower epoch in order to
 prevent a record's `Send Epoch`'s from becoming too large.
 
-> ***NOTE:** We do not retransmission `ACK`s as we do not know when they have arrived, therefore we simply resend them every time we receive a `MESSAGE`.*
+> ***NOTE:** We do not retransmission `ACK`s as we do not know when they have arrived,
+therefore we simply resend them every time we receive a `MESSAGE`.*
 
 ## Formal Specification
 

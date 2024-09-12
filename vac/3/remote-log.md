@@ -143,11 +143,7 @@ Bob only needs read-only access to NS and CAS.
 
 <!-- diagram -->
 
-<p align="center">
-    <img src="./images/remote-log.png" />
-    <br />
-    Figure 1: Remote log data synchronization.
-</p>
+![notification](./images/remote-log.png)
 
 <!-- Document the flow wrt operations -->
 
