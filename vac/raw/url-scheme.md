@@ -10,7 +10,8 @@ contributors:
 
 ## Abstract
 
-This document describes URL scheme for previewing and deep linking content as well as for triggering actions.
+This document describes URL scheme for previewing and
+deep linking content as well as for triggering actions.
 
 ## Background / Rationale / Motivation
 
@@ -53,7 +54,9 @@ A standard track RFC in `stable` status MUST feature this section.
 A standard track RFC in `raw` or `draft` status SHOULD feature this section.
 Informational RFCs (in any state) may feature this section.
 If there are none, this section MUST explicitly state that fact.
-This section MAY contain additional relevant information, e.g. an explanation as to why there are no security consideration for the respective document. -->
+This section MAY contain additional relevant information,
+e.g. an explanation as to why there are no security consideration
+for the respective document. -->
 
 ## Discussions
 
