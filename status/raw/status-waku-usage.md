@@ -4,7 +4,7 @@ name: Status Waku2 Usage
 status: raw
 category: Best Current Practice
 description: Defines how the Status application uses the Waku protocols.
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors: 
 - Jimmy Debe <jimmy@status.im>
 

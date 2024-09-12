@@ -6,7 +6,7 @@ status: draft
 category: Standards Track
 tags: waku-application
 description: A chat protocol to send public and private messages to a single recipient by the Status app.
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Andrea Piana <andreap@status.im>
 - Pedro Pombeiro <pedro@status.im>
@@ -54,7 +54,7 @@ There are two phases in the initial negotiation of a 1:1 chat:
 A QR code serves two purposes simultaneously - identity verification and initial key material retrieval;
 1. **Asynchronous initial key exchange**
 
-For more information on account generation and trust establishment, see [65/ACCOUNT-ADDRESS](../65/account-address.md)
+For more information on account generation and trust establishment, see [65/STATUS-ACCOUNT-ADDRESS](../65/account-address.md)
 
 ### Post Negotiation
 
@@ -213,7 +213,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
 2. [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
-3. [65/STATUS-ACCOUNT](../65/account-address.md)
+3. [65/STATUS-ACCOUNT-ADDRESS](../65/account-address.md)
 4. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
 5. [WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/master/standards/application/noise-sessions.md)
 6. [56/STATUS-COMMUNITIES](../56/communities.md)

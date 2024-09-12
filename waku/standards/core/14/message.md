@@ -8,7 +8,7 @@ tags: waku/core-protocol
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Sanaz Taheri <sanaz@status.im>
-  - Aaryamann Challani <aaryamann@status.im>
+  - Aaryamann Challani <p1ge0nh8er@proton.me>
   - Lorenzo Delgado <lorenzo@status.im>
   - Abhimanyu Rawat <abhi@status.im>
   - Oskar Thorén <oskarth@titanproxy.com>

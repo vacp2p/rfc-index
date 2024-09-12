@@ -6,7 +6,7 @@ status: draft
 category: Standards Track
 tags: waku-application
 description: Status Communities allow multiple users to communicate in a discussion space. This is a key feature of the Status application.
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Andrea Piana <andreap@status.im>
 ---
