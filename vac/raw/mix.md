@@ -410,8 +410,8 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
        $`\text{φ\_iv}_{i-1} = H(\text{"iv"}\ |\ s_{i-1})`$ (truncated to 128 bits)
 
-     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$, which is
-       AES-CTR encryption with the keystream starting from
+     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$,
+       which is AES-CTR encryption with the keystream starting from
        index $((t+1)(r-i)+t+2)\kappa$ :
 
        $`\phi_i = \text{AES-CTR}^\prime_i(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
