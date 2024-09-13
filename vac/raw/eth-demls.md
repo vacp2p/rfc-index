@@ -31,7 +31,7 @@ The specification is divided into the following sections:
 
 ## Private group messaging protocol
 
-### Theoretical content
+### Background
 
 The [Messaging Layer Security](https://datatracker.ietf.org/doc/rfc9420/) (MLS)
 protocol aims at providing a group of users with
