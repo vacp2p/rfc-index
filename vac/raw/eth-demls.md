@@ -936,78 +936,29 @@ replaced with SIWE in this specification.
 
 ### Addition of members to a group
 
-#### Alice knows Bob’s Ethereum address
-
-1. Off-chain - Alice and Bob set a secure communication channel.
-2. Alice creates the smart contract associated to the group. This smart
-contract MUST include an ACL.
-3. Alice adds Bob’s Ethereum address to the ACL.
-4. Off-chain - Alice sends a request to join the group to Bob. The
-request MUST include the contract’s address: `RequestMLSPayload {"You
-are joining the group with smart contract: 0xabcd"}`
-5. Off-chain - Bob responds the request with a digitally signed
-response. This response includes Bob’s credentials and key package:
-`ResponseMLSPayload {sig: signature(ethereum_sk, message_to_sign),
-address: ethereum_address, credentials, keypackage}`
-6. Off-chain - Alice verifies the signature, using Bob’s `ethereum_pk`
-and checks that it corresponds to an address contained in the ACL.
-7. Off-chain - Alice sends a welcome message to Bob.
-8. Off-chain - Alice SHOULD broadcasts a message announcing the
-addition of Bob to other users of the group.
-![figure7](./images/eth-secpm_onchain-register-1.png)
-
-#### Alice does not know Bob’s Ethereum address
-
-1. Off-chain - Alice and Bob set a secure communication channel.
-2. Alice creates the smart contract associated to the group.
-This smart contract MUST include an ACL.
-3. Off-chain - Alice sends a request to join the group to Bob. The
-request MUST include the contract’s address:
-`RequestMLSPayload{"You are joining the group
-with smart contract: 0xabcd"}`
-4. Off-chain - Bob responds the request with a digitally signed
-response. This response includes Bob’s credentials, his Ethereum
-address and key package: `ResponseMLSPayload {sig:
-signature(ethereum_sk, message_to_sign), address: ethereum_address,
-credentials, keypackage}`
-5. Off-chain - Alice verifies the signature using Bob’s `ethereum_pk`.
-6. Upon reception of Bob’s data, Alice registers data with the smart
-contract.
-7. Off-chain - Alice sends a welcome message to Bob.
-8. Off-chain - Alice SHOULD broadcasts a message announcing the
-addition of Bob to other users of the group.
+1. Alice creates a Smart Contract with ACL.
+2. Off-chain: Alice sends the contract address and an invitation message to Bob over the secure channel.
+3. Off-chain: Bob sends a digitally signed response confirming his Ethereum address and agreement to join.
+4. Off-chain: Alice verifies the digital signature using the public key of Bob.
+5. Alice sends a transaction to the smart contract to add Bob’s address to the ACL.
+6. Off-chain: Alice sends a welcome message to Bob.
+7. Off-chain: Alice sends a broadcast message to all group members, notifying them the addition of Bob.
 
 ![figure8](./images/eth-secpm_onchain-register-2.png)
 
-### Considerations regarding smart contracts
+### Updates in groups
 
-The role of the smart contract includes:
+Removal requests and update requests are considered the same operation. One assumes Alice is the creator of the contract.
+They MUST be processed as follows:
 
-- Register user information and key packages:
-As described in the previous section.
-- Updates of key material.
-  - Users MUST send any update in their key material to the other
-users of the group via off-chain messages.
-  - Upon reception of the new key material, the creator of the
-contract MUST update the state of the smart contract.
-- Deletion of users.
-  - Any user can submit a proposal for the removal of a user via
-off-chain message.
-  - This proposal MUST be sent to the creator of the contract.
-  - The creator of the contract MUST update the ACL, and send
-messages to the group for key update.
+1. Bob creates a new update package, possibly including new credentials, keys, or personal data changes.
+2. Bob sends the update package to Alice, possibly using a secure communication method.
+3. Alice verifies the authenticity and integrity of the update.
+4. If the update is verified successfully, Alice sends it to the smart contract for registration.
+5. The smart contract processes the request and updates Bob's data accordingly.
+6. Alice sends a broadcast message communicating the update to all users.
 
 ![figure9](./images/eth-secpm_onchain-update.png)
-
-> It is important to note that both
-user removal and updates of any kind
-have a similar interaction flow.
-
-- Queries of existing users.
-  - Any user can query the smart contract to know the state of the
-group, including existing users and removed ones.
-  - This aspect MUST be used when adding new members to verify that
-the prospective key package has not been already used.
 
 ## Copyright
 
