@@ -45,6 +45,7 @@ fields. Next, before posting on the network, the bridge MUST set a new expiry
 and ttl and do the PoW nonce calculation.
 
 ### Security Considerations
+
 As mentioned above, a bridge will be posting new Waku v1 envelopes, which
 requires doing the PoW nonce calculation.
 

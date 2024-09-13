@@ -7,7 +7,8 @@ editor: Hanno Cornelius <hanno@status.im>
 contributors:
 ---
 
-`29/WAKU2-CONFIG` describes the RECOMMENDED values to assign to configurable parameters for Waku v2 clients.
+`29/WAKU2-CONFIG` describes the RECOMMENDED values
+to assign to configurable parameters for Waku v2 clients.
 Since Waku v2 is built on [libp2p](https://github.com/libp2p/specs),
 most of the parameters and reasonable defaults are derived from there.
 
@@ -36,7 +37,8 @@ We repeat them here with RECOMMMENDED values for `11/WAKU2-RELAY` implementation
 ## GossipSub v1.1 parameters
 
 GossipSub v1.1 extended GossipSub v1.0 and introduced [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
-We repeat the global parameters here with RECOMMMENDED values for `11/WAKU2-RELAY` implementations.
+We repeat the global parameters here with RECOMMMENDED values
+for `11/WAKU2-RELAY` implementations.
 
 | Parameter      | Description                                                            | RECOMMENDED value |
 |----------------|------------------------------------------------------------------------|-------------------|
@@ -46,12 +48,15 @@ We repeat the global parameters here with RECOMMMENDED values for `11/WAKU2-RELA
 | `D_score`      | Number of peers to retain by score when pruning from oversubscription  | `D_low`           |
 | `D_out`        | Number of outbound connections to keep in the mesh.                    | `D_low` - 1       |
 
-`11/WAKU2-RELAY` clients SHOULD implement a peer scoring mechanism with the parameter constraints as [specified by libp2p](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
+`11/WAKU2-RELAY` clients SHOULD implement a peer scoring mechanism
+with the parameter constraints as
+[specified by libp2p](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
 
 ## Other configuration
 
 The following behavioural parameters are not specified by `libp2p`,
-but nevertheless describes constraints that `11/WAKU2-RELAY` clients MAY choose to implement.
+but nevertheless describes constraints that `11/WAKU2-RELAY` clients
+MAY choose to implement.
 
 | Parameter          | Description                                                               | RECOMMENDED value |
 |--------------------|---------------------------------------------------------------------------|-------------------|

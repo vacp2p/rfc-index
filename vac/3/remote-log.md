@@ -8,7 +8,8 @@ contributors:
   - Dean Eigenmann <dean@status.im>
 ---
 
-A remote log is a replication of a local log. This means a node can read data that originally came from a node that is offline.
+A remote log is a replication of a local log.
+This means a node can read data that originally came from a node that is offline.
 
 This specification is complemented by a proof of concept implementation[^1].
 
@@ -112,7 +113,12 @@ message RemoteLog {
 
 <!-- TODO: Better name for Pair, Mapping? -->
 
-<!-- TODO: Consider making more useful in conjunction with metadata field. It makes sense to explicitly list what sequence a message is <local hash, remote hash, data, seqid> this way I can easily sync a messages prior or after a specific number. To enable this to be dynamic it might make sense to add page info so that I am aware which page I can find seqid on -->
+<!-- TODO: Consider making more useful in conjunction with metadata field.
+It makes sense to explicitly list what sequence a message is <local hash,
+remote hash, data, seqid> this way I can easily sync a messages prior or
+after a specific number.
+To enable this to be dynamic it might make sense to add page info so
+that I am aware which page I can find seqid on -->
 
 ## Synchronization
 
@@ -122,12 +128,13 @@ There are four fundamental roles:
 
 1. Alice
 2. Bob
-2. Name system (NS)
-3. Content-addressed storage (CAS)
+3. Name system (NS)
+4. Content-addressed storage (CAS)
 
 The *remote log* protobuf is what is stored in the name system.
 
-"Bob" can represent anything from 0 to N participants. Unlike Alice, Bob only needs read-only access to NS and CAS.
+"Bob" can represent anything from 0 to N participants. Unlike Alice,
+Bob only needs read-only access to NS and CAS.
 
 <!-- TODO: Document random node as remote log -->
 <!-- TODO: Document how to find initial remote log (e.g. per sync contexts -->
@@ -136,11 +143,7 @@ The *remote log* protobuf is what is stored in the name system.
 
 <!-- diagram -->
 
-<p align="center">
-    <img src="./images/remote-log.png" />
-    <br />
-    Figure 1: Remote log data synchronization.
-</p>
+![notification](./images/remote-log.png)
 
 <!-- Document the flow wrt operations -->
 
@@ -157,7 +160,7 @@ modes:
 
 **Data format:**
 
-```
+```yaml
 | H1_3 | H2_3 |
 | H1_2 | H2_2 |
 | H1_1 | H2_1 |
@@ -177,7 +180,7 @@ A remote log MAY also choose to embed the wire payloads that corresponds to the
 native hash. This bypasses the need for a dedicated CAS and additional
 round-trips, with a trade-off in bandwidth usage.
 
-```
+```yaml
 | H1_3 | | C_3 |
 | H1_2 | | C_2 |
 | H1_1 | | C_1 |
@@ -198,13 +201,16 @@ log. The latter is useful for things like backups on durable storage.
 The pointer to the 'next page' is another remote log entry, at a previous point
 in time.
 
-<!-- TODO: Determine requirement re overlapping, adjacent, and/or missing entries -->
+<!-- TODO: Determine requirement re overlapping, adjacent, 
+and/or missing entries -->
 
 <!-- TODO: Document message ordering append only requirements -->
 
 ### Interaction with MVDS
 
-[vac.mvds.Message](../2/mvds.md/#payloads) payloads are the only payloads that MUST be uploaded. Other messages types MAY be uploaded, depending on the implementation.
+[vac.mvds.Message](../2/mvds.md/#payloads) payloads are the only payloads
+that MUST be uploaded.
+Other messages types MAY be uploaded, depending on the implementation.
 
 ## Acknowledgments
 

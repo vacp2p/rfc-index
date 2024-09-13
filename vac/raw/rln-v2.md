@@ -9,17 +9,26 @@ contributors:
 
 ## Abstract
 
-The protocol specified in this document is an improvement of [32/RLN-V1](../32/rln-v1.md), being more general construct, that allows to set various limits for an epoch (it's 1 message per epoch in [32/RLN-V1](../32/rln-v1.md)) while remaining almost as simple as it predecessor. 
-Moreover, it allows to set different rate-limits for different RLN app users based on some public data, e.g. stake or reputation.
+The protocol specified in this document is an improvement of [32/RLN-V1](../32/rln-v1.md),
+being more general construct, that allows to set various limits for an epoch
+(it's 1 message per epoch in [32/RLN-V1](../32/rln-v1.md))
+while remaining almost as simple as it predecessor.
+Moreover, it allows to set different rate-limits
+for different RLN app users based on some public data,
+e.g. stake or reputation.
 
 ## Motivation
 
-The main goal of this RFC is to generalize [32/RLN-V1](../32/rln-v1.md) and expand its applications. 
+The main goal of this RFC is to generalize [32/RLN-V1](../32/rln-v1.md) and
+expand its applications.
 There are two different subprotocols based on this protocol:
+
 * RLN-Same - RLN with the same rate-limit for all users;
 * RLN-Diff - RLN that allows to set different rate-limits for different users.
 
-It is important to note that by using a large epoch limit value, users will be able to remain anonymous, because their `internal_nullifiers` will not be repeated until they exceed the limit.
+It is important to note that by using a large epoch limit value,
+users will be able to remain anonymous,
+because their `internal_nullifiers` will not be repeated until they exceed the limit.
 
 ## Flow
 
@@ -29,11 +38,13 @@ As in [32/RLN-V1](../32/rln-v1.md), the general flow can be described by three s
 2. Signaling
 3. Verification and slashing
 
-The two sub-protocols have different flows, and hence are defined separately.
+The two sub-protocols have different flows, and
+hence are defined separately.
 
 ### Important note
 
-All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md), more details [here](../32/rln-v1.md/#technical-overview)
+All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md),
+more details [here](../32/rln-v1.md/#technical-overview)
 
 ## RLN-Same flow
 
@@ -41,13 +52,11 @@ All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md)
 
 The registration process in the RLN-Same subprotocol does not differ from [32/RLN-V1](../32/rln-v1.md).
 
-### Signalling
-
-#### Proof generation
+Signalling
 
 For proof generation, the user needs to submit the following fields to the circuit:
 
-```
+```js
 {
     identity_secret: identity_secret_hash,
     path_elements: Merkle_proof.path_elements,
@@ -59,11 +68,11 @@ For proof generation, the user needs to submit the following fields to the circu
 }
 ```
 
-#### Calculating output
+Calculating output
 
 The following fields are needed for proof output calculation:
 
-```
+```js
 {
     identity_secret_hash: bigint, 
     external_nullifier: bigint,
@@ -74,7 +83,7 @@ The following fields are needed for proof output calculation:
 
 The output `[y, internal_nullifier]` is calculated in the following way:
 
-```
+```js
 a_0 = identity_secret_hash
 a_1 = poseidonHash([a0, external_nullifier, message_id])
 
@@ -85,29 +94,36 @@ internal_nullifier = poseidonHash([a_1])
 
 ## RLN-Diff flow
 
-### Registration
+Registration
 
-**id_commitment** in [32/RLN-V1](../32/rln-v1.md) is equal to `poseidonHash(identity_secret)`. 
-The goal of RLN-Diff is to set different rate-limits for different users. 
-It follows that **id_commitment** must somehow depend on the `user_message_limit` parameter, where 0 <= `user_message_limit` <= `message_limit`. 
+**id_commitment** in [32/RLN-V1](../32/rln-v1.md) is equal to `poseidonHash(identity_secret)`.
+The goal of RLN-Diff is to set different rate-limits for different users.
+It follows that **id_commitment** must somehow depend
+on the `user_message_limit` parameter,
+where 0 <= `user_message_limit` <= `message_limit`.
 There are few ways to do that:
-1. Sending `identity_secret_hash` = `poseidonHash(identity_secret, userMessageLimit)` and zk proof that `user_message_limit` is valid (is in the right range). 
-This approach requires zkSNARK verification, which is an expensive operation on the blockchain.
-2. Sending the same `identity_secret_hash` as in [32/RLN-V1](../32/rln-v1.md) (`poseidonHash(identity_secret)`) and a user_message_limit publicly to a server or smart-contract where `rate_commitment` = `poseidonHash(identity_secret_hash, userMessageLimit)` is calculated. 
-The leaves in the membership Merkle tree would be the rate_commitments of the users. 
-This approach requires additional hashing in the Circuit, but it eliminates the need for zk proof verification for the registration.
 
-Both methods are correct, and the choice of the method is left to the implementer. 
+1. Sending `identity_secret_hash` = `poseidonHash(identity_secret, userMessageLimit)`
+and zk proof that `user_message_limit` is valid (is in the right range).
+This approach requires zkSNARK verification,
+which is an expensive operation on the blockchain.
+2. Sending the same `identity_secret_hash` as in [32/RLN-V1](../32/rln-v1.md)
+(`poseidonHash(identity_secret)`) and a user_message_limit publicly to a server
+ or smart-contract where
+`rate_commitment` = `poseidonHash(identity_secret_hash, userMessageLimit)` is calculated.
+The leaves in the membership Merkle tree would be the rate_commitments of the users.
+This approach requires additional hashing in the Circuit, but
+it eliminates the need for zk proof verification for the registration.
+
+Both methods are correct, and the choice of the method is left to the implementer.
 It is recommended to use second method for the reasons already described.
 The following flow description will also be based on the second method.
 
-### Signalling
-
-#### Proof generation
+Signalling
 
 For proof generation, the user need to submit the following fields to the circuit:
 
-```
+```js
 {
     identity_secret: identity_secret_hash,
     path_elements: Merkle_proof.path_elements,
@@ -119,76 +135,92 @@ For proof generation, the user need to submit the following fields to the circui
 }
 ```
 
-#### Calculating output
+Calculating output
 
 The Output is calculated in the same way as the RLN-Same sub-protocol.
 
 ### Verification and slashing
 
 Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](../32/rln-v1.md).
-The only difference that may arise is the `message_limit` check in RLN-Same, since it is now a public input of the Circuit.
+The only difference that may arise is the `message_limit` check in RLN-Same,
+since it is now a public input of the Circuit.
 
 ### ZK Circuits specification
 
-The design of the [32/RLN-V1](../32/rln-v1.md) circuits is different from the circuits of this protocol. 
+The design of the [32/RLN-V1](../32/rln-v1.md) circuits
+is different from the circuits of this protocol.
 RLN-v2 requires additional algebraic constraints.
 The membership proof and Shamir's Secret Sharing constraints remain unchanged.
 
 The ZK Circuit is implemented using a [Groth-16 ZK-SNARK](https://eprint.iacr.org/2016/260.pdf),
-using the [circomlib](https://docs.circom.io/) library. 
+using the [circomlib](https://docs.circom.io/) library.
 Both schemes contain compile-time constants/system parameters:
-* DEPTH - depth of membership Merkle tree
-* LIMIT_BIT_SIZE - bit size of `limit` numbers, e.g. for the 16 - maximum `limit` number is 65535.
 
-The main difference of the protocol is that instead of a new polynomial (a new value `a_1`) for a new epoch, a new polynomial is generated for each message. 
-The user assigns an identifier to each message; the main requirement is that this identifier be in the range from 1 to `limit`. 
+* DEPTH - depth of membership Merkle tree
+* LIMIT_BIT_SIZE - bit size of `limit` numbers,
+e.g. for the 16 - maximum `limit` number is 65535.
+
+The main difference of the protocol is that instead of a new polynomial
+(a new value `a_1`) for a new epoch, a new polynomial is generated for each message.
+The user assigns an identifier to each message;
+the main requirement is that this identifier be in the range from 1 to `limit`.
 This is proven using range constraints.
 
 ### RLN-Same circuit
 
 #### Circuit parameters
 
-**Public Inputs**
-- `x`
-- `external_nullifier`
-- `message_limit` - limit per epoch
+Public Inputs
 
-**Private Inputs**
-- `identity_secret_hash`
-- `path_elements` 
-- `identity_path_index`
-- `message_id`
+* `x`
+* `external_nullifier`
+* `message_limit` - limit per epoch
 
-**Outputs**
-- `y`
-- `root`
-- `internal_nullifier`
+Private Inputs
+
+* `identity_secret_hash`
+* `path_elements`
+* `identity_path_index`
+* `message_id`
+
+Outputs
+
+* `y`
+* `root`
+* `internal_nullifier`
 
 ### RLN-Diff circuit
 
-In the RLN-Diff scheme, instead of the public parameter `message_limit`, a parameter is used that is set for each user during registration (`user_message_limit`); the `message_id` value is compared to it in the same way as it is compared to `message_limit` in the case of RLN-Same.
+In the RLN-Diff scheme, instead of the public parameter `message_limit`,
+a parameter is used that is set for each user during registration (`user_message_limit`);
+the `message_id` value is compared to it in the same way
+as it is compared to `message_limit` in the case of RLN-Same.
 
-#### Circuit parameters
+Circuit parameters
 
-**Public Inputs**
-- `x`
-- `external_nullifier`
+Public Inputs
 
-**Private Inputs**
-- `identity_secret_hash`
-- `path_elements`
-- `identity_path_index`
-- `message_id`
-- `user_message_limit`
+* `x`
+* `external_nullifier`
 
-**Outputs**
-- `y`
-- `root`
-- `internal_nullifier`
+Private Inputs
+
+* `identity_secret_hash`
+* `path_elements`
+* `identity_path_index`
+* `message_id`
+* `user_message_limit`
+
+Outputs
+
+* `y`
+* `root`
+* `internal_nullifier`
 
 ## Appendix A: Security considerations
 
-Although there are changes in the circuits, this spec inherits all the security considerations of [32/RLN-V1](../32/rln-v1.md).
+Although there are changes in the circuits,
+this spec inherits all the security considerations of [32/RLN-V1](../32/rln-v1.md).
 
 ## Copyright
 
@@ -196,6 +228,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [1](https://zkresear.ch/t/rate-limit-nullifier-v2-circuits/102)
-- [2](https://github.com/Rate-Limiting-Nullifier/rln-circuits-v2)
-- [3](../32/rln-v1.md/#technical-overview)
+* [1](https://zkresear.ch/t/rate-limit-nullifier-v2-circuits/102)
+* [2](https://github.com/Rate-Limiting-Nullifier/rln-circuits-v2)
+* [3](../32/rln-v1.md/#technical-overview)
