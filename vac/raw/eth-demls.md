@@ -1,6 +1,6 @@
 ---
 title: ETH-DEMLS
-name: Secure channel setup using Ethereum accounts
+name: Secure channel setup using decentralized MLS and Ethereum accounts
 status: raw
 category: Standards Track
 tags:
