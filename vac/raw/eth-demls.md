@@ -5,7 +5,7 @@ status: raw
 category: Standards Track
 tags:
 editor: Ramses Fernandez <ramses@status.im>
-contributors:
+contributors: Aaryamann Challani <aaryamann@status.im>, Ekaterina Broslavskaya <ekaterina@status.im>, Ugur Sen <ugur@status.im>, Ksr <ksr@status.im>
 ---
 
 ## Motivation
@@ -75,8 +75,7 @@ Each member of a group presents a credential that provides one or more
 identities for the
 member and associates them with the member's signing key.
 The identities and signing key are verified by the Authentication
-Service in use for a
-group.
+Service in use for a group.
 
 Credentials MUST follow the specifications of section 5.3 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
@@ -88,33 +87,32 @@ Users MUST generate key pairs by themselves.
 ### Message framing
 
 Handshake and application messages use a common framing structure
-providing encryption to
-ensure confidentiality within the group, and signing to authenticate
-the sender.
+providing encryption to ensure confidentiality within the group,
+and signing to authenticate the sender.
 
 The structure is:
 
-- `PublicMessage`: represents a message that is only signed, and not
-encrypted.
-The definition and the encoding/decoding of a `PublicMessage` MUST
-follow the specification
-in section 6.2 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
-- `PrivateMessage`: represents a signed and encrypted message, with
-protections for both the content of the message and related metadata.
+- `PublicMessage`: represents a message that is only signed,
+and not encrypted.
+The definition and the encoding/decoding of a `PublicMessage`
+MUST follow the specification in section 6.2 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+- `PrivateMessage`: represents a signed and encrypted message,
+with protections for both the content of the message and related metadata.
 
-The definition, and the encoding/decoding of a `PrivateMessage` MUST
-follow the  specification in section 6.3 of
+The definition, and the encoding/decoding of a `PrivateMessage`
+MUST follow the specification in section 6.3 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Applications MUST use `PrivateMessage` to encrypt application messages.
 
 Applications SHOULD use `PrivateMessage` to encode handshake messages.
 
-Each encrypted MLS message carries a "generation" number which is a
-per-sender incrementing counter.
-If a group member observes a gap in the generation sequence for a
-sender, then they know that they have missed a message from that
-sender.
+Each encrypted MLS message carries a "generation" number which
+is a per-sender incrementing counter.
+If a group member observes a gap in the generation sequence
+for a sender, then they know that they have missed
+a message from that sender.
 
 ### Nodes contents
 
@@ -123,23 +121,22 @@ The nodes of a ratchet tree contain several types of data:
 - Leaf nodes describe individual members.
 - Parent nodes describe subgroups.
 
-Contents of each kind of node, and its structure MUST follow the
-indications described in
-sections 7.1 and 7.2 of
+Contents of each kind of node, and its structure MUST follow
+the indications described in sections 7.1 and 7.2 of
 [RFC9420](https://datatracker.ietf.org/docrfc9420/).
 
 ### Leaf node validation
 
-`KeyPackage` objects describe the client's capabilities and provides
-keys that can be used  to add the client to a group.
+`KeyPackage` objects describe the client's capabilities and
+provides keys that can be used  to add the client to a group.
 
-The validity of a leaf node needs to be verified at the following
-stages:
+The validity of a leaf node needs to be verified
+at the following stages:
 
-- When a leaf node is downloaded in a `KeyPackage`, before it is used
-to add the client to the group.
-- When a leaf node is received by a group member in an Add, Update, or
-Commit message.
+- When a leaf node is downloaded in a `KeyPackage`,
+before it is used to add the client to the group.
+- When a leaf node is received by a group member in an
+Add, Update, or Commit message.
 - When a client validates a ratchet tree.
 
 A client MUST verify the validity of a leaf node following the
@@ -149,10 +146,9 @@ instructions of section 7.3 in
 ### Ratchet tree evolution
 
 Whenever a member initiates an epoch change, they MAY need to refresh
-the key pairs of their leaf and of the nodes on their direct path. This
-is done to keep forward secrecy and post-compromise security.
-The member initiating the epoch change MUST follow this procedure
-procedure.
+the key pairs of their leaf and of the nodes on their direct path.
+This is done to keep forward secrecy and post-compromise security.
+The member initiating the epoch change MUST follow this procedure.
 A member updates the nodes along its direct path as follows:
 
 - Blank all the nodes on the direct path from the leaf to the root.
@@ -163,24 +159,24 @@ filtered direct path.
 It MUST follow the procedure described in section 7.4 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
-- Compute the sequence of HPKE key pairs `(node_priv,node_pub)`, one
-for each node on the leaf's direct path.
+- Compute the sequence of HPKE key pairs `(node_priv,node_pub)`,
+one for each node on the leaf's direct path.
 
 It MUST follow the procedure described in section 7.4 of
 [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Views of the tree synchronization
 
-After generating fresh key material and applying it to update their
-local tree state, the generator broadcasts this update to other members
-of the group.
-This operation MUST be done according to section 7.5 of [RFC9420
-(https://datatracker.ietf.org/doc/rfc9420/).
+After generating fresh key material and applying it to update
+their local tree state, the generator broadcasts this update
+to other members of the group.
+This operation MUST be done according to section 7.5 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Leaf synchronization
 
-Changes to group memberships MUST be represented by adding and removing
-leaves of the tree.
+Changes to group memberships MUST be represented by
+adding and removing leaves of the tree.
 This corresponds to increasing or decreasing the depth of the tree,
 resulting in the number of leaves being doubled or halved.
 These operations MUST be done as described in section 7.7 of
@@ -191,23 +187,24 @@ These operations MUST be done as described in section 7.7 of
 Group members can agree on the cryptographic state of the group by
 generating a hash value that represents the contents of the group
 ratchet tree and the member’s credentials.
-The hash of the tree is the hash of its root node, defined recursively
-from the leaves.
+The hash of the tree is the hash of its root node,
+defined recursively from the leaves.
 Tree hashes summarize the state of a tree at point in time.
 The hash of a leaf is the hash of the `LeafNodeHashInput` object.
-At the same time, the hash of a parent node including the root, is the
-hash of a `ParentNodeHashInput` object.
-Parent hashes capture information about how keys in the tree were
-populated.
+At the same time the hash of a parent node, including the root,
+is the hash of a `ParentNodeHashInput` object.
+Parent hashes capture information about
+how keys in the tree were populated.
 
-Tree and parent hashing MUST follow the directions in Sections 7.8 and
-7.9 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+Tree and parent hashing MUST follow the directions
+in Sections 7.8 and 7.9 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Key schedule
 
 Group keys are derived using the `Extract` and `Expand` functions from
-the KDF for the group's cipher suite, as well as the functions defined
-below:
+the KDF for the group's cipher suite,
+as well as the functions defined below:
 
 ```text
 ExpandWithLabel(Secret, Label, Context, Length) = KDF.Expand(Secret, KDFLabel, Length)
@@ -251,8 +248,9 @@ struct {
 } GroupContext;
 ```
 
-The use of key scheduling MUST follow the indications in sections 8.1 -
-8.7 in [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+The use of key scheduling MUST follow the indications
+in sections 8.1 - 8.7 in
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Secret trees
 
@@ -277,33 +275,36 @@ MLS encrypts three different types of information:
 For handshake and application messages, a sequence of keys is derived
 via a sender ratchet.
 Each sender has their own sender ratchet, and each step along the
-ratchet is called a generation. These procedures MUST follow section
-9.1 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+ratchet is called a generation. These procedures MUST follow
+section 9.1 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 #### Deletion schedule
 
-All security-sensitive values MUST be deleted as soon as they are
-consumed.
+All security-sensitive values MUST be deleted
+as soon as they are consumed.
 
 A sensitive value S is consumed if:
 
 - S was used to encrypt or (successfully) decrypt a message.
 - A key, nonce, or secret derived from S has been consumed.
 
-The deletion procedure MUST follow the instruction described in section
-9.2 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
+The deletion procedure MUST follow the instruction described in
+section 9.2 of
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Key packages
 
-KeyPackage objects are used to ease the addition of clients to a group
-asynchronously.
+KeyPackage objects are used to ease the addition of clients
+to a group asynchronously.
+
 A KeyPackage object specifies:
 
 - Protocol version and cipher suite supported by the client.
 - Public keys that can be used to encrypt Welcome messages.
-Welcome messages provide new members with the information
-to initialize their
-state for the epoch in which they were added or in which they want to
+Welcome messages provide new members with
+the information to initialize their state
+for the epoch in which they were added
+or in which they want to
 add themselves to the group
 - The content of the leaf node that should be added to the tree to
 represent this client.
@@ -363,8 +364,8 @@ defined by the cipher suite's signature scheme.
 ### Group creation
 
 A group is always created with a single member.
-Other members are then added to the group using the usual Add/Commit
-mechanism.
+Other members are then added to the group using the usual
+Add/Commit mechanism.
 The creator of a group MUST set:
 
 - the group ID.
@@ -379,8 +380,8 @@ The creator MUST use the capabilities information in these
 `KeyPackages` to verify that the chosen version and cipher suite is the
 best option supported by all members.
 
-Group IDs SHOULD be constructed so they are unique with high
-probability.
+Group IDs SHOULD be constructed so they are unique with
+high probability.
 
 To initialize a group, the creator of the group MUST initialize a one
 member group with the following initial values:
@@ -417,11 +418,13 @@ struct {
 }
 ```
 
-The flow diagram shows the procedure to fetch key material from other
-users:
+The flow diagram shows the procedure to fetch key material
+from other users:
+
 ![figure2](./images/eth-secpm_fetching.png)
 
 Below follows the flow diagram for the creation of a group:
+
 ![figure3](./images/eth-secpm_creation.png)
 
 ### Group evolution
@@ -430,8 +433,8 @@ Group membership can change, and existing members can change their keys
 in order to achieve post-compromise security.
 In MLS, each such change is accomplished by a two-step process:
 
-- A proposal to make the change is broadcast to the group in a Proposal
-message.
+- A proposal to make the change is broadcast to the group in a
+Proposal message.
 - A member of the group or a new member broadcasts a Commit message
 that causes one or more proposed changes to enter into effect.
 
@@ -485,8 +488,8 @@ Proposals structure and semantics MUST follow sections 12.1.1 - 12.1.7
 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Any list of commited proposals MUST be validated either by a the group
-member who created the commit, or any group member processing such
-commit.
+member who created the commit, or any group member processing
+such commit.
 The validation MUST be done according to one of the procedures
 described in Section 12.2 of
 [RFC9420](https://datatracker.ietf.orgdoc/rfc9420/).
@@ -497,6 +500,7 @@ The client MUST apply the proposals in the list in the order described
 in Section 12.3 of [RFC9420](https://datatracker.ietf.org/docrfc9420/).
 
 Below follows the flow diagram for the addition of a member to a group:
+
 ![figure4](./images/eth-secpm_add.png)
 
 The diagram below shows the procedure to remove a group member:
@@ -513,14 +517,14 @@ Commit messages initiate new group epochs.
 It informs group members to update their representation of the state of
 the group by applying the proposals and advancing the key schedule.
 
-Each proposal covered by the Commit is included by a `ProposalOrRef`
-value.
-`ProposalOrRef` identify the proposal to be applied by value or by
-reference.
-Commits that refer to new Proposals from the committer can be included
-by value.
-Commits for previously sent proposals from anyone can be sent by
-reference.
+Each proposal covered by the Commit is included by a
+`ProposalOrRef` value.
+`ProposalOrRef` identify the proposal to be applied by value
+or by reference.
+Commits that refer to new Proposals from the committer
+can be included by value.
+Commits for previously sent proposals from anyone can be sent
+by reference.
 Proposals sent by reference are specified by including the hash of the
 `AuthenticatedContent`.
 
@@ -536,8 +540,8 @@ Functioning of commits MUST follow the instructions of Section 12.4 of
 
 ### Application messages
 
-Handshake messages provide an authenticated group key exchange to
-clients.
+Handshake messages provide an authenticated group key exchange
+to clients.
 To protect application messages sent among the members of a group, the
 `encryption_secret` provided by the key schedule is used to derive a
 sequence of nonces and keys for message encryption.
@@ -557,8 +561,8 @@ Application messages SHOULD be padded to provide resistance against
 traffic analysis techniques.
 This avoids additional information to be provided to an attacker in
 order to guess the length of the encrypted message.
-Padding SHOULD be used on messages with zero-valued bytes before AEAD
-encryption.
+Padding SHOULD be used on messages with zero-valued bytes before
+AEAD encryption.
 
 Functioning of application messages MUST follow the instructions of
 Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
@@ -647,8 +651,8 @@ resource = "- " URI
 ```
 
 This specification defines the following SIWE Message fields that can
-be parsed from a SIWE Message by following the rules in ABNF Message
-Format:
+be parsed from a SIWE Message by following the rules in
+ABNF Message Format:
 
 - `scheme` OPTIONAL. The URI scheme of the origin of the request.
 Its value MUST be a
@@ -721,9 +725,8 @@ MUST be used.
 [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271)
 SHOULD be used.
 Otherwise, the implementer MUST clearly define the
-verification method
-to attain security and interoperability for both
-wallets and relying parties.
+verification method to attain security and interoperability
+for both wallets and relying parties.
 
   - When performing [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271)
 signature verification, the contract performing the verification MUST
@@ -732,8 +735,8 @@ be resolved from the specified `chain-id`.
   - Implementers SHOULD take into consideration that
 [ERC-1271](https://eips.ethereum.org/EIPS/eip-1271)
 implementations are not required to be pure functions.
-They can return different results for the same inputs depending on
-blockchain state.
+They can return different results for the same inputs depending
+on blockchain state.
 This can affect the security model and session validation rules.
 
 #### Resolving Ethereum Name Service (ENS) Data
@@ -793,15 +796,14 @@ SIWE Message.
 The origin SHOULD be read from a trusted data source such as the
 browser window or over WalletConnect
 [ERC-1328](https://eips.ethereum.org/EIPS/eip-1328) sessions for
-comparison against the
-signing message contents.
+comparison against the signing message contents.
 
 Wallet implementers MAY warn instead of rejecting the verification if
 the origin is pointing to localhost.
 
 The following is a RECOMMENDED algorithm for Wallets to conform with
-the requirements on request origin verification defined by this
-specification.
+the requirements on request origin verification defined by
+this specification.
 
 The algorithm takes the following input variables:
 
@@ -853,8 +855,8 @@ Other present fields MUST also be made available to the user prior to
 signing either by default or through an extended interface.
 
 Wallet implementers displaying a plaintext SIWE Message to the user
-SHOULD require the user to scroll to the bottom of the text area prior
-to signing.
+SHOULD require the user to scroll to the bottom of the text area
+prior to signing.
 
 Wallet implementers MAY construct a custom SIWE user interface by
 parsing the ABNF terms into data elements for use in the interface.
@@ -894,17 +896,17 @@ These credentials MUST use the digital signature key pair associated to
 the Ethereum address.
 - Other users can verify credentials.
 - With this approach, there is no need to have a dedicated
-Authentication Service responsible for the issuance and verification of
-credentials.
-- The interaction diagram showing the generation of credentials becomes
-obsolete.
+Authentication Service responsible for the issuance and
+verification of credentials.
+- The interaction diagram showing the generation of credentials
+becomes obsolete.
 
 ### With respect to the Delivery Service
 
 - Users MUST generate their own KeyPackage.
 - Other users can verify KeyPackages when required.
-- A Delivery Service storage system MUST verify KeyPackages before
-storing them.
+- A Delivery Service storage system MUST verify KeyPackages
+before storing them.
 - Interaction diagrams involving the DS do not change.
 
 ## Considerations with respect to decentralization
@@ -937,12 +939,15 @@ replaced with SIWE in this specification.
 ### Addition of members to a group
 
 1. Alice creates a Smart Contract with ACL.
-2. Off-chain: Alice sends the contract address and an invitation message to Bob over the secure channel.
-3. Off-chain: Bob sends a digitally signed response confirming his Ethereum address and agreement to join.
-4. Off-chain: Alice verifies the digital signature using the public key of Bob.
-5. Alice sends a transaction to the smart contract to add Bob’s address to the ACL.
+2. Off-chain: Alice sends the contract address
+and an invitation message to Bob over the secure channel.
+3. Off-chain: Bob sends a signed response
+confirming his Ethereum address and agreement to join.
+4. Off-chain: Alice verifies the signature using the public key of Bob.
+5. ON-chain: Alice adds Bob’s address to the ACL.
 6. Off-chain: Alice sends a welcome message to Bob.
-7. Off-chain: Alice sends a broadcast message to all group members, notifying them the addition of Bob.
+7. Off-chain: Alice sends a broadcast message to all group members,
+notifying them the addition of Bob.
 
 ![figure8](./images/eth-secpm_onchain-register-2.png)
 
@@ -951,12 +956,13 @@ replaced with SIWE in this specification.
 Removal requests and update requests are considered the same operation. One assumes Alice is the creator of the contract.
 They MUST be processed as follows:
 
-1. Bob creates a new update package, possibly including new credentials, keys, or personal data changes.
-2. Bob sends the update package to Alice, possibly using a secure communication method.
-3. Alice verifies the authenticity and integrity of the update.
-4. If the update is verified successfully, Alice sends it to the smart contract for registration.
-5. The smart contract processes the request and updates Bob's data accordingly.
-6. Alice sends a broadcast message communicating the update to all users.
+1. Off-chain: Bob creates a new update request.
+2. Off-chain: Bob sends the update request to Alice.
+3. Off-chain: Alice verifies the request.
+4. On-chain: If the verification is successfull,
+Alice sends it to the smart contract for registration.
+5. Off-chain: Alice sends a broadcast message
+communicating the update to all users.
 
 ![figure9](./images/eth-secpm_onchain-update.png)
 
