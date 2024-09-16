@@ -26,7 +26,7 @@ The specification is divided into the following sections:
 
 - Private group messaging protocol, based on the
 [MLS protocol](https://datatracker.ietf.org/doc/rfc9420/).
-- Description of an Ethereum-based authentication protocol, based on
+- Specification of an Ethereum-based authentication protocol, based on
 [SIWE](https://eips.ethereum.org/EIPS/eip-4361).
 
 ## Private group messaging protocol
