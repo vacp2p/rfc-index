@@ -3,6 +3,7 @@ slug: 62
 title: 62/STATUS-PAYLOADS
 name: Status Message Payloads
 status: draft
+description: Describes the payload of each message in Status.
 editor: r4bbit <r4bbit@status.im>
 contributors: 
 - Adam Babik <adam@status.im>
