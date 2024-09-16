@@ -44,8 +44,13 @@ post-compromise security.
 The MLS protocol achieves: low-complexity, group integrity,
 synchronization and extensibility.
 
-The extension to group chat described in forthcoming sections is built upon the
-[MLS](https://datatracker.ietf.org/doc/rfc9420/) protocol.
+This document describes how the structure and methods of the
+[MLS](https://datatracker.ietf.org/doc/rfc9420/) protocol
+are extended for their application in decentralized environments.
+The approach described in this document makes use of smart contracts.
+It makes use of a smart contract to manage each group chat.
+Furthermore, this document describes how to use the Sign-in With Ethereum protocol
+as authentication method.
 
 ### Structure
 
@@ -116,7 +121,12 @@ a message from that sender.
 
 ### Nodes contents
 
-The nodes of a ratchet tree contain several types of data:
+> This section makes use of sections 4 and 7 of
+[RFC9420](https://datatracker.ietf.org/docrfc9420/).
+
+The nodes of a ratchet tree 
+(Section 4 in [RFC9420](https://datatracker.ietf.org/docrfc9420/))
+contain several types of data:
 
 - Leaf nodes describe individual members.
 - Parent nodes describe subgroups.
@@ -567,6 +577,44 @@ AEAD encryption.
 Functioning of application messages MUST follow the instructions of
 Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
+## Implementation of the onchain component of the protocol
+
+### Assumptions
+
+- Users have set a secure 1-1 communication channel.
+- Each group is managed by a separate smart contract.
+
+### Addition of members to a group
+
+1. On-chain: Alice creates a Smart Contract with ACL.
+2. Off-chain: Alice sends the contract address
+and an invitation message to Bob over the secure channel.
+3. Off-chain: Bob sends a signed response
+confirming his Ethereum address and agreement to join.
+4. Off-chain: Alice verifies the signature using the public key of Bob.
+5. On-chain: Alice adds Bob’s address to the ACL.
+6. Off-chain: Alice sends a welcome message to Bob.
+7. Off-chain: Alice sends a broadcast message to all group members,
+notifying them the addition of Bob.
+
+![figure8](./images/eth-secpm_onchain-register-2.png)
+
+### Updates in groups
+
+Removal requests and update requests are considered the same operation.
+One assumes Alice is the creator of the contract.
+They MUST be processed as follows:
+
+1. Off-chain: Bob creates a new update request.
+2. Off-chain: Bob sends the update request to Alice.
+3. Off-chain: Alice verifies the request.
+4. On-chain: If the verification is successfull,
+Alice sends it to the smart contract for registration.
+5. Off-chain: Alice sends a broadcast message
+communicating the update to all users.
+
+![figure9](./images/eth-secpm_onchain-update.png)
+
 ## Ethereum-based authentication protocol
 
 ### Introduction
@@ -652,7 +700,9 @@ resource = "- " URI
 
 This specification defines the following SIWE Message fields that can
 be parsed from a SIWE Message by following the rules in
-ABNF Message Format:
+ABNF Message Format.
+This section follows the section _ABNF message format_
+in [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361).
 
 - `scheme` OPTIONAL. The URI scheme of the origin of the request.
 Its value MUST be a
@@ -877,41 +927,9 @@ the instructions in this
 [specification](https://github.com/vacp2p/rfc-index/blob/eth-secpm-splitted/vac/raw/eth-secure-channel.md)
 describing the use of X3DH in combination with the double ratchet mechanism.
 
-## Privacy and Security Considerations
-
-- For the information retrieval, the algorithm MUST include a access
-control mechanisms to restrict who can call the set and get functions.
-- One SHOULD include event logs to track changes in public keys.
-- The curve vurve448 MUST be chosen due to its higher security level:
-224-bit security instead of the 128-bit security provided by X25519.
-- It is important that Bob MUST NOT reuse `SPK`.
-
-## Considerations related to the use of Ethereum addresses
-
-### With respect to the Authentication Service
-
-- If users used their Ethereum addresses as identifiers, they MUST
-generate their own credentials.
-These credentials MUST use the digital signature key pair associated to
-the Ethereum address.
-- Other users can verify credentials.
-- With this approach, there is no need to have a dedicated
-Authentication Service responsible for the issuance and
-verification of credentials.
-- The interaction diagram showing the generation of credentials
-becomes obsolete.
-
-### With respect to the Delivery Service
-
-- Users MUST generate their own KeyPackage.
-- Other users can verify KeyPackages when required.
-- A Delivery Service storage system MUST verify KeyPackages
-before storing them.
-- Interaction diagrams involving the DS do not change.
-
 ## Considerations with respect to decentralization
 
-The MLS protocol assumes the existence on a (central, untrusted)
+The MLS protocol assumes the existence of a (central, untrusted)
 *delivery service*, whose responsabilites include:
 
 - Acting as a directory service providing the initial
@@ -929,43 +947,14 @@ version of the tree that allows for the generation of the group key.
 Another important component is the *authentication service*, which is
 replaced with SIWE in this specification.
 
-## Consideration related to the onchain component of the protocol
+## Privacy and Security Considerations
 
-### Assumptions
-
-- Users have set a secure 1-1 communication channel.
-- Each group is managed by a separate smart contract.
-
-### Addition of members to a group
-
-1. On-chain: Alice creates a Smart Contract with ACL.
-2. Off-chain: Alice sends the contract address
-and an invitation message to Bob over the secure channel.
-3. Off-chain: Bob sends a signed response
-confirming his Ethereum address and agreement to join.
-4. Off-chain: Alice verifies the signature using the public key of Bob.
-5. On-chain: Alice adds Bob’s address to the ACL.
-6. Off-chain: Alice sends a welcome message to Bob.
-7. Off-chain: Alice sends a broadcast message to all group members,
-notifying them the addition of Bob.
-
-![figure8](./images/eth-secpm_onchain-register-2.png)
-
-### Updates in groups
-
-Removal requests and update requests are considered the same operation.
-One assumes Alice is the creator of the contract.
-They MUST be processed as follows:
-
-1. Off-chain: Bob creates a new update request.
-2. Off-chain: Bob sends the update request to Alice.
-3. Off-chain: Alice verifies the request.
-4. On-chain: If the verification is successfull,
-Alice sends it to the smart contract for registration.
-5. Off-chain: Alice sends a broadcast message
-communicating the update to all users.
-
-![figure9](./images/eth-secpm_onchain-update.png)
+- For the information retrieval, the algorithm MUST include a access
+control mechanisms to restrict who can call the set and get functions.
+- One SHOULD include event logs to track changes in public keys.
+- The curve vurve448 MUST be chosen due to its higher security level:
+224-bit security instead of the 128-bit security provided by X25519.
+- It is important that Bob MUST NOT reuse `SPK`.
 
 ## Copyright
 
