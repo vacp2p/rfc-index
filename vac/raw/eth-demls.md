@@ -124,7 +124,7 @@ a message from that sender.
 > This section makes use of sections 4 and 7 of
 [RFC9420](https://datatracker.ietf.org/docrfc9420/).
 
-The nodes of a ratchet tree 
+The nodes of a ratchet tree
 (Section 4 in [RFC9420](https://datatracker.ietf.org/docrfc9420/))
 contain several types of data:
 
@@ -944,7 +944,7 @@ Concerning keys, each node can generate and disseminate their
 encryption key among the other nodes, so they can create a local
 version of the tree that allows for the generation of the group key.
 
-Another important component is the *authentication service*, which is
+Another important component is the _authentication service_, which is
 replaced with SIWE in this specification.
 
 ## Privacy and Security Considerations
