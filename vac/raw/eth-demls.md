@@ -953,7 +953,8 @@ notifying them the addition of Bob.
 
 ### Updates in groups
 
-Removal requests and update requests are considered the same operation. One assumes Alice is the creator of the contract.
+Removal requests and update requests are considered the same operation.
+One assumes Alice is the creator of the contract.
 They MUST be processed as follows:
 
 1. Off-chain: Bob creates a new update request.
