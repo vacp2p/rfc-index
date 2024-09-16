@@ -938,13 +938,13 @@ replaced with SIWE in this specification.
 
 ### Addition of members to a group
 
-1. Alice creates a Smart Contract with ACL.
+1. On-chain: Alice creates a Smart Contract with ACL.
 2. Off-chain: Alice sends the contract address
 and an invitation message to Bob over the secure channel.
 3. Off-chain: Bob sends a signed response
 confirming his Ethereum address and agreement to join.
 4. Off-chain: Alice verifies the signature using the public key of Bob.
-5. ON-chain: Alice adds Bob’s address to the ACL.
+5. On-chain: Alice adds Bob’s address to the ACL.
 6. Off-chain: Alice sends a welcome message to Bob.
 7. Off-chain: Alice sends a broadcast message to all group members,
 notifying them the addition of Bob.
