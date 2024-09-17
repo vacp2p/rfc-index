@@ -9,9 +9,14 @@ contributors:
   - Oskar Thorén <oskarth@titanproxy.com>
 ---
 
-In this specification, we describe a minimum viable protocol for data synchronization inspired by the Bramble Synchronization Protocol[^1]. This protocol is designed to ensure reliable messaging between peers across an unreliable peer-to-peer (P2P) network where they may be unreachable or unresponsive.
+In this specification, we describe a minimum viable protocol for
+data synchronization inspired by the Bramble Synchronization Protocol[^1].
+This protocol is designed to ensure reliable messaging
+between peers across an unreliable peer-to-peer (P2P) network where
+they may be unreachable or unresponsive.
 
-We present a reference implementation[^2] including a simulation to demonstrate its performance.
+We present a reference implementation[^2]
+including a simulation to demonstrate its performance.
 
 ## Definitions
 
@@ -25,7 +30,11 @@ We present a reference implementation[^2] including a simulation to demonstrate 
 
 ### Secure Transport
 
-This specification does not define anything related to the transport of packets. It is assumed that this is abstracted in such a way that any secure transport protocol could be easily implemented. Likewise, properties such as confidentiality, integrity, authenticity and forward secrecy are assumed to be provided by a layer below.
+This specification does not define anything related to the transport of packets.
+It is assumed that this is abstracted in such a way that
+any secure transport protocol could be easily implemented.
+Likewise, properties such as confidentiality, integrity, authenticity and
+forward secrecy are assumed to be provided by a layer below.
 
 ### Payloads
 
@@ -50,22 +59,29 @@ message Message {
 }
 ```
 
-*The payload field numbers are kept more "unique" to ensure no overlap with other protocol buffers.*
+*The payload field numbers are kept more "unique" to*
+*ensure no overlap with other protocol buffers.*
 
 Each payload contains the following fields:
 
-- **Acks:** This field contains a list (can be empty) of `message identifiers` informing the recipient that sender holds a specific message.
-- **Offers:** This field contains a list (can be empty) of `message identifiers` that the sender would like to give to the recipient.
-- **Requests:** This field contains a list (can be empty) of `message identifiers` that the sender would like to receive from the recipient.
+- **Acks:** This field contains a list (can be empty)
+of `message identifiers` informing the recipient that sender holds a specific message.
+- **Offers:** This field contains a list (can be empty)
+of `message identifiers` that the sender would like to give to the recipient.
+- **Requests:** This field contains a list (can be empty)
+of `message identifiers` that the sender would like to receive from the recipient.
 - **Messages:** This field contains a list of messages (can be empty).
 
-**Message Identifiers:** Each `message` has a message identifier calculated by hashing the `group_id`, `timestamp` and `body` fields as follows:
+**Message Identifiers:** Each `message` has a message identifier calculated by
+hashing the `group_id`, `timestamp` and `body` fields as follows:
 
-```
+```js
 HASH("MESSAGE_ID", group_id, timestamp, body);
 ```
 
-**Group Identifiers:** Each `message` is assigned into a **group** using the `group_id` field, groups are independent synchronization contexts between peers.
+**Group Identifiers:** Each `message` is assigned into a **group**
+using the `group_id` field,
+groups are independent synchronization contexts between peers.
 
 The current `HASH` function used is `sha256`.
 
@@ -73,50 +89,68 @@ The current `HASH` function used is `sha256`.
 
 ### State
 
-We refer to `state` as set of records for the types `OFFER`, `REQUEST` and `MESSAGE` that every node SHOULD store per peer. `state` MUST NOT contain `ACK` records as we do not retransmit those periodically. The following information is stored for records:
+We refer to `state` as set of records for the types `OFFER`, `REQUEST` and
+`MESSAGE` that every node SHOULD store per peer.
+`state` MUST NOT contain `ACK` records as we do not retransmit those periodically.
+The following information is stored for records:
 
- - **Type** - Either `OFFER`, `REQUEST` or `MESSAGE`
- - **Send Count** - The amount of times a record has been sent to a peer.
- - **Send Epoch** - The next epoch at which a record can be sent to a peer.
+- **Type** - Either `OFFER`, `REQUEST` or `MESSAGE`
+- **Send Count** - The amount of times a record has been sent to a peer.
+- **Send Epoch** - The next epoch at which a record can be sent to a peer.
 
 ### Flow
 
-A maximum of one payload SHOULD be sent to peers per epoch, this payload contains all `ACK`, `OFFER`, `REQUEST` and `MESSAGE` records for the specific peer. Payloads are created every epoch, containing reactions to previously received records by peers or new records being sent out by nodes. 
+A maximum of one payload SHOULD be sent to peers per epoch,
+this payload contains all `ACK`, `OFFER`, `REQUEST` and
+`MESSAGE` records for the specific peer.
+Payloads are created every epoch,
+containing reactions to previously received records by peers or
+new records being sent out by nodes.
 
-Nodes MAY have two modes with which they can send records: `BATCH` and `INTERACTIVE` mode. The following rules dictate how nodes construct payloads every epoch for any given peer for both modes.
+Nodes MAY have two modes with which they can send records:
+`BATCH` and `INTERACTIVE` mode.
+The following rules dictate how nodes construct payloads
+every epoch for any given peer for both modes.
 
 > ***NOTE:** A node may send messages both in interactive and in batch mode.*
 
 #### Interactive Mode
 
- - A node initially offers a `MESSAGE` when attempting to send it to a peer. This means an `OFFER` is added to the next payload and state for the given peer.
- - When a node receives an `OFFER`, a `REQUEST` is added to the next payload and state for the given peer. 
- - When a node receives a `REQUEST` for a previously sent `OFFER`, the `OFFER` is removed from the state and the corresponding `MESSAGE` is added to the next payload and state for the given peer.
- - When a node receives a `MESSAGE`, the `REQUEST` is removed from the state and an `ACK` is added to the next payload for the given peer.
- - When a node receives an `ACK`, the `MESSAGE` is removed from the state for the given peer.
- - All records that require retransmission are added to the payload, given `Send Epoch` has been reached.
+- A node initially offers a `MESSAGE` when attempting to send it to a peer.
+This means an `OFFER` is added to the next payload and state for the given peer.
+- When a node receives an `OFFER`, a `REQUEST` is added to the next payload and
+state for the given peer.
+- When a node receives a `REQUEST` for a previously sent `OFFER`,
+the `OFFER` is removed from the state and
+the corresponding `MESSAGE` is added to the next payload and
+state for the given peer.
+- When a node receives a `MESSAGE`, the `REQUEST` is removed from the state and
+an `ACK` is added to the next payload for the given peer.
+- When a node receives an `ACK`,
+the `MESSAGE` is removed from the state for the given peer.
+- All records that require retransmission are added to the payload,
+given `Send Epoch` has been reached.
 
-<p align="center">
-    <img src="./images/interactive.png" />
-    <br />
-    Figure 1: Delivery without retransmissions in interactive mode.
-</p>
+![notification](./images/interactive.png)
+
+Figure 1: Delivery without retransmissions in interactive mode.
 
 #### Batch Mode
 
- 1. When a node sends a `MESSAGE`, it is added to the next payload and the state for the given peer.
- 2. When a node receives a `MESSAGE`, an `ACK` is added to the next payload for the corresponding peer.
- 3. When a node receives an `ACK`, the `MESSAGE` is removed from the state for the given peer.
- 4. All records that require retransmission are added to the payload, given `Send Epoch` has been reached.
+1. When a node sends a `MESSAGE`,
+it is added to the next payload and the state for the given peer.
+2. When a node receives a `MESSAGE`,
+an `ACK` is added to the next payload for the corresponding peer.
+3. When a node receives an `ACK`,
+the `MESSAGE` is removed from the state for the given peer.
+4. All records that require retransmission are added to the payload,
+given `Send Epoch` has been reached.
 
 <!-- diagram -->
 
-<p align="center">
-    <img src="./images/batch.png" />
-    <br />
-    Figure 2: Delivery without retransmissions in batch mode.
-</p>
+![notification](./images/batch.png)
 
+Figure 2: Delivery without retransmissions in batch mode.
 
 > ***NOTE:** Batch mode is higher bandwidth whereas interactive mode is higher latency.*
 
@@ -124,21 +158,28 @@ Nodes MAY have two modes with which they can send records: `BATCH` and `INTERACT
 
 ### Retransmission
 
-The record of the type `Type` SHOULD be retransmitted every time `Send Epoch` is smaller than or equal to the current epoch.
+The record of the type `Type` SHOULD be retransmitted
+every time `Send Epoch` is smaller than or equal to the current epoch.
 
-`Send Epoch` and `Send Count` MUST be increased every time a record is retransmitted. Although no function is defined on how to increase `Send Epoch`, it SHOULD be exponentially increased until reaching an upper bound where it then goes back to a lower epoch in order to prevent a record's `Send Epoch`'s from becoming too large.
+`Send Epoch` and `Send Count` MUST be increased every time a record is retransmitted.
+Although no function is defined on how to increase `Send Epoch`,
+it SHOULD be exponentially increased until reaching an upper bound
+where it then goes back to a lower epoch in order to
+prevent a record's `Send Epoch`'s from becoming too large.
 
-> ***NOTE:** We do not retransmission `ACK`s as we do not know when they have arrived, therefore we simply resend them every time we receive a `MESSAGE`.*
+> ***NOTE:** We do not retransmission `ACK`s as we do not know when they have arrived,
+therefore we simply resend them every time we receive a `MESSAGE`.*
 
 ## Formal Specification
 
 MVDS has been formally specified using TLA+: <https://github.com/vacp2p/formalities/tree/master/MVDS>.
 
 ## Acknowledgments
- - Preston van Loon
- - Greg Markou
- - Rene Nayman
- - Jacek Sieka
+
+- Preston van Loon
+- Greg Markou
+- Rene Nayman
+- Jacek Sieka
 
 ## Copyright
 

@@ -10,20 +10,26 @@ contributors:
 
 ## Abstract
 
-This document lists the types of messages that are using [MVDS](/vac/2/mvds.md) in the Status application.
+This document lists the types of messages that are using [MVDS](/vac/2/mvds.md)
+in the Status application.
 
 ## Background
 
-Status app uses MVDS to ensure messages going through Waku are acknolwedged by the recipient. This is to ensure that the messages are not missed by any interested parties.
-
+Status app uses MVDS to ensure messages going through Waku
+are acknolwedged by the recipient.
+This is to ensure that the messages are not missed by any interested parties.
 
 ## Message types
 
-Various Message Types contain distinct information defined by the app to facilitate convenient serialization and deserialization.
+Various Message Types contain distinct information defined by the app
+to facilitate convenient serialization and deserialization.
 
-E2E reliability is a feature that ensures messages are delivered to the recipient. This is initially achieved by using MVDS in Status.
+E2E reliability is a feature that ensures messages are delivered to the recipient.
+This is initially achieved by using MVDS in Status.
 
-Chat Type specifies the category of chat that a message belongs to. It can be OneToOne (aka Direct Message), GroupChat, or CommunityChat. These are the three main types of chats in Status.
+Chat Type specifies the category of chat that a message belongs to.
+It can be OneToOne (aka Direct Message), GroupChat, or CommunityChat.
+These are the three main types of chats in Status.
 
 | Message Type                                                               | Use MVDS                            | Need e2e reliability | Chat Type               |
 |----------------------------------------------------------------------------|-------------------------------------|----------------------|-------------------------|
@@ -113,9 +119,6 @@ Chat Type specifies the category of chat that a message belongs to. It can be On
 | ApplicationMetadataMessage_COMMUNITY_TOKEN_ACTION                          | No                                  | Weak Yes             | CommunityChat           |
 | ApplicationMetadataMessage_COMMUNITY_SHARED_ADDRESSES_REQUEST              | No                                  | No                   | CommunityChat           |
 | ApplicationMetadataMessage_COMMUNITY_SHARED_ADDRESSES_RESPONSE             | No                                  | No                   | CommunityChat           |
-
-
-
 
 ## Copyright
 

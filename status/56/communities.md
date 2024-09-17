@@ -13,49 +13,66 @@ contributors:
 
 ## Abstract
 
-This document describes the design of Status Communities over Waku v2, allowing for multiple users to communicate in a discussion space. 
-This is a key feature for the Status messaging app. 
+This document describes the design of Status Communities over Waku v2,
+allowing for multiple users to communicate in a discussion space.
+This is a key feature for the Status messaging app.
 
 ## Background and Motivation
 
-The purpose of Status communities, as specified in this document, is allowing for large group chats.
+The purpose of Status communities, as specified in this document,
+is allowing for large group chats.
 Communities can have further substructure, e.g. specific channels.
 
-Smaller group chats, on the other hand, are out of scope for this document and can be built over [55/STATUS-1TO1-CHAT](../55/1to1-chat.md). 
-We refer to these smaller group chats simply as "group chats", to differentiate them from Communities.
+Smaller group chats, on the other hand,
+are out of scope for this document and
+can be built over [55/STATUS-1TO1-CHAT](../55/1to1-chat.md).
+We refer to these smaller group chats simply as "group chats",
+to differentiate them from Communities.
 
-For group chats based on [55/STATUS-1TO1-CHAT](../55/1to1-chat.md), the key exchange mechanism MUST be X3DH, as described in [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md).
+For group chats based on [55/STATUS-1TO1-CHAT](../55/1to1-chat.md),
+the key exchange mechanism MUST be X3DH,
+as described in [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md).
 
-However, this method does not scale as the number of participants increases, for the following reasons -
+However, this method does not scale as the number of participants increases,
+for the following reasons -
+
 1. The number of messages sent over the network increases with the number of participants.
 2. Handling the X3DH key exchange for each participant is computationally expensive.
 
 Having multicast channels reduces the overhead of a group chat based on 1:1 chat.
-Additionally, if all the participants of the group chat have a shared key, then the number of messages sent over the network is reduced to one per message.
+Additionally, if all the participants of the group chat have a shared key,
+then the number of messages sent over the network is reduced to one per message.
 
 ## Terminology
 
 - **Community**: A group of peers that can communicate with each other.
 - **Member**: A peer that is part of a community.
-- **Admin**: A member that has administrative privileges. Used interchangeably with "owner".
+- **Admin**: A member that has administrative privileges.
+Used interchangeably with "owner".
 - **Channel**: A designated subtopic for a community. Used interchangeably with "chat".
 
 ## Design Requirements
 
-Due to the nature of communities, the following requirements are necessary for the design of communities  -
+Due to the nature of communities,
+the following requirements are necessary for the design of communities  -
 
 1. The creator of the Community is the owner of the Community.
 2. The Community owner is trusted.
 3. The Community owner can add or remove members from the Community.
 This extends to banning and kicking members.
 4. The Community owner can add, edit and remove channels.
-5. Community members can send/receive messages to the channels which they have access to.
+5. Community members can send/receive messages
+to the channels which they have access to.
 6. Communities may be encrypted (private) or unencrypted (public).
 7. A Community is uniquely identified by a public key.
 8. The public key of the Community is shared out of band.
-9. The metadata of the Community can be found by listening on a content topic derived from the public key of the Community.
-10. Community members run their own Waku nodes, with the configuration described in [Waku-Protocols](#waku-protocols).
-Light nodes solely implementing [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) may not be able to run their own Waku node with the configuration described.
+9. The metadata of the Community can be found by listening on a content topic
+derived from the public key of the Community.
+10. Community members run their own Waku nodes,
+with the configuration described in [Waku-Protocols](#waku-protocols).
+Light nodes solely implementing
+[19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+may not be able to run their own Waku node with the configuration described.
 
 ## Design
 
@@ -64,16 +81,17 @@ Light nodes solely implementing [19/WAKU2-LIGHTPUSH](../../waku/standards/core/1
 The following cryptographic primitives are used in the design -
 
 - X3DH
-- Single Ratchet 
-    - The single ratchet is used to encrypt the messages sent to the Community.
-    - The single ratchet is re-keyed when a member is added/removed from the Community.
+- Single Ratchet
+  - The single ratchet is used to encrypt the messages sent to the Community.
+  - The single ratchet is re-keyed when a member is added/removed from the Community.
 
 ## Wire format
 
 <!--   
 The wire format is described first to give an overview of the protocol.
 It is referenced in the flow of community creation and community management.
-More or less an intersection of https://github.com/status-im/specs/blob/403b5ce316a270565023fc6a1f8dec138819f4b0/docs/raw/organisation-channels.md and https://github.com/status-im/status-go/blob/6072bd17ab1e5d9fc42cf844fcb8ad18aa07760c/protocol/protobuf/communities.proto,
+More or less an intersection of https://github.com/status-im/specs/blob/403b5ce316a270565023fc6a1f8dec138819f4b0/docs/raw/organisation-channels.md 
+and https://github.com/status-im/status-go/blob/6072bd17ab1e5d9fc42cf844fcb8ad18aa07760c/protocol/protobuf/communities.proto,
 
 -->
 
@@ -88,7 +106,8 @@ message IdentityImage {
   SourceType source_type = 2;
   // image_type signals the image type and method of parsing the payload
   ImageType image_type = 3;
-  // encryption_keys is a list of encrypted keys that can be used to decrypt an encrypted payload
+  // encryption_keys is a list of encrypted keys that can be used to decrypt an 
+  // encrypted payload
   repeated bytes encryption_keys = 4;
   // encrypted signals the encryption state of the payload, default is false.
   bool encrypted = 5;
@@ -101,7 +120,8 @@ message IdentityImage {
 
     // ENS_AVATAR uses the ENS record's resolver get-text-data.avatar data
     // The `payload` field will be ignored if ENS_AVATAR is selected
-    // The application will read and parse the ENS avatar data as image payload data, URLs will be ignored
+    // The application will read and 
+    // parse the ENS avatar data as image payload data, URLs will be ignored
     // The parent `ChatMessageIdentity` must have a valid `ens_name` set
     ENS_AVATAR = 2;
   }
@@ -129,7 +149,8 @@ message ChatIdentity {
   string color = 6;
   string emoji = 7;
   repeated SocialLink social_links = 8;
-  // first known message timestamp in seconds (valid only for community chats for now)
+  // first known message timestamp in seconds 
+  // (valid only for community chats for now)
   // 0 - unknown
   // 1 - no messages
   uint32 first_message_timestamp = 9;
@@ -287,14 +308,17 @@ Note: The usage of the clock is described in the [Clock](#clock) section.
 
 ### Content topic usage
 
-"Content topic" refers to the field in [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md/#message-attributes), further elaborated in [10/WAKU2](../../waku/standards/core/10/waku2.md/#overview-of-protocol-interaction).
+"Content topic" refers to the field in [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md/#message-attributes),
+further elaborated in [10/WAKU2](../../waku/standards/core/10/waku2.md/#overview-of-protocol-interaction).
 
 #### Advertising a Community
 
-The content topic that the community is advertised on MUST be derived from the public key of the community.
-The content topic MUST be the first four bytes of the keccak-256 hash of the compressed (33 bytes) public key of the community encoded into a hex string.
+The content topic that the community is advertised on
+MUST be derived from the public key of the community.
+The content topic MUST be the first four bytes of the keccak-256 hash
+of the compressed (33 bytes) public key of the community encoded into a hex string.
 
-```
+```js
 hash = hex(keccak256(encodeToHex(compressedPublicKey)))
 
 topicLen = 4
@@ -314,9 +338,11 @@ contentTopic = "/waku/1/0x" + topic + "/rfc26"
 
 The unique identifier for a community channel/chat is the chat id.
 <!-- Don't enforce any constraints on the unique id generation -->
-The content topic that Community channels/chats use MUST be the hex-encoded keccak-256 hash of the public key of the community concatenated with the chat id.
+The content topic, that Community channels/chats uses,
+MUST be the hex-encoded keccak-256 hash of the public key of the community
+concatenated with the chat id.
 
-```
+```js
 hash = hex(keccak256(encodeToHex(compressedPublicKey + chatId)))
 
 topicLen = 4
@@ -331,13 +357,14 @@ for i = 0; i < topicLen; i++ {
 contentTopic = "/waku/1/0x" + topic + "/rfc26"
 ```
 
-
 #### Community event messages
 
-Requests to leave, join, kick and ban, as well as key exchange messages, MUST be sent to the content topic derived from the public key of the community.
-The content topic MUST be the hex-encoded keccak-256 hash of the public key of the community.
+Requests to leave, join, kick and ban, as well as key exchange messages,
+MUST be sent to the content topic derived from the public key of the community.
+The content topic
+MUST be the hex-encoded keccak-256 hash of the public key of the community.
 
-```
+```js
 hash = hex(keccak256(encodeToHex(publicKey)))
 
 topicLen = 4
@@ -350,7 +377,7 @@ for i = 0; i < topicLen; i++ {
 }
 
 contentTopic = "/waku/1/0x" + topic + "/rfc26"
-``` 
+```
 
 ### Community Management
 
@@ -359,84 +386,123 @@ The flows for Community management are as described below.
 #### Community Creation Flow
 
 1. The Community owner generates a public/private key pair.
-2. The Community owner configures the Community metadata, according to the wire format "CommunityDescription".
-3. The Community owner publishes the Community metadata on a content topic derived from the public key of the Community. 
-the Community metadata SHOULD be encrypted with the public key of the Community. <!-- TODO: Verify this-->
-The Community metadata MAY be sent during fixed intervals, to ensure that the Community metadata is available to members.
+2. The Community owner configures the Community metadata,
+according to the wire format "CommunityDescription".
+3. The Community owner publishes the Community metadata on a content topic
+derived from the public key of the Community.
+the Community metadata SHOULD be encrypted with the public key of the Community.
+<!-- TODO: Verify this-->
+The Community metadata MAY be sent during fixed intervals,
+to ensure that the Community metadata is available to members.
 The Community metadata SHOULD be sent every time the Community metadata is updated.
-4. The Community owner MAY advertise the Community out of band, by sharing the public key of the Community on other mediums of communication.
+4. The Community owner MAY advertise the Community out of band,
+by sharing the public key of the Community on other mediums of communication.
 
 #### Community Join Flow (peer requests to join a Community)
 
 1. A peer and the Community owner establish a 1:1 chat as described in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md).
-2. The peer requests to join a Community by sending a "CommunityRequestToJoin" message to the Community.
-At this point, the peer MAY send a "CommunityCancelRequestToJoin" message to cancel the request.
+2. The peer requests to join a Community by sending a
+"CommunityRequestToJoin" message to the Community.
+At this point, the peer MAY send a
+"CommunityCancelRequestToJoin" message to cancel the request.
 3. The Community owner MAY accept or reject the request.
-4. If the request is accepted, the Community owner sends a "CommunityRequestToJoinResponse" message to the peer.
-5. The Community owner then adds the member to the Community metadata, and publishes the updated Community metadata.
+4. If the request is accepted,
+the Community owner sends a "CommunityRequestToJoinResponse" message to the peer.
+5. The Community owner then adds the member to the Community metadata, and
+publishes the updated Community metadata.
 
 #### Community Join Flow (peer is invited to join a Community)
 
 1. The Community owner and peer establish a 1:1 chat as described in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md).
-2. The peer is invited to join a Community by the Community owner, by sending a "CommunityInvitation" message.
+2. The peer is invited to join a Community by the Community owner,
+by sending a "CommunityInvitation" message.
 3. The peer decrypts the "CommunityInvitation" message, and verifies the signature.
-4. The peer requests to join a Community by sending a "CommunityRequestToJoin" message to the Community.
+4. The peer requests to join a Community by sending a
+"CommunityRequestToJoin" message to the Community.
 5. The Community owner MAY accept or reject the request.
-6. If the request is accepted, the Community owner sends a "CommunityRequestToJoinResponse" message to the peer.
-7. The Community owner then adds the member to the Community metadata, and publishes the updated Community metadata.
+6. If the request is accepted,
+the Community owner sends a "CommunityRequestToJoinResponse" message to the peer.
+7. The Community owner then adds the member to the Community metadata, and
+publishes the updated Community metadata.
 
 #### Community Leave Flow
 
-1. A member requests to leave a Community by sending a "CommunityRequestToLeave" message to the Community.
+1. A member requests to leave a Community by sending a
+"CommunityRequestToLeave" message to the Community.
 2. The Community owner MAY accept or reject the request.
-3. If the request is accepted, the Community owner removes the member from the Community metadata, and publishes the updated Community metadata.
+3. If the request is accepted,
+the Community owner removes the member from the Community metadata,
+and publishes the updated Community metadata.
 
 #### Community Ban Flow
 
-1. The Community owner adds a member to the ban list, revokes their grants, and publishes the updated Community metadata.
-2. If the Community is Private, Re-keying is performed between the members of the Community, to ensure that the banned member is unable to decrypt any messages.
+1. The Community owner adds a member to the ban list, revokes their grants,
+and publishes the updated Community metadata.
+2. If the Community is Private,
+Re-keying is performed between the members of the Community,
+to ensure that the banned member is unable to decrypt any messages.
 
-### Waku Protocols 
+### Waku Protocols
 
 The following Waku protocols SHOULD be used to implement Status Communities -
 
-1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) - To send and receive messages
-2. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) - To encrypt and decrypt messages
-3. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md) - To handle session keys
-4. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) - To wrap community messages in a Waku message
-5. [13/WAKU2-STORE](../../waku/standards/core/13/store.md) - To store and retrieve messages for offline devices
-
+1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) -
+To send and receive messages
+2. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) -
+To encrypt and decrypt messages
+3. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)-
+To handle session keys
+4. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) -
+To wrap community messages in a Waku message
+5. [13/WAKU2-STORE](../../waku/standards/core/13/store.md) -
+To store and retrieve messages for offline devices
 
 The following Waku protocols MAY be used to implement Status Communities -
 
-1. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md) - Content filtering for resource restricted devices
-2. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) - Allows Light clients to participate in the network
+1. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md) -
+Content filtering for resource restricted devices
+2. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) -
+Allows Light clients to participate in the network
 
 ### Backups
 
-The member MAY back up their local settings, by encrypting it with their public key, and sending it to a given content topic.
-The member MAY then rely on this backup to restore their local settings, in case of a data loss.
-This feature relies on [13/WAKU2-STORE](../../waku/standards/core/13/store.md) for storing and retrieving messages.
+The member MAY back up their local settings,
+by encrypting it with their public key, and
+sending it to a given content topic.
+The member MAY then rely on this backup to restore their local settings,
+in case of a data loss.
+This feature relies on
+[13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+for storing and retrieving messages.
 
 ### Clock
 
 The clock used in the wire format refers to the Lamport timestamp of the message.
-The Lamport timestamp is a logical clock that is used to determine the order of events in a distributed system.
-This allows ordering of messages in an asynchronous network where messages may be received out of order.
+The Lamport timestamp is a logical clock that is used to determine the order of events
+in a distributed system.
+This allows ordering of messages in an asynchronous network
+where messages may be received out of order.
 
 ## Security Considerations
 
-1. The Community owner is a single point of failure. If the Community owner is compromised, the Community is compromised.
+1. The Community owner is a single point of failure.
+If the Community owner is compromised, the Community is compromised.
 
-2. Follows the same security considerations as the [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) protocol.
+2. Follows the same security considerations as the
+[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) protocol.
 
 ## Future work
 
-1. To scale and optimize the Community management, the Community metadata should be stored on a decentralized storage system, and only the references to the Community metadata should be broadcasted. The following document describes this method in more detail - [Optimizing the `CommunityDescription` dissemination](https://hackmd.io/rD1OfIbJQieDe3GQdyCRTw)
+1. To scale and optimize the Community management,
+the Community metadata should be stored on a decentralized storage system, and
+only the references to the Community metadata should be broadcasted.
+The following document describes this method in more detail -
+[Optimizing the `CommunityDescription` dissemination](https://hackmd.io/rD1OfIbJQieDe3GQdyCRTw)
 
 2. Token gating for communities
 
-3. Sharding the content topic used for [#Community Event Messages](#community-event-messages), since members of the community don't need to receive all the control messages.
+3. Sharding the content topic used for [#Community Event Messages](#community-event-messages),
+since members of the community don't need to receive all the control messages.
 
 ## Copyright
 
@@ -455,5 +521,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
 
 ### informative
+
 - [community.go](https://github.com/status-im/status-go/blob/6072bd17ab1e5d9fc42cf844fcb8ad18aa07760c/protocol/communities/community.go)
 - [organisation-channels.md](https://github.com/status-im/specs/blob/403b5ce316a270565023fc6a1f8dec138819f4b0/docs/raw/organisation-channels.md)
