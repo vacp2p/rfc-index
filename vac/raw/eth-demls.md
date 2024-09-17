@@ -29,6 +29,64 @@ The specification is divided into the following sections:
 - Specification of an Ethereum-based authentication protocol, based on
 [SIWE](https://eips.ethereum.org/EIPS/eip-4361).
 
+## Protocol flow
+
+The following steps outline the flow of the protocol.
+
+### Account Registration and Key Generation
+
+Each user starts by registering their Ethereum account.
+It is used as the authentication service.
+Upon registration, the user generates a ``KeyPackage``
+that contains a public key
+and supporting metadata required for the MLS group.
+
+### Group Initialization and Member Management
+
+When a new group is created, the initiating client generates a new ``GroupContext``.
+It contains a unique group ID and an initial epoch.
+
+To add members, the initiator sends an ``Add`` request,
+which includes the new member’s KeyPackage.
+
+Existing members can update their identity in the group using the ``Update`` proposal,
+which replaces the sender’s LeafNode in the group’s ratchet tree.
+
+Members can be removed from the group via a ``Remove`` proposal,
+which specifies the index of the member to be removed from the tree.
+Upon processing this proposal,
+the group generates a new group key to ensure that removed members
+no longer have access to future communications.
+
+### Commit and Authentication
+
+After receiving a valid list of proposals (``Add``, ``Update``, ``Remove``),
+a client initiates a ``Commit`` message,
+processing the pending proposals and updates the group’s state.
+The ``Commit`` message includes the updated ``GroupContext``
+and a ``FramedContentAuthData``,
+which ensures that all group members are aware of the changes.
+Each member verifies the ``FramedContentAuthData`` to ensure the changes are consistent
+with the current epoch of the ``GroupContext``.
+
+### Message Exchange
+
+Once the group is established and all members have processed the latest ``Commit``,
+messages can be securely exchanged using
+the session keyderived from the group's ratchet tree.
+Each message is encapsulated within a ``FramedContent`` structure
+and authenticated using the ``FramedContentAuthData``,
+ensuring message integrity.
+Group members use the current ``GroupContext`` to validate incoming messages
+and ensure they are consistent with the current group state.
+
+### Use of smart contracts
+
+This protocol accomplishes decentralization
+through the use of smart contracts for managing groups.
+They are used to register users in a group and keep the state of the group updated.
+Smart contracts MUST include an ACL to keep the state of the group.
+
 ## Private group messaging protocol
 
 ### Background
