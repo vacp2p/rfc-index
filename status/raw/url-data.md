@@ -150,6 +150,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 2. [Base64url](https://datatracker.ietf.org/doc/html/rfc4648)
 3. [Brotli](https://datatracker.ietf.org/doc/html/rfc7932)
 4. [Protocol buffers version 3](https://protobuf.dev/reference/protobuf/proto3-spec/)
+5. [STATUS-URL-SCHEME](./url-scheme.md)
 
 <!-- ## informative
 
