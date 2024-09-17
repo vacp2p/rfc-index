@@ -41,7 +41,7 @@ Upon registration, the user generates a ``KeyPackage``
 that contains a public key
 and supporting metadata required for the MLS group.
 
-### Group Initialization and Member Management
+### Group Initialization and Member Management
 
 When a new group is created, the initiating client generates a new ``GroupContext``.
 It contains a unique group ID and an initial epoch.
@@ -58,7 +58,7 @@ Upon processing this proposal,
 the group generates a new group key to ensure that removed members
 no longer have access to future communications.
 
-### Commit and Authentication
+### Commit and Authentication
 
 After receiving a valid list of proposals (``Add``, ``Update``, ``Remove``),
 a client initiates a ``Commit`` message,
@@ -69,7 +69,7 @@ which ensures that all group members are aware of the changes.
 Each member verifies the ``FramedContentAuthData`` to ensure the changes are consistent
 with the current epoch of the ``GroupContext``.
 
-### Message Exchange
+### Message Exchange
 
 Once the group is established and all members have processed the latest ``Commit``,
 messages can be securely exchanged using
@@ -80,7 +80,7 @@ ensuring message integrity.
 Group members use the current ``GroupContext`` to validate incoming messages
 and ensure they are consistent with the current group state.
 
-### Use of smart contracts
+### Use of smart contracts
 
 This protocol accomplishes decentralization
 through the use of smart contracts for managing groups.
