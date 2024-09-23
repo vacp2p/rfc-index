@@ -4,7 +4,7 @@
 
 This repository contains specifications from the [Waku](https://waku.org/), [Nomos](https://nomos.tech/),
 [Codex](https://codex.storage/), and
-[Status](https://status.app/) projects thatare part of the [IFT portfolio](https://free.technology/).
+[Status](https://status.app/) projects that are part of the [IFT portfolio](https://free.technology/).
 [Vac](https://vac.dev) is an
 [IFT service](https://free.technology/services) that will manage the RFC,
 [Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments),
