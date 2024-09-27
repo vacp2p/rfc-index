@@ -1,141 +1,199 @@
 ---
-slug: 65
-title: 65/STATUS-ACCOUNT-ADDRESS
-name: Status Account Address
+slug: 9
+title: 9/ETHEREUM-USAGE
+name: Status interactions with the Ethereum blockchain
 status: draft
-category: Standards Track
-description: Details of what a Status account address is and how account addresses are created and used.
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
+description: All interactions that the Status client has with the Ethereum blockchain.
+editor: Andrea Maria Piana <andreap@status.im>
 contributors:
-- Corey Petty <corey@status.im>
-- Oskar Thorén <oskarth@titanproxy.com>
-- Samuel Hawksby-Robinson <samuel@status.im>
+- 
 ---
 
 ## Abstract
 
-This specification details what a Status account address is and
-how account addresses are created and used.
+This specification details all interactions
+that the Status client has with the Ethereum blockchain.
 
 ## Background
 
-The core concept of an account in Status is a set of cryptographic keypairs.
-Namely, the combination of the following:
+This specification documents all interactions
+that the Status client has with the Ethereum blockchain.
+All interactions are made through JSON-RPC.
+Currently, Infura is used.
+The client assumes high availability;
+otherwise, it will not be able to interact with the Ethereum blockchain.
+Status nodes rely on these Infura nodes
+to validate transaction integrity and report consistent history.
 
-1. a Waku chat identity keypair
-1. a set of cryptocurrency wallet keypairs
+[Key handling is described here](https://specs.status.im/spec/2-account.md)
 
-The Status node verifies or
-derives everything else associated with the contact from the above items, including:
+1 [Wallet]
+2 [ENS]
 
-- Ethereum address (future verification, currently the same base keypair)
-- identicon
-- message signatures
+## Wallet
 
-## Initial Key Generation
+The wallet in Status has two main components:
 
-### Public/Private Keypairs
+1. Sending transactions
+2. Fetching balance
 
-- An ECDSA (secp256k1 curve) public/private keypair MUST be generated via a
-[BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)
-derived path from a
-[BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
-mnemonic seed phrase.
+Below are the RPC calls made by the nodes,
+with brief descriptions of their functionality and how Status
+uses them.
 
-- The default paths are defined as such:
-  - Waku Chat Key (`IK`): `m/43'/60'/1581'/0'/0`  (post Multiaccount integration)
-    - following [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
-  - Status Wallet paths: `m/44'/60'/0'/0/i` starting at `i=0`
-    - following [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
-    - NOTE: this (`i=0`) is also the current (and only)
-    path for Waku key before Multiaccount integration
+### Sending Transactions
 
-## Account Broadcasting
+#### EstimateGas
 
-- A user is responsible for broadcasting certain information publicly so
-that others may contact them.
+`EstimateGas` tries to estimate the gas needed
+to execute a transaction based on the current pending state of the blockchain.
+There’s no guarantee this is the actual gas limit, but it provides a reasonable default.
 
-### X3DH Prekey bundles
-
-- Refer to [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
-for details on the X3DH prekey bundle broadcasting, as well as regeneration.
-
-## Optional Account additions
-
-### ENS Username
-
-- A user MAY register a public username on the Ethereum Name System (ENS).
-This username is a user-chosen subdomain of the `stateofus.eth`
-ENS registration that maps to their Waku identity key (`IK`).
-
-### User Profile Picture
-
-- An account MAY edit the `IK` generated identicon with a chosen picture.
-This picture will become part of the publicly broadcasted profile of the account.
-
-<!-- TODO: Elaborate on wallet account and multiaccount -->
-
-## Wire Format
-
-Below is the wire format for the account information that is broadcasted publicly.
-An Account is referred to as a Multiaccount in the wire format.
-
-```proto
-message MultiAccount {
-  string name = 1; // name of the account
-  int64 timestamp = 2; // timestamp of the message
-  string identicon = 3; // base64 encoded identicon
-  repeated ColorHash color_hash = 4; // color hash of the identicon
-  int64 color_id = 5; // color id of the identicon
-  string keycard_pairing = 6; // keycard pairing code
-  string key_uid = 7; // unique identifier of the account
-  repeated IdentityImage images = 8; // images associated with the account
-  string customization_color = 9; // color of the identicon
-  uint64 customization_color_clock = 10; // clock of the identicon color, to track updates
-
-  message ColorHash {
-    repeated int64 index = 1;
-  }
-
-  message IdentityImage {
-    string key_uid = 1; // unique identifier of the image
-    string name = 2; // name of the image
-    bytes payload = 3; // payload of the image
-    int64 width = 4; // width of the image
-    int64 height = 5; // height of the image
-    int64 filesize = 6; // filesize of the image
-    int64 resize_target = 7; // resize target of the image
-    uint64 clock = 8; // clock of the image, to track updates
-  }
-}
+```go
+func (ec *Client) EstimateGas(ctx context.Context, msg ethereum.CallMsg)(uint64, error)
 ```
 
-The above payload is broadcasted when 2 devices
-that belong to a user need to be paired.
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L499)
 
-## Security Considerations
+#### PendingNonceAt
 
-- This specification inherits security considerations of
-[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and
-[54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md).
+`PendingNonceAt` returns the account nonce of the given account in the pending state.
+This should be used for the next transaction.
+
+```go
+func (ec *Client) PendingNonceAt(ctx context.Context, account common.Address) (uint64, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L440)
+
+#### SuggestGasPrice
+
+`SuggestGasPrice` retrieves the suggested gas price for timely transaction execution.
+
+```go
+func (ec *Client) SuggestGasPrice(ctx context.Context) (*big.Int, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L487)
+
+#### SendTransaction
+
+`SendTransaction` injects a signed transaction into the pending pool for execution.
+If it's a contract creation, use `TransactionReceipt`
+to get the contract address after it's mined.
+
+```go
+func (ec *Client) SendTransaction(ctx context.Context, tx *types.Transaction) error
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L512)
+
+### Fetching Balance
+
+A Status node fetches current and historical [ERC-20](https://eips.ethereum.org/EIPS/eip-20)
+and ETH balances for the user wallet address.
+It supports default tokens, with custom tokens added
+by specifying the address, symbol, and decimals.
+
+#### BlockByHash
+
+`BlockByHash` returns the full block,
+used to fetch transfers to the user address (ETH and tokens).
+
+```go
+func (ec *Client) BlockByHash(ctx context.Context, hash common.Hash) (*types.Block, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L78)
+
+#### BlockByNumber
+
+`BlockByNumber` returns a block from the canonical chain. If `number` is nil,
+it returns the latest known block.
+
+```go
+func (ec *Client) BlockByNumber(ctx context.Context, number *big.Int) (*types.Block, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L82)
+
+#### FilterLogs
+
+`FilterLogs` executes a filter query.
+Status uses it to filter logs using the block hash and address ofinterest.
+
+```go
+func (ec *Client) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L377)
+
+#### NonceAt
+
+`NonceAt` returns the account nonce at a given block number.
+
+```go
+func (ec *Client) NonceAt(ctx context.Context, account common.Address, blockNumber *big.Int) (uint64, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L366)
+
+#### TransactionByHash
+
+`TransactionByHash` returns the transaction with the given hash,
+used to inspect transactions made or received by the user.
+
+```go
+func (ec *Client) TransactionByHash(ctx context.Context, hash common.Hash) (tx *types.Transaction, isPending bool, err error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L202)
+
+#### HeaderByNumber
+
+`HeaderByNumber` returns a block header from the canonical chain.
+
+```go
+func (ec *Client) HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L172)
+
+#### TransactionReceipt
+
+`TransactionReceipt` returns the receipt of a transaction by its hash,
+used to check if a token transfer was made to the user address.
+
+```go
+func (ec *Client) TransactionReceipt(ctx context.Context, txHash common.Hash) (*types.Receipt, error)
+```
+
+[Source](https://github.com/ethereum/go-ethereum/blob/26d271dfbba1367326dec38068f9df828d462c61/ethclient/ethclient.go#L270)
+
+### ENS
+
+All interactions with ENS are made through the ENS contract.
+
+#### Registering, Releasing, and Updating
+
+- **Registering a Username**
+- **Releasing a Username**
+- **Updating a Username**
+- **Slashing**
+  - Usernames MUST:
+    - Contain only alphanumeric characters.
+    - Not be in the form `0x[0-9a-f]{5}.*` and must have more than 12 characters.
+    - Not be reserved or too short (checked against the contract).
+  - **Slash a Username**:
+    - Reserved
+    - Invalid
+    - Too similar to an address
+    - Too short
+
+ENS names are propagated through `ChatMessage` and `ContactUpdate` payloads.
+A client SHOULD verify ENS names against the sender's public key
+on message receipt, using the ENS contract.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
-## References
-
-### normative
-
-- [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
-- [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
-- [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
-
-## informative
-
-- [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)
-- [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
-- [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
-- [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
-- [Ethereum Name System](https://ens.domains/)
-- [Status Multiaccount](../63/account-address.md)
+Waived via CC0.
