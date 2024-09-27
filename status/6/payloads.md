@@ -3,10 +3,12 @@ slug: 6
 title: 6/PAYLOADS
 name: Payloads
 status: draft
-description: Status relation with the EIPs
-editor: Ricardo Guilherme Schmidt <ricardo3@status.im>
+description: Payload of messages in Status, regarding chat and chat-related use cases.
+editor: 
 contributors:
-- 
+- Adam Babik <adam@status.im>
+- Andrea Maria Piana <andreap@status.im>
+- Oskar Thorén <oskar@status.im>
 ---
 
 ## Abstract
