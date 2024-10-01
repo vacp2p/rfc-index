@@ -273,7 +273,7 @@ message ContactUpdate {
 }
 ```
 
-### Payload Fields
+ Payload Fields
 
 | Field       | Name          | Type    | Description                                      |
 | ----------- | ------------- | ------- | ------------------------------------------------ |
@@ -305,7 +305,7 @@ message SyncInstallationContact {
 }
 ```
 
-### Payload Fields
+Payload Fields
 
 | Field          | Name          | Type          | Description                               |
 | -------------- | ------------- | ------------- | ----------------------------------------- |
@@ -327,7 +327,7 @@ message SyncInstallationPublicChat {
 }
 ```
 
-### Payload Fields
+Payload Fields
 
 | Field       | Name   | Type   | Description           |
 | ----------- | ------ | ------ | --------------------- |
@@ -348,7 +348,7 @@ message PairInstallation {
 }
 ```
 
-### Payload Fields
+Payload Fields
 
 | Field             | Name           | Type   | Description                                    |
 | ----------------- | -------------- | ------ | ---------------------------------------------- |
