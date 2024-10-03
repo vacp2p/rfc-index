@@ -9,12 +9,12 @@ contributors:
 
 ## Abstract
 
-This document introduces a decentralized group messaging protocol using
-Ethereum adresses as identifiers.
-It is based in the proposal [DCGKA](https://eprint.iacr.org/2020/1281) by
-Weidner et al.
-It includes also approximations to overcome limitations related to using PKI
-and the multi-device setting.
+This document introduces a decentralized group messaging protocol
+using Ethereum adresses as identifiers.
+It is based in the proposal
+[DCGKA](https://eprint.iacr.org/2020/1281) by Weidner et al.
+It includes also approximations to overcome limitations related to using PKI and
+the multi-device setting.
 
 ## Motivation
 
@@ -51,89 +51,93 @@ For instance, protocols like the [MLS](https://messaginglayersecurity.rocks)
 perform well in terms of scalability and security.
 However, they falls short in decentralization.
 
-Newer studies such as [CoCoa](https://eprint.iacr.org/2022/251) improve
-features related to security and scalability,
-but they still rely on servers, which may not be fully trusted though they are
-necessary.
+Newer studies such as [CoCoa](https://eprint.iacr.org/2022/251)
+improve features related to security and scalability,
+but they still rely on servers, which may not be fully trusted though they are necessary.
 
-On the other hand, older studies like
-[Causal TreeKEM](https://mattweidner.com/assets/pdf/acs-dissertation.pdf)
+On the other hand,
+older studies like [Causal TreeKEM](https://mattweidner.com/assets/pdf/acs-dissertation.pdf)
 exhibit decent scalability (logarithmic)
 but lack forward secrecy and have weak post-compromise security (PCS).
 
-The creators of [DCGKA](https://eprint.iacr.org/2020/1281) introduce a
-decentralized, asynchronous secure group messaging protocol that supports
-dynamic groups. This protocol operates effectively on various underlying
-networks without strict requirements on message ordering or latency.
+The creators of [DCGKA](https://eprint.iacr.org/2020/1281) introduce a decentralized,
+asynchronous secure group messaging protocol that supports dynamic groups.
+This protocol operates effectively on various underlying networks
+without strict requirements on message ordering or latency.
 It can be implemented in peer-to-peer or anonymity networks,
-accommodating network partitions, high latency links, and disconnected
-operation seamlessly. Notably, the protocol doesn't rely on servers or
+accommodating network partitions, high latency links, and
+disconnected operation seamlessly.
+Notably, the protocol doesn't rely on servers or
 a consensus protocol for its functionality.
 
-This proposal provides end-to-end encryption with forward secrecy and post
-compromise security, even when multiple users concurrently modify the group
-state.
+This proposal provides end-to-end encryption with forward secrecy and
+post-compromise security,
+even when multiple users concurrently modify the group state.
 
 ## Theory
 
 ### Protocol overview
 
-This protocol makes use of ratchets to provide FS by encrypting each message
-with a different key.
+This protocol makes use of ratchets to provide FS
+by encrypting each message with a different key.
 
 In the figure one can see the ratchet for encrypting a sequence of messages.
-The sender requires an initial update secret `I_1`, which is introduced in a
-PRG.
-The PRG will produce two outputs, namely a symmetric key for AEAD encryption,
-and a seed for the next ratchet state.
-The associated data needed in the AEAD encryption includes the message index
-`i`. The ciphertext `c_i` associated to message `m_i` is then broadcasted to
-all group members. The next step requires deleting `I_1`, `k_i` and any old
-ratchet state.
+The sender requires an initial update secret `I_1`, which is introduced in a PRG.
+The PRG will produce two outputs, namely a symmetric key for AEAD encryption, and
+a seed for the next ratchet state.
+The associated data needed in the AEAD encryption includes the message index `i`.
+The ciphertext `c_i` associated to message `m_i`
+is then broadcasted to all group members.
+The next step requires deleting `I_1`, `k_i` and any old ratchet state.
 
-After a period of time the sender may replace the ratchet state with new update
-secrets `I_2`, `I_3`, and so on.
+After a period of time the sender may replace the ratchet state with new update secrets
+`I_2`, `I_3`, and so on.
 
-To start a post-compromise security update, a user creates a new random value
-known as a seed secret and shares it with every other group member through a
-secure two-party channel. Upon receiving the seed secret, each group member
-uses it to calculate an update secret for both the sender's ratchet and their
-own.
-
+To start a post-compromise security update,
+a user creates a new random value known as a seed secret and
+shares it with every other group member through a secure two-party channel.
+Upon receiving the seed secret,
+each group member uses it to calculate an update secret for both the sender's ratchet
+and their own.
 Additionally, the recipient sends an unencrypted acknowledgment to the group
-confirming the update. Every member who receives the acknowledgment updates not
-only the ratchet for the original sender but also the ratchet for the sender of
-the acknowledgment.
-Consequently, after sharing the seed secret through `n - 1` two-party messages
-and confirming it with `n - 1` broadcast acknowledgments, every group member
-has derived an update secret and updated their ratchet accordingly.
+confirming the update.
+Every member who receives the acknowledgment updates
+not only the ratchet for the original sender but
+also the ratchet for the sender of the acknowledgment.
+Consequently, after sharing the seed secret through `n - 1` two-party messages and
+confirming it with `n - 1` broadcast acknowledgments,
+every group member has derived an update secret and updated their ratchet accordingly.
 
-When removing a group member, the user who initiates the removal conducts a
-post-compromise security update by sending the update secret to all group
-members except the one being removed. To add a new group member,
+When removing a group member,
+the user who initiates the removal conducts a post-compromise security update
+by sending the update secret to all group members except the one being removed.
+To add a new group member,
 each existing group member shares the necessary state with the new user,
 enabling them to derive their future update secrets.
 
-Since group members may receive messages in various orders, it's important to
-ensure that each sender's ratchet is updated consistently with the same
-sequence of update secrets at each group member.
+Since group members may receive messages in various orders,
+it's important to ensure that each sender's ratchet is updated consistently
+with the same sequence of update secrets at each group member.
 
-The network protocol used in this scheme ensures that messages from the same
-sender are processed in the order they were sent.
+The network protocol used in this scheme ensures that messages from the same sender
+are processed in the order they were sent.
 
 ### Components of the protocol
 
-This protocol relies in 3 components: authenticated causal broadcast (ACB),
-decentralized group membership (DGM) and 2-party secure messaging (2SM).
+This protocol relies in 3 components:
+authenticated causal broadcast (ACB),
+decentralized group membership (DGM) and
+2-party secure messaging (2SM).
 
 #### Authenticated causal broadcast
 
-A causal order is a partial order relation `<` on messages. Two messages `m_1`
-and `m_2` are causally ordered, or `m_1` causally precedes `m_2` (denoted by
-`m_1 < m_2`), if one of the following contiditions hold:
+A causal order is a partial order relation `<` on messages.
+Two messages `m_1` and `m_2` are causally ordered, or
+`m_1` causally precedes `m_2`
+(denoted by `m_1 < m_2`), if one of the following contiditions hold:
 
-1. `m_1` and `m_2` were sent by the same group member, and `m_1` was sent
-before `m_2`.
+1. `m_1` and `m_2` were sent by the same group member, and
+`m_1` was sent before `m_2`.
 2. `m_2` was sent by a group member U, and `m_1` was received and
 processed by `U` before sending `m_2`.
 3. There exists `m_3` such that `m_1 < m_3` and `m_3 < m_2`.
@@ -162,9 +166,10 @@ which consist of 3 algorithms: `2SM-Init`, `2SM-Send` and `2SM-Receive`.
 
 ##### Function 2SM-Init
 
-This function takes two IDs as inputs: `ID1` representing the local user and
-`ID2` representing the other party. It returns an initial protocol state
-`sigma`. The 2SM protocol relies on a Public Key Infrastructure (PKI) or
+This function takes two IDs as inputs:
+`ID1` representing the local user and `ID2` representing the other party.
+It returns an initial protocol state `sigma`.
+The 2SM protocol relies on a Public Key Infrastructure (PKI) or
 a key server to map these IDs to their corresponding public keys.
 In practice, the PKI should incorporate ephemeral prekeys.
 This allows users to send messages to a new group member,
@@ -176,6 +181,9 @@ This function takes a state `sigma` and a plaintext `m` as inputs, and returns
 a new state `sigma’` and a ciphertext `c`.
 
 ##### Function 2SM-Receive
+
+This function takes a state `sigma` and a ciphertext `c`, and
+returns a new state `sigma’` and a plaintext `m`.
 
 This function takes a state `sigma` and a ciphertext `c`, and returns a new
 state `sigma’` and a plaintext `m`.
@@ -194,11 +202,11 @@ sigma.otherPkIndex = 0
 
 ```
 
-#### 2SM-Init
+#### Function 2SM-Init
 
 On input a key pair `(sk, pk)`, this functions otuputs a state `sigma`.
 
-#### 2SM-Send
+#### Function 2SM-Send
 
 This function encrypts the message `m` using `sigma.otherPk`, which represents
 the other party’s current public key.
@@ -227,7 +235,7 @@ return (sigma`, msg)
 
 ```
 
-#### 2SM-Receive
+#### Function 2SM-Receive
 
 This function utilizes the metadata of the message `c` to determine which
 secret key to utilize for decryption, assigning it to `sk`.
@@ -291,8 +299,8 @@ return ((eta, delta))
 
 #### PKE-Dec
 
-The user `u` recovers a message `m` from a ciphertext `c` by performing the
-following operations:
+The user `u` recovers a message `m` from a ciphertext `c`
+by performing the following operations:
 
 ```text
 PKE-Dec(sk):
@@ -337,7 +345,7 @@ in `gamma`.
 
 ```text
 if gamma.2sm[recipient_ID] = empty_string then
-    gamma.2sm[recipient_ID] = 2SM_Init(gamma.myID, recipient_ID)
+ gamma.2sm[recipient_ID] = 2SM_Init(gamma.myID, recipient_ID)
 (gamma.2sm[recipient_ID], ciphertext) = 2SM_Send(gamma.2sm[recipient_ID], plaintext)
 return (gamma, ciphertext)
 
@@ -373,11 +381,11 @@ return (gamma, updateSecret)
 
 #### member-view
 
-This function calculates the set of group members based on the most recent
-control message sent by the specified user `ID`.
-It filters the group membership operations to include only those observed by
-the specified `ID`, and then invokes the DGM function to generate the group
-membership.
+This function calculates the set of group members
+based on the most recent control message sent by the specified user `ID`.
+It filters the group membership operations
+to include only those observed by the specified `ID`, and
+then invokes the DGM function to generate the group membership.
 
 ```text
 ops = {m in gamma.history st. m was sent or acknowledged by ID}
@@ -387,9 +395,10 @@ return DGM(ops)
 
 #### generate-seed
 
-This functions generates a random bit string and sends it encrypted to each
-member of the group using the `2SM` mechanism. It returns the updated protocol
-state and the set of direct messages (denoted as `dmsgs`) to send.
+This functions generates a random bit string and
+sends it encrypted to each member of the group using the `2SM` mechanism.
+It returns the updated protocol state and
+the set of direct messages (denoted as `dmsgs`) to send.
 
 ```text
 gamma.nextSeed = random.randbytes()
@@ -479,10 +488,9 @@ for ID in {members - (recipients + {sender})}
     s = gamma.memberSecret[sender, seq, gamma.myId]
     (gamma, msg) = encrypt-to(gamma, ID, s)
     forward = forward + {(ID, msg)}
-
-(gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, (sender,
-seq), empty_string)
-return (gamma, control, forward, I_sender, I_me)
+    (gamma, _, _, I_me, _) = process-ack(gamma, gamma.myId, gamma.mySeq, 
+    (sender, seq), empty_string)
+    return (gamma, control, forward, I_sender, I_me)
 
 ```
 
@@ -648,14 +656,14 @@ if gamma.myId in member-view(gamma, sender) then
     (gamma, s) = update-ratchet(gamma, sender, "welcome")
     gamma.memberSecret[sender, seq, added] = s
     (gamma, I_sender) = update-ratchet(gamma, sender, "add")
-else I_sender = empty_string
-if sender = gamma.myId then return (gamma, empty_string, empty_string,
-I_sender, empty_string)
-control = ("add-ack", ++gamma.mySeq, (sender, seq))
-(gamma, c) = encrypt-to(gamma, added, ratchet[gamma.myId])
-(gamma, _, _, I_me, _) = process-add-ack(gamma, gamma.myId, gamma.mySeq,
-(sender, seq), empty_string)
-return (gamma, control, {(added, c)}, I_sender, I_me)
+    else I_sender = empty_string
+    if sender = gamma.myId then return (gamma, empty_string, empty_string,
+    I_sender, empty_string)
+    control = ("add-ack", ++gamma.mySeq, (sender, seq))
+    (gamma, c) = encrypt-to(gamma, added, ratchet[gamma.myId])
+    (gamma, _, _, I_me, _) = process-add-ack(gamma, gamma.myId, gamma.mySeq,
+    (sender, seq), empty_string)
+    return (gamma, control, {(added, c)}, I_sender, I_me)
 
 ```
 
