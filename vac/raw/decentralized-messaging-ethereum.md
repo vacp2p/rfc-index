@@ -202,11 +202,11 @@ sigma.otherPkIndex = 0
 
 ```
 
-#### Function 2SM-Init
+#### 2SM-Init
 
 On input a key pair `(sk, pk)`, this functions otuputs a state `sigma`.
 
-#### Function 2SM-Send
+#### 2SM-Send
 
 This function encrypts the message `m` using `sigma.otherPk`, which represents
 the other party’s current public key.
@@ -235,7 +235,7 @@ return (sigma`, msg)
 
 ```
 
-#### Function 2SM-Receive
+#### 2SM-Receive
 
 This function utilizes the metadata of the message `c` to determine which
 secret key to utilize for decryption, assigning it to `sk`.
