@@ -1,4 +1,4 @@
 # Status RFCs
 
-Status is a communitication tool providing privacy features for the user.
-Specifcations can also be viewd at [Status](https://status.app/specs).
+Status is a communication tool providing privacy features for the user.
+Specifications can also be viewed at [Status](https://status.app/specs).
