@@ -26,7 +26,7 @@ this specification proposes a standard method for encoding data within URLs.
 - Community: Refer to [STATUS-COMMUNITIES](../56/communities.md)
 - Channel: Refer to terminology in [STATUS-COMMUNITIES](../56/communities.md)
 - User: Refer to terminology in [STATUS-COMMUNITIES](../56/communities.md)
-- Shard Refer to terminology in [51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
+- Shard Refer to terminology in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 
 ## Wire Format
 
