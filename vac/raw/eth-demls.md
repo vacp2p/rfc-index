@@ -1023,7 +1023,7 @@ and deploy when compared to the above MPC description.
 In order to avoid security issues like replay attacks and DDoS,
 one needs to have the following aspects in mind:
 
-1. Nonce uniqueness: this can be guaranteed using a map to track used nonces for each signature.
+1. Nonce uniqueness: this can be guaranteed tracking used nonces for each signature.
 This would prevent replay attacks as it provides proofs
 that a nonce was used only once by a particular address.
 2. Temporal uniqueness: timestamps allow checkings to prevent the reuse of old signatures.
@@ -1043,11 +1043,13 @@ while the core function is `authenticate`.
 Timestamps and nonce tracking are recommended to avoid replay attacks and DDoS attacks.
 
 ### Initial Setup
+
 used_nonces = empty map of address to set of bytes32
 group_members = empty set of addresses
 admin = creator_address
 
 ### Function `add_group_member`
+
 Input: member_address
 
 If the caller is not admin, return an error:
@@ -1055,6 +1057,7 @@ If the caller is not admin, return an error:
 Add member_address to the group_members set
 
 ### Function `remove_group_member`
+
 Input: member_address
 
 If the caller is not admin, return an error:
@@ -1062,6 +1065,7 @@ If the caller is not admin, return an error:
 Remove member_address from the group_members set
 
 ### Function `authenticate`
+
 Inputs: nonce, timestamp, signature
 
 Generate the message:
@@ -1087,6 +1091,7 @@ If caller_address is not in group_members, return an error:
 Add the nonce to used_nonces[caller_address]
 
 ### Helper Function `recover_signer`
+
 Inputs: message, signature
 
 Convert message to bytes:
