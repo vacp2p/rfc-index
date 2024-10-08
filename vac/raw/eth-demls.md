@@ -1005,6 +1005,104 @@ version of the tree that allows for the generation of the group key.
 Another important component is the _authentication service_, which is
 replaced with SIWE in this specification.
 
+## Considerations regarding authentication
+
+SIWE presents some centralization issues for random node generation.
+Since smart contracts cannot generate random nonces without the need of an oracle,
+or can only generate pseudo-random nonces
+which would be the result of combining data which could be hacked.
+
+The following approach aims at mitigating these issues.
+It is similar to SIWE,
+and would imply the users requesting to log into the system
+to create the nonce by themselves, sign it,
+and then send it to the smart contract for verification.
+This makes the approach easier to implement
+and deploy when compared to the above MPC description.
+
+In order to avoid security issues like replay attacks and DDoS,
+one needs to have the following aspects in mind:
+
+1. Nonce uniqueness: this can be guaranteed using a map to track used nonces for each signature.
+This would prevent replay attacks as it provides proofs
+that a nonce was used only once by a particular address.
+2. Temporal uniqueness: timestamps allow checkings to prevent the reuse of old signatures.
+3. Message uniqueness: including the sender’s address in the message hash
+ensures that messages are unique even if two users collide in the nonce and the timestamp.
+4. Group membership: one could keep a separate mapping
+to track who is allowed to authenticate.
+5. Admin role: the creator of the smart contract would have an admin role,
+allowing the dynamic management of group membership.
+
+## Pseudocode
+
+The following pseudocode outlines functions for a smart contract managing group users.
+The first two functions handle adding and removing members,
+while the core function is `authenticate`.
+
+Timestamps and nonce tracking are recommended to avoid replay attacks and DDoS attacks.
+
+### Initial Setup
+used_nonces = empty map of address to set of bytes32
+group_members = empty set of addresses
+admin = creator_address
+
+### Function `add_group_member`
+Input: member_address
+
+If the caller is not admin, return an error:
+"Only admin can perform this action"
+Add member_address to the group_members set
+
+### Function `remove_group_member`
+Input: member_address
+
+If the caller is not admin, return an error:
+"Only admin can perform this action"
+Remove member_address from the group_members set
+
+### Function `authenticate`
+Inputs: nonce, timestamp, signature
+
+Generate the message:
+message = KECCAK256(CONCAT(nonce, timestamp, caller_address))
+
+Recover the signer from the signature:
+signer = RECOVER_SIGNER(message, signature)
+
+If signer is not the caller_address, return an error:
+"Invalid signature"
+Check if the timestamp is recent:
+
+If block.timestamp - timestamp > 5 minutes, return an error:
+"Nonce expired"
+Check if the nonce has been used:
+
+If the nonce exists in used_nonces[caller_address], return an error:
+"Nonce already used"
+Ensure the caller is a group member:
+
+If caller_address is not in group_members, return an error:
+"Not a group member"
+Add the nonce to used_nonces[caller_address]
+
+### Helper Function `recover_signer`
+Inputs: message, signature
+
+Convert message to bytes:
+message_bytes = to_bytes(text=message)
+
+Hash the message using KECCAK-256:
+message_hash = keccak(message_bytes)
+
+Recover the public key from the message hash and signature:
+public_key = keys.Signature(signature).recover_public_key_from_msg_hash(message_hash)
+
+Convert the public key to an Ethereum address:
+address = public_key.to_checksum_address()
+
+Return the address
+
 ## Privacy and Security Considerations
 
 - For the information retrieval, the algorithm MUST include a access
