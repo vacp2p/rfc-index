@@ -310,7 +310,7 @@ Light protocols comprise
 * [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) for sending messages
 * [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
 for requesting messages with specific attributes
-* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
+* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 for discovering peers
 
 ## Waku Archive
@@ -369,9 +369,9 @@ functionality offered by the libp2p circuit relay protocols, and
 to upgrade to a direct connection.
 
 Nodes that do not announce themselves at all and only plan to use light protocols,
-MAY use rendezvous discovery instead of or along-side [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md).
+MAY use rendezvous discovery instead of or along-side [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md).
 For these nodes, rendezvous and
-[WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
+[WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 offer the same functionality,
 but return node sets sampled in different ways.
 Using both can help increasing connectivity.
@@ -401,7 +401,7 @@ The string conversion SHOULD remove leading zeros.
 field is of type string, a more efficient byte encoding is not utilized.
 
 Registering shard 2 in the Status shard cluster (with shard cluster index 16,
-see [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md),
+see [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md),
 the register query would look like
 
 ```rs
@@ -601,7 +601,7 @@ It could be rate-limited with RLN.
 
 This document makes several trade-offs to privacy and anonymity.
 Todo: elaborate.
-See [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md)
+See [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/master/informational/adversarial-models.md)
 for information on Waku Anonymity.
 
 ## Copyright
@@ -619,7 +619,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md)
 * [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
 * [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
-* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
+* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 * [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
 * [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md)
 * [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
@@ -629,9 +629,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [DCUtR](https://github.com/libp2p/specs/blob/master/relay/DCUtR.md)
 * [scoring](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
 * [Circuit Relay](https://docs.libp2p.io/concepts/nat/circuit-relay/)
-* [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md)
+* [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/master/informational/adversarial-models.md)
 
 ## Informative
 
 * [Circuit Relay](https://docs.libp2p.io/concepts/nat/circuit-relay/)
-* [WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
+* [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
