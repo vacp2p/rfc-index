@@ -41,7 +41,7 @@ within the network.
 in order of increasing decentralization
 
 * hard coded bootstrap nodes
-* [`DNS discovery`](https://rfc.vac.dev/spec/10/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
+* [`DNS discovery`](../10/waku2.md/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
 * `peer-exchange` (work in progress)
 * `33/WAKU2-DISCV5` (specified in this document)
 
@@ -74,7 +74,7 @@ This also increases decentralization.
 isolated from the Ethereum Discovery v5 network.
 
 Another simple solution would be taking part in the Ethereum Discovery network,
-and filtering Waku nodes based on whether they support [WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md).
+and filtering Waku nodes based on whether they support [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
 This solution is more resilient towards eclipse attacks.
 However, this discovery method is very inefficient
 for small percentages of Waku nodes
@@ -206,12 +206,12 @@ raises research questions that we will address in future stages of our discv5 ro
 
 1. [10/WAKU2](../10/waku2.md)
 1. [11/WAKU2-RELAY](../11/relay.md)
-1. [`WAKU2-ENR`](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
+1. [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 1. [Node Discovery Protocol v5 (`discv5`)](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 1. [`discv5` semantics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md).
 1. [`discv5` wire protocol](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-wire.md)
 1. [`discv5` topic discovery](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md#topic-advertisement)
-1. [Waku DNS discovery](https://rfc.vac.dev/spec/10/#discovery-domain)
+1. [Waku DNS discovery](../10/waku2.md/#discovery-domain)
 1. [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
 1. [`EIP-1459`](https://eips.ethereum.org/EIPS/eip-1459)
 1. [`GossipSub`](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
