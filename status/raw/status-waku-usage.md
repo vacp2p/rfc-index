@@ -15,12 +15,12 @@ contributors:
 Status is a chat application which has several features,
 including, but not limited to -
 
-- Private 1:1 chats, described by [55/STATUS-1TO1-CHAT](/spec/55)
-- Large scale group chats, described by [56/STATUS-COMMUNITIES](/spec/56)
+- Private 1:1 chats, described by [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
+- Large scale group chats, described by [56/STATUS-COMMUNITIES](../56/communities.md)
 
 This specification describes how a Status implementation will make use of
 the underlying infrastructure, Waku,
-which is described in [10/WAKU2](/spec/10).
+which is described in [10/WAKU2](../../waku/standards/core/10/waku2.md).
 
 ## Background
 
@@ -38,13 +38,13 @@ it is imperative to describe how each are used.
 
 | Name  | Description |
 | --------------- | --------- |
-| `RELAY`| This refers to the Waku Relay protocol, described in [11/WAKU2-RELAY](/spec/11) |
-| `FILTER` | This refers to the Waku Filter protocol, described in [12/WAKU2-FILTER](/spec/12) |
-| `STORE` | This refers to the Waku Store protocol, described in [13/WAKU2-STORE](/spec/13) |
-| `MESSAGE` | This refers to the Waku Message format, described in [14/WAKU2-MESSAGE](/spec/14) |
-| `LIGHTPUSH` | This refers to the Waku Lightpush protocol, described in [19/WAKU2-LIGHTPUSH](/spec/19) |
+| `RELAY`| This refers to the Waku Relay protocol, described in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) |
+| `FILTER` | This refers to the Waku Filter protocol, described in [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md) |
+| `STORE` | This refers to the Waku Store protocol, described in [13/WAKU2-STORE](../../waku/standards/core/13/store.md) |
+| `MESSAGE` | This refers to the Waku Message format, described in [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) |
+| `LIGHTPUSH` | This refers to the Waku Lightpush protocol, described in [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) |
 | Discovery | This refers to a peer discovery method used by a Waku node. |
-| `Pubsub Topic` / `Content Topic` | This refers to the routing of messages within the Waku network, described in [23/WAKU2-TOPICS](/spec/23/) |
+| `Pubsub Topic` / `Content Topic` | This refers to the routing of messages within the Waku network, described in [23/WAKU2-TOPICS](../../waku/informational/23/topics.md) |
 
 ### Waku Node
 
@@ -71,10 +71,10 @@ The following is a list of Waku Protocols used by a Status application.
 
 The `RELAY` MUST NOT be used by Status light clients.
 The `RELAY` is used to broadcast messages between Status clients.
-All Status messages are transformed into [14/WAKU2-MESSAGE](/spec/14),
+All Status messages are transformed into [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md),
 which are sent over the wire.
 
-All Status message types are described in [62/STATUS-PAYLOAD](/spec/62).
+All Status message types are described in [62/STATUS-PAYLOADS](../62/payloads.md).
 Status Clients MUST transform the following object into a `MESSAGE`
 as described below -
 
@@ -110,7 +110,7 @@ If both are received, the implementation MUST throw an error.
 This protocol MUST remain optional according to the user's preferences,
 it MAY be enabled on Light clients as well.
 
-Messages received via [11/WAKU2-RELAY](/spec/11), are stored in a database.
+Messages received via [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), are stored in a database.
 When Waku node running this protocol is service node,
 it MUST provide the complete list of network messages.
 Status clients SHOULD request historical messages from this service node.
@@ -146,16 +146,16 @@ The `filter-push` SHOULD be implemented on light clients to receive messages.
 Status clients SHOULD apply a filter for all the `Content Topic`
 they are interested in, such as `Content Topic` derived from -
 
-1. 1:1 chats with other users, described in [55/STATUS-1TO1-CHAT](/spec/55)
+1. 1:1 chats with other users, described in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 2. Group chats
-3. Community Channels, described in [56/STATUS-COMMUNITIES](/spec/56)
+3. Community Channels, described in [56/STATUS-COMMUNITIES](../56/communities.md)
 
 ### 4. `LIGHTPUSH`
 
 The `LIGHTPUSH` protocol MUST be enabled on Status light clients.
 A Status `RELAY` node MAY implement `LIGHTPUSH` to support light clients.
 Peers will be able to publish messages,
-without running a full-fledged [11/WAKU2-RELAY](/spec/11) protocol.
+without running a full-fledged [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) protocol.
 
 When a Status client is publishing a message,
 it MUST check if Light mode is enabled,
@@ -169,9 +169,9 @@ Status clients SHOULD make use of the following peer discovery methods
 that are provided by Waku, such as -
 
 1. [EIP-1459: DNS-Based Discovery](https://eips.ethereum.org/EIPS/eip-1459)
-2. [33/WAKU2-DISCV5](/spec/33): A node discovery protocol to
+2. [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md): A node discovery protocol to
 create decentralized network of interconnected Waku nodes.
-3. [34/WAKU2-PEER-EXCHANGE](/spec/34):
+3. [34/WAKU2-PEER-EXCHANGE](../../waku/standards/core/34/peer-exchange.md):
 A peer discovery protocol for resource restricted devices.
 
 Status clients MAY use any combination of the above peer discovery methods,
@@ -182,19 +182,19 @@ which is suited best for their implementation.
 This specification inherits the security and
 privacy considerations from the following specifications -
 
-1. [10/WAKU2](/spec/10)
-2. [11/WAKU2-RELAY](/spec/11)
-3. [12/WAKU2-FILTER](/spec/12)
-4. [13/WAKU2-STORE](/spec/13)
-5. [14/WAKU2-MESSAGE](/spec/14)
-6. [23/WAKU2-TOPICS](/spec/23)
-7. [19/WAKU2-LIGHTPUSH](/spec/19)
-8. [55/STATUS-1TO1-CHAT](/spec/55)
-9. [56/STATUS-COMMUNITIES](/spec/56)
-10. [62/STATUS-PAYLOAD](/spec/62)
+1. [10/WAKU2](../../waku/standards/core/10/waku2.md)
+2. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+3. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+4. [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+5. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
+6. [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
+7. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+8. [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
+9. [56/STATUS-COMMUNITIES](../56/communities.md)
+10. [62/STATUS-PAYLOADS](../62/payloads.md)
 11. [EIP-1459: DNS-Based Discovery](https://eips.ethereum.org/EIPS/eip-1459)
-12. [33/WAKU2-DISCV5](/spec/33)
-13. [34/WAKU2-PEER-EXCHANGE](/spec/34)
+12. [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md)
+13. [34/WAKU2-PEER-EXCHANGE](../../waku/standards/core/34/peer-exchange.md)
 
 ## Copyright
 
@@ -202,17 +202,17 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [55/STATUS-1TO1-CHAT](/spec/55)
-2. [56/STATUS-COMMUNITIES](/spec/56)
-3. [10/WAKU2](/spec/10)
-4. [11/WAKU2-RELAY](/spec/11)
-5. [12/WAKU2-FILTER](/spec/12)
-6. [13/WAKU2-STORE](/spec/13)
-7. [14/WAKU2-MESSAGE](/spec/14)
-8. [23/WAKU2-TOPICS](/spec/23)
-9. [19/WAKU2-LIGHTPUSH](/spec/19)
-10. [64/WAKU2-NETWORK](/spec/64)
-11. [62/STATUS-PAYLOAD](/spec/62)
+1. [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
+2. [56/STATUS-COMMUNITIES](../56/communities.md)
+3. [10/WAKU2](../../waku/standards/core/10/waku2.md)
+4. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+5. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+6. [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+7. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
+8. [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
+9. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+10. [64/WAKU2-NETWORK](../../waku/standards/core/64/network.md)
+11. [62/STATUS-PAYLOADS](../62/payloads.md)
 12. [EIP-1459: DNS-Based Discovery](https://eips.ethereum.org/EIPS/eip-1459)
-13. [33/WAKU2-DISCV5](/spec/33)
-14. [34/WAKU2-PEER-EXCHANGE](/spec/34)
+13. [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md)
+14. [34/WAKU2-PEER-EXCHANGE](../../waku/standards/core/34/peer-exchange.md)
