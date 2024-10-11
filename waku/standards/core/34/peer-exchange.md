@@ -48,7 +48,7 @@ The peer exchange protocol, specified in this document,
 is a simple request-response protocol.
 As Figure 1 illustrates, the requesting node sends a request to a peer,
 which acts as the responder.
-The responder replies with a list of ENRs as specified in [WAKU2-ENR](../enr.md).
+The responder replies with a list of ENRs as specified in [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
 The [multiaddresses](https://docs.libp2p.io/concepts/addressing/)
 used to connect to the respective peers can be extracted from the ENRs.
 
@@ -110,7 +110,7 @@ message PeerExchangeRPC {
 
 ```
 
-The `enr` field contains a Waku ENR as specified in [WAKU2-ENR](../enr.md).
+The `enr` field contains a Waku ENR as specified in [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
 
 Requesters send a `PeerExchangeQuery` to a peer.
 Responders SHOULD include a maximum of `num_peers` `PeerInfo` instances into a response.
@@ -133,7 +133,7 @@ depends on the average number of requested peers,
 which is expected to be the outbound degree of the underlying
 [libp2p gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 mesh network.
-The recommended value for this outbound degree is 6 (see parameter `D` in [29/WAKU2-CONFIG](https://rfc.vac.dev/spec/29/)).
+The recommended value for this outbound degree is 6 (see parameter `D` in [29/WAKU2-CONFIG](../../../informational/29/config.md)).
 It is recommended for the cache to hold at least 10 times as many peers (60).
 
 The RECCOMENDED cache size also depends on the number of requesters a responder
@@ -204,8 +204,8 @@ The `seen cache` MAY be used in conjunction to provide additional mitigation.
 
 ### Further Considerations
 
-The response field contains ENRs as specified in [WAKU2-ENR](../enr.md).
-While ENRs contain signatures, they do not violate the [Waku relay no-sign policy](https://rfc.vac.dev/spec/11/#signature-policy)),
+The response field contains ENRs as specified in [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
+While ENRs contain signatures, they do not violate the [Waku relay no-sign policy](../11/waku2.md/#signature-policy)),
 because they are part of the discovery domain and
 are not propagated in the relay domain.
 However, there might still be some form of leakage:
@@ -219,9 +219,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 * [33/WAKU2-DISCV5](../33/discv5.md)
-* [WAKU2-ENR](../enr.md)
+* [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 * [multiaddress](https://docs.libp2p.io/concepts/addressing/)
 * [libp2p discovery interface](https://github.com/status-im/nim-libp2p/issues/140)
 * [libp2p gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
-* [29/WAKU2-CONFIG](https://rfc.vac.dev/spec/29/)
+* [29/WAKU2-CONFIG](../../../informational/29/config.md)
 * [Waku relay anonymity](https://vac.dev/wakuv2-relay-anon)
