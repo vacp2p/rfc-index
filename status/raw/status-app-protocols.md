@@ -78,22 +78,22 @@ we can distinguish five distinct functional scopes.
 
 All Status messages MUST have one of these functional scopes:
 
-**Global scope**
+#### Global scope
 
 1. _Global control_: messages enabling the basic functioning of the app to control features that all app users should be able to participate in. Examples include Contact Requests, Community Invites, global Status Updates, Group Chat Invites, etc.
 2. _Global content_: messages carrying user-generated content for global functions. Examples include 1:1 chat messages, images shared over private group chats, etc.
 
-**Community scope**
+#### Community scope
 
 3. _Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
 4. _Community content_: messages carrying user-generated content _only for members of a specific community_.
 
-**Local scope**
+#### Local scope
 
 5. _Local_: messages related to functions that are only relevant to a single user. Also known as _self-addressed messages_. Examples include messages used to exchange information between app installations, such as User Backup and Sync messages.
 
 Note that the functional scope is a logical property of Status messages.
-It SHOULD however inform the underlying [transport layer sharding](#pubsub-topics-and-sharding) and [transport layer subscriptions](#subscribing) underneath the hood.
+It SHOULD however inform the underlying [transport layer sharding](#pubsub-topics-and-sharding) and [transport layer subscriptions](#subscribing).
 In general a Status client SHOULD subscribe to participate in:
 - all global functions,
 - (only) the community functions for communities of which it is a member, and
@@ -107,8 +107,8 @@ and [retrieving historical messages](#retrieving-historical-messages).
 A content topic SHOULD be identical across all messages that are always part of the same filter use case (or always form part of the same content-filtered query criteria).
 In other words, the number of content topics defined in the app SHOULD match the number of filter use cases.
 For the sake of illustration, consider the following common content topic and filter use cases:
-- all messages belonging to the same 1:1 chat are always filtered together and therefore SHOULD use the same content topic (see [55/STATUS-1TO1-CHAT](../55/1to1-chat.md))
-- all messages belonging to the same Community are always filtered together and therefore SHOULD use the same content topic (see [56/STATUS-COMMUNITIES](../56/communities.md)).
+- if all messages belonging to the same 1:1 chat are always filtered together, they SHOULD use the same content topic (see [55/STATUS-1TO1-CHAT](../55/1to1-chat.md))
+- if all messages belonging to the same Community are always filtered together, they SHOULD use the same content topic (see [56/STATUS-COMMUNITIES](../56/communities.md)).
 
 The app-level content topic MUST be populated in the `content_topic` field in the encapsulating Waku message (see [Waku messages](#waku-messages)).
 
@@ -137,6 +137,7 @@ Ephemeral messages SHOULD omit this layer.
 Non-ephemeral 1:1 chat messages SHOULD make use of MVDS to achieve reliable data synchronisation between the two parties involved in the communication.
 Non-ephemeral private group chat messages build on a set of 1:1 chat links
 and consequently SHOULD also make use of MVDS to achieve reliable data synchronisation between all parties involved in the communication.
+Non-ephemeral 1:1 and private group chat messages MAY make use of of [scalable distributed log reliability](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16) in future.
 Since MVDS does not scale for large number of participants in the communication,
 non-ephemeral community messages MUST use scalable distributed log reliability as defined in this [original forum post announcement](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16).
 The app MUST use a single channel ID per community.
@@ -181,24 +182,24 @@ Since pubsub topics define a routing layer for messages,
 they can be used to shard traffic.
 The pubsub topic used for publishing a message depends on the app-level [functional scope](#functional-scope).
 
-**Self-addressed messages**
+#### Self-addressed messages
 
 The application MUST define at least one distinct pubsub topic for self-addressed messages.
 The application MAY defined a set of more than one pubsub topic for self-addressed messages to allow traffic sharding for scalability.
 
-**Global messages**
+#### Global messages
 
 The application MUST define at least one distinct pubsub topic for global control messages and global content messages.
 The application MAY defined a set of more than one pubsub topic for global messages to allow traffic sharding for scalability.
 It is RECOMMENDED that separate pubsub topics be used for global control messages and global content messages.
 
-**Community messages**
+#### Community messages
 
-The application SHOULD define at least one separate pubsub topic for each separate community's community control and community content messages.
+The application SHOULD define at least one separate pubsub topic for each separate community's control and content messages.
 The application MAY define a set of more than one pubsub topic per community to allow traffic sharding for scalability.
-It is RECOMMENDED that separate pubsub topics be used for global control messages and global content messages.
+It is RECOMMENDED that separate pubsub topics be used for community control messages and community content messages.
 
-**Large messages**
+#### Large messages
 
 The application MAY define separate pubsub topics for large messages.
 These pubsub topics for large messages MAY be distinct for each functional scope.
@@ -242,15 +243,15 @@ Full clients SHOULD prefer relay protocol to subscribe to pubsub topics matching
 
 Light clients SHOULD use filter protocol to subscribe only to the content topics relevant to the user.
 
-**Self-addressed messages**
+#### Self-addressed messages
 
 Status clients (full or light) MUST NOT subscribe to topics for messages with self-addressed scopes.
-See [Self-addressed messages](#self-addressed-messages).
+See [Self-addressed messages](#self-addressed-messages-4).
 
-**Large messages**
+#### Large messages
 
 Status clients (full or light) SHOULD NOT subscribe to topics set aside for large messages.
-See [Large messages](#large-messages).
+See [Large messages](#large-messages-4).
 
 ### Publishing
 
@@ -267,15 +268,15 @@ Full clients SHOULD use relay protocol to publish to pubsub topics matching the 
 
 Light clients SHOULD use lightpush protocol to publish control and content messages.
 
-**Self-addressed messages**
+#### Self-addressed messages
 
 Status clients (full or light) MUST use lightpush protocol to publish self-addressed messages.
-See [Self-addressed messages](#self-addressed-messages).
+See [Self-addressed messages](#self-addressed-messages-4).
 
-**Large messages**
+#### Large messages
 
 Status clients (full or light) SHOULD use lightpush protocols to publish to pubsub topics set aside for large messages.
-See [Large messages](#large-messages).
+See [Large messages](#large-messages-4).
 
 ### Retrieving historical messages
 
@@ -285,7 +286,7 @@ Status clients SHOULD use [content filtered queries](https://github.com/waku-org
 to retrieve the full contents of historical messages that the client may have missed during offline periods,
 or to populate the local message database when the client starts up for the first time.
 
-**Store queries for reliability**
+#### Store queries for reliability
 
 Status clients MAY use periodic content filtered queries with `include_data` set to `false`,
 to retrieve only the message hashes of past messages on content topics relevant to the client.
@@ -300,15 +301,15 @@ to determine if one or more message hashes known to the client is present in the
 Clients MAY use this method to determine if a message that originated from the client
 has been successfully stored.
 
-**Self-addressed messages**
+#### Self-addressed messages
 
 Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve self-addressed messages relevant to that client.
-See [Self-addressed messages](#self-addressed-messages).
+See [Self-addressed messages](#self-addressed-messages-4).
 
-**Large messages**
+#### Large messages
 
 Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve large messages relevant to that client.
-See [Large messages](#large-messages).
+See [Large messages](#large-messages-4).
 
 ### Providing services
 
@@ -343,7 +344,7 @@ Status clients (full or light) SHOULD use lightpush protocols to publish to pubs
 Status clients (full or light) SHOULD NOT subscribe to topics set aside for large messages (see [Subscribing](#subscribing)).
 Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve large messages relevant to that client (see [Retrieving historical messages](#retrieving-historical-messages)).
 
-**Chunking**
+#### Chunking
 
 The Status application MAY use a chunking mechanism to break down large payloads
 into smaller segments for individual Waku transport.
