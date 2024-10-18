@@ -1036,77 +1036,347 @@ allowing the dynamic management of group membership.
 
 ## Pseudocode
 
-The following pseudocode outlines functions for a smart contract managing group users.
-The first two functions handle adding and removing members,
-while the core function is `authenticate`.
+### SIWE Message Structure
 
-Timestamps and nonce tracking are recommended to avoid replay attacks and DDoS attacks.
+```
+STRUCTURE SIWEMessage:
+    domain: STRING # The domain requesting the signing
+    address: ADDRESS # The user's Ethereum address
+    uri: STRING # The URI of the dApp
+    chainId: INTEGER # The ID of the blockchain network
+    issuedAt: TIMESTAMP # When the message was issued
+    expirationTime: TIMESTAMP # When the message expires
+    purpose: STRING # New field for unique contextual data
+```
 
-### Initial Setup
+### Smart Contract functions
 
-used_nonces = empty map of address to set of bytes32
-group_members = empty set of addresses
-admin = creator_address
+This contract handles authentication, group management, and session management
 
-### Function `add_group_member`
+```
+CLASS EthereumStyleAuthWithTimeWindow:
+    # State variables
+    groupMembers: MAP<ADDRESS, BOOLEAN> # Stores group membership status
+    admin: ADDRESS # The address of the contract administrator
+    lastAuthTime: MAP<ADDRESS, TIMESTAMP> # Tracks last authentication time for each user
+    sessions: MAP<ADDRESS, MAP<BYTES32, INTEGER>> # Stores session expiration times
+    sessionHashes: MAP<ADDRESS, MAP<BYTES32, STRING>> # Maps session IDs to IPFS hashes
+```
+```
+    # State variables for failed attempt tracking
+    failedAttempts: MAP<ADDRESS, INTEGER>
+    lastFailedAttemptTime: MAP<ADDRESS, TIMESTAMP>
 
-Input: member_address
+    # Constants for time-validity window
+    CONSTANT MIN_VALIDITY_PERIOD = 30 seconds   # Tightened validity window
+    CONSTANT MAX_VALIDITY_PERIOD = 2 minutes    # Adjusted as needed
+    CONSTANT MIN_AUTH_INTERVAL = 30 seconds     # Keep as is or adjust as needed
 
-If the caller is not admin, return an error:
-"Only admin can perform this action"
-Add member_address to the group_members set
+    # Constants for failed attempt limits
+    CONSTANT MAX_FAILED_ATTEMPTS = 5
+    CONSTANT LOCKOUT_DURATION = 15 minutes
+```
+```
+    # Constructor: Initializes the contract state
+    CONSTRUCTOR():
+        groupMembers = EMPTY_MAP()
+        admin = TRANSACTION_SENDER()  # Set the contract deployer as admin
+        groupMembers[admin] = TRUE  # Add admin to the group
+        allowedPurposes = EMPTY_MAP()
+        allowedPurposes["Authenticate to create session"] = TRUE
+        EMIT GroupMemberAdded(admin)
+```
+```
+    # Adds a new member to the group (admin only)
+    FUNCTION addGroupMember(memberAddress: ADDRESS):
+        REQUIRE(TRANSACTION_SENDER() == admin, "Only admin can perform this action")
+        REQUIRE(groupMembers[memberAddress] != TRUE, "Address is already a group member")
+        REQUIRE(memberAddress != NULL_ADDRESS, "Invalid address")
+        groupMembers[memberAddress] = TRUE
+        EMIT GroupMemberAdded(memberAddress)
+```
+```
+    # Removes a member from the group (admin only)
+    FUNCTION removeGroupMember(memberAddress: ADDRESS):
+        REQUIRE(TRANSACTION_SENDER() == admin, "Only admin can perform this action")
+        REQUIRE(memberAddress != admin, "Admin cannot be removed from the group")
+        REQUIRE(groupMembers[memberAddress] == TRUE, "Address is not a group member")
+        REQUIRE(memberAddress != NULL_ADDRESS, "Invalid address")
+        groupMembers[memberAddress] = FALSE
+        EMIT GroupMemberRemoved(memberAddress)
+```
+```
+    # Transfers admin rights to a new address
+    FUNCTION transferAdmin(newAdminAddress: ADDRESS):
+        REQUIRE(TRANSACTION_SENDER() == admin, "Only current admin can transfer admin rights")
+        REQUIRE(newAdminAddress != NULL_ADDRESS, "Invalid address")
+        REQUIRE(groupMembers[newAdminAddress] == TRUE, "New admin must be a group member")
+        EMIT AdminTransferred(admin, newAdminAddress)
+        admin = newAdminAddress
+```
+```
+    # Authenticates a user based on their SIWE message and signature
+    FUNCTION authenticate(
+        domain: STRING,
+        address: ADDRESS,
+        uri: STRING,
+        chainId: INTEGER,
+        issuedAt: TIMESTAMP,
+        expirationTime: TIMESTAMP,
+        purpose: STRING,
+        signature: BYTES
+    ):
+        signer = TRANSACTION_SENDER()
+        currentTime = CURRENT_TIMESTAMP()
 
-### Function `remove_group_member`
+    # Check if the user is in a lockout period
+    IF failedAttempts[signer] >= MAX_FAILED_ATTEMPTS:
+        lockoutEndTime = lastFailedAttemptTime[signer] + LOCKOUT_DURATION
+        IF currentTime < lockoutEndTime:
+            EMIT AuthenticationFailed(signer, "Account locked due to too many failed attempts")
+            RETURN FALSE
+        ELSE:
+            # Reset failed attempts after lockout duration
+            failedAttempts[signer] = 0
+    
+        # Perform authentication checks
+        IF groupMembers[signer] != TRUE:
+            recordFailedAttempt(signer, currentTime, "Not a group member")
+            RETURN FALSE
 
-Input: member_address
+        IF currentTime < issuedAt:
+            recordFailedAttempt(signer, currentTime, "Message not yet valid")
+            RETURN FALSE
 
-If the caller is not admin, return an error:
-"Only admin can perform this action"
-Remove member_address from the group_members set
+        IF currentTime > expirationTime:
+            recordFailedAttempt(signer, currentTime, "Message has expired")
+            RETURN FALSE
 
-### Function `authenticate`
+        IF expirationTime - issuedAt < MIN_VALIDITY_PERIOD:
+            recordFailedAttempt(signer, currentTime, "Validity period too short")
+            RETURN FALSE
 
-Inputs: nonce, timestamp, signature
+        IF expirationTime - issuedAt > MAX_VALIDITY_PERIOD:
+            recordFailedAttempt(signer, currentTime, "Validity period too long")
+            RETURN FALSE
 
-Generate the message:
-message = KECCAK256(CONCAT(nonce, timestamp, caller_address))
+        IF chainId != CURRENT_CHAIN_ID():
+            recordFailedAttempt(signer, currentTime, "Invalid chain ID")
+            RETURN FALSE
 
-Recover the signer from the signature:
-signer = RECOVER_SIGNER(message, signature)
+        IF address != signer:
+            recordFailedAttempt(signer, currentTime, "Address mismatch")
+            RETURN FALSE
 
-If signer is not the caller_address, return an error:
-"Invalid signature"
-Check if the timestamp is recent:
+        IF currentTime - lastAuthTime[signer] < MIN_AUTH_INTERVAL:
+            recordFailedAttempt(signer, currentTime, "Authentication too frequent")
+            RETURN FALSE
 
-If block.timestamp - timestamp > 5 minutes, return an error:
-"Nonce expired"
-Check if the nonce has been used:
+        # Reconstruct and verify the message
+        message = SIWEMessage(domain, address, uri, chainId, issuedAt, expirationTime, purpose)
+        messageHash = HASH_STRUCTURED_DATA(message)
+        expectedSigner = RECOVER_SIGNER(messageHash, signature)
+        IF expectedSigner != signer:
+            recordFailedAttempt(signer, currentTime, "Invalid signature")
+            RETURN FALSE
 
-If the nonce exists in used_nonces[caller_address], return an error:
-"Nonce already used"
-Ensure the caller is a group member:
+        # Verify the purpose or unique contextual data
+        IF !verifyPurpose(purpose):
+            recordFailedAttempt(signer, currentTime, "Invalid purpose")
+            RETURN FALSE
 
-If caller_address is not in group_members, return an error:
-"Not a group member"
-Add the nonce to used_nonces[caller_address]
+        lastAuthTime[signer] = currentTime  # Update last authentication time
+        failedAttempts[signer] = 0  # Reset failed attempts on success
+        EMIT AuthenticationSuccessful(signer, purpose)
+        RETURN TRUE
+```
+```
+    # Helper function to record failed authentication attempts
+    FUNCTION recordFailedAttempt(signer: ADDRESS, currentTime: TIMESTAMP, reason: STRING):
+        failedAttempts[signer] = failedAttempts[signer] + 1
+        lastFailedAttemptTime[signer] = currentTime
+        EMIT AuthenticationFailed(signer, reason)
+```
+```
+    # Helper function to verify the purpose
+    FUNCTION verifyPurpose(purpose: STRING) RETURNS (BOOLEAN):
+        # Implement logic to verify that the purpose is valid and expected
+        # For example, check that the purpose matches a known action
+        RETURN purpose == "Authenticate to create session"
+```
 
-### Helper Function `recover_signer`
+### Session management functions
 
-Inputs: message, signature
+```
+    # Creates a new session for an authenticated user
+    FUNCTION createSession(sessionId: BYTES32, expirationBlock: INTEGER, ipfsHash: STRING):
+        REQUIRE(groupMembers[TRANSACTION_SENDER()] == TRUE, "Not a group member")
+        REQUIRE(expirationBlock > CURRENT_BLOCK_NUMBER(), "Expiration block must be in the future")
+        REQUIRE(sessions[TRANSACTION_SENDER()][sessionId] == NULL, "Session ID already exists for this user")
 
-Convert message to bytes:
-message_bytes = to_bytes(text=message)
+        sessions[TRANSACTION_SENDER()][sessionId] = expirationBlock
+        sessionHashes[TRANSACTION_SENDER()][sessionId] = ipfsHash
+        EMIT SessionCreated(TRANSACTION_SENDER(), sessionId, expirationBlock)
+```
+```
+    # Retrieves the IPFS hash for a given session ID
+    FUNCTION getSessionHash(sessionId: BYTES32) VIEW RETURNS (STRING):
+        expirationBlock = sessions[TRANSACTION_SENDER()][sessionId]
+        REQUIRE(expirationBlock != NULL, "Session does not exist")
+        REQUIRE(expirationBlock > CURRENT_BLOCK_NUMBER(), "Session has expired")
 
-Hash the message using KECCAK-256:
-message_hash = keccak(message_bytes)
+        RETURN sessionHashes[TRANSACTION_SENDER()][sessionId]
+```
+```
+    # Extends the expiration time of an existing session
+    FUNCTION extendSession(sessionId: BYTES32, newExpirationBlock: INTEGER):
+        REQUIRE(sessions[TRANSACTION_SENDER()][sessionId] != NULL, "Session does not exist")
+        REQUIRE(newExpirationBlock > CURRENT_BLOCK_NUMBER(), "New expiration block must be in the future")
+        sessions[TRANSACTION_SENDER()][sessionId] = newExpirationBlock
+        EMIT SessionExtended(TRANSACTION_SENDER(), sessionId, newExpirationBlock)
+```
+```
+    # Ends a session, removing it from storage
+    FUNCTION endSession(sessionId: BYTES32):
+        REQUIRE(sessions[TRANSACTION_SENDER()][sessionId] != NULL, "Session does not exist")
+        DELETE sessions[TRANSACTION_SENDER()][sessionId]
+        DELETE sessionHashes[TRANSACTION_SENDER()][sessionId]
+        EMIT SessionEnded(TRANSACTION_SENDER(), sessionId)
+```
+```
+    # Cleans up expired sessions for the calling user
+    FUNCTION cleanUpExpiredSessions():
+        FOR EACH sessionId IN sessions[TRANSACTION_SENDER()]:
+            expirationBlock = sessions[TRANSACTION_SENDER()][sessionId]
+            IF expirationBlock <= CURRENT_BLOCK_NUMBER():
+                DELETE sessions[TRANSACTION_SENDER()][sessionId]
+                DELETE sessionHashes[TRANSACTION_SENDER()][sessionId]
+        EMIT SessionsCleanedUp(TRANSACTION_SENDER())
+```
 
-Recover the public key from the message hash and signature:
-public_key = keys.Signature(signature).recover_public_key_from_msg_hash(message_hash)
+### Client side functions
 
-Convert the public key to an Ethereum address:
-address = public_key.to_checksum_address()
+```
+# Generates a new SIWE message for authentication
+FUNCTION generateSIWEMessage(userAddress: ADDRESS):
+    domain = "example.com"
+    uri = "https://example.com/login"
+    issuedAt = GET_CURRENT_TIMESTAMP()
+    expirationTime = issuedAt + 1 minute  # Tight validity window
+    chainId = GET_CURRENT_CHAIN_ID()
+    purpose = "Authenticate to create session"  # Unique contextual data
+    RETURN NEW SIWEMessage(
+        domain, userAddress, uri, chainId, issuedAt, expirationTime, purpose)
+```
+```
+# Signs a SIWE message with the user's private key
+FUNCTION signSIWEMessage(message: SIWEMessage, userAddress: ADDRESS):
+    messageHash = HASH_STRUCTURED_DATA(message)
+    signature = SIGN_MESSAGE_HASH(messageHash, userAddress)
+    RETURN signature
+```
+```
+# Main authentication function that calls the smart contract
+FUNCTION authenticate():
+    userAddress = GET_CURRENT_USER_ADDRESS()
+    message = generateSIWEMessage(userAddress)
+    signature = signSIWEMessage(message, userAddress)
 
-Return the address
+    authResult = CALL contract.authenticate(
+        message.domain,
+        message.address,
+        message.uri,
+        message.chainId,
+        message.issuedAt,
+        message.expirationTime,
+        message.purpose,         # Pass the purpose to the contract
+        signature
+    ) AS userAddress
+
+    IF authResult == TRUE:
+        sessionId = createAndStoreSession(userAddress)
+        RETURN "Authentication and session creation successful"
+    ELSE:
+        RETURN "Authentication failed"
+```
+```
+# Constants or configuration parameters
+AVERAGE_BLOCK_TIME = 12  # in seconds
+SESSION_DURATION_IN_SECONDS = 3600  # 1 hour
+SESSION_DURATION_IN_BLOCKS = ROUND(SESSION_DURATION_IN_SECONDS / AVERAGE_BLOCK_TIME)  # 300 blocks
+```
+```
+# Creates and stores a new session after successful authentication
+FUNCTION createAndStoreSession(userAddress: ADDRESS):
+    sessionData = {
+        "userAddress": userAddress,
+        "loginTime": CURRENT_TIMESTAMP(),
+        # Add any other relevant session data
+    }
+    RANDOM_VALUE = GENERATE_RANDOM_BYTES32()
+    sessionId = KECCAK256(userAddress + CURRENT_TIMESTAMP() + RANDOM_VALUE)
+    expirationBlock = GET_CURRENT_BLOCK_NUMBER() + SESSION_DURATION_IN_BLOCKS
+    encryptedData = encryptSessionData(sessionData, USER_PUBLIC_KEY)
+    
+    ipfsHash = IPFS_ADD(encryptedData)
+    
+    CALL contract.createSession(sessionId, expirationBlock, ipfsHash) AS userAddress
+    
+    STORE_LOCALLY(sessionId)
+    RETURN sessionId
+```
+```
+# Restores a user's session using the stored session ID
+FUNCTION restoreUserSession():
+    storedSessionId = RETRIEVE_LOCALLY_STORED_SESSION_ID()
+    IF storedSessionId != NULL:
+        TRY:
+            ipfsHash = CALL contract.getSessionHash(storedSessionId) AS userAddress
+            encryptedData = IPFS_GET(ipfsHash)
+            sessionData = decryptSessionData(encryptedData, USER_PRIVATE_KEY)
+            APPLY_SESSION_DATA(sessionData)
+            RETURN "Session restored successfully"
+        CATCH:
+            RETURN "Session expired or invalid"
+    ELSE:
+        RETURN "No stored session found"
+```
+```
+# Encrypts session data for secure storage
+FUNCTION encryptSessionData(sessionData: OBJECT, userPublicKey: PUBLIC_KEY):
+    encryptedData = ENCRYPT(JSON.stringify(sessionData), userPublicKey)
+    RETURN encryptedData
+```
+```
+# Decrypts session data retrieved from storage
+FUNCTION decryptSessionData(encryptedData: STRING, userPrivateKey: PRIVATE_KEY):
+    decryptedData = DECRYPT(encryptedData, userPrivateKey)
+    RETURN JSON.parse(decryptedData)
+```
+```
+# Helper functions which hashes the SIWE message according to EIP-712 standards
+FUNCTION HASH_STRUCTURED_DATA(message: SIWEMessage):
+    RETURN KECCAK256(ENCODED_STRUCTURED_DATA(message))
+```
+```
+# Helper functions which recovers the signer's address from a message hash and signature
+FUNCTION RECOVER_SIGNER(messageHash: BYTES32, signature: BYTES):
+    RETURN ECRECOVER(messageHash, signature)
+```
+
+### Events
+
+```
+EVENT AuthenticationSuccessful(user: ADDRESS, purpose: STRING)
+EVENT GroupMemberAdded(member: ADDRESS)
+EVENT GroupMemberRemoved(member: ADDRESS)
+EVENT AdminTransferred(oldAdmin: ADDRESS, newAdmin: ADDRESS)
+EVENT SessionCreated(user: ADDRESS, sessionId: BYTES32, expirationBlock: INTEGER)
+EVENT SessionExtended(user: ADDRESS, sessionId: BYTES32, newExpirationBlock: INTEGER)
+EVENT SessionEnded(user: ADDRESS, sessionId: BYTES32)
+EVENT SessionsCleanedUp(user: ADDRESS)
+EVENT AuthenticationFailed(user: ADDRESS, reason: STRING)
+```
 
 ## Privacy and Security Considerations
 
