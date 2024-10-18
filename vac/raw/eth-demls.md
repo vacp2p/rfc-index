@@ -1266,7 +1266,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         EMIT SessionsCleanedUp(TRANSACTION_SENDER())
 ```
 
-### Client side functions
+### Client side functions
 
 ```text
 # Generates a new SIWE message for authentication
