@@ -1062,6 +1062,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
     sessions: MAP<ADDRESS, MAP<BYTES32, INTEGER>> # Stores session expiration times
     sessionHashes: MAP<ADDRESS, MAP<BYTES32, STRING>> # Maps session IDs to IPFS hashes
 ```
+
 ```text
     # State variables for failed attempt tracking
     failedAttempts: MAP<ADDRESS, INTEGER>
@@ -1076,6 +1077,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
     CONSTANT MAX_FAILED_ATTEMPTS = 5
     CONSTANT LOCKOUT_DURATION = 15 minutes
 ```
+
 ```text
     # Constructor: Initializes the contract state
     CONSTRUCTOR():
@@ -1086,6 +1088,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         allowedPurposes["Authenticate to create session"] = TRUE
         EMIT GroupMemberAdded(admin)
 ```
+
 ```text
     # Adds a new member to the group (admin only)
     FUNCTION addGroupMember(memberAddress: ADDRESS):
@@ -1095,6 +1098,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         groupMembers[memberAddress] = TRUE
         EMIT GroupMemberAdded(memberAddress)
 ```
+
 ```text
     # Removes a member from the group (admin only)
     FUNCTION removeGroupMember(memberAddress: ADDRESS):
@@ -1105,6 +1109,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         groupMembers[memberAddress] = FALSE
         EMIT GroupMemberRemoved(memberAddress)
 ```
+
 ```text
     # Transfers admin rights to a new address
     FUNCTION transferAdmin(newAdminAddress: ADDRESS):
@@ -1114,6 +1119,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         EMIT AdminTransferred(admin, newAdminAddress)
         admin = newAdminAddress
 ```
+
 ```text
     # Authenticates a user based on their SIWE message and signature
     FUNCTION authenticate(
@@ -1190,6 +1196,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         EMIT AuthenticationSuccessful(signer, purpose)
         RETURN TRUE
 ```
+
 ```text
     # Helper function to record failed authentication attempts
     FUNCTION recordFailedAttempt(signer: ADDRESS, currentTime: TIMESTAMP, reason: STRING):
@@ -1197,6 +1204,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         lastFailedAttemptTime[signer] = currentTime
         EMIT AuthenticationFailed(signer, reason)
 ```
+
 ```text
     # Helper function to verify the purpose
     FUNCTION verifyPurpose(purpose: STRING) RETURNS (BOOLEAN):
@@ -1218,6 +1226,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         sessionHashes[TRANSACTION_SENDER()][sessionId] = ipfsHash
         EMIT SessionCreated(TRANSACTION_SENDER(), sessionId, expirationBlock)
 ```
+
 ```text
     # Retrieves the IPFS hash for a given session ID
     FUNCTION getSessionHash(sessionId: BYTES32) VIEW RETURNS (STRING):
@@ -1227,6 +1236,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
 
         RETURN sessionHashes[TRANSACTION_SENDER()][sessionId]
 ```
+
 ```text
     # Extends the expiration time of an existing session
     FUNCTION extendSession(sessionId: BYTES32, newExpirationBlock: INTEGER):
@@ -1235,6 +1245,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         sessions[TRANSACTION_SENDER()][sessionId] = newExpirationBlock
         EMIT SessionExtended(TRANSACTION_SENDER(), sessionId, newExpirationBlock)
 ```
+
 ```text
     # Ends a session, removing it from storage
     FUNCTION endSession(sessionId: BYTES32):
@@ -1243,6 +1254,7 @@ CLASS EthereumStyleAuthWithTimeWindow:
         DELETE sessionHashes[TRANSACTION_SENDER()][sessionId]
         EMIT SessionEnded(TRANSACTION_SENDER(), sessionId)
 ```
+
 ```text
     # Cleans up expired sessions for the calling user
     FUNCTION cleanUpExpiredSessions():
@@ -1268,6 +1280,7 @@ FUNCTION generateSIWEMessage(userAddress: ADDRESS):
     RETURN NEW SIWEMessage(
         domain, userAddress, uri, chainId, issuedAt, expirationTime, purpose)
 ```
+
 ```text
 # Signs a SIWE message with the user's private key
 FUNCTION signSIWEMessage(message: SIWEMessage, userAddress: ADDRESS):
@@ -1275,6 +1288,7 @@ FUNCTION signSIWEMessage(message: SIWEMessage, userAddress: ADDRESS):
     signature = SIGN_MESSAGE_HASH(messageHash, userAddress)
     RETURN signature
 ```
+
 ```text
 # Main authentication function that calls the smart contract
 FUNCTION authenticate():
@@ -1299,12 +1313,14 @@ FUNCTION authenticate():
     ELSE:
         RETURN "Authentication failed"
 ```
+
 ```text
 # Constants or configuration parameters
 AVERAGE_BLOCK_TIME = 12  # in seconds
 SESSION_DURATION_IN_SECONDS = 3600  # 1 hour
 SESSION_DURATION_IN_BLOCKS = ROUND(SESSION_DURATION_IN_SECONDS / AVERAGE_BLOCK_TIME)  # 300 blocks
 ```
+
 ```text
 # Creates and stores a new session after successful authentication
 FUNCTION createAndStoreSession(userAddress: ADDRESS):
@@ -1325,6 +1341,7 @@ FUNCTION createAndStoreSession(userAddress: ADDRESS):
     STORE_LOCALLY(sessionId)
     RETURN sessionId
 ```
+
 ```text
 # Restores a user's session using the stored session ID
 FUNCTION restoreUserSession():
@@ -1341,23 +1358,27 @@ FUNCTION restoreUserSession():
     ELSE:
         RETURN "No stored session found"
 ```
+
 ```text
 # Encrypts session data for secure storage
 FUNCTION encryptSessionData(sessionData: OBJECT, userPublicKey: PUBLIC_KEY):
     encryptedData = ENCRYPT(JSON.stringify(sessionData), userPublicKey)
     RETURN encryptedData
 ```
+
 ```text
 # Decrypts session data retrieved from storage
 FUNCTION decryptSessionData(encryptedData: STRING, userPrivateKey: PRIVATE_KEY):
     decryptedData = DECRYPT(encryptedData, userPrivateKey)
     RETURN JSON.parse(decryptedData)
 ```
+
 ```text
 # Helper functions which hashes the SIWE message according to EIP-712 standards
 FUNCTION HASH_STRUCTURED_DATA(message: SIWEMessage):
     RETURN KECCAK256(ENCODED_STRUCTURED_DATA(message))
 ```
+
 ```text
 # Helper functions which recovers the signer's address from a message hash and signature
 FUNCTION RECOVER_SIGNER(messageHash: BYTES32, signature: BYTES):
