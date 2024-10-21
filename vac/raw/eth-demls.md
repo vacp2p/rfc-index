@@ -1206,11 +1206,11 @@ CLASS EthereumStyleAuthWithTimeWindow:
 ```
 
 ```text
-    # Helper function to verify the purpose
     FUNCTION verifyPurpose(purpose: STRING) RETURNS (BOOLEAN):
-        # Implement logic to verify that the purpose is valid and expected
-        # For example, check that the purpose matches a known action
-        RETURN purpose == "Authenticate to create session"
+        # Define the expected purpose
+        expectedPurpose = "Authenticate to create session"
+        # Check if the provided purpose matches the expected purpose
+        RETURN purpose == expectedPurpose
 ```
 
 ### Session management functions
