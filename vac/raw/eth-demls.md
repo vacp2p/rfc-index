@@ -1361,16 +1361,55 @@ FUNCTION restoreUserSession():
 
 ```text
 # Encrypts session data for secure storage
-FUNCTION encryptSessionData(sessionData: OBJECT, userPublicKey: PUBLIC_KEY):
-    encryptedData = ENCRYPT(JSON.stringify(sessionData), userPublicKey)
-    RETURN encryptedData
+    FUNCTION encryptSessionData(sessionData: OBJECT, userPrivateKey: PRIVATE_KEY):
+    # Derive a symmetric key from the user's private key or generate a new one
+        symmetricKey = DERIVE_SYMMETRIC_KEY(userPrivateKey)
+    
+    # Serialize the session data to a JSON string
+        serializedData = JSON.stringify(sessionData)
+    
+    # Encrypt the serialized data using the symmetric key
+        encryptedData = SYMMETRIC_ENCRYPT(serializedData, symmetricKey)
+        RETURN encryptedData
 ```
 
 ```text
 # Decrypts session data retrieved from storage
-FUNCTION decryptSessionData(encryptedData: STRING, userPrivateKey: PRIVATE_KEY):
-    decryptedData = DECRYPT(encryptedData, userPrivateKey)
-    RETURN JSON.parse(decryptedData)
+    FUNCTION decryptSessionData(encryptedData: STRING, userPrivateKey: PRIVATE_KEY):
+    # Derive the symmetric key using the user's private key
+        symmetricKey = DERIVE_SYMMETRIC_KEY(userPrivateKey)
+    
+    # Decrypt the data using the symmetric key
+        decryptedData = SYMMETRIC_DECRYPT(encryptedData, symmetricKey)
+    
+    # Deserialize the JSON string back into an object
+        sessionData = JSON.parse(decryptedData)
+        RETURN sessionData
+```
+
+```text
+# Derives a symmetric encryption key from the user's private key
+    FUNCTION DERIVE_SYMMETRIC_KEY(privateKey: PRIVATE_KEY) RETURNS (SYMMETRIC_KEY):
+    # Use a key derivation function (KDF) with a salt to derive a symmetric key
+        salt = FIXED_SALT_OR_USER_SPECIFIC_SALT
+        symmetricKey = KDF(privateKey, salt)
+        RETURN symmetricKey
+```
+
+```text
+# Symmetric encryption using AES or a similar algorithm
+    FUNCTION SYMMETRIC_ENCRYPT(data: STRING, key: SYMMETRIC_KEY) RETURNS (STRING):
+    # Encrypt the data using the symmetric key
+        encryptedData = AES_ENCRYPT(data, key)
+        RETURN encryptedData
+```
+
+```text
+# Symmetric decryption
+    FUNCTION SYMMETRIC_DECRYPT(encryptedData: STRING, key: SYMMETRIC_KEY) RETURNS (STRING):
+    # Decrypt the data using the symmetric key
+        decryptedData = AES_DECRYPT(encryptedData, key)
+        RETURN decryptedData
 ```
 
 ```text
