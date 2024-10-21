@@ -285,7 +285,7 @@ Contributors within the service SHOULD assist a *sub-domain* in creating a new s
 editing a specification, and
 promoting the status of a specification along with other tasks.
 Once a specification reaches some level of maturity by rough consensus,
-the specification SHOULD enter the [Vac RFC](rfc.vac.dev) process.
+the specification SHOULD enter the [Vac RFC](https://rfc.vac.dev/) process.
 Similar to the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html),
 the Vac RFC process SHOULD facilitate all updates to the specification.
 
@@ -293,7 +293,7 @@ Specifications are introduced by projects,
 under a specific *domain*, with the intention of becoming technically mature documents.
 The IFT domain currently houses the following projects:
 
-- [Status](status.app)
+- [Status](https://status.app/)
 - [Waku](https://waku.org/)
 - [Codex](https://codex.storage/)
 - [Nimbus](https://nimbus.team/)
