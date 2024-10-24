@@ -235,7 +235,7 @@ The specific Waku protocol used for subscription depends on the resource-availab
 1. Filter client protocol, as specified in [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md), allows subscribing for traffic with content topic granularity and is appropriate for resource-restricted subscriptions.
 2. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows subscribing to traffic only with pubsub topic granularity and therefore is more resource-intensive. Relay subscription also allows the application instance to contribute to the overall routing infrastructure, which adds to its overall higher resource usage but benefits the ecosystem.
 
-Full clients SHOULD prefer relay protocol to subscribe to pubsub topics matching the scopes:
+Full clients SHOULD use relay protocol as preferred method to subscribe to pubsub topics matching the scopes:
 1. Global control
 2. Global content
 3. Community control, for each community of which the app user is a member
