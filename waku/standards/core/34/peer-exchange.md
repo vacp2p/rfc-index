@@ -1,7 +1,7 @@
 ---
 slug: 34
 title: 34/WAKU2-PEER-EXCHANGE
-name: Waku v2 Peer Exchange
+name: Waku2 Peer Exchange
 status: draft
 category: Standards Track
 tags: waku/core-protocol
@@ -24,7 +24,7 @@ The main purpose of this protocol is providing resource restricted devices with 
 
 It may not be feasible, on resource restricted devices,
 to take part in distributed random sampling ambient peer discovery protocols,
-such as [33/WAKU2-DISCV5](../33/discv5.md).
+such as [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md).
 The Waku peer discovery protocol, specified in this document,
 allows resource restricted devices to request a list of peers from a service node.
 Network parameters necessary to connect to this service node COULD be learned
@@ -32,7 +32,7 @@ from a static bootstrapping method or
 using [EIP-1459: Node Discovery via DNS](https://eips.ethereum.org/EIPS/eip-1459).
 The advantage of using Waku peer exchange to discover new peers,
 compared to relying on a static peer list or DNS discovery, is a more even load distribution.
-If a lot of (resource restricted) nodes would use the same service nodes as relay
+If a lot of resource restricted nodes would use the same service nodes as relay
 or store nodes, the load on these would be very high.
 Heavily used static nodes also add a centralized element.
 Downtime of such a node might significantly impact the network.
@@ -40,9 +40,12 @@ Downtime of such a node might significantly impact the network.
 However, the resource efficiency of this protocol comes at an anonymity cost,
 which is explained in the
 [Security/Privacy Considerations](#security-considerations) section.
-This protocol SHOULD only be used if [33/WAKU2-DISCV5](../33/discv5.md) is infeasible.
+This protocol SHOULD only be used if [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md) is infeasible.
 
 ## Theory and Protocol Semantics
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 The peer exchange protocol, specified in this document,
 is a simple request-response protocol.
@@ -52,7 +55,7 @@ The responder replies with a list of ENRs as specified in [WAKU2-ENR](https://gi
 The [multiaddresses](https://docs.libp2p.io/concepts/addressing/)
 used to connect to the respective peers can be extracted from the ENRs.
 
-![Figure 1: The responder provides a list of ENRs to the requester. These ENRs contain the information necessary for connecting to the respective peers.](../../images/protocol.svg)
+![Figure 1: The responder provides a list of ENRs to the requester. These ENRs contain the information necessary for connecting to the respective peers.](/waku/standards/core/34/images/protocol.svg)
 
 In order to protect its anonymity,
 the responder MUST NOT provide peers from its actively used peer list
@@ -60,7 +63,7 @@ as this opens pathways to *Neighbourhood Surveillance* attacks, as described in 
 [Security/Privacy Considerations Section](#security-considerations).
 The responder SHOULD provide a set of peers
 that has been retrieved using ambient peer discovery methods supporting random sampling,
-e.g. [33/WAKU2-DISCV5](../33/discv5.md).
+e.g. [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md).
 This both protects the responder's anonymity as well as helps distributing load.
 
 To allow for fast responses, responders SHOULD retrieve peers unsolicited
@@ -75,7 +78,7 @@ randomly sample response sets from this local cache.
 The size of the cache SHOULD be large enough to allow randomly sampling peer sets
 that (on average) do not overlap too much.
 The responder SHOULD periodically replace the oldest peers in the cache.
-This document provides recommended choices for the cache size in the
+The RECOMMENDED options for the cache size are described in the
 [Implementation Suggestions Section](#implementation-suggestions).
 
 Requesters, in the context of the specified peer exchange protocol,
@@ -121,9 +124,9 @@ containing a list of `PeerInfo` instances, which in turn hold an ENR.
 
 ### Discovery Interface
 
-Implementations can implement the libp2p discovery interface
-(e.g. [nim](https://github.com/status-im/nim-libp2p/issues/140),
-[javascript](https://github.com/libp2p/js-libp2p-interfaces/tree/master/packages/interface-peer-discovery)).
+Implementations can implement the libp2p discovery interface:
+- [nim](https://github.com/status-im/nim-libp2p/issues/140)
+- [javascript](https://github.com/libp2p/js-libp2p-interfaces/tree/master/packages/interface-peer-discovery).
 
 ### Exchange Peer Cache Size
 
@@ -133,8 +136,8 @@ depends on the average number of requested peers,
 which is expected to be the outbound degree of the underlying
 [libp2p gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 mesh network.
-The recommended value for this outbound degree is 6 (see parameter `D` in [29/WAKU2-CONFIG](../../../informational/29/config.md)).
-It is recommended for the cache to hold at least 10 times as many peers (60).
+The RECOMMENDED value for this outbound degree is 6 (see parameter `D` in [29/WAKU2-CONFIG](/waku/informational/29/config.md)).
+It is RECOMMENDED for the cache to hold at least 10 times as many peers (60).
 
 The RECCOMENDED cache size also depends on the number of requesters a responder
 is expected to serve within a *refresh cycle*.
@@ -142,11 +145,7 @@ A refresh cycle is the time interval in which all peers in the cache
 are expected to be replaced.
 If the number of requests expected per refresh cycle exceeds 600
 (10 times the above recommended 60),
-it is recommended to increase the cache size to at least a tenth of that number.
-
-We will investigate peer exchange cache sizes and refresh strategies,
-and provide suggestions based on that in future versions
-(draft, stable) of this document.
+it is RECOMMENDED to increase the cache size to at least a tenth of that number.
 
 ## Security Considerations
 
@@ -187,7 +186,7 @@ It takes away the first hurdle of the *neighbourhood surveillance* attack:
 The attacker knows which peers to try to connect to.
 This increased vulnerability can be avoided by only responding
 with randomly sampled sets of peers,
-e.g. by requesting a random peer set via [33/WAKU2-DISCV5](../33/discv5.md).
+e.g. by requesting a random peer set via [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md).
 (As stated in the [Theory and Protocol Semantics Section](#theory-and-protocol-semantics),
 these peer sets SHOULD be retrieved unsolicitedly before
 receiving requests to achieve faster response times.)
@@ -205,7 +204,7 @@ The `seen cache` MAY be used in conjunction to provide additional mitigation.
 ### Further Considerations
 
 The response field contains ENRs as specified in [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
-While ENRs contain signatures, they do not violate the [Waku relay no-sign policy](../11/waku2.md/#signature-policy)),
+While ENRs contain signatures, they do not violate the [Waku relay no-sign policy](/waku/standards/core/11/relay.md#signature-policy),
 because they are part of the discovery domain and
 are not propagated in the relay domain.
 However, there might still be some form of leakage:
@@ -218,10 +217,13 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-* [33/WAKU2-DISCV5](../33/discv5.md)
+* [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md)
+* [EIP-1459: Node Discovery via DNS](https://eips.ethereum.org/EIPS/eip-1459)
 * [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 * [multiaddress](https://docs.libp2p.io/concepts/addressing/)
-* [libp2p discovery interface](https://github.com/status-im/nim-libp2p/issues/140)
+* [libp2p discovery interface in nim](https://github.com/status-im/nim-libp2p/issues/140)
+* [libp2p discovery interface in javascript](https://github.com/libp2p/js-libp2p-interfaces/tree/master/packages/interface-peer-discovery)
 * [libp2p gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
-* [29/WAKU2-CONFIG](../../../informational/29/config.md)
-* [Waku relay anonymity](https://vac.dev/wakuv2-relay-anon)
+* [29/WAKU2-CONFIG](/waku/informational/29/config.md)
+* [Waku Relay Anonymity](https://vac.dev/wakuv2-relay-anon)
+* [Waku relay no-sign policy](/waku/standards/core/11/relay.md#signature-policy)
