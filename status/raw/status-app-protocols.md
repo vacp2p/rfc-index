@@ -206,7 +206,7 @@ These pubsub topics for large messages MAY be distinct for each functional scope
 
 ### Resource usage
 
-The application can use a range of Waku protocols to interact with the Waku transport layer.
+The application SHOULD use a range of Waku protocols to interact with the Waku transport layer.
 The specific set of Waku protocols used depend on desired functionality and resource usage profile for the specific client.
 Resources can be restricted in terms of bandwidth and computing resources.
 
