@@ -3,7 +3,7 @@ title: STATUS-PROTOCOLS
 name: Status Protocol Stack
 status: raw
 category: Standards Track
-description: Specifies the Status application protocol stack
+description: Specifies the Status application protocol stack.
 editor: Hanno Cornelius <hanno@status.im>
 contributors: 
 - Jimmy Debe <jimmy@status.im>
