@@ -185,7 +185,7 @@ The pubsub topic used for publishing a message depends on the app-level [functio
 #### Self-addressed messages
 
 The application MUST define at least one distinct pubsub topic for self-addressed messages.
-The application MAY defined a set of more than one pubsub topic for self-addressed messages to allow traffic sharding for scalability.
+The application MAY define a set of more than one pubsub topic for self-addressed messages to allow traffic sharding for scalability.
 
 #### Global messages
 
