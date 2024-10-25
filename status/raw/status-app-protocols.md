@@ -58,8 +58,8 @@ Status currently defines functionality to support three main application feature
 Each application-level function, regardless which feature set it supports, has the following properties:
 
 1. Functional scope
-2. Content topic
-3. Ephemerality
+1. Content topic
+1. Ephemerality
 
 ### Functional Scope
 
@@ -140,7 +140,7 @@ App-level messages that are considered ephemeral, MUST set the `ephemeral` field
 The end-to-end reliability layer contains the functions related to one of the two end-to-end reliability schemes defined for Status app messages:
 
 1. Minimum Viable protocol for Data Synchronisation, or MVDS (see [STATUS-MVDS-USAGE](./status-mvds.md))
-2. Scalable distributed log reliability (spec and a punchier name TBD, see the [original forum post announcement](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16))
+1. Scalable distributed log reliability (spec and a punchier name TBD, see the [original forum post announcement](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16))
 
 Ephemeral messages SHOULD omit this layer.
 Non-ephemeral 1:1 chat messages SHOULD make use of MVDS to achieve reliable data synchronisation between the two parties involved in the communication.
