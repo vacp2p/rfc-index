@@ -1,5 +1,5 @@
 ---
-slug: 00
+slug: XX
 title: TEMPLATE
 name: RFC Template
 status: raw/draft/stable/deprecated
