@@ -235,6 +235,26 @@ For the purposes of the rest of this document,
 clients in full mode will be referred to as "full clients" and
 clients in light mode will be referred to as "light clients".
 
+### Discovery
+
+The application MUST make use of at least one discovery method to discover and connect to Waku peers
+useful for the user functions specific to that instance of the application.
+
+The specific Waku discovery protocol used for discovery depends on the use case and resource-availability of the client.
+
+1. [EIP-1459: DNS-based discovery](https://eips.ethereum.org/EIPS/eip-1459) is useful for initial connection to bootstrap peers.
+1. [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) allows decentralized discovery of Waku peers.
+1. [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/315264c202e0973476e2f1e2d0b01bea4fe1ad31/standards/core/peer-exchange.md) allows requesting peers from a service node
+and is appropriate for resource-restricted discovery.
+
+All clients SHOULD use DNS-based discovery on startup
+to discover a set of bootstrap peers for initial connection.
+
+Full clients SHOULD use [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) for continuous ambient peer discovery.
+
+Light clients SHOULD use [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/315264c202e0973476e2f1e2d0b01bea4fe1ad31/standards/core/peer-exchange.md) to discover a set of service peers
+used by that instance of the application.
+
 ### Subscribing
 
 The application MUST subscribe to receive the traffic necessary for minimal app operation
@@ -333,6 +353,10 @@ the filter service protocol (see [12/WAKU2-FILTER](../../waku/standards/core/12/
 and lightpush service protocol (see [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md))
 in order to provide light subscription and publishing services to other clients
 for each pubsub topic to which they have a relay subscription.
+
+Full clients SHOULD mount
+the peer exchange service protocol (see [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/315264c202e0973476e2f1e2d0b01bea4fe1ad31/standards/core/peer-exchange.md))
+to provide light discovery services to other clients.
 
 Status clients MAY mount the store query protocol as service node (see [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md))
 to store historical messages and
