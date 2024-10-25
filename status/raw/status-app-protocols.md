@@ -15,6 +15,7 @@ contributors:
 
 This specification describes the Status Application protocol stack.
 It focuses on elements and features in the protocol stack for all application-level functions:
+
 - functional scope (also _broadcast audience_)
 - content topic
 - ephemerality
@@ -24,10 +25,12 @@ It focuses on elements and features in the protocol stack for all application-le
 
 It also introduces strategies to restrict resource usage, distribute large messages, etc.
 Application-level functions are out of scope and specified separately. See:
+
 - [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 - [56/STATUS-COMMUNITIES](../56/communities.md)
 
 ## Status protocol stack
+
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
@@ -35,8 +38,8 @@ See the simplified diagram of the Status application protocol stack:
 
 |  |
 |---|
-| Status application layer  | 
-| End-to-end reliability layer  | 
+| Status application layer  |
+| End-to-end reliability layer  |
 | Encryption layer |
 | Transport layer (Waku) |
 | |
@@ -45,6 +48,7 @@ See the simplified diagram of the Status application protocol stack:
 
 Application level functions are defined in the _application_ layer.
 Status currently defines functionality to support three main application features:
+
 - Status Communities, as specified in [56/STATUS-COMMUNITIES](../56/communities.md)
 - Status 1:1 Chat, as specified in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 - Status Private Group Chat, as specified in a subsection of [55/STATUS-1TO1-CHAT](../55/1to1-chat.md#negotiation-of-a-11-chat-amongst-multiple-participants-group-chat)
@@ -52,6 +56,7 @@ Status currently defines functionality to support three main application feature
 <!-- TODO: list functions not related to main app features, such as user sync, backup, push notifications, etc. -->
 
 Each application-level function, regardless which feature set it supports, has the following properties:
+
 1. Functional scope
 2. Content topic
 3. Ephemerality
@@ -109,6 +114,7 @@ and [retrieving historical messages](#retrieving-historical-messages).
 A content topic SHOULD be identical across all messages that are always part of the same filter use case (or always form part of the same content-filtered query criteria).
 In other words, the number of content topics defined in the app SHOULD match the number of filter use cases.
 For the sake of illustration, consider the following common content topic and filter use cases:
+
 - if all messages belonging to the same 1:1 chat are always filtered together, they SHOULD use the same content topic (see [55/STATUS-1TO1-CHAT](../55/1to1-chat.md))
 - if all messages belonging to the same Community are always filtered together, they SHOULD use the same content topic (see [56/STATUS-COMMUNITIES](../56/communities.md)).
 
@@ -132,6 +138,7 @@ App-level messages that are considered ephemeral, MUST set the `ephemeral` field
 ## End-to-end reliability layer
 
 The end-to-end reliability layer contains the functions related to one of the two end-to-end reliability schemes defined for Status app messages:
+
 1. Minimum Viable protocol for Data Synchronisation, or MVDS (see [STATUS-MVDS-USAGE](./status-mvds.md))
 2. Scalable distributed log reliability (spec and a punchier name TBD, see the [original forum post announcement](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16))
 
@@ -234,14 +241,16 @@ The application MUST subscribe to receive the traffic necessary for minimal app 
 and to enable the user functions specific to that instance of the application.
 
 The specific Waku protocol used for subscription depends on the resource-availability of the client:
+
 1. Filter client protocol, as specified in [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md), allows subscribing for traffic with content topic granularity and is appropriate for resource-restricted subscriptions.
-2. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows subscribing to traffic only with pubsub topic granularity and therefore is more resource-intensive. Relay subscription also allows the application instance to contribute to the overall routing infrastructure, which adds to its overall higher resource usage but benefits the ecosystem.
+1. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows subscribing to traffic only with pubsub topic granularity and therefore is more resource-intensive. Relay subscription also allows the application instance to contribute to the overall routing infrastructure, which adds to its overall higher resource usage but benefits the ecosystem.
 
 Full clients SHOULD use relay protocol as preferred method to subscribe to pubsub topics matching the scopes:
+
 1. Global control
-2. Global content
-3. Community control, for each community of which the app user is a member
-4. Community content, for each community of which the app user is a member
+1. Global content
+1. Community control, for each community of which the app user is a member
+1. Community content, for each community of which the app user is a member
 
 Light clients SHOULD use filter protocol to subscribe only to the content topics relevant to the user.
 
@@ -259,14 +268,16 @@ See [Large messages](#large-messages-4).
 
 The application MUST publish user and app generated messages via the Waku transport layer.
 The specific Waku protocol used for publishing depends on the resource-availability of the client:
+
 1. Lightpush protocol, as specified in [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) allows publishing to a pubsub topic via an intermediate "full node" and is more appropriate for resource-restricted publishing.
-2. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows publishing directly into the relay routing network and is therefore more resource-intensive.
+1. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows publishing directly into the relay routing network and is therefore more resource-intensive.
 
 Full clients SHOULD use relay protocol to publish to pubsub topics matching the scopes:
+
 1. Global control
-2. Global content
-3. Community control, for each community of which the app user is a member
-4. Community content, for each community of which the app user is a member
+1. Global content
+1. Community control, for each community of which the app user is a member
+1. Community content, for each community of which the app user is a member
 
 Light clients SHOULD use lightpush protocol to publish control and content messages.
 
@@ -320,7 +331,7 @@ Status clients MAY provide service-side protocols to other clients.
 Full clients SHOULD mount
 the filter service protocol (see [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md))
 and lightpush service protocol (see [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md))
-in order to provide light subscription and publishing services to other clients 
+in order to provide light subscription and publishing services to other clients
 for each pubsub topic to which they have a relay subscription.
 
 Status clients MAY mount the store query protocol as service node (see [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md))
@@ -362,14 +373,13 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 1. [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
-2. [56/STATUS-COMMUNITIES](../56/communities.md)
-3. [10/WAKU2](../../waku/standards/core/10/waku2.md)
-4. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
-5. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
-6. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
-7. [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
-8. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
-9. [Scalable distributed log reliability](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16)
-10. [STATUS-MVDS-USAGE](./status-mvds.md)
-11. [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md)
-
+1. [56/STATUS-COMMUNITIES](../56/communities.md)
+1. [10/WAKU2](../../waku/standards/core/10/waku2.md)
+1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+1. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+1. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
+1. [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
+1. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+1. [Scalable distributed log reliability](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16)
+1. [STATUS-MVDS-USAGE](./status-mvds.md)
+1. [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md)
