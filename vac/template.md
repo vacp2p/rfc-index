@@ -1,9 +1,9 @@
 ---
-slug: XX
-title: XX/(WAKU2|LOGOS|CODEX|*)-TEMPLATE
-name: (Waku v2 | Logos | Codex) RFC Template
-status: (raw|draft|stable)
-category: (Standards Track|Informational|Best Current Practice)
+slug: 00
+title: TEMPLATE
+name: RFC Template
+status: raw/draft/stable/deprecated
+category: Standards Track/Informational/Best Current Practice
 tags: an optional list of tags, not standard
 editor: Daniel Kaiser <danielkaiser@status.im>
 contributors:
