@@ -1183,5 +1183,3 @@ attack protection.
 
 - SECP256K1: Standards for Efficient Cryptography Group,
 "Recommended Elliptic Curve Domain Parameters", 2010.
-
-- [IPFS documentation](https://ipfs.io/)
