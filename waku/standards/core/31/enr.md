@@ -2,6 +2,7 @@
 slug: 31
 title: WAKU2-ENR
 name: Waku v2 ENR Usage
+status: draft
 tags: waku/core-protocol
 editor: Franck Royer <franck@status.im>
 contributors:
