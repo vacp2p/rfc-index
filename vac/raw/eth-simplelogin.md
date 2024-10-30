@@ -22,7 +22,7 @@ contributors:
    With the increasing need for secure authentication mechanisms in
    decentralized applications, SimpleLogin provides a blockchain-based
    solution that ensures user authentication, session management, and
-   enhanced security features. It includes an emergency system to handle 
+   enhanced security features. It includes an emergency system to handle
    lockouts and provides batch operations to enhance scalability.
    It uses 90-day sessions with refresh capabilities and enhanced security measures.
 
@@ -197,7 +197,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `newProfileHash`: The new IPFS hash of the user's profile data.
+- `newProfileHash`: The new IPFS hash of the user's profile data.
 
    **Process**:
 
@@ -233,7 +233,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `contact`: The address of the emergency contact.
+- `contact`: The address of the emergency contact.
 
    **Process**:
 
@@ -289,7 +289,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `user`: The address of the user to lock out.
+- `user`: The address of the user to lock out.
 
    **Process**:
 
@@ -327,7 +327,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `userSignature`: The user's signature authorizing the disable request.
+- `userSignature`: The user's signature authorizing the disable request.
 
    **Process**:
 
@@ -444,8 +444,8 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `signature`: The user's signature to verify the session creation request.
-   - `dataHash`: The IPFS hash of the session data.
+- `signature`: The user's signature to verify the session creation request.
+- `dataHash`: The IPFS hash of the session data.
 
    **Process**:
 
@@ -488,7 +488,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `sessionId`: The identifier of the session to refresh.
+- `sessionId`: The identifier of the session to refresh.
 
    **Process**:
 
@@ -523,7 +523,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `sessionId`: The identifier of the session to terminate.
+- `sessionId`: The identifier of the session to terminate.
 
    **Process**:
 
@@ -553,7 +553,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `sessionId`: The identifier of the session to validate.
+- `sessionId`: The identifier of the session to validate.
 
    **Process**:
 
@@ -588,7 +588,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `sessionId`: The identifier of the session.
+- `sessionId`: The identifier of the session.
 
    **Process**:
 
@@ -631,7 +631,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `sessionId`: The identifier of the session.
+- `sessionId`: The identifier of the session.
 
    **Process**:
 
@@ -726,9 +726,9 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `users`: Array of user addresses.
-   - `signatures`: Array of signatures for each user.
-   - `dataHashes`: Array of IPFS hashes for session data.
+- `users`: Array of user addresses.
+- `signatures`: Array of signatures for each user.
+- `dataHashes`: Array of IPFS hashes for session data.
 
    **Process**:
 
@@ -768,7 +768,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `sessionIds`: Array of session identifiers to terminate.
+- `sessionIds`: Array of session identifiers to terminate.
 
    **Process**:
 
@@ -812,8 +812,8 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `users`: Array of user addresses.
-   - `newProfileHashes`: Array of new IPFS profile hashes.
+- `users`: Array of user addresses.
+- `newProfileHashes`: Array of new IPFS profile hashes.
 
    **Process**:
 
@@ -851,7 +851,7 @@ functions, and implementation specifics of SimpleLogin.
 
    **Parameters**:
 
-   - `users`: Array of user addresses to lock out.
+- `users`: Array of user addresses to lock out.
 
    **Process**:
 
@@ -1127,8 +1127,8 @@ functions, and implementation specifics of SimpleLogin.
 
    Nonces are used to prevent replay attacks during signature verification.
 
-   - Each user has an associated nonce stored in the `nonces` mapping.
-   - Nonces increment with each session creation.
+- Each user has an associated nonce stored in the `nonces` mapping.
+- Nonces increment with each session creation.
 
 ### Event Logging
 
@@ -1177,14 +1177,12 @@ transactions.
 
 ## References
 
-- **[EIP-155]**: Ethereum Improvement Proposal 155 - Simple replay
+- EIP-155: Ethereum Improvement Proposal 155 - Simple replay
 attack protection.
 
-- **[SECP256K1]**: Standards for Efficient Cryptography Group,
+- SECP256K1: Standards for Efficient Cryptography Group,
 "Recommended Elliptic Curve Domain Parameters", 2010.
 
-- **[Solidity]**: Solidity Documentation -
-<https://docs.soliditylang.org/>
+- [Solidity documentation](https://docs.soliditylang.org/)
 
-- **[IPFS]**: InterPlanetary File System -
-<https://ipfs.io/>
+- [IPFS documentation](https://ipfs.io/)
