@@ -8,7 +8,7 @@ editor: Ramses Fernandez <ramses@status.im>
 contributors:
 ---
 
-# Abstract
+## Abstract
 
    This document specifies SimpleLogin, a blockchain-based authentication
    system designed to provide secure user registration, session
@@ -17,7 +17,7 @@ contributors:
    facilitates 90-day sessions with refresh capabilities and supports
    batch operations for scalability.
 
-# 1. Motivation
+## Motivation
 
    With the increasing need for secure authentication mechanisms in
    decentralized applications, SimpleLogin provides a blockchain-based
@@ -26,61 +26,61 @@ contributors:
    lockouts and provides batch operations to enhance scalability.
    It uses 90-day sessions with refresh capabilities and enhanced security measures.
 
-# 2. Terminology
+## Terminology
 
-   - **User**: An entity registered within the SimpleLogin system.
+- **User**: An entity registered within the SimpleLogin system.
 
-   - **Session**: A temporary interaction period between a user and the
-     system, allowing access to certain functionalities.
+- **Session**: A temporary interaction period between a user and the system,
+allowing access to certain functionalities.
 
-   - **Emergency Contact**: A designated user who can manage emergency
-     lockout procedures for another user.
+- **Emergency Contact**: A designated user who can manage
+emergency lockout procedures for another user.
 
-   - **Nonce**: A number used once to prevent replay attacks in
-     cryptographic communication.
+- **Nonce**: A number used once to prevent replay attacks in
+cryptographic communication.
 
-   - **Signature**: A cryptographic value that proves the authenticity of
-     a message.
+- **Signature**: A cryptographic value that proves the authenticity of
+a message.
 
-   - **Multicall**: Batch operations that allow multiple actions to be
-     performed in a single transaction.
+- **Multicall**: Batch operations that allow multiple actions to be
+performed in a single transaction.
 
-   - **IPFS Hash**: A hash used to reference data stored on the
-     InterPlanetary File System (IPFS).
+- **IPFS Hash**: A hash used to reference data stored on the
+InterPlanetary File System (IPFS).
 
-# 3. Architecture Overview
+## Architecture Overview
 
    SimpleLogin is a smart contract that resides on a blockchain network,
    providing the following key functionalities:
 
-   - **User Registration and Profile Management**: Users can register by
-     providing a profile hash stored on IPFS and update their profiles as
-     needed.
+- **User Registration and Profile Management**: Users can register by
+providing a profile hash stored on IPFS and update their profiles as
+needed.
 
-   - **Session Management**: Implements session creation, refreshing, and
-     termination with strict timeouts and inactivity limits.
+- **Session Management**: Implements session creation, refreshing, and
+termination with strict timeouts and inactivity limits.
 
-   - **Security Measures**: Includes reentrancy guards, signature
-     verification using the secp256k1 curve, and activity tracking.
+- **Security Measures**: Includes reentrancy guards, signature
+verification using the secp256k1 curve, and activity tracking.
 
-   - **Emergency System**: Allows users to set an emergency contact who
-     can enable an emergency lockout in case of security concerns.
+- **Emergency System**: Allows users to set an emergency contact who
+can enable an emergency lockout in case of security concerns.
 
-   - **Batch Operations**: Supports batch processing of multiple
-     operations to enhance scalability and reduce transaction costs.
+- **Batch Operations**: Supports batch processing of multiple
+operations to enhance scalability and reduce transaction costs.
 
-   The contract uses specific time durations for sessions, refresh
-   windows, inactivity periods, and lockout timeouts to manage user
-   interactions effectively.
+The contract uses specific time durations for sessions, refresh
+windows, inactivity periods, and lockout timeouts to manage user
+interactions effectively.
 
-   The system includes a comprehensive set of mappings and data
-   structures to track user registrations, sessions, nonces, profiles,
-   emergency contacts, and lockout states.
+The system includes a comprehensive set of mappings and data
+structures to track user registrations, sessions, nonces, profiles,
+emergency contacts, and lockout states.
 
-   The following sections detail the constants, data structures,
-   functions, and implementation specifics of SimpleLogin.
+The following sections detail the constants, data structures,
+functions, and implementation specifics of SimpleLogin.
 
-# 4. Constants and Parameters
+## Constants and Parameters
 
    The contract defines several constants used throughout the system:
 
@@ -108,7 +108,7 @@ contributors:
    inactivity thresholds, signature validations, and batch operation
    constraints.
 
-# 5. Data Structures
+## Data Structures
 
    The contract uses several mappings and a struct to manage state:
 
@@ -141,14 +141,14 @@ contributors:
    The `Session` struct is optimized for storage efficiency, with careful
    consideration of data types and struct packing.
 
-# 6. Function Definitions
+## Function Definitions
 
    This section details all the functions implemented in the SimpleLogin
    contract, including their purpose, parameters, and internal processes.
 
-## 6.1. Registration and Profile Management
+### Registration and Profile Management
 
-### 6.1.1. `register`
+#### `register`
 
    **Description**: Allows a new user to register by providing a profile
    IPFS hash.
@@ -169,16 +169,16 @@ contributors:
 
    **Parameters**:
 
-   - `profileHash`: The IPFS hash of the user's profile data.
+- `profileHash`: The IPFS hash of the user's profile data.
 
    **Process**:
 
-   1. Checks if the caller is already registered.
-   2. Validates that the `profileHash` is not empty.
-   3. Marks the user as registered and stores the profile hash.
-   4. Emits the `UserRegistered` event.
+1. Checks if the caller is already registered.
+2. Validates that the `profileHash` is not empty.
+3. Marks the user as registered and stores the profile hash.
+4. Emits the `UserRegistered` event.
 
-### 6.1.2. `updateProfile`
+#### `updateProfile`
 
    **Description**: Allows a registered user to update their profile.
 
@@ -201,14 +201,14 @@ contributors:
 
    **Process**:
 
-   1. Validates that the caller is registered and not under emergency lockout.
-   2. Ensures the `newProfileHash` is not empty.
-   3. Updates the user's profile hash.
-   4. Emits the `UserProfileUpdated` event.
+1. Validates that the caller is registered and not under emergency lockout.
+2. Ensures the `newProfileHash` is not empty.
+3. Updates the user's profile hash.
+4. Emits the `UserProfileUpdated` event.
 
-## 6.2. Emergency Contact Management
+### Emergency Contact Management
 
-### 6.2.1. `setEmergencyContact`
+#### `setEmergencyContact`
 
    **Description**: Allows a user to designate an emergency contact.
 
@@ -237,12 +237,12 @@ contributors:
 
    **Process**:
 
-   1. Validates the `contact` address.
-   2. Checks that the contact is registered and not the caller themselves.
-   3. Updates the emergency contact mappings.
-   4. Emits the `EmergencyContactSet` event.
+1. Validates the `contact` address.
+2. Checks that the contact is registered and not the caller themselves.
+3. Updates the emergency contact mappings.
+4. Emits the `EmergencyContactSet` event.
 
-### 6.2.2. `removeEmergencyContact`
+#### `removeEmergencyContact`
 
    **Description**: Allows a user to remove their emergency contact.
 
@@ -263,14 +263,14 @@ contributors:
 
    **Process**:
 
-   1. Checks that the caller has an emergency contact set.
-   2. Validates that the caller is not under emergency lockout.
-   3. Removes the emergency contact and updates mappings.
-   4. Emits the `EmergencyContactSet` event with a null address.
+1. Checks that the caller has an emergency contact set.
+2. Validates that the caller is not under emergency lockout.
+3. Removes the emergency contact and updates mappings.
+4. Emits the `EmergencyContactSet` event with a null address.
 
-## 6.3. Emergency Lockout System
+### Emergency Lockout System
 
-### 6.3.1. `enableEmergencyLockout`
+#### `enableEmergencyLockout`
 
    **Description**: Allows an emergency contact to enable an emergency
    lockout for a user.
@@ -293,12 +293,12 @@ contributors:
 
    **Process**:
 
-   1. Validates that the caller is the emergency contact of the user.
-   2. Checks that the user is not already under lockout.
-   3. Sets the `emergencyLockout` flag for the user.
-   4. Emits the `EmergencyLockoutEnabled` event.
+1. Validates that the caller is the emergency contact of the user.
+2. Checks that the user is not already under lockout.
+3. Sets the `emergencyLockout` flag for the user.
+4. Emits the `EmergencyLockoutEnabled` event.
 
-### 6.3.2. `initiateDisableLockout`
+#### `initiateDisableLockout`
 
    **Description**: Allows a user under emergency lockout to initiate a
    request to disable the lockout.
@@ -331,13 +331,13 @@ contributors:
 
    **Process**:
 
-   1. Validates that the caller is under emergency lockout.
-   2. Creates a message for signature verification.
-   3. Verifies the user's signature.
-   4. Generates a `requestId` and stores it with a timestamp.
-   5. Emits the `EmergencyLockoutDisableRequested` event.
+1. Validates that the caller is under emergency lockout.
+2. Creates a message for signature verification.
+3. Verifies the user's signature.
+4. Generates a `requestId` and stores it with a timestamp.
+5. Emits the `EmergencyLockoutDisableRequested` event.
 
-### 6.3.3. `confirmDisableLockout`
+#### `confirmDisableLockout`
 
    **Description**: Allows the emergency contact to confirm and disable
    the emergency lockout.
@@ -371,19 +371,19 @@ contributors:
 
    **Parameters**:
 
-   - `user`: The address of the user under lockout.
-   - `requestId`: The identifier of the disable request.
-   - `emergencyContactSignature`: Signature from the emergency contact.
+- `user`: The address of the user under lockout.
+- `requestId`: The identifier of the disable request.
+- `emergencyContactSignature`: Signature from the emergency contact.
 
    **Process**:
 
-   1. Validates that the caller is the emergency contact of the user.
-   2. Checks that there is a valid pending disable request.
-   3. Verifies the emergency contact's signature.
-   4. Disables the emergency lockout and clears pending requests.
-   5. Emits the `EmergencyLockoutDisabled` event.
+1. Validates that the caller is the emergency contact of the user.
+2. Checks that there is a valid pending disable request.
+3. Verifies the emergency contact's signature.
+4. Disables the emergency lockout and clears pending requests.
+5. Emits the `EmergencyLockoutDisabled` event.
 
-### 6.3.4. `cancelDisableLockout`
+#### `cancelDisableLockout`
 
    **Description**: Allows a user to cancel a pending disable lockout request.
 
@@ -399,12 +399,12 @@ contributors:
 
    **Process**:
 
-   1. Checks that there is a pending disable request.
-   2. Deletes the request and timestamp from storage.
+1. Checks that there is a pending disable request.
+2. Deletes the request and timestamp from storage.
 
-## 6.4. Session Management
+### Session Management
 
-### 6.4.1. `createSession`
+#### `createSession`
 
    **Description**: Allows a registered user to create a new session.
 
@@ -449,15 +449,15 @@ contributors:
 
    **Process**:
 
-   1. Validates that the caller is registered and not under emergency lockout.
-   2. Checks that `dataHash` is not empty.
-   3. Creates a message and verifies the user's signature using the current nonce.
-   4. Generates a unique `sessionId`.
-   5. Creates a new `Session` struct and stores it.
-   6. Increments the user's nonce.
-   7. Emits the `NewSessionCreated` event.
+1. Validates that the caller is registered and not under emergency lockout.
+2. Checks that `dataHash` is not empty.
+3. Creates a message and verifies the user's signature using the current nonce.
+4. Generates a unique `sessionId`.
+5. Creates a new `Session` struct and stores it.
+6. Increments the user's nonce.
+7. Emits the `NewSessionCreated` event.
 
-### 6.4.2. `refreshSession`
+#### `refreshSession`
 
    **Description**: Allows the session owner to refresh the session's expiration.
 
@@ -492,13 +492,13 @@ contributors:
 
    **Process**:
 
-   1. Retrieves the session and validates ownership.
-   2. Checks that the session is valid and not expired.
-   3. Ensures it is within the `REFRESH_WINDOW` and `MAX_REFRESHES` has not been exceeded.
-   4. Updates `expiresAt`, `lastActivity`, and increments `refreshCount`.
-   5. Emits the `SessionRefreshed` event.
+1. Retrieves the session and validates ownership.
+2. Checks that the session is valid and not expired.
+3. Ensures it is within the `REFRESH_WINDOW` and `MAX_REFRESHES` has not been exceeded.
+4. Updates `expiresAt`, `lastActivity`, and increments `refreshCount`.
+5. Emits the `SessionRefreshed` event.
 
-### 6.4.3. `endSession`
+#### `endSession`
 
    **Description**: Allows a session owner or their emergency contact to invalidate a session.
 
@@ -527,12 +527,12 @@ contributors:
 
    **Process**:
 
-   1. Validates that the caller is authorized.
-   2. Checks that the session is valid.
-   3. Sets `isValid` to `false` and updates `lastActivity`.
-   4. Emits the `SessionInvalidated` event.
+1. Validates that the caller is authorized.
+2. Checks that the session is valid.
+3. Sets `isValid` to `false` and updates `lastActivity`.
+4. Emits the `SessionInvalidated` event.
 
-### 6.4.4. `isSessionValid`
+#### `isSessionValid`
 
    **Description**: Checks whether a session is currently valid.
 
@@ -557,11 +557,11 @@ contributors:
 
    **Process**:
 
-   1. Retrieves the session data.
-   2. Validates session state, expiration, inactivity, ownership, and lockout status.
-   3. Returns a boolean indicating validity.
+1. Retrieves the session data.
+2. Validates session state, expiration, inactivity, ownership, and lockout status.
+3. Returns a boolean indicating validity.
 
-### 6.4.5. `getSessionData`
+#### `getSessionData`
 
    **Description**: Retrieves the session data hash after validating the session.
 
@@ -592,11 +592,11 @@ contributors:
 
    **Process**:
 
-   1. Validates session ownership, validity, expiration, and inactivity.
-   2. Updates the session's activity timestamp.
-   3. Returns the `dataHash`.
+1. Validates session ownership, validity, expiration, and inactivity.
+2. Updates the session's activity timestamp.
+3. Returns the `dataHash`.
 
-### 6.4.6. `getSessionDetails`
+#### `getSessionDetails`
 
    **Description**: Retrieves detailed information about a session.
 
@@ -635,10 +635,10 @@ contributors:
 
    **Process**:
 
-   1. Validates that the caller is authorized.
-   2. Returns detailed session information.
+1. Validates that the caller is authorized.
+2. Returns detailed session information.
 
-### 6.4.7. `_updateActivity`
+#### `_updateActivity`
 
    **Description**: Internal function to update the session's last activity timestamp.
 
@@ -661,13 +661,13 @@ contributors:
 
    **Process**:
 
-   1. Calculates the inactive period.
-   2. Updates the `lastActivity` timestamp.
-   3. Emits `ActivityUpdated` and possibly `SignificantInactivity` events.
+1. Calculates the inactive period.
+2. Updates the `lastActivity` timestamp.
+3. Emits `ActivityUpdated` and possibly `SignificantInactivity` events.
 
-## 6.5. Batch Operations (Multicall)
+### Batch Operations (Multicall)
 
-### 6.5.1. `createMultipleSessions`
+#### `createMultipleSessions`
 
    **Description**: Allows creating multiple sessions in a single transaction.
 
@@ -732,13 +732,13 @@ contributors:
 
    **Process**:
 
-   1. Validates array lengths and batch size.
-   2. Iterates over each user to perform session creation steps.
-   3. Verifies signatures and increments nonces.
-   4. Emits `NewSessionCreated` events.
-   5. Returns an array of `sessionIds`.
+1. Validates array lengths and batch size.
+2. Iterates over each user to perform session creation steps.
+3. Verifies signatures and increments nonces.
+4. Emits `NewSessionCreated` events.
+5. Returns an array of `sessionIds`.
 
-### 6.5.2. `endMultipleSessions`
+#### `endMultipleSessions`
 
    **Description**: Ends multiple sessions in a single transaction.
 
@@ -772,13 +772,13 @@ contributors:
 
    **Process**:
 
-   1. Validates batch size.
-   2. Iterates over each `sessionId`.
-   3. Validates authorization and session validity.
-   4. Sets `isValid` to `false` and updates `lastActivity`.
-   5. Emits `SessionInvalidated` events.
+1. Validates batch size.
+2. Iterates over each `sessionId`.
+3. Validates authorization and session validity.
+4. Sets `isValid` to `false` and updates `lastActivity`.
+5. Emits `SessionInvalidated` events.
 
-### 6.5.3. `updateMultipleProfiles`
+#### `updateMultipleProfiles`
 
    **Description**: Updates profiles for multiple users in a single transaction.
 
@@ -817,12 +817,12 @@ contributors:
 
    **Process**:
 
-   1. Validates array lengths and batch size.
-   2. Iterates over each user.
-   3. Validates authorization and status.
-   4. Updates profiles and emits events.
+1. Validates array lengths and batch size.
+2. Iterates over each user.
+3. Validates authorization and status.
+4. Updates profiles and emits events.
 
-### 6.5.4. `enableMultipleEmergencyLockouts`
+#### `enableMultipleEmergencyLockouts`
 
    **Description**: Allows an emergency contact to enable lockouts for multiple users.
 
@@ -855,15 +855,15 @@ contributors:
 
    **Process**:
 
-   1. Validates batch size.
-   2. Iterates over each user.
-   3. Validates that the caller is the emergency contact.
-   4. Sets `emergencyLockout` to `true`.
-   5. Emits `EmergencyLockoutEnabled` events.
+1. Validates batch size.
+2. Iterates over each user.
+3. Validates that the caller is the emergency contact.
+4. Sets `emergencyLockout` to `true`.
+5. Emits `EmergencyLockoutEnabled` events.
 
-## 6.6. Signature Verification
+### Signature Verification
 
-### 6.6.1. `verify`
+#### `verify`
 
    **Description**: Verifies the authenticity of a message signed by a user.
 
@@ -892,17 +892,17 @@ contributors:
 
    **Parameters**:
 
-   - `message`: The hashed message that was signed.
-   - `signature`: The signature bytes.
+- `message`: The hashed message that was signed.
+- `signature`: The signature bytes.
 
    **Process**:
 
-   1. Splits the signature into `r`, `s`, and `v` components.
-   2. Validates `r`, `s`, and `v` according to secp256k1 standards.
-   3. Recovers the signer's address.
-   4. Compares the recovered address with `msg.sender`.
+1. Splits the signature into `r`, `s`, and `v` components.
+2. Validates `r`, `s`, and `v` according to secp256k1 standards.
+3. Recovers the signer's address.
+4. Compares the recovered address with `msg.sender`.
 
-### 6.6.2. `splitSignature`
+#### `splitSignature`
 
    **Description**: Splits a signature into its components.
 
@@ -926,15 +926,15 @@ contributors:
 
    **Parameters**:
 
-   - `sig`: The signature bytes.
+- `sig`: The signature bytes.
 
    **Process**:
 
-   1. Validates the length of the signature.
-   2. Extracts `r`, `s`, and `v` components.
-   3. Adjusts `v` if necessary.
+1. Validates the length of the signature.
+2. Extracts `r`, `s`, and `v` components.
+3. Adjusts `v` if necessary.
 
-### 6.6.3. `recoverSigner`
+#### `recoverSigner`
 
    **Description**: Helper function for signature recovery in batch operations.
 
@@ -963,19 +963,19 @@ contributors:
 
    **Parameters**:
 
-   - `message`: The hashed message.
-   - `signature`: The signature bytes.
+- `message`: The hashed message.
+- `signature`: The signature bytes.
 
    **Process**:
 
-   1. Creates a prefixed message.
-   2. Splits the signature.
-   3. Validates `s` and `v` values.
-   4. Recovers the signer's address.
+1. Creates a prefixed message.
+2. Splits the signature.
+3. Validates `s` and `v` values.
+4. Recovers the signer's address.
 
-## 6.7. View Functions
+### View Functions
 
-### 6.7.1. `getProfile`
+#### `getProfile`
 
    **Description**: Retrieves the profile hash of a registered user.
 
@@ -990,14 +990,14 @@ contributors:
 
    **Parameters**:
 
-   - `user`: The address of the user.
+- `user`: The address of the user.
 
    **Process**:
 
-   1. Validates that the user is registered.
-   2. Returns the profile hash.
+1. Validates that the user is registered.
+2. Returns the profile hash.
 
-### 6.7.2. `getUserNonce`
+#### `getUserNonce`
 
    **Description**: Retrieves the current nonce of a user.
 
@@ -1011,13 +1011,13 @@ contributors:
 
    **Parameters**:
 
-   - `user`: The address of the user.
+- `user`: The address of the user.
 
    **Process**:
 
-   1. Returns the user's nonce.
+1. Returns the user's nonce.
 
-### 6.7.3. `isDisableRequestValid`
+#### `isDisableRequestValid`
 
    **Description**: Checks if a pending disable lockout request is still valid.
 
@@ -1036,16 +1036,16 @@ contributors:
 
    **Parameters**:
 
-   - `user`: The address of the user.
+- `user`: The address of the user.
 
    **Process**:
 
-   1. Checks if there is a pending request.
-   2. Validates the request based on the timestamp and timeout.
+1. Checks if there is a pending request.
+2. Validates the request based on the timestamp and timeout.
 
-7. Implementation Details
+## Implementation Details
 
-## 7.1. Reentrancy Guard
+### Reentrancy Guard
 
    The contract uses a `nonReentrant` modifier to prevent reentrant calls
    to functions that modify critical state.
@@ -1063,11 +1063,11 @@ contributors:
 
    **Process**:
 
-   1. Checks if the `_locked` state is `false`.
-   2. Sets `_locked` to `true` before function execution.
-   3. Resets `_locked` to `false` after execution.
+1. Checks if the `_locked` state is `false`.
+2. Sets `_locked` to `true` before function execution.
+3. Resets `_locked` to `false` after execution.
 
-## 7.2. Session ID Generation
+### Session ID Generation
 
    **Function**: `generateSessionId`
 
@@ -1119,76 +1119,72 @@ contributors:
 
    **Process**:
 
-   1. Retrieves entropy from the blockchain.
-   2. Uses a per-user salt updated with each session creation.
-   3. Combines user address, nonce, timestamps, and entropy to generate a unique `sessionId`.
+1. Retrieves entropy from the blockchain.
+2. Uses a per-user salt updated with each session creation.
+3. Combines user address, nonce, timestamps, and entropy to generate a unique `sessionId`.
 
-## 7.3. Nonce Management
+### Nonce Management
 
    Nonces are used to prevent replay attacks during signature verification.
 
    - Each user has an associated nonce stored in the `nonces` mapping.
    - Nonces increment with each session creation.
 
-## 7.4. Event Logging
+### Event Logging
 
    The contract emits events to facilitate monitoring and logging of key actions:
 
-   - `UserRegistered(address indexed user);`
-   - `NewSessionCreated(address indexed user, bytes32 indexed sessionId, string dataHash);`
-   - `SessionInvalidated(bytes32 indexed sessionId);`
-   - `SessionRefreshed(bytes32 indexed sessionId, uint40 newExpiry);`
-   - `EmergencyContactSet(address indexed user, address indexed contact);`
-   - `EmergencyLockoutEnabled(address indexed user, address indexed triggeredBy);`
-   - `EmergencyLockoutDisabled(address indexed user, address indexed emergencyContact);`
-   - `EmergencyLockoutDisableRequested(address indexed user, bytes32 requestId);`
-   - `SignificantInactivity(bytes32 indexed sessionId, uint40 inactivePeriod);`
-   - `ActivityUpdated(bytes32 indexed sessionId, uint40 timestamp);`
-   - `UserProfileUpdated(address indexed user, string newProfileHash);`
+- `UserRegistered(address indexed user);`
+- `NewSessionCreated(address indexed user, bytes32 indexed sessionId, string dataHash);`
+- `SessionInvalidated(bytes32 indexed sessionId);`
+- `SessionRefreshed(bytes32 indexed sessionId, uint40 newExpiry);`
+- `EmergencyContactSet(address indexed user, address indexed contact);`
+- `EmergencyLockoutEnabled(address indexed user, address indexed triggeredBy);`
+- `EmergencyLockoutDisabled(address indexed user, address indexed emergencyContact);`
+- `EmergencyLockoutDisableRequested(address indexed user, bytes32 requestId);`
+- `SignificantInactivity(bytes32 indexed sessionId, uint40 inactivePeriod);`
+- `ActivityUpdated(bytes32 indexed sessionId, uint40 timestamp);`
+- `UserProfileUpdated(address indexed user, string newProfileHash);`
 
-# 8. Security Considerations
+## Security Considerations
 
-   - **Replay Protection**: Uses nonces to prevent replay attacks during
-     session creation and emergency procedures.
+- **Replay Protection**: Uses nonces to prevent replay attacks during
+session creation and emergency procedures.
 
-   - **Signature Validation**: Ensures that signatures conform to
-     secp256k1 standards and are correctly verified.
+- **Signature Validation**: Ensures that signatures conform to
+secp256k1 standards and are correctly verified.
 
-   - **Emergency Lockout**: Provides a mechanism for users to secure their
-     accounts in case of compromise, with dual-signature verification for
-     disabling lockouts.
+- **Emergency Lockout**: Provides a mechanism for users to secure their
+accounts in case of compromise, with dual-signature verification for
+disabling lockouts.
 
-   - **Reentrancy Guard**: Protects against reentrancy attacks by using a
-     `nonReentrant` modifier on critical functions.
+- **Reentrancy Guard**: Protects against reentrancy attacks by using a
+`nonReentrant` modifier on critical functions.
 
-   - **Session Inactivity**: Monitors inactivity and invalidates sessions
-     that exceed `MAX_INACTIVITY`.
+- **Session Inactivity**: Monitors inactivity and invalidates sessions
+that exceed `MAX_INACTIVITY`.
 
-   - **Entropy Sources**: Uses blockchain-provided entropy sources like
-     `blockhash` and `block.prevrandao` for generating session IDs, but
-     acknowledges the limitations and potential predictability.
+- **Entropy Sources**: Uses blockchain-provided entropy sources like
+`blockhash` and `block.prevrandao` for generating session IDs, but
+acknowledges the limitations and potential predictability.
 
-   - **Access Control**: Validates that only authorized users can perform
-     certain actions, such as ending sessions or updating profiles.
+- **Access Control**: Validates that only authorized users can perform
+certain actions, such as ending sessions or updating profiles.
 
-   - **Batch Operations Risks**: Ensures that batch operations do not
-     exceed predefined sizes to prevent denial-of-service through large
-     transactions.
+- **Batch Operations Risks**: Ensures that batch operations do not
+exceed predefined sizes to prevent denial-of-service through large
+transactions.
 
-   - **Time Casting**: Safely casts block timestamps to `uint40` to
-     prevent overflows, given that `uint40` can represent dates up to the
-     year 36812.
+## References
 
-# 9. References
+- **[EIP-155]**: Ethereum Improvement Proposal 155 - Simple replay
+attack protection.
 
-   - **[EIP-155]**: Ethereum Improvement Proposal 155 - Simple replay
-     attack protection.
+- **[SECP256K1]**: Standards for Efficient Cryptography Group,
+"Recommended Elliptic Curve Domain Parameters", 2010.
 
-   - **[SECP256K1]**: Standards for Efficient Cryptography Group,
-     "Recommended Elliptic Curve Domain Parameters", 2010.
+- **[Solidity]**: Solidity Documentation -
+<https://docs.soliditylang.org/>
 
-   - **[Solidity]**: Solidity Documentation -
-     <https://docs.soliditylang.org/>
-
-   - **[IPFS]**: InterPlanetary File System -
-     <https://ipfs.io/>
+- **[IPFS]**: InterPlanetary File System -
+<https://ipfs.io/>
