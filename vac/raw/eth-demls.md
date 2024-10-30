@@ -1020,17 +1020,15 @@ derived from on-chain data introduces potential security vulnerabilities.
 Additionally, implementing SIWE in a fully decentralized environment
 requires careful consideration of centralization risks and extra infrastructure.
 
-[SimpleLogin]
-(https://github.com/vacp2p/rfc-index/blob/eth-secpm-alt_authentication/vac/raw/eth-simplelogin.md)
+[SimpleLogin](https://github.com/vacp2p/rfc-index/blob/eth-secpm-alt_authentication/vac/raw/eth-simplelogin.md)
 provides a blockchain-based authentication system
 specifically designed for decentralized applications.
 
 SimpleLogin manages user registration, session handling,
 and emergency security measures.
 
-User registration and authentication MUST be implemented following the specification described
-[here]
-(https://github.com/vacp2p/rfc-index/blob/eth-secpm-alt_authentication/vac/raw/eth-simplelogin.md).
+User registration and authentication MUST be implemented following
+the specification described [here](https://github.com/vacp2p/rfc-index/blob/eth-secpm-alt_authentication/vac/raw/eth-simplelogin.md).
 
 ## Privacy and Security Considerations
 
