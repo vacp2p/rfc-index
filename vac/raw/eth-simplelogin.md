@@ -500,7 +500,8 @@ functions, and implementation specifics of SimpleLogin.
 
 #### `endSession`
 
-   **Description**: Allows a session owner or their emergency contact to invalidate a session.
+   **Description**: Allows a session owner or their emergency contact
+to invalidate a session.
 
    **Function Definition**:
 
@@ -1182,7 +1183,5 @@ attack protection.
 
 - SECP256K1: Standards for Efficient Cryptography Group,
 "Recommended Elliptic Curve Domain Parameters", 2010.
-
-- [Solidity documentation](https://docs.soliditylang.org/)
 
 - [IPFS documentation](https://ipfs.io/)
