@@ -3,7 +3,7 @@ title: ETH-SIMPLELOGIN
 name: SimpleLogin, a blockchain-based authentication system
 status: raw
 category: Standards Track
-tags: an optional list of tags, not standard
+tags:
 editor: Ramses Fernandez <ramses@status.im>
 contributors:
 ---
