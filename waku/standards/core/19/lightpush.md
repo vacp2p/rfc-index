@@ -1,7 +1,7 @@
 ---
 slug: 19
 title: 19/WAKU2-LIGHTPUSH
-name: Waku v2 Light Push
+name: Waku2 Light Push
 status: draft
 editor: Hanno Cornelius <hanno@status.im> 
 contributors: 
@@ -11,15 +11,18 @@ contributors:
 
 **Protocol identifier**: `/vac/waku/lightpush/2.0.0-beta1`
 
-## Motivation and Goals
+## Abstract
 
-Light nodes with short connection windows and
-limited bandwidth wish to publish messages into the Waku network.
+
+## Motivation
+
+Resource-retricted nodes (light nodes) with short connection windows and
+limited bandwidth wish to publish messages into the [64/WAKU-NETWORK]().
 Additionally,
 there is sometimes a need for confirmation
 that a message has been received "by the network"
 (here, at least one node).
-
+This specification addresses these 
 `19/WAKU2-LIGHTPUSH` is a request/response protocol for this.
 
 ## Payloads
