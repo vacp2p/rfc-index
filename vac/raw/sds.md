@@ -1,7 +1,7 @@
 ---
 title: SDS
 name: Scalable Data Sync protocol for distributed logs
-status: stable
+status: raw
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Akhil Peddireddy <akhil@status.im>
