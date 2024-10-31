@@ -642,36 +642,435 @@ Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 - Users have set a secure 1-1 communication channel.
 - Each group is managed by a separate smart contract.
 
-### Addition of members to a group
+### Group Management Contract
 
-1. On-chain: Alice creates a Smart Contract with ACL.
-2. Off-chain: Alice sends the contract address
-and an invitation message to Bob over the secure channel.
-3. Off-chain: Bob sends a signed response
-confirming his Ethereum address and agreement to join.
-4. Off-chain: Alice verifies the signature using the public key of Bob.
-5. On-chain: Alice adds Bob’s address to the ACL.
-6. Off-chain: Alice sends a welcome message to Bob.
-7. Off-chain: Alice sends a broadcast message to all group members,
-notifying them the addition of Bob.
+To ease decentralized and secure group management, the `GroupManager` smart contract is used. This contract provides functionalities for:
 
-![figure8](./images/eth-secpm_onchain-register-2.png)
+- **Group Creation**: Users can create new groups, specifying group names and types (OPEN or CLOSED).
+- **Membership Management**: Admins can add or remove members, and users can join OPEN groups directly.
+- **Role Assignment**: Roles (MEMBER, ADMIN) can be assigned to group members, with appropriate access control.
+- **Ownership Transfer**: Group owners can transfer ownership to another member.
+- **Access Control**: The contract enforces access control through modifiers that check roles, ownership, and session validity.
 
-### Updates in groups
+The `GroupManager` relies on the **`SimpleLogin`** contract for authentication, ensuring that only authenticated users with valid sessions can interact with the group management functionalities.
 
-Removal requests and update requests are considered the same operation.
-One assumes Alice is the creator of the contract.
-They MUST be processed as follows:
+#### Contract Specification
 
-1. Off-chain: Bob creates a new update request.
-2. Off-chain: Bob sends the update request to Alice.
-3. Off-chain: Alice verifies the request.
-4. On-chain: If the verification is successfull,
-Alice sends it to the smart contract for registration.
-5. Off-chain: Alice sends a broadcast message
-communicating the update to all users.
+```solidity
+// SimpleLogin interface provides authentication services through sessions
+interface ISimpleLogin {
+    // Verifies if a session is still valid
+    function isSessionValid(bytes32 sessionId) external view returns (bool);
+    // Returns the owner address of a session
+    function sessions(bytes32 sessionId) external view returns (address owner);
+    // Checks if an address is registered in the system
+    function registered(address user) external view returns (bool);
+}
 
-![figure9](./images/eth-secpm_onchain-update.png)
+contract GroupManager {
+    // Reentrancy guard state variable to prevent recursive calls
+    bool private _locked;
+    
+    // Authentication service reference
+    ISimpleLogin private immutable simpleLogin;
+
+    // Tracks total number of groups for ID assignment
+    uint256 public groupCount;
+    
+    // Group Types define joining permissions
+    enum GroupType { 
+        OPEN,    // Anyone can join
+        CLOSED   // Admin invitation required
+    }
+
+    // Roles define member permissions within groups
+    enum Role { 
+        NONE,      // Not a member
+        MEMBER,    // Basic access
+        ADMIN      // Full management access
+    }
+
+    // Group structure contains all group-related data
+    struct Group {
+        uint256 id;               // Unique identifier
+        string name;              // Display name
+        address owner;            // Owner address
+        GroupType groupType;      // Open/Closed status
+        uint256 memberCount;      // Total number of members
+        mapping(address => Role) members;  // Member roles
+        mapping(uint256 => address) memberList; // List of member addresses for iteration
+    }
+
+    // Maps group IDs to Group structs
+    mapping(uint256 => Group) public groups;
+
+    // Events for tracking state changes
+    event GroupCreated(
+        uint256 indexed groupId, 
+        string name, 
+        GroupType groupType, 
+        address indexed owner
+    );
+    
+    event MemberJoined(
+        uint256 indexed groupId, 
+        address indexed member, 
+        Role role
+    );
+    
+    event MemberRemoved(
+        uint256 indexed groupId, 
+        address indexed member
+    );
+    
+    event OwnershipTransferred(
+        uint256 indexed groupId, 
+        address indexed oldOwner, 
+        address indexed newOwner
+    );
+    
+    event RoleAssigned(
+        uint256 indexed groupId, 
+        address indexed member, 
+        Role role
+    );
+
+    // Guard against recursive calls to protected functions
+    modifier nonReentrant() {
+        require(!_locked, "ReentrancyGuard: reentrant call");
+        _locked = true;
+        _;
+        _locked = false;
+    }
+    
+    // Ensures session is valid and belongs to caller
+    modifier validSession(bytes32 sessionId) {
+        require(simpleLogin.isSessionValid(sessionId), "Invalid session");
+        require(simpleLogin.sessions(sessionId) == msg.sender, "Unauthorized");
+        _;
+    }
+
+    // Ensures group exists
+    modifier groupExists(uint256 groupId) {
+        require(groups[groupId].owner != address(0), "Group does not exist");
+        _;
+    }
+
+    // Ensures caller is group admin
+    modifier onlyAdmin(uint256 groupId) {
+        require(groups[groupId].members[msg.sender] == Role.ADMIN, "Not an admin");
+        _;
+    }
+
+    // Ensures caller is group owner
+    modifier onlyOwner(uint256 groupId) {
+        require(groups[groupId].owner == msg.sender, "Not group owner");
+        _;
+    }
+
+    // Prevents removing the last admin
+    modifier maintainAdmin(uint256 groupId, address member) {
+        _;
+        Group storage group = groups[groupId];
+        bool hasAdmin = false;
+        
+        // Check if at least one admin remains
+        for (uint i = 0; i < group.memberCount; i++) {
+            address memberAddress = group.memberList[i];
+            if (group.members[memberAddress] == Role.ADMIN) {
+                hasAdmin = true;
+                break;
+            }
+        }
+        require(hasAdmin, "Cannot remove last admin");
+    }
+
+    // Prevents admins from modifying other admins' roles
+    modifier adminHierarchy(uint256 groupId, address member) {
+        Group storage group = groups[groupId];
+        require(
+            group.members[member] != Role.ADMIN || 
+            msg.sender == group.owner,
+            "Only owner can modify admin roles"
+        );
+        _;
+    }
+
+    // Initialize contract with authentication service
+    constructor(address simpleLoginAddress) {
+        require(simpleLoginAddress != address(0), "Invalid SimpleLogin address");
+        simpleLogin = ISimpleLogin(simpleLoginAddress);
+    }
+
+    // Creates a new group with the caller as owner and admin
+    function createGroup(
+        bytes32 sessionId,
+        string calldata groupName,
+        GroupType groupType
+    ) 
+        external 
+        validSession(sessionId)
+        nonReentrant
+    {
+        // Validate group name
+        require(bytes(groupName).length > 0, "Empty group name");
+        require(bytes(groupName).length <= 100, "Group name too long");
+
+        // Create new group with incremented ID
+        groupCount++;
+        Group storage newGroup = groups[groupCount];
+        
+        // Initialize group properties
+        newGroup.id = groupCount;
+        newGroup.name = groupName;
+        newGroup.owner = msg.sender;
+        newGroup.groupType = groupType;
+        newGroup.memberCount = 1;
+        
+        // Add owner as first member with admin role
+        newGroup.members[msg.sender] = Role.ADMIN;
+        newGroup.memberList[0] = msg.sender;
+
+        emit GroupCreated(groupCount, groupName, groupType, msg.sender);
+    }
+
+    // Allows users to join OPEN groups directly
+    function joinGroup(
+        bytes32 sessionId, 
+        uint256 groupId
+    ) 
+        external
+        validSession(sessionId)
+        groupExists(groupId)
+        nonReentrant
+    {
+        Group storage group = groups[groupId];
+        
+        // Verify group is open and user not already member
+        require(group.groupType == GroupType.OPEN, "Cannot join closed group");
+        require(group.members[msg.sender] == Role.NONE, "Already a member");
+
+        // Add new member
+        group.members[msg.sender] = Role.MEMBER;
+        group.memberList[group.memberCount] = msg.sender;
+        group.memberCount++;
+
+        emit MemberJoined(groupId, msg.sender, Role.MEMBER);
+    }
+
+    // Allows admin to add members to any group type
+    function addMember(
+        bytes32 sessionId,
+        uint256 groupId,
+        address newMember
+    ) 
+        external
+        validSession(sessionId)
+        groupExists(groupId)
+        onlyAdmin(groupId)
+        nonReentrant
+    {
+        Group storage group = groups[groupId];
+        
+        // Validate new member
+        require(newMember != address(0), "Invalid member address");
+        require(group.members[newMember] == Role.NONE, "Already a member");
+        require(simpleLogin.registered(newMember), "User not registered");
+
+        // Add new member
+        group.members[newMember] = Role.MEMBER;
+        group.memberList[group.memberCount] = newMember;
+        group.memberCount++;
+
+        emit MemberJoined(groupId, newMember, Role.MEMBER);
+    }
+
+    // Allows admin to remove any member except owner
+    function removeMember(
+        bytes32 sessionId,
+        uint256 groupId,
+        address member
+    ) 
+        external
+        validSession(sessionId)
+        groupExists(groupId)
+        onlyAdmin(groupId)
+        maintainAdmin(groupId, member)
+        adminHierarchy(groupId, member)
+        nonReentrant
+    {
+        Group storage group = groups[groupId];
+        
+        // Validate member
+        require(member != group.owner, "Cannot remove owner");
+        require(group.members[member] != Role.NONE, "Not a member");
+
+        // Find and remove member from list
+        for (uint i = 0; i < group.memberCount; i++) {
+            if (group.memberList[i] == member) {
+                // Move last member to this position if not last
+                if (i != group.memberCount - 1) {
+                    group.memberList[i] = group.memberList[group.memberCount - 1];
+                }
+                delete group.memberList[group.memberCount - 1];
+                group.memberCount--;
+                break;
+            }
+        }
+
+        // Remove member role
+        delete group.members[member];
+
+        emit MemberRemoved(groupId, member);
+    }
+
+    // Transfers group ownership to another member
+    function transferOwnership(
+        bytes32 sessionId,
+        uint256 groupId,
+        address newOwner
+    ) 
+        external
+        validSession(sessionId)
+        groupExists(groupId)
+        onlyOwner(groupId)
+        nonReentrant
+    {
+        Group storage group = groups[groupId];
+        
+        // Validate new owner
+        require(newOwner != address(0), "Invalid owner address");
+        require(group.members[newOwner] != Role.NONE, "New owner must be member");
+        require(newOwner != msg.sender, "Already owner");
+
+        // Store old owner's role
+        Role oldOwnerRole = group.members[msg.sender];
+        
+        // Update ownership and roles
+        group.owner = newOwner;
+        group.members[newOwner] = Role.ADMIN;
+        
+        // Keep admin role for old owner if they had it
+        if (oldOwnerRole != Role.ADMIN) {
+            group.members[msg.sender] = Role.MEMBER;
+        }
+
+        emit OwnershipTransferred(groupId, msg.sender, newOwner);
+    }
+
+    // Assigns role to member, with admin hierarchy checks
+    function assignRole(
+        bytes32 sessionId,
+        uint256 groupId,
+        address member,
+        Role role
+    ) 
+        external
+        validSession(sessionId)
+        groupExists(groupId)
+        onlyAdmin(groupId)
+        maintainAdmin(groupId, member)
+        adminHierarchy(groupId, member)
+        nonReentrant
+    {
+        Group storage group = groups[groupId];
+        
+        // Validate member and role
+        require(member != address(0), "Invalid member address");
+        require(group.members[member] != Role.NONE, "Not a member");
+        require(role != Role.NONE, "Cannot assign NONE role");
+        require(member != group.owner, "Cannot modify owner role");
+
+        // Only owner can assign admin role
+        if (role == Role.ADMIN) {
+            require(msg.sender == group.owner, "Only owner can assign admin role");
+        }
+
+        group.members[member] = role;
+
+        emit RoleAssigned(groupId, member, role);
+    }
+
+    // Helper function to check if address is group member
+    function isMember(
+        uint256 groupId,
+        address user
+    ) 
+        external 
+        view 
+        groupExists(groupId) 
+        returns (bool) 
+    {
+        return groups[groupId].members[user] != Role.NONE;
+    }
+
+    // Helper function to get member role
+    function getMemberRole(
+        uint256 groupId,
+        address member
+    ) 
+        external 
+        view 
+        groupExists(groupId) 
+        returns (Role) 
+    {
+        return groups[groupId].members[member];
+    }
+
+    // Helper function to get member count
+    function getMemberCount(
+        uint256 groupId
+    ) 
+        external 
+        view 
+        groupExists(groupId) 
+        returns (uint256) 
+    {
+        return groups[groupId].memberCount;
+    }
+
+    // Helper function to get member at specific index
+    function getMemberAt(
+        uint256 groupId,
+        uint256 index
+    ) 
+        external 
+        view 
+        groupExists(groupId) 
+        returns (address) 
+    {
+        require(index < groups[groupId].memberCount, "Index out of bounds");
+        return groups[groupId].memberList[index];
+    }
+}
+```
+
+### Addition of Members to a Group
+
+The process of adding members to a group is facilitated by the `GroupManager` contract:
+
+1. **On-chain**: Alice (the group owner) creates a group using the `createGroup` function of `GroupManager`.
+2. **Off-chain**: Alice sends the contract address and an invitation to Bob over a secure channel.
+3. **Off-chain**: Bob responds, and Alice verifies his authentication via `SimpleLogin`.
+4. **On-chain**: Alice uses `addMember` to add Bob to the group.
+5. **Off-chain**: Alice notifies Bob and other group members about the addition.
+
+### Updates in Groups
+
+Group updates, such as member removal or role changes, are managed through the `GroupManager` contract:
+
+1. **Off-chain**: A member initiates an update request.
+2. **Off-chain**: The request is sent to the group admin or owner.
+3. **Off-chain**: The admin verifies the request and the member's authentication.
+4. **On-chain**: The admin calls the appropriate function (`removeMember`, `assignRole`) in `GroupManager`.
+5. **Off-chain**: The group is notified of the update.
+
+### Security Considerations
+
+- **Reentrancy Guard**: The `nonReentrant` modifier prevents reentrant calls to critical functions.
+- **Access Control**: Modifiers like `onlyAdmin`, `onlyOwner`, and `validSession` ensure that only authorized users can perform specific actions.
+- **Session Authentication**: Integration with `SimpleLogin` ensures that users have valid sessions before interacting with the contract.
+- **Preventing Unauthorized Role Changes**: The contract enforces hierarchy rules, where only owners can modify admin roles, and admins cannot alter other admins' roles without proper authorization.
 
 ## Ethereum-based authentication protocol
 
