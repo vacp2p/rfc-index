@@ -644,15 +644,22 @@ Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Group Management Contract
 
-To ease decentralized and secure group management, the `GroupManager` smart contract is used. This contract provides functionalities for:
+To ease decentralized and secure group management, the `GroupManager` smart contract is used.
+This contract provides functionalities for:
 
-- **Group Creation**: Users can create new groups, specifying group names and types (OPEN or CLOSED).
-- **Membership Management**: Admins can add or remove members, and users can join OPEN groups directly.
-- **Role Assignment**: Roles (MEMBER, ADMIN) can be assigned to group members, with appropriate access control.
+- **Group Creation**: Users can create new groups, specifying group names and types
+(OPEN or CLOSED).
+- **Membership Management**: Admins can add or remove members,
+and users can join OPEN groups directly.
+- **Role Assignment**: Roles (MEMBER, ADMIN) can be assigned to group members,
+with appropriate access control.
 - **Ownership Transfer**: Group owners can transfer ownership to another member.
-- **Access Control**: The contract enforces access control through modifiers that check roles, ownership, and session validity.
+- **Access Control**: The contract enforces access control through modifiers that check roles,
+ownership, and session validity.
 
-The `GroupManager` relies on the **`SimpleLogin`** contract for authentication, ensuring that only authenticated users with valid sessions can interact with the group management functionalities.
+The `GroupManager` relies on the **`SimpleLogin`** contract for authentication,
+ensuring that only authenticated users with valid sessions can interact
+with the group management functionalities.
 
 #### Contract Specification
 
