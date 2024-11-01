@@ -644,7 +644,7 @@ Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Group Management Contract
 
-To ease decentralized and secure group management, we set the `GroupManager` smart contract.
+To ease decentralized group management, we set the `GroupManager` smart contract.
 This contract provides functionalities for:
 
 - **Group Creation**: Users can create new groups, specifying group names and types
