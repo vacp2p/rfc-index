@@ -644,7 +644,7 @@ Section 15 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Group Management Contract
 
-To ease decentralized and secure group management, the `GroupManager` smart contract is used.
+To ease decentralized and secure group management, we set the `GroupManager` smart contract.
 This contract provides functionalities for:
 
 - **Group Creation**: Users can create new groups, specifying group names and types
@@ -654,8 +654,8 @@ and users can join OPEN groups directly.
 - **Role Assignment**: Roles (MEMBER, ADMIN) can be assigned to group members,
 with appropriate access control.
 - **Ownership Transfer**: Group owners can transfer ownership to another member.
-- **Access Control**: The contract enforces access control through modifiers that check roles,
-ownership, and session validity.
+- **Access Control**: The contract enforces access control through modifiers
+that check roles, ownership, and session validity.
 
 The `GroupManager` relies on the **`SimpleLogin`** contract for authentication,
 ensuring that only authenticated users with valid sessions can interact
@@ -1056,28 +1056,37 @@ contract GroupManager {
 
 The process of adding members to a group is facilitated by the `GroupManager` contract:
 
-1. **On-chain**: Alice (the group owner) creates a group using the `createGroup` function of `GroupManager`.
-2. **Off-chain**: Alice sends the contract address and an invitation to Bob over a secure channel.
+1. **On-chain**: Alice (group owner) creates a group using the `createGroup` function
+of `GroupManager`.
+2. **Off-chain**: Alice sends the contract address and an invitation to Bob
+over a secure channel.
 3. **Off-chain**: Bob responds, and Alice verifies his authentication via `SimpleLogin`.
 4. **On-chain**: Alice uses `addMember` to add Bob to the group.
 5. **Off-chain**: Alice notifies Bob and other group members about the addition.
 
 ### Updates in Groups
 
-Group updates, such as member removal or role changes, are managed through the `GroupManager` contract:
+Group updates, such as member removal or role changes,
+are managed through the `GroupManager`:
 
 1. **Off-chain**: A member initiates an update request.
 2. **Off-chain**: The request is sent to the group admin or owner.
 3. **Off-chain**: The admin verifies the request and the member's authentication.
-4. **On-chain**: The admin calls the appropriate function (`removeMember`, `assignRole`) in `GroupManager`.
+4. **On-chain**: The admin calls the appropriate function
+(`removeMember`, `assignRole`) in `GroupManager`.
 5. **Off-chain**: The group is notified of the update.
 
 ### Security Considerations
 
-- **Reentrancy Guard**: The `nonReentrant` modifier prevents reentrant calls to critical functions.
-- **Access Control**: Modifiers like `onlyAdmin`, `onlyOwner`, and `validSession` ensure that only authorized users can perform specific actions.
-- **Session Authentication**: Integration with `SimpleLogin` ensures that users have valid sessions before interacting with the contract.
-- **Preventing Unauthorized Role Changes**: The contract enforces hierarchy rules, where only owners can modify admin roles, and admins cannot alter other admins' roles without proper authorization.
+- **Reentrancy Guard**: The `nonReentrant` modifier prevents
+reentrant calls to critical functions.
+- **Access Control**: Modifiers like `onlyAdmin`, `onlyOwner`,
+and `validSession` ensure that only authorized users can perform specific actions.
+- **Session Authentication**: Integration with `SimpleLogin` ensures
+that users have valid sessions before interacting with the contract.
+- **Preventing Unauthorized Role Changes**: The contract enforces hierarchy rules,
+where only owners can modify admin roles, and admins cannot alter other
+admins' roles without proper authorization.
 
 ## Ethereum-based authentication protocol
 
