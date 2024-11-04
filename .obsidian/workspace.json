@@ -11,8 +11,14 @@
             "id": "b594eda603c72386",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "status/3/whisper-usage.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "whisper-usage"
             }
           }
         ]
@@ -35,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
             }
           },
           {
@@ -50,7 +58,9 @@
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-search",
+              "title": "Search"
             }
           },
           {
@@ -58,7 +68,9 @@
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {}
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
             }
           }
         ]
@@ -81,6 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "status/3/whisper-usage.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -88,7 +101,9 @@
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for whisper-usage"
             }
           },
           {
@@ -97,9 +112,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "status/3/whisper-usage.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from whisper-usage"
             }
           },
           {
@@ -110,7 +128,9 @@
               "state": {
                 "sortOrder": "frequency",
                 "useHierarchy": true
-              }
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
             }
           },
           {
@@ -118,7 +138,11 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "status/3/whisper-usage.md"
+              },
+              "icon": "lucide-list",
+              "title": "Outline of whisper-usage"
             }
           }
         ]
@@ -139,5 +163,42 @@
     }
   },
   "active": "b594eda603c72386",
-  "lastOpenFiles": []
+  "lastOpenFiles": [
+    "status/16/push-notification-server.md",
+    "status/16-2/Keycard Usage for Wallet and Chat Keys.md",
+    "status/16/notifications.md",
+    "status/16-2/client.md",
+    "status/16-2",
+    "status/16/client.md",
+    "status/15/notifications.md",
+    "status/15/client.md",
+    "status/14/dapp browser API usage.md",
+    "status/14/client.md",
+    "status/13/3rd-party.md",
+    "status/13/client.md",
+    "status/12/IPFS gateway for Sticker Pack.md",
+    "status/12/client.md",
+    "status/16",
+    "status/15",
+    "status/14",
+    "status/13",
+    "status/12",
+    "status/11/waku-mailserver.md",
+    "status/11/client.md",
+    "status/11",
+    "status/10/waku-usage.md",
+    "status/10/client.md",
+    "status/10",
+    "status/5/secure-transport.md",
+    "status/5/client.md",
+    "status/5",
+    "status/4/whisper-mailserver.md",
+    "status/4/client.md",
+    "status/4",
+    "status/2/account.md",
+    "status/2/client.md",
+    "status/1/client.md",
+    "status/1/group-chat.md",
+    "status/7/group-chat.md"
+  ]
 }
