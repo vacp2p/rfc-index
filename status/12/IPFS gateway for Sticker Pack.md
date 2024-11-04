@@ -1,386 +1,139 @@
 ---
-slug: 3
-title: 3/WHISPER-USAGE
-name: Whisper Usage
+slug: 12
+title: 12/IPFS-gateway-for-Sticker-Pack
+name: IPFS gateway for Sticker Pack
 status: draft
-description: Status uses Whisper to provide privacy-preserving routing and messaging on top of devP2P.
+description: This specification describes how Status uses the IPFS gateway to store stickers. 
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:
-  - Adam Babik <adam@status.im>
-  - Andrea Piana <andreap@status.im>
-  - Corey Petty <corey@status.im>
-  - Oskar Thorén <oskar@status.im>
+  - Gheorghe Pinzaru <gheorghe@status.im>
 ---
 
 ## Abstract
 
-This specification describes how the payload of each message in Status looks
-like. It is primarily centered around chat and chat-related use cases.
+This specification describes how Status uses the IPFS gateway  
+to store stickers.  
+The specification explores image format,  
+how a user uploads stickers,  
+and how an end user can see them inside the Status app.
 
-The payloads aim to be flexible enough to support messaging but also cases
-described in the Status Whitepaper as well as various clients created using
-different technologies.
+## Definition
 
-## Table of Contents
+| Term          | Description                                                      |
+|---------------|------------------------------------------------------------------|
+| Stickers      | A set of images used to express emotions                         |
+| Sticker Pack  | ERC721 token including the set of stickers                       |
+| IPFS          | P2P network used to store and share data, e.g., sticker images   |
 
-- [Abstract]
-- [Table of Contents]
-- [Introduction]
-- [Payload wrapper]
-- [Encoding]
-- [Types of messages]
-  - [Message]
-    - [Payload]
-    - [Payload]
-    - [Content types]
-      - [Sticker content type]
-    - [Message types]
-    - [Clock vs Timestamp and message ordering]
-    - [Chats]
-  - [Contact Update]
-    - [Payload]
-    - [Contact update]
-  - [SyncInstallationContact]
-    - [Payload]
-  - [SyncInstallationPublicChat]
-    - [Payload]
-  - [PairInstallation]
-    - [Payload]
-  - [MembershipUpdateMessage and MembershipUpdateEvent]
-- [Upgradability]
-- [Security Considerations]
-- [Changelog]
-  - [Version 0.3]
+## Specification
 
-## Introduction
+### Image Format
 
-This document describes the payload format and some special considerations.
+Accepted image file types are PNG, JPG/JPEG, and GIF,  
+with a maximum allowed size of 300kb.  
+The minimum sticker image resolution is 512x512,  
+and its background SHOULD be transparent.
 
-## Payload Wrapper
+### Distribution
 
-The node wraps all payloads in a protobuf record:
+The node implements sticker packs as ERC721 tokens,  
+which contain a set of stickers.  
+The node stores these stickers inside the sticker pack  
+as a set of hyperlinks pointing to IPFS storage.  
+These hyperlinks are publicly available  
+and can be accessed by any user inside the Status chat.  
+Stickers can be sent in chat only by accounts that own the sticker pack.
 
-```protobuf
-message ApplicationMetadataMessage {
-  bytes signature = 1;
-  bytes payload = 2;
-  
-  Type type = 3;
+### IPFS Gateway
 
-  enum Type {
-    UNKNOWN = 0;
-    CHAT_MESSAGE = 1;
-    CONTACT_UPDATE = 2;
-    MEMBERSHIP_UPDATE_MESSAGE = 3;
-    PAIR_INSTALLATION = 4;
-    SYNC_INSTALLATION = 5;
-    REQUEST_ADDRESS_FOR_TRANSACTION = 6;
-    ACCEPT_REQUEST_ADDRESS_FOR_TRANSACTION = 7;
-    DECLINE_REQUEST_ADDRESS_FOR_TRANSACTION = 8;
-    REQUEST_TRANSACTION = 9;
-    SEND_TRANSACTION = 10;
-    DECLINE_REQUEST_TRANSACTION = 11;
-    SYNC_INSTALLATION_CONTACT = 12;
-    SYNC_INSTALLATION_PUBLIC_CHAT = 14;
-    CONTACT_CODE_ADVERTISEMENT = 15;
-    PUSH_NOTIFICATION_REGISTRATION = 16;
-    PUSH_NOTIFICATION_REGISTRATION_RESPONSE = 17;
-    PUSH_NOTIFICATION_QUERY = 18;
-    PUSH_NOTIFICATION_QUERY_RESPONSE = 19;
-    PUSH_NOTIFICATION_REQUEST = 20;
-    PUSH_NOTIFICATION_RESPONSE = 21;
-  }
-}
+The current main Status app uses the Infura gateway,  
+but clients may choose a different gateway or run their own IPFS node.  
+Infura gateway is an HTTPS gateway,  
+which based on an HTTP GET request with the multihash block  
+will return the stored content at that block address.
+
+The node requires the use of a gateway  
+to enable easy access to resources over HTTP.  
+The node stores each sticker image in IPFS  
+using a unique address derived from the hash of the file,  
+ensuring the file cannot be overridden.  
+An end-user will receive the same file at a given address.
+
+### Security
+
+The IPFS gateway acts as an end-user of IPFS,  
+allowing gateway users to access IPFS without connecting to the P2P network.  
+Using a gateway introduces potential risks for its users.  
+In case of a security compromise,  
+metadata such as IP address and User-Agent may be leaked.  
+If provider servers are unavailable,  
+the node loses access to the IPFS network through the gateway.
+
+### Status Sticker Usage
+
+When the app shows a sticker,  
+Status makes an HTTP GET request to the IPFS gateway  
+using the hyperlink.
+
+To send a sticker in chat,  
+a Status user must buy or install a sticker pack.
+
+For a Sticker Pack to be available for installation,  
+it should be submitted to the Sticker Market by an author.
+
+### Submit a Sticker
+
+To submit a sticker pack,  
+the author should upload all assets to IPFS.  
+Then, generate a payload including name, author, thumbnail, preview,  
+and a list of stickers in the EDN format, following this structure:
+
+```edn
+{meta {:name "Sticker pack name"
+       :author "Author Name"
+       :thumbnail "e30101701220602163b4f56c747333f43775fdcbe4e62d6a3e147b22aaf6097ce0143a6b2373"
+       :preview "e30101701220ef54a5354b78ef82e542bd468f58804de71c8ec268da7968a1422909357f2456"
+       :stickers [{:hash "e301017012207737b75367b8068e5bdd027d7b71a25138c83e155d1f0c9bc5c48ff158724495"}
+       {:hash "e301017012201a9cdea03f27cda1aede7315f79579e160c7b2b6a2eb51a66e47a96f47fe5284"}]}}
 ```
 
-`signature` is the bytes of the signed SHA3-256 of the payload,
-signed with the key of the author.
-The node uses the signature to validate authorship of the message
-so it can be relayed to third parties.
-Messages without signatures will not be relayed
-and are considered plausibly deniable.
-
-`payload` is the protobuf-encoded content of the message,
-with the corresponding type set.
-
-## Encoding
-
-The node encodes the payload using Protobuf.
-
-## Types of Messages
-
-### Message
-
-The type `ChatMessage` represents a chat message exchanged between clients.
-
-### Payload
-
-The protobuf description is:
-
-```protobuf
-message ChatMessage {
-  uint64 clock = 1;            // Lamport timestamp of the chat message
-  uint64 timestamp = 2;        // Unix timestamps in milliseconds
-  string text = 3;             // Text of the message
-  string response_to = 4;      // Id of the message being replied to
-  string ens_name = 5;         // Ens name of the sender
-  string chat_id = 6;          // Chat id
-  MessageType message_type = 7;
-  ContentType content_type = 8;
-
-  oneof payload {
-    StickerMessage sticker = 9;
-  }
-
-  enum MessageType {
-    UNKNOWN_MESSAGE_TYPE = 0;
-    ONE_TO_ONE = 1;
-    PUBLIC_GROUP = 2;
-    PRIVATE_GROUP = 3;
-    SYSTEM_MESSAGE_PRIVATE_GROUP = 4;
-  }
-
-  enum ContentType {
-    UNKNOWN_CONTENT_TYPE = 0;
-    TEXT_PLAIN = 1;
-    STICKER = 2;
-    STATUS = 3;
-    EMOJI = 4;
-    TRANSACTION_COMMAND = 5;
-    SYSTEM_MESSAGE_CONTENT_PRIVATE_GROUP = 6;
-  }
-}
-```
-
-### Payload Fields
-
-| Field       | Name        | Type        | Description                                 |
-| ----------- | ----------- | ----------- | ------------------------------------------- |
-| 1           | clock       | `uint64`      | The clock of the chat                       |
-| 2           | timestamp   | `uint64`      | Sender timestamp at message creation        |
-| 3           | text        | `string`      | The content of the message                  |
-| 4           | response_to | `string`      | ID of the message replied to                |
-| 5           | ens_name    | `string`      | ENS name of the user sending the message    |
-| 6           | chat_id     | `string`      | Local ID of the chat                        |
-| 7           | message_type | `MessageType` | Type of message (one-to-one, public, group) |
-| 8           | content_type | `ContentType` | Type of message content                     |
-| 9           | payload     | `Sticker\|nil` | Payload of the message                      |
-
-## Content Types
-
-Nodes require content types to interpret incoming messages. Not all messages
-are plain text; some carry additional information.
-
-The following content types **MUST** be supported:
-
-- `TEXT_PLAIN`: Identifies a message with plaintext content.
-
-Other content types that **MAY** be implemented by clients include:
-
-- `STICKER`
-- `STATUS`
-- `EMOJI`
-- `TRANSACTION_COMMAND`
-
-## Mentions
-
-A mention **MUST** be represented as a string in the `@0xpk` format,
-where `pk` is the public key of the user to be mentioned,
-within the text field of a message with `content_type: TEXT_PLAIN`.
-A message **MAY** contain more than one mention.
-
-This specification **RECOMMENDS** that the application does not require the user
-to enter the entire public key. Instead, it should allow the user
-to create a mention by typing `@` followed by the ENS or 3-word pseudonym,
-with auto-completion functionality.
-
-For better user experience, the client **SHOULD** display the ENS name
-or 3-word pseudonym corresponding to the key instead of the public key.
-
-## Sticker Content Type
-
-A `ChatMessage` with `STICKER` content type **MUST** specify the ID of the pack
-and the hash of the pack in the `Sticker` field:
-
-```protobuf
-message StickerMessage {
-  string hash = 1;
-  int32 pack = 2;
-}
-```
-
-## Message Types
-
-A node requires message types to decide how to encrypt a message and what
-metadata to attach when passing it to the transport layer.
-
-The following message types **MUST** be supported:
-
-- `ONE_TO_ONE`: A one-to-one message.
-- `PUBLIC_GROUP`: A message to the public group.
-- `PRIVATE_GROUP`: A message to the private group.
-
-## Clock vs Timestamp and Message Ordering
-
-If a user sends a new message before receiving messages that were sent while
-they were offline, the new message should be displayed last in the chat.
-
-The Status client speculates that its Lamport timestamp will beat the current
-chat timestamp, using the format: `clock = max({timestamp}, chat_clock + 1)`.
-
-This satisfies the Lamport requirement: if `a -> b`, then `T(a) < T(b)`.
-
-- `timestamp` **MUST** be Unix time in milliseconds when the node creates the
-message. This field **SHOULD** not be relied upon for message ordering.
-- `clock` **SHOULD** be calculated using Lamport timestamps, based on the last
-received message's clock value: `max(timeNowInMs, last-message-clock-value + 1)`.
-
-Messages with a clock greater than 120 seconds over the Whisper/Waku timestamp
-**SHOULD** be discarded to prevent malicious clock increases. Messages with a
-clock less than 120 seconds under the Whisper/Waku timestamp may indicate
-attempted insertion into chat history.
-
-The node uses the clock value for message ordering. The distributed nature of
-the system produces casual ordering, which may lead to counter-intuitive results
-in edge cases. For example, when a user joins a public chat and sends a message
-before receiving previous messages, their message clock might be lower, causing
-the message to appear in the past once historical messages are fetched.
-
-## Chats
-
-A chat is a structure used to organize messages, helping to display messages
-from a single recipient or group of recipients.
-
-All incoming messages are matched against a chat. The table below shows how to
-calculate a chat ID for each message type:
-
-| Message Type   | Chat ID Calculation                         | Direction      | Comment   |
-| -------------- | ------------------------------------------- | -------------- | --------- |
-| PUBLIC_GROUP   | Chat ID equals public channel name           | Incoming/Outgoing |           |
-| ONE_TO_ONE     | Hex-encode the recipient's public key as chat ID | Outgoing       |           |
-| user-message   | Hex-encode the message sender’s public key as chat ID | Incoming | If no match, node may discard or create a new chat |
-| PRIVATE_GROUP  | Use chat ID from the message                 | Incoming/Outgoing | If no match, discard message |
-
-## Contact Update
-
-`ContactUpdate` notifies peers that the user has been added as a contact or
-that user information has changed.
-
-```protobuf
-message ContactUpdate {
-  uint64 clock = 1;
-  string ens_name = 2;
-  string profile_image = 3;
-}
-```
-
- Payload Fields
-
-| Field       | Name          | Type    | Description                                      |
-| ----------- | ------------- | ------- | ------------------------------------------------ |
-| 1           | clock         | uint64  | Clock value of the chat with the user             |
-| 2           | ens_name      | string  | ENS name if set                                  |
-| 3           | profile_image | string  | Base64-encoded profile picture of the user        |
-
-A client **SHOULD** send a `ContactUpdate` when:
-
-- The `ens_name` has changed.
-- The profile image is edited.
-
-Clients **SHOULD** also periodically send `ContactUpdate` messages to contacts.
-The Status official client sends these updates every 48 hours.
-
-## SyncInstallationContact
-
-The node uses `SyncInstallationContact` messages to synchronize contacts across
-devices in a best-effort manner.
-
-```protobuf
-message SyncInstallationContact {
-  uint64 clock = 1;
-  string id = 2;
-  string profile_image = 3;
-  string ens_name = 4;
-  uint64 last_updated = 5;
-  repeated string system_tags = 6;
-}
-```
-
-Payload Fields
-
-| Field          | Name          | Type          | Description                               |
-| -------------- | ------------- | ------------- | ----------------------------------------- |
-| 1              | clock         | uint64        | Clock value of the chat                   |
-| 2              | id            | string        | ID of the contact synced                  |
-| 3              | profile_image | string        | Base64-encoded profile picture of the user |
-| 4              | ens_name      | string        | ENS name of the contact                   |
-| 5              | system_tags   | array[string] | System tags like ":contact/added"         |
-
-## SyncInstallationPublicChat
-
-The node uses `SyncInstallationPublicChat` to synchronize public chats across
-devices.
-
-```protobuf
-message SyncInstallationPublicChat {
-  uint64 clock = 1;
-  string id = 2;
-}
-```
-
-Payload Fields
-
-| Field       | Name   | Type   | Description           |
-| ----------- | ------ | ------ | --------------------- |
-| 1           | clock  | uint64 | Clock value of the chat |
-| 2           | id     | string | ID of the chat synced  |
-
-## PairInstallation
-
-The node uses `PairInstallation` messages to propagate information about a
-device to its paired devices.
-
-```protobuf
-message PairInstallation {
-  uint64 clock = 1;
-  string installation_id = 2;
-  string device_type = 3;
-  string name = 4;
-}
-```
-
-Payload Fields
-
-| Field             | Name           | Type   | Description                                    |
-| ----------------- | -------------- | ------ | ---------------------------------------------- |
-| 1                 | clock          | uint64 | Clock value of the chat                        |
-| 2                 | installation_id | string | Randomly generated ID that identifies this device |
-| 3                 | device_type    | string | OS of the device (iOS, Android, or desktop)    |
-| 4                 | name           | string | Self-assigned name of the device               |
-
-## MembershipUpdateMessage and MembershipUpdateEvent
-
-`MembershipUpdateEvent` propagates information about group membership changes
-in a group chat. The details are covered in the [Group Chats specs](https://specs.status.im/draft/7-group-chat.md).
-
-## Upgradability
-
-There are two ways to upgrade the protocol without breaking compatibility:
-
-- A node always supports accretion.
-- A node does not support deletion of existing fields or messages,
-which might break compatibility.
-
-## Security Considerations
-
--
-
-## Changelog
-
-### Version 0.3
-
-- **Released**: May 22, 2020
-- **Changes**: Added language to include Waku in all relevant places.
+All asset fields are contenthash fields as per EIP 1577.  
+The node also uploads this payload to IPFS  
+and uses the IPFS address in the content field of the Sticker Market contract.  
+See Sticker Market spec for a detailed contract description.
+
+### Install a Sticker Pack
+
+To install a sticker pack,  
+the node fetches all sticker packs available in Sticker Market  
+by following these steps:
+
+1. **Get Total Number of Sticker Packs**  
+   Call `packCount()` on the sticker market contract,  
+   which returns the number of registered sticker packs as `uint256`.
+
+2. **Get Sticker Pack by ID**  
+   IDs are represented as `uint256` and are incremental  
+   from 0 to the total number of sticker packs.  
+   Call `getPackData(sticker-pack-id)`,  
+   which returns fields: `[category, owner, mintable, timestamp, price, contenthash]`.
+
+3. **Get Owned Sticker Packs**  
+   When opening any sticker view,  
+   the Status app fetches owned sticker packs.  
+   Call `balanceOf(address)` with the current account address,  
+   returning the count of available tokens.  
+   Use `tokenOfOwnerByIndex(address, uint256)`  
+   to get the token id, and call `tokenPackId(uint256)`  
+   to get the owned sticker pack id.
+
+4. **Buy a Sticker Pack**  
+   To buy a sticker pack,  
+   call `approveAndCall(address, uint256, bytes)`  
+   with the address of the buyer, price,  
+   and callback parameters. In the callback,  
+   call `buyToken(uint256, address, uint256)`  
+   with sticker pack id, buyer's address, and price.
 
 ## Copyright
 

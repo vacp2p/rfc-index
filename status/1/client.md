@@ -1,386 +1,269 @@
 ---
-slug: 3
-title: 3/WHISPER-USAGE
-name: Whisper Usage
+slug: 1
+title: 1/CLIENT
+name: Client
 status: draft
-description: Status uses Whisper to provide privacy-preserving routing and messaging on top of devP2P.
+description: This specification describes how to write a Status client for communicating with other Status clients.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:
   - Adam Babik <adam@status.im>
-  - Andrea Piana <andreap@status.im>
+  - Andrea Maria Piana <andreap@status.im>
+  - Dean Eigenmann <dean@status.im>
   - Corey Petty <corey@status.im>
   - Oskar Thorén <oskar@status.im>
+  - Samuel Hawksby-Robinson <samuel@status.im>
 ---
 
 ## Abstract
 
-This specification describes how the payload of each message in Status looks
-like. It is primarily centered around chat and chat-related use cases.
+This specification describes how to write a Status client for communicating  
+with other Status clients.  
+This specification presents a reference implementation of the protocol
+used in a command-line client and a mobile app.
 
-The payloads aim to be flexible enough to support messaging but also cases
-described in the Status Whitepaper as well as various clients created using
-different technologies.
+This document consists of two parts.  
+The first outlines the specifications required to be a full Status client.  
+The second provides a design rationale and answers some common questions.
 
 ## Table of Contents
 
-- [Abstract]
-- [Table of Contents]
-- [Introduction]
-- [Payload wrapper]
-- [Encoding]
-- [Types of messages]
-  - [Message]
-    - [Payload]
-    - [Payload]
-    - [Content types]
-      - [Sticker content type]
-    - [Message types]
-    - [Clock vs Timestamp and message ordering]
-    - [Chats]
-  - [Contact Update]
-    - [Payload]
-    - [Contact update]
-  - [SyncInstallationContact]
-    - [Payload]
-  - [SyncInstallationPublicChat]
-    - [Payload]
-  - [PairInstallation]
-    - [Payload]
-  - [MembershipUpdateMessage and MembershipUpdateEvent]
-- [Upgradability]
-- [Security Considerations]
-- [Changelog]
-  - [Version 0.3]
+- Abstract
+- Table of Contents
+- Introduction
+- Protocol layers
+- Protobuf
+- Components
+- P2P Overlay
+- Node discovery and roles
+- Bootstrapping
+- Discovery
+- Mobile nodes
+- Transport privacy and Whisper/Waku usage
+- Secure Transport
+- Data Sync
+- Payloads and clients
+- BIPs and EIPs Standards support
+- Security Considerations
+- Design Rationale
+- P2P Overlay
+- Why devp2p? Why not use libp2p?
+- What about other RLPx subprotocols like LES and Swarm?
+- Why do you use Whisper?
+- Why do you use Waku?
+- Why is PoW for Waku set so low?
+- Why do you not use Discovery v5 for node discovery?
+- I heard something about Mailservers being trusted somehow?
+- Data sync
+- Why is MVDS not used for public chats?
+- Footnotes
+- Appendix A: Security considerations
+- Scalability and UX
+- Privacy
+- Spam resistance
+- Censorship resistance
+- Acknowledgments
+- Changelog
+- Version 0.3
 
 ## Introduction
 
-This document describes the payload format and some special considerations.
-
-## Payload Wrapper
-
-The node wraps all payloads in a protobuf record:
-
-```protobuf
-message ApplicationMetadataMessage {
-  bytes signature = 1;
-  bytes payload = 2;
-  
-  Type type = 3;
-
-  enum Type {
-    UNKNOWN = 0;
-    CHAT_MESSAGE = 1;
-    CONTACT_UPDATE = 2;
-    MEMBERSHIP_UPDATE_MESSAGE = 3;
-    PAIR_INSTALLATION = 4;
-    SYNC_INSTALLATION = 5;
-    REQUEST_ADDRESS_FOR_TRANSACTION = 6;
-    ACCEPT_REQUEST_ADDRESS_FOR_TRANSACTION = 7;
-    DECLINE_REQUEST_ADDRESS_FOR_TRANSACTION = 8;
-    REQUEST_TRANSACTION = 9;
-    SEND_TRANSACTION = 10;
-    DECLINE_REQUEST_TRANSACTION = 11;
-    SYNC_INSTALLATION_CONTACT = 12;
-    SYNC_INSTALLATION_PUBLIC_CHAT = 14;
-    CONTACT_CODE_ADVERTISEMENT = 15;
-    PUSH_NOTIFICATION_REGISTRATION = 16;
-    PUSH_NOTIFICATION_REGISTRATION_RESPONSE = 17;
-    PUSH_NOTIFICATION_QUERY = 18;
-    PUSH_NOTIFICATION_QUERY_RESPONSE = 19;
-    PUSH_NOTIFICATION_REQUEST = 20;
-    PUSH_NOTIFICATION_RESPONSE = 21;
-  }
-}
-```
-
-`signature` is the bytes of the signed SHA3-256 of the payload,
-signed with the key of the author.
-The node uses the signature to validate authorship of the message
-so it can be relayed to third parties.
-Messages without signatures will not be relayed
-and are considered plausibly deniable.
-
-`payload` is the protobuf-encoded content of the message,
-with the corresponding type set.
-
-## Encoding
-
-The node encodes the payload using Protobuf.
-
-## Types of Messages
-
-### Message
-
-The type `ChatMessage` represents a chat message exchanged between clients.
-
-### Payload
-
-The protobuf description is:
-
-```protobuf
-message ChatMessage {
-  uint64 clock = 1;            // Lamport timestamp of the chat message
-  uint64 timestamp = 2;        // Unix timestamps in milliseconds
-  string text = 3;             // Text of the message
-  string response_to = 4;      // Id of the message being replied to
-  string ens_name = 5;         // Ens name of the sender
-  string chat_id = 6;          // Chat id
-  MessageType message_type = 7;
-  ContentType content_type = 8;
-
-  oneof payload {
-    StickerMessage sticker = 9;
-  }
-
-  enum MessageType {
-    UNKNOWN_MESSAGE_TYPE = 0;
-    ONE_TO_ONE = 1;
-    PUBLIC_GROUP = 2;
-    PRIVATE_GROUP = 3;
-    SYSTEM_MESSAGE_PRIVATE_GROUP = 4;
-  }
-
-  enum ContentType {
-    UNKNOWN_CONTENT_TYPE = 0;
-    TEXT_PLAIN = 1;
-    STICKER = 2;
-    STATUS = 3;
-    EMOJI = 4;
-    TRANSACTION_COMMAND = 5;
-    SYSTEM_MESSAGE_CONTENT_PRIVATE_GROUP = 6;
-  }
-}
-```
-
-### Payload Fields
-
-| Field       | Name        | Type        | Description                                 |
-| ----------- | ----------- | ----------- | ------------------------------------------- |
-| 1           | clock       | `uint64`      | The clock of the chat                       |
-| 2           | timestamp   | `uint64`      | Sender timestamp at message creation        |
-| 3           | text        | `string`      | The content of the message                  |
-| 4           | response_to | `string`      | ID of the message replied to                |
-| 5           | ens_name    | `string`      | ENS name of the user sending the message    |
-| 6           | chat_id     | `string`      | Local ID of the chat                        |
-| 7           | message_type | `MessageType` | Type of message (one-to-one, public, group) |
-| 8           | content_type | `ContentType` | Type of message content                     |
-| 9           | payload     | `Sticker\|nil` | Payload of the message                      |
+Implementing a Status client means implementing multiple layers.  
+This includes specifications for key management and account lifecycle.
 
-## Content Types
+Other aspects, such as how a node uses IPFS for stickers or how the browser  
+works, are currently underspecified.  
+These specifications support implementing a Status client for basic private  
+communication.
 
-Nodes require content types to interpret incoming messages. Not all messages
-are plain text; some carry additional information.
+| Layer           | Purpose                | Technology             |
+|-----------------|------------------------|------------------------|
+| Data and payloads | End user functionality | 1:1, group chat, public chat |
+| Data sync       | Data consistency       | MVDS                   |
+| Secure transport | Confidentiality, PFS   | Double Ratchet         |
+| Transport privacy | Routing, Metadata protection | Waku / Whisper       |
+| P2P Overlay     | Overlay routing, NAT traversal | devp2p             |
 
-The following content types **MUST** be supported:
+## Protobuf
 
-- `TEXT_PLAIN`: Identifies a message with plaintext content.
+`protobuf` is used in different layers, with `proto3` as the default version  
+unless otherwise specified.
 
-Other content types that **MAY** be implemented by clients include:
+## Components
 
-- `STICKER`
-- `STATUS`
-- `EMOJI`
-- `TRANSACTION_COMMAND`
+### P2P Overlay
 
-## Mentions
+Status clients run on a public, permissionless peer-to-peer network,  
+as specified by the devP2P network protocols.  
+devP2P provides a protocol for node discovery,  
+and the RLPx Transport Protocol v5 is used for TCP-based communication.
 
-A mention **MUST** be represented as a string in the `@0xpk` format,
-where `pk` is the public key of the user to be mentioned,
-within the text field of a message with `content_type: TEXT_PLAIN`.
-A message **MAY** contain more than one mention.
+The client **SHOULD NOT** use Whisper V6.  
+Instead, the client **SHOULD** use Waku V1 for privacy-preserving messaging  
+and efficient bandwidth usage.
 
-This specification **RECOMMENDS** that the application does not require the user
-to enter the entire public key. Instead, it should allow the user
-to create a mention by typing `@` followed by the ENS or 3-word pseudonym,
-with auto-completion functionality.
+### Node Discovery and Roles
 
-For better user experience, the client **SHOULD** display the ENS name
-or 3-word pseudonym corresponding to the key instead of the public key.
+There are four types of node roles:
 
-## Sticker Content Type
+- Bootstrap node
+- Whisper/Waku relayer
+- Mailserver (servers and clients)
+- Mobile node (Status Clients)
 
-A `ChatMessage` with `STICKER` content type **MUST** specify the ID of the pack
-and the hash of the pack in the `Sticker` field:
+A standard Status client **MUST** implement both Whisper/Waku relayer  
+and Mobile node node types.  
+Implementing a Mailserver client mode is **RECOMMENDED** for user experience.
 
-```protobuf
-message StickerMessage {
-  string hash = 1;
-  int32 pack = 2;
-}
-```
+### Bootstrapping
 
-## Message Types
+Bootstrap nodes allow Status nodes to discover and connect to other nodes.  
+Status GmbH provides the main bootstrap nodes,  
+but anyone connected to the Whisper/Waku network can run one.
 
-A node requires message types to decide how to encrypt a message and what
-metadata to attach when passing it to the transport layer.
+The current list of production bootstrap nodes is available
+at locations in Hong Kong, Amsterdam, and Central US.  
+These nodes **MAY** change as needed.
 
-The following message types **MUST** be supported:
+### Discovery
 
-- `ONE_TO_ONE`: A one-to-one message.
-- `PUBLIC_GROUP`: A message to the public group.
-- `PRIVATE_GROUP`: A message to the private group.
+A Status client **MUST** discover or have a list of peers to connect to.  
+Status uses a light discovery mechanism
+based on Discovery v5 and Rendezvous Protocol.  
+Static nodes **MAY** also be used.
 
-## Clock vs Timestamp and Message Ordering
+Discovery V5 is kademlia-based and may consume significant network traffic.  
+The Rendezvous protocol is request-response and uses ENR to report peers.
 
-If a user sends a new message before receiving messages that were sent while
-they were offline, the new message should be displayed last in the chat.
+Both discovery mechanisms use topics
+to provide peers with specific capabilities.  
+Status nodes wanting discovery **MUST** register with the `whisper` topic,  
+and Mailservers **MUST** additionally register with `whispermail`.
 
-The Status client speculates that its Lamport timestamp will beat the current
-chat timestamp, using the format: `clock = max({timestamp}, chat_clock + 1)`.
+Using both mechanisms is **RECOMMENDED**, alongside a `PeerPool` structure
+for optimal peer count management.
 
-This satisfies the Lamport requirement: if `a -> b`, then `T(a) < T(b)`.
+### Mobile Nodes
 
-- `timestamp` **MUST** be Unix time in milliseconds when the node creates the
-message. This field **SHOULD** not be relied upon for message ordering.
-- `clock` **SHOULD** be calculated using Lamport timestamps, based on the last
-received message's clock value: `max(timeNowInMs, last-message-clock-value + 1)`.
+A Mobile node is a Whisper and/or Waku node connecting to the network.  
+Mobile nodes **MAY** relay messages.  
+See 3/WHISPER-USAGE and 10/WAKU-USAGE for more details.
 
-Messages with a clock greater than 120 seconds over the Whisper/Waku timestamp
-**SHOULD** be discarded to prevent malicious clock increases. Messages with a
-clock less than 120 seconds under the Whisper/Waku timestamp may indicate
-attempted insertion into chat history.
+For an offline inbox, see 4/WHISPER-MAILSERVER and 11/WAKU-MAILSERVER.
 
-The node uses the clock value for message ordering. The distributed nature of
-the system produces casual ordering, which may lead to counter-intuitive results
-in edge cases. For example, when a user joins a public chat and sends a message
-before receiving previous messages, their message clock might be lower, causing
-the message to appear in the past once historical messages are fetched.
+## Transport Privacy and Whisper/Waku Usage
 
-## Chats
+After a Whisper/Waku node is active,  
+specific settings are required for communication with other Status nodes.
 
-A chat is a structure used to organize messages, helping to display messages
-from a single recipient or group of recipients.
+## Secure Transport
 
-All incoming messages are matched against a chat. The table below shows how to
-calculate a chat ID for each message type:
+To provide confidentiality, integrity, authentication,  
+and forward secrecy, secure transport is implemented on top of Whisper/Waku.  
+This applies to 1:1 and group chats, but not public chats.  
+See 5/SECURE-TRANSPORT for more.
 
-| Message Type   | Chat ID Calculation                         | Direction      | Comment   |
-| -------------- | ------------------------------------------- | -------------- | --------- |
-| PUBLIC_GROUP   | Chat ID equals public channel name           | Incoming/Outgoing |           |
-| ONE_TO_ONE     | Hex-encode the recipient's public key as chat ID | Outgoing       |           |
-| user-message   | Hex-encode the message sender’s public key as chat ID | Incoming | If no match, node may discard or create a new chat |
-| PRIVATE_GROUP  | Use chat ID from the message                 | Incoming/Outgoing | If no match, discard message |
+## Data Sync
 
-## Contact Update
+MVDS is used for 1:1 and group chats but is currently unused for public chats.  
+Status payloads are serialized, wrapped in an MVDS message,  
+and encrypted if needed for secure chats before sending.
 
-`ContactUpdate` notifies peers that the user has been added as a contact or
-that user information has changed.
+## Payloads and Clients
 
-```protobuf
-message ContactUpdate {
-  uint64 clock = 1;
-  string ens_name = 2;
-  string profile_image = 3;
-}
-```
+On top of secure transport, Status uses various data sync clients  
+and payload formats for chat types.  
+Refer to 6/PAYLOADS for details.
 
- Payload Fields
+## BIPs and EIPs Standards Support
 
-| Field       | Name          | Type    | Description                                      |
-| ----------- | ------------- | ------- | ------------------------------------------------ |
-| 1           | clock         | uint64  | Clock value of the chat with the user             |
-| 2           | ens_name      | string  | ENS name if set                                  |
-| 3           | profile_image | string  | Base64-encoded profile picture of the user        |
-
-A client **SHOULD** send a `ContactUpdate` when:
-
-- The `ens_name` has changed.
-- The profile image is edited.
-
-Clients **SHOULD** also periodically send `ContactUpdate` messages to contacts.
-The Status official client sends these updates every 48 hours.
-
-## SyncInstallationContact
-
-The node uses `SyncInstallationContact` messages to synchronize contacts across
-devices in a best-effort manner.
-
-```protobuf
-message SyncInstallationContact {
-  uint64 clock = 1;
-  string id = 2;
-  string profile_image = 3;
-  string ens_name = 4;
-  uint64 last_updated = 5;
-  repeated string system_tags = 6;
-}
-```
-
-Payload Fields
-
-| Field          | Name          | Type          | Description                               |
-| -------------- | ------------- | ------------- | ----------------------------------------- |
-| 1              | clock         | uint64        | Clock value of the chat                   |
-| 2              | id            | string        | ID of the contact synced                  |
-| 3              | profile_image | string        | Base64-encoded profile picture of the user |
-| 4              | ens_name      | string        | ENS name of the contact                   |
-| 5              | system_tags   | array[string] | System tags like ":contact/added"         |
-
-## SyncInstallationPublicChat
-
-The node uses `SyncInstallationPublicChat` to synchronize public chats across
-devices.
-
-```protobuf
-message SyncInstallationPublicChat {
-  uint64 clock = 1;
-  string id = 2;
-}
-```
-
-Payload Fields
-
-| Field       | Name   | Type   | Description           |
-| ----------- | ------ | ------ | --------------------- |
-| 1           | clock  | uint64 | Clock value of the chat |
-| 2           | id     | string | ID of the chat synced  |
-
-## PairInstallation
-
-The node uses `PairInstallation` messages to propagate information about a
-device to its paired devices.
-
-```protobuf
-message PairInstallation {
-  uint64 clock = 1;
-  string installation_id = 2;
-  string device_type = 3;
-  string name = 4;
-}
-```
-
-Payload Fields
-
-| Field             | Name           | Type   | Description                                    |
-| ----------------- | -------------- | ------ | ---------------------------------------------- |
-| 1                 | clock          | uint64 | Clock value of the chat                        |
-| 2                 | installation_id | string | Randomly generated ID that identifies this device |
-| 3                 | device_type    | string | OS of the device (iOS, Android, or desktop)    |
-| 4                 | name           | string | Self-assigned name of the device               |
-
-## MembershipUpdateMessage and MembershipUpdateEvent
-
-`MembershipUpdateEvent` propagates information about group membership changes
-in a group chat. The details are covered in the [Group Chats specs](https://specs.status.im/draft/7-group-chat.md).
-
-## Upgradability
-
-There are two ways to upgrade the protocol without breaking compatibility:
-
-- A node always supports accretion.
-- A node does not support deletion of existing fields or messages,
-which might break compatibility.
+For EIPs and BIPs **SHOULD** supported by Status clients, see 8/EIPS.
 
 ## Security Considerations
 
--
+See Appendix A for detailed security considerations.
+
+## Design Rationale
+
+P2P Overlay
+
+### Why devp2p? Why not use libp2p?
+
+At Status's start, devp2p was the most mature option.  
+In the future, libp2p may be used for multiple transports,  
+NAT traversal, and better protocol negotiation.
+
+#### Why do you use Whisper?
+
+Whisper was part of Ethereum's vision for a "world computer" alongside Swarm.
+
+#### Why do you use Waku?
+
+Waku is an upgraded, optimized version of Whisper,  
+addressing resource-restricted device limitations.  
+Waku standardizes messages for compatibility and scalability.
+
+Data Sync
+
+### Why is MVDS not used for public chats?
+
+Public chats are broadcast-based,  
+and MVDS is not optimized for large group contexts.  
+This is an active research area.
+
+## Footnotes
+
+1. [Footnote 1](https://github.com/status-im/status-protocol-go/)
+2. [Footnote 2](https://github.com/status-im/status-console-client/)
+3. [Footnote 3](https://github.com/status-im/status-mobile/)
+
+## Appendix A: Security Considerations
+
+Chief considerations include scalability, DDoS resistance,  
+and privacy depending on the capabilities used.
+
+### Scalability and UX
+
+- **Bandwidth usage**: High in version 1.
+- **Mailserver High Availability**:  
+  Mailserver needs to be online for receiving messages.
+- **Gossip-based routing**:  
+  Propagation probability may be low with too many light nodes.
+- **Lack of incentives**:  
+  Centralized choke points can form without node-running incentives.
+
+### Privacy
+
+- **Light node privacy**:  
+  Connected peers know message origin.
+- **Bloom filter privacy**:  
+  Interests reveal topics in bloom filters.
+- **Mailserver client privacy**:  
+  Trusted Mailservers reveal topic, IP, and peerID.
+- **Privacy guarantees not rigorous**:  
+  Privacy not rigorously studied like Tor or mixnets.
+
+### Spam Resistance
+
+Proof of work is ineffective for heterogeneous devices,  
+and a Mailserver can overwhelm a node with traffic.
+
+### Censorship Resistance
+
+Devp2p runs on port 30303, making it susceptible to censorship.
+
+## Acknowledgments
+
+- Jacek Sieka
 
 ## Changelog
 
 ### Version 0.3
 
-- **Released**: May 22, 2020
-- **Changes**: Added language to include Waku in all relevant places.
+- Released May 22, 2020
+- Added that Waku **SHOULD** be used
+- Added that Whisper **SHOULD NOT** be used
+- Updated Mailserver term consistency
+- Added language for Waku in all relevant places
 
 ## Copyright
 

@@ -1,386 +1,273 @@
 ---
-slug: 3
-title: 3/WHISPER-USAGE
-name: Whisper Usage
+slug: 5
+title: 5/SECURE-TRANSPORT
+name: Secure Transport
 status: draft
-description: Status uses Whisper to provide privacy-preserving routing and messaging on top of devP2P.
+description: This document describes how Status provides a secure channel between two peers, providing confidentiality, integrity, authenticity, and forward secrecy.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:
-  - Adam Babik <adam@status.im>
-  - Andrea Piana <andreap@status.im>
+  - Andrea Maria Piana <andreap@status.im>
   - Corey Petty <corey@status.im>
+  - Dean Eigenmann <dean@status.im>
   - Oskar Thorén <oskar@status.im>
+  - Pedro Pombeiro <pedro@status.im>
 ---
 
 ## Abstract
 
-This specification describes how the payload of each message in Status looks
-like. It is primarily centered around chat and chat-related use cases.
+This document describes how Status provides a secure channel between two peers,
+providing confidentiality, integrity, authenticity, and forward secrecy.  
+It is transport-agnostic and works over asynchronous networks.
 
-The payloads aim to be flexible enough to support messaging but also cases
-described in the Status Whitepaper as well as various clients created using
-different technologies.
+It builds on the X3DH and Double Ratchet specifications,  
+with adaptations to operate in a decentralized environment.
 
 ## Table of Contents
 
-- [Abstract]
-- [Table of Contents]
-- [Introduction]
-- [Payload wrapper]
-- [Encoding]
-- [Types of messages]
-  - [Message]
-    - [Payload]
-    - [Payload]
-    - [Content types]
-      - [Sticker content type]
-    - [Message types]
-    - [Clock vs Timestamp and message ordering]
-    - [Chats]
-  - [Contact Update]
-    - [Payload]
-    - [Contact update]
-  - [SyncInstallationContact]
-    - [Payload]
-  - [SyncInstallationPublicChat]
-    - [Payload]
-  - [PairInstallation]
-    - [Payload]
-  - [MembershipUpdateMessage and MembershipUpdateEvent]
-- [Upgradability]
-- [Security Considerations]
-- [Changelog]
-  - [Version 0.3]
+- Abstract
+- Table of Contents
+- Introduction
+- Definitions
+- Design Requirements
+- Conventions
+- Transport Layer
+- User flow for 1-to-1 communications
+- Account generation
+- Account recovery
+- Messaging
+- End-to-end encryption
+- Prekeys
+- Bundle retrieval
+- 1:1 chat contact request
+- Initial key exchange flow (X3DH)
+- Double Ratchet
+- Security Considerations
+- Session management
+- Abstract
+- Introduction
+- Initialization
+- Concurrent sessions
+- Re-keying
+- Multi-device support
+- Pairing
+- Sending messages to a paired group
+- Account recovery
+- Partitioned devices
+- Changelog
+- Version 0.3
 
 ## Introduction
 
-This document describes the payload format and some special considerations.
+This document describes how nodes establish a secure channel  
+and how various conversational security properties are achieved.
 
-## Payload Wrapper
+## Definitions
 
-The node wraps all payloads in a protobuf record:
+Perfect Forward Secrecy provides assurances that session keys remain secure  
+even if private keys are later compromised.  
+Secret channel describes a communication channel  
+where the Double Ratchet algorithm is in use.
+
+## Design Requirements
+
+- **Confidentiality**: The adversary should not be able to learn what data  
+  is being exchanged between two Status clients.
+- **Authenticity**: The adversary should not cause either endpoint  
+  of a Status 1:1 chat to accept data from any third party  
+  as though it came from the other endpoint.
+- **Forward Secrecy**: The adversary should not learn what data was exchanged  
+  between two Status clients, even if later the adversary compromises  
+  one or both of the endpoint devices.
+- **Integrity**: The adversary should not cause either endpoint  
+  of a Status 1:1 chat to accept tampered data.
+
+These properties are ensured by Signal’s Double Ratchet.
+
+## Conventions
+
+Types used in this specification are defined using Protobuf.
+
+## Transport Layer
+
+Whisper and Waku serve as the transport layers for the Status chat protocol.
+
+## User Flow for 1-to-1 Communications
+
+### Account Generation
+
+See Account specification.
+
+### Account Recovery
+
+If Alice recovers her account, Double Ratchet state information  
+is unavailable, so she can no longer decrypt messages  
+received from existing contacts.
+
+If a Whisper/Waku topic message fails to decrypt,  
+the node replies with the current bundle, notifying the other end of the device.
+Subsequent communications will use this new bundle.
+
+### Messaging
+
+All 1:1 and group chat messaging in Status uses end-to-end encryption  
+for privacy and security. Public chat messages are publicly readable,  
+as there’s no permission model for public chat participants.
+
+This document covers only 1:1 and private group chat.  
+Private group chat reduces to 1:1 chat,  
+since each pair-wise participant has a secure channel.
+
+### End-to-End Encryption
+
+End-to-end encryption (E2EE) occurs between two clients.  
+The main cryptographic protocol is a Status implementation  
+of the Double Ratchet protocol, derived from Off-the-Record protocol.  
+The transport protocol encrypts the message payload  
+using Whisper/Waku (see Transport Layer),  
+and symmetric key encryption.
+
+Status uses prekeys (via X3DH) to operate in an asynchronous environment,  
+so two parties need not be online simultaneously  
+to initiate an encrypted conversation.
+
+### Prekeys
+
+Each client generates key material stored locally:
+
+- **Identity keypair** based on secp256k1 - IK
+- **Signed prekey** based on secp256k1 - SPK
+- **Prekey signature** - Sig(IK, Encode(SPK))
+
+More details are in the X3DH Prekey bundle creation section of 2/ACCOUNT.
+
+Prekey bundles can be extracted from any user’s messages  
+or found by searching their topic, `{IK}-contact-code`.
+
+### Bundle Retrieval
+
+X3DH enables client apps to create and share a bundle of prekeys  
+(X3DH bundle) requested by other interlocutors to start a conversation.  
+Status chat clients must achieve this without a centralized server.
+
+Considered approaches, from most to least convenient:
+
+- **Contact codes**
+- **Public and one-to-one chats**
+- **QR codes**
+- **ENS record**
+- **Decentralized storage** (e.g., Swarm, IPFS)
+
+Currently, only public and one-to-one messages and Whisper/Waku  
+are used to exchange bundles.  
+QR codes or ENS records do not update to delete used keys,  
+so the bundle rotates every 24 hours, propagated by the app.
+
+### 1:1 Chat Contact Request
+
+The initial negotiation for a 1:1 chat involves two phases:
+
+1. **Identity verification** (e.g., QR code, Identicon matching).  
+   A QR code serves both identity verification and bundle retrieval.
+2. **Asynchronous initial key exchange**, using X3DH.
+
+See 2/ACCOUNT for account generation and trust establishment.
+
+### Initial Key Exchange Flow (X3DH)
+
+Section 3 of X3DH protocol covers initial key exchange flow,  
+with some additional context:
+
+- Users’ identity keys IK_A and IK_B are their respective Status chat keys.
+- One-time prekey OPK_B is not used in a decentralized environment.
+- Nodes serve Bundles in a decentralized way, as described in bundle retrieval.
+
+Alice retrieves Bob’s prekey bundle, which contains:
+
+protobuf
 
 ```protobuf
-message ApplicationMetadataMessage {
-  bytes signature = 1;
-  bytes payload = 2;
-  
-  Type type = 3;
-
-  enum Type {
-    UNKNOWN = 0;
-    CHAT_MESSAGE = 1;
-    CONTACT_UPDATE = 2;
-    MEMBERSHIP_UPDATE_MESSAGE = 3;
-    PAIR_INSTALLATION = 4;
-    SYNC_INSTALLATION = 5;
-    REQUEST_ADDRESS_FOR_TRANSACTION = 6;
-    ACCEPT_REQUEST_ADDRESS_FOR_TRANSACTION = 7;
-    DECLINE_REQUEST_ADDRESS_FOR_TRANSACTION = 8;
-    REQUEST_TRANSACTION = 9;
-    SEND_TRANSACTION = 10;
-    DECLINE_REQUEST_TRANSACTION = 11;
-    SYNC_INSTALLATION_CONTACT = 12;
-    SYNC_INSTALLATION_PUBLIC_CHAT = 14;
-    CONTACT_CODE_ADVERTISEMENT = 15;
-    PUSH_NOTIFICATION_REGISTRATION = 16;
-    PUSH_NOTIFICATION_REGISTRATION_RESPONSE = 17;
-    PUSH_NOTIFICATION_QUERY = 18;
-    PUSH_NOTIFICATION_QUERY_RESPONSE = 19;
-    PUSH_NOTIFICATION_REQUEST = 20;
-    PUSH_NOTIFICATION_RESPONSE = 21;
-  }
+message Bundle {
+  bytes identity = 1;
+  map<string,SignedPreKey> signed_pre_keys = 2;
+  bytes signature = 4;
+  int64 timestamp = 5;
 }
 ```
 
-`signature` is the bytes of the signed SHA3-256 of the payload,
-signed with the key of the author.
-The node uses the signature to validate authorship of the message
-so it can be relayed to third parties.
-Messages without signatures will not be relayed
-and are considered plausibly deniable.
+Fields:
 
-`payload` is the protobuf-encoded content of the message,
-with the corresponding type set.
+- **identity**: Identity key IK_B
+- **signed_pre_keys**: Signed prekey SPK_B for each device, indexed by `installation-id`
+- **signature**: Prekey signature `Sig(IK_B, Encode(SPK_B))`
+- **timestamp**: When the bundle was created locally
 
-## Encoding
+## Double Ratchet
 
-The node encodes the payload using Protobuf.
-
-## Types of Messages
-
-### Message
-
-The type `ChatMessage` represents a chat message exchanged between clients.
-
-### Payload
-
-The protobuf description is:
-
-```protobuf
-message ChatMessage {
-  uint64 clock = 1;            // Lamport timestamp of the chat message
-  uint64 timestamp = 2;        // Unix timestamps in milliseconds
-  string text = 3;             // Text of the message
-  string response_to = 4;      // Id of the message being replied to
-  string ens_name = 5;         // Ens name of the sender
-  string chat_id = 6;          // Chat id
-  MessageType message_type = 7;
-  ContentType content_type = 8;
-
-  oneof payload {
-    StickerMessage sticker = 9;
-  }
-
-  enum MessageType {
-    UNKNOWN_MESSAGE_TYPE = 0;
-    ONE_TO_ONE = 1;
-    PUBLIC_GROUP = 2;
-    PRIVATE_GROUP = 3;
-    SYSTEM_MESSAGE_PRIVATE_GROUP = 4;
-  }
-
-  enum ContentType {
-    UNKNOWN_CONTENT_TYPE = 0;
-    TEXT_PLAIN = 1;
-    STICKER = 2;
-    STATUS = 3;
-    EMOJI = 4;
-    TRANSACTION_COMMAND = 5;
-    SYSTEM_MESSAGE_CONTENT_PRIVATE_GROUP = 6;
-  }
-}
-```
-
-### Payload Fields
-
-| Field       | Name        | Type        | Description                                 |
-| ----------- | ----------- | ----------- | ------------------------------------------- |
-| 1           | clock       | `uint64`      | The clock of the chat                       |
-| 2           | timestamp   | `uint64`      | Sender timestamp at message creation        |
-| 3           | text        | `string`      | The content of the message                  |
-| 4           | response_to | `string`      | ID of the message replied to                |
-| 5           | ens_name    | `string`      | ENS name of the user sending the message    |
-| 6           | chat_id     | `string`      | Local ID of the chat                        |
-| 7           | message_type | `MessageType` | Type of message (one-to-one, public, group) |
-| 8           | content_type | `ContentType` | Type of message content                     |
-| 9           | payload     | `Sticker\|nil` | Payload of the message                      |
-
-## Content Types
-
-Nodes require content types to interpret incoming messages. Not all messages
-are plain text; some carry additional information.
-
-The following content types **MUST** be supported:
-
-- `TEXT_PLAIN`: Identifies a message with plaintext content.
-
-Other content types that **MAY** be implemented by clients include:
-
-- `STICKER`
-- `STATUS`
-- `EMOJI`
-- `TRANSACTION_COMMAND`
-
-## Mentions
-
-A mention **MUST** be represented as a string in the `@0xpk` format,
-where `pk` is the public key of the user to be mentioned,
-within the text field of a message with `content_type: TEXT_PLAIN`.
-A message **MAY** contain more than one mention.
-
-This specification **RECOMMENDS** that the application does not require the user
-to enter the entire public key. Instead, it should allow the user
-to create a mention by typing `@` followed by the ENS or 3-word pseudonym,
-with auto-completion functionality.
-
-For better user experience, the client **SHOULD** display the ENS name
-or 3-word pseudonym corresponding to the key instead of the public key.
-
-## Sticker Content Type
-
-A `ChatMessage` with `STICKER` content type **MUST** specify the ID of the pack
-and the hash of the pack in the `Sticker` field:
-
-```protobuf
-message StickerMessage {
-  string hash = 1;
-  int32 pack = 2;
-}
-```
-
-## Message Types
-
-A node requires message types to decide how to encrypt a message and what
-metadata to attach when passing it to the transport layer.
-
-The following message types **MUST** be supported:
-
-- `ONE_TO_ONE`: A one-to-one message.
-- `PUBLIC_GROUP`: A message to the public group.
-- `PRIVATE_GROUP`: A message to the private group.
-
-## Clock vs Timestamp and Message Ordering
-
-If a user sends a new message before receiving messages that were sent while
-they were offline, the new message should be displayed last in the chat.
-
-The Status client speculates that its Lamport timestamp will beat the current
-chat timestamp, using the format: `clock = max({timestamp}, chat_clock + 1)`.
-
-This satisfies the Lamport requirement: if `a -> b`, then `T(a) < T(b)`.
-
-- `timestamp` **MUST** be Unix time in milliseconds when the node creates the
-message. This field **SHOULD** not be relied upon for message ordering.
-- `clock` **SHOULD** be calculated using Lamport timestamps, based on the last
-received message's clock value: `max(timeNowInMs, last-message-clock-value + 1)`.
-
-Messages with a clock greater than 120 seconds over the Whisper/Waku timestamp
-**SHOULD** be discarded to prevent malicious clock increases. Messages with a
-clock less than 120 seconds under the Whisper/Waku timestamp may indicate
-attempted insertion into chat history.
-
-The node uses the clock value for message ordering. The distributed nature of
-the system produces casual ordering, which may lead to counter-intuitive results
-in edge cases. For example, when a user joins a public chat and sends a message
-before receiving previous messages, their message clock might be lower, causing
-the message to appear in the past once historical messages are fetched.
-
-## Chats
-
-A chat is a structure used to organize messages, helping to display messages
-from a single recipient or group of recipients.
-
-All incoming messages are matched against a chat. The table below shows how to
-calculate a chat ID for each message type:
-
-| Message Type   | Chat ID Calculation                         | Direction      | Comment   |
-| -------------- | ------------------------------------------- | -------------- | --------- |
-| PUBLIC_GROUP   | Chat ID equals public channel name           | Incoming/Outgoing |           |
-| ONE_TO_ONE     | Hex-encode the recipient's public key as chat ID | Outgoing       |           |
-| user-message   | Hex-encode the message sender’s public key as chat ID | Incoming | If no match, node may discard or create a new chat |
-| PRIVATE_GROUP  | Use chat ID from the message                 | Incoming/Outgoing | If no match, discard message |
-
-## Contact Update
-
-`ContactUpdate` notifies peers that the user has been added as a contact or
-that user information has changed.
-
-```protobuf
-message ContactUpdate {
-  uint64 clock = 1;
-  string ens_name = 2;
-  string profile_image = 3;
-}
-```
-
- Payload Fields
-
-| Field       | Name          | Type    | Description                                      |
-| ----------- | ------------- | ------- | ------------------------------------------------ |
-| 1           | clock         | uint64  | Clock value of the chat with the user             |
-| 2           | ens_name      | string  | ENS name if set                                  |
-| 3           | profile_image | string  | Base64-encoded profile picture of the user        |
-
-A client **SHOULD** send a `ContactUpdate` when:
-
-- The `ens_name` has changed.
-- The profile image is edited.
-
-Clients **SHOULD** also periodically send `ContactUpdate` messages to contacts.
-The Status official client sends these updates every 48 hours.
-
-## SyncInstallationContact
-
-The node uses `SyncInstallationContact` messages to synchronize contacts across
-devices in a best-effort manner.
-
-```protobuf
-message SyncInstallationContact {
-  uint64 clock = 1;
-  string id = 2;
-  string profile_image = 3;
-  string ens_name = 4;
-  uint64 last_updated = 5;
-  repeated string system_tags = 6;
-}
-```
-
-Payload Fields
-
-| Field          | Name          | Type          | Description                               |
-| -------------- | ------------- | ------------- | ----------------------------------------- |
-| 1              | clock         | uint64        | Clock value of the chat                   |
-| 2              | id            | string        | ID of the contact synced                  |
-| 3              | profile_image | string        | Base64-encoded profile picture of the user |
-| 4              | ens_name      | string        | ENS name of the contact                   |
-| 5              | system_tags   | array[string] | System tags like ":contact/added"         |
-
-## SyncInstallationPublicChat
-
-The node uses `SyncInstallationPublicChat` to synchronize public chats across
-devices.
-
-```protobuf
-message SyncInstallationPublicChat {
-  uint64 clock = 1;
-  string id = 2;
-}
-```
-
-Payload Fields
-
-| Field       | Name   | Type   | Description           |
-| ----------- | ------ | ------ | --------------------- |
-| 1           | clock  | uint64 | Clock value of the chat |
-| 2           | id     | string | ID of the chat synced  |
-
-## PairInstallation
-
-The node uses `PairInstallation` messages to propagate information about a
-device to its paired devices.
-
-```protobuf
-message PairInstallation {
-  uint64 clock = 1;
-  string installation_id = 2;
-  string device_type = 3;
-  string name = 4;
-}
-```
-
-Payload Fields
-
-| Field             | Name           | Type   | Description                                    |
-| ----------------- | -------------- | ------ | ---------------------------------------------- |
-| 1                 | clock          | uint64 | Clock value of the chat                        |
-| 2                 | installation_id | string | Randomly generated ID that identifies this device |
-| 3                 | device_type    | string | OS of the device (iOS, Android, or desktop)    |
-| 4                 | name           | string | Self-assigned name of the device               |
-
-## MembershipUpdateMessage and MembershipUpdateEvent
-
-`MembershipUpdateEvent` propagates information about group membership changes
-in a group chat. The details are covered in the [Group Chats specs](https://specs.status.im/draft/7-group-chat.md).
-
-## Upgradability
-
-There are two ways to upgrade the protocol without breaking compatibility:
-
-- A node always supports accretion.
-- A node does not support deletion of existing fields or messages,
-which might break compatibility.
+After establishing the initial shared secret SK through X3DH,  
+it seeds a Double Ratchet exchange between Alice and Bob.  
+Refer to the Double Ratchet spec for more details.
 
 ## Security Considerations
 
--
+These considerations apply as per section 4 of the X3DH spec  
+and section 6 of the Double Ratchet spec, with some additions.
+
+### Session Management
+
+A node identifies a peer by:
+
+1. An `installation-id` generated upon creating a new account in Status
+2. Their identity Whisper/Waku key
+
+#### Initialization
+
+A node initializes a session after a successful X3DH exchange.  
+Subsequent messages use the established session until re-keying is needed.
+
+#### Concurrent Sessions
+
+If two concurrent sessions are created, the one with the symmetric key  
+first in byte order **SHOULD** be used, marking the other expired.
+
+#### Re-keying
+
+On receiving a higher version bundle from a peer,  
+the old bundle **SHOULD** be marked as expired,  
+and a new session **SHOULD** be established on the next sent message.
+
+### Multi-Device Support
+
+Multi-device support is challenging without a central place for device info.  
+Nodes propagate multi-device info using x3dh bundles,  
+including information about paired devices and the sending device.
+
+### Pairing
+
+When adding a new account in Status, a new `installation-id` is generated.  
+Devices should be paired as soon as possible.  
+Once paired, contacts are notified of the new device,  
+and it is included in further communications.
+
+### Sending Messages to a Paired Group
+
+When sending a message, the peer sends it to other `installation-id`s seen.  
+Messages are sent using pairwise encryption, including the sender’s devices.
+
+Account Recovery
+
+Account recovery is similar to adding a new device and handled in the same way.
+
+### Partitioned Devices
+
+If a device receives a message not targeted to its `installation-id`,  
+it sends an empty message with bundle information to include it in future communication.
 
 ## Changelog
 
 ### Version 0.3
 
-- **Released**: May 22, 2020
-- **Changes**: Added language to include Waku in all relevant places.
+- Released May 22, 2020
+- Added language to include Waku in all relevant places
 
 ## Copyright
 

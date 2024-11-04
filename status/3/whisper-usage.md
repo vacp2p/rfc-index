@@ -12,375 +12,204 @@ contributors:
   - Oskar Thorén <oskar@status.im>
 ---
 
+- Abstract
+- Reason
+- Terminology
+- Whisper packets
+- Whisper node configuration
+- Handshake
+- Rate limiting
+- Keys management
+- Contact code topic
+- Partitioned topic
+- Public chats
+- Group chat topic
+- Message encryption
+- Message confirmations
+- Whisper V6 extensions
+- Request historic messages
+- shhext_requestMessages
+- Changelog
+
 ## Abstract
 
-This specification describes how the payload of each message in Status looks
-like. It is primarily centered around chat and chat-related use cases.
+Status uses Whisper to provide privacy-preserving routing  
+and messaging on top of devP2P.  
+Whisper uses topics to partition its messages,  
+which supports chat capabilities.  
+For public chats, the channel name maps to its Whisper topic,  
+allowing anyone to listen on a single channel.
 
-The payloads aim to be flexible enough to support messaging but also cases
-described in the Status Whitepaper as well as various clients created using
-different technologies.
+Whisper relies on decryption to identify recipients,  
+but Status nodes add another secure transport layer,  
+and Whisper extensions allow for offline messaging.
 
-## Table of Contents
+## Reason
 
-- [Abstract]
-- [Table of Contents]
-- [Introduction]
-- [Payload wrapper]
-- [Encoding]
-- [Types of messages]
-  - [Message]
-    - [Payload]
-    - [Payload]
-    - [Content types]
-      - [Sticker content type]
-    - [Message types]
-    - [Clock vs Timestamp and message ordering]
-    - [Chats]
-  - [Contact Update]
-    - [Payload]
-    - [Contact update]
-  - [SyncInstallationContact]
-    - [Payload]
-  - [SyncInstallationPublicChat]
-    - [Payload]
-  - [PairInstallation]
-    - [Payload]
-  - [MembershipUpdateMessage and MembershipUpdateEvent]
-- [Upgradability]
-- [Security Considerations]
-- [Changelog]
-  - [Version 0.3]
+Provide routing, metadata protection, topic-based multicasting,  
+and basic encryption for asynchronous chat.
 
-## Introduction
+## Terminology
 
-This document describes the payload format and some special considerations.
+- **Whisper node**: An Ethereum node with Whisper V6 enabled.
+- **Whisper network**: A group of Whisper nodes connected through the internet.
+- **Message**: A decrypted Whisper message.
+- **Offline message**: An archived envelope.
+- **Envelope**: An encrypted message with metadata like topic and TTL.
 
-## Payload Wrapper
+## Whisper Packets
 
-The node wraps all payloads in a protobuf record:
+| Packet Name         | Code | EIP-627 | References         |
+|---------------------|------|---------|--------------------|
+| Status              | 0    | ✔       | Handshake         |
+| Messages            | 1    | ✔       | EIP-627           |
+| PoW Requirement     | 2    | ✔       | EIP-627           |
+| Bloom Filter        | 3    | ✔       | EIP-627           |
+| Batch Ack           | 11   | 𝘅       | Undocumented      |
+| Message Response    | 12   | 𝘅       | Undocumented      |
+| P2P Sync Request    | 123  | 𝘅       | Undocumented      |
+| P2P Sync Response   | 124  | 𝘅       | Undocumented      |
+| P2P Request         | 126  | ✔       | 4/WHISPER-MAILSERVER |
+| P2P Messages        | 127  | ✔/𝘅     | 4/WHISPER-MAILSERVER |
 
-```protobuf
-message ApplicationMetadataMessage {
-  bytes signature = 1;
-  bytes payload = 2;
-  
-  Type type = 3;
+## Whisper Node Configuration
 
-  enum Type {
-    UNKNOWN = 0;
-    CHAT_MESSAGE = 1;
-    CONTACT_UPDATE = 2;
-    MEMBERSHIP_UPDATE_MESSAGE = 3;
-    PAIR_INSTALLATION = 4;
-    SYNC_INSTALLATION = 5;
-    REQUEST_ADDRESS_FOR_TRANSACTION = 6;
-    ACCEPT_REQUEST_ADDRESS_FOR_TRANSACTION = 7;
-    DECLINE_REQUEST_ADDRESS_FOR_TRANSACTION = 8;
-    REQUEST_TRANSACTION = 9;
-    SEND_TRANSACTION = 10;
-    DECLINE_REQUEST_TRANSACTION = 11;
-    SYNC_INSTALLATION_CONTACT = 12;
-    SYNC_INSTALLATION_PUBLIC_CHAT = 14;
-    CONTACT_CODE_ADVERTISEMENT = 15;
-    PUSH_NOTIFICATION_REGISTRATION = 16;
-    PUSH_NOTIFICATION_REGISTRATION_RESPONSE = 17;
-    PUSH_NOTIFICATION_QUERY = 18;
-    PUSH_NOTIFICATION_QUERY_RESPONSE = 19;
-    PUSH_NOTIFICATION_REQUEST = 20;
-    PUSH_NOTIFICATION_RESPONSE = 21;
-  }
-}
+A Whisper node must be configured to receive messages from Status clients.  
+Whisper’s PoW deters denial-of-service attacks,  
+and all clients **MUST** use:
+
+- PoW requirement ≤ 0.00001
+- TTL ≥ 10 seconds
+- Payloads < 50000 bytes must use PoW target ≥ 0.002 for backward compatibility
+
+## Handshake
+
+Handshake is an RLP-encoded packet sent to a newly connected peer.  
+It **MUST** start with Status Code (0x00)  
+and follow up with:
+
+```plaintext
+[ protocolVersion, PoW, bloom, isLightNode, confirmationsEnabled, rateLimits ]
 ```
 
-`signature` is the bytes of the signed SHA3-256 of the payload,
-signed with the key of the author.
-The node uses the signature to validate authorship of the message
-so it can be relayed to third parties.
-Messages without signatures will not be relayed
-and are considered plausibly deniable.
+Optional fields like `bloom`, `isLightNode`,  
+and other fields **MUST** be sequential if included to avoid ambiguity.
 
-`payload` is the protobuf-encoded content of the message,
-with the corresponding type set.
+## Rate Limiting
 
-## Encoding
+Nodes **SHOULD** define rate limits for IPs, peer IDs,  
+and topics to prevent DoS attacks,  
+and rate limits **MAY** be advertised with packet code (0x14).
 
-The node encodes the payload using Protobuf.
-
-## Types of Messages
-
-### Message
-
-The type `ChatMessage` represents a chat message exchanged between clients.
-
-### Payload
-
-The protobuf description is:
-
-```protobuf
-message ChatMessage {
-  uint64 clock = 1;            // Lamport timestamp of the chat message
-  uint64 timestamp = 2;        // Unix timestamps in milliseconds
-  string text = 3;             // Text of the message
-  string response_to = 4;      // Id of the message being replied to
-  string ens_name = 5;         // Ens name of the sender
-  string chat_id = 6;          // Chat id
-  MessageType message_type = 7;
-  ContentType content_type = 8;
-
-  oneof payload {
-    StickerMessage sticker = 9;
-  }
-
-  enum MessageType {
-    UNKNOWN_MESSAGE_TYPE = 0;
-    ONE_TO_ONE = 1;
-    PUBLIC_GROUP = 2;
-    PRIVATE_GROUP = 3;
-    SYSTEM_MESSAGE_PRIVATE_GROUP = 4;
-  }
-
-  enum ContentType {
-    UNKNOWN_CONTENT_TYPE = 0;
-    TEXT_PLAIN = 1;
-    STICKER = 2;
-    STATUS = 3;
-    EMOJI = 4;
-    TRANSACTION_COMMAND = 5;
-    SYSTEM_MESSAGE_CONTENT_PRIVATE_GROUP = 6;
-  }
-}
+```plaintext
+[ IP limits, PeerID limits, Topic limits ]
 ```
 
-### Payload Fields
+Nodes **SHOULD** respect peer rate limits  
+and throttle packets as needed.
 
-| Field       | Name        | Type        | Description                                 |
-| ----------- | ----------- | ----------- | ------------------------------------------- |
-| 1           | clock       | `uint64`      | The clock of the chat                       |
-| 2           | timestamp   | `uint64`      | Sender timestamp at message creation        |
-| 3           | text        | `string`      | The content of the message                  |
-| 4           | response_to | `string`      | ID of the message replied to                |
-| 5           | ens_name    | `string`      | ENS name of the user sending the message    |
-| 6           | chat_id     | `string`      | Local ID of the chat                        |
-| 7           | message_type | `MessageType` | Type of message (one-to-one, public, group) |
-| 8           | content_type | `ContentType` | Type of message content                     |
-| 9           | payload     | `Sticker\|nil` | Payload of the message                      |
+## Keys Management
 
-## Content Types
+Keys are required for signing/verifying (asymmetric)  
+and encrypting/decrypting (asymmetric or symmetric) messages.  
+Keys for PFS are described in 5/SECURE-TRANSPORT.
 
-Nodes require content types to interpret incoming messages. Not all messages
-are plain text; some carry additional information.
+## Contact Code Topic
 
-The following content types **MUST** be supported:
+Nodes use the contact code topic for X3DH bundle discovery,  
+and the topic is derived as follows:
 
-- `TEXT_PLAIN`: Identifies a message with plaintext content.
-
-Other content types that **MAY** be implemented by clients include:
-
-- `STICKER`
-- `STATUS`
-- `EMOJI`
-- `TRANSACTION_COMMAND`
-
-## Mentions
-
-A mention **MUST** be represented as a string in the `@0xpk` format,
-where `pk` is the public key of the user to be mentioned,
-within the text field of a message with `content_type: TEXT_PLAIN`.
-A message **MAY** contain more than one mention.
-
-This specification **RECOMMENDS** that the application does not require the user
-to enter the entire public key. Instead, it should allow the user
-to create a mention by typing `@` followed by the ENS or 3-word pseudonym,
-with auto-completion functionality.
-
-For better user experience, the client **SHOULD** display the ENS name
-or 3-word pseudonym corresponding to the key instead of the public key.
-
-## Sticker Content Type
-
-A `ChatMessage` with `STICKER` content type **MUST** specify the ID of the pack
-and the hash of the pack in the `Sticker` field:
-
-```protobuf
-message StickerMessage {
-  string hash = 1;
-  int32 pack = 2;
-}
+```plaintext
+contactCode := "0x" + hexEncode(activePublicKey) + "-contact-code"
 ```
 
-## Message Types
+## Partitioned Topic
 
-A node requires message types to decide how to encrypt a message and what
-metadata to attach when passing it to the transport layer.
+Partitioned topics balance efficiency and privacy.  
+Nodes use 5000 topics, generated as follows:
 
-The following message types **MUST** be supported:
-
-- `ONE_TO_ONE`: A one-to-one message.
-- `PUBLIC_GROUP`: A message to the public group.
-- `PRIVATE_GROUP`: A message to the private group.
-
-## Clock vs Timestamp and Message Ordering
-
-If a user sends a new message before receiving messages that were sent while
-they were offline, the new message should be displayed last in the chat.
-
-The Status client speculates that its Lamport timestamp will beat the current
-chat timestamp, using the format: `clock = max({timestamp}, chat_clock + 1)`.
-
-This satisfies the Lamport requirement: if `a -> b`, then `T(a) < T(b)`.
-
-- `timestamp` **MUST** be Unix time in milliseconds when the node creates the
-message. This field **SHOULD** not be relied upon for message ordering.
-- `clock` **SHOULD** be calculated using Lamport timestamps, based on the last
-received message's clock value: `max(timeNowInMs, last-message-clock-value + 1)`.
-
-Messages with a clock greater than 120 seconds over the Whisper/Waku timestamp
-**SHOULD** be discarded to prevent malicious clock increases. Messages with a
-clock less than 120 seconds under the Whisper/Waku timestamp may indicate
-attempted insertion into chat history.
-
-The node uses the clock value for message ordering. The distributed nature of
-the system produces casual ordering, which may lead to counter-intuitive results
-in edge cases. For example, when a user joins a public chat and sends a message
-before receiving previous messages, their message clock might be lower, causing
-the message to appear in the past once historical messages are fetched.
-
-## Chats
-
-A chat is a structure used to organize messages, helping to display messages
-from a single recipient or group of recipients.
-
-All incoming messages are matched against a chat. The table below shows how to
-calculate a chat ID for each message type:
-
-| Message Type   | Chat ID Calculation                         | Direction      | Comment   |
-| -------------- | ------------------------------------------- | -------------- | --------- |
-| PUBLIC_GROUP   | Chat ID equals public channel name           | Incoming/Outgoing |           |
-| ONE_TO_ONE     | Hex-encode the recipient's public key as chat ID | Outgoing       |           |
-| user-message   | Hex-encode the message sender’s public key as chat ID | Incoming | If no match, node may discard or create a new chat |
-| PRIVATE_GROUP  | Use chat ID from the message                 | Incoming/Outgoing | If no match, discard message |
-
-## Contact Update
-
-`ContactUpdate` notifies peers that the user has been added as a contact or
-that user information has changed.
-
-```protobuf
-message ContactUpdate {
-  uint64 clock = 1;
-  string ens_name = 2;
-  string profile_image = 3;
-}
+```plaintext
+partitionTopic := "contact-discovery-" + strconv.FormatInt(partition.Int64(), 10)
 ```
 
- Payload Fields
+## Public Chats
 
-| Field       | Name          | Type    | Description                                      |
-| ----------- | ------------- | ------- | ------------------------------------------------ |
-| 1           | clock         | uint64  | Clock value of the chat with the user             |
-| 2           | ens_name      | string  | ENS name if set                                  |
-| 3           | profile_image | string  | Base64-encoded profile picture of the user        |
+Public chat topics derive from the chat name as follows:
 
-A client **SHOULD** send a `ContactUpdate` when:
-
-- The `ens_name` has changed.
-- The profile image is edited.
-
-Clients **SHOULD** also periodically send `ContactUpdate` messages to contacts.
-The Status official client sends these updates every 48 hours.
-
-## SyncInstallationContact
-
-The node uses `SyncInstallationContact` messages to synchronize contacts across
-devices in a best-effort manner.
-
-```protobuf
-message SyncInstallationContact {
-  uint64 clock = 1;
-  string id = 2;
-  string profile_image = 3;
-  string ens_name = 4;
-  uint64 last_updated = 5;
-  repeated string system_tags = 6;
-}
+```plaintext
+var hash []byte = keccak256(name)
 ```
 
-Payload Fields
+## Group Chat Topic
 
-| Field          | Name          | Type          | Description                               |
-| -------------- | ------------- | ------------- | ----------------------------------------- |
-| 1              | clock         | uint64        | Clock value of the chat                   |
-| 2              | id            | string        | ID of the contact synced                  |
-| 3              | profile_image | string        | Base64-encoded profile picture of the user |
-| 4              | ens_name      | string        | ENS name of the contact                   |
-| 5              | system_tags   | array[string] | System tags like ":contact/added"         |
+Group chats do not use a dedicated topic;  
+messages are sent one-to-one.
 
-## SyncInstallationPublicChat
+## Negotiated Topic
 
-The node uses `SyncInstallationPublicChat` to synchronize public chats across
-devices.
+One-to-one messages use a negotiated topic based on a Diffie-Hellman key  
+exchange,  
+and the topic is derived as follows:
 
-```protobuf
-message SyncInstallationPublicChat {
-  uint64 clock = 1;
-  string id = 2;
-}
+```go
+sharedKey, err := ecies.ImportECDSA(myPrivateKey).GenerateShared(
+      ecies.ImportECDSAPublic(theirPublicKey),
+      16,
+      16,
+)
 ```
 
-Payload Fields
+## Flow
 
-| Field       | Name   | Type   | Description           |
-| ----------- | ------ | ------ | --------------------- |
-| 1           | clock  | uint64 | Clock value of the chat |
-| 2           | id     | string | ID of the chat synced  |
+To message client B,  
+client A **SHOULD**:
 
-## PairInstallation
+1. Listen to B’s Contact Code Topic for bundle info.
+2. Send a message on B’s partitioned topic.
+3. Listen to the Negotiated Topic between A & B.
 
-The node uses `PairInstallation` messages to propagate information about a
-device to its paired devices.
+## Message Encryption
 
-```protobuf
-message PairInstallation {
-  uint64 clock = 1;
-  string installation_id = 2;
-  string device_type = 3;
-  string name = 4;
-}
-```
+Whisper requires encryption,  
+and public/group messages use symmetric encryption  
+with a channel-based key,  
+while one-to-one messages use asymmetric encryption.
 
-Payload Fields
+## Message Confirmations
 
-| Field             | Name           | Type   | Description                                    |
-| ----------------- | -------------- | ------ | ---------------------------------------------- |
-| 1                 | clock          | uint64 | Clock value of the chat                        |
-| 2                 | installation_id | string | Randomly generated ID that identifies this device |
-| 3                 | device_type    | string | OS of the device (iOS, Android, or desktop)    |
-| 4                 | name           | string | Self-assigned name of the device               |
+Message confirmations inform a node that its message has been seen by peers,  
+and confirmations **MAY** be sent using Batch Ack (0x0b)  
+or Message Response (0x0c) packets.
 
-## MembershipUpdateMessage and MembershipUpdateEvent
+## Whisper V6 Extensions
 
-`MembershipUpdateEvent` propagates information about group membership changes
-in a group chat. The details are covered in the [Group Chats specs](https://specs.status.im/draft/7-group-chat.md).
+### Request Historic Messages
 
-## Upgradability
+Requests historic messages from a Mailserver,  
+and the Mailserver **MUST** be a direct, trusted peer.
 
-There are two ways to upgrade the protocol without breaking compatibility:
+### shhext_requestMessages
 
-- A node always supports accretion.
-- A node does not support deletion of existing fields or messages,
-which might break compatibility.
+Parameters:
 
-## Security Considerations
-
--
+- **Object**: The message request object
+- **mailServerPeer**: Mailserver’s enode address.
+- **from**: Lower time bound (default 24 hours back).
+- **to**: Upper time bound (default now).
+- **limit**: Message limit (default no limit).
+- **cursor**: Used for pagination.
+- **topics**: Hex-encoded message topics.
+- **symKeyID**: Symmetric key ID for Mailserver authentication.
 
 ## Changelog
 
-### Version 0.3
+### 0.3
 
-- **Released**: May 22, 2020
-- **Changes**: Added language to include Waku in all relevant places.
+- Updated minimum PoW to 0.00001
+
+### 0.2
+
+- Document created
 
 ## Copyright
 
