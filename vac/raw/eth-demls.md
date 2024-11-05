@@ -1069,24 +1069,103 @@ over a secure channel.
 Group updates, such as member removal or role changes,
 are managed through the `GroupManager`:
 
-1. **Off-chain**: A member initiates an update request.
-2. **Off-chain**: The request is sent to the group admin or owner.
-3. **Off-chain**: The admin verifies the request and the member's authentication.
-4. **On-chain**: The admin calls the appropriate function
+1. **Off-chain**: a member initiates an update request.
+2. **Off-chain**: the request is sent to the group admin or owner.
+3. **Off-chain**: the admin verifies the request and the member's authentication.
+4. **On-chain**: the admin calls the appropriate function
 (`removeMember`, `assignRole`) in `GroupManager`.
-5. **Off-chain**: The group is notified of the update.
+5. **Off-chain**: the group is notified of the update.
 
 ### Security Considerations
 
-- **Reentrancy Guard**: The `nonReentrant` modifier prevents
+- **Reentrancy guard**: the `nonReentrant` modifier prevents
 reentrant calls to critical functions.
-- **Access Control**: Modifiers like `onlyAdmin`, `onlyOwner`,
+- **Access control**: modifiers like `onlyAdmin`, `onlyOwner`,
 and `validSession` ensure that only authorized users can perform specific actions.
-- **Session Authentication**: Integration with `SimpleLogin` ensures
+- **Session authentication**: integration with `SimpleLogin` ensures
 that users have valid sessions before interacting with the contract.
-- **Preventing Unauthorized Role Changes**: The contract enforces hierarchy rules,
+- **Preventing unauthorized role changes**: the contract enforces hierarchy rules,
 where only owners can modify admin roles, and admins cannot alter other
 admins' roles without proper authorization.
+
+### Interaction between `GroupManager` and `SimpleLogin`
+
+#### Core Integration
+
+The integration between `GroupManager` and `SimpleLogin`
+is established through a clean interface and immutable contract reference.
+This ensures secure authentication and session management
+while maintaining separation of concerns.
+
+```solidity
+// GroupManager's interface to SimpleLogin
+interface ISimpleLogin {
+    function isSessionValid(bytes32 sessionId) external view returns (bool);
+    function sessions(bytes32 sessionId) external view returns (address owner);
+    function registered(address user) external view returns (bool);
+}
+
+// Integration setup in GroupManager
+contract GroupManager {
+    ISimpleLogin private immutable simpleLogin;
+
+    constructor(address simpleLoginAddress) {
+        require(simpleLoginAddress != address(0), "Invalid SimpleLogin address");
+        simpleLogin = ISimpleLogin(simpleLoginAddress);
+    }
+}
+```
+
+#### Interactions
+
+- Session validation: every operation in `GroupManager` requires a valid session from `SimpleLogin`.
+The `validSession` modifier ensures both session validity and ownership,
+creating a secure bridge between authentication and group operations.
+
+```solidity
+modifier validSession(bytes32 sessionId) {
+    require(simpleLogin.isSessionValid(sessionId), "Invalid session");
+    require(simpleLogin.sessions(sessionId) == msg.sender, "Unauthorized");
+    _;
+}
+```
+
+- Registration verification: before adding new members to a group,
+`GroupManager` verifies their registration status with `SimpleLogin`.
+This ensures that only registered users can become group members.
+
+```solidity
+function addMember(...) {
+    // ...
+    require(simpleLogin.registered(newMember), "User not registered");
+    // ...
+}
+```
+
+#### Interaction flow example
+
+The following flow shows the typical interaction pattern between users,
+`GroupManager`, and `SimpleLogin`,
+showing how authentication and group operations are integrated.
+
+```text
+1. User Authentication:
+   - User creates session through SimpleLogin
+   - Receives sessionId for future operations
+
+2. Group Operations:
+   - User includes sessionId in GroupManager calls
+   - GroupManager verifies session with SimpleLogin
+   - GroupManager checks message sender matches session owner
+   - Operation proceeds if validation successful
+
+3. Member Management:
+   - Admin adds new member
+   - GroupManager verifies admin's session
+   - GroupManager checks new member's registration
+   - Member addition proceeds if all checks pass
+```
+
 
 ## Ethereum-based authentication protocol
 
