@@ -92,17 +92,18 @@ All Status messages MUST have one of these functional scopes:
 
 #### Community scope
 
-3. _Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
-4. _Community content_: messages carrying user-generated content _only for members of a specific community_.
+1._Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
+2. _Community content_: messages carrying user-generated content _only for members of a specific community_.
 
 #### Local scope
 
-5. _Local_: messages related to functions that are only relevant to a single user. Also known as _self-addressed messages_. Examples include messages used to exchange information between app installations, such as User Backup and Sync messages.
+1. _Local_: messages related to functions that are only relevant to a single user. Also known as _self-addressed messages_. Examples include messages used to exchange information between app installations, such as User Backup and Sync messages.
 
 Note that the functional scope is a logical property of Status messages.
 It SHOULD however inform the underlying [transport layer sharding](#pubsub-topics-and-sharding) and [transport layer subscriptions](#subscribing).
 In general a Status client SHOULD subscribe to participate in:
-- all global functions,
+
+- all global functions
 - (only) the community functions for communities of which it is a member, and
 - its own local functions.
 
