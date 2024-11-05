@@ -1118,7 +1118,8 @@ contract GroupManager {
 
 #### Interactions
 
-- Session validation: every operation in `GroupManager` requires a valid session from `SimpleLogin`.
+- Session validation: every operation in `GroupManager`
+requires a valid session from `SimpleLogin`.
 The `validSession` modifier ensures both session validity and ownership,
 creating a secure bridge between authentication and group operations.
 
@@ -1165,7 +1166,6 @@ showing how authentication and group operations are integrated.
    - GroupManager checks new member's registration
    - Member addition proceeds if all checks pass
 ```
-
 
 ## Ethereum-based authentication protocol
 
