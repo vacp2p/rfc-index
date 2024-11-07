@@ -13,15 +13,16 @@ contributors:
 
 ## Abstract
 
+This specification describes the Waku lightpush protocol used with resource restricted devices.
 
 ## Motivation
 
-Resource-retricted nodes (light nodes) with short connection windows and
-limited bandwidth wish to publish messages into the [64/WAKU-NETWORK]().
+There is a need for resource-retricted nodes with short connection windows and
+limited bandwidth to publish messages to the [64/WAKU-NETWORK](/waku/standards/core/64/network.md).
 Additionally,
-there is sometimes a need for confirmation
+there is a need for confirmation
 that a message has been received "by the network"
-(here, at least one node).
+(this specification demonstrates at least one node).
 This specification addresses these 
 `19/WAKU2-LIGHTPUSH` is a request/response protocol for this.
 
