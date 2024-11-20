@@ -18,7 +18,7 @@ This specification describes the `17/WAKU2-RLN-RELAY` protocol,
 which is an extension of [`11/WAKU2-RELAY`](../11/relay.md)
 to provide spam protection using [Rate Limiting Nullifiers (RLN)](../../../../vac/32/rln-v1.md).
 
-The security objective is to contain spam activity in the (64/WAKU-NETWORK)[]
+The security objective is to contain spam activity in the [64/WAKU-NETWORK](../64/network.md)
 by enforcing a global messaging rate to all the peers.
 Peers that violate the messaging rate are considered spammers and
 their message is considered spam.
@@ -374,9 +374,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 1. [`11/WAKU2-RELAY`](../11/relay.md)
-2. [RLN](../../../../vac/32/rln-v1.md)
-3. [14/WAKU2-MESSAGE](../14/message.md)
-4. [RLN documentation](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view)
-5. [Public inputs to the RLN circuit](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Public-Inputs)
-6. [Shamir secret sharing scheme used in RLN](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Linear-Equation-amp-SSS)
-7. [RLN internal nullifier](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Nullifiers)
+2. [64/WAKU-NETWORK](../64/network.md)
+3. [RLN](../../../../vac/32/rln-v1.md)
+4. [14/WAKU2-MESSAGE](../14/message.md)
+5. [RLN documentation](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view)
+6. [Public inputs to the RLN circuit](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Public-Inputs)
+7. [Shamir secret sharing scheme used in RLN](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Linear-Equation-amp-SSS)
+8. [RLN internal nullifier](https://hackmd.io/tMTLMYmTR5eynw2lwK9n1w?view#Nullifiers)
