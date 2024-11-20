@@ -41,8 +41,8 @@ within the network.
 in order of increasing decentralization
 
 * hard coded bootstrap nodes
-* [`DNS discovery`](../10/waku2.md/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
-* `peer-exchange` (work in progress)
+* [`DNS discovery`](/waku/standards/10/waku2.md/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
+* [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
 * `33/WAKU2-DISCV5` (specified in this document)
 
 The purpose of ambient node discovery within [10/WAKU2](../10/waku2.md)
@@ -205,13 +205,13 @@ raises research questions that we will address in future stages of our discv5 ro
 ## References
 
 1. [10/WAKU2](../10/waku2.md)
+2. [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
 1. [11/WAKU2-RELAY](../11/relay.md)
 1. [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 1. [Node Discovery Protocol v5 (`discv5`)](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 1. [`discv5` semantics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md).
 1. [`discv5` wire protocol](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-wire.md)
 1. [`discv5` topic discovery](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md#topic-advertisement)
-1. [Waku DNS discovery](../10/waku2.md/#discovery-domain)
 1. [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
 1. [`EIP-1459`](https://eips.ethereum.org/EIPS/eip-1459)
 1. [`GossipSub`](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
