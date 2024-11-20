@@ -43,6 +43,7 @@ which is explained in the
 This protocol SHOULD only be used if [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md) is infeasible.
 
 ## Theory and Protocol Semantics
+
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
@@ -125,8 +126,9 @@ containing a list of `PeerInfo` instances, which in turn hold an ENR.
 ### Discovery Interface
 
 Implementations can implement the libp2p discovery interface:
-- [nim](https://github.com/status-im/nim-libp2p/issues/140)
-- [javascript](https://github.com/libp2p/js-libp2p-interfaces/tree/master/packages/interface-peer-discovery).
+
+* [nim](https://github.com/status-im/nim-libp2p/issues/140)
+* [javascript](https://github.com/libp2p/js-libp2p-interfaces/tree/master/packages/interface-peer-discovery).
 
 ### Exchange Peer Cache Size
 
