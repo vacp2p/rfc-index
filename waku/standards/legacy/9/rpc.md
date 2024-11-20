@@ -9,8 +9,10 @@ contributors:
   - Oskar Thorén <oskarth@titanproxy.com>
 ---
 
-This specification describes the RPC API that Waku nodes MAY adhere to. The unified API allows clients to easily
-be able to connect to any node implementation. The API described is privileged as a node stores the keys of clients. 
+This specification describes the RPC API that Waku nodes MAY adhere to.
+The unified API allows clients to easily
+be able to connect to any node implementation.
+The API described is privileged as a node stores the keys of clients.
 
 ## Introduction
 
@@ -20,7 +22,10 @@ This API is based off the [Whisper V6 RPC API](https://github.com/ethereum/go-et
 
 ### Transport
 
-Nodes SHOULD expose a [JSON RPC](https://www.jsonrpc.org/specification) API that can be accessed. The JSON RPC version SHOULD be `2.0`. Below is an example request:
+Nodes SHOULD expose a [JSON RPC](https://www.jsonrpc.org/specification) API
+that can be accessed.
+The JSON RPC version SHOULD be `2.0`.
+Below is an example request:
 
 ```json
 {
@@ -46,7 +51,11 @@ In this section you will find objects used throughout the JSON RPC API.
 
 #### Message
 
-The message object represents a Waku message. Below you will find the description of the attributes contained in the message object. A message is the decrypted payload and padding of an [envelope](/spec/7) along with all of its metadata and other extra information such as the hash.
+The message object represents a Waku message.
+Below you will find the description of the attributes contained in the message object.
+A message is the decrypted payload and
+padding of an [envelope](../7/data.md) along with all of its metadata and
+other extra information such as the hash.
 
 | Field | Type | Description |
 | ----: | :--: | ----------- |
@@ -62,7 +71,8 @@ The message object represents a Waku message. Below you will find the descriptio
 
 #### Filter
 
-The filter object represents filters that can be applied to retrieve messages. Below you will find the description of the attributes contained in the filter object.
+The filter object represents filters that can be applied to retrieve messages.
+Below you will find the description of the attributes contained in the filter object.
 
 | Field | Type | Description |
 | ----: | :--: | ----------- |
@@ -73,7 +83,9 @@ The filter object represents filters that can be applied to retrieve messages. B
 | `topics` | array | Array of possible topics, this can also contain partial topics |
 | `allowP2P` | boolean | Indicates if this filter allows processing of direct peer-to-peer messages |
 
-All fields are optional, however `symKeyID` or `privateKeyID` must be present, it cannot be both. Additionally, the `topics` field is only optional when an asymmetric key is used.
+All fields are optional, however `symKeyID` or `privateKeyID` must be present,
+it cannot be both.
+Additionally, the `topics` field is only optional when an asymmetric key is used.
 
 ### Methods
 
@@ -93,11 +105,11 @@ none
 
 The `waku_info` method returns information about a Waku node.
 
-##### Parameters
+Parameters
 
 none
 
-##### Response
+Response
 
 The response is an `Object` containing the following fields:
 
@@ -108,202 +120,231 @@ The response is an `Object` containing the following fields:
 
 #### `waku_setMaxEnvelopeSize`
 
-Sets the maximum envelope size allowed by this node. Any envelopes larger than this size both incoming and outgoing will be rejected. The envelope size can never exceed the underlying envelope size of `10mb`.
+Sets the maximum envelope size allowed by this node.
+Any envelopes larger than this size both incoming and outgoing will be rejected.
+The envelope size can never exceed the underlying envelope size of `10mb`.
 
-##### Parameters
+Parameters
 
- - **number** - The message size in bytes.
+- **number** - The message size in bytes.
 
-##### Response
+Response
 
-- **bool** - `true` on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** -
+`true` on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_setMinPoW`
 
 Sets the minimal PoW required by this node.
 
-##### Parameters
+Parameters
 
- - **number** - The new PoW requirement.
+- **number** - The new PoW requirement.
 
-##### Response
+Response
 
-- **bool** - `true` on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** -
+`true` on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_markTrustedPeer`
 
 Marks a specific peer as trusted allowing it to send expired messages.
 
-##### Parameters
+Parameters
 
 - **string** - `enode` of the peer.
 
-##### Response
+Response
 
-- **bool** - `true` on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** -
+`true` on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_newKeyPair`
 
 Generates a keypair used for message encryption and decryption.
 
-##### Parameters
+Parameters
 
 none
 
-##### Response
+Response
 
- - **string** - Key ID on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** -
+Key ID on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_addPrivateKey`
 
 Stores a key and returns its ID.
 
-##### Parameters
+Parameters
 
 - **string** - Private key as hex bytes.
 
-##### Response
+Response
 
- - **string** - Key ID on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - Key ID on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_deleteKeyPair`
 
 Deletes a specific key if it exists.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key pair.
 
-##### Response
+Response
 
-- **bool** - `true` on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** - `true` on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_hasKeyPair`
 
 Checks if the node has a private key of a key pair matching the given ID.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key pair.
 
-##### Response
+Response
 
-- **bool** - `true` or `false` or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** -
+`true` or
+`false` or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_getPublicKey`
 
 Returns the public key for an ID.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key.
 
-##### Response
+Response
 
- - **string** - The public key or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - The public key or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_getPrivateKey`
 
 Returns the private key for an ID.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key.
 
-##### Response
+Response
 
- - **string** - The private key or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - The private key or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_newSymKey`
 
-Generates a random symmetric key and stores it under an ID. This key can be used to encrypt and decrypt messages where the key is known to both parties.
+Generates a random symmetric key and stores it under an ID.
+This key can be used to encrypt and
+decrypt messages where the key is known to both parties.
 
-##### Parameters
+Parameters
 
 none
 
-##### Response
+Response
 
- - **string** - The key ID or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - The key ID or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_addSymKey`
 
 Stores the key and returns its ID.
 
-##### Parameters
+Parameters
 
 - **string** - The raw key for symmetric encryption hex encoded.
 
-##### Response
+Response
 
- - **string** - The key ID or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - The key ID or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_generateSymKeyFromPassword`
 
 Generates the key from a password and stores it.
 
-##### Parameters
+Parameters
 
- - **string** - The password.
+- **string** - The password.
 
-##### Response
+Response
 
- - **string** - The key ID or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - The key ID or an [error](https://www.jsonrpc.org/specification#error_object)
+on failure.
 
 #### `waku_hasSymKey`
 
 Returns whether there is a key associated with the ID.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key.
 
-##### Response
+Response
 
-- **bool** - `true` or `false` or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** - `true` or `false` or an [error](https://www.jsonrpc.org/specification#error_object)
+on failure.
 
 #### `waku_getSymKey`
 
 Returns the symmetric key associated with an ID.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key.
 
-##### Response
+Response
 
-- **string** - Raw key on success or an [error](https://www.jsonrpc.org/specification#error_object) of failure.
+- **string** - Raw key on success or
+an [error](https://www.jsonrpc.org/specification#error_object) of failure.
 
 #### `waku_deleteSymKey`
 
 Deletes the key associated with an ID.
 
-##### Parameters
+Parameters
 
 - **string** - ID of the Key.
 
-##### Response
+Response
 
-- **bool** - `true` or `false` or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** -
+`true` or `false` or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_subscribe`
 
-Creates and registers a new subscription to receive notifications for inbound Waku messages.
+Creates and
+registers a new subscription to receive notifications for inbound Waku messages.
 
-##### Parameters
+Parameters
 
 The parameters for this request is an array containing the following fields:
 
- 1. **string** - The ID of the function call, in case of Waku this must contain the value "messages".
+ 1. **string** - The ID of the function call,
+in case of Waku this must contain the value "messages".
  2. **object** - The [message filter](#filter).
 
-##### Response
+Response
 
-- **string** - ID of the subscription or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **string** - ID of the subscription or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
-###### Notifications
+Notifications
 
-Notifications received by the client contain a [message](#message) matching the filter. Below is an example notification:
+Notifications received by the client contain a [message](#message) matching the filter.
+Below is an example notification:
 
 ```json
 {
@@ -328,81 +369,90 @@ Notifications received by the client contain a [message](#message) matching the 
 
 #### `waku_unsubscribe`
 
-Cancels and removes an existing subscription. The node MUST stop sending the client notifications.
+Cancels and removes an existing subscription.
+The node MUST stop sending the client notifications.
 
-##### Parameters
+Parameters
 
- - **string** - The subscription ID.
+- **string** - The subscription ID.
 
-##### Response
+Response
 
 - **bool** - `true` or `false`
 
 #### `waku_newMessageFilter`
 
-Creates a new message filter within the node. This filter can be used to poll for new messages that match the criteria.
+Creates a new message filter within the node.
+This filter can be used to poll for new messages that match the criteria.
 
-##### Parameters
+Parameters
 
-The request must contain a [message filter](#filter) as its parameter. 
+The request must contain a [message filter](#filter) as its parameter.
 
-##### Response
+Response
 
- - **string** - The ID of the filter.
+- **string** - The ID of the filter.
 
 #### `waku_deleteMessageFilter`
 
 Removes a message filter from the node.
 
-##### Parameters
+Parameters
 
-- **string** - ID of the filter created with [`waku_newMessageFilter`](#waku_newMessageFilter).
+- **string** - ID of the filter created with [`waku_newMessageFilter`](#waku_newmessagefilter).
 
-##### Response
+Response
 
-- **bool** - `true` on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+- **bool** - `true` on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_getFilterMessages`
 
-Retrieves messages that match a filter criteria and were received after the last time this function was called.
+Retrieves messages that match a filter criteria and
+were received after the last time this function was called.
 
-##### Parameters
+Parameters
 
-- **string** - ID of the filter created with [`waku_newMessageFilter`](#waku_newMessageFilter).
+- **string** - ID of the filter created with [`waku_newMessageFilter`](#waku_newmessagefilter).
 
-##### Response
+Response
 
-The response contains an array of [messages](#messages) or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+The response contains an array of [messages](#message) or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 #### `waku_post`
 
 The `waku_post` method creates a waku envelope and propagates it to the network.
 
-##### Parameters
+Parameters
 
 The parameters is an `Object` containing the following fields:
- - **`symKeyID` [string]** `optional` - The ID of the symmetric key used for encryption
- - **`pubKey` [string]** `optional` - The public key for message encryption.
- - **`sig` [string]** `optional` - The ID of the signing key.
- - **`ttl` [number]** - The time-to-live in seconds.
- - **`topic` [string]** - 4 bytes message topic.
- - **`payload` [string]** - The payload to be encrypted.
- - **`padding` [string]** `optional` - The padding, a byte array of arbitrary length.
- - **`powTime` [number]** - Maximum time in seconds to be spent on the proof of work.
- - **`powTarget` [number]** - Minimal PoW target required for this message.
- - **`targetPeer` [string]** `optional` - The optional peer ID for peer-to-peer messages.
- 
-*Either the **`symKeyID`** or the **`pubKey`** need to be present. It can not be both.*
 
-#### Response
+- **`symKeyID` [string]** `optional` - The ID of the symmetric key used for encryption
+- **`pubKey` [string]** `optional` - The public key for message encryption.
+- **`sig` [string]** `optional` - The ID of the signing key.
+- **`ttl` [number]** - The time-to-live in seconds.
+- **`topic` [string]** - 4 bytes message topic.
+- **`payload` [string]** - The payload to be encrypted.
+- **`padding` [string]** `optional` - The padding, a byte array of arbitrary length.
+- **`powTime` [number]** - Maximum time in seconds to be spent on the proof of work.
+- **`powTarget` [number]** - Minimal PoW target required for this message.
+- **`targetPeer` [string]** `optional` - The optional peer ID for peer-to-peer messages.
 
-- **bool** - `true` on success or an [error](https://www.jsonrpc.org/specification#error_object) on failure.
+*Either the **`symKeyID`** or the **`pubKey`** need to be present.
+It can not be both.*
+
+Response
+
+- **bool** -
+`true` on success or
+an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 ## Changelog
 
 | Version                                                                                 | Comment          |
 | :--------------------------------------------------------------------------------------:| ---------------- |
-| [1.0.0](https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8)| Initial release. | 
+| [1.0.0](https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8)| Initial release. |
 
 ## Copyright
 

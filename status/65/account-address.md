@@ -5,7 +5,7 @@ name: Status Account Address
 status: draft
 category: Standards Track
 description: Details of what a Status account address is and how account addresses are created and used.
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Corey Petty <corey@status.im>
 - Oskar Thorén <oskarth@titanproxy.com>
@@ -14,42 +14,64 @@ contributors:
 
 ## Abstract
 
-This specification details what a Status account address is and how account addresses are created and used.
+This specification details what a Status account address is and
+how account addresses are created and used.
 
 ## Background
 
-The core concept of an account in Status is a set of cryptographic keypairs. Namely, the combination of the following:
+The core concept of an account in Status is a set of cryptographic keypairs.
+Namely, the combination of the following:
+
 1. a Waku chat identity keypair
 1. a set of cryptocurrency wallet keypairs
 
-The Status node verifies or derives everything else associated with the contact from the above items, including:
+The Status node verifies or
+derives everything else associated with the contact from the above items, including:
+
 - Ethereum address (future verification, currently the same base keypair)
 - identicon
 - message signatures
 
 ## Initial Key Generation
-### Public/Private Keypairs 
-- An ECDSA (secp256k1 curve) public/private keypair MUST be generated via a [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki) derived path from a [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed phrase.
+
+### Public/Private Keypairs
+
+- An ECDSA (secp256k1 curve) public/private keypair MUST be generated via a
+[BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)
+derived path from a
+[BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
+mnemonic seed phrase.
+
 - The default paths are defined as such:
-    - Waku Chat Key (`IK`): `m/43'/60'/1581'/0'/0`  (post Multiaccount integration)
-        - following [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
-    - Status Wallet paths: `m/44'/60'/0'/0/i` starting at `i=0`
-        - following [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
-        - NOTE: this (`i=0`) is also the current (and only) path for Waku key before Multiaccount integration
+  - Waku Chat Key (`IK`): `m/43'/60'/1581'/0'/0`  (post Multiaccount integration)
+    - following [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
+  - Status Wallet paths: `m/44'/60'/0'/0/i` starting at `i=0`
+    - following [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
+    - NOTE: this (`i=0`) is also the current (and only)
+    path for Waku key before Multiaccount integration
 
 ## Account Broadcasting
-- A user is responsible for broadcasting certain information publicly so that others may contact them.
+
+- A user is responsible for broadcasting certain information publicly so
+that others may contact them.
 
 ### X3DH Prekey bundles
-- Refer to [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) for details on the X3DH prekey bundle broadcasting, as well as regeneration.
+
+- Refer to [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+for details on the X3DH prekey bundle broadcasting, as well as regeneration.
 
 ## Optional Account additions
 
 ### ENS Username
-- A user MAY register a public username on the Ethereum Name System (ENS).  This username is a user-chosen subdomain of the `stateofus.eth` ENS registration that maps to their Waku identity key (`IK`). 
+
+- A user MAY register a public username on the Ethereum Name System (ENS).
+This username is a user-chosen subdomain of the `stateofus.eth`
+ENS registration that maps to their Waku identity key (`IK`).
 
 ### User Profile Picture
-- An account MAY edit the `IK` generated identicon with a chosen picture.  This picture will become part of the publicly broadcasted profile of the account.
+
+- An account MAY edit the `IK` generated identicon with a chosen picture.
+This picture will become part of the publicly broadcasted profile of the account.
 
 <!-- TODO: Elaborate on wallet account and multiaccount -->
 
@@ -88,11 +110,14 @@ message MultiAccount {
 }
 ```
 
-The above payload is broadcasted when 2 devices that belong to a user need to be paired.
+The above payload is broadcasted when 2 devices
+that belong to a user need to be paired.
 
 ## Security Considerations
 
-- This specification inherits security considerations of [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md).
+- This specification inherits security considerations of
+[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and
+[54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md).
 
 ## Copyright
 

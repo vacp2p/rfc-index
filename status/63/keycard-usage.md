@@ -5,14 +5,16 @@ name: Status Keycard Usage
 status: draft
 category: Standards Track
 description: Describes how an application can use the Status Keycard to create, store and transact with different account addresses.
-editor: Aaryamann Challani <aaryamann@status.im>
+editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
   - Jimmy Debe <jimmy@status.im>
 ---
 
 ## Terminology
 
-- **Account**: A valid [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) compliant key.
+- **Account**: A valid
+[BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
+compliant key.
 - **Multiaccount**: An account from which multiple Accounts can be derived.
 
 ## Abstract
@@ -28,8 +30,11 @@ More documentation on the Status Keycard can be found [here](https://keycard.tec
 
 ## Motivation
 
-The Status Keycard is a hardware wallet that can be used to store and sign transactions.
-For the purpose of the Status App, this specification describes how the Keycard SHOULD be used to store and sign transactions.
+The Status Keycard is a hardware wallet that can be used to store and
+sign transactions.
+For the purpose of the Status App,
+this specification describes how the Keycard SHOULD be used to store and
+sign transactions.
 
 ## Usage
 
@@ -40,7 +45,7 @@ For the purpose of the Status App, this specification describes how the Keycard 
 To initialize the keycard for use with the application.
 The keycard is locked with a 6 digit pin.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -48,7 +53,7 @@ The keycard is locked with a 6 digit pin.
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 {
@@ -65,18 +70,19 @@ The application SHOULD provide a way to recover the keycard in case the pin is f
 
 To fetch if the keycard is ready to be used by the application.
 
-#### Request wire format
+Request wire format
 
 The requester MAY add a `pairing` field to filter through the generated keys
+
 ```json
 {
   "pairing": <shared_secret>/<pairing_index>/<256_bit_salt> OR null
 }
 ```
 
-#### Response wire format
+Response wire format
 
-##### If the keycard is not initialized yet
+#### If the keycard is not initialized yet
 
 ```json
 {
@@ -84,7 +90,7 @@ The requester MAY add a `pairing` field to filter through the generated keys
 }
 ```
 
-##### If the keycard is initialized
+#### If the keycard is initialized
 
 ```json
 {
@@ -101,9 +107,10 @@ The requester MAY add a `pairing` field to filter through the generated keys
 
 ### 3. Pairing the Keycard to the Client device (`/pair`)
 
-To establish a secure communication channel described [here](https://keycard.tech/docs/apdu/opensecurechannel.html), the keycard and the client device need to be paired.
+To establish a secure communication channel described [here](https://keycard.tech/docs/apdu/opensecurechannel.html),
+the keycard and the client device need to be paired.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -111,7 +118,7 @@ To establish a secure communication channel described [here](https://keycard.tec
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 "<shared_secret>/<pairing_index>/<256_bit_salt>"
@@ -121,7 +128,7 @@ To establish a secure communication channel described [here](https://keycard.tec
 
 To generate a new set of keys and load them onto the keycard.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -131,7 +138,7 @@ To generate a new set of keys and load them onto the keycard.
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 {
@@ -154,7 +161,7 @@ To generate a new set of keys and load them onto the keycard.
 
 To fetch the keys that are currently loaded on the keycard.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -163,7 +170,7 @@ To fetch the keys that are currently loaded on the keycard.
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 {
@@ -184,9 +191,10 @@ To fetch the keys that are currently loaded on the keycard.
 
 ### 6. Sign a transaction (`/sign`)
 
-To sign a transaction using the keycard, passing in the pairing information and the transaction to be signed.
+To sign a transaction using the keycard, passing in the pairing information and
+the transaction to be signed.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -197,7 +205,7 @@ To sign a transaction using the keycard, passing in the pairing information and 
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 <256_bit_signature>
@@ -205,9 +213,10 @@ To sign a transaction using the keycard, passing in the pairing information and 
 
 ### 7. Export a key (`/export-key`)
 
-To export a key from the keycard, passing in the pairing information and the path to the key to be exported.
+To export a key from the keycard, passing in the pairing information and
+the path to the key to be exported.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -217,17 +226,17 @@ To export a key from the keycard, passing in the pairing information and the pat
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 <256_bit_public_key>
-``` 
+```
 
 ### 8. Verify a pin (`/verify-pin`)
 
 To verify the pin of the keycard.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -235,22 +244,22 @@ To verify the pin of the keycard.
 }
 ```
 
-#### Response wire format
+Response wire format
 
 ```json
 1_digit_status_code
 ```
 
 Status code reference:
+
 - 3: PIN is valid
 <!--TODO: what are the other status codes?-->
-
 
 ### 9. Change the pin (`/change-pin`)
 
 To change the pin of the keycard.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -260,15 +269,15 @@ To change the pin of the keycard.
 }
 ```
 
-#### Response wire format
+Response wire format
 
-##### If the operation was successful
+#### If the operation was successful
 
 ```json
 true
 ```
 
-##### If the operation was unsuccessful
+#### If the operation was unsuccessful
 
 ```json
 false
@@ -276,9 +285,10 @@ false
 
 ### 10. Unblock the keycard (`/unblock-pin`)
 
-If the Keycard is blocked due to too many incorrect pin attempts, it can be unblocked using the PUK.
+If the Keycard is blocked due to too many incorrect pin attempts,
+it can be unblocked using the PUK.
 
-#### Request wire format
+Request wire format
 
 ```json
 {
@@ -288,15 +298,15 @@ If the Keycard is blocked due to too many incorrect pin attempts, it can be unbl
 }
 ```
 
-#### Response wire format
+Response wire format
 
-##### If the operation was successful
+If the operation was successful
 
 ```json
 true
 ```
 
-##### If the operation was unsuccessful
+If the operation was unsuccessful
 
 ```json
 false
@@ -304,7 +314,8 @@ false
 
 ## Flows
 
-Any application that uses the Status Keycard MAY implement the following flows according to the actions listed above.
+Any application that uses the Status Keycard
+MAY implement the following flows according to the actions listed above.
 
 ### 1. A new user wants to use the Keycard with the application
 
@@ -335,7 +346,6 @@ Any application that uses the Status Keycard MAY implement the following flows a
 
 1. The user unblocks the Keycard using the `/unblock-pin` endpoint.
 
-
 ## Security Considerations
 
 Inherits the security considerations of [Status Keycard](https://keycard.tech/docs/)
@@ -343,7 +353,6 @@ Inherits the security considerations of [Status Keycard](https://keycard.tech/do
 ## Privacy Considerations
 
 Inherits the privacy considerations of [Status Keycard](https://keycard.tech/docs/)
-
 
 ## Copyright
 

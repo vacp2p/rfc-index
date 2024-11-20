@@ -11,7 +11,8 @@ This is an informational spec that show cases the concept of adaptive nodes.
 
 ## Node types - a continuum
 
-We can look at node types as a continuum, from more restricted to less restricted, fewer resources to more resources.
+We can look at node types as a continuum,
+from more restricted to less restricted, fewer resources to more resources.
 
 ![Node types - a continuum](./images/adaptive_node_continuum2.png)
 
@@ -29,11 +30,13 @@ Some examples:
 - Desktop: download, leave in background, contribute somewhat
 - Cluster: expensive, upkeep, but can contribute a lot
 
-These are also illustrative, so a node in a browser in certain environment might contribute similarly to Desktop.
+These are also illustrative,
+so a node in a browser in certain environment might contribute similarly to Desktop.
 
 ### Adaptive nodes
 
-We call these nodes *adaptive nodes* to highlights different modes of contributing, such as:
+We call these nodes *adaptive nodes* to highlights different modes of contributing,
+such as:
 
 - Only leeching from the network
 - Relaying messages for one or more topics
@@ -55,11 +58,18 @@ Each node can choose which protocols to support, depending on its resources and 
 
 ![Protocol selection](./images/adaptive_node_protocol_selection2.png)
 
-In the case of protocols like [11/WAKU2-RELAY](../../standards/core/11/relay.md) etc (12, 13, 19, 21) these correspond to Libp2p protocols.
+In the case of protocols like [11/WAKU2-RELAY](../../standards/core/11/relay.md)
+etc (12, 13, 19, 21) these correspond to Libp2p protocols.
 
-However, other protocols like 16/WAKU2-RPC (local HTTP JSON-RPC), 25/LIBP2P-DNS-DISCOVERY, Discovery v5 (DevP2P) or interfacing with distributed storage, are running on different network stacks.
+However, other protocols like 16/WAKU2-RPC
+(local HTTP JSON-RPC), 25/LIBP2P-DNS-DISCOVERY,
+Discovery v5 (DevP2P) or interfacing with distributed storage,
+are running on different network stacks.
 
-This is in addition to protocols that specify payloads, such as 14/WAKU2-MESSAGE, 26/WAKU2-PAYLOAD, or application specific ones. As well as specs that act more as recommendations, such as 23/WAKU2-TOPICS or 27/WAKU2-PEERS.
+This is in addition to protocols that specify payloads, such as 14/WAKU2-MESSAGE,
+26/WAKU2-PAYLOAD, or application specific ones.
+As well as specs that act more as recommendations,
+such as 23/WAKU2-TOPICS or 27/WAKU2-PEERS.
 
 ## Waku network visualization
 
@@ -67,7 +77,8 @@ We can better visualize the network with some illustrative examples.
 
 ### Topology and topics
 
-The first one shows an example topology with different PubSub topics for the relay protocol.
+The first one shows an example topology with different PubSub topics
+for the relay protocol.
 
 ![Waku Network visualization](./images/adaptive_node_network_topology_protocols2.png)
 
@@ -75,21 +86,25 @@ The first one shows an example topology with different PubSub topics for the rel
 
 ![Waku Network visualization legend](./images/adaptive_node_network_topology_protocols_legend.png)
 
-The dotted box shows what content topics (application-specific) a node is interested in.
+The dotted box shows what content topics (application-specific)
+a node is interested in.
 
 A node that is purely providing a service to the network might not care.
 
-In this example, we see support for toy chat, a topic in Waku v1 (Status chat), WalletConnect, and SuperRare community.
+In this example, we see support for toy chat,
+a topic in Waku v1 (Status chat), WalletConnect, and SuperRare community.
 
 ### Auxiliary network
 
 This is a separate component with its own topology.
 
-Behavior and interaction with other protocols specified in Vac RFCs, e.g. 25/LIBP2P-DNS-DISCOVERY, 15/WAKU-BRIDGE, etc.
+Behavior and interaction with other protocols specified in Vac RFCs,
+e.g. 25/LIBP2P-DNS-DISCOVERY, 15/WAKU-BRIDGE, etc.
 
 ### Node Cross Section
 
-This one shows a cross-section of nodes in different dimensions and shows how the connections look different for different protocols.
+This one shows a cross-section of nodes in different dimensions and
+shows how the connections look different for different protocols.
 
 ![Node Cross Section](./images/adaptive_node_cross_section2.png)
 

@@ -1,8 +1,9 @@
 ---
 slug: 62
-title: 62/STATUS-Payloads
+title: 62/STATUS-PAYLOADS
 name: Status Message Payloads
 status: draft
+description: Describes the payload of each message in Status.
 editor: r4bbit <r4bbit@status.im>
 contributors: 
 - Adam Babik <adam@status.im>
@@ -35,9 +36,13 @@ message StatusProtocolMessage {
 }
 ```
 
-`signature` is the bytes of the signed `SHA3-256` of the payload, signed with the key of the author of the message.
-The node needs the signature to validate authorship of the message, so that the message can be relayed to third parties.
-If a signature is not present, but an author is provided by a layer below, the message is not to be relayed to third parties, and it is considered plausibly deniable.
+`signature` is the bytes of the signed `SHA3-256` of the payload,
+signed with the key of the author of the message.
+The node needs the signature to validate authorship of the message,
+so that the message can be relayed to third parties.
+If a signature is not present, but an author is provided by a layer below,
+the message is not to be relayed to third parties,
+and it is considered plausibly deniable.
 
 ### Encoding
 
@@ -49,7 +54,7 @@ The node encodes the payload using [Protobuf](https://developers.google.com/prot
 
 The type `ChatMessage` represents a chat message exchanged between clients.
 
-#### Payload
+Payload
 
 The protobuf description is:
 
@@ -134,7 +139,7 @@ message ChatMessage {
 | 5 | ens_name | `string` | The ENS name of the user sending the message |
 | 6 | chat_id | `string` | The local ID of the chat the message is sent to |
 | 7 | message_type | `MessageType` | The type of message, different for one-to-one, public or group chats |
-| 8 | content_type | `ContentType` | The type of the content of the message | 
+| 8 | content_type | `ContentType` | The type of the content of the message |
 | 9 | payload | `Sticker` I `Image` I `Audio` I `DiscordMessage` I `bytes` I nil` | The payload of the message based on the content type |
 | 13 | grant | `bytes` | Grant for community chat messages |
 | 14 | display_name | `string` | The message author's display name |
@@ -143,12 +148,15 @@ message ChatMessage {
 
 #### Content types
 
-A node requires content types for a proper interpretation of incoming messages. Not each message is plain text but may carry different information.
+A node requires content types for a proper interpretation of incoming messages.
+Not each message is plain text but may carry different information.
 
 The following content types MUST be supported:
+
 * `TEXT_PLAIN` identifies a message which content is a plaintext.
 
 There are other content types that MAY be implemented by the client:
+
 * `STICKER`
 * `STATUS`
 * `EMOJI`
@@ -160,19 +168,29 @@ There are other content types that MAY be implemented by the client:
 * `DISCORD_MESSAGE`
 * `IDENTITY_VERIFICATION`
 
-##### Mentions 
+##### Mentions
 
-A mention MUST be represented as a string with the `@0xpk` format, where `pk` is the public key of the [user account](https://specs.status.im/spec/2) to be mentioned, within the `text` field of a message with content_type `TEXT_PLAIN`.
+A mention MUST be represented as a string with the `@0xpk` format,
+where `pk` is the public key of the
+[user account](https://specs.status.im/spec/2) to be mentioned,
+within the `text` field of a message with content_type `TEXT_PLAIN`.
 A message MAY contain more than one mention.
-This specification RECOMMENDs that the application does not require the user to enter the entire pk. 
-This specification RECOMMENDs that the application allows the user to create a mention by typing @ followed by the related ENS or 3-word pseudonym.
-This specification RECOMMENDs that the application provides the user auto-completion functionality to create a mention.
-For better user experience, the client SHOULD display a known [ens name or the 3-word pseudonym corresponding to the key](https://specs.status.im/spec/2#contact-verification) instead of the `pk`.
+This specification RECOMMENDs that the application
+does not require the user to enter the entire pk.
+This specification RECOMMENDs that the application
+allows the user to create a mention by typing @ followed by the related ENS or
+3-word pseudonym.
+This specification RECOMMENDs that the application
+provides the user auto-completion functionality to create a mention.
+For better user experience,
+the client SHOULD display a known
+[ens name or the 3-word pseudonym corresponding to the key](https://specs.status.im/spec/2#contact-verification)
+instead of the `pk`.
 
 ##### Sticker content type
 
-A `ChatMessage` with `STICKER` `Content/Type` MUST also specify the ID of the `Pack` and 
-the `Hash` of the pack, in the `Sticker` field of `ChatMessage`
+A `ChatMessage` with `STICKER` `Content/Type` MUST also specify the ID of the `Pack`
+and the `Hash` of the pack, in the `Sticker` field of `ChatMessage`
 
 ```protobuf
 message StickerMessage {
@@ -183,15 +201,17 @@ message StickerMessage {
 
 ##### Image content type
 
-A `ChatMessage` with `IMAGE` `Content/Type` MUST also specify the `payload` of the image
-and the `type`.
+A `ChatMessage` with `IMAGE` `Content/Type` MUST also
+specify the `payload` of the image and the `type`.
 
-Clients MUST sanitize the payload before accessing its content, in particular: 
-- Clients MUST choose a secure decoder
-- Clients SHOULD strip metadata if present without parsing/decoding it
-- Clients SHOULD NOT add metadata/exif when sending an image file for privacy and security reasons
-- Clients MUST make sure that the transport layer constraints the size of the payload to limit they are able to handle securely
+Clients MUST sanitize the payload before accessing its content, in particular:
 
+* Clients MUST choose a secure decoder
+* Clients SHOULD strip metadata if present without parsing/decoding it
+* Clients SHOULD NOT add metadata/exif when sending an image file for privacy
+and security reasons
+* Clients MUST make sure that the transport layer constraints the size of the payload
+to limit they are able to handle securely
 
 ```protobuf
 message ImageMessage {
@@ -209,14 +229,18 @@ message ImageMessage {
 
 ##### Audio content type
 
-A `ChatMessage` with `AUDIO` `Content/Type` MUST also specify the `payload` of the audio,
+A `ChatMessage` with `AUDIO`,
+`Content/Type` MUST also specify the `payload` of the audio,
 the `type` and the duration in milliseconds (`duration_ms`).
 
-Clients MUST sanitize the payload before accessing its content, in particular: 
-- Clients MUST choose a secure decoder
-- Clients SHOULD strip metadata if present without parsing/decoding it
-- Clients SHOULD NOT add metadata/exif when sending an audio file for privacy and security reasons
-- Clients MUST make sure that the transport layer constraints the size of the payload to limit they are able to handle securely
+Clients MUST sanitize the payload before accessing its content, in particular:
+
+* Clients MUST choose a secure decoder
+* Clients SHOULD strip metadata if present without parsing/decoding it
+* Clients SHOULD NOT add metadata/exif when sending an audio file for privacy
+and security reasons
+* Clients MUST make sure that the transport layer constraints the size
+of the payload to limit they are able to handle securely
 
 ```protobuf
 message AudioMessage {
@@ -231,11 +255,13 @@ message AudioMessage {
 
 ##### Community content type
 
-A `ChatMessage` with `COMMUNITY` `Content/Type` MUST also specify the `payload` of the community as bytes from a [CommunityDescription](#communitydescription).
+A `ChatMessage` with `COMMUNITY` `Content/Type`,
+MUST also specify the `payload` of the community as bytes from a [CommunityDescription](#communitydescription).
 
 ##### DiscordMessage content type
 
-A `ChatMessage` with `DISCORD_MESSAGE` `Content/Type` MUST also specify the `payload` of the `DiscordMessage`.
+A `ChatMessage` with `DISCORD_MESSAGE` `Content/Type`,
+MUST also specify the `payload` of the `DiscordMessage`.
 
 ```protobuf
 message DiscordMessage {
@@ -279,13 +305,16 @@ message DiscordMessageAttachment {
 
 #### Message types
 
-A node requires message types to decide how to encrypt a particular message and what metadata needs to be attached when passing a message to the transport layer.
+A node requires message types to decide how to encrypt a particular message and
+what metadata needs to be attached when passing a message to the transport layer.
 For more on this, see [10/WAKU2](../../waku/standards/core/10/waku2.md).
 
-<!-- TODO: This reference is a bit odd, considering the layer payloads should interact with is Secure Transport, and not Whisper/Waku. This requires more detail -->
-
+<!-- TODO: This reference is a bit odd,
+considering the layer payloads should interact with is Secure Transport, and
+not Whisper/Waku. This requires more detail -->
 
 The following messages types MUST be supported:
+
 * `ONE_TO_ONE` is a message to the public group
 * `PUBLIC_GROUP` is a private message
 * `PRIVATE_GROUP` is a message to the private group.
@@ -307,34 +336,56 @@ enum MessageType {
 
 #### Clock vs Timestamp and message ordering
 
-If a user sends a new message before the messages sent while the user was offline are received, the new message is supposed to be displayed last in a chat.
-This is where the basic algorithm of Lamport timestamp would fall short as it's only meant to order causally related events.
+If a user sends a new message,
+before the messages sent while the user was offline are received,
+the new message is supposed to be displayed last in a chat.
+This is where the basic algorithm of Lamport timestamp would fall short as
+it's only meant to order causally related events.
 
-The status client therefore makes a "bid", speculating that it will beat the current chat-timestamp, s.t. the status client's Lamport timestamp format is: `clock = `max({timestamp}, chat_clock + 1)`
+The status client therefore makes a "bid",
+speculating that it will beat the current chat-timestamp,
+s.t. the status client's Lamport timestamp format is:
+`clock = max({timestamp}, chat_clock + 1)`
 
 This will satisfy the Lamport requirement, namely: a -> b then T(a) < T(b)
 
-`timestamp` MUST be Unix time calculated, when the node creates the message, in milliseconds. 
+`timestamp` MUST be Unix time calculated, when the node creates the message,
+in milliseconds.
 This field SHOULD not be relied upon for message ordering.
 
-`clock` SHOULD be calculated using the algorithm of [Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamps). 
-When there are messages available in a chat, the node calculates `clock`'s value based on the last received message in a particular chat: `max(timeNowInMs, last-message-clock-value + 1)`. 
+`clock` SHOULD be calculated using the algorithm of
+[Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamps).
+When there are messages available in a chat,
+the node calculates `clock`'s value
+based on the last received message in a particular chat:
+`max(timeNowInMs, last-message-clock-value + 1)`.
 If there are no messages, `clock` is initialized with `timestamp`'s value.
 
-Messages with a `clock` greater than `120` seconds over the Whisper/Waku timestamp SHOULD be discarded, in order to avoid malicious users to increase the `clock` of a chat arbitrarily.
+Messages with a `clock` greater than `120` seconds over the Whisper/Waku timestamp
+SHOULD be discarded,
+in order to avoid malicious users to increase the `clock` of a chat arbitrarily.
 
-Messages with a `clock` less than `120` seconds under the Whisper/Waku timestamp might indicate an attempt to insert messages in the chat history which is not distinguishable from a `datasync` layer re-transit event. 
+Messages with a `clock` less than `120` seconds under the Whisper/Waku timestamp
+might indicate an attempt to insert messages in the chat history,
+which is not distinguishable from a `datasync` layer re-transit event.
 A client MAY mark this messages with a warning to the user, or discard them.
 
-The node uses `clock` value for the message ordering. The algorithm used, and the distributed nature of the system produces casual ordering, which might produce counter-intuitive results in some edge cases. 
-For example, when a user joins a public chat and sends a message before receiving the exist messages, their message `clock` value might be lower and the message will end up in the past when the historical messages are fetched.
+The node uses `clock` value for the message ordering.
+The algorithm used, and
+the distributed nature of the system produces casual ordering,
+which might produce counter-intuitive results in some edge cases.
+For example, when a user joins a public chat and
+sends a message before receiving the exist messages,
+their message `clock` value might be lower and
+the message will end up in the past when the historical messages are fetched.
 
 #### Chats
 
-Chat is a structure that helps organize messages. 
-It's usually desired to display messages only from a single recipient, or a group of recipients at a time and chats help to achieve that.
+Chat is a structure that helps organize messages.
+It's usually desired to display messages only from a single recipient,
+or a group of recipients at a time and chats help to achieve that.
 
-All incoming messages can be matched against a chat. 
+All incoming messages can be matched against a chat.
 The below table describes how to calculate a chat ID for each message type.
 
 |Message Type|Chat ID Calculation|Direction|Comment|
@@ -347,7 +398,9 @@ The below table describes how to calculate a chat ID for each message type.
 
 ### ContactUpdate
 
-`ContactUpdate` is a message exchange to notify peers that either the user has been added as a contact, or that information about the sending user have changed.
+`ContactUpdate` is a message exchange to notify peers
+that either the user has been added as a contact, or
+that information about the sending user have changed.
 
 ```protobuf
 message ContactUpdate {
@@ -368,7 +421,7 @@ message ContactRequestPropagatedState {
 }
 ```
 
-#### Payload
+#### Payload Fields
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
@@ -384,31 +437,38 @@ message ContactRequestPropagatedState {
 
 A client SHOULD send a `ContactUpdate` to all the contacts each time:
 
-- The ens_name has changed
-- A user edits the profile image
+* The ens_name has changed
+* A user edits the profile image
 
-A client SHOULD also periodically send a `ContactUpdate` to all the contacts, the interval is up to the client, the Status official client sends these updates every 48 hours.
+A client SHOULD also periodically send a `ContactUpdate` to all the contacts,
+the interval is up to the client,
+the Status official client sends these updates every 48 hours.
 
 ### EmojiReaction
 
-`EmojiReaction`s represents a user's "reaction" to a specific chat message. 
+`EmojiReaction`s represents a user's "reaction" to a specific chat message.
 For more information about the concept of emoji reactions see [Facebook Reactions](https://en.wikipedia.org/wiki/Facebook_like_button#Use_on_Facebook).
 
-This specification RECOMMENDS that the UI/UX implementation of sending `EmojiReactions` requires only a single click operation, as users have an expectation that emoji reactions are effortless and simple to perform.  
+This specification RECOMMENDS that the UI/UX implementation of sending `EmojiReactions`
+requires only a single click operation,
+as users have an expectation that emoji reactions are effortless
+and simple to perform.  
 
 ```protobuf
 message EmojiReaction {
   // clock Lamport timestamp of the chat message
   uint64 clock = 1;
 
-  // chat_id the ID of the chat the message belongs to, for query efficiency the chat_id is stored in the db even though the
+  // chat_id the ID of the chat the message belongs to, for query efficiency the
+  // chat_id is stored in the db even though the
   // target message also stores the chat_id
   string chat_id = 2;
 
   // message_id the ID of the target message that the user wishes to react to
   string message_id = 3;
 
-  // message_type is (somewhat confusingly) the ID of the type of chat the message belongs to
+  // message_type 
+  // is (somewhat confusingly) the ID of the type of chat the message belongs to
   MessageType message_type = 4;
 
   // type the ID of the emoji the user wishes to react with
@@ -431,20 +491,23 @@ message EmojiReaction {
 
 Clients MUST specify `clock`, `chat_id`, `message_id`, `type` and `message_type`.
 
-This specification RECOMMENDS that the UI/UX implementation of retracting an `EmojiReaction`s requires only a single click operation, as users have an expectation that emoji reaction removals are effortless and simple to perform.  
+This specification RECOMMENDS that the UI/UX implementation of retracting an `EmojiReaction`s
+requires only a single click operation,
+as users have an expectation that emoji reaction removals are effortless and
+ simple to perform.  
 
 ### MembershipUpdateMessage and MembershipUpdateEvent
 
-`MembershipUpdateEvent` is a message used to propagate information about group membership changes in a group chat.
+`MembershipUpdateEvent` is a message used to propagate information
+about group membership changes in a group chat.
 The details are in the [Group chats specs](../56/communities.md).
-
 
 ```protobuf
 message MembershipUpdateMessage {
   // The chat id of the private group chat
   string chat_id = 1;
-  // A list of events for this group chat, first x bytes are the signature, then is a 
-  // protobuf encoded MembershipUpdateEvent
+  // A list of events for this group chat, first x bytes are the signature, 
+  // then is a protobuf encoded MembershipUpdateEvent
   repeated bytes events = 2;
 
   // An optional chat message
@@ -483,7 +546,7 @@ message MembershipUpdateEvent {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
@@ -496,7 +559,8 @@ A `MembershipUpdateMessage` includes either a `ChatMessage` or `EmojiReaction`.
 
 ### SyncInstallationContactV2
 
-The node uses `SyncInstallationContact` messages to synchronize in a best-effort the contacts to other devices.
+The node uses `SyncInstallationContact` messages to synchronize
+in a best-effort the contacts to other devices.
 
 ```protobuf
 message SyncInstallationContactV2 {
@@ -522,16 +586,15 @@ message SyncInstallationContactV2 {
 }
 ```
 
-
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | last_updated_locally | `uint64` | Timestamp of last local update | 
+| 1 | last_updated_locally | `uint64` | Timestamp of last local update |
 | 2 | id | `string` | id of the contact synced |
 | 3 | profile_image | `string` |  `base64` encoded profile picture of the user |
 | 4 | ens_name | `string` | ENS name of the contact |
-| 5 | `array[string]` | Array of `system_tags` for the user, this can currently be: `":contact/added", ":contact/blocked", ":contact/request-received"`|
+| 5 | |`array[string]` | Array of `system_tags` for the user, this can currently be: `":contact/added", ":contact/blocked", ":contact/request-received"` |
 | 7 | local_nickname | `string` | Local display name of the contact |
 | 9 | added | `bool` | Wether the contact is added |
 | 10 | blocked | `bool` | Wether the contact is blocked |
@@ -547,7 +610,8 @@ message SyncInstallationContactV2 {
 
 ### SyncInstallationPublicChat
 
-The node uses `SyncInstallationPublicChat` message to synchronize in a best-effort the public chats to other devices.
+The node uses `SyncInstallationPublicChat` message to synchronize
+in a best-effort the public chats to other devices.
 
 ```protobuf
 message SyncInstallationPublicChat {
@@ -556,16 +620,17 @@ message SyncInstallationPublicChat {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | clock value of the chat | 
+| 1 | clock | `uint64` | clock value of the chat |
 | 2 | id | `string` | id of the chat synced |
 
 ### SyncPairInstallation
 
-The node uses `PairInstallation` messages to propagate information about a device to its paired devices.
+The node uses `PairInstallation` messages to propagate information
+about a device to its paired devices.
 
 ```protobuf
 message SyncPairInstallation {
@@ -578,18 +643,19 @@ message SyncPairInstallation {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | clock value of the chat | 
+| 1 | clock | `uint64` | clock value of the chat |
 | 2| installation_id | `string` | A randomly generated id that identifies this device |
 | 3 | device_type | `string` | The OS of the device `ios`,`android` or `desktop` |
 | 4 | name | `string` | The self-assigned name of the device |
 
 ### ChatIdentity
 
-`ChatIdentity` represents the user defined identity associated with their public chat key.
+`ChatIdentity` represents the user defined identity associated
+with their public chat key.
 
 ```protobuf
 message ChatIdentity {
@@ -601,18 +667,19 @@ message ChatIdentity {
   string color = 6;
   string emoji = 7;
   repeated SocialLink social_links = 8;
-  // first known message timestamp in seconds (valid only for community chats for now)
+  // first known message timestamp in seconds 
+  // (valid only for community chats for now)
   // 0 - unknown
   // 1 - no messages
   uint32 first_message_timestamp = 9;
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2| ens_name | `string` | A valid ENS associated with the chat key |
 | 3 | images | `map<string, IdentityImage>` | Image data associated with the chat key |
 | 4 | display_name | `string` | The self-assigned display_name of the chat key |
@@ -624,8 +691,8 @@ message ChatIdentity {
 
 ### CommunityDescription
 
-`CommunityDescription` represents a community metadata that is used to discover communities and share community updates.
-
+`CommunityDescription` represents a community metadata
+that is used to discover communities and share community updates.
 
 ```protobuf
 message CommunityDescription {
@@ -670,17 +737,20 @@ message CommunityPermissions {
   }
 
   bool ens_only = 1;
-  // https://gitlab.matrix.org/matrix-org/olm/blob/master/docs/megolm.md is a candidate for the algorithm to be used in case we want to have private communityal chats, lighter than pairwise encryption using the DR, less secure, but more efficient for large number of participants
+  // https://gitlab.matrix.org/matrix-org/olm/blob/master/docs/megolm.md is a 
+  // candidate for the algorithm to be used in case we want to have private 
+  // communityal chats, lighter than pairwise encryption using the DR, less secure,
+  // but more efficient for large number of participants
   bool private = 2;
   Access access = 3;
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2| members | `map<string, CommunityMember>` | The members of the community |
 | 3 | permissions | `CommunityPermissions` | Image data associated with the chat key |
 | 4 | display_name | `string` | The self-assigned display_name of the chat key |
@@ -692,9 +762,11 @@ message CommunityPermissions {
 
 ### CommunityRequestToJoin
 
-A `CommunityRequestToJoin` represents a request to join a community, sent by a user that is not yet a member of that community. 
+A `CommunityRequestToJoin` represents a request to join a community,
+sent by a user that is not yet a member of that community.
 A request to join a community includes a list of `RevealedAccount`.
-These are wallet addresses that users are willing to reveal with the community's control node and admins.
+These are wallet addresses that users are willing to reveal
+with the community's control node and admins.
 
 ```protobuf
 message CommunityRequestToJoin {
@@ -714,11 +786,11 @@ message RevealedAccount {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2| ens_name | `string` | The ENS of the user sending the request |
 | 3 | chat_id | `string` | The id of the chat to request access to |
 | 4 | community_id | `bytes` | The public key of the community |
@@ -727,7 +799,8 @@ message RevealedAccount {
 
 ### PinMessage
 
-A `PinMessage` is a signal that tells a client that a specific message has to be marked as pinned.
+A `PinMessage` is a signal that tells a client that a specific message
+has to be marked as pinned.
 
 ```protobuf
 message PinMessage {
@@ -739,21 +812,19 @@ message PinMessage {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2| message_id | `string` | The id of the message to be pinned |
 | 3 | chat_id | `string` | The id of the chat of the message to be pinned |
 | 4 | pinned | `bool` | Whether the message should be pinned or unpinned |
 | 5 | message_type | `MessageType` | The type of message (public/one-to-one/private-group-chat) |
 
-
 ### EditMessage
 
 A `EditMessage` represents an update to an existing message.
-
 
 ```protobuf
 message EditMessage {
@@ -773,11 +844,11 @@ message EditMessage {
 
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2| text | `string` | The updated message text |
 | 3 | chat_id | `string` | The id of the chat of the message |
 | 4 | message_id | `string` | The id of the message to be edited |
@@ -786,10 +857,10 @@ message EditMessage {
 | 7 | content_type | `ChatMessage.ContentType` | The updated content type of the message  |
 | 8 | unfurled_links | `array<UnfurledLink>` | Updated link metadata  |
 
-
 ### DeleteMessage
 
-A `DeleteMessage` represents a signal to delete a message from the local database of a client.
+A `DeleteMessage` represents a signal to delete a message
+from the local database of a client.
 
 ```protobuf
 message DeleteMessage {
@@ -808,21 +879,21 @@ message DeleteMessage {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | chat_id | `string` | The id of the chat of the message |
 | 3 | message_id | `string` | The id of the message to delete |
 | 4 | grant | `bytes` | A grant for a community edit messages  |
 | 5 | message_type | `MessageType` | The type of message  |
 | 6 | deleted_by | `string` | The public key of the user who deleted the message |
 
-
 ### CommunityMessageArchiveLink
 
-A `CommunityMessageArchiveLink` contains a magnet uri for a community's message archive, created using [61/STATUS-Community-History-Archives](../61/community-history-service.md).
+A `CommunityMessageArchiveLink` contains a magnet uri for a community's message archive,
+created using [61/STATUS-Community-History-Archives](../61/community-history-service.md).
 
 ```protobuf
 message CommunityMessageArchiveMagnetlink {
@@ -831,11 +902,11 @@ message CommunityMessageArchiveMagnetlink {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | magnet_uri | `string` | The magnet uri of the community archive torrent |
 
 ### AcceptContactRequest
@@ -850,16 +921,17 @@ message AcceptContactRequest {
 
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
 | 1 | id | `string` | The id of the contact request |
-| 2 | clock | `uint64` | Clock value of the message | 
+| 2 | clock | `uint64` | Clock value of the message |
 
 ### RetractContactRequest
 
-A `RetractContractRequest` message signals to the reiver of a request that the request was retracted.
+A `RetractContractRequest` message signals to the reiver, of a request,
+that the request was retracted.
 
 ```protobuf
 message RetractContactRequest {
@@ -869,12 +941,12 @@ message RetractContactRequest {
 
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
 | 1 | id | `string` | The id of the contact request |
-| 2 | clock | `uint64` | Clock value of the message | 
+| 2 | clock | `uint64` | Clock value of the message |
 
 ### CommunityRequestToJoinResponse
 
@@ -891,11 +963,11 @@ message CommunityRequestToJoinResponse {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | community | `CommunityDescription` | The community metadata |
 | 3 | accepted | `bool` | Whether the request was accepted |
 | 4 | grant | `bytes` | The grant |
@@ -904,7 +976,8 @@ message CommunityRequestToJoinResponse {
 
 ### CommunityRequestToLeave
 
-A `CommunityRequestToLeave` represents a signal to a community that a user wants to be removed from the community's member list.
+A `CommunityRequestToLeave` represents a signal to a community
+that a user wants to be removed from the community's member list.
 
 ```protobuf
 message CommunityRequestToLeave {
@@ -912,17 +985,19 @@ message CommunityRequestToLeave {
   bytes community_id = 2;
 }
 ```
-#### Payload
+
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | community_id | `bytes` | The id of the community |
-
 
 ### RequestContactVerification
 
-A `RequestContactVerification` is a request to verify a contact using a "challenge", which can by any string message and typically involves questions that only the contact should know.
+A `RequestContactVerification` is a request to verify a contact using a "challenge",
+which can by any string message and
+typically involves questions that only the contact should know.
 
 ```protobuf
 message RequestContactVerification {
@@ -930,17 +1005,18 @@ message RequestContactVerification {
   string challenge = 3;
 }
 ```
-#### Payload
+
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | challenge | `string` | The challenge message used for verification |
 
 ### AcceptContactVerification
 
-A `AcceptContactVerification` signals that a verification request was accepted and includes a response to the challenge.
-
+A `AcceptContactVerification` signals that a verification request was accepted and
+includes a response to the challenge.
 
 ```protobuf
 message AcceptContactVerification {
@@ -950,11 +1026,11 @@ message AcceptContactVerification {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | id | `string` | The verification request id |
 | 3 | response | `string` | The response for the challenge |
 
@@ -969,11 +1045,11 @@ message DeclineContactVerification {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | id | `string` | The verification request id |
 
 ### CancelContactVerification
@@ -987,13 +1063,12 @@ message CancelContactVerification {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | id | `string` | The verification request id |
-
 
 ### CommunityCancelRequestToJoin
 
@@ -1009,11 +1084,11 @@ message CommunityCancelRequestToJoin {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | ens_name | `string` | The ENS name of the account cancelling the request |
 | 3 | chat_id | `string` | The id of the chat |
 | 4 | community_id | `bytes` | The id of the community |
@@ -1021,7 +1096,8 @@ message CommunityCancelRequestToJoin {
 
 ### CommunityEditSharedAddresses
 
-A `CommunityEditSharedAddresses` message allows users to edit the shared accounts they've revealed when requesting to join a community.
+A `CommunityEditSharedAddresses` message allows users to edit the shared accounts
+they've revealed when requesting to join a community.
 
 ```protobuf
 message CommunityEditSharedAddresses {
@@ -1031,11 +1107,11 @@ message CommunityEditSharedAddresses {
 }
 ```
 
-#### Payload
+Payload
 
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
-| 1 | clock | `uint64` | Clock value of the message | 
+| 1 | clock | `uint64` | Clock value of the message |
 | 2 | community_id | `bytes` | The id of the community |
 | 3 | revealed_accounts | `array<RevealedAccount>` | A list of revealed accounts |
 
@@ -1043,12 +1119,11 @@ message CommunityEditSharedAddresses {
 
 There are two ways to upgrade the protocol without breaking compatibility:
 
-- A node always supports accretion
-- A node does not support deletion of existing fields or messages, which might break compatibility
+* A node always supports accretion
+* A node does not support deletion of existing fields or messages,
+which might break compatibility
 
 ## Security Considerations
-
--
 
 ## Changelog
 
@@ -1056,20 +1131,20 @@ There are two ways to upgrade the protocol without breaking compatibility:
 
 Released [August 25, 2020](https://github.com/status-im/specs/commit/968fafff23cdfc67589b34dd64015de29aaf41f0)
 
-- Added support for emoji reactions
+* Added support for emoji reactions
 
 ### Version 0.4
 
 Released [July 16, 2020](https://github.com/status-im/specs/commit/ad45cd5fed3c0f79dfa472253a404f670dd47396)
 
-- Added support for images
-- Added support for audio
+* Added support for images
+* Added support for audio
 
 ### Version 0.3
 
 Released [May 22, 2020](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)
 
-- Added language to include Waku in all relevant places
+* Added language to include Waku in all relevant places
 
 ## Copyright
 
