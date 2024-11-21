@@ -118,7 +118,7 @@ The key agreement is performed out of band.
 And provides an encrypted signature and padding for some form of unlinkability.
 
 - **Version 2:**
-The payload SHOULD be encoded according to [35/WAKU2-NOISE]([/spec/35](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md)).
+The payload SHOULD be encoded according to [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md).
 Waku Noise protocol provides symmetric encryption and asymmetric key exchange.
 
 Any `version` value not included in this list is reserved for future specification.
@@ -254,5 +254,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [6/WAKU1](../../legacy/6/waku1.md)
 - [Google Protocol buffers v3](https://developers.google.com/protocol-buffers/)
 - [26/WAKU-PAYLOAD](../../application/26/payload.md)
-- [35/WAKU2-NOISE]([/spec/35](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/noise.md))
+- [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
 - [62/STATUS-PAYLOADS](../../../../status/62/payloads.md/#clock-vs-timestamp-and-message-ordering)

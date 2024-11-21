@@ -63,14 +63,14 @@ efficient way will be part of a future document.
 Sharding the [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
 network is an integral part of scaling the Status app.
 
-[51/WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
+[WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 specifies shards clusters, which are sets of `1024` shards
 (separate pubsub mesh networks).
 Content topics specified by application protocols can be distributed over these shards.
 The Status app protocols are assigned to shard cluster `16`,
-as defined in [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md).
+as defined in [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md).
 
-[WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
+[WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 specifies three sharding methods.
 This document uses *static sharding*,
 which leaves the distribution of content topics to application protocols,
@@ -88,7 +88,7 @@ The 1024 shards within the main Status shard cluster are allocated as follows.
 |    768 - 895  |   1:1 chat                       |
 |   896 - 1023  |   media and control msgs         |
 
-Shard indices are mapped to pubsub topic names as follows (specified in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)).
+Shard indices are mapped to pubsub topic names as follows (specified in [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)).
 
 `/waku/2/rs/<cluster_id>/<shard_number>`
 
@@ -154,7 +154,7 @@ message CommunityDescription {
 }
 ```
 
-> *Note*: Currently, Status app has allocated shared cluster `16` in [52/WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md).
+> *Note*: Currently, Status app has allocated shared cluster `16` in [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md).
 Status app could allocate more shard clusters, for instance to establish a test net.
 We could add the shard cluster index to the community description as well.
 The recommendation for now,
@@ -168,7 +168,7 @@ Status communities can be mapped to shards in two ways: static, and owner-based.
 
 With static mapping,
 communities are assigned a specific shard index within the Status shard cluster.
-This mapping is similar in nature to the shard cluster allocation in [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md).
+This mapping is similar in nature to the shard cluster allocation in [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md).
 Shard indices allocated in that way are in the range `16 - 127`.
 The Status CC community uses index `16`
 (not to confuse with shard cluster index `16`, which is the Status shard cluster).
@@ -310,7 +310,7 @@ Light protocols comprise
 * [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) for sending messages
 * [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
 for requesting messages with specific attributes
-* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
+* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 for discovering peers
 
 ## Waku Archive
@@ -333,7 +333,7 @@ In fact, the archive service can be offered by infrastructure nodes.
 
 ## Discovery
 
-Shard discovery is covered by [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md).
+Shard discovery is covered by [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md).
 This allows the Status app to abstract from the discovery process and
 simply address shards by their index.
 
@@ -344,7 +344,7 @@ this document suggests using [libp2p rendezvous](https://github.com/libp2p/specs
 Nodes can check whether they are behind a restrictive NAT using the
 [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md).
 
-> *Note:* The following will move into [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md),
+> *Note:* The following will move into [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md),
 or [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md):
 Nodes behind restrictive NATs SHOULD not announce their publicly unreachable address
 via [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) discovery.
@@ -369,9 +369,9 @@ functionality offered by the libp2p circuit relay protocols, and
 to upgrade to a direct connection.
 
 Nodes that do not announce themselves at all and only plan to use light protocols,
-MAY use rendezvous discovery instead of or along-side [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md).
+MAY use rendezvous discovery instead of or along-side [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md).
 For these nodes, rendezvous and
-[WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
+[WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 offer the same functionality,
 but return node sets sampled in different ways.
 Using both can help increasing connectivity.
@@ -401,7 +401,7 @@ The string conversion SHOULD remove leading zeros.
 field is of type string, a more efficient byte encoding is not utilized.
 
 Registering shard 2 in the Status shard cluster (with shard cluster index 16,
-see [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md),
+see [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md),
 the register query would look like
 
 ```rs
@@ -601,7 +601,7 @@ It could be rate-limited with RLN.
 
 This document makes several trade-offs to privacy and anonymity.
 Todo: elaborate.
-See [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md)
+See [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/master/informational/adversarial-models.md)
 for information on Waku Anonymity.
 
 ## Copyright
@@ -614,12 +614,12 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 * [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
 * [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
-* [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
-* [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/waku-RFC/informational/relay-static-shard-alloc.md)
+* [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
+* [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md)
 * [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md)
 * [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
 * [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
-* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/peer-exchange/peer-exchange.md)
+* [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 * [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
 * [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md)
 * [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
@@ -629,9 +629,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [DCUtR](https://github.com/libp2p/specs/blob/master/relay/DCUtR.md)
 * [scoring](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
 * [Circuit Relay](https://docs.libp2p.io/concepts/nat/circuit-relay/)
-* [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/waku-RFC/informational/adversarial-models.md)
+* [WAKU2-ADVERSARIAL-MODELS](https://github.com/waku-org/specs/blob/master/informational/adversarial-models.md)
 
 ## Informative
 
 * [Circuit Relay](https://docs.libp2p.io/concepts/nat/circuit-relay/)
-* [WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
+* [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)

@@ -114,6 +114,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 * [11/WAKU2-RELAY](../11/relay.md)
-* [WAKU2-DANDELION](https://github.com/waku-org/specs/blob/waku-RFC/standards/application/dandelion.md)
+* [WAKU2-DANDELION](https://github.com/waku-org/specs/blob/master/standards/application/dandelion.md)
 * [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
 * [WAKU2-INCENTIVIZATION](https://github.com/waku-org/specs/blob/master/standards/core/incentivization.md)

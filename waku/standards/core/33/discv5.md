@@ -41,8 +41,8 @@ within the network.
 in order of increasing decentralization
 
 * hard coded bootstrap nodes
-* [`DNS discovery`](https://rfc.vac.dev/spec/10/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
-* `peer-exchange` (work in progress)
+* [`DNS discovery`](/waku/standards/10/waku2.md/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
+* [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
 * `33/WAKU2-DISCV5` (specified in this document)
 
 The purpose of ambient node discovery within [10/WAKU2](../10/waku2.md)
@@ -74,7 +74,7 @@ This also increases decentralization.
 isolated from the Ethereum Discovery v5 network.
 
 Another simple solution would be taking part in the Ethereum Discovery network,
-and filtering Waku nodes based on whether they support [WAKU2-ENR](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md).
+and filtering Waku nodes based on whether they support [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
 This solution is more resilient towards eclipse attacks.
 However, this discovery method is very inefficient
 for small percentages of Waku nodes
@@ -205,20 +205,20 @@ raises research questions that we will address in future stages of our discv5 ro
 ## References
 
 1. [10/WAKU2](../10/waku2.md)
-1. [11/WAKU2-RELAY](../11/relay.md)
-1. [`WAKU2-ENR`](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/enr.md)
-1. [Node Discovery Protocol v5 (`discv5`)](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
-1. [`discv5` semantics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md).
-1. [`discv5` wire protocol](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-wire.md)
-1. [`discv5` topic discovery](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md#topic-advertisement)
-1. [Waku DNS discovery](https://rfc.vac.dev/spec/10/#discovery-domain)
-1. [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
-1. [`EIP-1459`](https://eips.ethereum.org/EIPS/eip-1459)
-1. [`GossipSub`](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
-1. [Waku discv5 roadmap discussion](https://forum.vac.dev/t/waku-v2-discv5-roadmap-discussion/121)
-1. [discovery efficiency estimation](https://forum.vac.dev/t/waku-v2-discv5-roadmap-discussion/121/8)
-1. [implementation: Nim](https://github.com/kaiserd/nim-eth/blob/add-selectable-protocol-id-static/eth/p2p/discoveryv5/encoding.nim)
-1. [implementation: Go](https://github.com/status-im/go-waku/blob/master/waku/v2/discv5/discover.go)
+2. [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
+3. [11/WAKU2-RELAY](../11/relay.md)
+4. [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
+5. [Node Discovery Protocol v5 (`discv5`)](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
+6. [`discv5` semantics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md).
+7. [`discv5` wire protocol](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-wire.md)
+8. [`discv5` topic discovery](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md#topic-advertisement)
+9. [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
+10. [`EIP-1459`](https://eips.ethereum.org/EIPS/eip-1459)
+11. [`GossipSub`](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
+12. [Waku discv5 roadmap discussion](https://forum.vac.dev/t/waku-v2-discv5-roadmap-discussion/121)
+13. [discovery efficiency estimation](https://forum.vac.dev/t/waku-v2-discv5-roadmap-discussion/121/8)
+14. [implementation: Nim](https://github.com/kaiserd/nim-eth/blob/add-selectable-protocol-id-static/eth/p2p/discoveryv5/encoding.nim)
+15. [implementation: Go](https://github.com/status-im/go-waku/blob/master/waku/v2/discv5/discover.go)
 
 ## Copyright
 
