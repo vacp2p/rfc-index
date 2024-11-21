@@ -20,20 +20,24 @@ This specification describes the Waku lightpush protocol used with resource rest
 A non-relay node, or a edge node,
 are resource restricted devices that have short connection windows and
 limited bandwidth.
-Edge nodes should be able to send and receive messages in the network. 
-To accomplish this, the lightpush protocol helps edge nodes push messages to other nodes
+Edge nodes should be able to send and receive messages in the network.
+To accomplish this,
+the lightpush protocol helps edge nodes push messages to other nodes
 in the [64/WAKU-NETWORK](/waku/standards/core/64/network.md) for access to message services.
 A common use case is to request that a service node publish a message,
 received by an edge node, to an [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) pubsub-topic.
-Additionally, in some cases, there is a need for confirmation that a message has been received "by the network"
+Additionally, in some cases,
+there is a need for confirmation that a message has been received "by the network"
 (here, at least one node).
 
 ## Payloads
+
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”,
-“SHOULD NOT”, “RECOMMENDED”, “MAY”, and 
+“SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-Below describes the protobuf stucture used by Waku edge nodes and Waku service nodes who have lightpush enabled (set to `true`):
+Below describes the protobuf stucture used by Waku edge nodes and
+Waku service nodes who have lightpush enabled (set to `true`):
 
 ```protobuf
 syntax = "proto3";
@@ -57,7 +61,8 @@ message LightPushResponse {
 
 Nodes that respond to `LightPushRequest` SHOULD
 
-- either relay the encapsulated message via [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) protocol on the specified `pubsub_topic`
+- either relay the encapsulated message via
+[11/WAKU2-RELAY](/waku/standards/core/11/relay.md) protocol on the specified `pubsub_topic`
 - or perform another requested service.
 `Services beyond [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) are yet to be defined.`
 
@@ -70,7 +75,7 @@ it SHOULD return an error code in `LightPushResponse`.
 Possible error codes described below.
 
 Once the relay is successful,
-the `relay_peer_count` will indicate the number of peers that the node has managed to relay the message to. 
+the `relay_peer_count` will indicate the number of peers that the node has managed to relay the message to.
 It's important to note that this number may vary depending on the node subscriptions and
 support for the requested `pubsub_topic`.
 The client can use this information to either consider the relay as successful or
@@ -98,6 +103,7 @@ take further action, such as switching to a lightpush service peer with better c
 Since this can introduce an amplification factor,
 it is RECOMMENDED for the node relaying to the rest of the network to take extra precautions.
 Therefore Waku applies or will apply:
+
 - DOS protection through request rate limitation on the service itself.
 - message rate limiting via [17/WAKU2-RLN-RELAY](https://rfc.vac.dev/waku/standards/core/17/rln-relay), applied via network membership subscription.
 
@@ -113,7 +119,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-* [11/WAKU2-RELAY](../11/relay.md)
-* [WAKU2-DANDELION](https://github.com/waku-org/specs/blob/master/standards/application/dandelion.md)
-* [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
-* [WAKU2-INCENTIVIZATION](https://github.com/waku-org/specs/blob/master/standards/core/incentivization.md)
+- [11/WAKU2-RELAY](../11/relay.md)
+- [WAKU2-DANDELION](https://github.com/waku-org/specs/blob/master/standards/application/dandelion.md)
+- [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
+- [WAKU2-INCENTIVIZATION](https://github.com/waku-org/specs/blob/master/standards/core/incentivization.md)
