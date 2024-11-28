@@ -20,6 +20,8 @@ The outcome of the log consolidation procedure is
 that all nodes in the group eventually reflect in their own logs the same entries in the same order.
 The protocol aims to scale to very large groups.
 
+## Motivation
+
 A common application that fits this model is a p2p group chat (or group communication),
 where the participants act as log nodes
 and the group conversation is modelled as the consolidated logs maintained on each node.
@@ -57,17 +59,17 @@ Messages MUST adhere to the following meta structure:
 syntax = "proto3";
 
 message Message {
-  //1 Reserved for sender/participant id
+  // 1 Reserved for sender/participant id
   string message_id = 2;          // Unique identifier of the message
   string channel_id = 3;          // Identifier of the channel to which the message belongs
   optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
   optional repeated string causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
   optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
-  string content = 20;             // Actual content of the message
+  optional bytes content = 20;             // Actual content of the message
 }
 ```
 
-Each message MUST include its globally unique identifier in the `message_id` field.
+Each message MUST include its globally unique identifier in the `message_id` field, likely based on a message hash.
 The `channel_id` field MUST be set to the identifier of the channel of group communication that is being synchronized.
 For simple group communications without individual channels,
 the `channel_id` SHOULD be set to `0`.
@@ -144,6 +146,9 @@ the participant MUST follow the [Resolve Conflicts](#resolve-conflicts) procedur
 Triggered by the [Deliver Message](#deliver-message) procedure.
 
 The participant MUST order messages with the same Lamport timestamp in ascending order of message ID.
+If the message ID is implemented as a hash of the message,
+this means the message with the lowest hash would precede
+other messages with the same Lamport timestamp in the local log.
 
 #### Review ACK Status
 
@@ -159,13 +164,14 @@ taking into account the bloom filter size and hash number.
 
 #### Periodic Incoming Buffer Sweep
 
-The participant MUST periodically check causal dependencies for each message in the incoming buffer.- For each message in the incoming buffer:
+The participant MUST periodically check causal dependencies for each message in the incoming buffer.
+For each message in the incoming buffer:
 - the participant MAY attempt to retrieve missing dependencies from the Store node (high-availability cache) or other peers.
 - if all dependencies of a message are met,
 the participant MUST proceed to [deliver the message](#deliver-message).
 
 If a message's causal dependencies have failed to be met after a predetermined amount of time,
-the participant MAY mark them as irretrievably lost.
+the participant MAY mark them as **irretrievably lost**.
 
 #### Periodic Outgoing Buffer Sweep
 
