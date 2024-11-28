@@ -50,7 +50,9 @@ Each message has a globally unique, immutable ID (or hash).
 Messages can be requested from the high-availability caches or other participants using the corresponding message ID.
 
 ## Wire protocol
-
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, 
+“SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+ “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 ### Message
 
 Messages MUST adhere to the following meta structure:
