@@ -13,7 +13,7 @@ This specification introduces the Scalable Data Sync (SDS) protocol to achieve e
 when consolidating distributed logs in a decentralized manner.
 The protocol is designed for a peer-to-peer (p2p) topology
 where an append-only log is maintained by each member of a group of nodes
-who may individually append new entries to the their local log at any time and
+who may individually append new entries to their local log at any time and
 is interested in merging new entries from other nodes in real-time or close to real-time
 while maintaining a consistent order.
 The outcome of the log consolidation procedure is
