@@ -7,24 +7,33 @@ tags: waku-core
 editor: Hanno Cornelius <hanno@status.im>
 ---
 
-A bridge between Waku v1 and Waku v2.
+## Abstract
+
+This specification describes how [6/WAKU1](/waku/standards/legacy/6/waku1.md) can be used with [10/WAKU2](/waku/standards/core/10/waku2.md). 
 
 ## Bridge
 
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+
 A bridge requires supporting both Waku versions:
 
-* Waku v1 - using devp2p RLPx protocol
-* Waku v2 - using libp2p protocols
+* [6/WAKU1](/waku/standards/legacy/6/waku1.md) - using devp2p RLPx protocol
+* [10/WAKU2](/waku/standards/core/10/waku2.md) - using libp2p protocols
 
-Packets received on the Waku v1 network SHOULD be published just once on the
-Waku v2 network. More specifically, the bridge SHOULD publish
-this through the Waku Relay (PubSub domain).
+Packets received on the [6/WAKU1](/waku/standards/legacy/6/waku1.md) network
+SHOULD be published just once on the [10/WAKU2](/waku/standards/core/10/waku2.md).
+More specifically, the bridge SHOULD publish
+this through the [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) (PubSub domain).
 
-Publishing such packet will require the creation of a new `Message` with a
-new `WakuMessage` as data field. The `data` and `topic` field from the Waku v1
-`Envelope` MUST be copied to the `payload` and `contentTopic` fields of the
-`WakuMessage`. Other fields such as nonce, expiry and ttl will be dropped as
-they become obsolete in Waku v2.
+Publishing such packet REQUIRES the creation of a new `Message` with a
+new `WakuMessage` as data field.
+The `data` and
+`topic` field from the Waku v1 `Envelope` MUST be copied to the `payload` and
+`contentTopic` fields of the `WakuMessage`.
+Other fields such as nonce, expiry and
+ttl will be dropped as they become obsolete in Waku v2.
 
 Before this is done, the usual envelope verification still applies:
 
@@ -32,8 +41,9 @@ Before this is done, the usual envelope verification still applies:
 * PoW verification
 * Size verification
 
-Bridging SHOULD occur through the `WakuRelay`, but it MAY also be done on other Waku
-v2 protocols (e.g. `WakuFilter`). The latter is however not advised as it will
+Bridging SHOULD occur through the `WakuRelay`,
+but it MAY also be done on other Wakuv2 protocols (e.g. `WakuFilter`).
+The latter is however not advised as it will
 increase the complexity of the bridge and because of the
 [Security Considerations](#security-considerations) explained further below.
 
