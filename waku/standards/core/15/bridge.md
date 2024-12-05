@@ -9,7 +9,8 @@ editor: Hanno Cornelius <hanno@status.im>
 
 ## Abstract
 
-This specification describes how [6/WAKU1](/waku/standards/legacy/6/waku1.md) can be used with [10/WAKU2](/waku/standards/core/10/waku2.md). 
+This specification describes how [6/WAKU1](/waku/standards/legacy/6/waku1.md)
+can be used with [10/WAKU2](/waku/standards/core/10/waku2.md).
 
 ## Wire Format
 
@@ -34,7 +35,8 @@ the creation of a new `Message` with a new `WakuMessage` as data field is REQUIR
 The `data` and
 `topic` field, from the [6/WAKU1](/waku/standards/legacy/6/waku1.md) `Envelope`,
 MUST be copied to the `payload` and `content_topic` fields of the `WakuMessage`.
-See [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md#wire-format) for message format details.
+See [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md#wire-format)
+for message format details.
 Other fields such as `nonce`, `expiry` and
 `ttl` will be dropped as they become obsolete in [10/WAKU2](/waku/standards/core/10/waku2.md).
 
@@ -45,7 +47,7 @@ Before this is done, the usual envelope verification still applies:
 * Size verification
 
 Bridging SHOULD occur through the [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
-but it MAY also be done on other [10/WAKU2](/waku/standards/core/10/waku2.md) protocols 
+but it MAY also be done on other [10/WAKU2](/waku/standards/core/10/waku2.md) protocols
 (e.g. [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)).
 The latter is however not advised as it will
 increase the complexity of the bridge and
@@ -63,7 +65,7 @@ the bridge MUST set a new `expiry`, `ttl` and do the PoW `nonce` calculation.
 
 ### Security Considerations
 
-As mentioned above, 
+As mentioned above,
 a bridge will be posting new [6/WAKU1](/waku/standards/legacy/6/waku1.md) envelopes,
 which requires doing the PoW `nonce` calculation.
 
@@ -89,9 +91,9 @@ Copyright and related rights waived via
 
 ## References
 
-- [6/WAKU1](/waku/standards/legacy/6/waku1.md)
-- [10/WAKU2](/waku/standards/core/10/waku2.md)
-- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
-- [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
-- [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)
-- [64/WAKU2-NETWORK](/waku/standards/core/64/network.md)
+* [6/WAKU1](/waku/standards/legacy/6/waku1.md)
+* [10/WAKU2](/waku/standards/core/10/waku2.md)
+* [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+* [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
+* [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)
+* [64/WAKU2-NETWORK](/waku/standards/core/64/network.md)
