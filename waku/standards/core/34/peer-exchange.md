@@ -56,7 +56,7 @@ The responder replies with a list of ENRs as specified in [WAKU2-ENR](https://gi
 The [multiaddresses](https://docs.libp2p.io/concepts/addressing/)
 used to connect to the respective peers can be extracted from the ENRs.
 
-![Figure 1: The responder provides a list of ENRs to the requester. These ENRs contain the information necessary for connecting to the respective peers.](/waku/standards/core/34/images/protocol.svg)
+![Figure 1: The responder provides a list of ENRs to the requester. These ENRs contain the information necessary for connecting to the respective peers.](./images/protocol.svg)
 
 In order to protect its anonymity,
 the responder MUST NOT provide peers from its actively used peer list
