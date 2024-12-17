@@ -9,6 +9,7 @@ description: Status Communities allow multiple users to communicate in a discuss
 editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
 - Andrea Piana <andreap@status.im>
+- Prem Chaitanya Prathi <prem@waku.org>
 ---
 
 ## Abstract
@@ -306,10 +307,31 @@ message CommunityDescription {
 
 Note: The usage of the clock is described in the [Clock](#clock) section.
 
+### Pubsub topic or shard usage
+
+Status network uses static sharding as explained in [Relay Sharding](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md#static-sharding)
+
+All communities by default use the default shard `32` for most of their messages and use shard `64` for a few specific messages like community event messages.
+
+A community can be assigned a dedicated shard (in the range of 1-1024) after creation in which case all messages of the community are sent on that specific shard except for the community event messages.
+
+### Content topic level encryption
+
+-a universal chat identifier is used for all community chats.
+<!-- Don't enforce any constraints on the unique id generation -->
+
+All messages are encrypted before they are handed over to waku ir-respective of the encryption explained above.
+All community chats are encrypted using a symmetric key generated from universal chat id using pbkdf2.
+
+```js
+symKey = pbkdf2(password:universalChatID, salt:nil, iteration-count:65356,key-length:32, hash-func: random-sha256)
+```
+
 ### Content topic usage
 
 "Content topic" refers to the field in [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md/#message-attributes),
 further elaborated in [10/WAKU2](../../waku/standards/core/10/waku2.md/#overview-of-protocol-interaction).
+The content-topic usage follows the guidelines specified at [23/topics](../../waku/informational/23/topics.md#content-topic-usage-guidelines)
 
 #### Advertising a Community
 
@@ -334,32 +356,9 @@ for i = 0; i < topicLen; i++ {
 contentTopic = "/waku/1/0x" + topic + "/rfc26"
 ```
 
-#### Community channels/chats
-
-The unique identifier for a community channel/chat is the chat id.
-<!-- Don't enforce any constraints on the unique id generation -->
-The content topic, that Community channels/chats uses,
-MUST be the hex-encoded keccak-256 hash of the public key of the community
-concatenated with the chat id.
-
-```js
-hash = hex(keccak256(encodeToHex(compressedPublicKey + chatId)))
-
-topicLen = 4
-if len(hash) < topicLen {
-    topicLen = len(hash)
-}
-var topic [4]byte
-for i = 0; i < topicLen; i++ {
-    topic[i] = hash[i]
-}
-
-contentTopic = "/waku/1/0x" + topic + "/rfc26"
-```
-
 #### Community event messages
 
-Requests to leave, join, kick and ban, as well as key exchange messages,
+Message such as community description
 MUST be sent to the content topic derived from the public key of the community.
 The content topic
 MUST be the hex-encoded keccak-256 hash of the public key of the community.
@@ -379,6 +378,53 @@ for i = 0; i < topicLen; i++ {
 contentTopic = "/waku/1/0x" + topic + "/rfc26"
 ```
 
+#### Community Requests
+
+Requests to leave, join, kick and ban, as well as key exchange messages, MUST be sent to the content topic derived from the public key of the community on the common shard.
+
+The content topic
+MUST be the keccak-256 hash of hex-encoded universal chat id (public key appended with fixed string) of the community omitting the first 2 bytes.
+
+```js
+universalChatId = publicKey+"-memberUpdate"
+hash = hex(keccak256(encodeToHex(universalChatId))[2:])
+
+topicLen = 4
+if len(hash) < topicLen {
+    topicLen = len(hash)
+}
+var topic [4]byte
+for i = 0; i < topicLen; i++ {
+    topic[i] = hash[i]
+}
+
+contentTopic = "/waku/1/0x" + topic + "/rfc26"
+```
+
+#### Community Shard Info
+
+If a community is assigned a dedicated shard then the shard info for that community is published on a content topic derived from a specialized key. This is useful for users joining the new community so that they can subscribe to this specific content topic.
+
+```js
+chatID = publicKey+"-shard-info"
+hash = hex(keccak256(encodeToHex(chatID))[2:])
+
+topicLen = 4
+if len(hash) < topicLen {
+    topicLen = len(hash)
+}
+var topic [4]byte
+for i = 0; i < topicLen; i++ {
+    topic[i] = hash[i]
+}
+
+contentTopic = "/waku/1/0x" + topic + "/rfc26"
+```
+
+#### Community channels/chats
+
+All channels/chats shall use a single content-topic which is derived based on a universal chat id ir-respective of their individual unique chat ids.
+
 ### Community Management
 
 The flows for Community management are as described below.
@@ -391,8 +437,7 @@ according to the wire format "CommunityDescription".
 3. The Community owner publishes the Community metadata on a content topic
 derived from the public key of the Community.
 the Community metadata SHOULD be encrypted with the public key of the Community.
-<!-- TODO: Verify this-->
-The Community metadata MAY be sent during fixed intervals,
+The Community metadata is sent during fixed intervals,
 to ensure that the Community metadata is available to members.
 The Community metadata SHOULD be sent every time the Community metadata is updated.
 4. The Community owner MAY advertise the Community out of band,
