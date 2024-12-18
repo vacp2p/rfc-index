@@ -92,7 +92,7 @@ All Status messages MUST have one of these functional scopes:
 
 #### Community scope
 
-1._Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
+1. _Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
 2. _Community content_: messages carrying user-generated content _only for members of a specific community_.
 
 #### Local scope
