@@ -17,10 +17,13 @@ previous versions: [00](./previous-versions00)
 
 ---
 
-`WakuFilter` is a protocol that enables subscribing to messages that a peer receives.
-This is a more lightweight version of `WakuRelay`
+## Abstract
+
+This specification describes the `12/WAKU2-FILTER` protocol, 
+which enables subscribing to messages that a peer receives.
+This is a more lightweight version of [11/WAKU2-RELAY](),
 specifically designed for bandwidth restricted devices.
-This is due to the fact that light nodes subscribe to full-nodes and
+This is due to the fact that light-nodes subscribe to full-nodes and
 only receive the messages they desire.
 
 ## Content filtering
@@ -99,9 +102,6 @@ In specific, the communication channels are assumed to be secure.
 
 ```protobuf
 syntax = "proto3";
-
-// 12/WAKU2-FILTER rfc: https://rfc.vac.dev/spec/12/
-package waku.filter.v2;
 
 // Protocol identifier: /vac/waku/filter-subscribe/2.0.0-beta1
 message FilterSubscribeRequest {
