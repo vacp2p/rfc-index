@@ -4,7 +4,7 @@ title: 12/WAKU2-FILTER
 name: Waku v2 Filter
 status: draft
 tags: waku-core
-version: 01
+version: 01-
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
@@ -13,7 +13,10 @@ contributors:
   - Ebube Ud <ebube@status.im>
 ---
 
-previous versions: [00](./previous-versions00)
+**Protocol identifiers**:
+
+- _filter-subscribe_: `/vac/waku/filter-subscribe/2.0.0-beta1`
+- _filter-push_: `/vac/waku/filter-push/2.0.0-beta1`
 
 ---
 
@@ -21,56 +24,36 @@ previous versions: [00](./previous-versions00)
 
 This specification describes the `12/WAKU2-FILTER` protocol, 
 which enables subscribing to messages that a peer receives.
-This is a more lightweight version of [11/WAKU2-RELAY](),
+This is a more lightweight version of [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
 specifically designed for bandwidth restricted devices.
 This is due to the fact that light-nodes subscribe to full-nodes and
 only receive the messages they desire.
 
-## Content filtering
+## Motivation
 
-**Protocol identifiers**:
+Unlike the [13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol for historical messages,
+this protocol allows for native lower latency scenarios such as instant messaging.
+It is thus complementary to it.
 
-- _filter-subscribe_: `/vac/waku/filter-subscribe/2.0.0-beta1`
-- _filter-push_: `/vac/waku/filter-push/2.0.0-beta1`
+Strictly speaking, it is not just doing basic request-response, but
+performs sender push based on receiver intent.
+While this can be seen as a form of light publish/subscribe,
+it is only used between two nodes in a direct fashion. Unlike the
+Gossip domain, this is meant for light nodes which put a premium on bandwidth.
+No gossiping takes place.
+
+It is worth noting that a light node could get by with only using the
+[13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol to query for a recent time window,
+provided it is acceptable to do frequent polling.
+
+## Specification
+
+### Content filtering
 
 Content filtering is a way to do [message-based
 filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
 Currently the only content filter being applied is on `contentTopic`. This
-corresponds to topics in Waku v1.
-
-## Rationale
-
-Unlike the `store` protocol for historical messages, this protocol allows for
-native lower latency scenarios such as instant messaging. It is thus
-complementary to it.
-
-Strictly speaking, it is not just doing basic request response, but performs
-sender push based on receiver intent. While this can be seen as a form of light
-pub/sub, it is only used between two nodes in a direct fashion. Unlike the
-Gossip domain, this is meant for light nodes which put a premium on bandwidth.
-No gossiping takes place.
-
-It is worth noting that a light node could get by with only using the `store`
-protocol to query for a recent time window, provided it is acceptable to do
-frequent polling.
-
-## Design Requirements
-
-The effectiveness and reliability of the content filtering service enabled by  
-`WakuFilter` protocol rely on the _high availability_ of the full nodes
-as the service providers.
-To this end, full nodes must feature _high uptime_
-(to persistently listen and capture the network messages)
-as well as _high Bandwidth_ (to provide timely message delivery to the light nodes).
-
-## Security Consideration
-
-Note that while using `WakuFilter` allows light nodes to save bandwidth,
-it comes with a privacy cost in the sense that they need to
-disclose their liking topics to the full nodes to retrieve the relevant messages.
-Currently, anonymous subscription is not supported by the `WakuFilter`, however,
-potential solutions in this regard are sketched
-below in [Future Work](#future-work) section.
+corresponds to topics in [6/WAKU1](waku/standards/legacy/6/waku1.md).
 
 ### Terminology
 
@@ -79,7 +62,16 @@ refers to any piece of data that can be used to uniquely identify a user.
 For example, the signature verification key, and
 the hash of one's static IP address are unique for each user and hence count as PII.
 
-## Adversarial Model
+### Design Requirements
+
+The effectiveness and reliability of the content filtering service enabled by the 
+`WakuFilter` protocol rely on the _high availability_ of the full nodes
+as the service providers.
+To this end, full nodes must feature _high uptime_
+(to persistently listen and capture the network messages)
+as well as _high Bandwidth_ (to provide timely message delivery to the light nodes).
+
+### Adversarial Model
 
 Any node running the `WakuFilter` protocol
 i.e., both the subscriber node and the queried node are considered as an adversary.
@@ -282,7 +274,15 @@ and that it matches filter criteria belonging to that subscription.
 
 ---
 
-## Future Work
+## Security Consideration
+
+Note that while using `WakuFilter` allows light nodes to save bandwidth,
+it comes with a privacy cost in the sense that they need to
+disclose their liking topics to the full nodes to retrieve the relevant messages.
+Currently, anonymous subscription is not supported by the `WakuFilter`, however,
+potential solutions in this regard are discussed below.
+
+### Future Work
 <!-- Alternative title: Filter-subscriber unlinkability -->
 **Anonymous filter subscription**:
 This feature guarantees that nodes can anonymously subscribe for a message filter
@@ -318,31 +318,17 @@ Examples of such 2PC protocols are
 [Oblivious Transfers](https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains.)
 and one-way Private Set Intersections (PSI).
 
-## Changelog
-
-### Next
-
-- Added initial threat model and security analysis.
-
-### 2.0.0-beta2
-
-Initial draft version. Released [2020-10-28](https://github.com/vacp2p/specs/commit/5ceeb88cee7b918bb58f38e7c4de5d581ff31e68)
-
-- Fix: Ensure contentFilter is a repeated field, on implementation
-- Change: Add ability to unsubscribe from filters.
-Make `subscribe` an explicit boolean indication.
-Edit protobuf field order to be consistent with libp2p.
-
-### 2.0.0-beta1
-
-Initial draft version. Released [2020-10-05](https://github.com/vacp2p/specs/commit/31857c7434fa17efc00e3cd648d90448797d107b)
-
 ## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
+
+- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+- [6/WAKU1](waku/standards/legacy/6/waku1.md)
+- [13/WAKU2-STORE](/waku/standards/core/13/store.md)
+
 
 - [message-based
 filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
