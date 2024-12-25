@@ -4,7 +4,7 @@ title: 12/WAKU2-FILTER
 name: Waku v2 Filter
 status: draft
 tags: waku-core
-version: 01-
+version: 0.1
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
@@ -46,7 +46,11 @@ It is worth noting that a light node could get by with only using the
 [13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol to query for a recent time window,
 provided it is acceptable to do frequent polling.
 
-## Specification
+## Semantics
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”,
+“SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ### Content filtering
 
@@ -70,25 +74,6 @@ as the service providers.
 To this end, full nodes must feature _high uptime_
 (to persistently listen and capture the network messages)
 as well as _high Bandwidth_ (to provide timely message delivery to the light nodes).
-
-### Adversarial Model
-
-Any node running the `WakuFilter` protocol
-i.e., both the subscriber node and the queried node are considered as an adversary.
-Furthermore, we consider the adversary as a passive entity
-that attempts to collect information from other nodes to conduct an attack but
-it does so without violating protocol definitions and instructions.
-For example, under the passive adversarial model,
-no malicious node intentionally hides the messages
-matching to one's subscribed content filter
-as it is against the description of the `WakuFilter` protocol.
-
-The following are not considered as part of the adversarial model:
-
-- An adversary with a global view of all the nodes and their connections.
-- An adversary that can eavesdrop on communication links
-between arbitrary pairs of nodes (unless the adversary is one end of the communication).
-In specific, the communication channels are assumed to be secure.
 
 ### Protobuf
 
@@ -137,7 +122,6 @@ in its registered subscriptions.
 
 Since a filter service node is consuming resources to provide this service,
 it MAY account for usage and adapt its service provision to certain clients.
-An incentive mechanism is currently planned but underspecified.
 
 #### Filter Subscribe Request
 
@@ -148,8 +132,8 @@ Each request MUST include a `filter_subscribe_type`, indicating the type of requ
 
 #### Filter Subscribe Response
 
-In return to any `FilterSubscribeRequest`,
-a filter service node SHOULD respond with a `FilterSubscribeResponse`
+When responding to a `FilterSubscribeRequest`,
+a filter service node SHOULD send a `FilterSubscribeResponse`
 with a `requestId` matching that of the request.
 This response MUST contain a `status_code` indicating if the request was successful
 or not.
@@ -272,9 +256,27 @@ A filter client SHOULD verify that each `MessagePush` it receives
 originated from a service node where the client has an active subscription
 and that it matches filter criteria belonging to that subscription.
 
----
+### Adversarial Model
 
-## Security Consideration
+Any node running the `WakuFilter` protocol
+i.e., both the subscriber node and
+the queried node are considered as an adversary.
+Furthermore, we consider the adversary as a passive entity
+that attempts to collect information from other nodes to conduct an attack but
+it does so without violating protocol definitions and instructions.
+For example, under the passive adversarial model,
+no malicious node intentionally hides the messages
+matching to one's subscribed content filter
+as it is against the description of the `WakuFilter` protocol.
+
+The following are not considered as part of the adversarial model:
+
+- An adversary with a global view of all the nodes and their connections.
+- An adversary that can eavesdrop on communication links
+between arbitrary pairs of nodes (unless the adversary is one end of the communication).
+In specific, the communication channels are assumed to be secure.
+
+### Security Considerations
 
 Note that while using `WakuFilter` allows light nodes to save bandwidth,
 it comes with a privacy cost in the sense that they need to
@@ -282,7 +284,7 @@ disclose their liking topics to the full nodes to retrieve the relevant messages
 Currently, anonymous subscription is not supported by the `WakuFilter`, however,
 potential solutions in this regard are discussed below.
 
-### Future Work
+#### Future Work
 <!-- Alternative title: Filter-subscriber unlinkability -->
 **Anonymous filter subscription**:
 This feature guarantees that nodes can anonymously subscribe for a message filter
