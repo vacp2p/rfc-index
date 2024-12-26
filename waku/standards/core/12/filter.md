@@ -22,7 +22,7 @@ contributors:
 
 ## Abstract
 
-This specification describes the `12/WAKU2-FILTER` protocol, 
+This specification describes the `12/WAKU2-FILTER` protocol,
 which enables subscribing to messages that a peer receives.
 This is a more lightweight version of [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
 specifically designed for bandwidth restricted devices.
@@ -31,8 +31,9 @@ only receive the messages they desire.
 
 ## Motivation
 
-Unlike the [13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol for historical messages,
-this protocol allows for native lower latency scenarios such as instant messaging.
+Unlike the [13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol
+for historical messages, this protocol allows for native lower latency scenarios,
+such as instant messaging.
 It is thus complementary to it.
 
 Strictly speaking, it is not just doing basic request-response, but
@@ -43,8 +44,8 @@ Gossip domain, this is meant for light nodes which put a premium on bandwidth.
 No gossiping takes place.
 
 It is worth noting that a light node could get by with only using the
-[13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol to query for a recent time window,
-provided it is acceptable to do frequent polling.
+[13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol to
+query for a recent time window, provided it is acceptable to do frequent polling.
 
 ## Semantics
 
@@ -54,7 +55,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”,
 
 ### Content filtering
 
-Content filtering is a way to do 
+Content filtering is a way to do
 [message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
 Currently the only content filter being applied is on `contentTopic`.
 This corresponds to topics in [6/WAKU1](waku/standards/legacy/6/waku1.md).
@@ -68,7 +69,7 @@ the hash of one's static IP address are unique for each user and hence count as 
 
 ### Design Requirements
 
-The effectiveness and reliability of the content filtering service enabled by the 
+The effectiveness and reliability of the content filtering service enabled by the
 `WakuFilter` protocol rely on the _high availability_ of the full nodes
 as the service providers.
 To this end, full nodes must feature _high uptime_
@@ -178,7 +179,8 @@ The filter service node SHOULD ignore any filter criteria in the request.
 
 A filter client that sends a `FilterSubscribeRequest` with
 `filter_subscribe_type` set to `SUBSCRIBE`
-requests that the filter service node SHOULD push messages matching this filter to the client.
+requests that the filter service node SHOULD push messages
+matching this filter to the client.
 The filter client MUST include the desired filter criteria in the request.
 A client MAY use this request type to _modify_ an existing subscription
 by providing _additional_ filter criteria in a new request.
@@ -187,8 +189,9 @@ by providing _the same_ filter criteria in a new request.
 The filter service node SHOULD respond with a success `status_code`
 if it successfully honored this request
 or an error `status_code` if not.
-The filter service node SHOULD respond with an error `status_code` and discard the request
-if the `FilterSubscribeRequest` does not contain valid filter criteria,
+The filter service node SHOULD respond with an error `status_code` and
+discard the request if the `FilterSubscribeRequest`
+does not contain valid filter criteria,
 i.e. both a `pubsub_topic` _and_ a non-empty `content_topics` set.
 
 ##### UNSUBSCRIBE
@@ -205,8 +208,8 @@ to unsubscribe from in a new request.
 The filter service node SHOULD respond with a success `status_code`
 if it successfully honored this request
 or an error `status_code` if not.
-The filter service node SHOULD respond with an error `status_code` and discard the request
-if the unsubscribe request does not contain valid filter criteria,
+The filter service node SHOULD respond with an error `status_code` and
+discard the request if the unsubscribe request does not contain valid filter criteria,
 i.e. both a `pubsub_topic` _and_ a non-empty `content_topics` set.
 
 ##### UNSUBSCRIBE_ALL
@@ -229,7 +232,8 @@ matching registered subscriptions to this client.
 A filter service node SHOULD push all messages
 matching the filter criteria in a registered subscription
 to the subscribed filter client.
-These [`WakuMessage`s](/waku/standards/core/14/message.md) are likely to come from [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md),
+These [`WakuMessage`s](/waku/standards/core/14/message.md)
+are likely to come from [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md),
 but there MAY be other sources or protocols where this comes from.
 This is up to the consumer of the protocol.
 
