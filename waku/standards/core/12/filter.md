@@ -4,7 +4,7 @@ title: 12/WAKU2-FILTER
 name: Waku v2 Filter
 status: draft
 tags: waku-core
-version: 0.1
+version: v01
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
@@ -54,10 +54,10 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”,
 
 ### Content filtering
 
-Content filtering is a way to do [message-based
-filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
-Currently the only content filter being applied is on `contentTopic`. This
-corresponds to topics in [6/WAKU1](waku/standards/legacy/6/waku1.md).
+Content filtering is a way to do 
+[message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
+Currently the only content filter being applied is on `contentTopic`.
+This corresponds to topics in [6/WAKU1](waku/standards/legacy/6/waku1.md).
 
 ### Terminology
 
@@ -154,41 +154,41 @@ conditional to the selected `filter_subscribe_type`.
 If the request contains filter criteria,
 it MUST contain a `pubsub_topic`
 and the `content_topics` set MUST NOT be empty.
-A `WakuMessage` matches filter criteria
+A [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) matches filter criteria
 when its `content_topic` is in the `content_topics` set
 and it was published on a matching `pubsub_topic`.
 
 #### Filter Subscribe Types
 
-The following filter subscribe types are defined:
+The filter-subscribe types are defined as follows:
 
 ##### SUBSCRIBER_PING
 
 A filter client that sends a `FilterSubscribeRequest` with
-`filter_subscribe_type` set to `SUBSCRIBER_PING`
-requests that the service node SHOULD indicate if it has any active subscriptions
+`filter_subscribe_type` set to `SUBSCRIBER_PING`,
+requests that the filter service node SHOULD indicate if it has any active subscriptions
 for this client.
 The filter client SHOULD exclude any filter criteria from the request.
-The filter service node SHOULD respond with a success code
+The filter service node SHOULD respond with a success `status_code`
 if it has any active subscriptions for this client
-or an error code if not.
+or an error `status_code` if not.
 The filter service node SHOULD ignore any filter criteria in the request.
 
 ##### SUBSCRIBE
 
 A filter client that sends a `FilterSubscribeRequest` with
 `filter_subscribe_type` set to `SUBSCRIBE`
-requests that the service node SHOULD push messages matching this filter to the client.
+requests that the filter service node SHOULD push messages matching this filter to the client.
 The filter client MUST include the desired filter criteria in the request.
 A client MAY use this request type to _modify_ an existing subscription
 by providing _additional_ filter criteria in a new request.
 A client MAY use this request type to _refresh_ an existing subscription
 by providing _the same_ filter criteria in a new request.
-The filter service node SHOULD respond with a success code
+The filter service node SHOULD respond with a success `status_code`
 if it successfully honored this request
-or an error code if not.
-The filter service node SHOULD respond with an error code and discard the request
-if the subscribe request does not contain valid filter criteria,
+or an error `status_code` if not.
+The filter service node SHOULD respond with an error `status_code` and discard the request
+if the `FilterSubscribeRequest` does not contain valid filter criteria,
 i.e. both a `pubsub_topic` _and_ a non-empty `content_topics` set.
 
 ##### UNSUBSCRIBE
@@ -202,10 +202,10 @@ it desires to unsubscribe from in the request.
 A client MAY use this request type to _modify_ an existing subscription
 by providing _a subset of_ the original filter criteria
 to unsubscribe from in a new request.
-The filter service node SHOULD respond with a success code
+The filter service node SHOULD respond with a success `status_code`
 if it successfully honored this request
-or an error code if not.
-The filter service node SHOULD respond with an error code and discard the request
+or an error `status_code` if not.
+The filter service node SHOULD respond with an error `status_code` and discard the request
 if the unsubscribe request does not contain valid filter criteria,
 i.e. both a `pubsub_topic` _and_ a non-empty `content_topics` set.
 
@@ -217,8 +217,8 @@ requests that the service node SHOULD _stop_ pushing messages
 matching _any_ filter to the client.
 The filter client SHOULD exclude any filter criteria from the request.
 The filter service node SHOULD remove any existing subscriptions for this client.
-It SHOULD respond with a success code if it successfully honored this request
-or an error code if not.
+It SHOULD respond with a success `status_code` if it successfully honored this request
+or an error `status_code` if not.
 
 ### Filter-Push
 
@@ -229,7 +229,7 @@ matching registered subscriptions to this client.
 A filter service node SHOULD push all messages
 matching the filter criteria in a registered subscription
 to the subscribed filter client.
-These [`WakuMessage`s](../14/message.md) are likely to come from [`11/WAKU2-RELAY`](../11/relay.md),
+These [`WakuMessage`s](/waku/standards/core/14/message.md) are likely to come from [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md),
 but there MAY be other sources or protocols where this comes from.
 This is up to the consumer of the protocol.
 
@@ -240,7 +240,7 @@ for a period of time,
 the filter service node MAY choose to stop pushing messages to the client and
 remove its subscription.
 This period is up to the service node implementation.
-We consider `1 minute` to be a reasonable default.
+It is RECOMMENDED to set `1 minute` as a reasonable default.
 
 #### Message Push
 
@@ -329,16 +329,13 @@ Copyright and related rights waived via
 
 - [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
 - [6/WAKU1](waku/standards/legacy/6/waku1.md)
+- [message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
 - [13/WAKU2-STORE](/waku/standards/core/13/store.md)
-
-
-- [message-based
-filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
-- [`WakuMessage`s](../14/message.md)
-- [`11/WAKU2-RELAY`](../11/relay.md)
+- [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
 - [Oblivious Transfers](https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains)
-- previous versions: [00](./previous-versions00)
+- 12/WAKU2-FILTER previous version: [00](waku/standards/core/12/previous-versions/00/filter.md)
+
+### Informative
 
 1. [Message Filtering (Wikipedia)](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
-
 2. [Libp2p PubSub spec - topic validation](https://github.com/libp2p/specs/tree/master/pubsub#topic-validation)
