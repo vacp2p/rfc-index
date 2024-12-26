@@ -4,6 +4,7 @@ title: 12/WAKU2-FILTER
 name: Waku v2 Filter
 status: draft
 tags: waku-core
+version: v00
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
@@ -11,9 +12,8 @@ contributors:
   - Sanaz Taheri <sanaz@status.im>
   - Ebube Ud <ebube@status.im>
 ---
-version: 00
 
----
+
 `WakuFilter` is a protocol that enables subscribing to messages that a peer receives.
 This is a more lightweight version of `WakuRelay`
 specifically designed for bandwidth restricted devices.
