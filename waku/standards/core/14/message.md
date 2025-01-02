@@ -20,7 +20,7 @@ contributors:
 for secure communication.
 These protocols are designed to be secure, privacy-preserving,
 and censorship-resistant and can run in resource-restricted environments.
-At a high level, 
+At a high level,
 [10/WAKU2](/waku/standards/core/10/waku2.md) implements a publish/subscribe messaging pattern over libp2p and
 adds capabilities.
 
