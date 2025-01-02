@@ -423,7 +423,7 @@ contentTopic = "/waku/1/0x" + topic + "/rfc26"
 
 #### Community channels/chats
 
-All channels/chats shall use a single content-topic which is derived based on a universal chat id ir-respective of their individual unique chat ids.
+All channels/chats shall use a single content-topic which is derived from a universal chat id irrespective of their individual unique chat ids.
 
 ### Community Management
 
