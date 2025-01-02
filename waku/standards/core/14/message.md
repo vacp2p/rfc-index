@@ -2,7 +2,7 @@
 slug: 14
 title: 14/WAKU2-MESSAGE
 name: Waku v2 Message
-status: draft
+status: stable
 category: Standards Track
 tags: waku/core-protocol
 editor: Hanno Cornelius <hanno@status.im>
