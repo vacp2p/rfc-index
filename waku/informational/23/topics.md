@@ -131,15 +131,14 @@ for the [WakuMessage payload](../../standards/core/14/message.md/#payloads) fiel
 
 ### Content Topic usage guidelines
 
-Applications SHOULD be mindful while designing/using content topics so that a bloat of content-topics does not happen. 
+Applications SHOULD be mindful while designing/using content topics so that a bloat of content-topics does not happen.
 A content-topic bloat causes performance degradation in Store and Filter protocols while trying to retrieve messages.
 
 Store queries have been noticed to be considerably slow (e.g doubling of response-time when content-topic count is increased from 10 to 100) when a lot of content-topics are involved in a single query.
 Similarly number of filter subscriptions increase, which increases complexity on client side to maintain and manage these subscriptions.
 
-Applications SHOULD analyze the query/filter criteria for fetching messages from the network and select/design content topics to match such filter criteria. 
-e.g: even though applications may want to segregate messages into different sets based on some application logic, if those sets of messages are always fetched/queried together from the network, then all those messages SHOULD use a single content-topic. 
-
+Applications SHOULD analyze the query/filter criteria for fetching messages from the network and select/design content topics to match such filter criteria.
+e.g: even though applications may want to segregate messages into different sets based on some application logic, if those sets of messages are always fetched/queried together from the network, then all those messages SHOULD use a single content-topic.
 
 ## Differences with Waku v1
 
