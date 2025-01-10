@@ -1,6 +1,5 @@
 ---
-slug: 38
-title: 38/CONSENSUS-CLARO
+title: CONSENSUS-CLARO
 name: Claro Consensus Protocol
 status: raw
 category: Standards Track
