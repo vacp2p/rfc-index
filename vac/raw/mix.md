@@ -735,7 +735,7 @@ ii. **Verify Timestamp**
 - If the timestamp is outside the acceptable window, the exit node
   discards the message.
 
-iii. **Verifiy Response**
+iii. **Verify Response**
 
 - Compute the SHA-256 hash of the `message` and check if the hash
   meets the difficulty requirement, _i.e._, has at least 18 leading zeros.

@@ -19,9 +19,9 @@ In [10/WAKU2 spec](../../standards/core/10/waku2.md) there are two types of topi
 ## Pubsub Topics
 
 Pubsub topics are used for routing of messages (see [11/WAKU2-RELAY](../../standards/core/11/relay.md)),
-and can be named implicitly by Waku sharding (see [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)).
+and can be named implicitly by Waku sharding (see [RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)).
 This document comprises recommendations for explicitly naming pubsub topics
-(e.g. when choosing *named sharding* as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)).
+(e.g. when choosing *named sharding* as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)).
 
 ### Pubsub Topic Format
 
@@ -80,7 +80,7 @@ but for different domains completely.
 
 ### Named Topic Sharding Example
 
-The following is an example of named sharding, as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md).
+The following is an example of named sharding, as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md).
 
 ```text
 waku/2/waku-9_shard-0/
@@ -120,14 +120,25 @@ As an example, here's the content topic used for an upcoming testnet:
 
 ### Content Topic Naming Recommendations
 
-Application names should be unique to avoid conflicting issues with other protocols.
-Applications should specify their version (if applicable) in the version field.
+Application names SHOULD be unique to avoid conflicting issues with other protocols.
+Applications SHOULD specify their version (if applicable) in the version field.
 The `{content-topic-name}` portion of the content topic is up to the application,
 and depends on the problem domain.
 It can be hierarchical, for instance to separate content, or
 to indicate different bandwidth and privacy guarantees.
 The encoding field indicates the serialization/encoding scheme
 for the [WakuMessage payload](../../standards/core/14/message.md/#payloads) field.
+
+### Content Topic usage guidelines
+
+Applications SHOULD be mindful while designing/using content topics so that a bloat of content-topics does not happen.
+A content-topic bloat causes performance degradation in Store and Filter protocols while trying to retrieve messages.
+
+Store queries have been noticed to be considerably slow (e.g doubling of response-time when content-topic count is increased from 10 to 100) when a lot of content-topics are involved in a single query.
+Similarly number of filter subscriptions increase, which increases complexity on client side to maintain and manage these subscriptions.
+
+Applications SHOULD analyze the query/filter criteria for fetching messages from the network and select/design content topics to match such filter criteria.
+e.g: even though applications may want to segregate messages into different sets based on some application logic, if those sets of messages are always fetched/queried together from the network, then all those messages SHOULD use a single content-topic.
 
 ## Differences with Waku v1
 
@@ -175,7 +186,7 @@ Copyright and related rights waived via
 
 - [10/WAKU2 spec](../../standards/core/10/waku2.md)
 - [11/WAKU2-RELAY](../../standards/core/11/relay.md)
-- [RELAY-SHARDING](https://github.com/waku-org/specs/blob/waku-RFC/standards/core/relay-sharding.md)
+- [RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 - [Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages)
 - [14/WAKU2-MESSAGE](../../standards/core/14/message.md)
 - [12/WAKU2-FILTER](../../standards/core/12/filter.md)

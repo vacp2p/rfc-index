@@ -1,0 +1,253 @@
+---
+title: SDS
+name: Scalable Data Sync protocol for distributed logs
+status: raw
+editor: Hanno Cornelius <hanno@status.im>
+contributors:
+  - Akhil Peddireddy <akhil@status.im>
+---
+
+## Abstract
+
+This specification introduces the Scalable Data Sync (SDS) protocol
+to achieve end-to-end reliability
+when consolidating distributed logs in a decentralized manner.
+The protocol is designed for a peer-to-peer (p2p) topology
+where an append-only log is maintained by each member of a group of nodes
+who may individually append new entries to their local log at any time and
+is interested in merging new entries from other nodes in real-time or close to real-time
+while maintaining a consistent order.
+The outcome of the log consolidation procedure is
+that all nodes in the group eventually reflect in their own logs
+the same entries in the same order.
+The protocol aims to scale to very large groups.
+
+## Motivation
+
+A common application that fits this model is a p2p group chat (or group communication),
+where the participants act as log nodes
+and the group conversation is modelled as the consolidated logs
+maintained on each node.
+The problem of end-to-end reliability can then be stated as
+ensuring that all participants eventually see the same sequence of messages
+in the same causal order,
+despite the challenges of network latency, message loss,
+and scalability present in any communications transport layer.
+The rest of this document will assume the terminology of a group communication:
+log nodes being the _participants_ in the group chat
+and the logged entries being the _messages_ exchanged between participants.
+
+## Design Assumptions
+
+We make the following simplifying assumptions for a proposed reliability protocol:
+
+* **Broadcast routing:**
+Messages are broadcast disseminated by the underlying transport.
+The selected transport takes care of routing messages
+to all participants of the communication.
+* **Store nodes:**
+There are high-availability caches (a.k.a. Store nodes)
+from which missed messages can be retrieved.
+These caches maintain the full history of all messages that have been broadcast.
+This is an optional element in the protocol design,
+but improves scalability by reducing direct interactions between participants.
+* **Message ID:**
+Each message has a globally unique, immutable ID (or hash).
+Messages can be requested from the high-availability caches or
+other participants using the corresponding message ID.
+
+## Wire protocol
+
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”,
+“SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+ “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+
+### Message
+
+Messages MUST adhere to the following meta structure:
+
+```protobuf
+syntax = "proto3";
+
+message Message {
+  // 1 Reserved for sender/participant id
+  string message_id = 2;          // Unique identifier of the message
+  string channel_id = 3;          // Identifier of the channel to which the message belongs
+  optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
+  optional repeated string causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
+  optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
+  optional bytes content = 20;             // Actual content of the message
+}
+```
+
+Each message MUST include its globally unique identifier in the `message_id` field,
+likely based on a message hash.
+The `channel_id` field MUST be set to the identifier of the channel of group communication
+that is being synchronized.
+For simple group communications without individual channels,
+the `channel_id` SHOULD be set to `0`.
+The `lamport_timestamp`, `causal_history` and
+`bloom_filter` fields MUST be set according to the [protocol steps](#protocol-steps)
+set out below.
+These fields MAY be left unset in the case of [ephemeral messages](#ephemeral-messages).
+The message `content` MAY be left empty for [periodic sync messages](#periodic-sync-message),
+otherwise it MUST contain the application-level content
+
+### Participant state
+
+Each participant MUST maintain:
+
+* A Lamport timestamp for each channel of communication,
+initialized to current epoch time in nanosecond resolution.
+* A bloom filter for received message IDs per channel.
+The bloom filter SHOULD be rolled over and
+recomputed once it reaches a predefined capacity of message IDs.
+Furthermore,
+it SHOULD be designed to minimize false positives through an optimal selection of
+size and hash functions.
+* A buffer for unacknowledged outgoing messages
+* A buffer for incoming messages with unmet causal dependencies
+* A local log (or history) for each channel,
+containing all message IDs in the communication channel,
+ordered by Lamport timestamp.
+
+Messages in the unacknowledged outgoing buffer can be in one of three states:
+
+1. **Unacknowledged** - there has been no acknowledgement of message receipt
+by any participant in the channel
+2. **Possibly acknowledged** - there has been ambiguous indication that the message
+has been _possibly_ received by at least one participant in the channel
+3. **Acknowledged** - there has been sufficient indication that the message
+has been received by at least some of the participants in the channel.
+This state will also remove the message from the outgoing buffer.
+
+### Protocol Steps
+
+For each channel of communication,
+participants MUST follow these protocol steps to populate and interpret
+the `lamport_timestamp`, `causal_history` and `bloom_filter` fields.
+
+#### Send Message
+
+Before broadcasting a message:
+
+* the participant MUST increase its local Lamport timestamp by `1` and
+include this in the `lamport_timestamp` field.
+* the participant MUST determine the preceding few message IDs in the local history
+and include these in an ordered list in the `causal_history` field.
+The number of message IDs to include in the `causal_history` depends on the application.
+We recommend a causal history of two message IDs.
+* the participant MUST include the current `bloom_filter`
+state in the broadcast message.
+
+After broadcasting a message,
+the message MUST be added to the participant’s buffer
+of unacknowledged outgoing messages.
+
+#### Receive Message
+
+Upon receiving a message,
+
+* the participant MUST [review the ACK status](#review-ack-status) of messages
+in its unacknowledged outgoing buffer
+using the received message's causal history and bloom filter.
+* the participant MUST include the received message ID in its local bloom filter.
+* the participant MUST verify that all causal dependencies are met
+for the received message.
+Dependencies are met if the message IDs in the `causal_history` of the received message
+appear in the local history of the receiving participant.
+
+If all dependencies are met,
+the participant MUST [deliver the message](#deliver-message).
+If dependencies are unmet,
+the participant MUST add the message to the incoming buffer of messages
+with unmet causal dependencies.
+
+#### Deliver Message
+
+Triggered by the [Receive Message](#receive-message) procedure.
+
+If the received message’s Lamport timestamp is greater than the participant's
+local Lamport timestamp,
+the participant MUST update its local Lamport timestamp to match the received message.
+The participant MUST insert the message ID into its local log,
+based on Lamport timestamp.
+If one or more message IDs with the same Lamport timestamp already exists,
+the participant MUST follow the [Resolve Conflicts](#resolve-conflicts) procedure.
+
+#### Resolve Conflicts
+
+Triggered by the [Deliver Message](#deliver-message) procedure.
+
+The participant MUST order messages with the same Lamport timestamp
+in ascending order of message ID.
+If the message ID is implemented as a hash of the message,
+this means the message with the lowest hash would precede
+other messages with the same Lamport timestamp in the local log.
+
+#### Review ACK Status
+
+Triggered by the [Receive Message](#receive-message) procedure.
+
+For each message in the unacknowledged outgoing buffer,
+based on the received `bloom_filter` and `causal_history`:
+
+* the participant MUST mark all messages in the received `causal_history` as **acknowledged**.
+* the participant MUST mark all messages included in the `bloom_filter`
+as **possibly acknowledged**.
+If a message appears as **possibly acknowledged** in multiple received bloom filters,
+the participant MAY mark it as acknowledged based on probabilistic grounds,
+taking into account the bloom filter size and hash number.
+
+#### Periodic Incoming Buffer Sweep
+
+The participant MUST periodically check causal dependencies for each message
+in the incoming buffer.
+For each message in the incoming buffer:
+
+* the participant MAY attempt to retrieve missing dependencies from the Store node
+(high-availability cache) or other peers.
+* if all dependencies of a message are met,
+the participant MUST proceed to [deliver the message](#deliver-message).
+
+If a message's causal dependencies have failed to be met
+after a predetermined amount of time,
+the participant MAY mark them as **irretrievably lost**.
+
+#### Periodic Outgoing Buffer Sweep
+
+The participant MUST rebroadcast **unacknowledged** outgoing messages
+after a set period.
+The participant SHOULD use distinct resend periods for **unacknowledged** and
+**possibly acknowledged** messages,
+prioritizing **unacknowledged** messages.
+
+#### Periodic Sync Message
+
+For each channel of communication,
+participants SHOULD periodically send an empty-content message to maintain sync state,
+without incrementing the Lamport timestamp.
+To avoid network activity bursts in large groups,
+a participant MAY choose to only send periodic sync messages
+if no other messages have been broadcast in the channel after a random backoff period.
+
+Participants MUST process these sync messages
+following the same steps as regular messages.
+
+#### Ephemeral Messages
+
+Participants MAY choose to send short-lived messages for which no synchronization
+or reliability is required.
+These messages are termed _ephemeral_.
+
+Ephemeral messages SHOULD be sent with `lamport_timestamp`, `causal_history`, and
+`bloom_filter` unset.
+Ephemeral messages SHOULD NOT be added to the unacknowledged outgoing buffer
+after broadcast.
+Upon reception,
+ephemeral messages SHOULD be delivered immediately without buffering for causal dependencies
+or including in the local log.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
