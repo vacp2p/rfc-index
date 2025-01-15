@@ -13,6 +13,8 @@ contributors:
   - Ebube Ud <ebube@status.im>
 ---
 
+previous versions: [00](/waku/standards/core/12/previous-versions/00/filter.md)
+
 **Protocol identifiers**:
 
 - _filter-subscribe_: `/vac/waku/filter-subscribe/2.0.0-beta1`
