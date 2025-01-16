@@ -75,7 +75,7 @@ compared to the original publishing on the [64/WAKU2-NETWORK](/waku/standards/co
 Low PoW setting will lower this problem,
 but it is likely that it is still more expensive.
 
-For this reason, it is RECOOMENDED to run bridges independently of other nodes,
+For this reason, it is RECOMMENDED to run bridges independently of other nodes,
 so that a bridge that gets overwhelmed does not disrupt regular Waku v2 to v2
 traffic.
 
