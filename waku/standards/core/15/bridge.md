@@ -82,7 +82,7 @@ traffic.
 Bridging functionality SHOULD also be carefully implemented so that messages do
 not bounce back and forth between the two networks.
 The bridge SHOULD properly track messages with a seen filter,
-so that no amplification can be achieved here.
+so that no amplification occurs.
 
 ## Copyright
 
