@@ -28,7 +28,7 @@ A bridge requires supporting both Waku versions:
 Packets received on the [6/WAKU1](/waku/standards/legacy/6/waku1.md) network
 SHOULD be published just once on the [10/WAKU2](/waku/standards/core/10/waku2.md).
 More specifically, the bridge SHOULD publish
-this through the [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) (PubSub domain).
+this through [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) (PubSub domain).
 
 When publishing such packet,
 the creation of a new `Message` with a new `WakuMessage` as data field is REQUIRED.
