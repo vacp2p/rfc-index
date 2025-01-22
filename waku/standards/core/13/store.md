@@ -13,37 +13,24 @@ contributors:
 ## Abstract
 
 This specification explains the `WAKU2-STORE` protocol,
-which enables querying of messages received through the relay protocol and 
-stored by other nodes. 
-It also supports pagination for more efficient querying of historical messages. 
+which enables querying of [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)s.
 
 **Protocol identifier***: `/vac/waku/store-query/3.0.0`
 
-# Wire Specification
+### Terminology
+
+The term PII, Personally Identifiable Information,
+refers to any piece of data that can be used to uniquely identify a user.
+For example, the signature verification key, and
+the hash of one's static IP address are unique for each user and hence count as PII.
+
+## Wire Specification
+
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [RFC2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-### Terminology
-
-The term PII, Personally Identifiable Information, 
-refers to any piece of data that can be used to uniquely identify a user. 
-For example, the signature verification key, and 
-the hash of one's static IP address are unique for each user and hence count as PII.
-
 ### Design Requirements
-
-Nodes willing to provide the storage service using `WAKU2-STORE` protocol,
-SHOULD provide a complete and full view of message history.
-As such, they are required to be *highly available* and 
-specifically have a *high uptime* to consistently receive and
-store network messages. 
-The high uptime requirement makes sure that no message is missed out,
-hence a complete and 
-intact view of the message history is delivered to the querying nodes.
-Nevertheless, in case storage service nodes cannot afford high availability, 
-the querying nodes may retrieve the historical messages from multiple sources to achieve a full and
-intact view of the past.
 
 The concept of `ephemeral` messages introduced in [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) affects `WAKU2-STORE` as well.
 Nodes running `WAKU2-STORE` SHOULD support `ephemeral` messages as specified in [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md).
@@ -111,9 +98,8 @@ The store can be queried to return either a set of keys or a set of key-value pa
 Within the store query protocol,
 the [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) keys and
 values MUST be represented in a `WakuMessageKeyValue` message.
-
-- MUST contain the deterministic `message_hash` as the key.
-- it MAY contain the full [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) and 
+This message MUST contain the deterministic `message_hash` as the key.
+It MAY contain the full [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) and
 associated pubsub topic as the value in the `message` and
 `pubsub_topic` fields, depending on the use case as set out below.
 
@@ -122,7 +108,7 @@ both the `message` and `pubsub_topic` fields MUST be populated.
 The message MUST NOT have either `message` or `pubsub_topic` populated with the other unset.
 Both fields MUST either be set or unset.
 
-### Waku Message Store Eligibility
+#### Waku Message Store Eligibility
 
 In order for a message to be eligible for storage:
 
@@ -134,16 +120,16 @@ either into the past or the future when compared to the store node’s internal 
 the store node MAY reject the message.
 - the `ephemeral` field MUST be set to `false`.
 
-### Waku message sorting
+#### Waku message sorting
 
 The key-value entries in the store MUST be time-sorted by the [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) `timestamp` attribute.
 Where two or more key-value entries have identical `timestamp` values,
-the entries MUST be further sorted by the natural order of their `message_hash`.
+the entries MUST be further sorted by the natural order of their message hash keys.
 Within the context of traversing over key-value entries in the store,
 _"forward"_ indicates traversing the entries in ascending order,
 whereas _"backward"_ indicates traversing the entries in descending order.
 
-### Pagination
+#### Pagination
 
 If a large number of entries in the store service node match the query criteria provided in a `StoreQueryRequest`,
 the client MAY make use of pagination
@@ -170,7 +156,7 @@ All other fields and query criteria MUST be the same as in the preceding `StoreQ
 A `StoreQueryRequest` without a populated `pagination_cursor` indicates that
 the client wants to retrieve the "first page" of the stored entries matching the query.
 
-## Store Query Request
+### Store Query Request
 
 A client node MUST send all historical message queries within a `StoreQueryRequest` message.
 This request MUST contain a `request_id`.
@@ -178,16 +164,17 @@ The `request_id` MUST be a uniquely generated string.
 
 If the store query client requires the store service node to include [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) values in the query response,
 it MUST set `include_data` to `true`.
-If the store query client requires the store service node to return only `message_hash` in the query response,
+If the store query client requires the store service node to return only message hash keys in the query response,
 it SHOULD set `include_data` to `false`.
 By default, therefore, the store service node assumes `include_data` to be `false`.
 
 A store query client MAY include query filter criteria in the `StoreQueryRequest`.
 There are two types of filter use cases:
+
 1. Content filtered queries and
 2. Message hash lookup queries
 
-### Content filtered queries
+#### Content filtered queries
 
 A store query client MAY request the store service node to filter historical entries by a content filter.
 Such a client MAY create a filter on content topic, on time range or on both.
@@ -209,21 +196,21 @@ If any of the content filter fields are set,
 namely `pubsub_topic`, `content_topic`, `time_start`, or `time_end`,
 the client MUST NOT set the `message_hashes` field.
 
-### Message hash lookup queries
+#### Message hash lookup queries
 
 A store query client MAY request the store service node to filter historical entries by one or
 more matching message hash keys.
 This type of query acts as a "lookup" against a message hash key or
 set of keys already known to the client.
 
-In order to perform a lookup query, 
+In order to perform a lookup query,
 the store query client MUST populate the `message_hashes` field with the list of message hash keys it wants to lookup in the store service node.
 
 If the `message_hashes` field is set,
 the client MUST NOT set any of the content filter fields,
 namely `pubsub_topic`, `content_topic`, `time_start`, or `time_end`.
 
-### Presence queries
+#### Presence queries
 
 A presence query is a special type of lookup query that allows a client to check for the presence of one or
 more messages in the store service node,
@@ -236,9 +223,10 @@ the store query client MUST populate the `message_hashes` field in the `StoreQue
 for which it wants to verify presence in the store service node.
 The `include_data` property MUST be set to `false`.
 The client SHOULD interpret every `message_hash` returned in the `messages` field of the `StoreQueryResponse` as present in the store.
-The client SHOULD assume that all other message hashes included in the original `StoreQueryRequest` but not in the `StoreQueryResponse` is not present in the store.
+The client SHOULD assume that all other message hashes included in the original `StoreQueryRequest` but
+not in the `StoreQueryResponse` is not present in the store.
 
-### Pagination info
+#### Pagination info
 
 The store query client MAY include a message hash as `pagination_cursor`,
 to indicate at which key-value entry a store service node SHOULD start the query.
@@ -266,7 +254,7 @@ or larger than the service node's internal page size limit.
 
 See [pagination](#pagination) for more on how the pagination info is used in store transactions.
 
-## Store Query Response
+### Store Query Response
 
 In response to any `StoreQueryRequest`,
 a store service node SHOULD respond with a `StoreQueryResponse` with a `requestId` matching that of the request.
@@ -277,7 +265,7 @@ assume that the requested operation had failed.
 In addition,
 the store service node MAY choose to provide a more detailed status description in the `status_desc` field.
 
-### Filter matching
+#### Filter matching
 
 For [content filtered queries](#content-filtered-queries),
 an entry in the store service node matches the filter criteria in a `StoreQueryRequest` if each of the following conditions are met:
@@ -298,7 +286,7 @@ The store service node SHOULD respond with an error code and
 discard the request if the store query request contains both content filter criteria
 and message hashes.
 
-### Populating response messages
+#### Populating response messages
 
 The store service node SHOULD populate the `messages` field in the response
 only with entries matching the filter criteria provided in the corresponding request.
@@ -312,7 +300,7 @@ the service node SHOULD populate both the `message_hash` and
 In all other cases,
 the store service node SHOULD populate only the `message_hash` field for each entry in the response.
 
-### Paginating the response
+#### Paginating the response
 
 The response SHOULD NOT contain more `messages` than the `pagination_limit` provided in the corresponding `StoreQueryRequest`.
 It is RECOMMENDED that the store node defines its own maximum page size internally.
@@ -322,6 +310,7 @@ the store service node SHOULD ignore the `pagination_limit` field and
 apply its own internal maximum page size.
 
 In response to a _forward_ `StoreQueryRequest`:
+
 - if the `pagination_cursor` is set,
   the store service node SHOULD populate the `messages` field
   with matching entries following the `pagination_cursor` (exclusive).
@@ -334,6 +323,7 @@ In response to a _forward_ `StoreQueryRequest`:
   with the message hash key of the _last_ entry _included_ in the response.
 
 In response to a _backward_ `StoreQueryRequest`:
+
 - if the `pagination_cursor` is set,
   the store service node SHOULD populate the `messages` field
   with matching entries preceding the `pagination_cursor` (exclusive).
@@ -345,87 +335,105 @@ In response to a _backward_ `StoreQueryRequest`:
   the store service node SHOULD populate the `pagination_cursor` in the `StoreQueryResponse`
   with the message hash key of the _first_ entry _included_ in the response.
 
-# Security Consideration
+### Security Consideration
 
-The main security consideration to take into account while using this protocol is that a querying node have to reveal their content filters of interest to the queried node, hence potentially compromising their privacy.
+The main security consideration while using this protocol is that a querying node has to reveal its content filters of interest to the queried node,
+hence potentially compromising their privacy.
 
-## Adversarial Model
+#### Adversarial Model
 
-Any peer running the `WAKU2-STORE` protocol, i.e. 
-both the querying node and the queried node, are considered as an adversary. 
-Furthermore, 
-we currently consider the adversary as a passive entity that attempts to collect information from other peers to conduct an attack but 
-it does so without violating protocol definitions and instructions. 
-As we evolve the protocol, 
+Any peer running the `WAKU2-STORE` protocol, i.e.
+both the querying node and the queried node, are considered as an adversary.
+Furthermore,
+we currently consider the adversary as a passive entity that attempts to collect information from other peers to conduct an attack but
+it does so without violating protocol definitions and instructions.
+As we evolve the protocol,
 further adversarial models will be considered.
-For example, under the passive adversarial model, 
-no malicious node hides or 
-lies about the history of messages as it is against the description of the `WAKU2-STORE` protocol. 
+For example, under the passive adversarial model,
+no malicious node hides or
+lies about the history of messages as it is against the description of the `WAKU2-STORE` protocol.
 
 The following are not considered as part of the adversarial model:
-- An adversary with a global view of all the peers and their connections.
-- An adversary that can eavesdrop on communication links between arbitrary pairs of peers (unless the adversary is one end of the communication). 
-In specific, the communication channels are assumed to be secure.
 
-# Future Work
+- An adversary with a global view of all the peers and their connections.
+- An adversary that can eavesdrop on communication links between arbitrary pairs of peers (unless the adversary is one end of the communication).
+Specifically, the communication channels are assumed to be secure.
+
+### Future Work
 
 - **Anonymous query**: This feature guarantees that nodes can anonymously query historical messages from other nodes i.e.,
-without disclosing the exact topics of [14/WAKU2-MESSAGE](https://github.com/vacp2p/rfc-index/blob/7b443c1aab627894e3f22f5adfbb93f4c4eac4f6/waku/standards/core/14/message.md) they are interested in.  
+without disclosing the exact topics of [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) they are interested in.  
 As such, no adversary in the `WAKU2-STORE` protocol would be able to learn which peer is interested in which content filters i.e.,
-content topics of [14/WAKU2-MESSAGE](/spec/14). 
+content topics of [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md).
 The current version of the `WAKU2-STORE` protocol does not provide anonymity for historical queries,
 as the querying node needs to directly connect to another node in the `WAKU2-STORE` protocol and
-explicitly disclose the content filters of its interest to retrieve the corresponding messages. 
-However, one can consider preserving anonymity through one of the following ways: 
-  - By hiding the source of the request i.e., anonymous communication.
-  That is the querying node shall hide all its PII in its history request e.g., its IP address.
-  This can happen by the utilization of a proxy server or by using Tor. 
-  Note that the current structure of historical requests does not embody any piece of PII, otherwise,
-  such data fields must be treated carefully to achieve query anonymity. 
-  <!-- TODO: if nodes have to disclose their PeerIDs (e.g., for authentication purposes) when connecting to other nodes in the store protocol, then Tor does not preserve anonymity since it only helps in hiding the IP. So, the PeerId usage in switches must be investigated further. Depending on how PeerId is used, one may be able to link between a querying node and its queried topics despite hiding the IP address--> 
-  - By deploying secure 2-party computations in which the querying node obtains the historical messages of a certain topic,
-  the queried node learns nothing about the query. 
-  Examples of such 2PC protocols are secure one-way Private Set Intersections (PSI). 
-  <!-- TODO: add a reference for PSIs? --> <!-- TODO: more techniques to be included --> 
-<!-- TODO: Censorship resistant: this is about a node that hides the historical messages from other nodes. This attack is not included in the specs since it does not fit the passive adversarial model (the attacker needs to deviate from the store protocol).-->
+explicitly disclose the content filters of its interest to retrieve the corresponding messages.
+However, one can consider preserving anonymity through one of the following ways:
 
-- **Robust and verifiable timestamps**: Messages timestamp is a way to show that the message existed prior to some point in time.
+- By hiding the source of the request i.e., anonymous communication.
+That is the querying node shall hide all its PII in its history request e.g.,
+its IP address.
+This can happen by the utilization of a proxy server or by using Tor.
+Note that the current structure of historical requests does not embody any piece of PII, otherwise,
+such data fields must be treated carefully to achieve query anonymity.
+<!-- TODO: if nodes have to disclose their PeerIDs
+(e.g., for authentication purposes) when connecting to other nodes in the store protocol,
+then Tor does not preserve anonymity since it only helps in hiding the IP.
+So, the PeerId usage in switches must be investigated further.
+Depending on how PeerId is used, one may be able to link between a querying node 
+and its queried topics despite hiding the IP address-->
+- By deploying secure 2-party computations
+in which the querying node obtains the historical messages of a certain topic,
+the queried node learns nothing about the query.
+Examples of such 2PC protocols are secure one-way Private Set Intersections (PSI).
+<!-- TODO: add a reference for PSIs? --> <!-- TODO: more techniques to be included -->
+<!-- TODO: Censorship resistant:
+this is about a node that hides the historical messages from other nodes.
+This attack is not included in the specs since it does not fit the
+passive adversarial model (the attacker needs to deviate from the store protocol).-->
+
+- **Robust and verifiable timestamps**: Messages timestamp is a way to show that
+the message existed prior to some point in time.
 However, the lack of timestamp verifiability can create room for a range of attacks,
-including injecting messages with invalid timestamps pointing to the far future.   
+including injecting messages with invalid timestamps pointing to the far future.
 To better understand the attack,
-consider a store node whose current clock shows `2021-01-01 00:00:30` (and assume all the other nodes have a synchronized clocks +-20seconds).
+consider a store node whose current clock shows `2021-01-01 00:00:30`
+(and assume all the other nodes have a synchronized clocks +-20seconds).
 The store node already has a list of messages,
  `(m1,2021-01-01 00:00:00), (m2,2021-01-01 00:00:01), ..., (m10:2021-01-01 00:00:20)`,
 that are sorted based on their timestamp.  
 An attacker sends a message with an arbitrary large timestamp e.g.,
-10 hours ahead of the correct clock `(m',2021-01-01 10:00:30)`. 
+10 hours ahead of the correct clock `(m',2021-01-01 10:00:30)`.
 The store node places `m'` at the end of the list,
-`(m1,2021-01-01 00:00:00), (m2,2021-01-01 00:00:01), ..., (m10:2021-01-01 00:00:20), (m',2021-01-01 10:00:30)`. 
+`(m1,2021-01-01 00:00:00), (m2,2021-01-01 00:00:01), ..., (m10:2021-01-01 00:00:20),
+(m',2021-01-01 10:00:30)`.
 Now another message arrives with a valid timestamp e.g.,
 `(m11, 2021-01-01 00:00:45)`.
 However, since its timestamp precedes the malicious message `m'`,
 it gets placed before `m'` in the list i.e.,
-`(m1,2021-01-01 00:00:00), (m2,2021-01-01 00:00:01), ..., (m10:2021-01-01 00:00:20), (m11, 2021-01-01 00:00:45), (m',2021-01-01 10:00:30)`.
+`(m1,2021-01-01 00:00:00), (m2,2021-01-01 00:00:01), ..., (m10:2021-01-01 00:00:20),
+(m11, 2021-01-01 00:00:45), (m',2021-01-01 10:00:30)`.
 In fact, for the next 10 hours,
 `m'` will always be considered as the most recent message and
-served as the last message to the querying nodes irrespective of how many other messages arrive afterward. 
+served as the last message to the querying nodes irrespective of how many other
+messages arrive afterward.
 
-A robust and verifiable timestamp allows the receiver of a message to verify that a message has been generated prior to the claimed timestamp. 
+A robust and verifiable timestamp allows the receiver of a message to verify that
+a message has been generated prior to the claimed timestamp.
 One solution is the use of [open timestamps](https://opentimestamps.org/) e.g.,
-block height in Blockchain-based timestamps. 
-That is, messages contain the most recent block height perceived by their senders at the time of message generation. 
-This proves accuracy within a range of minutes (e.g., in Bitcoin blockchain) or 
-seconds (e.g., in Ethereum 2.0) from the time of origination. 
+block height in Blockchain-based timestamps.
+That is, messages contain the most recent block height perceived by their senders
+at the time of message generation.
+This proves accuracy within a range of minutes (e.g., in Bitcoin blockchain) or
+seconds (e.g., in Ethereum 2.0) from the time of origination.
 
-# Copyright
+## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-# References
-1. [14/WAKU2-MESSAGE](https://github.com/vacp2p/rfc-index/blob/7b443c1aab627894e3f22f5adfbb93f4c4eac4f6/waku/standards/core/14/message.md)
+## References
+
+1. [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
 2. [protocol buffers v3](https://developers.google.com/protocol-buffers/)
-3. [11/WAKU2-RELAY](https://github.com/vacp2p/rfc-index/blob/7b443c1aab627894e3f22f5adfbb93f4c4eac4f6/waku/standards/core/11/relay.md)
-4. [Open timestamps](https://opentimestamps.org/) 
-5. [13/WAKU2-STORE v2 previous version](https://github.com/vacp2p/rfc-index/blob/7b443c1aab627894e3f22f5adfbb93f4c4eac4f6/waku/standards/core/13/store.md)
-6. 
+3. [Open timestamps](https://opentimestamps.org/)
