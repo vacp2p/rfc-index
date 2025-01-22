@@ -9,6 +9,7 @@ contributors:
   - Aaryamann Challani <p1ge0nh8er@proton.me>
   - Sanaz Taheri <sanaz@status.im>
 ---
+Previous version: [00](waku/standards/core/13/previous-versions/00/store.md)
 
 ## Abstract
 
