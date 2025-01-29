@@ -4,6 +4,7 @@ title: 13/WAKU2-STORE
 name: Waku v2 Store
 status: draft
 tags: waku-core
+version: v00
 editor: Simon-Pierre Vivier <simvivier@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
