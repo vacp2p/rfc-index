@@ -7,24 +7,38 @@ tags: waku-core
 editor: Hanno Cornelius <hanno@status.im>
 ---
 
-A bridge between Waku v1 and Waku v2.
+## Abstract
 
-## Bridge
+This specification describes how [6/WAKU1](/waku/standards/legacy/6/waku1.md)
+traffic can be used with [10/WAKU2](/waku/standards/core/10/waku2.md) networks.
+
+## Wire Format
+
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 A bridge requires supporting both Waku versions:
 
-* Waku v1 - using devp2p RLPx protocol
-* Waku v2 - using libp2p protocols
+* [6/WAKU1](/waku/standards/legacy/6/waku1.md) - using devp2p RLPx protocol
+* [10/WAKU2](/waku/standards/core/10/waku2.md) - using libp2p protocols
 
-Packets received on the Waku v1 network SHOULD be published just once on the
-Waku v2 network. More specifically, the bridge SHOULD publish
-this through the Waku Relay (PubSub domain).
+## Publishing Packets
 
-Publishing such packet will require the creation of a new `Message` with a
-new `WakuMessage` as data field. The `data` and `topic` field from the Waku v1
-`Envelope` MUST be copied to the `payload` and `contentTopic` fields of the
-`WakuMessage`. Other fields such as nonce, expiry and ttl will be dropped as
-they become obsolete in Waku v2.
+Packets received on [6/WAKU1](/waku/standards/legacy/6/waku1.md) networks
+SHOULD be published just once on [10/WAKU2](/waku/standards/core/10/waku2.md) networks.
+More specifically, the bridge SHOULD publish
+this through [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) (PubSub domain).
+
+When publishing such packet,
+the creation of a new `Message` with a new `WakuMessage` as data field is REQUIRED.
+The `data` and
+`topic` field, from the [6/WAKU1](/waku/standards/legacy/6/waku1.md) `Envelope`,
+MUST be copied to the `payload` and `content_topic` fields of the `WakuMessage`.
+See [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md#wire-format)
+for message format details.
+Other fields such as `nonce`, `expiry` and
+`ttl` will be dropped as they become obsolete in [10/WAKU2](/waku/standards/core/10/waku2.md).
 
 Before this is done, the usual envelope verification still applies:
 
@@ -32,37 +46,54 @@ Before this is done, the usual envelope verification still applies:
 * PoW verification
 * Size verification
 
-Bridging SHOULD occur through the `WakuRelay`, but it MAY also be done on other Waku
-v2 protocols (e.g. `WakuFilter`). The latter is however not advised as it will
-increase the complexity of the bridge and because of the
-[Security Considerations](#security-considerations) explained further below.
+Bridging SHOULD occur through the [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
+but it MAY also be done on other [10/WAKU2](/waku/standards/core/10/waku2.md) protocols
+(e.g. [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)).
+The latter is however not advised as it will
+increase the complexity of the bridge and
+because of the [Security Considerations](#security-considerations) explained further below.
 
-Packets received on the Waku v2 network SHOULD be posted just once on the Waku
-v1 network. The Waku v2 `WakuMessage` contains only the `payload` and
-`contentTopic` fields. The bridge MUST create a new Waku v1 `Envelope` and
-copy over the `payload` and `contentFilter` fields to the `data` and `topic`
-fields. Next, before posting on the network, the bridge MUST set a new expiry
-and ttl and do the PoW nonce calculation.
+Packets received on [10/WAKU2](/waku/standards/core/10/waku2.md) networks,
+SHOULD be posted just once on [6/WAKU1](/waku/standards/legacy/6/waku1.md) networks.
+The [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) contains only the `payload` and
+`contentTopic` fields.
+The bridge MUST create a new [6/WAKU1](/waku/standards/legacy/6/waku1.md) `Envelope` and
+copy over the `payload` and `contentFilter`
+fields to the `data` and `topic` fields.
+Next, before posting on the network,
+the bridge MUST set a new `expiry`, `ttl` and do the PoW `nonce` calculation.
 
 ### Security Considerations
 
-As mentioned above, a bridge will be posting new Waku v1 envelopes, which
-requires doing the PoW nonce calculation.
+As mentioned above,
+a bridge will be posting new [6/WAKU1](/waku/standards/legacy/6/waku1.md) envelopes,
+which requires doing the PoW `nonce` calculation.
 
-This could be a DoS attack vector, as the PoW calculation will make it more
-expensive to post the message compared to the original publishing on the Waku v2
-network. Low PoW setting will lower this problem, but it is likely that it is
-still more expensive.
+This could be a DoS attack vector,
+as the PoW calculation will make it more expensive to post the message
+compared to the original publishing on [10/WAKU2](/waku/standards/core/10/waku2.md) networks.
+Low PoW setting will lower this problem,
+but it is likely that it is still more expensive.
 
-For this reason, bridges SHOULD probably be run independently of other nodes, so
-that a bridge that gets overwhelmed does not disrupt regular Waku v2 to v2
+For this reason, it is RECOMMENDED to run bridges independently of other nodes,
+so that a bridge that gets overwhelmed does not disrupt regular Waku v2 to v2
 traffic.
 
 Bridging functionality SHOULD also be carefully implemented so that messages do
-not bounce back and forth between the two networks. The bridge SHOULD properly
-track messages with a seen filter so that no amplification can be achieved here.
+not bounce back and forth between the [10/WAKU2](/waku/standards/core/10/waku2.md) and
+[6/WAKU1](/waku/standards/legacy/6/waku1.md) networks.
+The bridge SHOULD properly track messages with a seen filter,
+so that no amplification occurs.
 
 ## Copyright
 
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+* [6/WAKU1](/waku/standards/legacy/6/waku1.md)
+* [10/WAKU2](/waku/standards/core/10/waku2.md)
+* [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+* [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
+* [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)
