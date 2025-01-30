@@ -42,7 +42,7 @@ Strictly speaking, it is not just doing basic request-response, but
 performs sender push based on receiver intent.
 While this can be seen as a form of light publish/subscribe,
 it is only used between two nodes in a direct fashion. Unlike the
-Gossip domain, this is meant for light nodes which put a premium on bandwidth.
+Gossip domain, this is suitable for light nodes which put a premium on bandwidth.
 No gossiping takes place.
 
 It is worth noting that a light node could get by with only using the
