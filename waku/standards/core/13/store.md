@@ -3,7 +3,7 @@ slug: 13
 title: 13/WAKU2-STORE
 name: Waku Store Query
 tags: waku-core
-version: v01
+version: 01
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
   - Dean Eigenmann <dean@status.im>
