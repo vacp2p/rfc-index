@@ -60,7 +60,6 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”,
 Content filtering is a way to do
 [message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
 Currently the only content filter being applied is on `contentTopic`.
-This corresponds to topics in [6/WAKU1](waku/standards/legacy/6/waku1.md).
 
 ### Terminology
 
