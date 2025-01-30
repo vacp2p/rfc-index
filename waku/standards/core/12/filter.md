@@ -334,7 +334,6 @@ Copyright and related rights waived via
 ## References
 
 - [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
-- [6/WAKU1](waku/standards/legacy/6/waku1.md)
 - [message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
 - [13/WAKU2-STORE](/waku/standards/core/13/store.md)
 - [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
