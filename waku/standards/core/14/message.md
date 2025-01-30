@@ -82,7 +82,7 @@ This attribute MAY contain the Unix epoch time in nanoseconds.
 If the attribute is omitted, it SHOULD be interpreted as timestamp 0.
 
 - The `ephemeral` attribute, if present, signifies the transient nature of the message.
-For example, an ephemeral message SHOULD not be persisted by the [64/WAKU2-NETWORK](/waku/standards/core/64/network.md).
+For example, an ephemeral message SHOULD not be persisted by other nodes on the same network.
 If this attribute is set to `true`, the message SHOULD be interpreted as ephemeral.
 If, instead, the attribute is omitted or set to `false`,
 the message SHOULD be interpreted as non-ephemeral.
