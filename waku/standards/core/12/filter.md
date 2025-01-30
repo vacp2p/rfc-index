@@ -68,15 +68,6 @@ refers to any piece of data that can be used to uniquely identify a user.
 For example, the signature verification key, and
 the hash of one's static IP address are unique for each user and hence count as PII.
 
-### Design Requirements
-
-The effectiveness and reliability of the content filtering service enabled by the
-`WakuFilter` protocol rely on the _high availability_ of the full nodes
-as the service providers.
-To this end, full nodes must feature _high uptime_
-(to persistently listen and capture the network messages)
-as well as _high Bandwidth_ (to provide timely message delivery to the light nodes).
-
 ### Protobuf
 
 ```protobuf
