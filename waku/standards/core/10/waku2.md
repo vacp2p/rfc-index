@@ -14,9 +14,9 @@ contributors:
 
 ## Abstract
 
-Waku v2 is family of modular peer-to-peer protocols for secure communication.
+Waku v2 is a family of modular peer-to-peer protocols for secure communication.
 The protocols are designed to be secure, privacy-preserving, censorship-resistant
-and being able to run in resource restricted environments.
+and being able to run in resource-restricted environments.
 At a high level, it implements Pub/Sub over [libp2p](https://github.com/libp2p/specs)
 and adds a set of capabilities to it.
 These capabilities are things such as:
@@ -24,20 +24,20 @@ These capabilities are things such as:
 (ii) adaptive nodes, allowing for heterogeneous nodes to contribute to the network
 (iii) preserving bandwidth usage for resource-restriced devices
 
-This makes Waku ideal for running a p2p protocol on mobile and
+This makes Waku v2 ideal for running a p2p protocol on mobile and
 in similarly restricted environments.
 
-Historically, it has its roots in [6/WAKU1](../../legacy/6/waku1.md),
+Historically, it has its roots in [6/WAKU1](waku/standards/core/legacy/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627),
 originally part of the Ethereum stack.
-However, Waku v2 acts more as a thin wrapper for PubSub and has a different API.
+However, Waku v2 acts more as a thin wrapper for Pub/Sub and has a different API.
 It is implemented in an iterative manner where initial focus
 is on porting essential functionality to libp2p.
 See [rough road map (2020)](https://vac.dev/waku-v2-plan) for more historical context.
 
 ## Motivation and goals
 
-Waku as a family of protocols is designed to have a set of properties
+Waku, as a family of protocols, is designed to have a set of properties
 that are useful for many applications:
 
 1.**Useful for generalized messaging.**
@@ -62,7 +62,7 @@ Applications often run in restricted environments,
 where resources or the environment is restricted in some fashion.
 For example:
 
-- Limited bandwidth, CPU, memory, disk, battery, etc
+- Limited bandwidth, CPU, memory, disk, battery, etc.
 - Not being publicly connectable
 - Only being intermittently connected; mostly-offline
 
@@ -72,7 +72,7 @@ For example:
 
 - Pseudonymity and not being tied to any personally identifiable information (PII)
 - Metadata protection in transit
-- Various forms of unlinkability, etc
+- Various forms of unlinkability, etc.
 
 5.**Modular design.**
 
@@ -89,7 +89,7 @@ For example:
 - Stronger guarantees for spam protection vs economic registration cost
 
 For more on the concept of adaptive nodes and what this means in practice,
-please see the [30/ADAPTIVE-NODES](../../../informational/30/adaptive-nodes.md) spec.
+please see the [30/ADAPTIVE-NODES](waku/informational/30/adaptive-nodes.md) spec.
 
 ## Network interaction domains
 
@@ -107,7 +107,7 @@ The current main [protocol identifiers](https://docs.libp2p.io/concepts/protocol
 are:
 
 1. `/vac/waku/relay/2.0.0`
-2. `/vac/waku/store/2.0.0-beta4`
+2. `/vac/waku/store-query/3.0.0`
 3. `/vac/waku/filter/2.0.0-beta1`
 4. `/vac/waku/lightpush/2.0.0-beta1`
 
