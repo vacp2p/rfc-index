@@ -24,8 +24,8 @@ These capabilities are things such as:
 (ii) adaptive nodes, allowing for heterogeneous nodes to contribute to the network
 (iii) preserving bandwidth usage for resource-restriced devices
 
-This makes Waku v2 ideal for running a p2p protocol on mobile and
-in similarly restricted environments.
+This makes Waku v2 ideal for running a p2p protocol on mobile devices and
+other similar restricted environments.
 
 Historically, it has its roots in [6/WAKU1](waku/standards/core/legacy/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627),
@@ -35,7 +35,7 @@ It is implemented in an iterative manner where initial focus
 is on porting essential functionality to libp2p.
 See [rough road map (2020)](https://vac.dev/waku-v2-plan) for more historical context.
 
-## Motivation and goals
+## Motivation and Goals
 
 Waku, as a family of protocols, is designed to have a set of properties
 that are useful for many applications:
@@ -44,7 +44,7 @@ that are useful for many applications:
 
 Many applications require some form of messaging protocol to communicate
 between different subsystems or different nodes.
-This messaging can be human-to-human or machine-to-machine or a mix.
+This messaging can be human-to-human, machine-to-machine or a mix.
 Waku is designed to work for all these scenarios.
 
 2.**Peer-to-peer.**
@@ -91,16 +91,22 @@ For example:
 For more on the concept of adaptive nodes and what this means in practice,
 please see the [30/ADAPTIVE-NODES](waku/informational/30/adaptive-nodes.md) spec.
 
-## Network interaction domains
+## Specification
+
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+
+### Network Interaction Domains
 
 While Waku is best thought of as a single cohesive thing,
 there are three network interaction domains:
 
 (a) gossip domain
 (b) discovery domain
-(c) req/resp domain
+(c) request/response domain
 
-### Protocols and identifiers
+#### Protocols and Identifiers
 
 Since Waku v2 is built on top of libp2p, many protocols have a libp2p protocol identifier.
 The current main [protocol identifiers](https://docs.libp2p.io/concepts/protocols/)
@@ -117,19 +123,19 @@ Since these aren't negotiated libp2p protocols,
 they are referred to by their RFC ID.
 For example:
 
-- [14/WAKU2-MESSAGE](../14/message.md) and
-[26/WAKU-PAYLOAD](../../application/26/payload.md) for message payloads
-- [23/WAKU2-TOPICS](../../../informational/23/topics.md) and
-[27/WAKU2-PEERS](../../../informational/27/peers.md) for recommendations around usage
+- [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) and
+[26/WAKU-PAYLOAD](waku/standards/application/26/payload.md) for message payloads
+- [23/WAKU2-TOPICS](waku/informational/23/topics.md) and
+[27/WAKU2-PEERS](waku/informational/27/peers.md) for recommendations around usage
 
 There are also more experimental libp2p protocols such as:
 
-1. `/vac/waku/swap/2.0.0-beta1`
-2. `/vac/waku/waku-rln-relay/2.0.0-alpha1`
+1. `/vac/waku/waku-rln-relay/2.0.0-alpha1`
+2. `/vac/waku/peer-exchange/2.0.0-alpha1`
 
-These protocols and their semantics are elaborated on in their own specs.
+The semnatics of these protocols are referred to by RFC ID [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md) and [34/WAKU2-PEER-EXCHANGE](waku/standards/core/34/peer-exchange.md).
 
-### Use of libp2p and protobuf
+#### Use of libp2p and Protobuf
 
 Unless otherwise specified,
 all protocols are implemented over libp2p and use Protobuf by default.
@@ -139,20 +145,21 @@ libp2p protocols prefix binary message payloads with
 the length of the message in bytes.
 This length integer is encoded as a [protobuf varint](https://developers.google.com/protocol-buffers/docs/encoding#varints).
 
-### Gossip domain
+#### Gossip Domain
 
-Waku is using gossiping to disseminate messages throughout the network.
+Waku v2 is using gossiping to disseminate messages throughout the network.
 
 **Protocol identifier**: `/vac/waku/relay/2.0.0`
 
-See [11/WAKU2-RELAY](../11/relay.md) spec for more details.
+See [11/WAKU2-RELAY](waku/standards/core/11/relay.md) specification for more details.
 
-For an experimental privacy-preserving economic spam protection mechanism, see [17/WAKU2-RLN-RELAY](../17/rln-relay.md).
+For an experimental privacy-preserving economic spam protection mechanism,
+see [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md).
 
-See [23/WAKU2-TOPICS](../../../informational/23/topics.md)
-for more information about recommended topic usage.
+See [23/WAKU2-TOPICS](waku/informational/23/topics.md)
+for more information about the recommended topic usage.
 
-### Direct use of libp2p protocols
+#### Direct use of libp2p protocols
 
 In addition to `/vac/waku/*` protocols,
 Waku v2 MAY directly use the following libp2p protocols:
@@ -164,14 +171,14 @@ with protocol id
 /ipfs/ping/1.0.0
 ```
 
-for liveness checks between peers, or to keep peer-to-peer connections alive.
+for liveness checks between peers, or
+to keep peer-to-peer connections alive.
 
 - [libp2p identity and identity/push](https://docs.libp2p.io/concepts/protocols/#identify)
 with protocol IDs
 
 ```text
 /ipfs/id/1.0.0
-
 ```
 
 and
@@ -191,15 +198,13 @@ with better anonymity properties and more functionality.
 Waku v2 is built in top of libp2p, and like libp2p it strives to be transport agnostic.
 We define a set of recommended transports in order to achieve a baseline of
 interoperability between clients.
-
 This section describes these recommended transports.
 
-Waku client implementations SHOULD support the TCP transport.
-
+Waku v2 client implementations SHOULD support the TCP transport.
 Where TCP is supported it MUST be enabled for both dialing and listening,
 even if other transports are available.
 
-Waku v2 nodes where the environment do not allow to use TCP directly,
+Waku v2 nodes running in environments that do not allow the use of TCP directly,
 MAY use other transports.
 
 A Waku v2 node SHOULD support secure websockets for bidirectional communication streams,
@@ -208,18 +213,16 @@ for example in a web browser context.
 A node MAY support unsecure websockets if required by the application or
 running environment.
 
-### Discovery domain
+### Discovery Domain
 
-#### Discovery methods
+#### Discovery Methods
 
 Waku v2 can retrieve a list of nodes to connect to using DNS-based discovery
 as per [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459).
 While this is a useful way of bootstrapping connection to a set of peers,
 it MAY be used in conjunction with an [ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
-procedure to find still other nodes to connect to,
+procedure to find other nodes to connect to,
 such as [Node Discovery v5](https://github.com/ethereum/devp2p/blob/8fd5f7e1c1ec496a9d8dc1640a8548b8a8b5986b/discv5/discv5.md).
-More ambient peer discovery methods are being tested for Waku v2,
-and will be specified for wider adoption.
 It is possible to bypass the discovery domain by specifying static nodes.
 
 #### Use of ENR
@@ -229,50 +232,50 @@ describes the usage of [EIP-778 ENR (Ethereum Node Records)](https://eips.ethere
 for Waku v2 discovery purposes.
 It introduces two new ENR fields, `multiaddrs` and
 `waku2`, that a Waku v2 node MAY use for discovery purposes.
-These fields MUST be used under certain conditions, as set out in the spec.
-Both EIP-1459 DNS-based discovery and Node Discovery v5 operates on ENR,
-and it's reasonable to expect even wider utility for ENR in Waku v2 networks in future.
+These fields MUST be used under certain conditions, as set out in the specification.
+Both EIP-1459 DNS-based discovery and Node Discovery v5 operate on ENR,
+and it's reasonable to expect even wider utility for ENR in Waku v2 networks in the future.
 
-### Request/Reply domain
+### Request/Reply Domain
 
 In addition to the Gossip domain,
-Waku provides a set of Request/Reply protocols.
-They are primarily used in order to get Waku to run in resource restricted environments,
+Waku v2 provides a set of request/response protocols.
+They are primarily used in order to get Waku v2 to run in resource restricted environments,
 such as low bandwidth or being mostly offline.
 
-#### Historical message support
+#### Historical Message Support
 
-**Protocol identifier***: `/vac/waku/store/2.0.0-beta4`
+**Protocol identifier***: `/vac/waku/store-query/3.0.0`
 
 This is used to fetch historical messages for mostly offline devices.
-See [13/WAKU2-STORE spec](../13/store.md) spec for more details.
+See [13/WAKU2-STORE spec](waku/standards/core/13/store.md) specification for more details.
 
 There is also an experimental fault-tolerant addition to the store protocol
 that relaxes the high availability requirement.
-See [21/WAKU2-FT-STORE](../../application/21/fault-tolerant-store.md)
+See [21/WAKU2-FAULT-TOLERANT-STORE](waku/standards/application/21/fault-tolerant-store.md)
 
-#### Content filtering
+#### Content Filtering
 
 **Protocol identifier***: `/vac/waku/filter/2.0.0-beta1`
 
-This is used to make fetching of a subset of messages more bandwidth preserving.
-See [12/WAKU2-FILTER](../12/filter.md) spec for more details.
+This is used to preserve more bandwidth when fetching a subset of messages.
+See [12/WAKU2-FILTER](waku/standards/core/12/filter.md) specification for more details.
 
-#### Light push
+#### LightPush
 
 **Protocol identifier***: `/vac/waku/lightpush/2.0.0-beta1`
 
 This is used for nodes with short connection windows and
 limited bandwidth to publish messages into the Waku network.
-See [19/WAKU2-LIGHTPUSH](../19/lightpush.md) spec for more details.
+See [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md) specification for more details.
 
-#### Other protocols
+#### Other Protocols
 
 The above is a non-exhaustive list,
-and due to the modular design of Waku,
+and due to the modular design of Waku v2,
 there may be other protocols here that provide a useful service to the Waku network.
 
-### Overview of protocol interaction
+### Overview of Protocol Interaction
 
 See the sequence diagram below for an overview of how different protocols interact.
 
@@ -283,21 +286,21 @@ The protocols initially mounted are indicated as such.
 The PubSub topics `pubtopic1` and
 `pubtopic2` is used for routing and
 indicates that it is subscribed to messages on that topic for relay,
-see [11/WAKU2-RELAY](../11/relay.md) for details.
-Ditto for [13/WAKU2-STORE](../13/store.md)
+see [11/WAKU2-RELAY](waku/standards/core/11/relay.md) for details.
+Ditto for [13/WAKU2-STORE](waku/standards/core/13/store.md)
 where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
-See [14/WAKU2-MESSAGE](../14/message.md) for more details.
+See [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) for more details.
 If WakuMessage version is set to 1,
-we use the [6/WAKU1](../../legacy/6/waku1.md) compatible `data` field with encryption.
-See [7/WAKU-DATA](../../legacy/7/data.md) for more details.
+we use the [6/WAKU1](waku/standards/legacy/6/waku1.md) compatible `data` field with encryption.
+See [7/WAKU-DATA](waku/standards/legacy/7/data.md) for more details.
 
 2. Node F requests to get messages filtered by PubSub topic `pubtopic1` and
 ContentTopic `contentTopic1`.
 Node D subscribes F to this filter and
 will in the future forward messages that match that filter.
-See [12/WAKU2-FILTER](../12/filter.md) for more details.
+See [12/WAKU2-FILTER](waku/standards/core/12/filter.md) for more details.
 
 3. Node A publishes `msg1` on `pubtopic1` and
 subscribes to that relay topic pick it up.
