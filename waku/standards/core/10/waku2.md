@@ -303,35 +303,38 @@ will in the future forward messages that match that filter.
 See [12/WAKU2-FILTER](waku/standards/core/12/filter.md) for more details.
 
 3. Node A publishes `msg1` on `pubtopic1` and
-subscribes to that relay topic pick it up.
+subscribes to that relay topic.
 It then gets relayed further from B to D, but
 not C since it doesn't subscribe to that topic.
-See [11/WAKU2-RELAY](../11/relay.md).
+See [11/WAKU2-RELAY](waku/standards/core/11/relay.md).
 
 4. Node D saves `msg1` for possible later retrieval by other nodes.
-See [13/WAKU2-STORE](../13/store.md).
+See [13/WAKU2-STORE](waku/standards/core/13/store.md).
 
-5. Node D also pushes `msg1` to F, as it has previously subscribed F to this filter.
-See [12/WAKU2-FILTER](../12/filter.md).
+5. Node D also pushes `msg1` to F,
+as it has previously subscribed F to this filter.
+See [12/WAKU2-FILTER](waku/standards/core/12/filter.md).
 
 6. At a later time, Node E comes online.
-It then requests messages matching `pubtopic1` and `contentTopic1` from Node D.
-Node D responds with messages meeting this (and possibly other) criteria. See [13/WAKU2-STORE](../13/store.md).
+It then requests messages matching `pubtopic1` and
+`contentTopic1` from Node D.
+Node D responds with messages meeting this (and possibly other) criteria.
+See [13/WAKU2-STORE](waku/standards/core/13/store.md).
 
 ## Appendix A: Upgradability and Compatibility
 
 ### Compatibility with Waku v1
 
-Waku v1 and Waku v2 are different protocols all together.
+[6/WAKU1](waku/standards/legacy/6/waku1.md) and Waku v2 are different protocols all together.
 They use a different transport protocol underneath;
-Waku v1 is devp2p RLPx based while Waku v2 uses libp2p.
+[6/WAKU1](waku/standards/legacy/6/waku1.md) is devp2p RLPx based while Waku v2 uses libp2p.
 The protocols themselves also differ as does their data format.
 Compatibility can be achieved only by using a bridge
 that not only talks both devp2p RLPx and libp2p,
 but that also transfers (partially) the content of a packet from one version
 to the other.
 
-See [15/WAKU-BRIDGE](../15/bridge.md) for details on a bidirectional bridge mode.
+See [15/WAKU-BRIDGE](waku/standards/core/15/bridge.md) for details on a bidirectional bridge mode.
 
 ## Appendix B: Security
 
@@ -345,7 +348,7 @@ against a static adversarial model which is described below.
 Note that a more detailed security analysis of each Waku protocol
 is supplied in its respective specification as well.
 
-## Primary Adversarial Model
+### Primary Adversarial Model
 
 In the primary adversarial model,
 we consider adversary as a passive entity that attempts to collect information
@@ -360,9 +363,9 @@ between arbitrary pairs of peers
 (unless the adversary is one end of the communication).
 Specifically, the communication channels are assumed to be secure.
 
-## Security Features
+### Security Features
 
-### Pseudonymity
+#### Pseudonymity
 
 Waku v2 by default guarantees pseudonymity for all of the protocol layers
 since parties do not have to disclose their true identity
@@ -372,7 +375,7 @@ it does not guarantee full anonymity since the actions taken under the same pseu
 i.e., `PeerID` can be linked together and
 potentially result in the re-identification of the true actor.
   
-### Anonymity / Unlinkability
+#### Anonymity / Unlinkability
 
 At a high level,
 anonymity is the inability of an adversary in linking an actor
@@ -408,7 +411,7 @@ where k is proportional to the system size (number of subscribers).
 Note that there is no hard limit on the number of the pubsub topics, however,
 the use of one topic is recommended for the sake of anonymity.
 
-### Spam protection
+#### Spam protection
 
 This property indicates that no adversary can flood the system
 (i.e., publishing a large number of messages in a short amount of time),
@@ -416,19 +419,19 @@ either accidentally or deliberately, with any kind of message
 i.e. even if the message content is valid or useful.
 Spam protection is partly provided in `11/WAKU2-RELAY`
 through the [scoring mechanism](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#spam-protection-measures)
- rovided for by GossipSub v1.1.
+provided for by GossipSub v1.1.
 At a high level,
 peers utilize a scoring function to locally score the behavior
 of their connections and remove peers with a low score.
   
-### Data confidentiality, Integrity, and Authenticity
+#### Data confidentiality, Integrity, and Authenticity
 
 Confidentiality can be addressed through data encryption whereas integrity and
 authenticity are achievable through digital signatures.
 These features are provided for in [14/WAKU2-MESSAGE (version 1)](../14/message.md/#version-1)`
 through payload encryption as well as encrypted signatures.
 
-## Security Considerations
+### Security Considerations
 
 Lack of anonymity/unlinkability in the protocols involving direct connections
 including `13/WAKU2-STORE` and `12/WAKU2-FILTER` protocols:
@@ -493,7 +496,7 @@ This includes Waku v1 specs, as they are used for bridging between the two netwo
 To implement a minimal Waku v2 client,
 we recommend implementing the following subset in the following order:
 
-- [10/WAKU2](../10/waku2.md) - this spec
+- [10/WAKU2](../10/waku2.md) - this specification
 - [11/WAKU2-RELAY](../11/relay.md) - for basic operation
 - [14/WAKU2-MESSAGE](../14/message.md) - version 0 (unencrypted)
 - [13/WAKU2-STORE](../13/store.md) - for historical messaging (query mode only)
