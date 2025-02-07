@@ -395,14 +395,14 @@ the actors / actors' PII. Concerning anonymity, Waku v2 provides the following f
 **Publisher-Message Unlinkability**:
 This feature signifies the unlinkability of a publisher
 to its published messages in the 11/WAKU2-RELAY protocol.
-The [Publisher-Message Unlinkability](../11/relay.md/#security-analysis)
+The [Publisher-Message Unlinkability](waku/standards/core/11/relay.md/#security-analysis)
 is enforced through the `StrictNoSign` policy due to which the data fields
 of pubsub messages that count as PII for the publisher must be left unspecified.
 
 **Subscriber-Topic Unlinkability**:
 This feature stands for the unlinkability of the subscriber
 to its subscribed topics in the 11/WAKU2-RELAY protocol.
-The [Subscriber-Topic Unlinkability](../11/relay.md/#security-analysis)
+The [Subscriber-Topic Unlinkability](waku/standards/core/11/relay.md/#security-analysis)
 is achieved through the utilization of a single PubSub topic.
 As such, subscribers are not re-identifiable from their subscribed topic IDs
 as the entire network is linked to the same topic ID.
@@ -428,7 +428,7 @@ of their connections and remove peers with a low score.
 
 Confidentiality can be addressed through data encryption whereas integrity and
 authenticity are achievable through digital signatures.
-These features are provided for in [14/WAKU2-MESSAGE (version 1)](../14/message.md/#version-1)`
+These features are provided for in [14/WAKU2-MESSAGE (version 1)](waku/standards/core/14/message.md/#version-1)`
 through payload encryption as well as encrypted signatures.
 
 ### Security Considerations
@@ -466,45 +466,45 @@ There are multiple implementations of Waku v2 and its protocols:
 - [go-waku (Go)](https://github.com/status-im/go-waku/)
 - [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
 
-Below you can find an overview of the specs that they implement
+Below you can find an overview of the specifications that they implement
 as they relate to Waku v2.
-This includes Waku v1 specs, as they are used for bridging between the two networks.
+This includes Waku v1 specifications, as they are used for bridging between the two networks.
 
 | Spec | nim-waku (Nim) | go-waku (Go) | js-waku (Node JS) | js-waku (Browser JS) |
 | ---- | -------------- | ------------ | ----------------- | -------------------- |
-|[6/WAKU1](../../legacy/6/waku1.md)|✔||||
-|[7/WAKU-DATA](../../legacy/7/data.md)|✔|✔|||
-|[8/WAKU-MAIL](../../legacy/8/mail.md)|✔||||
-|[9/WAKU-RPC](../../legacy/9/rpc.md)|✔||||
-|[10/WAKU2](../10/waku2.md)|✔|🚧|🚧|🚧|
-|[11/WAKU2-RELAY](../11/relay.md)|✔|✔|✔|✔|
-|[12/WAKU2-FILTER](../12/filter.md)|✔|✔|||
-|[13/WAKU2-STORE](../13/store.md)|✔|✔|✔\*|✔\*|
-|[14/WAKU2-MESSAGE](../14/message.md))|✔|✔|✔|✔|
-|[15/WAKU2-BRIDGE](../15/bridge.md)|✔||||
-|[16/WAKU2-RPC](../16/rpc.md)|✔||||
-|[17/WAKU2-RLN-RELAY](../17/rln-relay.md)|🚧||||
-|[18/WAKU2-SWAP](../../application/18/swap.md)|🚧||||
-|[19/WAKU2-LIGHTPUSH](../19/lightpush.md)|✔|✔|✔\**|✔\**|
-|[21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)|✔|✔|||
+|[6/WAKU1](waku/standards/legacy/6/waku1.md)|✔||||
+|[7/WAKU-DATA](waku/standards/legacy/7/data.md)|✔|✔|||
+|[8/WAKU-MAIL](waku/standards/legacy/8/mail.md)|✔||||
+|[9/WAKU-RPC](waku/standards/legacy/9/rpc.md)|✔||||
+|[10/WAKU2](waku/standards/core/10/waku2.md)|✔|🚧|🚧|✔|
+|[11/WAKU2-RELAY](waku/standards/core/11/relay.md)|✔|✔|✔|✔|
+|[12/WAKU2-FILTER](waku/standards/core/12/filter.md)|✔|✔|||
+|[13/WAKU2-STORE](waku/standards/core/13/store.md)|✔|✔|✔\*|✔\*|
+|[14/WAKU2-MESSAGE](waku/standards/core/14/message.md))|✔|✔|✔|✔|
+|[15/WAKU2-BRIDGE](waku/standards/core/15/bridge.md)|✔||||
+|[16/WAKU2-RPC](waku/deprecated/16/rpc.md)|✔||||
+|[17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md)|🚧||||
+|[18/WAKU2-SWAP](waku/standards/application/18/swap.md)|🚧||||
+|[19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md)|✔|✔|✔\**|✔\**|
+|[21/WAKU2-FAULT-TOLERANT-STORE](waku/standards/application/21/fault-tolerant-store.md)|✔|✔|||
 
-*js-waku implements [13/WAKU2-STORE](../13/store.md) as a querying node only.
-**js-waku only implements [19/WAKU2-LIGHTPUSH](../19/lightpush.md) requests.
+*js-waku implements [13/WAKU2-STORE](waku/standards/core/13/store.md) as a querying node only.
+**js-waku only implements [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md) requests.
 
-### Recommendations for clients
+### Recommendations for Clients
 
 To implement a minimal Waku v2 client,
 we recommend implementing the following subset in the following order:
 
-- [10/WAKU2](../10/waku2.md) - this specification
-- [11/WAKU2-RELAY](../11/relay.md) - for basic operation
-- [14/WAKU2-MESSAGE](../14/message.md) - version 0 (unencrypted)
-- [13/WAKU2-STORE](../13/store.md) - for historical messaging (query mode only)
+- [10/WAKU2](waku/standards/core/10/waku2.md) - this specification
+- [11/WAKU2-RELAY](waku/standards/core/11/relay.md) - for basic operation
+- [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) - version 0 (unencrypted)
+- [13/WAKU2-STORE](waku/standards/core/13/store.md) - for historical messaging (query mode only)
 
 To get compatibility with Waku v1:
 
-- [7/WAKU-DATA](../../legacy/7/data.md)
-- [14/WAKU2-MESSAGE](../14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
+- [7/WAKU-DATA](waku/standards/legacy/7/data.md)
+- [14/WAKU2-MESSAGE](waku/standards/14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
 
 For an interoperable keep-alive mechanism:
 
@@ -513,13 +513,14 @@ with periodic pings to connected peers
 
 ## Appendix D: Future work
 
-The following features are currently experimental and under research and
-initial implementation:
+The following features are currently experimental,
+under research and initial implementations:
 
-**Economic Spam resistance**:
+**Economic Spam Resistance**:
+
 We aim to enable an incentivized spam protection technique
 to enhance `11/WAKU2-RELAY` by using rate limiting nullifiers.
-More details on this can be found in [17/WAKU2-RLN-RELAY](../17/rln-relay.md).
+More details on this can be found in [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md).
 In this advanced method,
 peers are limited to a certain rate of messaging per epoch and
 an immediate financial penalty is enforced for spammers who break this rate.
@@ -528,7 +529,7 @@ an immediate financial penalty is enforced for spammers who break this rate.
 Denial of service signifies the case where an adversarial node
 exhausts another node's service capacity (e.g., by making a large number of requests)
 and makes it unavailable to the rest of the system.
-DoS attack is to be mitigated through the accounting model as described in [18/WAKU2-SWAP](../../application/18/swap.md).
+DoS attack is to be mitigated through the accounting model as described in [18/WAKU2-SWAP](waku/deprecated/18/swap.md).
 In a nutshell, peers have to pay for the service they obtain from each other.
 In addition to incentivizing the service provider,
 accounting also makes DoS attacks costly for malicious peers.
@@ -537,7 +538,7 @@ The accounting model can be used in `13/WAKU2-STORE` and
 
 Additionally, this gives node operators who provide a useful service to the network
 an incentive to perform that service.
-See [18/WAKU2-SWAP](../../application/18/swap.md)
+See [18/WAKU2-SWAP](waku/deprecated/18/swap.md)
 for more details on this piece of work.
 
 ## Copyright
@@ -548,31 +549,31 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [libp2p specs](https://github.com/libp2p/specs)
 
-2. [6/WAKU1](../../legacy/6/waku1.md)
+2. [6/WAKU1](waku/standards/legacy/6/waku1.md)
 
 3. [Whisper spec (EIP627)](https://eips.ethereum.org/EIPS/eip-627)
 
 4. [Waku v2 plan](https://vac.dev/waku-v2-plan)
 
-5. [30/ADAPTIVE-NODES](../../../informational/30/adaptive-nodes.md)
+5. [30/ADAPTIVE-NODES](waku/informational/30/adaptive-nodes.md)
 
 6. [Protocol Identifiers](https://docs.libp2p.io/concepts/protocols/)
 
-7. [14/WAKU2-MESSAGE](../14/message.md)
+7. [14/WAKU2-MESSAGE](waku/standards/core/14/message.md)
 
-8. [26/WAKU-PAYLOAD](../../application/26/payload.md)
+8. [26/WAKU-PAYLOAD](waku/standards/application/26/payload.md)
 
-9. [23/WAKU2-TOPICS](../../../informational/23/topics.md)
+9. [23/WAKU2-TOPICS](waku/informational/23/topics.md)
 
-10. [27/WAKU2-PEERS](../../../informational/27/peers.md)
+10. [27/WAKU2-PEERS](waku/informational/27/peers.md)
 
 11. [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/)
 
 12. [Protobuf varint encoding](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 
-13. [11/WAKU2-RELAY spec](../11/relay.md)
+13. [11/WAKU2-RELAY spec](waku/standards/core/11/relay.md)
 
-14. [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
+14. [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md)
 
 15. [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459)
 
@@ -584,17 +585,17 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 19. [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778)
 
-20. [13/WAKU2-STORE spec](../13/store.md)
+20. [13/WAKU2-STORE spec](waku/standards/core/13/store.md)
 
-21. [21/WAKU2-FT-STORE](../../application/21/ft-store.md)
+21. [21/WAKU2-FT-STORE](waku/standards/application/21/ft-store.md)
 
-22. [12/WAKU2-FILTER](../12/filter.md)
+22. [12/WAKU2-FILTER](waku/standards/core/12/filter.md)
 
-23. [19/WAKU2-LIGHTPUSH](../19/lightpush.md)
+23. [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md)
 
-24. [7/WAKU-DATA](../../legacy/7/data.md)
+24. [7/WAKU-DATA](waku/standards/legacy/7/data.md)
 
-25. [15/WAKU-BRIDGE](../15/bridge.md)
+25. [15/WAKU-BRIDGE](waku/standards/core/15/bridge.md)
 
 26. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
 
@@ -606,12 +607,12 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 30. [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
 
-31. [8/WAKU-MAIL](../../legacy/8/mail.md)
+31. [8/WAKU-MAIL](waku/standards/legacy/8/mail.md)
 
-32. [9/WAKU-RPC](../../legacy/9/rpc.md)
+32. [9/WAKU-RPC](waku/standards/legacy/9/rpc.md)
 
-33. [16/WAKU2-RPC](../16/rpc.md)
+33. [16/WAKU2-RPC](waku/deprecated/16/rpc.md)
 
-34. [18/WAKU2-SWAP spec](../../application/18/swap.md)
+34. [18/WAKU2-SWAP spec](waku/deprecated/18/swap.md)
 
 35. [21/WAKU2-FAULT-TOLERANT-STORE](../../application/21/fault-tolerant-store.md)
