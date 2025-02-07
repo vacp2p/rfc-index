@@ -664,7 +664,6 @@ communicating the update to all users.
 
 ![figure9](./images/eth-secpm_onchain-update.png)
 
-
 ## Consideration to secure 1-to-1 channels
 
 There are situations where users need to set one-to-one communication
@@ -692,7 +691,7 @@ Concerning keys, each node can generate and disseminate their
 encryption key among the other nodes, so they can create a local
 version of the tree that allows for the generation of the group key.
 
-Another important component is the _authentication service_, which is
+Another important component is the authentication service, which is
 replaced with SIWE in this specification.
 
 ## Privacy and Security Considerations
