@@ -186,7 +186,7 @@ to a trusted Mailserver peer. The request does not await a response.
 
 - Released May 22, 2020
 - Created document
-- Forked from 3-whisper-usage
+- Forked from whisper-usage
 - Updated terminology to keep Mailserver term consistent
 
 ## Copyright
