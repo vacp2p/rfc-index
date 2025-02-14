@@ -142,7 +142,7 @@ Mailserver node.
 
 - Released May 22, 2020
 - Created document
-- Forked from 4-whisper-mailserver
+- Forked from whisper-mailserver
 - Updated to keep Mailserver terminology consistent
 - Replaced Whisper references with Waku
 
