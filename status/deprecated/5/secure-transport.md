@@ -46,7 +46,7 @@ where the Double Ratchet algorithm is in use.
 - **Integrity**: The adversary should not cause either endpoint  
   of a Status 1:1 chat to accept tampered data.
 
-These properties are ensured by Signal’s Double Ratchet.
+These properties are ensured by [Signal’s Double Ratchet](https://signal.org/docs/specifications/doubleratchet/).
 
 ## Conventions
 
