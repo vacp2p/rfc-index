@@ -1,17 +1,17 @@
 ---
-slug: 38
-title: 38/CONSENSUS-CLARO
+title: CONSENSUS-CLARO
 name: Claro Consensus Protocol
 status: raw
 category: Standards Track
-tags: logos/consensus
+tags:
+  - logos/consensus
 editor: Corey Petty <corey@status.im>
 created: 01-JUL-2022
 revised: <2022-08-26 Fri 13:11Z>
 uri: <https://rdf.logos.co/protocol/Claro/1/0/0#<2022-08-26%20Fri$2013:11Z>
 contributors:
-    - Álvaro Castro-Castilla 
-    - Mark Evenson
+  - Álvaro Castro-Castilla
+  - Mark Evenson
 ---
 
 ## Abstract
