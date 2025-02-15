@@ -1,7 +1,7 @@
 ---
 title: Dapp browser API usage
 name: Dapp browser API usage
-status: draft
+status: deprecated
 description: This document describes requirements that an application must fulfill in order to provide a proper environment for Dapps running inside a browser.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

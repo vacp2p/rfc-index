@@ -1,7 +1,7 @@
 ---
 title: WAKU-MAILSERVER
 name: Waku Mailserver
-status: draft
+status: deprecated
 description: Waku Mailserver is a specification that allows messages to be stored permanently and to allow the stored messages to be delivered to requesting client nodes, regardless if the messages are not available in the network due to the message TTL expiring.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

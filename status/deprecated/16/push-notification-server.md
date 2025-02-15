@@ -1,7 +1,7 @@
 ---
 title: PUSH-NOTIFICATION-SERVER
 name: Push notification server
-status: draft
+status: deprecated
 description: Status provides a set of Push notification services that can be used to achieve this functionality.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

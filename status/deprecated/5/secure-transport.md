@@ -1,7 +1,7 @@
 ---
 title: SECURE-TRANSPORT
 name: Secure Transport
-status: draft
+status: deprecated
 description: This document describes how Status provides a secure channel between two peers, providing confidentiality, integrity, authenticity, and forward secrecy.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

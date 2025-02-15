@@ -1,7 +1,7 @@
 ---
 title: GROUP-CHAT
 name: Group Chat
-status: draft
+status: deprecated
 description: This document describes the group chat protocol used by the Status application.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

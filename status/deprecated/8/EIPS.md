@@ -1,7 +1,7 @@
 ---
 title: EIPS
 name: EIPS
-status: draft
+status: deprecated
 description: Status relation with the EIPs
 editor: Ricardo Guilherme Schmidt <ricardo3@status.im>
 contributors:

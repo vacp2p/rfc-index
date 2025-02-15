@@ -1,7 +1,7 @@
 ---
 title: NOTIFICATIONS
 name: Notifications
-status: draft
+status: deprecated
 description: A client should implement local notifications to offer notifications for any event in the app without the privacy cost and dependency on third party services.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

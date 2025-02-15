@@ -1,7 +1,7 @@
 ---
 title: ETHEREUM-USAGE
 name: Status interactions with the Ethereum blockchain
-status: draft
+status: deprecated
 description: All interactions that the Status client has with the Ethereum blockchain.
 editor: Andrea Maria Piana <andreap@status.im>
 contributors:
@@ -24,7 +24,7 @@ otherwise, it will not be able to interact with the Ethereum blockchain.
 Status nodes rely on these Infura nodes
 to validate transaction integrity and report consistent history.
 
-[Key handling is described here](https://rfc.vac.dev/status/9/ethereum-usage.md)
+[Key handling is described here](https://rfc.vac.dev/status/deprecated/9/ethereum-usage.md)
 
 1 [Wallet]
 2 [ENS]

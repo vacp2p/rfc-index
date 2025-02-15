@@ -1,7 +1,7 @@
 ---
 title: WHISPER-MAILSERVER
 name: Whisper mailserver
-status: draft
+status: deprecated
 description: Whisper Mailserver is a Whisper extension that allows to store messages permanently and deliver them to the clients even though they are already not available in the network and expired.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

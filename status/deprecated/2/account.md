@@ -1,7 +1,7 @@
 ---
 title: ACCOUNT
 name: Account
-status: draft
+status: deprecated
 description: This specification explains what a Status account is, and how a node establishes trust.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

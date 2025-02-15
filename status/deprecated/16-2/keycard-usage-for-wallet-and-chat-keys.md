@@ -1,7 +1,7 @@
 ---
 title: Keycard Usage for Wallet and Chat Keys
 name: Keycard Usage for Wallet and Chat Keys
-status: draft
+status: deprecated
 description: In this specification, we describe how Status communicates with Keycard to create, store and use multiaccount.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

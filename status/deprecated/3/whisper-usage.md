@@ -1,7 +1,7 @@
 ---
 title: WHISPER-USAGE
 name: Whisper Usage
-status: draft
+status: deprecated
 description: Status uses Whisper to provide privacy-preserving routing and messaging on top of devP2P.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

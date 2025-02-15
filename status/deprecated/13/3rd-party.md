@@ -1,7 +1,7 @@
 ---
 title: 3RD-PARTY
 name: 3rd party
-status: draft
+status: deprecated
 description: This specification discusses 3rd party APIs that Status relies on.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

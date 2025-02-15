@@ -1,7 +1,7 @@
 ---
 title: WAKU-USAGE
 name: Waku Usage
-status: draft
+status: deprecated
 description: Status uses Waku to provide privacy-preserving routing and messaging on top of devP2P.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:

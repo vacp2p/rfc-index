@@ -1,7 +1,7 @@
 ---
 title: CLIENT
 name: Client
-status: draft
+status: deprecated
 description: This specification describes how to write a Status client for communicating with other Status clients.
 editor: Filip Dimitrijevic <filip@status.im>
 contributors:
