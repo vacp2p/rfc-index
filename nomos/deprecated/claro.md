@@ -1,7 +1,7 @@
 ---
 title: CONSENSUS-CLARO
 name: Claro Consensus Protocol
-status: raw
+status: deprecated
 category: Standards Track
 tags:
   - logos/consensus
