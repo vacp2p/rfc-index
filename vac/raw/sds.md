@@ -225,14 +225,26 @@ prioritizing **unacknowledged** messages.
 #### Periodic Sync Message
 
 For each channel of communication,
-participants SHOULD periodically send an empty-content message to maintain sync state,
-without incrementing the Lamport timestamp.
+participants SHOULD periodically send sync messages to maintain state.
+These sync messages:
+
+* MUST be sent with empty content
+* MUST include an incremented Lamport timestamp
+* MUST include causal history and bloom filter according to regular message rules
+* MUST NOT be added to the unacknowledged outgoing buffer
+* MUST NOT be included in causal histories of subsequent messages
+* MUST NOT be included in bloom filters
+* MUST NOT be added to the local log
+
+Since sync messages are not persisted,
+they MAY have non-unique message IDs without impacting the protocol.
 To avoid network activity bursts in large groups,
 a participant MAY choose to only send periodic sync messages
 if no other messages have been broadcast in the channel after a random backoff period.
 
-Participants MUST process these sync messages
-following the same steps as regular messages.
+Participants MUST process the causal history and bloom filter of these sync messages
+following the same steps as regular messages,
+but MUST NOT persist the sync messages themselves.
 
 #### Ephemeral Messages
 
