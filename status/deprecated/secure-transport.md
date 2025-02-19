@@ -60,7 +60,7 @@ Whisper and Waku serve as the transport layers for the Status chat protocol.
 
 ### Account Generation
 
-See [Account specification](/status/deprecated/account.md).
+See [Account specification](https://rfc.vac.dev/status/deprecated/account.md).
 
 ### Account Recovery
 

@@ -328,7 +328,7 @@ Payload Fields
 ## MembershipUpdateMessage and MembershipUpdateEvent
 
 `MembershipUpdateEvent` propagates information about group membership changes
-in a group chat. The details are covered in the [Group Chats specs](https://rfc.vac.dev/status/deprecated/7/group-chat.md).
+in a group chat. The details are covered in the [Group Chats specs](https://rfc.vac.dev/status/deprecated/group-chat.md).
 
 ## Upgradability
 
