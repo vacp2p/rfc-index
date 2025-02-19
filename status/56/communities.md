@@ -307,13 +307,25 @@ message CommunityDescription {
 
 Note: The usage of the clock is described in the [Clock](#clock) section.
 
-### Pubsub topic or shard usage
+### Functional scope and shard assignment
 
-Status network uses static sharding as explained in [Relay Sharding](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md#static-sharding)
+We define two special [functional scopes](../raw/status-app-protocols.md#functional-scope) for messages related to Status Communities:
+1. Global community control
+2. Global community content
 
-All communities by default use the default shard `32` for most of their messages and use shard `64` for a few specific messages like community event messages.
+All messages that relate to controlling communities MUST be assigned the _global community control_ scope.
+All messages that carry user-generated content for communities MUST be assigned the _global community content_ scope.
 
-A community can be assigned a dedicated shard (in the range of 1-1024) after creation in which case all messages of the community are sent on that specific shard except for the community event messages.
+> *Note:* a previous iteration of Status Communities defined separate community-wide scopes for each community.
+However, this model was deprecated and all communities now operate on a global, shared scope.
+This implies that different communities will share shards on the routing layer.
+
+The following [Waku transport layer](../raw/status-app-protocols.md#waku-transport-layer) allocations are reserved for communities:
+As per [STATUS-SIMPLE-SCALING](https://rfc.vac.dev/status/raw/simple-scaling/#relay-shards), communities use the default cluster ID `16`
+set aside for all Status app protocols.
+Within this cluster, the following [shards](../raw/status-app-protocols.md#pubsub-topics-and-sharding) are reserved for the community functional scopes:
+1. All messages with a _global community control_ scope MUST be published to shard `128`
+2. All messages with a _global community content_ scope MUST be published to shard `256`
 
 ### Content topic level encryption
 
