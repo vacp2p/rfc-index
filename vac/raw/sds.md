@@ -151,13 +151,14 @@ Upon receiving a message,
 * the participant MUST [review the ACK status](#review-ack-status) of messages
 in its unacknowledged outgoing buffer
 using the received message's causal history and bloom filter.
-* the participant MUST include the received message ID in its local bloom filter.
+* if the message has a populated `content` field,
+the participant MUST include the received message ID in its local bloom filter.
 * the participant MUST verify that all causal dependencies are met
 for the received message.
 Dependencies are met if the message IDs in the `causal_history` of the received message
 appear in the local history of the receiving participant.
 
-If all dependencies are met,
+If all dependencies are met and the message has a populated `content` field,
 the participant MUST [deliver the message](#deliver-message).
 If dependencies are unmet,
 the participant MUST add the message to the incoming buffer of messages
