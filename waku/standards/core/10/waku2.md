@@ -236,7 +236,7 @@ These fields MUST be used under certain conditions, as set out in the specificat
 Both EIP-1459 DNS-based discovery and Node Discovery v5 operate on ENR,
 and it's reasonable to expect even wider utility for ENR in Waku v2 networks in the future.
 
-### Request/Reply Domain
+### Request/Response Domain
 
 In addition to the Gossip domain,
 Waku v2 provides a set of request/response protocols.
