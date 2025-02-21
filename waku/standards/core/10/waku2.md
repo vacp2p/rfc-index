@@ -133,7 +133,7 @@ There are also more experimental libp2p protocols such as:
 1. `/vac/waku/waku-rln-relay/2.0.0-alpha1`
 2. `/vac/waku/peer-exchange/2.0.0-alpha1`
 
-The semnatics of these protocols are referred to by RFC ID [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md) and [34/WAKU2-PEER-EXCHANGE](waku/standards/core/34/peer-exchange.md).
+The semantics of these protocols are referred to by RFC ID [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md) and [34/WAKU2-PEER-EXCHANGE](waku/standards/core/34/peer-exchange.md).
 
 #### Use of libp2p and Protobuf
 
