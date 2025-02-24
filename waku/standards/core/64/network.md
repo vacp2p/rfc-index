@@ -50,16 +50,16 @@ routed on the combination of the eight pubsub topics:
 /waku/2/rs/1/7
 ```
 
-A node MUST use [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md)
+A node MUST use [WAKU-METADATA](https://github.com/vacp2p/rfc-index/blob/main/waku/standards/core/66/metadata.md)
 protocol to identify the `<cluster_id>` that every
 inbound/outbound peer that attempts to connect supports.
 In any of the following cases, the node MUST trigger a disconnection:
 
-* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md)
+* [WAKU-METADATA](https://github.com/vacp2p/rfc-index/blob/main/waku/standards/core/66/metadata.md)
 dial fails.
-* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md)
+* [WAKU-METADATA](https://github.com/vacp2p/rfc-index/blob/main/waku/standards/core/66/metadata.md)
 reports an empty `<cluster_id>`.
-* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md)
+* [WAKU-METADATA](https://github.com/vacp2p/rfc-index/blob/main/waku/standards/core/66/metadata.md)
 reports a `<cluster_id>` different than `1`.
 
 ## Roles
@@ -370,7 +370,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [17/WAKU2-RLN-RELAY](../17/rln-relay.md)
 * [11/WAKU2-RELAY](../11/relay.md)
 * [WAKU2-RELAY-SHARDING](../../core/relay-sharding.md)
-* [WAKU-METADATA](https://github.com/waku-org/specs/blob/master/standards/core/metadata.md)
+* [WAKU-METADATA](https://github.com/vacp2p/rfc-index/blob/main/waku/standards/core/66/metadata.md)
 * [EIP-1459 DNS-based discovery](https://eips.ethereum.org/EIPS/eip-1459)
 * [33/WAKU2-DISCV5](../33/discv5.md)
 * [12/WAKU2-FILTER](../12/filter.md)
