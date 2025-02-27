@@ -28,8 +28,9 @@ This specification describes the `12/WAKU2-FILTER` protocol,
 which enables a client to subscribe to a subset of real-time messages from a Waku peer.
 This is a more lightweight version of [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
 useful for bandwidth restricted devices.
-This is due to the fact that light-nodes subscribe to full-nodes and
-only receive the subset of messages they desire, based on content topic interest.
+This is often used by nodes with lower resource limits to subscribe to full Relay nodes and
+only receive the subset of messages they desire,
+based on content topic interest.
 
 ## Motivation
 
