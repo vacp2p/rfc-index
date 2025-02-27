@@ -26,7 +26,7 @@ adds capabilities.
 
 The present document specifies the [10/WAKU2](/waku/standards/core/10/waku2.md) message format.
 A way to encapsulate the messages sent with specific information security goals,
-and Whisper/Waku v1 backward compatibility.
+and Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) backward compatibility.
 
 ## Motivation
 
@@ -134,16 +134,16 @@ The Waku Noise protocol provides symmetric encryption and asymmetric key exchang
 Any `version` value not included in this list is reserved for future specification.
 And, in this case, the payload SHOULD be interpreted as unencrypted by the Waku layer.
 
-## Whisper/Waku v1 envelope compatibility
+## Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) envelope compatibility
 
-Whisper/Waku v1 envelopes are compatible with Waku v2 messages format.
+Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) envelopes are compatible with Waku messages format.
 
-- Whisper/Waku v1 `topic` field
-SHOULD be mapped to Waku v2 message's `content_topic` attribute.
-- Whisper/Waku v1 `data` field SHOULD be mapped to Waku v2 message's `payload` attribute.
+- Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) `topic` field
+SHOULD be mapped to Waku message's `content_topic` attribute.
+- Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) `data` field SHOULD be mapped to Waku message's `payload` attribute.
 
 [10/WAKU2](/waku/standards/core/10/waku2.md) implements a publish/subscribe messaging pattern over libp2p.
-This makes some Whisper/Waku v1 envelope fields redundant
+This makes some Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) envelope fields redundant
 (e.g., `expiry`, `ttl`, `topic`, etc.), so they can be ignored.
 
 ## Deterministic message hashing
