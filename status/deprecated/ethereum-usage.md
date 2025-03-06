@@ -3,9 +3,9 @@ title: ETHEREUM-USAGE
 name: Status interactions with the Ethereum blockchain
 status: deprecated
 description: All interactions that the Status client has with the Ethereum blockchain.
-editor: Andrea Maria Piana <andreap@status.im>
+editor: Filip Dimitrijevic <filip@status.im>
 contributors:
-- 
+    - Andrea Maria Piana <andreap@status.im>
 ---
 
 ## Abstract

@@ -9,117 +9,127 @@ contributors:
 
 ## Abstract
 
-This document describes requirements for applications to support Dapps  
-running inside a browser.
-It includes a description of the Status Dapp API,
-an overview of the bidirectional communication underlying the API,  
-and a list of EIPs implemented by this API.
+This document describes requirements that an application must fulfill in order to provide a proper environment for Dapps running inside a browser.
+A description of the Status Dapp API is provided, along with an overview of bidirectional communication underlying the API implementation.
+The document also includes a list of EIPs that this API implements.
 
 ## Definitions
 
-| Term              | Description                                                                               |
-|-------------------|-------------------------------------------------------------------------------------------|
-| Webview           | Platform-specific browser core implementation.                                            |
-| Ethereum Provider | JS object (`window.ethereum`) injected into each web page opened in the browser, providing a web3-compatible provider. |
-| Bridge            | Facilities allowing bidirectional communication between JS code and the application.      |
+| Term       | Description                                                                         |
+|------------|-------------------------------------------------------------------------------------|
+| **Webview**   | Platform-specific browser core implementation.                                    |
+| **Ethereum Provider** | A JS object (`window.ethereum`) injected into each web page opened in the browser providing web3 compatible provider. |
+| **Bridge** | A set of facilities allow bidirectional communication between JS code and the application. |
 
 ## Overview
 
-The application should expose an Ethereum Provider object (`window.ethereum`)  
-to JavaScript running inside the browser.  
-The `window.ethereum` object must be available before the page loads,  
-as Dapps may not function correctly otherwise.
+The application should expose an Ethereum Provider object (`window.ethereum`) to JS code running inside the browser.
+It is important to have the `window.ethereum` object available before the page loads, otherwise Dapps might not work correctly.
 
-The browser component should also enable bidirectional communication  
-between JavaScript code and the application.
+Additionally, the browser component should also provide bidirectional communication between JS code and the application.
 
 ## Usage in Dapps
 
-Dapps can use the following properties and methods of the `window.ethereum` object.
+Dapps can use the below properties and methods of `window.ethereum` object.
 
 ### Properties
 
-- **isStatus**  
-  Returns `true`. Indicates if the Dapp is running inside Status.
+#### `isStatus`
 
-- **status**
-Returns a `StatusAPI` object.
-Currently, it supports one method: `getContactCode`,
-which sends a contact-code request to Status.
+Returns true. Can be used by the Dapp to find out whether it's running inside Status.
+
+#### `status`
+
+Returns a `StatusAPI` object. For now it supports one method: `getContactCode` that sends a `contact-code` request to Status.
 
 ### Methods
 
-- **isConnected**  
-Similar to the Ethereum JS API documentation, it checks if a node connection exists.
-In Status, this function always returns `true` since the node is automatically started.
+#### `isConnected`
 
-- **scanQRCode**  
-  Sends a QR code request to the Status API.
+Similarly to Ethereum JS API [docs](https://github.com/ethereum/wiki/wiki/JavaScript-API#web3isconnected),
+it should be called to check if connection to a node exists. On Status, this fn always returns true, as once Status is up and running, node is automatically started.
 
-- **request**  
-  Implements the `request` method as defined by EIP-1193.
+#### `scanQRCode`
 
-### Unused (Legacy)
+Sends a `qr-code` Status API request.
 
-Below are deprecated methods that some Dapps may still use.
+#### `request`
 
-- **enable** *(DEPRECATED)*  
-Sends a web3 Status API request
-and returns the first account in the list of available accounts.
-Follows the legacy `enable` method from EIP-1102.
+`request` method as defined by EIP-1193.
 
-- **send** *(DEPRECATED)*  
-  Legacy `send` method as per EIP-1193.
+### Unused
 
-- **sendAsync** *(DEPRECATED)*  
-  Legacy `sendAsync` method as per EIP-1193.
+Below are some legacy methods that some Dapps might still use.
 
-- **sendSync** *(DEPRECATED)*  
-  Legacy `send` method.
+#### `enable` (DEPRECATED)
+
+Sends a `web3` Status API request. It returns a first entry in the list of available accounts.
+
+Legacy `enable` method as defined by [EIP1102](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md).
+
+#### `send` (DEPRECATED)
+
+Legacy `send` method as defined by [EIP1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md).
+
+#### `sendAsync` (DEPRECATED)
+
+Legacy `sendAsync` method as defined by [EIP1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md).
+
+#### `sendSync` (DEPRECATED)
+
+Legacy `send` method.
 
 ## Implementation
 
-Status uses a forked version of `react-native-webview` to display web or Dapp content.
-This fork provides an Android implementation of JavaScript injection
-before the page loads,
-which is required to inject the Ethereum Provider object correctly.
+Status uses a [forked version](https://github.com/status-im/react-native-webview) of [react-native-webview](https://github.com/react-native-community/react-native-webview)  to display web or dapps content.
+The fork provides an Android implementation of JS injection before page load.
+It is required in order to properly inject Ethereum Provider object.
 
-Status injects two JavaScript scripts:
+Status injects two JS scripts:
 
-1. **provider.js**: Injects the `window.ethereum` object.
-2. **webview.js**: Overrides `history.pushState` for internal use.
+- [provider.js](https://github.com/status-im/status-mobile/blob/develop/resources/js/provider.js): `window.ethereum` object
+- [webview.js](https://github.com/status-im/status-mobile/blob/develop/resources/js/webview.js): override for `history.pushState` used internally
 
-Dapps in the browser communicate with the Status Ethereum node  
-via a bridge provided by `react-native-webview`,  
-allowing bidirectional communication between the browser and Status.  
-A special `ReactNativeWebView` object is injected into each loaded page.
+Dapps running inside a browser communicate with Status Ethereum node by means of a *bridge* provided by react-native-webview library.
+The bridge allows for bidirectional communication between browser and Status. In order to do so, it injects a special `ReactNativeWebview` object into each page it loads.
 
-On the Status (React Native) end, `react-native-webview` provides  
-the `WebView.injectJavascript` function,  
-which enables execution of arbitrary code inside the webview.  
-This allows injecting a function call to pass Status node responses back to the Dapp.
+On Status (React Native) end, `react-native-webview` library provides `WebView.injectJavascript` function
+on a webview component that allows to execute arbitrary code inside the webview.
+Thus it is possible to inject a function call passing Status node response back to the Dapp.
 
-| Direction        | Side | Method                      |
-|------------------|------|-----------------------------|
-| Browser -> Status| JS   | `ReactNativeWebView.postMessage()` |
-| Browser -> Status| RN   | `WebView.onMessage()`       |
-| Status -> Browser| JS   | `ReactNativeWebView.onMessage()` |
-| Status -> Browser| RN   | `WebView.injectJavascript()`|
+Below is the table briefly describing what functions/properties are used. More details available in package [docs](https://github.com/react-native-community/react-native-webview/blob/master/docs/Guide.md#communicating-between-js-and-native).
+
+| Direction | Side | Method |
+|-----------|------|-----------|
+| Browser->Status | JS | `ReactNativeWebView.postMessage()`|
+| Browser->Status | RN | `WebView.onMessage()`|
+| Status->Browser | JS | `ReactNativeWebView.onMessage()`|
+| Status->Browser | RN | `WebView.injectJavascript()`|
 
 ## Compatibility
 
 Status browser supports the following EIPs:
 
-- **EIP-1102**: `eth_requestAccounts` support.
-- **EIP-1193**: `connect`, `disconnect`, `chainChanged`,
-and `accountsChanged` event support are not implemented.
+- [EIP1102](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md): `eth_requestAccounts` support
+- [EIP1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md): `connect`, `disconnect`, `chainChanged`, and `accountsChanged` event support is not implemented
 
 ## Changelog
 
-| Version | Comment          |
-|---------|-------------------|
-| 0.1.0   | Initial release.  |
+| Version | Comment |
+| :-----: | ------- |
+| 0.1.0 | Initial Release |
 
 ## Copyright
 
-Copyright and related rights waived via CC0.
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+- [Ethereum JS API docs](https://github.com/ethereum/wiki/wiki/JavaScript-API#web3isconnected)
+- [EIP1102](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md)
+- [EIP1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md)
+- [forked version](https://github.com/status-im/react-native-webview)
+- [react-native-webview](https://github.com/react-native-community/react-native-webview)
+- [provider.js](https://github.com/status-im/status-mobile/blob/develop/resources/js/provider.js)
+- [webview.js](https://github.com/status-im/status-mobile/blob/develop/resources/js/webview.js)
+- [docs](https://github.com/react-native-community/react-native-webview/blob/master/docs/Guide.md#communicating-between-js-and-native)
