@@ -96,7 +96,7 @@ All Status messages MUST have one of these functional scopes:
 1. _Global community control_: messages enabling the basic functioning of the app to control features related to communities. Examples include Community Invites, Community Membership Updates, community Status Updates, etc.
 2. _Global community content_: messages carrying user-generated content for members of any community.
 
-> *Note:* a previous iteration of the Status Communities feature defined separate community-wide scopes for each community.
+> *Note: a previous iteration of the Status Communities feature defined separate community-wide scopes for each community.
 However, this model was deprecated and all communities now operate on a global, shared scope.
 This implies that different communities will share shards on the routing layer.
 
@@ -280,15 +280,15 @@ Full clients SHOULD use relay protocol as preferred method to subscribe to pubsu
 
 Light clients SHOULD use filter protocol to subscribe only to the content topics relevant to the user.
 
-#### Self-addressed messages
+Self-addressed messages
 
 Status clients (full or light) MUST NOT subscribe to topics for messages with self-addressed scopes.
-See [Self-addressed messages](#self-addressed-messages-4).
+See Self-addressed messages.
 
-#### Large messages
+Large messages
 
 Status clients (full or light) SHOULD NOT subscribe to topics set aside for large messages.
-See [Large messages](#large-messages-4).
+See Large messages.
 
 ### Publishing
 
@@ -307,15 +307,15 @@ Full clients SHOULD use relay protocol to publish to pubsub topics matching the 
 
 Light clients SHOULD use lightpush protocol to publish control and content messages.
 
-#### Self-addressed messages
+Self-addressed messages
 
 Status clients (full or light) MUST use lightpush protocol to publish self-addressed messages.
-See [Self-addressed messages](#self-addressed-messages-4).
+See Self-addressed messages.
 
-#### Large messages
+Large messages
 
 Status clients (full or light) SHOULD use lightpush protocols to publish to pubsub topics set aside for large messages.
-See [Large messages](#large-messages-4).
+See Large messages.
 
 ### Retrieving historical messages
 
@@ -340,15 +340,15 @@ to determine if one or more message hashes known to the client is present in the
 Clients MAY use this method to determine if a message that originated from the client
 has been successfully stored.
 
-#### Self-addressed messages
+Self-addressed messages
 
 Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve self-addressed messages relevant to that client.
-See [Self-addressed messages](#self-addressed-messages-4).
+See Self-addressed messages.
 
-#### Large messages
+Large messages
 
 Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve large messages relevant to that client.
-See [Large messages](#large-messages-4).
+See Large messages.
 
 ### Providing services
 
@@ -369,7 +369,7 @@ to store historical messages and
 provide store services to other clients
 for each pubsub topic to which they have a relay subscription
 
-### Self-addressed messages
+Self-addressed messages
 
 Messages with a _local_ functional scope (see [Functional scope](#functional-scope)),
 also known as _self-addressed_ messages,
@@ -379,7 +379,7 @@ Status clients (full or light) MUST use lightpush protocol to publish self-addre
 Status clients (full or light) MUST NOT subscribe to topics for messages with self-addressed scopes (see [Subscribing](#subscribing)).
 Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve self-addressed messages relevant to that client (see [Retrieving historical messages](#retrieving-historical-messages)).
 
-### Large messages
+Large messages
 
 The application MAY define separate pubsub topics for large messages.
 These pubsub topics for large messages MAY be distinct for each functional scope (see [Pubsub topics and sharding](#pubsub-topics-and-sharding)).
