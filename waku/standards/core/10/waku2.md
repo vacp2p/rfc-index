@@ -14,7 +14,7 @@ contributors:
 
 ## Abstract
 
-Waku v2 is a family of modular peer-to-peer protocols for secure communication.
+Waku is a family of modular peer-to-peer protocols for secure communication.
 The protocols are designed to be secure, privacy-preserving, censorship-resistant
 and being able to run in resource-restricted environments.
 At a high level, it implements Pub/Sub over [libp2p](https://github.com/libp2p/specs)
@@ -24,13 +24,13 @@ These capabilities are things such as:
 (ii) adaptive nodes, allowing for heterogeneous nodes to contribute to the network
 (iii) preserving bandwidth usage for resource-restriced devices
 
-This makes Waku v2 ideal for running a p2p protocol on mobile devices and
+This makes Waku ideal for running a p2p protocol on mobile devices and
 other similar restricted environments.
 
 Historically, it has its roots in [6/WAKU1](waku/standards/core/legacy/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627),
 originally part of the Ethereum stack.
-However, Waku v2 acts more as a thin wrapper for Pub/Sub and has a different API.
+However, Waku acts more as a thin wrapper for Pub/Sub and has a different API.
 It is implemented in an iterative manner where initial focus
 is on porting essential functionality to libp2p.
 See [rough road map (2020)](https://vac.dev/waku-v2-plan) for more historical context.
@@ -108,7 +108,7 @@ there are three network interaction domains:
 
 #### Protocols and Identifiers
 
-Since Waku v2 is built on top of libp2p, many protocols have a libp2p protocol identifier.
+Since Waku is built on top of libp2p, many protocols have a libp2p protocol identifier.
 The current main [protocol identifiers](https://docs.libp2p.io/concepts/protocols/)
 are:
 
@@ -147,7 +147,7 @@ This length integer is encoded as a [protobuf varint](https://developers.google.
 
 #### Gossip Domain
 
-Waku v2 is using gossiping to disseminate messages throughout the network.
+Waku is using gossiping to disseminate messages throughout the network.
 
 **Protocol identifier**: `/vac/waku/relay/2.0.0`
 
@@ -162,7 +162,7 @@ for more information about the recommended topic usage.
 #### Direct use of libp2p protocols
 
 In addition to `/vac/waku/*` protocols,
-Waku v2 MAY directly use the following libp2p protocols:
+Waku MAY directly use the following libp2p protocols:
 
 - [libp2p ping protocol](https://docs.libp2p.io/concepts/protocols/#ping)
 with protocol id
@@ -189,25 +189,25 @@ and
 
 respectively, as basic means for capability discovery.
 These protocols are anyway used by the libp2p connection
-establishment layer Waku v2 is built on.
+establishment layer Waku is built on.
 We plan to introduce a new Vac capability discovery protocol
 with better anonymity properties and more functionality.
 
 #### Transports
 
-Waku v2 is built in top of libp2p, and like libp2p it strives to be transport agnostic.
+Waku is built in top of libp2p, and like libp2p it strives to be transport agnostic.
 We define a set of recommended transports in order to achieve a baseline of
 interoperability between clients.
 This section describes these recommended transports.
 
-Waku v2 client implementations SHOULD support the TCP transport.
+Waku client implementations SHOULD support the TCP transport.
 Where TCP is supported it MUST be enabled for both dialing and listening,
 even if other transports are available.
 
-Waku v2 nodes running in environments that do not allow the use of TCP directly,
+Waku nodes running in environments that do not allow the use of TCP directly,
 MAY use other transports.
 
-A Waku v2 node SHOULD support secure websockets for bidirectional communication streams,
+A Waku node SHOULD support secure websockets for bidirectional communication streams,
 for example in a web browser context.
 
 A node MAY support unsecure websockets if required by the application or
@@ -217,7 +217,7 @@ running environment.
 
 #### Discovery Methods
 
-Waku v2 can retrieve a list of nodes to connect to using DNS-based discovery
+Waku can retrieve a list of nodes to connect to using DNS-based discovery
 as per [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459).
 While this is a useful way of bootstrapping connection to a set of peers,
 it MAY be used in conjunction with an [ambient peer discovery](https://docs.libp2p.io/concepts/publish-subscribe/#discovery)
@@ -229,18 +229,18 @@ It is possible to bypass the discovery domain by specifying static nodes.
 
 [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 describes the usage of [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778)
-for Waku v2 discovery purposes.
+for Waku discovery purposes.
 It introduces two new ENR fields, `multiaddrs` and
-`waku2`, that a Waku v2 node MAY use for discovery purposes.
+`waku2`, that a Waku node MAY use for discovery purposes.
 These fields MUST be used under certain conditions, as set out in the specification.
 Both EIP-1459 DNS-based discovery and Node Discovery v5 operate on ENR,
-and it's reasonable to expect even wider utility for ENR in Waku v2 networks in the future.
+and it's reasonable to expect even wider utility for ENR in Waku networks in the future.
 
 ### Request/Response Domain
 
 In addition to the Gossip domain,
-Waku v2 provides a set of request/response protocols.
-They are primarily used in order to get Waku v2 to run in resource restricted environments,
+Waku provides a set of request/response protocols.
+They are primarily used in order to get Waku to run in resource restricted environments,
 such as low bandwidth or being mostly offline.
 
 #### Historical Message Support
@@ -272,14 +272,14 @@ See [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md) specification for 
 #### Other Protocols
 
 The above is a non-exhaustive list,
-and due to the modular design of Waku v2,
+and due to the modular design of Waku,
 there may be other protocols here that provide a useful service to the Waku network.
 
 ### Overview of Protocol Interaction
 
 See the sequence diagram below for an overview of how different protocols interact.
 
-![Overview of how protocols interact in Waku v2.](./images/overview.png)
+![Overview of how protocols interact in Waku.](./images/overview.png)
 
 0. We have six nodes, A-F.
 The protocols initially mounted are indicated as such.
@@ -323,11 +323,11 @@ See [13/WAKU2-STORE](waku/standards/core/13/store.md).
 
 ## Appendix A: Upgradability and Compatibility
 
-### Compatibility with Waku v1
+### Compatibility with Waku Legacy
 
-[6/WAKU1](waku/standards/legacy/6/waku1.md) and Waku v2 are different protocols all together.
+[6/WAKU1](waku/standards/legacy/6/waku1.md) and Waku are different protocols all together.
 They use a different transport protocol underneath;
-[6/WAKU1](waku/standards/legacy/6/waku1.md) is devp2p RLPx based while Waku v2 uses libp2p.
+[6/WAKU1](waku/standards/legacy/6/waku1.md) is devp2p RLPx based while Waku uses libp2p.
 The protocols themselves also differ as does their data format.
 Compatibility can be achieved only by using a bridge
 that not only talks both devp2p RLPx and libp2p,
@@ -338,12 +338,12 @@ See [15/WAKU-BRIDGE](waku/standards/core/15/bridge.md) for details on a bidirect
 
 ## Appendix B: Security
 
-Each protocol layer of Waku v2 provides a distinct service and
+Each protocol layer of Waku provides a distinct service and
 is associated with a separate set of security features and concerns.
-Therefore, the overall security of Waku v2
+Therefore, the overall security of Waku
 depends on how the different layers are utilized.
 In this section,
-we overview the security properties of Waku v2 protocols
+we overview the security properties of Waku protocols
 against a static adversarial model which is described below.
 Note that a more detailed security analysis of each Waku protocol
 is supplied in its respective specification as well.
@@ -367,7 +367,7 @@ Specifically, the communication channels are assumed to be secure.
 
 #### Pseudonymity
 
-Waku v2 by default guarantees pseudonymity for all of the protocol layers
+Waku by default guarantees pseudonymity for all of the protocol layers
 since parties do not have to disclose their true identity
 and instead they utilize libp2p `PeerID` as their identifiers.
 While pseudonymity is an appealing security feature,
@@ -390,7 +390,7 @@ hence count as PII.
 Notice that users' actions can be traced through their PIIs
 (e.g., signatures) and hence result in their re-identification risk.
 As such, we seek anonymity by avoiding linkability between actions and
-the actors / actors' PII. Concerning anonymity, Waku v2 provides the following features:
+the actors / actors' PII. Concerning anonymity, Waku provides the following features:
 
 **Publisher-Message Unlinkability**:
 This feature signifies the unlinkability of a publisher
@@ -460,15 +460,15 @@ the security features of each layer-->
 
 ### Implementation Matrix
 
-There are multiple implementations of Waku v2 and its protocols:
+There are multiple implementations of Waku and its protocols:
 
 - [nim-waku (Nim)](https://github.com/status-im/nim-waku/)
 - [go-waku (Go)](https://github.com/status-im/go-waku/)
 - [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
 
 Below you can find an overview of the specifications that they implement
-as they relate to Waku v2.
-This includes Waku v1 specifications, as they are used for bridging between the two networks.
+as they relate to Waku.
+This includes Waku legacy specifications, as they are used for bridging between the two networks.
 
 | Spec | nim-waku (Nim) | go-waku (Go) | js-waku (Node JS) | js-waku (Browser JS) |
 | ---- | -------------- | ------------ | ----------------- | -------------------- |
@@ -493,7 +493,7 @@ This includes Waku v1 specifications, as they are used for bridging between the 
 
 ### Recommendations for Clients
 
-To implement a minimal Waku v2 client,
+To implement a minimal Waku client,
 we recommend implementing the following subset in the following order:
 
 - [10/WAKU2](waku/standards/core/10/waku2.md) - this specification
@@ -501,7 +501,7 @@ we recommend implementing the following subset in the following order:
 - [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) - version 0 (unencrypted)
 - [13/WAKU2-STORE](waku/standards/core/13/store.md) - for historical messaging (query mode only)
 
-To get compatibility with Waku v1:
+To get compatibility with Waku Legacy:
 
 - [7/WAKU-DATA](waku/standards/legacy/7/data.md)
 - [14/WAKU2-MESSAGE](waku/standards/14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
