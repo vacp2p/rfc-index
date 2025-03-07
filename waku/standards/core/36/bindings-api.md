@@ -68,13 +68,12 @@ The following status codes are defined:
 
 A Waku Message in JSON Format:
 
-```ts
-{
-    payload: string;
-    contentTopic: string;
-    version: number;
-    timestamp: number;
-}
+```ts {
+  type JsonMessage* = ref object # https://rfc.vac.dev/spec/36/#jsonmessage-type
+  payload*: Base64String
+  contentTopic*: string
+  version*: uint
+  }
 ```
 
 Fields:
@@ -95,7 +94,6 @@ interface DecodedPayload {
     pubkey?: string;
     signature?: string;
     data: string;
-    padding: string;
   }
 ```
 
@@ -112,10 +110,9 @@ hex encoded with `0x` prefix,
 The criteria to create subscription to a light node in JSON Format:
 
 ```ts
-{
-    contentFilters: ContentFilter[];
-    pubsubTopic: string?;
-}
+  type FilterSubscription* = object
+  peerId*: string
+  filterCriteria*: seq[FilterTopic]
 ```
 
 Fields:
