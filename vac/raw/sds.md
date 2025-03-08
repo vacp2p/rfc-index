@@ -69,12 +69,17 @@ Messages MUST adhere to the following meta structure:
 ```protobuf
 syntax = "proto3";
 
+message HistoryEntry {
+  string message_id = 1; // Unique identifier of the SDS message, as defined in `Message`
+  optional bytes retrieval_hint = 2; // Optional information to help remote parties retrieve this SDS message; For example, A Waku deterministic message hash or routing payload hash
+}
+
 message Message {
   // 1 Reserved for sender/participant id
   string message_id = 2;          // Unique identifier of the message
   string channel_id = 3;          // Identifier of the channel to which the message belongs
   optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
-  repeated string causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
+  repeated HistoryEntry causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
   optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
   optional bytes content = 20;             // Actual content of the message
 }
@@ -137,6 +142,10 @@ include this in the `lamport_timestamp` field.
 and include these in an ordered list in the `causal_history` field.
 The number of message IDs to include in the `causal_history` depends on the application.
 We recommend a causal history of two message IDs.
+* the participant MAY include a `retrieval_hint` in the `HistoryEntry`
+for each message ID in the `causal_history` field.
+This is an application-specific field to facilitate retrieval of messages,
+e.g. from high-availability caches.
 * the participant MUST include the current `bloom_filter`
 state in the broadcast message.
 
@@ -208,6 +217,7 @@ For each message in the incoming buffer:
 
 * the participant MAY attempt to retrieve missing dependencies from the Store node
 (high-availability cache) or other peers.
+It MAY use the application-specific `retrieval_hint` in the `HistoryEntry` to facilitate retrieval.
 * if all dependencies of a message are met,
 the participant MUST proceed to [deliver the message](#deliver-message).
 
