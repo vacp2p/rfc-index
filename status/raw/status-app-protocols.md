@@ -74,10 +74,11 @@ However, since all users of the Status app MUST be able to participate in 1:1 ch
 the functional scope of messages enabling 1:1 chats MUST be a global scope.
 Similarly, since private group chats can be set up between any subset of Status app users,
 the functional scope for messages related to private group chats MUST be global.
-As a counter-example, messages that originate within a community (and are _addressed_ to members of that community)
-are only of interest to participants that are also members of that community.
-Such messages MUST have a community-wide functional scope.
-A third group of messages are addressed only to the participant that generated those messages itself.
+Along the same principle, messages that originate within communities are of global interest
+for all users who have an interest in the Status Communities feature.
+Such messages MUST have a global functional scope,
+that can be accessed by any app users interested in communities.
+A different group of messages are addressed only to the participant that generated those messages itself.
 These _self-addressed_ messages MUST have a local functional scope.
 
 If we further make a distinction between "control" and "content" messages,
@@ -85,15 +86,19 @@ we can distinguish five distinct functional scopes.
 
 All Status messages MUST have one of these functional scopes:
 
-#### Global scope
+#### Global general scope
 
-1. _Global control_: messages enabling the basic functioning of the app to control features that all app users should be able to participate in. Examples include Contact Requests, Community Invites, global Status Updates, Group Chat Invites, etc.
+1. _Global control_: messages enabling the basic functioning of the app to control general features that all app users should be able to participate in. Examples include Contact Requests, global Status Updates, Group Chat Invites, etc.
 2. _Global content_: messages carrying user-generated content for global functions. Examples include 1:1 chat messages, images shared over private group chats, etc.
 
-#### Community scope
+#### Global community scope
 
-1._Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
-2. _Community content_: messages carrying user-generated content _only for members of a specific community_.
+1. _Global community control_: messages enabling the basic functioning of the app to control features related to communities. Examples include Community Invites, Community Membership Updates, community Status Updates, etc.
+2. _Global community content_: messages carrying user-generated content for members of any community.
+
+> **Note:** a previous iteration of the Status Communities feature defined separate community-wide scopes for each community.
+However, this model was deprecated and all communities now operate on a global, shared scope.
+This implies that different communities will share shards on the routing layer.
 
 #### Local scope
 
@@ -104,7 +109,7 @@ It SHOULD however inform the underlying [transport layer sharding](#pubsub-topic
 In general a Status client SHOULD subscribe to participate in:
 
 - all global functions
-- (only) the community functions for communities of which it is a member, and
+- global community functions if it is interested in this feature, and
 - its own local functions.
 
 ### Content topics
@@ -205,9 +210,9 @@ It is RECOMMENDED that separate pubsub topics be used for global control message
 
 #### Community messages
 
-The application SHOULD define at least one separate pubsub topic for each separate community's control and content messages.
-The application MAY define a set of more than one pubsub topic per community to allow traffic sharding for scalability.
-It is RECOMMENDED that separate pubsub topics be used for community control messages and community content messages.
+The application SHOULD define at least one distinct pubsub topic for global community control messages and global community content messages.
+The application MAY define a set of more than one pubsub topic for global community messages to allow traffic sharding for scalability.
+It is RECOMMENDED that separate pubsub topics be used for global community control messages and global community content messages.
 
 #### Large messages
 
@@ -270,8 +275,8 @@ Full clients SHOULD use relay protocol as preferred method to subscribe to pubsu
 
 1. Global control
 2. Global content
-3. Community control, for each community of which the app user is a member
-4. Community content, for each community of which the app user is a member
+3. Global community control, if the client has activated the Status Communities feature
+4. Global community content, if the client has activated the Status Communities feature
 
 Light clients SHOULD use filter protocol to subscribe only to the content topics relevant to the user.
 
@@ -297,8 +302,8 @@ Full clients SHOULD use relay protocol to publish to pubsub topics matching the 
 
 1. Global control
 2. Global content
-3. Community control, for each community of which the app user is a member
-4. Community content, for each community of which the app user is a member
+3. Global community control, if the client has activated the Status Communities feature
+4. Global community content, if the client has activated the Status Communities feature
 
 Light clients SHOULD use lightpush protocol to publish control and content messages.
 
