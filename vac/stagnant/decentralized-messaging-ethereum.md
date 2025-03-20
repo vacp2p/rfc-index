@@ -1,7 +1,7 @@
 ---
 title: VAC-DECENTRALIZED-MESSAGING-ETHEREUM
 name: Decentralized Key and Session Setup for Secure Messaging over Ethereum
-status: raw
+status: stagnant
 category: informational
 editor: Ramses Fernandez-Valencia <ramses@status.im>
 contributors:
