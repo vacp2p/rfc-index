@@ -138,7 +138,7 @@ they become **stagnant** specifications.
 After a non-specified time, the specification can be asked to be downgraded to **stagnant**.
 They SHOULD be kept for their historical value but
 it is RECOMMENDED to not implement them.
-The editor MAY choose to reinstate the previous status at any time.
+The editor MAY choose to reinstate the specification to raw status at any time.
 Stagnant specifications have no contractual weight.
 
 ## Editorial control
