@@ -4,7 +4,7 @@ title: 33/WAKU2-DISCV5
 name: Waku v2 Discv5 Ambient Peer Discovery
 status: draft
 editor: Daniel Kaiser <danielkaiser@status.im>
-contributors:
+contributors: Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
