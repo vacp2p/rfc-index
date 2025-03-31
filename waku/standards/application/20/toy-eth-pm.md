@@ -176,7 +176,7 @@ it is not enough in itself to deduce Bob's Public Key.
 This is why the protocol dictates that Bob MUST send his Public Key first,
 and Alice MUST receive it before she can send him a message.
 
-Moreover, nim-waku, the reference implementation of [13/WAKU2-STORE](/waku/standards/core/13/store.md),
+Moreover, nwaku, the reference implementation of [13/WAKU2-STORE](/waku/standards/core/13/store.md),
 stores messages for a maximum period of 30 days.
 This means that Bob would need to broadcast his public key
 at least every 30 days to be reachable.
