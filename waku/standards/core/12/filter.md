@@ -13,61 +13,54 @@ contributors:
   - Ebube Ud <ebube@status.im>
 ---
 
-previous versions: [00](./previous-versions00)
-
----
-
-`WakuFilter` is a protocol that enables subscribing to messages that a peer receives.
-This is a more lightweight version of `WakuRelay`
-specifically designed for bandwidth restricted devices.
-This is due to the fact that light nodes subscribe to full-nodes and
-only receive the messages they desire.
-
-## Content filtering
+previous versions: [00](/waku/standards/core/12/previous-versions/00/filter.md)
 
 **Protocol identifiers**:
 
 - _filter-subscribe_: `/vac/waku/filter-subscribe/2.0.0-beta1`
 - _filter-push_: `/vac/waku/filter-push/2.0.0-beta1`
 
-Content filtering is a way to do [message-based
-filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
-Currently the only content filter being applied is on `contentTopic`. This
-corresponds to topics in Waku v1.
+---
 
-## Rationale
+## Abstract
 
-Unlike the `store` protocol for historical messages, this protocol allows for
-native lower latency scenarios such as instant messaging. It is thus
-complementary to it.
+This specification describes the `12/WAKU2-FILTER` protocol,
+which enables a client to subscribe to a subset of real-time messages from a Waku peer.
+This is a more lightweight version of [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
+useful for bandwidth restricted devices.
+This is often used by nodes with lower resource limits to subscribe to full Relay nodes and
+only receive the subset of messages they desire,
+based on content topic interest.
 
-Strictly speaking, it is not just doing basic request response, but performs
-sender push based on receiver intent. While this can be seen as a form of light
-pub/sub, it is only used between two nodes in a direct fashion. Unlike the
-Gossip domain, this is meant for light nodes which put a premium on bandwidth.
+## Motivation
+
+Unlike the [13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol
+for historical messages, this protocol allows for native lower latency scenarios,
+such as instant messaging.
+It is thus complementary to it.
+
+Strictly speaking, it is not just doing basic request-response, but
+performs sender push based on receiver intent.
+While this can be seen as a form of light publish/subscribe,
+it is only used between two nodes in a direct fashion. Unlike the
+Gossip domain, this is suitable for light nodes which put a premium on bandwidth.
 No gossiping takes place.
 
-It is worth noting that a light node could get by with only using the `store`
-protocol to query for a recent time window, provided it is acceptable to do
-frequent polling.
+It is worth noting that a light node could get by with only using the
+[13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol to
+query for a recent time window, provided it is acceptable to do frequent polling.
 
-## Design Requirements
+## Semantics
 
-The effectiveness and reliability of the content filtering service enabled by  
-`WakuFilter` protocol rely on the _high availability_ of the full nodes
-as the service providers.
-To this end, full nodes must feature _high uptime_
-(to persistently listen and capture the network messages)
-as well as _high Bandwidth_ (to provide timely message delivery to the light nodes).
+The key words “MUST”, “MUST NOT”, “REQUIRED”,
+“SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-## Security Consideration
+### Content filtering
 
-Note that while using `WakuFilter` allows light nodes to save bandwidth,
-it comes with a privacy cost in the sense that they need to
-disclose their liking topics to the full nodes to retrieve the relevant messages.
-Currently, anonymous subscription is not supported by the `WakuFilter`, however,
-potential solutions in this regard are sketched
-below in [Future Work](#future-work) section.
+Content filtering is a way to do
+[message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering).
+Currently the only content filter being applied is on `contentTopic`.
 
 ### Terminology
 
@@ -76,32 +69,10 @@ refers to any piece of data that can be used to uniquely identify a user.
 For example, the signature verification key, and
 the hash of one's static IP address are unique for each user and hence count as PII.
 
-## Adversarial Model
-
-Any node running the `WakuFilter` protocol
-i.e., both the subscriber node and the queried node are considered as an adversary.
-Furthermore, we consider the adversary as a passive entity
-that attempts to collect information from other nodes to conduct an attack but
-it does so without violating protocol definitions and instructions.
-For example, under the passive adversarial model,
-no malicious node intentionally hides the messages
-matching to one's subscribed content filter
-as it is against the description of the `WakuFilter` protocol.
-
-The following are not considered as part of the adversarial model:
-
-- An adversary with a global view of all the nodes and their connections.
-- An adversary that can eavesdrop on communication links
-between arbitrary pairs of nodes (unless the adversary is one end of the communication).
-In specific, the communication channels are assumed to be secure.
-
 ### Protobuf
 
 ```protobuf
 syntax = "proto3";
-
-// 12/WAKU2-FILTER rfc: https://rfc.vac.dev/spec/12/
-package waku.filter.v2;
 
 // Protocol identifier: /vac/waku/filter-subscribe/2.0.0-beta1
 message FilterSubscribeRequest {
@@ -145,7 +116,6 @@ in its registered subscriptions.
 
 Since a filter service node is consuming resources to provide this service,
 it MAY account for usage and adapt its service provision to certain clients.
-An incentive mechanism is currently planned but underspecified.
 
 #### Filter Subscribe Request
 
@@ -156,8 +126,8 @@ Each request MUST include a `filter_subscribe_type`, indicating the type of requ
 
 #### Filter Subscribe Response
 
-In return to any `FilterSubscribeRequest`,
-a filter service node SHOULD respond with a `FilterSubscribeResponse`
+When responding to a `FilterSubscribeRequest`,
+a filter service node SHOULD send a `FilterSubscribeResponse`
 with a `requestId` matching that of the request.
 This response MUST contain a `status_code` indicating if the request was successful
 or not.
@@ -178,41 +148,43 @@ conditional to the selected `filter_subscribe_type`.
 If the request contains filter criteria,
 it MUST contain a `pubsub_topic`
 and the `content_topics` set MUST NOT be empty.
-A `WakuMessage` matches filter criteria
+A [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) matches filter criteria
 when its `content_topic` is in the `content_topics` set
 and it was published on a matching `pubsub_topic`.
 
 #### Filter Subscribe Types
 
-The following filter subscribe types are defined:
+The filter-subscribe types are defined as follows:
 
 ##### SUBSCRIBER_PING
 
 A filter client that sends a `FilterSubscribeRequest` with
-`filter_subscribe_type` set to `SUBSCRIBER_PING`
-requests that the service node SHOULD indicate if it has any active subscriptions
+`filter_subscribe_type` set to `SUBSCRIBER_PING`,
+requests that the filter service node SHOULD indicate if it has any active subscriptions
 for this client.
 The filter client SHOULD exclude any filter criteria from the request.
-The filter service node SHOULD respond with a success code
+The filter service node SHOULD respond with a success `status_code`
 if it has any active subscriptions for this client
-or an error code if not.
+or an error `status_code` if not.
 The filter service node SHOULD ignore any filter criteria in the request.
 
 ##### SUBSCRIBE
 
 A filter client that sends a `FilterSubscribeRequest` with
 `filter_subscribe_type` set to `SUBSCRIBE`
-requests that the service node SHOULD push messages matching this filter to the client.
+requests that the filter service node SHOULD push messages
+matching this filter to the client.
 The filter client MUST include the desired filter criteria in the request.
 A client MAY use this request type to _modify_ an existing subscription
 by providing _additional_ filter criteria in a new request.
 A client MAY use this request type to _refresh_ an existing subscription
 by providing _the same_ filter criteria in a new request.
-The filter service node SHOULD respond with a success code
+The filter service node SHOULD respond with a success `status_code`
 if it successfully honored this request
-or an error code if not.
-The filter service node SHOULD respond with an error code and discard the request
-if the subscribe request does not contain valid filter criteria,
+or an error `status_code` if not.
+The filter service node SHOULD respond with an error `status_code` and
+discard the request if the `FilterSubscribeRequest`
+does not contain valid filter criteria,
 i.e. both a `pubsub_topic` _and_ a non-empty `content_topics` set.
 
 ##### UNSUBSCRIBE
@@ -226,11 +198,11 @@ it desires to unsubscribe from in the request.
 A client MAY use this request type to _modify_ an existing subscription
 by providing _a subset of_ the original filter criteria
 to unsubscribe from in a new request.
-The filter service node SHOULD respond with a success code
+The filter service node SHOULD respond with a success `status_code`
 if it successfully honored this request
-or an error code if not.
-The filter service node SHOULD respond with an error code and discard the request
-if the unsubscribe request does not contain valid filter criteria,
+or an error `status_code` if not.
+The filter service node SHOULD respond with an error `status_code` and
+discard the request if the unsubscribe request does not contain valid filter criteria,
 i.e. both a `pubsub_topic` _and_ a non-empty `content_topics` set.
 
 ##### UNSUBSCRIBE_ALL
@@ -241,8 +213,8 @@ requests that the service node SHOULD _stop_ pushing messages
 matching _any_ filter to the client.
 The filter client SHOULD exclude any filter criteria from the request.
 The filter service node SHOULD remove any existing subscriptions for this client.
-It SHOULD respond with a success code if it successfully honored this request
-or an error code if not.
+It SHOULD respond with a success `status_code` if it successfully honored this request
+or an error `status_code` if not.
 
 ### Filter-Push
 
@@ -253,7 +225,8 @@ matching registered subscriptions to this client.
 A filter service node SHOULD push all messages
 matching the filter criteria in a registered subscription
 to the subscribed filter client.
-These [`WakuMessage`s](../14/message.md) are likely to come from [`11/WAKU2-RELAY`](../11/relay.md),
+These [`WakuMessage`s](/waku/standards/core/14/message.md)
+are likely to come from [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md),
 but there MAY be other sources or protocols where this comes from.
 This is up to the consumer of the protocol.
 
@@ -264,7 +237,7 @@ for a period of time,
 the filter service node MAY choose to stop pushing messages to the client and
 remove its subscription.
 This period is up to the service node implementation.
-We consider `1 minute` to be a reasonable default.
+It is RECOMMENDED to set `1 minute` as a reasonable default.
 
 #### Message Push
 
@@ -280,9 +253,35 @@ A filter client SHOULD verify that each `MessagePush` it receives
 originated from a service node where the client has an active subscription
 and that it matches filter criteria belonging to that subscription.
 
----
+### Adversarial Model
 
-## Future Work
+Any node running the `WakuFilter` protocol
+i.e., both the subscriber node and
+the queried node are considered as an adversary.
+Furthermore, we consider the adversary as a passive entity
+that attempts to collect information from other nodes to conduct an attack but
+it does so without violating protocol definitions and instructions.
+For example, under the passive adversarial model,
+no malicious node intentionally hides the messages
+matching to one's subscribed content filter
+as it is against the description of the `WakuFilter` protocol.
+
+The following are not considered as part of the adversarial model:
+
+- An adversary with a global view of all the nodes and their connections.
+- An adversary that can eavesdrop on communication links
+between arbitrary pairs of nodes (unless the adversary is one end of the communication).
+In specific, the communication channels are assumed to be secure.
+
+### Security Considerations
+
+Note that while using `WakuFilter` allows light nodes to save bandwidth,
+it comes with a privacy cost in the sense that they need to
+disclose their liking topics to the full nodes to retrieve the relevant messages.
+Currently, anonymous subscription is not supported by the `WakuFilter`, however,
+potential solutions in this regard are discussed below.
+
+#### Future Work
 <!-- Alternative title: Filter-subscriber unlinkability -->
 **Anonymous filter subscription**:
 This feature guarantees that nodes can anonymously subscribe for a message filter
@@ -318,25 +317,6 @@ Examples of such 2PC protocols are
 [Oblivious Transfers](https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains.)
 and one-way Private Set Intersections (PSI).
 
-## Changelog
-
-### Next
-
-- Added initial threat model and security analysis.
-
-### 2.0.0-beta2
-
-Initial draft version. Released [2020-10-28](https://github.com/vacp2p/specs/commit/5ceeb88cee7b918bb58f38e7c4de5d581ff31e68)
-
-- Fix: Ensure contentFilter is a repeated field, on implementation
-- Change: Add ability to unsubscribe from filters.
-Make `subscribe` an explicit boolean indication.
-Edit protobuf field order to be consistent with libp2p.
-
-### 2.0.0-beta1
-
-Initial draft version. Released [2020-10-05](https://github.com/vacp2p/specs/commit/31857c7434fa17efc00e3cd648d90448797d107b)
-
 ## Copyright
 
 Copyright and related rights waived via
@@ -344,13 +324,14 @@ Copyright and related rights waived via
 
 ## References
 
-- [message-based
-filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
-- [`WakuMessage`s](../14/message.md)
-- [`11/WAKU2-RELAY`](../11/relay.md)
+- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+- [message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
+- [13/WAKU2-STORE](/waku/standards/core/13/store.md)
+- [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
 - [Oblivious Transfers](https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains)
-- previous versions: [00](./previous-versions00)
+- 12/WAKU2-FILTER previous version: [00](waku/standards/core/12/previous-versions/00/filter.md)
+
+### Informative
 
 1. [Message Filtering (Wikipedia)](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
-
 2. [Libp2p PubSub spec - topic validation](https://github.com/libp2p/specs/tree/master/pubsub#topic-validation)
