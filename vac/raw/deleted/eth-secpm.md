@@ -8,7 +8,7 @@ editor: Ramses Fernandez <ramses@status.im>
 contributors:
 ---
 
-This spec has been split into "eth-mls-on-chain" and "noise-x3dh-double-ratchet", 
+This spec has been split into "eth-mls-on-chain" and "noise-x3dh-double-ratchet",
 which is why this document has been deleted
 
 ## Motivation
