@@ -8,9 +8,11 @@ editor: Ramses Fernandez <ramses@status.im>
 contributors:
 ---
 
----
-**NOTE**: The content of this specification has been split between [ETH-DEMLS](vac/raw/eth-demls.md) and [NOISE-X3DH-RATCHET](vac/raw/noise-x3dh-ratchet.md) RFCs.
---- 
+## NOTE
+
+The content of this specification has been split between
+[ETH-DEMLS](vac/raw/eth-demls.md) and [NOISE-X3DH-RATCHET](vac/raw/noise-x3dh-ratchet.md)
+RFCs.
 
 ## Motivation
 
