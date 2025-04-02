@@ -1,7 +1,7 @@
 ---
 title: ETH-DEMLS
 name: Secure channel setup using decentralized MLS and Ethereum accounts
-status: raw
+status: stale 
 category: Standards Track
 tags:
 editor: Ramses Fernandez <ramses@status.im>
