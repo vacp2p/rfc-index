@@ -267,7 +267,7 @@ In the case of QR codes a compressed public key can reduce the complexity of the
 
 | Uncompressed | Compressed |
 | --- | --- |
-|![image](status/deprecated/images/qr-code1-accountmd.png)|![image](status/deprecated/images/qr-code2-accountmd.png)|
+|![image](status/images/qr-code1-accountmd.png)|![image](status/images/qr-code2-accountmd.png)|
 
 ### Key Encoding
 
