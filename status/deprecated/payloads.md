@@ -163,7 +163,7 @@ There are other content types that MAY be implemented by the client:
 
 ##### Mentions
 
-A mention MUST be represented as a string with the `@0xpk` format, where `pk` is the public key of the [user account](https://rfc.vac.dev/status/deprecated/account) to be mentioned,
+A mention MUST be represented as a string with the `@0xpk` format, where `pk` is the public key of the [user account](status/deprecated/account) to be mentioned,
 within the `text` field of a message with content_type `TEXT_PLAIN`.
 A message MAY contain more than one mention.
 This specification RECOMMENDs that the application does not require the user to enter the entire pk.
@@ -188,8 +188,8 @@ message StickerMessage {
 
 A node requires message types to decide how to encrypt a particular message
 and what metadata needs to be attached when passing a message to the transport layer.
-For more on this, see [3/WHISPER-USAGE](https://rfc.vac.dev/status/deprecated/whisper-usage)
-and [10/WAKU-USAGE](https://rfc.vac.dev/status/deprecated/waku-usage).
+For more on this, see [3/WHISPER-USAGE](status/deprecated/whisper-usage)
+and [10/WAKU-USAGE](status/deprecated/waku-usage).
 
 <!-- TODO: This reference is a bit odd, considering the layer payloads should interact with is Secure Transport, and not Whisper/Waku. This requires more detail -->
 
@@ -349,7 +349,7 @@ Payload
 ### MembershipUpdateMessage and MembershipUpdateEvent
 
 `MembershipUpdateEvent` is a message used to propagate information about group membership changes in a group chat.
-The details are in the [Group chats specs](https://rfc.vac.dev/status/deprecated/group-chat).
+The details are in the [Group chats specs](status/deprecated/group-chat).
 
 ## Upgradability
 
@@ -377,10 +377,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [Status Whitepaper](https://status.im/whitepaper.pdf)  
 [protobuf record](https://developers.google.com/protocol-buffers/)  
 [Protobuf](https://developers.google.com/protocol-buffers)  
-[Status user account](https://rfc.vac.dev/status/deprecated/account)  
-[ens name or the 3-word pseudonym corresponding to the key](https://rfc.vac.dev/status/deprecated/account/#contact-verification)  
-[3/WHISPER-USAGE](https://rfc.vac.dev/status/deprecated/whisper-usage)  
-[10/WAKU-USAGE](https://rfc.vac.dev/status/deprecated/waku-usage)  
+[Status user account](status/deprecated/account)  
+[ens name or the 3-word pseudonym corresponding to the key](deprecated/account/#contact-verification)  
+[3/WHISPER-USAGE](status/deprecated/whisper-usage)  
+[10/WAKU-USAGE](status/deprecated/waku-usage)  
 [Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamps)  
-[Group chats specs](https://rfc.vac.dev/status/deprecated/group-chat)  
+[Group chats specs](status/deprecated/group-chat)  
 [May 22, 2020 change commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)  

@@ -52,13 +52,13 @@ Types used in this specification are defined using [Protobuf](https://developers
 
 ### Transport Layer
 
-[Whisper](https://rfc.vac.dev/status/deprecated/whisper-usage) and [Waku](https://rfc.vac.dev/status/deprecated/waku-usage) serves as the transport layers for the Status chat protocol.
+[Whisper](status/deprecated/whisper-usage) and [Waku](status/deprecated/waku-usage) serves as the transport layers for the Status chat protocol.
 
 ### User flow for 1-to-1 communications
 
 #### Account generation
 
-See [Account specification](https://rfc.vac.dev/status/deprecated/account)
+See [Account specification](status/deprecated/account)
 
 #### Account recovery
 
@@ -160,7 +160,7 @@ There are two phases in the initial negotiation of a 1:1 chat:
 A QR code serves two purposes simultaneously - identity verification and initial bundle retrieval;
 1. **Asynchronous initial key exchange**, using X3DH.
 
-For more information on account generation and trust establishment, see [2/ACCOUNT](https://rfc.vac.dev/status/deprecated/account)
+For more information on account generation and trust establishment, see [2/ACCOUNT](status/deprecated/account)
 
 #### Initial key exchange flow (X3DH)
 
@@ -572,13 +572,13 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [X3DH](https://signal.org/docs/specifications/x3dh/)
 - [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Protobuf](https://developers.google.com/protocol-buffers/)
-- [Whisper](https://rfc.vac.dev/status/deprecated/whisper-usage)
-- [Waku](https://rfc.vac.dev/status/deprecated/waku-usage)
-- [Account specification](https://rfc.vac.dev/status/deprecated/account)
+- [Whisper](status/deprecated/whisper-usage)
+- [Waku](status/deprecated/waku-usage)
+- [Account specification](status/deprecated/account)
 - [Status implementation](https://github.com/status-im/doubleratchet/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
 - [X3DH](https://signal.org/docs/specifications/x3dh/)
-- [ACCOUNT](https://rfc.vac.dev/status/deprecated/account)
+- [ACCOUNT](status/deprecated/account)
 - [Section 3 of the X3DH protocol](https://signal.org/docs/specifications/x3dh/#sending-the-initial-message)
 - [protobuf L12](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L12)
 - [protobuf L5](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L5)

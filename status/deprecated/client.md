@@ -62,7 +62,7 @@ allows for TCP-based communication between nodes.
 
 On top of this RLPx-based subprotocols are ran, the client
 SHOULD NOT use [Whisper V6](https://eips.ethereum.org/EIPS/eip-627), the client
-SHOULD use [Waku V1](https://rfc.vac.dev/waku/standards/legacy/6/waku1)
+SHOULD use [Waku V1](waku/standards/legacy/6/waku1)
 for privacy-preserving messaging and efficient usage of a node's bandwidth.
 
 #### Node discovery and roles
@@ -166,9 +166,9 @@ to use Whisper and/or Waku to communicate with other Status nodes.
 Once a Whisper and/or Waku node is up and running there are some specific settings required
 to communicate with other Status nodes.
 
-See [3/WHISPER-USAGE](https://rfc.vac.dev/status/deprecated/whisper-usage) and [10/WAKU-USAGE](https://rfc.vac.dev/status/deprecated/waku-usage) for more details.
+See [3/WHISPER-USAGE](status/deprecated/whisper-usage) and [10/WAKU-USAGE](status/deprecated/waku-usage) for more details.
 
-For providing an offline inbox, see the complementary [4/WHISPER-MAILSERVER](https://rfc.vac.dev/status/deprecated/whisper-mailserver) and [11/WAKU-MAILSERVER](https://rfc.vac.dev/status/deprecated/waku-mailserver).
+For providing an offline inbox, see the complementary [4/WHISPER-MAILSERVER](status/deprecated/whisper-mailserver) and [11/WAKU-MAILSERVER](status/deprecated/waku-mailserver).
 
 ### Secure Transport
 
@@ -178,9 +178,9 @@ used in 1:1 chats and group chats, but not for public chats. See [5/SECURE-TRANS
 
 ### Data Sync
 
-[MVDS](https://specs.vac.dev/mvds.html) is used for 1:1 and group chats, however it is currently not in use for public chats.
+[MVDS](vac/2/mvds.md) is used for 1:1 and group chats, however it is currently not in use for public chats.
 [Status payloads](#payloads-and-clients) are serialized and then wrapped inside an
-MVDS message which is added to an [MVDS payload](https://specs.vac.dev/mvds.html#payloads),
+MVDS message which is added to an [MVDS payload](vac/2/mvds.md#payloads),
 the node encrypts this payload (if necessary for 1-to-1 / group-chats) and sends it using
 Whisper or Waku which also encrypts it.
 
@@ -238,7 +238,7 @@ computer.
 ### Why do you use Waku?
 
 Waku is a direct upgrade and replacement for Whisper, the main motivation for
-developing and implementing Waku can be found in the [Waku specs](https://rfc.vac.dev/waku).
+developing and implementing Waku can be found in the [Waku specs](waku).
 
 >Waku was created to incrementally improve in areas that Whisper is lacking in,
 >with special attention to resource restricted devices. We specify the standard for
@@ -396,15 +396,15 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 - [RLPx Transport Protocol, v5](https://github.com/ethereum/devp2p/blob/master/rlpx.md)
 - [Whisper V6](https://eips.ethereum.org/EIPS/eip-627)
-- [Waku V1](https://rfc.vac.dev/waku/standards/legacy/6/waku1)
+- [Waku V1](waku/standards/legacy/6/waku1)
 - [Rendezvous Protocol](https://github.com/libp2p/specs/tree/master/rendezvous)
 - [Rendezvous Protocol modifications](https://github.com/status-im/rendezvous#differences-with-original-rendezvous)
 - [Fleets Status](https://fleets.status.im)
 - [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459#client-protocol)
-- [3/WHISPER-USAGE](https://rfc.vac.dev/status/deprecated/whisper-usage)
-- [10/WAKU-USAGE](https://rfc.vac.dev/status/deprecated/waku-usage)
-- [4/WHISPER-MAILSERVER](https://rfc.vac.dev/status/deprecated/whisper-mailserver)
-- [11/WAKU-MAILSERVER](https://rfc.vac.dev/status/deprecated/waku-mailserver)
+- [3/WHISPER-USAGE](status/deprecated/whisper-usage)
+- [10/WAKU-USAGE](status/deprecated/waku-usage)
+- [4/WHISPER-MAILSERVER](status/deprecated/whisper-mailserver)
+- [11/WAKU-MAILSERVER](status/deprecated/waku-mailserver)
 - [5/SECURE-TRANSPORT](https://specs.status.im/spec/5)
 - [MVDS](https://specs.vac.dev/mvds.html)
 - [MVDS payload](https://specs.vac.dev/mvds.html#payloads)
@@ -414,7 +414,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Re-enable LES as option](https://github.com/status-im/status-go/issues/1025)
 - [Swarm adaptive nodes](https://github.com/ethersphere/SWIPs/pull/12)
 - [Whisper vs PSS](https://our.status.im/whisper-pss-comparison/)
-- [Waku specs](https://rfc.vac.dev/waku)
+- [Waku specs](waku)
 - [Vac](https://vac.dev/vac-overview)
 - [theoretical scaling model](https://github.com/vacp2p/research/tree/dcc71f4779be832d3b5ece9c4e11f1f7ec24aac2/whisper_scalability)
 - [Anonymity](https://eprint.iacr.org/2017/954.pdf)
