@@ -1,5 +1,5 @@
 ---
-title: ETH-DEMLS
+title: ETH-MLS-ONCHAIN
 name: Secure channel setup using decentralized MLS and Ethereum accounts
 status: raw
 category: Standards Track
