@@ -267,7 +267,7 @@ In the case of QR codes a compressed public key can reduce the complexity of the
 
 | Uncompressed | Compressed |
 | --- | --- |
-|![image](status/images/qr-code1-accountmd.png)|![image](status/images/qr-code2-accountmd.png)|
+|![image](/status/deprecated/images/qr-code1-accountmd.png)|![image](/status/deprecated/images/qr-code2-accountmd.png)|
 
 ### Key Encoding
 
@@ -451,9 +451,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [web3 API](https://web3js.readthedocs.io/en/1.0/web3-shh.html#generatesymkeyfrompassword)
 - [Protobuf encryption](https://github.com/status-im/status-go/messaging/chat/protobuf/encryption.pb.go)
 - [gfycat in Status](https://github.com/status-im/status-mobile/tree/develop/src/status_im/utils/gfycat)
-- [multiformats/multibase](https://github.com/multiformats/multibase)
-- [multiformats/multicodec](https://github.com/multiformats/multicodec)
-- [multiformats/unsigned-varint](https://github.com/multiformats/unsigned-varint)
+- [multiformats](https://github.com/multiformats/)
 - [status-go implementation and tests](https://github.com/status-im/status-go/blob/c9772325f2dca76b3504191c53313663ca2efbe5/api/utils_test.go)
 - [June 24, 2020 change commit](https://github.com/status-im/specs/commit/e98a9b76b7d4e1ce93e0b692e1521c2d54f72c59)
 - [May 22, 2020 change commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)

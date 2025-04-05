@@ -300,8 +300,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [Keycard Hardwallet Documentation](https://keycard.tech/docs/)
-- [SaveAccountAndLoginWithKeycard](https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L337)
-- [LoginWithKeycard](https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L373)
-- [HashTransaction](https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L492)
-- [HashMessage](https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L520)
-- [SendTransactionWithSignature](https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L471)
+- [Keycard Codebase](https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go)

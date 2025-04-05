@@ -13,7 +13,7 @@ contributors:
 
 ## Abstract
 
-Status uses [Waku](waku/standards/legacy/6/waku1) to provide privacy-preserving routing
+Status uses [Waku](/waku/standards/legacy/6/waku1.md) to provide privacy-preserving routing
 and messaging on top of devP2P.
 Waku uses topics to partition its messages,
 and these are leveraged for all chat capabilities.
@@ -42,14 +42,14 @@ encryption properties to support asynchronous chat.
 
 | Packet Name          | Code | References |
 | -------------------- | ---: | --- |
-| Status               |    0 | [Status](status), [WAKU-1](waku/standards/legacy/6/waku1/#status) |
-| Messages             |    1 | [WAKU-1](waku/standards/legacy/6/waku1/#messages) |
+| Status               |    0 | [Status](status), [WAKU-1](/waku/standards/legacy/6/waku1.md#status) |
+| Messages             |    1 | [WAKU-1](/waku/standards/legacy/6/waku1.md#messages) |
 | Batch Ack            |   11 | Undocumented. Marked for Deprecation |
-| Message Response     |   12 | [WAKU-1](waku/standards/legacy/6/waku1/#batch-ack-and-message-response) |
-| Status Update        |   22 | [WAKU-1](waku/standards/legacy/6/waku1/#status-update) |
-| P2P Request Complete |  125 | [4/WAKU-MAILSERVER](status/deprecated/waku-mailserver) |
-| P2P Request          |  126 | [4/WAKU-MAILSERVER](status/deprecated/waku-mailserver), [WAKU-1](waku/standards/legacy/6/waku1/#p2p-request) |
-| P2P Messages         |  127 | [4/WAKU-MAILSERVER](status/deprecated/waku-mailserver), [WAKU-1](waku/standards/legacy/6/waku1/#p2p-request-complete) |
+| Message Response     |   12 | [WAKU-1](/waku/standards/legacy/6/waku1.md#batch-ack-and-message-response) |
+| Status Update        |   22 | [WAKU-1](/waku/standards/legacy/6/waku1.md#status-update) |
+| P2P Request Complete |  125 | [4/WAKU-MAILSERVER](/status/deprecated/waku-mailserver.md) |
+| P2P Request          |  126 | [4/WAKU-MAILSERVER](/status/deprecated/waku-mailserver.md), [WAKU-1](/waku/standards/legacy/6/waku1.md#p2p-request) |
+| P2P Messages         |  127 | [4/WAKU-MAILSERVER](/status/deprecated/waku-mailserver.md), [WAKU-1](/waku/standards/legacy/6/waku1.md#p2p-request-complete) |
 
 ## Waku node configuration
 
@@ -81,12 +81,12 @@ Handshake is a RLP-encoded packet sent to a newly connected peer. It MUST start 
 
 | Option Name             | Key    | Type     | Description | References |
 | ----------------------- | ------ | -------- | ----------- | --- |
-| `pow-requirement`       | `0x00` | `uint64` | minimum PoW accepted by the peer | [WAKU-1#pow-requirement](waku/standards/legacy/6/waku1/#pow-requirement-field) |
-| `bloom-filter`          | `0x01` | `[]byte` | bloom filter of Waku topic accepted by the peer | [WAKU-1#bloom-filter](waku/standards/legacy/6/waku1/#bloom-filter-field) |
-| `light-node`            | `0x02` | `bool`   | when true, the peer won't forward envelopes through the Messages packet. | [WAKU-1#light-node](waku/standards/legacy/6/waku1/#light-node) |
-| `confirmations-enabled` | `0x03` | `bool`   | when true, the peer will send message confirmations | [WAKU-1#confirmations-enabled-field](waku/standards/legacy/6/waku1/#confirmations-enabled-field) |
-| `rate-limits`           | `0x04` |          | See [Rate limiting](waku/standards/legacy/6/waku1/#rate-limits-field) | [WAKU-1#rate-limits](waku/standards/legacy/6/waku1/#rate-limits-field) |
-| `topic-interest`        | `0x05` | `[10000][4]byte` | Topic interest is used to share a node's interest in envelopes with specific topics. It does this in a more bandwidth considerate way, at the expense of some metadata protection. Peers MUST only send envelopes with specified topics. | [WAKU-1#topic-interest](waku/standards/legacy/6/waku1/#topic-interest-field), [the theoretical scaling model](https://github.com/vacp2p/research/tree/dcc71f4779be832d3b5ece9c4e11f1f7ec24aac2/whisper_scalability) |
+| `pow-requirement`       | `0x00` | `uint64` | minimum PoW accepted by the peer | [WAKU-1#pow-requirement](/waku/standards/legacy/6/waku1.md#pow-requirement-field) |
+| `bloom-filter`          | `0x01` | `[]byte` | bloom filter of Waku topic accepted by the peer | [WAKU-1#bloom-filter](/waku/standards/legacy/6/waku1.md#bloom-filter-field) |
+| `light-node`            | `0x02` | `bool`   | when true, the peer won't forward envelopes through the Messages packet. | [WAKU-1#light-node](/waku/standards/legacy/6/waku1.md#light-node) |
+| `confirmations-enabled` | `0x03` | `bool`   | when true, the peer will send message confirmations | [WAKU-1#confirmations-enabled-field](/waku/standards/legacy/6/waku1.md#confirmations-enabled-field) |
+| `rate-limits`           | `0x04` |          | See [Rate limiting](/waku/standards/legacy/6/waku1.md#rate-limits-field) | [WAKU-1#rate-limits](/waku/standards/legacy/6/waku1.md#rate-limits-field) |
+| `topic-interest`        | `0x05` | `[10000][4]byte` | Topic interest is used to share a node's interest in envelopes with specific topics. It does this in a more bandwidth considerate way, at the expense of some metadata protection. Peers MUST only send envelopes with specified topics. | [WAKU-1#topic-interest](/waku/standards/legacy/6/waku1.md#topic-interest-field), [the theoretical scaling model](https://github.com/vacp2p/research/tree/dcc71f4779be832d3b5ece9c4e11f1f7ec24aac2/whisper_scalability) |
 
 <!-- TODO Add `light-node` and `confirmations-enabled` links when https://github.com/vacp2p/specs/pull/128 is merged -->
 
@@ -124,7 +124,7 @@ The protocol requires a key (symmetric or asymmetric) for the following actions:
 As nodes require asymmetric keys and symmetric keys to process incoming messages,
 they must be available all the time and are stored in memory.
 
-Keys management for PFS is described in [5/SECURE-TRANSPORT](status/deprecated/secure-transport).
+Keys management for PFS is described in [5/SECURE-TRANSPORT](/status/deprecated/secure-transport.md).
 
 The Status protocols uses a few particular Waku topics to achieve its goals.
 
@@ -380,16 +380,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 * [Waku](waku)
-* [WAKU1](waku/standards/legacy/6/waku1)
-* [WAKU-MAILSERVER](status/deprecated/waku-mailserver)
-* [WAKU-1-pow-requirement](waku/standards/legacy/6/waku1/#pow-requirement-field)
-* [WAKU-1-bloom-filter](waku/standards/legacy/6/waku1/#bloom-filter-field)
-* [WAKU-1-light-node](waku/standards/legacy/6/waku1/#light-node)
-* [WAKU-1-confirmations-enabled-field](waku/standards/legacy/6/waku1/#confirmations-enabled-field)
-* [WAKU-1-rate-limits](waku/standards/legacy/6/waku1/#rate-limits-field)
-* [WAKU-1-topic-interest](waku/standards/legacy/6/waku1/#topic-interest-field)
+* [WAKU1](/waku/standards/legacy/6/waku1.md)
+* [WAKU-MAILSERVER](/status/deprecated/waku-mailserver.md)
 * [The theoretical scaling model](https://github.com/vacp2p/research/tree/dcc71f4779be832d3b5ece9c4e11f1f7ec24aac2/whisper_scalability)
-* [SECURE-TRANSPORT](status/deprecated/secure-transport)
+* [SECURE-TRANSPORT](/status/deprecated/secure-transport.md)
 * [May 22, 2020 commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)
 * [`shh_generateSymKeyFromPassword`](https://github.com/ethereum/go-ethereum/wiki/Whisper-v6-RPC-API#shh_generatesymkeyfrompassword)
 * [Key Change #1](https://github.com/status-im/status-go/blob/2d13ccf5ec3db7e48d7a96a7954be57edb96f12f/waku/api.go#L172-L175)

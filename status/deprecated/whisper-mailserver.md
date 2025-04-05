@@ -140,10 +140,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 - [Whisper](https://eips.ethereum.org/EIPS/eip-627)
 - [EIP-627](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-627.md)
-- [SECURE-TRANSPORT](status/deprecated/secure-transport)
+- [SECURE-TRANSPORT](/status/deprecated/secure-transport.md)
 - [`shh_generateSymKeyFromPassword`](https://github.com/ethereum/go-ethereum/wiki/Whisper-v6-RPC-API#shh_generatesymkeyfrompassword)
 - [Whisper v6](https://eips.ethereum.org/EIPS/eip-627)
-- [Waku V0](waku/deprecated/5/waku0)
-- [Waku V1](waku/standards/legacy/6/waku1)
-- [Waku V1#Bridging](waku/standards/legacy/6/waku1/#waku-whisper-bridging)
+- [Waku V0](/waku/deprecated/5/waku0.md)
+- [Waku V1](/waku/standards/legacy/6/waku1.md)
 - [May 22, 2020 change commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)

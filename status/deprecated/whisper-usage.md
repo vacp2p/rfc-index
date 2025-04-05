@@ -52,9 +52,9 @@ encryption properties to support asynchronous chat.
 | Message Response | 12 | 𝘅 | Undocumented |
 | P2P Sync Request | 123 | 𝘅 | Undocumented |
 | P2P Sync Response | 124 | 𝘅 | Undocumented |
-| P2P Request Complete | 125 | 𝘅 | [4/WHISPER-MAILSERVER](status/deprecated/whisper-mailserver) |
-| P2P Request | 126 | ✔ | [4/WHISPER-MAILSERVER](status/deprecated/whisper-mailserver) |
-| P2P Messages | 127 | ✔/𝘅 (EIP-627 supports only single envelope in a packet) | [4/WHISPER-MAILSERVER](status/deprecated/whisper-mailserver) |
+| P2P Request Complete | 125 | 𝘅 | [4/WHISPER-MAILSERVER](/status/deprecated/whisper-mailserver.md) |
+| P2P Request | 126 | ✔ | [4/WHISPER-MAILSERVER](/status/deprecated/whisper-mailserver.md) |
+| P2P Messages | 127 | ✔/𝘅 (EIP-627 supports only single envelope in a packet) | [4/WHISPER-MAILSERVER](/status/deprecated/whisper-mailserver.md) |
 
 ## Whisper node configuration
 
@@ -121,7 +121,7 @@ The protocol requires a key (symmetric or asymmetric) for the following actions:
 As nodes require asymmetric keys and symmetric keys to process incoming messages,
 they must be available all the time and are stored in memory.
 
-Keys management for PFS is described in [5/SECURE-TRANSPORT](status/deprecated/whisper-mailserver).
+Keys management for PFS is described in [5/SECURE-TRANSPORT](/status/deprecated/whisper-mailserver.md).
 
 The Status protocols uses a few particular Whisper topics to achieve its goals.
 
@@ -332,12 +332,12 @@ In order to maintain compatibility between Whisper and Waku nodes,
 a Status network that implements both Whisper and Waku messaging protocols
 MUST have at least one node that is capable of discovering peers and implements
 [Whisper v6](https://eips.ethereum.org/EIPS/eip-627),
-[Waku V0](waku/deprecated/5/waku0) and
-[Waku V1](waku/standards/legacy/6/waku1) specifications.
+[Waku V0](/waku/deprecated/5/waku0.md) and
+[Waku V1](/waku/standards/legacy/6/waku1.md) specifications.
 
 Additionally, any Status network that implements both Whisper and Waku messaging protocols
 MUST implement bridging capabilities as detailed in
-[Waku V1#Bridging](waku/standards/legacy/6/waku1/#waku-whisper-bridging).  
+[Waku V1#Bridging](/waku/standards/legacy/6/waku1.md#waku-whisper-bridging).  
 
 ## Whisper V6 extensions
 
@@ -392,11 +392,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 * [Whisper](https://eips.ethereum.org/EIPS/eip-627)
-* [WHISPER-MAILSERVER](status/deprecated/whisper-mailserver)
-* [SECURE-TRANSPORT](status/deprecated/secure-transport)
+* [WHISPER-MAILSERVER](/status/deprecated/whisper-mailserver.md)
+* [SECURE-TRANSPORT](/status/deprecated/secure-transport.md)
 * [`shh_generateSymKeyFromPassword`](https://github.com/ethereum/go-ethereum/wiki/Whisper-v6-RPC-API#shh_generatesymkeyfrompassword)
 * [Whisper v6](https://eips.ethereum.org/EIPS/eip-627)
-* [Waku V0](waku/deprecated/5/waku0/)
-* [Waku V1](waku/standards/legacy/6/waku1)
-* [Waku V1 - Bridging](waku/standards/legacy/6/waku1/#waku-whisper-bridging)
+* [Waku V0](/waku/deprecated/5/waku0.md)
+* [Waku V1](/waku/standards/legacy/6/waku1.md)
 * [May 22, 2020 change commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)

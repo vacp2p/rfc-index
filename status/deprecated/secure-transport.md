@@ -116,7 +116,7 @@ Every client initially generates some key material which is stored locally:
 - A signed prekey based on secp256k1 - `SPK`
 - A prekey signature - `Sig(IK, Encode(SPK))`
 
-More details can be found in the `X3DH Prekey bundle creation` section of [2/ACCOUNT](https://specs.status.im/spec/2#x3dh-prekey-bundles).
+More details can be found in the `X3DH Prekey bundle creation` section of [2/ACCOUNT](/status/deprecated/account.md#x3dh-prekey-bundles).
 
 Prekey bundles can be extracted from any user's messages,
 or found via searching for their specific topic, `{IK}-contact-code`.
@@ -160,7 +160,7 @@ There are two phases in the initial negotiation of a 1:1 chat:
 A QR code serves two purposes simultaneously - identity verification and initial bundle retrieval;
 1. **Asynchronous initial key exchange**, using X3DH.
 
-For more information on account generation and trust establishment, see [2/ACCOUNT](status/deprecated/account)
+For more information on account generation and trust establishment, see [2/ACCOUNT](/status/deprecated/account.md)
 
 #### Initial key exchange flow (X3DH)
 
@@ -572,23 +572,12 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [X3DH](https://signal.org/docs/specifications/x3dh/)
 - [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Protobuf](https://developers.google.com/protocol-buffers/)
-- [Whisper](status/deprecated/whisper-usage)
-- [Waku](status/deprecated/waku-usage)
-- [Account specification](status/deprecated/account)
+- [Whisper](/status/deprecated/whisper-usage.md)
+- [Waku](/status/deprecated/waku-usage.md)
+- [Account specification](/status/deprecated/account.md)
 - [Status implementation](https://github.com/status-im/doubleratchet/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
 - [X3DH](https://signal.org/docs/specifications/x3dh/)
-- [ACCOUNT](status/deprecated/account)
-- [Section 3 of the X3DH protocol](https://signal.org/docs/specifications/x3dh/#sending-the-initial-message)
-- [protobuf L12](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L12)
-- [protobuf L5](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L5)
-- [protobuf L65](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L65)
-- [protobuf L56](https://github.com/status-im/status-go/blob/1ac9dd974415c3f6dee95145b6644aeadf02f02c/services/shhext/chat/encryption.proto#L56)
-- [protobuf L47](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L47)
-- [Double Ratchet spec section 2.2](https://signal.org/docs/specifications/doubleratchet/#symmetric-key-ratchet)
-- [protobuf L31](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L31)
-- [protobuf L42](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L42)
-- [section 4 of the X3DH spec](https://signal.org/docs/specifications/x3dh/#security-considerations)
-- [section 6 of the Double Ratchet spec](https://signal.org/docs/specifications/doubleratchet/#security-considerations)
+- [ACCOUNT](/status/deprecated/account.md)
 - [Sesame](https://signal.org/docs/specifications/sesame/)
 - [May 22, 2020 commit change](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)

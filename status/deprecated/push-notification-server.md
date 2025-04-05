@@ -243,7 +243,7 @@ If no filtering is done based on public keys,
 the access token SHOULD be included in the advertisement.
 Otherwise it SHOULD be left empty.
 
-This SHOULD be advertised on the [contact code topic](./10-waku-usage.md#contact-code-topic)
+This SHOULD be advertised on the [contact code topic](/status/deprecated/waku-usage.md#contact-code-topic)
 and SHOULD be coupled with normal contact-code advertisement.
 
 Every time a user register or re-register with a push notification service, their
@@ -358,7 +358,7 @@ message PushNotificationRequest {
 }
 ```
 
-A `PushNotificationRequest` message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REQUEST`.
+A `PushNotificationRequest` message MUST be wrapped in a [`ApplicationMetadataMessage`](/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REQUEST`.
 
 Where `message` is the encrypted payload of the message and `chat_id` is the
 `SHAKE-256` of the `chat_id`.
@@ -418,12 +418,12 @@ message PushNotificationResponse {
 }
 ```
 
-A `PushNotificationResponse` message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payloads/payload-wrapper) with type set to `PUSH_NOTIFICATION_RESPONSE`.
+A `PushNotificationResponse` message MUST be wrapped in a [`ApplicationMetadataMessage`](/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_RESPONSE`.
 
 Where `message_id` is the `message_id` sent by the client.
 
-The response MUST be sent on the [partitioned topic](status/deprecated/waku-usage/#partitioned-topic) of the sender
-and MUST not be encrypted using the [secure transport](status/deprecated/secure-transport) to facilitate
+The response MUST be sent on the [partitioned topic](/status/deprecated/waku-usage.md#partitioned-topic) of the sender
+and MUST not be encrypted using the [secure transport](/status/deprecated/secure-transport.md) to facilitate
 the usage of ephemeral keys.
 
 If the request is accepted `success` MUST be set to `true`.
@@ -468,7 +468,7 @@ If `error` is `INTERNAL_ERROR` the client MAY retry the request.
 `token_type`: the type of token. Currently supported is `APN_TOKEN` for Apple Push
 `device_token`: the actual push notification token sent by `Firebase` or `APN`
 and `FIREBASE_TOKEN` for firebase.
-`installation_id`: the [`installation_id`](status/deprecated/account) of the device
+`installation_id`: the [`installation_id`](/status/deprecated/account.md) of the device
 `access_token`: the access token that will be given to clients to send push notifications
 `enabled`: whether the device wants to be sent push notifications
 `version`: a monotonically increasing number identifying the current `PushNotificationRegistration`. Any time anything is changed in the record it MUST be increased by the client, otherwise the request will not be accepted.
@@ -552,7 +552,7 @@ Data disclosed
 ### PushNotificationRequest
 
 `requests`: a list of `PushNotification`
-`message_id`: the [status message id](./6-payloads.md)
+`message_id`: the [status message id](/status/deprecated/payloads.md)
 
 Data disclosed
 
@@ -583,7 +583,7 @@ This will hide their real chat key.
 This public key is effectively a secret and SHOULD only be disclosed to clients that you the user wants to be notified by.
 
 A client MAY advertise the access token on the contact-code topic of the key generated.
-A client MAY share their public key through [contact updates](status/deprecated/payloads/contact-update)
+A client MAY share their public key through [contact updates](/status/deprecated/payloads.md#contact-update)
 
 A client receiving a push notification public key SHOULD listen to the contact code
 topic of the push notification public key for updates.
@@ -592,7 +592,7 @@ The method described above effectively does not share the identity of the sender
 nor the receiver to the server, but MAY result in missing push notifications as
 the propagation of the secret is left to the client.
 
-This can be mitigated by [device syncing](status/deprecated/payloads), but not completely
+This can be mitigated by [device syncing](/status/deprecated/payloads.md), but not completely
 addressed.
 
 ## Security considerations
@@ -746,14 +746,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Firebase](https://firebase.google.com/)
 - [Gorush](https://github.com/appleboy/gorush)
 - [UUID Specification](https://tools.ietf.org/html/rfc4122)
-- [Partitioned Topic](status/deprecated/waku-usage/#partitioned-topic)
-- [Push Notification Payload Wrapper](status/deprecated/payloads/#payload-wrapper)
-- [Push Notification Query Topic](status/deprecated/waku-usage/#partitioned-topic)
-- [Push Notification Response](status/deprecated/payloads/payload-wrapper)
-- [Secure Transport](deprecated/secure-transport)
+- [Secure Transport](/status/deprecated/secure-transport.md)
 - [Silent Notifications on iOS](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/pushing_background_updates_to_your_app)
-- [Waku Contact Code Topic](status/deprecated/waku-usage/#contact-code-topic)
-- [Waku Public Chats](status/deprecated/waku-usage/#public-chats)
+- [Waku Usage](/status/deprecated/waku-usage.md)
 - [ENS Contract](https://github.com/ensdomains/ens)
-- [Payloads](status/deprecated/payloads)
-- [Payload wrapper](status/deprecated/payload/#payload-wrapper)
+- [Payloads](/status/deprecated/payloads.md)

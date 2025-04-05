@@ -118,3 +118,10 @@ users will be unable to view the app's privacy policy.
 ## Copyright
 
 Copyright and related rights waived via CC0.
+
+## References
+
+- [GraphQL](https://api.pixura.io/graphql)  
+- [Etheremon](https://www.etheremon.com/api)  
+- [Cryptostrikers](https://us-central1-cryptostrikers-prod.cloudfunctions.net/cards/)
+- [Cryptokitties](https://api.cryptokitties.co/)  

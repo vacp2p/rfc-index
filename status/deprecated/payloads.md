@@ -163,14 +163,14 @@ There are other content types that MAY be implemented by the client:
 
 ##### Mentions
 
-A mention MUST be represented as a string with the `@0xpk` format, where `pk` is the public key of the [user account](status/deprecated/account) to be mentioned,
+A mention MUST be represented as a string with the `@0xpk` format, where `pk` is the public key of the [user account](/status/deprecated/account.md) to be mentioned,
 within the `text` field of a message with content_type `TEXT_PLAIN`.
 A message MAY contain more than one mention.
 This specification RECOMMENDs that the application does not require the user to enter the entire pk.
 This specification RECOMMENDs that the application allows the user to create a mention
 by typing @ followed by the related ENS or 3-word pseudonym.
 This specification RECOMMENDs that the application provides the user auto-completion functionality to create a mention.
-For better user experience, the client SHOULD display a known [ens name or the 3-word pseudonym corresponding to the key](https://specs.status.im/spec/2#contact-verification) instead of the `pk`.
+For better user experience, the client SHOULD display a known [ens name or the 3-word pseudonym corresponding to the key](/status/deprecated/account.md#contact-verification) instead of the `pk`.
 
 ##### Sticker content type
 
@@ -188,8 +188,8 @@ message StickerMessage {
 
 A node requires message types to decide how to encrypt a particular message
 and what metadata needs to be attached when passing a message to the transport layer.
-For more on this, see [3/WHISPER-USAGE](status/deprecated/whisper-usage)
-and [10/WAKU-USAGE](status/deprecated/waku-usage).
+For more on this, see [WHISPER-USAGE](/status/deprecated/whisper-usage.md)
+and [WAKU-USAGE](/status/deprecated/waku-usage.md).
 
 <!-- TODO: This reference is a bit odd, considering the layer payloads should interact with is Secure Transport, and not Whisper/Waku. This requires more detail -->
 
@@ -349,7 +349,7 @@ Payload
 ### MembershipUpdateMessage and MembershipUpdateEvent
 
 `MembershipUpdateEvent` is a message used to propagate information about group membership changes in a group chat.
-The details are in the [Group chats specs](status/deprecated/group-chat).
+The details are in the [Group chats specs](/status/deprecated/group-chat.md).
 
 ## Upgradability
 
@@ -377,10 +377,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [Status Whitepaper](https://status.im/whitepaper.pdf)  
 [protobuf record](https://developers.google.com/protocol-buffers/)  
 [Protobuf](https://developers.google.com/protocol-buffers)  
-[Status user account](status/deprecated/account)  
+[Status user account](/status/deprecated/account.md)  
 [ens name or the 3-word pseudonym corresponding to the key](deprecated/account/#contact-verification)  
-[3/WHISPER-USAGE](status/deprecated/whisper-usage)  
-[10/WAKU-USAGE](status/deprecated/waku-usage)  
+[WHISPER-USAGE](/status/deprecated/whisper-usage.md)  
+[WAKU-USAGE](/status/deprecated/waku-usage.md)  
 [Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamps)  
-[Group chats specs](status/deprecated/group-chat)  
+[Group chats specs](/status/deprecated/group-chat.md)  
 [May 22, 2020 change commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)  

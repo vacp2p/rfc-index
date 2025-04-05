@@ -17,7 +17,7 @@ between each participant, similarly to a one-to-one message.
 ## Membership updates
 
 The node uses membership updates messages to propagate group chat membership changes.
-The protobuf format is described in the [6/PAYLOADS](status/deprecated/payloads).
+The protobuf format is described in the [PAYLOADS](/status/deprecated/payloads.md).
 Below describes each specific field.
 
 The protobuf messages are:
@@ -66,7 +66,7 @@ message MembershipUpdateEvent {
 | ----- | ---- | ---- | ---- |
 | 1 | chat-id | `string` | The chat id of the chat where the change is to take place |
 | 2 | events | See details | A list of events that describe the membership changes, in their encoded protobuf form |
-| 3 | message | `ChatMessage` | An optional message, described in [Message](status/deprecated/payloads.md/#message) |
+| 3 | message | `ChatMessage` | An optional message, described in [Message](/status/deprecated/payloads.md/#message) |
 
 `MembershipUpdateEvent`:
 
@@ -158,7 +158,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [6/PAYLOADS](status/deprecated/payloads)
-- [Status Payload Specs](deprecated/payloads/#clock-vs-timestamp-and-message-ordering)
-- [Message](status/deprecated/payloads.md/#message)
+- [PAYLOADS](/status/deprecated/payloads.md)
 - [UUID](https://tools.ietf.org/html/rfc4122)
