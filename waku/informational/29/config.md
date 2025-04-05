@@ -37,7 +37,7 @@ We repeat them here with RECOMMMENDED values for `11/WAKU2-RELAY` implementation
 
 ## GossipSub v1.1 parameters
 
-GossipSub v1.1 extended GossipSub v1.0 and 
+GossipSub v1.1 extended GossipSub v1.0 and
 introduced [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
 We repeat the global parameters here
 with RECOMMMENDED values for `11/WAKU2-RELAY` implementations.
