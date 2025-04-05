@@ -5,6 +5,7 @@ name: Waku v2 Client Peer Management Recommendations
 status: draft
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
+ - Filip Dimitrijevic <filip@status.im>
 ---
 
 `27/WAKU2-PEERS` describes a recommended minimal set of peer storage and
@@ -18,7 +19,8 @@ or the ability to store peer data on disk to resume state after a client restart
 Peer _management_ is a closely related concept and
 refers to the set of actions a client MAY choose to perform
 based on its knowledge of its connected peers,
-e.g. triggering reconnects/disconnects, keeping certain connections alive, etc.
+e.g. triggering reconnects/disconnects,
+keeping certain connections alive, etc.
 
 ## Peer store
 
@@ -55,7 +57,7 @@ disconnected gracefully.
 - **`Connected`**: The client is actively connected to this peer.
 
 This list does not preclude clients from tracking more advanced connectivity metadata,
-such as a peer's blacklist status (see [`18/WAKU2-SWAP`](../../standards/application/18/swap.md)).
+such as a peer's blacklist status (see [`18/WAKU2-SWAP`](/waku/deprecated/18/swap.md)).
 
 ### Persistence
 
@@ -91,8 +93,8 @@ This requires keeping track of the [last time each peer was disconnected](#track
 
 A Waku v2 client MAY choose to implement a keep-alive mechanism to certain peers.
 If a client chooses to implement keep-alive on a connection,
-it SHOULD do so by sending periodic [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping)
-as per `10/WAKU2` [client recommendations](../../standards/core/10/waku2.md/#recommendations-for-clients).
+it SHOULD do so by sending periodic [libp2p pings](https://docs.libp2p.io/concepts/fundamentals/protocols/#ping)
+as per `10/WAKU2` [client recommendations](/waku/standards/core/10/waku2.md#recommendations-for-clients).
 The recommended period between pings SHOULD be _at most_ 50%
 of the shortest idle connection timeout for the specific client and transport.
 For example, idle TCP connections often times out after 10 to 15 minutes.
@@ -111,9 +113,9 @@ Copyright and related rights waived via
 - [`Peer ID`](https://docs.libp2p.io/concepts/peer-id/)
 - [`multiaddrs`](https://docs.libp2p.io/concepts/addressing/)
 - [`protocol IDs`](https://docs.libp2p.io/concepts/protocols/#protocol-ids)
-- [`11/WAKU2-RELAY`](../../standards/core/11/relay.md)
-- [`13/WAKU2-STORE`](../../standards/core/13/store.md)
-- [`18/WAKU2-SWAP`](../../standards/application/18/swap.md)
-- [backing off period](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#prune-backoff-and-peer-exchange)
-- [libp2p pings](https://docs.libp2p.io/concepts/protocols/#ping)
-- [`10/WAKU2` client recommendations](../../standards/core/10/waku2.md/#recommendations-for-clients)
+- [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md)
+- [`13/WAKU2-STORE`](/waku/standards/core/13/store.md)
+- [`18/WAKU2-SWAP`](/waku/deprecated/18/swap.md)
+- [backing off period](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md/#prune-backoff-and-peer-exchange)
+- [libp2p pings](https://docs.libp2p.io/concepts/fundamentals/protocols/#ping)
+- [`10/WAKU2` client recommendations](/waku/standards/core/10/waku2.md#recommendations-for-clients)
