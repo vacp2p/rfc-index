@@ -165,3 +165,7 @@ malicious behaviours as follows:
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 
 ## References
+
+* [Hedera Hashgraph](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus)
+* [Gossip about gossip](https://docs.hedera.com/hedera/core-concepts/hashgraph-consensus-algorithms/gossip-about-gossip)
+* [Simple implementation of hashgraph consensus](https://github.com/conanwu777/hashgraph)
