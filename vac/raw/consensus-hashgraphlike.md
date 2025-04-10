@@ -42,6 +42,7 @@ Each sending message counts as a round after log(n) rounds all users in the netw
 have the others vote if at least 2/3 number of users are honest where honesty follows the protocol.
 
 In general, the voting-based consensus consists of the following phases:
+
 1. Initialization of voting
 2. Exchanging votes across the rounds
 3. Counting the votes
@@ -58,7 +59,7 @@ In general, the voting-based consensus consists of the following phases:
 A user initializes the voting with the proposal payload which is
 implemented using [protocol buffers v3](https://protobuf.dev/) as follows:
 
-```
+```bash
 syntax = "proto3";
 
 package vac.voting;
@@ -95,28 +96,27 @@ to the random peer from the network or sends it to the proposal to the specific 
 
 Once the peer receives the proposal message P_1 with its votes does the following checks:
 
-- Check the signatures of the voting
-(should it be the recursive from the first one to the last one)
+- Check the signatures of the voting(should it be the recursive from the first one to the last one)
 - Check the hash checks in particular:
-    - Parenthash check prevents double voting
-    - Receivedhash check provides tampering attacks
+  - Parenthash check prevents double voting
+  - Receivedhash check provides tampering attacks
  
 In particular, proposal message P_1 where its vote V_1 = P_1.votes[0] and performs as follows:
 - Verifies the vote V_1.signature with with the V_1.vote_owner in the proposal.
 - If the peer verifies the signature,
 it continues to create P_2 with the new vote V_2 that consists of as following:
-    - adding its public key
-    - timestamp
-    - boolean vote
-    - V_2.parent_hash = 0 if there is no previous peer's vote, otherwise Hash of previous owner's vote
-    - V_2.received_hash = P_1.votes[0]
-    - Calculates vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
+  - adding its public key
+  - timestamp
+  - boolean vote
+  - V_2.parent_hash = 0 if there is no previous peer's vote, otherwise Hash of previous owner's vote
+  - V_2.received_hash = P_1.votes[0]
+  - Calculates vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
     then adds the V_2.vote_hash
-    - Sign vote_hash with its private key then adds V_2.vote_hash.
+  - Sign vote_hash with its private key then adds V_2.vote_hash.
 - Create P_2 with by adding V_2 as follows:
-    - P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
-    - Add the V_2 to the P_2.Votes list.
-    - Increase the voting_round by one.
+  - P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
+  - Add the V_2 to the P_2.Votes list.
+  - Increase the voting_round by one.
 
 After the peer creates the proposal P_2 with its vote V_2,
 sends it to the random peer from the network or
@@ -133,14 +133,14 @@ traversing the accumulated Votes in the proposal.
 If this method returns true, then we check the strong validation of the vote as follows:
 
 - Check each signature in the vote
-    - as shown in the section Exchanging votes across the peers.
+  - as shown in the section Exchanging votes across the peers.
 - check the parent hash chain
-    - if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
+  - if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
     the parent hash of vote_i+1 should be the hash of vote_i
 - check the previous hash chain
-    - each received hash of vote_i+1 should be equal to the hash of vote_i.
+  - each received hash of vote_i+1 should be equal to the hash of vote_i.
 - Check the timestamp against the replay attack: 
-    - timestamps check the freshness of the message against the replay.
+  - timestamps check the freshness of the message against the replay.
     In particular, the timestamp cannot be the old in the determined threshold.
  
 If a proposal is verified by all the checks,
