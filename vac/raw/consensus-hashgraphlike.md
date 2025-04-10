@@ -9,21 +9,22 @@ contributors:
 ---
 ## Abstract
 
-The following specification covers the scalable, decentralized and 
+The following specification covers the scalable, decentralized and
 BFT-based consensus mechanism which is based on hashgraph and voting for P2P networks.
 
 ## Motivation
 
-Consensus is one of the essential components of decentralization. 
-In particular, the decentralized group messaging application is used for 
-binary decision-making to govern the group. 
-Therefore, each user contributes to the decision-making process. 
-Besides achieving decentralization, the consensus mechanism MUST be strong: 
-under the assumption of at least 2/3 honest users in the network, 
-each user MUST conclude the same decision and scalability: 
-the rounds MUST be growth logarithmic so as not to lose the scalability of the messaging applications. 
+Consensus is one of the essential components of decentralization.
+In particular, the decentralized group messaging application is used for
+binary decision-making to govern the group.
+Therefore, each user contributes to the decision-making process.
+Besides achieving decentralization, the consensus mechanism MUST be strong:
+under the assumption of at least 2/3 honest users in the network,
+each user MUST conclude the same decision and scalability:
+the rounds MUST be growth logarithmic so as not to lose the scalability of the messaging applications.
 
 ## Format Specification
+
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, 
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document 
 are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
