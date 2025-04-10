@@ -100,7 +100,7 @@ Once the peer receives the proposal message P_1 with its votes does the followin
 - Check the hash checks in particular:
   - Parenthash check prevents double voting
   - Receivedhash check provides tampering attacks
- 
+
 In particular, proposal message P_1 where its vote V_1 = P_1.votes[0] and performs as follows:
 - Verifies the vote V_1.signature with with the V_1.vote_owner in the proposal.
 - If the peer verifies the signature,
@@ -139,17 +139,17 @@ If this method returns true, then we check the strong validation of the vote as 
     the parent hash of vote_i+1 should be the hash of vote_i
 - check the previous hash chain
   - each received hash of vote_i+1 should be equal to the hash of vote_i.
-- Check the timestamp against the replay attack: 
+- Check the timestamp against the replay attack:
   - timestamps check the freshness of the message against the replay.
     In particular, the timestamp cannot be the old in the determined threshold.
- 
+
 If a proposal is verified by all the checks,
 the countVote method counts each YES vote from the accumulated Votes.
 If the YES votes are greater than the n/2, the result is YES.
 The peer calculates the result and broadcasts it.
 Otherwise, the voting MUST be continued.
 
-## Security 
+## Security
 
 This RFC uses cryptographic primitives to prevent the
 malicious behaviours as follows:
@@ -158,4 +158,4 @@ malicious behaviours as follows:
 - Integrity breaking attempt: tampering history by changing previous votes.
 - Replay attack: storing the old votes to maliciously use in fresh voting.
 
-## References 
+## References
