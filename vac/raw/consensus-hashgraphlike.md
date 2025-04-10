@@ -166,6 +166,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-* [Hedera Hashgraph](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus)
-* [Gossip about gossip](https://docs.hedera.com/hedera/core-concepts/hashgraph-consensus-algorithms/gossip-about-gossip)
-* [Simple implementation of hashgraph consensus](https://github.com/conanwu777/hashgraph)
+- [Hedera Hashgraph](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus)
+- [Gossip about gossip](https://docs.hedera.com/hedera/core-concepts/hashgraph-consensus-algorithms/gossip-about-gossip)
+- [Simple implementation of hashgraph consensus](https://github.com/conanwu777/hashgraph)
