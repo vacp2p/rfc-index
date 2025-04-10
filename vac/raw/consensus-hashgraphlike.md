@@ -102,6 +102,7 @@ Once the peer receives the proposal message P_1 with its votes does the followin
   - Receivedhash check provides tampering attacks
 
 In particular, proposal message P_1 where its vote V_1 = P_1.votes[0] and performs as follows:
+
 - Verifies the vote V_1.signature with with the V_1.vote_owner in the proposal.
 - If the peer verifies the signature,
 it continues to create P_2 with the new vote V_2 that consists of as following:
@@ -153,6 +154,7 @@ Otherwise, the voting MUST be continued.
 
 This RFC uses cryptographic primitives to prevent the
 malicious behaviours as follows:
+
 - Vote forgery attempt: creating unsigned invalid votes
 - Inconsistent voting: both yes and no voting in different stages.
 - Integrity breaking attempt: tampering history by changing previous votes.
