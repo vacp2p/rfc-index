@@ -2,6 +2,7 @@
 slug: 13
 title: 13/WAKU2-STORE
 name: Waku Store Query
+status: draft
 tags: waku-core
 version: 01
 editor: Hanno Cornelius <hanno@status.im>
@@ -11,7 +12,7 @@ contributors:
   - Aaryamann Challani <p1ge0nh8er@proton.me>
   - Sanaz Taheri <sanaz@status.im>
 ---
-Previous version: [00](waku/standards/core/13/previous-versions/00/store.md)
+Previous version: [00](/waku/standards/core/13/previous-versions/00/store.md)
 
 ## Abstract
 
