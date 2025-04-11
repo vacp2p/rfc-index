@@ -68,13 +68,12 @@ The following status codes are defined:
 
 A Waku Message in JSON Format:
 
-```ts
-{
-    payload: string;
-    contentTopic: string;
-    version: number;
-    timestamp: number;
-}
+```ts {
+  type JsonMessage* = ref object # https://rfc.vac.dev/spec/36/#jsonmessage-type
+  payload*: Base64String
+  contentTopic*: string
+  version*: uint
+  }
 ```
 
 Fields:
@@ -95,7 +94,6 @@ interface DecodedPayload {
     pubkey?: string;
     signature?: string;
     data: string;
-    padding: string;
   }
 ```
 
@@ -112,10 +110,9 @@ hex encoded with `0x` prefix,
 The criteria to create subscription to a light node in JSON Format:
 
 ```ts
-{
-    contentFilters: ContentFilter[];
-    pubsubTopic: string?;
-}
+  type FilterSubscription* = object
+  peerId*: string
+  filterCriteria*: seq[FilterTopic]
 ```
 
 Fields:
@@ -823,7 +820,7 @@ This list has this format:
     "peerID": "16Uiu2HAmJb2e28qLXxT5kZxVUUoJt72EMzNGXB47RedcBafeDCBA",
     "protocols": [
       "/ipfs/id/1.0.0",
-      "/vac/waku/relay/2.0.0",
+      "/waku/relay/2.0.0",
       "/ipfs/ping/1.0.0"
     ],
     "addrs": [
@@ -846,7 +843,7 @@ This list has this format:
 extern int waku_content_topic(char* applicationName, unsigned int applicationVersion, char* contentTopicName, char* encoding, WakuCallBack onOkCb){}
 ```
 
-Create a content topic string according to [RFC 23](../../../informational/23/topics.md).
+Create a content topic string according to [RFC 23](waku/informational/23/waku2-topics.md).
 
 Parameters
 
@@ -861,7 +858,7 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will receive the content topic formatted according to [RFC 23](../../../informational/23/topics.md):
+`onOkCb` will receive the content topic formatted according to [RFC 23](waku/informational/23/waku2-topics.md):
 `/{application-name}/{version-of-the-application}/{content-topic-name}/{encoding}`
 - 1 - The operation failed for any reason.
 - 2 - The function is missing the `onOkCb` callback
@@ -872,7 +869,7 @@ Returns
 extern int waku_pubsub_topic(char* name, char* encoding, WakuCallBack onOkCb){}
 ```
 
-Create a pubsub topic string according to [RFC 23](../../../informational/23/topics.md).
+Create a pubsub topic string according to [RFC 23](waku/informational/23/waku2-topics.md).
 
 Parameters
 
@@ -885,7 +882,7 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will get populated with a pubsub topic formatted according to [RFC 23](../../../informational/23/topics.md):
+`onOkCb` will get populated with a pubsub topic formatted according to [RFC 23](waku/informational/23/waku2-topics.md):
 `/waku/2/{topic-name}/{encoding}`
 - 1 - The operation failed for any reason.
 - 2 - The function is missing the `onOkCb` callback
@@ -897,7 +894,7 @@ extern int waku_default_pubsub_topic(WakuCallBack onOkCb){}
 ```
 
 Returns the default pubsub topic used for exchanging waku messages
-defined in [RFC 10](../10/waku2.md).
+defined in [RFC 10](waku/standards/core/10/waku2.md).
 
 Parameters
 
@@ -923,7 +920,7 @@ Publish a message using Waku Relay.
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md)
+JSON string containing the [Waku Message](waku/standards/core/14/waku2-message.md)
 as [`JsonMessage`](#jsonmessage-type).
 2. `char* pubsubTopic`: pubsub topic on which to publish the message.
    If `NULL`, it uses the default pubsub topic.
@@ -1028,7 +1025,8 @@ For Example:
 extern int waku_relay_unsubscribe(char* topic, WakuCallBack onErrCb)
 ```
 
-Closes the pubsub subscription to a pubsub topic. No more messages will be received
+Closes the pubsub subscription to a pubsub topic.
+No more messages will be received
 from this pubsub topic.
 
 Parameters
@@ -1077,7 +1075,7 @@ i.e `["pubsubTopic1", "pubsubTopic2"]`
 extern int waku_filter_subscribe(char* filterJSON, char* peerID, int timeoutMs, WakuCallBack onOkCb, WakuCallBack onErrCb)
 ```
 
-Creates a subscription to a filter full node matching a content filter..
+Creates a subscription to a filter full node matching a content filter.
 
 Parameters
 
@@ -1350,7 +1348,7 @@ Publish a message using Waku Lightpush.
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
+JSON string containing the [Waku Message](waku/standards/core/14/waku2-message.md) as [`JsonMessage`](#jsonmessage-type).
 2. `char* pubsubTopic`: pubsub topic on which to publish the message.
    If `NULL`, it uses the default pubsub topic.
 3. `char* peerID`: Peer ID supporting the lightpush protocol.
@@ -1465,7 +1463,7 @@ Encrypt a message using symmetric encryption and optionally sign the message
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
+JSON string containing the [Waku Message](waku/standards/core/14/waku2-message.md) as [`JsonMessage`](#jsonmessage-type).
 2. `char* symmetricKey`: hex encoded secret key to be used for encryption.
 3. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
@@ -1495,7 +1493,7 @@ Encrypt a message using asymmetric encryption and optionally sign the message
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
+JSON string containing the [Waku Message](waku/standards/core/14/waku2-message.md) as [`JsonMessage`](#jsonmessage-type).
 2. `char* publicKey`: hex encoded public key to be used for encryption.
 3. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
@@ -1527,7 +1525,7 @@ Decrypt a message using a symmetric key
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
+JSON string containing the [Waku Message](waku/standards/core/14/waku2-message.md) as [`JsonMessage`](#jsonmessage-type).
 2. `char* symmetricKey`: 32 byte symmetric key hex encoded.
 3. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
@@ -1565,7 +1563,7 @@ Decrypt a message using a secp256k1 private key
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
+JSON string containing the [Waku Message](waku/standards/core/14/waku2-message.md) as [`JsonMessage`](#jsonmessage-type).
 2. `char* privateKey`: secp256k1 private key hex encoded.
 3. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
