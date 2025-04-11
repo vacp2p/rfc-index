@@ -5,6 +5,7 @@ name: Waku v2 Client Parameter Configuration Recommendations
 status: draft
 editor: Hanno Cornelius <hanno@status.im>
 contributors:
+ - Filip Dimitrijevic <filip@status.im>
 ---
 
 `29/WAKU2-CONFIG` describes the RECOMMENDED values
@@ -12,7 +13,7 @@ to assign to configurable parameters for Waku v2 clients.
 Since Waku v2 is built on [libp2p](https://github.com/libp2p/specs),
 most of the parameters and reasonable defaults are derived from there.
 
-Waku v2 relay messaging is specified in [`11/WAKU2-RELAY`](../../standards/core/11/relay.md),
+Waku v2 relay messaging is specified in [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md),
 a minor extension of the [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md).
 GossipSub behaviour is controlled by a series of adjustable parameters.
 Waku v2 clients SHOULD configure these parameters to the recommended values below.
@@ -26,7 +27,7 @@ We repeat them here with RECOMMMENDED values for `11/WAKU2-RELAY` implementation
 |----------------------|-------------------------------------------------------|-------------------|
 | `D`                  | The desired outbound degree of the network            | 6                 |
 | `D_low`              | Lower bound for outbound degree                       | 4                 |
-| `D_high`             | Upper bound for outbound degree                       | 8                |
+| `D_high`             | Upper bound for outbound degree                       | 8                 |
 | `D_lazy`             | (Optional) the outbound degree for gossip emission    | `D`               |
 | `heartbeat_interval` | Time between heartbeats                               | 1 second          |
 | `fanout_ttl`         | Time-to-live for each topic's fanout state            | 60 seconds        |
@@ -36,9 +37,10 @@ We repeat them here with RECOMMMENDED values for `11/WAKU2-RELAY` implementation
 
 ## GossipSub v1.1 parameters
 
-GossipSub v1.1 extended GossipSub v1.0 and introduced [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
-We repeat the global parameters here with RECOMMMENDED values
-for `11/WAKU2-RELAY` implementations.
+GossipSub v1.1 extended GossipSub v1.0 and
+introduced [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters).
+We repeat the global parameters here
+with RECOMMMENDED values for `11/WAKU2-RELAY` implementations.
 
 | Parameter      | Description                                                            | RECOMMENDED value |
 |----------------|------------------------------------------------------------------------|-------------------|
@@ -73,7 +75,7 @@ Copyright and related rights waived via
 ## References
 
 - [libp2p](https://github.com/libp2p/specs)
-- [11/WAKU2-RELAY](../../standards/core/11/relay.md)
+- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
 - [libp2p GossipSub protocol](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
 - [corresponding libp2p specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md#parameters)
 - [several new parameters](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#overview-of-new-parameters)
