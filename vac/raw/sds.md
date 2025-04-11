@@ -69,12 +69,17 @@ Messages MUST adhere to the following meta structure:
 ```protobuf
 syntax = "proto3";
 
+message HistoryEntry {
+  string message_id = 1; // Unique identifier of the SDS message, as defined in `Message`
+  optional bytes retrieval_hint = 2; // Optional information to help remote parties retrieve this SDS message; For example, A Waku deterministic message hash or routing payload hash
+}
+
 message Message {
   // 1 Reserved for sender/participant id
   string message_id = 2;          // Unique identifier of the message
   string channel_id = 3;          // Identifier of the channel to which the message belongs
   optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
-  repeated string causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
+  repeated HistoryEntry causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
   optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
   optional bytes content = 20;             // Actual content of the message
 }
@@ -137,6 +142,10 @@ include this in the `lamport_timestamp` field.
 and include these in an ordered list in the `causal_history` field.
 The number of message IDs to include in the `causal_history` depends on the application.
 We recommend a causal history of two message IDs.
+* the participant MAY include a `retrieval_hint` in the `HistoryEntry`
+for each message ID in the `causal_history` field.
+This is an application-specific field to facilitate retrieval of messages,
+e.g. from high-availability caches.
 * the participant MUST include the current `bloom_filter`
 state in the broadcast message.
 
@@ -151,13 +160,14 @@ Upon receiving a message,
 * the participant MUST [review the ACK status](#review-ack-status) of messages
 in its unacknowledged outgoing buffer
 using the received message's causal history and bloom filter.
-* the participant MUST include the received message ID in its local bloom filter.
+* if the message has a populated `content` field,
+the participant MUST include the received message ID in its local bloom filter.
 * the participant MUST verify that all causal dependencies are met
 for the received message.
 Dependencies are met if the message IDs in the `causal_history` of the received message
 appear in the local history of the receiving participant.
 
-If all dependencies are met,
+If all dependencies are met and the message has a populated `content` field,
 the participant MUST [deliver the message](#deliver-message).
 If dependencies are unmet,
 the participant MUST add the message to the incoming buffer of messages
@@ -207,6 +217,7 @@ For each message in the incoming buffer:
 
 * the participant MAY attempt to retrieve missing dependencies from the Store node
 (high-availability cache) or other peers.
+It MAY use the application-specific `retrieval_hint` in the `HistoryEntry` to facilitate retrieval.
 * if all dependencies of a message are met,
 the participant MUST proceed to [deliver the message](#deliver-message).
 
@@ -225,14 +236,26 @@ prioritizing **unacknowledged** messages.
 #### Periodic Sync Message
 
 For each channel of communication,
-participants SHOULD periodically send an empty-content message to maintain sync state,
-without incrementing the Lamport timestamp.
+participants SHOULD periodically send sync messages to maintain state.
+These sync messages:
+
+* MUST be sent with empty content
+* MUST include an incremented Lamport timestamp
+* MUST include causal history and bloom filter according to regular message rules
+* MUST NOT be added to the unacknowledged outgoing buffer
+* MUST NOT be included in causal histories of subsequent messages
+* MUST NOT be included in bloom filters
+* MUST NOT be added to the local log
+
+Since sync messages are not persisted,
+they MAY have non-unique message IDs without impacting the protocol.
 To avoid network activity bursts in large groups,
 a participant MAY choose to only send periodic sync messages
 if no other messages have been broadcast in the channel after a random backoff period.
 
-Participants MUST process these sync messages
-following the same steps as regular messages.
+Participants MUST process the causal history and bloom filter of these sync messages
+following the same steps as regular messages,
+but MUST NOT persist the sync messages themselves.
 
 #### Ephemeral Messages
 
