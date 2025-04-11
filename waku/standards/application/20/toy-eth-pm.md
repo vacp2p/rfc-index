@@ -10,28 +10,37 @@ contributors:
 
 **Content Topics**:
 
-- Public Key Broadcast: `/eth-pm/1/public-key/proto`,
-- Private Message: `/eth-pm/1/private-message/proto`.
+- Public Key Broadcast: `/eth-pm/1/public-key/proto`
+- Private Message: `/eth-pm/1/private-message/proto`
+
+## Abstract
 
 This specification explains the Toy Ethereum Private Message protocol
 which enables a peer to send an encrypted message to another peer
-using the Waku v2 network, and the peer's Ethereum address.
-
-The main purpose of this specification
-is to demonstrate how Waku v2 can be used for encrypted messaging purposes,
-using Ethereum accounts for identity.
-This protocol caters for Web3 wallets restrictions,
-allowing it to be implemented only using standard Web3 API.
-In the current state,
-the protocol has privacy and features [limitations](#limitations),
-has not been audited and hence is not fit for production usage.
-We hope this can be an inspiration for developers
-wishing to build on top of Waku v2.
+over the Waku network using the peer's Ethereum address.
 
 ## Goal
 
-Alice wants to send an encrypted message to Bob, where only Bob can decrypt the message.
+Alice wants to send an encrypted message to Bob,
+where only Bob can decrypt the message.
 Alice only knows Bob's Ethereum Address.
+
+The goal of this specification
+is to demonstrate how Waku can be used for encrypted messaging purposes,
+using Ethereum accounts for identity.
+This protocol caters to Web3 wallet restrictions,
+allowing it to be implemented using standard Web3 API.
+In the current state,
+Toy Ethereum Private Message, ETH-PM, has privacy and features [limitations](#limitations),
+has not been audited and hence is not fit for production usage.
+We hope this can be an inspiration for developers
+wishing to build on top of Waku.
+
+## Design Requirements
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”,
+“SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ## Variables
 
@@ -42,19 +51,17 @@ Here are the variables used in the protocol and their definition:
 - `B'` is Bob's Encryption Public Key, for which `b'` is the private key.
 - `M` is the private message that Alice sends to Bob.
 
-## Design Requirements
-
 The proposed protocol MUST adhere to the following design requirements:
 
-1. Alice knows Bob's Ethereum address,
-2. Bob is willing to participate to Eth-PM, and publishes `B'`,
-3. Bob's ownership of `B'` MUST be verifiable,
-4. Alice wants to send message `M` to Bob,
-5. Bob SHOULD be able to get `M` using [10/WAKU2 spec](../../core/10/waku2.md),
-6. Participants only have access to their Ethereum Wallet via the Web3 API,
-7. Carole MUST NOT be able to read `M`'s content
-even if she is storing it or relaying it,
-8. [Waku Message Version 1](../26/payload.md) Asymmetric Encryption
+1. Alice knows Bob's Ethereum address
+2. Bob is willing to participate to Eth-PM, and publishes `B'`
+3. Bob's ownership of `B'` MUST be verifiable
+4. Alice wants to send message `M` to Bob
+5. Bob SHOULD be able to get `M` using [10/WAKU2](waku/standards/core/10/waku2.md)
+6. Participants only have access to their Ethereum Wallet via the Web3 API
+7. Carole MUST NOT be able to read `M`'s content,
+even if she is storing it or relaying it
+8. [Waku Message Version 1](waku/standards/application/26/payload.md) Asymmetric Encryption
 is used for encryption purposes.
 
 ## Limitations
@@ -72,14 +79,14 @@ If Bob's private key is compromised, past and future messages could be decrypted
 A solution combining regular [X3DH](https://www.signal.org/docs/specifications/x3dh/)
 bundle broadcast with [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 encryption would remove these limitations;
-See the [Status secure transport spec](https://specs.status.im/spec/5)
+See the [Status secure transport specification](status/deprecated/secure-transport.md)
 for an example of a protocol that achieves this in a peer-to-peer setting.
 
 Bob MUST decide to participate in the protocol before Alice can send him a message.
-This is discussed in more in details in
+This is discussed in more detail in
 [Consideration for a non-interactive/uncoordinated protocol](#consideration-for-a-non-interactiveuncoordinated-protocol)
 
-## The protocol
+## The Protocol
 
 ### Generate Encryption KeyPair
 
@@ -100,7 +107,7 @@ Bob MUST sign `B'` using `B`.
 
 To prove ownership of the Encryption Public Key,
 Bob must sign it using [EIP-712](https://eips.ethereum.org/EIPS/eip-712) v3,
-meaning calling `eth_signTypedData_v3` on his Wallet's API.
+meaning calling `eth_signTypedData_v3` on his wallet's API.
 
 Note: While v4 also exists, it is not available on all wallets and
 the features brought by v4 is not needed for the current use case.
@@ -156,9 +163,9 @@ message PublicKeyMessage {
 }
 ```
 
-This MUST be wrapped in a Waku Message version 0,
+This MUST be wrapped in a [14/WAKU-MESSAGE](/waku/standards/core/14/message.md) version 0,
 with the Public Key Broadcast content topic.
-Finally, Bob SHOULD publish the message on Waku v2.
+Finally, Bob SHOULD publish the message on Waku.
 
 ## Consideration for a non-interactive/uncoordinated protocol
 
@@ -169,7 +176,7 @@ it is not enough in itself to deduce Bob's Public Key.
 This is why the protocol dictates that Bob MUST send his Public Key first,
 and Alice MUST receive it before she can send him a message.
 
-Moreover, nim-waku, the reference implementation of [13/WAKU2-STORE](../../core/13/store.md),
+Moreover, nwaku, the reference implementation of [13/WAKU2-STORE](/waku/standards/core/13/store.md),
 stores messages for a maximum period of 30 days.
 This means that Bob would need to broadcast his public key
 at least every 30 days to be reachable.
@@ -201,7 +208,7 @@ Note that these would resolve a UX issue
 only if a sender wants to proceed with _air drops_.
 
 Indeed, if Bob does not publish his Public Key in the first place
-then it can be an indication that he simply does not participate in this protocol
+then it MAY be an indication that he does not participate in this protocol
 and hence will not receive messages.
 
 However, these solutions would be helpful
@@ -221,7 +228,7 @@ Another improvement would be for Bob not having to re-publish his public key
 every 30 days or less.
 Similarly to above,
 if Bob stops publishing his public key
-then it may be an indication that he does not participate in the protocol anymore.
+then it MAY be an indication that he does not participate in the protocol anymore.
 
 In any case,
 the protocol could be modified to store the Public Key in a more permanent storage,
@@ -229,19 +236,19 @@ such as a dedicated smart contract on the blockchain.
 
 ## Send Private Message
 
-Alice MAY monitor the Waku v2 to collect Ethereum Address and
+Alice MAY monitor the Waku network to collect Ethereum Address and
 Encryption Public Key tuples.
 Alice SHOULD verify that the `signature`s of `PublicKeyMessage`s she receives
 are valid as per EIP-712.
 She SHOULD drop any message without a signature or with an invalid signature.
 
 Using Bob's Encryption Public Key,
-retrieved via [10/WAKU2 spec](../../core/10/waku2.md),
+retrieved via [10/WAKU2](/waku/standards/core/10/waku2.md),
 Alice MAY now send an encrypted message to Bob.
 
 If she wishes to do so,
 Alice MUST encrypt her message `M` using Bob's Encryption Public Key `B'`,
-as per [26/WAKU-PAYLOAD Asymmetric Encryption specs](../26/payload.md/#asymmetric).
+as per [26/WAKU-PAYLOAD Asymmetric Encryption specs](waku/standards/application/26/payload.md/#asymmetric).
 
 Alice SHOULD now publish this message on the Private Message content topic.
 
@@ -251,11 +258,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [10/WAKU2 spec](../../core/10/waku2.md)
-- [Waku Message Version 1](../26/payload.md)
+- [10/WAKU2](/waku/standards/core/10/waku2.md)
+- [Waku Message Version 1](waku/standards/application/26/payload.md)
 - [X3DH](https://www.signal.org/docs/specifications/x3dh/)
 - [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
-- [Status secure transport spec](https://specs.status.im/spec/5)
+- [Status secure transport specification](status/deprecated/secure-transport.md)
 - [EIP-712](https://eips.ethereum.org/EIPS/eip-712)
-- [13/WAKU2-STORE](../../core/13/store.md)
+- [13/WAKU2-STORE](/waku/standards/core/13/store.md)
 - [The Graph](https://thegraph.com/)
