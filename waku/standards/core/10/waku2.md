@@ -27,7 +27,7 @@ These capabilities are things such as:
 This makes Waku ideal for running a p2p protocol on mobile devices and
 other similar restricted environments.
 
-Historically, it has its roots in [6/WAKU1](/waku/standards/core/legacy/6/waku1.md),
+Historically, it has its roots in [6/WAKU1](/waku/standards/legacy/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627),
 originally part of the Ethereum stack.
 However, Waku acts more as a thin wrapper for Pub/Sub and has a different API.
