@@ -1,5 +1,5 @@
 ---
-title: VAC-DECENTRALIZED-MESSAGING-ETHEREUM
+title: ETH-DCGKA
 name: Decentralized Key and Session Setup for Secure Messaging over Ethereum
 status: raw
 category: informational

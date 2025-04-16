@@ -1,5 +1,5 @@
 ---
-title: ETH-SECURE-CHANNEL
+title: NOISE-X3DH-DOUBLE-RATCHET
 name: Secure 1-to-1 channel setup using X3DH and the double ratchet
 status: raw
 category: Standards Track
