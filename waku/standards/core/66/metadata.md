@@ -5,12 +5,13 @@ name: Waku Metadata Protocol
 status: draft
 editor: Alvaro Revuelta <alrevuelta@status.im>
 contributors:
+ - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
 
 This specification describes the metadata
-that can be associated with a [10/WAKU2](../10/waku2.md) node.
+that can be associated with a [10/WAKU2](/waku/standards/core/10/waku2.md) node.
 
 ## Metadata Protocol
 
@@ -49,8 +50,9 @@ message WakuMetadataResponse {
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
 
-* [10/WAKU2](../10/waku2.md)
+* [10/WAKU2](/waku/standards/core/10/waku2.md)
