@@ -27,7 +27,7 @@ These capabilities are things such as:
 This makes Waku ideal for running a p2p protocol on mobile devices and
 other similar restricted environments.
 
-Historically, it has its roots in [6/WAKU1](waku/standards/core/legacy/6/waku1.md),
+Historically, it has its roots in [6/WAKU1](/waku/standards/legacy/6/waku1.md),
 which stems from [Whisper](https://eips.ethereum.org/EIPS/eip-627),
 originally part of the Ethereum stack.
 However, Waku acts more as a thin wrapper for Pub/Sub and has a different API.
@@ -89,7 +89,7 @@ For example:
 - Stronger guarantees for spam protection vs economic registration cost
 
 For more on the concept of adaptive nodes and what this means in practice,
-please see the [30/ADAPTIVE-NODES](waku/informational/30/adaptive-nodes.md) spec.
+please see the [30/ADAPTIVE-NODES](/waku/informational/30/adaptive-nodes.md) spec.
 
 ## Specification
 
@@ -123,17 +123,17 @@ Since these aren't negotiated libp2p protocols,
 they are referred to by their RFC ID.
 For example:
 
-- [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) and
-[26/WAKU-PAYLOAD](waku/standards/application/26/payload.md) for message payloads
-- [23/WAKU2-TOPICS](waku/informational/23/topics.md) and
-[27/WAKU2-PEERS](waku/informational/27/peers.md) for recommendations around usage
+- [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) and
+[26/WAKU-PAYLOAD](/waku/standards/application/26/payload.md) for message payloads
+- [23/WAKU2-TOPICS](/waku/informational/23/topics.md) and
+[27/WAKU2-PEERS](/waku/informational/27/peers.md) for recommendations around usage
 
 There are also more experimental libp2p protocols such as:
 
 1. `/vac/waku/waku-rln-relay/2.0.0-alpha1`
 2. `/vac/waku/peer-exchange/2.0.0-alpha1`
 
-The semantics of these protocols are referred to by RFC ID [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md) and [34/WAKU2-PEER-EXCHANGE](waku/standards/core/34/peer-exchange.md).
+The semantics of these protocols are referred to by RFC ID [17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md) and [34/WAKU2-PEER-EXCHANGE](/waku/standards/core/34/peer-exchange.md).
 
 #### Use of libp2p and Protobuf
 
@@ -151,12 +151,12 @@ Waku is using gossiping to disseminate messages throughout the network.
 
 **Protocol identifier**: `/vac/waku/relay/2.0.0`
 
-See [11/WAKU2-RELAY](waku/standards/core/11/relay.md) specification for more details.
+See [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) specification for more details.
 
 For an experimental privacy-preserving economic spam protection mechanism,
-see [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md).
+see [17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md).
 
-See [23/WAKU2-TOPICS](waku/informational/23/topics.md)
+See [23/WAKU2-TOPICS](/waku/informational/23/topics.md)
 for more information about the recommended topic usage.
 
 #### Direct use of libp2p protocols
@@ -248,18 +248,18 @@ such as low bandwidth or being mostly offline.
 **Protocol identifier***: `/vac/waku/store-query/3.0.0`
 
 This is used to fetch historical messages for mostly offline devices.
-See [13/WAKU2-STORE spec](waku/standards/core/13/store.md) specification for more details.
+See [13/WAKU2-STORE spec](/waku/standards/core/13/store.md) specification for more details.
 
 There is also an experimental fault-tolerant addition to the store protocol
 that relaxes the high availability requirement.
-See [21/WAKU2-FAULT-TOLERANT-STORE](waku/standards/application/21/fault-tolerant-store.md)
+See [21/WAKU2-FAULT-TOLERANT-STORE](/waku/standards/application/21/fault-tolerant-store.md)
 
 #### Content Filtering
 
 **Protocol identifier***: `/vac/waku/filter/2.0.0-beta1`
 
 This is used to preserve more bandwidth when fetching a subset of messages.
-See [12/WAKU2-FILTER](waku/standards/core/12/filter.md) specification for more details.
+See [12/WAKU2-FILTER](/waku/standards/core/12/filter.md) specification for more details.
 
 #### LightPush
 
@@ -267,7 +267,7 @@ See [12/WAKU2-FILTER](waku/standards/core/12/filter.md) specification for more d
 
 This is used for nodes with short connection windows and
 limited bandwidth to publish messages into the Waku network.
-See [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md) specification for more details.
+See [19/WAKU2-LIGHTPUSH](/waku/standards/core/19/lightpush.md) specification for more details.
 
 #### Other Protocols
 
@@ -286,55 +286,55 @@ The protocols initially mounted are indicated as such.
 The PubSub topics `pubtopic1` and
 `pubtopic2` is used for routing and
 indicates that it is subscribed to messages on that topic for relay,
-see [11/WAKU2-RELAY](waku/standards/core/11/relay.md) for details.
-Ditto for [13/WAKU2-STORE](waku/standards/core/13/store.md)
+see [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) for details.
+Ditto for [13/WAKU2-STORE](/waku/standards/core/13/store.md)
 where it indicates that these messages are persisted on that node.
 
 1. Node A creates a WakuMessage `msg1` with a ContentTopic `contentTopic1`.
-See [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) for more details.
+See [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) for more details.
 If WakuMessage version is set to 1,
-we use the [6/WAKU1](waku/standards/legacy/6/waku1.md) compatible `data` field with encryption.
-See [7/WAKU-DATA](waku/standards/legacy/7/data.md) for more details.
+we use the [6/WAKU1](/waku/standards/legacy/6/waku1.md) compatible `data` field with encryption.
+See [7/WAKU-DATA](/waku/standards/legacy/7/data.md) for more details.
 
 2. Node F requests to get messages filtered by PubSub topic `pubtopic1` and
 ContentTopic `contentTopic1`.
 Node D subscribes F to this filter and
 will in the future forward messages that match that filter.
-See [12/WAKU2-FILTER](waku/standards/core/12/filter.md) for more details.
+See [12/WAKU2-FILTER](/waku/standards/core/12/filter.md) for more details.
 
 3. Node A publishes `msg1` on `pubtopic1` and
 subscribes to that relay topic.
 It then gets relayed further from B to D, but
 not C since it doesn't subscribe to that topic.
-See [11/WAKU2-RELAY](waku/standards/core/11/relay.md).
+See [11/WAKU2-RELAY](/waku/standards/core/11/relay.md).
 
 4. Node D saves `msg1` for possible later retrieval by other nodes.
-See [13/WAKU2-STORE](waku/standards/core/13/store.md).
+See [13/WAKU2-STORE](/waku/standards/core/13/store.md).
 
 5. Node D also pushes `msg1` to F,
 as it has previously subscribed F to this filter.
-See [12/WAKU2-FILTER](waku/standards/core/12/filter.md).
+See [12/WAKU2-FILTER](/waku/standards/core/12/filter.md).
 
 6. At a later time, Node E comes online.
 It then requests messages matching `pubtopic1` and
 `contentTopic1` from Node D.
 Node D responds with messages meeting this (and possibly other) criteria.
-See [13/WAKU2-STORE](waku/standards/core/13/store.md).
+See [13/WAKU2-STORE](/waku/standards/core/13/store.md).
 
 ## Appendix A: Upgradability and Compatibility
 
 ### Compatibility with Waku Legacy
 
-[6/WAKU1](waku/standards/legacy/6/waku1.md) and Waku are different protocols all together.
+[6/WAKU1](/waku/standards/legacy/6/waku1.md) and Waku are different protocols all together.
 They use a different transport protocol underneath;
-[6/WAKU1](waku/standards/legacy/6/waku1.md) is devp2p RLPx based while Waku uses libp2p.
+[6/WAKU1](/waku/standards/legacy/6/waku1.md) is devp2p RLPx based while Waku uses libp2p.
 The protocols themselves also differ as does their data format.
 Compatibility can be achieved only by using a bridge
 that not only talks both devp2p RLPx and libp2p,
 but that also transfers (partially) the content of a packet from one version
 to the other.
 
-See [15/WAKU-BRIDGE](waku/standards/core/15/bridge.md) for details on a bidirectional bridge mode.
+See [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md) for details on a bidirectional bridge mode.
 
 ## Appendix B: Security
 
@@ -395,14 +395,14 @@ the actors / actors' PII. Concerning anonymity, Waku provides the following feat
 **Publisher-Message Unlinkability**:
 This feature signifies the unlinkability of a publisher
 to its published messages in the 11/WAKU2-RELAY protocol.
-The [Publisher-Message Unlinkability](waku/standards/core/11/relay.md/#security-analysis)
+The [Publisher-Message Unlinkability](/waku/standards/core/11/relay.md/#security-analysis)
 is enforced through the `StrictNoSign` policy due to which the data fields
 of pubsub messages that count as PII for the publisher must be left unspecified.
 
 **Subscriber-Topic Unlinkability**:
 This feature stands for the unlinkability of the subscriber
 to its subscribed topics in the 11/WAKU2-RELAY protocol.
-The [Subscriber-Topic Unlinkability](waku/standards/core/11/relay.md/#security-analysis)
+The [Subscriber-Topic Unlinkability](/waku/standards/core/11/relay.md/#security-analysis)
 is achieved through the utilization of a single PubSub topic.
 As such, subscribers are not re-identifiable from their subscribed topic IDs
 as the entire network is linked to the same topic ID.
@@ -428,7 +428,7 @@ of their connections and remove peers with a low score.
 
 Confidentiality can be addressed through data encryption whereas integrity and
 authenticity are achievable through digital signatures.
-These features are provided for in [14/WAKU2-MESSAGE (version 1)](waku/standards/core/14/message.md/#version-1)`
+These features are provided for in [14/WAKU2-MESSAGE (version 1)](/waku/standards/core/14/message.md/#version-1)`
 through payload encryption as well as encrypted signatures.
 
 ### Security Considerations
@@ -472,39 +472,39 @@ This includes Waku legacy specifications, as they are used for bridging between 
 
 | Spec | nim-waku (Nim) | go-waku (Go) | js-waku (Node JS) | js-waku (Browser JS) |
 | ---- | -------------- | ------------ | ----------------- | -------------------- |
-|[6/WAKU1](waku/standards/legacy/6/waku1.md)|✔||||
-|[7/WAKU-DATA](waku/standards/legacy/7/data.md)|✔|✔|||
-|[8/WAKU-MAIL](waku/standards/legacy/8/mail.md)|✔||||
-|[9/WAKU-RPC](waku/standards/legacy/9/rpc.md)|✔||||
-|[10/WAKU2](waku/standards/core/10/waku2.md)|✔|🚧|🚧|✔|
-|[11/WAKU2-RELAY](waku/standards/core/11/relay.md)|✔|✔|✔|✔|
-|[12/WAKU2-FILTER](waku/standards/core/12/filter.md)|✔|✔|||
-|[13/WAKU2-STORE](waku/standards/core/13/store.md)|✔|✔|✔\*|✔\*|
-|[14/WAKU2-MESSAGE](waku/standards/core/14/message.md))|✔|✔|✔|✔|
-|[15/WAKU2-BRIDGE](waku/standards/core/15/bridge.md)|✔||||
-|[16/WAKU2-RPC](waku/deprecated/16/rpc.md)|✔||||
-|[17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md)|🚧||||
-|[18/WAKU2-SWAP](waku/standards/application/18/swap.md)|🚧||||
-|[19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md)|✔|✔|✔\**|✔\**|
-|[21/WAKU2-FAULT-TOLERANT-STORE](waku/standards/application/21/fault-tolerant-store.md)|✔|✔|||
+|[6/WAKU1](/waku/standards/legacy/6/waku1.md)|✔||||
+|[7/WAKU-DATA](/waku/standards/legacy/7/data.md)|✔|✔|||
+|[8/WAKU-MAIL](/waku/standards/legacy/8/mail.md)|✔||||
+|[9/WAKU-RPC](/waku/standards/legacy/9/rpc.md)|✔||||
+|[10/WAKU2](/waku/standards/core/10/waku2.md)|✔|🚧|🚧|✔|
+|[11/WAKU2-RELAY](/waku/standards/core/11/relay.md)|✔|✔|✔|✔|
+|[12/WAKU2-FILTER](/waku/standards/core/12/filter.md)|✔|✔|||
+|[13/WAKU2-STORE](/waku/standards/core/13/store.md)|✔|✔|✔\*|✔\*|
+|[14/WAKU2-MESSAGE](/waku/standards/core/14/message.md))|✔|✔|✔|✔|
+|[15/WAKU2-BRIDGE](/waku/standards/core/15/bridge.md)|✔||||
+|[16/WAKU2-RPC](/waku/deprecated/16/rpc.md)|✔||||
+|[17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md)|🚧||||
+|[18/WAKU2-SWAP](/waku/standards/application/18/swap.md)|🚧||||
+|[19/WAKU2-LIGHTPUSH](/waku/standards/core/19/lightpush.md)|✔|✔|✔\**|✔\**|
+|[21/WAKU2-FAULT-TOLERANT-STORE](/waku/standards/application/21/fault-tolerant-store.md)|✔|✔|||
 
-*js-waku implements [13/WAKU2-STORE](waku/standards/core/13/store.md) as a querying node only.
-**js-waku only implements [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md) requests.
+*js-waku implements [13/WAKU2-STORE](/waku/standards/core/13/store.md) as a querying node only.
+**js-waku only implements [19/WAKU2-LIGHTPUSH](/waku/standards/core/19/lightpush.md) requests.
 
 ### Recommendations for Clients
 
 To implement a minimal Waku client,
 we recommend implementing the following subset in the following order:
 
-- [10/WAKU2](waku/standards/core/10/waku2.md) - this specification
-- [11/WAKU2-RELAY](waku/standards/core/11/relay.md) - for basic operation
-- [14/WAKU2-MESSAGE](waku/standards/core/14/message.md) - version 0 (unencrypted)
-- [13/WAKU2-STORE](waku/standards/core/13/store.md) - for historical messaging (query mode only)
+- [10/WAKU2](/waku/standards/core/10/waku2.md) - this specification
+- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) - for basic operation
+- [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) - version 0 (unencrypted)
+- [13/WAKU2-STORE](/waku/standards/core/13/store.md) - for historical messaging (query mode only)
 
 To get compatibility with Waku Legacy:
 
-- [7/WAKU-DATA](waku/standards/legacy/7/data.md)
-- [14/WAKU2-MESSAGE](waku/standards/14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
+- [7/WAKU-DATA](/waku/standards/legacy/7/data.md)
+- [14/WAKU2-MESSAGE](/waku/standards/14/message.md) - version 1 (encrypted with `7/WAKU-DATA`)
 
 For an interoperable keep-alive mechanism:
 
@@ -520,7 +520,7 @@ under research and initial implementations:
 
 We aim to enable an incentivized spam protection technique
 to enhance `11/WAKU2-RELAY` by using rate limiting nullifiers.
-More details on this can be found in [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md).
+More details on this can be found in [17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md).
 In this advanced method,
 peers are limited to a certain rate of messaging per epoch and
 an immediate financial penalty is enforced for spammers who break this rate.
@@ -529,7 +529,7 @@ an immediate financial penalty is enforced for spammers who break this rate.
 Denial of service signifies the case where an adversarial node
 exhausts another node's service capacity (e.g., by making a large number of requests)
 and makes it unavailable to the rest of the system.
-DoS attack is to be mitigated through the accounting model as described in [18/WAKU2-SWAP](waku/deprecated/18/swap.md).
+DoS attack is to be mitigated through the accounting model as described in [18/WAKU2-SWAP](/waku/deprecated/18/swap.md).
 In a nutshell, peers have to pay for the service they obtain from each other.
 In addition to incentivizing the service provider,
 accounting also makes DoS attacks costly for malicious peers.
@@ -538,7 +538,7 @@ The accounting model can be used in `13/WAKU2-STORE` and
 
 Additionally, this gives node operators who provide a useful service to the network
 an incentive to perform that service.
-See [18/WAKU2-SWAP](waku/deprecated/18/swap.md)
+See [18/WAKU2-SWAP](/waku/deprecated/18/swap.md)
 for more details on this piece of work.
 
 ## Copyright
@@ -549,31 +549,31 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [libp2p specs](https://github.com/libp2p/specs)
 
-2. [6/WAKU1](waku/standards/legacy/6/waku1.md)
+2. [6/WAKU1](/waku/standards/legacy/6/waku1.md)
 
 3. [Whisper spec (EIP627)](https://eips.ethereum.org/EIPS/eip-627)
 
 4. [Waku v2 plan](https://vac.dev/waku-v2-plan)
 
-5. [30/ADAPTIVE-NODES](waku/informational/30/adaptive-nodes.md)
+5. [30/ADAPTIVE-NODES](/waku/informational/30/adaptive-nodes.md)
 
 6. [Protocol Identifiers](https://docs.libp2p.io/concepts/protocols/)
 
-7. [14/WAKU2-MESSAGE](waku/standards/core/14/message.md)
+7. [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
 
-8. [26/WAKU-PAYLOAD](waku/standards/application/26/payload.md)
+8. [26/WAKU-PAYLOAD](/waku/standards/application/26/payload.md)
 
-9. [23/WAKU2-TOPICS](waku/informational/23/topics.md)
+9. [23/WAKU2-TOPICS](/waku/informational/23/topics.md)
 
-10. [27/WAKU2-PEERS](waku/informational/27/peers.md)
+10. [27/WAKU2-PEERS](/waku/informational/27/peers.md)
 
 11. [bi-directional binary stream](https://docs.libp2p.io/concepts/protocols/)
 
 12. [Protobuf varint encoding](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 
-13. [11/WAKU2-RELAY spec](waku/standards/core/11/relay.md)
+13. [11/WAKU2-RELAY spec](/waku/standards/core/11/relay.md)
 
-14. [17/WAKU2-RLN-RELAY](waku/standards/core/17/rln-relay.md)
+14. [17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md)
 
 15. [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459)
 
@@ -585,17 +585,17 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 19. [EIP-778 ENR (Ethereum Node Records)](https://eips.ethereum.org/EIPS/eip-778)
 
-20. [13/WAKU2-STORE spec](waku/standards/core/13/store.md)
+20. [13/WAKU2-STORE spec](/waku/standards/core/13/store.md)
 
-21. [21/WAKU2-FT-STORE](waku/standards/application/21/ft-store.md)
+21. [21/WAKU2-FT-STORE](/waku/standards/application/21/ft-store.md)
 
-22. [12/WAKU2-FILTER](waku/standards/core/12/filter.md)
+22. [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)
 
-23. [19/WAKU2-LIGHTPUSH](waku/standards/core/19/lightpush.md)
+23. [19/WAKU2-LIGHTPUSH](/waku/standards/core/19/lightpush.md)
 
-24. [7/WAKU-DATA](waku/standards/legacy/7/data.md)
+24. [7/WAKU-DATA](/waku/standards/legacy/7/data.md)
 
-25. [15/WAKU-BRIDGE](waku/standards/core/15/bridge.md)
+25. [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md)
 
 26. [k-anonymity](https://www.privitar.com/blog/k-anonymity-an-introduction/)
 
@@ -607,9 +607,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 30. [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
 
-31. [8/WAKU-MAIL](waku/standards/legacy/8/mail.md)
+31. [8/WAKU-MAIL](/waku/standards/legacy/8/mail.md)
 
-32. [9/WAKU-RPC](waku/standards/legacy/9/rpc.md)
+32. [9/WAKU-RPC](/waku/standards/legacy/9/rpc.md)
 
 33. [16/WAKU2-RPC](waku/deprecated/16/rpc.md)
 
