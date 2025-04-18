@@ -317,7 +317,7 @@ We define two special [functional scopes](../raw/status-app-protocols.md#functio
 All messages that relate to controlling communities MUST be assigned the _global community control_ scope.
 All messages that carry user-generated content for communities MUST be assigned the _global community content_ scope.
 
-> *Note: a previous iteration of Status Communities defined separate community-wide scopes for each community.
+> *Note:* a previous iteration of Status Communities defined separate community-wide scopes for each community.
 However, this model was deprecated and all communities now operate on a global, shared scope.
 This implies that different communities will share shards on the routing layer.
 
