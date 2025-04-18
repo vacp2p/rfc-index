@@ -1,567 +1,394 @@
 ---
-slug: 56
-title: 56/STATUS-COMMUNITIES
-name: Status Communities that run over Waku v2
-status: draft
+title: STATUS-PROTOCOLS
+name: Status Protocol Stack
+status: raw
 category: Standards Track
-tags: waku-application
-description: Status Communities allow multiple users to communicate in a discussion space. This is a key feature of the Status application.
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
-- Andrea Piana <andreap@status.im>
-- Prem Chaitanya Prathi <prem@waku.org>
+description: Specifies the Status application protocol stack.
+editor: Hanno Cornelius <hanno@status.im>
+contributors: 
+- Jimmy Debe <jimmy@status.im>
+- Aaryamann Challani <p1ge0nh8er@proton.me>
+
 ---
 
 ## Abstract
 
-This document describes the design of Status Communities over Waku v2,
-allowing for multiple users to communicate in a discussion space.
-This is a key feature for the Status messaging app.
+This specification describes the Status Application protocol stack.
+It focuses on elements and features in the protocol stack for all application-level functions:
 
-## Background and Motivation
+- functional scope (also _broadcast audience_)
+- content topic
+- ephemerality
+- end-to-end reliability layer
+- encryption layer
+- transport layer (Waku)
 
-The purpose of Status communities, as specified in this document,
-is allowing for large group chats.
-Communities can have further substructure, e.g. specific channels.
+It also introduces strategies to restrict resource usage, distribute large messages, etc.
+Application-level functions are out of scope and specified separately. See:
 
-Smaller group chats, on the other hand,
-are out of scope for this document and
-can be built over [55/STATUS-1TO1-CHAT](../55/1to1-chat.md).
-We refer to these smaller group chats simply as "group chats",
-to differentiate them from Communities.
+- [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
+- [56/STATUS-COMMUNITIES](../56/communities.md)
 
-For group chats based on [55/STATUS-1TO1-CHAT](../55/1to1-chat.md),
-the key exchange mechanism MUST be X3DH,
-as described in [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md).
+## Status protocol stack
 
-However, this method does not scale as the number of participants increases,
-for the following reasons -
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+See the simplified diagram of the Status application protocol stack:
 
-1. The number of messages sent over the network increases with the number of participants.
-2. Handling the X3DH key exchange for each participant is computationally expensive.
+|  |
+|---|
+| Status application layer  |
+| End-to-end reliability layer  |
+| Encryption layer |
+| Transport layer (Waku) |
+| |
 
-Having multicast channels reduces the overhead of a group chat based on 1:1 chat.
-Additionally, if all the participants of the group chat have a shared key,
-then the number of messages sent over the network is reduced to one per message.
+## Status application layer
 
-## Terminology
+Application level functions are defined in the _application_ layer.
+Status currently defines functionality to support three main application features:
 
-- **Community**: A group of peers that can communicate with each other.
-- **Member**: A peer that is part of a community.
-- **Admin**: A member that has administrative privileges.
-Used interchangeably with "owner".
-- **Channel**: A designated subtopic for a community. Used interchangeably with "chat".
+- Status Communities, as specified in [56/STATUS-COMMUNITIES](../56/communities.md)
+- Status 1:1 Chat, as specified in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
+- Status Private Group Chat, as specified in a subsection of [55/STATUS-1TO1-CHAT](../55/1to1-chat.md#negotiation-of-a-11-chat-amongst-multiple-participants-group-chat)
 
-## Design Requirements
+<!-- TODO: list functions not related to main app features, such as user sync, backup, push notifications, etc. -->
 
-Due to the nature of communities,
-the following requirements are necessary for the design of communities  -
+Each application-level function, regardless which feature set it supports, has the following properties:
 
-1. The creator of the Community is the owner of the Community.
-2. The Community owner is trusted.
-3. The Community owner can add or remove members from the Community.
-This extends to banning and kicking members.
-4. The Community owner can add, edit and remove channels.
-5. Community members can send/receive messages
-to the channels which they have access to.
-6. Communities may be encrypted (private) or unencrypted (public).
-7. A Community is uniquely identified by a public key.
-8. The public key of the Community is shared out of band.
-9. The metadata of the Community can be found by listening on a content topic
-derived from the public key of the Community.
-10. Community members run their own Waku nodes,
-with the configuration described in [Waku-Protocols](#waku-protocols).
-Light nodes solely implementing
-[19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
-may not be able to run their own Waku node with the configuration described.
+1. Functional scope
+1. Content topic
+1. Ephemerality
 
-## Design
+### Functional Scope
 
-### Cryptographic Primitives
+Each Status app-level message MUST define a functional scope.
+The functional scope MUST define the _minimum_ scope of the audience that should _participate_ in the app function the message is related to.
+In other words, it determines the minimum subset of Status app participants
+that should have access to messages related to that function.
 
-The following cryptographic primitives are used in the design -
+Note that the functional scope is distinct from the number of participants that is _addressed_ by a specific message.
+For example, a participant will address a 1:1 chat to only one other participant.
+However, since all users of the Status app MUST be able to participate in 1:1 chats,
+the functional scope of messages enabling 1:1 chats MUST be a global scope.
+Similarly, since private group chats can be set up between any subset of Status app users,
+the functional scope for messages related to private group chats MUST be global.
+As a counter-example, messages that originate within a community (and are _addressed_ to members of that community)
+are only of interest to participants that are also members of that community.
+Such messages MUST have a community-wide functional scope.
+A third group of messages are addressed only to the participant that generated those messages itself.
+These _self-addressed_ messages MUST have a local functional scope.
 
-- X3DH
-- Single Ratchet
-  - The single ratchet is used to encrypt the messages sent to the Community.
-  - The single ratchet is re-keyed when a member is added/removed from the Community.
+If we further make a distinction between "control" and "content" messages,
+we can distinguish five distinct functional scopes.
 
-## Wire format
+All Status messages MUST have one of these functional scopes:
 
-<!--   
-The wire format is described first to give an overview of the protocol.
-It is referenced in the flow of community creation and community management.
-More or less an intersection of https://github.com/status-im/specs/blob/403b5ce316a270565023fc6a1f8dec138819f4b0/docs/raw/organisation-channels.md 
-and https://github.com/status-im/status-go/blob/6072bd17ab1e5d9fc42cf844fcb8ad18aa07760c/protocol/protobuf/communities.proto,
+#### Global scope
 
--->
+1. _Global control_: messages enabling the basic functioning of the app to control features that all app users should be able to participate in. Examples include Contact Requests, Community Invites, global Status Updates, Group Chat Invites, etc.
+2. _Global content_: messages carrying user-generated content for global functions. Examples include 1:1 chat messages, images shared over private group chats, etc.
+
+#### Community scope
+
+3. _Community control_: messages enabling the basic functioning of the app to control features _only relevant to members of a specific community_. Examples include Community Membership Updates, community Status Updates, etc.
+4. _Community content_: messages carrying user-generated content _only for members of a specific community_.
+
+#### Local scope
+
+5. _Local_: messages related to functions that are only relevant to a single user. Also known as _self-addressed messages_. Examples include messages used to exchange information between app installations, such as User Backup and Sync messages.
+
+Note that the functional scope is a logical property of Status messages.
+It SHOULD however inform the underlying [transport layer sharding](#pubsub-topics-and-sharding) and [transport layer subscriptions](#subscribing).
+In general a Status client SHOULD subscribe to participate in:
+- all global functions,
+- (only) the community functions for communities of which it is a member, and
+- its own local functions.
+
+### Content topics
+
+Each Status app-level message MUST define a content topic that links messages in related app-level functions and sub-functions together.
+This MUST be based on the filter use cases for [transport layer subscriptions](#subscribing)
+and [retrieving historical messages](#retrieving-historical-messages).
+A content topic SHOULD be identical across all messages that are always part of the same filter use case (or always form part of the same content-filtered query criteria).
+In other words, the number of content topics defined in the app SHOULD match the number of filter use cases.
+For the sake of illustration, consider the following common content topic and filter use cases:
+
+- if all messages belonging to the same 1:1 chat are always filtered together, they SHOULD use the same content topic (see [55/STATUS-1TO1-CHAT](../55/1to1-chat.md))
+- if all messages belonging to the same Community are always filtered together, they SHOULD use the same content topic (see [56/STATUS-COMMUNITIES](../56/communities.md)).
+
+The app-level content topic MUST be populated in the `content_topic` field in the encapsulating Waku message (see [Waku messages](#waku-messages)).
+
+### Ephemerality
+
+Each Status app-level message MUST define its _ephemerality_.
+Ephemerality is a boolean value, set to `true` if a message is considered ephemeral.
+Ephemeral messages are messages emitted by the app that are transient in nature.
+They only have temporary "real-time" value
+and SHOULD NOT be stored and retrievable from historical message stores and sync caches.
+Similarly, ephemeral message delivery is best-effort in nature and SHOULD NOT be considered in message reliability mechanisms (see [End-to-end reliability layer](#end-to-end-reliability-layer)).
+
+An example of ephemeral messages would be periodic status update messages, indicating a particular user's online status.
+Since only a user's current online status is of value, there is no need to store historical status update messages.
+Since status updates are periodic, there is no strong need for end-to-end reliability as subsequent updates are always to follow.
+
+App-level messages that are considered ephemeral, MUST set the `ephemeral` field in the encapsulating Waku message to `true` (see [Waku messages](#waku-messages))
+
+## End-to-end reliability layer
+
+The end-to-end reliability layer contains the functions related to one of the two end-to-end reliability schemes defined for Status app messages:
+
+1. Minimum Viable protocol for Data Synchronisation, or MVDS (see [STATUS-MVDS-USAGE](./status-mvds.md))
+1. Scalable distributed log reliability (spec and a punchier name TBD, see the [original forum post announcement](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16))
+
+Ephemeral messages SHOULD omit this layer.
+Non-ephemeral 1:1 chat messages SHOULD make use of MVDS to achieve reliable data synchronisation between the two parties involved in the communication.
+Non-ephemeral private group chat messages build on a set of 1:1 chat links
+and consequently SHOULD also make use of MVDS to achieve reliable data synchronisation between all parties involved in the communication.
+Non-ephemeral 1:1 and private group chat messages MAY make use of of [scalable distributed log reliability](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16) in future.
+Since MVDS does not scale for large number of participants in the communication,
+non-ephemeral community messages MUST use scalable distributed log reliability as defined in this [original forum post announcement](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16).
+The app MUST use a single channel ID per community.
+
+## Encryption layer
+
+The encryption layer wraps the Status App and Reliability layers in an encrypted payload.
+
+<!-- TODO: This section is TBD. We may want to design a way for Communities to use de-MLS in a separate spec and generally simplify Status encryption. -->
+
+## Waku transport layer
+
+The Waku transport layer contains the functions allowing Status protocols to use [10/WAKU2](../../waku/standards/core/10/waku2.md) infrastructure as transport.
+
+### Waku messages
+
+Each Status application message MUST be transformed to a [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) with the following structure:
 
 ```protobuf
 syntax = "proto3";
 
-message IdentityImage {
-  // payload is a context based payload for the profile image data,
-  // context is determined by the `source_type`
+message WakuMessage {
   bytes payload = 1;
-  // source_type signals the image payload source
-  SourceType source_type = 2;
-  // image_type signals the image type and method of parsing the payload
-  ImageType image_type = 3;
-  // encryption_keys is a list of encrypted keys that can be used to decrypt an 
-  // encrypted payload
-  repeated bytes encryption_keys = 4;
-  // encrypted signals the encryption state of the payload, default is false.
-  bool encrypted = 5;
-  // SourceType are the predefined types of image source allowed
-  enum SourceType {
-    UNKNOWN_SOURCE_TYPE = 0;
-
-    // RAW_PAYLOAD image byte data
-    RAW_PAYLOAD = 1;
-
-    // ENS_AVATAR uses the ENS record's resolver get-text-data.avatar data
-    // The `payload` field will be ignored if ENS_AVATAR is selected
-    // The application will read and 
-    // parse the ENS avatar data as image payload data, URLs will be ignored
-    // The parent `ChatMessageIdentity` must have a valid `ens_name` set
-    ENS_AVATAR = 2;
-  }
-}
-
-// SocialLinks represents social link associated with given chat identity (personal/community)
-message SocialLink {
-  // Type of the social link
-  string text = 1;
-  // URL of the social link
-  string url = 2;
-}
-// ChatIdentity represents identity of a community/chat
-message ChatIdentity {
-  // Lamport timestamp of the message
-  uint64 clock = 1;
-  // ens_name is the valid ENS name associated with the chat key
-  string ens_name = 2;
-  // images is a string indexed mapping of images associated with an identity
-  map<string, IdentityImage> images = 3;
-  // display name is the user set identity
-  string display_name = 4;
-  // description is the user set description
-  string description = 5;
-  string color = 6;
-  string emoji = 7;
-  repeated SocialLink social_links = 8;
-  // first known message timestamp in seconds 
-  // (valid only for community chats for now)
-  // 0 - unknown
-  // 1 - no messages
-  uint32 first_message_timestamp = 9;
-}
-
-message Grant {
-  // Community ID (The public key of the community)
-  bytes community_id = 1;
-  // The member ID (The public key of the member)
-  bytes member_id = 2;
-  // The chat for which the grant is given
-  string chat_id = 3;
-  // The Lamport timestamp of the grant
-  uint64 clock = 4;
-}
-
-message CommunityMember {
-  // The roles a community member MAY have
-  enum Roles {
-    UNKNOWN_ROLE = 0;
-    ROLE_ALL = 1;
-    ROLE_MANAGE_USERS = 2;
-    ROLE_MODERATE_CONTENT = 3;
-  }
-  repeated Roles roles = 1;
-}
-
-message CommunityPermissions {
-  // The type of access a community MAY have
-  enum Access {
-    UNKNOWN_ACCESS = 0;
-    NO_MEMBERSHIP = 1;
-    INVITATION_ONLY = 2;
-    ON_REQUEST = 3;
-  }
-
-  // If the community should be available only to ens users
-  bool ens_only = 1;
-  // If the community is private
-  bool private = 2;
-  Access access = 3;
-}
-
-message CommunityAdminSettings {
-  // If the Community admin may pin messages
-  bool pin_message_all_members_enabled = 1;
-}
-
-message CommunityChat {
-  // A map of members in the community to their roles in a chat
-  map<string,CommunityMember> members = 1;
-  // The permissions of the chat
-  CommunityPermissions permissions = 2;
-  // The metadata of the chat
-  ChatIdentity identity = 3;
-  // The category of the chat
-  string category_id = 4;
-  // The position of chat in the display
-  int32 position = 5;
-}
-
-message CommunityCategory {
-  // The category id 
-  string category_id = 1;
-  // The name of the category
-  string name = 2;
-  // The position of the category in the display
-  int32 position = 3;
-}
-
-message CommunityInvitation {
-  // Encrypted/unencrypted community description
-  bytes community_description = 1;
-  // The grant offered by the community
-  bytes grant = 2;
-  // The chat id requested to join
-  string chat_id = 3;
-  // The public key of the community
-  bytes public_key = 4;
-}
-
-message CommunityRequestToJoin {
-  // The Lamport timestamp of the request  
-  uint64 clock = 1;
-  // The ENS name of the requester
-  string ens_name = 2;
-  // The chat id requested to join
-  string chat_id = 3;
-  // The public key of the community
-  bytes community_id = 4;
-  // The display name of the requester
-  string display_name = 5;
-}
-
-message CommunityCancelRequestToJoin {
-  // The Lamport timestamp of the request
-  uint64 clock = 1;
-  // The ENS name of the requester
-  string ens_name = 2;
-  // The chat id requested to join
-  string chat_id = 3;
-  // The public key of the community
-  bytes community_id = 4;
-  // The display name of the requester
-  string display_name = 5;
-  // Magnet uri for community history protocol
-  string magnet_uri = 6;
-}
-
-message CommunityRequestToJoinResponse {
-  // The Lamport timestamp of the request
-  uint64 clock = 1;
-  // The community description
-  CommunityDescription community = 2;
-  // If the request was accepted
-  bool accepted = 3;
-  // The grant offered by the community
-  bytes grant = 4;
-  // The community public key
-  bytes community_id = 5;
-}
-
-message CommunityRequestToLeave {
-  // The Lamport timestamp of the request
-  uint64 clock = 1;
-  // The community public key
-  bytes community_id = 2;
-}
-
-message CommunityDescription {
-  // The Lamport timestamp of the message
-  uint64 clock = 1;
-  // A mapping of members in the community to their roles
-  map<string,CommunityMember> members = 2;
-  // The permissions of the Community
-  CommunityPermissions permissions = 3;
-  // The metadata of the Community
-  ChatIdentity identity = 5;
-  // A mapping of chats to their details
-  map<string,CommunityChat> chats = 6;
-  // A list of banned members
-  repeated string ban_list = 7;
-  // A mapping of categories to their details
-  map<string,CommunityCategory> categories = 8;
-  // The admin settings of the Community
-  CommunityAdminSettings admin_settings = 10;
-  // If the community is encrypted
-  bool encrypted = 13;
-  // The list of tags
-  repeated string tags = 14;
+  string content_topic = 2;
+  optional uint32 version = 3;
+  optional sint64 timestamp = 10;
+  optional bytes meta = 11;
+  optional bool ephemeral = 31;
 }
 ```
 
-Note: The usage of the clock is described in the [Clock](#clock) section.
+- `payload` MUST be set to the full encrypted payload received from the higher layers
+- `version` MUST be set to `1`
+- `ephemeral` MUST be set to `true` if the app-level message is ephemeral
+- `content_topic` MUST be set to the app-level content topic
+- `timestamp` MUST be set to the current Unix epoch timestamp (in nanosecond precision)
 
-### Functional scope and shard assignment
+### Pubsub topics and sharding
 
-We define two special [functional scopes](../raw/status-app-protocols.md#functional-scope) for messages related to Status Communities:
+All Waku messages are published to pubsub topics as defined in [23/WAKU2-TOPICS](../../waku/informational/23/topics.md).
+Since pubsub topics define a routing layer for messages,
+they can be used to shard traffic.
+The pubsub topic used for publishing a message depends on the app-level [functional scope](#functional-scope).
 
-1. Global community control
-2. Global community content
+#### Self-addressed messages
 
-All messages that relate to controlling communities MUST be assigned the _global community control_ scope.
-All messages that carry user-generated content for communities MUST be assigned the _global community content_ scope.
+The application MUST define at least one distinct pubsub topic for self-addressed messages.
+The application MAY define a set of more than one pubsub topic for self-addressed messages to allow traffic sharding for scalability.
 
-> *Note: a previous iteration of Status Communities defined separate community-wide scopes for each community.
-However, this model was deprecated and all communities now operate on a global, shared scope.
-This implies that different communities will share shards on the routing layer.
+#### Global messages
 
-The following [Waku transport layer](../raw/status-app-protocols.md#waku-transport-layer) allocations are reserved for communities:
-As per [STATUS-SIMPLE-SCALING](https://rfc.vac.dev/status/raw/simple-scaling/#relay-shards), communities use the default cluster ID `16`
-set aside for all Status app protocols.
-Within this cluster, the following [shards](../raw/status-app-protocols.md#pubsub-topics-and-sharding) are reserved for the community functional scopes:
+The application MUST define at least one distinct pubsub topic for global control messages and global content messages.
+The application MAY defined a set of more than one pubsub topic for global messages to allow traffic sharding for scalability.
+It is RECOMMENDED that separate pubsub topics be used for global control messages and global content messages.
 
-1. All messages with a _global community control_ scope MUST be published to shard `128`
-2. All messages with a _global community content_ scope MUST be published to shard `256`
+#### Community messages
 
-### Content topic level encryption
+The application SHOULD define at least one separate pubsub topic for each separate community's control and content messages.
+The application MAY define a set of more than one pubsub topic per community to allow traffic sharding for scalability.
+It is RECOMMENDED that separate pubsub topics be used for community control messages and community content messages.
 
--a universal chat identifier is used for all community chats.
-<!-- Don't enforce any constraints on the unique id generation -->
+#### Large messages
 
-All messages are encrypted before they are handed over to waku ir-respective of the encryption explained above.
-All community chats are encrypted using a symmetric key generated from universal chat id using pbkdf2.
+The application MAY define separate pubsub topics for large messages.
+These pubsub topics for large messages MAY be distinct for each functional scope.
 
-```js
-symKey = pbkdf2(password:universalChatID, salt:nil, iteration-count:65356,key-length:32, hash-func: random-sha256)
-```
+### Resource usage
 
-### Content topic usage
+The application SHOULD use a range of Waku protocols to interact with the Waku transport layer.
+The specific set of Waku protocols used depend on desired functionality and resource usage profile for the specific client.
+Resources can be restricted in terms of bandwidth and computing resources.
 
-"Content topic" refers to the field in [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md/#message-attributes),
-further elaborated in [10/WAKU2](../../waku/standards/core/10/waku2.md/#overview-of-protocol-interaction).
-The content-topic usage follows the guidelines specified at [23/topics](../../waku/informational/23/topics.md#content-topic-usage-guidelines)
+Waku protocols that are more appropriate for resource-restricted environments are often termed "light protocols".
+Waku protocols that consume more resources, but simultaneously contribute more to Waku infrastructure, are often termed "full protocols".
+The terms "full" and "light" is just a useful abstraction than a strict binary, though,
+and Status clients can operate along a continuum of resource usage profiles,
+each using the combination of "full" and "light" protocols most appropriate to match its environment and motivations.
 
-#### Advertising a Community
+To simplify interaction with the selection of "full" and "light" protocols,
+Status clients MUST define a "full mode" and "light mode"
+to allow users to select whether their client would prefer "full protocols" or "light protocols" by default.
+Status Desktop clients are assumed to have more resources available and SHOULD use full mode by default.
+Status Mobile clients are assumed to operate with more resource restrictions and SHOULD use light mode by default.
 
-The content topic that the community is advertised on
-MUST be derived from the public key of the community.
-The content topic MUST be the first four bytes of the keccak-256 hash
-of the compressed (33 bytes) public key of the community encoded into a hex string.
+For the purposes of the rest of this document,
+clients in full mode will be referred to as "full clients" and
+clients in light mode will be referred to as "light clients".
 
-```js
-hash = hex(keccak256(encodeToHex(compressedPublicKey)))
+### Discovery
 
-topicLen = 4
-if len(hash) < topicLen {
-    topicLen = len(hash)
-}
+The application MUST make use of at least one discovery method to discover and connect to Waku peers
+useful for the user functions specific to that instance of the application.
 
-var topic [4]byte
-for i = 0; i < topicLen; i++ {
-    topic[i] = hash[i]
-}
+The specific Waku discovery protocol used for discovery depends on the use case and resource-availability of the client.
 
-contentTopic = "/waku/1/0x" + topic + "/rfc26"
-```
+1. [EIP-1459: DNS-based discovery](https://eips.ethereum.org/EIPS/eip-1459) is useful for initial connection to bootstrap peers.
+1. [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) allows decentralized discovery of Waku peers.
+1. [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/315264c202e0973476e2f1e2d0b01bea4fe1ad31/standards/core/peer-exchange.md) allows requesting peers from a service node
+and is appropriate for resource-restricted discovery.
 
-#### Community event messages
+All clients SHOULD use DNS-based discovery on startup
+to discover a set of bootstrap peers for initial connection.
 
-Message such as community description
-MUST be sent to the content topic derived from the public key of the community.
-The content topic
-MUST be the hex-encoded keccak-256 hash of the public key of the community.
+Full clients SHOULD use [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) for continuous ambient peer discovery.
 
-```js
-hash = hex(keccak256(encodeToHex(publicKey)))
+Light clients SHOULD use [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/315264c202e0973476e2f1e2d0b01bea4fe1ad31/standards/core/peer-exchange.md) to discover a set of service peers
+used by that instance of the application.
 
-topicLen = 4
-if len(hash) < topicLen {
-    topicLen = len(hash)
-}
-var topic [4]byte
-for i = 0; i < topicLen; i++ {
-    topic[i] = hash[i]
-}
+### Subscribing
 
-contentTopic = "/waku/1/0x" + topic + "/rfc26"
-```
+The application MUST subscribe to receive the traffic necessary for minimal app operation
+and to enable the user functions specific to that instance of the application.
 
-#### Community Requests
+The specific Waku protocol used for subscription depends on the resource-availability of the client:
 
-Requests to leave, join, kick and ban, as well as key exchange messages, MUST be sent to the content topic derived from the public key of the community on the common shard.
+1. Filter client protocol, as specified in [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md), allows subscribing for traffic with content topic granularity and is appropriate for resource-restricted subscriptions.
+1. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows subscribing to traffic only with pubsub topic granularity and therefore is more resource-intensive. Relay subscription also allows the application instance to contribute to the overall routing infrastructure, which adds to its overall higher resource usage but benefits the ecosystem.
 
-The content topic
-MUST be the keccak-256 hash of hex-encoded universal chat id (public key appended with fixed string) of the community omitting the first 2 bytes.
+Full clients SHOULD use relay protocol as preferred method to subscribe to pubsub topics matching the scopes:
 
-```js
-universalChatId = publicKey+"-memberUpdate"
-hash = hex(keccak256(encodeToHex(universalChatId))[2:])
+1. Global control
+1. Global content
+1. Community control, for each community of which the app user is a member
+1. Community content, for each community of which the app user is a member
 
-topicLen = 4
-if len(hash) < topicLen {
-    topicLen = len(hash)
-}
-var topic [4]byte
-for i = 0; i < topicLen; i++ {
-    topic[i] = hash[i]
-}
-
-contentTopic = "/waku/1/0x" + topic + "/rfc26"
-```
-
-#### Community Shard Info
-
-If a community is assigned a dedicated shard then the shard info for that community is published on a content topic derived from a specialized key. This is useful for users joining the new community so that they can subscribe to this specific content topic.
-
-```js
-chatID = publicKey+"-shard-info"
-hash = hex(keccak256(encodeToHex(chatID))[2:])
-
-topicLen = 4
-if len(hash) < topicLen {
-    topicLen = len(hash)
-}
-var topic [4]byte
-for i = 0; i < topicLen; i++ {
-    topic[i] = hash[i]
-}
-
-contentTopic = "/waku/1/0x" + topic + "/rfc26"
-```
-
-#### Community channels/chats
-
-All channels/chats shall use a single content-topic which is derived from a universal chat id irrespective of their individual unique chat ids.
-
-### Community Management
-
-The flows for Community management are as described below.
-
-#### Community Creation Flow
-
-1. The Community owner generates a public/private key pair.
-2. The Community owner configures the Community metadata,
-according to the wire format "CommunityDescription".
-3. The Community owner publishes the Community metadata on a content topic
-derived from the public key of the Community.
-the Community metadata SHOULD be encrypted with the public key of the Community.
-The Community metadata is sent during fixed intervals,
-to ensure that the Community metadata is available to members.
-The Community metadata SHOULD be sent every time the Community metadata is updated.
-4. The Community owner MAY advertise the Community out of band,
-by sharing the public key of the Community on other mediums of communication.
-
-#### Community Join Flow (peer requests to join a Community)
-
-1. A peer and the Community owner establish a 1:1 chat as described in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md).
-2. The peer requests to join a Community by sending a
-"CommunityRequestToJoin" message to the Community.
-At this point, the peer MAY send a
-"CommunityCancelRequestToJoin" message to cancel the request.
-3. The Community owner MAY accept or reject the request.
-4. If the request is accepted,
-the Community owner sends a "CommunityRequestToJoinResponse" message to the peer.
-5. The Community owner then adds the member to the Community metadata, and
-publishes the updated Community metadata.
-
-#### Community Join Flow (peer is invited to join a Community)
-
-1. The Community owner and peer establish a 1:1 chat as described in [55/STATUS-1TO1-CHAT](../55/1to1-chat.md).
-2. The peer is invited to join a Community by the Community owner,
-by sending a "CommunityInvitation" message.
-3. The peer decrypts the "CommunityInvitation" message, and verifies the signature.
-4. The peer requests to join a Community by sending a
-"CommunityRequestToJoin" message to the Community.
-5. The Community owner MAY accept or reject the request.
-6. If the request is accepted,
-the Community owner sends a "CommunityRequestToJoinResponse" message to the peer.
-7. The Community owner then adds the member to the Community metadata, and
-publishes the updated Community metadata.
-
-#### Community Leave Flow
-
-1. A member requests to leave a Community by sending a
-"CommunityRequestToLeave" message to the Community.
-2. The Community owner MAY accept or reject the request.
-3. If the request is accepted,
-the Community owner removes the member from the Community metadata,
-and publishes the updated Community metadata.
-
-#### Community Ban Flow
-
-1. The Community owner adds a member to the ban list, revokes their grants,
-and publishes the updated Community metadata.
-2. If the Community is Private,
-Re-keying is performed between the members of the Community,
-to ensure that the banned member is unable to decrypt any messages.
-
-### Waku Protocols
-
-The following Waku protocols SHOULD be used to implement Status Communities -
-
-1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) -
-To send and receive messages
-2. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) -
-To encrypt and decrypt messages
-3. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)-
-To handle session keys
-4. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) -
-To wrap community messages in a Waku message
-5. [13/WAKU2-STORE](../../waku/standards/core/13/store.md) -
-To store and retrieve messages for offline devices
-
-The following Waku protocols MAY be used to implement Status Communities -
-
-1. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md) -
-Content filtering for resource restricted devices
-2. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) -
-Allows Light clients to participate in the network
-
-### Backups
-
-The member MAY back up their local settings,
-by encrypting it with their public key, and
-sending it to a given content topic.
-The member MAY then rely on this backup to restore their local settings,
-in case of a data loss.
-This feature relies on
-[13/WAKU2-STORE](../../waku/standards/core/13/store.md)
-for storing and retrieving messages.
-
-### Clock
-
-The clock used in the wire format refers to the Lamport timestamp of the message.
-The Lamport timestamp is a logical clock that is used to determine the order of events
-in a distributed system.
-This allows ordering of messages in an asynchronous network
-where messages may be received out of order.
-
-## Security Considerations
-
-1. The Community owner is a single point of failure.
-If the Community owner is compromised, the Community is compromised.
-
-2. Follows the same security considerations as the
-[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) protocol.
-
-## Future work
-
-1. To scale and optimize the Community management,
-the Community metadata should be stored on a decentralized storage system, and
-only the references to the Community metadata should be broadcasted.
-The following document describes this method in more detail -
-[Optimizing the `CommunityDescription` dissemination](https://hackmd.io/rD1OfIbJQieDe3GQdyCRTw)
-
-2. Token gating for communities
-
-3. Sharding the content topic used for [#Community Event Messages](#community-event-messages),
-since members of the community don't need to receive all the control messages.
+Light clients SHOULD use filter protocol to subscribe only to the content topics relevant to the user.
+
+#### Self-addressed messages
+
+Status clients (full or light) MUST NOT subscribe to topics for messages with self-addressed scopes.
+See [Self-addressed messages](#self-addressed-messages-4).
+
+#### Large messages
+
+Status clients (full or light) SHOULD NOT subscribe to topics set aside for large messages.
+See [Large messages](#large-messages-4).
+
+### Publishing
+
+The application MUST publish user and app generated messages via the Waku transport layer.
+The specific Waku protocol used for publishing depends on the resource-availability of the client:
+
+1. Lightpush protocol, as specified in [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) allows publishing to a pubsub topic via an intermediate "full node" and is more appropriate for resource-restricted publishing.
+1. Relay protocol, as specified in [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md), allows publishing directly into the relay routing network and is therefore more resource-intensive.
+
+Full clients SHOULD use relay protocol to publish to pubsub topics matching the scopes:
+
+1. Global control
+1. Global content
+1. Community control, for each community of which the app user is a member
+1. Community content, for each community of which the app user is a member
+
+Light clients SHOULD use lightpush protocol to publish control and content messages.
+
+#### Self-addressed messages
+
+Status clients (full or light) MUST use lightpush protocol to publish self-addressed messages.
+See [Self-addressed messages](#self-addressed-messages-4).
+
+#### Large messages
+
+Status clients (full or light) SHOULD use lightpush protocols to publish to pubsub topics set aside for large messages.
+See [Large messages](#large-messages-4).
+
+### Retrieving historical messages
+
+Status clients SHOULD use the store query protocol, as specified in [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md), to retrieve historical messages relevant to the client from store service nodes in the network.
+
+Status clients SHOULD use [content filtered queries](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md#content-filtered-queries) with `include_data` set to `true`,
+to retrieve the full contents of historical messages that the client may have missed during offline periods,
+or to populate the local message database when the client starts up for the first time.
+
+#### Store queries for reliability
+
+Status clients MAY use periodic content filtered queries with `include_data` set to `false`,
+to retrieve only the message hashes of past messages on content topics relevant to the client.
+This can be used to compare the hashes available in the local message database with the hashes in the query response
+in order to identify possible missing messages.
+Once the Status client has identified a set of missing message hashes
+it SHOULD use [message hash lookup queries](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md#message-hash-lookup-queries) with `include_data` set to `true`
+to retrieve the full contents of the missing messages based on the hash.
+
+Status clients MAY use [presence queries](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md#presence-queries)
+to determine if one or more message hashes known to the client is present in the store service node.
+Clients MAY use this method to determine if a message that originated from the client
+has been successfully stored.
+
+#### Self-addressed messages
+
+Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve self-addressed messages relevant to that client.
+See [Self-addressed messages](#self-addressed-messages-4).
+
+#### Large messages
+
+Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve large messages relevant to that client.
+See [Large messages](#large-messages-4).
+
+### Providing services
+
+Status clients MAY provide service-side protocols to other clients.
+
+Full clients SHOULD mount
+the filter service protocol (see [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md))
+and lightpush service protocol (see [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md))
+in order to provide light subscription and publishing services to other clients
+for each pubsub topic to which they have a relay subscription.
+
+Full clients SHOULD mount
+the peer exchange service protocol (see [34/WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/315264c202e0973476e2f1e2d0b01bea4fe1ad31/standards/core/peer-exchange.md))
+to provide light discovery services to other clients.
+
+Status clients MAY mount the store query protocol as service node (see [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md))
+to store historical messages and
+provide store services to other clients
+for each pubsub topic to which they have a relay subscription
+
+### Self-addressed messages
+
+Messages with a _local_ functional scope (see [Functional scope](#functional-scope)),
+also known as _self-addressed_ messages,
+MUST be published to a distinct pubsub topic or a distinct _set_ of pubsub topics
+used exclusively for messages with local scope (see [Pubsub topics and sharding](#pubsub-topics-and-sharding)).
+Status clients (full or light) MUST use lightpush protocol to publish self-addressed messages (see [Publishing](#publishing)).
+Status clients (full or light) MUST NOT subscribe to topics for messages with self-addressed scopes (see [Subscribing](#subscribing)).
+Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve self-addressed messages relevant to that client (see [Retrieving historical messages](#retrieving-historical-messages)).
+
+### Large messages
+
+The application MAY define separate pubsub topics for large messages.
+These pubsub topics for large messages MAY be distinct for each functional scope (see [Pubsub topics and sharding](#pubsub-topics-and-sharding)).
+Status clients (full or light) SHOULD use lightpush protocols to publish to pubsub topics set aside for large messages (see [Publishing](#publishing)).
+Status clients (full or light) SHOULD NOT subscribe to topics set aside for large messages (see [Subscribing](#subscribing)).
+Status clients (full or light) SHOULD use store queries (rather than subscriptions) to retrieve large messages relevant to that client (see [Retrieving historical messages](#retrieving-historical-messages)).
+
+#### Chunking
+
+The Status application MAY use a chunking mechanism to break down large payloads
+into smaller segments for individual Waku transport.
+The definition of a large message is up to the application.
+However, the maximum size for a [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) payload is 150KB.
+Status application payloads that exceed this size MUST be chunked into smaller pieces
+and MUST be considered a "large message".
 
 ## Copyright
 
@@ -569,17 +396,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
-- [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
-- [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
-- [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
-- [10/WAKU2](../../waku/standards/core/10/waku2.md)
-- [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
-- [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
-- [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
-- [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
-
-### informative
-
-- [community.go](https://github.com/status-im/status-go/blob/6072bd17ab1e5d9fc42cf844fcb8ad18aa07760c/protocol/communities/community.go)
-- [organisation-channels.md](https://github.com/status-im/specs/blob/403b5ce316a270565023fc6a1f8dec138819f4b0/docs/raw/organisation-channels.md)
+1. [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
+1. [56/STATUS-COMMUNITIES](../56/communities.md)
+1. [10/WAKU2](../../waku/standards/core/10/waku2.md)
+1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+1. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+1. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
+1. [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
+1. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+1. [Scalable distributed log reliability](https://forum.vac.dev/t/end-to-end-reliability-for-scalable-distributed-logs/293/16)
+1. [STATUS-MVDS-USAGE](./status-mvds.md)
+1. [WAKU2-STORE](https://github.com/waku-org/specs/blob/8fea97c36c7bbdb8ddc284fa32aee8d00a2b4467/standards/core/store.md)
