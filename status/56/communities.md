@@ -310,7 +310,6 @@ Note: The usage of the clock is described in the [Clock](#clock) section.
 ### Functional scope and shard assignment
 
 We define two special [functional scopes](../raw/status-app-protocols.md#functional-scope) for messages related to Status Communities:
-
 1. Global community control
 2. Global community content
 
@@ -325,7 +324,6 @@ The following [Waku transport layer](../raw/status-app-protocols.md#waku-transpo
 As per [STATUS-SIMPLE-SCALING](https://rfc.vac.dev/status/raw/simple-scaling/#relay-shards), communities use the default cluster ID `16`
 set aside for all Status app protocols.
 Within this cluster, the following [shards](../raw/status-app-protocols.md#pubsub-topics-and-sharding) are reserved for the community functional scopes:
-
 1. All messages with a _global community control_ scope MUST be published to shard `128`
 2. All messages with a _global community content_ scope MUST be published to shard `256`
 
