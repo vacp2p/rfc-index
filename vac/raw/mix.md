@@ -5,37 +5,59 @@ status: raw
 category: Standards Track
 tags:
 editor: Akshaya Mani <akshaya@status.im>
-contributors:
+contributors: Daniel Kaiser <danielkaiser@status.im>
 ---
 
 ## Abstract
 
-This document specifies the Mix protocol, a custom protocol within the
-[libp2p](https://libp2p.io) framework designed to enable anonymous communication
-in peer-to-peer networks. The Mix protocol allows libp2p nodes to send messages
-without revealing the sender's identity to intermediary nodes or the recipient.
-It achieves this by using the [Sphinx packet format](https://www.researchgate.net/publication/220713667_Sphinx_A_Compact_and_Provably_Secure_Mix_Format),
-which encrypts and routes messages through a series of nodes (mix nodes)
-before reaching the recipient.
+The Mix protocol is a message-based routing layer within the libp2p framework that enables unlinkable
+communication over a decentralized mix network. It provides per-message anonymous routing by
+encapsulating messages in the Sphinx packet format and relaying them through a series of mix nodes.
+Unlike systems that rely on long-lived circuits (e.g., Tor), the Mix protocol achieves stronger traffic
+analysis resistance by using per-message path selection and randomized delays.
 
-Key features of the protocol include:
+Entry and Exit layers, which operate independently of the core Mix protocol, integrate it with existing
+libp2p protocols by forwarding messages into and out of the mix network. The protocol currently
+supports only one-way communication.
 
-i. Path selection for choosing a random route through the network via multiple
-mix nodes.\
-ii. Sphinx packet construction and processing, providing cryptographic
-guarantees of anonymity and security.\
-iii. Pluggable spam protection mechanism to prevent abuse of the mix network.\
-iv. Delayed message forwarding to thwart timing analysis attacks.
+## Specification
 
-**Protocol identifier:** `"/mix/1.0.0"`
+### 1. Protocol Identifier
 
-Note: The Mix Protocol is designed to work alongside existing libp2p protocols,
-allowing for seamless integration with current libp2p applications while
-providing enhanced privacy features. For example, it can encapsulate messages
-from protocols like [GossipSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.2.md)
-to ensure sender anonymity.
+The Mix protocol is identified by the string `"/mix/1.0.0"`.
 
-## Background
+### 2. Overview
+
+The Mix protocol defines a decentralized mixnet routing layer. It takes care of wrapping messages in
+Sphinx packets, selecting a random path through the mixnet, and transmitting messages hop-by-hop
+with embedded delays.
+
+The protocol itself is agnostic to the application-layer message content. Instead of maintaining long-
+lived circuits, each message is routed independently, with mix nodes applying randomized delays
+before forwarding. This message-based architecture is well-suited for high-latency, unlinkable
+communication.
+
+Integration with existing libp2p protocols is handled externally via Mix Entry and Exit layers:
+
+- The Entry Layer receives messages from an origin libp2p protocol (e.g., GossipSub), wraps
+them in a Sphinx packet, and sends them into the mixnet using the Mix protocol.
+- The Exit Layer receives a message from the mixnet, unwraps it, and forwards it to a destination
+libp2p protocol instance over a client-only connection.
+
+#### 2.1 Comparison with Tor
+
+The Mix protocol differs fundamentally from Tor in several ways:
+
+- **Unlinkability**: In the Mix protocol, there is no direct connection between source and destination.
+Each message is routed independently, eliminating correlation via persistent circuits.
+- **Delay-based mixing**: Mix nodes introduce randomized delays (e.g., exponential distribution)
+before forwarding, making timing correlation significantly harder.
+- **High-latency focus**: Unlike Tor, which targets low-latency web traffic, the Mix protocol is
+designed for high-latency scenarios.
+- **Message-based design**: Each message selects a fresh path and is fully self-contained;
+no session or state is maintained across messages.
+
+#### 2.2 Background
 
 libp2p protocols do not inherently protect sender identities.
 
@@ -62,70 +84,82 @@ By incorporating these features, the Mix protocol aims to provide a robust
 anonymity layer within the libp2p ecosystem, enabling developers to easily
 incorporate privacy features into their applications.
 
-## Specification
+#### 2.3 Core Responsibilities
 
-### 1. Protocol Identifier
+The Mix protocol defines the core logic for mixnet routing and leaves higher-level integration to
+separate layers. Its responsibilities include:
 
-The Mix protocol is identified by the string `"/mix/1.0.0"`.
+- Selecting a random path of mix nodes for each message.
+- Wrapping the message using the Sphinx packet format.
+- Embedding a randomized delay for each hop in the packet.
+- Ensuring message integrity and unlinkability between hops.
 
-### 2. Custom Mix Protocol
-
-The Mix protocol is designed as a standalone protocol,
-identified by the protocol identifier `"/mix/1.0.0"`.
-This approach allows the Mix protocol to operate independently,
-decoupled from specific applications,
-providing greater flexibility and reusability across various libp2p protocols.
-By doing so, the Mix protocol can evolve independently,
-focusing on its core functionality without being tied to the development
-and maintenance cycles of other protocols.
-
-#### 2.1 Mix Nodes Roles
-
-All nodes participating in the Mix protocol are considered as mix nodes. They
-have the capability to create/process and forward Sphinx packets. Mix nodes can
-play different roles depending on their position in a particular message path:
+All participating nodes run an instance of the Mix protocol and are considered as mix nodes. They
+have the capability to create/process and forward Sphinx packets. Each Mix node plays one of three roles
+depending on their position in a particular message path:
 
 - **Sender Node**
-  - A mix node that initiates the anonymous message publishing process.
+  - A mix node that initiates the anonymous message routing.
   - Responsible for:
-    - Path selection.
-    - Sphinx packet creation.
-    - Initiating the message routing through the mix network.
-  - Must run both the Mix protocol instance and the instance of the libp2p
-    protocol for the message being published (_e.g.,_ GossipSub, Ping, etc.).
+    - Selecting a path through the mix network.
+    - Wrapping messages in the Sphinx packet (includes path, delays, and payload).
+    - Forwarding the packet to the first mix node.
+  - The sender node operates purely within the Mix protocol—it is distinct from the Entry Layer.
 - **Intermediary Mix Node**
   - A mix node that is neither the sender nor the exit node in a message path.
-  - Responsible for:
-    - Receiving Sphinx packets.
-    - Processing (decrypting and re-encrypting) Sphinx packets.
-    - Forwarding processed packets to the next node in the path.
-  - Only needs to run the Mix protocol instance.
+  - Receives and processes a Sphinx packet.
+  - Decrypts one layer of the header, waits for a specified delay, and forwards the packet to the next hop.
+  - Cannot distinguish where in the path it is.
 - **Exit Node**
   - The final mix node in a message path.
-  - Responsible for:
+  - Fully unwraps the Sphinx packet and extracts the message payload.
+  - Hands the decrypted message to the **Exit Layer**, which is responsible for forwarding it to 
+  the destination libp2p protocol instance over a client-only connection.
     - Receiving and processing the final Sphinx packet.
-    - Extracting the original message.
-    - Disseminating the decrypted message using the appropriate libp2p protocol.
-  - Must run both the Mix protocol instance and the instance of the libp2p
-    protocol for the message being published.
+  
+Each node may play different roles for different messages, depending on where it appears in the
+sender's selected path.
 
-#### 2.2 Roles Flexibility
+#### 2.4 Mixing Strategy and Packet Format
 
-A single mix node can play different roles in different paths:
+The Mix protocol relies on two foundational components:
 
-- It can be a sender node for messages it initiates.
-- It can be an intermediary node for messages it is forwarding.
-- It can be an exit node for messages it is disseminating.
+- **Mixing Strategy**:
+  - Uses randomized delays per hop (e.g., exponential distribution).
+  - Enables large, potentially unbounded anonymity sets.
+  - Promotes efficient bandwidth usage with continuous-time forwarding.
 
-#### 2.3 Incentives
+- **Mix Packet Format**:
+  - Employs the Sphinx format to provide compact, cryptographically secure routing.
+  - Ensures message indistinguishability regardless of direction (forward/reply).
+  - Hides path length, node position, and payload metadata.
+  - Reply support is planned but currently not implemented.
 
-To publish an anonymous libp2p message (_e.g.,_ GossipSub, Ping, etc.), nodes
-MUST run a mix node instance. This requirement serves as an incentive for nodes
-to participate in the mix network, as it allows them to benefit from the
-anonymity features while also contributing to the network's overall anonymity
-and robustness.
+Weak packet formats can leak critical information (e.g., hop count, role), which Sphinx avoids by design.
 
-#### 2.4 Node Discovery
+#### 2.5. Pluggable Components
+
+The Mix protocol design supports the following pluggable extensions:
+
+- **Discovery**:
+  - Nodes MUST advertise Mix support via ENR (e.g., mix bit, X25519 pubkey).
+  - MUST enable unbiased random sampling of mix nodes.
+
+- **Delay Embedding**:
+  - Delays are specified by the sender per hop and embedded in the Sphinx packet.
+
+- **Spam Protection**:
+  - Prevents destination abuse by forcing resource commitment (e.g., PoW, VDF, RLN).
+  - Validated at the exit node before message forwarding.
+
+- **Cover Traffic**:
+  - Unobservability through loops, decoy traffic, and dummy messages.
+
+- **Incentivization**:
+  - To send anonymous messages, nodes MUST participate in the mixnet.
+  - Encourages mix node operation by tying usage to contribution.
+
+#### 2.6 Node Discovery
 
 All mix nodes participate in the discovery process and maintain a list of
 discovered nodes.
@@ -187,13 +221,13 @@ discovered nodes.
   iii. If not, performs discovery for that specific node.\
   iv. Forwards the Sphinx packet to the next hop.
 
-#### 2.5 Protocol Registration
+#### 2.7 Protocol Registration
 
 The protocol is registered with the libp2p host using the `"/mix/1.0.0"`
 identifier. This identifier is used to establish connections and negotiate the
 protocol between libp2p peers.
 
-#### 2.6 Transport Layer
+#### 2.8 Transport Layer
 
 The Mix protocol uses secure transport protocols to ensure confidentiality and
 integrity of communications. The recommended transport protocols are
@@ -201,7 +235,7 @@ integrity of communications. The recommended transport protocols are
 due to its performance benefits and built-in features
 such as low latency and efficient multiplexing).
 
-#### 2.7 Connection Establishment
+#### 2.9 Connection Establishment
 
 - The sender initiates a secure connection (TLS or QUIC) to the first mix node
   using the libp2p transport.
@@ -307,7 +341,7 @@ message SphinxPacket {
 }
 ```
 
-### 5. Handler Function
+### 5. Mix Protocol Handler
 
 The [handler function](https://docs.libp2p.io/concepts/fundamentals/protocols/#handler-functions)
 is responsible for processing connections and messages for
