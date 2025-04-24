@@ -96,7 +96,7 @@ All Status messages MUST have one of these functional scopes:
 1. _Global community control_: messages enabling the basic functioning of the app to control features related to communities. Examples include Community Invites, Community Membership Updates, community Status Updates, etc.
 2. _Global community content_: messages carrying user-generated content for members of any community.
 
-> *Note:* a previous iteration of the Status Communities feature defined separate community-wide scopes for each community.
+> **Note:** a previous iteration of the Status Communities feature defined separate community-wide scopes for each community.
 However, this model was deprecated and all communities now operate on a global, shared scope.
 This implies that different communities will share shards on the routing layer.
 

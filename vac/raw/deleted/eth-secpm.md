@@ -1,12 +1,18 @@
 ---
 title: ETH-SECPM
 name: Secure channel setup using Ethereum accounts
-status: raw
+status: deleted
 category: Standards Track
 tags:
 editor: Ramses Fernandez <ramses@status.im>
 contributors:
 ---
+
+## NOTE
+
+The content of this specification has been split between
+[ETH-DEMLS](vac/raw/eth-demls.md) and [NOISE-X3DH-RATCHET](vac/raw/noise-x3dh-ratchet.md)
+RFCs.
 
 ## Motivation
 

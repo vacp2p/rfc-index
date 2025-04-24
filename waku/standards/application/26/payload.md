@@ -5,39 +5,65 @@ name: Waku Message Payload Encryption
 status: draft
 editor: Oskar Thoren <oskarth@titanproxy.com>
 contributors:
+- Oskar Thoren <oskarth@titanproxy.com>
 ---
+
+## Abstract
 
 This specification describes how Waku provides confidentiality, authenticity, and
 integrity, as well as some form of unlinkability.
 Specifically, it describes how encryption, decryption and
-signing works in [6/WAKU1](../../legacy/6/waku1.md) and
-in [10/WAKU2 spec](../../core/10/waku2.md) with [14/WAKU-MESSAGE version 1](../../core/14/message.md/#version1).
+signing works in [6/WAKU1](waku/standards/legacy/6/waku1.md) and
+in [10/WAKU2](waku/standards/core/10/waku2.md) with [14/WAKU-MESSAGE](waku/standards/core/14/message.md/#version1).
 
-This specification effectively replaces [7/WAKU-DATA](../../legacy/7/data.md)
-as well as [6/WAKU1 Payload encryption](../../legacy/6/waku1.md/#payload-encryption)
-but written in a way that is agnostic and self-contained for Waku v1 and Waku v2.
+This specification effectively replaces [7/WAKU-DATA](waku/standards/legacy/7/data.md)
+as well as [6/WAKU1 Payload encryption](waku/standards/legacy/6/waku1.md/#payload-encryption)
+but written in a way that is agnostic and self-contained for [6/WAKU1](waku/standards/legacy/6/waku1.md) and [10/WAKU2](waku/standards/core/10/waku2.md).
 
 Large sections of the specification originate from
 [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627) as well from
 [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
 with some modifications.
 
+## Specification
+
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+
+For [6/WAKU1](waku/standards/legacy/6/waku1.md),
+the `data` field is used in the [waku envelope](waku/standards/legacy/6/waku1.md#abnf-specification)
+and the field MAY contain the encrypted payload.
+
+For [10/WAKU2](waku/standards/core/10/waku2.md),
+the `payload` field is used in `WakuMessage`
+and MAY contain the encrypted payload.
+
+The fields that are concatenated and
+encrypted as part of the `data` (Waku legacy) or
+`payload` (Waku) field are:
+
+- `flags`
+- `payload-length`
+- `payload`
+- `padding`
+- `signature`
+
 ## Design requirements
 
 - *Confidentiality*:
-The adversary should not be able to learn what data is being sent from one Waku node
+The adversary SHOULD NOT be able to learn what data is being sent from one Waku node
 to one or several other Waku nodes.
 - *Authenticity*:
-The adversary should not be able to cause Waku endpoint
+The adversary SHOULD NOT be able to cause Waku endpoint
 to accept data from any third party as though it came from the other endpoint.
 - *Integrity*:
-The adversary should not be able to cause a Waku endpoint to
+The adversary SHOULD NOT be able to cause a Waku endpoint to
 accept data that has been tampered with.
 
 Notable, *forward secrecy* is not provided for at this layer.
 If this property is desired,
-a more fully featured secure communication protocol can be used on top,
-such as [Status 5/SECURE-TRANSPORT](https://specs.status.im/spec/5).
+a more fully featured secure communication protocol can be used on top.
 
 It also provides some form of *unlinkability* since:
 
@@ -57,25 +83,6 @@ ECIES is using the following cryptosystem:
 - KDF: NIST SP 800-56 Concatenation Key Derivation Function, with SHA-256 option
 - MAC: HMAC with SHA-256
 - AES: AES-128-CTR
-
-## Specification
-
-For [6/WAKU1](../../legacy/6/waku1.md),
-the `data` field is used in the `waku envelope`,
-and the field MAY contain the encrypted payload.
-
-For [10/WAKU2 spec](../../core/10/waku2.md),
-the `payload` field is used in `WakuMessage` and
-MAY contain the encrypted payload.
-
-The fields that are concatenated and
-encrypted as part of the `data` (Waku v1) / `payload` (Waku v2) field are:
-
-- flags
-- payload-length
-- payload
-- padding
-- signature
 
 ### ABNF
 
@@ -101,7 +108,7 @@ signature       = 65OCTET
 
 data            = flags payload-length payload padding [signature]
 
-; This field is called payload in Waku v2
+; This field is called payload in Waku
 payload         = data
 ```
 
@@ -109,7 +116,7 @@ payload         = data
 
 Those unable to decrypt the payload/data are also unable to access the signature.
 The signature, if provided,
-is the ECDSA signature of the Keccak-256 hash of the unencrypted data
+SHOULD be the ECDSA signature of the Keccak-256 hash of the unencrypted data
 using the secret key of the originator identity.
 The signature is serialized as the concatenation of the `r`, `s` and `v` parameters
 of the SECP-256k1 ECDSA signature, in that order.
@@ -129,7 +136,7 @@ Symmetric encryption uses AES-256-GCM for
 The output of encryption is of the form (`ciphertext`, `tag`, `iv`)
 where `ciphertext` is the encrypted message,
 `tag` is a 16 byte message authentication tag and
-`iv` is a 12 byte initialization vector  (nonce).
+`iv` is a 12 byte initialization vector (nonce).
 The message authentication `tag` and
 initialization vector `iv` field MUST be appended to the resulting `ciphertext`,
 in that order.
@@ -144,7 +151,7 @@ Asymmetric encryption uses the standard Elliptic Curve Integrated Encryption Sch
 #### ECIES
 
 This section originates from the [RLPx Transport Protocol spec](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
-spec with minor modifications.
+specification with minor modifications.
 
 The cryptosystem used is:
 
@@ -177,11 +184,11 @@ then obtains the plaintext as `m = AES(kE, iv || c)`.
 
 ### Padding
 
-The padding field is used to align data size,
+The `padding` field is used to align data size,
 since data size alone might reveal important metainformation.
 Padding can be arbitrary size.
-However, it is recommended that the size of Data Field
-(excluding the IV and tag) before encryption (i.e. plain text)
+However, it is recommended that the size of `data` field
+(excluding the `iv` and `tag`) before encryption (i.e. plain text)
 SHOULD be a multiple of 256 bytes.
 
 ### Decoding a message
@@ -196,13 +203,13 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [6/WAKU1](../../legacy/6/waku1.md)
-2. [10/WAKU2 spec](../../core/10/waku2.md)
-3. [14/WAKU-MESSAGE version 1](../../core/14/message.md/#version1)
-4. [7/WAKU-DATA](../../legacy/7/data.md)
+1. [6/WAKU1](waku/standards/legacy/6/waku1.md)
+2. [10/WAKU2 spec](waku/standards/core/10/waku2.md)
+3. [14/WAKU-MESSAGE version 1](waku/standards/core/14/message.md/#version1)
+4. [7/WAKU-DATA](waku/standards/legacy/7/data.md)
 5. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
 6. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
-7. [Status 5/SECURE-TRANSPORT](https://specs.status.im/spec/5)
+7. [Status 5/SECURE-TRANSPORT](status/deprecated/secure-transport.md)
 8. [Augmented Backus-Naur form (ABNF)](https://tools.ietf.org/html/rfc5234)
 9. [Ethereum "Yellow paper": Appendix F Signing transactions](https://ethereum.github.io/yellowpaper/paper.pdf)
 10. [authenticated encryption](https://en.wikipedia.org/wiki/Authenticated_encryption)
