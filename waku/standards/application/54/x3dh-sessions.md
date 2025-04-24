@@ -7,11 +7,12 @@ category: Standards Track
 tags: waku-application
 editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
-- Andrea Piana <andreap@status.im>
-- Pedro Pombeiro <pedro@status.im>
-- Corey Petty <corey@status.im>
-- Oskar Thorén <oskarth@titanproxy.com>
-- Dean Eigenmann <dean@status.im>
+ - Andrea Piana <andreap@status.im>
+ - Pedro Pombeiro <pedro@status.im>
+ - Corey Petty <corey@status.im>
+ - Oskar Thorén <oskarth@titanproxy.com>
+ - Dean Eigenmann <dean@status.im>
+ - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -20,7 +21,7 @@ This document specifies how to manage sessions based on an X3DH key exchange.
 This includes how to establish new sessions,
 how to re-establish them, how to maintain them, and how to close them.
 
-[53/WAKU2-X3DH](../53/x3dh.md) specifies the Waku `X3DH` protocol
+[53/WAKU2-X3DH](/waku/standards/application/53/x3dh.md) specifies the Waku `X3DH` protocol
 for end-to-end encryption.
 Once two peers complete an X3DH handshake, they SHOULD establish an X3DH session.
 
@@ -80,11 +81,10 @@ of the shared secret encoded in hexadecimal format.
 
 ```js
 sharedKey, err := ecies.ImportECDSA(myPrivateKey).GenerateShared(
-      ecies.ImportECDSAPublic(theirPublicKey),
-      16,
-      16,
+    ecies.ImportECDSAPublic(theirPublicKey),
+    16,
+    16,
 )
-
 
 hexEncodedKey := hex.EncodeToString(sharedKey)
 
@@ -183,7 +183,7 @@ which will notify the receiving end not to include the device in any further com
 
 ## Security Considerations
 
-1. Inherits all security considerations from [53/WAKU2-X3DH](../53/x3dh.md).
+1. Inherits all security considerations from [53/WAKU2-X3DH](/waku/standards/application/53/x3dh.md).
 
 ### Recommendations
 
@@ -194,9 +194,10 @@ which will notify the receiving end not to include the device in any further com
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
 
-1. [53/WAKU2-X3DH](../53/x3dh.md)
-2. [Signal's Sesame Algorithm](https://signal.org/docs/specifications/sesame/)
+- [53/WAKU2-X3DH](/waku/standards/application/53/x3dh.md)
+- [Signal's Sesame Algorithm](https://signal.org/docs/specifications/sesame/)
