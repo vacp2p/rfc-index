@@ -91,7 +91,7 @@ This illustration shows an example of content topics a node is interested in.
 ![Waku Network visualization legend](./images/adaptive_node_network_topology_protocols_legend.png)
 
 The dotted box shows what content topics (application-specific)
-node A is interested in.
+a node is interested in.
 
 A node that is purely providing a service to the network might not care.
 
