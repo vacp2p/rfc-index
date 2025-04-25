@@ -104,7 +104,7 @@ Every specification has an independent lifecycle that documents clearly its curr
 
 A specification has six possible states that reflect its maturity and contractual weight:
 
-![Lifecycle diagram](./images/COSSDiagram.png)
+![Lifecycle diagram](./images/COSSChart.png)
 
 ### Raw Specifications
 
