@@ -141,6 +141,13 @@ it is RECOMMENDED to not implement them.
 The editor MAY choose to reinstate the specification to raw status at any time.
 Stagnant specifications have no contractual weight.
 
+### Deleted Specifications
+
+Deleted specifications are those that have not reached maturity (stable) and
+were discarded.
+They should not be used and are only kept for their historical value.
+Only raw and draft specifications can be deleted.
+
 ## Editorial control
 
 A specification MUST have a single responsible editor,
