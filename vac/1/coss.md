@@ -137,7 +137,7 @@ When raw or draft specifications have no activity and/or no desire to reach tech
 they become **stagnant** specifications.
 After a non-specified time, the specification can be asked to be downgraded to **stagnant**.
 They SHOULD be kept for their historical value but
-it is RECOMMENDED to not implement them.
+it is RECOMMENDED to not implement for commercial use.
 The editor MAY choose to reinstate the specification to raw status at any time.
 Stagnant specifications have no contractual weight.
 
