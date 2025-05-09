@@ -152,7 +152,7 @@ If this method returns true, then we check the strong validation of the vote as 
 If a proposal is verified by all the checks,
 the countVote method counts each YES vote from the list of Votes.
 
-## Properties 
+## Properties
 
 The consensus mechanism satisfies liveness and security properties as follows:
 
