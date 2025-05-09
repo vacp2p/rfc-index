@@ -120,9 +120,9 @@ it continues to create P_2 with the new vote V_2 that consists of as following:
 - Create P_2 with by adding V_2 as follows:
   - P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
   - Add the V_2 to the P_2.Votes list.
-  - Increase the round by one, namely P_2.round = P_1.round + 1. 
+  - Increase the round by one, namely P_2.round = P_1.round + 1.
   - Verify the time proposal timestamp is valid for expiration time, namely P_2.timestamp - current < P_1.expiration_time.
-  If this does not hold, other peers ignore the message. 
+  If this does not hold, other peers ignore the message.
 
 After the peer creates the proposal P_2 with its vote V_2,
 sends it to the random peer from the network or
@@ -154,7 +154,7 @@ the countVote method counts each YES vote from the list of Votes.
 
 ## Properties 
 
-The consensus mechanism satisfies liveness and security properties as follows: 
+The consensus mechanism satisfies liveness and security properties as follows:
 
 ### Liveness
 
@@ -164,10 +164,11 @@ Regarding the liveness property, if the YES votes are greater than n/2 among
  if a node could calculate the result of a proposal,
  it implies that no peer can calculate the opposite of the result.
  Still, reliability issues can cause some situations where peers cannot receive enough messages,
- so they cannot calculate the consensus result. 
+ so they cannot calculate the consensus result.
 
 Rounds are incremented when a peer adds and sends the new proposal.
 Calculating the required number of rounds, 2n/3 from the distinct peers' votes is achieved in two ways:
+
 1. 2n/3 rounds in pure P2P networks
 2. 2 rounds in gossipsub
 
@@ -182,6 +183,7 @@ Also, the expiration time is used to finalize the consensus in a specific time i
 
 Lastly, silent node management: Silent nodes are the nodes that not participate the voting as YES or NO.
 There are two possible counting votes for the silent peers.
+
 1. Silent peers means YES:
 Silent peers counted as YES vote, if the application prefer the strong rejection for NO votes.
 2. Silent peers means NO:
