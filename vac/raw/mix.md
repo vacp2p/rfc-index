@@ -76,7 +76,7 @@ The following terms are used throughout this specification:
   The Entry Layer is external to the Mix Protocol.
 
 - **Mix Exit Layer**
-  A component that receives decrypted messages from a Mix Protocol instance and and delivers them
+  A component that receives decrypted messages from a Mix Protocol instance and delivers them
   to the appropriate origin protocol instance at the destination.
   Like the Entry Layer, it is external to the Mix Protocol.
 
@@ -105,7 +105,7 @@ requiring per-message unlinkability.
 
 The Mix Protocol addresses this gap with a decentralized message routing layer based on classical
 mix network principles. It applies layered encryption and per-hop delays to obscure both routing paths
-and timing correlations. Each message is routed independently, pproviding resistance to traffic analysis
+and timing correlations. Each message is routed independently, providing resistance to traffic analysis
 and protection against metadata leakage
 
 By decoupling anonymity from connection state and transport negotiation, the Mix Protocol offers
@@ -135,6 +135,8 @@ The Mix Protocol differs fundamentally from Tor in several ways:
 - **Resistance to endpoint attacks**: The Mix Protocol is less susceptible to certain endpoint-level attacks,
   such as traffic volume correlation or targeted probing, since messages are delayed, reordered, and unlinkable at each hop.
 
+To understand the underlying anonymity properties of the Mix Protocol, we next describe the core components of a mix network.
+
 ## 4. Mixing Strategy and Packet Format
 
 The Mix Protocol relies on two core design elements to achieve sender unlinkability and metadata
@@ -157,7 +159,7 @@ The Mix Protocol instead uses continuous-time mixing, where each mix node applie
 delay to every incoming packet, typically drawn from an exponential distribution. This enables
 theoretically unbounded anonymity sets, since any packet may, with non-zero probability,
 be delayed arbitrarily long. In practice, the distribution is truncated once the probability
-of delay falls below a negligfible threshold. Continuous-time mixing also offers improved
+of delay falls below a negligible threshold. Continuous-time mixing also offers improved
 bandwidth utilization and smoother output traffic compared to batching-based approaches.
 
 To make continuous-time mixing tunable and predictable, the sender MUST select the mean delay
