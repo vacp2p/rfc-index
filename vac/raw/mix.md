@@ -111,3 +111,185 @@ and protection against metadata leakage
 By decoupling anonymity from connection state and transport negotiation, the Mix Protocol offers
 a modular privacy abstraction that existing libp2p protocols can adopt without altering their
 core behavior.
+
+To better illustrate the differences in design goals and threat models, the following  subsection contrasts
+the Mix Protocol with Tor, a widely known anonymity system.
+
+### 3.1 Comparison with Tor
+
+The Mix Protocol differs fundamentally from Tor in several ways:
+
+- **Unlinkability**: In the Mix Protocol, there is no direct connection between source and destination.
+  Each message is routed independently, eliminating correlation through persistent circuits.
+
+- **Delay-based mixing**: Mix nodes introduce randomized delays (e.g., from an exponential distribution)
+  before forwarding messages, making timing correlation significantly harder.
+
+- **High-latency focus**: Tor prioritizes low-latency communication for interactive web traffic,
+  whereas the Mix Protocol is designed for scenarios where higher latency is acceptable
+  in exchange for stronger anonymity.
+
+- **Message-based design**: Each message in the Mix Protocol is self-contained and independently routed.
+  No sessions or state are maintained between messages.
+
+- **Resistance to endpoint attacks**: The Mix Protocol is less susceptible to certain endpoint-level attacks,
+  such as traffic volume correlation or targeted probing, since messages are delayed, reordered, and unlinkable at each hop.
+
+## 4. Mixing Strategy and Packet Format
+
+The Mix Protocol relies on two core design elements to achieve sender unlinkability and metadata
+protection: a mixing strategy and a a cryptographically secure mix packet format.
+
+### 4.1 Mixing Strategy
+
+A mixing strategy defines how mix nodes delay and reorder incoming packets to resist timing
+correlation and input-output linkage. Two commonly used approaches are batch-based mixing and
+continuous-time mixing.
+
+In batching-based mixing, each mix node collects incoming packets over a fixed or adaptive
+interval, shuffles them, and forwards them in a batch. While this provides some
+unlinkability,
+it introduces high latency, requires synchronized flushing rounds, and may result in bursty
+output traffic. Anonymity is bounded by the batch size, and performance may degrade under variable
+message rates.
+
+The Mix Protocol instead uses continuous-time mixing, where each mix node applies a randomized
+delay to every incoming packet, typically drawn from an exponential distribution. This enables
+theoretically unbounded anonymity sets, since any packet may, with non-zero probability,
+be delayed arbitrarily long. In practice, the distribution is truncated once the probability
+of delay falls below a negligfible threshold. Continuous-time mixing also offers improved
+bandwidth utilization and smoother output traffic compared to batching-based approaches.
+
+To make continuous-time mixing tunable and predictable, the sender MUST select the mean delay
+for each hop and encode it into the Sphinx packet header. This allows top-level applications
+to balance latency and anonymity according to their requirements.
+
+### 4.2 Mix Packet Format
+
+A mix packet format defines how messages are encapsulated and routed through a mix network.
+It must ensure unlinkability between incoming and outgoing packets, prevent metadata leakage
+(e.g., path length, hop position, or payload size), and support uniform processing by mix nodes
+regardless of direction or content.
+
+The Mix Protocol uses [Sphinx packets](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)
+to meet these goals.
+Each message is encrypted in layers corresponding to the selected mix path. As a packet traverses
+the network, each mix node removes one encryption layer to obtain the next hop and delay,
+while the remaining payload remains encrypted and indistinguishable.
+
+Sphinx packets are fixed in size and bit-wise unlinkable. This ensures that they appear identical
+on the wire regardless of payload, direction, or route length, reducing opportunities for correlation
+based on packet size or format. Even mix nodes learn only the immediate routing information
+and the delay to be applied. They do not learn their position in the path or the total number of hops.
+
+The packet format is resistant to tagging and replay attacks and is compact and efficient to
+process. Sphinx packets also include per-hop integrity checks and enforces a maximum path length.
+Together with a constant-size header and payload, this provides bounded protection
+against
+endless routing and malformed packet propagation.
+
+It also supports anonymous and indistinguishable reply messages through [Single-Use Reply Blocks (SURBs)](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf),
+although reply support is not implemented yet.
+
+A complete specification of the Sphinx packet structure and fields is provided in [Section 6].
+
+## 5. Protocol Overview
+
+The Mix Protocol defines a decentralized, message-based routing layer that provides sender anonymity
+within the libp2p framework.
+
+It is agnostic to message content and semantics. Each message is treated as an opaque payload,
+wrapped into a [Sphinx packet](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf) and routed
+independently through a randomly selected mix path. Along the path, each mix node removes one layer
+of encryption, adds a randomized delay, and forwards the packet to the next hop. This combination of
+layered encryption and per-hop delay provides resistance to traffic analysis and enables message-level
+unlinkability.
+
+Unlike typical custom libp2p protocols, the Mix protocol is stateless&mdash;it does not establish
+persistent streams, negotiate protocols, or maintain sessions. Each message is self-contained
+and routed independently.
+
+The Mix Protocol sits above the transport layer and below the protocol layer in the libp2p stack.
+It provides a modular anonymity layer that other libp2p protocols MAY invoke selectively on a
+per-message basis.
+
+Integration with other libp2p protocols is handled through external components that  mediate
+between the origin protocol and the Mix Protocol instances. This enables selective anonymous routing
+without modifying protocol semantics or internal behavior.
+
+The following subsections describe how the Mix Protocol integrates with origin protocols via
+the Mix Entry and Exit layers, how per-message anonymity is controlled through the `mixify` flag,
+the rationale for defining Mix as a protocol rather than a transport, and the end-to-end message
+interaction flow.
+
+### 5.1 Integration with Origin Protocols
+
+libp2p protocols that wish to anonymize messages MUST do so by integrating with the Mix Protocol
+via the Mix Entry and Exit layers.
+
+- The **Mix Entry Layer** receives messages to be _mixified_ from an origin protocol and forwards them
+to the local Mix Protocol instance.
+- The **Mix Exit Layer** receives the final decrypted message from the Mix Protocol and forwards it
+to the appropriate origin protocol instance over a client-only connection.
+
+This integration is external to the Mix Protocol and is not handled by mix nodes themselves.
+
+### 5.2 Mixify Option
+
+Some origin protocols may require selective anonymity, choosing to anonymize _only_ certain messages
+based on their content, context, or destination. For example, a protocol may only  anonymize messages
+containing sensitive metadata while delivering others directly to optimize performance.
+
+To support this, origin protocols MAY implement a per-message `mixify` flag that indicates whether a message should be routed using the Mix Protocol.
+
+- If the flag is set, the message MUST be handed off to the Mix Entry Layer for anonymous routing.
+- If the flag is not set, the message SHOULD be routed using the origin protocol’s default mechanism.
+
+This design enables protocols to invoke the Mix Protocol only for selected messages, providing fine-grained control over privacy and performance trade-offs.
+
+### 5.3 Why a Protocol, Not a Transport
+
+The Mix Protocol is specified as a custom libp2p protocol rather than a transport to support
+selective anonymity while remaining compatible with libp2p’s architecture.
+
+As noted in [Section 5.2](#52-mixify-option), origin protocols may anonymize only specific messages
+based on content or context. Supporting such selective behavior requires invoking Mix on a per-message basis.
+
+libp2p transports, however, are negotiated per peer connection and apply globally to all messages
+exchanged between two peers. Enabling selective anonymity at the transport layer would
+therefore require
+changes to libp2p’s core transport semantics.
+
+Defining Mix as a protocol avoids these constraints and offers several benefits:
+
+- Supports selective invocation on a per-message basis.
+- Works atop existing secure transports (_e.g.,_ QUIC, TLS) without requiring changes to the transport stack.
+- Preserves a stateless, content-agnostic model focused on anonymous message routing.
+- Integrates seamlessly with origin protocols via the Mix Entry and Exit layers.
+
+This design preserves the modularity of the libp2p stack and allows Mix to be adopted without altering existing transport or protocol behavior.
+
+### 5.4 Protocol Interaction Flow
+
+A typical end-to-end Mix Protocol flow consists of the following three conceptual phases.
+Only the second phase&mdash;the anonymous routing performed by mix nodes&mdash;is part of the core
+Mix Protocol. The entry-side and exit-side integration steps are handled externally by the Mix Entry
+and Exit layers.
+
+1. **Entry-side Integration (Mix Entry Layer):**
+   - The origin protocol generates a message and sets the `mixify` flag.
+   - The message is passed to the Mix Entry Layer, which invokes the local Mix Protocol instance with
+   the message, destination, and origin protocol codec as input.
+
+2. **Anonymous Routing (Core Mix Protocol):**
+   - The Mix Protocol instance wraps the message in a Sphinx packet and selects a random mix path.
+   - Each mix node along the path:
+      - Processes the Sphinx packet by removing one encryption layer.
+      - Applies a delay and forwards the packet to the next hop.
+   - The final node in the path (exit node) decrypts the final layer, extracting the original plaintext message, destination, and origin protocol codec.
+
+3. **Exit-side Integration (Mix Exit Layer):**
+   - The Mix Exit Layer receives the plaintext message, destination, and origin protocol codec.
+   - It routes the message to the destination origin protocol instance using a client-only connection.
+
+The destination node does not need to support the Mix Protocol unless it also initiates mixified messages.
