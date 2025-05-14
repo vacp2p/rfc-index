@@ -38,8 +38,10 @@ Upon each user receives the proposal, validates the proposal,
 adds its vote as yes or no and with its signature and timestamp.
 Then this user sends the vote to the random node in the network or subscribing channel.
 Therefore, each user first validates the signature and then adds its new vote.
-Each sending message counts as a round after log(n) rounds all users in the network
-have the others vote if at least 2/3 number of users are honest where honesty follows the protocol.
+Each sending message counts as a round. 
+After log(n) rounds all users in the network have the others vote 
+if at least 2/3 number of users are honest where honesty follows the protocol.
+
 
 In general, the voting-based consensus consists of the following phases:
 
