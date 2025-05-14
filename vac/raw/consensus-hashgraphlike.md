@@ -38,10 +38,9 @@ Upon each user receives the proposal, validates the proposal,
 adds its vote as yes or no and with its signature and timestamp.
 Then this user sends the vote to the random node in the network or subscribing channel.
 Therefore, each user first validates the signature and then adds its new vote.
-Each sending message counts as a round. 
-After log(n) rounds all users in the network have the others vote 
+Each sending message counts as a round.
+After log(n) rounds all users in the network have the others vote
 if at least 2/3 number of users are honest where honesty follows the protocol.
-
 
 In general, the voting-based consensus consists of the following phases:
 
@@ -94,7 +93,6 @@ message Vote {
 To initiate a consensus for a proposal,
 a user MUST complete all the fields in the proposal, including attaching its vote. 
 Notably, `parent_hash` and `received_hash` are empty strings because there is no previous or received hash.
-
 Then the initialization section ends when the user who creates the proposal sends it
 to the random peer from the network or sends it to the proposal to the specific channel.
 
@@ -102,9 +100,10 @@ to the random peer from the network or sends it to the proposal to the specific 
 
 Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel does the following checks:
 
-- Check the signatures of the each votes in proposal, in particular for proposal P_1, 
+- Check the signatures of the each votes in proposal, in particular for proposal P_1,
 verify the signature of V_1 where V_1 = P_1.votes[0] with V_1.signature and V_1.vote_owner
-- Do `parent_hash` check: If there are repeated votes from the same sender, check that the hash of the former vote is equal to the `parent_hash` of the later vote.
+- Do `parent_hash` check: If there are repeated votes from the same sender,
+check that the hash of the former vote is equal to the `parent_hash` of the later vote.
 - Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
 - If the receiver peer verifies the signature, and hashes
 it continues to create P_2 with the new vote V_2 that consists of as following:
@@ -164,7 +163,7 @@ Liveness refers to the ability of the protocol to eventually reach a decision wh
 In this protocol, if more than n/2 of the votes among at least 2n/3 distinct peers are YES,
 then the consensus result is defined as YES.
  The peer calculates the result locally as shown in section3.
- From the [hashgraph property](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus), 
+ From the [hashgraph property](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus),
  if a node could calculate the result of a proposal,
  it implies that no peer can calculate the opposite of the result.
  Still, reliability issues can cause some situations where peers cannot receive enough messages,
