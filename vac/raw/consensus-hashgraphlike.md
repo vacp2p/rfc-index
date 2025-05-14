@@ -130,8 +130,8 @@ sends it to the proposal to the specific channel.
 
 ## 3. Determining the Result
 
-Since a peer cannot know if the votes are enough for the consensus without counting,
-it requires checking each time by the peers.
+Because consensus depends on meeting a quorum threshold, 
+each peer MUST verify the accumulated votes to determine whether the necessary conditions have been satisfied.
 The voting result is set YES if the majority of the 2n/3 from the distinct peers vote YES.
 
 To verify, the findDistinctVoter method processes the proposal by traversing its Votes list to determine the number of unique voters.
