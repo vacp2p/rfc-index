@@ -108,7 +108,7 @@ verify the signature of V_1 where V_1 = P_1.votes[0] with V_1.signature and V_1.
 - Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
 - If the receiver peer verifies the signature, and hashes
 it continues to create P_2 with the new vote V_2 that consists of as following:
-  - adding its public key
+  - adding its public key as P_2.vote_owner
   - timestamp
   - boolean vote
   - V_2.parent_hash = 0 if there is no previous peer's vote, otherwise hash of previous owner's vote
