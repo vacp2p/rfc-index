@@ -112,7 +112,8 @@ it continues to create P_2 with the new vote V_2 that consists of as following:
   - timestamp
   - boolean vote
   - V_2.parent_hash = 0 if there is no previous peer's vote, otherwise hash of previous owner's vote
-  - V_2.received_hash = P_1.votes[0]
+  - V_2.received_hash = hash(P_1.votes[0])
+
   - Calculate vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
     then adds the V_2.vote_hash
   - Sign vote_hash with its private key then adds V_2.vote_hash.
