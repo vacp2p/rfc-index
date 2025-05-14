@@ -15,7 +15,8 @@ consensus mechanism inspired by Hashgraph, designed for binary decision-making i
 ## Motivation
 
 Consensus is one of the essential components of decentralization.
-In particular, the decentralized group messaging application is used for
+In particular, in the decentralized group messaging application is used for
+
 binary decision-making to govern the group.
 Therefore, each user contributes to the decision-making process.
 Besides achieving decentralization, the consensus mechanism MUST be strong:
