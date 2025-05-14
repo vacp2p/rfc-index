@@ -116,7 +116,7 @@ it continues to create P_2 with the new vote V_2 that consists of as following:
 
   - Calculate vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
     then adds the V_2.vote_hash
-  - Sign vote_hash with its private key then adds V_2.vote_hash.
+  - Sign vote_hash with its private key corresponding the public key as vote_owner component then adds V_2.vote_hash.
 - Create P_2 with by adding V_2 as follows:
   - P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
   - Add the V_2 to the P_2.Votes list.
