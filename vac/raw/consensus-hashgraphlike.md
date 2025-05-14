@@ -103,9 +103,10 @@ to the random peer from the network or sends it to the proposal to the specific 
 Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel does the following checks:
 
 - Check the signatures of the voting
-- Check the hash checks in particular:
-  - Parenthash check prevents double voting
-  - Receivedhash check provides tampering attacks
+- Make checks regarding hashes:
+  - `parent_hash` verification prevents double voting
+  - Checking the `received_hash` prevents tampering attacks
+
 
 In particular, proposal message P_1 where its vote V_1 = P_1.votes[0] and performs as follows:
 
