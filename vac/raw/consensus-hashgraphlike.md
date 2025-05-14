@@ -128,7 +128,7 @@ After the peer creates the proposal P_2 with its vote V_2,
 sends it to the random peer from the network or
 sends it to the proposal to the specific channel.
 
-## 3. Determining the Result
+## 3. Determining the result
 
 Because consensus depends on meeting a quorum threshold,
 each peer MUST verify the accumulated votes to determine whether the necessary conditions have been satisfied.
@@ -141,7 +141,7 @@ which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
 - Check each signature in the vote
-  - as shown in the section Exchanging votes across the peers.
+  - as shown in the section 2 Exchanging votes across the peers.
 - Check the parent hash chain
   - if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
     the parent hash of vote_i+1 should be the hash of vote_i
@@ -154,7 +154,7 @@ no other honest peer can arrive at a conflicting result.
 If a proposal is verified by all the checks,
 the countVote method counts each YES vote from the list of Votes.
 
-## Properties
+## 4. Properties
 
 The consensus mechanism satisfies liveness and security properties as follows:
 
@@ -209,11 +209,11 @@ in different stages of the protocol, violating vote consistency and attempting t
 - Integrity breaking attempt: tampering history by changing previous votes.
 - Replay attack: storing the old votes to maliciously use in fresh voting.
 
-## Copyright
+## 5. Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 
-## References
+## 6. References
 
 - [Hedera Hashgraph](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus)
 - [Gossip about gossip](https://docs.hedera.com/hedera/core-concepts/hashgraph-consensus-algorithms/gossip-about-gossip)
