@@ -32,8 +32,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ## Flow
 
-Any user in the group initializes the consensus by creating a proposal that
-consists of the proposal without any registration phase.
+Any user in the group initializes the consensus by creating a proposal.
 Next, the user broadcasts the proposal to the whole network.
 Upon each user receives the proposal, validates the proposal,
 adds its vote as yes or no and with its signature and timestamp.
