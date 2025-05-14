@@ -91,9 +91,10 @@ message Vote {
 
 ```
 
-In particular, to initialize a consensus for a proposal,
-a user MUST fulfill all the fields in the proposal including attaching its vote.
-In particular, parent_hash and received_hash are empty string since there is no previous or received hash.
+To initiate a consensus for a proposal,
+a user MUST complete all the fields in the proposal, including attaching its vote. 
+Notably, `parent_hash` and `received_hash` are empty strings because there is no previous or received hash.
+
 Then the initialization section ends when the user who creates the proposal sends it
 to the random peer from the network or sends it to the proposal to the specific channel.
 
