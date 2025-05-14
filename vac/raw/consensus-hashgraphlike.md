@@ -74,7 +74,7 @@ message Proposal {
   int32 round = 15;                 // Number of Votes 
   int64 timestamp = 16;             // Creation time of proposal
   int64 expiration_time = 17;       // The time interval that the proposal is active.  
-  bool liveness_criteria_yes = 18;  // Shows how managing the silent peers vote
+  bool silent_node_yes = 18;       // Shows how managing the silent peers vote
 }
 
 message Vote {
@@ -184,7 +184,9 @@ the peer can continue to send the message for those not received enough messages
 too in the expiration time written in the proposal.
 Also, the expiration time is used to finalize the consensus in a specific time interval.
 
-Lastly, silent node management: Silent nodes are the nodes that not participate the voting as YES or NO.
+### Silent Node Management
+
+Silent nodes are the nodes that not participate the voting as YES or NO.
 There are two possible counting votes for the silent peers.
 
 1. Silent peers means YES:
@@ -192,7 +194,7 @@ Silent peers counted as YES vote, if the application prefer the strong rejection
 2. Silent peers means NO:
 Silent peers counted as NO vote, if the application prefer the strong acception for NO votes.
 
-The proposal is set to default true, which means silent peers' votes are counted as YES.
+The proposal is set to default true, which means silent peers' votes are counted as YES namely `liveness_criteria_yes` is set true by default.
 
 ### Security
 
