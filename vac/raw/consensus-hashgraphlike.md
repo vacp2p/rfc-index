@@ -160,8 +160,9 @@ The consensus mechanism satisfies liveness and security properties as follows:
 
 ### Liveness
 
-Regarding the liveness property, if the YES votes are greater than n/2 among
- the 2n/3 of the distinct peers that vote, we define the consensus result as YES.
+Liveness refers to the ability of the protocol to eventually reach a decision when sufficient honest participation is present. 
+In this protocol, if more than n/2 of the votes among at least 2n/3 distinct peers are YES, 
+then the consensus result is defined as YES. 
  The peer calculates the result locally. From the hashgraph property,
  if a node could calculate the result of a proposal,
  it implies that no peer can calculate the opposite of the result.
