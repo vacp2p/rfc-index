@@ -130,14 +130,14 @@ sends it to the proposal to the specific channel.
 
 ## 3. Determining the Result
 
-Because consensus depends on meeting a quorum threshold, 
+Because consensus depends on meeting a quorum threshold,
 each peer MUST verify the accumulated votes to determine whether the necessary conditions have been satisfied.
 The voting result is set YES if the majority of the 2n/3 from the distinct peers vote YES.
 
 To verify, the findDistinctVoter method processes the proposal by traversing its Votes list to determine the number of unique voters.
 
-If this method returns true, the peer proceeds with strong validation, 
-which ensures that if any honest peer reaches a decision, 
+If this method returns true, the peer proceeds with strong validation,
+which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
 - Check each signature in the vote
@@ -160,10 +160,11 @@ The consensus mechanism satisfies liveness and security properties as follows:
 
 ### Liveness
 
-Liveness refers to the ability of the protocol to eventually reach a decision when sufficient honest participation is present. 
-In this protocol, if more than n/2 of the votes among at least 2n/3 distinct peers are YES, 
-then the consensus result is defined as YES. 
- The peer calculates the result locally. From the hashgraph property,
+Liveness refers to the ability of the protocol to eventually reach a decision when sufficient honest participation is present.
+In this protocol, if more than n/2 of the votes among at least 2n/3 distinct peers are YES,
+then the consensus result is defined as YES.
+ The peer calculates the result locally as shown in section3.
+ From the [hashgraph property](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus), 
  if a node could calculate the result of a proposal,
  it implies that no peer can calculate the opposite of the result.
  Still, reliability issues can cause some situations where peers cannot receive enough messages,
@@ -179,10 +180,10 @@ Since the message complexity is O(1) in the gossipsub channel,
 in case the network has reliability issues,
 the second round is used for the peers cannot receive all the messages from the first round.
 
-If an honest and online peer has received at least one vote but not enough to reach consensus, 
-it MAY continue to propagate its own vote — and any votes it has received — to support message dissemination. 
-This process can continue beyond the expected round count, 
-as long as it remains within the expiration time defined in the proposal. 
+If an honest and online peer has received at least one vote but not enough to reach consensus,
+it MAY continue to propagate its own vote — and any votes it has received — to support message dissemination.
+This process can continue beyond the expected round count,
+as long as it remains within the expiration time defined in the proposal.
 The expiration time acts as a soft upper bound to ensure that consensus is either reached or aborted within a bounded timeframe.
 
 ### Silent Node Management
@@ -203,7 +204,7 @@ This RFC uses cryptographic primitives to prevent the
 malicious behaviours as follows:
 
 - Vote forgery attempt: creating unsigned invalid votes
-- Inconsistent voting: a malicious peer submits conflicting votes (e.g., YES to some peers and NO to others) 
+- Inconsistent voting: a malicious peer submits conflicting votes (e.g., YES to some peers and NO to others)
 in different stages of the protocol, violating vote consistency and attempting to undermine consensus.
 - Integrity breaking attempt: tampering history by changing previous votes.
 - Replay attack: storing the old votes to maliciously use in fresh voting.
