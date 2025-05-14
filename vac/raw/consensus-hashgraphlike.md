@@ -136,7 +136,9 @@ The voting result is set YES if the majority of the 2n/3 from the distinct peers
 
 To verify, the findDistinctVoter method processes the proposal by traversing its Votes list to determine the number of unique voters.
 
-If this method returns true, then we check the strong validation of the vote as follows:
+If this method returns true, the peer proceeds with strong validation, 
+which ensures that if any honest peer reaches a decision, 
+no other honest peer can arrive at a conflicting result.
 
 - Check each signature in the vote
   - as shown in the section Exchanging votes across the peers.
