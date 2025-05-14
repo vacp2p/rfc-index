@@ -179,10 +179,11 @@ Since the message complexity is O(1) in the gossipsub channel,
 in case the network has reliability issues,
 the second round is used for the peers cannot receive all the messages from the first round.
 
-If there is an online peer who has at least one vote but not enough for the consensus,
-the peer can continue to send the message for those not received enough messages
-too in the expiration time written in the proposal.
-Also, the expiration time is used to finalize the consensus in a specific time interval.
+If an honest and online peer has received at least one vote but not enough to reach consensus, 
+it MAY continue to propagate its own vote — and any votes it has received — to support message dissemination. 
+This process can continue beyond the expected round count, 
+as long as it remains within the expiration time defined in the proposal. 
+The expiration time acts as a soft upper bound to ensure that consensus is either reached or aborted within a bounded timeframe.
 
 ### Silent Node Management
 
