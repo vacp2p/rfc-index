@@ -200,7 +200,8 @@ This RFC uses cryptographic primitives to prevent the
 malicious behaviours as follows:
 
 - Vote forgery attempt: creating unsigned invalid votes
-- Inconsistent voting: both yes and no voting in different stages.
+- Inconsistent voting: a malicious peer submits conflicting votes (e.g., YES to some peers and NO to others) 
+in different stages of the protocol, violating vote consistency and attempting to undermine consensus.
 - Integrity breaking attempt: tampering history by changing previous votes.
 - Replay attack: storing the old votes to maliciously use in fresh voting.
 
