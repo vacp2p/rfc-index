@@ -137,8 +137,8 @@ Since a peer cannot know if the votes are enough for the consensus without count
 it requires checking each time by the peers.
 The voting result is set YES if the majority of the 2n/3 from the distinct peers vote YES.
 
-To check the findDistintVoter method takes the proposal and extracts the number of distinct voters by
-traversing the Votes list in the proposal.
+To verify, the findDistinctVoter method processes the proposal by traversing its Votes list to determine the number of unique voters.
+
 If this method returns true, then we check the strong validation of the vote as follows:
 
 - Check each signature in the vote
