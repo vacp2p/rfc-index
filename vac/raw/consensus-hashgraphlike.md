@@ -102,21 +102,16 @@ to the random peer from the network or sends it to the proposal to the specific 
 
 Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel does the following checks:
 
-- Check the signatures of the voting
-- Make checks regarding hashes:
-  - `parent_hash` verification prevents double voting
-  - Checking the `received_hash` prevents tampering attacks
-
-
-In particular, proposal message P_1 where its vote V_1 = P_1.votes[0] and performs as follows:
-
-- Verifiy the vote V_1.signature with with the V_1.vote_owner in the proposal.
-- If the peer verifies the signature,
+- Check the signatures of the each votes in proposal, in particular for proposal P_1, 
+verify the signature of V_1 where V_1 = P_1.votes[0] with V_1.signature and V_1.vote_owner
+- Do `parent_hash` check: If there are repeated votes from the same sender, check that the hash of the former vote is equal to the `parent_hash` of the later vote.
+- Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
+- If the receiver peer verifies the signature, and hashes
 it continues to create P_2 with the new vote V_2 that consists of as following:
   - adding its public key
   - timestamp
   - boolean vote
-  - V_2.parent_hash = 0 if there is no previous peer's vote, otherwise Hash of previous owner's vote
+  - V_2.parent_hash = 0 if there is no previous peer's vote, otherwise hash of previous owner's vote
   - V_2.received_hash = P_1.votes[0]
   - Calculate vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
     then adds the V_2.vote_hash
