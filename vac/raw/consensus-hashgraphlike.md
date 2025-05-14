@@ -100,7 +100,7 @@ to the random peer from the network or sends it to the proposal to the specific 
 
 ## 2. Exchanging votes across the peers
 
-Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel with its votes does the following checks:
+Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel does the following checks:
 
 - Check the signatures of the voting(should it be the recursive from the first one to the last one)
 - Check the hash checks in particular:
