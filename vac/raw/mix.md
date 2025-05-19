@@ -294,4 +294,149 @@ and Exit layers.
    - The Mix Exit Layer receives the plaintext message, destination, and origin protocol codec.
    - It routes the message to the destination origin protocol instance using a client-only connection.
 
-The destination node does not need to support the Mix Protocol unless it also initiates mixified messages.
+    The destination node does not need to support the Mix Protocol unless it also initiates mixified messages.
+
+The behavior described above represents the core Mix Protocol. In addition, the protocol
+supports a set of pluggable components that extend its functionality. These components cover
+areas such as node discovery, delay strategy, spam resistance, cover traffic generation,
+and incentivization. Some are REQUIRED for interoperability; others are OPTIONAL or deployment-specific.
+The next section describes each component.
+
+## 6. Pluggable Components
+
+Pluggable components define functionality that extends or configures the behavior of the Mix Protocol
+beyond its core message routing logic. Each component in this section falls into one of two categories:
+
+- Required for interoperability and path construction (_e.g.,_ discovery, delay strategy).
+- Optional or deployment-specific (_e.g.,_ spam protection, cover traffic, incentivization).
+
+The following subsections describe the role and expected behavior of each.
+
+### 6.1 Discovery
+
+The Mix Protocol does not mandate a specific peer discovery mechanism. However, nodes participating in
+the mixnet MUST be discoverable so that other nodes can construct routing paths that include them.
+
+To enable this, regardless of the discovery mechanism used, each mix node MUST make the following
+information available to peers:
+
+- Indicate Mix Protocol support (_e.g.,_ using a `mix` field or bit).
+- Its X25519 public key for Sphinx encryption.
+- One or more routable libp2p multiaddresses that identify the mix node’s own network endpoints.
+
+To support sender anonymity at scale, discovery mechanism SHOULD support _unbiased random sampling_
+from the set of live mix nodes. This enables diverse path construction and reduces exposure to
+adversarial routing bias.
+
+While no existing mechanism provides unbiased sampling by default,
+[Waku’s ambient discovery](https://rfc.vac.dev/waku/standards/core/33/discv5/) &mdash; an extension
+over [Discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md) &mdash; demonstrates
+an approximate solution. It combines topic-based capability advertisement with periodic
+peer sampling. A similar strategy could potentially be adapted for the Mix Protocol.
+
+A more robust solution would involve integrating capability-aware discovery directly into the
+libp2p stack, such as through extensions to `libp2p-kaddht`. This would enable direct lookup of
+mix nodes based on protocol support and eliminate reliance on external mechanisms such as Discv5.
+Such an enhancement remains exploratory and is outside the scope of this specification.
+
+Regardless of the mechanism, the goal is to ensure mix nodes are discoverable and that path selection
+is resistant to bias and node churn.
+
+### 6.2 Delay Strategy
+
+The Mix Protocol uses per-hop delay as a core mechanism for achieving timing unlinkability.
+For each hop in the mix path, the sender MUST specify a mean delay value, which is embedded in
+the Sphinx packet header. The mix node at each hop uses this value to sample a randomized delay
+before forwarding the packet.
+
+By default, delays are sampled from an exponential distribution. This supports continuous-time mixing,
+produces smooth output traffic, and enables tunable trade-offs between latency and anonymity.
+Importantly, it allows for unbounded anonymity sets: each packet may, with non-zero probability,
+be delayed arbitrarily long.
+
+The delay strategy is considered pluggable, and other distributions MAY be used to match
+application-specific anonymity or performance requirements. However, any delay strategy
+MUST ensure that:
+
+- Delays are sampled independently at each hop.
+- Delay sampling introduces sufficient variability to obscure timing correlation between packet
+  arrival and forwarding across multiple hops.
+
+Strategies that produce deterministic or tightly clustered output delays are NOT RECOMMENDED,
+as they increase the risk of timing correlation. Delay strategies SHOULD introduce enough uncertainty
+to prevent adversaries from linking packet arrival and departure times, even when monitoring
+multiple hops concurrently.
+
+### 6.3 Spam Protection
+
+The Mix Protocol supports optional spam protection mechanisms to defend recipients against
+abusive or unsolicited traffic. These mechanisms are applied at the exit node, which is the
+final node in the mix path before the message is delivered to its destination via the respective
+libp2p protocol.
+
+Exit nodes that enforce spam protection MUST validate the attached proof before forwarding
+the message. If validation fails, the message MUST be discarded.
+
+Common strategies include Proof of Work (PoW), Verifiable Delay Functions (VDFs), and Rate-limiting Nullifiers (RLNs).
+
+The sender is responsible for appending the appropriate spam protection data (e.g., nonce, timestamp)
+to the message payload. The format and verification logic depend on the selected method.
+An example using PoW is included in Appendix A.
+
+Note: The spam protection mechanisms described above are intended to protect the destination application
+or protocol from message abuse or flooding. They do not provide protection against denial-of-service (DoS) or
+resource exhaustion attacks targeting the mixnet itself (_e.g.,_ flooding mix nodes with traffic,
+inducing processing overhead, or targeting bandwidth).
+
+Protections against attacks targeting the mixnet itself are not defined in this specification
+but are critical to the long-term robustness of the system. Future versions of the protocol may
+define mechanisms to rate-limit clients, enforce admission control, or incorporate incentives and
+accountability to defend the mixnet itself from abuse.
+
+### 6.4 Cover Traffic
+
+Cover traffic is an optional mechanism used to improve privacy by making the presence or absence
+of actual messages indistinguishable to observers. It helps achieve _unobservability_ where
+a passive adversary cannot determine whether a node is sending real messages or not.
+
+In the Mix Protocol, cover traffic is limited to _loop messages_ &mdash; dummy Sphinx packets
+that follow a valid mix path and return to the originating node. These messages carry no application
+payload but are indistinguishable from real messages in structure, size, and routing behavior.
+
+Cover traffic MAY be generated by either mix nodes or senders. The strategy for generating
+such traffic &mdash; such as timing and frequency &mdash; is pluggable and not specified
+in this document.
+
+Implementations that support cover traffic SHOULD generate loop messages at randomized intervals.
+This helps mask actual sending behavior and increases the effective anonymity set. Timing
+strategies such as Poisson processes or exponential delays are commonly used, but the choice is
+left to the implementation.
+
+In addition to
+enhancing privacy, loop messages can be used to assess network liveness or path reliability
+without requiring explicit acknowledgments.
+
+### 6.5 Incentivization
+
+The Mix Protocol supports a simple tit-for-tat model to discourage free-riding and promote
+mix node participation. In this model, nodes that wish to send anonymous messages using the
+Mix Protocol MUST also operate a mix node. This requirement ensures that participants contribute to
+the anonymity set they benefit from, fostering a minimal form of fairness and reciprocity.
+
+This tit-for-tat model is intentionally lightweight and decentralized. It deters passive use
+of the mixnet by requiring each user to contribute bandwidth and processing capacity. However, it
+does not guarantee the quality of service provided by participating nodes. For example, it
+does not prevent nodes from running low-quality or misbehaving mix instances, nor does it
+deter participation by compromised or transient peers.
+
+The Mix Protocol does not mandate any form of payment, token exchange, or accounting. More
+sophisticated economic models &mdash; such as stake-based participation, credentialed relay networks,
+or zero-knowledge proof-of-contribution systems &mdash; MAY be layered on top of the protocol or
+enforced via external coordination.
+
+Additionally, network operators or application-layer policies MAY require nodes to maintain
+minimum uptime, prove their participation, or adhere to service-level guarantees.
+
+While the Mix Protocol defines a minimum participation requirement, additional incentivization
+extensions are considered pluggable and experimental in this version of the specification.
+No specific mechanism is standardized.
