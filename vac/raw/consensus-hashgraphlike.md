@@ -142,23 +142,23 @@ If this method returns true, the peer proceeds with strong validation,
 which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
-1. Check each signature in the vote
+- Step 1: Check each signature in the vote
 
 as shown in the section 2 Exchanging votes across the peers.
 
-2. Check the parent hash chain
+- Step 2: Check the parent hash chain
 
 if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
 the parent hash of vote_i+1 should be the hash of vote_i
 
-3. Check the previous hash chain
+- Step 3: Check the previous hash chain
 
-- each received hash of vote_i+1 should be equal to the hash of vote_i.
+each received hash of vote_i+1 should be equal to the hash of vote_i.
 
-4. Check the timestamp against the replay attack:
+- Step 4: Check the timestamp against the replay attack:
 
-- timestamps check the freshness of the message against the replay.
-    In particular, the timestamp cannot be the old in the determined threshold.
+timestamps check the freshness of the message against the replay.
+In particular, the timestamp cannot be the old in the determined threshold.
 
 If a proposal is verified by all the checks,
 the countVote method counts each YES vote from the list of Votes.
