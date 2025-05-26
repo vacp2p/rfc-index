@@ -101,12 +101,12 @@ to the random peer from the network or sends it to the proposal to the specific 
 
 Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel does the following checks:
 
-- Check the signatures of the each votes in proposal, in particular for proposal P_1,
+1. Check the signatures of the each votes in proposal, in particular for proposal P_1,
 verify the signature of V_1 where V_1 = P_1.votes[0] with V_1.signature and V_1.vote_owner
-- Do `parent_hash` check: If there are repeated votes from the same sender,
+2. Do `parent_hash` check: If there are repeated votes from the same sender,
 check that the hash of the former vote is equal to the `parent_hash` of the later vote.
-- Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
-- If the receiver peer verifies the signature, and hashes
+3. Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
+4. If the receiver peer verifies the signature, and hashes
 it continues to create P_2 with the new vote V_2 that consists of as following:
   - adding its public key as P_2.vote_owner
   - timestamp
@@ -117,7 +117,7 @@ it continues to create P_2 with the new vote V_2 that consists of as following:
   - Calculate vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
     then adds the V_2.vote_hash
   - Sign vote_hash with its private key corresponding the public key as vote_owner component then adds V_2.vote_hash.
-- Create P_2 with by adding V_2 as follows:
+5 Create P_2 with by adding V_2 as follows:
   - P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
   - Add the V_2 to the P_2.Votes list.
   - Increase the round by one, namely P_2.round = P_1.round + 1.
@@ -140,14 +140,14 @@ If this method returns true, the peer proceeds with strong validation,
 which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
-- Check each signature in the vote
-  - as shown in the section 2 Exchanging votes across the peers.
-- Check the parent hash chain
+1. Check each signature in the vote
+  1.1 as shown in the section 2 Exchanging votes across the peers.
+2. Check the parent hash chain
   - if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
     the parent hash of vote_i+1 should be the hash of vote_i
-- Check the previous hash chain
+3. Check the previous hash chain
   - each received hash of vote_i+1 should be equal to the hash of vote_i.
-- Check the timestamp against the replay attack:
+4. Check the timestamp against the replay attack:
   - timestamps check the freshness of the message against the replay.
     In particular, the timestamp cannot be the old in the determined threshold.
 
