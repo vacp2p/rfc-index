@@ -110,23 +110,23 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
 it continues to create P_2 with the new vote V_2 that consists of as following:
 
 - adding its public key as P_2.vote_owner
-- timestamp
-- boolean vote
-- V_2.parent_hash = 0 if there is no previous peer's vote, otherwise hash of previous owner's vote
-- V_2.received_hash = hash(P_1.votes[0])
+- `timestamp`
+- `boolean vote`
+- `V_2.parent_hash` = 0 if there is no previous peer's vote, otherwise hash of previous owner's vote
+- `V_2.received_hash` = `hash(P_1.votes[0])`
 
-- Calculate vote_hash by  hash of Vote hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)
-    then adds the V_2.vote_hash
-- Sign vote_hash with its private key corresponding the public key as vote_owner component then adds V_2.vote_hash.
-5 Create P_2 with by adding V_2 as follows:
+- Calculate vote_hash by  hash of Vote hash(`vote_id`, `owner`, `timestamp`, `vote`, `parent_hash`, `received_hash`)
+    then adds the `V_2.vote_hash`
+- Sign vote_hash with its private key corresponding the public key as vote_owner component then adds `V_2.vote_hash`.
+5 Create `P_2` with by adding `V_2` as follows:
 
-- P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
-- Add the V_2 to the P_2.Votes list.
-- Increase the round by one, namely P_2.round = P_1.round + 1.
-- Verify the time proposal timestamp is valid for expiration time, namely P_2.timestamp - current < P_1.expiration_time.
+- `P_2.name`, `P_2.proposal_id` and `P_2.proposal_owner` are the same with `P_1`.
+- Add the `V_2` to the `P_2.Votes` list.
+- Increase the round by one, namely `P_2.round` = `P_1.round` + 1.
+- Verify the time proposal timestamp is valid for expiration time, namely `P_2.timestamp` - `current.time` < `P_1.expiration_time`.
   If this does not hold, other peers ignore the message.
 
-After the peer creates the proposal P_2 with its vote V_2,
+After the peer creates the proposal `P_2` with its vote `V_2`,
 sends it to the random peer from the network or
 sends it to the proposal to the specific channel.
 
@@ -136,29 +136,29 @@ Because consensus depends on meeting a quorum threshold,
 each peer MUST verify the accumulated votes to determine whether the necessary conditions have been satisfied.
 The voting result is set YES if the majority of the 2n/3 from the distinct peers vote YES.
 
-To verify, the findDistinctVoter method processes the proposal by traversing its Votes list to determine the number of unique voters.
+To verify, the `findDistinctVoter` method processes the proposal by traversing its Votes list to determine the number of unique voters.
 
 If this method returns true, the peer proceeds with strong validation,
 which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
-- Step 1: Check each signature in the vote
+- Step 1: Check each `signature` in the vote
 
-as shown in the section 2 Exchanging votes across the peers.
+as shown in the section 2, exchanging votes across the peers.
 
-- Step 2: Check the parent hash chain
+- Step 2: Check the `parent_hash` chain
 
-if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
-the parent hash of vote_i+1 should be the hash of vote_i
+if there are multiple votes from the same owner namely `vote_i` and `vote_i+1` respectively,
+the parent hash of `vote_i+1` should be the hash of `vote_i`
 
-- Step 3: Check the previous hash chain
+- Step 3: Check the `previous_hash` chain
 
-each received hash of vote_i+1 should be equal to the hash of vote_i.
+each received hash of `vote_i+1` should be equal to the hash of `vote_i`.
 
-- Step 4: Check the timestamp against the replay attack:
+- Step 4: Check the `timestamp` against the replay attack:
 
 timestamps check the freshness of the message against the replay.
-In particular, the timestamp cannot be the old in the determined threshold.
+In particular, the `timestamp` cannot be the old in the determined threshold.
 
 If a proposal is verified by all the checks,
 the countVote method counts each YES vote from the list of Votes.
