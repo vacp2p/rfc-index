@@ -108,6 +108,7 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
 3. Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
 4. If the receiver peer verifies the signature, and hashes
 it continues to create P_2 with the new vote V_2 that consists of as following:
+
   - adding its public key as P_2.vote_owner
   - timestamp
   - boolean vote
@@ -118,6 +119,7 @@ it continues to create P_2 with the new vote V_2 that consists of as following:
     then adds the V_2.vote_hash
   - Sign vote_hash with its private key corresponding the public key as vote_owner component then adds V_2.vote_hash.
 5 Create P_2 with by adding V_2 as follows:
+
   - P_2.name, P_2.proposal_id and P_2.proposal_owner are the same with P_1.
   - Add the V_2 to the P_2.Votes list.
   - Increase the round by one, namely P_2.round = P_1.round + 1.
@@ -141,13 +143,17 @@ which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
 1. Check each signature in the vote
-  1.1 as shown in the section 2 Exchanging votes across the peers.
+
+  - as shown in the section 2 Exchanging votes across the peers.
 2. Check the parent hash chain
+
   - if there are multiple votes from the same owner namely vote_i and vote_i+1 respectively,
     the parent hash of vote_i+1 should be the hash of vote_i
 3. Check the previous hash chain
+
   - each received hash of vote_i+1 should be equal to the hash of vote_i.
 4. Check the timestamp against the replay attack:
+
   - timestamps check the freshness of the message against the replay.
     In particular, the timestamp cannot be the old in the determined threshold.
 
