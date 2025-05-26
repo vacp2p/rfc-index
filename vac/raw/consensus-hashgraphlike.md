@@ -73,7 +73,7 @@ message Proposal {
   int32 round = 15;                 // Number of Votes 
   int64 timestamp = 16;             // Creation time of proposal
   int64 expiration_time = 17;       // The time interval that the proposal is active.  
-  bool silent_node_yes = 18;       // Shows how managing the silent peers vote
+  bool liveness_criteria_yes = 18;       // Shows how managing the silent peers vote
 }
 
 message Vote {
