@@ -22,7 +22,7 @@ Therefore, each user contributes to the decision-making process.
 Besides achieving decentralization, the consensus mechanism MUST be strong:
 under the assumption of at least 2/3 honest users in the network,
 each user MUST conclude the same decision and scalability:
-the rounds MUST be growth logarithmic so as not to lose the scalability of the messaging applications.
+message propagation in the network MUST occur within O(log n) rounds, where n is the total number of peers, in order to preserve the scalability of the messaging application.
 
 ## Format Specification
 
