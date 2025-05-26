@@ -36,7 +36,8 @@ Any user in the group initializes the consensus by creating a proposal.
 Next, the user broadcasts the proposal to the whole network.
 Upon each user receives the proposal, validates the proposal,
 adds its vote as yes or no and with its signature and timestamp.
-Then this user sends the vote to the random node in the network or subscribing channel.
+The user then sends the proposal and vote to a random peer in a P2P setup, 
+or to a subscribed gossipsub channel if gossip-based messaging is used.
 Therefore, each user first validates the signature and then adds its new vote.
 Each sending message counts as a round.
 After log(n) rounds all users in the network have the others vote
