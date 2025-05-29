@@ -233,7 +233,7 @@ such as low latency and efficient multiplexing).
       keystream, which is XORed with the plaintext to produce the ciphertext.
   - **HMAC-SHA-256:** 256-bit MAC (truncated to 128 bits).
     - **Inputs:** Key `k` (16 bytes), Message `m`
-    - **Message**: Data to be authenticated (_e.g.,_ $β$ component).
+    - **Message**: Data to be authenticated (_e.g.,_ $ \beta $ component).
     - **Output**: MAC `mac` (truncated to 128 bits).
     - **Operation**: HMAC-SHA-256 uses the key and the message to produce a
       hash-based message authentication code.
@@ -247,7 +247,7 @@ such as low latency and efficient multiplexing).
    - Represents a Curve25519 group element (x-coordinate in GF(2^255 - 19)).
    - Used by mix nodes to extract shared session key using their private key.
 
-2. **Beta ($β$)**: $((t+1)r + 1)\kappa$ bytes typically, where $r$ is the maximum
+2. **Beta ($ \beta $)**: $((t+1)r + 1)\kappa$ bytes typically, where $r$ is the maximum
    path length.
 
    - Contains the encrypted routing information.
@@ -255,7 +255,7 @@ such as low latency and efficient multiplexing).
     latency/anonymity trade-offs.
    - This gives a reasonable size of $336$ bytes, when $t = 3$ (refer
      Section 5.2.10 for the choice of $t$).
-   - We extend $β$ to accommodate next hop address and delay below.
+   - We extend $ \beta $ to accommodate next hop address and delay below.
 
 3. **Gamma ($γ$)**: $\kappa$ bytes (16 bytes)
 
@@ -289,7 +289,7 @@ or $3$).
     - QUIC/TLS protocol identifier flag (1 byte)
     - Peer ID (32 bytes for Ed25519 or Secp256k1).
 
-The entire Sphinx packet header ($α$, $β$, and $γ$) can fit within a fixed size
+The entire Sphinx packet header ($α$, $ \beta $, and $γ$) can fit within a fixed size
 of $32 + (r(t+1)+1)\kappa + 16 = 384$ bytes, leaving ample room for a large $δ$ of
 up to $2413 - 384 = 2029$ bytes.
 
@@ -426,11 +426,11 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - Derive the AES key, MAC key, and IV:
 
-     $`\text{β\_aes\_key}_{i} = KDF(\text{"aes\_key"}\ |\ s_{i})`$
+     $`\text{\beta\_aes\_key}_{i} = KDF(\text{"aes\_key"}\ |\ s_{i})`$
 
      $`\text{mac\_key}_{i} = KDF(\text{"mac\_key"}\ |\ s_{i})`$
 
-     $`\text{β\_iv}_{i} = H(\text{"iv"}\ |\ s_{i})`$ (truncated to 128 bits)
+     $`\text{\beta\_iv}_{i} = H(\text{"iv"}\ |\ s_{i})`$ (truncated to 128 bits)
 
    - Generate random $`\text{delay\_i}`$, a 16-bit unsigned integer (0-65535 milliseconds).
 
@@ -443,19 +443,19 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - If $i = L-1$ (_i.e.,_ exit node):
 
-     $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ 0_{((t+1)
+     $`\beta_i = \text{AES-CTR}(\text{\beta\_aes\_key}_{i},\ \text{\beta\_iv}_{i},\ 0_{((t+1)
      (r-L)+t+2)\kappa})\ |\ \phi_{L-1}`$
 
    - Otherwise (_i.e.,_ intermediary node):
 
-     $`\beta_i = \text{AES-CTR}(\text{β\_aes\_key}_{i},\ \text{β\_iv}_{i},\ \text
+     $`\beta_i = \text{AES-CTR}(\text{\beta\_aes\_key}_{i},\ \text{\beta\_iv}_{i},\ \text
      {addr}_{i+1} \ |\ \text{delay}_{i+1}\ | \ \gamma_{i+1}\ |\ {\beta_{i+1}}_
      {[0\ldots(r(t+1)-t)\kappa−1]})`$
 
      Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$,
      where $t$ is the combined length of next hop address and delay.
 
-   - $`\gamma_i = \text{HMAC-SHA-256}(\text{mac\_key}_i,\ β_i)`$\
+   - $`\gamma_i = \text{HMAC-SHA-256}(\text{mac\_key}_i,\beta_i)`$\
       Note that the length of $\gamma_i$ is $\kappa$.
 
    d. **Compute** **Deltas (**$\delta_i$, **$i=0$** to **$L-1$)**
@@ -532,7 +532,7 @@ to relay a message:
 
    $`\text{mac\_key} = KDF(\text{"mac\_key"}\ |\ s)`$
 
-   b. Check if $`\gamma = \text{HMAC-SHA-256}(\text{mac\_key},\ β)`$ . If not,
+   b. Check if $`\gamma = \text{HMAC-SHA-256}(\text{mac\_key},\beta)`$ . If not,
    discard the message.
 
    c. Otherwise, store tag $H(s)$ in the list of seen message tags.
@@ -541,12 +541,12 @@ to relay a message:
 
    a. Derive the AES key, MAC key, and IV:
 
-   $`\text{β\_aes\_key} = KDF(\text{"aes\_key"}\ |\ s)`$
+   $`\text{\beta\_aes\_key} = KDF(\text{"aes\_key"}\ |\ s)`$
 
-   $`\text{β\_iv} = H(\text{"iv"}\ |\ s)`$ (truncated to 128 bits)
+   $`\text{\beta\_iv} = H(\text{"iv"}\ |\ s)`$ (truncated to 128 bits)
 
    b. Compute
-   $`B = \text{AES-CTR}(\text{β\_aes\_key},\ \text{β\_iv},\ \beta\ |\ 0_{(t+1)k})`$.
+   $`B = \text{AES-CTR}(\text{\beta\_aes\_key},\ \text{\beta\_iv},\ \beta\ |\ 0_{(t+1)k})`$.
 
    c. Uniquely parse prefix of $B$
 
