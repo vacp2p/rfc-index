@@ -426,7 +426,6 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - Derive the AES key, MAC key, and IV:
 
-
      $`\beta_{\mathrm{aes\_key}_i} = \mathrm{KDF}("aes\_key" \mid s_i)`$
 
      $`\text{mac\_key}_{i} = KDF(\text{"mac\_key"}\ |\ s_{i})`$
