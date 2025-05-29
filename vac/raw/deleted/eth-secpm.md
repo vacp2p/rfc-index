@@ -422,7 +422,7 @@ Credentials MUST follow the specifications of section 5.3 of
 
 Below follows the flow diagram for the generation of credentials.
 Users MUST generate key pairs by themselves.
-![figure1](./images/eth-secpm_credential.png)
+![figure1](vac/raw/images/eth-secpm_credential.png)
 
 ### Message framing
 
