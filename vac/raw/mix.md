@@ -539,7 +539,7 @@ to relay a message:
 
    c. Otherwise, store tag $H(s)$ in the list of seen message tags.
 
-6. **Decrypt One Layer**
+5. **Decrypt One Layer**
 
    a. Derive the AES key, MAC key, and IV:
 
@@ -588,7 +588,7 @@ to relay a message:
      $`\delta_{\mathrm{iv}} = \mathrm{H}("\delta\_iv" \mid s)`$ (truncated to 128 bits)
    - Compute $`\delta' = \mathrm{AES\text{-}CTR}(\delta_{\mathrm{aes\_key}}, \delta_{\mathrm{iv}}, \delta)`$
 
-7. **Construct Final Sphinx Packet**
+6. **Construct Final Sphinx Packet**
 
    a. Initialize header
 
@@ -602,9 +602,9 @@ to relay a message:
 
    `delta = delta' // variable size, max 2029 bytes`
 
-8. **Serialize the Sphinx Packet** using Protocol Buffers.
-9. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
-10. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
+7. **Serialize the Sphinx Packet** using Protocol Buffers.
+8. **Introduce A Delay** of $`\text{delay}`$ milliseconds.
+9. **Send the Serialized Packet** to $`\text{next\_hop}`$ using the
     `"/mix/1.0.0"` protocol.
 
 #### 5.3 Exit Node
