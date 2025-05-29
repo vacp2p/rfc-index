@@ -262,11 +262,11 @@ such as low latency and efficient multiplexing).
    - Output of HMAC-SHA-256, truncated to 128 bits.
    - Ensures the integrity of the header information.
 
-4. **Delta ($δ$)**: The encrypted payload, which can be of variable size.
+4. **Delta ($$\delta$$)**: The encrypted payload, which can be of variable size.
    - According to the [MixMatch](https://petsymposium.org/popets/2024/popets-2024-0050.pdf)
     paper, the Nym network uses Sphinx packets of a fixed
     size (2413 bytes).
-   - Considering this, the maximum $δ$ size can be chosen as 2413 bytes minus
+   - Considering this, the maximum $$\delta$$ size can be chosen as 2413 bytes minus
     the header length (which will be derived below).
 
 #### 4.2 Address Format and Delay Specification
@@ -290,7 +290,7 @@ or $3$).
     - Peer ID (32 bytes for Ed25519 or Secp256k1).
 
 The entire Sphinx packet header ($α$, $$\beta$$, and $γ$) can fit within a fixed size
-of $32 + (r(t+1)+1)\kappa + 16 = 384$ bytes, leaving ample room for a large $δ$ of
+of $32 + (r(t+1)+1)\kappa + 16 = 384$ bytes, leaving ample room for a large $$\delta$$ of
 up to $2413 - 384 = 2029$ bytes.
 
 #### 4.3 Message Format
@@ -466,18 +466,19 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
    - Derive the AES key and IV:
 
-     $`\text{δ\_aes\_key}_{i} = KDF(\text{"δ\_aes\_key"}\ |\ s_{i})`$
+    $`\delta_{\mathrm{aes\_key}_i} = \mathrm{KDF}("\delta\_aes\_key" \mid s_i)`$
 
-     $`\text{δ\_iv}_{i} = H(\text{"δ\_iv"}\ |\ s_{i})`$ (truncated to 128 bits)
+    $`\delta_{\mathrm{iv}_i} = \mathrm{H}("\delta\_iv" \mid s_i)`$ (truncated to 128 bits)
 
    - If $i = L-1$ (_i.e.,_ exit node):
 
-     $`\delta_i = \text{AES-CTR}(\text{δ\_aes\_key}_{i},\ \text{δ\_iv}_{i},
-     \ 0_{\kappa}\ |\ m)`$, where $m$ is the `message`.
+     $`\delta_i = \mathrm{AES\text{-}CTR}(\delta_{\mathrm{aes\_key}_i},
+     \delta_{\mathrm{iv}_i}, 0_{\kappa} \mid m)`$
+      , where $m$ is the `message`.
 
    - Otherwise (_i.e.,_ intermediary node):
 
-     $`\delta_i = \text{AES-CTR}(\text{δ\_aes\_key}_{i},\ \text{δ\_iv}_{i},\ \delta_{i+1})`$
+     $`\delta_i = \mathrm{AES\text{-}CTR}(\delta_{\mathrm{aes\_key}_i}, \delta_{\mathrm{iv}_i}, \delta_{i+1})`$
 
      Note that the length of $\delta$ is $|m| + \kappa$.
 
@@ -584,9 +585,9 @@ to relay a message:
    i. **Compute Delta**
 
    - Derive the AES key and IV:
-     $`\text{δ\_aes\_key} = KDF(\text{"δ\_aes\_key"}\ |\ s)`$
-     $`\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)$` (truncated to 128 bits)
-   - Compute $`\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)`$
+     $`\delta_{\mathrm{aes\_key}} = \mathrm{KDF}("\delta\_aes\_key" \mid s)`$
+     $`\delta_{\mathrm{iv}} = \mathrm{H}("\delta\_iv" \mid s)`$ (truncated to 128 bits)
+   - Compute $`\delta' = \mathrm{AES\text{-}CTR}(\delta_{\mathrm{aes\_key}}, \delta_{\mathrm{iv}}, \delta)`$
 
 7. **Construct Final Sphinx Packet**
 
@@ -618,11 +619,11 @@ to relay a message:
 
    - Derive the AES key and IV:
 
-     $`\text{δ\_aes\_key} = KDF(\text{"δ\_aes\_key"}\ |\ s)`$
+     $`\delta_{\mathrm{aes\_key}} = \mathrm{KDF}("\delta\_aes\_key" \mid s)`$
 
-     $`\text{δ\_iv} = H(\text{"δ\_iv"}\ |\ s)`$ (truncated to 128 bits)
+     $`\delta_{\mathrm{iv}} = \mathrm{H}("\delta\_iv" \mid s)`$ (truncated to 128 bits)
 
-   - Compute $`\delta' = \text{AES-CTR}(\text{δ\_aes\_key},\ \text{δ\_iv},\ \delta)`$.
+   - Compute $`\delta' = \mathrm{AES\text{-}CTR}(\delta_{\mathrm{aes\_key}}, \delta_{\mathrm{iv}}, \delta)`$.
 
 3. **Extract Message**
 
