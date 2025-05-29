@@ -445,7 +445,7 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
      $`\beta_i = \mathrm{AES\text{-}CTR}(\beta_{\mathrm{aes\_key}_i}, \beta_{\mathrm{iv}_i},
       0_{((t+1)(r-L)+t+2)\kappa}) \mid \phi_{L-1}`$
-     
+
    - Otherwise (_i.e.,_ intermediary node):
 
      $`\beta_i = \mathrm{AES\text{-}CTR}\bigl(\beta_{\mathrm{aes\_key}_i},
