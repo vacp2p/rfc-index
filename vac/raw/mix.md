@@ -406,16 +406,16 @@ sender, intermediary, and exit node) is detailed in the following subsections.
 
      - Derive the AES key and IV:
 
-       $`\text{φ\_aes\_key}_{i-1} = KDF(\text{"aes\_key"}\ |\ s_{i-1})`$
+       $`\phi_{\mathrm{aes\_key}_{i-1}} = \mathrm{KDF}("aes\_key" \mid s_{i-1})`$
 
-       $`\text{φ\_iv}_{i-1} = H(\text{"iv"}\ |\ s_{i-1})`$ (truncated to 128 bits)
+       $`\phi_{\mathrm{iv}_{i-1}} = \mathrm{H}("iv" \mid s_{i-1})`$ (truncated to 128 bits)
 
      - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$,
        which is AES-CTR encryption with the keystream starting from
        index $((t+1)(r-i)+t+2)\kappa$ :
 
-       $`\phi_i = \text{AES-CTR}^\prime_i(\text{φ\_aes\_key}_{i-1},\ \text{φ\_iv}_{i-1},
-       \ \phi_{i-1}\ |\ 0_{(t+1)\kappa})`$,
+       $`\phi_i = \mathrm{AES\text{-}CTR}'_i(\phi_{\mathrm{aes\_key}_{i-1}},
+        \phi_{\mathrm{iv}_{i-1}}, \phi_{i-1} \mid 0_{(t+1)\kappa})`$,
        where $0_{(t+1)\kappa}$ is the string of $0$ bits of length $(t+1)\kappa$.
 
    Note that the length of $\phi_i$ is $(t+1)i\kappa$.
