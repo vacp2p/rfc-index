@@ -112,16 +112,18 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
 
    4.1. Add its public key as `P_2.vote_owner`.
 
-   4.2. Set `timestamp`, `boolean vote`.
+   4.2. Set `timestamp`
+ 
+   4.3. Set boolean `vote`.
 
-   4.3. Define `V_2.parent_hash = 0` if there is no previous peer's vote, otherwise hash of previous owner's vote.
+   4.4. Define `V_2.parent_hash = 0` if there is no previous peer's vote, otherwise hash of previous owner's vote.
 
-   4.4. Set `V_2.received_hash = hash(P_1.votes[0])`.
+   4.5. Set `V_2.received_hash = hash(P_1.votes[0])`.
   
-   4.5. Calculate `vote_hash` by hash of all previously defined fields in Vote:
+   4.6. Calculate `vote_hash` by hash of all previously defined fields in Vote:
   `V_2.vote_hash = hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)`
   
-   4.6. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
+   4.7. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
 
 5. Create `P_2` with by adding `V_2` as follows:
   
