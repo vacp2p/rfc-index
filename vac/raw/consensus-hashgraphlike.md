@@ -5,7 +5,7 @@ status: raw
 category: Standards Track
 tags: 
 editor: Ugur Sen <ugur@status.im> 
-contributors: Seemenkina <ekaterina@status.im>
+contributors: seemenkina <ekaterina@status.im>
 ---
 ## Abstract
 
@@ -16,13 +16,16 @@ consensus mechanism inspired by Hashgraph, designed for binary decision-making i
 
 Consensus is one of the essential components of decentralization.
 In particular, in the decentralized group messaging application is used for
-
 binary decision-making to govern the group.
 Therefore, each user contributes to the decision-making process.
 Besides achieving decentralization, the consensus mechanism MUST be strong:
-under the assumption of at least 2/3 honest users in the network,
-each user MUST conclude the same decision and scalability:
-message propagation in the network MUST occur within O(log n) rounds, where n is the total number of peers, in order to preserve the scalability of the messaging application.
+
+- Under the assumption of at least `2/3` honest users in the network.
+
+- Each user MUST conclude the same decision and scalability:
+message propagation in the network MUST occur within `O(log n)` rounds,
+where `n` is the total number of peers,
+in order to preserve the scalability of the messaging application.
 
 ## Format Specification
 
@@ -40,8 +43,8 @@ The user then sends the proposal and vote to a random peer in a P2P setup,
 or to a subscribed gossipsub channel if gossip-based messaging is used.
 Therefore, each user first validates the signature and then adds its new vote.
 Each sending message counts as a round.
-After log(n) rounds all users in the network have the others vote
-if at least 2/3 number of users are honest where honesty follows the protocol.
+After `log(n)` rounds all users in the network have the others vote
+if at least `2/3` number of users are honest where honesty follows the protocol.
 
 In general, the voting-based consensus consists of the following phases:
 
@@ -74,7 +77,7 @@ message Proposal {
   int32 round = 15;                 // Number of Votes 
   int64 timestamp = 16;             // Creation time of proposal
   int64 expiration_time = 17;       // The time interval that the proposal is active.  
-  bool liveness_criteria_yes = 18;       // Shows how managing the silent peers vote
+  bool liveness_criteria_yes = 18;  // Shows how managing the silent peers vote
 }
 
 message Vote {
@@ -84,9 +87,8 @@ message Vote {
   bool vote = 23;                 // Vote bool value (true/false)
   bytes parent_hash = 24;         // Hash of previous owner's Vote
   bytes received_hash = 25;       // Hash of previous received Vote
-  bytes vote_hash 26 =            // hash of Vote hash(vote_id, owner, timestamp, 
-  vote, parent_hash, received_hash)
-  bytes signature = 27;           // Signature of hash Sign (hash)
+  bytes vote_hash = 26;           // Hash of all previously defined fields in Vote
+  bytes signature = 27;           // Signature of vote_hash
 }
 
 ```
@@ -99,32 +101,28 @@ to the random peer from the network or sends it to the proposal to the specific 
 
 ## 2. Exchanging votes across the peers
 
-Once the peer receives the proposal message P_1 from a 1-1 or a gossipsub channel does the following checks:
+Once the peer receives the proposal message `P_1` from a 1-1 or a gossipsub channel does the following checks:
 
-1. Check the signatures of the each votes in proposal, in particular for proposal P_1,
-verify the signature of V_1 where V_1 = P_1.votes[0] with V_1.signature and V_1.vote_owner
+1. Check the signatures of the each votes in proposal, in particular for proposal `P_1`,
+verify the signature of `V_1` where `V_1 = P_1.votes[0]` with `V_1.signature` and `V_1.vote_owner`
 2. Do `parent_hash` check: If there are repeated votes from the same sender,
 check that the hash of the former vote is equal to the `parent_hash` of the later vote.
 3. Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
-4. If the receiver peer verifies the signature, and hashes
-it continues to create P_2 with the new vote V_2 that consists of as following:
+4. After successful verification of the signature and hashes, the receiving peer proceeds to generate `P_2` containing a new vote `V_2` as following:
+   4.1. Add its public key as `P_2.vote_owner`.
+   4.2. Set `timestamp`, `boolean vote`.
+   4.3. Define `V_2.parent_hash = 0` if there is no previous peer's vote, otherwise hash of previous owner's vote.
+   4.4. Set `V_2.received_hash = hash(P_1.votes[0])`.
+   4.5. Calculate `vote_hash` by hash of all previously defined fields in Vote:
+  `V_2.vote_hash = hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)`
+   4.6. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
 
-- adding its public key as P_2.vote_owner
-- `timestamp`
-- `boolean vote`
-- `V_2.parent_hash` = 0 if there is no previous peer's vote, otherwise hash of previous owner's vote
-- `V_2.received_hash` = `hash(P_1.votes[0])`
-
-- Calculate vote_hash by  hash of Vote hash(`vote_id`, `owner`, `timestamp`, `vote`, `parent_hash`, `received_hash`)
-    then adds the `V_2.vote_hash`
-- Sign vote_hash with its private key corresponding the public key as vote_owner component then adds `V_2.vote_hash`.
-5 Create `P_2` with by adding `V_2` as follows:
-
-- `P_2.name`, `P_2.proposal_id` and `P_2.proposal_owner` are the same with `P_1`.
-- Add the `V_2` to the `P_2.Votes` list.
-- Increase the round by one, namely `P_2.round` = `P_1.round` + 1.
-- Verify the time proposal timestamp is valid for expiration time, namely `P_2.timestamp` - `current.time` < `P_1.expiration_time`.
-  If this does not hold, other peers ignore the message.
+5. Create `P_2` with by adding `V_2` as follows:
+   5.1. Assign `P_2.name`, `P_2.proposal_id`, and `P_2.proposal_owner` to be identical to those in `P_1`.
+   5.2. Add the `V_2` to the `P_2.Votes` list.
+   5.3. Increase the round by one, namely `P_2.round = P_1.round + 1`.
+   5.4. Verify that the proposal has not expired by checking that: `P_2.timestamp - current_time < P_1.expiration_time`.
+    If this does not hold, other peers ignore the message.
 
 After the peer creates the proposal `P_2` with its vote `V_2`,
 sends it to the random peer from the network or
@@ -134,34 +132,26 @@ sends it to the proposal to the specific channel.
 
 Because consensus depends on meeting a quorum threshold,
 each peer MUST verify the accumulated votes to determine whether the necessary conditions have been satisfied.
-The voting result is set YES if the majority of the 2n/3 from the distinct peers vote YES.
+The voting result is set YES if the majority of the `2n/3` from the distinct peers vote YES.
 
-To verify, the `findDistinctVoter` method processes the proposal by traversing its Votes list to determine the number of unique voters.
+To verify, the `findDistinctVoter` method processes the proposal by traversing its `Votes` list to determine the number of unique voters.
 
 If this method returns true, the peer proceeds with strong validation,
 which ensures that if any honest peer reaches a decision,
 no other honest peer can arrive at a conflicting result.
 
-- Step 1: Check each `signature` in the vote
+1. Check each `signature` in the vote as shown in the [Section 2](#2-exchanging-votes-across-the-peers).
 
-as shown in the section 2, exchanging votes across the peers.
-
-- Step 2: Check the `parent_hash` chain
-
-if there are multiple votes from the same owner namely `vote_i` and `vote_i+1` respectively,
+2. Check the `parent_hash` chain if there are multiple votes from the same owner namely `vote_i` and `vote_i+1` respectively,
 the parent hash of `vote_i+1` should be the hash of `vote_i`
 
-- Step 3: Check the `previous_hash` chain
+3. Check the `previous_hash` chain, each received hash of `vote_i+1` should be equal to the hash of `vote_i`.
 
-each received hash of `vote_i+1` should be equal to the hash of `vote_i`.
-
-- Step 4: Check the `timestamp` against the replay attack:
-
-timestamps check the freshness of the message against the replay.
+4. Check the `timestamp` against the replay attack.
 In particular, the `timestamp` cannot be the old in the determined threshold.
 
 If a proposal is verified by all the checks,
-the countVote method counts each YES vote from the list of Votes.
+the `countVote` method counts each YES vote from the list of Votes.
 
 ## 4. Properties
 
@@ -170,22 +160,22 @@ The consensus mechanism satisfies liveness and security properties as follows:
 ### Liveness
 
 Liveness refers to the ability of the protocol to eventually reach a decision when sufficient honest participation is present.
-In this protocol, if more than n/2 of the votes among at least 2n/3 distinct peers are YES,
+In this protocol, if more than `n/2` of the votes among at least `2n/3` distinct peers are YES,
 then the consensus result is defined as YES.
- The peer calculates the result locally as shown in section3.
- From the [hashgraph property](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus),
- if a node could calculate the result of a proposal,
- it implies that no peer can calculate the opposite of the result.
- Still, reliability issues can cause some situations where peers cannot receive enough messages,
- so they cannot calculate the consensus result.
+The peer calculates the result locally as shown in the [Section 3](#3-determining-the-result).
+From the [hashgraph property](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus),
+if a node could calculate the result of a proposal,
+it implies that no peer can calculate the opposite of the result.
+Still, reliability issues can cause some situations where peers cannot receive enough messages,
+so they cannot calculate the consensus result.
 
 Rounds are incremented when a peer adds and sends the new proposal.
-Calculating the required number of rounds, 2n/3 from the distinct peers' votes is achieved in two ways:
+Calculating the required number of rounds, `2n/3` from the distinct peers' votes is achieved in two ways:
 
-1. 2n/3 rounds in pure P2P networks
-2. 2 rounds in gossipsub
+1. `2n/3` rounds in pure P2P networks
+2. `2` rounds in gossipsub
 
-Since the message complexity is O(1) in the gossipsub channel,
+Since the message complexity is `O(1)` in the gossipsub channel,
 in case the network has reliability issues,
 the second round is used for the peers cannot receive all the messages from the first round.
 
@@ -200,9 +190,9 @@ The expiration time acts as a soft upper bound to ensure that consensus is eithe
 Silent nodes are the nodes that not participate the voting as YES or NO.
 There are two possible counting votes for the silent peers.
 
-1. Silent peers means YES:
+1. **Silent peers means YES:**
 Silent peers counted as YES vote, if the application prefer the strong rejection for NO votes.
-2. Silent peers means NO:
+2. **Silent peers means NO:**
 Silent peers counted as NO vote, if the application prefer the strong acception for NO votes.
 
 The proposal is set to default true, which means silent peers' votes are counted as YES namely `liveness_criteria_yes` is set true by default.
