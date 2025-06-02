@@ -109,18 +109,28 @@ verify the signature of `V_1` where `V_1 = P_1.votes[0]` with `V_1.signature` an
 check that the hash of the former vote is equal to the `parent_hash` of the later vote.
 3. Do `received_hash` check: If there are multiple votes in a proposal, check that the hash of a vote is equal to the `received_hash` of the next one.
 4. After successful verification of the signature and hashes, the receiving peer proceeds to generate `P_2` containing a new vote `V_2` as following:
+
    4.1. Add its public key as `P_2.vote_owner`.
+
    4.2. Set `timestamp`, `boolean vote`.
+
    4.3. Define `V_2.parent_hash = 0` if there is no previous peer's vote, otherwise hash of previous owner's vote.
+
    4.4. Set `V_2.received_hash = hash(P_1.votes[0])`.
+  
    4.5. Calculate `vote_hash` by hash of all previously defined fields in Vote:
   `V_2.vote_hash = hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)`
+  
    4.6. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
 
 5. Create `P_2` with by adding `V_2` as follows:
+  
    5.1. Assign `P_2.name`, `P_2.proposal_id`, and `P_2.proposal_owner` to be identical to those in `P_1`.
+  
    5.2. Add the `V_2` to the `P_2.Votes` list.
+  
    5.3. Increase the round by one, namely `P_2.round = P_1.round + 1`.
+  
    5.4. Verify that the proposal has not expired by checking that: `P_2.timestamp - current_time < P_1.expiration_time`.
     If this does not hold, other peers ignore the message.
 
