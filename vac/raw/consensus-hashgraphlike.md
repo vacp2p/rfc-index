@@ -112,8 +112,8 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
 
    4.1. Add its public key as `P_2.vote_owner`.
 
-   4.2. Set `timestamp`
- 
+   4.2. Set `timestamp`.
+
    4.3. Set boolean `vote`.
 
    4.4. Define `V_2.parent_hash = 0` if there is no previous peer's vote, otherwise hash of previous owner's vote.
