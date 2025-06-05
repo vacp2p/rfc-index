@@ -75,21 +75,40 @@ If staked tokens are not locked, the account MAY withdraw the full amount of tok
 
 ### Operator Role
 
-Operators are the owners of the staking system implemented in the staking system.
-The operator interacts with a `stakeMangaer` contract to faciltate the requirements of the staking system.
+Operators are the owners of the staking system implemented in the staking streamer protocol.
+The operator interacts with a `stakeMangaer` contract to faciltate the requirements of the system.
 A `stakeManager` is a smart contract that holds the logic for the staking system.
 Each account MUST use a `stakeVault` to interact with the `stakeManager`.
-Inclcuding when tokens 
-- The operator is the owner of the staking protocol and interacts with the `stakeManager` contract.
-- A `stakeManager` is a contract holds the logic for the staking protocol and
-is operatored by the owner of the staking streamer protocol, .
-- The user will be rewarded an ERC-20 token from the `stakeManager` contract, set by the owner of the `stakeManager`.
-The user will be awarded a non transferable token (NFT). ****
-- 
+This includes transfering to and from the staking system.
+
+The operator MAY set a perfered minimum lock duration for all tokens entering the system.
+Accounts transaction SHOULD fail if the minimum lock duration is not set.
+After a minimum lock duration is set,
+the operator SHOULD NOT be able to update this amount untilt the set period is complete.
+
+The `stakeManager` is upgradable only by the registered operator.
+Contract upgrades will occur when an operator wants to add and/or
+change the requirements of the system.
+When accounts are aware of changes, either by the operator informing them or
+reading the contract state, accounts SHOULD be able to leave the system if they do not agree with the changes.
+
+#### Emergency Mode
+
+Emergency mode MAY be enabled 
+
+- new vaults from registering,
+- current registered vaults from adding more stake,
+- staking with lock period,
+- unstaking tokens,
+- update the global state
+- claim accured rewards.
 
 ### Rewards
 
-### Multiplier Points
+- The user will be rewarded an ERC-20 token from the `stakeManager` contract, set by the owner of the `stakeManager`.
+The user will be awarded a non transferable token (NFT). ****
+
+#### Multiplier Points
 
 - In the staking streamer protocol, there are multipler points (MP),
 which are internal contract accounting ensuring users are rewarded based on the amount stake and the time of stake.
