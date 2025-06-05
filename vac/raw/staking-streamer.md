@@ -11,19 +11,21 @@ contributors:
 
 ## Abstract
 
-This specification describes the components of the smart contracts for the Staking streamer protocol.
-
+This specification describes the components of the smart contracts for the staking streamer protocol.
+The staking streamer protocol is currently used in Status Network.
 
 ## Background/Motivation
 
-The Status Network blockchain is a layer 2 blockchain that does not have gas fees for transactions.
-Instead, users gain access to the blockchain by staking native tokens on the staking streamer protocol.
-Staking will allow users to accumulate a ERC-20 token called Karma which can be used to create transactions,
-voting rights on the network, and other benefits.
+The Status Network is a layer 2 blockchain that is gasless.
+To achieve no gas fees for transactions conducted on the network,
+users utilize a staking mechanism with native tokens.
+This mechanism, called the staking streamer, 
+allow users to accumulate a ERC-20 token called Karma.
+With Karma, users can create transactions,
+have voting rights on the Status Network, and other benefits.
 The goal is to have a staking mechanism that is fair to all participates based on the stake amount and time staked.
-A user can have a significant increases in voting power when committed to the network for a longer period of time,
+Participants will have significant increases in voting power after committing their stake for a longer period of time,
 even if their stake is not the largest amongst all participants.
-
 
 ## Specification
 
@@ -31,43 +33,61 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”,
 “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
+The staking streamer protocol is a set of smart contracts that implements the staking system.
+The protocol consists of the following components:
+
+- accounts
+- staking operator
+- multipler points
+- reward mechanism
+
+The staking system MUST be supported by an operator who will introduce reward amounts, 
+reward periods, the REQUIRED tokens to use within the system and updates to the staking smart contract.
+It is the responsibility of the operator to keep accounts informed about requirements and
+intended changes to the staking system.
+
+emergencyExit, (MigrationFailed, Not Allowed to leave)/ update,update contract or global state/ prefered minium lock period/ 
 ### Accounts
 
-Users wanting to participate in the protocol should have an EOA account or smart account.
-Users should own some amount of the native blockchain coin and/or token that is accepted in the protocol.
-Users will make tranaction calls to stake vaults, which are controlled by accounts.
+Accounts are users who contrbtribute a token, ERC-20 standard, to the staking protocol.
+Accounts SHOULD interact with the protocol through a layer-1 blockchain smart contract.
+To participate,
+users MUST use an external owned account (EOA) to interact with a `stakeVault` contract.
+A `stakeVault` is a smart contract that records and
+maintains the current amount of tokens transfered by accounts to the protocol.
+Each `stakeVault` MUST have one registered as the owner.
+Once registered, the user is considered as an account.
+Accounts MAY be the owner of one or more `stakeVault`s.
 
-### User Staking Flow
+#### Account Staking Flow
 
-The staking streamer protocol tracks:
+To join a staking system, 
+accounts MUST use a `stakeVault` to transfer a token amount to the staking system.
+The ERC-20 token address used token address MUST match the token address used bybe identified by the operator as the  of the staking system,
+see [Operator section](#operatorrole).
+Accounts MAY set a predefined duration to lock tokens in the staking system.
+Tokens will not be retrievable by accounts until the set duration expires.
+This is designed to improve the rewards accured by accounts deciding to lock funds.
+When tokens are successfully transfered to the `stakeVault`,
+the account responsible will start to accumulate multiper points.
+The rewards and multipler points are described in further detail in [Rewards section](#rewards).
+If staked tokens are not locked, the account MAY withdraw the full amount of tokens at any time.
 
-- all tokens being staked
-- the accounts responisble for staking, tim
-- The owner/operator of the staking contract
-- the reward amount and distribution
+### Operator Role
 
-Accounts can stake token by creating one or more `stakingVault`s.
-A `stakeVault` is a contract that records and
-maintains the current amount of tokens transfered to the protocol.
-Accounts interact with the staking protocol through the `stakingVault`.
-The `stakeVault` contract must be owned by an account.
-To use a `stakingVault`, 
-an account MUST create a transaction to the `stakingVault` contract using a native token recognized by staking protocol.
-The native token MUST be known by the operator of the `stakeManager`.
-
-A `stakeManager` is a contract holds the logic for the staking protocol and
-is operatored by the owner of the staking streamer protocol, see [Operator Flow](#OperatorFlow).
-
-
--
-- When tokens are transfered to a `stakeVault` the tokens MAY be locked in the contract for a certain amount of time, set by ther user.
+Operators are the owners of the staking system implemented in the staking system.
+The operator interacts with a `stakeMangaer` contract to faciltate the requirements of the staking system.
+A `stakeManager` is a smart contract that holds the logic for the staking system.
+Each account MUST use a `stakeVault` to interact with the `stakeManager`.
+Inclcuding when tokens 
+- The operator is the owner of the staking protocol and interacts with the `stakeManager` contract.
+- A `stakeManager` is a contract holds the logic for the staking protocol and
+is operatored by the owner of the staking streamer protocol, .
 - The user will be rewarded an ERC-20 token from the `stakeManager` contract, set by the owner of the `stakeManager`.
 The user will be awarded a non transferable token (NFT). ****
-- The user will be start to accure multipler points, desibed below, based on amount of native tokens staked and for how long they are being staked.
-Those points have a limited duration and will be used by the contract to determine how to reward the ERC20 token. 
-- If staked tokens are not locked, the user can withdraw the full amount of tokens at any time.
-- When locked, the user must wait until the time, which is set by the user, expires.
--  
+- 
+
+### Rewards
 
 ### Multiplier Points
 
@@ -80,13 +100,9 @@ which are internal contract accounting ensuring users are rewarded based on the 
  The user MAY opt to lock tokens for a specific time period.
 - The Initial MP MUST be based on the amount tokens in the `stakingValut` and/or the lock-up duration.
 - The Accrued MP are accumulated over time as a function of the stake amount, elapsed time, and annual percentage yield (APY).
-
-### Operator Flow
-
-- The operator is the owner of the staking protocol and interacts with the `stakeManager` contract.
+- Those points have a limited duration and will be used by the contract to determine how to reward the ERC20 token.
+- Contract SHOULD account for all mp accured by all accounts participating
 - 
-
-### Rewards
 
 The system distributes rewards based on tree main factors:
 
