@@ -13,7 +13,10 @@ contributors:
 
 ## Introduction
 
-This document describes the encoding and verification processes of NomosDA, which is the data availability (DA) solution used by the Nomos blockchain. NomosDA provides an assurance that all data from Nomos zones — referred to as blobs — are accessible and verifiable by every network participant.
+This document describes the encoding and verification processes of NomosDA,
+which is the data availability (DA) solution used by the Nomos blockchain.
+NomosDA provides an assurance that all data from Nomos zones, referred to as blobs,
+are accessible and verifiable by every network participant.
 
 This document presents an implementation specification describing how:
 
@@ -22,18 +25,27 @@ This document presents an implementation specification describing how:
 
 ## Definitions
 
-* **Encoder**: Encodes the data as per the encoding protocol. In the Nomos architecture, the executor of a zone acts as the encoder.
-* **Verifier**: Verifies its portion of the distributed blob data as per the verification protocol. In the Nomos architecture, the DA nodes act as the verifiers.
+* **Encoder**: Encodes the data as per the encoding protocol. In the Nomos architecture,
+the executor of a zone acts as the encoder.
+* **Verifier**: Verifies its portion of the distributed blob data as per the verification protocol.
+In the Nomos architecture, the DA nodes act as the verifiers.
 
 ## Overview
 
-In the encoding stage, the encoder takes the DA parameters and the padded blob data and creates an initial matrix of data chunks. This matrix is expanded using Reed-Solomon coding and various commitments and proofs are created for the data.
+In the encoding stage, the encoder takes the DA parameters and the padded blob data
+and creates an initial matrix of data chunks.
+This matrix is expanded using Reed-Solomon coding and various commitments
+and proofs are created for the data.
 
-When a verifier receives a sample, it verifies the data it receives from the encoder and broadcasts the information if the data is verified. Finally, the verifier stores the sample data for the required length of time.
+When a verifier receives a sample, it verifies the data it receives from the encoder
+and broadcasts the information if the data is verified. Finally,
+the verifier stores the sample data for the required length of time.
 
 ## Construction
 
-The encoder and verifier use the NomosDA cryptographic protocol to carry out their respective functions. These functions are implemented as abstracted and configurable software entities that allow the original data to be encoded and verified via high-level operations.
+The encoder and verifier use the [NomosDA cryptographic protocol](https://www.notion.so/4bf3bb62cfb64422ab48b5b60aab6a73?pvs=25) to carry out their respective functions.
+These functions are implemented as abstracted and configurable software entities
+that allow the original data to be encoded and verified via high-level operations.
 
 ### Glossary
 
@@ -45,7 +57,10 @@ The encoder and verifier use the NomosDA cryptographic protocol to carry out the
 
 ### Encoder
 
-An encoder takes a set of parameters and the blob data, and creates a matrix of chunks that it uses to compute the necessary cryptographic data. It produces the set of Reed-Solomon (RS) encoded data, the commitments, and the proofs that are needed prior to [dispersal](https://www.notion.so/1818f96fb65c805ca257cb14798f24d4?pvs=25).
+An encoder takes a set of parameters and the blob data,
+and creates a matrix of chunks that it uses to compute the necessary cryptographic data.
+It produces the set of Reed-Solomon (RS) encoded data, the commitments,
+and the proofs that are needed prior to [dispersal](https://www.notion.so/1818f96fb65c805ca257cb14798f24d4?pvs=25).
 
 ```mermaid
 flowchart LR
@@ -71,7 +86,7 @@ The encoder executes the encoding process as follows:
     | Name                   | Description                                                                                                                                             | Representation     |
     |------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
     | `column_count`         | The number of subnets available for dispersal in the system.                                                                                            | `usize`, `int` in Python |
-    | `bytes_per_field_element` | The amount of bytes per data chunk. This is set to 31 bytes. Each chunk has 31 bytes rather than 32 to ensure that the chunk value does not exceed the maximum value on the BLS12-381 elliptic curve. | `usize`, `int` in Python |
+    | `bytes_per_field_element` | The amount of bytes per data chunk. This is set to 31 bytes. Each chunk has 31 bytes rather than 32 to ensure that the chunk value does not exceed the maximum value on the [BLS12-381 elliptic curve](https://hackmd.io/@benjaminion/bls12-381?ref=blog.nomos.tech). | `usize`, `int` in Python |
 
 2. The encoder also includes the **blob data** to be encoded, which must be of a size that is a multiple of `bytes_per_field_element` bytes. Clients are responsible for padding the data so it fits this constraint.
 3. The encoder splits the data into `bytes_per_field_element`-sized chunks. It also arranges  
@@ -136,7 +151,9 @@ the verification process as follows:
     | `blob_id`                    | Computed as the hash (`sha3_256`) of `aggregated_column_commitment` + `row_commitments`             | `bytes`                  |
 
 2. Upon receiving the above data, it verifies the column data as per the
-   [cryptographic details](https://www.notion.so/4bf3bb62cfb64422ab48b5b60aab6a73?pvs=25). If the verification is successful, the node triggers the [replication protocol](https://www.notion.so/1818f96fb65c80119fa0e958a087cc2b?pvs=25) and stores the blob.
+   [cryptographic details](https://www.notion.so/4bf3bb62cfb64422ab48b5b60aab6a73?pvs=25).
+   If the verification is successful,
+   the node triggers the [replication protocol](https://www.notion.so/1818f96fb65c80119fa0e958a087cc2b?pvs=25) and stores the blob.
 
     ```python
     class DAShare:
@@ -181,8 +198,12 @@ can be found in the NomosDA Cryptographic Protocol:
 
 [NomosDA Cryptographic Protocol](https://www.notion.so/NomosDA-Cryptographic-Protocol-4bf3bb62cfb64422ab48b5b60aab6a73)
 
-## Annex
+## References
 
-* Encoder spec: [GitHub/encoder.py](https://github.com/logos-co/nomos-specs/blob/master/da/encoder.py)
-* Verifier spec: [GitHub/verifier.py](https://github.com/logos-co/nomos-specs/blob/master/da/verifier.py)
+* Encoder Specification: [GitHub/encoder.py](https://github.com/logos-co/nomos-specs/blob/master/da/encoder.py)
+* Verifier Specification: [GitHub/verifier.py](https://github.com/logos-co/nomos-specs/blob/master/da/verifier.py)
 * Cryptographic protocol: [Notion Link](https://www.notion.so/NomosDA-Cryptographic-Protocol-4bf3bb62cfb64422ab48b5b60aab6a73)
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
