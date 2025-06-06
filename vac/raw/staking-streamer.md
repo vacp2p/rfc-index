@@ -231,7 +231,7 @@ $$
 For example, assuming a $MAX\_MULTIPLIER$ of `4`, an account that stakes 100 tokens would have a maximum of:
 
 $$
-\text{MP}_\text{Maximum} = 100 + {100 \times 4} = 500
+\mathrm{MP}_{\text{Maximum}} = 100 + (100 \times 4) = 500
 $$
 
 This means that the account can never have more than 500 MP,
@@ -284,7 +284,7 @@ until the account interacts with the system.
 Pending rewards are calculated as:
 
 $$
-\text{Pending Rewards} = \text{Account Weight} \times \left( \text{Current Reward Index} \minus \text{Account's Last Reward Index} \right)
+\text{Pending Rewards} = \text{Account Weight} \times \left( \text{Current Reward Index} - \text{Account's Last Reward Index} \right)
 $$
 
 Rewards are accured by accounts over time and
@@ -314,9 +314,9 @@ exit the system or change their stakes over time.
 The global reward index represents the cumulative rewards per unit of weight since the system's inception.
 It increases whenever new rewards are added to the system:
 
-$
+$$
 \text{New Index} = \text{Current Index} + \frac{\text{New Rewards} \times \text{Scale Factor}}{\text{Total System Weight}}
-$
+$$
 
 Where:
 
