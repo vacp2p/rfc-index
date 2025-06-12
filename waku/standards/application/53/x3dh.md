@@ -39,7 +39,7 @@ without other nodes network being able to read their messages.
 which provide assurances that session keys will not be compromised
 even if the private keys of the participants are compromised.
 Specifically, past messages cannot be decrypted by a third-party
-who manages to obtain a private key.
+who manages to obtain those private key.
 
 - **Secret channel** describes a communication channel
 where a Double Ratchet algorithm is in use.
