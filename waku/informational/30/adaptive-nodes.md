@@ -5,6 +5,7 @@ name: Adaptive nodes
 status: draft
 editor: Oskar Thorén <oskarth@titanproxy.com>
 contributors:
+ - Filip Dimitrijevic <filip@status.im>
 ---
 
 This is an informational spec that show cases the concept of adaptive nodes.
@@ -12,7 +13,8 @@ This is an informational spec that show cases the concept of adaptive nodes.
 ## Node types - a continuum
 
 We can look at node types as a continuum,
-from more restricted to less restricted, fewer resources to more resources.
+from more restricted to less restricted,
+fewer resources to more resources.
 
 ![Node types - a continuum](./images/adaptive_node_continuum2.png)
 
@@ -58,8 +60,8 @@ Each node can choose which protocols to support, depending on its resources and 
 
 ![Protocol selection](./images/adaptive_node_protocol_selection2.png)
 
-In the case of protocols like [11/WAKU2-RELAY](../../standards/core/11/relay.md)
-etc (12, 13, 19, 21) these correspond to Libp2p protocols.
+Protocols like [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
+as well as [12], [13], [19], and [21], correspond to libp2p protocols.
 
 However, other protocols like 16/WAKU2-RPC
 (local HTTP JSON-RPC), 25/LIBP2P-DNS-DISCOVERY,
@@ -77,12 +79,14 @@ We can better visualize the network with some illustrative examples.
 
 ### Topology and topics
 
-The first one shows an example topology with different PubSub topics
+This illustration shows an example topology with different PubSub topics
 for the relay protocol.
 
 ![Waku Network visualization](./images/adaptive_node_network_topology_protocols2.png)
 
 ### Legend
+
+This illustration shows an example of content topics a node is interested in.
 
 ![Waku Network visualization legend](./images/adaptive_node_network_topology_protocols_legend.png)
 
@@ -99,7 +103,8 @@ a topic in Waku v1 (Status chat), WalletConnect, and SuperRare community.
 This is a separate component with its own topology.
 
 Behavior and interaction with other protocols specified in Vac RFCs,
-e.g. 25/LIBP2P-DNS-DISCOVERY, 15/WAKU-BRIDGE, etc.
+e.g. [25/LIBP2P-DNS-DISCOVERY](/vac/25/libp2p-dns-discovery.md)
+and [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md).
 
 ### Node Cross Section
 
@@ -110,8 +115,11 @@ shows how the connections look different for different protocols.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
 
-- [11/WAKU2-RELAY](../../standards/core/11/relay.md)
+- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+- [25/LIBP2P-DNS-DISCOVERY](/vac/25/libp2p-dns-discovery.md)
+- [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md)
