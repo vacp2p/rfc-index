@@ -112,7 +112,7 @@ Stake_Thresholds: Set[Min_Stake]
 ```
 
 For more information on how the minimum stake is calculated,
-please refer to the Nomos documentation. 
+please refer to the Nomos documentation.
 <!--- Get the url for the minimum stake calculation documentation --->
 
 #### Service Parameters
