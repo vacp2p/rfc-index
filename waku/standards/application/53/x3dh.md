@@ -7,11 +7,12 @@ category: Standards Track
 tags: waku-application
 editor: Aaryamann Challani <p1ge0nh8er@proton.me>
 contributors:
-- Andrea Piana <andreap@status.im>
-- Pedro Pombeiro <pedro@status.im>
-- Corey Petty <corey@status.im>
-- Oskar Thorén <oskarth@titanproxy.com>
-- Dean Eigenmann <dean@status.im>
+ - Andrea Piana <andreap@status.im>
+ - Pedro Pombeiro <pedro@status.im>
+ - Corey Petty <corey@status.im>
+ - Oskar Thorén <oskarth@titanproxy.com>
+ - Dean Eigenmann <dean@status.im>
+ - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -38,7 +39,7 @@ without other nodes network being able to read their messages.
 which provide assurances that session keys will not be compromised
 even if the private keys of the participants are compromised.
 Specifically, past messages cannot be decrypted by a third-party
-who manages to get a hold of a private key.
+who manages to obtain those private key.
 
 - **Secret channel** describes a communication channel
 where a Double Ratchet algorithm is in use.
@@ -73,7 +74,7 @@ The main cryptographic protocol is a Double Ratchet protocol,
 which is derived from the
 [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html),
 using a different ratchet.
-[The Waku v2 protocol](../../core/10/waku2.md)
+[The Waku v2 protocol](/waku/standards/core/10/waku2.md)
 subsequently encrypts the message payload, using symmetric key encryption.
 Furthermore, the concept of prekeys
 (through the use of [X3DH](https://signal.org/docs/specifications/x3dh/))
@@ -234,38 +235,41 @@ Where:
     ([reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L47))
 
 ```protobuf
-    message X3DHHeader {
-      // Alice's ephemeral key `EK_A`
-      bytes key = 1;
-      // Bob's bundle signed prekey
-      bytes id = 4;
-    }
+message X3DHHeader {
+  // Alice's ephemeral key `EK_A`
+  bytes key = 1;
+  // Bob's bundle signed prekey
+  bytes id = 4;
+}
 ```
 
 - `DR_header`: Double ratchet header ([reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L31)).
 Used when Bob's public bundle is available:
 
 ``` protobuf
-    message DRHeader {
-      // Alice's current ratchet public key (as mentioned in [DR spec section 2.2](https://signal.org/docs/specifications/doubleratchet/#symmetric-key-ratchet))
-      bytes key = 1;
-      // number of the message in the sending chain
-      uint32 n = 2;
-      // length of the previous sending chain
-      uint32 pn = 3;
-      // Bob's bundle ID
-      bytes id = 4;
-    }
+message DRHeader {
+  // Alice's current ratchet public key
+  bytes key = 1;
+  // number of the message in the sending chain
+  uint32 n = 2;
+  // length of the previous sending chain
+  uint32 pn = 3;
+  // Bob's bundle ID
+  bytes id = 4;
+}
 ```
+
+Alice's current ratchet public key (above) is mentioned in
+[DR spec section 2.2](https://signal.org/docs/specifications/doubleratchet/#symmetric-key-ratchet)
 
 - `DH_header`: Diffie-Hellman header (used when Bob's bundle is not available):
     ([reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L42))
 
 ``` protobuf
-    message DHHeader {
-      // Alice's compressed ephemeral public key.
-      bytes key = 1;
-    }
+message DHHeader {
+  // Alice's compressed ephemeral public key.
+  bytes key = 1;
+}
 ```
 
 #### 3. Chain key update
@@ -286,7 +290,7 @@ The message key MUST be used to encrypt the next message to be sent.
 1. Inherits the security considerations of [X3DH](https://signal.org/docs/specifications/x3dh/#security-considerations)
 and [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/#security-considerations).
 
-2. Inherits the security considerations of the [Waku v2 protocol](../../core/10/waku2.md).
+2. Inherits the security considerations of the [Waku v2 protocol](/waku/standards/core/10/waku2.md).
 
 3. The protocol is designed to be used in a decentralized manner, however,
 it is possible to use a centralized server to serve prekey bundles.
@@ -299,7 +303,8 @@ It is possible to link messages signed by the same keypair.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
 
@@ -308,7 +313,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Signal's Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Protobuf](https://developers.google.com/protocol-buffers/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
-- [The Waku v2 protocol](../../core/10/waku2.md)
+- [The Waku v2 protocol](/waku/standards/core/10/waku2.md)
 - [HKDF](https://www.rfc-editor.org/rfc/rfc5869)
 - [2/ACCOUNT](https://specs.status.im/spec/2#x3dh-prekey-bundles)
 - [reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L12)
