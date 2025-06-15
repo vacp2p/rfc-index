@@ -821,7 +821,7 @@ This list has this format:
     "peerID": "16Uiu2HAmJb2e28qLXxT5kZxVUUoJt72EMzNGXB47RedcBafeDCBA",
     "protocols": [
       "/ipfs/id/1.0.0",
-      "/waku/relay/2.0.0",
+      "/vac/waku/relay/2.0.0",
       "/ipfs/ping/1.0.0"
     ],
     "addrs": [
@@ -1636,7 +1636,7 @@ enr and peerID each node found:
 ```
 
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed
+`onErrCb` will be executed with the reason the function execution failed.
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## DiscoveryV5
