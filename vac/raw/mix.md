@@ -303,6 +303,29 @@ areas such as node discovery, delay strategy, spam resistance, cover traffic gen
 and incentivization. Some are REQUIRED for interoperability; others are OPTIONAL or deployment-specific.
 The next section describes each component.
 
+### 5.5 Stream Management and Multiplexing
+
+Each Mix Protocol message is routed independently, and forwarding it to the next hop requires
+opening a new libp2p stream using the Mix Protocol. This applies to both the initial Sphinx packet
+transmission and each hop along the mix path.
+
+In high-throughput environments (_e.g._, messaging systems with continuous anonymous traffic),
+mix nodes may frequently communicate with a subset of mix nodes. Opening a new stream for each
+Sphinx packet in such scenarios can incur performance costs, as each stream setup requires a
+multistream handshake for protocol negotiation.
+
+While libp2p supports multiplexing multiple streams over a single transport connection using
+stream muxers such as mplex and yamux, it does not natively support reusing a stream over multiple
+message transmissions. However, stream reuse may be desirable in the mixnet setting to reduce overhead
+and avoid hitting per protocol stream limits between peers.
+
+The lifecycle of streams, including their reuse, eviction, or pooling strategy, is outside the
+scope of this specification. It SHOULD be handled by the libp2p host, connection manager, or
+transport stack.
+
+Mix Protocol implementations MUST NOT assume persistent stream availability and SHOULD gracefully
+fall back to opening a new stream when reuse is not possible.
+
 ## 6. Pluggable Components
 
 Pluggable components define functionality that extends or configures the behavior of the Mix Protocol
@@ -460,6 +483,12 @@ These roles and their required behaviors are defined in the following subsection
 
 The Mix Protocol is identified by the protocol string `"/mix/1.0.0"`.
 
+All Mix Protocol interactions occur over libp2p streams negotiated using this identifier.
+Each Sphinx packet transmission&mdash;whether initiated locally or forwarded as part of a
+mix path&mdash;involves opening a new libp2p stream to the next hop. Implementations MAY optimize
+performance by reusing streams where appropriate; see [Section 5.5](#55-stream-management-and-multiplexing)
+for more details on stream management.
+
 ### 7.2 Initiation
 
 A mix node initiates anonymous routing only when it is explicitly invoked with a message
@@ -509,3 +538,85 @@ To process a Sphinx packet as an exit, a mix node MUST:
 - Forward the valid message to the Mix Exit Layer for delivery to the destination origin protocol instance.
 
 The node MUST NOT retain decrypted content after forwarding.
+
+## 8. Sphinx Packet Format
+
+The Mix Protocol uses the Sphinx packet format to enable unlinkable, multi-hop message routing
+with per-hop confidentiality and integrity. Each message transmitted through the mix network is
+encapsulated in a Sphinx packet constructed by the initiating mix node. The packet is encrypted in
+layers such that each hop in the mix path can decrypt exactly one layer and obtain the next-hop
+routing information and delay value, without learning the complete path or the message origin.
+
+Sphinx packets are self-contained and indistinguishable on the wire, providing strong metadata
+protection. Mix nodes forward packets without retaining state or requiring knowledge of the
+source or destination beyond their immediate routing target.
+
+To ensure uniformity, each Sphinx packet consists of a fixed-length header and a payload
+that is padded to a fixed maximum size. Although the original message payload may vary in length,
+padding ensures that all packets are identical in size on the wire. This ensures unlinkability
+and protects against correlation attacks based on message size.
+
+If a message exceeds the maximum supported payload size, it MUST be fragmented before being passed
+to the Mix Protocol. Fragmentation and reassembly are the responsibility of the origin protocol
+or the top-level application. The Mix Protocol handles only messages that do not require
+fragmentation.
+
+The structure, encoding, and size constraints of the Sphinx packet are detailed in the following
+subsections.
+
+### 8.1 Packet Structure Overview
+
+Each Sphinx packet consists of three fixed-length header fields &mdash; $α$, $β$, and $γ$ &mdash;
+followed by a fixed-length encrypted payload $δ$. Together, these components enable per-hop message
+processing with strong confidentiality and integrity guarantees in a stateless and unlinkable manner.
+
+- **$α$ (Alpha)**: An ephemeral public value. Each mix node uses its private key and $α$ to
+derive a shared session key for that hop. This session key is used to decrypt and process
+one layer of the packet.
+- **$β$ (Beta)**: The nested encrypted routing information. It encodes the next hop address, the forwarding delay,
+integrity check $γ$ for the next hop, and the $β$ for subsequent hops.
+- **$γ$ (Gamma)**: A message authentication code computed over $β$ using the session key derived
+from $α$. It ensures header integrity at each hop.
+- **$δ$ (Delta)**: The encrypted payload. It consists of the message padded to a fixed maximum length and
+encrypted in layers corresponding to each hop in the mix path.
+
+At each hop, the mix node derives the session key from $α$, verifies the header integrity
+using $γ$, decrypts one layer of $β$ to extract the next hop and delay, and decrypts one layer
+of $δ$. It then constructs a new packet with updated values of $α$, $β$, $γ$, and $δ$, and
+forwards it to the next hop.
+
+All Sphinx packets are fixed in size and indistinguishable on the wire. This uniform format,
+combined with layered encryption and per-hop integrity protection, ensures unlinkability,
+tamper resistance, and robustness against correlation attacks.
+
+The structure and semantics of these fields, the cryptographic primitives used, and the construction
+and processing steps are defined in the following subsections.
+
+### 8.2 Cryptographic Primitives
+
+This section defines the cryptographic primitives used in Sphinx packet construction and processing.
+
+- **Security Parameter**: All cryptographic operations target a minimum of $\kappa = 128$ bits of
+  security, balancing performance with resistance to modern attacks.
+
+- **Elliptic Curve Group $\mathbb{G}$**:
+  - **Curve**: Curve25519
+  - **Purpose**: Used for deriving Diffie–Hellman-style shared key at each hop using $α$.
+  - **Representation**: Small 32-byte group elements, efficient for both encryption and key exchange.
+
+- **Key Derivation Function (KDF)**:  
+  - **Purpose**: To derive encryption keys, IVs, and MAC key from the shared session key at each hop.
+  - **Construction**: SHA-256 hash with output truncated to 128 bits.
+  - **Key Derivation**: The KDF key separation labels (_e.g.,_ `"aes_key"`, `"mac_key"`)
+  are fixed strings and MUST be agreed upon across implementations.
+
+- **Symmetric Encryption**: AES-128 in Counter Mode (AES-CTR)
+  - **Purpose**: To encrypt $β$ and $δ$ for each hop.  
+  - **Keys and IVs**: Each derived from the session key for the hop using the KDF.
+
+- **Message Authentication Code (MAC)**:
+  - **Construction**: HMAC-SHA-256 with output truncated to 128 bits.
+  - **Purpose**: To compute $γ$ for each hop.
+  - **Key**: Derived using KDF from the session key for the hop.
+
+These primitives are used consistently throughout packet construction and decryption, as described in the following sections.
