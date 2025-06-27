@@ -70,19 +70,20 @@ package vac.voting;
 
 message Proposal {
   string name = 10;                 // Proposal name
-  int32 proposal_id = 11;           // Unique identifier of the proposal
-  bytes proposal_owner = 12;        // Public key of the creator 
-  repeated Votes = 13;              // Vote list in the proposal
-  int32 expected_voters_count = 14; // Maximum number of distinct voters
-  int32 round = 15;                 // Number of Votes 
-  int64 timestamp = 16;             // Creation time of proposal
-  int64 expiration_time = 17;       // The time interval that the proposal is active.  
-  bool liveness_criteria_yes = 18;  // Shows how managing the silent peers vote
+  string payload = 11;
+  int32 proposal_id = 12;           // Unique identifier of the proposal
+  bytes proposal_owner = 13;        // Public key of the creator 
+  repeated Votes = 14;              // Vote list in the proposal
+  int32 expected_voters_count = 15; // Maximum number of distinct voters
+  int32 round = 16;                 // Number of Votes 
+  int64 timestamp = 17;             // Creation time of proposal
+  int64 expiration_time = 18;       // The time interval that the proposal is active.  
+  bool liveness_criteria_yes = 19;  // Shows how managing the silent peers vote
 }
 
 message Vote {
   int32 vote_id = 20;             // Unique identifier of the vote
-  bytes vote_owner = 11;          // Voter's public key
+  bytes vote_owner = 21;          // Voter's public key
   int64 timestamp = 22;           // Time when the vote was cast
   bool vote = 23;                 // Vote bool value (true/false)
   bytes parent_hash = 24;         // Hash of previous owner's Vote
@@ -94,7 +95,8 @@ message Vote {
 ```
 
 To initiate a consensus for a proposal,
-a user MUST complete all the fields in the proposal, including attaching its vote.
+a user MUST complete all the fields in the proposal, including attaching its `vote`
+and the `payload` that shows the purpose of the proposal.
 Notably, `parent_hash` and `received_hash` are empty strings because there is no previous or received hash.
 Then the initialization section ends when the user who creates the proposal sends it
 to the random peer from the network or sends it to the proposal to the specific channel.
