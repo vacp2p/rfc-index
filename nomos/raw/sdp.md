@@ -1,6 +1,6 @@
 ---
-title: SDP
-name: Service Declaration Protocol Specification
+title: NOMOS-SDP
+name: Nomos Service Declaration Protocol Specification
 status: raw
 category: 
 tags: participation, validators, declarations
