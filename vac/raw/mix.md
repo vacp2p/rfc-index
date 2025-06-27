@@ -414,8 +414,8 @@ the message, destination, and origin protocol codec as input.
    - The Mix Protocol instance wraps the message in a Sphinx packet and selects a
 random mix path.
    - Each mix node along the path:
-   - Processes the Sphinx packet by removing one encryption layer.
-   - Applies a delay and forwards the packet to the next hop.
+     - Processes the Sphinx packet by removing one encryption layer.
+     - Applies a delay and forwards the packet to the next hop.
    - The final node in the path (exit node) decrypts the final layer, extracting
 the original plaintext message, destination, and origin protocol codec.
 
@@ -870,28 +870,28 @@ $\kappa = 128$ bits of
 security, balancing performance with resistance to modern attacks.
 
 - **Elliptic Curve Group $\mathbb{G}$**:
-- **Curve**: Curve25519
-- **Purpose**: Used for deriving Diffie–Hellman-style shared key at each hop
+  - **Curve**: Curve25519
+  - **Purpose**: Used for deriving Diffie–Hellman-style shared key at each hop
 using $α$.
-- **Representation**: Small 32-byte group elements, efficient for both
+  - **Representation**: Small 32-byte group elements, efficient for both
 encryption and key exchange.
 
 - **Key Derivation Function (KDF)**:
-- **Purpose**: To derive encryption keys, IVs, and MAC key from the shared
+  - **Purpose**: To derive encryption keys, IVs, and MAC key from the shared
 session key at each hop.
-- **Construction**: SHA-256 hash with output truncated to 128 bits.
-- **Key Derivation**: The KDF key separation labels (_e.g.,_ `"aes_key"`,
+  - **Construction**: SHA-256 hash with output truncated to 128 bits.
+  - **Key Derivation**: The KDF key separation labels (_e.g.,_ `"aes_key"`,
 `"mac_key"`)
 are fixed strings and MUST be agreed upon across implementations.
 
 - **Symmetric Encryption**: AES-128 in Counter Mode (AES-CTR)
-- **Purpose**: To encrypt $β$ and $δ$ for each hop.
-- **Keys and IVs**: Each derived from the session key for the hop using the KDF.
+  - **Purpose**: To encrypt $β$ and $δ$ for each hop.
+  - **Keys and IVs**: Each derived from the session key for the hop using the KDF.
 
 - **Message Authentication Code (MAC)**:
-- **Construction**: HMAC-SHA-256 with output truncated to 128 bits.
-- **Purpose**: To compute $γ$ for each hop.
-- **Key**: Derived using KDF from the session key for the hop.
+  - **Construction**: HMAC-SHA-256 with output truncated to 128 bits.
+  - **Purpose**: To compute $γ$ for each hop.
+  - **Key**: Derived using KDF from the session key for the hop.
 
 These primitives are used consistently throughout packet construction and
 decryption, as described in the following sections.
