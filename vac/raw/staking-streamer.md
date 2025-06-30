@@ -120,7 +120,7 @@ multipler points, MP, are accured and calculated in the overall reward amount.
 This ensures that participants are rewarded fairly based on the stake amount
 and time staked.
 The MP are acculumated over time and MUST not be transferable.
-Calcuation is based on two factors, Initial MP and Accured MP.
+Calculation is based on two factors, Initial MP and Accured MP.
 
 ##### Initial MP
 
