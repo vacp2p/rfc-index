@@ -40,6 +40,7 @@ The protocol consists of the following components:
 - staking operator
 - multipler points
 - reward mechanism
+- stake vaults
 
 The staking system MUST be supported by an operator who will introduce reward amounts,
 reward periods, the REQUIRED tokens to use within the system and
@@ -52,7 +53,7 @@ and intended changes to the staking system.
 Accounts are users who contribute a token, ERC-20 standard, to the staking protocol.
 Accounts SHOULD interact with the protocol through a layer-1 blockchain smart contract.
 To participate,
-users MUST use an external owned account (EOA) to interact with a `stakeVault` contract.
+users MAY use an external owned account (EOA) to interact with a `stakeVault` contract.
 A `stakeVault` is a smart contract that records and
 maintains the current amount of tokens transferred by accounts to the protocol.
 Each `stakeVault` MUST have one registered as the owner.
