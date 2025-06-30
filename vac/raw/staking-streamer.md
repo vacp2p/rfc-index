@@ -20,12 +20,12 @@ The Status Network is a layer 2 blockchain that is gasless.
 To achieve no gas fees for transactions conducted on the network,
 users utilize a staking mechanism with native tokens.
 This mechanism, called the staking streamer,
-allow users to accumulate a [ERC-20 token](https://eips.ethereum.org/EIPS/eip-20) called Karma.
+allows users to accumulate a [ERC-20 token](https://eips.ethereum.org/EIPS/eip-20) called Karma.
 With Karma, users can create transactions,
 have voting rights on the Status Network, and other benefits.
-The goal is to have a staking mechanism that is fair to all participates based on the stake amount and time staked.
-Participants will have significant increases in voting power after committing their stake for a longer period of time,
-even if their stake is not the largest amongst all participants.
+The goal is to have a staking mechanism that is fair to all participants based on the stake amount and time staked.
+Participants will have significant increases in voting power after committing their stake for a longer period,
+even if their stake is not the largest among all participants.
 
 ## Specification
 
@@ -44,7 +44,7 @@ The protocol consists of the following components:
 The staking system MUST be supported by an operator who will introduce reward amounts,
 reward periods, the REQUIRED tokens to use within the system and
 updates to the staking smart contract.
-It is the responsibility of the operator to keep accounts informed about requirements
+It is the responsibility of the operator to keep accounts informed about the requirements
 and intended changes to the staking system.
 
 ### Accounts
@@ -54,7 +54,7 @@ Accounts SHOULD interact with the protocol through a layer-1 blockchain smart co
 To participate,
 users MUST use an external owned account (EOA) to interact with a `stakeVault` contract.
 A `stakeVault` is a smart contract that records and
-maintains the current amount of tokens transfered by accounts to the protocol.
+maintains the current amount of tokens transferred by accounts to the protocol.
 Each `stakeVault` MUST have one registered as the owner.
 Once registered, the user is considered as an account.
 Accounts MAY be the owner of one or more `stakeVault`s.
@@ -66,8 +66,8 @@ accounts MUST use a `stakeVault` to transfer a token amount to the staking syste
 The account MUST use the same token in the `stakeVault` registered by the operator in the staking system.
 Accounts MAY set a predefined duration to lock tokens in the staking system.
 Tokens will not be retrievable by accounts until the set duration expires.
-This is designed to improve the rewards accured by accounts deciding to lock funds.
-When tokens are successfully transfered to the `stakeVault`,
+This is designed to improve the rewards accrued by accounts deciding to lock funds.
+When tokens are successfully transferred to the `stakeVault`,
 the account responsible will start to accumulate multiper points.
 The rewards and multipler points are described in the [Rewards section](#rewards).
 If staked tokens are not locked, the account MAY withdraw the full amount of tokens at any time.
@@ -78,9 +78,9 @@ Operators are the owners of the staking system implemented in the staking stream
 The operator interacts with a `stakeManager` contract to facilitate the requirements of the system.
 A `stakeManager` is a smart contract that holds the logic for the staking system.
 Each account MUST use a `stakeVault` to interact with the `stakeManager`.
-This includes transfering to and from the staking system.
+This includes transferring to and from the staking system.
 
-The operator MAY set a perferred minimum lock duration for all tokens entering the system.
+The operator MAY set a preferred minimum lock duration for all tokens entering the system.
 Accounts transaction SHOULD fail if the minimum lock duration is not set.
 After a minimum lock duration is set,
 the operator SHOULD NOT be able to update this amount until the set period is complete.
@@ -93,7 +93,7 @@ accounts reading the blockchain state,
 accounts MAY leave the system if they do not agree with the changes.
 Including when the operator enables `emergencyMode`.
 
-- Operator decides amount of rewards should be awarded to stakers.
+- The operator decides the amount of rewards that should be awarded to stakers.
 - The operator MUST specify the amount of time for rewards to be distributed.
 
 #### Emergency Mode
@@ -105,7 +105,7 @@ When `emergencyMode` is enabled, the following SHOULD apply:
 - new vaults can not register,
 - current registered vaults can not stake or stake with lock period additional tokens,
 - operators can not update the global state
-- accounts can not claim accured rewards.
+- accounts can not claim accrued rewards.
 
 ### Rewards
 
@@ -116,11 +116,11 @@ that works in conjunction with the multiplier points system.
 #### Multiplier Points
 
 When accounts have staked for a certain amount of time,
-multipler points, MP, are accured and calculated in the overall reward amount.
+multipler points, MP, are accrued and calculated in the overall reward amount.
 This ensures that participants are rewarded fairly based on the stake amount
 and time staked.
-The MP are acculumated over time and MUST not be transferable.
-Calculation is based on two factors, Initial MP and Accured MP.
+The MP is accumulated over time and MUST not be transferable.
+The calculation is based on two factors, Initial MP and Accured MP.
 
 ##### Initial MP
 
@@ -155,7 +155,7 @@ $$
 
 Alice receives 100 MP.
 
-Another example, Alice stakes 100 tokens with a 30 days lock-up period:
+Another example, Alice stakes 100 tokens with a 30 day lock-up period:
 
 $$
 \text{MP}_ \text{Initial} = 100 \times \left( 1 + \frac{100 \times 30}{100 \times 365} \right)
@@ -186,7 +186,7 @@ Where:
 
 This formula adds MP as a function of time,
 rewarding accounts with locked stake.
-The Accrued MP are calculated based on the stake amount.
+The Accrued MP is calculated based on the stake amount.
 Already accrued MP SHOULD not affect the calculation of new accrued MP.
 For example, Alice stakes 100 tokens for 15 days:
 
@@ -206,7 +206,7 @@ $$
 Alice receives 8.2 MP for the 30 days she has staked.
 
 The `stakingManager` contract SHOULD account for all MP accrued by all accounts in the system.
-Accounts are REQUIRED to make a on-chain transaction to claim MP.
+Accounts are REQUIRED to make an on-chain transaction to claim MP.
 At any time, accounts MUST be able to retrieve the total MP accrued by the staking system by reading the contract state.
 Total MP combines both accrued MP and pending MP.
 The accrued MP contains the initial MP and the MP accrued over time.
@@ -239,7 +239,7 @@ no matter how long they stake.
 
 #### Reward Distribution
 
-The system distributes rewards based on tree main factors:
+The system distributes rewards based on a few main factors:
 
 - The amount of tokens staked
 - The account's Multiplier Points (MP)
@@ -254,7 +254,7 @@ $$
 \text{Account Weight} = \text{Staked Balance} + \text{MP Balance}
 $$
 
-In addition, the system MUST track of the total weight of all accounts in the system:
+In addition, the system MUST track the total weight of all accounts in the system:
 
 $$
 \text{Total System Weight} = \sum_{i=1}^{n} \text{Account Weight}_i
@@ -266,8 +266,8 @@ the total weight of the system increases with time as well.
 With the weights mechanism implemented,
 the system can now calculate the rewards for each account.
 For an individual account,
-dividing the account's weight by the total system weight and
-multiplying it by the total reward amount:
+divide the account's weight by the total system weight and
+multiply it by the total reward amount:
 
 $$
 \text{Reward Amount} = \text{Account Weight} \times \frac{\text{Total Reward Amount}}{\text{Total System Weight}}
@@ -290,13 +290,13 @@ $$
 Rewards are accrued by accounts over time and
 SHOULD be available for withdrawal at the end of each reward period.
 Based on the reward duration and amount of rewards,
-stakers will accrue rewards in real time based on the rate of rewards which is calculated:
+stakers will accrue rewards in real-time based on the rate of rewards which is calculated:
 
 $$
 \text{Reward Rate} = \frac{\text{Total Reward Amount}}{\text{Reward Duration}}
 $$
 
-- When the `rewardEndTime` period has occured,
+- When the `rewardEndTime` period has occurred,
 the operator MUST set the new reward ratio.
 - account weights increase with
 time, which in turn means,
@@ -329,7 +329,7 @@ Each account maintains its own reward index,
 which represents the point at which they last "claimed" rewards.
 The difference between the global index and
 an account's index is multiplied by the account's
-weight, determines their unclaimed rewards:
+weight determines their unclaimed rewards:
 
 $$
 \text{Unclaimed Rewards} = \text{Account Weight} \times (\text{Global Index} - \text{Account Index})
@@ -342,9 +342,9 @@ The system MUST update indices in the following situations:
 - When new rewards are added by the operator
 - When accounts stake or unstake tokens
 
-This mechanism ensures that, historical rewards are preserved accurately and
+This mechanism ensures that historical rewards are preserved accurately and
 accounts receive their fair share based on their weight over time.
-Also, accounts MUST NOT receive the rewards that were accounted for in system
+Also, accounts MUST NOT receive the rewards that were accounted for in the system
 at the time the account entered the system.
 
 ##### Index Adjustment Example
