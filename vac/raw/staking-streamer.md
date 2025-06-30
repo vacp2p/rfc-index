@@ -94,7 +94,7 @@ accounts MAY leave the system if they do not agree with the changes.
 Including when the operator enables `emergencyMode`.
 
 - Operator decides amount of rewards should be awarded to stakers.
-- The owner MUST specify the amount of time for rewards to be distributed.
+- The operator MUST specify the amount of time for rewards to be distributed.
 
 #### Emergency Mode
 
