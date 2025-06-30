@@ -168,7 +168,7 @@ $$
 Alice receives 108.2 MP.
 By locking up the stake for 30 days,
 Alice receives an additional 8.2 MP.
-Alice cannot access the toekns until the lock-up period has passed.
+Alice cannot access the tokens until the lock-up period has passed.
 
 ##### Accrued MP
 
