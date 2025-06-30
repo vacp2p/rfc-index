@@ -170,7 +170,7 @@ By locking up the stake for 30 days,
 Alice receives an additional 8.2 MP.
 Alice cannot access the toekns until the lock-up period has passed.
 
-##### Accured MP
+##### Accrued MP
 
 The Accrued MP SHOULD be accumulated over time as a function of the stake amount,
 elapsed time, and annual percentage yield (APY).
