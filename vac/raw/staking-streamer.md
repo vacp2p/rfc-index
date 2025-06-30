@@ -287,7 +287,7 @@ $$
 \text{Pending Rewards} = \text{Account Weight} \times \left( \text{Current Reward Index} - \text{Account's Last Reward Index} \right)
 $$
 
-Rewards are accured by accounts over time and
+Rewards are accrued by accounts over time and
 SHOULD be available for withdrawal at the end of each reward period.
 Based on the reward duration and amount of rewards,
 stakers will accrue rewards in real time based on the rate of rewards which is calculated:
