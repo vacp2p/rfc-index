@@ -207,7 +207,7 @@ Alice receives 8.2 MP for the 30 days she has staked.
 
 The `stakingManager` contract SHOULD account for all MP accrued by all accounts in the system.
 Accounts are REQUIRED to make a on-chain transaction to claim MP.
-At any time, accounts MUST be able to retrieve the total MP accured by the staking system by reading the contract state.
+At any time, accounts MUST be able to retrieve the total MP accrued by the staking system by reading the contract state.
 Total MP combines both accrued MP and pending MP.
 The accrued MP contains the initial MP and the MP accrued over time.
 Pending MP are MP that have yet to be "claimed" by the accounts:
