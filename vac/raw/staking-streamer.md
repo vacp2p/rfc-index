@@ -49,7 +49,7 @@ and intended changes to the staking system.
 
 ### Accounts
 
-Accounts are users who contrbtribute a token, ERC-20 standard, to the staking protocol.
+Accounts are users who contribute a token, ERC-20 standard, to the staking protocol.
 Accounts SHOULD interact with the protocol through a layer-1 blockchain smart contract.
 To participate,
 users MUST use an external owned account (EOA) to interact with a `stakeVault` contract.
