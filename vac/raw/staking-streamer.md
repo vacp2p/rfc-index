@@ -83,7 +83,7 @@ This includes transfering to and from the staking system.
 The operator MAY set a perferred minimum lock duration for all tokens entering the system.
 Accounts transaction SHOULD fail if the minimum lock duration is not set.
 After a minimum lock duration is set,
-the operator SHOULD NOT be able to update this amount untilt the set period is complete.
+the operator SHOULD NOT be able to update this amount until the set period is complete.
 
 The `stakeManager` SHOULD be upgradable only by the registered operator.
 Contract upgrades will occur when an operator wants to add and/or
