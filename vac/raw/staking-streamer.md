@@ -290,7 +290,7 @@ $$
 Rewards are accured by accounts over time and
 SHOULD be available for withdrawal at the end of each reward period.
 Based on the reward duration and amount of rewards,
-stakers will accure rewards in real time based on the rate of rewards which is calculated:
+stakers will accrue rewards in real time based on the rate of rewards which is calculated:
 
 $$
 \text{Reward Rate} = \frac{\text{Total Reward Amount}}{\text{Reward Duration}}
