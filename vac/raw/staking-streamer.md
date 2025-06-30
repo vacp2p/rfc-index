@@ -75,7 +75,7 @@ If staked tokens are not locked, the account MAY withdraw the full amount of tok
 ### Operator Role
 
 Operators are the owners of the staking system implemented in the staking streamer protocol.
-The operator interacts with a `stakeMangaer` contract to faciltate the requirements of the system.
+The operator interacts with a `stakeManager` contract to facilitate the requirements of the system.
 A `stakeManager` is a smart contract that holds the logic for the staking system.
 Each account MUST use a `stakeVault` to interact with the `stakeManager`.
 This includes transfering to and from the staking system.
