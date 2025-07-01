@@ -11,18 +11,23 @@ contributors:
 
 ## Abstract
 
-This specification describes the components of the smart contracts for the staking streamer protocol.
-The staking streamer protocol is currently used in Status Network.
+This specification describes the components used for the Status Staking Streamer protocol.
+The protocol is a set of smart contract protocols currently used in [Status Network](https://status.network/).
 
 ## Background/Motivation
 
-The Status Network is a layer 2 blockchain that is gasless.
-To achieve no gas fees for transactions conducted on the network,
-users utilize a staking mechanism with native tokens.
-This mechanism, called the staking streamer,
-allows users to accumulate a [ERC-20 token](https://eips.ethereum.org/EIPS/eip-20) called Karma.
-With Karma, users can create transactions,
-have voting rights on the Status Network, and other benefits.
+Traditional layer 2 blockchains generate revenue from gass fees required to make transactions on the network.
+This can introduce a barrier of entry for users wanting to build and
+interact with that blockchain.
+The Status Network is a layer 2 roll up where applications and
+users do not blockchain with gasless transactions.
+Revenue is derived from a few sources including native yield commission.
+Assests bridged to the Status Network are rehypothecated into yield-bearing equivalents and
+users earn an [ERC-20 token](https://eips.ethereum.org/EIPS/eip-20) called Karma.
+Karma is an goverance token in the Status Network that gives the user access to a certain throughput of free transactions,
+votings and other network benefits.
+The SNT token can also be staked with the staking streamer protocol to earn Karma.
+
 The goal is to have a staking mechanism that is fair to all participants based on the stake amount and time staked.
 Participants will have significant increases in voting power after committing their stake for a longer period,
 even if their stake is not the largest among all participants.
@@ -40,12 +45,12 @@ The protocol consists of the following components:
 - staking operator
 - multipler points
 - reward mechanism
-- stake vaults
+- staking vaults
 
-The staking system MUST be supported by an operator who will introduce reward amounts,
-reward periods, the REQUIRED tokens to use within the system and
-updates to the staking smart contract.
-It is the responsibility of the operator to keep accounts informed about the requirements
+The staking system MUST be supported by an `OPERATOR` who will introduce reward amounts,
+reward periods, the token defined by its contract address REQUIRED for use in the system and
+making updates to the staking smart contracts.
+It is the responsibility of the `OPERATOR` to keep accounts informed about the requirements
 and intended changes to the staking system.
 
 ### Accounts
@@ -380,4 +385,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
+- [Status Network](https://status.network/)
 - [ERC-20 token](https://eips.ethereum.org/EIPS/eip-20)
