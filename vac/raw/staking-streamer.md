@@ -90,7 +90,7 @@ Each account MUST use a `stakeVault` to interact with the `stakeManager`.
 This includes transferring to and from the staking system.
 
 The operator MAY set a preferred minimum lock duration for all tokens entering the system.
-Accounts transaction SHOULD fail if the minimum lock duration is not set.
+Accounts transaction MUST fail if the minimum lock duration is not set.
 After a minimum lock duration is set,
 the operator SHOULD NOT be able to update this amount until the set period is complete.
 
