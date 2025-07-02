@@ -58,7 +58,7 @@ and intended changes to the staking system.
 Accounts are users who contribute a token, ERC-20 standard, to the staking protocol.
 Accounts SHOULD interact with the protocol through a layer-1 blockchain smart contract.
 To participate,
-users MAY use an external owned account (EOA) to interact with a `stakeVault` contract.
+users MAY use an external owned account (EOA) and/or a smart account to interact with a `stakeVault` contract.
 A `stakeVault` is a smart contract that records and
 maintains the current amount of tokens transferred by accounts to the protocol.
 Each `stakeVault` MUST have one registered as the owner.
@@ -67,22 +67,25 @@ Accounts MAY be the owner of one or more `stakeVault`s.
 
 #### Account Staking Flow
 
-To join a staking system,
-accounts MUST use a `stakeVault` to transfer a token amount to the staking system.
-The account MUST use the same token in the `stakeVault` registered by the operator in the staking system.
-Accounts MAY set a predefined duration to lock tokens in the staking system.
+When joining a staking system,
+accounts MUST use a `stakeVault` to transfer a token amount to the `stakingManager` contract,
+which is described [below](#operatorrole).
+The account MUST use the same token, identitied by the token address,
+as registered in the `stakeVault` by the `OPERATOR`.
+Accounts MAY set a predefined duration to lock those tokens.
 Tokens will not be retrievable by accounts until the set duration expires.
 This is designed to improve the rewards accrued by accounts deciding to lock funds.
-When tokens are successfully transferred to the `stakeVault`,
+
+After tokens have successfully been transferred to the `stakeVault`,
 the account responsible will start to accumulate multiper points.
-The rewards and multipler points are described in the [Rewards section](#rewards).
+The rewards and multipler points are described in the [Rewards section](#rewards) below.
 If staked tokens are not locked, the account MAY withdraw the full amount of tokens at any time.
 
 ### Operator Role
 
-Operators are the owners of the staking system implemented in the staking streamer protocol.
-The operator interacts with a `stakeManager` contract to facilitate the requirements of the system.
-A `stakeManager` is a smart contract that holds the logic for the staking system.
+The `OPERATOR` is the owner of the staking system by deploying the some smart contracts.
+The `OPERATOR` MUST deploy a `stakeManager` smart contract and
+facilitate the requirements of the system.
 Each account MUST use a `stakeVault` to interact with the `stakeManager`.
 This includes transferring to and from the staking system.
 
