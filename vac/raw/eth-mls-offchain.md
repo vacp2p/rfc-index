@@ -61,7 +61,7 @@ messaging who organizes the changes upon the voted-proposals.
 Since the de-MLS consists of MLS backend, the MLS services and components
 often used in following specification as it is or modified.
 
-### MLS Services:
+### MLS Services
 
 MLS is operated in two services authentication service (AS) and delivery service (DS).
 AS enables group members to authenticate the credentials presented by other group members
@@ -69,11 +69,11 @@ while DS routes MLS messages among the nodes or members in the protocol in the c
 order and manage the `keyPackage` of the users where the `keyPackage` is the objects
 that provide some public information about a user.
 
-### MLS Objects:
+### MLS Objects
 
 Following section presents the MLS objects and components that used in this RFC:
 
-`Epoch`: Fixed time intervals that changes the state that is defined by members, 
+`Epoch`: Fixed time intervals that changes the state that is defined by members,
 section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 `MLS proposal message:` Members MUST receive the proposal message prior to the
@@ -90,7 +90,7 @@ the committer, who may be any member of the group, as specified in  [MLS RFC 942
 generates the necessary key material for the next epoch, including the appropriate welcome messages
 for new joiners and new entropy for removed members. In this RFC, the committers only MUST be stewards.
 
-### de-MLS Objects:
+### de-MLS Objects
 
 `Voting proposal message:` Voting proposal messages are different then MLS proposals as voting proposals are basically
 the application message in MLS group. Therefore, the steward can collect the proposals without halting the protocol.
@@ -102,7 +102,7 @@ General flow is as follows:
 - Each time a single `steward` initializes a group and creates and emits a group anouncement (GA) periodically.
 - Meanwhile, each`node`creates and sends their`credential` includes `keyPackage`.
 - Each `member`creates `voting proposals` sends them to from MLS group during epoch E.
-- Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into 
+- Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into
 `MLS proposals`  then sends them with correspondng `commit messages`
 - Evantually, with the commit messages, all members starts the next epoch E+1.
 
@@ -162,12 +162,12 @@ as in section 12.4.3.1. [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/
 To naive way to create a decentralized secure group messaging is having a single transparent `steward`
 who only applies the changes regarding the result of the voting.
 
-This is mostly similar with the general flow and specified in voting proposal and welcome message creation sections. 
+This is mostly similar with the general flow and specified in voting proposal and welcome message creation sections.
 
 1. Each time a single `steward` initializes a group with group parameters with parameters
 as in section 8.1. Group Context in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
 2. `steward` creates a group anouncement (GA) according to the previous step and
-broadcast it to the all network periodically. GA message is visible in network to all `nodes`. 
+broadcast it to the all network periodically. GA message is visible in network to all `nodes`.
 3. The each `node` who wants to be a member needs to obtain this anouncement and create `credential`
 includes `keyPackage` that is specified in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 10.
 4. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
@@ -186,14 +186,14 @@ including welcome messages for the new members. Therefore, the `commit message` 
 
 ## Multi stewards
 
-Decentralization has already been achieved in the previous section. 
-However, to improve availability and ensure censorship resistance, 
-the single-steward protocol is extended to a multi-steward architecture. 
-In this design, each epoch is coordinated by a designated steward, 
-operating under the same protocol as the single-steward model. 
-Thus, the multi-steward approach primarily defines how steward roles 
+Decentralization has already been achieved in the previous section.
+However, to improve availability and ensure censorship resistance,
+the single-steward protocol is extended to a multi-steward architecture.
+In this design, each epoch is coordinated by a designated steward,
+operating under the same protocol as the single-steward model.
+Thus, the multi-steward approach primarily defines how steward roles
 rotate across epochs while preserving the underlying structure and logic of the original protocol.
-Two variants of the multi-steward design are introduced to address different system requirements. 
+Two variants of the multi-steward design are introduced to address different system requirements.
 
 ### Multi steward with single consensus
 
