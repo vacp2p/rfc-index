@@ -1,6 +1,6 @@
 ---
-title: STATUS-STAKING-STREAMER
-name: Status Staking Streamer Protocol
+title: SNT-STAKING-STREAMER
+name: Status Network Staking Streamer Protocol
 status: raw
 category: Standards Track
 tags: status-network
@@ -11,7 +11,7 @@ contributors:
 
 ## Abstract
 
-This specification describes the components used for the Status Staking Streamer protocol.
+This specification describes the components used for the Status Network Staking Streamer protocol.
 The protocol is a set of smart contract protocols currently used in [Status Network](https://status.network/).
 
 ## Background/Motivation
@@ -83,7 +83,7 @@ If staked tokens are not locked, the account MAY withdraw the full amount of tok
 
 ### Operator Role
 
-The `OPERATOR` is the owner of the staking system by deploying the some smart contracts.
+The `OPERATOR` is the owner of the staking system by registering an address on the `stakeManager` contract.
 The `OPERATOR` MUST deploy a `stakeManager` smart contract and
 facilitate the requirements of the system.
 Each account MUST use a `stakeVault` to interact with the `stakeManager`.
@@ -112,7 +112,7 @@ an operator may choose to stop the functionality of the staking system.
 When `emergencyMode` is enabled, the following SHOULD apply:
 
 - new vaults can not register,
-- current registered vaults can not stake or stake with lock period additional tokens,
+- current registered vaults can not stake or stake additional tokens with a lock period,
 - operators can not update the global state
 - accounts can not claim accrued rewards.
 
@@ -120,12 +120,13 @@ When `emergencyMode` is enabled, the following SHOULD apply:
 
 Accounts participate in the staking protocol to earn rewards.
 The staking system implements a rewards distribution mechanism,
-that works in conjunction with the multiplier points system.
+that works in conjunction with a internal accouting system called multiplier points.
 
 #### Multiplier Points
 
 When accounts have staked for a certain amount of time,
-multipler points, MP, are accrued and calculated in the overall reward amount.
+multipler points (MP) are accrued.
+The accrued MP is counted toward the account's weight for reward distribution, as described [below](#account-weight).
 This ensures that participants are rewarded fairly based on the stake amount
 and time staked.
 The MP is accumulated over time and MUST not be transferable.
@@ -254,6 +255,8 @@ The system distributes rewards based on a few main factors:
 - The account's Multiplier Points (MP)
 - the account's system weight
 - The account's reward index
+
+#### Account Weight
 
 Every account in the system has a weight associated with it.
 This weight is calculated as the sum of the staked tokens
