@@ -1,6 +1,6 @@
 ---
-title: NomosDA Network Specification
-name: NomosDA Network Specification
+title: NOMOS-DA-NETWORK
+name: NomosDA Network
 status: raw
 category:
 tags: network, data-availability, da-nodes, executors, sampling
@@ -20,7 +20,7 @@ identifies participants,
 and describes the interactions among its components.  
 Please note that this document does not delve into the cryptographic aspects of the design.
 For comprehensive details on the cryptographic operations,
-refer to the [Encoding Specification](https://www.notion.so/NomosDA-Encoding-Verification-4d8ca269e96d4fdcb05abc70426c5e7c).
+a detailed specification is a work in progress.
 
 ## Objectives
 
