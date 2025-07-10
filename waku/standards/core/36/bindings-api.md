@@ -10,6 +10,16 @@ contributors:
  - Filip Dimitrijevic <filip@status.im>
 ---
 
+Based on your comprehensive RFC specification, here's an abstract that captures the essence of your work:
+
+## Abstract
+
+This specification defines a standardized C API for integrating Waku v2 functionality into native applications that cannot use nwaku's JSON RPC API due to packaging, performance, or executable constraints. The API provides a generic interface that can be implemented by both nwaku and go-waku C bindings, enabling consumption from multiple programming languages including C#, Kotlin, Swift, Rust, and C++.
+
+The API uses JSON as the primary data exchange format and provides comprehensive support for all core Waku protocols including Relay (pub/sub messaging), Filter (lightweight message filtering), Lightpush (resource-constrained publishing), and Store (historical message retrieval). Additionally, the specification includes message encryption and decryption capabilities using both symmetric and asymmetric cryptography, peer discovery mechanisms through DNS Discovery and DiscoveryV5, and comprehensive node lifecycle management.
+
+All API functions use callback-based asynchronous execution patterns with standardized status codes and error handling. The specification aims to provide a complete, production-ready interface for native applications to leverage the full capabilities of the Waku v2 decentralized messaging protocol while maintaining cross-platform compatibility and implementation flexibility.
+
 ## Introduction
 
 Native applications that wish to integrate Waku may not be able to use nwaku and
@@ -71,10 +81,10 @@ A Waku Message in JSON Format:
 
 ```ts
 {
-  type JsonMessage* = ref object # https://rfc.vac.dev/spec/36/#jsonmessage-type
-  payload*: Base64String
-  contentTopic*: string
-  version*: uint
+  payload: string;   
+  contentTopic: string;
+  version: number;
+  timestamp: number;
 }
 ```
 
@@ -534,7 +544,7 @@ to specify the domain name used in the certificate in the `dns4DomainName` attri
   Default `0.0.0.0`
 - `port`: TCP listening port for websocket connection
 (`0` for random, binding to `443` requires root access)
-  Default `60001`, if secure websockets support is enabled, the default is `6443“`
+  Default `60001`, if secure websockets support is enabled, the default is `6443"`
 - `secure`: enable secure websockets support
   Default `false`
 - `certPath`: secure websocket certificate path
@@ -1663,10 +1673,39 @@ Returns
 `onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onErrCb` callback
 
+## Security Considerations
+
+### Key Management
+
+Private keys MUST be handled securely in memory and SHOULD NOT be logged or stored in plain text. Applications SHOULD implement proper key storage mechanisms such as hardware security modules or secure enclaves when available.
+
+Symmetric keys MUST be generated using cryptographically secure random number generators and SHOULD be rotated periodically.
+
+### Message Security
+
+Applications SHOULD validate message signatures when present to ensure message authenticity and integrity.
+
+Encrypted messages MUST use approved cryptographic algorithms. The current implementation uses standard symmetric and asymmetric encryption schemes.
+
+Applications SHOULD implement proper message filtering and validation to prevent spam and malicious content.
+
+### Network Security
+
+Peer connections SHOULD be authenticated when possible to prevent man-in-the-middle attacks.
+
+Applications SHOULD implement rate limiting for message processing to prevent denial of service attacks.
+
+Bootstrap nodes and discovery mechanisms SHOULD use trusted sources to prevent eclipse attacks.
+
+### Privacy Considerations
+
+Applications SHOULD be aware that network-level metadata (such as IP addresses and connection patterns) may be observable by network adversaries even when message content is encrypted.
+
+The use of content topics and pubsub topics can provide metadata that may be used to identify application usage patterns.
+
 ## Copyright
 
-Copyright and related rights waived via
-[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
 
