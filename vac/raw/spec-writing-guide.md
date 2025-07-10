@@ -8,8 +8,8 @@ contributors:
 
 ## Abstract
 
-The documents describes a few techniques that can be used when writing specifcations.
-This is only informational document and it not required to use the following techniques when writing a specifcation.
+The documents describes a few techniques that can be used when writing specifications.
+This is an informational document and is not required the use of the following techniques.
 
 ## Background/ Motivation
 
