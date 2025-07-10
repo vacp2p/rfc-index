@@ -866,7 +866,7 @@ This section defines the cryptographic primitives used in Sphinx packet
 construction and processing.
 
 - **Security Parameter**: All cryptographic operations target a minimum of
-$\kappa = 128$ bits of
+$κ = 128$ bits of
 security, balancing performance with resistance to modern attacks.
 
 - **Elliptic Curve Group $\mathbb{G}$**:
@@ -879,7 +879,7 @@ encryption and key exchange.
 - **Key Derivation Function (KDF)**:
   - **Purpose**: To derive encryption keys, IVs, and MAC key from the shared
 session key at each hop.
-  - **Construction**: SHA-256 hash with output truncated to 128 bits.
+  - **Construction**: SHA-256 hash with output truncated to $128$ bits.
   - **Key Derivation**: The KDF key separation labels (_e.g.,_ `"aes_key"`,
 `"mac_key"`)
 are fixed strings and MUST be agreed upon across implementations.
@@ -889,9 +889,109 @@ are fixed strings and MUST be agreed upon across implementations.
   - **Keys and IVs**: Each derived from the session key for the hop using the KDF.
 
 - **Message Authentication Code (MAC)**:
-  - **Construction**: HMAC-SHA-256 with output truncated to 128 bits.
+  - **Construction**: HMAC-SHA-256 with output truncated to $128$ bits.
   - **Purpose**: To compute $γ$ for each hop.
   - **Key**: Derived using KDF from the session key for the hop.
 
 These primitives are used consistently throughout packet construction and
 decryption, as described in the following sections.
+
+### 8.3 Packet Component Sizes
+
+This section defines the size of each component in a Sphinx packet, deriving them
+from the security parameter and protocol parameters introduced earlier. All Sphinx
+packets MUST be fixed in length to ensure uniformity and indistinguishability on
+the wire. The serialized packet is structured as follows:
+
+```text
++--------+----------+--------+----------+
+|   α    |     β    |   γ    |    δ     |
+| 32 B   | variable | 16 B   | variable |
++--------+----------+--------+----------+
+```
+
+#### 8.3.1 Header Field Sizes
+
+The header consists of the fields $α$, $β$, and $γ$, totaling a fixed size per
+maximum path length:
+
+- **$α$ (Alpha)**: 32 bytes
+  The size of $α$ is determined by the elliptic curve group representation used
+  (Curve25519), which encodes group elements as 32-byte values.
+
+- **$β$ (Beta)**: $((t + 1)r + 1)κ$ bytes
+  The size of $β$ depends on:
+  - **Maximum path length ($r$)**: The recommended value of $r=5$ balances
+  bandwidth versus anonymity tradeoffs.
+  - **Combined address and delay width ($tκ$)**: The recommended $t=3$
+  accommodates standard libp2p multiaddress representations plus a 2-byte delay
+  field. While the actual multiaddress and delay fields may be shorter, they
+  are padded to $tκ$ bytes to maintain fixed field size.
+  - **Per-hop $γ$ size ($κ$)** (defined below): Accounts for the integrity tag
+  included with each hop’s routing information.
+
+  Using this recommended value of $r$ and $t$, the resulting $β$ size is $336$ bytes.
+
+- **$γ$ (Gamma)**: $16$ bytes
+  The size of $γ$ equals the security parameter $κ$, providing a $κ$-bit integrity
+  tag at each hop.
+
+Thus, the total header length is:
+
+$$|Header| = α + β + γ = 32 + ((t + 1)r + 1)κ + 16$$
+
+Notation: $|x|$ denotes the size (in bytes) of field $x$.
+
+Using the recommended parameter ($r = 5$, $t = 3$), the header size is:
+
+$$|Header| = 32 + 336 + 16 = 384 \ bytes$$
+
+#### 8.3.2 Payload Size
+
+This subsection defines the size of the encrypted payload $δ$ in a Sphinx packet.
+
+$δ$ contains the application message, padded to a fixed maximum length to ensure
+all packets are indistinguishable on the wire. The size of $δ$ is calculated as:
+
+$$|δ| = TotalPacketSize - HeaderSize$$
+
+The recommended total packet size is $4608$ bytes, chosen to:
+
+- Accommodate typical libp2p application messages such as Waku (average ~4KB payloads),
+- Allow inclusion of additional data such as anonymous reply headers without
+  requiring fragmentation,
+- Maintain reasonable per-hop processing and bandwidth overhead.
+
+This recommended total packet size of \$4608\$ bytes yields:
+
+$$Payload = 4608 - 384 = 4224\ bytes$$
+
+Implementations MUST account for payload extensions, such as anonymous reply
+headers, when determining the maximum message size that can be encapsulated in a
+single Sphinx packet. Details on anonymous reply headers are defined in
+[Section X.X].
+
+The following subsection defines the padding and fragmentation requirements for
+ensuring this fixed-size constraint.
+
+#### 8.3.3 Padding and Fragmentation
+
+Implementations MUST ensure that all messages shorter than the maximum payload size
+are padded before Sphinx encapsulation to ensure that all packets are
+indistinguishable on the wire. Messages larger than the maximum payload size MUST
+be fragmented by the origin protocol or top-level application before being passed
+to the Mix Protocol. Reassembly is the responsibility of the consuming application,
+not the Mix Protocol.
+
+#### 8.3.4 Anonymity Set Considerations
+
+The fixed maximum packet size is a configurable parameter. Protocols or
+applications that choose to configure a different packet size (either larger or
+smaller than the default) MUST be aware that using unique or uncommon packet sizes
+can reduce their effective anonymity set to only other users of the same size.
+Implementers SHOULD align with widely used defaults to maximize anonymity set size.
+
+Similarly, parameters such as $r$ and $t$ are configurable. Changes to these
+parameters affect header size and therefore impact payload size if the total packet
+size remains fixed. However, if such changes alter the total packet size on the
+wire, the same anonymity set considerations apply.
