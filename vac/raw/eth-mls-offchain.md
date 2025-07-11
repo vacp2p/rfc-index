@@ -5,7 +5,8 @@ status: raw
 category: Standards Track
 tags:
 editor: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
-contributors: Seemenkina [ekaterina@status.im](mailto:ekaterina@status.im)
+contributors: seemenkina [ekaterina@status.im](mailto:ekaterina@status.im)
+
 ---
 
 ## Abstract
