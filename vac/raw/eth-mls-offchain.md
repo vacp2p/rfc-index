@@ -13,9 +13,9 @@ contributors: Seemenkina [ekaterina@status.im](mailto:ekaterina@status.im)
 The following document specifies Ethereum authenticated scalable
 and decentralized secure group messaging application by
 integrating Message Layer Security (MLS) backend.
-Decentralization refers each user is a node in P2P network as well as
-each user has voice for any changes in group and decentraliation
-is achieved by integration of the consensus mechanism.
+Decentralization refers each user is a node in P2P network and
+each user has voice for any changes in group.
+This is achieved by integrating a consensus mechanism.
 
 ## Motivation
 
