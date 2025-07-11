@@ -84,7 +84,7 @@ In this RFC, the add and remove proposals are used.
 `Application message`: This message type used in arbitrary encrypted communication between group members.
 This is restricted by [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) as if there is pending proposal,
 the application message should be cut.
-Notet that: Since the MLS is based on servers, this delay between proposal and commit messages are very small.
+Note that: Since the MLS is based on servers, this delay between proposal and commit messages are very small.
 `Commit message:` After members receive the proposals regarding group changes,
 the committer, who may be any member of the group, as specified in  [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/),
 generates the necessary key material for the next epoch, including the appropriate welcome messages
