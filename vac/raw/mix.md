@@ -820,12 +820,10 @@ subsections.
 
 ### 8.1 Packet Structure Overview
 
-Each Sphinx packet consists of three fixed-length header fields&mdash;$α$,
-$β$, and $γ$&mdash;
-followed by a fixed-length encrypted payload $δ$. Together, these components
-enable per-hop message
-processing with strong confidentiality and integrity guarantees in a stateless
-and unlinkable manner.
+Each Sphinx packet consists of three fixed-length header fields&mdash; $α$,
+$β$, and $γ$ &mdash;followed by a fixed-length encrypted payload $δ$.
+Together, these components enable per-hop message processing with strong
+confidentiality and integrity guarantees in a stateless and unlinkable manner.
 
 - **$α$ (Alpha)**: An ephemeral public value. Each mix node uses its private key
 and $α$ to
