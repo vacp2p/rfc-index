@@ -173,8 +173,13 @@ broadcast it to the all network periodically. GA message is visible in network t
 includes `keyPackage` that is specified in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 10.
 4. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
 based on the outcome of the voting process.
-5. `members` start to create `voting proposals` for adding or removing a users,
-and present them to the voting in MLS group as a application message.
+5. Any `member` start to create `voting proposals` for adding or removing users,
+and present them to the voting in the MLS group as an application message.
+
+However, unlimited use of `voting proposals` within the group may be misused by
+malicious or overly active members.
+Therefore, an application-level constraint can be introduced to limit the number
+or frequency of proposals initiated by each member to prevent spam or abuse.
 6. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
 that have received affirmative votes from members via application messages.
 Otherwise, the `steward` discards proposals that did not receive a majority of "YES" votes.
