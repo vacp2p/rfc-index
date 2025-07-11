@@ -928,7 +928,8 @@ maximum path length:
   - **Per-hop $γ$ size ($κ$)** (defined below): Accounts for the integrity tag
   included with each hop’s routing information.
 
-  Using this recommended value of $r$ and $t$, the resulting $β$ size is $336$ bytes.
+  Using the recommended value of $r=5$ and $t=3$, the resulting $β$ size is
+  $336$ bytes.
 
 - **$γ$ (Gamma)**: $16$ bytes
   The size of $γ$ equals the security parameter $κ$, providing a $κ$-bit integrity
@@ -936,13 +937,23 @@ maximum path length:
 
 Thus, the total header length is:
 
-$$|Header| = α + β + γ = 32 + ((t + 1)r + 1)κ + 16$$
+$`
+\begin{aligned}
+|Header| &= α + β + γ \\
+  &= 32 + ((t + 1)r + 1)κ + 16
+\end{aligned}
+`$
 
 Notation: $|x|$ denotes the size (in bytes) of field $x$.
 
-Using the recommended parameter ($r = 5$, $t = 3$), the header size is:
+Using the recommended value of $r = 5$ and $t = 3$, the header size is:
 
-$$|Header| = 32 + 336 + 16 = 384 \ bytes$$
+$`
+\begin{aligned}
+|Header| &= 32 + 336 + 16 \\
+  &= 384 \ bytes
+\end{aligned}
+`$
 
 #### 8.3.2 Payload Size
 
@@ -951,7 +962,11 @@ This subsection defines the size of the encrypted payload $δ$ in a Sphinx packe
 $δ$ contains the application message, padded to a fixed maximum length to ensure
 all packets are indistinguishable on the wire. The size of $δ$ is calculated as:
 
-$$|δ| = TotalPacketSize - HeaderSize$$
+$`
+\begin{aligned}
+|δ| &= TotalPacketSize - HeaderSize
+\end{aligned}
+`$
 
 The recommended total packet size is $4608$ bytes, chosen to:
 
@@ -962,7 +977,12 @@ The recommended total packet size is $4608$ bytes, chosen to:
 
 This recommended total packet size of \$4608\$ bytes yields:
 
-$$Payload = 4608 - 384 = 4224\ bytes$$
+$`
+\begin{aligned}
+Payload &= 4608 - 384
+  &= 4224\ bytes
+\end{aligned}
+`$
 
 Implementations MUST account for payload extensions, such as anonymous reply
 headers, when determining the maximum message size that can be encapsulated in a
