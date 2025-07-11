@@ -174,7 +174,7 @@ includes `keyPackage` that is specified in [MLS RFC 9420](https://datatracker.ie
 based on the outcome of the voting process.
 5. `members` start to create `voting proposals` for adding or removing a users,
 and present them to the voting in MLS group as a application message.
-6. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch E,
+6. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
 that have received affirmative votes from members via application messages.
 Otherwise, the `steward` discards proposals that did not receive a majority of "YES" votes.
 Since voting proposals are transmitted as application messages, omitting them does not affect
