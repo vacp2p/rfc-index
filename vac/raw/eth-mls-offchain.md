@@ -199,7 +199,7 @@ Two variants of the multi-steward design are introduced to address different sys
 
 In this model, all group modifications, such as adding or removing members,
 must be approved through consensus by all participants,
-including the steward assigned for epoch E.
+including the steward assigned for epoch `E`.
 A configuration with multiple stewards operating under a shared consensus protocol offers
 increased decentralization and stronger protection against censorship.
 However, this benefit comes with reduced operational efficiency.
