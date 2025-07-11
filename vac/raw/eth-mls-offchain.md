@@ -181,7 +181,7 @@ Otherwise, the `steward` discards proposals that did not receive a majority of "
 Since voting proposals are transmitted as application messages, omitting them does not affect
 the protocol’s correctness or consistency.
 7. The `steward` converts all approved `voting proposals` into
-corresponding `MLS proposals` and `commit messages`, and
+corresponding `MLS proposals` and `commit message`, and
 transmits both in a single operation as in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 12.4,
 including welcome messages for the new members. Therefore, the `commit message` ends the previous epoch and create new ones.
 
