@@ -62,7 +62,7 @@ A node SHOULD use the remote node's libp2p peer id as identifier for this heuris
 A node MAY proceed with metadata request upon reconnection to a remote peer.
 
 A node SHOULD store the remote peer's metadata information for future reference.
-A node MAY implement a TTL regarding a remote peer's metadata, and refresh it upon it.
+A node MAY implement a TTL regarding a remote peer's metadata, and refresh it upon expiry by initiating another metadata request.
 It is RECOMMENDED to set the TTL to 6 hours.
 
 A node MAY trigger a metadata request after receiving an error response from a remote note
