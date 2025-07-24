@@ -65,7 +65,7 @@ A node SHOULD store remote peer's metadata information fo future reference.
 A node MAY implement a TTL regarding a remote peer's metadata, and refresh it upon it.
 It is RECOMMENDED to set the TTL to 6 hours.
 
-A node MAY trigger a metadata request after receiving an error stating from a remote note
+A node MAY trigger a metadata request after receiving an error response from a remote note
 stating they do not support a specific shard or pubsub topic.
 
 ### Providing Cluster Id
