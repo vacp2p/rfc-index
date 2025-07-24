@@ -57,7 +57,7 @@ message WakuMetadataResponse {
 ### Triggering Metadata Request
 
 A node SHOULD proceed with metadata request upon first connection to a remote node.
-A node SHOULD use the remote's node peer id as identifier for this heuristic.
+A node SHOULD use the remote node's libp2p peer id as identifier for this heuristic.
 
 A node MAY proceed with metadata request upon re-connection to a remote peer.
 
