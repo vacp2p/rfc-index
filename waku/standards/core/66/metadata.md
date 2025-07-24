@@ -59,7 +59,7 @@ message WakuMetadataResponse {
 A node SHOULD proceed with metadata request upon first connection to a remote node.
 A node SHOULD use the remote node's libp2p peer id as identifier for this heuristic.
 
-A node MAY proceed with metadata request upon re-connection to a remote peer.
+A node MAY proceed with metadata request upon reconnection to a remote peer.
 
 A node SHOULD store remote peer's metadata information fo future reference.
 A node MAY implement a TTL regarding a remote peer's metadata, and refresh it upon it.
