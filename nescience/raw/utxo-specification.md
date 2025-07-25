@@ -9,9 +9,9 @@ contributors:
 - Filip Dimitrijevic <filip@status.im>
 ---
 
-The UTXO model in the NSSA architecture underpins privacy-preserving executions for private, SE, and DE transactions.
+The UTXO model in the NSSA architecture underpins privacy-preserving executions for three transaction types: private transactions, Shielded Execution (SE) transactions, and Decoupled Execution (DE) transactions.
 By utilizing cryptographic methods and structured components,
-UTXOs facilitate programmable privacy,selective transparency,
+UTXOs facilitate programmable privacy, selective transparency,
 and secure state transitions.
 
 ## Components of a UTXO
