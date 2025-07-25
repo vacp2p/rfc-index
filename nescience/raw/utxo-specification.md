@@ -37,17 +37,16 @@ to enable efficient computations within zkVM environments.
 
 - Minimum value: 0 (representing zero tokens).
 
-- Maximum value: $2^{128-1}$ Any value less than the modulus $p$, which approximately is $2^{256}$.
+- Maximum value: $2^{128}-1$. Any value less than the modulus $p$, which is approximately $2^{256}$.
 
-- This provides an upper bound of 128 bits,
-  allowing for large balances256while remaining compatible with cryptographic constraints.
+- This provides an upper bound of 128 bits, allowing for large balances while remaining compatible with cryptographic constraints.
 
 ### Decimals
 
 - Decimal values are supported through rational number representation,
-  stored in the form $A/B$ where $B^{-1}$ is the multiplicative inverse of ﻿ in $B$ $\mathbb {F}_{p}$.
+  stored in the form $A/B$ where $B^{-1}$ is the multiplicative inverse of $B$ in $\mathbb{F}_{p}$.
 
-- Example: For $3.14$, the value is stored as $314⋅100−1$ mod $p$ where $100^{-1}$ ﻿ is computed using modular arithmetic.
+- Example: For $3.14$, the value is stored as $314 \cdot 100^{-1} \bmod p$ where $100^{-1}$ is computed using modular arithmetic.
 
 - This approach ensures precision and avoids the need for floating-point arithmetic,
   which is not compatible with cryptographic systems.
