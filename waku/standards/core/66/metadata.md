@@ -16,7 +16,7 @@ that can be associated with a [10/WAKU2](/waku/standards/core/10/waku2.md) node.
 
 ## Metadata Protocol
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”,
+The keywords “MUST”, // List style “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”,
 “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 Waku specifies a req/resp protocol that provides information about the node's capabilities.
@@ -76,13 +76,13 @@ It is RECOMMENDED for a node to operate on a single cluster id.
 
 ### Providing Shard Information
 
-- Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) MAY include the shards they are subscribed to in their metadata payload.
-- Shard-relevant services are message related services,
+* Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) MAY include the shards they are subscribed to in their metadata payload.
+* Shard-relevant services are message related services,
   such as [`13/WAKU2-STORE`](/waku/standards/core/13/store.md), [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)
   and [`19/WAKU2-LIGHTPUSH`](/waku/standards/core/19/lightpush.md)
   but not [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
-- Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) and a shard-relevant service SHOULD include the shards they are subscribed to in their metadata payload.
-- Nodes that do not mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) SHOULD NOT include any shard information
+* Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) and a shard-relevant service SHOULD include the shards they are subscribed to in their metadata payload.
+* Nodes that do not mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) SHOULD NOT include any shard information
 
 ### Using Cluster Id
 
