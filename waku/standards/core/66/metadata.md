@@ -95,10 +95,8 @@ It is NOT RECOMMENDED to disconnect from a peer based on the fact that their sha
 Ahead of doing a shard-relevant request,
 a node MAY use the previously received metadata shard information to select a peer that support the targeted shard.
 
-As part of peer management, a node MAY aim to maintain connections to a healthy pool of peers with different shards,
-based on the importance of shards for the application.
+For non-shard-relevant requests, a node SHOULD NOT discriminate a peer based on medata shard information.
 
-A node SHOULD maintain connection to some nodes in less relevant shards, to uses non-shard-related services such as [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md).
 
 ## Copyright
 
