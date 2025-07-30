@@ -66,21 +66,22 @@ A node MAY implement a TTL regarding a remote peer's metadata, and refresh it up
 It is RECOMMENDED to set the TTL to 6 hours.
 
 A node MAY trigger a metadata request after receiving an error response from a remote note
-stating they do not support a specific shard or pubsub topic.
+stating they do not support a specific cluster or shard.
+For example, when using a request-response service such as [`19/WAKU2-LIGHTPUSH`](/waku/standards/core/19/lightpush.md).
 
 ### Providing Cluster Id
 
-A node SHOULD always include their cluster id into their metadata payload.
-It is assumed that a node always operate on a single cluster id.
+A node MUST include their cluster id into their metadata payload.
+It is RECOMMENDED for a node to operate on a single cluster id.
 
 ### Providing Shard Information
 
 - Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) MAY include the shards they are subscribed to in their metadata payload.
-- Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) and a shard-relevant service SHOULD include the shards they are subscribed to in their metadata payload.
 - Shard-relevant services are message related services,
   such as [`13/WAKU2-STORE`](/waku/standards/core/13/store.md), [12/WAKU2-FILTER](/waku/standards/core/12/filter.md)
   and [`19/WAKU2-LIGHTPUSH`](/waku/standards/core/19/lightpush.md)
   but not [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
+- Nodes that mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) and a shard-relevant service SHOULD include the shards they are subscribed to in their metadata payload.
 - Nodes that do not mount [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md) SHOULD NOT include any shard information
 
 ### Using Cluster Id
