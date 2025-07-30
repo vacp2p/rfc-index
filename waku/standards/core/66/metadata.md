@@ -97,7 +97,6 @@ a node MAY use the previously received metadata shard information to select a pe
 
 For non-shard-relevant requests, a node SHOULD NOT discriminate a peer based on medata shard information.
 
-
 ## Copyright
 
 Copyright and related rights waived via
