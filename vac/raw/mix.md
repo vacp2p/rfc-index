@@ -303,7 +303,7 @@ layered encryption and per-hop delay provides resistance to traffic analysis and
 enables message-level
 unlinkability.
 
-Unlike typical custom libp2p protocols, the Mix protocol is stateless&mdash;it
+Unlike typical custom libp2p protocols, the Mix Protocol is stateless&mdash;it
 does not establish
 persistent streams, negotiate protocols, or maintain sessions. Each message is
 self-contained
@@ -520,7 +520,7 @@ While no existing mechanism provides unbiased sampling by default,
 [Waku’s ambient discovery](https://rfc.vac.dev/waku/standards/core/33/discv5/)
 &mdash;an extension
 over [Discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
-&mdash; demonstrates
+&mdash;demonstrates
 an approximate solution. It combines topic-based capability advertisement with
 periodic
 peer sampling. A similar strategy could potentially be adapted for the Mix
@@ -880,10 +880,19 @@ security, balancing performance with resistance to modern attacks.
 
 - **Elliptic Curve Group $\mathbb{G}$**:
   - **Curve**: Curve25519
+  - **Notation**: Let $g$ denote the canonical base point (generator) of $\mathbb{G}$.
   - **Purpose**: Used for deriving Diffie–Hellman-style shared key at each hop
 using $α$.
   - **Representation**: Small 32-byte group elements, efficient for both
 encryption and key exchange.
+  - **Scalar Field**: The curve is defined over the finite field
+$\mathbb{Z}_q$, where $q = 2^{252} + 27742317777372353535851937790883648493$.
+Ephemeral exponents used in Sphinx packet construction are selected uniformly
+at random from $\mathbb{Z}_q^*$, the multiplicative subgroup of $\mathbb{Z}_q$.
+
+- **Hash Function**:
+  - **Construction**: SHA-256
+  - **Notation**: The hash function is denoted by $H(\cdot)$ in subsequent sections.
 
 - **Key Derivation Function (KDF)**:
   - **Purpose**: To derive encryption keys, IVs, and MAC key from the shared
@@ -932,15 +941,17 @@ maximum path length:
   The size of $β$ depends on:
   - **Maximum path length ($r$)**: The recommended value of $r=5$ balances
   bandwidth versus anonymity tradeoffs.
-  - **Combined address and delay width ($tκ$)**: The recommended $t=3$
-  accommodates standard libp2p multiaddress representations plus a 2-byte delay
-  field. While the actual multiaddress and delay fields may be shorter, they
-  are padded to $tκ$ bytes to maintain fixed field size.
+  - **Combined address and delay width ($tκ$)**: The recommended $t=6$
+  accommodates standard libp2p relay multiaddress representations plus a
+  2-byte delay field. While the actual multiaddress and delay fields may be
+  shorter, they are padded to $tκ$ bytes to maintain fixed field size. The
+  structure and rationale for the $tκ$ block and its encoding are specified in
+  [Section 8.4](#84-address-and-delay-encoding).
   - **Per-hop $γ$ size ($κ$)** (defined below): Accounts for the integrity tag
   included with each hop’s routing information.
 
-  Using the recommended value of $r=5$ and $t=3$, the resulting $β$ size is
-  $336$ bytes.
+  Using the recommended value of $r=5$ and $t=6$, the resulting $β$ size is
+  $576$ bytes.
 
 - **$γ$ (Gamma)**: $16$ bytes
   The size of $γ$ equals the security parameter $κ$, providing a $κ$-bit integrity
@@ -957,12 +968,12 @@ $`
 
 Notation: $|x|$ denotes the size (in bytes) of field $x$.
 
-Using the recommended value of $r = 5$ and $t = 3$, the header size is:
+Using the recommended value of $r = 5$ and $t = 6$, the header size is:
 
 $`
 \begin{aligned}
-|Header| &= 32 + 336 + 16 \\
-  &= 384 \ bytes
+|Header| &= 32 + 576 + 16 \\
+  &= 624 \ bytes
 \end{aligned}
 `$
 
@@ -989,8 +1000,8 @@ This recommended total packet size of \$4608\$ bytes yields:
 
 $`
 \begin{aligned}
-Payload &= 4608 - 384
-  &= 4224\ bytes
+Payload &= 4608 - 624 \\
+  &= 3984\ bytes
 \end{aligned}
 `$
 
@@ -1046,11 +1057,29 @@ nodes within a deployment.
 
 For interoperability, a recommended default encoding format involves:
 
-- Encoding the next-hop libp2p multi-address as:
+- Encoding the next-hop libp2p multi-address:
+  - Each mix node is limited to one IPv4 circuit relay multiaddress to keep the
+  next-hop routing block compact while allowing relay connectivity. This
+  ensures that most nodes can act as mix nodes, including those behind NATs
+  or firewalls.
+  - In libp2p terms, this combines transport addresses with multiple peer
+  identities to form an address that describes a relay circuit:
+  $`
+  \begin{aligned}
+  /ip4/<ipv4>/tcp/<port>/p2p/<relayPeerID>/p2p-circuit/p2p/<relayedPeerID>
+  \end{aligned}
+  `$
+  Variants may include directly reachable peers and transport such as
+  `/quic-v1`, depending on the mix node's supported stack.
+  - IPv6 support is deferred, as it adds $16$ bytes just for the IP field.
+  - Future revisions may extend this format to support IPv6 or DNS-based
+  multiaddresses.
+  
+  With these constraints, the recommended encoding layout is:
   - IPv4 address (4 bytes)
-  - Protocol identifier (1 byte)
+  - Protocol identifier _e.g.,_ TCP or QUIC (1 byte)
   - Port number (2 bytes)
-  - Peer ID (39 bytes, post-Base58 decoding)
+  - Peer IDs (39 bytes, post-Base58 decoding)
 
 - Encoding the forwarding delay as an unsigned 16-bit integer (2 bytes) in
   milliseconds, using big endian network byte order.
@@ -1070,11 +1099,6 @@ The construction process wraps the message in a sequence of encryption
 layers&mdash;one for each hop&mdash;such that only the corresponding mix node
 can decrypt its layer and retrieve the routing instructions for that hop.
 
-The construction process uses the cryptographic primitives from
-[Section 8.2](#82-cryptographic-primitives) and adheres to the packet structure
-and size constraints defined in [Section 8.3](#83-packet-component-sizes) and
-[Section 8.4](#84-address-and-delay-encoding).
-
 #### 8.5.1 Inputs
 
 To initiate the Mix Protocol, the origin protocol instance submits a message
@@ -1082,7 +1106,7 @@ to the Mix Entry Layer on the same node. This layer forwards it to the local
 Mix Protocol instance, which constructs a Sphinx packet
 using the following REQUIRED inputs:
 
-- **Application message $m$**: The serialized message provided by the origin
+- **Application message**: The serialized message provided by the origin
   protocol instance. The Mix Protocol instance applies any configured spam
   protection mechanism and attaches one or two SURBs prior to encapsulating
   the message in the Sphinx packet. The initiating node MUST ensure that
