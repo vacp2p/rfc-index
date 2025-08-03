@@ -1,6 +1,6 @@
 ---
-title: HARDWARE-REQUIREMENTS
-name: Nomos P2P Network Hardware Requirements Specification
+title: P2P-HARDWARE-REQUIREMENTS
+name: Nomos p2p Network Hardware Requirements Specification
 status: draft
 category: infrastructure
 tags: [hardware, requirements, nodes, validators, services]
