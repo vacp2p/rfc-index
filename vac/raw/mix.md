@@ -1063,12 +1063,10 @@ For interoperability, a recommended default encoding format involves:
   ensures that most nodes can act as mix nodes, including those behind NATs
   or firewalls.
   - In libp2p terms, this combines transport addresses with multiple peer
-  identities to form an address that describes a relay circuit:
-
+  identities to form an address that describes a relay circuit:  
   `
   /ip4/<ipv4>/tcp/<port>/p2p/<relayPeerID>/p2p-circuit/p2p/<relayedPeerID>
-  `
-  
+  `  
   Variants may include directly reachable peers and transport such as
   `/quic-v1`, depending on the mix node's supported stack.
   - IPv6 support is deferred, as it adds $16$ bytes just for the IP field.
@@ -1122,3 +1120,60 @@ using the following REQUIRED inputs:
 - **Destination address**: The routing address of the intended recipient of
   the message. This address is encoded into the Sphinx packet and revealed
   only at the last hop.
+
+#### 8.5.2 Construction Steps
+
+This subsection defines how the initiating mix node constructs a complete
+Sphinx packet using the inputs defined in
+[Section 8.5.1](#851-inputs). The construction MUST
+follow the cryptographic structure defined in
+[Section 8.1](#81-packet-structure-overview), use the primitives specified in
+[Section 8.2](#82-cryptographic-primitives), and adhere to the component sizes
+and encoding formats from [Section 8.3](#83-packet-component-sizes) and
+[Section 8.4](#84-address-and-delay-encoding).
+
+The construction MUST proceed as follows:
+
+1. **Prepare Application Message**
+
+   - Apply any configured spam protection mechanism (_e.g.,_ PoW, VDF, RLN)
+  to the serialized message.
+   - Attach one or more SURBs, if required.
+   - Append the origin protocol codec.
+   - Pad the resulting message to the maximum payload length using a
+  deterministic padding scheme. The chosen scheme MUST yield a fixed-size
+  padded output and MUST be consistent across all mix nodes to ensure
+  correct interpretation during unpadding. For example, schemes that
+  explicitly encode the padding length and prepend zero-valued padding
+  bytes MAY be used.
+   - Let this result be the plaintext payload $m$.
+
+2. **Select A Mix Path**
+
+   - Choose a random mix path of length $L$: $n_0, n_1, \dots, n_{L-1}$.
+   - Let the X25519 public keys of the mix nodes in the path be
+  $y_0,\ y_1,\ \ldots,\ y_{L-1}$.
+
+3. **Wrap Plaintext Payload In Sphinx Packet**
+
+   a. **Compute Ephemeral Secrets**
+
+   - Choose a random private exponent $x$ from $\mathbb{Z}_q^*$.
+   - Initialize:  
+     $`
+     \begin{aligned}
+     α_0 &= g^x \\
+     s_0 &= y_0^x \\
+     b_0 &= H(α_0\ |\ s_0)
+     \end{aligned}
+     `$
+   - For each hop $i$ (from $1$ to $L-1$), compute:  
+     $`
+     \begin{aligned}
+     α_i &= α_{i-1}^{b_{i-1}} \\
+     s_i &= y_{i}^{x\prod_{\text{j=0}}^{\text{i-1}} b_{j}} \\
+     b_i &= H(α_i\ |\ s_i)
+     \end{aligned}
+     `$
+
+   Note that the value $α_0$ becomes the $α$ field in the final Sphinx packet.
