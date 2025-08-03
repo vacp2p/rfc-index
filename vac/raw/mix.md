@@ -1177,3 +1177,25 @@ The construction MUST proceed as follows:
      `$
 
    Note that the value $α_0$ becomes the $α$ field in the final Sphinx packet.
+
+   b. **Compute Per-Hop Filler Strings**
+
+   - Initialize $\phi_0 = \epsilon$ (empty string).
+   - For each $i$ (from $1$ to $L-1$):
+
+     - Derive the AES key and IV:
+
+       $`\phi_{\mathrm{aes\_key}_{i-1}} = \mathrm{KDF}("aes\_key" \mid s_{i-1})`$
+
+       $`\phi_{\mathrm{iv}_{i-1}} = \mathrm{H}("iv" \mid s_{i-1})`$
+       (truncated to 128 bits)
+
+     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$,
+       which is AES-CTR encryption with the keystream starting from
+       index $((t+1)(r-i)+t+2)\kappa$ :
+
+       $`\phi_i = \mathrm{AES\text{-}CTR}'_i(\phi_{\mathrm{aes\_key}_{i-1}},
+        \phi_{\mathrm{iv}_{i-1}}, \phi_{i-1} \mid 0_{(t+1)\kappa})`$,
+       where $0_{(t+1)\kappa}$ is the string of $0$ bits of length $(t+1)\kappa$.
+
+   Note that the length of $\phi_i$ is $(t+1)i\kappa$.
