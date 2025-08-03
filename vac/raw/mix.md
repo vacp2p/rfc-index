@@ -933,11 +933,11 @@ the wire. The serialized packet is structured as follows:
 The header consists of the fields $α$, $β$, and $γ$, totaling a fixed size per
 maximum path length:
 
-- **$α$ (Alpha)**: 32 bytes
+- **$α$ (Alpha)**: 32 bytes  
   The size of $α$ is determined by the elliptic curve group representation used
   (Curve25519), which encodes group elements as 32-byte values.
 
-- **$β$ (Beta)**: $((t + 1)r + 1)κ$ bytes
+- **$β$ (Beta)**: $((t + 1)r + 1)κ$ bytes  
   The size of $β$ depends on:
   - **Maximum path length ($r$)**: The recommended value of $r=5$ balances
   bandwidth versus anonymity tradeoffs.
@@ -953,7 +953,7 @@ maximum path length:
   Using the recommended value of $r=5$ and $t=6$, the resulting $β$ size is
   $576$ bytes.
 
-- **$γ$ (Gamma)**: $16$ bytes
+- **$γ$ (Gamma)**: $16$ bytes  
   The size of $γ$ equals the security parameter $κ$, providing a $κ$-bit integrity
   tag at each hop.
 
@@ -1064,11 +1064,11 @@ For interoperability, a recommended default encoding format involves:
   or firewalls.
   - In libp2p terms, this combines transport addresses with multiple peer
   identities to form an address that describes a relay circuit:
-  $`
-  \begin{aligned}
+
+  `
   /ip4/<ipv4>/tcp/<port>/p2p/<relayPeerID>/p2p-circuit/p2p/<relayedPeerID>
-  \end{aligned}
-  `$
+  `
+  
   Variants may include directly reachable peers and transport such as
   `/quic-v1`, depending on the mix node's supported stack.
   - IPv6 support is deferred, as it adds $16$ bytes just for the IP field.
