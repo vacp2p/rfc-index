@@ -1007,7 +1007,7 @@ Payload &= 4608 - 624 \\
 
 Implementations MUST account for payload extensions, such as SURBs,
 when determining the maximum message size that can be encapsulated in a
-single Sphinx packet. Details on anonymous reply headers are defined in
+single Sphinx packet. Details on SURBs are defined in
 [Section X.X].
 
 The following subsection defines the padding and fragmentation requirements for
@@ -1137,8 +1137,10 @@ The construction MUST proceed as follows:
 1. **Prepare Application Message**
 
    - Apply any configured spam protection mechanism (_e.g.,_ PoW, VDF, RLN)
-  to the serialized message.
-   - Attach one or more SURBs, if required.
+  to the serialized message. Spam protection mechanisms are pluggable as defined
+  in [Section 6.3](#63-spam-protection).
+   - Attach one or more SURBs, if required. Their format and processing are
+  specified in [Section X.X].
    - Append the origin protocol codec.
    - Pad the resulting message to the maximum payload length using a
   deterministic padding scheme. The chosen scheme MUST yield a fixed-size
@@ -1150,7 +1152,7 @@ The construction MUST proceed as follows:
 
 2. **Select A Mix Path**
 
-   - Choose a random mix path of length $L$: $n_0, n_1, \dots, n_{L-1}$.
+   - Choose a random mix path of length $L \geq 3$: $n_0, n_1, \dots, n_{L-1}$.
    - Let the X25519 public keys of the mix nodes in the path be
   $y_0,\ y_1,\ \ldots,\ y_{L-1}$.
 
@@ -1158,7 +1160,7 @@ The construction MUST proceed as follows:
 
    a. **Compute Ephemeral Secrets**
 
-   - Choose a random private exponent $x$ from $\mathbb{Z}_q^*$.
+   - Choose a random private exponent $x \in_R \mathbb{Z}_q^*$.
    - Initialize:  
      $`
      \begin{aligned}
@@ -1185,17 +1187,25 @@ The construction MUST proceed as follows:
 
      - Derive the AES key and IV:
 
-       $`\phi_{\mathrm{aes\_key}_{i-1}} = \mathrm{KDF}("aes\_key" \mid s_{i-1})`$
-
-       $`\phi_{\mathrm{iv}_{i-1}} = \mathrm{H}("iv" \mid s_{i-1})`$
-       (truncated to 128 bits)
+       $`
+       \begin{array}{l}
+       \phi_{\mathrm{aes\_key}_{i-1}} =
+       \mathrm{KDF}(\text{"aes\_key"} \mid s_{i-1})\\
+       \phi_{\mathrm{iv}_{i-1}} =
+       \mathrm{H}(\text{"iv"} \mid s_{i-1}) \;\;\;\; \text{(truncated to $128$ bits)}
+       \end{array}
+       `$
 
      - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$,
        which is AES-CTR encryption with the keystream starting from
        index $((t+1)(r-i)+t+2)\kappa$ :
 
-       $`\phi_i = \mathrm{AES\text{-}CTR}'_i(\phi_{\mathrm{aes\_key}_{i-1}},
-        \phi_{\mathrm{iv}_{i-1}}, \phi_{i-1} \mid 0_{(t+1)\kappa})`$,
-       where $0_{(t+1)\kappa}$ is the string of $0$ bits of length $(t+1)\kappa$.
+       $`
+       \begin{array}{l}
+       \phi_i = \mathrm{AES\text{-}CTR}'_i(\phi_{\mathrm{aes\_key}_{i-1}},
+       \phi_{\mathrm{iv}_{i-1}}, \phi_{i-1} \mid 0_{(t+1)\kappa}),
+       \text{where $0_{(t+1)\kappa}$ is the string of $0$ bits of length $(t+1)\kappa$.}
+       \end{array}
+       `$
 
    Note that the length of $\phi_i$ is $(t+1)i\kappa$.
