@@ -4,13 +4,13 @@ name: Nomos P2P Network NAT Solution Specification
 status: draft
 category: networking
 tags: [nat, traversal, autonat, upnp, pcp, nat-pmp]
-editor: Chris Lis <tba>, Antonio <tba>
+editor: Antonio Antonino <antonio@status.im>
 contributors:
 - Álvaro Castro-Castilla <alvaro@status.im>
 - Daniel Sanchez-Quiros <danielsq@status.im>
-- Petar Radovic <tba>
+- Petar Radovic <petar@status.im>
 - Gusto Bacvinka <augustinas@status.im>
-- Youngjoon Lee <tba>
+- Youngjoon Lee <youngjoon@status.im>
 - Filip Dimitrijevic <filip@status.im>
 ---
 
