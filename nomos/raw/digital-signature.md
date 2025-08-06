@@ -56,7 +56,8 @@ EdDSA SHOULD NOT be used for ZK circuit contruction.
 
 The prover computes the following EdDSA signature, twisted Edwards curve Curve25519:
 
-> $-x^2 + y^2 = 1 - (121665/121666)x^2y^2 \mod{(2^{255} - 19)}$
+$$ -x^2 + y^2 = 1 - (121665/121666)x^2y^2 \mod{(2^{255} - 19)} $$
+
 
 - The public key size MUST be 32 bytes
 - The signature size MUST be 64 bytes.
