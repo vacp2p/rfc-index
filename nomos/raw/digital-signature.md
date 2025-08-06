@@ -52,23 +52,21 @@ EdDSA is a signature scheme based on elliptic-curve cryptography,
 defined over twisted [Edwards curves](https://eprint.iacr.org/2008/013.pdf).
 Nomos uses the Ed25519 instances uses Curve25519, 
 providing 128-bit security for general purpose signing.
-EdDSA SHOUD NOT be used for ZK circuits use.
+EdDSA SHOULD NOT be used for ZK circuit contruction.
 
-The prover computes the EdDSA signature, twisted Edwards curve Curve25519:
+The prover computes the following EdDSA signature, twisted Edwards curve Curve25519:
 
 > $-x^2 + y^2 = 1 - (121665/121666)x^2y^2 \mod{(2^{255} - 19)}$
 
 - The public key size MUST be 32 bytes
 - The signature size MUST be 64 bytes.
-- The public key MUST NOT already exist*
-
-The verifier runs the verification algorithm:
+- The public key MUST NOT already exist
 
 ### ZKSignature
 
-The ZkSignature scheme enables a prover to demonstrate cryptographic knowledge of a secret key corresponding to a publicly available key,
+The ZkSignature scheme enables a prover to demonstrate cryptographic knowledge of a secret key,
+corresponding to a publicly available key,
 without revealing the secret key itself.
-
 The following is the structure for a proof attesting public key:
 
 ```python
@@ -91,7 +89,7 @@ The prover knows a witness:
 
 Such that the following constraints hold:
 
-The number of secret keys is equal to the number of public keys.
+The number of secret keys is equal to the number of public keys:
     
 ```python
 
@@ -99,7 +97,7 @@ The number of secret keys is equal to the number of public keys.
     
 ```
     
-- Each public key is derived from the corresponding secret key.
+Each public key is derived from the corresponding secret key.
     
 ```python
 
@@ -116,7 +114,7 @@ The ZkSignature circuit MUST take a maximum of 32 public keys as inputs.
 To prove ownership when lower than 32 keys,
 the remaining inputs MUST be padded with the public key corresponding to the secret key `0`.
 These padding are ignored during execution.
-The outputs of the circuit have no size limit, as they MUST included in the hashed `msg`.
+The outputs of the circuit have no size limit, as they MUST be included in the hashed `msg`.
 
 ## Copyright
 
@@ -128,5 +126,3 @@ Copyright and related rights waived via
 - [Nomos whitepaper](https://nomos-tech.notion.site/The-Nomos-Whitepaper-1fd261aa09df81318690c6f398064efb?pvs=97#1fd261aa09df817bac4ad46fdb8d94ab)
 - [Common Ledger specification](https://nomos-tech.notion.site/Common-Ledger-Specification-1fd261aa09df81088b76f39cbbe7c648)
 - [Edwards curves](https://eprint.iacr.org/2008/013.pdf)
-
-
