@@ -10,27 +10,31 @@ contributors:
 
 ## Abstract
 
-This specification describes the digital signature element used in different components of the Nomos system design.
-Thoughout the system, Nomos components share the same signature scheme.
+This specification describes the digital signature element,
+which is used for different components in the Nomos system design.
+Thoughout the system, each Nomos layer share the same signature scheme.
 
 ## Background
 
 The Nomos Bedrock consist of a few key components that Nomos Network is built on,
-see the 
+see the
 [Nomos whitepaper](https://nomos-tech.notion.site/The-Nomos-Whitepaper-1fd261aa09df81318690c6f398064efb?pvs=97#1fd261aa09df817bac4ad46fdb8d94ab)
-for more information. 
+for more information.
 The Bedrock Mantle component serves as the operating system of Nomos.
 This includes facilitating operations like writing data to the blockchain or
 a restricted ledger of notes to support payments and staking.
-This component also defines how Nomos zones update their state and the coordination between the Nomos zone executor nodes.
-It is like a system call interface designed to provide a minimal set of operations to interact with lower-level Bedrock services.
-An execution layer that connects Nomos services to provide the necessary functionality for sovereign rollups and zones,
+This component also defines how Nomos zones update their state and
+ the coordination between the Nomos zone executor nodes.
+It is like a system call interface designed to provide a minimal set of operations
+to interact with lower-level Bedrock services.
+It is an execution layer that connects Nomos services
+to provide the necessary functionality for sovereign rollups and zones,
 see [Common Ledger specification](https://nomos-tech.notion.site/Common-Ledger-Specification-1fd261aa09df81088b76f39cbbe7c648) for more on Nomos zones.
 
-In order for the Bedrock layer to remain lightweight, it focuses on data availability and
-verification rather than execution.
-Native zones on the other hand will be able to define their state transition function and
-prove to the Bedrock layer their correct execution.
+In order for the Bedrock layer to remain lightweight, it focuses on data availability
+and verification rather than execution.
+Native zones on the other hand will be able to define their state transition function
+and prove to the Bedrock layer their correct execution.
 The Bedrock layer components share the same digital signature mechanism to ensure security and privacy.
 This document will describe the validation tools that are used with Bedrock services in the Nomos network.
 
@@ -50,14 +54,13 @@ verifiers include:
 
 EdDSA is a signature scheme based on elliptic-curve cryptography,
 defined over twisted [Edwards curves](https://eprint.iacr.org/2008/013.pdf).
-Nomos uses the Ed25519 instances uses Curve25519, 
+Nomos uses the Ed25519 instances uses Curve25519,
 providing 128-bit security for general purpose signing.
 EdDSA SHOULD NOT be used for ZK circuit contruction.
 
 The prover computes the following EdDSA signature, twisted Edwards curve Curve25519:
 
 $$ -x^2 + y^2 = 1 - (121665/121666)x^2y^2 \mod{(2^{255} - 19)} $$
-
 
 - The public key size MUST be 32 bytes
 - The signature size MUST be 64 bytes.
@@ -83,7 +86,7 @@ The prover knows a witness:
 ```python
 
   class ZkSignatureWitness:
-		# The list of secret keys used to signed the message
+ # The list of secret keys used to signed the message
     secret_keys: list[ZkSecretKey]
 
 ```
@@ -91,15 +94,15 @@ The prover knows a witness:
 Such that the following constraints hold:
 
 The number of secret keys is equal to the number of public keys:
-    
+
 ```python
 
   assert len(secret_keys) == len(public_keys)
     
 ```
-    
+
 Each public key is derived from the corresponding secret key.
-    
+
 ```python
 
     assert all(
@@ -108,14 +111,16 @@ Each public key is derived from the corresponding secret key.
     )
 
 ```
-    
+
 - The proof MUST be embedded in the hashed `msg`.
 
 The ZkSignature circuit MUST take a maximum of 32 public keys as inputs.
 To prove ownership when lower than 32 keys,
-the remaining inputs MUST be padded with the public key corresponding to the secret key `0`.
+the remaining inputs MUST be padded with the public key corresponding
+to the secret key `0`.
 These padding are ignored during execution.
-The outputs of the circuit have no size limit, as they MUST be included in the hashed `msg`.
+The outputs of the circuit have no size limit,
+as they MUST be included in the hashed `msg`.
 
 ## Copyright
 
