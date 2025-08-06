@@ -15,24 +15,24 @@ Thoughout the system, Nomos components share the same signature scheme.
 
 ## Background
 
-The Nomos protocol has Bedrock which is the a few key components that Nomos Network is built on,
+The Nomos Bedrock consist of a few key components that Nomos Network is built on,
 see the 
 [Nomos whitepaper](https://nomos-tech.notion.site/The-Nomos-Whitepaper-1fd261aa09df81318690c6f398064efb?pvs=97#1fd261aa09df817bac4ad46fdb8d94ab)
 for more information. 
 The Bedrock Mantle component serves as the operating system of Nomos.
 This includes facilitating operations like writing data to the blockchain or
 a restricted ledger of notes to support payments and staking.
-Also defines Nomos zone updates and coordination between Nomos zone executors.
-It is like a system call interface designed to provide a minimal and 
-a execution layer that connects Nomos services to provide the necessary functionality for sovereign rollups and zones,
+This component also defines how Nomos zones update their state and the coordination between the Nomos zone executor nodes.
+It is like a system call interface designed to provide a minimal set of operations to interact with lower-level Bedrock services.
+An execution layer that connects Nomos services to provide the necessary functionality for sovereign rollups and zones,
 see [Common Ledger specification](https://nomos-tech.notion.site/Common-Ledger-Specification-1fd261aa09df81088b76f39cbbe7c648) for more on Nomos zones.
 
-In order for this layer to remain lightweight, it focuses on data availability and
+In order for the Bedrock layer to remain lightweight, it focuses on data availability and
 verification rather than execution.
-Native zones on the other hand will be able to define their state transition function (STF) and
+Native zones on the other hand will be able to define their state transition function and
 prove to the Bedrock layer their correct execution.
-The Bedrock components share the same digital signature mechanism to ensure security and privacy.***
-This document will describe the validation tools that can be used with Bedrock services in the Nomos network.
+The Bedrock layer components share the same digital signature mechanism to ensure security and privacy.
+This document will describe the validation tools that are used with Bedrock services in the Nomos network.
 
 ## Wire Format
 
@@ -40,7 +40,8 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [RFC2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-The signature schemes used by the provers and verifiers participating in the of the Nomos systems include:
+The signature schemes used by the provers and
+verifiers include:
 
 - ZKSignature
 - EdDSA Digital Signature Algorithm
@@ -59,13 +60,73 @@ The prover computes the EdDSA signature, twisted Edwards curve Curve25519:
 
 - The public key size MUST be 32 bytes
 - The signature size MUST be 64 bytes.
+- The public key MUST NOT already exist*
 
 The verifier runs the verification algorithm:
-
 
 ### ZKSignature
 
 The ZkSignature scheme enables a prover to demonstrate cryptographic knowledge of a secret key corresponding to a publicly available key,
 without revealing the secret key itself.
+
+The following is the structure for a proof attesting public key:
+
+```python
+
+  class ZkSignaturePublic:
+    public_keys: list[ZkPublicKey] # The public keys signing the message
+    msg: hash # The hash of the message
+
+```
+
+The prover knows a witness:
+
+```python
+
+  class ZkSignatureWitness:
+		# The list of secret keys used to signed the message
+    secret_keys: list[ZkSecretKey]
+
+```
+
+Such that the following constraints hold:
+
+The number of secret keys is equal to the number of public keys.
+    
+```python
+
+  assert len(secret_keys) == len(public_keys)
+    
+```
+    
+- Each public key is derived from the corresponding secret key.
+    
+```python
+
+    assert all(
+      notes[i].public_key == hash("NOMOS_KDF", secret_keys[i])
+      for i in range(len(public_keys)
+    )
+
+```
+    
+- The proof MUST be embedded in the hashed `msg`.
+
+The ZkSignature circuit MUST take a maximum of 32 public keys as inputs.
+To prove ownership when lower than 32 keys,
+the remaining inputs MUST be padded with the public key corresponding to the secret key `0`.
+These padding are ignored during execution.
+The outputs of the circuit have no size limit, as they MUST included in the hashed `msg`.
+
+## Copyright
+
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+- [Nomos whitepaper](https://nomos-tech.notion.site/The-Nomos-Whitepaper-1fd261aa09df81318690c6f398064efb?pvs=97#1fd261aa09df817bac4ad46fdb8d94ab)
+- [Common Ledger specification](https://nomos-tech.notion.site/Common-Ledger-Specification-1fd261aa09df81088b76f39cbbe7c648)
+- [Edwards curves](https://eprint.iacr.org/2008/013.pdf)
 
 
