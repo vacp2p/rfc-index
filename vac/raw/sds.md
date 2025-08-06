@@ -165,7 +165,8 @@ of unacknowledged outgoing messages.
 
 Upon receiving a message,
 
-* the participant SHOULD ignore the message if it has a `sender_id` matching its own
+* the participant SHOULD ignore the message if it has a `sender_id` matching its own.
+* the participant MAY deduplicate the message by comparing its `message_id` to previously received message IDs.
 * the participant MAY deduplicate the message by comparing its `message_id` to previously received message IDs
 * the participant MUST [review the ACK status](#review-ack-status) of messages
 in its unacknowledged outgoing buffer
