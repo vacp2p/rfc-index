@@ -100,7 +100,8 @@ the application message in MLS group. Therefore, the steward can collect the pro
 
 General flow is as follows:
 
-- A steward initializes a group just once, and then sends out Group Announcements (GA) periodically..
+- A steward initializes a group just once, and then sends out Group Announcements (GA) periodically.
+
 - Meanwhile, each`node`creates and sends their`credential` includes `keyPackage`.
 - Each `member`creates `voting proposals` sends them to from MLS group during epoch E.
 - Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into
