@@ -35,22 +35,16 @@ The Nomos P2P network addresses three critical challenges:
 
 ### Transport Protocol
 
-#### QUIC Transport
+#### [QUIC protocol](https://docs.libp2p.io/concepts/transports/quic/) Transport
 
-The Nomos network employs **QUIC** as the primary transport protocol, leveraging the libp2p implementation.
+The Nomos network employs **[QUIC protocol](https://docs.libp2p.io/concepts/transports/quic/)** as the primary transport protocol, leveraging the [libp2p protocol](https://docs.libp2p.io/) implementation.
 
-**Rationale for QUIC:**
+**Rationale for [QUIC protocol](https://docs.libp2p.io/concepts/transports/quic/):**
 
 - Rapid connection establishment
 - Enhanced NAT traversal capabilities (UDP-based)
 - Built-in multiplexing simplifies configuration
 - Production-tested reliability
-
-**Protocol Identifier:**
-
-```text
-/quic-v1
-```
 
 ### Peer Discovery
 
