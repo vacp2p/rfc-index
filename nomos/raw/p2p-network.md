@@ -175,10 +175,9 @@ All network messages follow the Nomos Wire Format specification for consistent e
 
 All Nomos nodes MUST implement:
 
-1. **QUIC transport**
-2. **Kademlia DHT** for peer discovery
-3. **Identify protocol** for peer information exchange
-4. **Gossipsub** for message dissemination
+1. **Kademlia DHT** for peer discovery
+2. **Identify protocol** for peer information exchange
+3. **Gossipsub** for message dissemination
 
 ### Optional Enhancements
 
