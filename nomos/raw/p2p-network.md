@@ -195,33 +195,61 @@ Protocol versions follow semantic versioning:
 - **Minor version**: Backward-compatible enhancements
 - **Patch version**: Bug fixes and optimizations
 
-### Configuration Parameters
+## Configuration Parameters
+
+### Implementation Note
+
+**Current Status**: The Nomos P2P network implementation uses hardcoded libp2p protocol parameters for optimal performance and reliability. While the node configuration file (`config.yaml`) contains network-related settings, the core libp2p protocol parameters (Kademlia DHT, Identify, and Gossipsub) are embedded in the source code.
+
+### Node Configuration
+
+The following network parameters are configurable via `config.yaml`:
+
+#### Network Backend Settings
+
+```yaml
+network:
+  backend:
+    host: 0.0.0.0
+    port: 3000
+    node_key: <node_private_key>
+    initial_peers: []
+```
+
+#### Protocol-Specific Topics
+
+**Mempool Dissemination:**
+
+- **Mainnet**: `/nomos/mempool/0.1.0`
+- **Testnet**: `/nomos-testnet/mempool/0.1.0`
+
+**Block Propagation:**
+
+- **Mainnet**: `/nomos/cryptarchia/0.1.0`
+- **Testnet**: `/nomos-testnet/cryptarchia/0.1.0`
+
+### Hardcoded Protocol Parameters
+
+The following libp2p protocol parameters are currently hardcoded in the implementation:
 
 #### Peer Discovery Parameters
 
-```yaml
-kademlia:
-  protocol_id: "/nomos/kad/1.0.0"
-  replication_factor: 20
-  query_timeout: 60s
+- **Protocol identifiers** for Kademlia DHT and Identify protocols
+- **DHT routing table** configuration and query timeouts
+- **Peer discovery intervals** and connection management
 
-identify:
-  protocol_id: "/nomos/identify/1.0.0"
-  push_interval: 300s
-```
+#### Message Dissemination Parameters  
 
-#### Gossipsub Parameters
+- **Gossipsub mesh parameters** (peer degree, heartbeat intervals)
+- **Message validation** and caching settings
+- **Topic subscription** and fanout management
 
-```yaml
-gossipsub:
-  min_peers: 8
-  max_peers: 200
-  heartbeat_interval: 1s
-  fanout_ttl: 60s
-  topics:
-    - "/nomos/mempool/0.1.0"
-    - "/nomos/cryptarchia/0.1.0"
-```
+#### Rationale for Hardcoded Parameters
+
+1. **Network Stability**: Prevents misconfigurations that could fragment the network
+2. **Performance Optimization**: Parameters are tuned for the target network size and latency requirements
+3. **Security**: Reduces attack surface by limiting configurable network parameters
+4. **Simplicity**: Eliminates need for operators to understand complex P2P tuning
 
 ## Security Considerations
 
@@ -244,6 +272,10 @@ gossipsub:
 2. **Peer Scoring**: Implement reputation-based peer management
 3. **Circuit Breakers**: Automatic protection against resource exhaustion
 
+### Node Configuration Example
+
+[Nomos Node Configuration](https://github.com/logos-co/nomos/blob/master/nodes/nomos-node/config.yaml) is an example node configuration
+
 ## Performance Characteristics
 
 ### Scalability
@@ -265,6 +297,8 @@ gossipsub:
 3. [Kademlia DHT](https://docs.libp2p.io/concepts/discovery-routing/kaddht/)
 4. [Gossipsub Protocol](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub)
 5. [Identify Protocol](https://github.com/libp2p/specs/blob/master/identify/README.md)
+6. [Nomos Implementation](https://github.com/logos-co/nomos) - Reference implementation and source code
+7. [Nomos Node Configuration](https://github.com/logos-co/nomos/blob/master/nodes/nomos-node/config.yaml) - Example node configuration
 
 ## Copyright
 
