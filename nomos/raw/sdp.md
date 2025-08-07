@@ -12,7 +12,7 @@ contributors:
 - Thomas Lavaur <thomaslavaur@status.im>
 - Filip Dimitrijevic <filip@status.im>
 - Gusto Bacvinka <augustinas@status.im>
-- David Rusu
+- David Rusu <davidrusu@status.im>
 ---
 
 ## Introduction
