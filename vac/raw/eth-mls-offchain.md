@@ -16,7 +16,10 @@ and decentralized secure group messaging application by
 integrating Message Layer Security (MLS) backend.
 Decentralization refers each user is a node in P2P network and
 each user has voice for any changes in group.
-This is achieved by integrating a consensus mechanism.
+This is achieved by integrating a consensus mechanism. 
+Lastly, this RFC MAY also be referred to as de-MLS,
+short for decentralized MLS, to emphasize its deviation
+from the centralized trust assumptions of traditional MLS deployments.
 
 ## Motivation
 
@@ -49,7 +52,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ## Roles
 
-In de-MLS RFC, there are three roles as follows:
+In this RFC, there are three roles as follows:
 
 - `node`: Nodes are members of network without being in any secure group messaging.
 - `member`: Members are special nodes in the secure group messaging who
