@@ -16,7 +16,7 @@ and decentralized secure group messaging application by
 integrating Message Layer Security (MLS) backend.
 Decentralization refers each user is a node in P2P network and
 each user has voice for any changes in group.
-This is achieved by integrating a consensus mechanism. 
+This is achieved by integrating a consensus mechanism.
 Lastly, this RFC MAY also be referred to as de-MLS,
 short for decentralized MLS, to emphasize its deviation
 from the centralized trust assumptions of traditional MLS deployments.
