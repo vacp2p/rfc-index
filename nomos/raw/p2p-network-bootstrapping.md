@@ -9,7 +9,6 @@ contributors:
 - Álvaro Castro-Castilla <alvaro@status.im>
 - Petar Radovic <petar@status.im>
 - Gusto Bacvinka <augustinas@status.im>
-- Chris Lis
 - Antonio Antonino <antonio@status.im>
 - Youngjoon Lee <youngjoon@status.im>
 - Filip Dimitrijevic <filip@status.im>
