@@ -1226,8 +1226,8 @@ The construction MUST proceed as follows:
 
        $`
        \begin{array}{l}
-       Φ_i = \mathrm{AES\text{-}CTR}'_i(Φ_{\mathrm{aes\_key}_{i-1}},
-       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)\kappa}),
+       Φ_i = \mathrm{AES\text{-}CTR}'_i\bigl(Φ_{\mathrm{aes\_key}_{i-1}},
+       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)\kappa} \bigr),
        \text{where notation $0_x$ defines the string of $0$ bits of length $x$.}
        \end{array}
        `$
@@ -1278,7 +1278,7 @@ The construction MUST proceed as follows:
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
        β_{\mathrm{iv}_i}, Δ \mid $\mathrm{delay}_i$ \mid 0_{((t+1)(r-L)+2)\kappa}
-       \bigr) \mid Φ_{L-1}
+       \bigr) \bigm| Φ_{L-1}
        \end{array}
        `$
 
@@ -1299,7 +1299,7 @@ The construction MUST proceed as follows:
 
        $`
        \begin{array}{l}
-       γ_i = \mathrm{HMAC\text{-}SHA\text{-}256}\bigl\mathrm{mac\_key}_i,
+       γ_i = \mathrm{HMAC\text{-}SHA\text{-}256}\bigl(\mathrm{mac\_key}_i,
        β_i \bigr)
        \end{array}
        `$
