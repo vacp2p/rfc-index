@@ -800,8 +800,10 @@ encapsulated in a Sphinx packet constructed by the initiating mix node. The
 packet is encrypted in
 layers such that each hop in the mix path can decrypt exactly one layer and
 obtain the next-hop
-routing information and delay value, without learning the complete path or the
+routing information and forwarding delay, without learning the complete path or the
 message origin.
+Only the final hop learns the destination, which is encoded in the innermost
+routing layer.
 
 Sphinx packets are self-contained and indistinguishable on the wire, providing
 strong metadata
@@ -842,8 +844,9 @@ derive a shared session key for that hop. This session key is used to decrypt
 and process
 one layer of the packet.
 - **$β$ (Beta)**: The nested encrypted routing information. It encodes the next
-hop address, the forwarding delay,
-integrity check $γ$ for the next hop, and the $β$ for subsequent hops.
+hop address, the forwarding delay, integrity check $γ$ for the next hop, and
+the $β$ for subsequent hops. At the final hop, $β$ encodes the destination
+address and fixed-length zero padding to preserve uniform size.
 - **$γ$ (Gamma)**: A message authentication code computed over $β$ using the
 session key derived
 from $α$. It ensures header integrity at each hop.
@@ -852,12 +855,12 @@ fixed maximum length and
 encrypted in layers corresponding to each hop in the mix path.
 
 At each hop, the mix node derives the session key from $α$, verifies the header
-integrity
-using $γ$, decrypts one layer of $β$ to extract the next hop and delay, and
-decrypts one layer
-of $δ$. It then constructs a new packet with updated values of $α$, $β$, $γ$,
-and $δ$, and
-forwards it to the next hop.
+integrity using $γ$, decrypts one layer of $β$ to extract the next hop and
+delay, and decrypts one layer of $δ$. It then constructs a new packet with
+updated values of $α$, $β$, $γ$, and $δ$, and forwards it to the next hop. At
+the final hop, the mix node decrypts the innermost layer of $β$ and $δ$, which
+yields the destination address and the original application message
+respectively.
 
 All Sphinx packets are fixed in size and indistinguishable on the wire. This
 uniform format,
@@ -951,7 +954,8 @@ maximum path length:
   included with each hop’s routing information.
 
   Using the recommended value of $r=5$ and $t=6$, the resulting $β$ size is
-  $576$ bytes.
+  $576$ bytes. At the final hop, $β$ encodes the destination address in the
+  first $tκ-2$ bytes and the remaining bytes are zero-padded.
 
 - **$γ$ (Gamma)**: $16$ bytes  
   The size of $γ$ equals the security parameter $κ$, providing a $κ$-bit integrity
@@ -1035,18 +1039,21 @@ parameters affect header size and therefore impact payload size if the total pac
 size remains fixed. However, if such changes alter the total packet size on the
 wire, the same anonymity set considerations apply.
 
-The following subsection defines how the next-hop address and forwarding delay are
-encoded within $β$ to enable correct routing and mixing behavior.
+The following subsection defines how the next-hop or destination address and
+forwarding delay are encoded within $β$ to enable correct routing and mixing
+behavior.
 
 ### 8.4 Address and Delay Encoding
 
-Each hop’s $β$ includes a fixed-size block containing the next-hop address and the
-forwarding delay. This section defines the structure and encoding of that block.
+Each hop’s $β$ includes a fixed-size block containing the next-hop address and
+the forwarding delay, except for the final hop, which encodes the destination
+address and a delay-sized zero padding. This section defines the structure and
+encoding of that block.
 
 The combined address and delay block MUST be exactly $tκ$ bytes in length,
 as defined in [Section 8.3.1](#831-header-field-sizes), regardless of the
 actual address or delay values. The first $(tκ - 2)$ bytes MUST encode the
-next-hop address, and the final $2$ bytes MUST encode the forwarding delay.
+address, and the final $2$ bytes MUST encode the forwarding delay.
 This fixed-length encoding ensures that packets remain indistinguishable on
 the wire and prevents correlation attacks based on routing metadata structure.
 
@@ -1057,7 +1064,7 @@ nodes within a deployment.
 
 For interoperability, a recommended default encoding format involves:
 
-- Encoding the next-hop libp2p multi-address:
+- Encoding the next-hop or destination libp2p multi-address:
   - Each mix node is limited to one IPv4 circuit relay multiaddress to keep the
   next-hop routing block compact while allowing relay connectivity. This
   ensures that most nodes can act as mix nodes, including those behind NATs
@@ -1117,9 +1124,9 @@ using the following REQUIRED inputs:
 - **Mix Path length $L$**: The number of mix nodes to include in the path.
   The mix path MUST consist of at least three hops, each representing a
   distinct mix node.
-- **Destination address**: The routing address of the intended recipient of
-  the message. This address is encoded into the Sphinx packet and revealed
-  only at the last hop.
+- **Destination address $Δ$**: The routing address of the intended recipient
+  of the message. This address is encoded in $(tκ - 2)$ bytes as defined in
+  [Section 8.4](#84-address-and-delay-encoding) and revealed only at the last hop.
 
 #### 8.5.2 Construction Steps
 
@@ -1152,9 +1159,20 @@ The construction MUST proceed as follows:
 
 2. **Select A Mix Path**
 
-   - Choose a random mix path of length $L \geq 3$: $n_0, n_1, \dots, n_{L-1}$.
-   - Let the X25519 public keys of the mix nodes in the path be
-  $y_0,\ y_1,\ \ldots,\ y_{L-1}$.
+   - First obtain an unbiased random sample of live, routable mix nodes using
+  some discovery mechanism. The choice of discovery mechanism is
+  deployment-specific as defined in [Section 6.1](#61-discovery). The
+  discovery mechanism MUST be unbiased and provide, at a minimum, the
+  multiaddress and X25519 public key of each mix node.
+   - From this sample, choose a random mix path of length $L \geq 3$. As defined
+  in [Section 2](#2-terminology), a mix path is a non-repeating sequence of
+  mix nodes.
+   - For each hop $i \in \{0 \ldots L-1\}$:
+     - Retrieve the multiaddress and corresponding X25519 public key $y_i$ of
+  the $i$-th mix node.
+     - Encode the multiaddress in $(tκ - 2)$ bytes as defined in
+  [Section 8.4](#84-address-and-delay-encoding). Let the resulting encoded
+  multiaddress be $\mathrm{addr\_i}$.
 
 3. **Wrap Plaintext Payload In Sphinx Packet**
 
@@ -1178,34 +1196,116 @@ The construction MUST proceed as follows:
      \end{aligned}
      `$
 
-   Note that the value $α_0$ becomes the $α$ field in the final Sphinx packet.
+   Note that the length of $α_i$ is $32$ bytes as defined in
+   [Section](#83-packet-component-sizes).
 
-   b. **Compute Per-Hop Filler Strings**
+   b. **Compute Per-Hop Filler Strings**  
+   Filler strings are encrypted strings that are appended to the header during
+   encryption. They ensure that the header length remains constant across hops,
+   regardless of the position of a node in the mix path.
 
-   - Initialize $\phi_0 = \epsilon$ (empty string).
+   To compute the sequence of filler strings, perform the following steps:
+
+   - Initialize $Φ_0 = \epsilon$ (empty string).
    - For each $i$ (from $1$ to $L-1$):
 
-     - Derive the AES key and IV:
+     - Derive per-hop AES key and IV:
 
        $`
        \begin{array}{l}
-       \phi_{\mathrm{aes\_key}_{i-1}} =
+       Φ_{\mathrm{aes\_key}_{i-1}} =
        \mathrm{KDF}(\text{"aes\_key"} \mid s_{i-1})\\
-       \phi_{\mathrm{iv}_{i-1}} =
+       Φ_{\mathrm{iv}_{i-1}} =
        \mathrm{H}(\text{"iv"} \mid s_{i-1}) \;\;\;\; \text{(truncated to $128$ bits)}
        \end{array}
        `$
 
-     - Compute the filler string $\phi_i$ using $\text{AES-CTR}^\prime_i$,
+     - Compute the filler string $Φ_i$ using $\text{AES-CTR}^\prime_i$,
        which is AES-CTR encryption with the keystream starting from
        index $((t+1)(r-i)+t+2)\kappa$ :
 
        $`
        \begin{array}{l}
-       \phi_i = \mathrm{AES\text{-}CTR}'_i(\phi_{\mathrm{aes\_key}_{i-1}},
-       \phi_{\mathrm{iv}_{i-1}}, \phi_{i-1} \mid 0_{(t+1)\kappa}),
-       \text{where $0_{(t+1)\kappa}$ is the string of $0$ bits of length $(t+1)\kappa$.}
+       Φ_i = \mathrm{AES\text{-}CTR}'_i(Φ_{\mathrm{aes\_key}_{i-1}},
+       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)\kappa}),
+       \text{where notation $0_x$ defines the string of $0$ bits of length $x$.}
        \end{array}
        `$
 
-   Note that the length of $\phi_i$ is $(t+1)i\kappa$.
+   Note that the length of $Φ_i$ is $(t+1)i\kappa$.
+
+   c. **Construct Routing Header**
+   The routing header as defined in
+   [Section 8.1](#81-packet-structure-overview) is the encrypted structure
+   that carries the forwarding instructions for each hop. It ensures that a
+   mix node can learn only its immediate next hop and forwarding delay without
+   inferring the full path.
+
+   Filler strings computed in
+   [Section 8.5.2.b](#852-filler-strings) are appended during encryption to
+   ensure that the header length remains constant across hops. This prevents
+   a node from distinguishing its position in the path based on header size.
+
+   To construct the routing header, perform the following steps for each hop
+   $i = L-1$ down to $0$, recursively:
+
+   - Derive per-hop AES key, MAC key, and IV:
+
+       $`
+       \begin{array}{l}
+       β_{\mathrm{aes\_key}_i} =
+       \mathrm{KDF}(\text{"aes\_key"} \mid s_i)\\
+       \mathrm{mac\_key}_i =
+       \mathrm{KDF}(\text{"mac\_key"} \mid s_{i})\\
+       β_{\mathrm{iv}_i} =
+       \mathrm{H}(\text{"iv"} \mid s_i) \;\;\;\; \text{(truncated to $128$ bits)}
+       \end{array}
+       `$
+  
+   - Set the per hop two-byte encoded delay $\mathrm{delay}_i$ as defined in
+  [Section 8.4](#84-address-and-delay-encoding):
+     - If final hop (_i.e.,_ $i = L - 1$), encode two byte zero padding.
+     - For all other hop $i,\ i < L - 1$, sample a forwarding delay
+  using the delay strategy configured by the application and encode it in two bytes.
+  The delay strategy is pluggable as defined in [Section 6.2](#62-delay-strategy).
+  
+   - Using the derived keys and encoded forwarding delay, compute the nested
+  encrypted routing information $β_i$:
+
+     - If $i = L-1$ (_i.e.,_ exit node):
+
+       $`
+       \begin{array}{l}
+       β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
+       β_{\mathrm{iv}_i}, Δ \mid $\mathrm{delay}_i$ \mid 0_{((t+1)(r-L)+2)\kappa}
+       \bigr) \mid Φ_{L-1}
+       \end{array}
+       `$
+
+     - Otherwise (_i.e.,_ intermediary node):
+
+       $`
+       \begin{array}{l}
+       β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
+       β_{\mathrm{iv}_i}, $\mathrm{addr}_{i+1}$ \mid $\mathrm{delay}_i$
+       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)\kappa - 1]} \bigr)
+       \end{array}
+       `$
+
+     Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$
+     as defined in [Section](#83-packet-component-sizes).
+
+     - Compute the message authentication code $γ_i$:
+
+       $`
+       \begin{array}{l}
+       γ_i = \mathrm{HMAC\text{-}SHA\text{-}256}\bigl\mathrm{mac\_key}_i,
+       β_i \bigr)
+       \end{array}
+       `$
+
+     Note that the length of $\gamma_i$ is $\kappa$ as defined in
+     [Section](#83-packet-component-sizes).
+
+   d. **Encrypt Payload**
+   e. **Assemble Final Packet**
