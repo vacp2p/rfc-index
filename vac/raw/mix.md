@@ -1197,7 +1197,7 @@ The construction MUST proceed as follows:
      `$
 
    Note that the length of $α_i$ is $32$ bytes as defined in
-   [Section](#83-packet-component-sizes).
+   [Section 8.3](#83-packet-component-sizes).
 
    b. **Compute Per-Hop Filler Strings**  
    Filler strings are encrypted strings that are appended to the header during
@@ -1293,7 +1293,7 @@ The construction MUST proceed as follows:
        `$
 
      Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$
-     as defined in [Section](#83-packet-component-sizes).
+     as defined in [Section 8.3](#83-packet-component-sizes).
 
      - Compute the message authentication code $γ_i$:
 
@@ -1305,7 +1305,7 @@ The construction MUST proceed as follows:
        `$
 
      Note that the length of $\gamma_i$ is $\kappa$ as defined in
-     [Section](#83-packet-component-sizes).
+     [Section 8.3](#83-packet-component-sizes).
 
    d. **Encrypt Payload**
    e. **Assemble Final Packet**
