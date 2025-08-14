@@ -46,7 +46,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ### Assumptions
 
-- The nodes in the P2P network can discover the nodes or they are subscribing same channel in a gossipsub.
+- The nodes in the P2P network can discover other nodes or will connect to other nodes when subscribing to same topic in a gossipsub.
 - We MAY have non-reliable (silent) nodes.
 - We MUST have a consensus that is lightweight, scalable and finalized in a specific time.
 
