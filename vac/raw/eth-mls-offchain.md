@@ -68,10 +68,11 @@ often used in following specification as it is or modified.
 ### MLS Services
 
 MLS is operated in two services authentication service (AS) and delivery service (DS).
-Authentication service enables group members to authenticate the credentials presented by other group members
-while delivery service routes MLS messages among the nodes or members in the protocol in the correct
-order and manage the `keyPackage` of the users where the `keyPackage` is the objects
-that provide some public information about a user.
+Authentication service enables group members to authenticate the credentials presented by other group members.
+The delivery service routes MLS messages among the nodes or
+members in the protocol in the correct order and 
+manage the `keyPackage` of the users where the `keyPackage` is the objects
+ that provide some public information about a user.
 
 ### MLS Objects
 
