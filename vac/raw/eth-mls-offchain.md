@@ -52,7 +52,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ## Roles
 
-In this RFC, there are three roles as follows:
+The three roles used in de-MLS is as follows:
 
 - `node`: Nodes are members of network without being in any secure group messaging.
 - `member`: Members are special nodes in the secure group messaging who
