@@ -148,8 +148,8 @@ bytes signature = 27;           // Signature of vote_hash
 }
 ```
 
-After the member creates the voting proposal that may include adding or removing a node or member,
-the voting proposal is emitted to the network via the MLS `Application message` with a lightweight,
+The voting proposal MAY include adding a `node` or removing a `member`.
+After the `member` creates the voting proposal, it is emitted to the network via the MLS `Application message` with a lightweight,
 
 epoch based voting such as [hashgraphlike consensus.](https://github.com/vacp2p/rfc-index/blob/consensus-hashgraph-like/vac/raw/consensus-hashgraphlike.md)
 This consensus result MUST be finalized within the epoch as YES or NO.
