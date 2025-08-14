@@ -116,7 +116,8 @@ General flow is as follows:
 A `member` MAY initializes the voting with the proposal payload
 which is implemented using [protocol buffers v3](https://protobuf.dev/) as follows:
 
-```bash
+```protobuf
+
 syntax = "proto3";
 
 message Proposal {
