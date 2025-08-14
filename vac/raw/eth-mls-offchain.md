@@ -63,14 +63,14 @@ messaging who organizes the changes upon the voted-proposals.
 ## MLS Background
 
 The de-MLS consists of MLS backend, so the MLS services and other MLS components
-are taken from the original [MLS specification](), with or without modifications.
+are taken from the original [MLS specification](https://datatracker.ietf.org/doc/rfc9420/), with or without modifications.
 
 ### MLS Services
 
 MLS is operated in two services authentication service (AS) and delivery service (DS).
 Authentication service enables group members to authenticate the credentials presented by other group members.
 The delivery service routes MLS messages among the nodes or
-members in the protocol in the correct order and 
+members in the protocol in the correct order and
 manage the `keyPackage` of the users where the `keyPackage` is the objects
  that provide some public information about a user.
 
@@ -149,8 +149,8 @@ bytes signature = 27;           // Signature of vote_hash
 ```
 
 The voting proposal MAY include adding a `node` or removing a `member`.
-After the `member` creates the voting proposal, it is emitted to the network via the MLS `Application message` with a lightweight,
-
+After the `member` creates the voting proposal,
+it is emitted to the network via the MLS `Application message` with a lightweight,
 epoch based voting such as [hashgraphlike consensus.](https://github.com/vacp2p/rfc-index/blob/consensus-hashgraph-like/vac/raw/consensus-hashgraphlike.md)
 This consensus result MUST be finalized within the epoch as YES or NO.
 
