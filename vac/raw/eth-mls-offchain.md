@@ -62,8 +62,8 @@ messaging who organizes the changes upon the voted-proposals.
 
 ## MLS Background
 
-Since the de-MLS consists of MLS backend, the MLS services and components
-often used in following specification as it is or modified.
+The de-MLS consists of MLS backend, so the MLS services and other MLS components
+are taken from the original [MLS specification](), with or without modifications.
 
 ### MLS Services
 
