@@ -165,7 +165,7 @@ a `commit message` SHOULD follow,
 as in section 12.04 [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) to the members.
 In order for the new `member` joining the group to synchronize with the current members
 who received the `commit message`,
-the `steward` sends a welcome message to the new `member`,
+the `steward` sends a welcome message to the node as the new `member`,
 as in section 12.4.3.1. [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ## Single steward
