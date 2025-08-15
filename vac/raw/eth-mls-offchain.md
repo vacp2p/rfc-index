@@ -79,7 +79,7 @@ manage the `keyPackage` of the users where the `keyPackage` is the objects
 Following section presents the MLS objects and components that used in this RFC:
 
 `Epoch`: Fixed time intervals that changes the state that is defined by members,
-section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/). 
+section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 `MLS proposal message:` Members MUST receive the proposal message prior to the
 corresponding commit message that initiates a new epoch with key changes,
