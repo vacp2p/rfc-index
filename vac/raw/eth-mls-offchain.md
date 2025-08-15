@@ -79,12 +79,12 @@ manage the `keyPackage` of the users where the `keyPackage` is the objects
 Following section presents the MLS objects and components that used in this RFC:
 
 `Epoch`: Fixed time intervals that changes the state that is defined by members,
-section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
+section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/). 
 
 `MLS proposal message:` Members MUST receive the proposal message prior to the
 corresponding commit message that initiates a new epoch with key changes,
 in order to ensure the intended security properties, section 12.1 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
-In this RFC, the add and remove proposals are used.
+Here, the add and remove proposals are used.
 
 `Application message`: This message type used in arbitrary encrypted communication between group members.
 This is restricted by [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) as if there is pending proposal,
@@ -97,8 +97,9 @@ for new joiners and new entropy for removed members. In this RFC, the committers
 
 ### de-MLS Objects
 
-`Voting proposal message:` Voting proposal messages are different then MLS proposals as voting proposals are basically
-the application message in MLS group. Therefore, the steward can collect the proposals without halting the protocol.
+`Voting proposal` Similar to MLS proposals, but processed only if approved through a voting process.
+They function as application messages in the MLS group,
+allowing the steward to collect them without halting the protocol.
 
 ## Flow
 
