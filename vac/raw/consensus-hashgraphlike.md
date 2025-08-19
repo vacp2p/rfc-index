@@ -71,18 +71,18 @@ package vac.voting;
 message Proposal {
   string name = 10;                 // Proposal name
   string payload = 11;
-  int32 proposal_id = 12;           // Unique identifier of the proposal
+  uint32 proposal_id = 12;           // Unique identifier of the proposal
   bytes proposal_owner = 13;        // Public key of the creator 
   repeated Votes = 14;              // Vote list in the proposal
-  int32 expected_voters_count = 15; // Maximum number of distinct voters
-  int32 round = 16;                 // Number of Votes 
-  int64 timestamp = 17;             // Creation time of proposal
-  int64 expiration_time = 18;       // The time interval that the proposal is active.  
+  uint32 expected_voters_count = 15; // Maximum number of distinct voters
+  uint32 round = 16;                 // Number of Votes 
+  uint64 timestamp = 17;             // Creation time of proposal
+  uint64 expiration_time = 18;       // The time interval that the proposal is active.  
   bool liveness_criteria_yes = 19;  // Shows how managing the silent peers vote
 }
 
 message Vote {
-  int32 vote_id = 20;             // Unique identifier of the vote
+  uint32 vote_id = 20;             // Unique identifier of the vote
   bytes vote_owner = 21;          // Voter's public key
   int64 timestamp = 22;           // Time when the vote was cast
   bool vote = 23;                 // Vote bool value (true/false)
