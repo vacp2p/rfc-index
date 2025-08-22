@@ -88,7 +88,7 @@ message Message {
 }
 ```
 
-The sending participant MUST include its own globally unique identifier in the `sender_id` field. 
+The sending participant MUST include its own globally unique identifier in the `sender_id` field.
 In addition, it MUST include a globally unique identifier for the message in the `message_id` field,
 likely based on a message hash.
 The `channel_id` field MUST be set to the identifier of the channel of group communication
