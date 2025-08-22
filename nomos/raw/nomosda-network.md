@@ -171,20 +171,22 @@ and queries each for the availability of the corresponding column for the sample
 
 - If `num_subnets` is 2048, `sample_size` is [20 as per the sampling research](https://www.notion.so/1708f96fb65c80a08c97d728cb8476c3?pvs=25#1708f96fb65c80bab6f9c6a946940078)
 
-    ```sequenceDiagram
-    SamplingClient→>+DANode_1: Request
-    DANode_1>-SamplingClient: Response
-    SamplingClient→>+DANode_2: Request
-    DANode_2>-SamplingClient: Response
-    SamplingClient→>+DANode_n: Request
-    DANode_n⟶>-SamplingClient: Response
-    ```
+```mermaid
+sequenceDiagram
+    SamplingClient ->> DANode_1: Request
+    DANode_1 -->> SamplingClient: Response
+    SamplingClient ->>DANode_2: Request
+    DANode_2 -->> SamplingClient: Response
+    SamplingClient ->> DANode_n: Request
+    DANode_n -->> SamplingClient: Response
+```
 
 ### Network Schematics
 
 The overall network and protocol interactions is represented by the following diagram
 
-```flowchart TD
+```mermaid
+flowchart TD
 subgraph Replication
     subgraph Subnetwork_N
         N10 -->|Replicate| N20
