@@ -55,6 +55,9 @@ but improves scalability by reducing direct interactions between participants.
 Each message has a globally unique, immutable ID (or hash).
 Messages can be requested from the high-availability caches or
 other participants using the corresponding message ID.
+* **Participant ID:**
+Each participant has a globally unique, immutable ID
+visible to other participants in the communication.
 
 ## Wire protocol
 
@@ -75,7 +78,7 @@ message HistoryEntry {
 }
 
 message Message {
-  // 1 Reserved for sender/participant id
+  string sender_id = 1;           // Participant ID of the message sender
   string message_id = 2;          // Unique identifier of the message
   string channel_id = 3;          // Identifier of the channel to which the message belongs
   optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
@@ -85,7 +88,8 @@ message Message {
 }
 ```
 
-Each message MUST include its globally unique identifier in the `message_id` field,
+The sending participant MUST include its own globally unique identifier in the `sender_id` field.
+In addition, it MUST include a globally unique identifier for the message in the `message_id` field,
 likely based on a message hash.
 The `channel_id` field MUST be set to the identifier of the channel of group communication
 that is being synchronized.
@@ -97,6 +101,10 @@ set out below.
 These fields MAY be left unset in the case of [ephemeral messages](#ephemeral-messages).
 The message `content` MAY be left empty for [periodic sync messages](#periodic-sync-message),
 otherwise it MUST contain the application-level content
+
+> **_Note:_** Close readers may notice that, outside of filtering messages originating from the sender itself,
+the `sender_id` field is not used for much.
+Its importance is expected to increase once a p2p retrieval mechanism is added to SDS, as is planned for the protocol.
 
 ### Participant state
 
@@ -157,6 +165,8 @@ of unacknowledged outgoing messages.
 
 Upon receiving a message,
 
+* the participant SHOULD ignore the message if it has a `sender_id` matching its own.
+* the participant MAY deduplicate the message by comparing its `message_id` to previously received message IDs.
 * the participant MUST [review the ACK status](#review-ack-status) of messages
 in its unacknowledged outgoing buffer
 using the received message's causal history and bloom filter.
