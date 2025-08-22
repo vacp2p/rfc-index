@@ -292,6 +292,8 @@ The following libp2p protocol parameters are currently hardcoded in the implemen
 
 ## References
 
+Original working document, from Nomos Notion: [P2P Network Specification](https://nomos-tech.notion.site/P2P-Network-Specification-206261aa09df81db8100d5f410e39d75).
+
 1. [libp2p Specifications](https://docs.libp2p.io/)
 2. [QUIC Protocol Specification](https://docs.libp2p.io/concepts/transports/quic/)
 3. [Kademlia DHT](https://docs.libp2p.io/concepts/discovery-routing/kaddht/)
