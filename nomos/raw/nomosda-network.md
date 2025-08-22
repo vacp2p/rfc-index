@@ -120,48 +120,8 @@ Nodes refer to nodes in the Data Availability SDP set to ascertain their connect
 
 #### Assignment Algorithm
 
-The algorithm for subnetwork assignment operates as follows:
-
-```python
-from itertools import cycle
-from typing import List, Sequence, Set, TypeAlias
-import ipaddress
-
-# A NodeDef is a tuple of an SDP peer id and an IP address
-DA_ROLE_ID: TypeAlias = bytes
-NodeDef = tuple[DA_ROLE_ID, ipaddress.ip_address]
-
-def calculate_subnets(
-    # list of registered nodes
-    nodes_list: Sequence[NodeDef],
-    # number of subnets 2048 for current setup)
-    num_subnets: int,
-    # minimum filler number per subnetwork (usually total_peers/num_subnets)
-    replication_factor: int 
-) -> List[Set[NodeDef]]:
-    """
-    Calculate in which subnet(s) to place each node.
-    Fills up each subnet up to a count in an iterative mode
-    """
-    # key of dict is the subnet number
-    nodes_list = sorted(nodes_list)
-    # create a cycling iterator which will cycle through
-    # all nodes continuously
-    nodes = cycle(nodes_list)
-    # compute the minimum size for each subnetwork
-    subnetwork_size = max(len(nodes_list)/num_subnets, replication_factor)
-    # for each subnet, cycle through the node list and create a set
-    # (collection) up to the replication factor
-    subnets: List[Set[NodeDef]] = []
-    i = 0
-    for _ in range(num_subnets):
-        subnet = set()
-    for _ in range(subnetwork_size):
-        subnet.add([nodes[i]])
-        i = (i + 1) % len(nodes)
-        subnets.append(subnet)
-    return subnets
-```
+The concrete distribution algorithm is described in the following specification:
+[DA Subnetwork Assignation](https://www.notion.so/DA-Subnetwork-Assignation-217261aa09df80fc8bb9cf46092741ce)
 
 ## Executor Connections
 
@@ -274,19 +234,19 @@ ensures the overlay node distribution is scalable for networks of any size.
 
 ## References
 
-- Introduction: [Encoding Specification](https://www.notion.so/NomosDA-Encoding-Verification-4d8ca269e96d4fdcb05abc70426c5e7c)
-- Requirements: [Encoding & Verification Specification](https://www.notion.so/NomosDA-Encoding-Verification-4d8ca269e96d4fdcb05abc70426c5e7c)
-- Sub-protocols: [NomosDA Dispersal](https://www.notion.so/NomosDA-Dispersal-1818f96fb65c805ca257cb14798f24d4?pvs=21)
-- Sub-protocols: [NomosDA Subnetwork Replication](https://www.notion.so/NomosDA-Subnetwork-Replication-1818f96fb65c80119fa0e958a087cc2b?pvs=21)
-- Sub-protocols: [NomosDA Sampling](https://www.notion.so/NomosDA-Sampling-1538f96fb65c8031a44cf7305d271779?pvs=21)
-- Sub-protocols: [NomosDA Reconstruction](https://www.notion.so/NomosDA-Reconstruction-1828f96fb65c80b2bbb9f4c5a0cf26a5?pvs=21)
-- Sub-protocols: [NomosDA Indexing](https://www.notion.so/NomosDA-Indexing-1bb8f96fb65c8044b635da9df20c2411?pvs=21)
-- NomosDA Network Registration: [SDP](https://www.notion.so/Final-Draft-Validator-Role-Protocol-17b8f96fb65c80c69c2ef55e22e29506)
-- Dispersal: [Encoding Specification](https://www.notion.so/NomosDA-Encoding-Verification-4d8ca269e96d4fdcb05abc70426c5e7c)
-- Sampling: [invoked based on the node's current role](https://www.notion.so/1538f96fb65c8031a44cf7305d271779?pvs=25#15e8f96fb65c8006b9d7f12ffdd9a159)
-- Sampling: [20 as per the sampling research](https://www.notion.so/1708f96fb65c80a08c97d728cb8476c3?pvs=25#1708f96fb65c80bab6f9c6a946940078)
-- Network specifics: [multiplexed](https://docs.libp2p.io/concepts/transports/quic/#quic-native-multiplexing)
-- Network specifics: [QUIC](https://docs.libp2p.io/concepts/transports/quic/)
+- [Encoding Specification](https://www.notion.so/NomosDA-Encoding-Verification-4d8ca269e96d4fdcb05abc70426c5e7c)
+- [Encoding & Verification Specification](https://www.notion.so/NomosDA-Encoding-Verification-4d8ca269e96d4fdcb05abc70426c5e7c)
+- [NomosDA Dispersal](https://www.notion.so/NomosDA-Dispersal-1818f96fb65c805ca257cb14798f24d4?pvs=21)
+- [NomosDA Subnetwork Replication](https://www.notion.so/NomosDA-Subnetwork-Replication-1818f96fb65c80119fa0e958a087cc2b?pvs=21)
+- [DA Subnetwork Assignation](https://www.notion.so/DA-Subnetwork-Assignation-217261aa09df80fc8bb9cf46092741ce)
+- [NomosDA Sampling](https://www.notion.so/NomosDA-Sampling-1538f96fb65c8031a44cf7305d271779?pvs=21)
+- [NomosDA Reconstruction](https://www.notion.so/NomosDA-Reconstruction-1828f96fb65c80b2bbb9f4c5a0cf26a5?pvs=21)
+- [NomosDA Indexing](https://www.notion.so/NomosDA-Indexing-1bb8f96fb65c8044b635da9df20c2411?pvs=21)
+- [SDP](https://www.notion.so/Final-Draft-Validator-Role-Protocol-17b8f96fb65c80c69c2ef55e22e29506)
+- [invoked based on the node's current role](https://www.notion.so/1538f96fb65c8031a44cf7305d271779?pvs=25#15e8f96fb65c8006b9d7f12ffdd9a159)
+- [20 as per the sampling research](https://www.notion.so/1708f96fb65c80a08c97d728cb8476c3?pvs=25#1708f96fb65c80bab6f9c6a946940078)
+- [multiplexed](https://docs.libp2p.io/concepts/transports/quic/#quic-native-multiplexing)
+- [QUIC](https://docs.libp2p.io/concepts/transports/quic/)
 
 ## Copyright
 
