@@ -195,48 +195,6 @@ Requirements may vary based on:
 - **Service Combinations**: Running multiple services simultaneously increases requirements
 - **Geographic Location**: Network latency affects optimal performance requirements
 
-### Configuration Parameters
-
-#### Light Node Configuration
-
-```yaml
-light_node:
-  max_connections: 8
-  sync_mode: "light"
-  storage_limit: "5GB"
-  bandwidth_limit: "1Mbps"
-```
-
-#### Validator Node Configuration
-
-```yaml
-validator:
-  max_connections: 50
-  storage_expansion: "auto"
-  backup_enabled: true
-  monitoring: "basic"
-```
-
-#### Service Node Configuration
-
-```yaml
-services:
-  data_availability:
-    storage_limit: "500GB"
-    max_connections: 1000
-    external_ip: "required"
-  
-  blend_protocol:
-    max_connections: 200
-    latency_target: "50ms"
-    external_ip: "required"
-  
-  executor_network:
-    gpu_acceleration: "required"
-    memory_limit: "32GB"
-    proof_cache: "10GB"
-```
-
 ## Security Considerations
 
 ### Hardware Security
