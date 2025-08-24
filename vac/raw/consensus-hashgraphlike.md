@@ -69,20 +69,20 @@ syntax = "proto3";
 package vac.voting;
 
 message Proposal {
-  string name = 10;                 // Proposal name
-  string payload = 11;
+  string name = 10;                  // Proposal name
+  string payload = 11;               // Proposal description
   uint32 proposal_id = 12;           // Unique identifier of the proposal
-  bytes proposal_owner = 13;        // Public key of the creator 
-  repeated Votes = 14;              // Vote list in the proposal
+  bytes proposal_owner = 13;         // Public key of the creator 
+  repeated Votes = 14;               // Vote list in the proposal
   uint32 expected_voters_count = 15; // Maximum number of distinct voters
   uint32 round = 16;                 // Number of Votes 
   uint64 timestamp = 17;             // Creation time of proposal
   uint64 expiration_time = 18;       // The time interval that the proposal is active.  
-  bool liveness_criteria_yes = 19;  // Shows how managing the silent peers vote
+  bool liveness_criteria_yes = 19;   // Shows how managing the silent peers vote
 }
 
 message Vote {
-  uint32 vote_id = 20;             // Unique identifier of the vote
+  uint32 vote_id = 20;            // Unique identifier of the vote
   bytes vote_owner = 21;          // Voter's public key
   int64 timestamp = 22;           // Time when the vote was cast
   bool vote = 23;                 // Vote bool value (true/false)
@@ -90,6 +90,7 @@ message Vote {
   bytes received_hash = 25;       // Hash of previous received Vote
   bytes vote_hash = 26;           // Hash of all previously defined fields in Vote
   bytes signature = 27;           // Signature of vote_hash
+  uint32 proposal_id = 28;        // Linking votes and proposals
 }
 
 ```
@@ -126,6 +127,8 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
   `V_2.vote_hash = hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)`
   
    4.7. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
+
+   4.8. Set `proposal_id` for the `vote`.
 
 5. Create `P_2` with by adding `V_2` as follows:
   
