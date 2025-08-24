@@ -167,6 +167,8 @@ the parent hash of `vote_i+1` should be the hash of `vote_i`
 4. Check the `timestamp` against the replay attack.
 In particular, the `timestamp` cannot be the old in the determined threshold.
 
+5. Check that the number of YES votes strictly exceeds the number of NO votes.
+
 If a proposal is verified by all the checks,
 the `countVote` method counts each YES vote from the list of Votes.
 
