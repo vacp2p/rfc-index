@@ -174,8 +174,9 @@ The consensus mechanism satisfies liveness and security properties as follows:
 ### Liveness
 
 Liveness refers to the ability of the protocol to eventually reach a decision when sufficient honest participation is present.
-In this protocol, if more than `n/2` of the votes among at least `2n/3` distinct peers are YES,
-then the consensus result is defined as YES.
+In this protocol, if `n > 2` and more than `n/2` of the votes among at least `2n/3` distinct peers are YES,
+then the consensus result is defined as YES; otherwise, when `n ≤ 2`, unanimous agreement (100% YES votes) is required.
+
 The peer calculates the result locally as shown in the [Section 3](#3-determining-the-result).
 From the [hashgraph property](https://hedera.com/learning/hedera-hashgraph/what-is-hashgraph-consensus),
 if a node could calculate the result of a proposal,
