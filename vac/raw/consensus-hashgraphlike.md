@@ -205,10 +205,10 @@ This process can continue beyond the expected round count,
 as long as it remains within the expiration time defined in the proposal.
 The expiration time acts as a soft upper bound to ensure that consensus is either reached or aborted within a bounded timeframe.
 
-#### Equality of votes 
+#### Equality of votes
 
 An equality of votes occurs when verifying at least `2n/3` distinct voters and
-applying `liveness_criteria_yes` the number of YES and NO votes is equal. 
+applying `liveness_criteria_yes` the number of YES and NO votes is equal.
 
 Handling ties is an application-level decision. The application MUST define a deterministic tie policy:
 
@@ -217,7 +217,6 @@ RETRY: re-run the vote with a new proposal_id, optionally adjusting parameters.
 REJECT: abort the proposal and return voting result as NO.
 
 The chosen policy SHOULD be consistent for all peers via proposal's `payload` to ensure convergence on the same outcome.
-
 
 ### Silent Node Management
 
