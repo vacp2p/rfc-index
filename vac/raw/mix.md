@@ -1149,13 +1149,16 @@ The construction MUST proceed as follows:
    - Attach one or more SURBs, if required. Their format and processing are
   specified in [Section X.X].
    - Append the origin protocol codec.
-   - Pad the resulting message to the maximum payload length using a
-  deterministic padding scheme. The chosen scheme MUST yield a fixed-size
-  padded output and MUST be consistent across all mix nodes to ensure
-  correct interpretation during unpadding. For example, schemes that
-  explicitly encode the padding length and prepend zero-valued padding
-  bytes MAY be used.
-   - Let this result be the plaintext payload $m$.
+   - Pad the result to the maximum application message length of $3968$ bytes
+  using a deterministic padding scheme. This value is derived from the fixed
+  payload size in [Section 8.3.2](#832-payload-size) ($3984$ bytes) minus the
+  security parameter $κ = 16$ bytes defined in
+  [Section 8.2](#82-cryptographic-primitives). The chosen scheme MUST yield a
+  fixed-size padded output and MUST be consistent across all mix nodes to
+  ensure correct interpretation during unpadding. For example, schemes that
+  explicitly encode the padding length and prepend zero-valued padding bytes
+  MAY be used.
+   - Let the resulting message be $m$.  
 
 2. **Select A Mix Path**
 
@@ -1241,9 +1244,8 @@ The construction MUST proceed as follows:
    mix node can learn only its immediate next hop and forwarding delay without
    inferring the full path.
 
-   Filler strings computed in
-   [Section 8.5.2.b](#852-filler-strings) are appended during encryption to
-   ensure that the header length remains constant across hops. This prevents
+   Filler strings computed in the previous step are appended during encryption
+   to ensure that the header length remains constant across hops. This prevents
    a node from distinguishing its position in the path based on header size.
 
    To construct the routing header, perform the following steps for each hop
@@ -1251,16 +1253,16 @@ The construction MUST proceed as follows:
 
    - Derive per-hop AES key, MAC key, and IV:
 
-       $`
-       \begin{array}{l}
-       β_{\mathrm{aes\_key}_i} =
-       \mathrm{KDF}(\text{"aes\_key"} \mid s_i)\\
-       \mathrm{mac\_key}_i =
-       \mathrm{KDF}(\text{"mac\_key"} \mid s_{i})\\
-       β_{\mathrm{iv}_i} =
-       \mathrm{H}(\text{"iv"} \mid s_i) \;\;\;\; \text{(truncated to $128$ bits)}
-       \end{array}
-       `$
+     $`
+     \begin{array}{l}
+     β_{\mathrm{aes\_key}_i} =
+     \mathrm{KDF}(\text{"aes\_key"} \mid s_i)\\
+     \mathrm{mac\_key}_i =
+     \mathrm{KDF}(\text{"mac\_key"} \mid s_{i})\\
+     β_{\mathrm{iv}_i} =
+     \mathrm{H}(\text{"iv"} \mid s_i) \;\;\;\; \text{(truncated to $128$ bits)}
+     \end{array}
+     `$
   
    - Set the per hop two-byte encoded delay $\mathrm{delay}_i$ as defined in
   [Section 8.4](#84-address-and-delay-encoding):
@@ -1277,7 +1279,7 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
-       β_{\mathrm{iv}_i}, Δ \mid $\mathrm{delay}_i$ \mid 0_{((t+1)(r-L)+2)\kappa}
+       β_{\mathrm{iv}_i}, Δ \mid \mathrm{delay}_i \mid 0_{((t+1)(r-L)+2)\kappa}
        \bigr) \bigm| Φ_{L-1}
        \end{array}
        `$
@@ -1287,7 +1289,7 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
-       β_{\mathrm{iv}_i}, $\mathrm{addr}_{i+1}$ \mid $\mathrm{delay}_i$
+       β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid $\mathrm{delay}_i$
        \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)\kappa - 1]} \bigr)
        \end{array}
        `$
@@ -1308,4 +1310,42 @@ The construction MUST proceed as follows:
      [Section 8.3](#83-packet-component-sizes).
 
    d. **Encrypt Payload**
-   e. **Assemble Final Packet**
+   The encrypted payload $δ$ contains the message $m$ defined in Step 1,
+   prepended with a $κ$-byte string of zeros. It is encrypted in layers such that
+   each hop in the mix path removes exactly one layer using the per-hop session
+   key. This ensures that only the final hop (_i.e.,_ the exit node) can fully
+   recover $m$, validate its integrity, and forward it to the destination.
+   To compute the encrypted payload, perform the following steps for each hop
+   $i = L-1$ down to $0$, recursively:
+
+   - Derive per-hop AES key and IV:
+
+     $`
+     \begin{array}{l}
+     δ_{\mathrm{aes\_key}_i} =
+     \mathrm{KDF}(\text{"δ\_aes\_key"} \mid s_i)\\
+     δ_{\mathrm{iv}_i} =
+     \mathrm{H}(\text{"δ\_iv"} \mid s_i) \;\;\;\; \text{(truncated to $128$ bits)}
+     \end{array}
+     `$
+  
+   - Using the derived keys, compute the encrypted payload $δ_i$:
+
+     - If $i = L-1$ (_i.e.,_ exit node):
+
+       $`
+       \begin{array}{l}
+       δ_i = \mathrm{AES\text{-}CTR}\bigl(δ_{\mathrm{aes\_key}_i},
+       δ_{\mathrm{iv}_i}, 0_{\kappa} \mid m
+       \bigr)
+       \end{array}
+       `$
+
+     - Otherwise (_i.e.,_ intermediary node):
+
+       $`
+       \begin{array}{l}
+       δ_i = \mathrm{AES\text{-}CTR}\bigl(δ_{\mathrm{aes\_key}_i},
+       δ_{\mathrm{iv}_i}, δ_{i+1} \bigr)
+       \end{array}
+       `$
