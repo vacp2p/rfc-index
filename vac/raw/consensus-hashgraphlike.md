@@ -167,7 +167,7 @@ the parent hash of `vote_i+1` should be the hash of `vote_i`
 4. Check the `timestamp` against the replay attack.
 In particular, the `timestamp` cannot be the old in the determined threshold.
 
-5. Check that the number of YES votes strictly exceeds the number of NO votes.
+5. Check that the liveness criteria defined in the Liveness section are satisfied.
 
 If a proposal is verified by all the checks,
 the `countVote` method counts each YES vote from the list of Votes.
@@ -204,6 +204,20 @@ it MAY continue to propagate its own vote — and any votes it has received — 
 This process can continue beyond the expected round count,
 as long as it remains within the expiration time defined in the proposal.
 The expiration time acts as a soft upper bound to ensure that consensus is either reached or aborted within a bounded timeframe.
+
+#### Equality of votes 
+
+An equality of votes occurs when verifying at least `2n/3` distinct voters and
+applying `liveness_criteria_yes` the number of YES and NO votes is equal. 
+
+Handling ties is an application-level decision. The application MUST define a deterministic tie policy:
+
+RETRY: re-run the vote with a new proposal_id, optionally adjusting parameters.
+
+REJECT: abort the proposal and return voting result as NO.
+
+The chosen policy SHOULD be consistent for all peers via proposal's `payload` to ensure convergence on the same outcome.
+
 
 ### Silent Node Management
 
