@@ -111,7 +111,7 @@ Its importance is expected to increase once a p2p retrieval mechanism is added t
 Each participant MUST maintain:
 
 * A Lamport timestamp for each channel of communication,
-initialized to current epoch time in nanosecond resolution.
+initialized to current epoch time in millisecond resolution.
 * A bloom filter for received message IDs per channel.
 The bloom filter SHOULD be rolled over and
 recomputed once it reaches a predefined capacity of message IDs.
