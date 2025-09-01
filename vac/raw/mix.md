@@ -1349,3 +1349,88 @@ The construction MUST proceed as follows:
        δ_{\mathrm{iv}_i}, δ_{i+1} \bigr)
        \end{array}
        `$
+
+## 9. Security Considerations
+
+This section describes the security guarantees and limitations of the Mix
+Protocol. It begins by outlining the anonymity properties provided by the core
+protocol when routing messages through the mix network. It then discusses the
+trust assumptions required at the edges of the network, particularly at the
+final hop. Finally, it presents an alternative trust model for destinations
+that support Mix Protocol directly, followed by a summary of broader
+limitations and areas that may be addressed in future iterations.
+
+### 9.1 Security Guarantees of the Core Mix Protocol
+
+The core Mix Protocol&mdash;comprising anonymous routing through a sequence of
+mix nodes using Sphinx packets&mdash;provides the following security guarantees:
+
+- **Sender anonymity**: Each message is wrapped in layered encryption and
+  routed independently, making it unlinkable to the sender even if multiple
+  mix nodes are colluding.
+- **Metadata protection**: All messages are fixed in size and indistinguishable
+  on the wire. Sphinx packets reveal only the immediate next hop and delay to
+  each mix node. No mix node learns its position in the path or the total path
+  length.
+- **Traffic analysis resistance**: Continuous-time mixing with randomized
+  per-hop delays reduces the risk of timing correlation and input-output
+  linkage.
+- **Per-hop confidentiality and integrity**: Each hop decrypts only its
+  assigned layer of the Sphinx packet and verifies header integrity via a
+  per-hop MAC.
+- **No long-term state**: All routing is stateless. Mix nodes do not maintain
+  per-message metadata, reducing the surface for correlation attacks.
+
+These guarantees hold only within the boundaries of the Mix Protocol.
+Additional trust assumptions are introduced at the edges, particularly at the
+final hop, where the decrypted message is handed off to the Mix Exit Layer for
+delivery to the destination outside the mixnet. The next subsection discusses
+these trust assumptions in detail.
+
+### 9.2 Exit Node Trust Model
+
+The Mix Protocol ensures strong sender anonymity and metadata protection
+between the Mix Entry and Exit layers. However, at the final hop, the decrypted
+Sphinx packet reveals the plaintext message and destination address. The exit
+node is then trusted to deliver this message to the destination application or
+peer, and&mdash;if a reply is expected&mdash;to return the response using the
+embedded reply key.
+
+In this model, the exit node becomes a privileged middleman. It has full
+visibility into the decrypted payload and destination. Specifically, the exit
+node may tamper with either direction of communication:
+
+- It may alter or drop the forwarded message.
+- It may fabricate a reply instead of forwarding the actual response from the
+  destination.
+
+There is no mechanism within the Mix Protocol to detect such behavior. Since
+messages are routed independently and the protocol does not establish
+persistent sessions or end-to-end integrity channels, the sender has no
+cryptographic guarantee that the destination received the intended message or
+that any reply originated from the correct source.
+
+This limitation is consistent with the broader mixnet trust model. It is well
+established that while intermediate nodes in the mix path do not learn path
+positions or message content and direction, edge nodes&mdash;specifically the
+initiating node and the exit node in the path&mdash;are inherently more
+privileged. In particular, the exit node necessarily observes decrypted content
+and can distinguish forward messages from replies. This distinction is inherent
+to any system where the destination does not participate in the mix network.
+
+Applications that require verifiable delivery or response origin authentication
+are expected to layer additional cryptographic mechanisms (_e.g.,_
+application-layer encryption or digital signatures) on top of the Mix Protocol.
+This is analogous to how TLS is used in Tor to protect against exit-level
+tampering of HTTP traffic. Without such protections, the exit node remains a
+point of trust in the message delivery path.
+
+Despite these limitations, this model is compatible with legacy protocols and
+destinations that do not support the Mix Protocol. It allows applications to
+preserve sender anonymity without requiring any participation from the
+recipient.
+
+However, in scenarios that demand stronger end-to-end
+guarantees&mdash;such as verifiable message delivery or response origin
+authentication&mdash;it may be beneficial for the destination itself to operate
+a Mix instance. This alternative model is described in the next subsection.
