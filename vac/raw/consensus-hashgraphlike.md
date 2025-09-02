@@ -126,9 +126,9 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
    4.6. Calculate `vote_hash` by hash of all previously defined fields in Vote:
   `V_2.vote_hash = hash(vote_id, owner, timestamp, vote, parent_hash, received_hash)`
   
-   4.7. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
+   4.7. Set `proposal_id` for the `vote`.
 
-   4.8. Set `proposal_id` for the `vote`.
+   4.8. Sign `vote_hash` with its private key corresponding the public key as `vote_owner` component then adds `V_2.vote_hash`.
 
 5. Create `P_2` with by adding `V_2` as follows:
   
