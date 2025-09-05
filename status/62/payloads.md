@@ -892,13 +892,13 @@ Payload
 
 ### CommunityMessageArchiveLink
 
-A `CommunityMessageArchiveLink` contains a magnet uri for a community's message archive,
+A `CommunityMessageArchiveLink` contains a CID for a community's message archive,
 created using [61/STATUS-Community-History-Archives](../61/community-history-service.md).
 
 ```protobuf
 message CommunityMessageArchiveMagnetlink {
   uint64 clock = 1;
-  string magnet_uri = 2;
+  string cid = 2;
 }
 ```
 
@@ -907,7 +907,7 @@ Payload
 | Field | Name | Type | Description |
 | ----- | ---- | ---- | ---- |
 | 1 | clock | `uint64` | Clock value of the message |
-| 2 | magnet_uri | `string` | The magnet uri of the community archive torrent |
+| 2 | cid | `string` | The Codex CID of the community archive index file |
 
 ### AcceptContactRequest
 
@@ -959,7 +959,7 @@ message CommunityRequestToJoinResponse {
   bool accepted = 3;
   bytes grant = 4;
   bytes community_id = 5;
-  string magnet_uri = 6;
+  string cid = 6;
 }
 ```
 
@@ -972,7 +972,7 @@ Payload
 | 3 | accepted | `bool` | Whether the request was accepted |
 | 4 | grant | `bytes` | The grant |
 | 5 | community_id | `bytes` | The id of the community |
-| 6 | magnet_uri | `string` | The latest magnet uri of the community's archive torrent |
+| 6 | cid | `string` | The latest Codex CID of the community's archive index file |
 
 ### CommunityRequestToLeave
 
