@@ -28,7 +28,7 @@ This specification describes how **Control Nodes**
 (which are specific nodes in Status communities)
 archive historical message data of their communities,
 beyond the time range limit provided by Store Nodes using
-the [BitTorrent](https://bittorrent.org) protocol.
+the [Codex](https://codex.storage) protocol.
 It also describes how the archives are distributed to community members via
 the Status network,
 so they can fetch them and gain access to a complete message history.
@@ -50,9 +50,8 @@ while others operate in the Status communities layer):
 | Community member     | A Status user that is part of a Status community, not owning the private key of the community |
 | Community member node| A Status node with message archive capabilities enabled, run by a community member |
 | Live messages        | Waku messages received through the Waku network |
-| BitTorrent client    | A program implementing the [BitTorrent](https://bittorrent.org) protocol |
-| Torrent/Torrent file | A file containing metadata about data to be downloaded by BitTorrent clients |
-| Magnet link          | A link encoding the metadata provided by a torrent file ([Magnet URI scheme](https://en.wikipedia.org/wiki/Magnet_URI_scheme)) |
+| Codex node           | A program implementing the [Codex](https://codex.storage) protocol |
+| CID                  | A content identifier, uniquely identifies a file that can be downloaded by Codex nodes |
 
 ## Requirements / Assumptions
 
@@ -101,18 +100,14 @@ this channel is not visible in the user interface.
 4. Community owner invites community members.
 5. Control node receives messages published in channels and
 stores them into a local database.
-6. After 7 days, the control node exports and
+6. Every 7 days, the control node exports and
 compresses last 7 days worth of messages from database and
-bundles it together with a
-[message archive index](#wakumessagearchiveindex) into a torrent,
-from which it then creates a magnet link ([Magnet URI scheme](https://en.wikipedia.org/wiki/Magnet_URI_scheme),
-[Extensions for Peers to Send Metadata Files](https://www.bittorrent.org/beps/bep_0009.html)).
-7. Control node sends the magnet link created in step 6 to community members via
+creates a message archive file.
+7. It uploads the messsage archive file to a Codex node, producing a CID.
+8. It updates the [message archive index](#wakumessagearchiveindex) by adding the new CID
+and its metadata, and uploads it to a Codex node as well, producing a CID.
+9. Control node sends the CID created in the previous step to community members via
 special channel created in step 3 through the Waku network.
-8. Every subsequent 7 days,
-steps 6 and 7 are repeated and
-the new message archive data
-is appended to the previously created message archive data.
 
 ### Serving archives for missed messages
 
@@ -125,8 +120,8 @@ it MUST go through the following process:
 for the missed time range for all channels in their community
 3. All missed messages are stored into control node's local message database
 4. If 7 or more days have elapsed since the last message history torrent was created,
-the control node will perform step 6 and
-7 of [Serving community history archives](#serving-community-history-archives)
+the control node will perform step 6 through 9
+ of [Serving community history archives](#serving-community-history-archives)
 for every 7 days worth of messages in the missed time range
 (e.g. if the node was offline for 30 days, it will create 4 message history archives)
 
@@ -144,13 +139,13 @@ message archive metadata exchange provided by the community
 including the special channel from store nodes
 4. Member node receives Waku message
 ([14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md))
-that contains the metadata magnet link from the special channel
-5. Member node extracts the magnet link from the Waku message and
-passes it to torrent client
-6. Member node downloads
+that contains the CID of the message archive index file from the special channel
+5. Member node extracts the CID from the Waku message and
+uses a Codex node to download it
+6. Member node interpret the
 [message archive index](#message-history-archive-index) file and
-determines which message archives are not downloaded yet (all or some)
-7. Member node fetches missing message archive data via torrent
+determines the CIDs for the message archives to be downloaded
+7. Member node uses a Codex node to download the missing message archive files
 8. Member node unpacks and
 decompresses message archive data to then hydrate its local database,
 deleting any messages,
@@ -162,13 +157,13 @@ as covered by the message history archive
 For archival data serving, the control node MUST store live messages as [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md).
 This is in addition to their database of application messages.
 This is required to provide confidentiality, authenticity,
-and integrity of message data distributed via the BitTorrent layer, and
+and integrity of message data distributed via Codex, and
 later validated by community members when they unpack message history archives.
 
 Control nodes SHOULD remove those messages from their local databases
 once they are older than 30 days and
 after they have been turned into message archives and
-distributed to the BitTorrent network.
+distributed to the Codex network.
 
 ### Exporting messages for bundling
 
