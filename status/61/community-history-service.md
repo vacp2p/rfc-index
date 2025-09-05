@@ -465,14 +465,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
-- [BitTorrent](https://bittorrent.org)
 - [10/WAKU2](../../waku/standards/core/10/waku2.md)
 - [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
-- [Magnet URI scheme](https://en.wikipedia.org/wiki/Magnet_URI_scheme)
 - [forum discussion](https://forum.vac.dev/t/status-communities-protocol-and-product-point-of-view/114)
 - [org channels](https://github.com/status-im/specs/pull/151)
 - [UI feature spec](https://github.com/status-im/feature-specs/pull/36)
-- [Extensions for Peers to Send Metadata Files](https://www.bittorrent.org/beps/bep_0009.html)
 - [org channels spec](../56/communities.md)
 - [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
 - [62/STATUS-PAYLOADS](../62/payloads.md)

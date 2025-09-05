@@ -703,7 +703,7 @@ message CommunityDescription {
   map<string,CommunityChat> chats = 6;
   repeated string ban_list = 7;
   map<string,CommunityCategory> categories = 8;
-  uint64 archive_magnetlink_clock = 9;
+  uint64 archive_index_clock = 9;
   CommunityAdminSettings admin_settings = 10;
   string intro_message = 11;
   string outro_message = 12;
@@ -896,7 +896,7 @@ A `CommunityMessageArchiveLink` contains a CID for a community's message archive
 created using [61/STATUS-Community-History-Archives](../61/community-history-service.md).
 
 ```protobuf
-message CommunityMessageArchiveMagnetlink {
+message CommunityMessageArchiveIndex {
   uint64 clock = 1;
   string cid = 2;
 }

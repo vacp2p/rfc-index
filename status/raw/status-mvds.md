@@ -75,7 +75,7 @@ These are the three main types of chats in Status.
 | ApplicationMetadataMessage_SYNC_BOOKMARK                                   | Yes                                 | Yes                  | Pair                    |
 | ApplicationMetadataMessage_SYNC_CLEAR_HISTORY                              | Yes                                 | Yes                  | Pair                    |
 | ApplicationMetadataMessage_SYNC_SETTING                                    | Yes                                 | Yes                  | Pair                    |
-| ApplicationMetadataMessage_COMMUNITY_MESSAGE_ARCHIVE_MAGNETLINK            | No                                  | No                   | CommunityChat           |
+| ApplicationMetadataMessage_COMMUNITY_MESSAGE_ARCHIVE_INDEX                 | No                                  | No                   | CommunityChat           |
 | ApplicationMetadataMessage_SYNC_PROFILE_PICTURES                           | Yes                                 | Yes                  | Pair                    |
 | ApplicationMetadataMessage_SYNC_ACCOUNT                                    | Yes                                 | Yes                  | Pair                    |
 | ApplicationMetadataMessage_ACCEPT_CONTACT_REQUEST                          | Yes                                 | Yes                  | OneToOne                |
