@@ -124,7 +124,7 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
    4.5. Set `V_2.received_hash = hash(P_1.votes[0])`.
   
    4.6. Set `proposal_id` for the `vote`.
-   
+  
    4.7. Calculate `vote_hash` by hash of all previously defined fields in Vote:
   `V_2.vote_hash = hash(vote_id, owner, proposal_id, timestamp, vote, parent_hash, received_hash)`
 
