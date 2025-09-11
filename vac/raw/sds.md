@@ -309,8 +309,6 @@ This is used to determine the group of participants who will respond to a repair
 * `repair_request` in `Message`:
 a capped list of history entries missing for the message sender
 and for which it's requesting a repair.
-The number of items to include is up to the application.
-We RECOMMEND a maximum of 3 repair request entries per SDS message.
 
 #### SDS-R participant state
 
@@ -361,6 +359,11 @@ In other words, if the (roughly) expected number of participants is expressed as
 In other words, if there are fewer than 128 participants in a communication,
 they will all belong to the same response group.
 
+We RECOMMEND that the global state variables `T_min`, `T_max` and `num_response_groups` be set _statically_ for a specific SDS-R application,
+based on expected number of group participants and volume of traffic.
+
+**_Note:_** Future versions of this protocol will recommend dynamic global SDS-R variables, based on the current number of participants.
+
 #### SDS-R send message
 
 SDS-R adds the following steps when sending a message:
@@ -398,7 +401,7 @@ A participant determines the repair request timestamp, `T_req`,
 for a missing `HistoryEntry` as follows:
 
 ```
-T_req = current_time + hash(participant_id, message_id) % T_max + T_min
+T_req = current_time + hash(participant_id, message_id) % (T_max - T_min) + T_min
 ```
 
 where `current_time` is the current timestamp,
@@ -416,7 +419,7 @@ A participant determines the repair response timestamp, `T_resp`,
 for a `HistoryEntry` that it could repair as follows:
 
 ```
-distance = participant_id XOR sender_id
+distance = hash(participant_id) XOR hash(sender_id)
 T_resp = current_time + distance*hash(message_id) % T_max
 ```
 
@@ -444,6 +447,8 @@ hash(participant_id, message_id) % num_response_groups == hash(sender_id, messag
 
 where `num_response_groups` is as set out in [SDS-R global state](#sds-r-global-state).
 This ensures that a participant will always be in the response group for its own published messages.
+It also allows participants to determine immediately on first reception of a message or a history entry
+if they are in the associated response group.
 
 #### SDS-R incoming repair request buffer sweep
 
