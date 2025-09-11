@@ -79,7 +79,7 @@ message HistoryEntry {
   string message_id = 1; // Unique identifier of the SDS message, as defined in `Message`
   optional bytes retrieval_hint = 2; // Optional information to help remote parties retrieve this SDS message; For example, A Waku deterministic message hash or routing payload hash
 
-  optional string sender_id = 3; //Participant ID of original message sender. Only populated if using optional SDS Repair extension
+  optional string sender_id = 3; // Participant ID of original message sender. Only populated if using optional SDS Repair extension
 }
 
 message Message {
@@ -89,7 +89,6 @@ message Message {
   optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
   repeated HistoryEntry causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
   optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
-
 
   repeated HistoryEntry repair_request = 13; // Capped list of history entries missing from sender's causal history. Only populated if using the optional SDS Repair extension.
 
@@ -307,7 +306,7 @@ SDS-R adds the following fields to SDS messages:
 * `sender_id` in `HistoryEntry`:
 the original message sender's participant ID.
 This is used to determine the group of participants who will respond to a repair request.
-*  `repair_request` in `Message`:
+* `repair_request` in `Message`:
 a capped list of history entries missing for the message sender
 and for which it's requesting a repair.
 The number of items to include is up to the application.
@@ -458,7 +457,7 @@ if its corresponding response timestamp, `T_resp`, has expired (in other words, 
 If the participant is due to send a periodic sync message,
 it SHOULD send the message according to [SDS-R send message](#sds-r-send-message)
 if there are any eligible items in the outgoing repair request buffer,
-regardless of whether other participants have also recently broadcast a Perdiodic Sync message.
+regardless of whether other participants have also recently broadcast a Periodic Sync message.
 
 ## Copyright
 
