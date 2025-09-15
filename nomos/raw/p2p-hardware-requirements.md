@@ -1,7 +1,7 @@
 ---
 title: P2P-HARDWARE-REQUIREMENTS
 name: Nomos p2p Network Hardware Requirements Specification
-status: draft
+status: raw
 category: infrastructure
 tags: [hardware, requirements, nodes, validators, services]
 editor: Daniel Sanchez-Quiros <danielsq@status.im>
