@@ -1,11 +1,11 @@
 ---
-title: consensus-hashgraphlike
+title: HASHGRAPHLIKE CONSENSUS
 name: Hashgraphlike Consensus Protocol
 status: raw
 category: Standards Track
 tags: 
-editor: Ugur Sen <ugur@status.im> 
-contributors: seemenkina <ekaterina@status.im>
+editor: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
+contributors: seemenkina [ekaterina@status.im](mailto:ekaterina@status.im)
 ---
 ## Abstract
 
