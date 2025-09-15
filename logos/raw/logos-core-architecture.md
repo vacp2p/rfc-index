@@ -1,7 +1,7 @@
 --- 
 title: LOGOS-CORE-ARCHITECTURE
 name: Logos Core Modular Platform Architecture
-status: draft
+status: raw
 category: Standards Track
 tags: logos-core, modular-architecture, process-isolation, authentication
 editor: Logos Core Team
