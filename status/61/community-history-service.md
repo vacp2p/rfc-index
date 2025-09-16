@@ -282,7 +282,7 @@ via the community id.
 ### Seeding message history archives
 
 The control node MUST ensure that the
-[generated archive files](#creating-message-archive) are stored in their Codex node.
+[generated archive files](#creating-message-archives) are stored in their Codex node.
 The individual archive files must be stored indefinitely.
 Only the most recent archive index file must be stored.
 
