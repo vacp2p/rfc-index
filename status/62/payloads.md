@@ -703,7 +703,7 @@ message CommunityDescription {
   map<string,CommunityChat> chats = 6;
   repeated string ban_list = 7;
   map<string,CommunityCategory> categories = 8;
-  uint64 archive_index_clock = 9;
+  uint64 archive_clock = 9;
   CommunityAdminSettings admin_settings = 10;
   string intro_message = 11;
   string outro_message = 12;
@@ -890,13 +890,13 @@ Payload
 | 5 | message_type | `MessageType` | The type of message  |
 | 6 | deleted_by | `string` | The public key of the user who deleted the message |
 
-### CommunityMessageArchiveLink
+### CommunityMessageArchive
 
-A `CommunityMessageArchiveLink` contains a CID for a community's message archive,
+A `CommunityMessageArchive` contains a CID for a community's message archive,
 created using [61/STATUS-Community-History-Archives](../61/community-history-service.md).
 
 ```protobuf
-message CommunityMessageArchiveIndex {
+message CommunityMessageArchive {
   uint64 clock = 1;
   string cid = 2;
 }

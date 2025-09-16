@@ -142,9 +142,9 @@ including the special channel from store nodes
 that contains the CID of the message archive index file from the special channel
 5. Member node extracts the CID from the Waku message and
 uses a Codex node to download it
-6. Member node interpret the
+6. Member node interprets the
 [message archive index](#message-history-archive-index) file and
-determines the CIDs for the message archives to be downloaded
+determines the CIDs of missing message archives
 7. Member node uses a Codex node to download the missing message archive files
 8. Member node unpacks and
 decompresses message archive data to then hydrate its local database,
@@ -267,7 +267,7 @@ message WakuMessageArchiveIndex {
 
 The control node MUST update the `WakuMessageArchiveIndex`
 every time it creates one or
-more `WakuMessageArchive`s, and upload it to Codex, and broadcast the new index CID.
+more `WakuMessageArchive`s, and upload it to Codex. The resulting CID from the upload operation must be sent to the special community channel.
 For every created `WakuMessageArchive`,
 there MUST be a `WakuMessageArchiveIndexMetadata` entry in the `archives` field `WakuMessageArchiveIndex`.
 
@@ -284,7 +284,7 @@ via the community id.
 The control node MUST ensure that the
 [generated archive files](#creating-message-archive) are stored in their Codex node.
 The individual archive files must be stored indefinitely.
-Only the most recent archive index files must be stored.
+Only the most recent archive index file must be stored.
 
 The control node SHOULD delete CIDs for older message history archive index files.
 Only one archive index file per community should be stored in the Codex node at a time.
@@ -358,7 +358,7 @@ When member nodes receive a message with a `CommunityMessageHistoryArchive`
 they MUST extract the `cid` and
 pass it to their underlying Codex node
 so they can fetch the latest message history archive index file,
-which is the `index` file to access individual message history archive files (see [Creating message archives](#Creating-message-archives)).
+which is the `index` file to access individual message history archive files (see [Creating message archives](#creating-message-archives)).
 
 Due to the nature of distributed systems,
 there's no guarantee that a received message is the "last" message.
