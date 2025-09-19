@@ -1,7 +1,7 @@
 ---
 title: CODEX-DHT
 name: Codex DHT
-status: draft
+status: raw
 tags: 
 editor: 
 contributors:
@@ -82,18 +82,11 @@ The structure consist of:
 All key values, exculing the `ip`, is REQUORED.
 A `provider` in the network MUST store the `SignedPeerRecord` belonging to a set of `provider`s in the network.
 This will help finding content stored on nodes with the DHT.
-The exact nodes**** to be saved is explained in the {routing table](#routingtable) section.
+Which nodes and the amount of nodes in this set is described in the {routing table](#routingtable) section.
 The private key MUST be used to sign the `record`.
-
-The component SHOULD contact other nodes*** in the network to disseinate new and updated records.
+If the `record` is unsigned, a `provider` MUST disregard messages from that node.
+The `provider` SHOULD contact other nodes in the network to disseinate new and updated records.
 Using the 
-
-
-- random lookup every 5 minutes?
-
-- CID are converted to nodeID
-- disregard unsigned records, verify record signatures,
-- Node A MUST have a copy of node B's record in order to communicate with it
 
 ## Retrieve Records
 
@@ -107,27 +100,28 @@ Using the
 
 ``` js
 
-"RoutingTable" : {
-    "localProvider": Provider,
-    "buckets": seq[KBucket],
-    "bitsPerHop": number, 
-    "ipLimits": IpLimits, ## IP limits for total routing table: all buckets and
-    ## replacement caches.
-    "distanceCalculator" : DistanceCalculator,
-    "rng" : ref HmacDrbgContext
-}
-    KBucket = ref object
-    istart, iend: NodeId 
-    nodes: seq[Node] 
-    replacementCache: seq[Node] ## Nodes that could not be added to the `nodes`
-    ## seq as it is full and without stale nodes. This is practically a small
-    ## LRU cache.
-    ipLimits: IpLimits ## IP limits for bucket: node entries and replacement
-    ## cache entries combined.
-
-    "TableIpLimits" : {
-      "tableIpLimit": number
+   "RoutingTable" : {
+       "localProvider": Provider,
+       "buckets": seq[KBucket],
+       "bitsPerHop": number, 
+       "ipLimits": IpLimits, ## IP limits for total routing table: all buckets and
+       ## replacement caches.
+       "distanceCalculator" : DistanceCalculator,
+       "rng" : ref HmacDrbgContext
+   }
+   "KBucket" : {
+       "istart", "iend": NodeId, 
+       "providers": seq[Provider],
+       "replacementCache": seq[Providers], ## Nodes that could not be added to the `providers`
+       ## seq as it is full and without stale nodes. This is practically a small
+       ## LRU cache.
+       "ipLimits": IpLimits, ## IP limits for bucket: node entries and replacement
+       ## cache entries combined.
+   }
+   "IpLimits" : {
+      "tableIpLimit": number,
       "bucketIpLimit": number
+   }
 
 
 ```
@@ -145,30 +139,29 @@ will result in an improvement of $ \log_{2^b} n $ hops per lookup.
 simple logarithmic distance as buckets can be split over a prefix that
 does not cover the `localNode` id.
 
-- nodes: Node entries of the KBucket.
-Sorted according to last time seen.
+- providers: Node entries of the KBucket are sorted according to last time seen.
 First entry (head) is considered the most recently seen node and
 the last entry (tail) is considered the least recently seen node.
-Here "seen" means a successful request-response.
+Here "seen" indicates a successful request-response.
 This can also not have occured yet.
 
-- TableIpLimits: ## The routing table IP limits are applied on both the total table,
+- IpLimits: The routing table IP limits are applied on both the total table,
 and on the individual buckets.
 In each case, the active node entries,
 but also the entries waiting in the replacement cache are accounted for.
 This way, the replacement cache can't get filled with nodes that then can't be added due to the limits that apply.
-As entries are not verified (=contacted) immediately before or on entry,
-it is possible that a malicious node could fill (poison)
-the routing table or a specific bucket with SPRs with IPs it does not control.
+As entries are not verified immediately before or on entry,
+it is possible that a malicious node could fill the routing table or
+a specific bucket with SPRs with IPs it does not control.
 The effect of this would be that a node that actually owns the
-IP could have a difficult time getting its SPR distrubuted in the DHT and
-as a consequence would not be reached from the outside as much (or at all).
-However, that node can still search and find nodes to connect to.
-So it would practically be a similar situation as a node that is not reachable behind the NAT because port mapping is not set up properly.
-There is the possiblity to set the IP limit on verified (=contacted) nodes only,
+IP could have a difficult time getting its SPR distrubuted in the DHT.
+As a consequence would not be reached from the outside as much or at all.
+However, that `provider` can still search and find nodes to connect to.
+
+There is the possiblity to set the IP limit on verified `providers` only,
 but that would allow for lookups to be done on a higher set of nodes owned by the same identity.
 This is a worse alternative.
-Next, doing lookups only on verified nodes would slow down discovery start up.
+Doing lookups only on verified nodes would slow down discovery start up.
 
 ## Copyright
 
