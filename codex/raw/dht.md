@@ -88,15 +88,16 @@ If the `record` is unsigned, a `provider` MUST disregard messages from that node
 The `provider` SHOULD contact other nodes in the network to disseinate new and updated records.
 Using the 
 
-## Retrieve Records
+### Retrieve Records
 
 - nodes in the network to perform queries
-- SHOULD update their record, increase the sequence number and sign a new version of the record whenever their information changes
+- it SHOULD update their `record`, increase the sequence number and
+sign a new version of the `record` whenever their information changes
 - discard stale records as defined by configuration
 
-## Distance calculation
+### Distance calculation
 
-## Routing table
+#### Routing table
 
 ``` js
 
@@ -104,19 +105,19 @@ Using the
        "localProvider": Provider,
        "buckets": seq[KBucket],
        "bitsPerHop": number, 
-       "ipLimits": IpLimits, ## IP limits for total routing table: all buckets and
-       ## replacement caches.
+       "ipLimits": IpLimits, // IP limits for total routing table: all buckets and
+       // replacement caches.
        "distanceCalculator" : DistanceCalculator,
        "rng" : ref HmacDrbgContext
    }
    "KBucket" : {
        "istart", "iend": NodeId, 
        "providers": seq[Provider],
-       "replacementCache": seq[Providers], ## Nodes that could not be added to the `providers`
-       ## seq as it is full and without stale nodes. This is practically a small
-       ## LRU cache.
+       "replacementCache": seq[Providers], // Nodes that could not be added to the `providers`
+       // seq as it is full and without stale nodes. This is practically a small
+       // LRU cache.
        "ipLimits": IpLimits, ## IP limits for bucket: node entries and replacement
-       ## cache entries combined.
+       // cache entries combined.
    }
    "IpLimits" : {
       "tableIpLimit": number,
