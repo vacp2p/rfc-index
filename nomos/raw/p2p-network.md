@@ -1,5 +1,5 @@
 ---
-title: P2P-NETWORK
+title: NOMOS-P2P-NETWORK
 name: Nomos P2P Network Specification
 status: draft
 category: networking
@@ -35,7 +35,7 @@ The Nomos P2P network addresses three critical challenges:
 
 ### Transport Protocol
 
-#### [QUIC protocol](https://docs.libp2p.io/concepts/transports/quic/) Transport
+#### QUIC Protocol Transport
 
 The Nomos network employs **[QUIC protocol](https://docs.libp2p.io/concepts/transports/quic/)** as the primary transport protocol, leveraging the [libp2p protocol](https://docs.libp2p.io/) implementation.
 
