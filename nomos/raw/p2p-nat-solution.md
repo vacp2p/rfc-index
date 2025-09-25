@@ -1,7 +1,7 @@
 ---
 title: P2P-NAT-SOLUTION
 name: Nomos P2P Network NAT Solution Specification
-status: draft
+status: raw
 category: networking
 tags: [nat, traversal, autonat, upnp, pcp, nat-pmp]
 editor: Antonio Antonino <antonio@status.im>
