@@ -71,8 +71,8 @@ Message Manifest {
   optional uint32 codec = 4;         # Dataset codec
   optional uint32 hcodec  = 5        # Multihash codec
   optional uint32 version = 6;       # Cid version
-  optional string filename = 8;      # original filename
-  optional string mimetype = 9;      # original mimetype
+  optional string filename = 7;      # original filename
+  optional string mimetype = 8;      # original mimetype
 }
 
 ```
@@ -80,8 +80,8 @@ Message Manifest {
 | attribute | type | description |
 |-----------|------|-------------|
 | `treeCid` | string | A hash based on [CIDv1](https://github.com/multiformats/cid#cidv1). The root of the merkle tree |
-| `datasetSize` | bytes | Total size of all blocks, after data is chunked. |
 | `blockSize` | bytes | Size of each contained block. |
+| `datasetSize` | bytes | Total size of all blocks, after data is chunked. |
 | `codec` | [MultiCodec](https://github.com/multiformats/multicodec) |  A dataset codec. |
 | `hcodec` | [MultiCodec](https://github.com/multiformats/multicodec) | A multihash codec. |
 | `version` | string | The CID version |
