@@ -323,7 +323,7 @@ therefore each member can verify that there is no `MLS proposal` corresponding t
 If there is a steward who releases a commit message without it in the steward list or in the wrong order,
 this is counted as unauthorized steward activity resulting in emergency criteria consensus.
 
- ## Security Considerations
+## Security Considerations
 
 In this section, the security considerations are shown as de-MLS assurance.
 
