@@ -293,7 +293,7 @@ which MAY not be suitable for the big groups with more than 1000 members.
 
 ### Multi steward with small consensuses
 
-The two-consensus model offers improved efficiency with a trade-off in decentralization.
+The small-consensus model offers improved efficiency with a trade-off in decentralization.
 In this design, group changes require consensus only among the stewards, rather than all members.
 Regular members participate by periodically selecting the stewards but do not take part in each decision.
 This structure enables faster coordination since consensus is achieved within a smaller group of stewards.
