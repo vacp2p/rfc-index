@@ -97,9 +97,17 @@ for new joiners and new entropy for removed members. In this RFC, the committers
 
 ### de-MLS Objects
 
-`Voting proposal` Similar to MLS proposals, but processed only if approved through a voting process.
+`Voting proposal`: Similar to MLS proposals, but processed only if approved through a voting process.
 They function as application messages in the MLS group,
 allowing the steward to collect them without halting the protocol.
+
+`Epoch steward`: The steward assigned to commit in epoch E according to the steward list.
+Holds the primary responsibility for creating the steward commit in that epoch.
+
+`Backup steward`: The steward next in line after the epoch steward in epoch E.
+Only becomes active if the epoch steward is malicious or fails,
+in which case it completes the commitment phase.
+If unused in epoch E, it automatically becomes the epoch steward in epoch E+1.
 
 ## Flow
 
@@ -211,7 +219,47 @@ Thus, the multi-steward approach primarily defines how steward roles
 rotate across epochs while preserving the underlying structure and logic of the original protocol.
 Two variants of the multi-steward design are introduced to address different system requirements.
 
-### Multi steward with single consensus
+### Consensus Types
+
+Consensus is agnostic with its payload, threfore it can be used for different purposes.
+It is used in three ways here:
+
+1. `Commit proposal:` Each commit message MUST be committed with its YES vote by a specific steward.
+`Commit proposal` is the proposal instance that is specified in Creating Voting Proposal section
+with Proposal.payload MUST show the commit request from `members`.
+2. `Steward election proposal:` Each steward list MUST be verified by this consensus;
+therefore, each member knows and identifies which epoch will be in charge
+and if there is an unauthorised steward commit.
+Proposal.payload MUST represent the identities of stewards in an order.
+3. `Emergency criteria proposal:` If there is a malicious member or steward,
+this event MUST be voted on to finalize it.
+If this returns YES, the next epoch MUST include the removal of the member or steward.
+Proposal.payload MUST consist of the evidence of the dishonesty as described in the Steward violation list.
+
+### Steward list
+
+A steward list is an ordered list that consists of authorized stewards who are eligible
+to create commits when a particular steward commit order should be defined beforehand.
+Therefore, if a malicious steward occurred, the backup steward will be charged with committing.
+
+The steward list is an ordered list; the size is determined when the group is created.
+The index of the slots shows that the Epoch and Steward ID are stored.
+The next in line steward for the epoch E is named as epoch-steward, which has index E.
+And the subsequent steward in the epoch E is named as the backup steward.
+
+If the epoch steward is honest, the back-up steward does not involve the process in epoch,
+and the back-up steward will be the epoch steward within the epoch E+1.
+
+If the epoch steward is malicious, the backup steward is involved in the commitment phase in epoch E
+and the next steward becomes the backup steward in epoch E.
+
+Liveness related to the steward list: After the Steward list is done,
+the members proceed with another set of stewards, which could be the same set,
+then call the consensus type 2.
+This had priority against the application of messaging,
+so till the new set of Stewards are voted as YES, the application is frozen.
+
+### Multi steward with big consensus
 
 In this model, all group modifications, such as adding or removing members,
 must be approved through consensus by all participants,
@@ -222,6 +270,27 @@ However, this benefit comes with reduced operational efficiency.
 The model is therefore best suited for small groups that value
 decentralization and censorship resistance more than performance.
 
+To create a multi-steward with a big consensus,
+the group is initialized with a single Steward as specified as follows:
+
+1. The steward initialized the group with the config file.
+This config file MUST contain `sn` as the steward list size.
+2. The steward adds the members as a centralized way till the number of members reaches the `sn`.
+After the number of members reaches `sn`, members propose lists by voting proposal
+as a consensus among all members, as mentioned in the consensus section 2, according to the checks:
+the size of the voting proposal is equal to the `sn`.
+3. After the voting proposal ends up with a steward list, the freezing also ends,
+and application message is done and group changes committed as specified in single steward section
+with a difference which is members also checks the comittted steward is epoch steward or back-up steward,
+otherwise any one can create the third type of consensus and waiting for the response for emergency call.
+4. If the epoch steward violates the changing process as mentioned in the section Steward violation list,
+one of the members MUST initialize the consensus section 3 to remove the malicious Steward.
+Also, the backup steward fulfills the epoch by committing again correctly.
+
+A big consensus provides better decentralization,
+but it requires a big consensus,
+which MAY not be suitable for the big groups with more than 1000 members.
+
 ### Multi steward with two consensuses
 
 The two-consensus model offers improved efficiency with a trade-off in decentralization.
@@ -229,6 +298,41 @@ In this design, group changes require consensus only among the stewards, rather 
 Regular members participate by periodically selecting the stewards but do not take part in each decision.
 This structure enables faster coordination since consensus is achieved within a smaller group of stewards.
 It is particularly suitable for large user groups, where involving every member in each decision would be impractical.
+
+The flow is similar to the big consensus including the Steward list finalization with all members consensus
+only the difference here, the commit messages requires consensus only among the stewards.
+
+## Steward violation list
+
+A steward’s activity is called a violation if the action is one or more of the following:
+
+1. Broken commit: The steward releases a different commit message from the voted `commit proposal`.
+This activity is identified by the `members` since the RFC9420 provides the methods
+that members can use to identify the broken commit messages that are possible in a few situations,
+such as commit and proposal incompatibility. Specifically, the broken commit can arise as follows:
+The commit belongs to the earlier epoch. The commit message should equal the latest epoch,
+or the commit needs to be compatible with the previous epoch’s `MLS proposal`.
+2. Broken MLS proposal: The steward prepares a different `MLS proposal` for the corresponding `voting proposal`.
+This activity is identified by the `members` since both `MLS proposal` and `voting proposal` are visible
+and can be identified by checking the hash of Proposal.payload and MLSProposal.payload is the same as RFC9240 section 12.1. Proposals.
+3. Censorship and inactivity: The situation where there is a voting proposal that is visible for every member,
+and the Steward does not provide an MLS proposal and commit.
+This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
+therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
+4. Unauthorized steward: The order of the release of commit messages is pre-determined by the steward list consensus.
+If there is a steward who releases a commit message without it in the steward list or in the wrong order,
+this is counted as unauthorized steward activity resulting in emergency criteria consensus.
+
+ ## Security Considerations
+
+In this section, the security considerations are shown as de-MLS assurance.
+
+1. Malicious Steward: A Malicious steward can act maliciously,
+as in the Steward violation list section.
+Therefore, de-MLS enforces that any steward only follows the protocol under the consensus order
+and commits without emergency criteria application.
+2. Malicious Member: A member is only marked as malicious
+when the member acts by releasing a commit message.
 
 ## Copyright
 
