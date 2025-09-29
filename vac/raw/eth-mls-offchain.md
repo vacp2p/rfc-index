@@ -291,7 +291,7 @@ A big consensus provides better decentralization,
 but it requires a big consensus,
 which MAY not be suitable for the big groups with more than 1000 members.
 
-### Multi steward with two consensuses
+### Multi steward with small consensuses
 
 The two-consensus model offers improved efficiency with a trade-off in decentralization.
 In this design, group changes require consensus only among the stewards, rather than all members.
