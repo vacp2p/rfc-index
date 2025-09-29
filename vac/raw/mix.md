@@ -1074,7 +1074,7 @@ For interoperability, a recommended default encoding format involves:
   `
   /ip4/<ipv4>/tcp/<port>/p2p/<relayPeerID>/p2p-circuit/p2p/<relayedPeerID>
   `  
-  Variants may include directly reachable peers and transport such as
+  Variants may include directly reachable peers and transports such as
   `/quic-v1`, depending on the mix node's supported stack.
   - IPv6 support is deferred, as it adds $16$ bytes just for the IP field.
   - Future revisions may extend this format to support IPv6 or DNS-based
