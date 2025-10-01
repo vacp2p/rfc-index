@@ -81,7 +81,7 @@ message Message {
   string sender_id = 1;           // Participant ID of the message sender
   string message_id = 2;          // Unique identifier of the message
   string channel_id = 3;          // Identifier of the channel to which the message belongs
-  optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
+  optional uint32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
   repeated HistoryEntry causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
   optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
   optional bytes content = 20;             // Actual content of the message
@@ -111,7 +111,7 @@ Its importance is expected to increase once a p2p retrieval mechanism is added t
 Each participant MUST maintain:
 
 * A Lamport timestamp for each channel of communication,
-initialized to current epoch time in millisecond resolution.
+initialized to current epoch time in second resolution.
 * A bloom filter for received message IDs per channel.
 The bloom filter SHOULD be rolled over and
 recomputed once it reaches a predefined capacity of message IDs.
