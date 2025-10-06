@@ -87,8 +87,7 @@ A per-message flag set by the origin protocol to indicate that a message should
 be routed using
 the Mix Protocol or not.
 Only messages with mixify set are forwarded to the Mix Entry Layer.
-Other messages SHOULD be routed using the origin protocol’s default behavior.
-
+Other messages SHOULD be routed using the origin protocol’s default behavior.  
 The phrases 'messages to be mixified', 'to mixify a message' and related
 variants are used
 informally throughout this document to refer to messages that either have the
@@ -1220,8 +1219,8 @@ The construction MUST proceed as follows:
      \end{aligned}
      `$
 
-   Note that the length of $α_i$ is $32$ bytes as defined in
-   [Section 8.3](#83-packet-component-sizes).
+   Note that the length of $α_i$ is $32$ bytes, $0 \leq i \leq L-1$ as defined in
+   [Section 8.3.1](#831-header-field-sizes).
 
    b. **Compute Per-Hop Filler Strings**  
    Filler strings are encrypted strings that are appended to the header during
@@ -1256,7 +1255,7 @@ The construction MUST proceed as follows:
        \end{array}
        `$
 
-   Note that the length of $Φ_i$ is $(t+1)i\kappa$.
+   Note that the length of $Φ_i$ is $(t+1)i\kappa$, $0 \leq i \leq L-1$.
 
    c. **Construct Routing Header**
    The routing header as defined in
@@ -1316,7 +1315,7 @@ The construction MUST proceed as follows:
        `$
 
      Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$
-     as defined in [Section 8.3](#83-packet-component-sizes).
+     as defined in [Section 8.3.1](#831-header-field-sizes).
 
      - Compute the message authentication code $γ_i$:
 
@@ -1327,8 +1326,8 @@ The construction MUST proceed as follows:
        \end{array}
        `$
 
-     Note that the length of $\gamma_i$ is $\kappa$ as defined in
-     [Section 8.3](#83-packet-component-sizes).
+     Note that the length of $\gamma_i$ is $\kappa$, $0 \leq i \leq L-1$
+     as defined in [Section 8.3.1](#831-header-field-sizes).
 
    d. **Encrypt Payload**
    The encrypted payload $δ$ contains the message $m$ defined in Step 1,
@@ -1370,3 +1369,84 @@ The construction MUST proceed as follows:
        δ_{\mathrm{iv}_i}, δ_{i+1} \bigr)
        \end{array}
        `$
+
+     Note that the length of $\delta_i$, $0 \leq i \leq L-1$ is $|m| + \kappa$ bytes.
+
+     Given that the derived size of $\delta_i$ is $3984$ bytes as defined in
+     [Section 8.3.2](#832-payload-size), this allows $m$ to be of length
+     $3984-16 = 3968$ bytes as defined in Step 1.
+
+   e. **Assemble Final Packet**
+   The final Sphinx packet is structured as defined in
+   [Section 8.3](#83-packet-component-sizes):
+
+   ```text
+   α = α_0      // 32 bytes
+   β = β_0      // 576 bytes
+   γ = γ_0      // 16 bytes
+   δ = δ_0      // 3984 bytes
+   ```
+
+   Serialize the final packet using a consistent format and transmit it to
+   the first hop via a libp2p stream negotiated under the `"/mix/1.0.0"`
+   protocol identifier.
+
+   Implementations MAY reuse an existing stream to the first hop as described in
+   [Section 5.5](#55-stream-management-and-multiplexing), if doing so
+   does not introduce any observable linkability between the packets.
+
+Once a Sphinx packet is constructed and transmitted by the initiating node, it is
+processed hop-by-hop by the remaining mix nodes in the path. Each node receives
+the packet over a libp2p stream negotiated under the `"/mix/1.0.0"` protocol.
+The following subsection defines the per-hop packet handling logic expected of
+each mix node, depending on whether it acts as an intermediary or an exit.
+
+### 8.6 Sphinx Packet Handling
+
+Each mix node MUST implement a handler for incoming data received over
+libp2p streams negotiated under the `"/mix/1.0.0"` protocol identifier.
+The incoming stream may have been reused by the previous hop, as described
+in [Section 5.5](#55-stream-management-and-multiplexing). Implementations
+MUST ensure that packet handling remains stateless and unlinkable,
+regardless of stream reuse.
+
+Upon receiving the stream payload, the node MUST interpret it as a Sphinx packet
+and process it in one of two roles&mdash;intermediary or exit&mdash; as defined in
+[Section 7.3](#73-sphinx-packet-receiving-and-processing). This section defines
+the exact behavior for both roles.
+
+#### 8.6.1 Shared Preprocessing
+
+Upon receiving a stream payload over a libp2p stream, the mix node MUST first
+deserialize it into a Sphinx packet `(α, β, γ, δ)`.
+
+The deserialized fields MUST match the sizes defined in
+[Section 8.5.2](#852-construction-steps)
+step 3.e., and the total packet length MUST match the fixed packet size defined in
+[Section 8.3.2](#832-payload-size).
+
+If the stream payload does not match the expected length, it MUST be discarded and
+the processing MUST terminate.
+
+After successful deserialization, the mix node performs the following steps:
+
+1. **Derive Session Key**
+
+   Let $x \in \mathbb{Z}_q^*$ be the mix node's X25519 private key. Compute the
+   shared secret as follows:
+
+     $`
+     \begin{array}{l}
+     s = α^x
+     \end{array}
+     `$
+
+2. **Check for Replays**
+
+3. **Compute MAC**
+
+4. **Decrypt One Layer**
+
+#### 8.6.2 Intermediary
+
+#### 8.6.3 Exit
