@@ -7,6 +7,7 @@ category: Standards Track
 tags: codex, storage, marketplace, state-machine
 editor: Codex Team
 contributors:
+- Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
