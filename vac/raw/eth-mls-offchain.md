@@ -57,8 +57,10 @@ The three roles used in de-MLS is as follows:
 - `node`: Nodes are members of network without being in any secure group messaging.
 - `member`: Members are special nodes in the secure group messaging who
 obtains current group key of secure group messaging.
-- `steward`: Stewards are special and transparent members in secure group
-messaging who organizes the changes upon the voted-proposals.
+- `steward`: Stewards are special and transparent members in the secure group
+messaging who organize the changes by releasing commit messages upon the voted proposals.
+There are two special subsets of steward as epoch and backup steward,
+which are defined in the section de-MLS Objects. 
 
 ## MLS Background
 
@@ -101,25 +103,24 @@ for new joiners and new entropy for removed members. In this RFC, the committers
 They function as application messages in the MLS group,
 allowing the steward to collect them without halting the protocol.
 
-`Epoch steward`: The steward assigned to commit in epoch E according to the steward list.
+`Epoch steward`: The steward assigned to commit in `epoch E` according to the steward list.
 Holds the primary responsibility for creating the steward commit in that epoch.
 
-`Backup steward`: The steward next in line after the epoch steward in epoch E.
-Only becomes active if the epoch steward is malicious or fails,
+`Backup steward`: The steward next in line after the `epoch steward` in `epoch E`.
+Only becomes active if the `epoch steward` is malicious or fails,
 in which case it completes the commitment phase.
-If unused in epoch E, it automatically becomes the epoch steward in epoch E+1.
+If unused in `epoch E`, it automatically becomes the `epoch steward` in `epoch E+1`.
 
 ## Flow
 
 General flow is as follows:
 
 - A steward initializes a group just once, and then sends out Group Announcements (GA) periodically.
-
-- Meanwhile, each`node`creates and sends their`credential` includes `keyPackage`.
-- Each `member`creates `voting proposals` sends them to from MLS group during epoch E.
+- Meanwhile, each `node`creates and sends their `credential` includes `keyPackage`.
+- Each `member`creates `voting proposals` sends them to from MLS group during `epoch E`.
 - Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into
-`MLS proposals`  then sends them with correspondng `commit messages`
-- Evantually, with the commit messages, all members starts the next epoch E+1.
+`MLS proposals` then sends them with corresponding `commit messages`
+- Evantually, with the commit messages, all members starts the next `epoch E+1`.
 
 ## Creating Voting Proposal
 
@@ -240,30 +241,30 @@ Proposal.payload MUST consist of the evidence of the dishonesty as described in 
 
 A steward list is an ordered list that consists of authorized stewards who are eligible
 to create commits when a particular steward commit order should be defined beforehand.
-Therefore, if a malicious steward occurred, the backup steward will be charged with committing.
+Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
 
 The steward list is an ordered list; the size is determined when the group is created.
 The index of the slots shows that the Epoch and Steward ID are stored.
-The next in line steward for the epoch E is named as epoch-steward, which has index E.
-And the subsequent steward in the epoch E is named as the backup steward.
+The next in line steward for the `epoch E` is named as epoch-steward, which has index E.
+And the subsequent steward in the `epoch E` is named as the `backup steward`.
 
-If the epoch steward is honest, the back-up steward does not involve the process in epoch,
-and the back-up steward will be the epoch steward within the epoch E+1.
+If the `epoch steward` is honest, the backup steward does not involve the process in epoch,
+and the `backup steward` will be the `epoch steward` within the `epoch E+1`.
 
-If the epoch steward is malicious, the backup steward is involved in the commitment phase in epoch E
-and the next steward becomes the backup steward in epoch E.
+If the `epoch steward` is malicious, the `backup steward` is involved in the commitment phase in `epoch E`
+and the next steward becomes the `backup steward` in `epoch E`.
 
 Liveness related to the steward list: After the Steward list is done,
 the members proceed with another set of stewards, which could be the same set,
-then call the consensus type 2.
+then call the consensus type 2, `steward election proposal:`.
 This had priority against the application of messaging,
 so till the new set of Stewards are voted as YES, the application is frozen.
 
-### Multi steward with big consensus
+### Multi steward with big consensuses
 
 In this model, all group modifications, such as adding or removing members,
 must be approved through consensus by all participants,
-including the steward assigned for epoch `E`.
+including the steward assigned for `epoch E`.
 A configuration with multiple stewards operating under a shared consensus protocol offers
 increased decentralization and stronger protection against censorship.
 However, this benefit comes with reduced operational efficiency.
@@ -281,11 +282,11 @@ as a consensus among all members, as mentioned in the consensus section 2, accor
 the size of the voting proposal is equal to the `sn`.
 3. After the voting proposal ends up with a steward list, the freezing also ends,
 and application message is done and group changes committed as specified in single steward section
-with a difference which is members also checks the comittted steward is epoch steward or back-up steward,
+with a difference which is members also checks the comittted steward is `epoch steward` or `backup steward`,
 otherwise any one can create the third type of consensus and waiting for the response for emergency call.
-4. If the epoch steward violates the changing process as mentioned in the section Steward violation list,
+4. If the `epoch steward` violates the changing process as mentioned in the section Steward violation list,
 one of the members MUST initialize the consensus section 3 to remove the malicious Steward.
-Also, the backup steward fulfills the epoch by committing again correctly.
+Also, the `backup steward` fulfills the epoch by committing again correctly.
 
 A big consensus provides better decentralization,
 but it requires a big consensus,
@@ -307,7 +308,7 @@ only the difference here, the commit messages requires consensus only among the 
 A steward’s activity is called a violation if the action is one or more of the following:
 
 1. Broken commit: The steward releases a different commit message from the voted `commit proposal`.
-This activity is identified by the `members` since the RFC9420 provides the methods
+This activity is identified by the `members` since the [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) provides the methods
 that members can use to identify the broken commit messages that are possible in a few situations,
 such as commit and proposal incompatibility. Specifically, the broken commit can arise as follows:
 The commit belongs to the earlier epoch. The commit message should equal the latest epoch,
