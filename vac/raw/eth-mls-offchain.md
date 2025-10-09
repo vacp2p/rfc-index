@@ -60,7 +60,7 @@ obtains current group key of secure group messaging.
 - `steward`: Stewards are special and transparent members in the secure group
 messaging who organize the changes by releasing commit messages upon the voted proposals.
 There are two special subsets of steward as epoch and backup steward,
-which are defined in the section de-MLS Objects. 
+which are defined in the section de-MLS Objects.
 
 ## MLS Background
 
