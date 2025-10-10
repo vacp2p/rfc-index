@@ -55,6 +55,9 @@ but improves scalability by reducing direct interactions between participants.
 Each message has a globally unique, immutable ID (or hash).
 Messages can be requested from the high-availability caches or
 other participants using the corresponding message ID.
+* **Participant ID:**
+Each participant has a globally unique, immutable ID
+visible to other participants in the communication.
 
 ## Wire protocol
 
@@ -75,17 +78,18 @@ message HistoryEntry {
 }
 
 message Message {
-  // 1 Reserved for sender/participant id
+  string sender_id = 1;           // Participant ID of the message sender
   string message_id = 2;          // Unique identifier of the message
   string channel_id = 3;          // Identifier of the channel to which the message belongs
-  optional int32 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
+  optional uint64 lamport_timestamp = 10;    // Logical timestamp for causal ordering in channel
   repeated HistoryEntry causal_history = 11;  // List of preceding message IDs that this message causally depends on. Generally 2 or 3 message IDs are included.
   optional bytes bloom_filter = 12;         // Bloom filter representing received message IDs in channel
   optional bytes content = 20;             // Actual content of the message
 }
 ```
 
-Each message MUST include its globally unique identifier in the `message_id` field,
+The sending participant MUST include its own globally unique identifier in the `sender_id` field.
+In addition, it MUST include a globally unique identifier for the message in the `message_id` field,
 likely based on a message hash.
 The `channel_id` field MUST be set to the identifier of the channel of group communication
 that is being synchronized.
@@ -98,12 +102,20 @@ These fields MAY be left unset in the case of [ephemeral messages](#ephemeral-me
 The message `content` MAY be left empty for [periodic sync messages](#periodic-sync-message),
 otherwise it MUST contain the application-level content
 
+> **_Note:_** Close readers may notice that, outside of filtering messages originating from the sender itself,
+the `sender_id` field is not used for much.
+Its importance is expected to increase once a p2p retrieval mechanism is added to SDS, as is planned for the protocol.
+
 ### Participant state
 
 Each participant MUST maintain:
 
 * A Lamport timestamp for each channel of communication,
-initialized to current epoch time in nanosecond resolution.
+initialized to current epoch time in millisecond resolution.
+The Lamport timestamp is increased as described in the [protocol steps](#protocol-steps)
+to maintain a logical ordering of events while staying close to the current epoch time.
+This allows the messages from new joiners to be correctly ordered with other recent messages,
+without these new participants first having to synchronize past messages to discover the current Lamport timestamp.
 * A bloom filter for received message IDs per channel.
 The bloom filter SHOULD be rolled over and
 recomputed once it reaches a predefined capacity of message IDs.
@@ -136,8 +148,11 @@ the `lamport_timestamp`, `causal_history` and `bloom_filter` fields.
 
 Before broadcasting a message:
 
-* the participant MUST increase its local Lamport timestamp by `1` and
-include this in the `lamport_timestamp` field.
+* the participant MUST set its local Lamport timestamp
+to the maximum between the current value + `1`
+and the current epoch time in milliseconds.
+In other words the local Lamport timestamp is set to `max(timeNowInMs, current_lamport_timestamp + 1)`.
+* the participant MUST include the increased Lamport timestamp in the message's `lamport_timestamp` field.
 * the participant MUST determine the preceding few message IDs in the local history
 and include these in an ordered list in the `causal_history` field.
 The number of message IDs to include in the `causal_history` depends on the application.
@@ -157,6 +172,8 @@ of unacknowledged outgoing messages.
 
 Upon receiving a message,
 
+* the participant SHOULD ignore the message if it has a `sender_id` matching its own.
+* the participant MAY deduplicate the message by comparing its `message_id` to previously received message IDs.
 * the participant MUST [review the ACK status](#review-ack-status) of messages
 in its unacknowledged outgoing buffer
 using the received message's causal history and bloom filter.
@@ -240,7 +257,8 @@ participants SHOULD periodically send sync messages to maintain state.
 These sync messages:
 
 * MUST be sent with empty content
-* MUST include an incremented Lamport timestamp
+* MUST include a Lamport timestamp increased to `max(timeNowInMs, current_lamport_timestamp + 1)`,
+where `timeNowInMs` is the current epoch time in milliseconds.
 * MUST include causal history and bloom filter according to regular message rules
 * MUST NOT be added to the unacknowledged outgoing buffer
 * MUST NOT be included in causal histories of subsequent messages
