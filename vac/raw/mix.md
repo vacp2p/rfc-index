@@ -1099,8 +1099,10 @@ For interoperability, a recommended default encoding format involves:
   - Port number (2 bytes)
   - Peer IDs (39 bytes, post-Base58 decoding)
 
-- Encoding the forwarding delay as an unsigned 16-bit integer (2 bytes) in
-  milliseconds, using big endian network byte order.
+- Encoding the forwarding delay as an unsigned 16-bit integer (2 bytes),
+  representing the mean delay in milliseconds for the configured delay
+  distribution, using big endian network byte order.  
+  The delay distribution is pluggable, as defined in [Section 6.2](#62-delay-strategy).
 
 If the encoded address or delay is shorter than its respective allocated
 field, it MUST be padded with zeros. If it exceeds the allocated size, it
@@ -1245,17 +1247,17 @@ The construction MUST proceed as follows:
 
      - Compute the filler string $Φ_i$ using $\text{AES-CTR}^\prime_i$,
        which is AES-CTR encryption with the keystream starting from
-       index $((t+1)(r-i)+t+2)\kappa$ :
+       index $((t+1)(r-i)+t+2)κ$ :
 
        $`
        \begin{array}{l}
        Φ_i = \mathrm{AES\text{-}CTR}'_i\bigl(Φ_{\mathrm{aes\_key}_{i-1}},
-       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)\kappa} \bigr),
+       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr),\\
        \text{where notation $0_x$ defines the string of $0$ bits of length $x$.}
        \end{array}
        `$
 
-   Note that the length of $Φ_i$ is $(t+1)i\kappa$, $0 \leq i \leq L-1$.
+   Note that the length of $Φ_i$ is $(t+1)iκ$, $0 \leq i \leq L-1$.
 
    c. **Construct Routing Header**
    The routing header as defined in
@@ -1285,21 +1287,22 @@ The construction MUST proceed as follows:
      `$
   
    - Set the per hop two-byte encoded delay $\mathrm{delay}_i$ as defined in
-  [Section 8.4](#84-address-and-delay-encoding):
+   [Section 8.4](#84-address-and-delay-encoding):
      - If final hop (_i.e.,_ $i = L - 1$), encode two byte zero padding.
-     - For all other hop $i,\ i < L - 1$, sample a forwarding delay
-  using the delay strategy configured by the application and encode it in two bytes.
-  The delay strategy is pluggable as defined in [Section 6.2](#62-delay-strategy).
+     - For all other hop $i,\ i < L - 1$, select the mean forwarding delay
+     for the delay strategy configured by the application, and encode it as a
+     two-byte value. The delay strategy is pluggable, as defined in
+     [Section 6.2](#62-delay-strategy).
   
    - Using the derived keys and encoded forwarding delay, compute the nested
-  encrypted routing information $β_i$:
+     encrypted routing information $β_i$:
 
      - If $i = L-1$ (_i.e.,_ exit node):
 
        $`
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
-       β_{\mathrm{iv}_i}, Δ \mid \mathrm{delay}_i \mid 0_{((t+1)(r-L)+2)\kappa}
+       β_{\mathrm{iv}_i}, Δ \mid \mathrm{delay}_i \mid 0_{((t+1)(r-L)+2)κ}
        \bigr) \bigm| Φ_{L-1}
        \end{array}
        `$
@@ -1310,11 +1313,13 @@ The construction MUST proceed as follows:
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
        β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid $\mathrm{delay}_i$
-       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)\kappa - 1]} \bigr)
+       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\\
+       \text{where notation $X_{[a \ldots b]}$ denotes the substring of $X$
+       from byte offset $a$ to $b$, inclusive, using zero-based indexing.}
        \end{array}
        `$
 
-     Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$
+     Note that the length of $\beta_i$ is $(r(t+1)+1)κ$, $0 \leq i \leq L-1$
      as defined in [Section 8.3.1](#831-header-field-sizes).
 
      - Compute the message authentication code $γ_i$:
@@ -1326,8 +1331,8 @@ The construction MUST proceed as follows:
        \end{array}
        `$
 
-     Note that the length of $\gamma_i$ is $\kappa$, $0 \leq i \leq L-1$
-     as defined in [Section 8.3.1](#831-header-field-sizes).
+     Note that the length of $\gamma_i$ is $κ$, $0 \leq i \leq L-1$ as defined in
+     [Section 8.3.1](#831-header-field-sizes).
 
    d. **Encrypt Payload**
    The encrypted payload $δ$ contains the message $m$ defined in Step 1,
@@ -1356,7 +1361,7 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        δ_i = \mathrm{AES\text{-}CTR}\bigl(δ_{\mathrm{aes\_key}_i},
-       δ_{\mathrm{iv}_i}, 0_{\kappa} \mid m
+       δ_{\mathrm{iv}_i}, 0_{κ} \mid m
        \bigr)
        \end{array}
        `$
@@ -1370,7 +1375,7 @@ The construction MUST proceed as follows:
        \end{array}
        `$
 
-     Note that the length of $\delta_i$, $0 \leq i \leq L-1$ is $|m| + \kappa$ bytes.
+     Note that the length of $\delta_i$, $0 \leq i \leq L-1$ is $|m| + κ$ bytes.
 
      Given that the derived size of $\delta_i$ is $3984$ bytes as defined in
      [Section 8.3.2](#832-payload-size), this allows $m$ to be of length
@@ -1387,13 +1392,25 @@ The construction MUST proceed as follows:
    δ = δ_0      // 3984 bytes
    ```
 
-   Serialize the final packet using a consistent format and transmit it to
-   the first hop via a libp2p stream negotiated under the `"/mix/1.0.0"`
-   protocol identifier.
+   Serialize the final packet using a consistent format and
+   prepare it for transmission.
 
-   Implementations MAY reuse an existing stream to the first hop as described in
-   [Section 5.5](#55-stream-management-and-multiplexing), if doing so
-   does not introduce any observable linkability between the packets.
+   f. **Transmit Packet**
+   - Sample a randomized delay from the same distribution family used for
+   per-hop delays (in Step 3.e.) with an independently chosen mean.  
+
+   This delay prevents timing correlation when multiple Sphinx packets are
+   sent in quick succession. Such bursts may occur when an upstream protocol
+   fragments a large message, or when several messages are sent close together.
+
+   - After the randomized delay elapses, transmit the serialized packet to
+   the first hop via a libp2p stream negotiated under the
+   `"/mix/1.0.0"` protocol identifier.
+
+   Implementations MAY reuse an existing stream to the first hop as
+   described in [Section 5.5](#55-stream-management-and-multiplexing), if
+   doing so does not introduce any observable linkability between the
+   packets.
 
 Once a Sphinx packet is constructed and transmitted by the initiating node, it is
 processed hop-by-hop by the remaining mix nodes in the path. Each node receives
@@ -1420,8 +1437,7 @@ the exact behavior for both roles.
 Upon receiving a stream payload over a libp2p stream, the mix node MUST first
 deserialize it into a Sphinx packet `(α, β, γ, δ)`.
 
-The deserialized fields MUST match the sizes defined in
-[Section 8.5.2](#852-construction-steps)
+The deserialized fields MUST match the sizes defined in [Section 8.5.2](#852-construction-steps)
 step 3.e., and the total packet length MUST match the fixed packet size defined in
 [Section 8.3.2](#832-payload-size).
 
@@ -1432,21 +1448,271 @@ After successful deserialization, the mix node performs the following steps:
 
 1. **Derive Session Key**
 
-   Let $x \in \mathbb{Z}_q^*$ be the mix node's X25519 private key. Compute the
-   shared secret as follows:
-
-     $`
-     \begin{array}{l}
-     s = α^x
-     \end{array}
-     `$
+   Let $x \in \mathbb{Z}_q^*$ denote the node's X25519 private key.  
+   Compute the shared secret $s = α^x$.
 
 2. **Check for Replays**
 
-3. **Compute MAC**
+   - Compute the tag $H(s)$.
+   - If the tag exists in the node's table of previously seen tags,
+   discard the packet and terminate processing.
+   - Otherwise, store the tag in the table.
 
-4. **Decrypt One Layer**
+   The table MAY be flushed when the node rotates its private key.
+   Implementations SHOULD perform this cleanup securely and automatically.
 
-#### 8.6.2 Intermediary
+3. **Check Header Integrity**
 
-#### 8.6.3 Exit
+   - Derive the MAC key from the session secret $s$:
+
+     $`
+     \begin{array}{l}
+     \mathrm{mac\_key} =
+     \mathrm{KDF}(\text{"mac\_key"} \mid s)
+     \end{array}
+     `$
+
+   - Verify the integrity of the routing header:
+
+     $`
+     \begin{array}{l}
+     γ \stackrel{?}{=} \mathrm{HMAC\text{-}SHA\text{-}256}\bigl(\mathrm{mac\_key},
+     β \bigr)
+     \end{array}
+     `$
+
+     If the check fails, discard the packet and terminate processing.
+
+4. **Decrypt One Layer of the Routing Header**
+
+   - Derive the routing header AES key and IV from the session secret $s$:
+
+     $`
+     \begin{array}{l}
+     β_{\mathrm{aes\_key}} =
+     \mathrm{KDF}(\text{"aes\_key"} \mid s)\\
+     β_{\mathrm{iv}} =
+     \mathrm{KDF}(\text{"iv"} \mid s)
+     \end{array}
+     `$
+
+   - Decrypt the suitably padded $β$ to obtain the routing block $B$ for this hop:
+
+     $`
+     \begin{array}{l}
+     B = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}},
+     β_{\mathrm{iv}}, β \mid 0_{(t+1)κ}
+     \bigr)
+     \end{array}
+     `$
+
+     This step removes the filler string appended during header encryption in
+     [Section 8.5.2](#852-construction-steps) step 3.c. and
+     yields the plaintext routing information for this hop.
+
+   The routing block $B$ MUST be parsed according to the rules and field layout
+   defined in [Section 8.6.2](#862-node-role-determination) to determine
+   whether the current node is an intermediary or the exit.
+
+5. **Decrypt One Layer of the Payload**
+
+   - Derive the payload AES key and IV from the session secret $s$:
+
+     $`
+     \begin{array}{l}
+     δ_{\mathrm{aes\_key}} =
+     \mathrm{KDF}(\text{"δ\_aes\_key"} \mid s)\\
+     δ_{\mathrm{iv}} =
+     \mathrm{KDF}(\text{"δ\_iv"} \mid s)
+     \end{array}
+     `$
+
+   - Decrypt one layer of the encrypted payload $δ$:
+
+     $`
+     \begin{array}{l}
+     δ' = \mathrm{AES\text{-}CTR}\bigl(δ_{\mathrm{aes\_key}},
+     δ_{\mathrm{iv}}, δ \bigr)
+     \end{array}
+     `$
+
+   The resulting $δ'$ is the decrypted payload for this hop and MUST be
+   interpreted depending on the parsed node's role, determined by $B$, as
+   described in [Section 8.6.2](#862-node-role-determination).
+
+#### 8.6.2 Node Role Determination
+
+As described in [Section 8.6.1](#861-shared-preprocessing), the mix node
+obtains the routing block $B$ by decrypting one layer of the encrypted
+header $β$.
+
+At this stage, the node MUST determine whether it is an intermediary
+or the exit based on the prefix of $B$, in accordance with the construction of
+$β_i$ defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+
+- If the first $(tκ - 2)$ bytes of $B$ contain a nonzero-encoded
+  address, immediately followed by a two-byte zero delay,
+  and then $((t + 1)(r - L) + t + 2)κ$ bytes of all-zero padding,
+  process the packet as an exit.
+- Otherwise, process the packet as an intermediary.
+
+The following subsections define the precise behavior for each case.
+
+#### 8.6.3 Intermediary Processing
+
+Once the node determines its role as an intermediary following the steps in
+[Section 8.6.2](#862-node-role-determination), it MUST perform the following
+steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
+[Section 8.6.1](#861-shared-preprocessing):
+
+1. **Parse Routing Block**
+
+   Parse the routing block $B$ according to the $β_i$, $i \neq L - 1$ construction
+   defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+
+   - Extract first $(tκ - 2)$ bytes of $B$ as the next hop address
+
+     $`
+     \begin{array}{l}
+     \mathrm{next\_hop\_addr} = B_{[0\ldots(tκ - 2) - 1]}
+     \end{array}
+     `$
+
+   - Extract next two bytes as the mean delay
+
+     $`
+     \begin{array}{l}
+     \mathrm{delay} = B_{[(tκ - 2)\ldots{tκ} - 1]}
+     \end{array}
+     `$
+
+   - Extract next $κ$ bytes as the next hop MAC $γ'$
+
+     $`
+     \begin{array}{l}
+     γ' = B_{[tκ\ldots(t + 1)κ - 1]}
+     \end{array}
+     `$
+
+   - Extract next $(r(t+1)+1)κ$ bytes as the next hop routing information $β'$
+
+     $`
+     \begin{array}{l}
+     β' = B_{[(t + 1)κ\ldots(r(t +1 ) + t + 2)\kappa - 1]}
+     \end{array}
+     `$
+
+   If parsing fails, discard the packet and terminate processing.
+
+2. **Update Header Fields**
+
+   Update the header fields according to the construction steps
+   defined in [Section 8.5.2](#852-construction-steps):
+
+   - Compute the next hop ephemeral public value $α'$, deriving the blinding factor
+   $b$ from the shared secret $s$ computed in
+   [Section 8.6.1](#861-shared-preprocessing) step 1.
+
+     $`
+     \begin{aligned}
+     b &= H(α\ |\ s) \\
+     α' &= α^b
+     \end{aligned}
+     `$
+
+   - Use the $β'$ and $γ'$ extracted in Step 1. as the routing information and
+   MAC respectively in the outgoing packet.
+
+3. **Update Payload**
+
+   Use the decrypted payload $δ'$ computed in
+   [Section 8.6.1](#861-shared-preprocessing) step 5. as the payload in the
+   outgoing packet.
+
+4. **Assemble Final Packet**
+   The final Sphinx packet is structured as defined in
+   [Section 8.3](#83-packet-component-sizes):
+
+   ```text
+   α = α'      // 32 bytes
+   β = β'      // 576 bytes
+   γ = γ'      // 16 bytes
+   δ = δ'      // 3984 bytes
+   ```
+
+   Serialize $α'$ using the same format used in
+   [Section 8.5.2](#852-construction-steps). The remaining fields are
+   already fixed-length buffers and do not require further
+   transformation.
+
+5. **Transmit Packet**
+
+   - Interpret the $\mathrm{next\_hop\_addr}$ and $\mathrm{delay}$ extracted in
+   Step 1. according to the encoding format used during construction in
+   [Section 8.5.2](#852-construction-steps) Step 3.c.
+
+   - Sample the actual forwarding delay from the configured delay distribution,
+   using the decoded mean delay value as the distribution parameter.
+
+   - After the forwarding delay elapses, transmit the serialized packet to
+   the next hop address via a libp2p stream negotiated under the `"/mix/1.0.0"`
+   protocol identifier.
+
+   Implementations MAY reuse an existing stream to the next hop as
+   described in [Section 5.5](#55-stream-management-and-multiplexing), if
+   doing so does not introduce any observable linkability between the
+   packets.
+
+6. **Erase State**
+
+   - After transmission, erase all temporary values securely from memory,
+   including session keys, decrypted content, and routing metadata.
+
+   - If any error occurs&mdash;such as malformed header, invalid delay, or
+   failed stream transmission&mdash;silently discard the packet and do not
+   send any error response.
+
+#### 8.6.4 Exit Processing
+
+Once the node determines its role as an exit following the steps in
+[Section 8.6.2](#862-node-role-determination), it MUST perform the following
+steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
+[Section 8.6.1](#861-shared-preprocessing):
+
+1. **Parse Routing Block**
+
+   Parse the routing block $B$ according to the $β_i$, $i = L - 1$ construction
+   defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+
+   - Extract first $(tκ - 2)$ bytes of $B$ as the destination address $Δ$
+
+     $`
+     \begin{array}{l}
+     Δ = B_{[0\ldots(tκ - 2) - 1]}
+     \end{array}
+     `$
+
+2. **Recover Plaintext Message**
+
+   - Verify the decrypted payload $δ'$ computed in
+   [Section 8.6.1](#861-shared-preprocessing) step 5.:
+
+     $`
+     \begin{array}{l}
+     δ'_{[0\ldots{κ} - 1]} \stackrel{?}{=} 0_{κ}
+     \end{array}
+     `$
+
+   If the check fails, discard $δ'$ and terminate processing.
+
+   - Extract rest of the bytes of $δ'$ as the plaintext message $m$:
+
+     $`
+     \begin{array}{l}
+     m = δ'_{[κ\ldots]},\\
+     \text{where notation $X_{[a \ldots]}$ denotes the substring of $X$
+     from byte offset $a$ to the end of the string using zero-based indexing.}
+     \end{array}
+     `$
+
+   - 
