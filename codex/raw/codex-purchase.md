@@ -12,11 +12,11 @@ contributors:
 
 ## Abstract
 
-This specification defines the Purchase module for [Codex](https://github.com/codex-storage/nim-codex), which manages the lifecycle of a storage agreement between a client and a host in Codex. It ensures that each purchase is correctly initialized, tracked, and completed according to the state of its corresponding `StorageRequest` in the marketplace.
+This specification defines the Purchase module for [Codex](https://github.com/codex-storage/nim-codex), which manages the lifecycle of a storage agreement between a client and a host in Codex. It ensures that each purchase is correctly initialized, tracked, and completed or failed according to the state of its corresponding `StorageRequest` in the marketplace.
 
 ## Background / Rationale / Motivation
 
-The Purchase module manages the lifecycle of a storage agreement between a client and a host in Codex. It ensures that each purchase is correctly initialized, tracked, and completed according to the state of its corresponding `StorageRequest` in the marketplace.
+The Purchase module manages the lifecycle of a storage agreement between a client and a host in Codex. It ensures that each purchase is correctly initialized, tracked, and completed or failed according to the state of its corresponding `StorageRequest` in the marketplace.
 
 Purchases are implemented as a state machine that progresses through defined states until reaching a deterministic terminal state (`finished`, `cancelled`, or `errored`). This state machine approach provides:
 
