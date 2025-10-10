@@ -285,13 +285,27 @@ Before a dataset for a slot is downloaded, a Reservation is created, and the fre
 When bytes are downloaded, the reservation of those bytes in the storage module is released.
 Accounting of both reserved bytes in the storage module and freeSize in the Availability are cleaned up upon completion of the state machine.
 
+```mermaid
+graph TD
+    A[Availability] -->|creates| R[Reservation]
+    A -->|reserves bytes in| SM[Storage Module]
+    R -->|reduces| AF[Availability.freeSize]
+    R -->|downloads data| D[Dataset]
+    D -->|releases bytes to| SM
+    TC[Terminal State] -->|triggers cleanup| C[Cleanup]
+    C -->|returns bytes to| AF
+    C -->|deletes| R
+    C -->|returns collateral to| A
+```
+
 ### Hooks
 
 - **onStore**: streams data into the node's storage
 - **onProve**: produces proofs for initial and periodic proving
 - **onExpiryUpdate**: notifies the client node of a change in the expiry data
 - **onSale**: notifies that the host is now responsible for the slot
-- **onClear**: notification emitted once the state machine has concluded; used to reconcile Availability bytes and reserved bytes in the storage module.
+- **onClear**: notification emitted once the state machine has concluded; used to reconcile Availability bytes and reserved bytes in the storage module
+- **onCleanUp**: cleanup hook called in terminal states to release resources, delete reservations, and return collateral to availabilities
 
 ### Error Handling
 
@@ -488,6 +502,7 @@ type
 | `onExpiryUpdate` | Notify the final expiry for the content.                   | `(rootCid: Cid, expiry: SecondsSince1970) -> Future[?!void]` |
 | `onClear`        | Inform that a sale is over and the slot can be cleaned up in the node client side. | `(request: StorageRequest, slotIndex: uint64) -> void`       |
 | `onSale`         | Inform that a sale has been taken for this host.           | `(request: StorageRequest, slotIndex: uint64) -> void`       |
+| `onCleanUp`      | Cleanup hook called in terminal states to release resources, delete reservations, and return collateral. | `(returnedCollateral: ?UInt256) -> void`                     |
 
 ### Marketplace Interactions
 
@@ -532,7 +547,10 @@ method reserveSlot*(market: Market, requestId: RequestId, slotIndex: uint64)
 - Retry policy must be in place for all external calls (e.g., `marketplace` API).
 - Sales must recover deterministically after interruptions, reconciling local and `on-chain` state.
 - Any terminal state (`SaleFinished`, `SaleFailed`, `SaleCancelled`, `SaleIgnored`, `SaleErrored`) must trigger cleanup and collateral handling.
-- Implement a window mechanism to ensure slots from the same dataset are geographically distributed across nodes, preventing centralisation of stored data.
+
+#### Window Mechanism for Geographic Distribution
+
+To prevent centralisation of stored data and ensure geographic distribution of slots from the same dataset across nodes, the Sales module must implement a window mechanism. This mechanism ensures that multiple slots from the same storage request are not all filled by nodes in the same geographic region or network locality, thereby improving data availability and resilience against regional failures.
 
 ### Observability
 
