@@ -1312,7 +1312,7 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
-       β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid $\mathrm{delay}_i$
+       β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid \mathrm{delay}_i
        \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\\
        \text{where notation $X_{[a \ldots b]}$ denotes the substring of $X$
        from byte offset $a$ to $b$, inclusive, using zero-based indexing.}
@@ -1476,8 +1476,8 @@ After successful deserialization, the mix node performs the following steps:
 
      $`
      \begin{array}{l}
-     γ \stackrel{?}{=} \mathrm{HMAC\text{-}SHA\text{-}256}\bigl(\mathrm{mac\_key},
-     β \bigr)
+     γ \stackrel{?}{=} \mathrm{HMAC\text{-}SHA\text{-}256}(\mathrm{mac\_key},
+     β)
      \end{array}
      `$
 
@@ -1570,15 +1570,15 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
    Parse the routing block $B$ according to the $β_i$, $i \neq L - 1$ construction
    defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
 
-   - Extract first $(tκ - 2)$ bytes of $B$ as the next hop address
+   - Extract first $(tκ - 2)$ bytes of $B$ as the next hop address $\mathrm{addr}$
 
      $`
      \begin{array}{l}
-     \mathrm{next\_hop\_addr} = B_{[0\ldots(tκ - 2) - 1]}
+     \mathrm{addr} = B_{[0\ldots(tκ - 2) - 1]}
      \end{array}
      `$
 
-   - Extract next two bytes as the mean delay
+   - Extract next two bytes as the mean delay $\mathrm{delay}$
 
      $`
      \begin{array}{l}
@@ -1647,7 +1647,7 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
 
 5. **Transmit Packet**
 
-   - Interpret the $\mathrm{next\_hop\_addr}$ and $\mathrm{delay}$ extracted in
+   - Interpret the $\mathrm{addr}$ and $\mathrm{delay}$ extracted in
    Step 1. according to the encoding format used during construction in
    [Section 8.5.2](#852-construction-steps) Step 3.c.
 
@@ -1714,5 +1714,3 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
      from byte offset $a$ to the end of the string using zero-based indexing.}
      \end{array}
      `$
-
-   - 
