@@ -77,7 +77,7 @@ Clients MUST:
 
 This section describes implementation approaches used in the nim-codex reference implementation. These are suggestions and not normative requirements.
 
-The nim-codex implementation uses a state machine pattern to manage purchase lifecycles, providing deterministic state transitions, explicit terminal states, and recovery support.
+The nim-codex implementation uses a state machine pattern to manage purchase lifecycles, providing deterministic state transitions, explicit terminal states, and recovery support. The state machine definitions (state identifiers, transitions, state descriptions, requirements, data models, and interfaces) are documented in the subsections below.
 
 > **Note**: The Purchase module terminology and state machine design are specific to the nim-codex implementation. The protocol only requires that clients interact with the marketplace smart contract as specified in the Client Protocol Requirements section.
 
@@ -130,7 +130,7 @@ The storage request has been created and the purchase waits for the request to s
 
 **Started State (`started`)**
 
-The purchase is active and waits until the end of the request—defined by the storage request parameters—before moving to the `finished` state. A subscription is made to the marketplace to be notified about request failure. If a request failure is notified, the state machine moves to `failed`.
+The purchase is active and waits until the end of the request, defined by the storage request parameters, before moving to the `finished` state. A subscription is made to the marketplace to be notified about request failure. If a request failure is notified, the state machine moves to `failed`.
 
 Marketplace subscription signature:
 
@@ -171,6 +171,8 @@ method requestState*(market: Market, requestId: RequestId): Future[?RequestState
 ```
 
 Based on this information, it moves to the corresponding next state.
+
+> **Note**: Functional and non-functional requirements for the client role are summarized in the [Codex Marketplace Specification](https://github.com/codex-storage/codex-spec/blob/master/specs/marketplace.md). The requirements listed below are specific to the nim-codex Purchase module implementation.
 
 ### Functional Requirements
 
