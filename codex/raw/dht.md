@@ -15,16 +15,16 @@ as well as content identifiers (CID) for each host.
 
 ## Background
 
-Codex is a network of peer nodes, identified as hosts,
-particapting in a decentralized peer-to-peer storage solution.
+Codex is a network of peer nodes, identified as providers or hosts,
+particapting in a decentralized peer-to-peer storage protocol.
 Codex offers data durability guarantees, incentive mechanisms and data persistenace guarantees.
 
-The Codex DHT component is a modified version of [DiscV5 DHT](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md).
-DiscV5 is a node discovery system used to find peers within a peer-to-peer network.
-This allows for hosts to publish connection information and
+The Codex DHT component is a modified version of [DiscV5 DHT](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md) protocol.
+DiscV5 is a node discovery system used to find peers who are registered on a distributed hash table.
+This allows a provider to publish their connection information and
 information about what content they are storing.
-All Codex host run this system at no extra cost other than using resources to store node records.
-This allows any node to become the entry point to connect to the current live nodes into the Codex netowork.
+A Codex provider will support this protocol at no extra cost other than using resources to store node records.
+This allows any node to become the entry point to connect to the current live nodes on the Codex netowork.
 
 ## Wire Format
 
