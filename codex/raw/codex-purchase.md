@@ -5,30 +5,81 @@ name: Codex Purchase Module
 status: raw
 category: Standards Track
 tags: codex, storage, marketplace, state-machine
-editor: Codex Team
+editor: Codex Team and Filip Dimitrijevic <filip@status.im>
 contributors:
 - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
 
-This specification defines the Purchase module for [Codex](https://github.com/codex-storage/nim-codex), which manages the lifecycle of a storage agreement between a client and a host in Codex. It ensures that each purchase is correctly initialized, tracked, and completed or failed according to the state of its corresponding `StorageRequest` in the marketplace.
+This specification defines the client role in the [Codex](https://github.com/codex-storage/nim-codex) marketplace protocol. A client is a Codex node that purchases storage by creating storage requests, submitting them to the marketplace smart contract, and managing the request lifecycle until completion or failure.
 
-## Background / Rationale / Motivation
+The specification outlines the protocol-level requirements for clients, including storage request creation, marketplace interactions, fund management, and request state monitoring. Implementation approaches, such as state machines and recovery mechanisms, are provided as suggestions.
 
-The Purchase module manages the lifecycle of a storage agreement between a client and a host in Codex. It ensures that each purchase is correctly initialized, tracked, and completed or failed according to the state of its corresponding `StorageRequest` in the marketplace.
+## Background
 
-Purchases are implemented as a state machine that progresses through defined states until reaching a deterministic terminal state (`finished`, `cancelled`, or `errored`). This state machine approach provides:
+In the Codex marketplace protocol, clients purchase storage by creating and submitting storage requests to the marketplace smart contract. Each storage request specifies the data to be stored (identified by a CID), storage parameters (duration, collateral requirements, proof parameters), and the number of storage slots needed.
 
-- **Deterministic behavior**: Each purchase follows a well-defined path through states
-- **Recoverability**: The `load` procedure enables recovery after process restarts by starting in the `unknown` state
-- **Clear terminal conditions**: Every purchase reaches exactly one of three terminal states
+The marketplace smart contract manages the storage request lifecycle, including request fulfillment, slot management, and fund distribution. Clients must interact with the marketplace to submit requests, monitor request state, and withdraw funds when requests complete or fail.
 
-The `StorageRequest` contains all necessary data for the agreement (CID, collateral, expiry, etc.) and is stored in the `marketplace` dependency.
+This specification defines what the protocol requires from clients. The marketplace smart contract governs these requirements—how individual Codex nodes implement them internally (state machines, recovery mechanisms, etc.) is an implementation detail covered in the Implementation Suggestions section.
 
-In this document, on-chain refers to interactions with that marketplace, but the abstraction could be replaceable: it could point to a different backend or custom storage system in future implementations. This abstraction allows the Purchase module to work with different marketplace implementations without changing its core logic.
+## Client Protocol Requirements
 
-## Theory / Semantics
+This section defines the normative requirements for client implementations to participate in the Codex marketplace.
+
+### Storage Request Creation
+
+Clients MUST create storage requests with the following parameters:
+
+- **client**: The client's address (identifying the requester)
+- **ask**: Storage parameters including proof probability, pricing, collateral, slots, slot size, duration, and maximum slot loss
+- **content**: Content identification using CID and merkle root
+- **expiry**: Expiration timestamp for the request (uint64)
+- **nonce**: Unique nonce value to ensure request uniqueness
+
+### Marketplace Interactions
+
+Clients MUST implement the following smart contract interactions:
+
+- **requestStorage(request)**: Submit a new storage request to the marketplace along with required payment. Returns a unique `requestId` for tracking the request.
+
+- **getRequest(requestId)**: Retrieve the full `StorageRequest` data from the marketplace. Used for recovery and state verification.
+
+- **requestState(requestId)**: Query the current state of a storage request. Used for recovery and monitoring request progress.
+
+- **withdrawFunds(requestId)**: Withdraw funds locked by the marketplace when a request completes, is cancelled, or fails. Clients MUST call this function to release locked funds.
+
+### Event Subscriptions
+
+Clients MUST subscribe to the following marketplace events:
+
+- **RequestFulfilled(requestId)**: Emitted when a storage request has enough filled slots to start. Clients monitor this event to determine when their request becomes active.
+
+- **RequestFailed(requestId)**: Emitted when a storage request fails due to proof failures or other reasons. Clients observe this event to detect failed requests and initiate fund withdrawal.
+
+### Request Lifecycle Management
+
+Clients MUST monitor storage requests through their lifecycle:
+
+- After submitting a request with `requestStorage`, clients wait for the `RequestFulfilled` event or expiry timeout
+- Once fulfilled, clients monitor for the request duration to complete successfully or for a `RequestFailed` event
+- When a request completes (finished), is cancelled (expired before fulfillment), or fails, clients MUST call `withdrawFunds` to release locked funds
+
+### Fund Management
+
+Clients MUST:
+
+- Provide sufficient payment when calling `requestStorage` to cover the storage request cost (based on slots, duration, and pricing parameters)
+- Call `withdrawFunds` when a request completes, is cancelled, or fails to release any locked funds
+
+## Implementation Suggestions
+
+This section describes implementation approaches used in the nim-codex reference implementation. These are suggestions and not normative requirements.
+
+The nim-codex implementation uses a state machine pattern to manage purchase lifecycles, providing deterministic state transitions, explicit terminal states, and recovery support.
+
+> **Note**: The Purchase module terminology and state machine design are specific to the nim-codex implementation. The protocol only requires that clients interact with the marketplace smart contract as specified in the Client Protocol Requirements section.
 
 ### State Identifiers
 
@@ -171,9 +222,7 @@ All state transitions and errors should be clearly logged for traceability.
 - Unit tests check that each state handles success and error properly.
 - Integration tests check that a full purchase flows correctly through states.
 
-## Wire Format Specification / Syntax
-
-### Data Models
+### Data Models (Wire Format)
 
 #### Purchase
 
@@ -266,10 +315,6 @@ A distinct 32-byte array type used as a unique nonce value in `StorageRequest` t
 | `method run*(state: PurchaseCancelled, machine: Machine): Future[?State] {.async: (raises: []).}` | Purchase cancelled or timed out. | `state: PurchaseCancelled`, `machine: Machine` | `Future[Option[State]]` |
 | `method run*(state: PurchaseUnknown, machine: Machine): Future[?State] {.async: (raises: []).}` | Recover a purchase. | `state: PurchaseUnknown`, `machine: Machine` | `Future[Option[State]]` |
 
-## Implementation Suggestions
-
-This section provides guidance for implementing the Purchase module based on the dependencies and requirements defined in this specification.
-
 ### Dependencies
 
 The Purchase module requires the following dependencies:
@@ -315,7 +360,7 @@ The deterministic state machine design ensures:
 - The `failed` state is an intermediate state that always transitions to `errored`
 - State transitions follow the defined state diagram without cycles in terminal states
 
-### Fund Management
+### Fund Management Safety
 
 All terminal paths (`finished`, `failed`, `cancelled`) call `marketplace.withdrawFunds` as specified in the state descriptions. This ensures locked funds are released when purchases complete or fail.
 
@@ -353,6 +398,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
+- **Codex Marketplace Specification**: [Marketplace Spec](https://github.com/codex-storage/codex-spec/blob/master/specs/marketplace.md) - Defines the client role and protocol requirements
 - **Codex Purchase Implementation**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
 - **Codex Documentation**: [Codex Docs - Component Specification - Purchase](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Purchase.md)
 
