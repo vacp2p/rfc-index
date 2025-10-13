@@ -1186,7 +1186,7 @@ The construction MUST proceed as follows:
    MAY be used.
    - Let the resulting message be $m$.  
 
-1. **Select A Mix Path**
+2. **Select A Mix Path**
 
    - First obtain an unbiased random sample of live, routable mix nodes using
   some discovery mechanism. The choice of discovery mechanism is
@@ -1203,7 +1203,7 @@ The construction MUST proceed as follows:
   [Section 8.4](#84-address-and-delay-encoding). Let the resulting encoded
   multiaddress be $\mathrm{addr\_i}$.
 
-1. **Wrap Plaintext Payload In Sphinx Packet**
+3. **Wrap Plaintext Payload In Sphinx Packet**
 
    a. **Compute Ephemeral Secrets**
 
