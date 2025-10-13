@@ -5,37 +5,94 @@ name: Codex Sales Module
 status: raw
 category: Standards Track
 tags: codex, storage, marketplace, state-machine
-editor: Codex Team
+editor: Codex Team and Filip Dimitrijevic <filip@status.im>
 contributors:
 - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
 
-The Sales module manages the full lifecycle of offering storage capacity on the [Codex](https://github.com/codex-storage/nim-codex) marketplace.
-A host declares an `Availability` describing the space, duration, price, and collateral they commit.
-When a `StorageRequest` from the marketplace matches these criteria, the host creates a `Reservation` to store a slot from that request, a portion of data assigned to this host, as part of a dataset distributed across multiple nodes.
-Each hosted slot runs in its own state machine, handling reservation, data storage, proof submission, and eventual payout or cleanup.
-The module operates both for new requests and for ongoing ones, such as when a slot must be repaired.
+This specification defines the Storage Provider (SP) role in the [Codex](https://github.com/codex-storage/nim-codex) marketplace protocol. A Storage Provider is a Codex node that persists data across the network by hosting slots requested by clients in their storage requests.
+
+The specification outlines the protocol-level requirements for Storage Providers, including event subscriptions, smart contract interactions, data handling, proof submission, and payout mechanisms. Implementation approaches, such as state machines and resource management strategies, are provided as suggestions.
 
 ## Background / Motivation
 
-The Sales module manages the full lifecycle of offering storage capacity on the Codex marketplace.
+The Codex marketplace enables decentralized storage through a protocol where clients request storage and Storage Providers (SPs) offer storage capacity. The marketplace is governed by a smart contract that manages storage requests, slot assignments, collateral, proofs, and payouts.
 
-A host declares an `Availability` describing the space, duration, price, and collateral they commit. When a `StorageRequest` from the marketplace matches these criteria, the host creates a `Reservation` to store a slot from that request, a portion of data assigned to this host, as part of a dataset distributed across multiple nodes. Each hosted slot runs in its own state machine, handling reservation, data storage, proof submission, and eventual payout or cleanup.
+Storage Providers observe storage requests on the marketplace, decide which requests to fulfill based on their own criteria, reserve and fill slots with appropriate collateral, download and store the assigned data, and submit proofs periodically to demonstrate continued storage. The protocol ensures that Storage Providers are compensated for successful storage and penalized (slashed) for failing to provide proofs.
 
-The module operates both for new requests and for ongoing ones, such as when a slot must be repaired.
+This specification defines the protocol requirements that all Storage Provider implementations must adhere to in order to participate in the Codex marketplace. The Codex marketplace specification ([Marketplace Spec](https://github.com/codex-storage/codex-spec/blob/master/specs/marketplace.md)) provides the complete smart contract protocol definition.
 
-The system must support:
+## Storage Provider Protocol Requirements
 
-- Matching incoming storage requests to declared availabilities
-- Managing reservations and collateral
-- Downloading and persisting slot data
-- Generating and submitting proofs periodically
-- Handling recovery after interruptions
-- Managing concurrent sales with bounded resources
+This section defines the normative requirements for Storage Provider implementations to participate in the Codex marketplace.
 
-## Theory / Semantics
+### Event Subscriptions
+
+Storage Providers MUST subscribe to the following marketplace events:
+
+- **StorageRequested(requestId, ask, expiry)**: Emitted when a client submits a new storage request to the marketplace. Storage Providers observe this event to discover storage opportunities.
+
+- **SlotFilled(requestId, slotIndex)**: Emitted when a slot is filled. Storage Providers monitor this event to track slot status and determine when slots from a request have been filled.
+
+- **SlotFreed(requestId, slotIndex)**: Emitted when a slot is freed due to proof failures or other reasons. Storage Providers observe this event to discover repair opportunities where they can fill freed slots.
+
+### Smart Contract Interactions
+
+Storage Providers MUST implement the following smart contract interactions:
+
+- **reserveSlot(requestId, slotIndex)**: Reserve a specific slot before filling it. This prevents multiple Storage Providers from attempting to fill the same slot simultaneously.
+
+- **fillSlot(requestId, slotIndex, proof)**: Fill a reserved slot by submitting an initial proof along with the required collateral. The proof demonstrates that the Storage Provider has downloaded and can store the assigned data.
+
+- **submitProof(slotId, proof)**: Submit periodic proofs when challenged by the marketplace. Proofs are required stochastically based on the `proofProbability` parameter in the storage request.
+
+- **freeSlot(slotId)**: Release a slot when the storage period ends or when the Storage Provider can no longer fulfill the storage obligation.
+
+- **isProofRequired(slotId)**: Query whether a proof is currently required for a given slot. Storage Providers use this to detect when they must submit proofs.
+
+- **getChallenge(slotId)**: Retrieve the current proof challenge for a slot. The challenge is used to generate the proof.
+
+### Data Handling
+
+Storage Providers MUST:
+
+- Download the complete dataset for their assigned slot(s) from the network
+- Apply Reed-Solomon erasure coding to reconstruct their slot data if necessary
+- Generate cryptographic proofs over the downloaded/reconstructed data
+- Store the data for the entire duration specified in the storage request
+
+The dataset is chunked and erasure coded, with each erasure coded chunk representing a slot. Storage Providers are assigned specific slots to host.
+
+### Proof Generation and Submission
+
+Storage Providers MUST:
+
+- Monitor for proof requirements using `isProofRequired(slotId)`
+- Retrieve the current challenge using `getChallenge(slotId)` when a proof is required
+- Generate a valid proof over their stored data in response to the challenge
+- Submit the proof using `submitProof(slotId, proof)` before the proof deadline
+- Understand that proof challenges are stochastic based on the `proofProbability` parameter
+
+**Slashing Conditions:**
+
+- Missing a required proof results in slashing by `config.collateral.slashPercentage` of the originally required collateral
+- If the number of slashes exceeds `config.collateral.maxNumberOfSlashes`, the slot is freed
+
+### Lifecycle and Payouts
+
+Storage Providers MUST handle the following slot lifecycle states:
+
+- **Finished**: The storage period completed successfully. The Storage Provider receives the full reward for hosting the slot, along with the collateral.
+
+- **Cancelled**: The storage request was cancelled before completion. The collateral is returned along with a proportional payout based on the hosting duration.
+
+- **Failed**: The storage request failed (e.g., due to excessive proof failures). No funds are collected. The reward is returned to the client, and the collateral is burned.
+
+## Implementation Suggestions
+
+This section describes implementation approaches used in the nim-codex reference implementation. These are suggestions and not normative requirements.
 
 ### State Machine
 
@@ -321,32 +378,18 @@ Cleanup releases resources held by a sales agent and optionally requeues the slo
 - If `reprocessSlot` is true, push the slot back into the queue marked as seen
 - Remove the agent from the sales set and track the removal future
 
-### Functional Requirements
+### Resource Management Approach
+
+The nim-codex implementation uses Availabilities and Reservations to manage local storage resources:
 
 #### Reservation Management
 
-- Maintain `Availability` and `Reservation` records
-- Match incoming slot requests to the correct availability using prioritisation rules
+- Maintain `Availability` and `Reservation` records locally
+- Match incoming slot requests to available capacity using prioritisation rules
 - Lock capacity and collateral when creating a reservation
 - Release reserved bytes progressively during download and free all remaining resources in terminal states
 
-#### Marketplace Interaction
-
-- Reserve slots through the `marketplace`
-- Fill reserved slots when data is stored and proven
-- Submit proofs periodically
-- React to events from the `marketplace`
-
-#### Data Handling
-
-- Download and persist slot data via the `onStore` hook
-- Track committed bytes and update reservations accordingly
-- Update data expiry information via `onExpiryUpdate`
-
-#### State
-
-- Execute the sale state machine deterministically for both fresh and recovery flows
-- Trigger cleanup hooks (`onClear`, `onCleanUp`) in terminal states
+**Note:** Availabilities and Reservations are completely local to the Storage Provider implementation and are not visible at the protocol level. They provide one approach to managing storage capacity, but other implementations may use different resource management strategies.
 
 ## Wire Format Specification / Syntax
 
@@ -550,7 +593,7 @@ method reserveSlot*(market: Market, requestId: RequestId, slotIndex: uint64)
 
 #### Window Mechanism for Geographic Distribution
 
-To prevent centralisation of stored data and ensure geographic distribution of slots from the same dataset across nodes, the Sales module must implement a window mechanism. This mechanism ensures that multiple slots from the same storage request are not all filled by nodes in the same geographic region or network locality, thereby improving data availability and resilience against regional failures.
+Implement a window mechanism to ensure slots from the same dataset are geographically distributed across nodes, preventing centralisation of stored data.
 
 ### Observability
 
@@ -594,6 +637,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
+- **Codex Marketplace Specification**: [Marketplace Spec](https://github.com/codex-storage/codex-spec/blob/master/specs/marketplace.md) - Defines the Storage Provider (SP) role and protocol requirements
 - **Codex Sales Implementation**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
 - **Codex Documentation**: [Codex Docs - Component Specification - Sales](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Sales.md)
 
