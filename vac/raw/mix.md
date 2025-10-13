@@ -1166,23 +1166,27 @@ The construction MUST proceed as follows:
 1. **Prepare Application Message**
 
    - Apply any configured spam protection mechanism (_e.g.,_ PoW, VDF, RLN)
-  to the serialized message. Spam protection mechanisms are pluggable as defined
-  in [Section 6.3](#63-spam-protection).
+   to the serialized message. Spam protection mechanisms are pluggable as defined
+   in [Section 6.3](#63-spam-protection).
    - Attach one or more SURBs, if required. Their format and processing are
-  specified in [Section X.X].
-   - Append the origin protocol codec.
+   specified in [Section X.X].
+   - Append the origin protocol codec in a format that enables the exit node to
+   reliably extract it during parsing. A recommended encoding approach is to
+   prefix the codec string with its length, encoded as a compact varint field
+   limited to two bytes. Regardless of the scheme used, implementations MUST
+   agree on the format within a deployment to ensure deterministic decoding.
    - Pad the result to the maximum application message length of $3968$ bytes
-  using a deterministic padding scheme. This value is derived from the fixed
-  payload size in [Section 8.3.2](#832-payload-size) ($3984$ bytes) minus the
-  security parameter $κ = 16$ bytes defined in
-  [Section 8.2](#82-cryptographic-primitives). The chosen scheme MUST yield a
-  fixed-size padded output and MUST be consistent across all mix nodes to
-  ensure correct interpretation during unpadding. For example, schemes that
-  explicitly encode the padding length and prepend zero-valued padding bytes
-  MAY be used.
+   using a deterministic padding scheme. This value is derived from the fixed
+   payload size in [Section 8.3.2](#832-payload-size) ($3984$ bytes) minus the
+   security parameter $κ = 16$ bytes defined in
+   [Section 8.2](#82-cryptographic-primitives). The chosen scheme MUST yield a
+   fixed-size padded output and MUST be consistent across all mix nodes to
+   ensure correct interpretation during unpadding. For example, schemes that
+   explicitly encode the padding length and prepend zero-valued padding bytes
+   MAY be used.
    - Let the resulting message be $m$.  
 
-2. **Select A Mix Path**
+1. **Select A Mix Path**
 
    - First obtain an unbiased random sample of live, routable mix nodes using
   some discovery mechanism. The choice of discovery mechanism is
@@ -1199,7 +1203,7 @@ The construction MUST proceed as follows:
   [Section 8.4](#84-address-and-delay-encoding). Let the resulting encoded
   multiaddress be $\mathrm{addr\_i}$.
 
-3. **Wrap Plaintext Payload In Sphinx Packet**
+1. **Wrap Plaintext Payload In Sphinx Packet**
 
    a. **Compute Ephemeral Secrets**
 
@@ -1252,7 +1256,7 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        Φ_i = \mathrm{AES\text{-}CTR}'_i\bigl(Φ_{\mathrm{aes\_key}_{i-1}},
-       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr),\\
+       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr),\; \; \;
        \text{where notation $0_x$ defines the string of $0$ bits of length $x$.}
        \end{array}
        `$
@@ -1313,7 +1317,7 @@ The construction MUST proceed as follows:
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
        β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid \mathrm{delay}_i
-       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\\
+       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\; \; \;
        \text{where notation $X_{[a \ldots b]}$ denotes the substring of $X$
        from byte offset $a$ to $b$, inclusive, using zero-based indexing.}
        \end{array}
@@ -1570,7 +1574,7 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
    Parse the routing block $B$ according to the $β_i$, $i \neq L - 1$ construction
    defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
 
-   - Extract first $(tκ - 2)$ bytes of $B$ as the next hop address $\mathrm{addr}$
+   - Extract the first $(tκ - 2)$ bytes of $B$ as the next hop address $\mathrm{addr}$
 
      $`
      \begin{array}{l}
@@ -1681,8 +1685,8 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
 
 1. **Parse Routing Block**
 
-   Parse the routing block $B$ according to the $β_i$, $i = L - 1$ construction
-   defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+   Parse the routing block $B$ according to the $β_i$, $i = L - 1$
+   construction defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
 
    - Extract first $(tκ - 2)$ bytes of $B$ as the destination address $Δ$
 
@@ -1692,7 +1696,7 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
      \end{array}
      `$
 
-2. **Recover Plaintext Message**
+2. **Recover Padded Application Message**
 
    - Verify the decrypted payload $δ'$ computed in
    [Section 8.6.1](#861-shared-preprocessing) step 5.:
@@ -1705,12 +1709,45 @@ steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
 
    If the check fails, discard $δ'$ and terminate processing.
 
-   - Extract rest of the bytes of $δ'$ as the plaintext message $m$:
+   - Extract rest of the bytes of $δ'$ as the padded application message $m$:
 
      $`
      \begin{array}{l}
-     m = δ'_{[κ\ldots]},\\
+     m = δ'_{[κ\ldots]},\; \; \;
      \text{where notation $X_{[a \ldots]}$ denotes the substring of $X$
      from byte offset $a$ to the end of the string using zero-based indexing.}
      \end{array}
      `$
+
+3. **Extract Application Message**
+
+   Interpret recovered $m$ according to the construction steps
+   defined in [Section 8.5.2](#852-construction-steps) step 1.:
+
+   - First, unpad $m$ using the deterministic padding scheme defined during
+   construction.
+  
+   - Next, parse the unpadded message deterministically to extract:
+
+     - optional spam protection proof
+     - zero or more SURBs
+     - the origin protocol codec
+     - the serialized application message
+
+   - Parse and deserialize the metadata fields required for spam validation,
+   SURB extraction, and protocol codec identification, consistent with the
+   format and extensions applied by the initiator.  
+   The application message itself MUST remain serialized.
+
+   - If parsing fails at any stage, discard $m$ and terminate processing.
+
+4. **Handoff to Exit Layer**
+
+   - Hand off the serialized application message, the origin protocol codec, and
+   destination address $Δ$ (extracted in step 1.) to the local Exit layer for
+   further processing and delivery.
+
+   - The Exit Layer is responsible for establishing a client-only connection and
+   forwarding the message to the destination. Implementations MAY reuse an
+   existing stream to the destination, if doing so does not introduce any
+   observable linkability between forwarded messages.
