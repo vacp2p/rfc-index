@@ -5,6 +5,7 @@ status: raw
 tags: 
 editor: 
 contributors:
+- Jimmy Debe <jimmy@status.im>
 ---
 
 ## Abstract
@@ -172,5 +173,6 @@ Doing lookups only on verified nodes would slow down discovery start up.
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
+
 - [DiscV5 DHT](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 - [Ethereum Node Record](https://github.com/ethereum/devp2p/blob/master/enr.md)
