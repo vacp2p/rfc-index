@@ -6,20 +6,21 @@ category: Standards Track
 tags: codex
 editor: 
 contributors:
+- Jimmy Debe <jimmy@status.im>
 ---
 
 ## Abstract
 
-This specification defines the attributes for the Codex manifest.
+This specification defines the attributes of the Codex manifest.
 
 ## Background
 
 The Codex manifest provides the description of the metadata uploaded to the Codex network.
 It is in many ways similar to the BitTorrent metainfo file also known as .torrent files,
-(for more information see, [BEP3 from BitTorrent Enhancement Proposals (BEPs)]().
+(for more information see, [BEP3](http://bittorrent.org/beps/bep_0003.html) from BitTorrent Enhancement Proposals (BEPs).
 While the BitTorrent metainfo files are generally distributed out-of-band,
-Codex manifest receives its own [content identifier (CID)]() that is announced on the Codex DHT, also 
-see the [CODEX-DHT specification]().
+Codex manifest receives its own content identifier, [CIDv1](https://github.com/multiformats/cid#cidv1), that is announced on the Codex DHT, also 
+see the [CODEX-DHT specification](./dht.md).
 
 In version 1 of the BitTorrent protocol a user wants to upload (seed) some content to the BitTorrent network,
 the client chunks the content into pieces.
@@ -33,19 +34,6 @@ We then include the CID of the root of this Merkle Tree as treeCid attribute in 
 In version 2 of the BitTorrent protocol also uses Merkle Trees and
 includes the root of the tree in the info dictionary for each .torrent file.
 
-The resulting Manifest is encoded and
-the corresponding CID - Manifest CID - is then returned to the user in Multibase base58btc
-encoding (official string representation of CID version 1).
-Because in Codex, Manifest CID is announced on the DHT,
-the nodes storing the corresponding Manifest block can be found.
-From the resolved manifest, 
-the nodes storing relevant blocks can be identified using the treeCid attribute from the manifest.
-The treeCid in Codex is this similar to the infoHash from BitTorrent.
-In version 2 of the BitTorrent protocol,
-infoHash is also announced on the BitTorrent DHT,
-but a torrent file or the so-called magnet link (also introduced later)
-has to be distributed out-of-band.
-
 The Codex manifest, CID in particular,
 is the ability to uniquely identify the content and
 be able to retrieve that content from any single Codex client.
@@ -56,11 +44,17 @@ The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL N
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-### Manifest
+The manifest is encoded in multibase base58btc encoding and
+has corresponding CID, the manifest content identifier.
+In Codex, manifest CID is announced on the DHT, so
+the nodes storing the corresponding manifest block can be found by other clients requesting to download the corresponding dataset.
 
-The manifest SHOULD be 
+From the manifest, 
+providers storing relevant blocks SHOULD be identified using the `treeCid` attribute.
+The `treeCid` in Codex is similar to the `info_hash` from BitTorrent.
+The `filename` of the orginial dataset SHOULD be included in the manifest.
 
-#### Parameters
+#### Manifest Attributes
 
 ```protobuf
 
@@ -79,14 +73,17 @@ Message Manifest {
 
 | attribute | type | description |
 |-----------|------|-------------|
-| `treeCid` | string | A hash based on [CIDv1](https://github.com/multiformats/cid#cidv1). The root of the merkle tree |
-| `blockSize` | bytes | Size of each contained block. |
-| `datasetSize` | bytes | Total size of all blocks, after data is chunked. |
-| `codec` | [MultiCodec](https://github.com/multiformats/multicodec) |  A dataset codec. |
-| `hcodec` | [MultiCodec](https://github.com/multiformats/multicodec) | A multihash codec. |
-| `version` | string | The CID version |
-| `filename` | bool | |
-| `mimetype` | int |  |
+| `treeCid` | string | A hash based on [CIDv1](https://github.com/multiformats/cid#cidv1) of the root of the [Codex Tree],
+which is a form of a Merkle Tree corresponding to the dataset described by the manifest. 
+Its multicodec is (codex-root, 0xCD03) |
+| `blockSize` | bytes | The size of each block for the given dataset. The default block size used in Codex is 64KiB. |
+| `datasetSize` | bytes | The total size of all blocks for the original dataset. |
+| `codec` | [MultiCodec](https://github.com/multiformats/multicodec) |  The multicodec used for the CIDs of the dataset blocks. Codex uses (codex-block, 0xCD02) |
+| `hcodec` | [MultiCodec](https://github.com/multiformats/multicodec) | Multicodec used for computing of the multihash used in blocks CIDs.
+Codex uses (sha2-256, 0x12). |
+| `version` | string | The version of CID used for the dataset blocks. |
+| `filename` | string | When provided, it can be used by the client as a file name while downloading the content. |
+| `mimetype` | int | When provided, it can be used by the client to set a content type of the downloaded content.  |
 
 ## Copyright
 
@@ -94,5 +91,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
+- [BEP3](http://bittorrent.org/beps/bep_0003.html)
+- [CODEX-DHT specification](./dht.md)
 - [MultiCodec](https://github.com/multiformats/multicodec)
-- [CIDv1](https://github.com/multiformats/cid#cidv1)
+
