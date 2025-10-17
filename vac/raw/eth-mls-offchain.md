@@ -53,10 +53,9 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 ## Roles
 
 The three roles used in de-MLS is as follows:
-
 - `node`: Nodes are members of network without being in any secure group messaging.
 - `member`: Members are special nodes in the secure group messaging who
-obtains current group key of secure group messaging. 
+obtains current group key of secure group messaging.
 Each node is assigned a unique identity represented as a 20-byte value named `member id`.
 - `steward`: Stewards are special and transparent members in the secure group
 messaging who organize the changes by releasing commit messages upon the voted proposals.
@@ -106,8 +105,8 @@ This section presents the de-MLS objects:
 `Voting proposal`: Similar to MLS proposals, but processed only if approved through a voting process.
 They function as application messages in the MLS group,
 allowing the steward to collect them without halting the protocol.
-There are three types of `voting proposal` according to the type of consensus as in shown Consensus Types section, 
-these are, commit, steward election and emercency criteria 
+There are three types of `voting proposal` according to the type of consensus as in shown Consensus Types section,
+these are, commit, steward election and emercency criteria
 
 `Epoch steward`: The steward assigned to commit in `epoch E` according to the steward list.
 Holds the primary responsibility for creating the steward commit in that epoch.
@@ -254,7 +253,9 @@ This proposal can be created by any member in any epoch.
 The order of consensus proposal messages is important to achieving a consistent result.
 Therefore, messages MUST be prioritized by type in the following order, from highest to lowest priority:
 - `Emergency criteria proposal`
+
 - `Steward election proposal`
+
 - `Commit proposal`
 
 This means that if a higher-priority consensus proposal is present in the network,
@@ -283,9 +284,9 @@ then call the consensus type 2, `steward election proposal:`.
 
 A `Steward Election Proposal` is considered valid only if the resulting `steward list`
 is produced through a deterministic process that ensures an unbiased distribution of steward assignments.
-The list MUST be composed of the first `sn` members from the member list, 
-sorted according to the ascending value of `sha256(epoch_id + member_identity_key)`, 
-where `epoch_id` is the epoch in which the election proposal is initiated. 
+The list MUST be composed of the first `sn` members from the member list,
+sorted according to the ascending value of `sha256(epoch_id + member_identity_key)`,
+where `epoch_id` is the epoch in which the election proposal is initiated.
 Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
 
 ### Multi steward with big consensuses
