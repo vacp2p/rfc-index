@@ -53,6 +53,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 ## Roles
 
 The three roles used in de-MLS is as follows:
+
 - `node`: Nodes are members of network without being in any secure group messaging.
 - `member`: Members are special nodes in the secure group messaging who
 obtains current group key of secure group messaging.
@@ -252,6 +253,7 @@ This proposal can be created by any member in any epoch.
 
 The order of consensus proposal messages is important to achieving a consistent result.
 Therefore, messages MUST be prioritized by type in the following order, from highest to lowest priority:
+
 - `Emergency criteria proposal`
 
 - `Steward election proposal`
@@ -285,8 +287,8 @@ then call the consensus type 2, `steward election proposal:`.
 A `Steward Election Proposal` is considered valid only if the resulting `steward list`
 is produced through a deterministic process that ensures an unbiased distribution of steward assignments.
 The list MUST be composed of the first `sn` members from the member list,
-sorted according to the ascending value of `sha256(epoch_id + member_identity_key)`,
-where `epoch_id` is the epoch in which the election proposal is initiated.
+sorted according to the ascending value of `sha256(epoch id + member id)`,
+where `epoch id` is the epoch in which the election proposal is initiated.
 Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
 
 ### Multi steward with big consensuses
