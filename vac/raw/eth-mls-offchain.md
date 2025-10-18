@@ -284,12 +284,15 @@ Liveness related to the `steward list`: After the `steward list` is done,
 the members proceed with another set of stewards, which could be the same set,
 then call the consensus type 2, `steward election proposal:`.
 
-A `Steward Election Proposal` is considered valid only if the resulting `steward list`
+A `Steward election proposal` is considered valid only if the resulting `steward list`
 is produced through a deterministic process that ensures an unbiased distribution of steward assignments.
 The list MUST be composed of the first `sn` members from the member list,
-sorted according to the ascending value of `sha256(epoch id + member id)`,
-where `epoch id` is the epoch in which the election proposal is initiated.
+sorted according to the ascending value of `SHA256(epoch E || member id)`,
+where `epoch E` is the epoch in which the election proposal is initiated.
 Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
+
+We assume that there are no recurring entries in the `steward list`, since the SHA256 outputs are unique
+when there is no repetition in the `member id` values, against the conflicts on sorting issues.
 
 ### Multi steward with big consensuses
 
