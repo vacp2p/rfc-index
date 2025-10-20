@@ -108,7 +108,7 @@ This section presents the de-MLS objects:
 They function as application messages in the MLS group,
 allowing the steward to collect them without halting the protocol.
 There are three types of `voting proposal` according to the type of consensus as in shown Consensus Types section,
-these are, `commit proposal`, `steward election proposal` and `emercency criteria proposal`.
+these are, `commit proposal`, `steward election proposal` and `emergency criteria proposal`.
 
 `Epoch steward`: The steward assigned to commit in `epoch E` according to the steward list.
 Holds the primary responsibility for creating commit in that epoch.
