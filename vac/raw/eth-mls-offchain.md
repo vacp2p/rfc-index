@@ -240,7 +240,7 @@ It is used in three ways as follows:
 
 1. `Commit proposal`: Each commit message MUST be committed with its YES vote by a specific steward.
 `Commit proposal` is the proposal instance that is specified in Creating Voting Proposal section
-with `Proposal.payload` MUST show the commit request from `members`. 
+with `Proposal.payload` MUST show the commit request from `members`.
 Any member MAY create this proposal in any epoch.
 This is the only proposal type common to both single steward and multi steward designs.
 2. `Steward election proposal`: This is the process that finalizes the `steward list`,
@@ -283,11 +283,11 @@ and the `backup steward` will be the `epoch steward` within the `epoch E+1`.
 If the `epoch steward` is malicious, the `backup steward` is involved in the commitment phase in `epoch E`
 and the former steward becomes the `backup steward` in `epoch E`.
 
-Liveness criteria: 
+Liveness criteria:
 
-Once the active `steward list` has completed its assigned epoch, 
-members MUST proceed to elect the next set of stewards 
-(which MAY include some or all of the previous members). 
+Once the active `steward list` has completed its assigned epoch,
+members MUST proceed to elect the next set of stewards
+(which MAY include some or all of the previous members).
 This election is conducted through a type 2 consensus procedure, `steward election proposal`.
 
 A `Steward election proposal` is considered valid only if the resulting `steward list`
@@ -354,7 +354,7 @@ A steward’s activity is called a violation if the action is one or more of the
 This activity is identified by the `members` since the [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) provides the methods
 that members can use to identify the broken commit messages that are possible in a few situations,
 such as commit and proposal incompatibility. Specifically, the broken commit can arise as follows:
-    1. The commit belongs to the earlier epoch. 
+    1. The commit belongs to the earlier epoch.
     2. The commit message should equal the latest epoch
     3. The commit needs to be compatible with the previous epoch’s `MLS proposal`.
 2. Broken MLS proposal: The steward prepares a different `MLS proposal` for the corresponding `voting proposal`.
