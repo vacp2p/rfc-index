@@ -320,7 +320,7 @@ This config file MUST contain `sn` as the `steward list` size.
 After the number of members reaches `sn`, members propose lists by voting proposal
 as a consensus among all members, as mentioned in the consensus section 2, according to the checks:
 the size of the voting proposal is equal to the `sn`.
-3. After the voting proposal ends up with a `steward list`, 
+3. After the voting proposal ends up with a `steward list`,
 and group changes are ready to be committed as specified in single steward section
 with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
 otherwise anyone can create `emergency criteria proposal`.
