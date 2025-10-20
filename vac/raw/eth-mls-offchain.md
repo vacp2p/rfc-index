@@ -354,8 +354,9 @@ A steward’s activity is called a violation if the action is one or more of the
 This activity is identified by the `members` since the [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) provides the methods
 that members can use to identify the broken commit messages that are possible in a few situations,
 such as commit and proposal incompatibility. Specifically, the broken commit can arise as follows:
-The commit belongs to the earlier epoch. The commit message should equal the latest epoch,
-or the commit needs to be compatible with the previous epoch’s `MLS proposal`.
+    1. The commit belongs to the earlier epoch. 
+    2. The commit message should equal the latest epoch
+    3. The commit needs to be compatible with the previous epoch’s `MLS proposal`.
 2. Broken MLS proposal: The steward prepares a different `MLS proposal` for the corresponding `voting proposal`.
 This activity is identified by the `members` since both `MLS proposal` and `voting proposal` are visible
 and can be identified by checking the hash of Proposal.payload and MLSProposal.payload is the same as RFC9240 section 12.1. Proposals.
