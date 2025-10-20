@@ -240,8 +240,8 @@ It is used in three ways as follows:
 
 1. `Commit proposal`: Each commit message MUST be committed with its YES vote by a specific steward.
 `Commit proposal` is the proposal instance that is specified in Creating Voting Proposal section
-with Proposal.payload MUST show the commit request from `members`. This proposal can be created by
-any member in any epoch.
+with `Proposal.payload` MUST show the commit request from `members`. 
+Any member MAY create this proposal in any epoch.
 This is the only proposal type common to both single steward and multi steward designs.
 2. `Steward election proposal`: This is the process that finalizes the `steward list`,
 which sets and orders stewards responsible for creating commits over a predefined number of epochs.
