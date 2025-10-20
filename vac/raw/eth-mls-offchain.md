@@ -283,9 +283,12 @@ and the `backup steward` will be the `epoch steward` within the `epoch E+1`.
 If the `epoch steward` is malicious, the `backup steward` is involved in the commitment phase in `epoch E`
 and the former steward becomes the `backup steward` in `epoch E`.
 
-Liveness related to the `steward list`: After the `steward list` is done,
-the members proceed with another set of stewards, which could be the same set,
-then call the consensus type 2, `steward election proposal:`.
+Liveness criteria: 
+
+Once the active `steward list` has completed its assigned epoch, 
+members MUST proceed to elect the next set of stewards 
+(which MAY include some or all of the previous members). 
+This election is conducted through a type 2 consensus procedure, `steward election proposal`.
 
 A `Steward election proposal` is considered valid only if the resulting `steward list`
 is produced through a deterministic process that ensures an unbiased distribution of steward assignments,
