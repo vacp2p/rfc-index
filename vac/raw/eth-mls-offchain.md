@@ -120,7 +120,7 @@ If unused in `epoch E`, it automatically becomes the `epoch steward` in `epoch E
 
 `Steward list`: It is an ordered list that contains the `member id`s of authorized stewards.
 Each steward in the list becomes responsible for creating the commit message when its turn arrives,
-according to this order for each epoch. 
+according to this order for each epoch.
 For example, suppose there are two stewards in the list `steward A` first and `steward B` last in the list.
 `steward A` is responsible for creating the commit message for first epoch.
 Similarly, `steward B` is for the last epoch.
@@ -280,9 +280,9 @@ lower-priority messages MUST be withheld from transmission until the higher-prio
 The `steward list` size as `sn` is determined when the group is created.
 The index of the slots shows epoch info and value of index shows `member id`s.
 The next in line steward for the `epoch E` is named as `epoch steward`, which has index E.
-And the subsequent steward in the `epoch E` is named as the `backup steward`. 
+And the subsequent steward in the `epoch E` is named as the `backup steward`.
 For example, let's assume steward list is (S3, S2, S1) if in the previous epoch the roles were
-(`backup steward`: S2, `epoch steward`: S1), then in the next epoch they become 
+(`backup steward`: S2, `epoch steward`: S1), then in the next epoch they become
 (`backup steward`: S3, `epoch steward`: S2) by shifting.
 
 If the `epoch steward` is honest, the `backup steward` does not involve the process in epoch,
