@@ -120,7 +120,11 @@ If unused in `epoch E`, it automatically becomes the `epoch steward` in `epoch E
 
 `Steward list`: It is an ordered list that contains the `member id`s of authorized stewards.
 Each steward in the list becomes responsible for creating the commit message when its turn arrives,
-according to this order for each epoch.
+according to this order for each epoch. 
+For example, suppose there are two stewards in the list `steward A` first and `steward B` last in the list.
+`steward A` is responsible for creating the commit message for first epoch.
+Similarly, `steward B` is for the last epoch.
+Since, only one steward MUST create a commit per epoch to maintain consistency and prevent conflicting updates.
 
 Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
 Lastly, the size of the list named as `sn`, which also shows the epoch interval for steward list determination.
