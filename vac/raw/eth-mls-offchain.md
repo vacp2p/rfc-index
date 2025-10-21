@@ -118,8 +118,10 @@ Only becomes active if the `epoch steward` is malicious or fails,
 in which case it completes the commitment phase.
 If unused in `epoch E`, it automatically becomes the `epoch steward` in `epoch E+1`.
 
-`Steward list`: It is an ordered list that consists of authorized stewards' `member id`s which belongs
-to stewards who eligible to create commits when a particular steward commit order should be defined beforehand.
+`Steward list`: It is an ordered list that contains the `member id`s of authorized stewards.
+Each steward in the list becomes responsible for creating the commit message when its turn arrives,
+according to this order for each epoch.
+
 Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
 Lastly, the size of the list named as `sn`, which also shows the epoch interval for steward list determination.
 
