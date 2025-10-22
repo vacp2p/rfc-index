@@ -326,7 +326,7 @@ and for which it's requesting a repair.
 SDS-R adds the following to each participant state:
 
 * Outgoing **repair request buffer**:
-a list of locally missing `HistoryEntry`s 
+a list of locally missing `HistoryEntry`s
 each mapped to a future request timestamp, `T_req`,
 after which this participant will request a repair if at that point the missing dependency has not been repaired yet.
 `T_req` is computed as a pseudorandom backoff from the timestamp when the dependency was detected missing.
@@ -477,7 +477,7 @@ a history entry if they are in the associated response group.
 
 #### SDS-R incoming repair request buffer sweep
 
-An SDS-R participant MUST periodically check if there are any incoming requests in the *incoming repair request buffer* that is due for a response.
+An SDS-R participant MUST periodically check if there are any incoming requests in the **incoming** repair request buffer* that is due for a response.
 For each item in the buffer,
 the participant SHOULD broadcast the corresponding `Message` from local history
 if its corresponding response timestamp, `T_resp`, has expired
