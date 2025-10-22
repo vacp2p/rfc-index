@@ -59,8 +59,8 @@ other participants using the corresponding message ID.
 Each participant has a globally unique, immutable ID
 visible to other participants in the communication.
 * **Sender ID:**
-The *Participant ID* of the original sender of a message,
-often coupled with a *Message ID*.
+The **Participant ID** of the original sender of a message,
+often coupled with a **Message ID**.
 
 ## Wire protocol
 
@@ -110,9 +110,11 @@ These fields MAY be left unset in the case of [ephemeral messages](#ephemeral-me
 The message `content` MAY be left empty for [periodic sync messages](#periodic-sync-message),
 otherwise it MUST contain the application-level content
 
-> **_Note:_** Close readers may notice that, outside of filtering messages originating from the sender itself,
+> **_Note:_** Close readers may notice that,
+outside of filtering messages originating from the sender itself,
 the `sender_id` field is not used for much.
-Its importance is expected to increase once a p2p retrieval mechanism is added to SDS, as is planned for the protocol.
+Its importance is expected to increase once a p2p retrieval mechanism is added to SDS,
+as is planned for the protocol.
 
 ### Participant state
 
@@ -311,6 +313,7 @@ such as peer-to-peer syncing or the use of a high-availability centralised cache
 #### SDS-R message fields
 
 SDS-R adds the following fields to SDS messages:
+
 * `sender_id` in `HistoryEntry`:
 the original message sender's participant ID.
 This is used to determine the group of participants who will respond to a repair request.
@@ -329,7 +332,8 @@ after which this participant will request a repair if at that point the missing 
 `T_req` is computed as a pseudorandom backoff from the timestamp when the dependency was detected missing.
 [Determining `T_req`](#determine-t_req) is described below.
 We RECOMMEND that the outgoing repair request buffer be chronologically ordered in ascending order of `T_req`.
-- Incoming **repair request buffer**:
+
+* Incoming **repair request buffer**:
 a list of locally available `HistoryEntry`s
 that were requested for repair by a remote participant
 AND for which this participant might be an eligible responder,
@@ -338,13 +342,15 @@ after which this participant will rebroadcast the corresponding requested `Messa
 `T_resp` is computed as a pseudorandom backoff from the timestamp when the repair was first requested.
 [Determining `T_resp`](#determine-t_resp) is described below.
 We describe below how a participant can [determine if they're an eligible responder](#determine-response-group) for a specific repair request.
-- Augmented local history log:
+
+* Augmented local history log:
 for each message ID kept in the local log for which the participant could be a repair responder,
 the full SDS `Message` must be cached rather than just the message ID,
 in case this participant is called upon to rebroadcast the message.
 We describe below how a participant can [determine if they're an eligible responder](#determine-response-group) for a specific message.
 
-**_Note:_** The required state can likely be significantly reduced in future by simply requiring that a responding participant should _reconstruct_ the original `Message` when rebroadcasting, rather than the simpler, but heavier, requirement of caching the entire received `Message` content in local history.
+**_Note:_** The required state can likely be significantly reduced in future by simply requiring that a responding participant should _reconstruct_ the original `Message` when rebroadcasting, rather than the simpler, but heavier,
+requirement of caching the entire received `Message` content in local history.
 
 #### SDS-R global state
 
@@ -367,28 +373,34 @@ In other words, if the (roughly) expected number of participants is expressed as
 In other words, if there are fewer than 128 participants in a communication,
 they will all belong to the same response group.
 
-We RECOMMEND that the global state variables `T_min`, `T_max` and `num_response_groups` be set _statically_ for a specific SDS-R application,
+We RECOMMEND that the global state variables `T_min`, `T_max` and `num_response_groups`
+be set _statically_ for a specific SDS-R application,
 based on expected number of group participants and volume of traffic.
 
-**_Note:_** Future versions of this protocol will recommend dynamic global SDS-R variables, based on the current number of participants.
+**_Note:_** Future versions of this protocol will recommend dynamic global SDS-R variables,
+based on the current number of participants.
 
 #### SDS-R send message
 
 SDS-R adds the following steps when sending a message:
 
 Before broadcasting a message,
+
 * the participant SHOULD populate the `repair_request` field in the message
 with _eligible_ entries from the outgoing repair request buffer.
 An entry is eligible to be included in a `repair_request`
-if its corresponding request timestamp, `T_req`, has expired (in other words, `T_req <= current_time`).
+if its corresponding request timestamp, `T_req`, has expired (in other words,
+`T_req <= current_time`).
 The maximum number of repair request entries to include is up to the application.
 We RECOMMEND that this quota be filled by the eligible entries from the outgoing repair request buffer with the lowest `T_req`.
 We RECOMMEND a maximum of 3 entries.
-If there are no eligible entries in the buffer, this optional field MUST be left unset.
+If there are no eligible entries in the buffer,
+this optional field MUST be left unset.
 
 #### SDS-R receive message
 
 On receiving a message,
+
 * the participant MUST remove entries matching the received message ID from its _outgoing_ repair request buffer.
 This ensures that the participant does not request repairs for dependencies that have now been met.
 * the participant MUST remove entries matching the received message ID from its _incoming_ repair request buffer.
@@ -396,9 +408,9 @@ This ensures that the participant does not respond to repair requests that anoth
 * the participant SHOULD add any unmet causal dependencies to its outgoing repair request buffer against a unique `T_req` timestamp for that entry.
 It MUST compute the `T_req` for each such HistoryEntry according to the steps outlined in [_Determine T_req_](#determine-t_req).
 * for each item in the `repair_request` field:
-  - the participant MUST remove entries matching the repair message ID from its own outgoing repair request buffer.
+  * the participant MUST remove entries matching the repair message ID from its own outgoing repair request buffer.
   This limits the number of participants that will request a common missing dependency.
-  - if the participant has the requested `Message` in its local history _and_ is an eligible responder for the repair request,
+  * if the participant has the requested `Message` in its local history _and_ is an eligible responder for the repair request,
   it SHOULD add the request to its incoming repair request buffer against a unique `T_resp` timestamp for that entry.
   It MUST compute the `T_resp` for each such repair request according to the steps outlined in [_Determine T_resp_](#determine-t_resp).
   It MUST determine if it's an eligible responder for a repair request according to the steps outlined in [_Determine response group_](#determine-response-group).
@@ -408,12 +420,13 @@ It MUST compute the `T_req` for each such HistoryEntry according to the steps ou
 A participant determines the repair request timestamp, `T_req`,
 for a missing `HistoryEntry` as follows:
 
-```
+```text
 T_req = current_time + hash(participant_id, message_id) % (T_max - T_min) + T_min
 ```
 
 where `current_time` is the current timestamp,
-`participant_id` is the participant's _own_ participant ID (not the `sender_id` in the missing `HistoryEntry`),
+`participant_id` is the participant's _own_ participant ID
+(not the `sender_id` in the missing `HistoryEntry`),
 `message_id` is the missing `HistoryEntry`'s message ID,
 and `T_min` and `T_max` are as set out in [SDS-R global state](#sds-r-global-state).
 
@@ -426,7 +439,7 @@ This allows `T_req` to be pseudorandomly and linearly distributed as a backoff o
 A participant determines the repair response timestamp, `T_resp`,
 for a `HistoryEntry` that it could repair as follows:
 
-```
+```text
 distance = hash(participant_id) XOR hash(sender_id)
 T_resp = current_time + distance*hash(message_id) % T_max
 ```
@@ -437,33 +450,38 @@ where `current_time` is the current timestamp,
 `message_id` is the requested `HistoryEntry` message ID,
 and `T_max` is as set out in [SDS-R global state](#sds-r-global-state).
 
-We first calculate the logical `distance` between the local `participant_id` and the original `sender_id`.
+We first calculate the logical `distance` between the local `participant_id` and
+the original `sender_id`.
 If this participant is the original sender, the `distance` will be `0`.
-It should then be clear that the original participant will have a response backoff time of `0`, making it the most likely responder.
-The `T_resp` values for other eligible participants will be pseudorandomly and linearly distributed as a backoff of up to `T_max` from current time.
+It should then be clear that the original participant will have a response backoff time of `0`,
+making it the most likely responder.
+The `T_resp` values for other eligible participants will be pseudorandomly and
+linearly distributed as a backoff of up to `T_max` from current time.
 
-> **_Note:_** placing `T_resp` values on an exponential backoff curve will likely be more appropriate and is left for a future improvement.
+> **_Note:_** placing `T_resp` values on an exponential backoff curve will likely be more appropriate and
+is left for a future improvement.
 
 #### Determine response group
 
 Given a message with `sender_id` and `message_id`,
 a participant with `participant_id` is in the response group for that message if
 
-```
+```text
 hash(participant_id, message_id) % num_response_groups == hash(sender_id, message_id) % num_response_groups
 ```
 
 where `num_response_groups` is as set out in [SDS-R global state](#sds-r-global-state).
 This ensures that a participant will always be in the response group for its own published messages.
-It also allows participants to determine immediately on first reception of a message or a history entry
-if they are in the associated response group.
+It also allows participants to determine immediately on first reception of a message or
+a history entry if they are in the associated response group.
 
 #### SDS-R incoming repair request buffer sweep
 
 An SDS-R participant MUST periodically check if there are any incoming requests in the *incoming repair request buffer* that is due for a response.
 For each item in the buffer,
 the participant SHOULD broadcast the corresponding `Message` from local history
-if its corresponding response timestamp, `T_resp`, has expired (in other words, `T_resp <= current_time`).
+if its corresponding response timestamp, `T_resp`, has expired
+(in other words, `T_resp <= current_time`).
 
 #### SDS-R Periodic Sync Message
 
