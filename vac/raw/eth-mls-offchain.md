@@ -252,7 +252,7 @@ This is the only proposal type common to both single steward and multi steward d
 which sets and orders stewards responsible for creating commits over a predefined number of range in (`sn_min`,`sn_max`).
 The validity of the choosen `steward list` ends when the last steward in the list (the one at the final index) completes its commit.
 At that point, a new `steward election proposal` MUST be initiated again by any member during the corresponding epoch.
-The Proposal.payload field MUST represent the ordered identities of the proposed stewards.
+The `Proposal.payload` field MUST represent the ordered identities of the proposed stewards.
 Each steward election proposal MUST be verified and finalized through the consensus process
 so that members can identify which steward will be responsible in each epoch
 and detect any unauthorized steward commits.
@@ -261,7 +261,7 @@ this event MUST be voted on to finalize it.
 If this returns YES, the next epoch MUST include the removal of the member or steward.
 In a specific case where a steward is removed from the group, causing the total number of stewards to fall below `sn_min`,  
 it is required to repeat the `steward election proposal`.
-Proposal.payload MUST consist of the evidence of the dishonesty as described in the Steward violation list,
+`Proposal.payload` MUST consist of the evidence of the dishonesty as described in the Steward violation list,
 and the identifier of the malicious member or steward.
 This proposal can be created by any member in any epoch.
 
@@ -374,7 +374,7 @@ such as commit and proposal incompatibility. Specifically, the broken commit can
     3. The commit needs to be compatible with the previous epoch’s `MLS proposal`.
 2. Broken MLS proposal: The steward prepares a different `MLS proposal` for the corresponding `voting proposal`.
 This activity is identified by the `members` since both `MLS proposal` and `voting proposal` are visible
-and can be identified by checking the hash of Proposal.payload and MLSProposal.payload is the same as RFC9240 section 12.1. Proposals.
+and can be identified by checking the hash of `Proposal.payload` and `MLSProposal.payload` is the same as RFC9240 section 12.1. Proposals.
 3. Censorship and inactivity: The situation where there is a voting proposal that is visible for every member,
 and the Steward does not provide an MLS proposal and commit.
 This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
