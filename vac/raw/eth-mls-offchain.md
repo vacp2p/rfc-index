@@ -309,7 +309,7 @@ is produced through a deterministic process that ensures an unbiased distributio
 since allowing bias could enable a malicious participant to manipulate the list
 and retain control within a favored group for multiple epochs.
 
-The list MUST be composed of the first `sn_min` members from the member list,
+The list MUST be composed of the first `sn_min` members including previous stewards,
 sorted according to the ascending value of `SHA256(epoch E || member id || group id)`,
 where `epoch E` is the epoch in which the election proposal is initiated,
 and `group id` for shuffling the list across the different groups.
