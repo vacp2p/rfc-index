@@ -249,9 +249,9 @@ with `Proposal.payload` MUST show the commit request from `members`.
 Any member MAY create this proposal in any epoch and `epoch steward` MUST collect and commit YES voted proposals.
 This is the only proposal type common to both single steward and multi steward designs.
 2. `Steward election proposal`: This is the process that finalizes the `steward list`,
-which sets and orders stewards responsible for creating commits over a predefined number of epochs.
-This proposal is created periodically, once every number of epochs equal to the steward list size,
-and SHOULD be initialized by any member during the corresponding epoch.
+which sets and orders stewards responsible for creating commits over a predefined number of range in (`sn_min`,`sn_max`).
+The validity of the choosen `steward list` ends when the last steward in the list (the one at the final index) completes its commit.
+At that point, a new `steward election proposal` MUST be initiated again by any member during the corresponding epoch.
 The Proposal.payload field MUST represent the ordered identities of the proposed stewards.
 Each steward election proposal MUST be verified and finalized through the consensus process
 so that members can identify which steward will be responsible in each epoch
