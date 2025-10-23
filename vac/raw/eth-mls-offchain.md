@@ -305,8 +305,9 @@ since allowing bias could enable a malicious participant to manipulate the list
 and retain control within a favored group for multiple epochs.
 
 The list MUST be composed of the first `sn` members from the member list,
-sorted according to the ascending value of `SHA256(epoch E || member id)`,
-where `epoch E` is the epoch in which the election proposal is initiated.
+sorted according to the ascending value of `SHA256(epoch E || member id || group id)`,
+where `epoch E` is the epoch in which the election proposal is initiated,
+and `group id` for shuffling the list across the different groups.
 Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
 
 We assume that there are no recurring entries in `SHA256(epoch E || member id)`, since the SHA256 outputs are unique
