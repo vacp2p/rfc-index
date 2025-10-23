@@ -9,58 +9,64 @@ contributors:
 
 ## Abstract
 
-This specification describes the erasue coding technique used in the Codex network.
-A Codex node uses erasue coding to encode a dataset that will be stored on the network.
+This specification describes the erasue coding technique used by Codex clients.
+A Codex client will encode a dataset before it is stored on the network.
 
 ## Background
 
-The Codex protocol has storage proofs to verify whether a storage provider is storing a certain dataset.
+The Codex protocol uses storage proofs to verify whether a storage provider (SP) is storing a certain dataset.
 Before a dataset can be retrievable on the network,
-storage providers must agree to store dataset for a certain period of time.
-This task is done by multiple providers participating in the network.
-Before making a request on the network,
-requesting clients create erasure-protected data blocks using [Reed-Solomon]() erasure coding.
-These blocks are assigned between a number of different storage providers via slots through the [CODEX=MARKETPLACE]()
-The requester can be assured of data retrievablity even in cases where some data blocks are abandoned by storage providers.
+SPs must agree to store dataset for a certain period of time.
+When to storage request is active erasure coding help ensure the dataset is retrievable from the network.
+This is achieved by the dataset that is chunked is restored in retrieveal by erasure coding.****
+When data blocks are abandoned by storage providers,
+the requester can be assured of data retrievability.
 
-## Wire Format
+
+## Specification
 
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-A client SHOULD perform erasure coding locally before providing a dataset to the network.
-The dataset is split into data chunks represented by `k`.
-The total number of blocks for an erasure protected dataset is represented by `n`.
-This would include a set of parity blocks that MAY be generated using the [Reed Solomon algorithm](),
-which is represented by `n - k`.
+A client SHOULD perform the erasure encoding locally before providing a dataset to the network.
+During validation, nodes will conduct error coorection and decoding based on the erasure coding technique known to the network.
+Datasets using encodings not recognized by the network, MAY be ignored during decoding and
+validation by other nodes in the network. 
 
-The erasure coding process is utilized by all node roles on the network.
+The dataset SHOULD split into data chunks represented by `k`, e.g. $(k_1, k_2, k_3, \ldots, k_{n})$.
+Each chunk `k` MUST be encoded into `n` blocks, using an erasure encoding technique like the [Reed Solomon algorithm]().
+Including a set of parity blocks that MUST be generated,
+represented by `m`.
+All node roles on the Codex network use the [Leapard Codec](https://github.com/catid/leopard).
 
-Below are the steps where erasure coding is used:
+Below is the encoding process:
 
-1. Prepare prefered dataset and encode with Reed-Solomon technique
-2.  Derive an CID from encoded chunks and make a re share on the marketplace
+1.  Prepare the dataset for the marketplace using erasure encoding.
+2.  Derive an manifest CID from the root encoded blocks
 3.  Error correction by validator nodes once storage contract begins
+4.  Decode data back to original data.
 
-# Prepare Data
+### Encoding
 
-A user wanting to be stored by the network will prepare the dataset before the request.
-The client MUST divide this dataset into chunks, e.g. $(c_1, c_2, c_3, \ldots, c_{n})$.
-Interleaving MAY be used to the data chunks to 
-Including the [CODEX-MANIFEST](manifest), the data chucks will be encoded based on the following parameters:
+A client MAY prepare a dataset locally before making the request to the network.
+The data chunks, `k`, MUST be the same size, if not,
+the lesser chunk MAY be padded with empty data.
+
+The data chucks will are encoded based on the following parameters:
 
 ```js
+
 struct encodingParms {
-  ecK: int,
-  ecM: int,
-  rounded: int,
-  steps: int,
-  blocksCount: int,
-  strategy: enum
+  ecK: int, # Number of data blocks (K)
+  ecM: int, # Number of parity blocks (M)
+  rounded: int, # Dataset rounded to multiple of (K)
+  steps: int, # Number of encoding iterations (steps)
+  blocksCount: int, # Total blocks after encoding
+  strategy: enum, # Indexing strategy used
 }
+
 ```
-### Encoding Data
 
 With Reed-Solomon algorithm, extra data chunks need to be created for the dataset.
 Parity blocks is added to the chucks of data before encoding.
@@ -70,6 +76,7 @@ Slots containing encoded data chunks are located by the CID and downloaded by st
 Below is the content of the dag-pb protobuf message:
 
 ```protobuf
+
    Message VerificationInfo {
      bytes verifyRoot = 1;             # Decimal encoded field-element
      repeated bytes slotRoots = 2;     # Decimal encoded field-elements
@@ -91,7 +98,16 @@ Below is the content of the dag-pb protobuf message:
      optional version: CidVersion = 6;  # Cid version
      optional ErasureInfo erasure = 7;  # erasure coding info
    }
+
 ```
+
+
+After erasure encoding process, 
+the dataset is ready to be stored on the network via the [CODEX-MARKETPLACE](./marketplace.md).
+
+- Store the data blocks
+- Store tree roots
+- Create protected manifest
 
 ### Decode Data
 
