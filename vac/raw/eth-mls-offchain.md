@@ -259,6 +259,8 @@ and detect any unauthorized steward commits.
 3. `Emergency criteria proposal`: If there is a malicious member or steward,
 this event MUST be voted on to finalize it.
 If this returns YES, the next epoch MUST include the removal of the member or steward.
+In a specific case where a steward is removed from the group, causing the total number of stewards to fall below `sn_min`,  
+it is required to repeat the `steward election proposal`.
 Proposal.payload MUST consist of the evidence of the dishonesty as described in the Steward violation list,
 and the identifier of the malicious member or steward.
 This proposal can be created by any member in any epoch.
