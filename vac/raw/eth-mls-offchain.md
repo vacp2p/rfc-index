@@ -277,7 +277,10 @@ lower-priority messages MUST be withheld from transmission until the higher-prio
 
 ### Steward list creation
 
-The `steward list` size as `sn` is determined when the group is created.
+The `steward list` size, defined by minimum `sn_min` and maximum `sn_max` bounds,
+is determined at the time of group creation.
+The actual size of the list MAY vary within this range as `sn`, with the minimum value being at least 1.
+
 The index of the slots shows epoch info and value of index shows `member id`s.
 The next in line steward for the `epoch E` is named as `epoch steward`, which has index E.
 And the subsequent steward in the `epoch E` is named as the `backup steward`.
@@ -304,7 +307,7 @@ is produced through a deterministic process that ensures an unbiased distributio
 since allowing bias could enable a malicious participant to manipulate the list
 and retain control within a favored group for multiple epochs.
 
-The list MUST be composed of the first `sn` members from the member list,
+The list MUST be composed of the first `sn_min` members from the member list,
 sorted according to the ascending value of `SHA256(epoch E || member id || group id)`,
 where `epoch E` is the epoch in which the election proposal is initiated,
 and `group id` for shuffling the list across the different groups.
@@ -328,11 +331,11 @@ To create a multi steward with a big consensus,
 the group is initialized with a single steward as specified as follows:
 
 1. The steward initialized the group with the config file.
-This config file MUST contain `sn` as the `steward list` size.
-2. The steward adds the members as a centralized way till the number of members reaches the `sn`.
-After the number of members reaches `sn`, members propose lists by voting proposal
+This config file MUST contain (`sn_min`,`sn_max`) as the `steward list` size range.
+2. The steward adds the members as a centralized way till the number of members reaches the `sn_min`.
+Then, members propose lists by voting proposal with size `sn`
 as a consensus among all members, as mentioned in the consensus section 2, according to the checks:
-the size of the voting proposal is equal to the `sn`.
+the size of the proposed list `sn` is in invertal (`sn_min`,`sn_max`).
 3. After the voting proposal ends up with a `steward list`,
 and group changes are ready to be committed as specified in single steward section
 with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
