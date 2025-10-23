@@ -388,6 +388,10 @@ Therefore, de-MLS enforces that any steward only follows the protocol under the 
 and commits without emergency criteria application.
 2. Malicious Member: A member is only marked as malicious
 when the member acts by releasing a commit message.
+3. Steward list election bias: Although SHA256 is used together with two global variables
+to shuffle stewards in a deterministic and verifiable manner,
+this approach only minimizes election bias; it does not completely eliminate it.
+This design choice is intentional, in order to preserve the efficiency advantages provided by the MLS mechanism.
 
 ## Copyright
 
