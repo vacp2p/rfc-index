@@ -53,7 +53,7 @@ A client MAY prepare a dataset locally before making the request to the network.
 The data chunks, `k`, MUST be the same size, if not,
 the lesser chunk MAY be padded with empty data.
 
-The data chucks will are encoded based on the following parameters:
+The data blocks are encoded based on the following parameters:
 
 ```js
 
@@ -68,20 +68,20 @@ struct encodingParms {
 
 ```
 
-With Reed-Solomon algorithm, extra data chunks need to be created for the dataset.
-Parity blocks is added to the chucks of data before encoding.
-Once data is encoded, it is prepared to be transmitted or placed into slots by the client node.
-Slots containing encoded data chunks are located by the CID and downloaded by storage providers.
+After the erasure coding process,
+a protected manifest SHOULD be generated for the dataset which would store the a CID of the root merkle tree.
+The content of the protected manifest below, see [CODEX-MANIFEST]() for more information:
 
-Below is the content of the dag-pb protobuf message:
+```js
 
-```protobuf
-
-   Message VerificationInfo {
-     bytes verifyRoot = 1;             # Decimal encoded field-element
-     repeated bytes slotRoots = 2;     # Decimal encoded field-elements
+   type verifiable {
+      verifyRoot: Cid                  # Root of verification tree
+      slotRoots: seq[Cid]              # Individual slot roots
+      cellSize: NBytes                 # Size of verification cells
+      verifiableStrategy: StrategyType # Strategy for verification
    }
-   Message ErasureInfo {
+
+   struct ErasureInfo {
      optional uint32 ecK = 1;                            # number of encoded blocks
      optional uint32 ecM = 2;                            # number of parity blocks
      optional bytes originalTreeCid = 3;                 # cid of the original dataset
@@ -89,7 +89,7 @@ Below is the content of the dag-pb protobuf message:
      optional VerificationInformation verification = 5;  # verification information
    }
 
-   Message Header {
+   struct Manifest {
      optional bytes treeCid = 1;        # cid (root) of the tree
      optional uint32 blockSize = 2;     # size of a single block
      optional uint64 datasetSize = 3;   # size of the dataset
@@ -101,44 +101,50 @@ Below is the content of the dag-pb protobuf message:
 
 ```
 
+After the encoding process, 
+is ready to be stored on the network via the [CODEX-MARKETPLACE](./marketplace.md).
+The merkle tree root SHOULD be included in the manifest so other nodes are able to locate and
+recontruct a dataset from the erasure encoded blocks.
 
-After erasure encoding process, 
-the dataset is ready to be stored on the network via the [CODEX-MARKETPLACE](./marketplace.md).
+### Data Repair
 
-- Store the data blocks
-- Store tree roots
-- Create protected manifest
+Storage providers may have periods during a storage contract where they are not storing the data.
+A validator node MAY store the `treeCid` from the `Manifest` to locate all the data blocks and 
+recontruct the merkle tree.
+When a missing branch of the tree is not retrievable from a SP, data repair will be REQUIRED.
+The validator will open a request for a new SP to reconstruct the merkle tree and
+store the missing data blocks.
+The validator role is described in the [CODEX-MARKETPLACE]() specification.
 
 ### Decode Data
 
-Decoding occurs after a dataset is downloaded by storage providers and
-and proofs of storage are required.
-There are two node roles that will need to decode data.
-
-- Client nodes to read data
-- Validator nodes to verfiy storage providers are storing data as per the marketplace
-- During repair of slots
-
-Using the CID of a dataset, a client node can read the data during a storage request.
-The client node will download all slots accioscated to the dataset to perform erasure decoding.
-
-To ensure data is being stored by storage providers, the smart contracts REQUIRES proof of storage to be submitted.
-Once submitted by an SP node, validator check proofs are valid by decoding data. 
+During dataset retrieval, a node will use the `treeCid` to locate the data blocks.
+The number of retrieved blocks by the node MUST be greater than `k`.
+If less than `k`, the node MAY not be able to recontruct the dataset.
+The node SHOULD request missing data chunks from the network and
+wait until the threshold is reached.
 
 ## Security Considerations
 
 ### Adversarial Attack
 
-An adversarial storage provider can remove only the first element from more than half of the block, and the slot data can no longer be recovered from the data that the host stores.
-For example, with 1TB of slot data erasure coded into 256 data and parity shards, an adversary could strategically remove 129 bytes, and the data can no longer be fully recovered with the erasure coded data that is present on the host.
+An adversarial storage provider can remove only the first element from more than half of the block,
+and the slot data can no longer be recovered from the data that the host stores.
+For example, with data blocks of size 1TB erasure coded into 256 data and parity shard,
+an adversary could strategically remove 129 bytes, and
+the data can no longer be fully recovered with the erasure coded data that is present on the host.
 
 The RECOMMENDED solution should perform checks on entire shards to protect against adversarial erasure.
-In the Merkle storage proofs, we need to hash the entire shard, and then check that hash with a Merkle proof.
-Effectively the block size for Merkle proofs should equal the shard size of the erasure coding interleaving. Hashing large amounts of data will be expensive to perform in a SNARK, which is used to compress proofs in size in Codex.
+In the Merkle storage proofs, the entire shard SHOULD be hased, 
+then that hash is checked against the Merkle proof.
+Effectively, the block size for Merkle proofs should equal the shard size of the erasure coding interleaving.
+Hashing large amounts of data will be expensive to perform in a SNARK, which is used to compress proofs in size in Codex.
 
 ### Data Encryption
 
-If data is not encryted before entering the encoding process, nodes, including storage providers, will be able to access the data. This may lead to privacy concerns and the misuse of data.
+If data is not encryted before entering the encoding process, nodes, including storage providers,
+MAY be able to access the data.
+This may lead to privacy concerns and the misuse of data.
 
 ## Copyright
 
