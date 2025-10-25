@@ -1,12 +1,16 @@
 ---
 slug: codex-purchase
-title: CODEX-PURCHASE
-name: Codex Purchase Module
+title: CODEX-PURCHASING
+name: Codex Purchasing Module
 status: raw
 category: Standards Track
 tags: codex, storage, marketplace, state-machine
 editor: Codex Team and Filip Dimitrijevic <filip@status.im>
 contributors:
+- Adam Uhlíř <adam.u@status.im>
+- Arnaud DeVille <arnaud@status.im>
+- Mark Spanbroek <mark@spanbroek.net>
+- Eric Mastro <ericmastro@status.im>
 - Filip Dimitrijevic <filip@status.im>
 ---
 
