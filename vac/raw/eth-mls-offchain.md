@@ -337,7 +337,7 @@ This config file MUST contain (`sn_min`,`sn_max`) as the `steward list` size ran
 2. The steward adds the members as a centralized way till the number of members reaches the `sn_min`.
 Then, members propose lists by voting proposal with size `sn`
 as a consensus among all members, as mentioned in the consensus section 2, according to the checks:
-the size of the proposed list `sn` is in invertal (`sn_min`,`sn_max`).
+the size of the proposed list `sn` is in the interval (`sn_min`,`sn_max`).
 3. After the voting proposal ends up with a `steward list`,
 and group changes are ready to be committed as specified in single steward section
 with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
