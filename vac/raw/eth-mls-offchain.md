@@ -315,7 +315,7 @@ where `epoch E` is the epoch in which the election proposal is initiated,
 and `group id` for shuffling the list across the different groups.
 Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
 
-We assume that there are no recurring entries in `SHA256(epoch E || member id)`, since the SHA256 outputs are unique
+We assume that there are no recurring entries in `SHA256(epoch E || member id || group id)`, since the SHA256 outputs are unique
 when there is no repetition in the `member id` values, against the conflicts on sorting issues.
 
 ### Multi steward with big consensuses
