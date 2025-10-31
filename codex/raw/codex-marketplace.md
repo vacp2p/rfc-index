@@ -62,7 +62,7 @@ A validator ensures that SPs have submitted valid proofs each period where the s
 
 The diagram below depicts the lifecycle of a storage request:
 
-```
+```mermaid
                       ┌───────────┐
                       │ Cancelled │
                       └───────────┘
@@ -102,8 +102,6 @@ Time ran out │ │                              └─────────
        │ Finished │
        └──────────┘
 ```
-
-![image](./images/storeRequest.png)
 
 ## Client Role
 
@@ -157,7 +155,7 @@ The the table below provides the description of the `Request` and the associated
 | `expiry` | `uint64` | Timeout in seconds during which all the slots have to be filled, otherwise Request will get cancelled. The final deadline timestamp is calculated at the moment the transaction is mined. |
 | `nonce` | `byte32` | Random value to differentiate from other requests of same parameters. It SHOULD be a random byte array. |
 | `pricePerBytePerSecond` | `uint256` | Amount of tokens that will be awarded to SPs for finishing the storage request. It MUST be an amount of Tokens offered per slot per second per byte. The Ethereum address that submits the `requestStorage()` transaction MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least an equivalent amount of full reward (`pricePerBytePerSecond * duration * slots * slotSize`) in Tokens. |
-| `collateralPerByte` | `uint256` | The amount of tokens per byte of slot's size that SPs submit when they fill slots. Collateral is then slashed or forfeited if SPs fail to provide the service requested by the storage request (more information in the [Slashing](#Slashing) section). |
+| `collateralPerByte` | `uint256` | The amount of tokens per byte of slot's size that SPs submit when they fill slots. Collateral is then slashed or forfeited if SPs fail to provide the service requested by the storage request (more information in the [Slashing](#### Slashing) section). |
 | `proofProbability` | `uint256` | Determines the average frequency that a proof is required within a period: $\frac{1}{proofProbability}$. SPs are required to provide proofs of storage to the marketplace smart contract when challenged by the smart contract. To prevent hosts from only coming online when proofs are required, the frequency at which proofs are requested from SPs is stochastic and is influenced by the `proofProbability` parameter. |
 | `duration` | `uint64` | Total duration of the storage request in seconds. It MUST NOT exceed the limit specified in the configuration `config.requestDurationLimit`. |
 | `slots` | `uint64` | The number of requested slots. The slots will all have the same size. |
@@ -168,7 +166,7 @@ The the table below provides the description of the `Request` and the associated
 
 #### Renewal of Storage Requests
 
-It should be noted that the marketplace does not support extending requests. It is REQUIRED that if the user wants to extend the duration of a request, a new request with the same CID must be [created](#Creating-storage-requests) **before the original request completes**.
+It should be noted that the marketplace does not support extending requests. It is REQUIRED that if the user wants to extend the duration of a request, a new request with the same CID must be [created](### Creating Storage Requests) **before the original request completes**.
 
 This ensures that the data will continue to persist in the network at the time when the new (or existing) SPs need to retrieve the complete dataset to fill the slots of the new request.
 
@@ -196,7 +194,7 @@ The following tasks need to be considered when hosting a slot:
 When a new request is created, the `StorageRequested(requestId, ask, expiry)` event is emitted with the following properties:
 
 - `requestId` - the ID of the request.
-- `ask` - the specification of the request parameters. For details, see the definition of the `Request` type in the [Creating Storage Requests](#Creating-storage-requests) section above.
+- `ask` - the specification of the request parameters. For details, see the definition of the `Request` type in the [Creating Storage Requests](### Creating Storage Requests) section above.
 - `expiry` - a Unix timestamp specifying when the request will be canceled if all slots are not filled by then.
 
 It is then up to the SP node to decide, based on the emitted parameters and node's operator configuration, whether it wants to participate in the request and attempt to fill its slot(s) (note that one SP can fill more than one slot). If the SP node decides to ignore the request, no further action is required. However, if the SP decides to fill a slot, it MUST follow the remaining steps described below.
@@ -211,7 +209,7 @@ When the proof is ready, the SP MUST call `fillSlot()` on the smart contract wit
 
 The Ethereum address of the SP node from which the transaction originates MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least the amount of Tokens required as collateral for the slot (`collateralPerByte * slotSize`).
 
-If the proof delivered by the SP is invalid or the slot was already filled by another SP, then the transaction will revert. Otherwise, a `SlotFilled(requestId, slotIndex)` event is emitted. If the transaction is successful, the SP SHOULD transition into the __proving__ state, where it will need to submit proof of data possession when challenged by the smart contract.
+If the proof delivered by the SP is invalid or the slot was already filled by another SP, then the transaction will revert. Otherwise, a `SlotFilled(requestId, slotIndex)` event is emitted. If the transaction is successful, the SP SHOULD transition into the **proving** state, where it will need to submit proof of data possession when challenged by the smart contract.
 
 It should be noted that if the SP node observes a `SlotFilled` event for the slot it is currently downloading the dataset for or generating the proof for, it means that the slot has been filled by another node in the meantime. In response, the SP SHOULD stop its current operation and attempt to fill a different, unfilled slot.
 
@@ -244,10 +242,10 @@ The repair process is similar to filling slots. If the original slot dataset is 
 The repair process proceeds as follows:
 
 1. The SP observes the `SlotFreed` event and decides to repair the slot.
-2. The SP MUST reserve the slot with the `reserveSlot(requestId, slotIndex)` call. For more information see the [Filling Slots](#filling-slots) section.
+2. The SP MUST reserve the slot with the `reserveSlot(requestId, slotIndex)` call. For more information see the [Filling Slots](###filling slots) section.
 3. The SP MUST download the chunks of data required to reconstruct the freed slot's data. The node MUST use the [Reed-Solomon algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA) to reconstruct the missing data.
 4. The SP MUST generate proof over the reconstructed data.
-5. The SP MUST call the `fillSlot()` smart contract function with the same parameters and collateral allowance as described in the [Filling Slots](#filling-slot) section.
+5. The SP MUST call the `fillSlot()` smart contract function with the same parameters and collateral allowance as described in the [Filling Slots](###filling slots) section.
 
 ### Collecting Funds
 
