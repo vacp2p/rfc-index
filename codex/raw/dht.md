@@ -10,7 +10,7 @@ contributors:
 
 ## Abstract
 
-This document explians the Codex DHT (Data Hash Table) component.
+This document explians the Codex DHT (Distributed Hash Table) component.
 It is used to store Codex's signed-peer-record (SPR) entries,
 as well as content identifiers (CID) for each host.
 
