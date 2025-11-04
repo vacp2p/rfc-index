@@ -139,15 +139,16 @@ New `provider`s SHOULD query live nodes to update their local routing table with
 ```
 
 The `bitsPerHop` MUST indicate the minimum number of bits of a `NodeId` needed to get closer to finding the target per query.
-Practically, it tells a `provider` also how often the node "not in range" branch will split off.
+Practically, it tells a `provider` also how often a node "not in range", based on `NodeId` prefix similarities,
+will cause a branch to split off.
 Setting this value to 1 is the basic, non-accelerated version,
-which will never split off the not in range branch and
+which will never split off the "not in range" branch and
 which will result in $ \log_2 n $ hops per lookup.
 Setting it higher will increase the amount of splitting on a "not in range" branch,
 thus holding more `providers` with a better keyspace coverage and
 will result in an improvement of $ \log_{2^b} n $ hops per lookup.
 
-- `DistanceCalculator`: value MUST be generated with 
+- `DistanceCalculator`: value SHOULD be generated with the defined node distance algorithm used in the [discv5 specification](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md).
 - `istart`: The range of `NodeId`s this `KBucket` covers.
 This is not a simple logarithmic distance, as buckets can be split over a prefix that
 does not cover the `localNode` id.
@@ -164,10 +165,10 @@ In each case, the active node entries,
 but also the entries waiting in the replacement cache, are accounted for.
 This way, the replacement cache can't get filled with nodes that then can't be added due to the limits that apply.
 As entries are not verified immediately before or on entry,
-it is possible that a malicious node could fill the routing table or
-a specific bucket with SPRs that have `ip`s it does not control.
-This would affect the node that actually owns the `ip`,
-as they could have a difficult time getting its SPR distributed in the DHT.
+a malicious node MAY fill the routing table or
+a specific bucket with SPRs that have `ip`s not controlled by that adversary.
+This would affect the `provider` that actually controls the `ip`,
+as they could have a difficult time disseminating its SPR to be stored in the DHT by other `provider`s.
 However, that `provider` can still search and find nodes to connect to.
 
 There is the possibility to set the `IPLimits` on verified `providers` only,
