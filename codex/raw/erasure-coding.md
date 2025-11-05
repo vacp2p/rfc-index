@@ -22,7 +22,6 @@ This is achieved by the dataset that is chunked is restored in retrieveal by era
 When data blocks are abandoned by storage providers,
 the requester can be assured of data retrievability.
 
-
 ## Specification
 
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
@@ -32,20 +31,20 @@ The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL N
 A client SHOULD perform the erasure encoding locally before providing a dataset to the network.
 During validation, nodes will conduct error coorection and decoding based on the erasure coding technique known to the network.
 Datasets using encodings not recognized by the network, MAY be ignored during decoding and
-validation by other nodes in the network. 
+validation by other nodes in the network.
 
 The dataset SHOULD split into data chunks represented by `k`, e.g. $(k_1, k_2, k_3, \ldots, k_{n})$.
-Each chunk `k` MUST be encoded into `n` blocks, using an erasure encoding technique like the [Reed Solomon algorithm]().
+Each chunk `k` MUST be encoded into `n` blocks, using an erasure encoding technique like the Reed Solomon algorithm.
 Including a set of parity blocks that MUST be generated,
 represented by `m`.
 All node roles on the Codex network use the [Leapard Codec](https://github.com/catid/leopard).
 
 Below is the encoding process:
 
-1.  Prepare the dataset for the marketplace using erasure encoding.
-2.  Derive an manifest CID from the root encoded blocks
-3.  Error correction by validator nodes once storage contract begins
-4.  Decode data back to original data.
+1. Prepare the dataset for the marketplace using erasure encoding.
+2. Derive an manifest CID from the root encoded blocks
+3. Error correction by validator nodes once storage contract begins
+4. Decode data back to original data.
 
 ### Encoding
 
@@ -70,7 +69,7 @@ struct encodingParms {
 
 After the erasure coding process,
 a protected manifest SHOULD be generated for the dataset which would store the a CID of the root merkle tree.
-The content of the protected manifest below, see [CODEX-MANIFEST]() for more information:
+The content of the protected manifest below, see [CODEX-MANIFEST](./manifest.md) for more information:
 
 ```js
 
@@ -101,7 +100,7 @@ The content of the protected manifest below, see [CODEX-MANIFEST]() for more inf
 
 ```
 
-After the encoding process, 
+After the encoding process,
 is ready to be stored on the network via the [CODEX-MARKETPLACE](./marketplace.md).
 The merkle tree root SHOULD be included in the manifest so other nodes are able to locate and
 recontruct a dataset from the erasure encoded blocks.
@@ -109,12 +108,12 @@ recontruct a dataset from the erasure encoded blocks.
 ### Data Repair
 
 Storage providers may have periods during a storage contract where they are not storing the data.
-A validator node MAY store the `treeCid` from the `Manifest` to locate all the data blocks and 
+A validator node MAY store the `treeCid` from the `Manifest` to locate all the data blocks and
 recontruct the merkle tree.
 When a missing branch of the tree is not retrievable from a SP, data repair will be REQUIRED.
 The validator will open a request for a new SP to reconstruct the merkle tree and
 store the missing data blocks.
-The validator role is described in the [CODEX-MARKETPLACE]() specification.
+The validator role is described in the [CODEX-MARKETPLACE](./marketplace.md) specification.
 
 ### Decode Data
 
@@ -135,7 +134,7 @@ an adversary could strategically remove 129 bytes, and
 the data can no longer be fully recovered with the erasure coded data that is present on the host.
 
 The RECOMMENDED solution should perform checks on entire shards to protect against adversarial erasure.
-In the Merkle storage proofs, the entire shard SHOULD be hased, 
+In the Merkle storage proofs, the entire shard SHOULD be hased,
 then that hash is checked against the Merkle proof.
 Effectively, the block size for Merkle proofs should equal the shard size of the erasure coding interleaving.
 Hashing large amounts of data will be expensive to perform in a SNARK, which is used to compress proofs in size in Codex.
@@ -152,4 +151,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
+- [Leapard Codec](https://github.com/catid/leopard)
+- [CODEX-MANIFEST](./manifest.md)
 - [CODEX-MARKETPLACE](./marketplace.md)
