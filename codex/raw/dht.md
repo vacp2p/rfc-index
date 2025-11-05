@@ -97,7 +97,7 @@ On the Codex network,
 the `record` is identified a `SignedPeerRecord`, SPR.
 
 All values, excluding the `ip`, are REQUIRED in a SPR.
-Which nodes and the number of nodes in this set are described in the [routing table](#routingtable) section.
+Which nodes and the number of nodes in this set are described in the [routing table](#Routing table) section.
 The `PrivateKey` MUST be used to sign the `record`.
 A `provider` SHOULD disregard messages from a node if the `record` is unsigned or becomes stale.
 The `provider` SHOULD contact other live nodes to disseminate new and updated records.
@@ -105,7 +105,7 @@ The update will increase the `seqNum`, then sign the new version of the `record`
 
 ### Distance calculation
 
-#### Routing table
+#### Routing Table
 
 Each `provider` has a local routing table which stores the SPR of other `provider`s it has discovered.
 New `provider`s SHOULD query live nodes to update their local routing table with SPRs.
