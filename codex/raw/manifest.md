@@ -51,7 +51,7 @@ the nodes storing the corresponding manifest block can be found by other clients
 
 From the manifest, 
 providers storing relevant blocks SHOULD be identified using the `treeCid` attribute.
-The `treeCid` in Codex is similar to the `info_hash` from BitTorrent.
+The manifest `CID` in Codex is similar to the `info_hash` from BitTorrent.
 The `filename` of the orginial dataset SHOULD be included in the manifest.
 
 #### Manifest Attributes
