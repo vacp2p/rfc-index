@@ -54,11 +54,15 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 The three roles used in de-MLS is as follows:
 
-- `node`: Nodes are members of network without being in any secure group messaging.
+- `node`: Nodes are participants in the network that are not currently members
+of any secure group messaging session but remain available as potential candidates for group membership.
 - `member`: Members are special nodes in the secure group messaging who
 obtains current group key of secure group messaging.
-- `steward`: Stewards are special and transparent members in secure group
-messaging who organizes the changes upon the voted-proposals.
+Each node is assigned a unique identity represented as a 20-byte value named `member id`.
+- `steward`: Stewards are special and transparent members in the secure group
+messaging who organize the changes by releasing commit messages upon the voted proposals.
+There are two special subsets of steward as epoch and backup steward,
+which are defined in the section de-MLS Objects.
 
 ## MLS Background
 
@@ -78,7 +82,7 @@ manage the `keyPackage` of the users where the `keyPackage` is the objects
 
 Following section presents the MLS objects and components that used in this RFC:
 
-`Epoch`: Fixed time intervals that changes the state that is defined by members,
+`Epoch`: Time intervals that changes the state that is defined by members,
 section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 `MLS proposal message:` Members MUST receive the proposal message prior to the
@@ -90,6 +94,7 @@ Here, the add and remove proposals are used.
 This is restricted by [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) as if there is pending proposal,
 the application message should be cut.
 Note that: Since the MLS is based on servers, this delay between proposal and commit messages are very small.
+
 `Commit message:` After members receive the proposals regarding group changes,
 the committer, who may be any member of the group, as specified in  [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/),
 generates the necessary key material for the next epoch, including the appropriate welcome messages
@@ -97,21 +102,43 @@ for new joiners and new entropy for removed members. In this RFC, the committers
 
 ### de-MLS Objects
 
-`Voting proposal` Similar to MLS proposals, but processed only if approved through a voting process.
+This section presents the de-MLS objects:
+
+`Voting proposal`: Similar to MLS proposals, but processed only if approved through a voting process.
 They function as application messages in the MLS group,
 allowing the steward to collect them without halting the protocol.
+There are three types of `voting proposal` according to the type of consensus as in shown Consensus Types section,
+these are, `commit proposal`, `steward election proposal` and `emergency criteria proposal`.
+
+`Epoch steward`: The steward assigned to commit in `epoch E` according to the steward list.
+Holds the primary responsibility for creating commit in that epoch.
+
+`Backup steward`: The steward next in line after the `epoch steward` on the `steward list` in `epoch E`.
+Only becomes active if the `epoch steward` is malicious or fails,
+in which case it completes the commitment phase.
+If unused in `epoch E`, it automatically becomes the `epoch steward` in `epoch E+1`.
+
+`Steward list`: It is an ordered list that contains the `member id`s of authorized stewards.
+Each steward in the list becomes responsible for creating the commit message when its turn arrives,
+according to this order for each epoch.
+For example, suppose there are two stewards in the list `steward A` first and `steward B` last in the list.
+`steward A` is responsible for creating the commit message for first epoch.
+Similarly, `steward B` is for the last epoch.
+Since to maintain consistency and prevent conflicting updates, each epoch MUST have exactly one commit from exactly one steward.
+
+Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
+Lastly, the size of the list named as `sn`, which also shows the epoch interval for steward list determination.
 
 ## Flow
 
 General flow is as follows:
 
 - A steward initializes a group just once, and then sends out Group Announcements (GA) periodically.
-
-- Meanwhile, each`node`creates and sends their`credential` includes `keyPackage`.
-- Each `member`creates `voting proposals` sends them to from MLS group during epoch E.
+- Meanwhile, each `node` creates and sends their `credential` includes `keyPackage`.
+- Each `member` creates `voting proposals` sends them to from MLS group during `epoch E`.
 - Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into
-`MLS proposals`  then sends them with correspondng `commit messages`
-- Evantually, with the commit messages, all members starts the next epoch E+1.
+`MLS proposals` then sends them with corresponding `commit messages`
+- Evantually, with the commit messages, all members starts the next `epoch E+1`.
 
 ## Creating Voting Proposal
 
@@ -204,31 +231,172 @@ including welcome messages for the new members. Therefore, the `commit message` 
 
 Decentralization has already been achieved in the previous section.
 However, to improve availability and ensure censorship resistance,
-the single-steward protocol is extended to a multi-steward architecture.
+the single steward protocol is extended to a multi steward architecture.
 In this design, each epoch is coordinated by a designated steward,
-operating under the same protocol as the single-steward model.
-Thus, the multi-steward approach primarily defines how steward roles
+operating under the same protocol as the single steward model.
+Thus, the multi steward approach primarily defines how steward roles
 rotate across epochs while preserving the underlying structure and logic of the original protocol.
-Two variants of the multi-steward design are introduced to address different system requirements.
+Two variants of the multi steward design are introduced to address different system requirements.
 
-### Multi steward with single consensus
+### Consensus Types
+
+Consensus is agnostic with its payload; therefore, it can be used for various purposes.
+Note that each message for the consensus of proposals is an `application message` in the MLS object section.
+It is used in three ways as follows:
+
+1. `Commit proposal`:  It is the proposal instance that is specified in Creating Voting Proposal section
+with `Proposal.payload` MUST show the commit request from `members`.
+Any member MAY create this proposal in any epoch and `epoch steward` MUST collect and commit YES voted proposals.
+This is the only proposal type common to both single steward and multi steward designs.
+2. `Steward election proposal`: This is the process that finalizes the `steward list`,
+which sets and orders stewards responsible for creating commits over a predefined number of range in (`sn_min`,`sn_max`).
+The validity of the choosen `steward list` ends when the last steward in the list (the one at the final index) completes its commit.
+At that point, a new `steward election proposal` MUST be initiated again by any member during the corresponding epoch.
+The `Proposal.payload` field MUST represent the ordered identities of the proposed stewards.
+Each steward election proposal MUST be verified and finalized through the consensus process
+so that members can identify which steward will be responsible in each epoch
+and detect any unauthorized steward commits.
+3. `Emergency criteria proposal`: If there is a malicious member or steward,
+this event MUST be voted on to finalize it.
+If this returns YES, the next epoch MUST include the removal of the member or steward.
+In a specific case where a steward is removed from the group, causing the total number of stewards to fall below `sn_min`,  
+it is required to repeat the `steward election proposal`.
+`Proposal.payload` MUST consist of the evidence of the dishonesty as described in the Steward violation list,
+and the identifier of the malicious member or steward.
+This proposal can be created by any member in any epoch.
+
+The order of consensus proposal messages is important to achieving a consistent result.
+Therefore, messages MUST be prioritized by type in the following order, from highest to lowest priority:
+
+- `Emergency criteria proposal`
+
+- `Steward election proposal`
+
+- `Commit proposal`
+
+This means that if a higher-priority consensus proposal is present in the network,
+lower-priority messages MUST be withheld from transmission until the higher-priority proposals have been finalized.
+
+### Steward list creation
+
+The `steward list` size, defined by minimum `sn_min` and maximum `sn_max` bounds,
+is determined at the time of group creation.
+The actual size of the list MAY vary within this range as `sn`, with the minimum value being at least 1.
+
+The index of the slots shows epoch info and value of index shows `member id`s.
+The next in line steward for the `epoch E` is named as `epoch steward`, which has index E.
+And the subsequent steward in the `epoch E` is named as the `backup steward`.
+For example, let's assume steward list is (S3, S2, S1) if in the previous epoch the roles were
+(`backup steward`: S2, `epoch steward`: S1), then in the next epoch they become
+(`backup steward`: S3, `epoch steward`: S2) by shifting.
+
+If the `epoch steward` is honest, the `backup steward` does not involve the process in epoch,
+and the `backup steward` will be the `epoch steward` within the `epoch E+1`.
+
+If the `epoch steward` is malicious, the `backup steward` is involved in the commitment phase in `epoch E`
+and the former steward becomes the `backup steward` in `epoch E`.
+
+Liveness criteria:
+
+Once the active `steward list` has completed its assigned epochs,
+
+members MUST proceed to elect the next set of stewards
+(which MAY include some or all of the previous members).
+This election is conducted through a type 2 consensus procedure, `steward election proposal`.
+
+A `Steward election proposal` is considered valid only if the resulting `steward list`
+is produced through a deterministic process that ensures an unbiased distribution of steward assignments,
+since allowing bias could enable a malicious participant to manipulate the list
+and retain control within a favored group for multiple epochs.
+
+The list MUST be composed of the first `sn_min` members including previous stewards,
+sorted according to the ascending value of `SHA256(epoch E || member id || group id)`,
+where `epoch E` is the epoch in which the election proposal is initiated,
+and `group id` for shuffling the list across the different groups.
+Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
+
+We assume that there are no recurring entries in `SHA256(epoch E || member id || group id)`, since the SHA256 outputs are unique
+when there is no repetition in the `member id` values, against the conflicts on sorting issues.
+
+### Multi steward with big consensuses
 
 In this model, all group modifications, such as adding or removing members,
 must be approved through consensus by all participants,
-including the steward assigned for epoch `E`.
+including the steward assigned for `epoch E`.
 A configuration with multiple stewards operating under a shared consensus protocol offers
 increased decentralization and stronger protection against censorship.
 However, this benefit comes with reduced operational efficiency.
 The model is therefore best suited for small groups that value
 decentralization and censorship resistance more than performance.
 
-### Multi steward with two consensuses
+To create a multi steward with a big consensus,
+the group is initialized with a single steward as specified as follows:
 
-The two-consensus model offers improved efficiency with a trade-off in decentralization.
+1. The steward initialized the group with the config file.
+This config file MUST contain (`sn_min`,`sn_max`) as the `steward list` size range.
+2. The steward adds the members as a centralized way till the number of members reaches the `sn_min`.
+Then, members propose lists by voting proposal with size `sn`
+as a consensus among all members, as mentioned in the consensus section 2, according to the checks:
+the size of the proposed list `sn` is in the interval (`sn_min`,`sn_max`).
+3. After the voting proposal ends up with a `steward list`,
+and group changes are ready to be committed as specified in single steward section
+with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
+otherwise anyone can create `emergency criteria proposal`.
+4. If the `epoch steward` violates the changing process as mentioned in the section Steward violation list,
+one of the members MUST initialize the `emergency criteria proposal` to remove the malicious Steward.
+Then `backup steward` fulfills the epoch by committing again correctly.
+
+A large consensus group provides better decentralization, but it requires significant coordination,
+which MAY not be suitable for groups with more than 1000 members.
+
+### Multi steward with small consensuses
+
+The small consensus model offers improved efficiency with a trade-off in decentralization.
 In this design, group changes require consensus only among the stewards, rather than all members.
-Regular members participate by periodically selecting the stewards but do not take part in each decision.
+Regular members participate by periodically selecting the stewards by `steward election proposal`
+but do not take part in commit decision by `commit proposal`.
 This structure enables faster coordination since consensus is achieved within a smaller group of stewards.
 It is particularly suitable for large user groups, where involving every member in each decision would be impractical.
+
+The flow is similar to the big consensus including the `steward list` finalization with all members consensus
+only the difference here, the commit messages requires `commit proposal` only among the stewards.
+
+## Steward violation list
+
+A steward’s activity is called a violation if the action is one or more of the following:
+
+1. Broken commit: The steward releases a different commit message from the voted `commit proposal`.
+This activity is identified by the `members` since the [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) provides the methods
+that members can use to identify the broken commit messages that are possible in a few situations,
+such as commit and proposal incompatibility. Specifically, the broken commit can arise as follows:
+    1. The commit belongs to the earlier epoch.
+    2. The commit message should equal the latest epoch
+    3. The commit needs to be compatible with the previous epoch’s `MLS proposal`.
+2. Broken MLS proposal: The steward prepares a different `MLS proposal` for the corresponding `voting proposal`.
+This activity is identified by the `members` since both `MLS proposal` and `voting proposal` are visible
+and can be identified by checking the hash of `Proposal.payload` and `MLSProposal.payload` is the same as RFC9240 section 12.1. Proposals.
+3. Censorship and inactivity: The situation where there is a voting proposal that is visible for every member,
+and the Steward does not provide an MLS proposal and commit.
+This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
+therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
+4. Unauthorized steward: The order of the release of commit messages is pre-determined by the `steward list` consensus.
+If there is a steward who releases a commit message without it in the `steward list` or in the wrong order,
+this is counted as unauthorized steward activity resulting in emergency criteria consensus.
+
+## Security Considerations
+
+In this section, the security considerations are shown as de-MLS assurance.
+
+1. Malicious Steward: A Malicious steward can act maliciously,
+as in the Steward violation list section.
+Therefore, de-MLS enforces that any steward only follows the protocol under the consensus order
+and commits without emergency criteria application.
+2. Malicious Member: A member is only marked as malicious
+when the member acts by releasing a commit message.
+3. Steward list election bias: Although SHA256 is used together with two global variables
+to shuffle stewards in a deterministic and verifiable manner,
+this approach only minimizes election bias; it does not completely eliminate it.
+This design choice is intentional, in order to preserve the efficiency advantages provided by the MLS mechanism.
 
 ## Copyright
 
