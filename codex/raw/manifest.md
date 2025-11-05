@@ -49,13 +49,13 @@ has corresponding `CID`, the manifest `CID`.
 In Codex, manifest `CID` SHOULD be announced on the [CODEX-DHT](./dht.md), so
 the nodes storing the corresponding manifest block can be found by other clients requesting to download the corresponding dataset.
 
-From the manifest, 
+From the manifest,
 providers storing relevant blocks SHOULD be identified using the `treeCid` attribute.
 The manifest `CID` in Codex is similar to the `info_hash` from BitTorrent.
 The `filename` of the original dataset MAY be included in the manifest.
 The `mimetype` of the original dataset MAY be included in the manifest.
 
-#### Manifest Attributes
+### Manifest Attributes
 
 ```protobuf
 
@@ -92,4 +92,3 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [BEP3](http://bittorrent.org/beps/bep_0003.html)
 - [CODEX-DHT specification](./dht.md)
 - [MultiCodec](https://github.com/multiformats/multicodec)
-
