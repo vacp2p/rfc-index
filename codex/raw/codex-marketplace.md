@@ -34,7 +34,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 | Storage Request or Request | A request created by a client node to persist data on the Codex network.                                                  |
 | Slot or Storage Slot       | A space allocated by the storage request to store a piece of the request's dataset.              |
 | Smart Contract             | A smart contract implementing the marketplace functionality.                                                               |
-| Token               | ERC20-based token used within the Codex network.     |
+| Token               | The ERC20-based token used within the Codex network.     |
 
 ## Motivation
 
@@ -132,7 +132,7 @@ struct Request {
   Ask ask;
   Content content;
   uint64 expiry;
-  byte32 nonce;
+  bytes32 nonce;
 }
 
 struct Ask {
@@ -147,11 +147,11 @@ struct Ask {
 
 struct Content {
   bytes cid;
-  byte32 merkleRoot;
+  bytes32 merkleRoot;
 }
 ```
 
-The the table below provides the description of the `Request` and the associated types attributes:
+The table below provides the description of the `Request` and the associated types attributes:
 
 | attribute | type | description |
 |-----------|------|-------------|
@@ -159,16 +159,16 @@ The the table below provides the description of the `Request` and the associated
 | `ask` | `Ask` | Parameters of Request. |
 | `content` | `Content` | The dataset that will be hosted with the storage request. |
 | `expiry` | `uint64` | Timeout in seconds during which all the slots have to be filled, otherwise Request will get cancelled. The final deadline timestamp is calculated at the moment the transaction is mined. |
-| `nonce` | `byte32` | Random value to differentiate from other requests of same parameters. It SHOULD be a random byte array. |
-| `pricePerBytePerSecond` | `uint256` | Amount of tokens that will be awarded to SPs for finishing the storage request. It MUST be an amount of Tokens offered per slot per second per byte. The Ethereum address that submits the `requestStorage()` transaction MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least an equivalent amount of full reward (`pricePerBytePerSecond * duration * slots * slotSize`) in Tokens. |
+| `nonce` | `bytes32` | Random value to differentiate from other requests of same parameters. It SHOULD be a random byte array. |
+| `pricePerBytePerSecond` | `uint256` | Amount of tokens that will be awarded to SPs for finishing the storage request. It MUST be an amount of tokens offered per slot per second per byte. The Ethereum address that submits the `requestStorage()` transaction MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least an equivalent amount of full reward (`pricePerBytePerSecond * duration * slots * slotSize`) in tokens. |
 | `collateralPerByte` | `uint256` | The amount of tokens per byte of slot's size that SPs submit when they fill slots. Collateral is then slashed or forfeited if SPs fail to provide the service requested by the storage request (more information in the [Slashing](#### Slashing) section). |
-| `proofProbability` | `uint256` | Determines the average frequency that a proof is required within a period: $\frac{1}{proofProbability}$. SPs are required to provide proofs of storage to the marketplace smart contract when challenged by the smart contract. To prevent hosts from only coming online when proofs are required, the frequency at which proofs are requested from SPs is stochastic and is influenced by the `proofProbability` parameter. |
+| `proofProbability` | `uint256` | Determines the average frequency that a proof is required within a period: $\frac{1}{proofProbability}$. SPs are required to provide proofs of storage to the marketplace contract when challenged. To prevent hosts from only coming online when proofs are required, the frequency at which proofs are requested from SPs is stochastic and is influenced by the `proofProbability` parameter. |
 | `duration` | `uint64` | Total duration of the storage request in seconds. It MUST NOT exceed the limit specified in the configuration `config.requestDurationLimit`. |
 | `slots` | `uint64` | The number of requested slots. The slots will all have the same size. |
 | `slotSize` | `uint64` | Amount of storage per slot in bytes. |
 | `maxSlotLoss` | `uint64` |  Max slots that can be lost without data considered to be lost. |
 | `cid`     | `bytes` | An identifier used to locate the Manifest representing the dataset. It MUST be a [CIDv1](https://github.com/multiformats/cid#cidv1), SHA-256 [multihash](https://github.com/multiformats/multihash) and the data it represents SHOULD be discoverable in the network, otherwise the request will be eventually canceled. |
-| `merkleRoot` | `byte32` | Merkle root of the dataset, used to verify storage proofs |
+| `merkleRoot` | `bytes32` | Merkle root of the dataset, used to verify storage proofs |
 
 #### Renewal of Storage Requests
 
@@ -233,7 +233,7 @@ When the proof is ready, the SP MUST call `fillSlot()` on the smart contract wit
 - `slotIndex` - the slot index that the node wants to fill.
 - `proof` - the `Groth16Proof` proof structure, generated over the slot data.
 
-The Ethereum address of the SP node from which the transaction originates MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least the amount of Tokens required as collateral for the slot (`collateralPerByte * slotSize`).
+The Ethereum address of the SP node from which the transaction originates MUST have [approval](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-) for the transfer of at least the amount of tokens required as collateral for the slot (`collateralPerByte * slotSize`).
 
 If the proof delivered by the SP is invalid or the slot was already filled by another SP, then the transaction will revert. Otherwise, a `SlotFilled(requestId, slotIndex)` event is emitted. If the transaction is successful, the SP SHOULD transition into the **proving** state, where it will need to submit proof of data possession when challenged by the smart contract.
 
@@ -241,7 +241,7 @@ It should be noted that if the SP node observes a `SlotFilled` event for the slo
 
 ### Proving
 
-Once an SP fills a slot, it MUST submit proofs to the smart contract when a challenge is issued by the contract. SPs SHOULD detect that a proof is required for the current period using the `isProofRequired(slotId)` function, or that it will be required using the `willProofBeRequired(slotId)` function in the case that the [pointer is in downtime](https://github.com/codex-storage/codex-research/blob/41c4b4409d2092d0a5475aca0f28995034e58d14/design/storage-proof-timing.md).
+Once an SP fills a slot, it MUST submit proofs to the marketplace contract when a challenge is issued by the contract. SPs SHOULD detect that a proof is required for the current period using the `isProofRequired(slotId)` function, or that it will be required using the `willProofBeRequired(slotId)` function in the case that the [proving clock pointer is in downtime](https://github.com/codex-storage/codex-research/blob/41c4b4409d2092d0a5475aca0f28995034e58d14/design/storage-proof-timing.md).
 
 Once an SP knows it has to provide a proof it MUST get the proof challenge using `getChallenge(slotId)`, which then
 MUST be incorporated into the proof generation as described in Proving RFC (**TODO: Proving RFC**).
