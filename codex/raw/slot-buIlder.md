@@ -10,7 +10,7 @@ contributors:
 ## Abstract
 
 This document describes the Codex slot builder mechanism.
-Slots in Codex is an important component to the node collaboration in the network. 
+Slots used in the Codex protocol is an important component to node collaboration in the network. 
 
 ## Background
 
@@ -28,16 +28,23 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 A client would present the dataset after the erasure coding process,
 for more information refer to the [CODEX-ERASURE-CODING](./erasure-coding.md) specification.
-A block digest tree is contructed to produce a unqiue root hash that represents the dataset.
-The root hash SHOULD be used to fill slots.
-
-Slots are request made by a client to store a part of a dataset. 
+ 
 
 ### Block Tree
 
+A block digest tree is contructed to produce a unqiue root hash that represents the dataset.
+The root hash SHOULD be used to fill slots.
+
+Slots are request made by a client to store a part of a dataset.
+
+
 ### Slot Tree Contruction
 
-``` js
+If slots MAY be empty, meaning containing no data,
+depending on the size of the dataset.
+
+
+``` nim
 
 type SlotsBuilder*[T, H] = ref object of RootObj
   store: BlockStore              # Storage backend for blocks
@@ -54,11 +61,23 @@ type SlotsBuilder*[T, H] = ref object of RootObj
 
 ### Verification Tree
 
+A verification tree is contructed from all slots of a dataset.
 
-Construct slot trees from block digests
-Create verification trees from slot roots
-Manage empty blocks and padding
-Store cryptographic proofs in the block store
+```nim
+
+type ProofInputs*[H] = object
+  entropy*: H                    # Randomness value
+  datasetRoot*: H                # Dataset root hash
+  slotIndex*: Natural            # Slot identifier
+  slotRoot*: H                   # Root hash of slot
+  nCellsPerSlot*: Natural        # Cell count per slot
+  nSlotsPerDataSet*: Natural     # Total slot count
+  slotProof*: seq[H]             # Inclusion proof for slot in dataset
+  samples*: seq[Sample[H]]       # Cell inclusion proofs
+
+```
+
+
 
 ## Copyright
 
@@ -66,4 +85,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-
+- [CODEX-ERASURE-CODING](./erasure-coding.md)
+- 
