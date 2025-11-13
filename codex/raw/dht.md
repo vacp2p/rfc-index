@@ -1,34 +1,59 @@
----
+00---
 title: CODEX-DHT
 name: Codex Discovery
 status: raw
-tags: 
-editor: 
+tags:
+editor:
 contributors:
 - Jimmy Debe <jimmy@status.im>
+- Giuliano Mega <giuliano@status.im>
 ---
 
 ## Abstract
 
-This document explains the Codex DHT (Distributed Hash Table) component.
-It is used to store Codex's signed-peer-record (SPR) entries,
-as well as content identifiers (CID) for each host.
+This document explains the Codex DHT (Distributed Hash Table) component. The DHT maps content IDs (CIDs) into providers of that
+content.
 
-## Background
+## Background and Overview
 
 Codex is a network of nodes, identified as providers,
 participating in a decentralized peer-to-peer storage protocol.
 The decentralized storage solution offers data durability guarantees,
 incentive mechanisms and data persistence guarantees.
 
-The Codex DHT component is a modified version of
-[DiscV5 DHT](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md) protocol to store Codex SPR entries,
-as well as the CID for each host.
-DiscV5 is a node discovery system used to find peers who are registered on a distributed hash table (DHT).
-This allows a provider to publish to the network their connection information and
-information about what content they are storing.
-A Codex provider will support this protocol at no extra cost other than the use of resources to store node records.
-This allows any provider node to be used as the entry point for new providers to connect to live nodes on the Codex network.
+The Codex DHT is the service responsible for helping providers find other peers hosting both [dataset and standalone blocks]() in the Codex network. It maps content IDs -- which identify blocks and datasets -- into lists of providers -- which identify and provide the information required to connect to those providers.
+
+The Codex DHT is a modified version of
+[discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md), with the following differences:
+
+1. it uses [libp2p SPRs](https://github.com/libp2p/specs/blob/master/RFC/0002-signed-envelopes.md) instead of Ethereum's [ENRs](https://eips.ethereum.org/EIPS/eip-778) to identify peers and convey connection information;
+2. it extends the DHT message interface with `GET_PROVIDERS`/`ADD_PROVIDER` requests for managing provider lists;
+3. it replaces [discv5 packet encoding](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-wire.md#packet-encoding) with protobuf.
+
+The Codex DHT is, indeed, closer to the [libp2p DHT](https://github.com/libp2p/specs/blob/master/kad-dht/README.md) than to discv5 in terms of what it provides. Historically, this is because the Nim version of libp2p did not implement the [Kad DHT spec](https://github.com/libp2p/specs/tree/master/kad-dht) at the time, so project builders opted to adapt the [nim-eth](https://github.com/status-im/nim-eth) Kademlia-based discv5 DHT instead.
+
+A Codex provider will support this protocol at no extra cost other than the use of resources to store node records, and the bandwidth to serve queries and process data advertisements. As it is usually the case with DHTs, any publicly reachable node running the DHT protocol can be used as a bootstrap node into the Codex network.
+
+## Service Interface
+
+The two core primitives provided by the Codex DHT on top of discv5 are:
+
+```python
+def addProvider(cid: NodeId, provider: SignedPeerRecord)
+def getProviders(cid: NodeId): List[SignedPeerRecord]
+```
+
+where `NodeId` is a 256-bit string, [obtained from the keccak256 hash function of the node's public key](https://github.com/ethereum/devp2p/blob/master/enr.md#v4-identity-scheme), the same used to sign peer records.
+
+By convention, we convert from libp2p CIDs to `NodeId` by taking the keccak256 hash of the CID's contents. For reference, the Nim implementation of this conversion looks like:
+
+```nim
+proc toNodeId*(cid: Cid): NodeId =
+  ## Cid to discovery id
+  ##
+
+  readUintBE[256](keccak256.digest(cid.data.buffer).data)
+```
 
 ## Wire Format
 
@@ -36,145 +61,50 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-A `provider` is a node running the Codex protocol and providing resources to the Codex network.
-To become a `provider`, the node MUST have a `NodeId`,
-which is generated with the keccak256 hash function of its `PublicKey`.
-The record will be shared and
-stored by other `provider`s in their local routing table.
-A `FINDNODEMESSAGE` message is used by the new `provider` to query other nodes who may choose to store the new record.
-Once stored by one `provider`,
-the new `provider` will be accessible to the network.
+As in discv5, all messages in the Codex DHT MUST be encoded with a `request_id`, which SHALL be serialized before the actual message data, as per the message envelope below:
 
-This record SHOULD include node identity information, connection information,
-timing information, and reliability information.
-Information provided in the record can be updated at any time to match the live details of the `provider`.
-The following is the `provider` node record in the Codex network.
-
-``` js
-
-{
-   "Provider" : {
-        id: NodeId
-        pubkey: PublicKey
-        address: Array[peerId]
-        record: SignedPeerRecord
-        seen: float // Indicates if there was at least one successful
-        // request-response with this provider, or if the node was verified
-        // through the underlying transport mechanisms. After first contact
-        // it tracks how reliable is the communication with the provider.
-        stats: Stats // traffic measurements and statistics
-    }
-  
-    "SignedPeerRecord" : {
-      "seqNum": uint64, // sequence number of record update
-      "pubkkey": PublicKey,
-      "ip": IpAddress, // ip address is optional
-      "tcpPort": Port,
-      "udpPort": Port
-    }
-
-   "NodeId" : keccak256(PublicKey)
-
-   "Stats" : { 
-       "rttMin": float // millisec
-       "rttAvg": float // millisec
-       "bwAvg": float // bps
-       "bwMax": float // bps
-   }
-
+```protobuf
+message MessageEnvelope {
+  bytes request_id = 1;    // RequestId (max 8 bytes)
+  bytes message_data = 2;  // Encoded specific message
 }
-
 ```
 
-As in the discV5 protocol, the `NodeId` is a unqiue identifier to find other nodes within the network.
-The `peerId` and `NodeId` MUST NOT be the same.
+Signed peer records are simply libp2p [peer records](https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md#address-record-format) wrapped in a [signed envelope](https://github.com/libp2p/specs/blob/master/RFC/0002-signed-envelopes.md#wire-format) and MUST be serialized according to the libp2p protobuf wire formats.
 
-### Signed Peer Record
+Providers MUST[^1] support the standard discv5 messages, with the following additions:
 
-The `record` MUST be generated by the `provider`,
-which contains their connection information.
-On the Codex network,
-the `record` is identified a `SignedPeerRecord`, SPR.
+**ADD_PROVIDER request (0x0B)**
 
-All values, excluding the `ip`, are REQUIRED in a SPR.
-Which nodes and the number of nodes in this set are described in the [routing table](#routing-table) section.
-The `PrivateKey` MUST be used to sign the `record`.
-A `provider` SHOULD disregard messages from a node if the `record` is unsigned or becomes stale.
-The `provider` SHOULD contact other live nodes to disseminate new and updated records.
-The update will increase the `seqNum`, then sign the new version of the `record`.
-
-### Distance calculation
-
-#### Routing Table
-
-Each `provider` has a local routing table which stores the SPR of other `provider`s it has discovered.
-New `provider`s SHOULD query live nodes to update their local routing table with SPRs.
-
-``` js
-
-   "RoutingTable" : {
-       "localProvider": Provider,
-       "buckets": seq[KBucket],
-       "bitsPerHop": number, 
-       "ipLimits": IpLimits, // IP limits for total routing table: all buckets and
-       // replacement caches.
-       "distanceCalculator" : DistanceCalculator,
-       "rng" : ref HmacDrbgContext
-   }
-   "KBucket" : {
-       "istart", "iend": NodeId, 
-       "providers": seq[Provider],
-       "replacementCache": seq[Providers], // Nodes that could not be added to the `providers`
-       // seq as it is full and without stale nodes. This is practically a small
-       // LRU cache.
-       "ipLimits": IpLimits, ## IP limits for bucket: node entries and replacement
-       // cache entries combined.
-   }
-   "IpLimits" : {
-      "tableIpLimit": number,
-      "bucketIpLimit": number
-   }
-
-
+```protobuf
+message AddProviderMessage {
+  bytes content_id = 1; // NodeId - 32 bytes, big-endian
+  Envelope signed_peer_record = 2;
+}
 ```
 
-The `bitsPerHop` MUST indicate the minimum number of bits of a `NodeId` needed to get closer to finding the target per query.
-Practically, it tells a `provider` also how often a node "not in range", based on `NodeId` prefix similarities,
-will cause a branch to split off.
-Setting this value to 1 is the basic, non-accelerated version,
-which will never split off the "not in range" branch and
-which will result in $ \log_2 n $ hops per lookup.
-Setting it higher will increase the amount of splitting on a "not in range" branch,
-thus holding more `providers` with a better keyspace coverage and
-will result in an improvement of $ \log_{2^b} n $ hops per lookup.
+Registers the peer in `signed_peer_record` as a provider of the content identified by `content_id`.
 
-- `DistanceCalculator`: value SHOULD be generated with the defined node distance algorithm used in the [discv5 specification](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md).
-- `istart`: The range of `NodeId`s this `KBucket` covers.
-This is not a simple logarithmic distance, as buckets can be split over a prefix that
-does not cover the `localNode` id.
+**GET_PROVIDERS request (0x0C)**
 
-- `providers`: Node entries of the KBucket are sorted according to last time seen.
-First entry (head) is considered the most recently seen node, and
-the last entry (tail) is considered the least recently seen node.
-Here, "seen" indicates a successful request-response.
-This can also not have occurred yet.
+```protobuf
+message GetProvidersMessage {
+  bytes content_id = 1; // NodeId - 32 bytes, big-endian
+}
+```
 
-- `IpLimits`: The routing table IP limits are applied on both the total table,
-and on the individual buckets.
-In each case, the active node entries,
-but also the entries waiting in the replacement cache, are accounted for.
-This way, the replacement cache can't get filled with nodes that then can't be added due to the limits that apply.
-As entries are not verified immediately before or on entry,
-a malicious node MAY fill the routing table or
-a specific bucket with SPRs that have `ip`s not controlled by that adversary.
-This would affect the `provider` that actually controls the `ip`,
-as they could have a difficult time disseminating its SPR to be stored in the DHT by other `provider`s.
-However, that `provider` can still search and find nodes to connect to.
+Requests the list of providers of the content identified by `content_id`.
 
-There is the possibility to set the `IPLimits` on verified `providers` only,
-but that would allow for lookups to be done on a higher set of nodes owned by the same identity.
-This is a worse alternative.
-Doing lookups only on verified nodes would slow down discovery startup.
+**PROVIDERS response (0x0D)**
+
+```protobuf
+message ProvidersMessage {
+  uint32 total = 1;
+  repeated Envelope signed_peer_records = 2;
+}
+```
+
+Returns the list of known providers of the content identified by `content_id`. `total` is currently always set to $1$.
 
 ## Copyright
 
@@ -184,3 +114,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 - [DiscV5 DHT](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 - [Ethereum Node Record](https://github.com/ethereum/devp2p/blob/master/enr.md)
+
+[^1]: This is actually stronger than necessary, but we'll refine it over time.
