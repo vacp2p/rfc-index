@@ -389,17 +389,276 @@ since we’ve finished trying with it.
 
 ### Overview
 
+The `LOOKUP(s)` procedure is run by a discoverer to query registrar nodes
+to find advertisements for a specific service ID `s`.
+
+Discoverers runs `LOOKUP(s)` periodically and when more peers are requested by its service application.
+Implementations may choose the interval based on their requirements.
+
+It works like a gradual search on the search table `DiscT(s)`,
+starting from far buckets (`b_0`) which has registrar nodes with fewer shared bits with `s`
+and moving to buckets (`b_(m-1)`) containing registrar nodes with higher number of shared bits or closer to `s`.
+
 ### Lookup Algorithm
+
+```protobuf
+procedure LOOKUP(s):
+    DiscT(s) ← KadDHT(node.id)
+    foundPeers ← SET<Peers>
+    for i in 0, 1, ..., m-1:
+        for j in 0, ..., K_lookup - 1:
+            peer ← DiscT(s).getBucket(i).getRandomNode()
+            if peer = None:
+                break
+            end if
+            response ← peer.GetAds(s)
+            for ad in response.ads:
+                assert(ad.hasValidSignature())
+                foundPeers.add(ad.peerId)
+                if foundPeers.size ≥ F_lookup:
+	                  break
+	              end if
+	          end for
+            DiscT(s).add(response.closerPeers)
+            if foundPeers.size ≥ F_lookup:
+                return foundPeers
+            end if
+        end for
+    end for
+    return foundPeers
+end procedure
+```
+
+#### LOOKUP(s) algorithm explanation:
+
+1. The **Discovery Table** `DiscT(s)` is initialized by
+bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
+(Refer [Distance](#distance) section)
+2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
+3. Go through each bucket of the search table `DiscT(s)` —
+from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `s`.
+For each bucket, query up to `K_lookup` random peers.
+    1. Pick a random registrar node from bucket `i` of the search table `DiscT(s)` to query
+        1. `DiscT(s).getBucket(i)` → returns a list of registrars in bucket `i` from the search table `DiscT(S)`
+        2. `.getRandomNode()` → function returns a random registrar node.
+        The discover queries this node to get `ads` for a particular service ID `s`.
+        The function remembers already returned nodes and never returns the same one twice.
+        If there are no peers, it returns `None`.
+    2. A `GET_ADS` request is sent to the selected registrar peer.
+    Refer to [GET_ADS Message](#get_ads-message) to see the request and response structure for `GET_ADS`.
+    The response returned by the registrar node is stored in `response`
+    3. The `response` contains a list of advertisements `response.ads`.
+    A queried registrar returns at most `F_return` advertisements.
+    If it returns more we can just randomly keep `F_return` of them.
+    For each advertisement returned:
+        1. Verify its digital signature for authenticity.
+        2. Add the advertiser’s node ID `ad.peerID` to the list `foundPeers`.
+    4. The `response` also contains a list of peers `response.closerPeers`
+    that is inserted into the search table `DiscT(s)`.
+    Refer [Distance](#distance) Section for how it is added.
+    5. Stop early if enough advertiser peers (`F_lookup`) have been found — no need to continue searching.
+    For popular services `F_lookup` advertisers are generally found in the initial phase
+    from the farther buckets and the search terminates.
+    But for unpopular ones it might take longer but not more than `O(log N)`
+    where N is number of nodes participating in the network as registrars.
+    6. If early stop doesn’t happen then the search stops when no unqueried registrars remain in any of the buckets.
+4. Return `foundPeers` which is the final list of discovered advertisers that provide service `s`
+
+Making the advertisers and discoverers walk towards `s` in a similar fashion
+guarantees that the two processes overlap and contact a similar set of registrars that relay the `ads`.
+At the same time, contacting random registrars in each encountered bucket using `getRandomNode()`
+makes it difficult for an attacker to strategically place malicious registrars in the network.
+The first bucket `b_0(s)` covers the largest fraction of the key space
+as it corresponds to peers with no common prefix to `s` (i.e. 50% of all the registrars).
+Placing malicious registrars in this fraction of the key space
+to impact service discovery process would require considerable resources.
+Subsequent buckets cover smaller fractions of the key space,
+making it easier for the attacker to place Sybils
+but also increasing the chance of advertisers already gathering enough ads in previous buckets.
+
+Parameters `F_return` and `F_lookup` play an important role in setting a compromise between security and efficiency.
+A small value of `F_return << F_lookup` increases the diversity of the source of `ads` received by the discoverer
+but increases search time, and requires reaching buckets covering smaller key ranges where eclipse risks are higher.
+On the other hand, similar values for `F_lookup` and `F_return` reduce overheads
+but increase the danger of a discoverer receiving ads uniquely from malicious nodes.
+Finally, low values of `F_lookup` stop the search operation early,
+before reaching registrars close to the service hash, contributing to a more balanced load distribution.
+Implementations should consider these trade-offs carefully when selecting appropriate values.
 
 ## Admission Protocol
 
 ### Overview
 
+Registrars use a waiting time based admission protocol to admit advertisements into their `ad_cache`.
+The mechanism does not require registrars to maintain any state for each ongoing request preventing DoS attacks.
+
+`ad_cache` is the advertisement cache.
+It is a bounded storage structure maintained by registrars to store accepted advertisements.
+Each ad stored in the `ad_cache` has an associated expiry time `E`,
+after which the `ad` is automatically removed.
+The total size of the `ad_cache` is limited by its capacity `C`.
+
 ### Registration Flow
+
+When a registrar receives a `REGISTER` request from an advertiser
+then it runs the `Register()` algorithm to decide whether to admit `ad` coming from advertiser
+into its `ad_cache` or not.
+Refer to section [Register Message](#register-message) for the request and response structure of `REGISTER`.
+
+```text
+procedure REGISTER(ad, ticket):
+    assert(ad not in ad_cache)
+    response.ticket.ad ← ad
+    t_wait ← CALCULATE_WAITING_TIME(ad)
+
+    if ticket.empty():
+        t_remaining ← t_wait
+        response.ticket.t_init ← NOW()
+        response.ticket.t_mod ← NOW()
+    else:
+        assert(ticket.hasValidSignature())
+        assert(ticket.ad = ad)
+        assert(ad.notInAdCache())
+        t_scheduled ← ticket.t_mod + ticket.t_wait_for
+        assert(t_scheduled ≤ NOW() ≤ t_scheduled + δ)
+        t_remaining ← t_wait - (NOW() - ticket.t_init)
+    end if
+    if t_remaining ≤ 0:
+        ad_cache.add(ad)
+        response.status ← Confirmed
+    else:
+        response.status ← Wait
+        response.ticket.t_wait_for ← MIN(E, t_remaining)
+        response.ticket.t_mod ← NOW()
+        SIGN(response.ticket)
+    end if
+    response.closerPeers ← GETPEERS(ad.s)
+    return response
+end procedure
+```
+
+#### `REGISTER()` algorithm explanation:
+
+1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
+Duplicates are not allowed.
+An advertiser can place at most one `ad` for a specific service ID `s` in the `ad_cache` of a given registrar.
+2. Prepare a response ticket `response.ticket` linked to this `ad`.
+3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
+Refer section [Waiting Time Calculation](#waiting-time-calculation) for details.
+4. Check if this is the first registration attempt (no ticket yet):
+    1. If yes then it’s the first try. The advertiser must wait for the full waiting time `t_wait`.
+    The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
+    2. If no, then this is a retry, so a previous ticket exists.
+        1. Validate that the ticket is properly signed by the registrar,
+        belongs to this same advertisement and that the ad is still not already in the `ad_cache`.
+        2. Ensure the retry is happening within the allowed time window `δ` after the scheduled time.
+        If the advertiser waits too long or too short, the ticket is invalid.
+        3. Calculate how much waiting time is left `t_remaining`
+        by subtracting how long the advertiser has already waited
+        (`NOW() - ticket.t_init`) from `t_wait`.
+5. Check if the remaining waiting time `t_remaining` is less than or equal to 0.
+This means  the waiting time is over.
+`t_remaining` can be 0 also when the registrar decides that
+the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting time `t_wait` is 0).
+    1. If yes, add the `ad` to `ad_cache` and confirm registration.
+    The advertisement is now officially registered.
+    2. If no, then there is still time to wait.
+    In this case registrar does not store ad but instead issues a ticket.
+        1. set `reponse.status` to `wait`
+        2. Update the ticket with the new remaining waiting time `t_wait_for`
+        3. Update the ticket last modification time `t_mod`
+        4. Sign the ticket again. The advertiser will retry later using this new ticket.
+6. Add a list of peers closer to the service ID `ad.s` using the `GETPEERS()` function
+to the response (the advertiser uses this to update its advertise table `AdvT(s)`).
+7. Send the full response back to the advertiser
+
+Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
+before trying to register again with the same registrar.
+Each new registration attempt must include the latest ticket issued by that registrar.
+
+A ticket can only be used within a limited **registration window** `δ`,
+which is chosen to cover the maximum expected delay between the advertiser and registrar.
+This rule prevents attackers from collecting many tickets, accumulating waiting times,
+and submitting them all at once to overload the registrar.
+
+Advertisers only read the waiting time `t_wait` from the ticket —
+they do **not** use the creation time `t_init` or the modification time `t_mod`.
+Therefore, **clock** synchronization between advertisers and registrars is not required.
+
+The waiting time `t_wait` is not fixed.
+Each time an advertiser tries to register, the registrar recalculates a new waiting time based on its current cache state.
+The remaining time `t_remaining` is then computed as the difference between
+the new waiting time and the time the advertiser has already waited, as recorded in the ticket.
+With every retry, the advertiser accumulates waiting time and will eventually be admitted.
+However, if the advertiser misses its registration window or fails to include the last ticket,
+it loses all accumulated waiting time and must restart the registration process from the beginning.
+Implementations must consider these factors while deciding the registration window `δ` time.
+
+This design lets registrars prioritize advertisers that have waited longer
+without keeping any per-request state before the ad is admitted to the cache.
+Because waiting times are recalculated and tickets are stored only on the advertiser’s side,
+the registrar is protected from memory exhaustion and DoS attacks caused by inactive or malicious advertisers.
 
 ### Lookup Response Algorithm
 
+Registrars respond to `GET_ADS` requests from discoverers using the `LOOKUP_RESPONSE()` algorithm.
+Refer to section [GET_ADS Message](#get_ads-message) for the request and response structure of `GET_ADS`.
+
+```text
+procedure LOOKUP_RESPONSE(s):
+	response.ads ← ad_cache.getAdvertisements(s)[:F_return]
+	response.closerPeers ← GETPEERS(s)
+	return response
+end procedure
+```
+
+#### `LOOKUP_RESPONSE(s)` algorithm explanation:
+
+1. Fetch all advertisements for service ID `s` from the registrar’s `ad_cache`.
+Then return up to `F_return` of them (a system parameter limiting how many ads are sent per query by a registrar).
+2. Call the `GETPEERS(s)` function to get a list of peers from across the registrar’s routing table `RegT(s)`.
+3. Send the assembled response (advertisements + closer peers) back to the discoverer.
+
 ### Peer Table Updates
+
+While responding to both `REGISTER` requests by advertisers and `GET_ADS` request by discoverers,
+the contacted registrar node also returns a list of peers.
+To get this list of peers, the registrar runs the `GETPEERS(s)` algorithm.
+Both advertisers and discoverers update their service-specific tables using this list of peers.
+
+```text
+procedure GETPEERS(s):
+    peers ← SET<peers>
+    RegT(s) ← KadDHT(node.id)
+    for i in 0, 1, ..., m-1:
+        peer ← b_i(s).getRandomNode()
+        if peer ≠ None:
+            peers.add(peer)
+        end if
+    end for
+    return peers
+end procedure
+```
+
+#### `GETPEERS(s)` algorithm explanation:
+
+1. `peers` is initialized as an empty set to avoid storing duplicates
+2. The registrar table `RegT(s)` is initialized from the node’s `KadDHT(node.id)` routing table.
+Refer [Distance](#distance) section on how to add peers.
+3. Go through all `m` buckets in the registrar’s table — from farthest to closest relative to the service ID `s`.
+    1. Pick one random peer from bucket `i`.
+    `getRandomNode()`  function remembers already returned nodes and never returns the same one twice.
+    2. If peer returned is not null then we move on to next bucket.
+    Else we try to get another peer in the same bucket
+4. Return `peers` which contains one peer from every bucket of `RegT(s)`.
+
+Malicious registrars could return large numbers of malicious nodes in a specific bucket.
+To limit this risk, a node communicating with a registrar asks it to return a single peer per bucket
+from registrar’s view of the routing table `RegT(s)`.
+Contacting registrars in consecutive buckets divides the search space by a constant factor,
+and allows learning new peers from more densely-populated routing tables towards the destination.
+The procedure mitigates the risk of having malicious peers polluting the table
+while still learning rare peers in buckets close to `s`.
 
 ## Waiting Time Calculation
 
