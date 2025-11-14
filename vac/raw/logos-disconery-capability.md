@@ -361,7 +361,7 @@ Each bucket corresponds to a particular distance from the service ID `s`.
     The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
     Asynchronous execution allows multiple ads (to multiple registrars) to proceed in parallel.
 
-**ADVERTISE_SINGLE() algorithm explanation:**
+#### ADVERTISE_SINGLE() algorithm explanation
 
 `ADVERTISE_SINGLE()` algorithm handles registration to one registrar at a time
 
@@ -429,7 +429,7 @@ procedure LOOKUP(s):
 end procedure
 ```
 
-#### LOOKUP(s) algorithm explanation:
+#### LOOKUP(s) algorithm explanation
 
 1. The **Discovery Table** `DiscT(s)` is initialized by
 bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
@@ -537,7 +537,7 @@ procedure REGISTER(ad, ticket):
 end procedure
 ```
 
-#### `REGISTER()` algorithm explanation:
+#### `REGISTER()` algorithm explanation
 
 1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
 Duplicates are not allowed.
@@ -612,7 +612,7 @@ procedure LOOKUP_RESPONSE(s):
 end procedure
 ```
 
-#### `LOOKUP_RESPONSE(s)` algorithm explanation:
+#### `LOOKUP_RESPONSE(s)` algorithm explanation
 
 1. Fetch all advertisements for service ID `s` from the registrar’s `ad_cache`.
 Then return up to `F_return` of them (a system parameter limiting how many ads are sent per query by a registrar).
@@ -640,7 +640,7 @@ procedure GETPEERS(s):
 end procedure
 ```
 
-#### `GETPEERS(s)` algorithm explanation:
+#### `GETPEERS(s)` algorithm explanation
 
 1. `peers` is initialized as an empty set to avoid storing duplicates
 2. The registrar table `RegT(s)` is initialized from the node’s `KadDHT(node.id)` routing table.
