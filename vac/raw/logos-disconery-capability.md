@@ -285,7 +285,7 @@ such that other peers can  find it efficiently.
 
 ### Advertisement Algorithm
 
-```
+```text
 procedure ADVERTISE(s):
     ongoing ← MAP<bucketIndex; LIST<registrars>>
     AdvT(s) ← KadDHT(node.id)
@@ -325,7 +325,7 @@ procedure ADVERTISE_SINGLE(registrar, ad, i, s):
 end procedure
 ```
 
-**ADVERTISE() algorithm explanation**
+#### ADVERTISE() algorithm explanation
 
 Advertisers place advertisements across multiple registrars using the `ADVERTISE()` algorithm.
 The advertisers run `ADVERTISE()` periodically.
