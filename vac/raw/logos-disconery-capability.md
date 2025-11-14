@@ -709,7 +709,7 @@ Implementations should consider this while setting the value for `P_occ`
 
 ### Service Similarity
 
-```
+```text
 service_similarity = c(ad.s) / C
 ```
 
@@ -783,7 +783,7 @@ It’s used to detect when too many ads come from the same network or IP prefix 
 
 ```text
 procedure CALCULATE_IP_SCORE(tree, IP):
-	v ← tree.root
+    v ← tree.root
     score ← 0
     bits ← IP.toBinary()
     for i in 0, 1, ..., 31:
@@ -850,7 +850,7 @@ Invariant: A new waiting time `w_2` at time `t_2`
 cannot be smaller than a previous waiting time `w_1` at time `t_1`
 (where `t_1 < t_2`) by more than the elapsed time:
 
-```
+```text
 w_2 ≥ w_1 - (t_2 - t_1)
 ```
 
