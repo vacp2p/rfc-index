@@ -313,7 +313,7 @@ It uses the `LOOKUP_RESPONSE()` as described in Section 8, algorithm to respond 
 
 ### GET_ADS Message
 
-##  Implementation Notes
+## Implementation Notes
 
 ### Client and Server Mode
 
