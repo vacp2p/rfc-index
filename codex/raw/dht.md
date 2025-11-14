@@ -1,12 +1,14 @@
-00---
+---
 title: CODEX-DHT
 name: Codex Discovery
 status: raw
 tags:
 editor:
 contributors:
+
 - Jimmy Debe <jimmy@status.im>
 - Giuliano Mega <giuliano@status.im>
+
 ---
 
 ## Abstract
@@ -21,7 +23,7 @@ participating in a decentralized peer-to-peer storage protocol.
 The decentralized storage solution offers data durability guarantees,
 incentive mechanisms and data persistence guarantees.
 
-The Codex DHT is the service responsible for helping providers find other peers hosting both [dataset and standalone blocks]() in the Codex network. It maps content IDs -- which identify blocks and datasets -- into lists of providers -- which identify and provide the information required to connect to those providers.
+The Codex DHT is the service responsible for helping providers find other peers hosting both dataset and standalone blocks[^2] in the Codex network. It maps content IDs -- which identify blocks and datasets -- into lists of providers -- which identify and provide the information required to connect to those providers.
 
 The Codex DHT is a modified version of
 [discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md), with the following differences:
@@ -74,7 +76,7 @@ Signed peer records are simply libp2p [peer records](https://github.com/libp2p/s
 
 Providers MUST[^1] support the standard discv5 messages, with the following additions:
 
-**ADD_PROVIDER request (0x0B)**
+### ADD_PROVIDER request (0x0B)
 
 ```protobuf
 message AddProviderMessage {
@@ -85,7 +87,7 @@ message AddProviderMessage {
 
 Registers the peer in `signed_peer_record` as a provider of the content identified by `content_id`.
 
-**GET_PROVIDERS request (0x0C)**
+### GET_PROVIDERS request (0x0C)
 
 ```protobuf
 message GetProvidersMessage {
@@ -95,7 +97,7 @@ message GetProvidersMessage {
 
 Requests the list of providers of the content identified by `content_id`.
 
-**PROVIDERS response (0x0D)**
+### PROVIDERS response (0x0D)
 
 ```protobuf
 message ProvidersMessage {
@@ -116,3 +118,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Ethereum Node Record](https://github.com/ethereum/devp2p/blob/master/enr.md)
 
 [^1]: This is actually stronger than necessary, but we'll refine it over time.
+[^2]: This should link to the block exchange spec once it's done.
