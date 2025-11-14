@@ -664,9 +664,224 @@ while still learning rare peers in buckets close to `s`.
 
 ### Formula
 
+The waiting time is the time advertisers have to wait before being admitted to the ad_cache.
+The waiting time is given based on the ad itself and the current state of the registrar’s ad_cache.
+
+The waiting time for an advertisement is calculated using:
+
+```text
+w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.s)/C + score(getIP(ad.addrs)) + G)
+```
+
+- `c`: Current cache occupancy
+- `c(ad.s)`: Number of advertisements for service `s` in cache
+- `getIP(ad.addrs)` is a function to get the IP address from the multiaddress of the advertisement.
+- `score(getIP(ad.addrs))`: IP similarity score (0 to 1). Refer section [IP Similarity Score](#ip-similarity-score)
+
+Section [System Parameters](#system-parameters) can be referred
+for the definitions of the remaining parameters in the formula.
+
+Issuing waiting times promote diversity in the ad cache.
+It results in high waiting times and slower admission for malicious advertisers
+using Sybil identities from a limited number of IP addresses.
+It also promotes less popular services with fast admission
+ensuring fairness and robustness against failures of single registrars.
+
+### Scaling
+
+The waiting time is normalized by the ad’s expiry time `E`.
+It binds waiting time to `E` and allows us to reason about the number of incoming requests
+regardless of the time each ad spends in the ad cache.
+
+### Occupancy Score
+
+```text
+occupancy_score = 1 / (1 - c/C)^P_occ
+```
+
+The occupancy score increases progressively as the cache fills:
+
+- When `c << C`: Score ≈ 1 (minimal impact)
+- As the ad_cache fills up, the score will be amplified by the divisor of the equation.
+The higher the value of `P_occ`, the faster the increase.
+Implementations should consider this while setting the value for `P_occ`
+- As `c → C`: Score → ∞ (prevents overflow)
+
+### Service Similarity
+
+```
+service_similarity = c(ad.s) / C
+```
+
+The service similarity score promotes diversity:
+
+- Low when service `s` has few advertisements in cache. Thus lower waiting time.
+- High when service `s` dominates the cache. Thus higher waiting time.
+
+### IP Similarity Score
+
+IP similarity score is used to limit the number of IPs coming from the same subnetwork
+by increasing their waiting time.
+Higher similarity means higher score and a higher waiting time.
+The `score` ranges from 0 to 1:
+
+- closer to 1 for IPs sharing similar prefix
+- closer to 0 for diverse IPs
+
+IP tree is a binary tree that stores IPs used by ads that are currently present in the ad_cache.
+
+#### Tree Structure
+
+- Each tree vertex stores a `counter` showing how many IPs pass through that node.
+- Apart from root, the IP tree is a 32-level binary tree
+- The counter of every vertex of the tree is initially set to 0.
+- edges represent consecutive 0s or 1s in a binary representation of IPv4 addresses.
+- While inserting an IPv4 address into the tree using `ADD_IP_TO_TREE()` algorithm,
+counters of all the visited vertices are increased by 1.
+The visited path is the binary representation of the IPv4 address.
+IPv4 addresses are inserted into the tree only when they are admitted to the ad_cache.
+- The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
+- When an ad expires after `E` the ad is removed from the ad_cache
+and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the counters on the path.
+The path is the binary representation of the IPv4 address.
+- the root counter stores the number of IPv4 addresses that are currently present in the ad_cache
+
+#### `ADD_IP_TO_TREE()` algorithm
+
+IPv4 addresses are added to the IP tree using the `ADD_IP_TO_TREE()` algorithm when an ad admitted to the ad_cache.
+
+```text
+procedure ADD_IP_TO_TREE(tree, IP):
+    v ← tree.root
+    bits ← IP.toBinary()
+    for i in 0, 1, ..., 31:
+        v.counter ← v.counter + 1
+        if bits[i] = 0:
+            v ← v.left
+        else:
+            v ← v.right
+        end if
+    end for
+end procedure
+```
+
+1. Start from the root node of the tree. Initialize current node variable `v` to root of the tree `tree.root`.
+2. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
+3. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
+    1. Increase the counter for the current node `v.counter`.
+    This records that another IP passed through this vertex `v` (i.e., shares this prefix).
+    2. Move to the next node in the tree. Go left `v.left` if the current bit `bits[i]` is `0`.
+    Go right `v.right` if it’s `1`.
+    This follows the path corresponding to the IP’s binary representation.
+
+The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
+It calculates how similar a given IP address is to other IPs already in the ad_cache
+and returns the IP similarity score of the inserted IP address.
+It’s used to detect when too many ads come from the same network or IP prefix — a possible Sybil behavior.
+
+#### `CALCULATE_IP_SCORE()` algorithm
+
+```text
+procedure CALCULATE_IP_SCORE(tree, IP):
+	v ← tree.root
+    score ← 0
+    bits ← IP.toBinary()
+    for i in 0, 1, ..., 31:
+        if bits[i] = 0:
+            v ← v.left
+        else:
+            v ← v.right
+        end if
+        if v.counter > tree.root.counter / 2^i:
+            score ← score + 1
+        end if
+    end for
+    return score / 32
+end procedure
+```
+
+1. Start from the root node of the tree.
+2. Initialize the similarity score `score` to 0. This score will later show how common the IP’s prefix is among existing IPs.
+3. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
+4. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
+    1. Move to the next node in the tree. Go left `v.left` if the current bit `bits[i]` is `0`. Go right `v.right` if it’s `1`.
+    This follows the path corresponding to the IP’s binary representation.
+    2. Check if this node’s counter is larger than expected in a perfectly balanced tree.
+    If it is, that means too many IPs share this prefix, so increase the similarity score `score` by 1.
+5. Divide the total score by 32 (the number of bits in the IP) and return it.
+
+#### `REMOVE_FROM_IP_TREE()` algorithm
+
+When an ad expires after `E`, its IP is removed from the tree, and the counters in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
+
+```text
+procedure REMOVE_FROM_IP_TREE(tree, IP):
+    v ← tree.root
+    bits ← IP.toBinary()
+    for i in 0, 1, ..., 31:
+        v.counter ← v.counter - 1
+        if bits[i] = 0:
+            v ← v.left
+        else:
+            v ← v.right
+        end if
+    end for
+end procedure
+```
+
+Implementations can extend the IP tree algorithms to IPv6 by using a 128-level binary tree,
+corresponding to the 128-bit length of IPv6 addresses.
+
+### Safety Parameter
+
+The safety parameter `G` ensures waiting times never reach zero even when:
+
+- Service similarity is zero (new service).
+- IP similarity is zero (completely distinct IP)
+
+It prevents ad_cache overflow in cases when attackers try to send ads for random services or from diverse IPs.
+
+### Lower Bound Enforcement
+
+To prevent "ticket grinding" attacks where advertisers repeatedly request new tickets hoping for better waiting times,
+registrars enforce lower bounds:
+
+Invariant: A new waiting time `w_2` at time `t_2`
+cannot be smaller than a previous waiting time `w_1` at time `t_1`
+(where `t_1 < t_2`) by more than the elapsed time:
+
+```
+w_2 ≥ w_1 - (t_2 - t_1)
+```
+
+Thus registrars maintain lower bound state for:
+
+- Each service in the cache: `bound(s)` and `timestamp(s)`
+- Each IP prefix in the IP tree: `bound(IP)` and `timestamp(IP)`
+
+The total waiting time will respect the lower bound if lower bound is enforced on these.
+These two sets have a bounded size as number of ads present in the ad_cache at a time is bounded by the cache capacity C.
+
+**How lower bound is calculated for service IDs:**
+
+When new service ID `s` enters the cache, `bound(s)` is set to `0`,
+and a `timestamp(s)` is set to the current time.
+When a new ticket request arrives for the same service ID `s`,
+the registrar calculates the service waiting time `w_s` and then applies the lower-bound rule:
+
+`w_s = max(w_s, bound(s) - timestamp(s))`
+
+The values `bound(s)` and `timestamp(s)` are updated whenever a new ticket is issued
+and the condition `w_s > (bound(s) - timestamp(s))`is satisfied.
+
+**How lower bound is calculated for IPs:**
+Registrars enforce lower-bound state for the advertiser’s IP address using IP tree
+(refer section [IP Similarity Score](#ip-similarity-score)).
+
 ## RPC Messages
 
-All RPC messages are sent using the libp2p Kad-dht message format with new message types added for Logos discovery operations.
+All RPC messages are sent using the libp2p Kad-dht message format
+with new message types added for Logos discovery operations.
 
 ### Message Types
 
