@@ -416,9 +416,9 @@ procedure LOOKUP(s):
                 assert(ad.hasValidSignature())
                 foundPeers.add(ad.peerId)
                 if foundPeers.size ≥ F_lookup:
-	                  break
-	              end if
-	          end for
+                      break
+                  end if
+              end for
             DiscT(s).add(response.closerPeers)
             if foundPeers.size ≥ F_lookup:
                 return foundPeers
@@ -606,9 +606,9 @@ Refer to section [GET_ADS Message](#get_ads-message) for the request and respons
 
 ```text
 procedure LOOKUP_RESPONSE(s):
-	response.ads ← ad_cache.getAdvertisements(s)[:F_return]
-	response.closerPeers ← GETPEERS(s)
-	return response
+    response.ads ← ad_cache.getAdvertisements(s)[:F_return]
+    response.closerPeers ← GETPEERS(s)
+    return response
 end procedure
 ```
 
