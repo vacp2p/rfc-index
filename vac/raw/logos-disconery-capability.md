@@ -335,14 +335,8 @@ Incentivization mechanisms are beyond the scope of this RFC.
 
 [0] Kademlia: A Peer-to-Peer Information System Based on the XOR Metric
 
-[1] DISC-NG: Robust Service Discovery in the Ethereum Global Network: https://ieeexplore.ieee.org/document/10629017
+[1] [DISC-NG: Robust Service Discovery in the Ethereum Global Network](https://ieeexplore.ieee.org/document/10629017)
 
-[2] libp2p Kademlia DHT specification. https://github.com/libp2p/specs/blob/master/kad-dht/README.md
+[2] [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md)
 
-[3] Go implementation: https://github.com/libp2p/go-libp2p-kad-dht
-
-[4] Go implementation docs: https://pkg.go.dev/github.com/libp2p/go-libp2p-kad-dht#section-readme
-
-[5] Rust Implementation:  https://github.com/libp2p/rust-libp2p/tree/master/protocols/kad
-
-[6] Rust implementation docs: https://docs.rs/libp2p-kad/latest/libp2p_kad/
+[3] [Go implementation](https://github.com/libp2p/go-libp2p-kad-dht)
