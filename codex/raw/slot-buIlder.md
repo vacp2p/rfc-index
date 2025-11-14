@@ -28,19 +28,28 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 A client would present the dataset after the erasure coding process,
 for more information refer to the [CODEX-ERASURE-CODING](./erasure-coding.md) specification.
- 
+There SHOULD be three merkle tree contructed for the slot building process.
+A block digest tree, a slot tree and a verification tree.
 
-### Block Tree
+A prepared dataset will be presented to the network in the form of slots.
+Slot represent a data chunk with a block that include all mechanisms for conducting a storage contract.
+Based on the storage contract, storage providers SHOULD be able to locate a specifc data chunk that is tasked to be stored.
 
-A block digest tree is contructed to produce a unqiue root hash that represents the dataset.
-The root hash SHOULD be used to fill slots.
+### Contruct the Slot Tree
 
-Slots are request made by a client to store a part of a dataset.
+A slot stores a list of root hashes that aid in the retrieval of a dataset.
+The block digest tree SHOULD be contructed before building any slots.
+A block is divided into cells that are then hashed and
+those hashes are used to create a [Posieden2]() based merkle tree.
+A block digest tree SHOULD contain the unqiue root hashes of blocks of the entire dataset,
+which MAY also be based on the Posiden2 algorithm.
+The total byte size of each block MUST be able to evenly divide by the cell size and/or 
+the number of slots.
 
 
 ### Slot Tree Contruction
 
-If slots MAY be empty, meaning containing no data,
+Some slots MAY be empty, meaning containing no data,
 depending on the size of the dataset.
 
 
@@ -61,7 +70,8 @@ type SlotsBuilder*[T, H] = ref object of RootObj
 
 ### Verification Tree
 
-A verification tree is contructed from all slots of a dataset.
+A verification tree is a merkle proof based on the `slotRoot`.
+
 
 ```nim
 
