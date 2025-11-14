@@ -468,7 +468,7 @@ message Ticket {
 
 ### REGISTER Message
 
-**Request**
+#### Request
 
 ```protobuf
 message Message {
@@ -479,7 +479,7 @@ message Message {
 }
 ```
 
-**Response**
+#### Response
 
 ```protobuf
 enum RegistrationStatus {
@@ -498,7 +498,7 @@ message Message {
 
 ### GET_ADS Message
 
-**Request**
+#### Request
 
 ```protobuf
 message Message {
@@ -507,7 +507,7 @@ message Message {
 }
 ```
 
-**Response**
+#### Response
 
 ```protobuf
 message Message {
