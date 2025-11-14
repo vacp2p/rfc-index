@@ -65,8 +65,6 @@ Services are identified by a unique service identifier string like `waku.store, 
 
 ### Service ID
 
-### Service ID
-
 The service ID **`s`** is the SHA-256 hash of the service identifier string.
 
 For example:
@@ -273,13 +271,119 @@ Registers store ads from advertisers in their advertisement cache.
 Registers use a waiting time based admission control mechanism using the `REGISTER()` algorithm
 as described in [Registration Flow section](#registration-flow)
 to decide whether to admit an advertisement coming from an advertiser or not.
-It uses the `LOOKUP_RESPONSE()` as described in Section 8, algorithm to respond to `LOOKUP()` requests of discoverers.
+It uses the `LOOKUP_RESPONSE()` as described in [Lookup Response Algorithm section](#lookup-response-algorithm),
+algorithm to respond to `LOOKUP()` requests of discoverers.
 
 ## Advertisement Placement
 
 ### Overview
 
+`ADVERTISE(s)` lets advertisers publish itself as a participant in a particular *service with ID* `s` .
+
+It spreads advertisements for its service across multiple registrars,
+such that other peers can  find it efficiently.
+
 ### Advertisement Algorithm
+
+```
+procedure ADVERTISE(s):
+    ongoing ← MAP<bucketIndex; LIST<registrars>>
+    AdvT(s) ← KadDHT(node.id)
+    for i in 0, 1, ..., m-1:
+        while ongoing[i].size < K_register:
+            registrar ← AdvT(s).getBucket(i).getRandomNode()
+            if registrar = None:
+                break
+            end if
+            ongoing[i].add(registrar)
+            ad.serviceId ← s
+            ad.peerId ← node.id
+            ad.addrs ← node.addrs
+            ad.timestamp ← NOW()
+            SIGN(ad)
+            async(ADVERTISE_SINGLE(registrar, ad, i, s))
+        end while
+    end for
+end procedure
+
+procedure ADVERTISE_SINGLE(registrar, ad, i, s):
+    ticket ← None
+    while True:
+        response ← registrar.Register(ad, ticket)
+        AdvT(s).add(response.closerPeers)
+        if response.status = Confirmed:
+            SLEEP(E)
+            break
+        else if response.status = Wait:
+            SLEEP(min(E, response.ticket.t_wait_for))
+            ticket ← response.ticket
+        else:
+            break
+        end if
+    end while
+    ongoing[i].remove(registrar)
+end procedure
+```
+
+**ADVERTISE() algorithm explanation**
+
+Advertisers place advertisements across multiple registrars using the `ADVERTISE()` algorithm.
+The advertisers run `ADVERTISE()` periodically.
+Implementations may choose the interval based on their requirements.
+
+1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
+2. Initialize the advertise table `AdvT(s)` by bootstrapping peers from
+the advertiser’s `KadDHT(node.id)` routing table.
+(Refer Section [Distance](#distance))
+3. Iterate over all buckets (i = 0 through `m-1`),
+where `m` is the number of buckets in `AdvT(s)` and `ongoing` map.
+Each bucket corresponds to a particular distance from the service ID `s`.
+    1. `ongoing[i]` contains list of  registrars with active (unexpired) registrations
+    or ongoing registration attempts at a distance `i`
+    from the service ID `s` of the service that the advertiser is advertising for.
+    2. Advertisers continuously maintain up to `K_register` active (unexpired) registrations
+    or ongoing registration attempts in every bucket of the `ongoing` map for its service.
+    Increasing `K_register` makes the advertiser easier to find
+    at the cost of increased communication and storage costs.
+    3. Pick a random registrar from bucket `i` of `AdvT(s)` to advertise to.
+        - `AdvT(s).getBucket(i)` → returns a list of registrars in bucket `i`
+        from the advertise table `AdvT(S)`
+        - `.getRandomNode()` → function returns a random registrar node.
+        The advertiser tries to place its advertisement into that registrar.
+        The function remembers already returned nodes
+        and never returns the same one twice during the same ad placement process.
+        If there are no peers, it returns `None`.
+    4. if we get a peer then we add that to that bucket `ongoing[i]`
+    5. Build the advertisement object `ad` containing `serviceId`, `peerID`, `addrs`, and `timestamp`
+    (Refer section [Advertisement Structure](#advertisement-structure)) .
+    Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
+    6. Then send this `ad` asynchronously to the selected registrar.
+    The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
+    Asynchronous execution allows multiple ads (to multiple registrars) to proceed in parallel.
+
+**ADVERTISE_SINGLE() algorithm explanation:**
+
+`ADVERTISE_SINGLE()` algorithm handles registration to one registrar at a time
+
+1. Initialize `ticket` to `None` as we have not yet got any ticket from registrar
+2. Keep trying until the registrar confirms or rejects the `ad`.
+    1. Send the `ad` to the registrar using `Register` request.
+    Request structure is described in section [Register Message Structure](#register-message).
+    If we already have a ticket, include it in the request.
+    2. The registrar replies with a `response`.
+    Refer Section [Register Message Structure](#register-message) for the response structure
+    3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(s)`.
+    Refer section [Distance](#distance) on how to add.
+    These help improve the table for future use.
+    4. If the registrar accepted the advertisement successfully,
+    wait for `E` seconds (the ad expiry time),
+    then stop retrying because the ad is already registered.
+    5. If the registrar says “wait” (its cache is full or overloaded),
+    sleep for the time written in the ticket `ticket.t_wait_for`(but not more than ad expiry time `E`).
+    Then update `ticket` with the new one from the registrar, and try again.
+    6. If the registrar rejects the ad, stop trying with this registrar.
+3. Remove this registrar from the `ongoing` map in bucket i (`ongoing[i]`),
+since we’ve finished trying with it.
 
 ## Service Discovery
 
@@ -303,15 +407,115 @@ It uses the `LOOKUP_RESPONSE()` as described in Section 8, algorithm to respond 
 
 ## RPC Messages
 
+All RPC messages are sent using the libp2p Kad-dht message format with new message types added for Logos discovery operations.
+
 ### Message Types
+
+The following message types are added to the Kad-dht `Message.MessageType` enum:
+
+```protobuf
+enum MessageType {
+    // ... existing Kad-dht message types ...
+    REGISTER = 6;
+    GET_ADS = 7;
+}
+```
 
 ### Advertisement Structure
 
+```protobuf
+message Advertisement {
+    // Service identifier (32-byte SHA-256 hash)
+    bytes serviceId = 1;
+
+    // Peer ID of advertiser (32-byte hash of public key)
+    bytes peerId = 2;
+
+    // Multiaddrs of advertiser
+    repeated bytes addrs = 3;
+
+    // Ed25519 signature over (serviceId || peerId || addrs)
+    bytes signature = 4;
+
+    // Optional: Service-specific metadata
+    optional bytes metadata = 5;
+
+    // Unix timestamp in seconds
+    uint64 timestamp = 6;
+}
+```
+
 ### Ticket Structure
+
+```protobuf
+message Ticket {
+    // Copy of the original advertisement
+    Advertisement ad = 1;
+
+    // Ticket creation timestamp (Unix time in seconds)
+    uint64 t_init = 2;
+
+    // Last modification timestamp (Unix time in seconds)
+    uint64 t_mod = 3;
+
+    // Remaining wait time in seconds
+    uint32 t_wait_for = 4;
+
+    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+    bytes signature = 5;
+}
+```
 
 ### REGISTER Message
 
+**Request**
+
+```protobuf
+message Message {
+    MessageType type = 1;  // REGISTER
+    bytes key = 2;         // serviceId
+    Advertisement ad = 3;   // The advertisement to register
+    optional Ticket ticket = 4;  // Optional: ticket from previous attempt
+}
+```
+
+**Response**
+
+```protobuf
+enum RegistrationStatus {
+    CONFIRMED = 0;  // Advertisement accepted
+    WAIT = 1;       // Must wait, ticket provided
+    REJECTED = 2;   // Advertisement rejected
+}
+
+message Message {
+    MessageType type = 1;       // REGISTER
+    RegistrationStatus status = 2;
+    optional Ticket ticket = 3;  // Provided if status = WAIT
+    repeated Peer closerPeers = 4;  // Peers for populating advertise table
+}
+```
+
 ### GET_ADS Message
+
+**Request**
+
+```protobuf
+message Message {
+    MessageType type = 1;  // GET_ADS
+    bytes key = 2;         // serviceId to look up
+}
+```
+
+**Response**
+
+```protobuf
+message Message {
+    MessageType type = 1;              // GET_ADS
+    repeated Advertisement ads = 2;     // Up to F_return advertisements
+    repeated Peer closerPeers = 3;     // Peers for populating search table
+}
+```
 
 ## Implementation Notes
 
