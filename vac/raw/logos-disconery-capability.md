@@ -429,67 +429,7 @@ procedure REGISTER(ad, ticket):
 end procedure
 ```
 
-#### `REGISTER()` algorithm explanation
-
-1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
-Duplicates are not allowed.
-An advertiser can place at most one `ad` for a specific service ID `s` in the `ad_cache` of a given registrar.
-2. Prepare a response ticket `response.ticket` linked to this `ad`.
-3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
-Refer section [Waiting Time Calculation](#waiting-time-calculation) for details.
-4. Check if this is the first registration attempt (no ticket yet):
-    1. If yes then it’s the first try. The advertiser must wait for the full waiting time `t_wait`.
-    The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
-    2. If no, then this is a retry, so a previous ticket exists.
-        1. Validate that the ticket is properly signed by the registrar,
-        belongs to this same advertisement and that the ad is still not already in the `ad_cache`.
-        2. Ensure the retry is happening within the allowed time window `δ` after the scheduled time.
-        If the advertiser waits too long or too short, the ticket is invalid.
-        3. Calculate how much waiting time is left `t_remaining`
-        by subtracting how long the advertiser has already waited
-        (`NOW() - ticket.t_init`) from `t_wait`.
-5. Check if the remaining waiting time `t_remaining` is less than or equal to 0.
-This means  the waiting time is over.
-`t_remaining` can be 0 also when the registrar decides that
-the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting time `t_wait` is 0).
-    1. If yes, add the `ad` to `ad_cache` and confirm registration.
-    The advertisement is now officially registered.
-    2. If no, then there is still time to wait.
-    In this case registrar does not store ad but instead issues a ticket.
-        1. set `reponse.status` to `wait`
-        2. Update the ticket with the new remaining waiting time `t_wait_for`
-        3. Update the ticket last modification time `t_mod`
-        4. Sign the ticket again. The advertiser will retry later using this new ticket.
-6. Add a list of peers closer to the service ID `ad.s` using the `GETPEERS()` function
-to the response (the advertiser uses this to update its advertise table `AdvT(s)`).
-7. Send the full response back to the advertiser
-
-Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
-before trying to register again with the same registrar.
-Each new registration attempt must include the latest ticket issued by that registrar.
-
-A ticket can only be used within a limited **registration window** `δ`,
-which is chosen to cover the maximum expected delay between the advertiser and registrar.
-This rule prevents attackers from collecting many tickets, accumulating waiting times,
-and submitting them all at once to overload the registrar.
-
-Advertisers only read the waiting time `t_wait` from the ticket —
-they do **not** use the creation time `t_init` or the modification time `t_mod`.
-Therefore, **clock** synchronization between advertisers and registrars is not required.
-
-The waiting time `t_wait` is not fixed.
-Each time an advertiser tries to register, the registrar recalculates a new waiting time based on its current cache state.
-The remaining time `t_remaining` is then computed as the difference between
-the new waiting time and the time the advertiser has already waited, as recorded in the ticket.
-With every retry, the advertiser accumulates waiting time and will eventually be admitted.
-However, if the advertiser misses its registration window or fails to include the last ticket,
-it loses all accumulated waiting time and must restart the registration process from the beginning.
-Implementations must consider these factors while deciding the registration window `δ` time.
-
-This design lets registrars prioritize advertisers that have waited longer
-without keeping any per-request state before the ad is admitted to the cache.
-Because waiting times are recalculated and tickets are stored only on the advertiser’s side,
-the registrar is protected from memory exhaustion and DoS attacks caused by inactive or malicious advertisers.
+Refer [Register Algorithm Explanation](#register-algorithm-explanation) section for detailed explanation.
 
 ### Lookup Response Algorithm
 
@@ -1035,3 +975,68 @@ Finally, low values of `F_lookup` stop the search operation early,
 before reaching registrars close to the service hash, contributing to a more balanced load distribution.
 Implementations should consider these trade-offs carefully when selecting appropriate values.
 
+### Registrar Algorithms
+
+#### `REGISTER()` algorithm explanation
+
+Refer [Registration Flow](#registration-flow) Section for the pseudocode
+
+1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
+Duplicates are not allowed.
+An advertiser can place at most one `ad` for a specific service ID `s` in the `ad_cache` of a given registrar.
+2. Prepare a response ticket `response.ticket` linked to this `ad`.
+3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
+Refer section [Waiting Time Calculation](#waiting-time-calculation) for details.
+4. Check if this is the first registration attempt (no ticket yet):
+    1. If yes then it’s the first try. The advertiser must wait for the full waiting time `t_wait`.
+    The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
+    2. If no, then this is a retry, so a previous ticket exists.
+        1. Validate that the ticket is properly signed by the registrar,
+        belongs to this same advertisement and that the ad is still not already in the `ad_cache`.
+        2. Ensure the retry is happening within the allowed time window `δ` after the scheduled time.
+        If the advertiser waits too long or too short, the ticket is invalid.
+        3. Calculate how much waiting time is left `t_remaining`
+        by subtracting how long the advertiser has already waited
+        (`NOW() - ticket.t_init`) from `t_wait`.
+5. Check if the remaining waiting time `t_remaining` is less than or equal to 0.
+This means  the waiting time is over.
+`t_remaining` can be 0 also when the registrar decides that
+the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting time `t_wait` is 0).
+    1. If yes, add the `ad` to `ad_cache` and confirm registration.
+    The advertisement is now officially registered.
+    2. If no, then there is still time to wait.
+    In this case registrar does not store ad but instead issues a ticket.
+        1. set `reponse.status` to `wait`
+        2. Update the ticket with the new remaining waiting time `t_wait_for`
+        3. Update the ticket last modification time `t_mod`
+        4. Sign the ticket again. The advertiser will retry later using this new ticket.
+6. Add a list of peers closer to the service ID `ad.s` using the `GETPEERS()` function
+to the response (the advertiser uses this to update its advertise table `AdvT(s)`).
+7. Send the full response back to the advertiser
+
+Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
+before trying to register again with the same registrar.
+Each new registration attempt must include the latest ticket issued by that registrar.
+
+A ticket can only be used within a limited **registration window** `δ`,
+which is chosen to cover the maximum expected delay between the advertiser and registrar.
+This rule prevents attackers from collecting many tickets, accumulating waiting times,
+and submitting them all at once to overload the registrar.
+
+Advertisers only read the waiting time `t_wait` from the ticket —
+they do **not** use the creation time `t_init` or the modification time `t_mod`.
+Therefore, **clock** synchronization between advertisers and registrars is not required.
+
+The waiting time `t_wait` is not fixed.
+Each time an advertiser tries to register, the registrar recalculates a new waiting time based on its current cache state.
+The remaining time `t_remaining` is then computed as the difference between
+the new waiting time and the time the advertiser has already waited, as recorded in the ticket.
+With every retry, the advertiser accumulates waiting time and will eventually be admitted.
+However, if the advertiser misses its registration window or fails to include the last ticket,
+it loses all accumulated waiting time and must restart the registration process from the beginning.
+Implementations must consider these factors while deciding the registration window `δ` time.
+
+This design lets registrars prioritize advertisers that have waited longer
+without keeping any per-request state before the ad is admitted to the cache.
+Because waiting times are recalculated and tickets are stored only on the advertiser’s side,
+the registrar is protected from memory exhaustion and DoS attacks caused by inactive or malicious advertisers.
