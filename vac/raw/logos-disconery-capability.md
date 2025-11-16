@@ -285,6 +285,10 @@ such that other peers can  find it efficiently.
 
 ### Advertisement Algorithm
 
+Advertisers place advertisements across multiple registrars using the `ADVERTISE()` algorithm.
+The advertisers run `ADVERTISE()` periodically.
+Implementations may choose the interval based on their requirements.
+
 ```text
 procedure ADVERTISE(s):
     ongoing ← MAP<bucketIndex; LIST<registrars>>
@@ -325,65 +329,7 @@ procedure ADVERTISE_SINGLE(registrar, ad, i, s):
 end procedure
 ```
 
-#### ADVERTISE() algorithm explanation
-
-Advertisers place advertisements across multiple registrars using the `ADVERTISE()` algorithm.
-The advertisers run `ADVERTISE()` periodically.
-Implementations may choose the interval based on their requirements.
-
-1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
-2. Initialize the advertise table `AdvT(s)` by bootstrapping peers from
-the advertiser’s `KadDHT(node.id)` routing table.
-(Refer Section [Distance](#distance))
-3. Iterate over all buckets (i = 0 through `m-1`),
-where `m` is the number of buckets in `AdvT(s)` and `ongoing` map.
-Each bucket corresponds to a particular distance from the service ID `s`.
-    1. `ongoing[i]` contains list of  registrars with active (unexpired) registrations
-    or ongoing registration attempts at a distance `i`
-    from the service ID `s` of the service that the advertiser is advertising for.
-    2. Advertisers continuously maintain up to `K_register` active (unexpired) registrations
-    or ongoing registration attempts in every bucket of the `ongoing` map for its service.
-    Increasing `K_register` makes the advertiser easier to find
-    at the cost of increased communication and storage costs.
-    3. Pick a random registrar from bucket `i` of `AdvT(s)` to advertise to.
-        - `AdvT(s).getBucket(i)` → returns a list of registrars in bucket `i`
-        from the advertise table `AdvT(S)`
-        - `.getRandomNode()` → function returns a random registrar node.
-        The advertiser tries to place its advertisement into that registrar.
-        The function remembers already returned nodes
-        and never returns the same one twice during the same ad placement process.
-        If there are no peers, it returns `None`.
-    4. if we get a peer then we add that to that bucket `ongoing[i]`
-    5. Build the advertisement object `ad` containing `serviceId`, `peerID`, `addrs`, and `timestamp`
-    (Refer section [Advertisement Structure](#advertisement-structure)) .
-    Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
-    6. Then send this `ad` asynchronously to the selected registrar.
-    The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
-    Asynchronous execution allows multiple ads (to multiple registrars) to proceed in parallel.
-
-#### ADVERTISE_SINGLE() algorithm explanation
-
-`ADVERTISE_SINGLE()` algorithm handles registration to one registrar at a time
-
-1. Initialize `ticket` to `None` as we have not yet got any ticket from registrar
-2. Keep trying until the registrar confirms or rejects the `ad`.
-    1. Send the `ad` to the registrar using `Register` request.
-    Request structure is described in section [Register Message Structure](#register-message).
-    If we already have a ticket, include it in the request.
-    2. The registrar replies with a `response`.
-    Refer Section [Register Message Structure](#register-message) for the response structure
-    3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(s)`.
-    Refer section [Distance](#distance) on how to add.
-    These help improve the table for future use.
-    4. If the registrar accepted the advertisement successfully,
-    wait for `E` seconds (the ad expiry time),
-    then stop retrying because the ad is already registered.
-    5. If the registrar says “wait” (its cache is full or overloaded),
-    sleep for the time written in the ticket `ticket.t_wait_for`(but not more than ad expiry time `E`).
-    Then update `ticket` with the new one from the registrar, and try again.
-    6. If the registrar rejects the ad, stop trying with this registrar.
-3. Remove this registrar from the `ongoing` map in bucket i (`ongoing[i]`),
-since we’ve finished trying with it.
+Refer Section [Advertiser Algorithms Explanation](#advertiser-algorithms-explanation) for a detailed explantion.
 
 ## Service Discovery
 
@@ -429,61 +375,7 @@ procedure LOOKUP(s):
 end procedure
 ```
 
-#### LOOKUP(s) algorithm explanation
-
-1. The **Discovery Table** `DiscT(s)` is initialized by
-bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
-(Refer [Distance](#distance) section)
-2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
-3. Go through each bucket of the search table `DiscT(s)` —
-from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `s`.
-For each bucket, query up to `K_lookup` random peers.
-    1. Pick a random registrar node from bucket `i` of the search table `DiscT(s)` to query
-        1. `DiscT(s).getBucket(i)` → returns a list of registrars in bucket `i` from the search table `DiscT(S)`
-        2. `.getRandomNode()` → function returns a random registrar node.
-        The discover queries this node to get `ads` for a particular service ID `s`.
-        The function remembers already returned nodes and never returns the same one twice.
-        If there are no peers, it returns `None`.
-    2. A `GET_ADS` request is sent to the selected registrar peer.
-    Refer to [GET_ADS Message](#get_ads-message) to see the request and response structure for `GET_ADS`.
-    The response returned by the registrar node is stored in `response`
-    3. The `response` contains a list of advertisements `response.ads`.
-    A queried registrar returns at most `F_return` advertisements.
-    If it returns more we can just randomly keep `F_return` of them.
-    For each advertisement returned:
-        1. Verify its digital signature for authenticity.
-        2. Add the advertiser’s node ID `ad.peerID` to the list `foundPeers`.
-    4. The `response` also contains a list of peers `response.closerPeers`
-    that is inserted into the search table `DiscT(s)`.
-    Refer [Distance](#distance) Section for how it is added.
-    5. Stop early if enough advertiser peers (`F_lookup`) have been found — no need to continue searching.
-    For popular services `F_lookup` advertisers are generally found in the initial phase
-    from the farther buckets and the search terminates.
-    But for unpopular ones it might take longer but not more than `O(log N)`
-    where N is number of nodes participating in the network as registrars.
-    6. If early stop doesn’t happen then the search stops when no unqueried registrars remain in any of the buckets.
-4. Return `foundPeers` which is the final list of discovered advertisers that provide service `s`
-
-Making the advertisers and discoverers walk towards `s` in a similar fashion
-guarantees that the two processes overlap and contact a similar set of registrars that relay the `ads`.
-At the same time, contacting random registrars in each encountered bucket using `getRandomNode()`
-makes it difficult for an attacker to strategically place malicious registrars in the network.
-The first bucket `b_0(s)` covers the largest fraction of the key space
-as it corresponds to peers with no common prefix to `s` (i.e. 50% of all the registrars).
-Placing malicious registrars in this fraction of the key space
-to impact service discovery process would require considerable resources.
-Subsequent buckets cover smaller fractions of the key space,
-making it easier for the attacker to place Sybils
-but also increasing the chance of advertisers already gathering enough ads in previous buckets.
-
-Parameters `F_return` and `F_lookup` play an important role in setting a compromise between security and efficiency.
-A small value of `F_return << F_lookup` increases the diversity of the source of `ads` received by the discoverer
-but increases search time, and requires reaching buckets covering smaller key ranges where eclipse risks are higher.
-On the other hand, similar values for `F_lookup` and `F_return` reduce overheads
-but increase the danger of a discoverer receiving ads uniquely from malicious nodes.
-Finally, low values of `F_lookup` stop the search operation early,
-before reaching registrars close to the service hash, contributing to a more balanced load distribution.
-Implementations should consider these trade-offs carefully when selecting appropriate values.
+Refer [Lookup Algorithm Explanation](#lookups-algorithm-explanation) section for the detailed explanation.
 
 ## Admission Protocol
 
@@ -1018,3 +910,128 @@ Incentivization mechanisms are beyond the scope of this RFC.
 [2] [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md)
 
 [3] [Go implementation](https://github.com/libp2p/go-libp2p-kad-dht)
+
+## Appendix
+
+This appendix provides detailed explanations of all algorithms and helper procedures referenced throughout this RFC. To maintain clarity and readability in the main specification, the body contains only the concise pseudocode and high-level descriptions.
+
+### Advertiser Algorithms Explanation
+
+Refer [Advertisement Algorithm](#advertisement-algorithm) Section for the pseudocode.
+
+#### ADVERTISE() algorithm explanation
+
+1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
+2. Initialize the advertise table `AdvT(s)` by bootstrapping peers from
+the advertiser’s `KadDHT(node.id)` routing table.
+(Refer Section [Distance](#distance))
+3. Iterate over all buckets (i = 0 through `m-1`),
+where `m` is the number of buckets in `AdvT(s)` and `ongoing` map.
+Each bucket corresponds to a particular distance from the service ID `s`.
+    1. `ongoing[i]` contains list of  registrars with active (unexpired) registrations
+    or ongoing registration attempts at a distance `i`
+    from the service ID `s` of the service that the advertiser is advertising for.
+    2. Advertisers continuously maintain up to `K_register` active (unexpired) registrations
+    or ongoing registration attempts in every bucket of the `ongoing` map for its service.
+    Increasing `K_register` makes the advertiser easier to find
+    at the cost of increased communication and storage costs.
+    3. Pick a random registrar from bucket `i` of `AdvT(s)` to advertise to.
+        - `AdvT(s).getBucket(i)` → returns a list of registrars in bucket `i`
+        from the advertise table `AdvT(S)`
+        - `.getRandomNode()` → function returns a random registrar node.
+        The advertiser tries to place its advertisement into that registrar.
+        The function remembers already returned nodes
+        and never returns the same one twice during the same ad placement process.
+        If there are no peers, it returns `None`.
+    4. if we get a peer then we add that to that bucket `ongoing[i]`
+    5. Build the advertisement object `ad` containing `serviceId`, `peerID`, `addrs`, and `timestamp`
+    (Refer section [Advertisement Structure](#advertisement-structure)) .
+    Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
+    6. Then send this `ad` asynchronously to the selected registrar.
+    The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
+    Asynchronous execution allows multiple ads (to multiple registrars) to proceed in parallel.
+
+#### ADVERTISE_SINGLE() algorithm explanation
+
+`ADVERTISE_SINGLE()` algorithm handles registration to one registrar at a time
+
+1. Initialize `ticket` to `None` as we have not yet got any ticket from registrar
+2. Keep trying until the registrar confirms or rejects the `ad`.
+    1. Send the `ad` to the registrar using `Register` request.
+    Request structure is described in section [Register Message Structure](#register-message).
+    If we already have a ticket, include it in the request.
+    2. The registrar replies with a `response`.
+    Refer Section [Register Message Structure](#register-message) for the response structure
+    3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(s)`.
+    Refer section [Distance](#distance) on how to add.
+    These help improve the table for future use.
+    4. If the registrar accepted the advertisement successfully,
+    wait for `E` seconds (the ad expiry time),
+    then stop retrying because the ad is already registered.
+    5. If the registrar says “wait” (its cache is full or overloaded),
+    sleep for the time written in the ticket `ticket.t_wait_for`(but not more than ad expiry time `E`).
+    Then update `ticket` with the new one from the registrar, and try again.
+    6. If the registrar rejects the ad, stop trying with this registrar.
+3. Remove this registrar from the `ongoing` map in bucket i (`ongoing[i]`),
+since we’ve finished trying with it.
+
+### Discoverer Algorithms
+
+#### LOOKUP(s) algorithm explanation
+
+Refer [Lookup Algorithm](#lookup-algorithm) Section for the pseudocode.
+
+1. The **Discovery Table** `DiscT(s)` is initialized by
+bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
+(Refer [Distance](#distance) section)
+2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
+3. Go through each bucket of the search table `DiscT(s)` —
+from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `s`.
+For each bucket, query up to `K_lookup` random peers.
+    1. Pick a random registrar node from bucket `i` of the search table `DiscT(s)` to query
+        1. `DiscT(s).getBucket(i)` → returns a list of registrars in bucket `i` from the search table `DiscT(S)`
+        2. `.getRandomNode()` → function returns a random registrar node.
+        The discover queries this node to get `ads` for a particular service ID `s`.
+        The function remembers already returned nodes and never returns the same one twice.
+        If there are no peers, it returns `None`.
+    2. A `GET_ADS` request is sent to the selected registrar peer.
+    Refer to [GET_ADS Message](#get_ads-message) to see the request and response structure for `GET_ADS`.
+    The response returned by the registrar node is stored in `response`
+    3. The `response` contains a list of advertisements `response.ads`.
+    A queried registrar returns at most `F_return` advertisements.
+    If it returns more we can just randomly keep `F_return` of them.
+    For each advertisement returned:
+        1. Verify its digital signature for authenticity.
+        2. Add the advertiser’s node ID `ad.peerID` to the list `foundPeers`.
+    4. The `response` also contains a list of peers `response.closerPeers`
+    that is inserted into the search table `DiscT(s)`.
+    Refer [Distance](#distance) Section for how it is added.
+    5. Stop early if enough advertiser peers (`F_lookup`) have been found — no need to continue searching.
+    For popular services `F_lookup` advertisers are generally found in the initial phase
+    from the farther buckets and the search terminates.
+    But for unpopular ones it might take longer but not more than `O(log N)`
+    where N is number of nodes participating in the network as registrars.
+    6. If early stop doesn’t happen then the search stops when no unqueried registrars remain in any of the buckets.
+4. Return `foundPeers` which is the final list of discovered advertisers that provide service `s`
+
+Making the advertisers and discoverers walk towards `s` in a similar fashion
+guarantees that the two processes overlap and contact a similar set of registrars that relay the `ads`.
+At the same time, contacting random registrars in each encountered bucket using `getRandomNode()`
+makes it difficult for an attacker to strategically place malicious registrars in the network.
+The first bucket `b_0(s)` covers the largest fraction of the key space
+as it corresponds to peers with no common prefix to `s` (i.e. 50% of all the registrars).
+Placing malicious registrars in this fraction of the key space
+to impact service discovery process would require considerable resources.
+Subsequent buckets cover smaller fractions of the key space,
+making it easier for the attacker to place Sybils
+but also increasing the chance of advertisers already gathering enough ads in previous buckets.
+
+Parameters `F_return` and `F_lookup` play an important role in setting a compromise between security and efficiency.
+A small value of `F_return << F_lookup` increases the diversity of the source of `ads` received by the discoverer
+but increases search time, and requires reaching buckets covering smaller key ranges where eclipse risks are higher.
+On the other hand, similar values for `F_lookup` and `F_return` reduce overheads
+but increase the danger of a discoverer receiving ads uniquely from malicious nodes.
+Finally, low values of `F_lookup` stop the search operation early,
+before reaching registrars close to the service hash, contributing to a more balanced load distribution.
+Implementations should consider these trade-offs carefully when selecting appropriate values.
+
