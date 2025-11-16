@@ -329,7 +329,7 @@ procedure ADVERTISE_SINGLE(registrar, ad, i, s):
 end procedure
 ```
 
-Refer Section [Advertiser Algorithms Explanation](#advertiser-algorithms-explanation) for a detailed explantion.
+Refer Section [Advertiser Algorithms Explanation](#advertiser-algorithms-explanation) for a detailed explanation.
 
 ## Service Discovery
 
@@ -444,8 +444,6 @@ procedure LOOKUP_RESPONSE(s):
 end procedure
 ```
 
-#### `LOOKUP_RESPONSE(s)` algorithm explanation
-
 1. Fetch all advertisements for service ID `s` from the registrar’s `ad_cache`.
 Then return up to `F_return` of them (a system parameter limiting how many ads are sent per query by a registrar).
 2. Call the `GETPEERS(s)` function to get a list of peers from across the registrar’s routing table `RegT(s)`.
@@ -471,8 +469,6 @@ procedure GETPEERS(s):
     return peers
 end procedure
 ```
-
-#### `GETPEERS(s)` algorithm explanation
 
 1. `peers` is initialized as an empty set to avoid storing duplicates
 2. The registrar table `RegT(s)` is initialized from the node’s `KadDHT(node.id)` routing table.
@@ -853,7 +849,7 @@ Incentivization mechanisms are beyond the scope of this RFC.
 
 ## Appendix
 
-This appendix provides detailed explanations of all algorithms and helper procedures referenced throughout this RFC. To maintain clarity and readability in the main specification, the body contains only the concise pseudocode and high-level descriptions.
+This appendix provides detailed explanations of some algorithms and helper procedures referenced throughout this RFC. To maintain clarity and readability in the main specification, the body contains only the concise pseudocode and high-level descriptions.
 
 ### Advertiser Algorithms Explanation
 
