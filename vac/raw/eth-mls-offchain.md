@@ -206,26 +206,34 @@ This is mostly similar with the general flow and specified in voting proposal an
 as in section 8.1. Group Context in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
 2. `steward` creates a group anouncement (GA) according to the previous step and
 broadcast it to the all network periodically. GA message is visible in network to all `nodes`.
-3. The each `node` who wants to be a member needs to obtain this anouncement and create `credential`
+3. The each `node` who wants to be a `member` needs to obtain this anouncement and create `credential`
 includes `keyPackage` that is specified in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 10.
-4. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
+4. The `node` send the `KeyPackages` in plaintext with its signature with current `steward` public key which
+anounced in welcome topic. This step is crucial for security, ensuring that malicious nodes/stewards
+cannot use others' `KeyPackages`.
+It also provides flexibility for liveness in multi-steward settings,
+allowing more than one steward to obtain `KeyPackages` to commit.
+5. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
 based on the outcome of the voting process.
-5. Any `member` start to create `voting proposals` for adding or removing users,
+6. Any `member` start to create `voting proposals` for adding or removing users,
 and present them to the voting in the MLS group as an application message.
 
 However, unlimited use of `voting proposals` within the group may be misused by
 malicious or overly active members.
 Therefore, an application-level constraint can be introduced to limit the number
 or frequency of proposals initiated by each member to prevent spam or abuse.
-6. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
+7. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
 that have received affirmative votes from members via application messages.
 Otherwise, the `steward` discards proposals that did not receive a majority of "YES" votes.
 Since voting proposals are transmitted as application messages, omitting them does not affect
 the protocol’s correctness or consistency.
-7. The `steward` converts all approved `voting proposals` into
+8. The `steward` converts all approved `voting proposals` into
 corresponding `MLS proposals` and `commit message`, and
 transmits both in a single operation as in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 12.4,
-including welcome messages for the new members. Therefore, the `commit message` ends the previous epoch and create new ones.
+including welcome messages for the new members.
+Therefore, the `commit message` ends the previous epoch and create new ones.
+9. The `members` applied the incoming `commit message` by checking the signatures and `voting proposals` 
+and synchronized with the upcoming epoch. 
 
 ## Multi stewards
 
@@ -309,7 +317,7 @@ is produced through a deterministic process that ensures an unbiased distributio
 since allowing bias could enable a malicious participant to manipulate the list
 and retain control within a favored group for multiple epochs.
 
-The list MUST be composed of the first `sn_min` members including previous stewards,
+The list MUST consist of at least `sn_min` members, including retained previous stewards,
 sorted according to the ascending value of `SHA256(epoch E || member id || group id)`,
 where `epoch E` is the epoch in which the election proposal is initiated,
 and `group id` for shuffling the list across the different groups.
