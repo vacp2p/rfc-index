@@ -232,8 +232,8 @@ corresponding `MLS proposals` and `commit message`, and
 transmits both in a single operation as in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 12.4,
 including welcome messages for the new members.
 Therefore, the `commit message` ends the previous epoch and create new ones.
-9. The `members` applied the incoming `commit message` by checking the signatures and `voting proposals` 
-and synchronized with the upcoming epoch. 
+9. The `members` applied the incoming `commit message` by checking the signatures and `voting proposals`
+and synchronized with the upcoming epoch.
 
 ## Multi stewards
 
@@ -287,6 +287,8 @@ lower-priority messages MUST be withheld from transmission until the higher-prio
 
 ### Steward list creation
 
+The `steward list` consists of steward nominees who will become actual stewards if the `steward election proposal` is finalized with YES,
+is arbitrarily chosen from `member` and OPTIONALLY adjusted depending on the needs of the implementation.
 The `steward list` size, defined by minimum `sn_min` and maximum `sn_max` bounds,
 is determined at the time of group creation.
 The actual size of the list MAY vary within this range as `sn`, with the minimum value being at least 1.
