@@ -131,7 +131,6 @@ in case the epoch steward is inactive or slow.
 Duplicate commits are not re-applied and only the single valid commit for the epoch is accepted by the group,
 as in described in section filtering proposals against the multiple comitting.
 
-
 Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
 Lastly, the size of the list named as `sn`, which also shows the epoch interval for steward list determination.
 
