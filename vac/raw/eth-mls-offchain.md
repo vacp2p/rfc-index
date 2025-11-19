@@ -119,12 +119,18 @@ in which case it completes the commitment phase.
 If unused in `epoch E`, it automatically becomes the `epoch steward` in `epoch E+1`.
 
 `Steward list`: It is an ordered list that contains the `member id`s of authorized stewards.
-Each steward in the list becomes responsible for creating the commit message when its turn arrives,
+Each steward in the list becomes main responsible for creating the commit message when its turn arrives,
 according to this order for each epoch.
 For example, suppose there are two stewards in the list `steward A` first and `steward B` last in the list.
 `steward A` is responsible for creating the commit message for first epoch.
 Similarly, `steward B` is for the last epoch.
-Since to maintain consistency and prevent conflicting updates, each epoch MUST have exactly one commit from exactly one steward.
+Since the `epoch steward` is the primary committer for an epoch,
+it holds the main responsibility for producing the commit.
+However, other stewards MAY also generate a commit within the same epoch to preserve liveness
+in case the epoch steward is inactive or slow.
+Duplicate commits are not re-applied and only the single valid commit for the epoch is accepted by the group,
+as in described in section filtering proposals against the multiple comitting.
+
 
 Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
 Lastly, the size of the list named as `sn`, which also shows the epoch interval for steward list determination.
@@ -352,6 +358,8 @@ This config file MUST contain (`sn_min`,`sn_max`) as the `steward list` size ran
 Then, members propose lists by voting proposal with size `sn`
 as a consensus among all members, as mentioned in the consensus section 2, according to the checks:
 the size of the proposed list `sn` is in the interval (`sn_min`,`sn_max`).
+Note that if the total number of members is below `sn_min`,
+then the steward list size MUST be equal to the total member count.
 3. After the voting proposal ends up with a `steward list`,
 and group changes are ready to be committed as specified in single steward section
 with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
@@ -375,6 +383,15 @@ It is particularly suitable for large user groups, where involving every member 
 The flow is similar to the big consensus including the `steward list` finalization with all members consensus
 only the difference here, the commit messages requires `commit proposal` only among the stewards.
 
+## Filtering proposals against the multiple comitting
+
+Since stewards are allowed to produce a commit even when they are not the designated `epoch steward`,
+multiple commits may appear within the same epoch, often reflecting recurring versions of the same proposal.
+To ensure a consistent outcome, the valid commit for the epoch SHOULD be selected as the one derived
+from the longest proposal chain, ordered by the ascending value of each proposal as `SHA256(proposal)`.
+All other cases, such as invalid commits or commits based on proposals that were not approved through voting,
+can be easily detected and discarded by the members.
+
 ## Steward violation list
 
 A steward’s activity is called a violation if the action is one or more of the following:
@@ -393,9 +410,6 @@ and can be identified by checking the hash of `Proposal.payload` and `MLSProposa
 and the Steward does not provide an MLS proposal and commit.
 This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
 therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
-4. Unauthorized steward: The order of the release of commit messages is pre-determined by the `steward list` consensus.
-If there is a steward who releases a commit message without it in the `steward list` or in the wrong order,
-this is counted as unauthorized steward activity resulting in emergency criteria consensus.
 
 ## Security Considerations
 
