@@ -4,8 +4,8 @@ name: A secure discovery mechanism with multi-service support
 status: raw
 category: Standards Track
 tags:
-editor:
-contributors:
+editor: Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im)
+contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
 
 ---
 
