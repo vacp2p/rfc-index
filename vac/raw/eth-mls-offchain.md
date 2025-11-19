@@ -289,8 +289,12 @@ lower-priority messages MUST be withheld from transmission until the higher-prio
 
 The `steward list` consists of steward nominees who will become actual stewards if the `steward election proposal` is finalized with YES,
 is arbitrarily chosen from `member` and OPTIONALLY adjusted depending on the needs of the implementation.
-The `steward list` size, defined by minimum `sn_min` and maximum `sn_max` bounds,
+The `steward list` size, defined by the minimum `sn_min` and maximum `sn_max` bounds,
 is determined at the time of group creation.
+The `sn_min` requirement is applied only when the total number of members exceeds `sn_min`;
+if the number of available members falls below this threshold,
+the list size automatically adjusts to include all existing members.
+
 The actual size of the list MAY vary within this range as `sn`, with the minimum value being at least 1.
 
 The index of the slots shows epoch info and value of index shows `member id`s.
