@@ -267,7 +267,7 @@ by running the `LOOKUP()` algorithm as in described in [Lookup Algorithm section
 
 ### Registrar
 
-Registers store ads from advertisers in their advertisement cache.
+Registrars store ads from advertisers in their advertisement cache.
 Registers use a waiting time based admission control mechanism using the `REGISTER()` algorithm
 as described in [Registration Flow section](#registration-flow)
 to decide whether to admit an advertisement coming from an advertiser or not.
