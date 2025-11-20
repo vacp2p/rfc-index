@@ -31,7 +31,7 @@ enhancing reliability while maintaining compatibility with existing Kad-dht beha
 ## Motivation
 
 In decentralized networks supporting multiple services,
-efficient peer discovery is critical.
+efficient peer discovery for specific services is critical.
 Traditional approaches face several challenges:
 
 1. Random walk is Inefficient for unpopular services.
