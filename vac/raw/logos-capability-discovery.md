@@ -1,6 +1,6 @@
 ---
 title: LOGOS-CAPABILITY-DISCOVERY
-name: A secure discovery mechanism with multi-service support
+name: Logos Capability Discovery Protocol
 status: raw
 category: Standards Track
 tags:
@@ -11,9 +11,9 @@ contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
 
 ## Abstract
 
-This RFC defines the Logos discovery capability,
-a DISC-NG-inspired discovery mechanism
-built on top of [Kad-dht](https://github.com/libp2p/specs/tree/master/kad-dht).
+This RFC defines the Logos capability discovery protocol,
+a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore.ieee.org/document/10629017)
+built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
 It enables nodes to advertise their participation in specific services
 and allows other nodes to efficiently discover peers participating in those services.
 
