@@ -77,7 +77,7 @@ For example:
 ### Ticket
 
 Tickets are digitally signed objects
-(Refer to [Ticket Structure section](#ticket-structure))
+(refer to the [Ticket Structure section](#ticket-structure))
 issued by registrars to advertisers to reliably indicate
 how long an advertiser already waited for admission.
 
