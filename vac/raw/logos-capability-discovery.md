@@ -83,7 +83,7 @@ how long an advertiser already waited for admission.
 
 ### Advertisement
 
-An **advertisement** is a data structure (Refer [Advertisement Structure section](#advertisement-structure))
+An **advertisement** is a data structure (refer to the [Advertisement Structure section](#advertisement-structure))
 indicating that a specific node participates in a service.
 
 ### Advertisement Cache
