@@ -329,7 +329,7 @@ procedure ADVERTISE_SINGLE(registrar, ad, i, s):
 end procedure
 ```
 
-Refer Section [Advertiser Algorithms Explanation](#advertiser-algorithms-explanation) for a detailed explanation.
+Refer to the [Advertiser Algorithms Explanation section](#advertiser-algorithms-explanation) for a detailed explanation.
 
 ## Service Discovery
 
@@ -375,7 +375,7 @@ procedure LOOKUP(s):
 end procedure
 ```
 
-Refer [Lookup Algorithm Explanation](#lookups-algorithm-explanation) section for the detailed explanation.
+Refer to the [Lookup Algorithm Explanation section](#lookups-algorithm-explanation) for the detailed explanation.
 
 ## Admission Protocol
 
@@ -395,7 +395,7 @@ The total size of the `ad_cache` is limited by its capacity `C`.
 When a registrar receives a `REGISTER` request from an advertiser
 then it runs the `Register()` algorithm to decide whether to admit `ad` coming from advertiser
 into its `ad_cache` or not.
-Refer to section [Register Message](#register-message) for the request and response structure of `REGISTER`.
+Refer to the [Register Message section](#register-message) for the request and response structure of `REGISTER`.
 
 ```text
 procedure REGISTER(ad, ticket):
@@ -429,12 +429,12 @@ procedure REGISTER(ad, ticket):
 end procedure
 ```
 
-Refer [Register Algorithm Explanation](#register-algorithm-explanation) section for detailed explanation.
+Refer to the [Register Algorithm Explanation section](#register-algorithm-explanation) for detailed explanation.
 
 ### Lookup Response Algorithm
 
 Registrars respond to `GET_ADS` requests from discoverers using the `LOOKUP_RESPONSE()` algorithm.
-Refer to section [GET_ADS Message](#get_ads-message) for the request and response structure of `GET_ADS`.
+Refer to [GET_ADS Message section](#get_ads-message) for the request and response structure of `GET_ADS`.
 
 ```text
 procedure LOOKUP_RESPONSE(s):
@@ -472,7 +472,7 @@ end procedure
 
 1. `peers` is initialized as an empty set to avoid storing duplicates
 2. The registrar table `RegT(s)` is initialized from the node’s `KadDHT(node.id)` routing table.
-Refer [Distance](#distance) section on how to add peers.
+Refer to the [Distance section](#distance) on how to add peers.
 3. Go through all `m` buckets in the registrar’s table — from farthest to closest relative to the service ID `s`.
     1. Pick one random peer from bucket `i`.
     `getRandomNode()`  function remembers already returned nodes and never returns the same one twice.
@@ -504,7 +504,7 @@ w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.s)/C + score(getIP(ad.addrs)) + G)
 - `c`: Current cache occupancy
 - `c(ad.s)`: Number of advertisements for service `s` in cache
 - `getIP(ad.addrs)` is a function to get the IP address from the multiaddress of the advertisement.
-- `score(getIP(ad.addrs))`: IP similarity score (0 to 1). Refer section [IP Similarity Score](#ip-similarity-score)
+- `score(getIP(ad.addrs))`: IP similarity score (0 to 1). Refer to the [IP Similarity Score section](#ip-similarity-score)
 
 Section [System Parameters](#system-parameters) can be referred
 for the definitions of the remaining parameters in the formula.
@@ -704,7 +704,7 @@ and the condition `w_s > (bound(s) - timestamp(s))`is satisfied.
 
 **How lower bound is calculated for IPs:**
 Registrars enforce lower-bound state for the advertiser’s IP address using IP tree
-(refer section [IP Similarity Score](#ip-similarity-score)).
+(refer to the [IP Similarity Score section](#ip-similarity-score)).
 
 ## RPC Messages
 
@@ -853,14 +853,14 @@ This appendix provides detailed explanations of some algorithms and helper proce
 
 ### Advertiser Algorithms Explanation
 
-Refer [Advertisement Algorithm](#advertisement-algorithm) Section for the pseudocode.
+Refer to the [Advertisement Algorithm section](#advertisement-algorithm) for the pseudocode.
 
 #### ADVERTISE() algorithm explanation
 
 1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
 2. Initialize the advertise table `AdvT(s)` by bootstrapping peers from
 the advertiser’s `KadDHT(node.id)` routing table.
-(Refer Section [Distance](#distance))
+(Refer to the [Distance section](#distance))
 3. Iterate over all buckets (i = 0 through `m-1`),
 where `m` is the number of buckets in `AdvT(s)` and `ongoing` map.
 Each bucket corresponds to a particular distance from the service ID `s`.
@@ -881,7 +881,7 @@ Each bucket corresponds to a particular distance from the service ID `s`.
         If there are no peers, it returns `None`.
     4. if we get a peer then we add that to that bucket `ongoing[i]`
     5. Build the advertisement object `ad` containing `serviceId`, `peerID`, `addrs`, and `timestamp`
-    (Refer section [Advertisement Structure](#advertisement-structure)) .
+    (Refer to the [Advertisement Structure section](#advertisement-structure)) .
     Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
     6. Then send this `ad` asynchronously to the selected registrar.
     The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
@@ -897,9 +897,9 @@ Each bucket corresponds to a particular distance from the service ID `s`.
     Request structure is described in section [Register Message Structure](#register-message).
     If we already have a ticket, include it in the request.
     2. The registrar replies with a `response`.
-    Refer Section [Register Message Structure](#register-message) for the response structure
+    Refer to the [Register Message Structure section](#register-message) for the response structure
     3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(s)`.
-    Refer section [Distance](#distance) on how to add.
+    Refer to the [Distance](#distance section) on how to add.
     These help improve the table for future use.
     4. If the registrar accepted the advertisement successfully,
     wait for `E` seconds (the ad expiry time),
@@ -915,11 +915,11 @@ since we’ve finished trying with it.
 
 #### LOOKUP(s) algorithm explanation
 
-Refer [Lookup Algorithm](#lookup-algorithm) Section for the pseudocode.
+Refer to the [Lookup Algorithm section](#lookup-algorithm) for the pseudocode.
 
 1. The **Discovery Table** `DiscT(s)` is initialized by
 bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
-(Refer [Distance](#distance) section)
+(refer to the [Distance section](#distance))
 2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
 3. Go through each bucket of the search table `DiscT(s)` —
 from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `s`.
@@ -931,7 +931,7 @@ For each bucket, query up to `K_lookup` random peers.
         The function remembers already returned nodes and never returns the same one twice.
         If there are no peers, it returns `None`.
     2. A `GET_ADS` request is sent to the selected registrar peer.
-    Refer to [GET_ADS Message](#get_ads-message) to see the request and response structure for `GET_ADS`.
+    Refer to the [GET_ADS Message section](#get_ads-message) to see the request and response structure for `GET_ADS`.
     The response returned by the registrar node is stored in `response`
     3. The `response` contains a list of advertisements `response.ads`.
     A queried registrar returns at most `F_return` advertisements.
@@ -941,7 +941,7 @@ For each bucket, query up to `K_lookup` random peers.
         2. Add the advertiser’s node ID `ad.peerID` to the list `foundPeers`.
     4. The `response` also contains a list of peers `response.closerPeers`
     that is inserted into the search table `DiscT(s)`.
-    Refer [Distance](#distance) Section for how it is added.
+    Refer to the [Distance section](#distance) for how it is added.
     5. Stop early if enough advertiser peers (`F_lookup`) have been found — no need to continue searching.
     For popular services `F_lookup` advertisers are generally found in the initial phase
     from the farther buckets and the search terminates.
@@ -975,14 +975,14 @@ Implementations should consider these trade-offs carefully when selecting approp
 
 #### `REGISTER()` algorithm explanation
 
-Refer [Registration Flow](#registration-flow) Section for the pseudocode
+Refer to the [Registration Flow section](#registration-flow) for the pseudocode
 
 1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
 Duplicates are not allowed.
 An advertiser can place at most one `ad` for a specific service ID `s` in the `ad_cache` of a given registrar.
 2. Prepare a response ticket `response.ticket` linked to this `ad`.
 3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
-Refer section [Waiting Time Calculation](#waiting-time-calculation) for details.
+Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for details.
 4. Check if this is the first registration attempt (no ticket yet):
     1. If yes then it’s the first try. The advertiser must wait for the full waiting time `t_wait`.
     The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
