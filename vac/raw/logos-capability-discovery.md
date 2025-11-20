@@ -109,7 +109,7 @@ which discoverers can query to get advertisements for a particular service.
 
 ### Distance
 
-The distance `d` between any two keys in Logos Discovery Capability
+The distance `d` between any two keys in Logos Capability Discovery
 is defined using the bitwise XOR applied to their 256-bit SHA-256 representations.
 This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
 The keyspace is the entire numerical range of possible `node.ids` and service IDs `s`
