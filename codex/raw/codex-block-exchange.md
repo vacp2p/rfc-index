@@ -8,6 +8,17 @@ editor: Codex Team
 contributors:
 ---
 
+## Specification Status
+
+This specification contains a mix of:
+
+- **Verified protocol elements**: Core message formats, protobuf structures, and addressing modes confirmed from implementation
+- **Design specifications**: Payment flows, state machines, and negotiation strategies representing intended behavior
+- **Recommended values**: Protocol limits and timeouts that serve as guidelines (actual implementations may vary)
+- **Pending verification**: Some technical details (e.g., multicodec 0xCD02) require further validation
+
+Sections marked with notes indicate areas where implementation details may differ from this specification.
+
 ## Abstract
 
 The Block Exchange (BE) is a core Codex component responsible for
@@ -119,17 +130,20 @@ following specifications:
 |----------|-------|-------------|
 | Default Block Size | 64 KiB | Standard size for data blocks |
 | Maximum Block Size | 100 MiB | Upper limit for block data field |
-| Multicodec | `codex-block` (0xCD02) | Format identifier |
+| Multicodec | `codex-block` (0xCD02)* | Format identifier |
 | Multihash | `sha2-256` (0x12) | Hash algorithm for addressing |
 | Padding Requirement | Zero-padding | Incomplete final blocks padded |
 
+**Note:** *The multicodec value 0xCD02 is not currently registered in the official [multiformats multicodec table](https://github.com/multiformats/multicodec/blob/master/table.csv). This may be a reserved/private code pending official registration.
+
 ### Protocol Limits
 
-To ensure network stability and prevent resource exhaustion, the following
-limits apply:
+To ensure network stability and prevent resource exhaustion, implementations
+SHOULD enforce reasonable limits. The following are **recommended values**
+(actual implementation limits may vary):
 
-| Limit | Value | Description |
-|-------|-------|-------------|
+| Limit | Recommended Value | Description |
+|-------|-------------------|-------------|
 | **Maximum Block Size** | 100 MiB | Maximum size of block data in BlockDelivery |
 | **Maximum WantList Size** | 1000 entries | Maximum entries per WantList message |
 | **Maximum Concurrent Requests** | 256 per peer | Maximum simultaneous block requests per peer |
@@ -138,12 +152,16 @@ limits apply:
 | **Maximum Message Size** | 105 MiB | Maximum total message size (protobuf) |
 | **Maximum Pending Bytes** | 10 GiB | Maximum pending data per peer connection |
 
+**Note:** These values are **not verified from implementation** and serve as
+reasonable guidelines. Actual implementations MAY use different limits based
+on their resource constraints and deployment requirements.
+
 **Enforcement:**
 
-- Implementations MUST reject messages exceeding size limits
+- Implementations MUST reject messages exceeding their configured size limits
 - Implementations SHOULD track per-peer request counts
-- Implementations SHOULD close streams exceeding timeout limits
-- Implementations MAY implement stricter limits based on local resources
+- Implementations SHOULD close streams exceeding configured timeout limits
+- Implementations MAY implement stricter or more lenient limits based on local resources
 
 ## Service Interface
 
@@ -212,7 +230,9 @@ identifier:
 ### Version Negotiation
 
 The protocol version is negotiated through libp2p's multistream-select
-protocol during connection establishment.
+protocol during connection establishment. The following describes standard
+libp2p version negotiation behavior; actual Codex implementation details
+may vary.
 
 #### Protocol Versioning
 
@@ -1008,8 +1028,8 @@ Message {
       }
       proof: <CodexProof bytes>  // Merkle proof data
         // Contains: path indices, sibling hashes, tree height
-        // Format: [height][index][hash1][hash2]...[hashN]
-        // Example size: ~1024 bytes for depth-10 tree
+        // Format: Implementation-specific (e.g., [height][index][hash1][hash2]...[hashN])
+        // Size varies by tree depth (illustrative: ~1KB for depth-10 tree)
     }
   ]
 }
@@ -1160,7 +1180,7 @@ Full CID: 0x0155a0e40220b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ac
 Parts:
   Version:   0x01           (CID v1)
   Multicodec: 0x55          (raw)
-  Codec Size: 0xa0e402      (codex-block = 0xCD02, varint encoded)
+  Codec Size: 0xa0e402      (codex-block = 0xCD02, varint encoded)*
   Hash Type:  0x20          (SHA2-256)
   Hash Len:   0x12 (20)     (32 bytes)
   Hash:       b94d27b993... (32 bytes SHA256)
@@ -1273,6 +1293,9 @@ Requester:
 ```
 
 #### Payment State Machine
+
+**Note:** The following state machine represents a **design specification** for
+payment flow logic. Actual implementation may differ.
 
 ```text
 State: INIT
