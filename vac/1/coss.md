@@ -40,7 +40,7 @@ Request For Comments specification process managed by the Vac service department
 
 ## License
 
-Copyright (c) 2008-24 the Editor and Contributors.
+Copyright (c) 2008-26 the Editor and Contributors.
 
 This Specification is free software;
 you can redistribute it and/or
