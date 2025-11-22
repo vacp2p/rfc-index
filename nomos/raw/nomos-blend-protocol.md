@@ -6,9 +6,9 @@ category: Standards Track
 tags: nomos, blend, privacy, anonymous-broadcast, mixnet
 editor: Marcin Pawlowski
 contributors:
-  - Alexander Mozeika
+  - Alexander Mozeika <alexander.mozeika@status.im>
   - Youngjoon Lee <youngjoon@status.im>
-  - Frederico Teixeira
+  - Frederico Teixeira <frederico@status.im>
   - Mehmet Gonen <mehmet@status.im>
   - Daniel Sanchez Quiros <danielsq@status.im>
   - Álvaro Castro-Castilla <alvaro@status.im>
