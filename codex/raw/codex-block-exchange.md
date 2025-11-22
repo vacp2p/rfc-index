@@ -6,6 +6,7 @@ category: Standards Track
 tags: codex, block-exchange, p2p, data-distribution
 editor: Codex Team
 contributors:
+  - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Specification Status
