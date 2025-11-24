@@ -492,7 +492,7 @@ while still learning rare peers in buckets close to `s`.
 
 ### Formula
 
-The waiting time is the time advertisers have to wait before being admitted to the ad_cache.
+The waiting time is the time advertisers have to wait before being admitted to the `ad_cache`.
 The waiting time is given based on the ad itself and the current state of the registrar’s `ad_cache`.
 
 The waiting time for an advertisement is calculated using:
