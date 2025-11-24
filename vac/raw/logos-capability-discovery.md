@@ -246,7 +246,7 @@ not an individual ad field or parameter of an individual registrar.
 How expiry works:
 
 - When an advertisement is registered,
-it is stored in the registrar node’s ad_cache
+it is stored in the registrar node’s `ad_cache`
 with its `Timestamp` = current Unix time.
 - When processing or periodically cleaning,
 the registrar checks `if currentTime - ad.Timestamp > E`.
