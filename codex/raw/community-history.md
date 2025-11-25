@@ -9,9 +9,9 @@ contributors:
 
 ## Abstract
 
-This document describes how Control Nodes, nodes in Status communities,
-archive historical message data of their communities,
-beyond the time range limit provided by Store Nodes using the BitTorrent protocol.
+This document describes how Control Nodes, nodes in Status Communities,
+archive historical message data of their communities.
+Beyond the time range limit provided by [13/WAKU2-STORE](../../waku/standards/core/13/store.md) Nodes using the BitTorrent protocol.
 It also describes how the archives are distributed to community members via the Status network,
 so they can fetch them and
 gain access to a complete message history.
@@ -29,18 +29,18 @@ where recently joined members of a community are not able to request complete me
 
 | Name | Description |
 | ---- | -------------- |
-| Waku node |	A [10/WAKU2]() node that implements [11/WAKU2-RELAY]() |
+| Waku node | A [10/WAKU2]() node that implements [11/WAKU2-RELAY]() |
 | Store node | A [10/WAKU2]() node that implements [13/WAKU2-STORE]() |
-| Waku network |	A group of [10/WAKU2]() nodes forming a graph, connected via [11/WAKU2-RELAY]() |
-| Status user |	An Status account that is used in a Status consumer product, such as Status Mobile or Status Desktop |
-| Status node |	A Status client run by a Status application |
-| Control node|	A Status node that owns the private key for a Status community |
-| Community member |	A Status user that is part of a Status community, not owning the private key of the community|
-| Community member node	| A Status node with message archive capabilities enabled, run by a community member |
-| Live messages |	Waku messages received through the Waku network |
-| BitTorrent client |	A program implementing the BitTorrent protocol |
-| Torrent/Torrent file |	A file containing metadata about data to be downloaded by BitTorrent clients |
-| Magnet link |	A link encoding the metadata provided by a torrent file (Magnet URI scheme) |
+| Waku network | A group of [10/WAKU2]() nodes forming a graph, connected via [11/WAKU2-RELAY]() |
+| Status user | An Status account that is used in a Status consumer product, such as Status Mobile or Status Desktop |
+| Status node | A Status client run by a Status application |
+| Control node| A Status node that owns the private key for a Status community |
+| Community member | A Status user that is part of a Status community, not owning the private key of the community|
+| Community member node | A Status node with message archive capabilities enabled, run by a community member |
+| Live messages | Waku messages received through the Waku network |
+| BitTorrent client | A program implementing the BitTorrent protocol |
+| Torrent/Torrent file | A file containing metadata about data to be downloaded by BitTorrent clients |
+| Magnet link | A link encoding the metadata provided by a torrent file (Magnet URI scheme) |
 
 ## Specification
 
@@ -114,7 +114,6 @@ message WakuMessageArchiveIndex {
 
 ```
 
-
 A `WakuMessageArchiveIndex` is a map where the key is the KECCAK-256 hash of the `WakuMessageArchiveIndexMetadata` derived from a 7-day archive
 and the value is an instance of that `WakuMessageArchiveIndexMetadata` corresponding to that archive.
 
@@ -168,7 +167,7 @@ Let WakuMessageArchive "A1" be of size 20 bytes:
 
 With a pieceLength of 10 bytes, A1 will fit into 20 / 10 = 2 pieces:
 
-```
+```text
  0 11 22 33 44 55 66 77 88 99 // piece[0] SHA1: 0x123
 10 11 12 13 14 15 16 17 18 19 // piece[1] SHA1: 0x456
 ```
@@ -176,7 +175,7 @@ With a pieceLength of 10 bytes, A1 will fit into 20 / 10 = 2 pieces:
 Example: With padding
 Let WakuMessageArchive "A2" be of size 21 bytes:
 
-```
+```text
  0 11 22 33 44 55 66 77 88 99
 10 11 12 13 14 15 16 17 18 19
 20
@@ -186,7 +185,7 @@ With a pieceLength of 10 bytes, A2 will fit into 21 / 10 = 2 pieces.
 
 The remainder will introduce a third piece:
 
-```
+```text
  0 11 22 33 44 55 66 77 88 99 // piece[0] SHA1: 0x123
 10 11 12 13 14 15 16 17 18 19 // piece[1] SHA1: 0x456
 20                            // piece[2] SHA1: 0x789
@@ -196,7 +195,7 @@ The next WakuMessageArchive "A3" will be appended ("#3") to the existing data an
 
 The piece at index 2 will now produce a different SHA1 hash:
 
-```
+```text
  0 11 22 33 44 55 66 77 88 99 // piece[0] SHA1: 0x123
 10 11 12 13 14 15 16 17 18 19 // piece[1] SHA1: 0x456
 20 #3 #3 #3 #3 #3 #3 #3 #3 #3 // piece[2] SHA1: 0xeef
@@ -205,7 +204,7 @@ The piece at index 2 will now produce a different SHA1 hash:
 
 By filling up the remaining space of the third piece with A2 using its padding field, it is guaranteed that its SHA1 will stay the same:
 
-```
+```text
  0 11 22 33 44 55 66 77 88 99 // piece[0] SHA1: 0x123
 10 11 12 13 14 15 16 17 18 19 // piece[1] SHA1: 0x456
 20  0  0  0  0  0  0  0  0  0 // piece[2] SHA1: 0x999
@@ -305,7 +304,8 @@ Download all archives - Request and download all data pieces for data provided b
 Download only the latest archive - Request and download all pieces starting at the offset of the latest WakuMessageArchiveIndexMetadata (this is the case for any member node that already has downloaded all previous history and is now interested in only the latst archive)
 Download specific archives - Look into from and to fields of every WakuMessageArchiveIndexMetadata and determine the pieces for archives of a specific time range (can be the case for member nodes that have recently joined the network and are only interested in a subset of the complete history)
 Storing historical messages
-When message archives are fetched, community member nodes MUST unwrap the resulting WakuMessage instances into ApplicationMetadataMessage instances and store them in their local database. Community member nodes SHOULD NOT store the wrapped WakuMessage messages.
+When message archives are fetched, community member nodes MUST unwrap the resulting WakuMessage instances into ApplicationMetadataMessage instances and store them in their local database.
+Community member nodes SHOULD NOT store the wrapped WakuMessage messages.
 
 All message within the same time range MUST be replaced with the messages provided by the message history archive.
 
@@ -326,11 +326,13 @@ they might also contain different sets of magnet links and their corresponding h
 Even if just a single message is missing in one of the histories,
 the hashes presented in archive indices will look completely different,
 resulting in the community member node to download the corresponding archive.
-This might be identical to an archive that was already downloaded, except for that one message.
+This might be identical to an archive that was already downloaded,
+except for that one message.
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
-- 
+
+-
