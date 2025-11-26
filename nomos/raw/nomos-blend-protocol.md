@@ -96,6 +96,22 @@ resistance and network-level privacy for block producers. It must be used
 alongside mempool protections (like NomosDA) to achieve truly
 privacy-preserving system.
 
+## Document Structure
+
+This specification is organized into two distinct parts to serve different audiences and use cases:
+
+**Part I: Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node. This section defines the cryptographic primitives, message formats, network protocols, and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees. Protocol designers, auditors, and those seeking to understand the core mechanisms should focus on this part.
+
+**Part II: Implementation Details** provides non-normative guidance for implementers. This section offers practical recommendations, optimization strategies, and detailed examples that help developers build efficient and robust implementations. While these details are not required for interoperability, they represent best practices learned from reference implementations and can significantly improve performance and reliability.
+
+This separation provides several benefits:
+
+1. **Clarity of Requirements**: Implementers can clearly distinguish between mandatory requirements for interoperability (Part I) and optional optimizations (Part II)
+2. **Protocol Evolution**: The core protocol specification (Part I) can remain stable while implementation guidance (Part II) evolves with new techniques and optimizations
+3. **Multiple Implementations**: Different implementations can make different trade-offs in Part II while maintaining full compatibility through adherence to Part I
+4. **Audit Focus**: Security auditors can concentrate on the normative requirements in Part I that are critical for the protocol's privacy guarantees
+5. **Accessibility**: Protocol researchers can understand the essential mechanisms without being overwhelmed by implementation details, while developers get the practical guidance they need
+
 ## Part I: Protocol Specification
 
 ---
