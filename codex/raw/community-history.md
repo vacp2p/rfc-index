@@ -5,6 +5,7 @@ status: raw
 tags: codex
 editor:
 contributors:
+- Jimmy Debe <jimmy@status.im>
 ---
 
 ## Abstract
@@ -314,7 +315,7 @@ using the KECCAK-256 hashes stored in the index.
 For this lookup to work,
 member nodes MUST store the KECCAK-256 hashes,
 of the `WakuMessageArchiveIndexMetadata` provided by the index file,
-for all of the message history archives that have been downlaoded in their local database.
+for all of the message history archives that have been downloaded in their local database.
 
 Given a `WakuMessageArchiveIndex`, member nodes can access individual `WakuMessageArchiveIndexMetadata` to download individual archives.
 
@@ -325,7 +326,7 @@ Community member nodes MUST choose one of the following options:
 2. Download only the latest archive: Request and
 download all pieces starting at the offset of the latest `WakuMessageArchiveIndexMetadata`
 (this is the case for any member node that already has downloaded all previous history and
-is now interested in only the latst archive).
+is now interested in only the latest archive).
 3. Download specific archives: Look into from and
 to fields of every `WakuMessageArchiveIndexMetadata` and
 determine the pieces for archives of a specific time range
