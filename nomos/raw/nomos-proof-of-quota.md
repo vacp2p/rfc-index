@@ -427,6 +427,8 @@ Implementations SHOULD handle:
 
 ### Informative
 
+- [Proof of Quota Specification](https://nomos-tech.notion.site/Proof-of-Quota-Specification-215261aa09df81d88118ee22205cbafe)
+  \- Original Proof of Quota documentation
 - BN256 Curve Specification
 - zk-SNARKs (Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge)
 - [Cryptarchia Consensus](https://arxiv.org/abs/2402.06408)
