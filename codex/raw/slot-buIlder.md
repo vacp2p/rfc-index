@@ -25,31 +25,41 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-A client would present the dataset after the erasure coding process,
-for more information refer to the [CODEX-ERASURE-CODING](./erasure-coding.md) specification.
-There SHOULD be three merkle tree contructed for the slot building process.
-A block digest tree, a slot tree and a verification tree.
+A Codex client wanting to present a dataset to the network will present a set of erasure encoded data blocks,
+as described in the [CODEX-ERASURE-CODING](./erasure-coding.md) specification.
+These data blocks will be placed into slots for storage providers to access.
+The slot building process MUST to contruct a block digest merkle tree from the data blocks.
+The root hashes from this tree is used as the leaves in a slot merkle tree.
 
-A prepared dataset will be presented to the network in the form of slots.
-Slot represent a data chunk with a block that include all mechanisms for conducting a storage contract.
-Based on the storage contract, storage providers SHOULD be able to locate a specifc data chunk that is tasked to be stored.
+A prepared dataset will be presented to storage providers in the form of slots.
+Slot represents a data block cell to be stored based on a storage contract terms.
+Based on the storage contract,
+storage providers SHOULD be able to locate a specifc data block needing to be stored.
 
 ### Contruct the Slot Tree
 
 A slot stores a list of root hashes that help in the retrieval of a dataset.
 The block digest tree SHOULD be contructed before building any slots.
 A block is divided into cells that are then hashed and
-those hashes are used to create a [Posieden2]() based merkle tree.
+those hashes are used to create a [Posieden2](https://eprint.iacr.org/2023/323) based merkle tree.
+The block size must be divisible by the cell size for block tree constuction.
+
+$$
+\text{Cell size} \mid \text{Block size (in bytes)}
+$$
+
 A block digest tree SHOULD contain the unqiue root hashes of blocks of the entire dataset,
 which MAY also be based on the Posiden2 algorithm.
-The total byte size of each block MUST be able to evenly divide by the cell size and/or 
-the number of slots.
 
-### Slot Tree Contruction
+
+#### Slot Tree Contruction
 
 Some slots MAY be empty,
 depending on the size of the dataset.
 
+$$
+\text{Blocks per slot} = \frac{\text{Total blocks}}{\text{Number of slots}}
+$$
 
 ``` nim
 
@@ -97,6 +107,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [CODEX-ERASURE-CODING](./erasure-coding.md)
-
-- [CODEX-ERASURE-CODING](./erasure-coding.md)
+- [Posieden2](https://eprint.iacr.org/2023/323)
 - 
