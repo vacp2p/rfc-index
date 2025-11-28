@@ -248,6 +248,8 @@ Implementations SHOULD:
 
 ### Informative
 
+- [Key Types and Generation Specification](https://nomos-tech.notion.site/Key-Types-and-Generation-Specification-215261aa09df81088b8fd7c3089162e8)
+  \- Original Key Types and Generation documentation
 - [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032) - Edwards-Curve Digital Signature Algorithm (EdDSA)
 - [RFC 7748](https://www.rfc-editor.org/rfc/rfc7748) - Elliptic Curves for Security (X25519)
 - Ed25519 to Curve25519 conversion: Standard practice for deriving X25519 keys from Ed25519 keys
