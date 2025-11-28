@@ -905,6 +905,8 @@ bias (< 2^{-128} for N < 2^{128}), acceptable for expected network sizes (<
 
 ### Informative
 
+- [Blend Protocol](https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084)
+  \- Original Blend Protocol documentation
 - [Nomos Services](https://www.notion.so/Nomos-Services) - Overview of Nomos
   services architecture
 - [Anonymous Leaders Reward Protocol](https://www.notion.so/Anonymous-Leaders-Reward-Protocol)
