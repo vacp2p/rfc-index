@@ -556,7 +556,7 @@ The `score` ranges from 0 to 1:
 - closer to 1 for IPs sharing similar prefix
 - closer to 0 for diverse IPs
 
-IP tree is a binary tree that stores IPs used by ads that are currently present in the ad_cache.
+IP tree is a binary tree that stores IPs used by ads that are currently present in the `ad_cache`.
 
 #### Tree Structure
 
