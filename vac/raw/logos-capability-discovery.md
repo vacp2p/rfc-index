@@ -530,7 +530,7 @@ occupancy_score = 1 / (1 - c/C)^P_occ
 The occupancy score increases progressively as the cache fills:
 
 - When `c << C`: Score ≈ 1 (minimal impact)
-- As the ad_cache fills up, the score will be amplified by the divisor of the equation.
+- As the `ad_cache` fills up, the score will be amplified by the divisor of the equation.
 The higher the value of `P_occ`, the faster the increase.
 Implementations should consider this while setting the value for `P_occ`
 - As `c → C`: Score → ∞ (prevents overflow)
@@ -567,16 +567,16 @@ IP tree is a binary tree that stores IPs used by ads that are currently present 
 - While inserting an IPv4 address into the tree using `ADD_IP_TO_TREE()` algorithm,
 counters of all the visited vertices are increased by 1.
 The visited path is the binary representation of the IPv4 address.
-IPv4 addresses are inserted into the tree only when they are admitted to the ad_cache.
+IPv4 addresses are inserted into the tree only when they are admitted to the `ad_cache`.
 - The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
-- When an ad expires after `E` the ad is removed from the ad_cache
+- When an ad expires after `E` the ad is removed from the `ad_cache`
 and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the counters on the path.
 The path is the binary representation of the IPv4 address.
-- the root counter stores the number of IPv4 addresses that are currently present in the ad_cache
+- the root counter stores the number of IPv4 addresses that are currently present in the `ad_cache`
 
 #### `ADD_IP_TO_TREE()` algorithm
 
-IPv4 addresses are added to the IP tree using the `ADD_IP_TO_TREE()` algorithm when an ad admitted to the ad_cache.
+IPv4 addresses are added to the IP tree using the `ADD_IP_TO_TREE()` algorithm when an ad admitted to the `ad_cache`.
 
 ```text
 procedure ADD_IP_TO_TREE(tree, IP):
@@ -603,7 +603,7 @@ end procedure
     This follows the path corresponding to the IP’s binary representation.
 
 The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
-It calculates how similar a given IP address is to other IPs already in the ad_cache
+It calculates how similar a given IP address is to other IPs already in the `ad_cache`
 and returns the IP similarity score of the inserted IP address.
 It’s used to detect when too many ads come from the same network or IP prefix — a possible Sybil behavior.
 
@@ -667,7 +667,7 @@ The safety parameter `G` ensures waiting times never reach zero even when:
 - Service similarity is zero (new service).
 - IP similarity is zero (completely distinct IP)
 
-It prevents ad_cache overflow in cases when attackers try to send ads for random services or from diverse IPs.
+It prevents `ad_cache` overflow in cases when attackers try to send ads for random services or from diverse IPs.
 
 ### Lower Bound Enforcement
 
@@ -688,7 +688,7 @@ Thus registrars maintain lower bound state for:
 - Each IP prefix in the IP tree: `bound(IP)` and `timestamp(IP)`
 
 The total waiting time will respect the lower bound if lower bound is enforced on these.
-These two sets have a bounded size as number of ads present in the ad_cache at a time is bounded by the cache capacity C.
+These two sets have a bounded size as number of ads present in the `ad_cache` at a time is bounded by the cache capacity C.
 
 **How lower bound is calculated for service IDs:**
 
