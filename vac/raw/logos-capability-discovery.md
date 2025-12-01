@@ -35,9 +35,9 @@ In decentralized networks supporting multiple services,
 efficient peer discovery for specific services is critical.
 Traditional approaches face several challenges:
 
-1. Random walk lookups is inefficient for unpopular services.
-2. Direct DHT lookups to closest nodes create hotspots at popular services
-and are vulnerable to Sybil and Eclipse attacks.
+1. Random-walk–based discovery is inefficient for unpopular services.
+2. A naive approach where nodes advertise their service at DHT peers
+whose IDs are closest to the service ID leads to hotspots and overload at popular services.
 3. Discovery must scale logarithmically across many distinct services.
 
 Through service-specific tables, adaptive advertisement placement,
