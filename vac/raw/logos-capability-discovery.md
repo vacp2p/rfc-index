@@ -84,6 +84,7 @@ It is built and maintained in the same way as in the base Kad-dht.
 ### Service
 
 A service is a logical sub-network within the larger peer-to-peer network.
+It represents a specific capability a node supports — for example, a particular protocol or functionality it offers.
 Services are identified by a unique service identifier string like `waku.store, libp2p.mix, etc.`
 
 ### Service ID
