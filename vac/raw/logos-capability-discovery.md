@@ -563,19 +563,19 @@ IP tree is a binary tree that stores IPs used by `ads` that are currently presen
 
 #### Tree Structure
 
-- Each tree vertex stores a `counter` showing how many IPs pass through that node.
+- Each tree vertex stores a `IP_counter` showing how many IPs pass through that node.
 - Apart from root, the IP tree is a 32-level binary tree
-- The counter of every vertex of the tree is initially set to 0.
+- The `IP_counter` of every vertex of the tree is initially set to 0.
 - edges represent consecutive 0s or 1s in a binary representation of IPv4 addresses.
 - While inserting an IPv4 address into the tree using `ADD_IP_TO_TREE()` algorithm,
-counters of all the visited vertices are increased by 1.
+`IP_counter`s of all the visited vertices are increased by 1.
 The visited path is the binary representation of the IPv4 address.
 IPv4 addresses are inserted into the tree only when they are admitted to the `ad_cache`.
 - The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
 - When an ad expires after `E` the ad is removed from the `ad_cache`
-and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the counters on the path.
+and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the `IP_counter`s on the path.
 The path is the binary representation of the IPv4 address.
-- the root counter stores the number of IPv4 addresses that are currently present in the `ad_cache`
+- the root `IP_counter` stores the number of IPv4 addresses that are currently present in the `ad_cache`
 
 #### `ADD_IP_TO_TREE()` algorithm
 
@@ -586,7 +586,7 @@ procedure ADD_IP_TO_TREE(tree, IP):
     v ← tree.root
     bits ← IP.toBinary()
     for i in 0, 1, ..., 31:
-        v.counter ← v.counter + 1
+        v.IP_counter ← v.IP_counter + 1
         if bits[i] = 0:
             v ← v.left
         else:
@@ -599,7 +599,7 @@ end procedure
 1. Start from the root node of the tree. Initialize current node variable `v` to root of the tree `tree.root`.
 2. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
 3. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
-    1. Increase the counter for the current node `v.counter`.
+    1. Increase the `IP_counter` for the current node `v.IP_counter`.
     This records that another IP passed through this vertex `v` (i.e., shares this prefix).
     2. Move to the next node in the tree. Go left `v.left` if the current bit `bits[i]` is `0`.
     Go right `v.right` if it’s `1`.
@@ -623,7 +623,7 @@ procedure CALCULATE_IP_SCORE(tree, IP):
         else:
             v ← v.right
         end if
-        if v.counter > tree.root.counter / 2^i:
+        if v.IP_counter > tree.root.IP_counter / 2^i:
             score ← score + 1
         end if
     end for
@@ -637,20 +637,20 @@ end procedure
 4. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
     1. Move to the next node in the tree. Go left `v.left` if the current bit `bits[i]` is `0`. Go right `v.right` if it’s `1`.
     This follows the path corresponding to the IP’s binary representation.
-    2. Check if this node’s counter is larger than expected in a perfectly balanced tree.
+    2. Check if this node’s `IP_counter` is larger than expected in a perfectly balanced tree.
     If it is, that means too many IPs share this prefix, so increase the similarity score `score` by 1.
 5. Divide the total score by 32 (the number of bits in the IP) and return it.
 
 #### `REMOVE_FROM_IP_TREE()` algorithm
 
-When an ad expires after `E`, its IP is removed from the tree, and the counters in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
+When an ad expires after `E`, its IP is removed from the tree, and the `IP_counter`s in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
 
 ```text
 procedure REMOVE_FROM_IP_TREE(tree, IP):
     v ← tree.root
     bits ← IP.toBinary()
     for i in 0, 1, ..., 31:
-        v.counter ← v.counter - 1
+        v.IP_counter ← v.IP_counter - 1
         if bits[i] = 0:
             v ← v.left
         else:
