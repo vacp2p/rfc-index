@@ -52,6 +52,28 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document
 are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
+## Protocol Roles
+
+### Advertiser
+
+**Advertisers** participate in service and want to be discovered by their peers.
+Advertisers run the `ADVERTISE()` algorithm as in described in [Advertise Algorithm section](#advertisement-algorithm)
+for distributing advertisements across registrars. They maintain the **advertise table** `AdvT(s)`.
+
+### Discoverer
+
+Discoverers attempt to discover advertisers registered under specific service
+by running the `LOOKUP()` algorithm as in described in [Lookup Algorithm section](#lookup-algorithm).
+
+### Registrar
+
+Registrars store ads from advertisers in their advertisement cache.
+Registrars use a waiting time based admission control mechanism using the `REGISTER()` algorithm
+as described in [Registration Flow section](#registration-flow)
+to decide whether to admit an advertisement coming from an advertiser or not.
+It uses the `LOOKUP_RESPONSE()` as described in [Lookup Response Algorithm section](#lookup-response-algorithm),
+algorithm to respond to `LOOKUP()` requests of discoverers.
+
 ## Definitions
 
 ### DHT Routing Table
@@ -253,28 +275,6 @@ with its `Timestamp` = current Unix time.
 - When processing or periodically cleaning,
 the registrar checks `if currentTime - ad.Timestamp > E`.
 - If true → the ad is expired and should be removed from the cache.
-
-## Protocol Roles
-
-### Advertiser
-
-**Advertisers** participate in service and want to be discovered by their peers.
-Advertisers run the `ADVERTISE()` algorithm as in described in [Advertise Algorithm section](#advertisement-algorithm)
-for distributing advertisements across registrars. They maintain the **advertise table** `AdvT(s)`.
-
-### Discoverer
-
-Discoverers attempt to discover advertisers registered under specific service
-by running the `LOOKUP()` algorithm as in described in [Lookup Algorithm section](#lookup-algorithm).
-
-### Registrar
-
-Registrars store ads from advertisers in their advertisement cache.
-Registrars use a waiting time based admission control mechanism using the `REGISTER()` algorithm
-as described in [Registration Flow section](#registration-flow)
-to decide whether to admit an advertisement coming from an advertiser or not.
-It uses the `LOOKUP_RESPONSE()` as described in [Lookup Response Algorithm section](#lookup-response-algorithm),
-algorithm to respond to `LOOKUP()` requests of discoverers.
 
 ## Advertisement Placement
 
