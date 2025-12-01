@@ -268,15 +268,6 @@ and supported natively in libp2p.
 The expiry time **`E`** is a system wide parameter,
 not an individual ad field or parameter of an individual registrar.
 
-How expiry works:
-
-- When an advertisement is registered,
-it is stored in the registrar node’s `ad_cache`
-with its `Timestamp` = current Unix time.
-- When processing or periodically cleaning,
-the registrar checks `if currentTime - ad.Timestamp > E`.
-- If true → the ad is expired and should be removed from the cache.
-
 ## Advertisement Placement
 
 ### Overview
@@ -389,9 +380,18 @@ The mechanism does not require registrars to maintain any state for each ongoing
 
 `ad_cache` is the advertisement cache.
 It is a bounded storage structure maintained by registrars to store accepted advertisements.
+The total size of the `ad_cache` is limited by its capacity `C`.
 Each ad stored in the `ad_cache` has an associated expiry time `E`,
 after which the `ad` is automatically removed.
-The total size of the `ad_cache` is limited by its capacity `C`.
+
+How expiry works:
+
+- When an advertisement is registered,
+it is stored in the registrar node’s `ad_cache`
+with its `Timestamp` = current Unix time.
+- When processing or periodically cleaning,
+the registrar checks `if currentTime - ad.Timestamp > E`.
+- If true → the ad is expired and should be removed from the cache.
 
 ### Registration Flow
 
