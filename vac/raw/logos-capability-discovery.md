@@ -16,6 +16,8 @@ a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore
 built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
 It enables nodes to advertise their participation in specific services
 and allows other nodes to efficiently discover peers participating in those services.
+In this RFC, the terms capability and service are used interchangeably.
+Within Logos, a node’s “capabilities” map directly to the “services” it participates in.
 
 The protocol adds service-specific advertisement placement and retrieval mechanisms
 on top of the base Kad-dht functionality.
