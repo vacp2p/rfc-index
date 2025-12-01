@@ -66,7 +66,7 @@ by running the `LOOKUP()` algorithm as in described in [Lookup Algorithm section
 
 ### Registrar
 
-Registrars store ads from advertisers in their advertisement cache.
+Registrars store advertisements from advertisers in their advertisement cache.
 Registrars use a waiting time based admission control mechanism using the `REGISTER()` algorithm
 as described in [Registration Flow section](#registration-flow)
 to decide whether to admit an advertisement coming from an advertiser or not.
@@ -108,6 +108,7 @@ how long an advertiser already waited for admission.
 
 An **advertisement** is a data structure (refer to the [Advertisement Structure section](#advertisement-structure))
 indicating that a specific node participates in a service.
+In this RFC we refer to advertisement objects as `ads`.
 
 ### Advertisement Cache
 
@@ -445,8 +446,8 @@ procedure LOOKUP_RESPONSE(s):
 end procedure
 ```
 
-1. Fetch all advertisements for service ID `s` from the registrar’s `ad_cache`.
-Then return up to `F_return` of them (a system parameter limiting how many ads are sent per query by a registrar).
+1. Fetch all `ads` for service ID `s` from the registrar’s `ad_cache`.
+Then return up to `F_return` of them (a system parameter limiting how many `ads` are sent per query by a registrar).
 2. Call the `GETPEERS(s)` function to get a list of peers from across the registrar’s routing table `RegT(s)`.
 3. Send the assembled response (advertisements + closer peers) back to the discoverer.
 
@@ -557,7 +558,7 @@ The `score` ranges from 0 to 1:
 - closer to 1 for IPs sharing similar prefix
 - closer to 0 for diverse IPs
 
-IP tree is a binary tree that stores IPs used by ads that are currently present in the `ad_cache`.
+IP tree is a binary tree that stores IPs used by `ads` that are currently present in the `ad_cache`.
 
 #### Tree Structure
 
@@ -606,7 +607,7 @@ end procedure
 The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
 It calculates how similar a given IP address is to other IPs already in the `ad_cache`
 and returns the IP similarity score of the inserted IP address.
-It’s used to detect when too many ads come from the same network or IP prefix — a possible Sybil behavior.
+It’s used to detect when too many `ads` come from the same network or IP prefix — a possible Sybil behavior.
 
 #### `CALCULATE_IP_SCORE()` algorithm
 
@@ -668,7 +669,7 @@ The safety parameter `G` ensures waiting times never reach zero even when:
 - Service similarity is zero (new service).
 - IP similarity is zero (completely distinct IP)
 
-It prevents `ad_cache` overflow in cases when attackers try to send ads for random services or from diverse IPs.
+It prevents `ad_cache` overflow in cases when attackers try to send `ads` for random services or from diverse IPs.
 
 ### Lower Bound Enforcement
 
@@ -689,7 +690,7 @@ Thus registrars maintain lower bound state for:
 - Each IP prefix in the IP tree: `bound(IP)` and `timestamp(IP)`
 
 The total waiting time will respect the lower bound if lower bound is enforced on these.
-These two sets have a bounded size as number of ads present in the `ad_cache` at a time is bounded by the cache capacity C.
+These two sets have a bounded size as number of `ads` present in the `ad_cache` at a time is bounded by the cache capacity C.
 
 **How lower bound is calculated for service IDs:**
 
@@ -886,7 +887,7 @@ Each bucket corresponds to a particular distance from the service ID `s`.
     Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
     6. Then send this `ad` asynchronously to the selected registrar.
     The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
-    Asynchronous execution allows multiple ads (to multiple registrars) to proceed in parallel.
+    Asynchronous execution allows multiple `ads` (to multiple registrars) to proceed in parallel.
 
 #### ADVERTISE_SINGLE() algorithm explanation
 
@@ -961,13 +962,13 @@ Placing malicious registrars in this fraction of the key space
 to impact service discovery process would require considerable resources.
 Subsequent buckets cover smaller fractions of the key space,
 making it easier for the attacker to place Sybils
-but also increasing the chance of advertisers already gathering enough ads in previous buckets.
+but also increasing the chance of advertisers already gathering enough `ads` in previous buckets.
 
 Parameters `F_return` and `F_lookup` play an important role in setting a compromise between security and efficiency.
 A small value of `F_return << F_lookup` increases the diversity of the source of `ads` received by the discoverer
 but increases search time, and requires reaching buckets covering smaller key ranges where eclipse risks are higher.
 On the other hand, similar values for `F_lookup` and `F_return` reduce overheads
-but increase the danger of a discoverer receiving ads uniquely from malicious nodes.
+but increase the danger of a discoverer receiving `ads` uniquely from malicious nodes.
 Finally, low values of `F_lookup` stop the search operation early,
 before reaching registrars close to the service hash, contributing to a more balanced load distribution.
 Implementations should consider these trade-offs carefully when selecting appropriate values.
