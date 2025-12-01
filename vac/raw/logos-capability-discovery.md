@@ -26,7 +26,6 @@ it is safe to assume behaviour similar to Kad-dht.
 The terms “peer” and “node” are used interchangeably throughout this document
 and refer to the same entity — a participant in the Logos Discovery network.
 
-While Kad-dht provides scalable content routing, it is limited in resilience.
 Logos discovery extends Kad-dht toward a multi-service, resilient discovery layer,
 enhancing reliability while maintaining compatibility with existing Kad-dht behavior.
 
