@@ -132,81 +132,6 @@ and  maintained through interactions with registrars during lookup operations.
 Every bucket in the table has a list of registrars at a particular distance
 which discoverers can query to get advertisements for a particular service.
 
-### Distance
-
-The distance `d` between any two keys in Logos Capability Discovery
-is defined using the bitwise XOR applied to their 256-bit SHA-256 representations.
-This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
-The keyspace is the entire numerical range of possible `node.ids` and service IDs `s`
-— the 256-bit space in which all SHA-256–derived IDs exist.
-XOR is used to measure distances between them in the keyspace.
-
-For every node in the network, the `node.id` is unique.
-In this system, both `node.id` and the service ID `s` are 256-bit SHA-256 hashes.
-Thus both belong to the same keyspace.
-
-Advertise table `AdvT(s)` and search table `DiscT(s)` are centered on service ID `s`
-while `KadDHT(node.id)` table is centered on `node.id`.
-
-When inserting a node into advertise table `AdvT(s)` or the search table `DiscT(s)`,
-the bucket index into which the node will be inserted is determined by:
-
-- x = reference ID which is the service ID `s`
-- y = target peer ID `node.id`
-- L = 256 = bit length of IDs
-- `m` = 16 = number of buckets in the advertise/search table
-- `d = x ⊕ y = s ⊕ node.id` = bitwise XOR distance (interpreted as an unsigned integer)
-
-The bucket index `i` where `y` is placed in `x`'s advertise/search table is:
-
-- For `d > 0`, `i = min( ⌊ (m / 256) * (256 − 1 − ⌊log₂(d)⌋) ⌋ , m − 1 )`
-- For `d = 0`, `i = m - 1` which is the same ID case
-
-If we further simplify it, then:
-
-- Let `lz = CLZ(d)` = number of leading zeros in the 256-bit representation of `d`
-- `i = min( ⌊ (lz * m) / 256 ⌋ , m − 1 )`
-
-Lower-index buckets represent peers far away from `s` in the keyspace,
-while higher-index buckets contain peers closer to `s`.
-This property allows efficient logarithmic routing:
-each hop moves to a peer that shares a longer prefix of bits
-with the target service ID `s`.
-
-This formula is also used when we bootstrap peers from the `KadDHT` table.
-For every peer present in the `KadDHT(node.id)` table
-we use the same formula to place them in advertise table `AdvT(s)`,
-search table `DiscT(s)` and Registrar Table `RegT(s)` buckets.
-
-Initially the density of peers in the search table `DiscT(S)`
-and advertise table `AdvT(s)` around `s` might be low or even null
-particularly when `s` and `node.id` are distant in the keyspace
-(as `KadDHT(node.id)` is centered on node ID).
-The buckets are thus filled opportunistically
-while interacting with peers during the search or advertisement process.
-Registrars, apart from responding to queries,
-return a list of peers as `response.closerPeers` .
-These are also added to buckets in `AdvT(s)` and `DiscT(s)` using the same formula.
-
-### System Parameters
-
-The system parameters are derived directly from
-the [DISC-NG paper](https://ieeexplore.ieee.org/document/10629017).
-Implementations may modify them as needed based on specific requirements.
-
-| Parameter | Default Value | Description |
-| --- | --- | --- |
-| `K_register` | 3 | Max number of active (i.e. unexpired) registrations + ongoing registration attempts per bucket. |
-| `K_lookup` | 5 | For each bucket in the search table, number of random registrar nodes queried by discoverers |
-| `F_lookup` | 30 | number of advertisers to find in the lookup process. we stop lookup process when we have found these many advertisers |
-| `F_return` | 10 | max number of service-specific peers returned from a single registrar |
-| `E` | 900 seconds | Advertisement expiry time (15 minutes) |
-| `C` | 1,000 | Advertisement cache capacity |
-| `P_occ` | 10 | Occupancy exponent for waiting time calculation |
-| `G` | 10⁻⁷ | Safety parameter for waiting time calculation |
-| `δ` | 1 second | Registration window time |
-| `m`  | 16 | Number of buckets for advertise table, search table |
-
 ### Bucket
 
 Each bucket in all the tables stores peer information —
@@ -267,6 +192,83 @@ and supported natively in libp2p.
 `E` is advertisement expiry time in seconds.
 The expiry time **`E`** is a system wide parameter,
 not an individual ad field or parameter of an individual registrar.
+
+## Protocol Specifications
+
+### System Parameters
+
+The system parameters are derived directly from
+the [DISC-NG paper](https://ieeexplore.ieee.org/document/10629017).
+Implementations may modify them as needed based on specific requirements.
+
+| Parameter | Default Value | Description |
+| --- | --- | --- |
+| `K_register` | 3 | Max number of active (i.e. unexpired) registrations + ongoing registration attempts per bucket. |
+| `K_lookup` | 5 | For each bucket in the search table, number of random registrar nodes queried by discoverers |
+| `F_lookup` | 30 | number of advertisers to find in the lookup process. we stop lookup process when we have found these many advertisers |
+| `F_return` | 10 | max number of service-specific peers returned from a single registrar |
+| `E` | 900 seconds | Advertisement expiry time (15 minutes) |
+| `C` | 1,000 | Advertisement cache capacity |
+| `P_occ` | 10 | Occupancy exponent for waiting time calculation |
+| `G` | 10⁻⁷ | Safety parameter for waiting time calculation |
+| `δ` | 1 second | Registration window time |
+| `m`  | 16 | Number of buckets for advertise table, search table |
+
+### Distance
+
+The distance `d` between any two keys in Logos Capability Discovery
+is defined using the bitwise XOR applied to their 256-bit SHA-256 representations.
+This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
+The keyspace is the entire numerical range of possible `node.ids` and service IDs `s`
+— the 256-bit space in which all SHA-256–derived IDs exist.
+XOR is used to measure distances between them in the keyspace.
+
+For every node in the network, the `node.id` is unique.
+In this system, both `node.id` and the service ID `s` are 256-bit SHA-256 hashes.
+Thus both belong to the same keyspace.
+
+Advertise table `AdvT(s)` and search table `DiscT(s)` are centered on service ID `s`
+while `KadDHT(node.id)` table is centered on `node.id`.
+
+When inserting a node into advertise table `AdvT(s)` or the search table `DiscT(s)`,
+the bucket index into which the node will be inserted is determined by:
+
+- x = reference ID which is the service ID `s`
+- y = target peer ID `node.id`
+- L = 256 = bit length of IDs
+- `m` = 16 = number of buckets in the advertise/search table
+- `d = x ⊕ y = s ⊕ node.id` = bitwise XOR distance (interpreted as an unsigned integer)
+
+The bucket index `i` where `y` is placed in `x`'s advertise/search table is:
+
+- For `d > 0`, `i = min( ⌊ (m / 256) * (256 − 1 − ⌊log₂(d)⌋) ⌋ , m − 1 )`
+- For `d = 0`, `i = m - 1` which is the same ID case
+
+If we further simplify it, then:
+
+- Let `lz = CLZ(d)` = number of leading zeros in the 256-bit representation of `d`
+- `i = min( ⌊ (lz * m) / 256 ⌋ , m − 1 )`
+
+Lower-index buckets represent peers far away from `s` in the keyspace,
+while higher-index buckets contain peers closer to `s`.
+This property allows efficient logarithmic routing:
+each hop moves to a peer that shares a longer prefix of bits
+with the target service ID `s`.
+
+This formula is also used when we bootstrap peers from the `KadDHT` table.
+For every peer present in the `KadDHT(node.id)` table
+we use the same formula to place them in advertise table `AdvT(s)`,
+search table `DiscT(s)` and Registrar Table `RegT(s)` buckets.
+
+Initially the density of peers in the search table `DiscT(S)`
+and advertise table `AdvT(s)` around `s` might be low or even null
+particularly when `s` and `node.id` are distant in the keyspace
+(as `KadDHT(node.id)` is centered on node ID).
+The buckets are thus filled opportunistically
+while interacting with peers during the search or advertisement process.
+Registrars, apart from responding to queries,
+return a list of peers as `response.closerPeers` .
+These are also added to buckets in `AdvT(s)` and `DiscT(s)` using the same formula.
 
 ## Advertisement Placement
 
