@@ -52,7 +52,7 @@ $$
 $$
 
 A block digest tree SHOULD contain the unique root hashes of blocks of the entire dataset,
-which MAY be based on the [Posieden2](https://eprint.iacr.org/2023/323) algorithm.
+which MAY be based on the [Poseidon2](https://eprint.iacr.org/2023/323) algorithm.
 The result of one digest tree will be represented by the root hash of the tree.
 
 #### Slot Tree
@@ -130,4 +130,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 - [CODEX-ERASURE-CODING](./erasure-coding.md)
 - [CODEX-MARKETPLACE](./marketplace.md)
-- [Posieden2](https://eprint.iacr.org/2023/323)
+- [Poseidon2](https://eprint.iacr.org/2023/323)
