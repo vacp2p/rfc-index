@@ -78,11 +78,11 @@ algorithm to respond to `LOOKUP()` requests of discoverers.
 ### DHT Routing Table
 
 Every participant in the kad-dht peer discovery layer maintains the peer routing table `KadDHT(node.id)`.
-It is centered on `node.id`.
 It is a distributed key-value store with
 [peer IDs](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/peer-ids/peer-ids.md#peer-ids)
 as key against their matching
 [signed peer records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md) values.
+It is centered on `node.id`.
 
 **Note:**
 
