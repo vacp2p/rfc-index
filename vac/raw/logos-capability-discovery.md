@@ -57,7 +57,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 **Advertisers** participate in service and want to be discovered by their peers.
 Advertisers run the `ADVERTISE()` algorithm as in described in [Advertise Algorithm section](#advertisement-algorithm)
-for distributing advertisements across registrars. They maintain the **advertise table** `AdvT(s)`.
+for distributing advertisements across registrars. They maintain the **advertise table** `AdvT(service_id_hash)`.
 
 ### Discoverer
 
@@ -89,7 +89,7 @@ Services are identified by a unique service identifier string like `waku.store, 
 
 ### Service ID
 
-The service ID **`s`** is the SHA-256 hash of the service identifier string.
+The service ID `service_id_hash` is the SHA-256 hash of the service identifier string.
 
 For example:
 
@@ -110,6 +110,7 @@ how long an advertiser already waited for admission.
 An **advertisement** is a data structure (refer to the [Advertisement Structure section](#advertisement-structure))
 indicating that a specific node participates in a service.
 In this RFC we refer to advertisement objects as `ads`.
+For a single advertisement object we use `ad`.
 
 ### Advertisement Cache
 
@@ -118,7 +119,7 @@ maintained by registrars to store accepted advertisements.
 
 ### Advertise Table
 
-An advertise table `AdvT(s)` is centered on service ID `s` and maintained by advertisers.
+An advertise table `AdvT(service_id_hash)` is centered on `service_id_hash` and maintained by advertisers.
 It is initialized from the advertiser’s Kad-dht routing table
 and maintained through interactions with registrars during the advertisement process.
 Every bucket in the table has a list of registrars at a particular distance
@@ -126,7 +127,7 @@ on which advertisers can place their advertisements.
 
 ### Search Table
 
-A search table `DiscT(s)` is centered service ID on `s`  and maintained by discoverers.
+A search table `DiscT(service_id_hash)` is centered `service_id_hash` and maintained by discoverers.
 It is initialized from the discoverer’s Kad-dht routing table
 and  maintained through interactions with registrars during lookup operations.
 Every bucket in the table has a list of registrars at a particular distance
@@ -148,14 +149,6 @@ The number of entries a bucket can hold is implementation-dependent.
 
 - Smaller buckets → lower memory usage but may reduce resilience to churn.
 - Larger buckets → better redundancy but increased maintenance
-
-**Note:**
-
-The `response.closerPeers` field returned by registrars should include
-a list of peer information object which contains both peer IDs and addresses,
-as the latter is required to contact peers.
-In this RFC, we simplify representation by listing only peer IDs,
-but full implementations must include address information.
 
 ### Address
 
@@ -219,25 +212,25 @@ Implementations may modify them as needed based on specific requirements.
 The distance `d` between any two keys in Logos Capability Discovery
 is defined using the bitwise XOR applied to their 256-bit SHA-256 representations.
 This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
-The keyspace is the entire numerical range of possible `node.ids` and service IDs `s`
+The keyspace is the entire numerical range of possible `node.id` and `service_id_hash`
 — the 256-bit space in which all SHA-256–derived IDs exist.
 XOR is used to measure distances between them in the keyspace.
 
 For every node in the network, the `node.id` is unique.
-In this system, both `node.id` and the service ID `s` are 256-bit SHA-256 hashes.
+In this system, both `node.id` and the service ID `service_id_hash` are 256-bit SHA-256 hashes.
 Thus both belong to the same keyspace.
 
-Advertise table `AdvT(s)` and search table `DiscT(s)` are centered on service ID `s`
+Advertise table `AdvT(service_id_hash)` and search table `DiscT(service_id_hash)` are centered on `service_id_hash`
 while `KadDHT(node.id)` table is centered on `node.id`.
 
-When inserting a node into advertise table `AdvT(s)` or the search table `DiscT(s)`,
+When inserting a node into advertise table `AdvT(service_id_hash)` or the search table `DiscT(service_id_hash)`,
 the bucket index into which the node will be inserted is determined by:
 
-- x = reference ID which is the service ID `s`
+- x = reference ID which is the `service_id_hash`
 - y = target peer ID `node.id`
 - L = 256 = bit length of IDs
 - `m` = 16 = number of buckets in the advertise/search table
-- `d = x ⊕ y = s ⊕ node.id` = bitwise XOR distance (interpreted as an unsigned integer)
+- `d = x ⊕ y = service_id_hash ⊕ node.id` = bitwise XOR distance (interpreted as an unsigned integer)
 
 The bucket index `i` where `y` is placed in `x`'s advertise/search table is:
 
@@ -249,32 +242,40 @@ If we further simplify it, then:
 - Let `lz = CLZ(d)` = number of leading zeros in the 256-bit representation of `d`
 - `i = min( ⌊ (lz * m) / 256 ⌋ , m − 1 )`
 
-Lower-index buckets represent peers far away from `s` in the keyspace,
-while higher-index buckets contain peers closer to `s`.
+Lower-index buckets represent peers far away from `service_id_hash` in the keyspace,
+while higher-index buckets contain peers closer to `service_id_hash`.
 This property allows efficient logarithmic routing:
 each hop moves to a peer that shares a longer prefix of bits
-with the target service ID `s`.
+with the target `service_id_hash`.
 
 This formula is also used when we bootstrap peers from the `KadDHT` table.
 For every peer present in the `KadDHT(node.id)` table
-we use the same formula to place them in advertise table `AdvT(s)`,
-search table `DiscT(s)` and Registrar Table `RegT(s)` buckets.
+we use the same formula to place them in advertise table `AdvT(service_id_hash)`,
+search table `DiscT(service_id_hash)` and Registrar Table `RegT(service_id_hash)` buckets.
 
-Initially the density of peers in the search table `DiscT(S)`
-and advertise table `AdvT(s)` around `s` might be low or even null
-particularly when `s` and `node.id` are distant in the keyspace
+Initially the density of peers in the search table `DiscT(service_id_hash)`
+and advertise table `AdvT(service_id_hash)` around `service_id_hash` might be low or even null
+particularly when `service_id_hash` and `node.id` are distant in the keyspace
 (as `KadDHT(node.id)` is centered on node ID).
 The buckets are thus filled opportunistically
 while interacting with peers during the search or advertisement process.
 Registrars, apart from responding to queries,
 return a list of peers as `response.closerPeers` .
-These are also added to buckets in `AdvT(s)` and `DiscT(s)` using the same formula.
+These are also added to buckets in `AdvT(service_id_hash)` and `DiscT(service_id_hash)` using the same formula.
+
+**Note:**
+
+The `response.closerPeers` field returned by registrars should include
+a list of peer information object which contains both peer IDs and addresses,
+as the latter is required to contact peers.
+In this RFC, we simplify representation by listing only peer IDs,
+but full implementations must include address information.
 
 ## Advertisement Placement
 
 ### Overview
 
-`ADVERTISE(s)` lets advertisers publish itself as a participant in a particular *service with ID* `s` .
+`ADVERTISE(service_id_hash)` lets advertisers publish itself as a participant in a particular `service_id_hash` .
 
 It spreads advertisements for its service across multiple registrars,
 such that other peers can  find it efficiently.
@@ -286,31 +287,31 @@ The advertisers run `ADVERTISE()` periodically.
 Implementations may choose the interval based on their requirements.
 
 ```text
-procedure ADVERTISE(s):
+procedure ADVERTISE(service_id_hash):
     ongoing ← MAP<bucketIndex; LIST<registrars>>
-    AdvT(s) ← KadDHT(node.id)
+    AdvT(service_id_hash) ← KadDHT(node.id)
     for i in 0, 1, ..., m-1:
         while ongoing[i].size < K_register:
-            registrar ← AdvT(s).getBucket(i).getRandomNode()
+            registrar ← AdvT(service_id_hash).getBucket(i).getRandomNode()
             if registrar = None:
                 break
             end if
             ongoing[i].add(registrar)
-            ad.serviceId ← s
+            ad.service_id_hash ← service_id_hash
             ad.peerId ← node.id
             ad.addrs ← node.addrs
             ad.timestamp ← NOW()
             SIGN(ad)
-            async(ADVERTISE_SINGLE(registrar, ad, i, s))
+            async(ADVERTISE_SINGLE(registrar, ad, i, service_id_hash))
         end while
     end for
 end procedure
 
-procedure ADVERTISE_SINGLE(registrar, ad, i, s):
+procedure ADVERTISE_SINGLE(registrar, ad, i, service_id_hash):
     ticket ← None
     while True:
         response ← registrar.Register(ad, ticket)
-        AdvT(s).add(response.closerPeers)
+        AdvT(service_id_hash).add(response.closerPeers)
         if response.status = Confirmed:
             SLEEP(E)
             break
@@ -331,29 +332,29 @@ Refer to the [Advertiser Algorithms Explanation section](#advertiser-algorithms-
 
 ### Overview
 
-The `LOOKUP(s)` procedure is run by a discoverer to query registrar nodes
-to find advertisements for a specific service ID `s`.
+The `LOOKUP(service_id_hash)` procedure is run by a discoverer to query registrar nodes
+to find advertisements for a specific `service_id_hash`.
 
-Discoverers runs `LOOKUP(s)` periodically and when more peers are requested by its service application.
+Discoverers runs `LOOKUP(service_id_hash)` periodically and when more peers are requested by its service application.
 Implementations may choose the interval based on their requirements.
 
-It works like a gradual search on the search table `DiscT(s)`,
-starting from far buckets (`b_0`) which has registrar nodes with fewer shared bits with `s`
-and moving to buckets (`b_(m-1)`) containing registrar nodes with higher number of shared bits or closer to `s`.
+It works like a gradual search on the search table `DiscT(service_id_hash)`,
+starting from far buckets (`b_0`) which has registrar nodes with fewer shared bits with `service_id_hash`
+and moving to buckets (`b_(m-1)`) containing registrar nodes with higher number of shared bits or closer to `service_id_hash`.
 
 ### Lookup Algorithm
 
 ```protobuf
-procedure LOOKUP(s):
-    DiscT(s) ← KadDHT(node.id)
+procedure LOOKUP(service_id_hash):
+    DiscT(service_id_hash) ← KadDHT(node.id)
     foundPeers ← SET<Peers>
     for i in 0, 1, ..., m-1:
         for j in 0, ..., K_lookup - 1:
-            peer ← DiscT(s).getBucket(i).getRandomNode()
+            peer ← DiscT(service_id_hash).getBucket(i).getRandomNode()
             if peer = None:
                 break
             end if
-            response ← peer.GetAds(s)
+            response ← peer.GetAds(service_id_hash)
             for ad in response.ads:
                 assert(ad.hasValidSignature())
                 foundPeers.add(ad.peerId)
@@ -361,7 +362,7 @@ procedure LOOKUP(s):
                       break
                   end if
               end for
-            DiscT(s).add(response.closerPeers)
+            DiscT(service_id_hash).add(response.closerPeers)
             if foundPeers.size ≥ F_lookup:
                 return foundPeers
             end if
@@ -429,7 +430,7 @@ procedure REGISTER(ad, ticket):
         response.ticket.t_mod ← NOW()
         SIGN(response.ticket)
     end if
-    response.closerPeers ← GETPEERS(ad.s)
+    response.closerPeers ← GETPEERS(ad.service_id_hash)
     return response
 end procedure
 ```
@@ -442,31 +443,32 @@ Registrars respond to `GET_ADS` requests from discoverers using the `LOOKUP_RESP
 Refer to [GET_ADS Message section](#get_ads-message) for the request and response structure of `GET_ADS`.
 
 ```text
-procedure LOOKUP_RESPONSE(s):
-    response.ads ← ad_cache.getAdvertisements(s)[:F_return]
-    response.closerPeers ← GETPEERS(s)
+procedure LOOKUP_RESPONSE(service_id_hash):
+    response.ads ← ad_cache.getAdvertisements(service_id_hash)[:F_return]
+    response.closerPeers ← GETPEERS(service_id_hash)
     return response
 end procedure
 ```
 
-1. Fetch all `ads` for service ID `s` from the registrar’s `ad_cache`.
+1. Fetch all `ads` for `service_id_hash` from the registrar’s `ad_cache`.
 Then return up to `F_return` of them (a system parameter limiting how many `ads` are sent per query by a registrar).
-2. Call the `GETPEERS(s)` function to get a list of peers from across the registrar’s routing table `RegT(s)`.
+2. Call the `GETPEERS(service_id_hash)` function to get a list of peers
+from across the registrar’s routing table `RegT(service_id_hash)`.
 3. Send the assembled response (advertisements + closer peers) back to the discoverer.
 
 ### Peer Table Updates
 
 While responding to both `REGISTER` requests by advertisers and `GET_ADS` request by discoverers,
 the contacted registrar node also returns a list of peers.
-To get this list of peers, the registrar runs the `GETPEERS(s)` algorithm.
+To get this list of peers, the registrar runs the `GETPEERS(service_id_hash)` algorithm.
 Both advertisers and discoverers update their service-specific tables using this list of peers.
 
 ```text
-procedure GETPEERS(s):
+procedure GETPEERS(service_id_hash):
     peers ← SET<peers>
-    RegT(s) ← KadDHT(node.id)
+    RegT(service_id_hash) ← KadDHT(node.id)
     for i in 0, 1, ..., m-1:
-        peer ← b_i(s).getRandomNode()
+        peer ← b_i(service_id_hash).getRandomNode()
         if peer ≠ None:
             peers.add(peer)
         end if
@@ -476,22 +478,22 @@ end procedure
 ```
 
 1. `peers` is initialized as an empty set to avoid storing duplicates
-2. The registrar table `RegT(s)` is initialized from the node’s `KadDHT(node.id)` routing table.
+2. The registrar table `RegT(service_id_hash)` is initialized from the node’s `KadDHT(node.id)` routing table.
 Refer to the [Distance section](#distance) on how to add peers.
-3. Go through all `m` buckets in the registrar’s table — from farthest to closest relative to the service ID `s`.
+3. Go through all `m` buckets in the registrar’s table — from farthest to closest relative to the `service_id_hash`.
     1. Pick one random peer from bucket `i`.
     `getRandomNode()`  function remembers already returned nodes and never returns the same one twice.
     2. If peer returned is not null then we move on to next bucket.
     Else we try to get another peer in the same bucket
-4. Return `peers` which contains one peer from every bucket of `RegT(s)`.
+4. Return `peers` which contains one peer from every bucket of `RegT(service_id_hash)`.
 
 Malicious registrars could return large numbers of malicious nodes in a specific bucket.
 To limit this risk, a node communicating with a registrar asks it to return a single peer per bucket
-from registrar’s view of the routing table `RegT(s)`.
+from registrar’s view of the routing table `RegT(service_id_hash)`.
 Contacting registrars in consecutive buckets divides the search space by a constant factor,
 and allows learning new peers from more densely-populated routing tables towards the destination.
 The procedure mitigates the risk of having malicious peers polluting the table
-while still learning rare peers in buckets close to `s`.
+while still learning rare peers in buckets close to `service_id_hash`.
 
 ## Waiting Time Calculation
 
@@ -503,11 +505,11 @@ The waiting time is given based on the ad itself and the current state of the re
 The waiting time for an advertisement is calculated using:
 
 ```text
-w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.s)/C + score(getIP(ad.addrs)) + G)
+w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(ad.addrs)) + G)
 ```
 
 - `c`: Current cache occupancy
-- `c(ad.s)`: Number of advertisements for service `s` in cache
+- `c(ad.service_id_hash)`: Number of advertisements for `service_id_hash` in cache
 - `getIP(ad.addrs)` is a function to get the IP address from the multiaddress of the advertisement.
 - `score(getIP(ad.addrs))`: IP similarity score (0 to 1). Refer to the [IP Similarity Score section](#ip-similarity-score)
 
@@ -543,13 +545,13 @@ Implementations should consider this while setting the value for `P_occ`
 ### Service Similarity
 
 ```text
-service_similarity = c(ad.s) / C
+service_similarity = c(ad.service_id_hash) / C
 ```
 
 The service similarity score promotes diversity:
 
-- Low when service `s` has few advertisements in cache. Thus lower waiting time.
-- High when service `s` dominates the cache. Thus higher waiting time.
+- Low when `service_id_hash` has few advertisements in cache. Thus lower waiting time.
+- High when `service_id_hash` dominates the cache. Thus higher waiting time.
 
 ### IP Similarity Score
 
@@ -689,7 +691,7 @@ w_2 ≥ w_1 - (t_2 - t_1)
 
 Thus registrars maintain lower bound state for:
 
-- Each service in the cache: `bound(s)` and `timestamp(s)`
+- Each service in the cache: `bound(service_id_hash)` and `timestamp(service_id_hash)`
 - Each IP prefix in the IP tree: `bound(IP)` and `timestamp(IP)`
 
 The total waiting time will respect the lower bound if lower bound is enforced on these.
@@ -697,15 +699,15 @@ These two sets have a bounded size as number of `ads` present in the `ad_cache` 
 
 **How lower bound is calculated for service IDs:**
 
-When new service ID `s` enters the cache, `bound(s)` is set to `0`,
-and a `timestamp(s)` is set to the current time.
-When a new ticket request arrives for the same service ID `s`,
+When new `service_id_hash` enters the cache, `bound(service_id_hash)` is set to `0`,
+and a `timestamp(service_id_hash)` is set to the current time.
+When a new ticket request arrives for the same `service_id_hash`,
 the registrar calculates the service waiting time `w_s` and then applies the lower-bound rule:
 
-`w_s = max(w_s, bound(s) - timestamp(s))`
+`w_s = max(w_s, bound(service_id_hash) - timestamp(service_id_hash))`
 
-The values `bound(s)` and `timestamp(s)` are updated whenever a new ticket is issued
-and the condition `w_s > (bound(s) - timestamp(s))`is satisfied.
+The values `bound(service_id_hash)` and `timestamp(service_id_hash)` are updated whenever a new ticket is issued
+and the condition `w_s > (bound(service_id_hash) - timestamp(service_id_hash))`is satisfied.
 
 **How lower bound is calculated for IPs:**
 Registrars enforce lower-bound state for the advertiser’s IP address using IP tree
@@ -733,7 +735,7 @@ enum MessageType {
 ```protobuf
 message Advertisement {
     // Service identifier (32-byte SHA-256 hash)
-    bytes serviceId = 1;
+    bytes service_id_hash = 1;
 
     // Peer ID of advertiser (32-byte hash of public key)
     bytes peerId = 2;
@@ -741,7 +743,7 @@ message Advertisement {
     // Multiaddrs of advertiser
     repeated bytes addrs = 3;
 
-    // Ed25519 signature over (serviceId || peerId || addrs)
+    // Ed25519 signature over (service_id_hash || peerId || addrs)
     bytes signature = 4;
 
     // Optional: Service-specific metadata
@@ -780,7 +782,7 @@ message Ticket {
 ```protobuf
 message Message {
     MessageType type = 1;  // REGISTER
-    bytes key = 2;         // serviceId
+    bytes key = 2;         // service_id_hash
     Advertisement ad = 3;   // The advertisement to register
     optional Ticket ticket = 4;  // Optional: ticket from previous attempt
 }
@@ -810,7 +812,7 @@ message Message {
 ```protobuf
 message Message {
     MessageType type = 1;  // GET_ADS
-    bytes key = 2;         // serviceId to look up
+    bytes key = 2;         // service_id_hash to look up
 }
 ```
 
@@ -863,29 +865,29 @@ Refer to the [Advertisement Algorithm section](#advertisement-algorithm) for the
 #### ADVERTISE() algorithm explanation
 
 1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
-2. Initialize the advertise table `AdvT(s)` by bootstrapping peers from
+2. Initialize the advertise table `AdvT(service_id_hash)` by bootstrapping peers from
 the advertiser’s `KadDHT(node.id)` routing table.
 (Refer to the [Distance section](#distance))
 3. Iterate over all buckets (i = 0 through `m-1`),
-where `m` is the number of buckets in `AdvT(s)` and `ongoing` map.
-Each bucket corresponds to a particular distance from the service ID `s`.
+where `m` is the number of buckets in `AdvT(service_id_hash)` and `ongoing` map.
+Each bucket corresponds to a particular distance from the `service_id_hash`.
     1. `ongoing[i]` contains list of  registrars with active (unexpired) registrations
     or ongoing registration attempts at a distance `i`
-    from the service ID `s` of the service that the advertiser is advertising for.
+    from the `service_id_hash` of the service that the advertiser is advertising for.
     2. Advertisers continuously maintain up to `K_register` active (unexpired) registrations
     or ongoing registration attempts in every bucket of the `ongoing` map for its service.
     Increasing `K_register` makes the advertiser easier to find
     at the cost of increased communication and storage costs.
-    3. Pick a random registrar from bucket `i` of `AdvT(s)` to advertise to.
-        - `AdvT(s).getBucket(i)` → returns a list of registrars in bucket `i`
-        from the advertise table `AdvT(S)`
+    3. Pick a random registrar from bucket `i` of `AdvT(service_id_hash)` to advertise to.
+        - `AdvT(service_id_hash).getBucket(i)` → returns a list of registrars in bucket `i`
+        from the advertise table `AdvT(service_id_hash)`
         - `.getRandomNode()` → function returns a random registrar node.
         The advertiser tries to place its advertisement into that registrar.
         The function remembers already returned nodes
         and never returns the same one twice during the same ad placement process.
         If there are no peers, it returns `None`.
     4. if we get a peer then we add that to that bucket `ongoing[i]`
-    5. Build the advertisement object `ad` containing `serviceId`, `peerID`, `addrs`, and `timestamp`
+    5. Build the advertisement object `ad` containing `service_id_hash`, `peerID`, `addrs`, and `timestamp`
     (Refer to the [Advertisement Structure section](#advertisement-structure)) .
     Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
     6. Then send this `ad` asynchronously to the selected registrar.
@@ -903,7 +905,7 @@ Each bucket corresponds to a particular distance from the service ID `s`.
     If we already have a ticket, include it in the request.
     2. The registrar replies with a `response`.
     Refer to the [Register Message Structure section](#register-message) for the response structure
-    3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(s)`.
+    3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(service_id_hash)`.
     Refer to the [Distance](#distance section) on how to add.
     These help improve the table for future use.
     4. If the registrar accepted the advertisement successfully,
@@ -918,21 +920,21 @@ since we’ve finished trying with it.
 
 ### Discoverer Algorithms
 
-#### LOOKUP(s) algorithm explanation
+#### LOOKUP(service_id_hash) algorithm explanation
 
 Refer to the [Lookup Algorithm section](#lookup-algorithm) for the pseudocode.
 
-1. The **Discovery Table** `DiscT(s)` is initialized by
+1. The **Discovery Table** `DiscT(service_id_hash)` is initialized by
 bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
 (refer to the [Distance section](#distance))
 2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
-3. Go through each bucket of the search table `DiscT(s)` —
-from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `s`.
+3. Go through each bucket of the search table `DiscT(service_id_hash)` —
+from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `service_id_hash`.
 For each bucket, query up to `K_lookup` random peers.
-    1. Pick a random registrar node from bucket `i` of the search table `DiscT(s)` to query
-        1. `DiscT(s).getBucket(i)` → returns a list of registrars in bucket `i` from the search table `DiscT(S)`
+    1. Pick a random registrar node from bucket `i` of the search table `DiscT(service_id_hash)` to query
+        1. `DiscT(service_id_hash).getBucket(i)` → returns a list of registrars in bucket `i` from the search table `DiscT(service_id_hash)`
         2. `.getRandomNode()` → function returns a random registrar node.
-        The discover queries this node to get `ads` for a particular service ID `s`.
+        The discover queries this node to get `ads` for a particular service ID `service_id_hash`.
         The function remembers already returned nodes and never returns the same one twice.
         If there are no peers, it returns `None`.
     2. A `GET_ADS` request is sent to the selected registrar peer.
@@ -945,7 +947,7 @@ For each bucket, query up to `K_lookup` random peers.
         1. Verify its digital signature for authenticity.
         2. Add the advertiser’s node ID `ad.peerID` to the list `foundPeers`.
     4. The `response` also contains a list of peers `response.closerPeers`
-    that is inserted into the search table `DiscT(s)`.
+    that is inserted into the search table `DiscT(service_id_hash)`.
     Refer to the [Distance section](#distance) for how it is added.
     5. Stop early if enough advertiser peers (`F_lookup`) have been found — no need to continue searching.
     For popular services `F_lookup` advertisers are generally found in the initial phase
@@ -953,14 +955,14 @@ For each bucket, query up to `K_lookup` random peers.
     But for unpopular ones it might take longer but not more than `O(log N)`
     where N is number of nodes participating in the network as registrars.
     6. If early stop doesn’t happen then the search stops when no unqueried registrars remain in any of the buckets.
-4. Return `foundPeers` which is the final list of discovered advertisers that provide service `s`
+4. Return `foundPeers` which is the final list of discovered advertisers that provide service `service_id_hash`
 
-Making the advertisers and discoverers walk towards `s` in a similar fashion
+Making the advertisers and discoverers walk towards `service_id_hash` in a similar fashion
 guarantees that the two processes overlap and contact a similar set of registrars that relay the `ads`.
 At the same time, contacting random registrars in each encountered bucket using `getRandomNode()`
 makes it difficult for an attacker to strategically place malicious registrars in the network.
-The first bucket `b_0(s)` covers the largest fraction of the key space
-as it corresponds to peers with no common prefix to `s` (i.e. 50% of all the registrars).
+The first bucket `b_0(service_id_hash)` covers the largest fraction of the key space
+as it corresponds to peers with no common prefix to `service_id_hash` (i.e. 50% of all the registrars).
 Placing malicious registrars in this fraction of the key space
 to impact service discovery process would require considerable resources.
 Subsequent buckets cover smaller fractions of the key space,
@@ -984,7 +986,7 @@ Refer to the [Registration Flow section](#registration-flow) for the pseudocode
 
 1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
 Duplicates are not allowed.
-An advertiser can place at most one `ad` for a specific service ID `s` in the `ad_cache` of a given registrar.
+An advertiser can place at most one `ad` for a specific `service_id_hash` in the `ad_cache` of a given registrar.
 2. Prepare a response ticket `response.ticket` linked to this `ad`.
 3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
 Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for details.
@@ -1011,8 +1013,8 @@ the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting ti
         2. Update the ticket with the new remaining waiting time `t_wait_for`
         3. Update the ticket last modification time `t_mod`
         4. Sign the ticket again. The advertiser will retry later using this new ticket.
-6. Add a list of peers closer to the service ID `ad.s` using the `GETPEERS()` function
-to the response (the advertiser uses this to update its advertise table `AdvT(s)`).
+6. Add a list of peers closer to the `ad.service_id_hash` using the `GETPEERS()` function
+to the response (the advertiser uses this to update its advertise table `AdvT(service_id_hash)`).
 7. Send the full response back to the advertiser
 
 Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
