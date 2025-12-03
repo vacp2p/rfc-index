@@ -372,7 +372,7 @@ procedure LOOKUP(service_id_hash):
 end procedure
 ```
 
-Refer to the [Lookup Algorithm Explanation section](#lookups-algorithm-explanation) for the detailed explanation.
+Refer to the [Lookup Algorithm Explanation section](#lookupservice_id_hash-algorithm-explanation) for the detailed explanation.
 
 ## Admission Protocol
 
