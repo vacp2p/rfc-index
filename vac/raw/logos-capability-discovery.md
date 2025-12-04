@@ -77,12 +77,12 @@ algorithm to respond to `LOOKUP()` requests of discoverers.
 
 ### DHT Routing Table
 
-Every participant in the kad-dht peer discovery layer maintains the peer routing table `KadDHT(node.id)`.
+Every participant in the kad-dht peer discovery layer maintains the peer routing table `KadDHT(peerID)`.
 It is a distributed key-value store with
 [peer IDs](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/peer-ids/peer-ids.md#peer-ids)
 as key against their matching
 [signed peer records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md) values.
-It is centered on `node.id`.
+It is centered on the node's `peerID`.
 
 **Note:**
 
@@ -220,25 +220,25 @@ Implementations may modify them as needed based on specific requirements.
 The distance `d` between any two keys in Logos Capability Discovery
 is defined using the bitwise XOR applied to their 256-bit SHA-256 representations.
 This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
-The keyspace is the entire numerical range of possible `node.id` and `service_id_hash`
+The keyspace is the entire numerical range of possible `peerID` and `service_id_hash`
 — the 256-bit space in which all SHA-256–derived IDs exist.
 XOR is used to measure distances between them in the keyspace.
 
-For every node in the network, the `node.id` is unique.
-In this system, both `node.id` and the service ID `service_id_hash` are 256-bit SHA-256 hashes.
+For every node in the network, the `peerID` is unique.
+In this system, both `peerID` and the `service_id_hash` are 256-bit SHA-256 hashes.
 Thus both belong to the same keyspace.
 
 Advertise table `AdvT(service_id_hash)` and search table `DiscT(service_id_hash)` are centered on `service_id_hash`
-while `KadDHT(node.id)` table is centered on `node.id`.
+while `KadDHT(peerID)` table is centered on `peerID`.
 
 When inserting a node into advertise table `AdvT(service_id_hash)` or the search table `DiscT(service_id_hash)`,
 the bucket index into which the node will be inserted is determined by:
 
 - x = reference ID which is the `service_id_hash`
-- y = target peer ID `node.id`
+- y = target peer ID `peerID`
 - L = 256 = bit length of IDs
 - `m` = 16 = number of buckets in the advertise/search table
-- `d = x ⊕ y = service_id_hash ⊕ node.id` = bitwise XOR distance (interpreted as an unsigned integer)
+- `d = x ⊕ y = service_id_hash ⊕ peerID` = bitwise XOR distance (interpreted as an unsigned integer)
 
 The bucket index `i` where `y` is placed in `x`'s advertise/search table is:
 
@@ -257,14 +257,14 @@ each hop moves to a peer that shares a longer prefix of bits
 with the target `service_id_hash`.
 
 This formula is also used when we bootstrap peers from the `KadDHT` table.
-For every peer present in the `KadDHT(node.id)` table
+For every peer present in the `KadDHT(peerID)` table
 we use the same formula to place them in advertise table `AdvT(service_id_hash)`,
 search table `DiscT(service_id_hash)` and Registrar Table `RegT(service_id_hash)` buckets.
 
 Initially the density of peers in the search table `DiscT(service_id_hash)`
 and advertise table `AdvT(service_id_hash)` around `service_id_hash` might be low or even null
-particularly when `service_id_hash` and `node.id` are distant in the keyspace
-(as `KadDHT(node.id)` is centered on node ID).
+particularly when `service_id_hash` and `peerID` are distant in the keyspace
+(as `KadDHT(peerID)` is centered on `peerID`).
 The buckets are thus filled opportunistically
 while interacting with peers during the search or advertisement process.
 Registrars, apart from responding to queries,
@@ -297,7 +297,7 @@ Implementations may choose the interval based on their requirements.
 ```text
 procedure ADVERTISE(service_id_hash):
     ongoing ← MAP<bucketIndex; LIST<registrars>>
-    AdvT(service_id_hash) ← KadDHT(node.id)
+    AdvT(service_id_hash) ← KadDHT(peerID)
     for i in 0, 1, ..., m-1:
         while ongoing[i].size < K_register:
             registrar ← AdvT(service_id_hash).getBucket(i).getRandomNode()
@@ -306,7 +306,7 @@ procedure ADVERTISE(service_id_hash):
             end if
             ongoing[i].add(registrar)
             ad.service_id_hash ← service_id_hash
-            ad.peerId ← node.id
+            ad.peerID ← peerID
             ad.addrs ← node.addrs
             ad.timestamp ← NOW()
             SIGN(ad)
@@ -354,7 +354,7 @@ and moving to buckets (`b_(m-1)`) containing registrar nodes with higher number 
 
 ```protobuf
 procedure LOOKUP(service_id_hash):
-    DiscT(service_id_hash) ← KadDHT(node.id)
+    DiscT(service_id_hash) ← KadDHT(peerID)
     foundPeers ← SET<Peers>
     for i in 0, 1, ..., m-1:
         for j in 0, ..., K_lookup - 1:
@@ -365,7 +365,7 @@ procedure LOOKUP(service_id_hash):
             response ← peer.GetAds(service_id_hash)
             for ad in response.ads:
                 assert(ad.hasValidSignature())
-                foundPeers.add(ad.peerId)
+                foundPeers.add(ad.peerID)
                 if foundPeers.size ≥ F_lookup:
                       break
                   end if
@@ -474,7 +474,7 @@ Both advertisers and discoverers update their service-specific tables using this
 ```text
 procedure GETPEERS(service_id_hash):
     peers ← SET<peers>
-    RegT(service_id_hash) ← KadDHT(node.id)
+    RegT(service_id_hash) ← KadDHT(peerID)
     for i in 0, 1, ..., m-1:
         peer ← b_i(service_id_hash).getRandomNode()
         if peer ≠ None:
@@ -486,7 +486,7 @@ end procedure
 ```
 
 1. `peers` is initialized as an empty set to avoid storing duplicates
-2. The registrar table `RegT(service_id_hash)` is initialized from the node’s `KadDHT(node.id)` routing table.
+2. The registrar table `RegT(service_id_hash)` is initialized from the node’s `KadDHT(peerID)` routing table.
 Refer to the [Distance section](#distance) on how to add peers.
 3. Go through all `m` buckets in the registrar’s table — from farthest to closest relative to the `service_id_hash`.
     1. Pick one random peer from bucket `i`.
@@ -746,12 +746,12 @@ message Advertisement {
     bytes service_id_hash = 1;
 
     // Peer ID of advertiser (32-byte hash of public key)
-    bytes peerId = 2;
+    bytes peerID = 2;
 
     // Multiaddrs of advertiser
     repeated bytes addrs = 3;
 
-    // Ed25519 signature over (service_id_hash || peerId || addrs)
+    // Ed25519 signature over (service_id_hash || peerID || addrs)
     bytes signature = 4;
 
     // Optional: Service-specific metadata
@@ -874,7 +874,7 @@ Refer to the [Advertisement Algorithm section](#advertisement-algorithm) for the
 
 1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
 2. Initialize the advertise table `AdvT(service_id_hash)` by bootstrapping peers from
-the advertiser’s `KadDHT(node.id)` routing table.
+the advertiser’s `KadDHT(peerID)` routing table.
 (Refer to the [Distance section](#distance))
 3. Iterate over all buckets (i = 0 through `m-1`),
 where `m` is the number of buckets in `AdvT(service_id_hash)` and `ongoing` map.
@@ -933,14 +933,15 @@ since we’ve finished trying with it.
 Refer to the [Lookup Algorithm section](#lookup-algorithm) for the pseudocode.
 
 1. The **Discovery Table** `DiscT(service_id_hash)` is initialized by
-bootstrapping peers from the discoverer’s `KadDHT(node.id)` routing table.
+bootstrapping peers from the discoverer’s `KadDHT(peerID)` routing table.
 (refer to the [Distance section](#distance))
 2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
 3. Go through each bucket of the search table `DiscT(service_id_hash)` —
 from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `service_id_hash`.
 For each bucket, query up to `K_lookup` random peers.
     1. Pick a random registrar node from bucket `i` of the search table `DiscT(service_id_hash)` to query
-        1. `DiscT(service_id_hash).getBucket(i)` → returns a list of registrars in bucket `i` from the search table `DiscT(service_id_hash)`
+        1. `DiscT(service_id_hash).getBucket(i)` → returns a list of registrars
+        in bucket `i` from the search table `DiscT(service_id_hash)`
         2. `.getRandomNode()` → function returns a random registrar node.
         The discover queries this node to get `ads` for a particular service ID `service_id_hash`.
         The function remembers already returned nodes and never returns the same one twice.
@@ -953,7 +954,7 @@ For each bucket, query up to `K_lookup` random peers.
     If it returns more we can just randomly keep `F_return` of them.
     For each advertisement returned:
         1. Verify its digital signature for authenticity.
-        2. Add the advertiser’s node ID `ad.peerID` to the list `foundPeers`.
+        2. Add the advertiser’s peer ID `ad.peerID` to the list `foundPeers`.
     4. The `response` also contains a list of peers `response.closerPeers`
     that is inserted into the search table `DiscT(service_id_hash)`.
     Refer to the [Distance section](#distance) for how it is added.
