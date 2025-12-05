@@ -1,5 +1,4 @@
 ---
-slug: codex-prover
 title: CODEX-PROVER
 name: Codex Prover Module
 status: raw
@@ -12,11 +11,25 @@ contributors:
 
 ## Abstract
 
-This specification defines the Proving module for [Codex](https://github.com/codex-storage/nim-codex), which provides a succinct, publicly verifiable way to check that storage providers still hold the data they committed to. The proving module samples cells from stored slots, and generates zero-knowledge proofs that tie those samples and Merkle paths back to the published dataset root commitment. The marketplace contract verifies these proofs on-chain and uses the result to manage incentives such as payments and slashing.
+This specification defines the Proving module for
+[Codex](https://github.com/codex-storage/nim-codex),
+which provides a succinct, publicly verifiable way to check that storage
+providers still hold the data they committed to.
+The proving module samples cells from stored slots,
+and generates zero-knowledge proofs that tie those samples and Merkle paths
+back to the published dataset root commitment.
+The marketplace contract verifies these proofs on-chain and uses the result
+to manage incentives such as payments and slashing.
 
 ## Background / Rationale / Motivation
 
-In decentralized storage networks such as [Codex](https://github.com/codex-storage/nim-codex), one of the main challenges is ensuring durability and availability of data stored by storage providers. To achieve durability, random sampling combined with erasure coding is used to provide probabilistic guarantees while touching only a tiny fraction of the stored data per challenge.
+In decentralized storage networks such as
+[Codex](https://github.com/codex-storage/nim-codex),
+one of the main challenges is ensuring durability and availability of data
+stored by storage providers.
+To achieve durability, random sampling combined with erasure coding is used
+to provide probabilistic guarantees while touching only a tiny fraction of
+the stored data per challenge.
 
 The proving module addresses this challenge by:
 
@@ -31,7 +44,14 @@ The proving module consists of three main sub-components:
 2. **Prover**: Produces succinct ZK proofs for valid proof inputs and verifies such proofs
 3. **ZK Circuit**: Defines the logic for sampling, cell hashing, and Merkle tree membership checks
 
-The proving module relies on `BlockStore` for storage and `SlotsBuilder` to build initial commitments to the stored data. The incentives involved, including collateral and slashing, are handled by the marketplace logic.
+The proving module relies on `BlockStore` for block-level storage access
+and `SlotsBuilder` to build initial commitments to the stored data.
+`BlockStore` is Codex's local storage abstraction that provides
+block retrieval by CID.
+`SlotsBuilder` constructs the Merkle tree commitments for slots and datasets
+(see [CODEX-SLOT-BUILDER](#references) for details).
+The incentives involved, including collateral and slashing,
+are handled by the marketplace logic.
 
 ## Theory / Semantics
 
@@ -69,21 +89,37 @@ In Codex, a dataset is split into `numSlots` slots which are the ones sampled. E
 
 **Slot tree (block -> slot):**
 
-- For all blocks in a slot, build a Merkle tree over their block hashes (root of block trees). The number of leaves is expected to be a power of two (in Codex, the `SlotsBuilder` pads the slots). The Slot tree root is the public commitment that is sampled.
+- For all blocks in a slot, build a Merkle tree over their block hashes
+  (root of block trees).
+  The number of leaves is expected to be a power of two
+  (in Codex, the `SlotsBuilder` pads the slots).
+  The Slot tree root is the public commitment that is sampled.
+  See [CODEX-SLOT-BUILDER](#references) for the detailed slot building process.
 
 **Dataset tree (slot -> dataset):**
 
-- Build a Merkle tree over the slot trees roots to obtain the dataset root (this is different from SHA-256 CID used for content addressing). The dataset root is the public commitment to all slots hosted by a single storage provider.
+- Build a Merkle tree over the slot trees roots to obtain the dataset root
+  (this is different from SHA-256 CID used for content addressing).
+  The dataset root is the public commitment to all slots hosted by a single
+  storage provider.
 
 ### Codex Merkle Tree Conventions
 
-Codex extends the standard Merkle tree with a keyed compression that depends on (a) whether a node is on the bottom (i.e. leaf layer) and (b) whether a node is odd (has a single child) or even (two children). These two bits are encoded as `{0,1,2,3}` and fed into the hash so tree shape cannot be manipulated.
+Codex extends the standard Merkle tree with a keyed compression that depends on
+(a) whether a node is on the bottom (i.e. leaf layer) and
+(b) whether a node is odd (has a single child) or even (two children).
+These two bits are encoded as `{0,1,2,3}` and fed into the hash so tree shape
+cannot be manipulated.
 
 **Steps in building the Merkle tree (bytes/leaves -> root):**
 
-Cell bytes are split into 31-byte chunks to fit in BN254, each mapped little-endian into a BN254 field element. `10*` padding is used.
+Cell bytes are split into 31-byte chunks to fit in BN254,
+each mapped little-endian into a BN254 field element.
+`10*` padding is used.
 
-Leaves (cells) are hashed with a Poseidon2 sponge with state size `t=3` and rate `r=2`. The sponge is initialized with IV `(0,0, domSep)` where:
+Leaves (cells) are hashed with a Poseidon2 sponge with state size `t=3`
+and rate `r=2`.
+The sponge is initialized with IV `(0,0, domSep)` where:
 
 ```text
 domSep := 2^64 + 256*t + rate
@@ -106,17 +142,23 @@ where `key` encodes the two bits:
 
 - **Odd node** with single child `x`: `compress(x, 0, key)` (i.e., the missing sibling is zero).
 - **Singleton tree** (only one element in the tree): still apply one compression round.
-- **Merkle Paths** need only sibling hashes: left/right direction is inferred from the binary decomposition of the leaf index, so you don't transmit direction flags.
+- **Merkle Paths** need only sibling hashes:
+  left/right direction is inferred from the binary decomposition of the
+  leaf index, so you don't transmit direction flags.
 
 ### Sampling
 
 **Sampling request:**
 
-Sampling begins when a proof is requested containing the entropy (also called `ProofChallenge`). A `DataSampler` instance is created for a specific slot and then used to produce `Sample` records.
+Sampling begins when a proof is requested containing the entropy
+(also called `ProofChallenge`).
+A `DataSampler` instance is created for a specific slot and then used to
+produce `Sample` records.
 
 The sampler needs:
 
-- `slotIndex`: the index of the slot being proven. This is fixed when the `DataSampler` is constructed.
+- `slotIndex`: the index of the slot being proven.
+  This is fixed when the `DataSampler` is constructed.
 - `entropy`: public randomness (e.g., blockhash).
 - `nSamples`: the number of cells to sample.
 
@@ -128,15 +170,28 @@ The sampler derives deterministic cell indices from the challenge entropy and th
 idx = H(entropy || slotRoot || counter) mod nCells
 ```
 
-where `counter = 1..nSamples` and `H` is the Poseidon2 sponge (rate = 2) with `10*` padding. The result is a sequence of indices in `[0, nCells)`, identical for any honest party given the same `(entropy, slotRoot, nSamples)`. Note that there is a chance however small that you would have multiple of the same cell index samples purely by chance. The chance of that depends on the slot and cell sizes; the larger the slot and smaller the cell, the lower the chance of landing on the same cell index.
+where `counter = 1..nSamples` and `H` is the Poseidon2 sponge (rate = 2)
+with `10*` padding.
+The result is a sequence of indices in `[0, nCells)`,
+identical for any honest party given the same `(entropy, slotRoot, nSamples)`.
+Note that there is a chance however small that you would have multiple of
+the same cell index samples purely by chance.
+The chance of that depends on the slot and cell sizes;
+the larger the slot and smaller the cell,
+the lower the chance of landing on the same cell index.
 
 **Generate per-sample data:**
 
-- Fetch the `cellData` via the `BlockStore` and `builder`, and fetch the stored `cell -> block`, `block -> slot`, `slot -> dataset` Merkle paths. Note that `cell -> block` can be built on the fly and `slot -> dataset` can be reused for all samples in that slot.
+- Fetch the `cellData` via the `BlockStore` and `builder`,
+  and fetch the stored `cell -> block`, `block -> slot`, `slot -> dataset`
+  Merkle paths.
+  Note that `cell -> block` can be built on the fly and `slot -> dataset`
+  can be reused for all samples in that slot.
 
 **Collect Proof Inputs:**
 
-The `DataSampler` collects the `ProofInputs` required for the zk proof system which contains the following:
+The `DataSampler` collects the `ProofInputs` required for the zk proof system
+which contains the following:
 
 - `entropy`: the challenge randomness.
 - `datasetRoot`: the root of the dataset Merkle tree.
@@ -149,11 +204,16 @@ The `DataSampler` collects the `ProofInputs` required for the zk proof system wh
   - `cellData`: the sampled cell encoded as field elements.
   - `merklePaths`: the concatenation `(cell -> block) || (block -> slot)`.
 
-These `ProofInputs` are then passed to the prover to generate the succinct ZK proof.
+These `ProofInputs` are then passed to the prover to generate the succinct
+ZK proof.
 
 ### Proof Generation
 
-To produce a zk storage proof, Codex uses a pluggable proving backend. In practice, Groth16 over BN254 (altbn128) is used with circuits written in Circom. The `Prover` with `ProofInputs` calls the backend to create a succinct proof, and optionally verifies it locally before submission.
+To produce a zk storage proof, Codex uses a pluggable proving backend.
+In practice, Groth16 over BN254 (altbn128) is used with circuits written
+in Circom.
+The `Prover` with `ProofInputs` calls the backend to create a succinct proof,
+and optionally verifies it locally before submission.
 
 ### ZK Circuit Specification
 
@@ -497,12 +557,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-### normative
+### Normative
 
 - **Codex**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
 - **Codex Prover Specification**: [Codex Docs - Component Specification - Prover](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Prover.md)
+- **CODEX-SLOT-BUILDER**: Codex Slot Builder specification (defines `SlotsBuilder`
+  and slot commitment construction)
 
-### informative
+### Informative
 
 - **Codex Storage Proofs Circuits**: [GitHub - codex-storage/codex-storage-proofs-circuits](https://github.com/codex-storage/codex-storage-proofs-circuits) - Circom implementations of Codex's proof circuits targeting Groth16 over BN254
 - **Nim Circom Compat**: [GitHub - codex-storage/nim-circom-compat](https://github.com/codex-storage/nim-circom-compat) - Nim bindings that load compiled Circom artifacts
