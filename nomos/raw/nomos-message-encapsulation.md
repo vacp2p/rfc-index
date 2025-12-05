@@ -289,7 +289,7 @@ For more information, look at Key Types and Generation Specification.
 
 The first step is to generate a set of keys alongside all necessary proofs that will be used in the next steps of the algorithm.
 
-**Step 1: Generate Key Collection**
+#### Step 1: Generate Key Collection
 
 Generate the collection $\mathbf K^n_h$, where $h$ defines the number of encapsulation layers such that $h \le \beta_{max}$.
 
@@ -363,7 +363,7 @@ class ProofOfQuotaWitness:
 
 The ProofOfQuotaPublic and ProofOfQuotaWitness are passed to the zero-knowledge circuits that generate the proof $\pi^{K^{n}{l}}{Q}$ which derives the key_nullifier ($\nu_s$) from session, private index, private secret key during proof generation.
 
-**Step 2: Select Nodes**
+#### Step 2: Select Nodes
 
 Select $h$ nodes from the set of nodes $\mathcal{N}$ in a random and verifiable manner. For $i \in \{1,…,h\}$, select $l_i = \text{CSPRBG}(H_{\mathbf N}(\rho))_{8} \mod N$, where $\rho$ is a selection randomness (using little-endian encoding), a shared secret derived during Proof of Quota generation, the output of the $\text{CSPRBG}()_8$ is returns 8 bytes (little-endian).
 
@@ -385,11 +385,11 @@ def modular_bytes(data: bytes, modulus: int) -> int:
     return int.from_bytes(data, byteorder='little') % modulus
 ```
 
-**Step 3: Generate Proofs of Selection**
+#### Step 3: Generate Proofs of Selection
 
 Generate proofs of selection $\pi^{K^{n}i,l_i}{S}$ for $i \in \{1,…,h\}$, which proves that the public key $K^{n}_i$ correctly maps to the index $l_i$ from the set of nodes $\mathcal{N}$.
 
-**Step 4: Retrieve Public Keys**
+#### Step 4: Retrieve Public Keys
 
 For $i \in \{1,…,h\}$, retrieve public keys $\mathcal P = \{ {P^{l_1},..., P^{l_h}} \}$ for all $h$ selected nodes using the SDP protocol (defined as provider_id in Identifiers).
 
@@ -398,7 +398,7 @@ def blend_node_signing_public_keys(selected_nodes: List[Node]) -> List[Ed25519Pu
     return [node.signing_public_key for node in selected_nodes]
 ```
 
-**Step 5: Calculate Shared Keys**
+#### Step 5: Calculate Shared Keys
 
 For $i \in \{1,…,h\}$, calculate shared keys from a set of public keys of selected nodes $\kappa^{n,i}{i} = k^{n}{i} \cdot P^{l_i}$.
 
@@ -433,11 +433,11 @@ For more information about proof of selection please refer to Proof of Selection
 
 The second step is to create an empty message $\mathbf M$ and fill the private header with random values.
 
-**Step 1: Create Empty Message**
+#### Step 1: Create Empty Message
 
 Create an empty message $\mathbf M$ (filled with zeros).
 
-**Step 2: Randomize Private Header**
+#### Step 2: Randomize Private Header
 
 Randomize the private header: For $\mathbf b_i \in \mathbf h = (\mathbf b_{1},...,\mathbf b_{\beta_{max}})$, set $\mathbf b_{i} = \text {CSPRBG}( \rho_{i})_{|\mathbf b|}$, where $\rho_i$ is some random value.
 
@@ -451,7 +451,7 @@ def randomize_private_header() -> PrivateHeader:
     return blending_headers
 ```
 
-**Step 3: Fill Last Blend Headers**
+#### Step 3: Fill Last Blend Headers
 
 Fill the last $h$ blend headers with reconstructable payloads: For $i = \{ 1+\beta_{max}-h,...,\beta_{max})$, do the following:
 
@@ -484,7 +484,7 @@ def fill_last_blending_headers(private_header: PrivateHeader,
     return private_header
 ```
 
-**Step 4: Encrypt Last Blend Headers**
+#### Step 4: Encrypt Last Blend Headers
 
 Encrypt the last $h$ blend headers in a reconstructable manner: For $i=\{ 1,...,h \}$, for $j=\{1, ..., i \}$, encrypt blend header:
 
@@ -612,10 +612,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -> by
 If a message $\mathbf M$ is received by the node and its public header is correct - that is, it was verified according to the relay logic defined here: Relaying - then the node $l$ executes the following logic:
 
 1. Calculate the shared secret. Using the key $K^{n}_l \in \mathbf H$ from the public header of the message $\mathbf M$ and the private key $p^l$ of the node $l$ calculate: $\kappa^{n,l}_l = K^{n}_l \cdot p^l$.
-2. Decrypt the private header using the shared key $\kappa^{n,l}_l$.
-
-For each $\mathbf b_j \in \mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})$ using a shared key $\kappa^{n,l}l$ decrypt the blending header: $\mathbf{b}j = D{H\mathbf{b}(\kappa^{n,l}_l)}(\mathbf{b}_j)=\mathbf{b}j \oplus \text {CSPRBG}(H\mathbf{b}(\kappa^{n,l}_l))$.
-
+2. Decrypt the private header using the shared key $\kappa^{n,l}_l$. For each $\mathbf b_j \in \mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})$ using a shared key $\kappa^{n,l}l$ decrypt the blending header: $\mathbf{b}j = D{H\mathbf{b}(\kappa^{n,l}_l)}(\mathbf{b}_j)=\mathbf{b}j \oplus \text {CSPRBG}(H\mathbf{b}(\kappa^{n,l}_l))$.
 3. Verify the header:
    1. If the proof $\pi^{K^{n}l,l}{S}\in \mathbf b_1$ is not correct, discard the message. That is, if the node index $l$ does not correspond to the $K^{n}_l\in \mathbf H$, then the message must be rejected.
    2. If the key $K^{n}_l \in \mathbf b_1$ was already seen, discard the message.
@@ -770,11 +767,11 @@ We are omitting protocol version in the header for simplicity.
 
 #### Initialization
 
-**Step 1: Create Empty Message**
+##### Step 1: Create Empty Message
 
 Create an empty message: $\mathbf{M} = (\mathbf{H}=0,\mathbf{h}=0,\mathbf{P}=0)$
 
-**Step 2: Randomize Private Header**
+##### Step 2: Randomize Private Header
 
 Randomize the private header: $\mathbf h_0 = \{$
 
@@ -788,7 +785,7 @@ $\mathbf b_4 = \text {CSPRBG}( \rho_{4})_{|\mathbf b|}$,
 
 $\}$.
 
-**Step 3: Fill Last h Blend Headers**
+##### Step 3: Fill Last h Blend Headers
 
 Fill the last $h$ blend headers with reconstructable payloads: $\mathbf h_0 = \{$
 
@@ -802,7 +799,7 @@ $\mathbf b_4 = \{ r_{l_1,1}, r_{l_1,2} ,r_{l_1,3}, r_{l_1,4} \}$,
 
 $\}$.
 
-**Step 4: Encrypt Last h Blend Headers**
+##### Step 4: Encrypt Last h Blend Headers
 
 Encrypt the last $h$ blend headers in a reconstructable manner: $\mathbf h_{E_0} = \{$
 
