@@ -6,13 +6,13 @@ category: Standards Track
 tags: nomos, blend, message-encapsulation, privacy, cryptography
 editor: Marcin Pawlowski
 contributors:
-  - Youngjoon Lee
-  - Alexander Mozeika
-  - Mehmet Gonen
-  - Álvaro Castro-Castilla
-  - Daniel Kashepava
-  - Daniel Sanchez Quiros
-  - Filip Dimitrijevic
+  - Youngjoon Lee <youngjoon@status.im>
+  - Alexander Mozeika <alexander.mozeika@status.im>
+  - Mehmet Gonen <mehmet@status.im>
+  - Álvaro Castro-Castilla <alvaro@status.im>
+  - Daniel Kashepava <danielkashepava@status.im>
+  - Daniel Sanchez Quiros <danielsq@status.im>
+  - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -20,6 +20,12 @@ contributors:
 The message encapsulation mechanism is a core component of the Blend Protocol that ensures privacy and security during node-to-node message transmission. By implementing multiple encryption layers and cryptographic operations, this mechanism keeps messages confidential while concealing their origins. The encapsulation process includes building a multi-layered structure with public headers, private headers, and encrypted payloads, using cryptographic keys and proofs for layer security and authentication, applying verifiable random node selection for message routing, and using shared key derivation for secure inter-node communication.
 
 This document is part of the Formatting section and outlines the cryptographic notation, data structures, and algorithms essential to the encapsulation process, providing a complete specification for implementing this mechanism within the Blend Protocol.
+
+## Semantics
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
 
 ## Document Structure
 
