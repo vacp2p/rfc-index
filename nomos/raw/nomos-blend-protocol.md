@@ -20,37 +20,32 @@ contributors:
 
 ## Abstract
 
-The Blend Protocol is an anonymous broadcasting protocol for the Nomos
-network that provides network-level privacy for block proposers. It addresses
-network-based de-anonymization by making it difficult and costly to link block
-proposals to their proposers through network analysis. The protocol increases
-the time to link a sender to a proposal by at least 300 times, making stake
-inference highly impractical.
+The Blend Protocol is an anonymous broadcasting protocol for the Nomos network that provides network-level privacy for block proposers.
+It addresses network-based de-anonymization by making it difficult and costly to link block proposals to their proposers through network analysis.
+The protocol increases the time to link a sender to a proposal by at least 300 times,
+making stake inference highly impractical.
 
-The protocol achieves probabilistic unlinkability in a highly decentralized
-environment with low bandwidth cost but high latency. It hides the sender of a
-block proposal through cryptographic obfuscation and timing delays, routing
-encrypted messages through multiple blend nodes before revelation.
+The protocol achieves probabilistic unlinkability in a highly decentralized environment with low bandwidth cost but high latency.
+It hides the sender of a block proposal through cryptographic obfuscation and timing delays,
+routing encrypted messages through multiple blend nodes before revelation.
 
 ## Motivation
 
-All Proof of Stake (PoS) systems have an inherent privacy problem where stake
-determines node behavior. By observing node behavior, one can infer the node's
-stake. The Blend Protocol addresses network-based de-anonymization where an
-adversary observes network activity to link nodes to their proposals and
-estimate stake.
+All Proof of Stake (PoS) systems have an inherent privacy problem where stake determines node behavior.
+By observing node behavior,
+one can infer the node's stake.
+The Blend Protocol addresses network-based de-anonymization where an adversary observes network activity to link nodes to their proposals and estimate stake.
 
 The protocol achieves:
 
-1. **Unlinkability**: Block proposers cannot be linked to their proposals
-   through network analysis
-2. **Stake privacy**: Inferring relative stake takes more than 10 years for
-   adversaries controlling 10% stake (targeting 0.1% stake node)
+1. **Unlinkability**:
+   Block proposers cannot be linked to their proposals through network analysis
+2. **Stake privacy**:
+   Inferring relative stake takes more than 10 years for adversaries controlling 10% stake (targeting 0.1% stake node)
 
-The Blend Protocol is one of the Nomos Bedrock Services, providing censorship
-resistance and network-level privacy for block producers. It must be used
-alongside mempool protections (like NomosDA) to achieve truly
-privacy-preserving system.
+The Blend Protocol is one of the Nomos Bedrock Services,
+providing censorship resistance and network-level privacy for block producers.
+It must be used alongside mempool protections (like NomosDA) to achieve truly privacy-preserving system.
 
 ## Semantics
 
@@ -100,17 +95,35 @@ interpreted as described in RFC 2119.
 
 This specification is organized into two distinct parts to serve different audiences and use cases:
 
-**Part I: Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node. This section defines the cryptographic primitives, message formats, network protocols, and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees. Protocol designers, auditors, and those seeking to understand the core mechanisms should focus on this part.
+**Part I: Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives,
+message formats,
+network protocols,
+and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees.
+Protocol designers,
+auditors,
+and those seeking to understand the core mechanisms should focus on this part.
 
-**Part II: Implementation Details** provides non-normative guidance for implementers. This section offers practical recommendations, optimization strategies, and detailed examples that help developers build efficient and robust implementations. While these details are not required for interoperability, they represent best practices learned from reference implementations and can significantly improve performance and reliability.
+**Part II: Implementation Details** provides non-normative guidance for implementers.
+This section offers practical recommendations,
+optimization strategies,
+and detailed examples that help developers build efficient and robust implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations and can significantly improve performance and reliability.
 
 This separation provides several benefits:
 
-1. **Clarity of Requirements**: Implementers can clearly distinguish between mandatory requirements for interoperability (Part I) and optional optimizations (Part II)
-2. **Protocol Evolution**: The core protocol specification (Part I) can remain stable while implementation guidance (Part II) evolves with new techniques and optimizations
-3. **Multiple Implementations**: Different implementations can make different trade-offs in Part II while maintaining full compatibility through adherence to Part I
-4. **Audit Focus**: Security auditors can concentrate on the normative requirements in Part I that are critical for the protocol's privacy guarantees
-5. **Accessibility**: Protocol researchers can understand the essential mechanisms without being overwhelmed by implementation details, while developers get the practical guidance they need
+1. **Clarity of Requirements**:
+   Implementers can clearly distinguish between mandatory requirements for interoperability (Part I) and optional optimizations (Part II)
+2. **Protocol Evolution**:
+   The core protocol specification (Part I) can remain stable while implementation guidance (Part II) evolves with new techniques and optimizations
+3. **Multiple Implementations**:
+   Different implementations can make different trade-offs in Part II while maintaining full compatibility through adherence to Part I
+4. **Audit Focus**:
+   Security auditors can concentrate on the normative requirements in Part I that are critical for the protocol's privacy guarantees
+5. **Accessibility**:
+   Protocol researchers can understand the essential mechanisms without being overwhelmed by implementation details,
+   while developers get the practical guidance they need
 
 ## Part I: Protocol Specification
 
@@ -141,9 +154,10 @@ The Blend Protocol works as follows:
    - Extracts the block proposal payload
    - Broadcasts block proposal to Nomos Network
 
-**Note**: Current protocol version is optimized for privacy of core nodes.
-Edge nodes gain lower privacy level, which is acceptable as they are assumed
-mobile without static long-term network identifiers and have lower stake.
+**Note**:
+Current protocol version is optimized for privacy of core nodes.
+Edge nodes gain lower privacy level,
+which is acceptable as they are assumed mobile without static long-term network identifiers and have lower stake.
 
 ### Network Protocol
 
@@ -162,9 +176,9 @@ Edge nodes connect to core nodes on-demand when they need to send messages.
 
 #### Minimal Network Size
 
-The protocol requires a minimum number of core nodes to operate safely. If
-this minimum is not met, nodes MUST NOT use the Blend protocol and MUST
-broadcast data messages directly.
+The protocol requires a minimum number of core nodes to operate safely.
+If this minimum is not met,
+nodes MUST NOT use the Blend protocol and MUST broadcast data messages directly.
 
 #### Network Maintenance
 
@@ -174,28 +188,26 @@ Nodes monitor connection quality and adjust their connections based on:
 - Network health indicators
 - Protocol compliance of peers
 
-Nodes may close connections with misbehaving peers and establish new
-connections to maintain network quality.
+Nodes may close connections with misbehaving peers and establish new connections to maintain network quality.
 
 #### Session Transitions
 
-When a new session or epoch begins, the network implements a transition
-period to allow messages generated with old credentials to safely complete
-their journey through the network.
+When a new session or epoch begins,
+the network implements a transition period to allow messages generated with old credentials to safely complete their journey through the network.
 
 ### Quota Protocol
 
-The protocol limits the number of messages that can be generated during a
-session through a quota system. Two types of quota exist:
+The protocol limits the number of messages that can be generated during a session through a quota system.
+Two types of quota exist:
 
-1. **Core Quota**: Limits cover message generation and blending operations for
-   core nodes during a session
-2. **Leadership Quota**: Limits blending operations a block proposer can
-   perform per proof of leadership
+1. **Core Quota**:
+   Limits cover message generation and blending operations for core nodes during a session
+2. **Leadership Quota**:
+   Limits blending operations a block proposer can perform per proof of leadership
 
-Nodes generate session-specific key pools, where each key is associated with
-a proof of quota. This ensures messages are properly rate-limited and nodes
-cannot exceed their allowed message generation capacity.
+Nodes generate session-specific key pools,
+where each key is associated with a proof of quota.
+This ensures messages are properly rate-limited and nodes cannot exceed their allowed message generation capacity.
 
 ### Message Protocol
 
@@ -203,38 +215,51 @@ cannot exceed their allowed message generation capacity.
 
 Messages consist of three components:
 
-1. **Public Header (H)**: Contains public key, proof of quota, and signature
-2. **Encrypted Private Header (h)**: Contains blending headers for each hop,
+1. **Public Header (H)**:
+   Contains public key,
+   proof of quota,
+   and signature
+2. **Encrypted Private Header (h)**:
+   Contains blending headers for each hop,
    with proofs of selection
-3. **Payload (P)**: The actual content (block proposal or cover message data)
+3. **Payload (P)**:
+   The actual content (block proposal or cover message data)
 
 #### Message Lifecycle
 
 Messages follow a defined lifecycle through the network:
 
-1. **Generation**: Triggered by consensus lottery (data) or schedule (cover)
-2. **Relaying**: Nodes validate and forward messages to neighbors
-3. **Processing**: Designated nodes decrypt and extract next-hop information
-4. **Delaying**: Random delays hide timing correlations
-5. **Releasing**: Messages released according to delay schedule
-6. **Broadcasting**: Final nodes extract and broadcast block proposals
+1. **Generation**:
+   Triggered by consensus lottery (data) or schedule (cover)
+2. **Relaying**:
+   Nodes validate and forward messages to neighbors
+3. **Processing**:
+   Designated nodes decrypt and extract next-hop information
+4. **Delaying**:
+   Random delays hide timing correlations
+5. **Releasing**:
+   Messages released according to delay schedule
+6. **Broadcasting**:
+   Final nodes extract and broadcast block proposals
 
 ### Proof Mechanisms
 
 #### Proof of Quota (PoQ)
 
-Guarantees that honestly generated messages use valid quota allocation. Two
-types exist:
+Guarantees that honestly generated messages use valid quota allocation.
+Two types exist:
 
-- **Core Quota Proof**: Validated message is within core node's session quota
-- **Leadership Quota Proof**: Validated message is within leader's quota per
-  won slot
+- **Core Quota Proof**:
+  Validated message is within core node's session quota
+- **Leadership Quota Proof**:
+  Validated message is within leader's quota per won slot
 
 Combined proof uses logical OR of both proof types.
 
 #### Proof of Selection (PoSel)
 
-Makes node selection for message processing random and verifiable. Prevents:
+Makes node selection for message processing random and verifiable.
+Prevents:
 
 - Targeting specific nodes
 - Selfish behavior (sending all messages to self)
@@ -262,39 +287,46 @@ Multiple mechanisms prevent denial-of-service attacks:
 
 #### Privacy Properties
 
-The protocol provides probabilistic unlinkability with quantifiable privacy
-guarantees. Time to link sender to proposal and time to infer stake increase
-significantly with each additional hop in the blending path.
+The protocol provides probabilistic unlinkability with quantifiable privacy guarantees.
+Time to link sender to proposal and time to infer stake increase significantly with each additional hop in the blending path.
 
 #### Attack Resistance
 
 Protection against various attack vectors:
 
-- **Grinding attacks**: Prevented by unpredictable session randomness
-- **Tagging attacks**: Addressed by mempool protections (NomosDA)
-- **Timing attacks**: Mitigated by random delays
-- **Content inspection**: Prevented by layered encryption
-- **Replay attacks**: Prevented by TLS and key uniqueness verification
+- **Grinding attacks**:
+  Prevented by unpredictable session randomness
+- **Tagging attacks**:
+  Addressed by mempool protections (NomosDA)
+- **Timing attacks**:
+  Mitigated by random delays
+- **Content inspection**:
+  Prevented by layered encryption
+- **Replay attacks**:
+  Prevented by TLS and key uniqueness verification
 
 ### Rationale
 
 #### Design Decisions
 
-**Blending vs Mixing**: Protocol uses blending (spatial anonymity through
-multiple nodes) rather than mixing (temporal anonymity through single node)
-for higher decentralization and censorship resistance.
+**Blending vs Mixing**:
+Protocol uses blending (spatial anonymity through multiple nodes) rather than mixing (temporal anonymity through single node) for higher decentralization and censorship resistance.
 
-**Two-tier reward system**: Base reward ensures fairness; premium reward
-continues motivating nodes through lottery mechanism.
+**Two-tier reward system**:
+Base reward ensures fairness;
+premium reward continues motivating nodes through lottery mechanism.
 
-**Edge node privacy trade-off**: Lower privacy acceptable as edge nodes are
-assumed mobile, without static identifiers, with lower stake.
+**Edge node privacy trade-off**:
+Lower privacy acceptable as edge nodes are assumed mobile,
+without static identifiers,
+with lower stake.
 
-**Cover traffic motivation**: Nodes must generate cover messages for own
-privacy; protocol enforces statistical indistinguishability.
+**Cover traffic motivation**:
+Nodes must generate cover messages for own privacy;
+protocol enforces statistical indistinguishability.
 
-**Statistical bias**: Modulo operation for node selection introduces
-negligible bias (< 2^{-128}) for expected network sizes.
+**Statistical bias**:
+Modulo operation for node selection introduces negligible bias (< 2^{-128}) for expected network sizes.
 
 ---
 
