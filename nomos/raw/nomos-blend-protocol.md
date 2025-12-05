@@ -32,6 +32,26 @@ environment with low bandwidth cost but high latency. It hides the sender of a
 block proposal through cryptographic obfuscation and timing delays, routing
 encrypted messages through multiple blend nodes before revelation.
 
+## Motivation
+
+All Proof of Stake (PoS) systems have an inherent privacy problem where stake
+determines node behavior. By observing node behavior, one can infer the node's
+stake. The Blend Protocol addresses network-based de-anonymization where an
+adversary observes network activity to link nodes to their proposals and
+estimate stake.
+
+The protocol achieves:
+
+1. **Unlinkability**: Block proposers cannot be linked to their proposals
+   through network analysis
+2. **Stake privacy**: Inferring relative stake takes more than 10 years for
+   adversaries controlling 10% stake (targeting 0.1% stake node)
+
+The Blend Protocol is one of the Nomos Bedrock Services, providing censorship
+resistance and network-level privacy for block producers. It must be used
+alongside mempool protections (like NomosDA) to achieve truly
+privacy-preserving system.
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
@@ -75,26 +95,6 @@ interpreted as described in RFC 2119.
 | **Passive adversary** | Can only observe, cannot modify node behavior. |
 | **Active adversary** | Can modify node behavior and observe network. |
 | **Local observer** | Passive adversary with limited network view and ability to observe internals of limited nodes. |
-
-## Motivation
-
-All Proof of Stake (PoS) systems have an inherent privacy problem where stake
-determines node behavior. By observing node behavior, one can infer the node's
-stake. The Blend Protocol addresses network-based de-anonymization where an
-adversary observes network activity to link nodes to their proposals and
-estimate stake.
-
-The protocol achieves:
-
-1. **Unlinkability**: Block proposers cannot be linked to their proposals
-   through network analysis
-2. **Stake privacy**: Inferring relative stake takes more than 10 years for
-   adversaries controlling 10% stake (targeting 0.1% stake node)
-
-The Blend Protocol is one of the Nomos Bedrock Services, providing censorship
-resistance and network-level privacy for block producers. It must be used
-alongside mempool protections (like NomosDA) to achieve truly
-privacy-preserving system.
 
 ## Document Structure
 
@@ -226,8 +226,8 @@ Messages follow a defined lifecycle through the network:
 Guarantees that honestly generated messages use valid quota allocation. Two
 types exist:
 
-- **Core Quota Proof**: Validates message is within core node's session quota
-- **Leadership Quota Proof**: Validates message is within leader's quota per
+- **Core Quota Proof**: Validated message is within core node's session quota
+- **Leadership Quota Proof**: Validated message is within leader's quota per
   won slot
 
 Combined proof uses logical OR of both proof types.
