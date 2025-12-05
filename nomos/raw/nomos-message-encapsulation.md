@@ -767,11 +767,11 @@ We are omitting protocol version in the header for simplicity.
 
 #### Initialization
 
-##### Step 1: Create Empty Message
+##### Create Empty Message (Example)
 
 Create an empty message: $\mathbf{M} = (\mathbf{H}=0,\mathbf{h}=0,\mathbf{P}=0)$
 
-##### Step 2: Randomize Private Header
+##### Randomize Private Header (Example)
 
 Randomize the private header: $\mathbf h_0 = \{$
 
@@ -785,7 +785,7 @@ $\mathbf b_4 = \text {CSPRBG}( \rho_{4})_{|\mathbf b|}$,
 
 $\}$.
 
-##### Step 3: Fill Last h Blend Headers
+##### Fill Last h Blend Headers (Example)
 
 Fill the last $h$ blend headers with reconstructable payloads: $\mathbf h_0 = \{$
 
@@ -799,7 +799,7 @@ $\mathbf b_4 = \{ r_{l_1,1}, r_{l_1,2} ,r_{l_1,3}, r_{l_1,4} \}$,
 
 $\}$.
 
-##### Step 4: Encrypt Last h Blend Headers
+##### Encrypt Last h Blend Headers (Example)
 
 Encrypt the last $h$ blend headers in a reconstructable manner: $\mathbf h_{E_0} = \{$
 
