@@ -1,5 +1,4 @@
 ---
-slug: codex-store
 title: CODEX-STORE
 name: Codex Store Module
 status: raw
@@ -12,17 +11,34 @@ contributors:
 
 ## Abstract
 
-This specification describes the Store Module, the core storage abstraction in [Codex](https://github.com/codex-storage/nim-codex), providing a unified interface for storing and retrieving content-addressed blocks and associated metadata.
+This specification describes the Store Module,
+the core storage abstraction in [Codex](https://github.com/codex-storage/nim-codex),
+providing a unified interface for storing and retrieving content-addressed blocks
+and associated metadata.
 
-The Store Module decouples storage operations from underlying datastore semantics by introducing the `BlockStore` interface, which standardizes methods for storing and retrieving both ephemeral and persistent blocks across different storage backends. The module integrates a maintenance engine responsible for cleaning up expired ephemeral data according to configured policies.
+The Store Module decouples storage operations from underlying datastore semantics
+by introducing the `BlockStore` interface,
+which standardizes methods for storing and retrieving both ephemeral
+and persistent blocks across different storage backends.
+The module integrates a maintenance engine responsible for cleaning up
+expired ephemeral data according to configured policies.
 
-The Store Module is built on top of the generic [DataStore (DS) interface](https://github.com/codex-storage/nim-datastore/blob/master/datastore/datastore.nim), which is implemented by multiple backends such as SQLite, LevelDB, and the filesystem.
+The Store Module is built on top of the generic
+[DataStore (DS) interface](https://github.com/codex-storage/nim-datastore/blob/master/datastore/datastore.nim),
+which is implemented by multiple backends such as SQLite, LevelDB,
+and the filesystem.
 
 ## Background / Rationale / Motivation
 
-The primary design goal is to decouple storage operations from the underlying datastore semantics by introducing the `BlockStore` interface. This interface standardizes methods for storing and retrieving both ephemeral and persistent blocks, ensuring a consistent API across different storage backends.
+The primary design goal is to decouple storage operations from the underlying
+datastore semantics by introducing the `BlockStore` interface.
+This interface standardizes methods for storing and retrieving both ephemeral
+and persistent blocks,
+ensuring a consistent API across different storage backends.
 
-The DataStore provides a KV-store abstraction with `Get`, `Put`, `Delete`, and `Query` operations, with backend-dependent guarantees. At a minimum, row-level consistency and basic batching are expected.
+The DataStore provides a KV-store abstraction with `Get`, `Put`, `Delete`,
+and `Query` operations, with backend-dependent guarantees.
+At a minimum, row-level consistency and basic batching are expected.
 
 The DataStore supports:
 
@@ -33,7 +49,9 @@ The DataStore supports:
 The current implementation has several limitations:
 
 - No dataset-level operations or advanced batching support
-- Lack of consistent locking and concurrency control, which may lead to inconsistencies during crashes or long-running operations on block groups (e.g., reference count updates, expiration updates)
+- Lack of consistent locking and concurrency control,
+  which may lead to inconsistencies during crashes or long-running operations
+  on block groups (e.g., reference count updates, expiration updates)
 
 ## Theory / Semantics
 
@@ -65,18 +83,25 @@ The `BlockStore` interface provides the following methods:
 
 ### Store Implementations
 
-The Store module provides three concrete implementations of the `BlockStore` interface, each optimized for a specific role in the Codex architecture: RepoStore, NetworkStore, and CacheStore.
+The Store module provides three concrete implementations of the `BlockStore`
+interface,
+each optimized for a specific role in the Codex architecture:
+RepoStore, NetworkStore, and CacheStore.
 
 #### RepoStore
 
-The RepoStore is a persistent `BlockStore` implementation that interfaces directly with low-level storage backends, such as hard drives and databases.
+The RepoStore is a persistent `BlockStore` implementation
+that interfaces directly with low-level storage backends,
+such as hard drives and databases.
 
 It uses two distinct DataStore backends:
 
 - FileSystem — for storing raw block data
 - LevelDB — for storing associated metadata
 
-This separation ensures optimal performance, allowing block data operations to run efficiently while metadata updates benefit from a fast key-value database.
+This separation ensures optimal performance,
+allowing block data operations to run efficiently
+while metadata updates benefit from a fast key-value database.
 
 Characteristics:
 
@@ -111,9 +136,13 @@ Configuration:
 
 #### NetworkStore
 
-The NetworkStore is a composite `BlockStore` that combines local persistence with network-based retrieval for distributed content access.
+The NetworkStore is a composite `BlockStore` that combines local persistence
+with network-based retrieval for distributed content access.
 
-It follows a local-first strategy — attempting to retrieve or store blocks locally first, and falling back to network retrieval via the Block Exchange Engine if the block is not available locally.
+It follows a local-first strategy —
+attempting to retrieve or store blocks locally first,
+and falling back to network retrieval via the Block Exchange Engine
+if the block is not available locally.
 
 Characteristics:
 
@@ -148,7 +177,8 @@ Characteristics:
 
 #### CacheStore
 
-The CacheStore is an in-memory `BlockStore` implementation designed for fast access to frequently used blocks.
+The CacheStore is an in-memory `BlockStore` implementation
+designed for fast access to frequently used blocks.
 
 This store maintains two separate LRU caches:
 
@@ -186,11 +216,14 @@ Configuration:
 
 ### Workflows
 
-The following flow charts summarize how put, get, and delete operations interact with the shared block storage, metadata store, and quota management systems.
+The following flow charts summarize how put, get, and delete operations
+interact with the shared block storage, metadata store,
+and quota management systems.
 
 #### PutBlock
 
-The following flow chart shows how a block is stored with metadata and quota management:
+The following flow chart shows how a block is stored
+with metadata and quota management:
 
 ```text
 putBlock: blk, ttl
@@ -226,7 +259,10 @@ putBlock: blk, ttl
 
 #### GetBlock
 
-The following flow chart explains how a block is retrieved by CID or tree reference, resolving metadata if necessary, and returning the block or an error:
+The following flow chart explains how a block is retrieved by CID
+or tree reference,
+resolving metadata if necessary,
+and returning the block or an error:
 
 ```text
 getBlock: cid/address
@@ -256,7 +292,9 @@ getBlock: cid/address
 
 #### DelBlock
 
-The following flow chart shows how a block is deleted when it is unused or expired, including metadata cleanup and quota/counter updates:
+The following flow chart shows how a block is deleted
+when it is unused or expired,
+including metadata cleanup and quota/counter updates:
 
 ```text
 delBlock: cid
@@ -372,7 +410,8 @@ QuotaUsage* {.serialize.} = object
   - Batch operations for dataset block groups.
 
 - Concurrency Control
-  - Consistent locking and coordination mechanisms to prevent inconsistencies during crashes or long-running operations.
+  - Consistent locking and coordination mechanisms to prevent inconsistencies
+    during crashes or long-running operations.
 
 - Lifecycle & Maintenance
   - Cooperative scheduling to avoid blocking.
@@ -413,33 +452,54 @@ QuotaUsage* {.serialize.} = object
 
 ## Wire Format Specification / Syntax
 
-The Store Module does not define a wire format specification. It provides an internal storage abstraction for [Codex](https://github.com/codex-storage/nim-codex) and relies on underlying datastore implementations for serialization and persistence.
+The Store Module does not define a wire format specification.
+It provides an internal storage abstraction
+for [Codex](https://github.com/codex-storage/nim-codex)
+and relies on underlying datastore implementations for serialization
+and persistence.
 
 ## Security/Privacy Considerations
 
-- Block Integrity: The Store Module verifies block content integrity upon retrieval to ensure data has not been corrupted or tampered with.
+- Block Integrity: The Store Module verifies block content integrity
+  upon retrieval to ensure data has not been corrupted or tampered with.
 
-- Quota Enforcement: Storage quotas are enforced to prevent disk exhaustion attacks. The default quota is 20 GiB, but this is configurable.
+- Quota Enforcement: Storage quotas are enforced
+  to prevent disk exhaustion attacks.
+  The default quota is 20 GiB, but this is configurable.
 
-- Safe Data Cleanup: The maintenance engine safely removes expired ephemeral data and orphaned blocks without compromising data integrity.
+- Safe Data Cleanup: The maintenance engine safely removes expired
+  ephemeral data and orphaned blocks without compromising data integrity.
 
-- Reference Counting: Reference counting–based garbage collection ensures that blocks are not deleted while they are still in use by other components.
+- Reference Counting: Reference counting–based garbage collection ensures
+  that blocks are not deleted while they are still in use by other components.
 
-Future security enhancements include finer-grained quota enforcement across tenants/namespaces and stronger rollback semantics for multi-node consistency.
+Future security enhancements include finer-grained quota enforcement
+across tenants/namespaces and stronger rollback semantics
+for multi-node consistency.
 
 ## Rationale
 
 The Store Module design prioritizes:
 
-- Decoupling: By introducing the `BlockStore` interface, the Store Module decouples storage operations from underlying datastore semantics, allowing for flexible backend implementations.
+- Decoupling: By introducing the `BlockStore` interface,
+  the Store Module decouples storage operations from underlying
+  datastore semantics,
+  allowing for flexible backend implementations.
 
-- Performance: The separation of block data (filesystem) and metadata (LevelDB) in RepoStore ensures optimal performance for both types of operations.
+- Performance: The separation of block data (filesystem) and metadata (LevelDB)
+  in RepoStore ensures optimal performance for both types of operations.
 
-- Flexibility: The three store implementations (RepoStore, NetworkStore, CacheStore) provide different trade-offs between persistence, network access, and performance, allowing Codex to optimize for different use cases.
+- Flexibility: The three store implementations
+  (RepoStore, NetworkStore, CacheStore) provide different trade-offs
+  between persistence, network access, and performance,
+  allowing Codex to optimize for different use cases.
 
-- Scalability: Reference counting, quota management, and pagination enable the Store Module to scale to large datasets while preventing resource exhaustion.
+- Scalability: Reference counting, quota management, and pagination enable
+  the Store Module to scale to large datasets
+  while preventing resource exhaustion.
 
-The current limitations (lack of dataset-level operations, inconsistent locking) are acknowledged and will be addressed in future versions.
+The current limitations (lack of dataset-level operations, inconsistent locking)
+are acknowledged and will be addressed in future versions.
 
 ## Copyright
 
