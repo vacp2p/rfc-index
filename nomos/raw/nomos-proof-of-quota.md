@@ -16,33 +16,64 @@ contributors:
 
 ## Introduction
 
-This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which ensures that there is a limited number of message encapsulations that a node can perform, thereby constraining the number of messages a node can introduce to the Blend network.
+This document defines an implementation-friendly specification
+of the Proof of Quota (PoQ),
+which ensures that there is a limited number of message encapsulations
+that a node can perform,
+thereby constraining the number of messages a node can introduce
+to the Blend network.
 
 ## Overview
 
-The PoQ ensures that there is a limited number of message encapsulations that a node can perform. This constrains the number of messages a node can introduce to the Blend network. The mechanism regulating these messages is similar to rate-limiting nullifiers.
+The PoQ ensures that there is a limited number of message encapsulations
+that a node can perform.
+This constrains the number of messages a node can introduce to the Blend network.
+The mechanism regulating these messages is similar to rate-limiting nullifiers.
 
-The proof verifies that a node's public key is within a limit for either a core node or a leader node.
+The proof verifies that a node's public key is within a limit
+for either a core node or a leader node.
 
 ## Document Structure
 
-This specification is organized into two distinct parts to serve different audiences and use cases:
+This specification is organized into two distinct parts
+to serve different audiences and use cases:
 
-**Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node. This section defines the cryptographic primitives, message formats, network protocols, and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees. Protocol designers, auditors, and those seeking to understand the core mechanisms should focus on this part.
+**Protocol Specification** contains the normative requirements necessary
+for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives, message formats,
+network protocols, and behavioral requirements that all implementations
+MUST follow to ensure compatibility and maintain the protocol's
+privacy guarantees.
+Protocol designers, auditors, and those seeking to understand the core
+mechanisms should focus on this part.
 
-**Implementation Considerations** provides non-normative guidance for implementers. This section offers practical recommendations, optimization strategies, and detailed examples that help developers build efficient and robust implementations. While these details are not required for interoperability, they represent best practices learned from reference implementations and can significantly improve performance and reliability.
+**Implementation Considerations** provides non-normative guidance
+for implementers.
+This section offers practical recommendations, optimization strategies,
+and detailed examples that help developers build efficient and robust
+implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations
+and can significantly improve performance and reliability.
 
 ## Protocol Specification
 
-This section defines the normative cryptographic protocol requirements for the Proof of Quota.
+This section defines the normative cryptographic protocol requirements
+for the Proof of Quota.
 
 ### Construction
 
 The Proof of Quota (PoQ) consists of two parts:
 
-1. **Proof of Core Quota (PoQ_C)**: Ensures that the core node is declared and hasn't already produced more keys than the core quota Q_C.
+1. **Proof of Core Quota (PoQ_C)**: Ensures that the core node is declared
+   and hasn't already produced more keys than the core quota Q_C.
 
-2. **Proof of Leadership Quota (PoQ_L)**: Ensures that the leader node would win the proof of stake for current Cryptarchia epoch and hasn't already produced more keys than the leadership quota Q_L. This doesn't guarantee that the node is indeed winning because the PoQ doesn't check if the note is unspent, enabling generation of the proof ahead of time preventing extreme delays.
+2. **Proof of Leadership Quota (PoQ_L)**: Ensures that the leader node
+   would win the proof of stake for current Cryptarchia epoch
+   and hasn't already produced more keys than the leadership quota Q_L.
+   This doesn't guarantee that the node is indeed winning
+   because the PoQ doesn't check if the note is unspent,
+   enabling generation of the proof ahead of time preventing extreme delays.
 
 **Validity**: The final proof PoQ is valid if either PoQ_C or PoQ_L holds.
 
@@ -50,7 +81,8 @@ The Proof of Quota (PoQ) consists of two parts:
 
 #### Public Values
 
-A proof attesting that for the following public values derived from blockchain parameters:
+A proof attesting that for the following public values
+derived from blockchain parameters:
 
 ```python
 class ProofOfQuotaPublic:
@@ -72,13 +104,18 @@ class ProofOfQuotaPublic:
 **Field Descriptions:**
 
 - `session`: Unique session identifier for temporal partitioning
-- `core_quota`: Maximum number of message encapsulations allowed per session for core nodes (20-bit value)
-- `leader_quota`: Maximum number of message encapsulations allowed per session for potential leaders (20-bit value)
-- `core_root`: Root of Merkle tree containing zk_id values of all declared core nodes
-- `K_part_one`, `K_part_two`: Split representation of one-time signature public key (32 bytes total)
+- `core_quota`: Maximum number of message encapsulations allowed per session
+  for core nodes (20-bit value)
+- `leader_quota`: Maximum number of message encapsulations allowed per session
+  for potential leaders (20-bit value)
+- `core_root`: Root of Merkle tree containing zk_id values
+  of all declared core nodes
+- `K_part_one`, `K_part_two`: Split representation of one-time signature
+  public key (32 bytes total)
 - `pol_epoch_nonce`: Proof of Leadership epoch nonce for lottery
 - `pol_t0`, `pol_t1`: Proof of Leadership threshold constants
-- `pol_ledger_aged`: Root of Merkle tree containing eligible Proof of Leadership notes
+- `pol_ledger_aged`: Root of Merkle tree containing eligible
+  Proof of Leadership notes
 - `key_nullifier`: Output nullifier preventing key reuse within a session
 
 #### Witness
@@ -109,7 +146,9 @@ class ProofOfQuotaWitness:
 
 **Witness Field Descriptions:**
 
-- `index`: The index of the generated key. Limiting this index limits the maximum number of keys generated (20 bits enables up to 2^20 = 1,048,576 messages per node per session)
+- `index`: The index of the generated key.
+  Limiting this index limits the maximum number of keys generated
+  (20 bits enables up to 2^20 = 1,048,576 messages per node per session)
 - `selector`: Boolean flag indicating node type (1 for leader, 0 for core node)
 - `core_sk`: Secret key corresponding to the core node's zk_id
 - `core_path`: Merkle authentication path for core node membership
@@ -124,37 +163,57 @@ The following constraints MUST hold for a valid proof:
 
 #### Step 1: Index Selection and Quota Limitation
 
-The prover selects an index for the chosen key. This index MUST be lower than the allowed quota and not already used. This index is used to derive the key nullifier in Step 4.
+The prover selects an index for the chosen key.
+This index MUST be lower than the allowed quota and not already used.
+This index is used to derive the key nullifier in Step 4.
 
-**Purpose**: Limiting the possible values of this index limits the possible nullifiers created, which produces the desired effect of limiting the generation of keys to a certain quota.
+**Purpose**: Limiting the possible values of this index limits the possible
+nullifiers created,
+which produces the desired effect of limiting the generation of keys
+to a certain quota.
 
-**Specification**: `index` is 20 bits, enabling up to 2^20 messages per node per session.
+**Specification**: `index` is 20 bits,
+enabling up to 2^20 messages per node per session.
 
 #### Step 2: Core Node Verification
 
-If the prover indicated that the node is a core node for the proof (`selector = 0`), the proof checks that:
+If the prover indicated that the node is a core node for the proof
+(`selector = 0`), the proof checks that:
 
-1. **Core Node Registration**: The core node is registered in the set N = SDP(session). This is proven by demonstrating knowledge of a `core_sk` that corresponds to a declared `zk_id`, which is a valid SDP registry for the current session.
+1. **Core Node Registration**: The core node is registered
+   in the set N = SDP(session).
+   This is proven by demonstrating knowledge of a `core_sk`
+   that corresponds to a declared `zk_id`,
+   which is a valid SDP registry for the current session.
 
    - The `zk_id` values are stored in a Merkle tree with a fixed depth of 20
    - The root is provided as a public input
-   - To build the Merkle tree, `zk_id` values are ordered from smallest to biggest (when seen as natural numbers between 0 and p)
-   - Remaining empty leaves are represented by 0 after the sorting (appended at the end of the vector)
+   - To build the Merkle tree, `zk_id` values are ordered from smallest
+     to biggest (when seen as natural numbers between 0 and p)
+   - Remaining empty leaves are represented by 0 after the sorting
+     (appended at the end of the vector)
    - This structure supports up to 1M validators
 
 2. **Index Validity**: The index MUST satisfy: `index < core_quota`
 
 #### Step 3: Leader Node Verification
 
-If the prover indicated that the node is a potential leader node for the proof (`selector = 1`), the proof checks that:
+If the prover indicated that the node is a potential leader node for the proof
+(`selector = 1`), the proof checks that:
 
-1. **Leadership Lottery**: The leader node possesses a note that would win a slot in the consensus lottery. Unlike leadership conditions, the proof of quota doesn't verify that the note is unspent. This enables potential provers to generate the PoQ well in advance. All other lottery constraints are the same as in Circuit Constraints.
+1. **Leadership Lottery**: The leader node possesses a note
+   that would win a slot in the consensus lottery.
+   Unlike leadership conditions,
+   the proof of quota doesn't verify that the note is unspent.
+   This enables potential provers to generate the PoQ well in advance.
+   All other lottery constraints are the same as in Circuit Constraints.
 
 2. **Index Validity**: The index MUST satisfy: `index < leader_quota`
 
 #### Step 4: Key Nullifier Derivation
 
-The prover derives a `key_nullifier` maintained by blend nodes during the session for message deduplication purposes:
+The prover derives a `key_nullifier` maintained by blend nodes
+during the session for message deduplication purposes:
 
 ```python
 selection_randomness = zkhash(b"SELECTION_RANDOMNESS_V1", sk, index, session)
@@ -166,13 +225,17 @@ Where `sk` is:
 - The `core_sk` as defined in the Mantle specification if the node is a core node
 - The secret key of the PoL note if it's a leader node derived from inputs
 
-**Rationale**: Two hashes are used because the selection randomness is used in the Proof of Selection to prove the ownership of a valid PoQ.
+**Rationale**: Two hashes are used because the selection randomness is used
+in the Proof of Selection to prove the ownership of a valid PoQ.
 
 #### Step 5: One-Time Signature Key Attachment
 
-The prover attaches a one-time signature key used in the blend protocol. This public key is split into two 16-byte parts: `K_part_one` and `K_part_two`.
+The prover attaches a one-time signature key used in the blend protocol.
+This public key is split into two 16-byte parts:
+`K_part_one` and `K_part_two`.
 
-**Encoding**: When written in little-endian byte order, the complete public key equals the concatenation `K_part_one || K_part_two`.
+**Encoding**: When written in little-endian byte order,
+the complete public key equals the concatenation `K_part_one || K_part_two`.
 
 ### Circuit Implementation
 
@@ -227,9 +290,11 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 
 ### Proof Compression
 
-The proof confirming that the PoQ is correct MUST be compressed to a size of 128 bytes.
+The proof confirming that the PoQ is correct MUST be compressed
+to a size of 128 bytes.
 
-**Uncompressed Format**: The UncompressedProof comprises 2 G1 and 1 G2 BN256 elements:
+**Uncompressed Format**: The UncompressedProof comprises 2 G1 and 1 G2
+BN256 elements:
 
 ```python
 class UncompressedProof:
@@ -246,7 +311,8 @@ class UncompressedProof:
 
 ### Proof Serialization
 
-The ProofOfQuota structure contains `key_nullifier` and the compressed proof transformed into bytes.
+The ProofOfQuota structure contains `key_nullifier` and the compressed proof
+transformed into bytes.
 
 ```python
 class ProofOfQuota:
@@ -398,22 +464,6 @@ Implementations SHOULD handle:
 - Merkle path verification failures
 - Invalid selector values
 
-### Performance Benchmarks
-
-**Reference Hardware**:
-
-- CPU: 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
-- RAM: 32GB - Speed: 5600 MT/s
-- Motherboard: Micro-Star International Co., Ltd. MS-17S1
-- OS: Ubuntu 22.04.5 LTS
-- Kernel: 6.8.0-59-generic
-
-**Expected Performance** (implementation-dependent):
-
-- Proof generation: TBD
-- Proof verification: TBD
-- Merkle path computation: TBD
-
 ## References
 
 ### Normative
@@ -423,7 +473,8 @@ Implementations SHOULD handle:
 - Mantle Specification
 - Circuit Constraints (Cryptarchia)
 - Proof of Selection
-- rate-limiting nullifiers
+- [Rate-Limiting Nullifiers](https://rate-limiting-nullifier.github.io/rln-docs/)
+  \- RLN documentation for rate-limiting mechanisms
 
 ### Informative
 
