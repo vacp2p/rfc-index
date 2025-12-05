@@ -529,6 +529,27 @@ including service interface, peer discovery, and network protocol interactions.
 
 #### Complete Block Request Flow
 
+The protocol supports two strategies for WantBlock requests,
+each with different trade-offs.
+Implementations may choose the strategy based on network conditions,
+peer availability, and resource constraints.
+
+##### Strategy 1: Parallel Request (Low Latency)
+
+In this strategy, the requester sends `wantType = wantBlock` to all
+discovered peers simultaneously.
+This minimizes latency as the first peer to respond with the block
+data wins, but it wastes bandwidth since multiple peers may send
+the same block data.
+
+**Trade-offs:**
+
+- **Pro**: Lowest latency - block arrives as soon as any peer can deliver it
+- **Pro**: More resilient to slow or unresponsive peers
+- **Con**: Bandwidth-wasteful - multiple peers may send duplicate data
+- **Con**: Higher network overhead for the requester
+- **Best for**: Time-critical data retrieval, unreliable networks
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -537,37 +558,115 @@ sequenceDiagram
     participant Discovery
     participant PeerA
     participant PeerB
+    participant PeerC
 
     Client->>BlockExchange: requestBlock(address)
     BlockExchange->>LocalStore: checkBlock(address)
+    LocalStore-->>BlockExchange: Not found
 
-    alt Block in local storage
-        LocalStore-->>BlockExchange: Block found
-        BlockExchange-->>Client: Return block
-    else Block not local
-        LocalStore-->>BlockExchange: Not found
-        BlockExchange->>Discovery: findPeers(address)
-        Discovery-->>BlockExchange: [PeerA, PeerB]
+    BlockExchange->>Discovery: findPeers(address)
+    Discovery-->>BlockExchange: [PeerA, PeerB, PeerC]
 
-        par Send to multiple peers
-            BlockExchange->>PeerA: Message(wantlist)
-            BlockExchange->>PeerB: Message(wantlist)
-        end
-
-        alt PeerA has block
-            PeerA-->>BlockExchange: Message(blockPresences, payload)
-            BlockExchange->>BlockExchange: Verify block
-            BlockExchange->>LocalStore: Store block
-            BlockExchange->>PeerB: Message(wantlist.cancel)
-            BlockExchange-->>Client: Return block
-        else PeerA doesn't have
-            PeerA-->>BlockExchange: Message(blockPresences.dontHave)
-            PeerB-->>BlockExchange: Message(payload)
-            BlockExchange->>BlockExchange: Verify block
-            BlockExchange->>LocalStore: Store block
-            BlockExchange-->>Client: Return block
-        end
+    par Send wantBlock to all peers
+        BlockExchange->>PeerA: Message(wantlist: wantBlock)
+        BlockExchange->>PeerB: Message(wantlist: wantBlock)
+        BlockExchange->>PeerC: Message(wantlist: wantBlock)
     end
+
+    Note over PeerA,PeerC: All peers start preparing block data
+
+    PeerB-->>BlockExchange: Message(payload: BlockDelivery)
+    Note over BlockExchange: First response wins
+
+    BlockExchange->>BlockExchange: Verify block
+    BlockExchange->>LocalStore: Store block
+
+    par Cancel requests to other peers
+        BlockExchange->>PeerA: Message(wantlist: cancel)
+        BlockExchange->>PeerC: Message(wantlist: cancel)
+    end
+
+    Note over PeerA,PeerC: May have already sent data (wasted bandwidth)
+
+    BlockExchange-->>Client: Return block
+```
+
+##### Strategy 2: Two-Phase Discovery (Bandwidth Efficient)
+
+In this strategy, the requester first sends `wantType = wantHave` to
+discover which peers have the block, then sends `wantType = wantBlock`
+only to a single selected peer.
+This conserves bandwidth but adds an extra round-trip of latency.
+
+**Trade-offs:**
+
+- **Pro**: Bandwidth-efficient - only one peer sends block data
+- **Pro**: Enables price comparison before committing to a peer
+- **Pro**: Allows selection based on peer reputation or proximity
+- **Con**: Higher latency due to extra round-trip for presence check
+- **Con**: Selected peer may become unavailable between phases
+- **Best for**: Large blocks, paid content, bandwidth-constrained networks
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant BlockExchange
+    participant LocalStore
+    participant Discovery
+    participant PeerA
+    participant PeerB
+    participant PeerC
+
+    Client->>BlockExchange: requestBlock(address)
+    BlockExchange->>LocalStore: checkBlock(address)
+    LocalStore-->>BlockExchange: Not found
+
+    BlockExchange->>Discovery: findPeers(address)
+    Discovery-->>BlockExchange: [PeerA, PeerB, PeerC]
+
+    Note over BlockExchange: Phase 1: Discovery
+
+    par Send wantHave to all peers
+        BlockExchange->>PeerA: Message(wantlist: wantHave)
+        BlockExchange->>PeerB: Message(wantlist: wantHave)
+        BlockExchange->>PeerC: Message(wantlist: wantHave)
+    end
+
+    PeerA-->>BlockExchange: BlockPresence(presenceDontHave)
+    PeerB-->>BlockExchange: BlockPresence(presenceHave, price=X)
+    PeerC-->>BlockExchange: BlockPresence(presenceHave, price=Y)
+
+    BlockExchange->>BlockExchange: Select best peer (PeerB: lower price)
+
+    Note over BlockExchange: Phase 2: Retrieval
+
+    BlockExchange->>PeerB: Message(wantlist: wantBlock)
+    PeerB-->>BlockExchange: Message(payload: BlockDelivery)
+
+    BlockExchange->>BlockExchange: Verify block
+    BlockExchange->>LocalStore: Store block
+    BlockExchange-->>Client: Return block
+```
+
+##### Hybrid Approach
+
+Implementations MAY combine both strategies:
+
+1. Use two-phase discovery for large blocks or paid content
+2. Use parallel requests for small blocks or time-critical data
+3. Adaptively switch strategies based on network conditions
+
+```mermaid
+flowchart TD
+    A[Block Request] --> B{Block Size?}
+    B -->|Small < 64 KiB| C[Parallel Strategy]
+    B -->|Large >= 64 KiB| D{Paid Content?}
+    D -->|Yes| E[Two-Phase Discovery]
+    D -->|No| F{Network Condition?}
+    F -->|Reliable| E
+    F -->|Unreliable| C
+    C --> G[Return Block]
+    E --> G
 ```
 
 #### Dataset Block Verification Flow
