@@ -17,9 +17,20 @@ contributors:
 
 ## Abstract
 
-The message encapsulation mechanism is a core component of the Blend Protocol that ensures privacy and security during node-to-node message transmission. By implementing multiple encryption layers and cryptographic operations, this mechanism keeps messages confidential while concealing their origins. The encapsulation process includes building a multi-layered structure with public headers, private headers, and encrypted payloads, using cryptographic keys and proofs for layer security and authentication, applying verifiable random node selection for message routing, and using shared key derivation for secure inter-node communication.
+The message encapsulation mechanism is a core component of the Blend Protocol
+that ensures privacy and security during node-to-node message transmission.
+By implementing multiple encryption layers and cryptographic operations,
+this mechanism keeps messages confidential while concealing their origins.
+The encapsulation process includes building a multi-layered structure
+with public headers, private headers, and encrypted payloads,
+using cryptographic keys and proofs for layer security and authentication,
+applying verifiable random node selection for message routing,
+and using shared key derivation for secure inter-node communication.
 
-This document is part of the Formatting section and outlines the cryptographic notation, data structures, and algorithms essential to the encapsulation process, providing a complete specification for implementing this mechanism within the Blend Protocol.
+This document is part of the Formatting section and outlines the cryptographic
+notation, data structures, and algorithms essential to the encapsulation process,
+providing a complete specification for implementing this mechanism
+within the Blend Protocol.
 
 ## Semantics
 
@@ -29,38 +40,68 @@ interpreted as described in RFC 2119.
 
 ## Document Structure
 
-This specification is organized into two distinct parts to serve different audiences and use cases:
+This specification is organized into two distinct parts
+to serve different audiences and use cases:
 
-**Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node. This section defines the cryptographic primitives, message formats, network protocols, and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees. Protocol designers, auditors, and those seeking to understand the core mechanisms should focus on this part.
+**Protocol Specification** contains the normative requirements necessary
+for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives, message formats,
+network protocols, and behavioral requirements that all implementations
+MUST follow to ensure compatibility and maintain the protocol's
+privacy guarantees.
+Protocol designers, auditors, and those seeking to understand the core
+mechanisms should focus on this part.
 
-**Implementation Considerations** provides non-normative guidance for implementers. This section offers practical recommendations, optimization strategies, and detailed examples that help developers build efficient and robust implementations. While these details are not required for interoperability, they represent best practices learned from reference implementations and can significantly improve performance and reliability.
+**Implementation Considerations** provides non-normative guidance
+for implementers.
+This section offers practical recommendations, optimization strategies,
+and detailed examples that help developers build efficient and robust
+implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations
+and can significantly improve performance and reliability.
 
 ## Protocol Specification
 
 ### Introduction
 
-The message encapsulation mechanism is part of the Blend Protocol and it describes the cryptographic operations necessary for building and processing messages by a Blend node.
+The message encapsulation mechanism is part of the Blend Protocol
+and it describes the cryptographic operations necessary for building
+and processing messages by a Blend node.
 
-This document is part of the Formatting section. Please read through that document to better understand the context of the encapsulation mechanism and constructions used here.
+This document is part of the Formatting section.
+Please read through that document to better understand the context
+of the encapsulation mechanism and constructions used here.
 
 ### Overview
 
-The Message Encapsulation Mechanism is a core component of the Blend Protocol that ensures privacy and security during node-to-node message transmission. By implementing multiple encryption layers and cryptographic operations, this mechanism keeps messages confidential while concealing their origins.
+The Message Encapsulation Mechanism is a core component of the Blend Protocol
+that ensures privacy and security during node-to-node message transmission.
+By implementing multiple encryption layers and cryptographic operations,
+this mechanism keeps messages confidential while concealing their origins.
 
 The encapsulation process includes:
 
-- Building a multi-layered structure with public headers, private headers, and encrypted payloads
+- Building a multi-layered structure with public headers,
+  private headers, and encrypted payloads
 - Using cryptographic keys and proofs for layer security and authentication
 - Applying verifiable random node selection for message routing
 - Using shared key derivation for secure inter-node communication
 
-This document outlines the cryptographic notation, data structures, and algorithms essential to the encapsulation process, providing a complete specification for implementing this mechanism within the Blend Protocol.
+This document outlines the cryptographic notation, data structures,
+and algorithms essential to the encapsulation process,
+providing a complete specification for implementing this mechanism
+within the Blend Protocol.
 
 ### Notation
 
 **Key Collections:**
 
-$\mathbf K^{n}h = \{(K^{n}{0}, k^{n}{0}, \pi{Q}^{K_{0}^{n}}),...,(K^{n}{h-1}, k^{n}{h-1}, \pi_{Q}^{K_{h-1}^{n}}) \}$ is a collection of $h$ key pairs for a node $n$ with proofs of quota, where $K_{i}^{n}$ is the $i$-th public key and $k_{i}^{n}$ is its corresponding private key, and $\pi_{Q}^{K_{i}^{n}}$ is its proof of quota.
+$\mathbf K^{n}h = \{(K^{n}{0}, k^{n}{0}, \pi{Q}^{K_{0}^{n}}),...,(K^{n}{h-1}, k^{n}{h-1}, \pi_{Q}^{K_{h-1}^{n}}) \}$
+is a collection of $h$ key pairs for a node $n$ with proofs of quota,
+where $K_{i}^{n}$ is the $i$-th public key
+and $k_{i}^{n}$ is its corresponding private key,
+and $\pi_{Q}^{K_{i}^{n}}$ is its proof of quota.
 
 ```python
 Ed25519PublicKey = bytes
@@ -81,15 +122,20 @@ class ProofOfQuota:
     proof: bytes  # 128 bytes
 ```
 
-For more information about key generation mechanism please refer to Key Types and Generation Specification.
+For more information about key generation mechanism
+please refer to Key Types and Generation Specification.
 
 For more information about proof of quota please refer to Proof of Quota.
 
 **Service Declaration Protocol:**
 
-$P^n$ is a public key of the node $n$, which is globally accessible using the Service Declaration Protocol (SDP). We are using this notation to distinguish the origin of the key, hence the following simplified notation.
+$P^n$ is a public key of the node $n$,
+which is globally accessible using the Service Declaration Protocol (SDP).
+We are using this notation to distinguish the origin of the key,
+hence the following simplified notation.
 
-For more information about Service Declaration Protocol please refer to Service Declaration Protocol.
+For more information about Service Declaration Protocol
+please refer to Service Declaration Protocol.
 
 $\mathcal{N} = \text{SDP}(s)$ is the set of nodes globally accessible using the SDP.
 
@@ -101,7 +147,11 @@ $N =|\mathcal{N}|$ is the number of nodes globally accessible using the SDP.
 
 **Shared Keys:**
 
-$\kappa^{n,m}{i} = k^{n}{i} \cdot P^{m} = p^{m} \cdot K^{n}_{i}$, is a shared key calculated between node $n$ and node $m$ using the $i$-th key of the node $n$, $P^{m}$ is the public key of the node $m$ retrieved from the SDP protocol and $p^m$ is its corresponding private key.
+$\kappa^{n,m}{i} = k^{n}{i} \cdot P^{m} = p^{m} \cdot K^{n}_{i}$,
+is a shared key calculated between node $n$ and node $m$
+using the $i$-th key of the node $n$,
+$P^{m}$ is the public key of the node $m$ retrieved from the SDP protocol
+and $p^m$ is its corresponding private key.
 
 ```python
 SharedKey = bytes  # KEY_SIZE
@@ -109,39 +159,48 @@ SharedKey = bytes  # KEY_SIZE
 
 **Proof of Selection:**
 
-$\pi^{K^{n}{l},m}{S}$ is the proof of selection of the public key $K^{n}_l$ to the node index $m$ from a set of all nodes $\mathcal N$.
+$\pi^{K^{n}{l},m}{S}$ is the proof of selection of the public key $K^{n}_l$
+to the node index $m$ from a set of all nodes $\mathcal N$.
 
 ```python
 ProofOfSelection = bytes
 PROOF_OF_SELECTION_SIZE = 32
 ```
 
-For more information about the proof of selection, please refer to Proof of Selection.
+For more information about the proof of selection,
+please refer to Proof of Selection.
 
 **Hash Functions:**
 
-$H_{\mathbf N}()$ is a domain-separated hash function dedicated to the node index selection (the implementation of the hash function is blake2b).
+$H_{\mathbf N}()$ is a domain-separated hash function dedicated to the
+node index selection (the implementation of the hash function is blake2b).
 
 ```python
 def hashds(domain=b"BlendNode", data: bytes) -> bytes:
     return Blake2B.hash512(domain + data)
 ```
 
-$H_\mathbf{I}()$ is a domain-separated hash function dedicated to the initialization of the blend header (the implementation of the hash function is blake2b).
+$H_\mathbf{I}()$ is a domain-separated hash function dedicated to the
+initialization of the blend header
+(the implementation of the hash function is blake2b).
 
 ```python
 def hashds(domain=b"BlendInitialization", data: bytes) -> bytes:
     return Blake2b.hash512(domain + data)
 ```
 
-$H_\mathbf{b}()$ is a domain-separated hash function dedicated to the blend header encryption operations (the implementation of the hash function is blake2b).
+$H_\mathbf{b}()$ is a domain-separated hash function dedicated to the
+blend header encryption operations
+(the implementation of the hash function is blake2b).
 
 ```python
 def hashds(domain=b"BlendHeader", data: bytes) -> bytes:
     return Blake2b.hash512(domain + data)
 ```
 
-$H_\mathbf{P}()$ is a domain-separated hash function dedicated to the payload encryption operations (the implementation of the hash function is blake2b).
+$H_\mathbf{P}()$ is a domain-separated hash function dedicated to the
+payload encryption operations
+(the implementation of the hash function is blake2b).
 
 ```python
 def hashds(domain=b"BlendPayload", data: bytes) -> bytes:
@@ -158,9 +217,13 @@ ENCAPSULATION_COUNT: int
 
 **Pseudo-Random Generation:**
 
-$\text {CSPRBG}()$ is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as BLAKE2b-Based PRNG Construction.
+$\text {CSPRBG}()$ is a generalized cryptographically secure pseudo-random
+bytes generator,
+it is implemented as BLAKE2b-Based PRNG Construction.
 
-$\text {CSPRBG}()_{x}$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $x$ bytes, it is implemented as BLAKE2b-Based PRNG Construction.
+$\text {CSPRBG}()_{x}$ is a cryptographically secure pseudo-random bytes
+generator whose output is restricted to $x$ bytes,
+it is implemented as BLAKE2b-Based PRNG Construction.
 
 ```python
 def pseudo_random(domain: bytes, key: bytes, size: int) -> bytes:
@@ -183,14 +246,18 @@ def xor(a: bytes, b: bytes) -> bytes:
 
 **Encryption and Decryption:**
 
-$E_k(x)=\text{CSPRBG}(k) \oplus x$ is an encryption that uses a cryptographically secure pseudo-random bytes generator with a secret $k$ and payload $x$.
+$E_k(x)=\text{CSPRBG}(k) \oplus x$ is an encryption that uses a
+cryptographically secure pseudo-random bytes generator
+with a secret $k$ and payload $x$.
 
 ```python
 def encrypt(data: bytes, key: bytes) -> bytes:
     return xor(data, pseudo_random(b"BlendEncapsulation", key, len(data)))
 ```
 
-$D_k(x)=\text{CSPRBG}(k) \oplus x$ is a decryption that uses using cryptographically secure pseudo-random bytes generator with a secret $k$ and payload $x$.
+$D_k(x)=\text{CSPRBG}(k) \oplus x$ is a decryption that uses
+cryptographically secure pseudo-random bytes generator
+with a secret $k$ and payload $x$.
 
 ```python
 def decrypt(data: bytes, key: bytes) -> bytes:
@@ -201,9 +268,11 @@ def decrypt(data: bytes, key: bytes) -> bytes:
 
 #### Message Structure
 
-We start with a definition of the message structure that must be used to provide the protocol with the envisioned capabilities.
+We start with a definition of the message structure
+that must be used to provide the protocol with the envisioned capabilities.
 
-A node $n$ constructs a message $\mathbf M = (\mathbf H, \mathbf h, \mathbf P)$ according to the format presented below.
+A node $n$ constructs a message $\mathbf M = (\mathbf H, \mathbf h, \mathbf P)$
+according to the format presented below.
 
 ```python
 class Message:
@@ -218,8 +287,12 @@ $\mathbf H$ is a public header:
 
 1. $V$, version of the header, it is set to $1$.
 2. $K^{n}_i$, a public key from the set $\mathbf K^n_h$.
-3. $\pi^{K^{n}i}{Q}$, a corresponding proof of quota for the key $K^{n}_i$ from the set $\mathbf K^n_h$ and contains its proof nullifier.
-4. $\sigma_{K^{n}_{i}}(\mathbf {h|P}i)$, a signature of the concatenation of the $i$-th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$, that can be verified by the public key $K^{n}{i}$.
+3. $\pi^{K^{n}i}{Q}$, a corresponding proof of quota for the key $K^{n}_i$
+   from the set $\mathbf K^n_h$ and contains its proof nullifier.
+4. $\sigma_{K^{n}_{i}}(\mathbf {h|P}i)$, a signature of the concatenation
+   of the $i$-th encapsulation of the payload $\mathbf P$
+   and the private header $\mathbf h$,
+   that can be verified by the public key $K^{n}{i}$.
 
 ```python
 Signature = bytes
@@ -239,9 +312,14 @@ $\mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})$ is an encrypted private 
 $\mathbf b_l$ is a blending header:
 
 1. $K^{n}_{l}$, a public key from the set $\mathbf K^n_h$.
-2. $\pi^{K^{n}{l}}{Q}$, a corresponding proof of quota for the key $K^{n}_l$ from the $\mathbf K^n_h$ and contains its proof nullifier.
-3. $\sigma_{K^{n}_{l}}(\mathbf {h|P}l)$, a signature of the concatenation of the $l$-th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$, that can be verified by public key $K^{n}{l}$.
-4. $\pi^{K^{n}{l+1},m{l+1}}{S}$, a proof of selection of the node index $m{l+1}$ assuming public key $K^{n}_{l+1}$.
+2. $\pi^{K^{n}{l}}{Q}$, a corresponding proof of quota for the key $K^{n}_l$
+   from the $\mathbf K^n_h$ and contains its proof nullifier.
+3. $\sigma_{K^{n}_{l}}(\mathbf {h|P}l)$, a signature of the concatenation
+   of the $l$-th encapsulation of the payload $\mathbf P$
+   and the private header $\mathbf h$,
+   that can be verified by public key $K^{n}{l}$.
+4. $\pi^{K^{n}{l+1},m{l+1}}{S}$, a proof of selection of the node index
+   $m{l+1}$ assuming public key $K^{n}_{l+1}$.
 5. $\Omega$, a flag that indicates that this is the last blending header.
 
 ```python
@@ -280,18 +358,29 @@ class PayloadType(Enum):
 
 #### Keys and Proof Generation
 
-For simplicity of the presentation, we do not distinguish between signing and encryption keys. However, in practice, such a distinction is necessary, that is:
+For simplicity of the presentation,
+we do not distinguish between signing and encryption keys.
+However, in practice, such a distinction is necessary, that is:
 
-- The $\mathbf K^n_h$ contains Ephemeral Signing Keys (ESK) that are part of the PoQ generation and are used for message signing; these are included in the public and private headers.
-- Shared secret keys used for encryption of messages are generated from an Ephemeral Encryption Key (sender), which is derived from the ESK, and from a Non-ephemeral Encryption Key (NEK) (receiver), which is derived from a Non-ephemeral Signing Key (NSK) retrieved from the SDP protocol.
+- The $\mathbf K^n_h$ contains Ephemeral Signing Keys (ESK)
+  that are part of the PoQ generation and are used for message signing;
+  these are included in the public and private headers.
+- Shared secret keys used for encryption of messages are generated from an
+  Ephemeral Encryption Key (sender), which is derived from the ESK,
+  and from a Non-ephemeral Encryption Key (NEK) (receiver),
+  which is derived from a Non-ephemeral Signing Key (NSK)
+  retrieved from the SDP protocol.
 
 For more information, look at Key Types and Generation Specification.
 
-The first step is to generate a set of keys alongside all necessary proofs that will be used in the next steps of the algorithm.
+The first step is to generate a set of keys alongside all necessary proofs
+that will be used in the next steps of the algorithm.
 
 #### Step 1: Generate Key Collection
 
-Generate the collection $\mathbf K^n_h$, where $h$ defines the number of encapsulation layers such that $h \le \beta_{max}$.
+Generate the collection $\mathbf K^n_h$,
+where $h$ defines the number of encapsulation layers
+such that $h \le \beta_{max}$.
 
 ```python
 def generate_key_collection(num_layers: int) -> List[KeyPair]:
@@ -300,12 +389,16 @@ def generate_key_collection(num_layers: int) -> List[KeyPair]:
     return [KeyPair.random() for _ in range(num_layers)]
 ```
 
-The key collection generation requires generation of Proof of Quota (Proof of Quota Specification) for each key, as defined in the following steps.
+The key collection generation requires generation of Proof of Quota
+(Proof of Quota Specification) for each key, as defined in the following steps.
 
-The ProofOfQuotaPublic (Public values) structure must be filled with public information:
+The ProofOfQuotaPublic (Public values) structure must be filled
+with public information:
 
-1. session, core_quota, leader_quota, core_root, pol_epoch_nonce, pol_t0, pol_t1, pol_ledger_aged are retrieved from the blockchain.
-2. K_part_one and K_part_two are first and second part of the signature key (KeyPair) generated by the above generate_key_collection.
+1. session, core_quota, leader_quota, core_root, pol_epoch_nonce, pol_t0,
+   pol_t1, pol_ledger_aged are retrieved from the blockchain.
+2. K_part_one and K_part_two are first and second part of the signature key
+   (KeyPair) generated by the above generate_key_collection.
 
 ```python
 class ProofOfQuotaPublic:
@@ -361,11 +454,20 @@ class ProofOfQuotaWitness:
                                          # sk_secrets_root (len = 25)
 ```
 
-The ProofOfQuotaPublic and ProofOfQuotaWitness are passed to the zero-knowledge circuits that generate the proof $\pi^{K^{n}{l}}{Q}$ which derives the key_nullifier ($\nu_s$) from session, private index, private secret key during proof generation.
+The ProofOfQuotaPublic and ProofOfQuotaWitness are passed to the
+zero-knowledge circuits that generate the proof $\pi^{K^{n}{l}}{Q}$
+which derives the key_nullifier ($\nu_s$) from session,
+private index, private secret key during proof generation.
 
 #### Step 2: Select Nodes
 
-Select $h$ nodes from the set of nodes $\mathcal{N}$ in a random and verifiable manner. For $i \in \{1,…,h\}$, select $l_i = \text{CSPRBG}(H_{\mathbf N}(\rho))_{8} \mod N$, where $\rho$ is a selection randomness (using little-endian encoding), a shared secret derived during Proof of Quota generation, the output of the $\text{CSPRBG}()_8$ is returns 8 bytes (little-endian).
+Select $h$ nodes from the set of nodes $\mathcal{N}$
+in a random and verifiable manner.
+For $i \in \{1,…,h\}$,
+select $l_i = \text{CSPRBG}(H_{\mathbf N}(\rho))_{8} \mod N$,
+where $\rho$ is a selection randomness (using little-endian encoding),
+a shared secret derived during Proof of Quota generation,
+the output of the $\text{CSPRBG}()_8$ is returns 8 bytes (little-endian).
 
 ```python
 def select_nodes(key_collection: List[KeyPair], nodes: List[Node]) -> List[Node]:
@@ -387,11 +489,16 @@ def modular_bytes(data: bytes, modulus: int) -> int:
 
 #### Step 3: Generate Proofs of Selection
 
-Generate proofs of selection $\pi^{K^{n}i,l_i}{S}$ for $i \in \{1,…,h\}$, which proves that the public key $K^{n}_i$ correctly maps to the index $l_i$ from the set of nodes $\mathcal{N}$.
+Generate proofs of selection $\pi^{K^{n}i,l_i}{S}$ for $i \in \{1,…,h\}$,
+which proves that the public key $K^{n}_i$ correctly maps to the index $l_i$
+from the set of nodes $\mathcal{N}$.
 
 #### Step 4: Retrieve Public Keys
 
-For $i \in \{1,…,h\}$, retrieve public keys $\mathcal P = \{ {P^{l_1},..., P^{l_h}} \}$ for all $h$ selected nodes using the SDP protocol (defined as provider_id in Identifiers).
+For $i \in \{1,…,h\}$,
+retrieve public keys $\mathcal P = \{ {P^{l_1},..., P^{l_h}} \}$
+for all $h$ selected nodes using the SDP protocol
+(defined as provider_id in Identifiers).
 
 ```python
 def blend_node_signing_public_keys(selected_nodes: List[Node]) -> List[Ed25519PublicKey]:
@@ -400,7 +507,9 @@ def blend_node_signing_public_keys(selected_nodes: List[Node]) -> List[Ed25519Pu
 
 #### Step 5: Calculate Shared Keys
 
-For $i \in \{1,…,h\}$, calculate shared keys from a set of public keys of selected nodes $\kappa^{n,i}{i} = k^{n}{i} \cdot P^{l_i}$.
+For $i \in \{1,…,h\}$,
+calculate shared keys from a set of public keys of selected nodes
+$\kappa^{n,i}{i} = k^{n}{i} \cdot P^{l_i}$.
 
 ```python
 def derive_shared_keys(key_collection: List[KeyPair],
@@ -421,17 +530,32 @@ def derive_shared_keys(key_collection: List[KeyPair],
 
 **Node Selection Mechanism:**
 
-In step 2 of the algorithm above, the sender constructs a blending path from nodes sampled at random but in a verifiable manner. The nodes are selected deterministically (and randomly) by the key value. The key to node mapping is proven in step 3.
+In step 2 of the algorithm above,
+the sender constructs a blending path from nodes sampled at random
+but in a verifiable manner.
+The nodes are selected deterministically (and randomly) by the key value.
+The key to node mapping is proven in step 3.
 
-The node selection proof $\pi^{K^n_i,l_i}_{S}$ is constructed in such a way that it proves only the fact that the key $K^n_i$ used for the encryption maps correctly to the node index $l_i$ from the stable set of nodes $\mathcal{N}$. This proof should be considered a private proof intended only for the recipient blend node.
+The node selection proof $\pi^{K^n_i,l_i}_{S}$ is constructed in such a way
+that it proves only the fact that the key $K^n_i$ used for the encryption
+maps correctly to the node index $l_i$ from the stable set of nodes
+$\mathcal{N}$.
+This proof should be considered a private proof intended only
+for the recipient blend node.
 
-This mechanism intends to limit the possibility of "double spending" the emission token. This restricts the sender's ability to use the same emission token twice, first for constructing and emitting a message and then for claiming a reward for it.
+This mechanism intends to limit the possibility of "double spending"
+the emission token.
+This restricts the sender's ability to use the same emission token twice,
+first for constructing and emitting a message
+and then for claiming a reward for it.
 
-For more information about proof of selection please refer to Proof of Selection.
+For more information about proof of selection
+please refer to Proof of Selection.
 
 #### Message Initialization
 
-The second step is to create an empty message $\mathbf M$ and fill the private header with random values.
+The second step is to create an empty message $\mathbf M$
+and fill the private header with random values.
 
 #### Step 1: Create Empty Message
 
@@ -439,7 +563,10 @@ Create an empty message $\mathbf M$ (filled with zeros).
 
 #### Step 2: Randomize Private Header
 
-Randomize the private header: For $\mathbf b_i \in \mathbf h = (\mathbf b_{1},...,\mathbf b_{\beta_{max}})$, set $\mathbf b_{i} = \text {CSPRBG}( \rho_{i})_{|\mathbf b|}$, where $\rho_i$ is some random value.
+Randomize the private header:
+For $\mathbf b_i \in \mathbf h = (\mathbf b_{1},...,\mathbf b_{\beta_{max}})$,
+set $\mathbf b_{i} = \text {CSPRBG}( \rho_{i})_{|\mathbf b|}$,
+where $\rho_i$ is some random value.
 
 ```python
 def randomize_private_header() -> PrivateHeader:
@@ -453,7 +580,8 @@ def randomize_private_header() -> PrivateHeader:
 
 #### Step 3: Fill Last Blend Headers
 
-Fill the last $h$ blend headers with reconstructable payloads: For $i = \{ 1+\beta_{max}-h,...,\beta_{max})$, do the following:
+Fill the last $h$ blend headers with reconstructable payloads:
+For $i = \{ 1+\beta_{max}-h,...,\beta_{max})$, do the following:
 
 1. $t=\beta_{max} - i + 1$
 2. $r_{t,1} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,t}t|1)){|K|}$
@@ -486,7 +614,8 @@ def fill_last_blending_headers(private_header: PrivateHeader,
 
 #### Step 4: Encrypt Last Blend Headers
 
-Encrypt the last $h$ blend headers in a reconstructable manner: For $i=\{ 1,...,h \}$, for $j=\{1, ..., i \}$, encrypt blend header:
+Encrypt the last $h$ blend headers in a reconstructable manner:
+For $i=\{ 1,...,h \}$, for $j=\{1, ..., i \}$, encrypt blend header:
 
 $$ \mathbf{b}{\beta{max}-i+1}=E_{H_{\mathbf b}(\kappa^{n,l_j}{j})}(\mathbf b{\beta_{max}-i+1}) $$
 
@@ -504,11 +633,16 @@ def encrypt_last_blending_headers(private_header: PrivateHeader,
     return private_header
 ```
 
-This prevents leakage of the encryption sequence when a message is encapsulated less than $\beta_{max}$ times, and enables us to encode the header in a way that it can be reconstructed during the decapsulation.
+This prevents leakage of the encryption sequence when a message is encapsulated
+less than $\beta_{max}$ times,
+and enables us to encode the header in a way
+that it can be reconstructed during the decapsulation.
 
 #### Message Encapsulation
 
-The final part of the algorithm is the true encapsulation of the payload. That is, given the payload $\mathbf P_0$ and number of encapsulations $h \le \beta_{max}$ we do the following.
+The final part of the algorithm is the true encapsulation of the payload.
+That is, given the payload $\mathbf P_0$ and number of encapsulations
+$h \le \beta_{max}$ we do the following.
 
 For $i \in \{ 1,…,h \}$ do the following:
 
