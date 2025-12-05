@@ -14,7 +14,15 @@ contributors:
 
 ## Abstract
 
-This document defines an implementation-friendly specification of the Message Formatting for the Blend Protocol. The message contains a header and a payload, where the header informs the protocol about the version and the payload type. The message contains either a drop or a non-drop payload, with fixed-length payloads to prevent adversaries from distinguishing message types based on length. This specification reuses notation from the Notation document and integrates with the Message Encapsulation Mechanism.
+This document defines an implementation-friendly specification of
+the Message Formatting for the Blend Protocol.
+The message contains a header and a payload,
+where the header informs the protocol about the version and the payload type.
+The message contains either a drop or a non-drop payload,
+with fixed-length payloads to prevent adversaries from
+distinguishing message types based on length.
+This specification reuses notation from the Notation document
+and integrates with the Message Encapsulation Mechanism.
 
 ## Semantics
 
@@ -24,23 +32,41 @@ interpreted as described in RFC 2119.
 
 ## Document Structure
 
-This specification is organized into two distinct parts to serve different audiences and use cases:
+This specification is organized into two distinct parts
+to serve different audiences and use cases:
 
-**Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node. This section defines the cryptographic primitives, message formats, network protocols, and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees. Protocol designers, auditors, and those seeking to understand the core mechanisms should focus on this part.
+**Protocol Specification** contains the normative requirements
+necessary for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives, message formats, network protocols,
+and behavioral requirements that all implementations MUST follow
+to ensure compatibility and maintain the protocol's privacy guarantees.
+Protocol designers, auditors,
+and those seeking to understand the core mechanisms should focus on this part.
 
-**Implementation Details** provides non-normative guidance for implementers. This section offers practical recommendations, optimization strategies, and detailed examples that help developers build efficient and robust implementations. While these details are not required for interoperability, they represent best practices learned from reference implementations and can significantly improve performance and reliability.
+**Implementation Details** provides non-normative guidance for implementers.
+This section offers practical recommendations, optimization strategies,
+and detailed examples that help developers build efficient and robust implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations
+and can significantly improve performance and reliability.
 
 ## Protocol Specification
 
 ### Introduction
 
-This document defines an implementation-friendly specification of the Message Formatting, which is introduced in the Formatting section.
+This document defines an implementation-friendly specification of the Message Formatting,
+which is introduced in the Formatting section.
 
 In this document we are reusing notation from Notation.
 
 ### Overview
 
-The message contains a header and a payload. The header informs the protocol about the version of the protocol and the payload type. The message contains a drop or a non-drop payload. The length of a payload is fixed to prevent adversaries from distinguishing types of messages based on their length.
+The message contains a header and a payload.
+The header informs the protocol about the version of the protocol
+and the payload type.
+The message contains a drop or a non-drop payload.
+The length of a payload is fixed to prevent adversaries from
+distinguishing types of messages based on their length.
 
 ### Construction
 
@@ -72,21 +98,31 @@ class PublicHeader:
 **Fields:**
 
 - version=0x01 is version of the protocol.
-- public_key is $K^{n}_i$, a public key from the set $\mathbf K^n_h$ as defined in the Message Encapsulation spec.
-- proof_of_quota is $\pi^{K^{n}i}{Q}$, a corresponding proof of quota for the key $K^{n}_i$ from the $\mathbf K^n_h$ it also contains the key nullifier.
-- signature is $\sigma_{K^{n}_{i}}(\mathbf {h|P}i)$, a signature of the concatenation of the $i$-th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$, that can be verified by the public key $K^{n}{i}$.
+- public_key is $K^{n}_i$,
+  a public key from the set $\mathbf K^n_h$
+  as defined in the Message Encapsulation spec.
+- proof_of_quota is $\pi^{K^{n}i}{Q}$,
+  a corresponding proof of quota for the key $K^{n}_i$ from the $\mathbf K^n_h$
+  it also contains the key nullifier.
+- signature is $\sigma_{K^{n}_{i}}(\mathbf {h|P}i)$,
+  a signature of the concatenation of the $i$-th encapsulation
+  of the payload $\mathbf P$ and the private header $\mathbf h$,
+  that can be verified by the public key $K^{n}{i}$.
 
 #### Private Header
 
-The private_header must be generated as the outcome of the Message Encapsulation Mechanism.
+The private_header must be generated as the outcome of
+the Message Encapsulation Mechanism.
 
-The private header contains a set of encrypted blending headers $\mathbf h = (\mathbf b_1,...,\mathbf b_{h_{max}})$.
+The private header contains a set of encrypted blending headers
+$\mathbf h = (\mathbf b_1,...,\mathbf b_{h_{max}})$.
 
 ```python
 private_header: list[BlendingHeader]
 ```
 
-The size of the set is limited to $\beta_{max}=3$ BlendingHeader entries, as defined in the Global Parameters.
+The size of the set is limited to $\beta_{max}=3$ BlendingHeader entries,
+as defined in the Global Parameters.
 
 **Blending Header:**
 
@@ -103,19 +139,35 @@ class BlendingHeader:
 
 **Fields:**
 
-- public_key is $K^{n}_{l}$, a public key from the set $\mathbf K^n_h$.
-- proof_of_quota is $\pi^{K^{n}l}{Q}$, a corresponding proof of quota for the key $K^{n}_l$ from the $\mathbf K^n_h$ it also contains the key nullifier.
-- signature is $\sigma_{K^{n}_{l}}(\mathbf {h|P}l)$, a signature of the concatenation of $l$-th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$, that can be verified by public key $K^{n}{l}$.
-- proof_of_selection is $\pi^{K^{n}{l+1},m{l+1}}{S}$, a proof of selection of the node index $m{l+1}$ assuming valid proof of quota $\pi^{K^{n}{l}}{Q}$.
-- is_last is $\Omega$, a flag that indicates that this is the last encapsulation.
+- public_key is $K^{n}_{l}$,
+  a public key from the set $\mathbf K^n_h$.
+- proof_of_quota is $\pi^{K^{n}l}{Q}$,
+  a corresponding proof of quota for the key $K^{n}_l$ from the $\mathbf K^n_h$
+  it also contains the key nullifier.
+- signature is $\sigma_{K^{n}_{l}}(\mathbf {h|P}l)$,
+  a signature of the concatenation of $l$-th encapsulation
+  of the payload $\mathbf P$ and the private header $\mathbf h$,
+  that can be verified by public key $K^{n}{l}$.
+- proof_of_selection is $\pi^{K^{n}{l+1},m{l+1}}{S}$,
+  a proof of selection of the node index $m{l+1}$
+  assuming valid proof of quota $\pi^{K^{n}{l}}{Q}$.
+- is_last is $\Omega$,
+  a flag that indicates that this is the last encapsulation.
 
 #### Payload
 
-The payload must be formatted according to the Payload Formatting Specification. The formatted payload must be generated as the outcome of the Message Encapsulation Mechanism.
+The payload must be formatted according to the Payload Formatting Specification.
+The formatted payload must be generated as the outcome of
+the Message Encapsulation Mechanism.
 
 #### Maximum Payload Length
 
-The Max_Payload_Length parameter defines the maximum length of the payload, which for version 1 of the Blend Protocol is fixed as Max_Payload_Length=34003. That is, 34kB for the payload body (Max_Body_Length) and 3 bytes for the payload header. More information about payload formatting can be found in Payload Formatting Specification.
+The Max_Payload_Length parameter defines the maximum length of the payload,
+which for version 1 of the Blend Protocol is fixed as Max_Payload_Length=34003.
+That is, 34kB for the payload body (Max_Body_Length)
+and 3 bytes for the payload header.
+More information about payload formatting can be found in
+Payload Formatting Specification.
 
 ```python
 MAX_PAYLOAD_LENGTH = 34003
@@ -147,10 +199,12 @@ PAYLOAD_HEADER_SIZE = 3
 
 **Dependency on Encapsulation:**
 
-- Both public_header and private_header are generated by the Message Encapsulation Mechanism
+- Both public_header and private_header are generated by
+  the Message Encapsulation Mechanism.
 - Implementations must not manually construct headers
 - The encapsulation mechanism ensures proper cryptographic properties
-- Headers include signatures, proofs, and encryption as specified in the Message Encapsulation spec
+- Headers include signatures, proofs, and encryption
+  as specified in the Message Encapsulation spec.
 
 ### Blending Header Limit
 
@@ -194,7 +248,8 @@ PAYLOAD_HEADER_SIZE = 3
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in RFCs to Indicate Requirement Levels
+- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
+  \- Key words for use in RFCs to Indicate Requirement Levels
 - [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df8136a3bbf64df8b59779)
   \- Cryptographic operations for building and processing messages
 - [Payload Formatting Specification](https://nomos-tech.notion.site/Payload-Formatting-215261aa09df81b2a3e1d913a0df9ad9)
