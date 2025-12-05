@@ -1561,6 +1561,52 @@ The Block Exchange protocol defines error handling for common failure scenarios:
 
 ### Recovery Strategies
 
+#### Retry Responsibility Model
+
+The protocol defines a clear separation between system-level and caller-level
+retry responsibilities:
+
+**System-Level Retry (Automatic):**
+
+The Block Exchange module automatically retries in these scenarios:
+
+- **Peer failure**: If a peer disconnects or times out, the system
+  transparently tries alternative peers from the discovery set
+- **Transient errors**: Network glitches, temporary unavailability
+- **Peer rotation**: Automatic failover to next available peer
+
+The caller's `requestBlock` call remains pending during system-level retries.
+This is transparent to the caller.
+
+**Caller-Level Retry (Manual):**
+
+The caller is responsible for retry decisions when:
+
+- **All peers exhausted**: No more peers available from discovery
+- **Permanent failures**: Block doesn't exist in the network
+- **Timeout exceeded**: Request timeout (300s) expired
+- **Verification failures**: All peers provided invalid data
+
+In these cases, `requestBlock` returns an error and the caller decides
+whether to retry, perhaps after waiting or refreshing the peer list
+via discovery.
+
+**Retry Flow:**
+
+```text
+requestBlock(address)
+    │
+    ├─► System tries Peer A ──► Fails
+    │       │
+    │       └─► System tries Peer B ──► Fails (automatic, transparent)
+    │               │
+    │               └─► System tries Peer C ──► Success ──► Return block
+    │
+    └─► All peers failed ──► Return error to caller
+                                    │
+                                    └─► Caller decides: retry? wait? abort?
+```
+
 **Peer Rotation:**
 
 When a peer fails to deliver blocks:
@@ -1574,14 +1620,14 @@ When a peer fails to deliver blocks:
 
 - If verification fails, request block from alternative peer
 - If all peers fail, propagate error to caller
-- Maintain request queue for later retry
 - Clean up resources (memory, pending requests) on unrecoverable failures
 
 **Error Propagation:**
 
-- Service interface functions (`requestBlock`, `cancelRequest`) return errors to callers
+- Service interface functions (`requestBlock`, `cancelRequest`) return errors
+  to callers only after system-level retries are exhausted
 - Internal errors logged for debugging
-- Network errors result in peer disconnection and retry
+- Network errors trigger automatic peer rotation before surfacing to caller
 - Verification errors result in block rejection and peer reputation impact
 
 ## Security Considerations
