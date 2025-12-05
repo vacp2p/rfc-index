@@ -69,7 +69,7 @@ Accounts MAY be the owner of one or more `stakeVault`s.
 
 When joining a staking system,
 accounts MUST use a `stakeVault` to transfer a token amount to the `stakingManager` contract,
-which is described [below](#operatorrole).
+which is described [below](#operator-role).
 The account MUST use the same token, identitied by the token address,
 as registered in the `stakeVault` by the `OPERATOR`.
 Accounts MAY set a predefined duration to lock those tokens.
