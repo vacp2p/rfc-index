@@ -245,9 +245,9 @@ Makes node selection for message processing random and verifiable. Prevents:
 Nodes are rewarded for participating in the protocol:
 
 1. **Message Processing**: Nodes collect blending tokens as proof of work
-2. **Activity Proof**: Probabilistic attestation using Hamming distance
+2. **Activity Proof**: Probabilistic attestation using [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
 3. **Two-Tier Rewards**: Base reward for all active nodes, premium reward for
-   nodes with minimal Hamming distance
+   nodes with minimal [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
 
 ### Security Considerations
 
@@ -490,7 +490,7 @@ Message generation is triggered by:
 
 Generation process:
 
-1. Generate keys according to Key Types and Generation Specification
+1. Generate keys according to [Key Types and Generation Specification](https://nomos-tech.notion.site/Key-Types-and-Generation-Specification-215261aa09df81088b8fd7c3089162e8)
    - Each key uses message-type-specific allowance (quota)
    - Correct usage proven by Proof of Quota
 2. Format payload according to Payload Formatting Specification
