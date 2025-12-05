@@ -28,25 +28,53 @@ This document ensures that the keys are used and generated in a common manner, w
 - **Non-ephemeral Encryption Key (NEK)** — used for deriving shared secrets for message encryption.
 - **Ephemeral Encryption Key (EEK)** — used for encrypting Blend messages, one per encapsulation.
 
+## Semantics
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in
+[RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
+
 ## Document Structure
 
-This specification is organized into two distinct parts to serve different audiences and use cases:
+This specification is organized into two distinct parts
+to serve different audiences and use cases:
 
-**Protocol Specification** contains the normative requirements necessary for implementing an interoperable Blend Protocol node. This section defines the cryptographic primitives, message formats, network protocols, and behavioral requirements that all implementations MUST follow to ensure compatibility and maintain the protocol's privacy guarantees. Protocol designers, auditors, and those seeking to understand the core mechanisms should focus on this part.
+**Protocol Specification** contains the normative requirements necessary
+for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives, message formats,
+network protocols, and behavioral requirements that all implementations
+MUST follow to ensure compatibility and maintain the protocol's
+privacy guarantees.
+Protocol designers, auditors, and those seeking to understand the core
+mechanisms should focus on this part.
 
-**Implementation Considerations** provides non-normative guidance for implementers. This section offers practical recommendations, optimization strategies, and detailed examples that help developers build efficient and robust implementations. While these details are not required for interoperability, they represent best practices learned from reference implementations and can significantly improve performance and reliability.
+**Implementation Considerations** provides non-normative guidance
+for implementers.
+This section offers practical recommendations, optimization strategies,
+and detailed examples that help developers build efficient and robust
+implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations
+and can significantly improve performance and reliability.
 
 ## Protocol Specification
 
-This section defines the normative cryptographic protocol requirements for interoperability.
+This section defines the normative cryptographic protocol requirements
+for interoperability.
 
 ### Construction
 
 #### Non-ephemeral Quota Key
 
-A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature (Zero Knowledge Signature Scheme). The NQK is stored on the ledger as the `zk_id` field in the `DeclarationInfo` of the node's outcome of the participation in the Service Declaration Protocol (SDP).
+A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature
+(Zero Knowledge Signature Scheme).
+The NQK is stored on the ledger as the `zk_id` field in the `DeclarationInfo`
+of the node's outcome of the participation in the
+Service Declaration Protocol (SDP).
 
-The NQK is used to prove that the node is part of the set of core nodes as indicated through the SDP.
+The NQK is used to prove that the node is part of the set of core nodes
+as indicated through the SDP.
 
 **Properties:**
 
@@ -57,9 +85,13 @@ The NQK is used to prove that the node is part of the set of core nodes as indic
 
 #### Non-ephemeral Signing Key
 
-A node generates a Non-ephemeral Signing Key (NSK) that is an Ed25519 key. The NSK is stored on the ledger as the `provider_id` field in the `DeclarationInfo` of the node's outcome of the participation in the Service Declaration Protocol (SDP).
+A node generates a Non-ephemeral Signing Key (NSK) that is an Ed25519 key.
+The NSK is stored on the ledger as the `provider_id` field in the
+`DeclarationInfo` of the node's outcome of the participation in the
+Service Declaration Protocol (SDP).
 
-The NSK is used to authenticate the node on the network level and to derive the Non-ephemeral Encryption Key.
+The NSK is used to authenticate the node on the network level and to derive
+the Non-ephemeral Encryption Key.
 
 **Properties:**
 
@@ -72,9 +104,13 @@ The NSK is used to authenticate the node on the network level and to derive the 
 
 #### Ephemeral Signing Key
 
-A node generates Ephemeral Signing Keys (ESK) that are proved to be limited in number by the Proof of Quota (PoQ). The PoQ for core nodes requires a valid NQK for the session for which the PoQ is generated.
+A node generates Ephemeral Signing Keys (ESK) that are proved to be limited
+in number by the Proof of Quota (PoQ).
+The PoQ for core nodes requires a valid NQK for the session for which the
+PoQ is generated.
 
-A unique signing key MUST be generated for every encapsulation as required by the Message Encapsulation Mechanism.
+A unique signing key MUST be generated for every encapsulation as required
+by the Message Encapsulation Mechanism.
 
 **Properties:**
 
@@ -86,15 +122,20 @@ A unique signing key MUST be generated for every encapsulation as required by th
 
 **Security Requirements:**
 
-- The key MUST NOT be reused. Otherwise, the messages that reuse the same key can be linked together.
+- The key MUST NOT be reused.
+  Otherwise, the messages that reuse the same key can be linked together.
 - The node is responsible for not reusing the key.
 - A unique signing key MUST be generated for every encapsulation.
 
 #### Non-ephemeral Encryption Key
 
-A node generates a Non-ephemeral Encryption Key (NEK). It is an X25519 curve key derived from the NSK (Ed25519) public key retrieved from the `provider_id`, which is stored on the ledger when the node executes the SDP protocol.
+A node generates a Non-ephemeral Encryption Key (NEK).
+It is an X25519 curve key derived from the NSK (Ed25519) public key
+retrieved from the `provider_id`,
+which is stored on the ledger when the node executes the SDP protocol.
 
-The NEK key is used for deriving a shared secret (alongside EEK defined below) for the Blend message encapsulation purposes.
+The NEK key is used for deriving a shared secret (alongside EEK defined below)
+for the Blend message encapsulation purposes.
 
 **Properties:**
 
@@ -112,9 +153,11 @@ The NEK key is used for deriving a shared secret (alongside EEK defined below) f
 
 #### Ephemeral Encryption Key
 
-A node derives an Ephemeral Encryption Key (EEK) pair using the X25519 curve from the ESK.
+A node derives an Ephemeral Encryption Key (EEK) pair using the X25519 curve
+from the ESK.
 
-A unique encryption key MUST be generated for every encapsulation as required by the Message Encapsulation Mechanism.
+A unique encryption key MUST be generated for every encapsulation as required
+by the Message Encapsulation Mechanism.
 
 **Properties:**
 
@@ -125,18 +168,22 @@ A unique encryption key MUST be generated for every encapsulation as required by
 
 **Shared Secret Derivation:**
 
-The derivation of a shared secret for the encryption of an encapsulated message requires:
+The derivation of a shared secret for the encryption of an encapsulated
+message requires:
 
 - **Sender**: EEK (Ephemeral Encryption Key of sender)
-- **Recipient**: X25519 key derived from NEK (Non-ephemeral Encryption Key of recipient)
+- **Recipient**: X25519 key derived from NEK
+  (Non-ephemeral Encryption Key of recipient)
 
-The shared secret is computed using the X25519 Diffie-Hellman key exchange between the sender's EEK and the recipient's derived NEK.
+The shared secret is computed using the X25519 Diffie-Hellman key exchange
+between the sender's EEK and the recipient's derived NEK.
 
 ### Security Considerations
 
 #### Key Reuse
 
-- **CRITICAL**: Ephemeral keys (ESK, EEK) MUST NOT be reused across different encapsulations
+- **CRITICAL**: Ephemeral keys (ESK, EEK) MUST NOT be reused across
+  different encapsulations
 - Key reuse enables message linking, breaking anonymity guarantees
 - Implementations MUST enforce unique key generation per encapsulation
 
@@ -226,7 +273,8 @@ Implementations SHOULD:
 
 #### Secure Key Management
 
-- Store non-ephemeral keys in secure storage (HSM, secure enclave, or encrypted memory)
+- Store non-ephemeral keys in secure storage
+  (HSM, secure enclave, or encrypted memory)
 - Implement secure key erasure for ephemeral keys immediately after use
 - Use constant-time operations for key comparisons to prevent timing attacks
 
@@ -234,7 +282,8 @@ Implementations SHOULD:
 
 - Log key generation events (without logging key material)
 - Monitor for anomalous key usage patterns
-- Implement rate limiting on key generation to prevent resource exhaustion
+- Implement rate limiting on key generation to prevent resource
+  exhaustion
 - Regularly audit key lifecycle management
 
 ## References
