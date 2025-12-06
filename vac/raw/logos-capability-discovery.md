@@ -17,8 +17,8 @@ built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b
 
 The protocol enables nodes to:
 
-1. Advertise their participation in specific services
-2. Efficiently discover other peers participating in those services
+- Advertise their participation in specific services
+- Efficiently discover other peers participating in those services
 
 In this RFC, the terms capability and service are used interchangeably.
 Within Logos, a node’s “capabilities” map directly to the “services” it participates in.
@@ -35,10 +35,10 @@ In decentralized networks supporting multiple services,
 efficient peer discovery for specific services is critical.
 Traditional approaches face several challenges:
 
-1. Inefficiency: Random-walk–based discovery is inefficient for unpopular services.
-2. Load imbalance: A naive approach where nodes advertise their service at DHT peers
+- Inefficiency: Random-walk–based discovery is inefficient for unpopular services.
+- Load imbalance: A naive approach where nodes advertise their service at DHT peers
 whose IDs are closest to the service ID leads to hotspots and overload at popular services.
-3. Scalability: Discovery must scale logarithmically across many distinct services.
+- Scalability: Discovery must scale logarithmically across many distinct services.
 
 Logos discovery addresses these through:
 
@@ -68,7 +68,7 @@ Responsibilities:
 
 ### Discoverer
 
-**Discoverers** aare nodes attempting to find peers that provide a specific service.
+**Discoverers** are nodes attempting to find peers that provide a specific service.
 
 Responsibilities:
 
@@ -95,9 +95,7 @@ as key against their matching
 [signed peer records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md) values.
 It is centered on the node's own `peerID`.
 
-**Note:**
-
-“Centered on” means the table is organized using that ID as the reference point
+>> “Centered on” means the table is organized using that ID as the reference point
 for computing distances with other peers and assigning peers to buckets.
 
 ### Bucket
@@ -145,7 +143,7 @@ maintained by registrars to store accepted advertisements.
 An advertise table `AdvT(service_id_hash)` is maintained by advertiser nodes.
 It MUST be centered on `service_id_hash`.
 It MAY be initialized from the advertiser’s Kad-dht routing table.
-and maintained through interactions with registrars during the advertisement process.
+It is maintained through interactions with registrars during the advertisement process.
 Every bucket in the table has a list of registrars at a particular distance
 on which advertisers can place their advertisements.
 
@@ -154,32 +152,28 @@ on which advertisers can place their advertisements.
 A search table `DiscT(service_id_hash)` is maintained by discoverer nodes.
 It MUST be centered `service_id_hash`.
 It MAY be initialized from the discoverer’s Kad-dht routing table.
-and  maintained through interactions with registrars during lookup operations.
+It is  maintained through interactions with registrars during lookup operations.
 Every bucket in the table has a list of registrars at a particular distance
 which discoverers can query to get advertisements for a particular service.
 
 ### Address
 
 A [multiaddress](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/quic#multiaddress)
-is a standardized way used in libp2p to represent network addresses
+is a standardized way used in libp2p to represent network addresses.
+We RECOMMEND USING multiaddresses for peer connectivity.
+However, implementations MAY use alternative address representations if they:
 
-Since this RFC builds upon libp2p Kademlia DHT, we use multiaddresses for peer connectivity.
-However, implementations MAY use alternative address representations,
-as long as they remain interoperable and convey sufficient information to establish a connection.
+- Remain interoperable
+- Convey sufficient information (IP + port) to establish connections
 
 ### Signature
 
 Refer to [Peer Ids and Keys](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/peer-ids/peer-ids.md)
 to know about supported signatures.
-
 In the base Kad DHT specification, signatures are optional,
 typically implemented as a PKI signature over the tuple `(key || value || author)`.
-
 In this RFC digital signatures are used to
 authenticate advertisements and tickets.
-
-Implementations MUST support Ed25519. Implementations SHOULD support RSA. Implementations MAY
-support Secp256k1 and ECDSA.
 
 ### Expiry Time `E`
 
