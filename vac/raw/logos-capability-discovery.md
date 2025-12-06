@@ -100,110 +100,149 @@ It is centered on the node's own `peerID`.
 “Centered on” means the table is organized using that ID as the reference point
 for computing distances with other peers and assigning peers to buckets.
 
+### Bucket
+
+Each table is organized into buckets.
+A bucket is a container that stores information about peers
+at a particular distance range from the center ID.
+
+For simplicity in this RFC, we represent each bucket as a list of peer IDs.
+However, in a full implementation, each entry in the bucket MUST store
+a complete peer information necessary to enable communication.
+
+**Bucket Size:**
+
+The number of entries a bucket can hold is implementation-dependent.
+
+- Smaller buckets → lower memory usage but reduced resilience to churn
+- Larger buckets →  better redundancy but increased maintenance overhead
+
 ### Service
 
 A service is a logical sub-network within the larger peer-to-peer network.
 It represents a specific capability a node supports — for example, a particular protocol or functionality it offers.
-Services are identified by a unique service identifier string like `waku.store, libp2p.mix, etc.`
+A service MUST be identified by a libp2p protocol ID via the
+[identify protocol](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/identify).
 
 ### Service ID
 
-The service ID `service_id_hash` is the SHA-256 hash of the service identifier string.
+The service ID `service_id_hash` MUST be the SHA-256 hash of the protocol ID.
 
 For example:
 
-| Service Identifier | Service ID (hex, truncated) |
+| Service Identifier | Service ID |
 | --- | --- |
-| `waku.store` | `a4b6f3d1c7e2d8f4c9b9e6d1f3a1c2e9...` |
-| `libp2p.mix` | `5e71b18a9d7c3c20f92a15b54a7d4c3e...` |
-
-### Ticket
-
-Tickets are digitally signed objects
-(refer to the [Ticket Structure section](#ticket-structure))
-issued by registrars to advertisers to reliably indicate
-how long an advertiser already waited for admission.
-
-### Advertisement
-
-An **advertisement** is a data structure (refer to the [Advertisement Structure section](#advertisement-structure))
-indicating that a specific node participates in a service.
-In this RFC we refer to advertisement objects as `ads`.
-For a single advertisement object we use `ad`.
+| `/waku/store/1.0.0` | `313a14f48b3617b0ac87daabd61c1f1f1bf6a59126da455909b7b11155e0eb8e` |
+| `/libp2p/mix/1.2.0` | `9c55878d86e575916b267195b34125336c83056dffc9a184069bcb126a78115d` |
 
 ### Advertisement Cache
 
-An advertisement cache is a bounded storage structure
+An advertisement cache `ad_cache` is a bounded storage structure
 maintained by registrars to store accepted advertisements.
 
 ### Advertise Table
 
-An advertise table `AdvT(service_id_hash)` is centered on `service_id_hash` and maintained by advertisers.
-It is initialized from the advertiser’s Kad-dht routing table
+An advertise table `AdvT(service_id_hash)` is maintained by advertiser nodes.
+It MUST be centered on `service_id_hash`.
+It MAY be initialized from the advertiser’s Kad-dht routing table.
 and maintained through interactions with registrars during the advertisement process.
 Every bucket in the table has a list of registrars at a particular distance
 on which advertisers can place their advertisements.
 
 ### Search Table
 
-A search table `DiscT(service_id_hash)` is centered `service_id_hash` and maintained by discoverers.
-It is initialized from the discoverer’s Kad-dht routing table
+A search table `DiscT(service_id_hash)` is maintained by discoverer nodes.
+It MUST be centered `service_id_hash`.
+It MAY be initialized from the discoverer’s Kad-dht routing table.
 and  maintained through interactions with registrars during lookup operations.
 Every bucket in the table has a list of registrars at a particular distance
 which discoverers can query to get advertisements for a particular service.
 
-### Bucket
-
-Each bucket in all the tables stores peer information —
-typically including the peer ID, multiaddresses, and other relevant metadata.
-
-For simplicity in this RFC, we represent each bucket as a list of peer IDs.
-However, in a full implementation, each entry in the bucket should store
-a complete peer information object containing both the peer ID
-and the corresponding network address (to enable communication).
-
-**Bucket Size:**
-
-The number of entries a bucket can hold is implementation-dependent.
-
-- Smaller buckets → lower memory usage but may reduce resilience to churn.
-- Larger buckets → better redundancy but increased maintenance
-
 ### Address
 
-A multiaddress is a standardized way used in libp2p to represent network addresses
+A [multiaddress](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/quic#multiaddress)
+is a standardized way used in libp2p to represent network addresses
 
 Since this RFC builds upon libp2p Kademlia DHT, we use multiaddresses for peer connectivity.
-However, implementations are free to use alternative address representations,
-as long as they remain interoperable and convey sufficient information
-(e.g., IP + port) to establish a connection.
+However, implementations MAY use alternative address representations,
+as long as they remain interoperable and convey sufficient information to establish a connection.
 
 ### Signature
 
+Refer to [Peer Ids and Keys](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/peer-ids/peer-ids.md)
+to know about supported signatures.
+
 In the base Kad DHT specification, signatures are optional,
-typically implemented as a PKI ****signature over the tuple `(key || value || author)`.
+typically implemented as a PKI signature over the tuple `(key || value || author)`.
 
-This RFC does not restrict the specific digital signature algorithm used,
-but implementations must ensure verifiability and interoperability across peers.
+In this RFC digital signatures are used to
+authenticate advertisements and tickets.
 
-The recommended default is `Ed25519`,
-as it is already widely used within the libp2p and Ethereum ecosystem
-due to its balance of security and efficiency.
-
-However, implementations may choose alternative schemes
-based on their cryptographic stack or ecosystem requirements, such as:
-
-- `secp256k1` — compatible with Ethereum and other ECDSA-based systems.
-- `BLS12-381` — suitable for aggregate signatures
-or use cases requiring threshold verification.
-- `Ed25519` — recommended default; fast, deterministic,
-and supported natively in libp2p.
+Implementations MUST support Ed25519. Implementations SHOULD support RSA. Implementations MAY
+support Secp256k1 and ECDSA.
 
 ### Expiry Time `E`
 
 `E` is advertisement expiry time in seconds.
 The expiry time **`E`** is a system wide parameter,
 not an individual ad field or parameter of an individual registrar.
+
+## Data Structures
+
+### Advertisement
+
+An **advertisement** is a data structure
+indicating that a specific node participates in a service.
+In this RFC we refer to advertisement objects as `ads`.
+For a single advertisement object we use `ad`.
+
+```protobuf
+message Advertisement {
+    // Service identifier (32-byte SHA-256 hash)
+    bytes service_id_hash = 1;
+
+    // Peer ID of advertiser (32-byte hash of public key)
+    bytes peerID = 2;
+
+    // Multiaddrs of advertiser
+    repeated bytes addrs = 3;
+
+    // Ed25519 signature over (service_id_hash || peerID || addrs)
+    bytes signature = 4;
+
+    // Optional: Service-specific metadata
+    optional bytes metadata = 5;
+
+    // Unix timestamp in seconds
+    uint64 timestamp = 6;
+}
+```
+
+### Ticket
+
+Tickets are digitally signed objects
+issued by registrars to advertisers to reliably indicate
+how long an advertiser already waited for admission.
+
+
+```protobuf
+message Ticket {
+    // Copy of the original advertisement
+    Advertisement ad = 1;
+
+    // Ticket creation timestamp (Unix time in seconds)
+    uint64 t_init = 2;
+
+    // Last modification timestamp (Unix time in seconds)
+    uint64 t_mod = 3;
+
+    // Remaining wait time in seconds
+    uint32 t_wait_for = 4;
+
+    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+    bytes signature = 5;
+}
+```
 
 ## Protocol Specifications
 
@@ -304,51 +343,6 @@ enum MessageType {
     // ... existing Kad-dht message types ...
     REGISTER = 6;
     GET_ADS = 7;
-}
-```
-
-### Advertisement Structure
-
-```protobuf
-message Advertisement {
-    // Service identifier (32-byte SHA-256 hash)
-    bytes service_id_hash = 1;
-
-    // Peer ID of advertiser (32-byte hash of public key)
-    bytes peerID = 2;
-
-    // Multiaddrs of advertiser
-    repeated bytes addrs = 3;
-
-    // Ed25519 signature over (service_id_hash || peerID || addrs)
-    bytes signature = 4;
-
-    // Optional: Service-specific metadata
-    optional bytes metadata = 5;
-
-    // Unix timestamp in seconds
-    uint64 timestamp = 6;
-}
-```
-
-### Ticket Structure
-
-```protobuf
-message Ticket {
-    // Copy of the original advertisement
-    Advertisement ad = 1;
-
-    // Ticket creation timestamp (Unix time in seconds)
-    uint64 t_init = 2;
-
-    // Last modification timestamp (Unix time in seconds)
-    uint64 t_mod = 3;
-
-    // Remaining wait time in seconds
-    uint32 t_wait_for = 4;
-
-    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
-    bytes signature = 5;
 }
 ```
 
@@ -513,8 +507,6 @@ Refer to the [Lookup Algorithm Explanation section](#lookupservice_id_hash-algor
 Registrars use a waiting time based admission protocol to admit advertisements into their `ad_cache`.
 The mechanism does not require registrars to maintain any state for each ongoing request preventing DoS attacks.
 
-`ad_cache` is the advertisement cache.
-It is a bounded storage structure maintained by registrars to store accepted advertisements.
 The total size of the `ad_cache` is limited by its capacity `C`.
 Each ad stored in the `ad_cache` has an associated expiry time `E`,
 after which the `ad` is automatically removed.
@@ -907,7 +899,7 @@ Each bucket corresponds to a particular distance from the `service_id_hash`.
         If there are no peers, it returns `None`.
     4. if we get a peer then we add that to that bucket `ongoing[i]`
     5. Build the advertisement object `ad` containing `service_id_hash`, `peerID`, `addrs`, and `timestamp`
-    (Refer to the [Advertisement Structure section](#advertisement-structure)) .
+    (Refer to the [Advertisement section](#advertisement)) .
     Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
     6. Then send this `ad` asynchronously to the selected registrar.
     The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
