@@ -218,7 +218,6 @@ Tickets are digitally signed objects
 issued by registrars to advertisers to reliably indicate
 how long an advertiser already waited for admission.
 
-
 ```protobuf
 message Ticket {
     // Copy of the original advertisement
