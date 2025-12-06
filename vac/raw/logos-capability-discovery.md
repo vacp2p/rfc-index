@@ -14,20 +14,20 @@ contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
 This RFC defines the Logos capability discovery protocol,
 a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore.ieee.org/document/10629017)
 built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
-It enables nodes to advertise their participation in specific services
-and allows other nodes to efficiently discover peers participating in those services.
+
+The protocol enables nodes to:
+
+1. Advertise their participation in specific services
+2. Efficiently discover other peers participating in those services
+
 In this RFC, the terms capability and service are used interchangeably.
 Within Logos, a node’s “capabilities” map directly to the “services” it participates in.
-
-The protocol adds service-specific advertisement placement and retrieval mechanisms
-on top of the base Kad-dht functionality.
-For everything else that isn't explicitly stated herein,
-it is safe to assume behaviour similar to Kad-dht.
-The terms “peer” and “node” are used interchangeably throughout this document
-and refer to the same entity — a participant in the Logos Discovery network.
+Similarly, "peer" and "node" refer to the same entity: a participant in the Logos Discovery network.
 
 Logos discovery extends Kad-dht toward a multi-service, resilient discovery layer,
 enhancing reliability while maintaining compatibility with existing Kad-dht behavior.
+For everything else that isn't explicitly stated herein,
+it is safe to assume behaviour similar to Kad-dht.
 
 ## Motivation
 
@@ -35,15 +35,16 @@ In decentralized networks supporting multiple services,
 efficient peer discovery for specific services is critical.
 Traditional approaches face several challenges:
 
-1. Random-walk–based discovery is inefficient for unpopular services.
-2. A naive approach where nodes advertise their service at DHT peers
+1. Inefficiency: Random-walk–based discovery is inefficient for unpopular services.
+2. Load imbalance: A naive approach where nodes advertise their service at DHT peers
 whose IDs are closest to the service ID leads to hotspots and overload at popular services.
-3. Discovery must scale logarithmically across many distinct services.
+3. Scalability: Discovery must scale logarithmically across many distinct services.
 
-Through service-specific tables, adaptive advertisement placement,
-admission control, and improved lookup operation,
-Logos discovery aims to balance efficiency, scalability,
-and resilience across multiple services.
+Logos discovery addresses these through:
+
+- Service-specific routing tables
+- Adaptive advertisement placement with admission control
+- Improved lookup operations balancing efficiency and resilience
 
 ## Format Specification
 
@@ -53,25 +54,35 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ## Protocol Roles
 
+The Logos capability discovery protocol defines three roles that nodes can perform:
+
 ### Advertiser
 
-**Advertisers** participate in service and want to be discovered by their peers.
-Advertisers run the `ADVERTISE()` algorithm as in described in [Advertise Algorithm section](#advertisement-algorithm)
-for distributing advertisements across registrars. They maintain the **advertise table** `AdvT(service_id_hash)`.
+**Advertisers** are nodes that participate in a service
+and want to be discovered by other peers.
+
+Responsibilities:
+
+- Register advertisements for their service across registrars
+- Handle registration responses
 
 ### Discoverer
 
-Discoverers attempt to discover advertisers registered under specific service
-by running the `LOOKUP()` algorithm as in described in [Lookup Algorithm section](#lookup-algorithm).
+**Discoverers** aare nodes attempting to find peers that provide a specific service.
+
+Responsibilities:
+
+- Query registrars for advertisements of a service
 
 ### Registrar
 
-Registrars store advertisements from advertisers in their advertisement cache.
-Registrars use a waiting time based admission control mechanism using the `REGISTER()` algorithm
-as described in [Registration Flow section](#registration-flow)
-to decide whether to admit an advertisement coming from an advertiser or not.
-It uses the `LOOKUP_RESPONSE()` as described in [Lookup Response Algorithm section](#lookup-response-algorithm),
-algorithm to respond to `LOOKUP()` requests of discoverers.
+**Registrars** are nodes that store and serve advertisements.
+
+Responsibilities:
+
+- Use a waiting time based admission control mechanism
+to decide whether to store an advertisement coming from an advertiser or not.
+- Respond to query requests for advertisements coming from discoverers.
 
 ## Definitions
 
@@ -82,7 +93,7 @@ It is a distributed key-value store with
 [peer IDs](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/peer-ids/peer-ids.md#peer-ids)
 as key against their matching
 [signed peer records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md) values.
-It is centered on the node's `peerID`.
+It is centered on the node's own `peerID`.
 
 **Note:**
 
