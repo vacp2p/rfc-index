@@ -279,6 +279,119 @@ as the latter is required to contact peers.
 In this RFC, we simplify representation by listing only peer IDs,
 but full implementations must include address information.
 
+## RPC Messages
+
+All RPC messages are sent using the libp2p Kad-dht message format
+with new message types added for Logos discovery operations.
+
+### Message Types
+
+The following message types are added to the Kad-dht `Message.MessageType` enum:
+
+```protobuf
+enum MessageType {
+    // ... existing Kad-dht message types ...
+    REGISTER = 6;
+    GET_ADS = 7;
+}
+```
+
+### Advertisement Structure
+
+```protobuf
+message Advertisement {
+    // Service identifier (32-byte SHA-256 hash)
+    bytes service_id_hash = 1;
+
+    // Peer ID of advertiser (32-byte hash of public key)
+    bytes peerID = 2;
+
+    // Multiaddrs of advertiser
+    repeated bytes addrs = 3;
+
+    // Ed25519 signature over (service_id_hash || peerID || addrs)
+    bytes signature = 4;
+
+    // Optional: Service-specific metadata
+    optional bytes metadata = 5;
+
+    // Unix timestamp in seconds
+    uint64 timestamp = 6;
+}
+```
+
+### Ticket Structure
+
+```protobuf
+message Ticket {
+    // Copy of the original advertisement
+    Advertisement ad = 1;
+
+    // Ticket creation timestamp (Unix time in seconds)
+    uint64 t_init = 2;
+
+    // Last modification timestamp (Unix time in seconds)
+    uint64 t_mod = 3;
+
+    // Remaining wait time in seconds
+    uint32 t_wait_for = 4;
+
+    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+    bytes signature = 5;
+}
+```
+
+### REGISTER Message
+
+#### Request
+
+```protobuf
+message Message {
+    MessageType type = 1;  // REGISTER
+    bytes key = 2;         // service_id_hash
+    Advertisement ad = 3;   // The advertisement to register
+    optional Ticket ticket = 4;  // Optional: ticket from previous attempt
+}
+```
+
+#### Response
+
+```protobuf
+enum RegistrationStatus {
+    CONFIRMED = 0;  // Advertisement accepted
+    WAIT = 1;       // Must wait, ticket provided
+    REJECTED = 2;   // Advertisement rejected
+}
+
+message Message {
+    MessageType type = 1;       // REGISTER
+    RegistrationStatus status = 2;
+    optional Ticket ticket = 3;  // Provided if status = WAIT
+    repeated Peer closerPeers = 4;  // Peers for populating advertise table
+}
+```
+
+### GET_ADS Message
+
+#### Request
+
+```protobuf
+message Message {
+    MessageType type = 1;  // GET_ADS
+    bytes key = 2;         // service_id_hash to look up
+}
+```
+
+#### Response
+
+```protobuf
+message Message {
+    MessageType type = 1;              // GET_ADS
+    repeated Advertisement ads = 2;     // Up to F_return advertisements
+    repeated Peer closerPeers = 3;     // Peers for populating search table
+}
+```
+
 ## Advertisement Placement
 
 ### Overview
@@ -720,119 +833,6 @@ and the condition `w_s > (bound(service_id_hash) - timestamp(service_id_hash))`i
 **How lower bound is calculated for IPs:**
 Registrars enforce lower-bound state for the advertiser’s IP address using IP tree
 (refer to the [IP Similarity Score section](#ip-similarity-score)).
-
-## RPC Messages
-
-All RPC messages are sent using the libp2p Kad-dht message format
-with new message types added for Logos discovery operations.
-
-### Message Types
-
-The following message types are added to the Kad-dht `Message.MessageType` enum:
-
-```protobuf
-enum MessageType {
-    // ... existing Kad-dht message types ...
-    REGISTER = 6;
-    GET_ADS = 7;
-}
-```
-
-### Advertisement Structure
-
-```protobuf
-message Advertisement {
-    // Service identifier (32-byte SHA-256 hash)
-    bytes service_id_hash = 1;
-
-    // Peer ID of advertiser (32-byte hash of public key)
-    bytes peerID = 2;
-
-    // Multiaddrs of advertiser
-    repeated bytes addrs = 3;
-
-    // Ed25519 signature over (service_id_hash || peerID || addrs)
-    bytes signature = 4;
-
-    // Optional: Service-specific metadata
-    optional bytes metadata = 5;
-
-    // Unix timestamp in seconds
-    uint64 timestamp = 6;
-}
-```
-
-### Ticket Structure
-
-```protobuf
-message Ticket {
-    // Copy of the original advertisement
-    Advertisement ad = 1;
-
-    // Ticket creation timestamp (Unix time in seconds)
-    uint64 t_init = 2;
-
-    // Last modification timestamp (Unix time in seconds)
-    uint64 t_mod = 3;
-
-    // Remaining wait time in seconds
-    uint32 t_wait_for = 4;
-
-    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
-    bytes signature = 5;
-}
-```
-
-### REGISTER Message
-
-#### Request
-
-```protobuf
-message Message {
-    MessageType type = 1;  // REGISTER
-    bytes key = 2;         // service_id_hash
-    Advertisement ad = 3;   // The advertisement to register
-    optional Ticket ticket = 4;  // Optional: ticket from previous attempt
-}
-```
-
-#### Response
-
-```protobuf
-enum RegistrationStatus {
-    CONFIRMED = 0;  // Advertisement accepted
-    WAIT = 1;       // Must wait, ticket provided
-    REJECTED = 2;   // Advertisement rejected
-}
-
-message Message {
-    MessageType type = 1;       // REGISTER
-    RegistrationStatus status = 2;
-    optional Ticket ticket = 3;  // Provided if status = WAIT
-    repeated Peer closerPeers = 4;  // Peers for populating advertise table
-}
-```
-
-### GET_ADS Message
-
-#### Request
-
-```protobuf
-message Message {
-    MessageType type = 1;  // GET_ADS
-    bytes key = 2;         // service_id_hash to look up
-}
-```
-
-#### Response
-
-```protobuf
-message Message {
-    MessageType type = 1;              // GET_ADS
-    repeated Advertisement ads = 2;     // Up to F_return advertisements
-    repeated Peer closerPeers = 3;     // Peers for populating search table
-}
-```
 
 ## Implementation Notes
 
