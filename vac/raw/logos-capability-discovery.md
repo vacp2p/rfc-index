@@ -587,13 +587,13 @@ this is the advertiser's first registration attempt for the `ad`.
 The registrar MUST create a new `ticket`
 and return the signed `ticket` to the advertiser with status `Wait`.
 -  If the advertiser provides a `ticket` in the `REGISTER` request from a previous attempt:
-    - The registrar MUST verify the `ticket.signature` is valid and was issued by this registrar.
-    - The registrar MUST verify that `ticket.ad` matches the `ad` in the current request
-    - The registrar MUST verify that the `ad` is still not in the `ad_cache`
-    - The registrar MUST verify the retry is within the registration window
-    - If any verification fails, the registrar MUST reject the request
-    - The registrar MUST recalculate the waiting time based on current cache state
-    - The registrar MUST calculate remaining wait time:
+  - The registrar MUST verify the `ticket.signature` is valid and was issued by this registrar.
+  - The registrar MUST verify that `ticket.ad` matches the `ad` in the current request
+  - The registrar MUST verify that the `ad` is still not in the `ad_cache`
+  - The registrar MUST verify the retry is within the registration window
+  - If any verification fails, the registrar MUST reject the request
+  - The registrar MUST recalculate the waiting time based on current cache state
+  - The registrar MUST calculate remaining wait time:
     `t_remaining = t_wait - (NOW() - ticket.t_init)`.
     This ensures advertisers accumulate waiting time across retries
 - If `t_remaining ≤ 0`, the registrar MUST add the `ad` to the `ad_cache`
