@@ -390,6 +390,10 @@ message Message {
 }
 ```
 
+## Sequence Diagram
+
+<img width="1910" height="3292" alt="Untitled diagram-2025-12-04-095445" src="https://github.com/user-attachments/assets/d85fab17-c636-417a-afaf-c609aa53075d" />
+
 ## Advertisement Placement
 
 ### Overview
