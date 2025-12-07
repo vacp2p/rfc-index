@@ -63,8 +63,8 @@ and want to be discovered by other peers.
 
 Responsibilities:
 
-- Register advertisements for their service across registrars
-- Handle registration responses
+- Advertisers SHOULD register advertisements for their service across registrars
+- Advertisers SHOULD handle registration responses
 
 ### Discoverer
 
@@ -72,7 +72,7 @@ Responsibilities:
 
 Responsibilities:
 
-- Query registrars for advertisements of a service
+- Discoverers SHOULD query registrars for advertisements of a service
 
 ### Registrar
 
@@ -80,9 +80,9 @@ Responsibilities:
 
 Responsibilities:
 
-- Use a waiting time based admission control mechanism
+- Registrars MUST use a waiting time based admission control mechanism
 to decide whether to store an advertisement coming from an advertiser or not.
-- Respond to query requests for advertisements coming from discoverers.
+- Registrars SHOULD respond to query requests for advertisements coming from discoverers.
 
 ## Definitions
 
@@ -95,7 +95,7 @@ as key against their matching
 [signed peer records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md) values.
 It is centered on the node's own `peerID`.
 
->> “Centered on” means the table is organized using that ID as the reference point
+> “Centered on” means the table is organized using that ID as the reference point
 for computing distances with other peers and assigning peers to buckets.
 
 ### Bucket
@@ -142,8 +142,8 @@ maintained by registrars to store accepted advertisements.
 
 An advertise table `AdvT(service_id_hash)` is maintained by advertiser nodes.
 It MUST be centered on `service_id_hash`.
-It MAY be initialized from the advertiser’s Kad-dht routing table.
-It is maintained through interactions with registrars during the advertisement process.
+It MAY be initialized from the advertiser’s `KadDHT(peerID)` routing table.
+It SHOULD be maintained through interactions with registrars during the advertisement process.
 Every bucket in the table has a list of registrars at a particular distance
 on which advertisers can place their advertisements.
 
@@ -152,7 +152,7 @@ on which advertisers can place their advertisements.
 A search table `DiscT(service_id_hash)` is maintained by discoverer nodes.
 It MUST be centered `service_id_hash`.
 It MAY be initialized from the discoverer’s Kad-dht routing table.
-It is  maintained through interactions with registrars during lookup operations.
+It is SHOULD be maintained through interactions with registrars during lookup operations.
 Every bucket in the table has a list of registrars at a particular distance
 which discoverers can query to get advertisements for a particular service.
 
@@ -172,7 +172,7 @@ Refer to [Peer Ids and Keys](https://github.com/libp2p/specs/blob/7740c076350b66
 to know about supported signatures.
 In the base Kad DHT specification, signatures are optional,
 typically implemented as a PKI signature over the tuple `(key || value || author)`.
-In this RFC digital signatures MUST br used to
+In this RFC digital signatures MUST be used to
 authenticate advertisements and tickets.
 
 ### Expiry Time `E`
@@ -213,7 +213,7 @@ message Advertisement {
 ```
 
 Advertisements MUST include `service_id_hash`, `peerID`, `addrs` and `signature` fields.
-Implementations MAY include `metadata` and `timestamp` fields in advertisements.
+Advertisements MAY include `metadata` and `timestamp` fields.
 The `signature` field MUST be a Ed25519 signature over the concatenation of
 (`service_id_hash` || `peerID` || `addrs`).
 Refer to [Signature](#signature) section for more details.
@@ -255,7 +255,7 @@ Implementations MUST verify this signature before accepting a ticket.
 
 The system parameters are derived directly from
 the [DISC-NG paper](https://ieeexplore.ieee.org/document/10629017).
-Implementations may modify them as needed based on specific requirements.
+Implementations MAY modify them as needed based on specific requirements.
 
 | Parameter | Default Value | Description |
 | --- | --- | --- |
@@ -273,17 +273,17 @@ Implementations may modify them as needed based on specific requirements.
 ### Distance
 
 The distance `d` between any two keys in Logos Capability Discovery
-is defined using the bitwise XOR applied to their 256-bit SHA-256 representations.
+MUST be calculated using the bitwise XOR applied to their 256-bit SHA-256 representations.
 This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
 The keyspace is the entire numerical range of possible `peerID` and `service_id_hash`
 — the 256-bit space in which all SHA-256–derived IDs exist.
-XOR is used to measure distances between them in the keyspace.
+XOR MUST be used to measure distances between them in the keyspace.
 
 For every node in the network, the `peerID` is unique.
 In this system, both `peerID` and the `service_id_hash` are 256-bit SHA-256 hashes.
 Thus both belong to the same keyspace.
 
-Advertise table `AdvT(service_id_hash)` and search table `DiscT(service_id_hash)` are centered on `service_id_hash`
+Advertise table `AdvT(service_id_hash)` and search table `DiscT(service_id_hash)` MUST be centered on `service_id_hash`
 while `KadDHT(peerID)` table is centered on `peerID`.
 
 When inserting a node into advertise table `AdvT(service_id_hash)` or the search table `DiscT(service_id_hash)`,
@@ -312,7 +312,7 @@ each hop moves to a peer that shares a longer prefix of bits
 with the target `service_id_hash`.
 
 This formula MUST also used when we bootstrap peers.
-Bootstrapping MAY be from the `KadDHT` table.
+Bootstrapping MAY be done from the `KadDHT(peerID)` table.
 For every peer present in the table from where we bootstrap,
 we MUST use the same formula to place them in advertise table `AdvT(service_id_hash)`,
 search table `DiscT(service_id_hash)` and Registrar Table `RegT(service_id_hash)` buckets.
@@ -357,11 +357,9 @@ enum MessageType {
 
 #### Request
 
-`REGISTER` request message is sent by advertisers to registrars
+Advertisers SHOULD send `REGISTER` request message to registrars
 to admit the advertiser's advertisemnet for a service
 into the registrar's `ad_cache`.
-Advertisers SHOULD include the `service_id_hash` in the `key` field and the advertisement in the `ad` field.
-If this is a retry attempt, advertisers SHOULD include the latest `ticket` received from the registrar.
 
 ```protobuf
 message Message {
@@ -371,6 +369,9 @@ message Message {
     optional Ticket ticket = 4;  // Optional: ticket from previous attempt
 }
 ```
+
+Advertisers SHOULD include the `service_id_hash` in the `key` field and the advertisement in the `ad` field of the request.
+If this is a retry attempt, advertisers SHOULD include the latest `ticket` received from the registrar.
 
 #### Response
 
@@ -391,6 +392,10 @@ message Message {
 }
 ```
 
+Registrars SHOULD set the `status` field to indicate the result of the registration attempt.
+If `status` is `WAIT`, registrars MUST provide a valid `ticket`.
+Registrars SHOULD include `closerPeers` to help populate the advertiser's table.
+
 ### GET_ADS Message
 
 #### Request
@@ -405,11 +410,12 @@ message Message {
 }
 ```
 
+Discoverers MUST include the `service_id_hash` they are searching for in the `key` field.
+
 #### Response
 
-Registrars SHOULD respond to discoverer's `GET_ADS` request.
-Registrars SHOULD return up to `F_return` advertisements for the requested service.
-Registrars SHOULD include `closerPeers` to help populate the discoverer's search table.
+Registrars SHOULD respond to discoverer's `GET_ADS` request
+using the following response structure.
 
 ```protobuf
 message Message {
@@ -418,6 +424,9 @@ message Message {
     repeated Peer closerPeers = 3;     // Peers for populating search table
 }
 ```
+
+Registrars MUST return up to `F_return` advertisements for the requested service.
+Registrars SHOULD include `closerPeers` to help populate the discoverer's search table.
 
 ## Sequence Diagram
 
@@ -490,25 +499,30 @@ To perform discovery, discoverers MUST maintain a search table `DiscT(service_id
 #### Discovery Table `DiscT(service_id_hash)` Requirements
 
 For each service that a discoverer wants to find,
-it MUST instantiate a new search table `DiscT(service_id_hash)`, centered on that `service_id_hash`.
+it MUST instantiate a search table `DiscT(service_id_hash)`, centered on that `service_id_hash`.
 
-Discoverers MAY initialize `DiscT(service_id_hash)` by copying existing entries
-from the Kad-dht routing table already maintained by the node.
+Discoverers MAY bootstrap `DiscT(service_id_hash)` by copying existing entries
+from `KadDHT(peerID)` already maintained by the node.
+For every peer present in the table from where we bootstrap,
+we MUST use the formula described in the [Distance](#distance) section to place them in buckets.
 `DiscT(service_id_hash)` SHOULD be maintained through interactions with registrars during lookup operations.
 
 #### Lookup Requirements
-The `LOOKUP(service_id_hash)` procedure SHOULD work as a gradual search on the search table `DiscT(service_id_hash)`,
-starting from far buckets `(b_0)` which has registrar nodes with fewer shared bits with service_id_hash
+
+The `LOOKUP(service_id_hash)` is carried out by discoverer nodes to query registrar nodes
+to get advertisements of a particular `service_id_hash`.
+The `LOOKUP(service_id_hash)` procedure MUST work as a gradual search
+on the search table `DiscT(service_id_hash)` of the service whose advertisements it wants.
+The `LOOKUP(service_id_hash)` MUST start from far buckets `(b_0)` which has registrar nodes with fewer shared bits with service_id_hash
 and moving to buckets `(b_(m-1))` containing registrar nodes with higher number of shared bits or closer to `service_id_hash`.
 To perform a lookup, discoverers:
 
-- MUST query registrar nodes from their search table `DiscT(service_id_hash)`
-to find advertisements for the specific `service_id_hash`.
-- MUST verify the digital signature of each advertisement received before accepting it.
+- SHOULD query `K_lookup` random registrar nodes from every bucket of `DiscT(service_id_hash)`.
+- MUST verify the signature of each advertisement received before accepting it.
 - SHOULD add closer peers returned by registrars in the response to `DiscT(service_id_hash)` to improve future lookups.
-- MAY stop the lookup early once enough advertiser peers (`F_lookup`) have been found.
-- SHOULD run the lookup process periodically and when more peers are requested by its service application.
-Implementations MAY choose the interval based on their requirements.
+- SHOULD retrieve at most `F_return` advertisement peers from a single registrar.
+- SHOULD run the lookup process periodically.
+Implementations can choose the interval based on their requirements.
 
 ### Lookup Algorithm
 
@@ -549,27 +563,64 @@ Refer to the [Lookup Algorithm Explanation section](#lookupservice_id_hash-algor
 
 ### Overview
 
+Registrars are nodes that store and serve advertisements.
+They play a critical role in the Logos discovery network
+by acting as intermediaries between advertisers and discoverers.
+
+#### Admission Control Requirements
+
 Registrars MUST use a waiting time based admission protocol to admit advertisements into their `ad_cache`.
 The mechanism does not require registrars to maintain any state for each ongoing request preventing DoS attacks.
 
-The total size of the `ad_cache` SHOULD be limited by its capacity `C`.
-Each ad stored in the `ad_cache` has an associated expiry time `E`,
-after which the `ad` is SHOULD be automatically removed.
+When a registrar node receives a `REGISTER` request from an advertiser node
+to admit its `ad` for a service into the `ad_cache`,
+the registrar MUST process the request according to the following requirements:
 
-How expiry works:
+- The registrar MUST NOT admit an advertisement
+if an identical `ad` already exists in the `ad_cache`.
+- The Registrar MUST calculate waiting time for the advertisement
+using the formula specified in the [Waiting Time Calculation](#waiting-time-calculation) section.
+The waiting time determines how long the advertiser must wait
+before the `ad` can be admitted to the `ad_cache`.
+- If no `ticket` is provided in the `REGISTER` request then
+this is the advertiser's first registration attempt for the `ad`.
+The registrar MUST create a new `ticket`
+and return the signed `ticket` to the advertiser with status `Wait`.
+-  If the advertiser provides a `ticket` in the `REGISTER` request from a previous attempt:
+    - The registrar MUST verify the `ticket.signature` is valid and was issued by this registrar.
+    - The registrar MUST verify that `ticket.ad` matches the `ad` in the current request
+    - The registrar MUST verify that the `ad` is still not in the `ad_cache`
+    - The registrar MUST verify the retry is within the registration window
+    - If any verification fails, the registrar MUST reject the request
+    - The registrar MUST recalculate the waiting time based on current cache state
+    - The registrar MUST calculate remaining wait time:
+    `t_remaining = t_wait - (NOW() - ticket.t_init)`.
+    This ensures advertisers accumulate waiting time across retries
+- If `t_remaining ≤ 0`, the registrar MUST add the `ad` to the `ad_cache`
+with `ad.Timestamp` set to current Unix time.
+The registrar SHOULD return response with status Confirmed
+- If `t_remaining > 0`, the advertiser SHOULD continue waiting.
+The registrar MUST issue a new `ticket` with updated `ticket.t_mod` and `ticket.t_wait_for = MIN(E, t_remaining)`.
+The registrar MUST sign the new `ticket`.
+The registrar SHOULD return response with status `Wait` and the new signed `ticket`.
+- The registrar SHOULD include a list of closer peers (`response.closerPeers`)
+to help the advertiser improve its advertise table.
 
-- When an advertisement is registered,
-it is stored in the registrar node’s `ad_cache`
-with its `Timestamp` = current Unix time.
+`ad_cache` maintainence:
+
+- The total size of the `ad_cache` MUST be limited by its capacity `C`.
+- Each ad stored in the `ad_cache` MUST have an associated expiry time `E`,
+after which the `ad` is MUST be automatically removed.
 - When processing or periodically cleaning,
-the registrar checks `if currentTime - ad.Timestamp > E`.
-- If true → the ad is expired and should be removed from the cache.
+the registrar MUST check `if currentTime - ad.Timestamp > E`.
+If true, the `ad` is expired and MUST be removed from the cache.
+- `ad_cache` MUST NOT store duplicate `ad`.
 
 ### Registration Flow
 
-When a registrar receives a `REGISTER` request from an advertiser
-then it runs the `Register()` algorithm to decide whether to admit `ad` coming from advertiser
-into its `ad_cache` or not.
+We RECOMMEND that the following algorithm be used by registrars
+to implement the admission control requirements specified above.
+
 Refer to the [Register Message section](#register-message) for the request and response structure of `REGISTER`.
 
 ```text
@@ -606,7 +657,7 @@ end procedure
 
 Refer to the [Register Algorithm Explanation section](#register-algorithm-explanation) for detailed explanation.
 
-### Lookup Response Algorithm
+## Lookup Response Algorithm
 
 Registrars respond to `GET_ADS` requests from discoverers using the `LOOKUP_RESPONSE()` algorithm.
 Refer to [GET_ADS Message section](#get_ads-message) for the request and response structure of `GET_ADS`.
@@ -625,7 +676,7 @@ Then return up to `F_return` of them (a system parameter limiting how many `ads`
 from across the registrar’s routing table `RegT(service_id_hash)`.
 3. Send the assembled response (advertisements + closer peers) back to the discoverer.
 
-### Peer Table Updates
+## Peer Table Updates
 
 While responding to both `REGISTER` requests by advertisers and `GET_ADS` request by discoverers,
 the contacted registrar node also returns a list of peers.
