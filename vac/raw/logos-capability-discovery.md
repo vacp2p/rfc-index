@@ -484,17 +484,36 @@ Refer to the [Advertiser Algorithms Explanation section](#advertiser-algorithms-
 
 ### Overview
 
-The `LOOKUP(service_id_hash)` procedure is run by a discoverer to query registrar nodes
-to find advertisements for a specific `service_id_hash`.
+Discoverers are nodes attempting to find peers that provide a specific service identified by `service_id_hash`.
+To perform discovery, discoverers MUST maintain a search table `DiscT(service_id_hash)` for the service they are searching for.
 
-Discoverers runs `LOOKUP(service_id_hash)` periodically and when more peers are requested by its service application.
-Implementations may choose the interval based on their requirements.
+#### Discovery Table `DiscT(service_id_hash)` Requirements
 
-It works like a gradual search on the search table `DiscT(service_id_hash)`,
-starting from far buckets (`b_0`) which has registrar nodes with fewer shared bits with `service_id_hash`
-and moving to buckets (`b_(m-1)`) containing registrar nodes with higher number of shared bits or closer to `service_id_hash`.
+For each service that a discoverer wants to find,
+it MUST instantiate a new search table `DiscT(service_id_hash)`, centered on that `service_id_hash`.
+
+Discoverers MAY initialize `DiscT(service_id_hash)` by copying existing entries
+from the Kad-dht routing table already maintained by the node.
+`DiscT(service_id_hash)` SHOULD be maintained through interactions with registrars during lookup operations.
+
+#### Lookup Requirements
+The `LOOKUP(service_id_hash)` procedure SHOULD work as a gradual search on the search table `DiscT(service_id_hash)`,
+starting from far buckets `(b_0)` which has registrar nodes with fewer shared bits with service_id_hash
+and moving to buckets `(b_(m-1))` containing registrar nodes with higher number of shared bits or closer to `service_id_hash`.
+To perform a lookup, discoverers:
+
+- MUST query registrar nodes from their search table `DiscT(service_id_hash)`
+to find advertisements for the specific `service_id_hash`.
+- MUST verify the digital signature of each advertisement received before accepting it.
+- SHOULD add closer peers returned by registrars in the response to `DiscT(service_id_hash)` to improve future lookups.
+- MAY stop the lookup early once enough advertiser peers (`F_lookup`) have been found.
+- SHOULD run the lookup process periodically and when more peers are requested by its service application.
+Implementations MAY choose the interval based on their requirements.
 
 ### Lookup Algorithm
+
+We RECOMMEND that the following algorithm be used to implement the service discovery requirements specified above.
+Implementations MAY use alternative algorithms as long as they satisfy requirements specified in the previous section.
 
 ```protobuf
 procedure LOOKUP(service_id_hash):
@@ -530,12 +549,12 @@ Refer to the [Lookup Algorithm Explanation section](#lookupservice_id_hash-algor
 
 ### Overview
 
-Registrars use a waiting time based admission protocol to admit advertisements into their `ad_cache`.
+Registrars MUST use a waiting time based admission protocol to admit advertisements into their `ad_cache`.
 The mechanism does not require registrars to maintain any state for each ongoing request preventing DoS attacks.
 
-The total size of the `ad_cache` is limited by its capacity `C`.
+The total size of the `ad_cache` SHOULD be limited by its capacity `C`.
 Each ad stored in the `ad_cache` has an associated expiry time `E`,
-after which the `ad` is automatically removed.
+after which the `ad` is SHOULD be automatically removed.
 
 How expiry works:
 
