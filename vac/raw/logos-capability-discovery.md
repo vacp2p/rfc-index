@@ -160,7 +160,7 @@ which discoverers can query to get advertisements for a particular service.
 
 A [multiaddress](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/quic#multiaddress)
 is a standardized way used in libp2p to represent network addresses.
-We RECOMMEND USING multiaddresses for peer connectivity.
+Implementations SHOULD use multiaddresses for peer connectivity.
 However, implementations MAY use alternative address representations if they:
 
 - Remain interoperable
@@ -172,7 +172,7 @@ Refer to [Peer Ids and Keys](https://github.com/libp2p/specs/blob/7740c076350b66
 to know about supported signatures.
 In the base Kad DHT specification, signatures are optional,
 typically implemented as a PKI signature over the tuple `(key || value || author)`.
-In this RFC digital signatures are used to
+In this RFC digital signatures MUST br used to
 authenticate advertisements and tickets.
 
 ### Expiry Time `E`
@@ -212,6 +212,13 @@ message Advertisement {
 }
 ```
 
+Advertisements MUST include `service_id_hash`, `peerID`, `addrs` and `signature` fields.
+Implementations MAY include `metadata` and `timestamp` fields in advertisements.
+The `signature` field MUST be a Ed25519 signature over the concatenation of
+(`service_id_hash` || `peerID` || `addrs`).
+Refer to [Signature](#signature) section for more details.
+Implementations MUST verify this signature before accepting an advertisement.
+
 ### Ticket
 
 Tickets are digitally signed objects
@@ -236,6 +243,11 @@ message Ticket {
     bytes signature = 5;
 }
 ```
+
+Tickets MUST include `ad`, `t_init`, `t_mod`, `t_wait_for` and `signature` fields.
+The `signature` field MUST be an Ed25519 signature over the concatenation of
+(`ad` || `t_init` || `t_mod` || `t_wait_for`).
+Implementations MUST verify this signature before accepting a ticket.
 
 ## Protocol Specifications
 
@@ -275,7 +287,7 @@ Advertise table `AdvT(service_id_hash)` and search table `DiscT(service_id_hash)
 while `KadDHT(peerID)` table is centered on `peerID`.
 
 When inserting a node into advertise table `AdvT(service_id_hash)` or the search table `DiscT(service_id_hash)`,
-the bucket index into which the node will be inserted is determined by:
+the bucket index into which the node will be inserted MUST be determined by:
 
 - x = reference ID which is the `service_id_hash`
 - y = target peer ID `peerID`
@@ -299,37 +311,39 @@ This property allows efficient logarithmic routing:
 each hop moves to a peer that shares a longer prefix of bits
 with the target `service_id_hash`.
 
-This formula is also used when we bootstrap peers from the `KadDHT` table.
-For every peer present in the `KadDHT(peerID)` table
-we use the same formula to place them in advertise table `AdvT(service_id_hash)`,
+This formula MUST also used when we bootstrap peers.
+Bootstrapping MAY be from the `KadDHT` table.
+For every peer present in the table from where we bootstrap,
+we MUST use the same formula to place them in advertise table `AdvT(service_id_hash)`,
 search table `DiscT(service_id_hash)` and Registrar Table `RegT(service_id_hash)` buckets.
 
 Initially the density of peers in the search table `DiscT(service_id_hash)`
 and advertise table `AdvT(service_id_hash)` around `service_id_hash` might be low or even null
 particularly when `service_id_hash` and `peerID` are distant in the keyspace
 (as `KadDHT(peerID)` is centered on `peerID`).
-The buckets are thus filled opportunistically
+The buckets SHOULD be filled opportunistically
 while interacting with peers during the search or advertisement process.
 Registrars, apart from responding to queries,
-return a list of peers as `response.closerPeers` .
-These are also added to buckets in `AdvT(service_id_hash)` and `DiscT(service_id_hash)` using the same formula.
+SHOULD return a list of peers as `response.closerPeers` .
+These peers SHOULD be added to buckets in `AdvT(service_id_hash)` and `DiscT(service_id_hash)`.
+While adding peers implementations MUST use the same formula.
 
 **Note:**
 
-The `response.closerPeers` field returned by registrars should include
+The `response.closerPeers` field returned by registrars SHOULD include
 a list of peer information object which contains both peer IDs and addresses,
 as the latter is required to contact peers.
 In this RFC, we simplify representation by listing only peer IDs,
-but full implementations must include address information.
+but full implementations SHOULD include address information.
 
 ## RPC Messages
 
-All RPC messages are sent using the libp2p Kad-dht message format
+All RPC messages MUST be sent using the libp2p Kad-dht message format
 with new message types added for Logos discovery operations.
 
 ### Message Types
 
-The following message types are added to the Kad-dht `Message.MessageType` enum:
+The following message types MUST be added to the Kad-dht `Message.MessageType` enum:
 
 ```protobuf
 enum MessageType {
@@ -343,6 +357,12 @@ enum MessageType {
 
 #### Request
 
+`REGISTER` request message is sent by advertisers to registrars
+to admit the advertiser's advertisemnet for a service
+into the registrar's `ad_cache`.
+Advertisers SHOULD include the `service_id_hash` in the `key` field and the advertisement in the `ad` field.
+If this is a retry attempt, advertisers SHOULD include the latest `ticket` received from the registrar.
+
 ```protobuf
 message Message {
     MessageType type = 1;  // REGISTER
@@ -354,10 +374,12 @@ message Message {
 
 #### Response
 
+`REGISTER` response SHOULD be sent by registrars to advertisers.
+
 ```protobuf
 enum RegistrationStatus {
     CONFIRMED = 0;  // Advertisement accepted
-    WAIT = 1;       // Must wait, ticket provided
+    WAIT = 1;       // wait, ticket provided
     REJECTED = 2;   // Advertisement rejected
 }
 
@@ -373,6 +395,9 @@ message Message {
 
 #### Request
 
+Discoverers send `GET_ADS` request message to registrars
+to get advertisements for a particular service.
+
 ```protobuf
 message Message {
     MessageType type = 1;  // GET_ADS
@@ -381,6 +406,10 @@ message Message {
 ```
 
 #### Response
+
+Registrars SHOULD respond to discoverer's `GET_ADS` request.
+Registrars SHOULD return up to `F_return` advertisements for the requested service.
+Registrars SHOULD include `closerPeers` to help populate the discoverer's search table.
 
 ```protobuf
 message Message {
