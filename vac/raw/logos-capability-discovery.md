@@ -21,8 +21,10 @@ The protocol enables nodes to:
 - Efficiently discover other peers participating in those services
 
 In this RFC, the terms capability and service are used interchangeably.
-Within Logos, a node’s “capabilities” map directly to the “services” it participates in.
-Similarly, "peer" and "node" refer to the same entity: a participant in the Logos Discovery network.
+Within Logos, a node’s “capabilities” map directly to
+the “services” it participates in.
+Similarly, "peer" and "node" refer to the same entity:
+a participant in the Logos Discovery network.
 
 Logos discovery extends Kad-dht toward a multi-service, resilient discovery layer,
 enhancing reliability while maintaining compatibility with existing Kad-dht behavior.
@@ -37,7 +39,8 @@ Traditional approaches face several challenges:
 
 - Inefficiency: Random-walk–based discovery is inefficient for unpopular services.
 - Load imbalance: A naive approach where nodes advertise their service at DHT peers
-whose IDs are closest to the service ID leads to hotspots and overload at popular services.
+whose IDs are closest to the service ID
+leads to hotspots and overload at popular services.
 - Scalability: Discovery must scale logarithmically across many distinct services.
 
 Logos discovery addresses these through:
@@ -88,7 +91,8 @@ to decide whether to store an advertisement coming from an advertiser or not.
 
 ### DHT Routing Table
 
-Every participant in the kad-dht peer discovery layer maintains the peer routing table `KadDHT(peerID)`.
+Every participant in the kad-dht peer discovery layer
+maintains the peer routing table `KadDHT(peerID)`.
 It is a distributed key-value store with
 [peer IDs](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/peer-ids/peer-ids.md#peer-ids)
 as key against their matching
@@ -118,7 +122,8 @@ The number of entries a bucket can hold is implementation-dependent.
 ### Service
 
 A service is a logical sub-network within the larger peer-to-peer network.
-It represents a specific capability a node supports — for example, a particular protocol or functionality it offers.
+It represents a specific capability a node supports
+— for example, a particular protocol or functionality it offers.
 A service MUST be identified by a libp2p protocol ID via the
 [identify protocol](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/identify).
 
@@ -355,7 +360,7 @@ enum MessageType {
 
 ### REGISTER Message
 
-#### Request
+#### REGISTER Request
 
 Advertisers SHOULD send `REGISTER` request message to registrars
 to admit the advertiser's advertisemnet for a service
@@ -373,7 +378,7 @@ message Message {
 Advertisers SHOULD include the `service_id_hash` in the `key` field and the advertisement in the `ad` field of the request.
 If this is a retry attempt, advertisers SHOULD include the latest `ticket` received from the registrar.
 
-#### Response
+#### REGISTER Response
 
 `REGISTER` response SHOULD be sent by registrars to advertisers.
 
@@ -398,7 +403,7 @@ Registrars SHOULD include `closerPeers` to help populate the advertiser's table.
 
 ### GET_ADS Message
 
-#### Request
+#### GET_ADS Request
 
 Discoverers send `GET_ADS` request message to registrars
 to get advertisements for a particular service.
@@ -412,7 +417,7 @@ message Message {
 
 Discoverers MUST include the `service_id_hash` they are searching for in the `key` field.
 
-#### Response
+#### GET_ADS Response
 
 Registrars SHOULD respond to discoverer's `GET_ADS` request
 using the following response structure.
@@ -586,7 +591,7 @@ before the `ad` can be admitted to the `ad_cache`.
 this is the advertiser's first registration attempt for the `ad`.
 The registrar MUST create a new `ticket`
 and return the signed `ticket` to the advertiser with status `Wait`.
--  If the advertiser provides a `ticket` in the `REGISTER` request from a previous attempt:
+- If the advertiser provides a `ticket` in the `REGISTER` request from a previous attempt:
   - The registrar MUST verify the `ticket.signature` is valid and was issued by this registrar.
   - The registrar MUST verify that `ticket.ad` matches the `ad` in the current request
   - The registrar MUST verify that the `ad` is still not in the `ad_cache`
