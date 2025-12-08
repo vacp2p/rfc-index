@@ -9,6 +9,8 @@ contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
 
 ---
 
+> *_Note:_* This specification is currently a WIP and undergoing a high rate of changes.
+
 ## Abstract
 
 This RFC defines the Logos Capability Discovery protocol,
