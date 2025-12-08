@@ -11,7 +11,7 @@ contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
 
 ## Abstract
 
-This RFC defines the Logos capability discovery protocol,
+This RFC defines the Logos Capability Discovery protocol,
 a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore.ieee.org/document/10629017)
 built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
 
@@ -20,7 +20,7 @@ The protocol enables nodes to:
 - Advertise their participation in specific services
 - Efficiently discover other peers participating in those services
 
-In this RFC, the terms capability and service are used interchangeably.
+In this RFC, the terms "capability" and "service" are used interchangeably.
 Within Logos, a node’s “capabilities” map directly to
 the “services” it participates in.
 Similarly, "peer" and "node" refer to the same entity:
@@ -153,7 +153,7 @@ It SHOULD be updated opportunistically through interactions with
 registrars during the advertisement process.
 
 Each bucket in the advertise table contains a list of registrar peers at a
-particular XOR distance from `service_id_hash`, which are candidates for placing
+particular XOR distance range from `service_id_hash`, which are candidates for placing
 advertisements.
 
 ### Search Table
@@ -166,12 +166,29 @@ It SHOULD be updated through interactions with
 registrars during lookup operations.
 
 Each bucket in the search table contains a list of registrar peers at a
-particular XOR distance from `service_id_hash`, which discoverers can query to
+particular XOR distance range from `service_id_hash`, which discoverers can query to
 retrieve advertisements for that service.
+
+### Registrar Table
+
+For every service for which it stores and serves advertisements,
+a registrar node SHOULD maintain a registrar table `RegT(service_id_hash)`
+centered on `service_id_hash`.
+The table MAY be initialized using peers from the
+registrar’s `KadDHT(peerID)` routing table.
+It SHOULD be updated opportunistically
+through interactions with advertisers and discoverers.
+
+Each bucket in the registrar table contains a list of peer nodes
+at a particular XOR distance range from `service_id_hash`.
+Registrars use this table to return
+`closerPeers` during `REGISTER` and `GET_ADS` responses,
+enabling advertisers and discoverers to
+refine their service-specific routing tables.
 
 ### Address
 
-A [multiaddress](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/quic#multiaddress)
+A [multiaddress](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/addressing)
 is a standardized way used in libp2p to represent network addresses.
 Implementations SHOULD use multiaddresses for peer connectivity.
 However, implementations MAY use alternative address representations if they:
@@ -192,7 +209,7 @@ authenticate advertisements and tickets.
 
 `E` is advertisement expiry time in seconds.
 The expiry time **`E`** is a system wide parameter,
-not an individual ad field or parameter of an individual registrar.
+not an individual advertisement field or parameter of an individual registrar.
 
 ## Data Structures
 
@@ -260,6 +277,7 @@ message Ticket {
 Tickets MUST include `ad`, `t_init`, `t_mod`, `t_wait_for` and `signature` fields.
 The `signature` field MUST be an Ed25519 signature over the concatenation of
 (`ad` || `t_init` || `t_mod` || `t_wait_for`).
+Refer to [Signature](#signature) section for more details.
 Implementations MUST verify this signature before accepting a ticket.
 
 ## Protocol Specifications
@@ -268,7 +286,7 @@ Implementations MUST verify this signature before accepting a ticket.
 
 The system parameters are derived directly from
 the [DISC-NG paper](https://ieeexplore.ieee.org/document/10629017).
-Implementations MAY modify them as needed based on specific requirements.
+Implementations SHOULD modify them as needed based on specific requirements.
 
 | Parameter | Default Value | Description |
 | --- | --- | --- |
@@ -296,10 +314,11 @@ For every node in the network, the `peerID` is unique.
 In this system, both `peerID` and the `service_id_hash` are 256-bit SHA-256 hashes.
 Thus both belong to the same keyspace.
 
-Advertise table `AdvT(service_id_hash)` and search table `DiscT(service_id_hash)` MUST be centered on `service_id_hash`
+Advertise table `AdvT(service_id_hash)`, search table `DiscT(service_id_hash)`
+and registrar table `RegT(service_id_hash)` MUST be centered on `service_id_hash`
 while `KadDHT(peerID)` table is centered on `peerID`.
 
-When inserting a node into advertise table `AdvT(service_id_hash)` or the search table `DiscT(service_id_hash)`,
+When inserting a node into `AdvT(service_id_hash)`, `DiscT(service_id_hash)` or `RegT(service_id_hash)`,
 the bucket index into which the node will be inserted MUST be determined by:
 
 - x = reference ID which is the `service_id_hash`
@@ -327,8 +346,8 @@ with the target `service_id_hash`.
 This formula MUST also used when we bootstrap peers.
 Bootstrapping MAY be done from the `KadDHT(peerID)` table.
 For every peer present in the table from where we bootstrap,
-we MUST use the same formula to place them in advertise table `AdvT(service_id_hash)`,
-search table `DiscT(service_id_hash)` and Registrar Table `RegT(service_id_hash)` buckets.
+we MUST use the same formula to place them in `AdvT(service_id_hash)`,
+`DiscT(service_id_hash)` and `RegT(service_id_hash)` buckets.
 
 Initially the density of peers in the search table `DiscT(service_id_hash)`
 and advertise table `AdvT(service_id_hash)` around `service_id_hash` might be low or even null
@@ -637,7 +656,7 @@ to help the advertiser improve its advertise table.
 `ad_cache` maintainence:
 
 - The total size of the `ad_cache` MUST be limited by its capacity `C`.
-- Each ad stored in the `ad_cache` MUST have an associated expiry time `E`,
+- Each `ad` stored in the `ad_cache` MUST have an associated expiry time `E`,
 after which the `ad` is MUST be automatically removed.
 - When processing or periodically cleaning,
 the registrar MUST check `if currentTime - ad.Timestamp > E`.
@@ -756,7 +775,7 @@ while still learning rare peers in buckets close to `service_id_hash`.
 
 The waiting time is the time advertisers have to
 wait before being admitted to the `ad_cache`.
-The waiting time is given based on the ad itself
+The waiting time is given based on the `ad` itself
 and the current state of the registrar’s `ad_cache`.
 
 The waiting time for an advertisement is calculated using:
@@ -773,7 +792,7 @@ w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(ad.ad
 Section [System Parameters](#system-parameters) can be referred
 for the definitions of the remaining parameters in the formula.
 
-Issuing waiting times promote diversity in the ad cache.
+Issuing waiting times promote diversity in the `ad_cache`.
 It results in high waiting times and slower admission for malicious advertisers
 using Sybil identities from a limited number of IP addresses.
 It also promotes less popular services with fast admission
@@ -783,7 +802,7 @@ ensuring fairness and robustness against failures of single registrars.
 
 The waiting time is normalized by the ad’s expiry time `E`.
 It binds waiting time to `E` and allows us to reason about the number of incoming requests
-regardless of the time each ad spends in the ad cache.
+regardless of the time each `ad` spends in the `ad_cache`.
 
 ### Occupancy Score
 
@@ -834,7 +853,7 @@ The visited path is the binary representation of the IPv4 address.
 IPv4 addresses are inserted into the tree only when they are admitted to the `ad_cache`.
 - The IP tree is traversed to calculate the IP score using
 `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
-- When an ad expires after `E` the ad is removed from the `ad_cache`
+- When an `ad` expires after `E` the `ad` is removed from the `ad_cache`
 and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the `IP_counter`s on the path.
 The path is the binary representation of the IPv4 address.
 - the root `IP_counter` stores the number of IPv4 addresses that are currently present in the `ad_cache`
@@ -842,7 +861,7 @@ The path is the binary representation of the IPv4 address.
 #### `ADD_IP_TO_TREE()` algorithm
 
 IPv4 addresses are added to the IP tree using the
-`ADD_IP_TO_TREE()` algorithm when an ad admitted to the `ad_cache`.
+`ADD_IP_TO_TREE()` algorithm when an `ad` admitted to the `ad_cache`.
 
 ```text
 procedure ADD_IP_TO_TREE(tree, IP):
@@ -913,7 +932,7 @@ from the most significant (leftmost `0`) to the least (rightmost `31`).
 
 #### `REMOVE_FROM_IP_TREE()` algorithm
 
-When an ad expires after `E`, its IP is removed from the tree,
+When an `ad` expires after `E`, its IP is removed from the tree,
 and the `IP_counter`s in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
 
 ```text
@@ -1045,7 +1064,7 @@ Each bucket corresponds to a particular distance from the `service_id_hash`.
         - `.getRandomNode()` → function returns a random registrar node.
         The advertiser tries to place its advertisement into that registrar.
         The function remembers already returned nodes
-        and never returns the same one twice during the same ad placement process.
+        and never returns the same one twice during the same `ad` placement process.
         If there are no peers, it returns `None`.
     4. if we get a peer then we add that to that bucket `ongoing[i]`
     5. Build the advertisement object `ad` containing `service_id_hash`, `peerID`, `addrs`, and `timestamp`
@@ -1070,10 +1089,10 @@ Each bucket corresponds to a particular distance from the `service_id_hash`.
     Refer to the [Distance](#distance section) on how to add.
     These help improve the table for future use.
     4. If the registrar accepted the advertisement successfully,
-    wait for `E` seconds (the ad expiry time),
-    then stop retrying because the ad is already registered.
+    wait for `E` seconds,
+    then stop retrying because the `ad` is already registered.
     5. If the registrar says “wait” (its cache is full or overloaded),
-    sleep for the time written in the ticket `ticket.t_wait_for`(but not more than ad expiry time `E`).
+    sleep for the time written in the ticket `ticket.t_wait_for`(but not more than `E`).
     Then update `ticket` with the new one from the registrar, and try again.
     6. If the registrar rejects the ad, stop trying with this registrar.
 3. Remove this registrar from the `ongoing` map in bucket i (`ongoing[i]`),
@@ -1157,7 +1176,7 @@ Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for d
     The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
     2. If no, then this is a retry, so a previous ticket exists.
         1. Validate that the ticket is properly signed by the registrar,
-        belongs to this same advertisement and that the ad is still not already in the `ad_cache`.
+        belongs to this same advertisement and that the `ad` is still not already in the `ad_cache`.
         2. Ensure the retry is happening within the allowed time window `δ` after the scheduled time.
         If the advertiser waits too long or too short, the ticket is invalid.
         3. Calculate how much waiting time is left `t_remaining`
@@ -1170,7 +1189,7 @@ the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting ti
     1. If yes, add the `ad` to `ad_cache` and confirm registration.
     The advertisement is now officially registered.
     2. If no, then there is still time to wait.
-    In this case registrar does not store ad but instead issues a ticket.
+    In this case registrar does not store `ad` but instead issues a ticket.
         1. set `reponse.status` to `wait`
         2. Update the ticket with the new remaining waiting time `t_wait_for`
         3. Update the ticket last modification time `t_mod`
@@ -1203,7 +1222,7 @@ it loses all accumulated waiting time and must restart the registration process 
 Implementations must consider these factors while deciding the registration window `δ` time.
 
 This design lets registrars prioritize advertisers that have waited longer
-without keeping any per-request state before the ad is admitted to the cache.
+without keeping any per-request state before the `ad` is admitted to the cache.
 Because waiting times are recalculated and tickets are stored only on the advertiser’s side,
 the registrar is protected from memory exhaustion
 and DoS attacks caused by inactive or malicious advertisers.
