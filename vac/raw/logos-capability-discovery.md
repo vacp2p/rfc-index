@@ -145,21 +145,29 @@ maintained by registrars to store accepted advertisements.
 
 ### Advertise Table
 
-An advertise table `AdvT(service_id_hash)` is maintained by advertiser nodes.
-It MUST be centered on `service_id_hash`.
-It MAY be initialized from the advertiser’s `KadDHT(peerID)` routing table.
-It SHOULD be maintained through interactions with registrars during the advertisement process.
-Every bucket in the table has a list of registrars at a particular distance
-on which advertisers can place their advertisements.
+For every service it participates in, an advertiser node MUST maintain an
+advertise table `AdvT(service_id_hash)` centered on `service_id_hash`.
+The table MAY be initialized using
+peers from the advertiser’s `KadDHT(peerID)` routing table.
+It SHOULD be updated opportunistically through interactions with
+registrars during the advertisement process.
+
+Each bucket in the advertise table contains a list of registrar peers at a
+particular XOR distance from `service_id_hash`, which are candidates for placing
+advertisements.
 
 ### Search Table
 
-A search table `DiscT(service_id_hash)` is maintained by discoverer nodes.
-It MUST be centered `service_id_hash`.
-It MAY be initialized from the discoverer’s Kad-dht routing table.
-It is SHOULD be maintained through interactions with registrars during lookup operations.
-Every bucket in the table has a list of registrars at a particular distance
-which discoverers can query to get advertisements for a particular service.
+For every service it attempts to discover, a discoverer node MUST maintain a
+search table `DiscT(service_id_hash)` centered on `service_id_hash`.
+The table MAY be initialized using
+peers from the discoverer’s`KadDHT(peerID)` routing table.
+It SHOULD be updated through interactions with
+registrars during lookup operations.
+
+Each bucket in the search table contains a list of registrar peers at a
+particular XOR distance from `service_id_hash`, which discoverers can query to
+retrieve advertisements for that service.
 
 ### Address
 
@@ -266,7 +274,7 @@ Implementations MAY modify them as needed based on specific requirements.
 | --- | --- | --- |
 | `K_register` | 3 | Max number of active (i.e. unexpired) registrations + ongoing registration attempts per bucket. |
 | `K_lookup` | 5 | For each bucket in the search table, number of random registrar nodes queried by discoverers |
-| `F_lookup` | 30 | number of advertisers to find in the lookup process. we stop lookup process when we have found these many advertisers |
+| `F_lookup` | 30 | number of advertisers to find in the lookup process. We stop lookup process when we have found these many advertisers |
 | `F_return` | 10 | max number of service-specific peers returned from a single registrar |
 | `E` | 900 seconds | Advertisement expiry time (15 minutes) |
 | `C` | 1,000 | Advertisement cache capacity |
@@ -375,8 +383,10 @@ message Message {
 }
 ```
 
-Advertisers SHOULD include the `service_id_hash` in the `key` field and the advertisement in the `ad` field of the request.
-If this is a retry attempt, advertisers SHOULD include the latest `ticket` received from the registrar.
+Advertisers SHOULD include the `service_id_hash` in the `key` field
+and the advertisement in the `ad` field of the request.
+If this is a retry attempt, advertisers SHOULD include
+the latest `ticket` received from the registrar.
 
 #### REGISTER Response
 
@@ -441,7 +451,8 @@ Registrars SHOULD include `closerPeers` to help populate the discoverer's search
 
 ### Overview
 
-`ADVERTISE(service_id_hash)` lets advertisers publish itself as a participant in a particular `service_id_hash` .
+`ADVERTISE(service_id_hash)` lets advertisers publish itself
+as a participant in a particular `service_id_hash` .
 
 It spreads advertisements for its service across multiple registrars,
 such that other peers can  find it efficiently.
@@ -498,19 +509,21 @@ Refer to the [Advertiser Algorithms Explanation section](#advertiser-algorithms-
 
 ### Overview
 
-Discoverers are nodes attempting to find peers that provide a specific service identified by `service_id_hash`.
-To perform discovery, discoverers MUST maintain a search table `DiscT(service_id_hash)` for the service they are searching for.
+Discoverers are nodes attempting to find peers that
+provide a specific service identified by `service_id_hash`.
 
 #### Discovery Table `DiscT(service_id_hash)` Requirements
 
 For each service that a discoverer wants to find,
-it MUST instantiate a search table `DiscT(service_id_hash)`, centered on that `service_id_hash`.
+it MUST instantiate a search table `DiscT(service_id_hash)`,
+centered on that `service_id_hash`.
 
 Discoverers MAY bootstrap `DiscT(service_id_hash)` by copying existing entries
 from `KadDHT(peerID)` already maintained by the node.
 For every peer present in the table from where we bootstrap,
 we MUST use the formula described in the [Distance](#distance) section to place them in buckets.
-`DiscT(service_id_hash)` SHOULD be maintained through interactions with registrars during lookup operations.
+`DiscT(service_id_hash)` SHOULD be maintained through interactions
+with registrars during lookup operations.
 
 #### Lookup Requirements
 
@@ -518,21 +531,26 @@ The `LOOKUP(service_id_hash)` is carried out by discoverer nodes to query regist
 to get advertisements of a particular `service_id_hash`.
 The `LOOKUP(service_id_hash)` procedure MUST work as a gradual search
 on the search table `DiscT(service_id_hash)` of the service whose advertisements it wants.
-The `LOOKUP(service_id_hash)` MUST start from far buckets `(b_0)` which has registrar nodes with fewer shared bits with service_id_hash
-and moving to buckets `(b_(m-1))` containing registrar nodes with higher number of shared bits or closer to `service_id_hash`.
+The `LOOKUP(service_id_hash)` MUST start from far buckets `(b_0)`
+which has registrar nodes with fewer shared bits with service_id_hash
+and moving to buckets `(b_(m-1))` containing registrar nodes with
+higher number of shared bits or closer to `service_id_hash`.
 To perform a lookup, discoverers:
 
 - SHOULD query `K_lookup` random registrar nodes from every bucket of `DiscT(service_id_hash)`.
 - MUST verify the signature of each advertisement received before accepting it.
-- SHOULD add closer peers returned by registrars in the response to `DiscT(service_id_hash)` to improve future lookups.
+- SHOULD add closer peers returned by registrars
+in the response to `DiscT(service_id_hash)` to improve future lookups.
 - SHOULD retrieve at most `F_return` advertisement peers from a single registrar.
 - SHOULD run the lookup process periodically.
 Implementations can choose the interval based on their requirements.
 
 ### Lookup Algorithm
 
-We RECOMMEND that the following algorithm be used to implement the service discovery requirements specified above.
-Implementations MAY use alternative algorithms as long as they satisfy requirements specified in the previous section.
+We RECOMMEND that the following algorithm be used
+to implement the service discovery requirements specified above.
+Implementations MAY use alternative algorithms
+as long as they satisfy requirements specified in the previous section.
 
 ```protobuf
 procedure LOOKUP(service_id_hash):
@@ -562,7 +580,8 @@ procedure LOOKUP(service_id_hash):
 end procedure
 ```
 
-Refer to the [Lookup Algorithm Explanation section](#lookupservice_id_hash-algorithm-explanation) for the detailed explanation.
+Refer to the [Lookup Algorithm Explanation section](#lookupservice_id_hash-algorithm-explanation)
+for the detailed explanation.
 
 ## Admission Protocol
 
@@ -574,8 +593,10 @@ by acting as intermediaries between advertisers and discoverers.
 
 #### Admission Control Requirements
 
-Registrars MUST use a waiting time based admission protocol to admit advertisements into their `ad_cache`.
-The mechanism does not require registrars to maintain any state for each ongoing request preventing DoS attacks.
+Registrars MUST use a waiting time based admission protocol
+to admit advertisements into their `ad_cache`.
+The mechanism does not require registrars to maintain
+any state for each ongoing request preventing DoS attacks.
 
 When a registrar node receives a `REGISTER` request from an advertiser node
 to admit its `ad` for a service into the `ad_cache`,
@@ -584,7 +605,8 @@ the registrar MUST process the request according to the following requirements:
 - The registrar MUST NOT admit an advertisement
 if an identical `ad` already exists in the `ad_cache`.
 - The Registrar MUST calculate waiting time for the advertisement
-using the formula specified in the [Waiting Time Calculation](#waiting-time-calculation) section.
+using the formula specified in the
+[Waiting Time Calculation](#waiting-time-calculation) section.
 The waiting time determines how long the advertiser must wait
 before the `ad` can be admitted to the `ad_cache`.
 - If no `ticket` is provided in the `REGISTER` request then
@@ -592,7 +614,8 @@ this is the advertiser's first registration attempt for the `ad`.
 The registrar MUST create a new `ticket`
 and return the signed `ticket` to the advertiser with status `Wait`.
 - If the advertiser provides a `ticket` in the `REGISTER` request from a previous attempt:
-  - The registrar MUST verify the `ticket.signature` is valid and was issued by this registrar.
+  - The registrar MUST verify the `ticket.signature`
+  is valid and was issued by this registrar.
   - The registrar MUST verify that `ticket.ad` matches the `ad` in the current request
   - The registrar MUST verify that the `ad` is still not in the `ad_cache`
   - The registrar MUST verify the retry is within the registration window
@@ -626,7 +649,8 @@ If true, the `ad` is expired and MUST be removed from the cache.
 We RECOMMEND that the following algorithm be used by registrars
 to implement the admission control requirements specified above.
 
-Refer to the [Register Message section](#register-message) for the request and response structure of `REGISTER`.
+Refer to the [Register Message section](#register-message)
+for the request and response structure of `REGISTER`.
 
 ```text
 procedure REGISTER(ad, ticket):
@@ -660,12 +684,15 @@ procedure REGISTER(ad, ticket):
 end procedure
 ```
 
-Refer to the [Register Algorithm Explanation section](#register-algorithm-explanation) for detailed explanation.
+Refer to the [Register Algorithm Explanation section](#register-algorithm-explanation)
+for detailed explanation.
 
 ## Lookup Response Algorithm
 
-Registrars respond to `GET_ADS` requests from discoverers using the `LOOKUP_RESPONSE()` algorithm.
-Refer to [GET_ADS Message section](#get_ads-message) for the request and response structure of `GET_ADS`.
+Registrars respond to `GET_ADS` requests from discoverers
+using the `LOOKUP_RESPONSE()` algorithm.
+Refer to [GET_ADS Message section](#get_ads-message)
+for the request and response structure of `GET_ADS`.
 
 ```text
 procedure LOOKUP_RESPONSE(service_id_hash):
@@ -676,17 +703,20 @@ end procedure
 ```
 
 1. Fetch all `ads` for `service_id_hash` from the registrar’s `ad_cache`.
-Then return up to `F_return` of them (a system parameter limiting how many `ads` are sent per query by a registrar).
+Then return up to `F_return` of them
+(a system parameter limiting how many `ads` are sent per query by a registrar).
 2. Call the `GETPEERS(service_id_hash)` function to get a list of peers
 from across the registrar’s routing table `RegT(service_id_hash)`.
 3. Send the assembled response (advertisements + closer peers) back to the discoverer.
 
 ## Peer Table Updates
 
-While responding to both `REGISTER` requests by advertisers and `GET_ADS` request by discoverers,
+While responding to both `REGISTER` requests by advertisers
+and `GET_ADS` request by discoverers,
 the contacted registrar node also returns a list of peers.
 To get this list of peers, the registrar runs the `GETPEERS(service_id_hash)` algorithm.
-Both advertisers and discoverers update their service-specific tables using this list of peers.
+Both advertisers and discoverers update their
+service-specific tables using this list of peers.
 
 ```text
 procedure GETPEERS(service_id_hash):
@@ -724,8 +754,10 @@ while still learning rare peers in buckets close to `service_id_hash`.
 
 ### Formula
 
-The waiting time is the time advertisers have to wait before being admitted to the `ad_cache`.
-The waiting time is given based on the ad itself and the current state of the registrar’s `ad_cache`.
+The waiting time is the time advertisers have to
+wait before being admitted to the `ad_cache`.
+The waiting time is given based on the ad itself
+and the current state of the registrar’s `ad_cache`.
 
 The waiting time for an advertisement is calculated using:
 
@@ -800,7 +832,8 @@ IP tree is a binary tree that stores IPs used by `ads` that are currently presen
 `IP_counter`s of all the visited vertices are increased by 1.
 The visited path is the binary representation of the IPv4 address.
 IPv4 addresses are inserted into the tree only when they are admitted to the `ad_cache`.
-- The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
+- The IP tree is traversed to calculate the IP score using
+`CALCULATE_IP_SCORE()` every time the waiting time is calculated.
 - When an ad expires after `E` the ad is removed from the `ad_cache`
 and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the `IP_counter`s on the path.
 The path is the binary representation of the IPv4 address.
@@ -808,7 +841,8 @@ The path is the binary representation of the IPv4 address.
 
 #### `ADD_IP_TO_TREE()` algorithm
 
-IPv4 addresses are added to the IP tree using the `ADD_IP_TO_TREE()` algorithm when an ad admitted to the `ad_cache`.
+IPv4 addresses are added to the IP tree using the
+`ADD_IP_TO_TREE()` algorithm when an ad admitted to the `ad_cache`.
 
 ```text
 procedure ADD_IP_TO_TREE(tree, IP):
@@ -825,7 +859,8 @@ procedure ADD_IP_TO_TREE(tree, IP):
 end procedure
 ```
 
-1. Start from the root node of the tree. Initialize current node variable `v` to root of the tree `tree.root`.
+1. Start from the root node of the tree.
+Initialize current node variable `v` to root of the tree `tree.root`.
 2. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
 3. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
     1. Increase the `IP_counter` for the current node `v.IP_counter`.
@@ -834,10 +869,12 @@ end procedure
     Go right `v.right` if it’s `1`.
     This follows the path corresponding to the IP’s binary representation.
 
-The IP tree is traversed to calculate the IP score using `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
+The IP tree is traversed to calculate the IP score using
+`CALCULATE_IP_SCORE()` every time the waiting time is calculated.
 It calculates how similar a given IP address is to other IPs already in the `ad_cache`
 and returns the IP similarity score of the inserted IP address.
-It’s used to detect when too many `ads` come from the same network or IP prefix — a possible Sybil behavior.
+It’s used to detect when too many `ads`
+come from the same network or IP prefix — a possible Sybil behavior.
 
 #### `CALCULATE_IP_SCORE()` algorithm
 
@@ -861,18 +898,23 @@ end procedure
 ```
 
 1. Start from the root node of the tree.
-2. Initialize the similarity score `score` to 0. This score will later show how common the IP’s prefix is among existing IPs.
+2. Initialize the similarity score `score` to 0.
+This score will later show how common the IP’s prefix is among existing IPs.
 3. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
-4. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
-    1. Move to the next node in the tree. Go left `v.left` if the current bit `bits[i]` is `0`. Go right `v.right` if it’s `1`.
+4. Go through each bit of the IP address,
+from the most significant (leftmost `0`) to the least (rightmost `31`).
+    1. Move to the next node in the tree.
+    Go left `v.left` if the current bit `bits[i]` is `0`. Go right `v.right` if it’s `1`.
     This follows the path corresponding to the IP’s binary representation.
     2. Check if this node’s `IP_counter` is larger than expected in a perfectly balanced tree.
-    If it is, that means too many IPs share this prefix, so increase the similarity score `score` by 1.
+    If it is, that means too many IPs share this prefix,
+    so increase the similarity score `score` by 1.
 5. Divide the total score by 32 (the number of bits in the IP) and return it.
 
 #### `REMOVE_FROM_IP_TREE()` algorithm
 
-When an ad expires after `E`, its IP is removed from the tree, and the `IP_counter`s in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
+When an ad expires after `E`, its IP is removed from the tree,
+and the `IP_counter`s in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
 
 ```text
 procedure REMOVE_FROM_IP_TREE(tree, IP):
@@ -899,12 +941,14 @@ The safety parameter `G` ensures waiting times never reach zero even when:
 - Service similarity is zero (new service).
 - IP similarity is zero (completely distinct IP)
 
-It prevents `ad_cache` overflow in cases when attackers try to send `ads` for random services or from diverse IPs.
+It prevents `ad_cache` overflow in cases when attackers try to
+send `ads` for random services or from diverse IPs.
 
 ### Lower Bound Enforcement
 
-To prevent "ticket grinding" attacks where advertisers repeatedly request new tickets hoping for better waiting times,
-registrars enforce lower bounds:
+To prevent "ticket grinding" attacks where advertisers
+repeatedly request new tickets hoping for better waiting times,
+registrars MUST enforce lower bounds:
 
 Invariant: A new waiting time `w_2` at time `t_2`
 cannot be smaller than a previous waiting time `w_1` at time `t_1`
@@ -914,15 +958,16 @@ cannot be smaller than a previous waiting time `w_1` at time `t_1`
 w_2 ≥ w_1 - (t_2 - t_1)
 ```
 
-Thus registrars maintain lower bound state for:
+Thus registrars MUST maintain lower bound state for:
 
 - Each service in the cache: `bound(service_id_hash)` and `timestamp(service_id_hash)`
 - Each IP prefix in the IP tree: `bound(IP)` and `timestamp(IP)`
 
 The total waiting time will respect the lower bound if lower bound is enforced on these.
-These two sets have a bounded size as number of `ads` present in the `ad_cache` at a time is bounded by the cache capacity C.
+These two sets have a bounded size as number of `ads` present in the `ad_cache`
+at a time is bounded by the cache capacity `C`.
 
-**How lower bound is calculated for service IDs:**
+**How SHOULD lower bound be calculated for service IDs:**
 
 When new `service_id_hash` enters the cache, `bound(service_id_hash)` is set to `0`,
 and a `timestamp(service_id_hash)` is set to the current time.
@@ -931,10 +976,11 @@ the registrar calculates the service waiting time `w_s` and then applies the low
 
 `w_s = max(w_s, bound(service_id_hash) - timestamp(service_id_hash))`
 
-The values `bound(service_id_hash)` and `timestamp(service_id_hash)` are updated whenever a new ticket is issued
+The values `bound(service_id_hash)` and `timestamp(service_id_hash)`
+are updated whenever a new ticket is issued
 and the condition `w_s > (bound(service_id_hash) - timestamp(service_id_hash))`is satisfied.
 
-**How lower bound is calculated for IPs:**
+**How SHOULD lower bound be calculated for IPs:**
 Registrars enforce lower-bound state for the advertiser’s IP address using IP tree
 (refer to the [IP Similarity Score section](#ip-similarity-score)).
 
@@ -945,10 +991,10 @@ Registrars enforce lower-bound state for the advertiser’s IP address using IP 
 Logos discovery respects the client/server mode distinction
 from the base Kad-dht specification:
 
-- **Server mode nodes**: Can be Discoverer, Advertiser and Registrar
-- **Client mode nodes**: Can only be Discoverer
+- **Server mode nodes**: MAY be Discoverer, Advertiser and Registrar
+- **Client mode nodes**: MUST be only Discoverer
 
-Implementations may include incentivization mechanisms
+Implementations MAY include incentivization mechanisms
 to encourage peers to participate as advertisers or registrars,
 rather than operating solely in client mode.
 This helps prevent free-riding behavior,
@@ -968,7 +1014,10 @@ Incentivization mechanisms are beyond the scope of this RFC.
 
 ## Appendix
 
-This appendix provides detailed explanations of some algorithms and helper procedures referenced throughout this RFC. To maintain clarity and readability in the main specification, the body contains only the concise pseudocode and high-level descriptions.
+This appendix provides detailed explanations of some algorithms
+and helper procedures referenced throughout this RFC.
+To maintain clarity and readability in the main specification,
+the body contains only the concise pseudocode and high-level descriptions.
 
 ### Advertiser Algorithms Explanation
 
@@ -1144,7 +1193,8 @@ they do **not** use the creation time `t_init` or the modification time `t_mod`.
 Therefore, **clock** synchronization between advertisers and registrars is not required.
 
 The waiting time `t_wait` is not fixed.
-Each time an advertiser tries to register, the registrar recalculates a new waiting time based on its current cache state.
+Each time an advertiser tries to register,
+the registrar recalculates a new waiting time based on its current cache state.
 The remaining time `t_remaining` is then computed as the difference between
 the new waiting time and the time the advertiser has already waited, as recorded in the ticket.
 With every retry, the advertiser accumulates waiting time and will eventually be admitted.
@@ -1155,4 +1205,5 @@ Implementations must consider these factors while deciding the registration wind
 This design lets registrars prioritize advertisers that have waited longer
 without keeping any per-request state before the ad is admitted to the cache.
 Because waiting times are recalculated and tickets are stored only on the advertiser’s side,
-the registrar is protected from memory exhaustion and DoS attacks caused by inactive or malicious advertisers.
+the registrar is protected from memory exhaustion
+and DoS attacks caused by inactive or malicious advertisers.
