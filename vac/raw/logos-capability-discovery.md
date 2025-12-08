@@ -444,7 +444,7 @@ message Message {
 }
 ```
 
-Discoverers MUST include the `service_id_hash` they are searching for in the `key` field.
+Discoverers SHOULD include the `service_id_hash` they are searching for in the `key` field.
 
 #### GET_ADS Response
 
@@ -645,7 +645,7 @@ and return the signed `ticket` to the advertiser with status `Wait`.
     This ensures advertisers accumulate waiting time across retries
 - If `t_remaining ≤ 0`, the registrar MUST add the `ad` to the `ad_cache`
 with `ad.Timestamp` set to current Unix time.
-The registrar SHOULD return response with status Confirmed
+The registrar SHOULD return response with `status = Confirmed`
 - If `t_remaining > 0`, the advertiser SHOULD continue waiting.
 The registrar MUST issue a new `ticket` with updated `ticket.t_mod` and `ticket.t_wait_for = MIN(E, t_remaining)`.
 The registrar MUST sign the new `ticket`.
@@ -774,11 +774,11 @@ while still learning rare peers in buckets close to `service_id_hash`.
 ### Formula
 
 The waiting time is the time advertisers have to
-wait before being admitted to the `ad_cache`.
+wait before their `ad` is admitted to the `ad_cache`.
 The waiting time is given based on the `ad` itself
 and the current state of the registrar’s `ad_cache`.
 
-The waiting time for an advertisement is calculated using:
+The waiting time for an advertisement MUST be calculated using:
 
 ```text
 w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(ad.addrs)) + G)
@@ -831,17 +831,38 @@ The service similarity score promotes diversity:
 
 ### IP Similarity Score
 
-IP similarity score is used to limit the number of IPs coming from the same subnetwork
+The IP similarity score is used to detect and limit
+Sybil attacks where malicious actors create multiple advertisements
+from the same network or IP prefix.
+
+Registrars MUST use an IP similarity score to
+limit the number of `ads` coming from the same subnetwork
 by increasing their waiting time.
-Higher similarity means higher score and a higher waiting time.
-The `score` ranges from 0 to 1:
+The IP similarity mechanism:
 
-- closer to 1 for IPs sharing similar prefix
-- closer to 0 for diverse IPs
-
-IP tree is a binary tree that stores IPs used by `ads` that are currently present in the `ad_cache`.
+- MUST calculate a score ranging from 0 to 1, where:
+  - A score closer to 1 indicates IPs sharing similar prefixes
+  (potential Sybil behavior)
+  - A score closer to 0 indicates diverse IPs (legitimate behavior)
+- MUST track IP addresses of `ads` currently in the `ad_cache`.
+- MUST update its tracking structure when:
+  - A new `ad` is admitted to the `ad_cache`: MUST add the IP
+  - An `ad` expires after time `E`:
+  MUST remove IP if there are no other active `ads` from the same IP
+- MUST calculate the IP similarity score every time
+a waiting time is calculated for a new registration attempt.
 
 #### Tree Structure
+
+We RECOMMEND using an IP tree data structure
+to efficiently track and calculate IP similarity scores.
+An IP tree is a binary tree that stores
+IPs used by `ads` currently present in the `ad_cache`.
+This data structure provides logarithmic time complexity
+for insertion, deletion, and score calculation.
+Implementations MAY use alternative data structures
+as long as they satisfy the requirements specified above.
+The recommended IP tree has the following structure:
 
 - Each tree vertex stores a `IP_counter` showing how many IPs pass through that node.
 - Apart from root, the IP tree is a 32-level binary tree
@@ -854,14 +875,21 @@ IPv4 addresses are inserted into the tree only when they are admitted to the `ad
 - The IP tree is traversed to calculate the IP score using
 `CALCULATE_IP_SCORE()` every time the waiting time is calculated.
 - When an `ad` expires after `E` the `ad` is removed from the `ad_cache`
-and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm by decreasing the `IP_counter`s on the path.
+and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm
+by decreasing the `IP_counter`s on the path.
 The path is the binary representation of the IPv4 address.
-- the root `IP_counter` stores the number of IPv4 addresses that are currently present in the `ad_cache`
+- the root `IP_counter` stores the number of IPv4 addresses
+that are currently present in the `ad_cache`
 
 #### `ADD_IP_TO_TREE()` algorithm
 
-IPv4 addresses are added to the IP tree using the
-`ADD_IP_TO_TREE()` algorithm when an `ad` admitted to the `ad_cache`.
+When an `ad` is admitted to the `ad_cache`,
+its IPv4 address MUST be added to the IP tracking structure.
+
+We RECOMMEND the `ADD_IP_TO_TREE()` algorithm for adding IPv4 addresses to the IP tree.
+This algorithm ensures efficient insertion with O(32) time complexity.
+Implementations MAY use alternative approaches as long as they maintain
+accurate IP tracking for similarity calculation.
 
 ```text
 procedure ADD_IP_TO_TREE(tree, IP):
@@ -888,14 +916,17 @@ Initialize current node variable `v` to root of the tree `tree.root`.
     Go right `v.right` if it’s `1`.
     This follows the path corresponding to the IP’s binary representation.
 
-The IP tree is traversed to calculate the IP score using
-`CALCULATE_IP_SCORE()` every time the waiting time is calculated.
-It calculates how similar a given IP address is to other IPs already in the `ad_cache`
-and returns the IP similarity score of the inserted IP address.
-It’s used to detect when too many `ads`
-come from the same network or IP prefix — a possible Sybil behavior.
-
 #### `CALCULATE_IP_SCORE()` algorithm
+
+Every time a waiting time is calculated for a registration attempt,
+the registrar MUST calculate the IP similarity score for the advertiser's IP address.
+This score determines how similar the IP is to other IPs already in the cache.
+
+We RECOMMEND the `CALCULATE_IP_SCORE()` algorithm for calculating IP similarity scores.
+This algorithm traverses the IP tree to detect how many IPs share common prefixes,
+providing an effective measure of potential Sybil behavior.
+Implementations MAY use alternative approaches
+as long as they accurately measure IP similarity on a 0-1 scale.
 
 ```text
 procedure CALCULATE_IP_SCORE(tree, IP):
@@ -932,8 +963,14 @@ from the most significant (leftmost `0`) to the least (rightmost `31`).
 
 #### `REMOVE_FROM_IP_TREE()` algorithm
 
-When an `ad` expires after `E`, its IP is removed from the tree,
-and the `IP_counter`s in the nodes are decreased using the `REMOVE_FROM_IP_TREE()` algorithm.
+When an `ad` expires after time `E`,
+the registrar MUST remove the `ad` from the `ad_cache`.
+The registrar MUST also remove the IP from IP tracking structure
+if there are no other active `ad` in `ad_cache` from the same IP.
+
+We RECOMMEND the `REMOVE_FROM_IP_TREE()` algorithm for removing IPv4 addresses from the IP tree.
+This algorithm ensures efficient deletion with O(32) time complexity.
+Implementations MAY use alternative approaches as long as they maintain accurate IP tracking.
 
 ```text
 procedure REMOVE_FROM_IP_TREE(tree, IP):
@@ -950,7 +987,8 @@ procedure REMOVE_FROM_IP_TREE(tree, IP):
 end procedure
 ```
 
-Implementations can extend the IP tree algorithms to IPv6 by using a 128-level binary tree,
+Implementations can extend the IP tree algorithms to IPv6
+by using a 128-level binary tree,
 corresponding to the 128-bit length of IPv6 addresses.
 
 ### Safety Parameter
@@ -996,7 +1034,7 @@ the registrar calculates the service waiting time `w_s` and then applies the low
 `w_s = max(w_s, bound(service_id_hash) - timestamp(service_id_hash))`
 
 The values `bound(service_id_hash)` and `timestamp(service_id_hash)`
-are updated whenever a new ticket is issued
+are updated whenever a new `ticket` is issued
 and the condition `w_s > (bound(service_id_hash) - timestamp(service_id_hash))`is satisfied.
 
 **How SHOULD lower bound be calculated for IPs:**
@@ -1010,7 +1048,7 @@ Registrars enforce lower-bound state for the advertiser’s IP address using IP 
 Logos discovery respects the client/server mode distinction
 from the base Kad-dht specification:
 
-- **Server mode nodes**: MAY be Discoverer, Advertiser and Registrar
+- **Server mode nodes**: MAY be Discoverer, Advertiser or Registrar
 - **Client mode nodes**: MUST be only Discoverer
 
 Implementations MAY include incentivization mechanisms
