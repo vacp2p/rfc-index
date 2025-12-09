@@ -73,7 +73,7 @@ message Proposal {
   string payload = 11;               // Proposal description
   uint32 proposal_id = 12;           // Unique identifier of the proposal
   bytes proposal_owner = 13;         // Public key of the creator 
-  repeated Votes = 14;               // Vote list in the proposal
+  repeated Vote votes = 14;              // Vote list in the proposal
   uint32 expected_voters_count = 15; // Maximum number of distinct voters
   uint32 round = 16;                 // Number of Votes 
   uint64 timestamp = 17;             // Creation time of proposal
