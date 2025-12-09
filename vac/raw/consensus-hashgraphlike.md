@@ -77,7 +77,7 @@ message Proposal {
   uint32 expected_voters_count = 15; // Maximum number of distinct voters
   uint32 round = 16;                 // Number of Votes 
   uint64 timestamp = 17;             // Creation time of proposal
-  uint64 expiration_time = 18;       // The time interval that the proposal is active.  
+  uint64 expiration_timestamp = 18;  // The time interval that the proposal is active.  
   bool liveness_criteria_yes = 19;   // Shows how managing the silent peers vote
 }
 
@@ -138,7 +138,7 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
   
    5.3. Increase the round by one, namely `P_2.round = P_1.round + 1`.
   
-   5.4. Verify that the proposal has not expired by checking that: `P_2.timestamp - current_time < P_1.expiration_time`.
+   5.4. Verify that the proposal has not expired by checking that: `current_time in [P_timestamp, P_expiration_timestamp]`.
     If this does not hold, other peers ignore the message.
 
 After the peer creates the proposal `P_2` with its vote `V_2`,
