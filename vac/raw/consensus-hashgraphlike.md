@@ -85,7 +85,7 @@ message Vote {
   uint32 vote_id = 20;            // Unique identifier of the vote
   bytes vote_owner = 21;          // Voter's public key
   uint32 proposal_id = 22;        // Linking votes and proposals
-  int64 timestamp = 23;           // Time when the vote was cast
+  uint64 timestamp = 23;          // Time when the vote was cast
   bool vote = 24;                 // Vote bool value (true/false)
   bytes parent_hash = 25;         // Hash of previous owner's Vote
   bytes received_hash = 26;       // Hash of previous received Vote
