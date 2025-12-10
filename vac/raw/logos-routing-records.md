@@ -39,7 +39,8 @@ such as supported protocols,
 on first connection.
 The routing record (in a signed envelope) can also be exchanged during `identify`.
 However, peers may want to exchange finer-grained information related to supported protocols/services,
-that would otherwise require an application-level negotiation protocol.
+that would otherwise require an application-level negotiation protocol,
+or that is critical to connect to the service in the first place.
 An example would be nodes supporting libp2p [`mix` protocol](https://rfc.vac.dev/vac/raw/mix) also needing to exchange the mix key
 before the service can be used.
 2. **To advertise supported services:**
@@ -99,7 +100,8 @@ message LogosPeerRecord {
 
 A peer MAY include a list of supported services in the `services` field.
 These services could be libp2p protocols,
-in which case it is RECOMMENDED that the libp2p protocol identifier be used as the `ServiceInfo` `id` field.
+in which case it is RECOMMENDED that the `ServiceInfo` `id` field
+be derived from the libp2p protocol identifier.
 In any case, for each supported service,
 the `id` field MUST be populated with a string identifier for that service.
 In addition, the `data` field MAY be populated with additional information about the service.
