@@ -1018,7 +1018,7 @@ Similar decapsulation steps are performed by subsequent nodes in the blending pa
 
 ### Informative
 
-- [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df8136a3bbf64df8b59779)
+- [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b)
   \- Original Message Encapsulation documentation
 - [Blend Protocol](https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084)
   \- Context for message structure and formatting conventions
