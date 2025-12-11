@@ -30,7 +30,7 @@ In Codex,
 instead of hashes of individual pieces,
 we create a Merkle Tree computed over the blocks in the dataset.
 We then include the CID of the root of this Merkle Tree as treeCid attribute in the Codex Manifest file.
-
+See [CODEX-MERKLE-TREE](./merkle-tree.md) for more information.
 In version 2 of the BitTorrent protocol also uses Merkle Trees and
 includes the root of the tree in the info dictionary for each .torrent file.
 
@@ -60,14 +60,14 @@ The `mimetype` of the original dataset MAY be included in the manifest.
 ```protobuf
 
 message Manifest {
-  optional bytes treeCid = 1;        # cid (root) of the tree
-  optional uint32 blockSize = 2;     # size of a single block
-  optional uint64 datasetSize = 3;   # size of the dataset
-  optional uint32 codec = 4;         # Dataset codec
-  optional uint32 hcodec  = 5;       # Multihash codec
-  optional uint32 version = 6;       # Cid version
-  optional string filename = 7;      # original filename
-  optional uint32 mimetype = 8;      # original mimetype
+  optional bytes treeCid = 1;        // cid (root) of the tree
+  optional uint32 blockSize = 2;     // size of a single block
+  optional uint64 datasetSize = 3;   // size of the dataset
+  optional uint32 codec = 4;         // Dataset codec
+  optional uint32 hcodec  = 5;       // Multihash codec
+  optional uint32 version = 6;       // Cid version
+  optional string filename = 7;      // original filename
+  optional string mimetype = 8;      // original mimetype
 }
 
 ```
@@ -81,7 +81,7 @@ message Manifest {
 | `hcodec` | [MultiCodec](https://github.com/multiformats/multicodec) | Multicodec used for computing of the multihash used in blocks CIDs. Codex uses (sha2-256, 0x12). |
 | `version` | integer | The version of CID used for the dataset blocks. |
 | `filename` | string | When provided, it can be used by the client as a file name while downloading the content. |
-| `mimetype` | integer | When provided, it can be used by the client to set a content type of the downloaded content.  |
+| `mimetype` | string | When provided, it can be used by the client to set a content type of the downloaded content.  |
 
 ## Copyright
 
@@ -89,6 +89,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
+- [CODEX-MERKLE-TREE](./merkle-tree.md)
 - [BEP3](http://bittorrent.org/beps/bep_0003.html)
 - [CODEX-DHT specification](./dht.md)
 - [MultiCodec](https://github.com/multiformats/multicodec)
