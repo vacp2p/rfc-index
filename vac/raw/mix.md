@@ -87,8 +87,7 @@ A per-message flag set by the origin protocol to indicate that a message should
 be routed using
 the Mix Protocol or not.
 Only messages with mixify set are forwarded to the Mix Entry Layer.
-Other messages SHOULD be routed using the origin protocol’s default behavior.
-
+Other messages SHOULD be routed using the origin protocol’s default behavior.  
 The phrases 'messages to be mixified', 'to mixify a message' and related
 variants are used
 informally throughout this document to refer to messages that either have the
@@ -1100,8 +1099,10 @@ For interoperability, a recommended default encoding format involves:
   - Port number (2 bytes)
   - Peer IDs (39 bytes, post-Base58 decoding)
 
-- Encoding the forwarding delay as an unsigned 16-bit integer (2 bytes) in
-  milliseconds, using big endian network byte order.
+- Encoding the forwarding delay as an unsigned 16-bit integer (2 bytes),
+  representing the mean delay in milliseconds for the configured delay
+  distribution, using big endian network byte order.  
+  The delay distribution is pluggable, as defined in [Section 6.2](#62-delay-strategy).
 
 If the encoded address or delay is shorter than its respective allocated
 field, it MUST be padded with zeros. If it exceeds the allocated size, it
@@ -1165,20 +1166,24 @@ The construction MUST proceed as follows:
 1. **Prepare Application Message**
 
    - Apply any configured spam protection mechanism (_e.g.,_ PoW, VDF, RLN)
-  to the serialized message. Spam protection mechanisms are pluggable as defined
-  in [Section 6.3](#63-spam-protection).
+   to the serialized message. Spam protection mechanisms are pluggable as defined
+   in [Section 6.3](#63-spam-protection).
    - Attach one or more SURBs, if required. Their format and processing are
-  specified in [Section X.X].
-   - Append the origin protocol codec.
+   specified in [Section X.X].
+   - Append the origin protocol codec in a format that enables the exit node to
+   reliably extract it during parsing. A recommended encoding approach is to
+   prefix the codec string with its length, encoded as a compact varint field
+   limited to two bytes. Regardless of the scheme used, implementations MUST
+   agree on the format within a deployment to ensure deterministic decoding.
    - Pad the result to the maximum application message length of $3968$ bytes
-  using a deterministic padding scheme. This value is derived from the fixed
-  payload size in [Section 8.3.2](#832-payload-size) ($3984$ bytes) minus the
-  security parameter $κ = 16$ bytes defined in
-  [Section 8.2](#82-cryptographic-primitives). The chosen scheme MUST yield a
-  fixed-size padded output and MUST be consistent across all mix nodes to
-  ensure correct interpretation during unpadding. For example, schemes that
-  explicitly encode the padding length and prepend zero-valued padding bytes
-  MAY be used.
+   using a deterministic padding scheme. This value is derived from the fixed
+   payload size in [Section 8.3.2](#832-payload-size) ($3984$ bytes) minus the
+   security parameter $κ = 16$ bytes defined in
+   [Section 8.2](#82-cryptographic-primitives). The chosen scheme MUST yield a
+   fixed-size padded output and MUST be consistent across all mix nodes to
+   ensure correct interpretation during unpadding. For example, schemes that
+   explicitly encode the padding length and prepend zero-valued padding bytes
+   MAY be used.
    - Let the resulting message be $m$.  
 
 2. **Select A Mix Path**
@@ -1220,8 +1225,8 @@ The construction MUST proceed as follows:
      \end{aligned}
      `$
 
-   Note that the length of $α_i$ is $32$ bytes as defined in
-   [Section 8.3](#83-packet-component-sizes).
+   Note that the length of $α_i$ is $32$ bytes, $0 \leq i \leq L-1$ as defined in
+   [Section 8.3.1](#831-header-field-sizes).
 
    b. **Compute Per-Hop Filler Strings**  
    Filler strings are encrypted strings that are appended to the header during
@@ -1246,17 +1251,17 @@ The construction MUST proceed as follows:
 
      - Compute the filler string $Φ_i$ using $\text{AES-CTR}^\prime_i$,
        which is AES-CTR encryption with the keystream starting from
-       index $((t+1)(r-i)+t+2)\kappa$ :
+       index $((t+1)(r-i)+t+2)κ$ :
 
        $`
        \begin{array}{l}
        Φ_i = \mathrm{AES\text{-}CTR}'_i\bigl(Φ_{\mathrm{aes\_key}_{i-1}},
-       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)\kappa} \bigr),
+       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr),\; \; \;
        \text{where notation $0_x$ defines the string of $0$ bits of length $x$.}
        \end{array}
        `$
 
-   Note that the length of $Φ_i$ is $(t+1)i\kappa$.
+   Note that the length of $Φ_i$ is $(t+1)iκ$, $0 \leq i \leq L-1$.
 
    c. **Construct Routing Header**
    The routing header as defined in
@@ -1286,21 +1291,22 @@ The construction MUST proceed as follows:
      `$
   
    - Set the per hop two-byte encoded delay $\mathrm{delay}_i$ as defined in
-  [Section 8.4](#84-address-and-delay-encoding):
+   [Section 8.4](#84-address-and-delay-encoding):
      - If final hop (_i.e.,_ $i = L - 1$), encode two byte zero padding.
-     - For all other hop $i,\ i < L - 1$, sample a forwarding delay
-  using the delay strategy configured by the application and encode it in two bytes.
-  The delay strategy is pluggable as defined in [Section 6.2](#62-delay-strategy).
+     - For all other hop $i,\ i < L - 1$, select the mean forwarding delay
+     for the delay strategy configured by the application, and encode it as a
+     two-byte value. The delay strategy is pluggable, as defined in
+     [Section 6.2](#62-delay-strategy).
   
    - Using the derived keys and encoded forwarding delay, compute the nested
-  encrypted routing information $β_i$:
+     encrypted routing information $β_i$:
 
      - If $i = L-1$ (_i.e.,_ exit node):
 
        $`
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
-       β_{\mathrm{iv}_i}, Δ \mid \mathrm{delay}_i \mid 0_{((t+1)(r-L)+2)\kappa}
+       β_{\mathrm{iv}_i}, Δ \mid \mathrm{delay}_i \mid 0_{((t+1)(r-L)+2)κ}
        \bigr) \bigm| Φ_{L-1}
        \end{array}
        `$
@@ -1310,13 +1316,15 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
-       β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid $\mathrm{delay}_i$
-       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)\kappa - 1]} \bigr)
+       β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid \mathrm{delay}_i
+       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\; \; \;
+       \text{where notation $X_{[a \ldots b]}$ denotes the substring of $X$
+       from byte offset $a$ to $b$, inclusive, using zero-based indexing.}
        \end{array}
        `$
 
-     Note that the length of $\beta_i$ is $(r(t+1)+1)\kappa$, $0 \leq i \leq L-1$
-     as defined in [Section 8.3](#83-packet-component-sizes).
+     Note that the length of $\beta_i$ is $(r(t+1)+1)κ$, $0 \leq i \leq L-1$
+     as defined in [Section 8.3.1](#831-header-field-sizes).
 
      - Compute the message authentication code $γ_i$:
 
@@ -1327,8 +1335,8 @@ The construction MUST proceed as follows:
        \end{array}
        `$
 
-     Note that the length of $\gamma_i$ is $\kappa$ as defined in
-     [Section 8.3](#83-packet-component-sizes).
+     Note that the length of $\gamma_i$ is $κ$, $0 \leq i \leq L-1$ as defined in
+     [Section 8.3.1](#831-header-field-sizes).
 
    d. **Encrypt Payload**
    The encrypted payload $δ$ contains the message $m$ defined in Step 1,
@@ -1357,7 +1365,7 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        δ_i = \mathrm{AES\text{-}CTR}\bigl(δ_{\mathrm{aes\_key}_i},
-       δ_{\mathrm{iv}_i}, 0_{\kappa} \mid m
+       δ_{\mathrm{iv}_i}, 0_{κ} \mid m
        \bigr)
        \end{array}
        `$
@@ -1370,3 +1378,630 @@ The construction MUST proceed as follows:
        δ_{\mathrm{iv}_i}, δ_{i+1} \bigr)
        \end{array}
        `$
+
+     Note that the length of $\delta_i$, $0 \leq i \leq L-1$ is $|m| + κ$ bytes.
+
+     Given that the derived size of $\delta_i$ is $3984$ bytes as defined in
+     [Section 8.3.2](#832-payload-size), this allows $m$ to be of length
+     $3984-16 = 3968$ bytes as defined in Step 1.
+
+   e. **Assemble Final Packet**
+   The final Sphinx packet is structured as defined in
+   [Section 8.3](#83-packet-component-sizes):
+
+   ```text
+   α = α_0      // 32 bytes
+   β = β_0      // 576 bytes
+   γ = γ_0      // 16 bytes
+   δ = δ_0      // 3984 bytes
+   ```
+
+   Serialize the final packet using a consistent format and
+   prepare it for transmission.
+
+   f. **Transmit Packet**
+   - Sample a randomized delay from the same distribution family used for
+   per-hop delays (in Step 3.e.) with an independently chosen mean.  
+
+   This delay prevents timing correlation when multiple Sphinx packets are
+   sent in quick succession. Such bursts may occur when an upstream protocol
+   fragments a large message, or when several messages are sent close together.
+
+   - After the randomized delay elapses, transmit the serialized packet to
+   the first hop via a libp2p stream negotiated under the
+   `"/mix/1.0.0"` protocol identifier.
+
+   Implementations MAY reuse an existing stream to the first hop as
+   described in [Section 5.5](#55-stream-management-and-multiplexing), if
+   doing so does not introduce any observable linkability between the
+   packets.
+
+Once a Sphinx packet is constructed and transmitted by the initiating node, it is
+processed hop-by-hop by the remaining mix nodes in the path. Each node receives
+the packet over a libp2p stream negotiated under the `"/mix/1.0.0"` protocol.
+The following subsection defines the per-hop packet handling logic expected of
+each mix node, depending on whether it acts as an intermediary or an exit.
+
+### 8.6 Sphinx Packet Handling
+
+Each mix node MUST implement a handler for incoming data received over
+libp2p streams negotiated under the `"/mix/1.0.0"` protocol identifier.
+The incoming stream may have been reused by the previous hop, as described
+in [Section 5.5](#55-stream-management-and-multiplexing). Implementations
+MUST ensure that packet handling remains stateless and unlinkable,
+regardless of stream reuse.
+
+Upon receiving the stream payload, the node MUST interpret it as a Sphinx packet
+and process it in one of two roles&mdash;intermediary or exit&mdash; as defined in
+[Section 7.3](#73-sphinx-packet-receiving-and-processing). This section defines
+the exact behavior for both roles.
+
+#### 8.6.1 Shared Preprocessing
+
+Upon receiving a stream payload over a libp2p stream, the mix node MUST first
+deserialize it into a Sphinx packet `(α, β, γ, δ)`.
+
+The deserialized fields MUST match the sizes defined in [Section 8.5.2](#852-construction-steps)
+step 3.e., and the total packet length MUST match the fixed packet size defined in
+[Section 8.3.2](#832-payload-size).
+
+If the stream payload does not match the expected length, it MUST be discarded and
+the processing MUST terminate.
+
+After successful deserialization, the mix node performs the following steps:
+
+1. **Derive Session Key**
+
+   Let $x \in \mathbb{Z}_q^*$ denote the node's X25519 private key.  
+   Compute the shared secret $s = α^x$.
+
+2. **Check for Replays**
+
+   - Compute the tag $H(s)$.
+   - If the tag exists in the node's table of previously seen tags,
+   discard the packet and terminate processing.
+   - Otherwise, store the tag in the table.
+
+   The table MAY be flushed when the node rotates its private key.
+   Implementations SHOULD perform this cleanup securely and automatically.
+
+3. **Check Header Integrity**
+
+   - Derive the MAC key from the session secret $s$:
+
+     $`
+     \begin{array}{l}
+     \mathrm{mac\_key} =
+     \mathrm{KDF}(\text{"mac\_key"} \mid s)
+     \end{array}
+     `$
+
+   - Verify the integrity of the routing header:
+
+     $`
+     \begin{array}{l}
+     γ \stackrel{?}{=} \mathrm{HMAC\text{-}SHA\text{-}256}(\mathrm{mac\_key},
+     β)
+     \end{array}
+     `$
+
+     If the check fails, discard the packet and terminate processing.
+
+4. **Decrypt One Layer of the Routing Header**
+
+   - Derive the routing header AES key and IV from the session secret $s$:
+
+     $`
+     \begin{array}{l}
+     β_{\mathrm{aes\_key}} =
+     \mathrm{KDF}(\text{"aes\_key"} \mid s)\\
+     β_{\mathrm{iv}} =
+     \mathrm{KDF}(\text{"iv"} \mid s)
+     \end{array}
+     `$
+
+   - Decrypt the suitably padded $β$ to obtain the routing block $B$ for this hop:
+
+     $`
+     \begin{array}{l}
+     B = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}},
+     β_{\mathrm{iv}}, β \mid 0_{(t+1)κ}
+     \bigr)
+     \end{array}
+     `$
+
+     This step removes the filler string appended during header encryption in
+     [Section 8.5.2](#852-construction-steps) step 3.c. and
+     yields the plaintext routing information for this hop.
+
+   The routing block $B$ MUST be parsed according to the rules and field layout
+   defined in [Section 8.6.2](#862-node-role-determination) to determine
+   whether the current node is an intermediary or the exit.
+
+5. **Decrypt One Layer of the Payload**
+
+   - Derive the payload AES key and IV from the session secret $s$:
+
+     $`
+     \begin{array}{l}
+     δ_{\mathrm{aes\_key}} =
+     \mathrm{KDF}(\text{"δ\_aes\_key"} \mid s)\\
+     δ_{\mathrm{iv}} =
+     \mathrm{KDF}(\text{"δ\_iv"} \mid s)
+     \end{array}
+     `$
+
+   - Decrypt one layer of the encrypted payload $δ$:
+
+     $`
+     \begin{array}{l}
+     δ' = \mathrm{AES\text{-}CTR}\bigl(δ_{\mathrm{aes\_key}},
+     δ_{\mathrm{iv}}, δ \bigr)
+     \end{array}
+     `$
+
+   The resulting $δ'$ is the decrypted payload for this hop and MUST be
+   interpreted depending on the parsed node's role, determined by $B$, as
+   described in [Section 8.6.2](#862-node-role-determination).
+
+#### 8.6.2 Node Role Determination
+
+As described in [Section 8.6.1](#861-shared-preprocessing), the mix node
+obtains the routing block $B$ by decrypting one layer of the encrypted
+header $β$.
+
+At this stage, the node MUST determine whether it is an intermediary
+or the exit based on the prefix of $B$, in accordance with the construction of
+$β_i$ defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+
+- If the first $(tκ - 2)$ bytes of $B$ contain a nonzero-encoded
+  address, immediately followed by a two-byte zero delay,
+  and then $((t + 1)(r - L) + t + 2)κ$ bytes of all-zero padding,
+  process the packet as an exit.
+- Otherwise, process the packet as an intermediary.
+
+The following subsections define the precise behavior for each case.
+
+#### 8.6.3 Intermediary Processing
+
+Once the node determines its role as an intermediary following the steps in
+[Section 8.6.2](#862-node-role-determination), it MUST perform the following
+steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
+[Section 8.6.1](#861-shared-preprocessing):
+
+1. **Parse Routing Block**
+
+   Parse the routing block $B$ according to the $β_i$, $i \neq L - 1$ construction
+   defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+
+   - Extract the first $(tκ - 2)$ bytes of $B$ as the next hop address $\mathrm{addr}$
+
+     $`
+     \begin{array}{l}
+     \mathrm{addr} = B_{[0\ldots(tκ - 2) - 1]}
+     \end{array}
+     `$
+
+   - Extract next two bytes as the mean delay $\mathrm{delay}$
+
+     $`
+     \begin{array}{l}
+     \mathrm{delay} = B_{[(tκ - 2)\ldots{tκ} - 1]}
+     \end{array}
+     `$
+
+   - Extract next $κ$ bytes as the next hop MAC $γ'$
+
+     $`
+     \begin{array}{l}
+     γ' = B_{[tκ\ldots(t + 1)κ - 1]}
+     \end{array}
+     `$
+
+   - Extract next $(r(t+1)+1)κ$ bytes as the next hop routing information $β'$
+
+     $`
+     \begin{array}{l}
+     β' = B_{[(t + 1)κ\ldots(r(t +1 ) + t + 2)\kappa - 1]}
+     \end{array}
+     `$
+
+   If parsing fails, discard the packet and terminate processing.
+
+2. **Update Header Fields**
+
+   Update the header fields according to the construction steps
+   defined in [Section 8.5.2](#852-construction-steps):
+
+   - Compute the next hop ephemeral public value $α'$, deriving the blinding factor
+   $b$ from the shared secret $s$ computed in
+   [Section 8.6.1](#861-shared-preprocessing) step 1.
+
+     $`
+     \begin{aligned}
+     b &= H(α\ |\ s) \\
+     α' &= α^b
+     \end{aligned}
+     `$
+
+   - Use the $β'$ and $γ'$ extracted in Step 1. as the routing information and
+   MAC respectively in the outgoing packet.
+
+3. **Update Payload**
+
+   Use the decrypted payload $δ'$ computed in
+   [Section 8.6.1](#861-shared-preprocessing) step 5. as the payload in the
+   outgoing packet.
+
+4. **Assemble Final Packet**
+   The final Sphinx packet is structured as defined in
+   [Section 8.3](#83-packet-component-sizes):
+
+   ```text
+   α = α'      // 32 bytes
+   β = β'      // 576 bytes
+   γ = γ'      // 16 bytes
+   δ = δ'      // 3984 bytes
+   ```
+
+   Serialize $α'$ using the same format used in
+   [Section 8.5.2](#852-construction-steps). The remaining fields are
+   already fixed-length buffers and do not require further
+   transformation.
+
+5. **Transmit Packet**
+
+   - Interpret the $\mathrm{addr}$ and $\mathrm{delay}$ extracted in
+   Step 1. according to the encoding format used during construction in
+   [Section 8.5.2](#852-construction-steps) Step 3.c.
+
+   - Sample the actual forwarding delay from the configured delay distribution,
+   using the decoded mean delay value as the distribution parameter.
+
+   - After the forwarding delay elapses, transmit the serialized packet to
+   the next hop address via a libp2p stream negotiated under the `"/mix/1.0.0"`
+   protocol identifier.
+
+   Implementations MAY reuse an existing stream to the next hop as
+   described in [Section 5.5](#55-stream-management-and-multiplexing), if
+   doing so does not introduce any observable linkability between the
+   packets.
+
+6. **Erase State**
+
+   - After transmission, erase all temporary values securely from memory,
+   including session keys, decrypted content, and routing metadata.
+
+   - If any error occurs&mdash;such as malformed header, invalid delay, or
+   failed stream transmission&mdash;silently discard the packet and do not
+   send any error response.
+
+#### 8.6.4 Exit Processing
+
+Once the node determines its role as an exit following the steps in
+[Section 8.6.2](#862-node-role-determination), it MUST perform the following
+steps to interpret routing block $B$ and decrypted payload $δ'$ obtained in
+[Section 8.6.1](#861-shared-preprocessing):
+
+1. **Parse Routing Block**
+
+   Parse the routing block $B$ according to the $β_i$, $i = L - 1$
+   construction defined in [Section 8.5.2](#852-construction-steps) step 3.c.:
+
+   - Extract first $(tκ - 2)$ bytes of $B$ as the destination address $Δ$
+
+     $`
+     \begin{array}{l}
+     Δ = B_{[0\ldots(tκ - 2) - 1]}
+     \end{array}
+     `$
+
+2. **Recover Padded Application Message**
+
+   - Verify the decrypted payload $δ'$ computed in
+   [Section 8.6.1](#861-shared-preprocessing) step 5.:
+
+     $`
+     \begin{array}{l}
+     δ'_{[0\ldots{κ} - 1]} \stackrel{?}{=} 0_{κ}
+     \end{array}
+     `$
+
+   If the check fails, discard $δ'$ and terminate processing.
+
+   - Extract rest of the bytes of $δ'$ as the padded application message $m$:
+
+     $`
+     \begin{array}{l}
+     m = δ'_{[κ\ldots]},\; \; \;
+     \text{where notation $X_{[a \ldots]}$ denotes the substring of $X$
+     from byte offset $a$ to the end of the string using zero-based indexing.}
+     \end{array}
+     `$
+
+3. **Extract Application Message**
+
+   Interpret recovered $m$ according to the construction steps
+   defined in [Section 8.5.2](#852-construction-steps) step 1.:
+
+   - First, unpad $m$ using the deterministic padding scheme defined during
+   construction.
+  
+   - Next, parse the unpadded message deterministically to extract:
+
+     - optional spam protection proof
+     - zero or more SURBs
+     - the origin protocol codec
+     - the serialized application message
+
+   - Parse and deserialize the metadata fields required for spam validation,
+   SURB extraction, and protocol codec identification, consistent with the
+   format and extensions applied by the initiator.  
+   The application message itself MUST remain serialized.
+
+   - If parsing fails at any stage, discard $m$ and terminate processing.
+
+4. **Handoff to Exit Layer**
+
+   - Hand off the serialized application message, the origin protocol codec, and
+   destination address $Δ$ (extracted in step 1.) to the local Exit layer for
+   further processing and delivery.
+
+   - The Exit Layer is responsible for establishing a client-only connection and
+   forwarding the message to the destination. Implementations MAY reuse an
+   existing stream to the destination, if doing so does not introduce any
+   observable linkability between forwarded messages.
+
+## 9. Security Considerations
+
+This section describes the security guarantees and limitations of the Mix
+Protocol. It begins by outlining the anonymity properties provided by the core
+protocol when routing messages through the mix network. It then discusses the
+trust assumptions required at the edges of the network, particularly at the
+final hop. Finally, it presents an alternative trust model for destinations
+that support Mix Protocol directly, followed by a summary of broader
+limitations and areas that may be addressed in future iterations.
+
+### 9.1 Security Guarantees of the Core Mix Protocol
+
+The core Mix Protocol&mdash;comprising anonymous routing through a sequence of
+mix nodes using Sphinx packets&mdash;provides the following security guarantees:
+
+- **Sender anonymity**: Each message is wrapped in layered encryption and
+  routed independently, making it unlinkable to the sender even if multiple
+  mix nodes are colluding.
+- **Metadata protection**: All messages are fixed in size and indistinguishable
+  on the wire. Sphinx packets reveal only the immediate next hop and delay to
+  each mix node. No intermediate node learns its position in the path or the
+  total pathlength.
+- **Traffic analysis resistance**: Continuous-time mixing with randomized
+  per-hop delays reduces the risk of timing correlation and input-output
+  linkage.
+- **Per-hop confidentiality and integrity**: Each hop decrypts only its
+  assigned layer of the Sphinx packet and verifies header integrity via a
+  per-hop MAC.
+- **No long-term state**: All routing is stateless. Mix nodes do not maintain
+  per-message metadata, reducing the surface for correlation attacks.
+
+These guarantees hold only within the boundaries of the Mix Protocol.
+Additional trust assumptions are introduced at the edges, particularly at the
+final hop, where the decrypted message is handed off to the Mix Exit Layer for
+delivery to the destination outside the mixnet. The next subsection discusses
+these trust assumptions in detail.
+
+### 9.2 Exit Node Trust Model
+
+The Mix Protocol ensures strong sender anonymity and metadata protection
+between the Mix Entry and Exit layers. However, once a Sphinx packet is
+decrypted at the final hop, additional trust assumptions are introduced.
+The node processing the final layer of encryption is trusted to forward the
+correct message to the destination and return any reply using the provided
+reply key. This section outlines the resulting trust boundaries.
+
+#### 9.2.1 Message Delivery and Origin Trust
+
+At the final hop, the decrypted Sphinx packet reveals the plaintext message
+and destination address. The exit node is then trusted to deliver this message
+to the destination application, and&mdash;if a reply is expected&mdash;
+to return the response using the embedded reply key.
+
+In this model, the exit node becomes a privileged middleman. It has full
+visibility into the decrypted payload. Specifically, the exit node could tamper
+with either direction of communication without detection:
+
+- It may alter or drop the forwarded message.
+- It may fabricate a reply instead of forwarding the actual response from the
+  destination.
+
+This limitation is consistent with the broader mixnet trust model. While
+intermediate nodes are constrained by layered encryption, edge nodes
+&mdash;specifically the initiating and the exit nodes in the path&mdash;
+are inherently more privileged and operate outside the cryptographic protections
+of the mixnet.
+
+In systems like Tor, such exit-level tampering is mitigated by long-lived circuits
+that allow endpoints to negotiate shared session keys (_e.g.,_ via TLS). A
+malicious exit cannot forge a valid forward message or response without access to
+these session secrets.
+
+The Mix Protocol, by contrast, is stateless and message-based. Each message is
+routed independently, with no persistent circuit or session context. As a
+result, endpoints cannot correlate messages, establish session keys, or validate
+message origin. That is, the exit remains a necessary point of trust for message
+delivery and response handling.
+
+The next subsection describes a related limitation: the exit’s ability to pose
+as a legitimate client to the destination’s origin protocol, and how that
+can be abused to bypass application-layer expectations.
+
+#### 9.2.2 Origin Protocol Trust and Client Role Abuse
+
+In addition to the message delivery and origin trust assumption, the exit
+node also initiates a client-side connection to the origin protocol instance
+at the destination. From the destination's perspective, this appears
+indistinguishable from a conventional peer connection, and the exit is accepted
+as a legitimate peer.
+
+As a result, any protocol-level safeguards and integrity checks are applied
+to the exit node as well. However, since the exit node is not a verifiable peer
+and may open fresh connections at will, such protections are limited in their
+effectiveness. A malicious exit may repeatedly initiate new connections, send
+well-formed fabricated messages and circumvent any peer scoring mechanisms by
+reconnecting. These messages are indistinguishable from legitimate peer messages
+from the destination’s point of view.
+
+This class of attack is distinct from basic message tampering. Even if the
+message content is well-formed and semantically valid, the exit’s role as an
+unaccountable client allows it to bypass application-level assumptions about
+peer behavior. This results in protocol misuse, targeted disruption, or
+spoofed message injection that the destination cannot attribute.
+
+Despite these limitations, this model is compatible with legacy protocols and
+destinations that do not support the Mix Protocol. It allows applications to
+preserve sender anonymity without requiring any participation from the
+recipient.
+
+However, in scenarios that demand stronger end-to-end guarantees&mdash;such as
+verifiable message delivery, origin authentication, or control over
+client access&mdash;it may be beneficial for the destination itself to operate
+a Mix instance. This alternative model is described in the next subsection.
+
+### 9.3 Destination as Final Hop
+
+In some deployments, it may be desirable for the destination node to
+participate in the Mix Protocol directly. In this model, the destination
+operates its own Mix instance and is selected as the final node in the mix
+path. The decrypted message is then delivered by the Mix Exit Layer directly to the
+destination's local origin protocol instance, without relying on a separate
+exit node.
+
+From a security standpoint, this model provides end-to-end integrity
+guarantees. It removes the trust assumption on an external exit. The message is
+decrypted and delivered entirely within the destination node, eliminating the
+risk of tampering during the final delivery step. The response, if used, is
+also encrypted and returned by the destination itself, avoiding reliance on a
+third-party node to apply the reply key.
+
+This model also avoids client role abuse. Since the Mix Exit Layer delivers the
+message locally, the destination need not accept arbitrary inbound connections
+from external clients. This removes the risk of an adversarial exit posing as
+a peer and injecting protocol-compliant but unauthorized messages.
+
+This approach does require the destination to support the Mix Protocol.
+However, this requirement can be minimized by supporting a lightweight mode in
+which the destination only sends and receives messages via Mix, without
+participating in message routing for other nodes. This is similar to the model
+adopted by Waku, where edge nodes are not required to relay traffic but still
+interact with the network. In practice, this tradeoff is often acceptable.
+
+The core Mix Protocol does not mandate destination participation. However,
+implementations MAY support this model as an optional mode for use in
+deployments that require stronger end-to-end security guarantees. The discovery
+mechanism MAY include a flag to advertise support for routing versus
+receive-only participation. Additional details on discovery configurations are
+out of scope for this specification.
+
+This trust model is not required for interoperability, but is recommended
+when assessing deployment-specific threat models, especially in protocols that
+require message integrity or authenticated replies.
+
+### 9.4 Known Protocol Limitations
+
+The Mix Protocol provides strong sender anonymity and metadata protection
+guarantees within the mix network. However, it does not address all classes of
+network-level disruption or application-layer abuse. This section outlines
+known limitations that deployments MUST consider when
+evaluating system resilience and reliability.
+
+#### 9.4.1 Undetectable Node Misbehavior
+
+The Mix Protocol in its current version does not include mechanisms to detect
+or attribute misbehavior by mix nodes. Since Sphinx packets are unlinkable and
+routing is stateless, malicious or faulty nodes may delay, drop, or selectively
+forward packets without detection.
+
+This behavior is indistinguishable from benign network failure. There is no
+native support for feedback, acknowledgment, or proof-of-relay. As a result,
+unreliable nodes cannot be penalized or excluded based on observed reliability.
+
+Future versions may explore accountability mechanisms. For now, deployments MAY
+improve robustness by sending each packet along multiple paths as defined in
+[Section X.X], but MUST treat message loss as a possibility.
+
+#### 9.4.2 No Built-in Retry or Acknowledgment
+
+The Mix protocol does not support retransmission, delivery acknowledgments,
+or automated fallback logic. Each message is sent once and routed
+independently through the mixnet. If a message is lost or a node becomes
+unavailable, recovery is the responsibility of the top-level application.
+
+Single-Use Reply Blocks (SURBs) (defined in Section[X.X]) enable destinations to
+send responses back to the sender via a fresh mix path. However, SURBs are
+optional, and their usage for acknowledgments or retries must be coordinated by
+the application.
+
+Applications using the Mix Protocol MUST treat delivery as probabilistic. To
+improve reliability, the sender MAY:
+
+- Use parallel transmission across `D` disjoint paths.
+- Estimate end-to-end delay bounds based on chosen per-hop delays (defined in
+  [Section 6.2](#62-delay-strategy)), and retry using different paths if
+  a response is not received within the expected window.
+
+These strategies MUST be implemented at the origin protocol layer or through
+Mix integration logic and are not enforced by the Mix Protocol itself.
+
+#### 9.4.3 No Sybil Resistance
+
+The Mix Protocol does not include any built-in defenses against Sybil attacks.
+All nodes that support the protocol and are discoverable via peer discovery
+are equally eligible for path selection. An adversary that operates a large
+number of Sybil nodes may be selected into mix paths more often than expected,
+increasing the likelihood of partial or full path compromise.
+
+In the worst case, if an adversary controls a significant fraction of nodes
+(_e.g.,_ one-third of the network), the probability that a given path includes
+only adversarial nodes increases sharply. This raises the risk of
+deanonymization through end-to-end traffic correlation or timing analysis.
+
+Deployments concerned with Sybil resistance MAY implement passive defenses
+such as minimum path length constraints. More advanced mitigations such as
+stake-based participation or resource proofs typically require some form of
+trusted setup or blockchain-based coordination.
+
+Such defenses are out of scope in the current version of the Mix Protocol,
+but are critical to ensuring anonymity at scale and may be explored in future
+iterations.
+
+#### 9.4.4 Vulnerability to Denial-of-Service Attacks
+
+The Mix Protocol does not provide built-in defenses against denial-of-service
+(DoS) attacks targeting mix nodes. A malicious mix node may generate
+a high volume of valid Sphinx packets to exhaust computational, memory, or
+bandwidth resources along random paths through the network.
+
+This risk stems from the protocol’s stateless and sender-anonymous design.
+Mix nodes process each packet independently and cannot distinguish honest users
+from attackers. There is no mechanism to attribute packets, limit per-sender
+usage, or apply network-wide fairness constraints.
+
+Application-level defenses—such as PoW, VDFs, and RLNs (defined in
+[Section 6.3](#63-spam-protection)) to protect destination endpoints&mdash;
+do not address abuse _within_ the mixnet. Mix nodes remain vulnerable to
+volumetric attacks even when destinations are protected.
+
+While the Mix Protocol includes safeguards such as layered encryption, per-hop
+integrity checks, and fixed-size headers, these primarily defend against
+tagging attacks and structurally invalid or malformed traffic. The Sphinx packet
+format also enforces a maximum path length $(L \leq r)$, which prevents infinite
+loops or excessively long paths being embedded. However, these protections do not
+prevent adversaries from injecting large volumes of short, well-formed messages to
+exhaust mix node resources.
+
+DoS protection&mdash;such as admission control, rate-limiting, or resource-bound
+access&mdash;MUST be implemented outside the core protocol. Any such mechanism MUST
+preserve sender unlinkability and SHOULD be evaluated carefully to avoid
+introducing correlation risks.
+
+Defending against large-scale DoS attacks is considered a deployment-level
+responsibility and is out of scope for this specification.
