@@ -250,7 +250,7 @@ PAYLOAD_HEADER_SIZE = 3
 
 - [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
   \- Key words for use in RFCs to Indicate Requirement Levels
-- [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df8136a3bbf64df8b59779)
+- [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b)
   \- Cryptographic operations for building and processing messages
 - [Payload Formatting Specification](https://nomos-tech.notion.site/Payload-Formatting-215261aa09df81b2a3e1d913a0df9ad9)
   \- Defines payload structure and formatting rules
@@ -259,7 +259,7 @@ PAYLOAD_HEADER_SIZE = 3
 
 ### Informative
 
-- [Message Formatting](https://nomos-tech.notion.site/Message-Formatting-215261aa09df81dab083c6e01e2b56e3)
+- [Message Formatting Specification](https://nomos-tech.notion.site/Message-Formatting-Specification-215261aa09df81c79e3acd9e921bcc30)
   \- Original Message Formatting documentation
 - [Blend Protocol Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81a3b3ebc1f438209467)
   \- High-level overview of message formatting in Blend Protocol
