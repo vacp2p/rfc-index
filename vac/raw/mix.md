@@ -763,7 +763,7 @@ The construction MUST proceed as follows:
        \begin{array}{l}
        Φ_i = \mathrm{AES\text{-}CTR}'_i\bigl(Φ_{\mathrm{aes\_key}_{i-1}},
        Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr),\; \; \;
-       \text{where notation $0_x$ defines the string of $0$ bits of length $x$.}
+       \text{where notation } 0_x \text{ defines the string of } 0 \text{ bits of length } x\text{.}
        \end{array}
        `$
 
@@ -814,9 +814,9 @@ The construction MUST proceed as follows:
        \begin{array}{l}
        β_i = \mathrm{AES\text{-}CTR}\bigl(β_{\mathrm{aes\_key}_i},
        β_{\mathrm{iv}_i}, \mathrm{addr}_{i+1} \mid \mathrm{delay}_i
-       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\; \; \;
-       \text{where notation $X_{[a \ldots b]}$ denotes the substring of $X$
-       from byte offset $a$ to $b$, inclusive, using zero-based indexing.}
+       \mid γ_{i+1} \mid β_{i+1 \, [0 \ldots (r(t+1) - t)κ - 1]} \bigr),\\
+       \text{where notation } X_{[a \ldots b]} \text{ denotes the substring of } X
+       \text{ from byte offset } a \text{ to } b\text{, inclusive, using zero-based indexing.}
        \end{array}
        `$
 
@@ -1055,7 +1055,7 @@ Once the node determines its role as an intermediary following the steps in [Sec
 
      $`
      \begin{array}{l}
-     β' = B_{[(t + 1)κ\ldots(r(t +1 ) + t + 2)\kappa - 1]}
+     β' = B_{[(t + 1)κ\ldots(r(t +1 ) + t + 2)κ - 1]}
      \end{array}
      `$
 
@@ -1142,8 +1142,8 @@ Once the node determines its role as an exit following the steps in [Section 8.6
      $`
      \begin{array}{l}
      m = δ'_{[κ\ldots]},\; \; \;
-     \text{where notation $X_{[a \ldots]}$ denotes the substring of $X$
-     from byte offset $a$ to the end of the string using zero-based indexing.}
+     \text{where notation } X_{[a \ldots]} \text{ denotes the substring of } X
+     \text{ from byte offset } a \text{ to the end of the string using zero-based indexing.}
      \end{array}
      `$
 
