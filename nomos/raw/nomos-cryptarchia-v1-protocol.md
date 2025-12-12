@@ -158,7 +158,7 @@ cryptography, consensus and network engineering.
 
 | Symbol | Name | Description | Value |
 |--------|------|-------------|-------|
-| $f$ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. | 1/30 |
+| $f$ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. (See Block Times & Blend Network Analysis for analysis leading to the choice of value.) | 1/30 |
 | $k$ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
 | none | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
@@ -605,6 +605,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
   \- Bootstrap and synchronization procedures
 - [Total Stake Inference](https://nomos-tech.notion.site/Total-Stake-Inference)
   \- Stake inference mechanism
+- [Block Times & Blend Network Analysis](https://nomos-tech.notion.site/Block-Times-Blend-Network-Analysis)
+  \- Analysis for slot activation coefficient
 
 ### Informative
 
