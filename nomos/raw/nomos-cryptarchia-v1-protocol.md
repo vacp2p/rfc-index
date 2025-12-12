@@ -100,7 +100,8 @@ throughout the protocol, including that:
   from their past on-chain activity.
 - **Cryptarchia must not reveal the stake of the leader** -
   that is, it must be a Private Proof of Stake (PPoS) protocol.
-  If the activity of the leader reveals their stake values (e.g. through weighted voting),
+  If the activity of the leader reveals their stake values
+  (e.g. through weighted voting),
   then this value can be used to reduce the anonymity set for the leader
   by bucketing the leader as high/low stake and can open him up to targeting.
 - **Leaders should be protected against network triangulation attacks**.
@@ -418,7 +419,8 @@ Given block $B=(header, transactions)$ and the block tree $T$ where:
 - $header$ is the header defined in Header
 - $transactions$ is the sequence of transactions in the block
 
-We say $\textbf{valid\_header}(B)$ returns True if all of the following constraints hold,
+We say $\textbf{valid\_header}(B)$ returns True
+if all of the following constraints hold,
 otherwise it returns False.
 
 1. `header.version.bedrock_version = 1`
@@ -438,7 +440,8 @@ otherwise it returns False.
 
 6. `wallclock_time() > slot_time(header.slot)`
    Ensure this block's slot time has elapsed.
-   Local time is used in this validation. See Clocks for discussion around clock synchronization.
+   Local time is used in this validation.
+   See Clocks for discussion around clock synchronization.
 
 7. `header.parent ∈ T`
    Ensure we have already accepted the block's parent into the block tree.
@@ -451,9 +454,12 @@ otherwise it returns False.
    this step must be replaced with `is_ancestor(B_imm, B)`,
    which checks whether $B_\text{imm}$ is an ancestor of $B$.
 
-9. Verify the leader's right to propose and ensure it is the one proposing this block:
-   Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL}, P_\text{LEAD}, \sigma)$, where:
-   - $\pi_\text{PoL}$ is the slot lottery win proof as defined in Proof of Leadership Specification
+9. Verify the leader's right to propose
+   and ensure it is the one proposing this block:
+   Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL}, P_\text{LEAD}, \sigma)$,
+   where:
+   - $\pi_\text{PoL}$ is the slot lottery win proof
+     as defined in Proof of Leadership Specification
    - $P_\text{LEAD}$ is the public key committed to in $\pi_\text{PoL}$
    - $\sigma$ is a signature
 
@@ -486,7 +492,8 @@ c_loc' := B                              if parent(B) = c_loc
           fork_choice(c_loc, F_T', k, s)  if parent(B) ≠ c_loc
 
 if fork_choice_rule = ONLINE:
-    Explicitly commit to the k-deep block if the Online Fork Choice Rule is being used.
+    Explicitly commit to the k-deep block
+    if the Online Fork Choice Rule is being used.
     (T', B_imm) := commit(T', c_loc', k)
 
 return (c_loc', B_imm, T')
@@ -545,7 +552,8 @@ return T'
 
 ### Versioning and Protocol Upgrades
 
-Protocol versions are signalled through the `bedrock_version` field of the block header.
+Protocol versions are signalled through the `bedrock_version` field
+of the block header.
 Protocol upgrades need to be co-ordinated well in advance
 to ensure that node operators have enough time to update their node.
 We will use block height to schedule the activation of protocol updates.
