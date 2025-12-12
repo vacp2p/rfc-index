@@ -1,0 +1,274 @@
+---
+title: PAYMENT-STREAMS
+name: Payment Streams Protocol for Logos Services
+status: raw
+category: Standards Track
+tags: logos, payment, streams
+editor: Sergei Tikhomirov <sergei@status.im>
+contributors: Akhil Peddireddy <akhil@status.im>
+---
+
+## Abstract
+
+This document provides a functional specification
+for a payment streams protocol for Logos services.
+
+A payment stream is an off-chain protocol
+where a payer's deposit releases gradually to a payee.
+The blockchain determines fund accrual based on elapsed time.
+
+The protocol targets Nescience,
+a privacy-focused blockchain in the Logos stack.
+This document clarifies MVP requirements
+and facilitates discussion with Nescience developers
+on implementation feasibility and challenges.
+
+## Language
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in this document are to be interpreted as described in
+[RFC 2119](http://tools.ietf.org/html/rfc2119).
+
+## Change Process
+
+This document is governed by the [1/COSS](../1/coss.md) (COSS).
+
+## Motivation
+
+Logos is a privacy-focused tech stack that includes
+Logos Messaging, Logos Blockchain, and Logos Storage.
+
+Logos Messaging comprises a suite of communication protocols
+with both P2P and request-response structures.
+The backbone P2P protocols use tit-for-tat mechanisms.
+We plan to introduce incentivization
+for auxiliary request-response protocols
+where client and server roles are well defined.
+One such protocol is Store,
+which allows clients to query historical messages
+from Logos Messaging relay nodes.
+
+We target the following requirements:
+
+- Performance: Efficient payments with low latency and fees.
+- Security: Limited loss exposure through spending controls.
+- Privacy: Unlinkable payments across different providers.
+- Extendability: Simple initial design with room for enhancements.
+
+After reviewing prior work on payment channels, streams,
+e-cash, and tickets,
+we selected payment streams as the most suitable mechanism.
+
+Payment streams enable unidirectional time-based fund flows
+from payer to payee.
+Streams are simpler than alternatives
+and map well to use cases with distinct roles.
+Parties need not store old states or initiate disputes
+as required in payment channel protocols.
+Streams avoid relying on a centralized mint entity,
+typical for e-cash and ticket protocols,
+improving resilience and privacy.
+
+Nescience is a privacy-focused blockchain under development
+for the Logos Blockchain stack.
+Its core innovation is state separation architecture (NSSA),
+which enables both transparent and shielded execution.
+Nescience is a natural fit
+for the on-chain component of the payment protocol.
+
+This document provides clarity on MVP requirements
+and facilitates discussion with Nescience developers on:
+whether the required functionality can be implemented,
+which parts are most challenging and how to simplify them,
+and other implementation considerations.
+
+## Theory and Semantics
+
+### Architecture Overview
+
+The protocol has two roles:
+
+- User: the party paying for services (payer).
+- Provider: the party delivering services
+and receiving payment (payee).
+
+The protocol uses a two-level architecture
+of vaults and streams.
+
+A vault holds a user's deposit and backs multiple streams.
+To start using the protocol,
+the user MUST deposit funds into a vault.
+A vault holds the total balance available for that user's streams.
+One vault MAY have multiple streams to different providers.
+The user MAY withdraw unallocated funds from the vault at any time.
+Vault withdrawals MUST send funds to external addresses.
+
+A stream is an individual payment flow from a vault to one provider.
+When creating a stream,
+the user MUST allocate a portion of vault funds to that stream.
+Each stream MUST belong to exactly one vault.
+Each stream MUST specify an accrual rate (tokens per time unit).
+An allocation is the portion of vault funds committed to a stream.
+The sum of all stream allocations MUST NOT exceed vault balance.
+
+A claim is the operation
+where the provider retrieves accrued funds from a stream.
+The provider MAY claim accrued funds from a stream in any state.
+
+### Stream Lifecycle
+
+Stream states:
+
+- ACTIVE: Funds accrue to the provider at the agreed rate.
+- PAUSED: Accrual is stopped by user action.
+The stream MAY be resumed by the user.
+- DEPLETED: Stream has run out of allocated funds.
+Accrual is stopped automatically.
+- CLOSED: Stream is permanently terminated.
+The stream MUST NOT transition to any other state.
+
+Stream state transitions:
+
+- Create: User creates a stream in ACTIVE state
+by allocating funds from the vault.
+- Pause: User pauses an ACTIVE stream, stopping accrual.
+- Resume: User resumes a PAUSED stream, restarting accrual.
+- Deplete: Automatic transition from ACTIVE
+when allocated funds are fully accrued.
+- Top-Up: User MAY add funds to stream allocation.
+From DEPLETED state, stream MUST transition to PAUSED.
+From ACTIVE or PAUSED state, stream MUST remain in same state.
+- Close: Either user or provider MAY close the stream
+from any non-CLOSED state.
+- Withdraw: User MAY withdraw only unaccrued funds
+from a CLOSED stream.
+A withdraw operation MUST return funds to the vault.
+The user MUST NOT withdraw from any non-CLOSED stream.
+Accrued funds remain available for provider to claim.
+- Claim: Provider MAY claim accrued funds
+from a stream in any state.
+A claim operation does not change stream state.
+
+### Stream State Transition Diagram
+
+```mermaid
+graph LR;
+    ACTIVE --> PAUSED;
+    PAUSED --> ACTIVE;
+    ACTIVE --> DEPLETED;
+    DEPLETED --> PAUSED;
+    ACTIVE --> CLOSED;
+    PAUSED --> CLOSED;
+    DEPLETED --> CLOSED;
+```
+
+### Assumptions
+
+Parties MUST agree on stream parameters before creation.
+A separate discovery protocol SHOULD enable
+providers to advertise services and expected payment,
+or enable users and providers to negotiate parameters.
+
+Users SHOULD monitor service delivery
+and take action when providers stop delivering service.
+Since users are typically online to receive service,
+monitoring quality and pausing or closing streams
+is a reasonable expectation.
+
+## Protocol Extensions
+
+This section describes optional modifications
+that MAY be applied to the base protocol.
+Each extension is independent.
+
+### Epoch-Based Accrual Caps
+
+The user MAY specify epoch length and epoch cap when creating a stream.
+When accrued amount reaches the epoch cap,
+the stream MUST automatically transition to PAUSED state.
+The user MAY resume the stream, resetting the epoch accrual counter.
+
+### Delivery Receipts
+
+The claim operation MAY require delivery receipts as proof of service.
+A delivery receipt is a user-signed message that MUST include
+stream identifier, service delivery details, and signature.
+If a stream has delivery receipts enabled,
+the protocol MUST only allow claims with valid receipts.
+Receipt granularity (per-message vs batched) affects
+proof granularity and interaction overhead.
+
+### Automatic Settlement on Closure
+
+This extension adds two independent boolean stream parameters:
+
+- Auto-claim on close:
+When enabled, closing the stream
+MUST automatically claim accrued funds for the provider.
+- Auto-withdraw on close:
+When enabled, closing the stream
+MUST automatically return unaccrued funds to the user's vault.
+
+## Implementation Considerations
+
+This section captures implementation questions:
+
+- Mapping streams to NSSA:
+How does the stream protocol map onto Nescience architecture?
+- Timestamp-based accrual calculation:
+Can shielded execution access block timestamps
+to calculate accrued amounts based on elapsed time?
+- Encoding and enforcing state transitions:
+How to encode and enforce state machine transition rules
+for the stream lifecycle states?
+
+## Security and Privacy Considerations
+
+This section captures security and privacy questions:
+
+- Can or should all protocol operations be within shielded execution?
+- If not, where is the boundary
+between transparent and shielded execution?
+- Who decides whether to use transparent or shielded execution:
+user, provider, both, or fixed by protocol design?
+- What data is stored in the user's account
+and who can see it in transparent vs shielded execution?
+- How to ensure external observers cannot correlate
+streams from the same vault across different providers?
+- How to ensure providers cannot see
+streams from the same user to other providers,
+while still being able to verify balance constraints?
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+### Informative
+
+#### Related Work
+
+- [Off-Chain Payment Protocols: Classification and Architectural Choice](https://forum.vac.dev/t/off-chain-payment-protocols-classification-and-architectural-choice/596)
+- [Nescience: A User-Centric State-Separation Architecture](https://vac.dev/rlog/Nescience-state-separation-architecture)
+
+#### Payment Streaming Protocols
+
+Existing payment streaming protocols
+(Sablier Flow, Sablier Lockup, LlamaPay V2, Superfluid)
+target EVM-like state architectures.
+They use time-based accrual with ERC-20 tokens.
+Protocols differ in stream duration.
+Some support fixed-duration streams (Sablier Lockup),
+while others allow open-ended streams (Sablier Flow).
+Deposit architecture also varies.
+Singleton managers (Sablier Flow, Sablier Lockup)
+require separate deposits per stream.
+Per-payer vaults (LlamaPay V2)
+allow one deposit to back multiple streams.
+
+- [Sablier Flow](https://github.com/sablier-labs/flow)
+- [Sablier Lockup](https://github.com/sablier-labs/lockup)
+- [LlamaPay V2](https://github.com/LlamaPay/llamapay-v2)
+- [Superfluid Protocol](https://github.com/superfluid-org/protocol-monorepo)
