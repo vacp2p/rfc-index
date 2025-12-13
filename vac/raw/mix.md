@@ -762,8 +762,8 @@ The construction MUST proceed as follows:
        $`
        \begin{array}{l}
        Φ_i = \mathrm{AES\text{-}CTR}'_i\bigl(Φ_{\mathrm{aes\_key}_{i-1}},
-       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr),\; \; \;
-       \text{where notation } 0_x \text{ defines the string of } 0 \text{ bits of length } x\text{.}
+       Φ_{\mathrm{iv}_{i-1}}, Φ_{i-1} \mid 0_{(t+1)κ} \bigr), \\
+       \text{where } 0_x \text{ defines the string of } 0 \text{ bits of length } x\text{.}
        \end{array}
        `$
 
@@ -794,7 +794,7 @@ The construction MUST proceed as follows:
    - Set the per hop two-byte encoded delay $\mathrm{delay}_i$ as defined in [Section 8.4](#84-address-and-delay-encoding):
 
      - If final hop (_i.e.,_ $i = L - 1$), encode two byte zero padding.
-     - For all other hop $i,\ i < L - 1$, select the mean forwarding delay for the delay strategy configured by the application, and encode it as a two-byte value. The delay strategy is pluggable, as defined in [Section 6.2](#62-delay-strategy).
+     - For all other hop $i$, $i < L - 1$, select the mean forwarding delay for the delay strategy configured by the application, and encode it as a two-byte value. The delay strategy is pluggable, as defined in [Section 6.2](#62-delay-strategy).
 
    - Using the derived keys and encoded forwarding delay, compute the nested encrypted routing information $β_i$:
 
