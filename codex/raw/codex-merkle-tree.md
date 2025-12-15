@@ -103,7 +103,7 @@ and an array of `T`-s of length `l` by `T[l]`.
 
 ## Tree Construction
 
-We want to avoid three kind of attacks:
+The following kinds of attacks should be avoided:
 
 - padding attacks
 - layer abusing attacks
