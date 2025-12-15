@@ -92,7 +92,8 @@ For example:
   (in our case `t=3`, `k=1` for BN254 field;
   or `t=12`, `k=4` for the [Goldilocks](https://github.com/codex-storage/nim-goldilocks-hash) field;
   or `t=24`, `k=8` for a ~32 bit field)
-- as an alternative, the "Jive strategy" for binary compression
+- as an alternative,
+  the "[Jive compression mode](https://eprint.iacr.org/2022/840)" for binary compression
   can eliminate the "minus `k`" requirement (you can compress `t` into `t/2`)
 - A naive Merkle tree implementation could for example
   accept only a power-of-two sized sequence of `T`
@@ -458,3 +459,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - **nim-poseidon2**: [GitHub - codex-storage/nim-poseidon2](https://github.com/codex-storage/nim-poseidon2) - Poseidon2 hash function for BN254
 - **nim-goldilocks-hash**: [GitHub - codex-storage/nim-goldilocks-hash](https://github.com/codex-storage/nim-goldilocks-hash) - Goldilocks field hash functions
 - **BearSSL**: [bearssl.org](https://bearssl.org/) - BearSSL cryptographic library
+- **Jive Compression Mode**: [Anemoi Permutations and Jive Compression Mode](https://eprint.iacr.org/2022/840) - Efficient arithmetization-oriented hash functions
