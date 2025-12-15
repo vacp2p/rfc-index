@@ -69,7 +69,7 @@ as serialization of trees should be included in the component).
 A Merkle tree, built on a hash function `H`,
 produces a Merkle root of type `T` ("Target type").
 This is usually the same type as the output of the hash function
-(we will assume this below).
+(this is assumed below).
 Some examples:
 
 - SHA1: `T` is 160 bits
@@ -313,7 +313,7 @@ of an `encodeBytes` function and the former
 - `MerklePath[H]` is a record, consisting of
   - `path`: a sequence of `T`-s
   - `index`: a linear index (int)
-  - `leaf`: the leaf we prove (a `T`)
+  - `leaf`: the leaf being proved (a `T`)
   - `size`: the number of elements from which the tree was created
 - `MerkleTree[H]`: a binary tree of `T`-s; alternatively a sequence of sequences of `T`-s
 
