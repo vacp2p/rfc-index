@@ -423,25 +423,6 @@ The design is parametrized by the hash function, supporting:
 This flexibility allows easy addition of new hash functions
 while maintaining security guarantees.
 
-### Functional Requirements
-
-The implementation must:
-
-- work correctly
-- be parametrized by the hash function
-- allow easy addition of new hash functions
-
-Reference implementations are available in [Haskell](https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/haskell/src/Poseidon2/Merkle.hs) and [Nim](https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/nim/proof_input/src/merkle.nim).
-
-### Non-Functional Requirements
-
-The implementation should:
-
-- be safe from theoretical attacks
-- be fast
-- optionally provide a streaming interface to handle larger data than fits into memory (may be needed in the future)
-- optionally provide multithreading support
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -455,8 +436,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ### informative
 
 - **Merkle Tree Conventions**: [GitHub - codex-storage-proofs-circuits](https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/README.md#merkle-tree-conventions) - Merkle tree specification in codex-storage-proofs-circuits
-- **Reference Implementation (Haskell)**: [GitHub - Poseidon2/Merkle.hs](https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/haskell/src/Poseidon2/Merkle.hs) - Haskell reference implementation
-- **Reference Implementation (Nim)**: [GitHub - merkle.nim](https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/nim/proof_input/src/merkle.nim) - Nim reference implementation
 - **nim-poseidon2**: [GitHub - codex-storage/nim-poseidon2](https://github.com/codex-storage/nim-poseidon2) - Poseidon2 hash function for BN254
 - **nim-goldilocks-hash**: [GitHub - codex-storage/nim-goldilocks-hash](https://github.com/codex-storage/nim-goldilocks-hash) - Goldilocks field hash functions
 - **BearSSL**: [bearssl.org](https://bearssl.org/) - BearSSL cryptographic library
