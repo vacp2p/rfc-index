@@ -32,8 +32,6 @@ that is safe from padding attacks, data encoding attacks, and layer abusing atta
 
 Merkle trees can be implemented in quite a few different ways,
 and if naively implemented, can be also attacked in several ways.
-This specification is based on the
-[Component Specification - Merkle tree](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Merkle%20tree.md).
 
 Some possible attacks:
 
@@ -451,7 +449,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ### normative
 
 - **Codex Merkle Tree Implementation**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
-- **Codex Documentation**: [Codex Docs - Component Specification - Merkle tree](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Merkle%20tree.md)
 
 ### informative
 
