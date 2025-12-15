@@ -3,7 +3,7 @@ title: PAYMENT-STREAMS
 name: Payment Streams Protocol for Logos Services
 status: raw
 category: Standards Track
-tags: logos, payment, streams
+tags: logos, nescience, payment-streams
 editor: Sergei Tikhomirov <sergei@status.im>
 contributors: Akhil Peddireddy <akhil@status.im>
 ---
@@ -97,12 +97,17 @@ The protocol uses a two-level architecture
 of vaults and streams.
 
 A vault holds a user's deposit and backs multiple streams.
+A user MAY have multiple vaults.
 To start using the protocol,
 the user MUST deposit funds into a vault.
-A vault holds the total balance available for that user's streams.
+A vault holds the total balance available for that vault's streams.
 One vault MAY have multiple streams to different providers.
 The user MAY withdraw unallocated funds from the vault at any time.
-Vault withdrawals MUST send funds to external addresses.
+Vault withdrawals send funds to addresses,
+which MAY be external addresses or other vaults.
+Allocating funds from a vault to a stream
+is not considered a withdrawal,
+as the funds remain within the protocol.
 
 A stream is an individual payment flow from a vault to one provider.
 When creating a stream,
@@ -145,6 +150,8 @@ from any non-CLOSED state.
 from a CLOSED stream.
 A withdraw operation MUST return funds to the vault.
 The user MUST NOT withdraw from any non-CLOSED stream.
+When a stream is closed,
+unaccrued funds MUST automatically return to the user's vault.
 Accrued funds remain available for provider to claim.
 - Claim: Provider MAY claim accrued funds
 from a stream in any state.
@@ -196,19 +203,31 @@ A delivery receipt is a user-signed message that MUST include
 stream identifier, service delivery details, and signature.
 If a stream has delivery receipts enabled,
 the protocol MUST only allow claims with valid receipts.
-Receipt granularity (per-message vs batched) affects
-proof granularity and interaction overhead.
 
-### Automatic Settlement on Closure
+Receipt granularity presents a trade-off.
+Per-message receipts allow the user to approve each message individually
+but require signing each receipt, increasing interaction overhead.
+Batched receipts reduce signing overhead
+but require the user to approve multiple messages at once.
 
-This extension adds two independent boolean stream parameters:
+### Automatic Claim on Closure
 
-- Auto-claim on close:
-When enabled, closing the stream
-MUST automatically claim accrued funds for the provider.
-- Auto-withdraw on close:
-When enabled, closing the stream
-MUST automatically return unaccrued funds to the user's vault.
+This extension adds an optional auto-claim flag.
+When auto-claim is enabled,
+closing the stream MUST automatically claim accrued funds for the provider.
+
+Auto-claim simplifies the protocol
+by ensuring closed streams hold no funds,
+eliminating the need to track balances in closed streams.
+
+However, auto-claim has potential issues:
+prevents provider from batching claims,
+may create timing correlations that leak privacy,
+requires user to pay for provider's claim operation,
+and may cause the entire close operation to fail if claim fails.
+
+Assessing these trade-offs requires clarity on Nescience architecture,
+particularly gas model, batching techniques, and timing privacy.
 
 ## Implementation Considerations
 
