@@ -19,16 +19,13 @@ The purpose of this component is to deal with Merkle trees
 except that certain arithmetic hashes constructed via the sponge construction
 use the same encoding standards).
 
+## Background / Rationale / Motivation
+
 Merkle trees and Merkle tree roots are used for:
 
 - content addressing (via the Merkle root hash)
 - data authenticity (via a Merkle path from a block to the root)
 - remote auditing (via Merkle proofs of pieces)
-
-This specification provides a concrete implementation
-that is safe from padding attacks, data encoding attacks, and layer abusing attacks.
-
-## Background / Rationale / Motivation
 
 Merkle trees can be implemented in quite a few different ways,
 and if naively implemented, can be also attacked in several ways.
@@ -115,7 +112,7 @@ and an array of `T`-s of length `l` by `T[l]`.
 
 ## Tree Construction
 
-The following kinds of attacks should be avoided:
+We want to avoid the following kind of attacks:
 
 - padding attacks
 - layer abusing attacks
