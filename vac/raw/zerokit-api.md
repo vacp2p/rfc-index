@@ -16,7 +16,6 @@ Native applications may require a stable, language-agnostic
 interface for ease of integration across different platforms and toolchains.
 This RFC describes the C API that will be provided for applications that wish to use Zerokit.
 
-
 ## Format Specification
 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
