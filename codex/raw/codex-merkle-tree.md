@@ -101,6 +101,18 @@ For example:
 Notation: Let's denote a sequence of `T`-s by `[T]`;
 and an array of `T`-s of length `l` by `T[l]`.
 
+## Data Models
+
+- `H`, the set of supported hash functions, is an enumeration
+- `S := Source[H]` and `T := Target[H]`
+- `MerklePath[H]` is a record, consisting of
+  - `path`: a sequence of `T`-s
+  - `index`: a linear index (int)
+  - `leaf`: the leaf being proved (a `T`)
+  - `size`: the number of elements from which the tree was created
+- `MerkleTree[H]`: a binary tree of `T`-s;
+  alternatively a sequence of sequences of `T`-s
+
 ## Tree Construction
 
 The following kinds of attacks should be avoided:
@@ -305,17 +317,6 @@ of an `encodeBytes` function and the former
 | deserializeFromBytes() | deserializes a sequence of `T`-s from bytes | sequence of bytes | sequence of `T`-s, or error |
 | serializeTree() | serializes the Merkle tree data structure (to be stored on disk) | MerkleTree[T] | sequence of bytes |
 | deserializeTree() | deserializes the Merkle tree data structure (to be load from disk) | sequence of bytes | error or MerkleTree[T] |
-
-## Data Models
-
-- `H`, the set of supported hash functions, is an enumeration
-- `S := Source[H]` and `T := Target[H]`
-- `MerklePath[H]` is a record, consisting of
-  - `path`: a sequence of `T`-s
-  - `index`: a linear index (int)
-  - `leaf`: the leaf being proved (a `T`)
-  - `size`: the number of elements from which the tree was created
-- `MerkleTree[H]`: a binary tree of `T`-s; alternatively a sequence of sequences of `T`-s
 
 ## Dependencies
 
