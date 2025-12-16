@@ -16,17 +16,26 @@ contributors:
 
 ## Introduction
 
-This document defines the key types used in the Blend protocol and describes the process of generating them.
+This document defines the key types used in the Blend protocol
+and describes the process of generating them.
 
 ## Overview
 
-This document ensures that the keys are used and generated in a common manner, which is necessary for making the Blend protocol work. The keys include:
+This document ensures that the keys are used and generated in a common manner,
+which is necessary for making the Blend protocol work.
+The keys include:
 
-- **Non-ephemeral Quota Key (NQK)** — used for proving that a node is a core node.
-- **Non-ephemeral Signing Key (NSK)** — used to authenticate the node on the network level and derive the Non-ephemeral Encryption Key.
-- **Ephemeral Signing Key (ESK)** — used for signing Blend messages, one per encapsulation.
-- **Non-ephemeral Encryption Key (NEK)** — used for deriving shared secrets for message encryption.
-- **Ephemeral Encryption Key (EEK)** — used for encrypting Blend messages, one per encapsulation.
+- **Non-ephemeral Quota Key (NQK)** —
+  used for proving that a node is a core node.
+- **Non-ephemeral Signing Key (NSK)** —
+  used to authenticate the node on the network level
+  and derive the Non-ephemeral Encryption Key.
+- **Ephemeral Signing Key (ESK)** —
+  used for signing Blend messages, one per encapsulation.
+- **Non-ephemeral Encryption Key (NEK)** —
+  used for deriving shared secrets for message encryption.
+- **Ephemeral Encryption Key (EEK)** —
+  used for encrypting Blend messages, one per encapsulation.
 
 ## Semantics
 
@@ -44,7 +53,7 @@ to serve different audiences and use cases:
 for implementing an interoperable Blend Protocol node.
 This section defines the cryptographic primitives, message formats,
 network protocols, and behavioral requirements that all implementations
-MUST follow to ensure compatibility and maintain the protocol's
+must follow to ensure compatibility and maintain the protocol's
 privacy guarantees.
 Protocol designers, auditors, and those seeking to understand the core
 mechanisms should focus on this part.
@@ -67,9 +76,11 @@ for interoperability.
 
 #### Non-ephemeral Quota Key
 
-A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature
-(Zero Knowledge Signature Scheme).
-The NQK is stored on the ledger as the `zk_id` field in the `DeclarationInfo`
+A node generates a Non-ephemeral Quota Key (NQK)
+that is a ZkSignature (Zero Knowledge Signature Scheme).
+The NQK is stored on the Nomos blockchain ledger
+as the `zk_id` field in the `DeclarationInfo`
+(see [Service Declaration Protocol](#references))
 of the node's outcome of the participation in the
 Service Declaration Protocol (SDP).
 
@@ -79,24 +90,27 @@ as indicated through the SDP.
 **Properties:**
 
 - **Type**: ZkSignature (Zero Knowledge Signature Scheme)
-- **Storage**: Ledger (`zk_id` field in `DeclarationInfo`)
+- **Storage**: Nomos blockchain ledger (`zk_id` field in `DeclarationInfo`)
 - **Purpose**: Prove core node membership
 - **Lifecycle**: Non-ephemeral (persistent across sessions)
 
 #### Non-ephemeral Signing Key
 
-A node generates a Non-ephemeral Signing Key (NSK) that is an Ed25519 key.
-The NSK is stored on the ledger as the `provider_id` field in the
-`DeclarationInfo` of the node's outcome of the participation in the
+A node generates a Non-ephemeral Signing Key (NSK)
+using the Ed25519 algorithm (see [RFC 8032](#references)).
+The NSK is stored on the Nomos blockchain ledger
+as the `provider_id` field in the `DeclarationInfo`
+(see [Service Declaration Protocol](#references))
+of the node's outcome of the participation in the
 Service Declaration Protocol (SDP).
 
-The NSK is used to authenticate the node on the network level and to derive
-the Non-ephemeral Encryption Key.
+The NSK is used to authenticate the node on the network level
+and to derive the Non-ephemeral Encryption Key.
 
 **Properties:**
 
-- **Type**: Ed25519
-- **Storage**: Ledger (`provider_id` field in `DeclarationInfo`)
+- **Type**: Ed25519 (see [RFC 8032](#references))
+- **Storage**: Nomos blockchain ledger (`provider_id` field in `DeclarationInfo`)
 - **Purpose**:
   - Network-level node authentication
   - Derivation of Non-ephemeral Encryption Key (NEK)
@@ -130,38 +144,39 @@ by the Message Encapsulation Mechanism.
 #### Non-ephemeral Encryption Key
 
 A node generates a Non-ephemeral Encryption Key (NEK).
-It is an X25519 curve key derived from the NSK (Ed25519) public key
-retrieved from the `provider_id`,
-which is stored on the ledger when the node executes the SDP protocol.
+It is an X25519 curve key (see [RFC 7748](#references))
+derived from the NSK (Ed25519) public key retrieved from the `provider_id`,
+which is stored on the Nomos blockchain ledger
+when the node executes the SDP protocol.
 
-The NEK key is used for deriving a shared secret (alongside EEK defined below)
-for the Blend message encapsulation purposes.
+The NEK key is used for deriving a shared secret
+(alongside EEK defined below) for the Blend message encapsulation purposes.
 
 **Properties:**
 
-- **Type**: X25519
+- **Type**: X25519 (see [RFC 7748](#references))
 - **Derivation**: Derived from NSK (Ed25519) public key
-- **Source**: `provider_id` field from ledger
+- **Source**: `provider_id` field from Nomos blockchain ledger
 - **Purpose**: Deriving shared secrets for message encryption
 - **Lifecycle**: Non-ephemeral (persistent across sessions)
 
 **Derivation Process:**
 
-1. Retrieve NSK (Ed25519) public key from `provider_id` on ledger
+1. Retrieve NSK (Ed25519) public key from `provider_id` on Nomos blockchain ledger
 2. Derive X25519 curve key from Ed25519 public key
 3. Use resulting NEK for shared secret derivation
 
 #### Ephemeral Encryption Key
 
-A node derives an Ephemeral Encryption Key (EEK) pair using the X25519 curve
-from the ESK.
+A node derives an Ephemeral Encryption Key (EEK) pair
+using the X25519 curve (see [RFC 7748](#references)) from the ESK.
 
-A unique encryption key MUST be generated for every encapsulation as required
-by the Message Encapsulation Mechanism.
+A unique encryption key MUST be generated for every encapsulation
+as required by the Message Encapsulation Mechanism.
 
 **Properties:**
 
-- **Type**: X25519
+- **Type**: X25519 (see [RFC 7748](#references))
 - **Derivation**: Derived from ESK (Ed25519)
 - **Purpose**: Encrypting Blend messages
 - **Lifecycle**: Ephemeral (one per encapsulation)
@@ -201,7 +216,7 @@ between the sender's EEK and the recipient's derived NEK.
 
 #### Ledger Storage
 
-- NQK and NSK MUST be retrievable from ledger via SDP protocol
+- NQK and NSK MUST be retrievable from Nomos blockchain ledger via SDP protocol
 - Ledger data MUST be integrity-protected
 - Implementations SHOULD verify ledger data authenticity before use
 
@@ -213,7 +228,7 @@ This section provides guidance for implementing the protocol specification.
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│                    Ledger (SDP Protocol)                    │
+│              Nomos Blockchain Ledger (SDP Protocol)         │
 ├─────────────────────────────────────────────────────────────┤
 │  DeclarationInfo:                                           │
 │    - zk_id: NQK (ZkSignature)                              │
@@ -244,8 +259,8 @@ This section provides guidance for implementing the protocol specification.
 
 | Key Type | Algorithm | Storage | Lifecycle | Primary Use | Derived From |
 |----------|-----------|---------|-----------|-------------|--------------|
-| **NQK** | ZkSignature | Ledger (`zk_id`) | Non-ephemeral | Core node proof | Generated |
-| **NSK** | Ed25519 | Ledger (`provider_id`) | Non-ephemeral | Authentication | Generated |
+| **NQK** | ZkSignature | Nomos blockchain (`zk_id`) | Non-ephemeral | Core node proof | Generated |
+| **NSK** | Ed25519 | Nomos blockchain (`provider_id`) | Non-ephemeral | Authentication | Generated |
 | **NEK** | X25519 | Derived | Non-ephemeral | Shared secret derivation | NSK public key |
 | **ESK** | Ed25519 | Memory | Ephemeral | Message signing | Generated (PoQ-limited) |
 | **EEK** | X25519 | Memory | Ephemeral | Message encryption | ESK |
