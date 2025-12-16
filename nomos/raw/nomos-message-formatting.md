@@ -57,8 +57,6 @@ and can significantly improve performance and reliability.
 This document defines an implementation-friendly specification of the Message Formatting,
 which is introduced in the Formatting section.
 
-In this document we are reusing notation from Notation.
-
 ### Overview
 
 The message contains a header and a payload.
