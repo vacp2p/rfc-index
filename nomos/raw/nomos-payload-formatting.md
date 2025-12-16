@@ -106,6 +106,10 @@ then it must be padded with random data.
 MAX_BODY_LENGTH = 33129
 ```
 
+**Note:** The MAX_BODY_LENGTH (33129 bytes) defined here differs from
+MAX_PAYLOAD_LENGTH (34003 bytes) in the Message Formatting specification.
+The Message Formatting spec includes additional message headers beyond the payload body.
+
 ## Implementation Considerations
 
 ### Fixed-Length Design
