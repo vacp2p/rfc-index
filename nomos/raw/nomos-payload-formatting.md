@@ -262,5 +262,3 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 - [Payload Formatting Specification](https://nomos-tech.notion.site/Payload-Formatting-Specification-215261aa09df8153a456c555b7dcbe1c)
   \- Original Payload Formatting documentation
-- [Blend Protocol Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81a3b3ebc1f438209467)
-  \- High-level overview of payload formatting in Blend Protocol
