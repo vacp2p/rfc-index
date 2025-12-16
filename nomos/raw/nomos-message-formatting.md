@@ -75,7 +75,7 @@ The Message is a structure that contains a public_header, private_header and a p
 ```python
 class Message:
     public_header: PublicHeader
-    private_header: Private_Header
+    private_header: PrivateHeader
     payload: bytes
 ```
 
