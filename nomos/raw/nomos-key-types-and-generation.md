@@ -19,11 +19,28 @@ contributors:
 This document defines the key types used in the Blend protocol
 and describes the process of generating them.
 
-## Overview
+## Background
+
+The Blend protocol is a mix network protocol
+that provides anonymous communication in the Nomos network.
+It uses layered encryption and message mixing
+to prevent traffic analysis and ensure sender anonymity.
+For more details, see [Blend Protocol](#references).
 
 This document ensures that the keys are used and generated in a common manner,
 which is necessary for making the Blend protocol work.
-The keys include:
+
+**Core nodes** are nodes that participate in the Blend network
+by mixing and forwarding messages.
+They are registered through the Service Declaration Protocol (SDP)
+and store their credentials on the Nomos blockchain ledger.
+
+**Blend messages** are encrypted messages
+that are routed through the mix network.
+Each message is encapsulated with multiple layers of encryption,
+one for each hop in the network.
+
+The keys defined in this specification include:
 
 - **Non-ephemeral Quota Key (NQK)** —
   used for proving that a node is a core node.
@@ -305,7 +322,9 @@ Implementations SHOULD:
 
 ### Normative
 
-- Service Declaration Protocol (SDP)
+- Blend Protocol - Mix network protocol for anonymous communication in Nomos
+- Service Declaration Protocol (SDP) - Protocol for registering core nodes
+  and storing `DeclarationInfo` on the Nomos blockchain ledger
 - Proof of Quota Specification (PoQ)
 - Message Encapsulation Mechanism
 - Zero Knowledge Signature Scheme (ZkSignature)
