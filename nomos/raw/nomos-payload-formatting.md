@@ -23,6 +23,13 @@ The payload must be of a fixed length to prevent adversaries from
 distinguishing types of messages based on their length.
 Therefore, shorter messages must be padded with random data.
 
+## Semantics
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in
+[RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
+
 ## Protocol Specification
 
 ### Introduction
