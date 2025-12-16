@@ -183,6 +183,81 @@ Since users are typically online to receive service,
 monitoring quality and pausing or closing streams
 is a reasonable expectation.
 
+## Off-Chain Protocol
+
+This section describes off-chain communication
+for stream establishment, service delivery, and closure.
+
+### Design Rationale
+
+On-chain state is the source of truth for fund allocation and accrual.
+Off-chain communication coordinates lifecycle events
+and enables service delivery.
+
+Users MAY pause or close streams without prior notice.
+Providers SHOULD track on-chain state for their streams.
+
+If the provider stops serving the user,
+the provider MUST notify the user off-chain
+before closing the stream on-chain.
+
+### Message Types
+
+#### Stream Establishment
+
+StreamRequest:
+The user sends a StreamRequest to initiate a stream.
+This message MUST include:
+
+- service_type: identifier of the requested service
+- stream_rate: proposed accrual rate (tokens per time unit)
+- stream_allocation: proposed initial allocation
+- public_key: key for signing subsequent service requests
+
+StreamResponse:
+The provider responds with acceptance or rejection.
+This message MUST include:
+
+- status: ACCEPTED or REJECTED
+- reason: explanation if rejected (OPTIONAL)
+
+If accepted, the user creates the stream on-chain.
+Acceptance commits the provider to deliver the specified service
+while payment accrues at the agreed rate.
+The provider MAY later terminate service
+but MUST send a ServiceTermination message first.
+
+#### Service Request
+
+ServiceRequest:
+The user sends service requests during stream operation.
+Each request MUST include:
+
+- request_data: service-specific payload
+- signature: signature over request_data using the committed public key
+
+The signature proves the request originates from the stream owner.
+The provider tracks on-chain state to verify the stream remains active.
+
+This design assumes the underlying blockchain provides funding privacy.
+Stream creation MUST NOT reveal which vault funded the stream.
+Vault deposits MUST NOT reveal the depositor's identity.
+
+#### Service Termination
+
+ServiceTermination:
+The provider sends this message when stopping service.
+This message MUST include:
+
+- termination_type: TEMPORARY or PERMANENT
+- resume_after: timestamp after which service MAY resume
+  (REQUIRED for TEMPORARY, empty for PERMANENT)
+
+For temporary termination,
+the user MAY pause the stream until the resume_after time.
+For permanent termination,
+the user SHOULD close the stream to recover unaccrued funds.
+
 ## Protocol Extensions
 
 This section describes optional modifications
