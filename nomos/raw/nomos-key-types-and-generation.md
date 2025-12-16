@@ -1,6 +1,6 @@
 ---
 title: NOMOS-KEY-TYPES-GENERATION
-name: Nomos Key Types and Generation Specification
+name: Nomos Key Types and Generation
 status: raw
 category: Standards Track
 tags: cryptography, keys, blend, encryption, signing
