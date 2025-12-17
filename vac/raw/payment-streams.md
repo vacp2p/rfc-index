@@ -263,12 +263,16 @@ This section describes optional modifications
 that MAY be applied to the base protocol.
 Each extension is independent.
 
-### Epoch-Based Accrual Caps
+### Auto-Pause
 
-The user MAY specify epoch length and epoch cap when creating a stream.
-When accrued amount reaches the epoch cap,
+The user MAY specify an auto-pause duration when creating a stream.
+When the specified duration elapses since stream creation or last resume,
 the stream MUST automatically transition to PAUSED state.
-The user MAY resume the stream, resetting the epoch accrual counter.
+The user MAY resume the stream, resetting the auto-pause timer.
+
+Auto-pause limits loss if service stops and the user is offline.
+Per-stream allocation already bounds total risk;
+auto-pause adds periodic check-ins for long-running streams.
 
 ### Delivery Receipts
 
