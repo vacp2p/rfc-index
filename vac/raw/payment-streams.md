@@ -126,10 +126,10 @@ The provider MAY claim accrued funds from a stream in any state.
 Stream states:
 
 - ACTIVE: Funds accrue to the provider at the agreed rate.
-- PAUSED: Accrual is stopped by user action.
+- PAUSED: Accrual is stopped.
+The stream transitions to PAUSED by user action
+or automatically when allocated funds are fully accrued.
 The stream MAY be resumed by the user.
-- DEPLETED: Stream has run out of allocated funds.
-Accrual is stopped automatically.
 - CLOSED: Stream is permanently terminated.
 The stream MUST NOT transition to any other state.
 
@@ -138,12 +138,12 @@ Stream state transitions:
 - Create: User creates a stream in ACTIVE state
 by allocating funds from the vault.
 - Pause: User pauses an ACTIVE stream, stopping accrual.
-- Resume: User resumes a PAUSED stream, restarting accrual.
-- Deplete: Automatic transition from ACTIVE
+The stream also transitions automatically from ACTIVE to PAUSED
 when allocated funds are fully accrued.
+- Resume: User resumes a PAUSED stream, restarting accrual.
+Resume MUST fail if remaining allocation is zero.
 - Top-Up: User MAY add funds to stream allocation.
-From DEPLETED state, stream MUST transition to PAUSED.
-From ACTIVE or PAUSED state, stream MUST remain in same state.
+Stream MUST remain in same state after top-up.
 - Close: Either user or provider MAY close the stream
 from any non-CLOSED state.
 - Withdraw: User MAY withdraw only unaccrued funds
@@ -161,13 +161,10 @@ A claim operation does not change stream state.
 
 ```mermaid
 graph LR;
-    ACTIVE --> PAUSED;
-    PAUSED --> ACTIVE;
-    ACTIVE --> DEPLETED;
-    DEPLETED --> PAUSED;
-    ACTIVE --> CLOSED;
-    PAUSED --> CLOSED;
-    DEPLETED --> CLOSED;
+    ACTIVE -->|pause / deplete| PAUSED;
+    PAUSED -->|resume| ACTIVE;
+    ACTIVE -->|close| CLOSED;
+    PAUSED -->|close| CLOSED;
 ```
 
 ### Assumptions
