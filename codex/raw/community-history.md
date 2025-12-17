@@ -33,7 +33,7 @@ where recently joined members of a community are not able to request complete me
 | Waku node | A [10/WAKU2](../../waku/standards/core/10/waku.md) node that implements [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) |
 | Store node | A [10/WAKU2](../../waku/standards/core/10/waku.md) node that implements [13/WAKU2-STORE](../../waku/standards/core/13/store.md) |
 | Waku network | A group of [10/WAKU2](../../waku/standards/core/10/waku.md) nodes forming a graph, connected via [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) |
-| Status user | An Status account that is used in a Status consumer product, such as Status Mobile or Status Desktop |
+| Status user | A Status account that is used in a Status consumer product, such as Status Mobile or Status Desktop |
 | Status node | A Status client run by a Status application |
 | Control node| A Status node that owns the private key for a Status community |
 | Community member | A Status user that is part of a Status community, not owning the private key of the community|
@@ -57,20 +57,20 @@ The following describes the protocol buffer for `WakuMessageArchive` :
 
 ``` protobuf
 
-syntax = "proto3"
+syntax = "proto3";
 
 message WakuMessageArchiveMetadata {
-  uint8 version = 1
-  uint64 from = 2
-  uint64 to = 3
-  repeated string content_Topic = 4
+  uint8 version = 1;
+  uint64 from = 2;
+  uint64 to = 3;
+  repeated string content_Topic = 4;
 }
 
 message WakuMessageArchive {
-  uint8 version = 1
-  WakuMessageArchiveMetadata metadata = 2
-  repeated WakuMessage messages = 3 // `WakuMessage` is provided by 14/WAKU2-MESSAGE
-  bytes padding = 4
+  uint8 version = 1;
+  WakuMessageArchiveMetadata metadata = 2;
+  repeated WakuMessage messages = 3; // `WakuMessage` is provided by 14/WAKU2-MESSAGE
+  bytes padding = 4;
 }
 
 ```
@@ -78,9 +78,9 @@ message WakuMessageArchive {
 The `from` field SHOULD contain a `timestamp` of the time range's lower bound.
 This type parallels to the `timestamp` of a `WakuMessage`.
 The `to` field SHOULD contain a `timestamp` of the time range's the higher bound.
-The `contentTopic` field MUST contain a list of all communiity channel `contentTopic`s.
-The `messages` field MUST contain all messages that belong into the archive given its `from`,
-`to` and `contentTopic` fields.
+The `contentTopic` field MUST contain a list of all community channel `contentTopic`s.
+The `messages` field MUST contain all messages that belong in the archive, given its `from`,
+`to`, and `contentTopic` fields.
 
 The `padding` field MUST contain the amount of zero bytes needed for the protobuf encoded `WakuMessageArchive`.
 The overall byte size MUST be a multiple of the `pieceLength` used to divide the data into pieces.
@@ -133,7 +133,7 @@ there MUST be a `WakuMessageArchiveIndexMetadata` entry in the archives field `W
 
 ### Creating Message Archive Torrents
 
-Control nodes MUST create a .torrent file containing metadata to all message history archives.
+Control nodes MUST create a .torrent file containing metadata for all message history archives.
 To create a .torrent file, and
 later serve the message archive data on the BitTorrent network,
 control nodes MUST store the necessary data in dedicated files on the file system.
@@ -144,29 +144,29 @@ A torrent's source folder MUST contain the following two files:
 concatenated in ascending order based on their time
 - `index`: Contains the protobuf encoded `WakuMessageArchiveIndex`
 
-Control nodes SHOULD store these files in a dedicated folder that is identifiable, via a community identifier.
+Control nodes SHOULD store these files in a dedicated folder that is identifiable via a community identifier.
 
 ### Ensuring Reproducible Data Pieces
 
 The control node MUST ensure that the byte string from the protobuf encoded data
 is equal to the byte string data from the previously generated message archive torrent.
 Including the data of the latest seven days worth of messages encoded as `WakuMessageArchive`.
-Therefore, the size of data grows every seven days as it's append only.
+Therefore, the size of data grows every seven days as it's append-only.
 
 Control nodes MUST ensure that the byte size,
 for every individual `WakuMessageArchive` encoded protobuf,
 is a multiple of `pieceLength` using the padding field.
 If the `WakuMessageArchive` is not a multiple of `pieceLength`,
 its padding field MUST be filled with zero bytes and
-the `WakuMessageArchive` MUST be re-encoded until its size becomes multiple of `pieceLength`.
+the `WakuMessageArchive` MUST be re-encoded until its size becomes a multiple of `pieceLength`.
 
 This is necessary because the content of the data file will be split into pieces of `pieceLength` when the torrent file is created,
 and the SHA1 hash of every piece is then stored in the torrent file and
 later used by other nodes to request the data for each individual data piece.
 
 By fitting message archives into a multiple of `pieceLength` and
-ensuring they fill possible remaining space with zero bytes,
-control nodes prevent the next message archive to occupy that remaining space of the last piece,
+ensuring they fill the possible remaining space with zero bytes,
+control nodes prevent the next message archive from occupying that remaining space of the last piece,
 which will result in a different SHA1 hash for that piece.
 
 Example: Without padding
@@ -243,7 +243,7 @@ following the Magnet URI scheme using the underlying [BitTorrent protocol](https
 #### Message Archive Distribution
 
 Message archives are available via the BitTorrent network as they are being seeded by the control node.
-Other community member nodes will download the message archives from the BitTorrent network,
+Other community member nodes will download the message archives, from the BitTorrent network,
 after receiving a magnet link that contains a message archive index.
 
 The control node MUST send magnet links containing message archives and
@@ -261,14 +261,14 @@ with a [62/STATUS-PAYLOADS](../../status/62/payloads.md) of `CommunityMessageArc
 Only the control node MAY post to the special channel.
 Other messages on this specified channel MUST be ignored by clients.
 Community members MUST NOT have permission to send messages to the special channel.
-However, community member nodes MUST subscribe to special channel,
-to receive [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) containing magnet links for message archives.
+However, community member nodes MUST subscribe to a special channel,
+to receive a [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) containing magnet links for message archives.
 
 #### Canonical Message Histories
 
 Only control nodes are allowed to distribute messages with magnet links,
 via the special channel for magnet link exchange.
-Status nodes MUST ignore all messages in the special channel that isn't signed by a control node.
+Status nodes MUST ignore all messages in the special channel that aren't signed by a control node.
 Since the magnet links are created from the control node's database
 (and previously distributed archives),
 the message history provided by the control node becomes the canonical message history and
@@ -282,18 +282,18 @@ even if it already existed in a community member node's database.
 
 ### Fetching Message History Archives
 
-The process of fetching message hsitory:
+The process of fetching message history:
 
 1. Receive message archive index magnet link as described in [Message archive distribution](#message-archive-distribution),
-2. Download index file from torrent, then determine which message archives to download
+2. Download the index file from the torrent, then determine which message archives to download
 3. Download individual archives
 
-Community member nodes subscribe to the special channel of the control nodes that publish magnet links for message history archives to.
+Community member nodes subscribe to the special channel of the control nodes that publish magnet links for message history archives.
 Two RECOMMENDED scenarios in which community member nodes can receive such a magnet link message from the special channel:
 
 1. The member node receives it via live messages, by listening to the special channel.
 2. The member node requests messages for a time range of up to 30 days from store nodes
-(this is the case when a new community member joins a community).
+(this is the case when a new community member joins a community.)
 3. Downloading message archives
 
 When community member nodes receive a message with a `CommunityMessageHistoryArchive` [62/STATUS-PAYLOADS](../../status/62/payloads.md),
@@ -315,14 +315,14 @@ using the KECCAK-256 hashes stored in the index.
 For this lookup to work,
 member nodes MUST store the KECCAK-256 hashes,
 of the `WakuMessageArchiveIndexMetadata` provided by the index file,
-for all of the message history archives that have been downloaded in their local database.
+for all of the message history archives that have been downloaded into their local database.
 
 Given a `WakuMessageArchiveIndex`, member nodes can access individual `WakuMessageArchiveIndexMetadata` to download individual archives.
 
 Community member nodes MUST choose one of the following options:
 
-1. Download all archives: Request and download all data pieces for data provided by the torrent
-(this is the case for new community member nodes that haven't downloaded any archives yet).
+1. Download all archives: Request and download all data pieces for the data provided by the torrent
+(this is the case for new community member nodes that haven't downloaded any archives yet.)
 2. Download only the latest archive: Request and
 download all pieces starting at the offset of the latest `WakuMessageArchiveIndexMetadata`
 (this is the case for any member node that already has downloaded all previous history and
@@ -340,9 +340,9 @@ community member nodes MUST unwrap the resulting `WakuMessage` instances into `A
 and store them in their local database.
 Community member nodes SHOULD NOT store the wrapped `WakuMessage` messages.
 
-All message within the same time range MUST be replaced with the messages provided by the message history archive.
+All messages within the same time range MUST be replaced with the messages provided by the message history archive.
 
-Community members nodes MUST ignore the expiration state of each archive message.
+Community members' nodes MUST ignore the expiration state of each archive message.
 
 ### Security Considerations
 
@@ -350,15 +350,15 @@ Community members nodes MUST ignore the expiration state of each archive message
 
 It is possible for control nodes to export the private key of their owned community and
 pass it to other users so they become control nodes as well.
-This means, it's possible for multiple control nodes to exist for one community.
+This means it's possible for multiple control nodes to exist for one community.
 
 This might conflict with the assumption that the control node serves as a single source of truth.
 Multiple control nodes can have different message histories.
 Not only will multiple control nodes multiply the amount of archive index messages being distributed to the network,
-they might also contain different sets of magnet links and their corresponding hashes.
+but they might also contain different sets of magnet links and their corresponding hashes.
 Even if just a single message is missing in one of the histories,
-the hashes presented in archive indices will look completely different,
-resulting in the community member node to download the corresponding archive.
+the hashes presented in the archive indices will look completely different,
+resulting in the community member node downloading the corresponding archive.
 This might be identical to an archive that was already downloaded,
 except for that one message.
 
