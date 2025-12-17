@@ -143,7 +143,9 @@ when allocated funds are fully accrued.
 - Resume: User resumes a PAUSED stream, restarting accrual.
 Resume MUST fail if remaining allocation is zero.
 - Top-Up: User MAY add funds to stream allocation.
-Stream MUST remain in same state after top-up.
+Top-up MUST transition the stream to ACTIVE state.
+If the user wants to add funds without resuming,
+the user MUST pause the stream after top-up.
 - Close: Either user or provider MAY close the stream
 from any non-CLOSED state.
 - Withdraw: User MAY withdraw only unaccrued funds
@@ -162,7 +164,7 @@ A claim operation does not change stream state.
 ```mermaid
 graph LR;
     ACTIVE -->|pause / deplete| PAUSED;
-    PAUSED -->|resume| ACTIVE;
+    PAUSED -->|resume / top-up| ACTIVE;
     ACTIVE -->|close| CLOSED;
     PAUSED -->|close| CLOSED;
 ```
