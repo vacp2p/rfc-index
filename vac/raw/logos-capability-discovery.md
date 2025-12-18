@@ -769,6 +769,7 @@ for detailed explanation.
 
 Registrars SHOULD respond to [`GET_ADS`](#get_ads-message) requests from discoverers.
 When responding, registrars:
+
 - SHOULD return up to `F_return` advertisements
 from their `ad_cache` for the requested `service_id_hash`.
 - SHOULD include a list of closer peers
@@ -805,6 +806,7 @@ and `GET_ADS` request by discoverers,
 registrars play an important role in helping nodes discover the network topology.
 
 When responding to requests, registrars:
+
 - May initialize their registrar table `RegT(service_id_hash)`
 from their `KadDHT(peerID)` routing table using
 the formula specified in the [Distance](#distance) section.
