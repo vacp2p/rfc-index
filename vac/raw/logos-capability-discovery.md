@@ -320,6 +320,14 @@ Advertise table `AdvT(service_id_hash)`, search table `DiscT(service_id_hash)`
 and registrar table `RegT(service_id_hash)` MUST be centered on `service_id_hash`
 while `KadDHT(peerID)` table is centered on `peerID`.
 
+Each bucket in `AdvT(service_id_hash)`, `DiscT(service_id_hash)`, and `RegT(service_id_hash)`
+SHOULD contain unique peers.
+
+When inserting a peer into a bucket, implementations  SHOULD first check
+whether a peer with the same `peerID` already exists in that bucket.
+If so, the insertion SHOULD be ignored or treated as a refresh,
+but SHOULD NOT result in duplicate entries.
+
 When inserting a node into `AdvT(service_id_hash)`, `DiscT(service_id_hash)` or `RegT(service_id_hash)`,
 the bucket index into which the node will be inserted MUST be determined by:
 
@@ -472,17 +480,62 @@ Registrars SHOULD include `closerPeers` to help populate the discoverer's search
 
 ### Overview
 
-`ADVERTISE(service_id_hash)` lets advertisers publish itself
-as a participant in a particular `service_id_hash` .
+For each service, identified by `service_id_hash`,
+that an advertiser wants to advertise,
+the advertiser MUST instantiate a
+new advertise table `AdvT(service_id_hash)`,
+centered on that `service_id_hash`.
 
-It spreads advertisements for its service across multiple registrars,
-such that other peers can  find it efficiently.
+The advertiser MAY bootstrap `AdvT(service_id_hash)`
+by copying existing entries from `KadDHT(peerID)`
+already maintained by the node.
+For every peer present in the table
+from where the advertiser bootstraps,
+it MUST use the formula described in the [Distance](#distance) section
+to place the peers in buckets.
+`AdvT(service_id_hash)` SHOULD be maintained through
+interactions with registrars during advertise operations.
+The advertiser SHOULD try to maintain up to `K_register`
+active registrations per bucket.
+It does so by selecting random registrars
+from each bucket of `AdvT(service_id_hash)`
+and following the registration maintenance procedure.
+These ongoing registrations MAY be tracked in a separate data structure.
+Ongoing registrations include those registrars
+which has an active `ad` or the advertiser is
+trying to register its `ad` into that registrar.
+
+### Registration Maintenance Requirements
+
+To maintain each registration, the advertiser:
+
+- SHOULD send a [REGISTER message](#register-message) to the registrar.
+If there is already a cached `ticket` from a previous registration attempt
+for the same `ad` in the same registrar,
+the `ticket` SHOULD also be included in the REGISTER message.
+- On receipt of a Response,
+SHOULD add the closer peers indicated in the response to `AdvT(service_id_hash)`
+using the formula described in the [Distance](#distance) section.
+- SHOULD schedule a next registration to the same registrar,
+based on the response status field:
+  - If the `status` is `Confirmed`, the registration is maintained
+  in the registrar's `ad_cache` for `E` seconds.
+  After `E` seconds it MUST removed from the ongoing registrations for that bucket.
+  - If the `status` indicates `Wait`,
+  the next registration is scheduled based on
+  the `ticket.t_wait_for` value included in the response.
+  In this case, the `Response` also contains a `ticket`,
+  which SHOULD be included in the next registration attempt to this registrar.
+  - On `status` is `Rejected` then
+  the registrar SHOULD be from the ongoing registrations for that bucket.
 
 ### Advertisement Algorithm
 
-Advertisers place advertisements across multiple registrars using the `ADVERTISE()` algorithm.
+Advertisers place advertisements across multiple registrars
+using the `ADVERTISE()` algorithm.
 The advertisers run `ADVERTISE()` periodically.
-Implementations may choose the interval based on their requirements.
+We RECOMMEND that the following algorithms be used
+to implement the advertisement placement requirements specified above.
 
 ```text
 procedure ADVERTISE(service_id_hash):
@@ -653,6 +706,8 @@ The registrar MUST issue a new `ticket` with updated `ticket.t_mod` and `ticket.
 The registrar MUST sign the new `ticket`.
 The registrar SHOULD return response with status `Wait` and the new signed `ticket`.
 - The registrar SHOULD include a list of closer peers (`response.closerPeers`)
+using the algorithm described in
+[Peer Table Updates](#peer-table-updates) section
 to help the advertiser improve its advertise table.
 
 `ad_cache` maintainence:
@@ -710,10 +765,21 @@ for detailed explanation.
 
 ## Lookup Response Algorithm
 
+### Overview
+
+Registrars SHOULD respond to [`GET_ADS`](#get_ads-message) requests from discoverers.
+When responding, registrars:
+- SHOULD return up to `F_return` advertisements
+from their `ad_cache` for the requested `service_id_hash`.
+- SHOULD include a list of closer peers
+to help discoverers populate their search table using the algorithm described in
+[Peer Table Updates](#peer-table-updates) section.
+
+### Recommended Lookup Response Algorithm
+
 Registrars respond to `GET_ADS` requests from discoverers
 using the `LOOKUP_RESPONSE()` algorithm.
-Refer to [GET_ADS Message section](#get_ads-message)
-for the request and response structure of `GET_ADS`.
+We RECOMMEND using the following algorithm.
 
 ```text
 procedure LOOKUP_RESPONSE(service_id_hash):
@@ -732,12 +798,25 @@ from across the registrar’s routing table `RegT(service_id_hash)`.
 
 ## Peer Table Updates
 
+### Overview
+
 While responding to both `REGISTER` requests by advertisers
 and `GET_ADS` request by discoverers,
-the contacted registrar node also returns a list of peers.
-To get this list of peers, the registrar runs the `GETPEERS(service_id_hash)` algorithm.
-Both advertisers and discoverers update their
-service-specific tables using this list of peers.
+registrars play an important role in helping nodes discover the network topology.
+
+When responding to requests, registrars:
+- May initialize their registrar table `RegT(service_id_hash)`
+from their `KadDHT(peerID)` routing table using
+the formula specified in the [Distance](#distance) section.
+- SHOULD return a list of peers to help advertisers
+populate their `AdvT(service_id_hash)` tables and
+discoverers populate their `DiscT(service_id_hash)` tables.
+- SHOULD return peers that are diverse and distributed across different buckets
+to prevent malicious registrars from polluting routing tables.
+
+### Recommended Peer Selection Algorithm
+
+We RECOMMEND that the following algorithm be used to select peers to return in responses.
 
 ```text
 procedure GETPEERS(service_id_hash):
