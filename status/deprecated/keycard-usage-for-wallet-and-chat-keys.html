@@ -1,0 +1,511 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Keycard Usage for Wallet and Chat Keys - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html" class="active"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: Keycard Usage for Wallet and Chat Keys
+name: Keycard Usage for Wallet and Chat Keys
+status: deprecated
+description: In this specification, we describe how Status communicates with Keycard to create, store and use multiaccount.
+editor: Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a>
+contributors:</p>
+<ul>
+<li>Roman Volosovskyi <a href="mailto:roman@status.im">roman@status.im</a></li>
+</ul>
+<hr />
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>In this specification, we describe how Status communicates with Keycard to create, store and use multiaccount.</p>
+<h2 id="definitions"><a class="header" href="#definitions">Definitions</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody>
+<tr><td>Keycard Hardwallet</td><td><a href="https://keycard.tech/docs/">https://keycard.tech/docs/</a></td></tr>
+<tr><td></td><td></td></tr>
+</tbody></table>
+</div>
+<h2 id="multiaccount-creationrestoring"><a class="header" href="#multiaccount-creationrestoring">Multiaccount creation/restoring</a></h2>
+<h3 id="creation-and-restoring-via-mnemonic"><a class="header" href="#creation-and-restoring-via-mnemonic">Creation and restoring via mnemonic</a></h3>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/get-application-info</code>
+request: <code>nil</code>
+response: <code>{"initialized?" false}</code></p>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/init-card</code>
+request: <code>{:pin 123123}</code>
+response:</p>
+<pre><code class="language-clojure">{"password" "nEJXqf6VWbqeC5oN", 
+ "puk" "411810112887", 
+ "pin" "123123"}
+</code></pre>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/get-application-info</code>
+request: <code>nil</code>
+response:</p>
+<pre><code class="language-clojure">{"free-pairing-slots" 5, 
+ "app-version" "2.2", 
+ "secure-channel-pub-key" "04e70d7af7d91b8cd23adbefdfc242c096adee6c1b5ad27a4013a8f926864c1a4f816b338238dc4a04226ab42f23672585c6dca03627885530643f1656ee69b025", 
+ "key-uid" "", 
+ "instance-uid" "9f149d438988a7af5e1a186f650c9328", 
+ "paired?" false, 
+ "has-master-key?" false, 
+ "initialized?" true}
+</code></pre>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/pair</code>
+params: <code>{:password "nEJXqf6VWbqeC5oN"}</code>
+response: <code>AAVefVX0kPGsxnvQV5OXRbRTLGI3k8/S27rpsq/lZrVR</code> (<code>pairing</code>)</p>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/generate-and-load-keys</code></p>
+</li>
+</ol>
+<pre><code class="language-clojure">   {:mnemonic "lift mansion moment version card type uncle sunny lock gather nerve math", 
+    :pairing "AAVefVX0kPGsxnvQV5OXRbRTLGI3k8/S27rpsq/lZrVR", 
+    :pin "123123"}
+</code></pre>
+<pre><code>response:
+```clojure
+{"whisper-address" "1f29a1a60c8a12f80c397a91c6ae0323f420e609", 
+ "whisper-private-key" "123123123123123", 
+ "wallet-root-public-key" "04eb9d01990a106a65a6dfaa48300f72aecfeabe502d9f4f7aeaccb146dc2f16e2dec81dcec0a1a52c1df4450f441a48c210e1a73777c0161030378df22e4ae015", 
+ "encryption-public-key" "045ee42f012d72be74b31a28ce320df617e0cd5b9b343fad34fcd61e2f5dfa89ab23d880473ba4e95401a191764c7f872b7af92ea0d8c39462147df6f3f05c2a11", 
+ "wallet-root-address" "132dd67ff47cc1c376879c474fd2afd0f1eee6de", 
+ "whisper-public-key" "0450ad84bb95f32c64f4e5027cc11d1b363a0566a0cfc475c5653e8af9964c5c9b0661129b75e6e1bc6e96ba2443238e53e7f49f2c5f2d16fcf04aca4826765d46", 
+ "address" "bf93eb43fea2ce94bf3a6463c16680b56aa4a08a", 
+ "wallet-address" "7eee1060d8e4722d36c99f30ff8291caa3cfc40c", 
+ "key-uid" "472d8436ccedb64bcbd897bed5895ec3458b306352e1bcee377df87db32ef2c2", 
+ "wallet-public-key" "0495ab02978ea1f8b059140e0be5a87aad9b64bb7d9706735c47dda6e182fd5ca41744ca37583b9a10c316b01d4321d6c85760c61301874089acab041037246294", 
+ "public-key" "0465d452d12171711f32bb931f9ea26fe1b88fe2511a7909a042b914fde10a99719136365d506e2d1694fc14627f9d557da33865efc6001da3942fc1d4d2469ca1", 
+ "instance-uid" "9f149d438988a7af5e1a186f650c9328"}
+```
+</code></pre>
+<h3 id="multiaccount-restoring-via-pairing"><a class="header" href="#multiaccount-restoring-via-pairing">Multiaccount restoring via pairing</a></h3>
+<p>This flow is required in case if a user want to pair a card with an existing multiaccount on it.</p>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/get-application-info</code>
+request: <code>nil</code>
+response:</p>
+<pre><code class="language-clojure">{"free-pairing-slots" 4, 
+ "app-version" "2.2", 
+ "secure-channel-pub-key" "04e70d7af7d91b8cd23adbefdfc242c096adee6c1b5ad27a4013a8f926864c1a4f816b338238dc4a04226ab42f23672585c6dca03627885530643f1656ee69b025", 
+ "key-uid" "", 
+ "instance-uid" "9f149d438988a7af5e1a186f650c9328", 
+ "paired?" false, 
+ "has-master-key?" false, 
+ "initialized?" true}
+</code></pre>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/pair</code>
+params: <code>{:password "nEJXqf6VWbqeC5oN"}</code>
+response: <code>AAVefVX0kPGsxnvQV5OXRbRTLGI3k8/S27rpsq/lZrVR</code> (<code>pairing</code>)</p>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/generate-and-load-keys</code></p>
+<pre><code class="language-clojure">{:mnemonic "lift mansion moment version card type uncle sunny lock gather nerve math", 
+ :pairing "AAVefVX0kPGsxnvQV5OXRbRTLGI3k8/S27rpsq/lZrVR", 
+ :pin "123123"}
+</code></pre>
+<p>response:</p>
+<pre><code class="language-clojure">{"whisper-address" "1f29a1a60c8a12f80c397a91c6ae0323f420e609", 
+ "whisper-private-key" "123123123123123123123", 
+ "wallet-root-public-key" "04eb9d01990a106a65a6dfaa48300f72aecfeabe502d9f4f7aeaccb146dc2f16e2dec81dcec0a1a52c1df4450f441a48c210e1a73777c0161030378df22e4ae015", 
+ "encryption-public-key" "045ee42f012d72be74b31a28ce320df617e0cd5b9b343fad34fcd61e2f5dfa89ab23d880473ba4e95401a191764c7f872b7af92ea0d8c39462147df6f3f05c2a11", 
+ "wallet-root-address" "132dd67ff47cc1c376879c474fd2afd0f1eee6de", 
+ "whisper-public-key" "0450ad84bb95f32c64f4e5027cc11d1b363a0566a0cfc475c5653e8af9964c5c9b0661129b75e6e1bc6e96ba2443238e53e7f49f2c5f2d16fcf04aca4826765d46", 
+ "address" "bf93eb43fea2ce94bf3a6463c16680b56aa4a08a", 
+ "wallet-address" "7eee1060d8e4722d36c99f30ff8291caa3cfc40c", 
+ "key-uid" "472d8436ccedb64bcbd897bed5895ec3458b306352e1bcee377df87db32ef2c2", 
+ "wallet-public-key" "0495ab02978ea1f8b059140e0be5a87aad9b64bb7d9706735c47dda6e182fd5ca41744ca37583b9a10c316b01d4321d6c85760c61301874089acab041037246294", 
+ "public-key" "0465d452d12171711f32bb931f9ea26fe1b88fe2511a7909a042b914fde10a99719136365d506e2d1694fc14627f9d557da33865efc6001da3942fc1d4d2469ca1", 
+ "instance-uid" "9f149d438988a7af5e1a186f650c9328"}
+</code></pre>
+</li>
+</ol>
+<h2 id="multiaccount-unlocking"><a class="header" href="#multiaccount-unlocking">Multiaccount unlocking</a></h2>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/get-application-info</code>
+params:</p>
+<pre><code class="language-clojure">{:pairing nil, :on-success nil}
+</code></pre>
+<p>response:</p>
+<pre><code class="language-clojure">{"free-pairing-slots" 4, 
+ "app-version" "2.2", 
+ "secure-channel-pub-key" "04b079ac513d5e0ebbe9becbae1618503419f5cb59edddc7d7bb09ce0db069a8e6dec1fb40c6b8e5454f7e1fcd0bb4a0b9750256afb4e4390e169109f3ea3ba91d", 
+ "key-uid" "a5424fb033f5cc66dce9cbbe464426b6feff70ca40aa952c56247aaeaf4764a9", 
+ "instance-uid" "2268254e3ed7898839abe0b40e1b4200", 
+ "paired?" false, 
+ "has-master-key?" true, 
+ "initialized?" true}
+</code></pre>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/get-keys</code>
+params:</p>
+<pre><code class="language-clojure">{:pairing "ACEWbvUlordYWOE6M1Narn/AXICRltjyuKIAn4kkPXQG",
+ :pin "123123"}
+</code></pre>
+<p>response:</p>
+<pre><code class="language-clojure">{"whisper-address" "ec83f7354ca112203d2ce3e0b77b47e6e33258aa", 
+ "whisper-private-key" "123123123123123123123123",
+ "wallet-root-public-key" "0424a93fe62a271ad230eb2957bf221b4644670589f5c0d69bd11f3371034674bf7875495816095006c2c0d5f834d628b87691a8bbe3bcc2225269020febd65a19", 
+ "encryption-public-key" "0437eef85e669f800570f444e64baa2d0580e61cf60c0e9236b4108455ec1943f385043f759fcb5bd8348e32d6d6550a844cf24e57f68e9397a0f7c824a8caee2d", 
+ "wallet-root-address" "6ff915f9f31f365511b1b8c1e40ce7f266caa5ce", 
+ "whisper-public-key" "04b195df4336c596cca1b89555dc55dd6bb4c5c4491f352f6fdfae140a2349213423042023410f73a862aa188f6faa05c80b0344a1e39c253756cb30d8753f9f8324", 
+ "address" "73509a1bb5f3b74d0dba143705cd9b4b55b8bba1", 
+ "wallet-address" "2f0cc0e0859e7a05f319d902624649c7e0f48955", 
+ "key-uid" "a5424fb033f5cc66dce9cbbe464426b6feff70ca40aa952c56247aaeaf4764a9", 
+ "wallet-public-key" "04d6fab73772933215872c239787b2281f3b10907d099d04b88c861e713bd2b95883e0b1710a266830da29e76bbf6b87ed034ab139e36cc235a1b2a5b5ddfd4e91", 
+ "public-key" "0437eef85e669f800570f444e64baa2d0580e61cf60c0e9236b4108455ec1943f385043f759fcb5bd8348e32d6d6550a844cf24e57f68e9397a0f7c824a8caee2d", 
+ "instance-uid" "2268254e3ed7898839abe0b40e1b4200"}
+</code></pre>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/get-application-info</code>
+params:</p>
+<pre><code class="language-clojure">{:pairing "ACEWbvUlordYWOE6M1Narn/AXICRltjyuKIAn4kkPXQG"}
+</code></pre>
+<p>response:</p>
+<pre><code class="language-clojure">{"paired?" true, 
+ "has-master-key?" true, 
+ "app-version" "2.2", 
+ "free-pairing-slots" 4, 
+ "pin-retry-counter" 3, 
+ "puk-retry-counter" 5, 
+ "initialized?" true, 
+ "secure-channel-pub-key" "04b079ac513d5e0ebbe9becbae1618503419f5cb59edddc7d7bb09ce0db069a8e6dec1fb40c6b8e5454f7e1fcd0bb4a0b9750256afb4e4390e169109f3ea3ba91d", 
+ "key-uid" "a5424fb033f5cc66dce9cbbe464426b6feff70ca40aa952c56247aaeaf4764a9", 
+ "instance-uid" "2268254e3ed7898839abe0b40e1b4200"}
+</code></pre>
+</li>
+</ol>
+<h2 id="transaction-signing"><a class="header" href="#transaction-signing">Transaction signing</a></h2>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/get-application-info</code></p>
+<p>params:</p>
+<pre><code class="language-clojure">{:pairing "ALecvegKyOW4szknl01yYWx60GLDK5gDhxMgJECRZ+7h", 
+ :on-success :hardwallet/sign}
+</code></pre>
+<p>response:</p>
+<pre><code class="language-clojure"> {"paired?" true, 
+  "has-master-key?" true, 
+  "app-version" "2.2", 
+  "free-pairing-slots" 4, 
+  "pin-retry-counter" 3, 
+  "puk-retry-counter" 5, 
+  "initialized?" true, 
+  "secure-channel-pub-key" "0476d11f2ccdad4e7779b95a1ce063d7280cb6c09afe2c0e48ca0c64ab9cf2b3c901d12029d6c266bfbe227c73a802561302b2330ac07a3270fc638ad258fced4a", 
+  "key-uid" "d5c8cde8085e7a3fcf95aafbcbd7b3cfe32f61b85c2a8f662f60e76bdc100718", 
+  "instance-uid" "e20e27bfee115b431e6e81b8e9dcf04c"}
+</code></pre>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/sign</code>
+params:</p>
+<pre><code class="language-clojure">{:hash "92fc7ef54c3e0c42de256b93fbf2c49dc6948ee089406e204dec943b7a0142a9", 
+ :pairing "ALecvegKyOW4szknl01yYWx60GLDK5gDhxMgJECRZ+7h", 
+ :pin "123123", 
+ :path "m/44'/60'/0'/0/0"}
+</code></pre>
+<p>response: <code>5d2ca075593cf50aa34007a0a1df7df14a369534450fce4a2ae8d023a9d9c0e216b5e5e3f64f81bee91613318d01601573fdb15c11887a3b8371e3291e894de600</code></p>
+</li>
+</ol>
+<h2 id="account-derivation"><a class="header" href="#account-derivation">Account derivation</a></h2>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/verify-pin</code>
+params:</p>
+<pre><code class="language-clojure">{:pin "123123", 
+ :pairing "ALecvegKyOW4szknl01yYWx60GLDK5gDhxMgJECRZ+7h"}
+</code></pre>
+<p>response: <code>3</code></p>
+</li>
+<li>
+<p><code>status-im.hardwallet.card/export-key</code>
+params:</p>
+<pre><code class="language-clojure">{:pin "123123", 
+ :pairing "ALecvegKyOW4szknl01yYWx60GLDK5gDhxMgJECRZ+7h", 
+ :path "m/44'/60'/0'/0/1"}
+</code></pre>
+<p>response: <code>046d1bcd2310a5e0094bc515b0ec995a8cb59e23d564094443af10011b6c00bdde44d160cdd32b4b6341ddd7dc83a4f31fdf60ec2276455649ccd7a22fa4ea01d8</code> (account's <code>public-key</code>)</p>
+</li>
+</ol>
+<h2 id="reset-pin"><a class="header" href="#reset-pin">Reset pin</a></h2>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/change-pin</code>
+params:</p>
+<pre><code class="language-clojure">{:new-pin "111111", 
+ :current-pin "222222", 
+ :pairing "AA0sKxPkN+jMHXZZeI8Rgz04AaY5Fg0CzVbm9189Khob"}
+</code></pre>
+<p>response:
+<code>true</code></p>
+</li>
+</ol>
+<h2 id="unblock-pin"><a class="header" href="#unblock-pin">Unblock pin</a></h2>
+<p>If user enters a wrong pin three times in a row a card gets blocked. The user can use puk code then to unblock the card and set a new pin.</p>
+<ol>
+<li>
+<p><code>status-im.hardwallet.card/unblock-pin</code>
+params:</p>
+<pre><code class="language-clojure">{:puk "120702722103", 
+ :new-pin "111111", 
+ :pairing "AIoQl0OtCL0/uSN7Ct1/FHRMEk/eM2Lrhn0bw7f8sgOe"}
+</code></pre>
+<p>response
+<code>true</code></p>
+</li>
+</ol>
+<h2 id="status-go-calls"><a class="header" href="#status-go-calls">Status go calls</a></h2>
+<p>In order to use the card in the app we need to use some parts of status-go API, specifically:</p>
+<ol>
+<li><a href="https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L337"><code>SaveAccountAndLoginWithKeycard</code></a> after multiaccount creation/restoring to store multiaccount and login into it</li>
+<li><a href="https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L373"><code>LoginWithKeycard</code></a> to log into already existing account</li>
+<li><a href="https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L492"><code>HashTransaction</code></a> and <a href="https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L520"><code>HashMessage</code></a> for hashing transaction/message before signing</li>
+<li><a href="https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go#L471"><code>SendTransactionWithSignature</code></a> to send transaction</li>
+</ol>
+<h2 id="where-are-the-keys-stored"><a class="header" href="#where-are-the-keys-stored">Where are the keys stored?</a></h2>
+<ol>
+<li>When we create a regular multiaccount all its keys are stored on device and are encrypted via key which is derived from user's password. In case if account was created using keycard all keys are stored on the card and are retrieved from it during signing into multiaccount.</li>
+<li>When we create a regular multiaccount we also create a separate database for it and this database is encrypted using key which is derived from user's password. For a keycard account we use <code>encryption-public-key</code> (returned by <code>status-im.hardwallet.card/get-keys</code>/<code>status-im.hardwallet.card/generate-and-load-keys</code>) as a password.</li>
+</ol>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ul>
+<li><a href="https://keycard.tech/docs/">Keycard Hardwallet Documentation</a></li>
+<li><a href="https://github.com/status-im/status-go/blob/b33ad8147d23a932064f241e575511d70a601dcc/mobile/status.go">Keycard Codebase</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../status/deprecated/notifications.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../status/deprecated/notifications.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

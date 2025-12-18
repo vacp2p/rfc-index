@@ -1,0 +1,513 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Noise X3DH Double Ratchet - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html" class="active"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<h2>title: NOISE-X3DH-DOUBLE-RATCHET
+name: Secure 1-to-1 channel setup using X3DH and the double ratchet
+status: raw
+category: Standards Track
+tags:
+editor: Ramses Fernandez <a href="mailto:ramses@status.im">ramses@status.im</a>
+contributors:</h2>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>The need for secure communications has become paramount.
+This specification outlines a protocol describing a
+secure 1-to-1 comunication channel between 2 users. The
+main components are the X3DH key establishment mechanism,
+combined with the double ratchet. The aim of this
+combination of schemes is providing a protocol with both
+forward secrecy and post-compromise security.</p>
+<h2 id="theory"><a class="header" href="#theory">Theory</a></h2>
+<p>The specification is based on the noise protocol framework.
+It corresponds to the double ratchet scheme combined with
+the X3DH algorithm, which will be used to initialize the former.
+We chose to express the protocol in noise to be be able to use
+the noise streamlined implementation and proving features.
+The X3DH algorithm provides both authentication and forward
+secrecy, as stated in the
+<a href="https://signal.org/docs/specifications/x3dh/">X3DH specification</a>.</p>
+<p>This protocol will consist of several stages:</p>
+<ol>
+<li>Key setting for X3DH: this step will produce
+prekey bundles for Bob which will be fed into X3DH.
+It will also allow Alice to generate the keys required
+to run the X3DH algorithm correctly.</li>
+<li>Execution of X3DH: This step will output
+a common secret key <code>SK</code> together with an additional
+data vector <code>AD</code>. Both will be used in the double
+ratchet algorithm initialization.</li>
+<li>Execution of the double ratchet algorithm
+for forward secure, authenticated communications,
+using the common secret key <code>SK</code>, obtained from X3DH, as a root key.</li>
+</ol>
+<p>The protocol assumes the following requirements:</p>
+<ul>
+<li>Alice knows Bob’s Ethereum address.</li>
+<li>Bob is willing to participate in the protocol,
+and publishes his public key.</li>
+<li>Bob’s ownership of his public key is verifiable,</li>
+<li>Alice wants to send message M to Bob.</li>
+<li>An eavesdropper cannot read M’s content
+even if she is storing it or relaying it.</li>
+</ul>
+<h2 id="syntax"><a class="header" href="#syntax">Syntax</a></h2>
+<h3 id="cryptographic-suite"><a class="header" href="#cryptographic-suite">Cryptographic suite</a></h3>
+<p>The following cryptographic functions MUST be used:</p>
+<ul>
+<li><code>X488</code> as Diffie-Hellman function <code>DH</code>.</li>
+<li><code>SHA256</code> as KDF.</li>
+<li><code>AES256-GCM</code> as AEAD algorithm.</li>
+<li><code>SHA512</code> as hash function.</li>
+<li><code>XEd448</code> for digital signatures.</li>
+</ul>
+<h3 id="x3dh-initialization"><a class="header" href="#x3dh-initialization">X3DH initialization</a></h3>
+<p>This scheme MUST work on the curve curve448.
+The X3DH algorithm corresponds to the IX pattern in Noise.</p>
+<p>Bob and Alice MUST define personal key pairs
+<code>(ik_B, IK_B)</code> and <code>(ik_A, IK_A)</code> respectively where:</p>
+<ul>
+<li>The key <code>ik</code> must be kept secret,</li>
+<li>and the key <code>IK</code> is public.</li>
+</ul>
+<p>Bob MUST generate new keys using
+<code>(ik_B, IK_B) = GENERATE_KEYPAIR(curve = curve448)</code>.</p>
+<p>Bob MUST also generate a public key pair
+<code>(spk_B, SPK_B) = GENERATE_KEYPAIR(curve = curve448)</code>.</p>
+<p><code>SPK</code> is a public key generated and stored at medium-term.
+Both signed prekey and the certificate MUST
+undergo periodic replacement.
+After replacing the key,
+Bob keeps the old private key of <code>SPK</code>
+for some interval, dependant on the implementation.
+This allows Bob to decrypt delayed messages.</p>
+<p>Bob MUST sign <code>SPK</code> for authentication:
+<code>SigSPK = XEd448(ik, Encode(SPK))</code></p>
+<p>A final step requires the definition of
+<code>prekey_bundle = (IK, SPK, SigSPK, OPK_i)</code></p>
+<p>One-time keys <code>OPK</code> MUST be generated as
+<code>(opk_B, OPK_B) = GENERATE_KEYPAIR(curve = curve448)</code>.</p>
+<p>Before sending an initial message to Bob,
+Alice MUST generate an AD: <code>AD = Encode(IK_A) || Encode(IK_B)</code>.</p>
+<p>Alice MUST generate ephemeral key pairs
+<code>(ek, EK) = GENERATE_KEYPAIR(curve = curve448)</code>.</p>
+<p>The function <code>Encode()</code> transforms a
+curve448 public key into a byte sequence.
+This is specified in the <a href="http://www.ietf.org/rfc/rfc7748.txt">RFC 7748</a>
+on elliptic curves for security.</p>
+<p>One MUST consider <code>q = 2^446 - 13818066809895115352007386748515426880336692474882178609894547503885</code>
+for digital signatures with <code>(XEd448_sign, XEd448_verify)</code>:</p>
+<pre><code class="language-text">XEd448_sign((ik, IK), message):
+    Z = randbytes(64)  
+    r = SHA512(2^456 - 2 || ik || message || Z )
+    R = (r * convert_mont(5)) % q
+    h = SHA512(R || IK || M)
+    s = (r + h * ik) % q
+    return (R || s)
+</code></pre>
+<pre><code class="language-text">XEd448_verify(u, message, (R || s)):
+    if (R.y &gt;= 2^448) or (s &gt;= 2^446): return FALSE
+    h = (SHA512(R || 156326 || message)) % q
+    R_check = s * convert_mont(5) - h * 156326
+    if R == R_check: return TRUE
+    return FALSE 
+</code></pre>
+<pre><code class="language-text">convert_mont(u):
+    u_masked = u % mod 2^448
+    inv = ((1 - u_masked)^(2^448 - 2^224 - 3)) % (2^448 - 2^224 - 1)
+    P.y = ((1 + u_masked) * inv)) % (2^448 - 2^224 - 1)
+    P.s = 0
+    return P
+</code></pre>
+<h3 id="use-of-x3dh"><a class="header" href="#use-of-x3dh">Use of X3DH</a></h3>
+<p>This specification combines the double ratchet
+with X3DH using the following data as initialization for the former:</p>
+<ul>
+<li>The <code>SK</code> output from X3DH becomes the <code>SK</code>
+input of the double ratchet. See section 3.3 of
+<a href="https://signal.org/docs/specifications/doubleratchet/">Signal Specification</a>
+for a detailed description.</li>
+<li>The <code>AD</code> output from X3DH becomes the <code>AD</code>
+input of the double ratchet. See sections 3.4 and 3.5 of
+<a href="https://signal.org/docs/specifications/doubleratchet/">Signal Specification</a>
+for a detailed description.</li>
+<li>Bob’s signed prekey <code>SigSPKB</code> from X3DH is used as Bob’s
+initial ratchet public key of the double ratchet.</li>
+</ul>
+<p>X3DH has three phases:</p>
+<ol>
+<li>Bob publishes his identity key and prekeys to a server,
+a network, or dedicated smart contract.</li>
+<li>Alice fetches a prekey bundle from the server,
+and uses it to send an initial message to Bob.</li>
+<li>Bob receives and processes Alice's initial message.</li>
+</ol>
+<p>Alice MUST perform the following computations:</p>
+<pre><code class="language-text">dh1 = DH(IK_A, SPK_B, curve = curve448)
+dh2 = DH(EK_A, IK_B, curve = curve448)
+dh3 = DH(EK_A, SPK_B)
+SK = KDF(dh1 || dh2 || dh3)
+</code></pre>
+<p>Alice MUST send to Bob a message containing:</p>
+<ul>
+<li><code>IK_A, EK_A</code>.</li>
+<li>An identifier to Bob's prekeys used.</li>
+<li>A message encrypted with AES256-GCM using <code>AD</code> and <code>SK</code>.</li>
+</ul>
+<p>Upon reception of the initial message, Bob MUST:</p>
+<ol>
+<li>Perform the same computations above with the <code>DH()</code> function.</li>
+<li>Derive <code>SK</code> and construct <code>AD</code>.</li>
+<li>Decrypt the initial message encrypted with <code>AES256-GCM</code>.</li>
+<li>If decryption fails, abort the protocol.</li>
+</ol>
+<h3 id="initialization-of-the-double-datchet"><a class="header" href="#initialization-of-the-double-datchet">Initialization of the double datchet</a></h3>
+<p>In this stage Bob and Alice have generated key pairs
+and agreed a shared secret <code>SK</code> using X3DH.</p>
+<p>Alice calls <code>RatchetInitAlice()</code> defined below:</p>
+<pre><code class="language-text">RatchetInitAlice(SK, IK_B):
+    state.DHs = GENERATE_KEYPAIR(curve = curve448)
+    state.DHr = IK_B
+    state.RK, state.CKs = HKDF(SK, DH(state.DHs, state.DHr)) 
+    state.CKr = None
+    state.Ns, state.Nr, state.PN = 0
+    state.MKSKIPPED = {}
+</code></pre>
+<p>The HKDF function MUST be the proposal by
+<a href="http://www.ietf.org/rfc/rfc5869.txt">Krawczyk and Eronen</a>.
+In this proposal <code>chaining_key</code> and <code>input_key_material</code>
+MUST be replaced with <code>SK</code> and the output of <code>DH</code> respectively.</p>
+<p>Similarly, Bob calls the function <code>RatchetInitBob()</code> defined below:</p>
+<pre><code class="language-text">RatchetInitBob(SK, (ik_B,IK_B)):
+    state.DHs = (ik_B, IK_B)
+    state.Dhr = None
+    state.RK = SK
+    state.CKs, state.CKr = None
+    state.Ns, state.Nr, state.PN = 0
+    state.MKSKIPPED = {}
+</code></pre>
+<h3 id="encryption"><a class="header" href="#encryption">Encryption</a></h3>
+<p>This function performs the symmetric key ratchet.</p>
+<pre><code class="language-text">RatchetEncrypt(state, plaintext, AD):
+   state.CKs, mk = HMAC-SHA256(state.CKs)
+   header = HEADER(state.DHs, state.PN, state.Ns)
+   state.Ns = state.Ns + 1
+   return header, AES256-GCM_Enc(mk, plaintext, AD || header)
+</code></pre>
+<p>The <code>HEADER</code> function creates a new message header
+containing the public key from the key pair output of the <code>DH</code>function.
+It outputs the previous chain length <code>pn</code>,
+and the message number <code>n</code>.
+The returned header object contains ratchet public key
+<code>dh</code> and integers <code>pn</code> and <code>n</code>.</p>
+<h3 id="decryption"><a class="header" href="#decryption">Decryption</a></h3>
+<p>The function <code>RatchetDecrypt()</code> decrypts incoming messages:</p>
+<pre><code class="language-text">RatchetDecrypt(state, header, ciphertext, AD):
+    plaintext = TrySkippedMessageKeys(state, header, ciphertext, AD)
+    if plaintext != None:
+        return plaintext
+    if header.dh != state.DHr:
+        SkipMessageKeys(state, header.pn)
+        DHRatchet(state, header)
+    SkipMessageKeys(state, header.n)
+    state.CKr, mk = HMAC-SHA256(state.CKr)
+    state.Nr = state.Nr + 1
+    return AES256-GCM_Dec(mk, ciphertext, AD || header)
+</code></pre>
+<p>Auxiliary functions follow:</p>
+<pre><code class="language-text">DHRatchet(state, header):
+    state.PN = state.Ns
+    state.Ns = state.Nr = 0
+    state.DHr = header.dh
+    state.RK, state.CKr = HKDF(state.RK, DH(state.DHs, state.DHr))
+    state.DHs = GENERATE_KEYPAIR(curve = curve448)
+    state.RK, state.CKs = HKDF(state.RK, DH(state.DHs, state.DHr))
+</code></pre>
+<pre><code class="language-text">SkipMessageKeys(state, until):
+    if state.NR + MAX_SKIP &lt; until:
+        raise Error
+    if state.CKr != none:
+        while state.Nr &lt; until:
+            state.CKr, mk = HMAC-SHA256(state.CKr)
+            state.MKSKIPPED[state.DHr, state.Nr] = mk
+            state.Nr = state.Nr + 1
+</code></pre>
+<pre><code class="language-text">TrySkippedMessageKey(state, header, ciphertext, AD):
+    if (header.dh, header.n) in state.MKSKIPPED:
+        mk = state.MKSKIPPED[header.dh, header.n]
+        delete state.MKSKIPPED[header.dh, header.n]
+        return AES256-GCM_Dec(mk, ciphertext, AD || header)
+    else: return None
+</code></pre>
+<h2 id="information-retrieval"><a class="header" href="#information-retrieval">Information retrieval</a></h2>
+<h3 id="static-data"><a class="header" href="#static-data">Static data</a></h3>
+<p>Some data, such as the key pairs <code>(ik, IK)</code> for Alice and Bob,
+MAY NOT be regenerated after a period of time.
+Therefore the prekey bundle MAY be stored in long-term
+storage solutions, such as a dedicated smart contract
+which outputs such a key pair when receiving an Ethereum wallet
+address.</p>
+<p>Storing static data is done using a dedicated
+smart contract <code>PublicKeyStorage</code> which associates
+the Ethereum wallet address of a user with his public key.
+This mapping is done by <code>PublicKeyStorage</code>
+using a <code>publicKeys</code> function, or a <code>setPublicKey</code> function.
+This mapping is done if the user passed an authorization process.
+A user who wants to retrieve a public key associated
+with a specific wallet address calls a function <code>getPublicKey</code>.
+The user provides the wallet address as the only
+input parameter for <code>getPublicKey</code>.
+The function outputs the associated public key
+from the smart contract.</p>
+<h3 id="ephemeral-data"><a class="header" href="#ephemeral-data">Ephemeral data</a></h3>
+<p>Storing ephemeral data on Ethereum MAY be done using
+a combination of on-chain and off-chain solutions.
+This approach provides an efficient solution to
+the problem of storing updatable data in Ethereum.</p>
+<ol>
+<li>Ethereum stores a reference or a hash
+that points to the off-chain data.</li>
+<li>Off-chain solutions can include systems like IPFS,
+traditional cloud storage solutions, or
+decentralized storage networks such as a
+<a href="https://www.ethswarm.org">Swarm</a>.</li>
+</ol>
+<p>In any case, the user stores the associated
+IPFS hash, URL or reference in Ethereum.</p>
+<p>The fact of a user not updating the ephemeral information
+can be understood as Bob not willing to participate in any
+communication.</p>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ul>
+<li><a href="https://signal.org/docs/specifications/doubleratchet/">The Double Ratchet Algorithm</a></li>
+<li><a href="https://signal.org/docs/specifications/x3dh/">The X3DH Key Agreement Protocol</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../vac/raw/mix.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../vac/raw/rln-interep-spec.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../vac/raw/mix.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../vac/raw/rln-interep-spec.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

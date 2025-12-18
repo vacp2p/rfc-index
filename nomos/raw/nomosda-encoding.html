@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>NomosDA Encoding - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html" class="active"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html" class="active"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: NOMOSDA-ENCODING
+name: NomosDA Encoding Protocol
+status: raw
+category:
+tags: data-availability
+editor: Daniel Sanchez-Quiros <a href="mailto:danielsq@status.im">danielsq@status.im</a>
+contributors:</p>
+<ul>
+<li>Daniel Kashepava <a href="mailto:danielkashepava@status.im">danielkashepava@status.im</a></li>
+<li>Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a></li>
+<li>Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></li>
+<li>Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a></li>
+<li>Mehmet Gonen <a href="mailto:mehmet@status.im">mehmet@status.im</a></li>
+</ul>
+<hr />
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>This document describes the encoding and verification processes of NomosDA, which is the data availability (DA) solution used by the Nomos blockchain. NomosDA provides an assurance that all data from Nomos blobs are accessible and verifiable by every network participant.</p>
+<p>This document presents an implementation specification describing how:</p>
+<ul>
+<li>Encoders encode blobs they want to upload to the Data Availability layer.</li>
+<li>Other nodes implement the verification of blobs that were already uploaded to DA.</li>
+</ul>
+<h2 id="definitions"><a class="header" href="#definitions">Definitions</a></h2>
+<ul>
+<li>
+<p><strong>Encoder</strong>: An encoder is any actor who performs the encoding process described in this document. This involves committing to the data, generating proofs, and submitting the result to the DA layer.</p>
+<p>In the Nomos architecture, the rollup sequencer typically acts as the encoder, but the role is not exclusive and any actor in the DA layer can also act as encoders.</p>
+</li>
+<li>
+<p><strong>Verifier</strong>: Verifies its portion of the distributed blob data as per the verification protocol. In the Nomos architecture, the DA nodes act as the verifiers.</p>
+</li>
+</ul>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>In the encoding stage, the encoder takes the DA parameters and the padded blob data and creates an initial matrix of data chunks. This matrix is expanded using Reed-Solomon coding and various commitments and proofs are created for the data.</p>
+<p>When a verifier receives a sample, it verifies the data it receives from the encoder and broadcasts the information if the data is verified. Finally, the verifier stores the sample data for the required length of time.</p>
+<h2 id="construction"><a class="header" href="#construction">Construction</a></h2>
+<p>The encoder and verifier use the <a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">NomosDA cryptographic protocol</a> to carry out their respective functions. These functions are implemented as abstracted and configurable software entities that allow the original data to be encoded and verified via high-level operations.</p>
+<h3 id="glossary"><a class="header" href="#glossary">Glossary</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Description</th><th>Representation</th></tr></thead><tbody>
+<tr><td><code>Commitment</code></td><td>Commitment as per the <a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">NomosDA Cryptographic Protocol</a></td><td><code>bytes</code></td></tr>
+<tr><td><code>Proof</code></td><td>Proof as per the <a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">NomosDA Cryptographic Protocol</a></td><td><code>bytes</code></td></tr>
+<tr><td><code>ChunksMatrix</code></td><td>Matrix of chunked data. Each chunk is <strong>31 bytes.</strong> Row and Column sizes depend on the encoding necessities.</td><td><code>List[List[bytes]]</code></td></tr>
+</tbody></table>
+</div>
+<h3 id="encoder"><a class="header" href="#encoder">Encoder</a></h3>
+<p>An encoder takes a set of parameters and the blob data, and creates a matrix of chunks that it uses to compute the necessary cryptographic data. It produces the set of Reed-Solomon (RS) encoded data, the commitments, and the proofs that are needed prior to <a href="https://www.notion.so/NomosDA-Dispersal-1fd261aa09df815288c9caf45ed72c95?pvs=21">dispersal</a>.</p>
+<pre><code class="language-mermaid">flowchart LR
+    A[DaEncoderParams] --&gt;|Input| B(Encoder)
+    I[31bytes-padded-input] --&gt;|Input| B
+    B --&gt;|Creates| D[Chunks matrix]
+    D --&gt; |Input| C[NomosDA encoding]
+    C --&gt; E{Encoded data📄}
+</code></pre>
+<h4 id="encoding-process"><a class="header" href="#encoding-process">Encoding Process</a></h4>
+<p>The encoder executes the encoding process as follows:</p>
+<ol>
+<li>
+<p>The encoder takes the following input parameters:</p>
+<pre><code class="language-python">class DAEncoderParams:
+    column_count: usize
+    bytes_per_field_element: usize
+</code></pre>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Description</th><th>Representation</th></tr></thead><tbody>
+<tr><td><code>column_count</code></td><td>The number of subnets available for dispersal in the system</td><td><code>usize</code>, <code>int</code> in Python</td></tr>
+<tr><td><code>bytes_per_field_element</code></td><td>The amount of bytes per data chunk. This is set to 31 bytes. Each chunk has 31 bytes rather than 32 to ensure that the chunk value does not exceed the maximum value on the <a href="https://electriccoin.co/blog/new-snark-curve/">BLS12-381 elliptic curve</a>.</td><td><code>usize</code>, <code>int</code> in Python</td></tr>
+</tbody></table>
+</div></li>
+<li>
+<p>The encoder also includes the blob data to be encoded, which must be of a size that is a multiple of <code>bytes_per_field_element</code> bytes. Clients are responsible for padding the data so it fits this constraint.</p>
+</li>
+<li>
+<p>The encoder splits the data into <code>bytes_per_field_element</code>-sized chunks. It also arranges these chunks into rows and columns, creating a matrix.
+a. The amount of columns of the matrix needs to fit with the <code>column_count</code> parameter, taking into account the <code>rs_expansion_factor</code> (currently fixed to 2).
+i. This means that the size of each row in this matrix is <code>(bytes_per_field_element*column_count)/rs_expansion_factor</code>.
+b. The amount of rows depends on the size of the data.</p>
+</li>
+<li>
+<p>The data is encoded as per <a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">the cryptographic details</a>.</p>
+</li>
+<li>
+<p>The encoder provides the encoded data set:</p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Description</th><th>Representation</th></tr></thead><tbody>
+<tr><td><code>data</code></td><td>Original data</td><td><code>bytes</code></td></tr>
+<tr><td><code>chunked_data</code></td><td>Matrix before RS expansion</td><td><code>ChunksMatrix</code></td></tr>
+<tr><td><code>extended_matrix</code></td><td>Matrix after RS expansion</td><td><code>ChunksMatrix</code></td></tr>
+<tr><td><code>row_commitments</code></td><td>Commitments for each matrix row</td><td><code>List[Commitment]</code></td></tr>
+<tr><td><code>combined_column_proofs</code></td><td>Proofs for each matrix column</td><td><code>List[Proof]</code></td></tr>
+</tbody></table>
+</div>
+<pre><code class="language-python">class EncodedData:
+    data: bytes
+    chunked_data: ChunksMatrix
+    extended_matrix: ChunksMatrix
+    row_commitments: List[Commitment]
+    combined_column_proofs: List[Proof]
+</code></pre>
+</li>
+</ol>
+<h4 id="encoder-limits"><a class="header" href="#encoder-limits">Encoder Limits</a></h4>
+<p>NomosDA does not impose a fixed limit on blob size at the encoding level. However, protocols that involve resource-intensive operations must include upper bounds to prevent abuse. In the case of NomosDA, blob size limits are expected to be enforced, as part of the protocol's broader responsibility for resource management and fairness.</p>
+<p>Larger blobs naturally result in higher computational and bandwidth costs, particularly for the encoder, who must compute a proof for each column. Without size limits, malicious clients could exploit the system by attempting to stream unbounded data to DA nodes. Since payment is provided before blob dispersal, DA nodes are protected from performing unnecessary work. This enables the protocol to safely accept very large blobs, as the primary computational cost falls on the encoder. The protocol can accommodate generous blob sizes in practice, while rejecting only absurdly large blobs, such as those exceeding 1 GB, to prevent denial-of-service attacks and ensure network stability.</p>
+<p>To mitigate this, the protocol define acceptable blob size limits, and DA implementations enforce local mitigation strategies, such as flagging or blacklisting clients that violate these constraints.</p>
+<h3 id="verifier"><a class="header" href="#verifier">Verifier</a></h3>
+<p>A verifier checks the proper encoding of data blobs it receives. A verifier executes the verification process as follows:</p>
+<ol>
+<li>
+<p>The verifier receives a <code>DAShare</code> with the required verification data:</p>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Description</th><th>Representation</th></tr></thead><tbody>
+<tr><td><code>column</code></td><td>Column chunks (31 bytes) from the encoded matrix</td><td><code>List[bytes]</code></td></tr>
+<tr><td><code>column_idx</code></td><td>Column id (<code>0..2047</code>). It is directly related to the <code>subnetworks</code> in the <a href="https://www.notion.so/NomosDA-Network-Specification-1fd261aa09df81188e76cb083791252d?pvs=21">network specification</a>.</td><td><code>u16</code>, unsigned int of 16 bits. <code>int</code> in Python</td></tr>
+<tr><td><code>combined_column_proof</code></td><td>Proof of the random linear combination of the column elements.</td><td><code>Proof</code></td></tr>
+<tr><td><code>row_commitments</code></td><td>Commitments for each matrix row</td><td><code>List[Commitment]</code></td></tr>
+<tr><td><code>blob_id</code></td><td>This is computed as the hash (<strong>blake2b</strong>) of <code>row_commitments</code></td><td><code>bytes</code></td></tr>
+</tbody></table>
+</div></li>
+<li>
+<p>Upon receiving the above data it verifies the column data as per the <a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">cryptographic details</a>. If the verification is successful, the node triggers the <a href="https://www.notion.so/NomosDA-Subnetwork-Replication-1fd261aa09df811d93f8c6280136bfbb?pvs=21">replication protocol</a> and stores the blob.</p>
+<pre><code class="language-python">class DAShare:
+    column: Column
+    column_idx: u16
+    combined_column_proof: Proof
+    row_commitments: List[Commitment]
+
+    def blob_id(self) -&gt; BlobId:
+        hasher = blake2b(digest_size=32)
+        for c in self.row_commitments:
+            hasher.update(bytes(c))
+        return hasher.digest()
+</code></pre>
+</li>
+</ol>
+<h3 id="verification-logic"><a class="header" href="#verification-logic">Verification Logic</a></h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant N as Node
+    participant S as Subnetwork Column N
+    loop For each incoming blob column
+        N--&gt;&gt;N: If blob is valid
+        N--&gt;&gt;S: Replication
+        N-&gt;&gt;N: Stores blob
+    end
+</code></pre>
+<h2 id="details"><a class="header" href="#details">Details</a></h2>
+<p>The encoder and verifier processes described above make use of a variety of cryptographic functions to facilitate the correct verification of column data by verifiers. These functions rely on primitives such as polynomial commitments and Reed-Solomon erasure codes, the details of which are outside the scope of this document. These details, as well as introductions to the cryptographic primitives being used, can be found in the NomosDA Cryptographic Protocol:</p>
+<p><a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">NomosDA Cryptographic Protocol</a></p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ul>
+<li>Encoder Specification: <a href="https://github.com/logos-co/nomos-specs/blob/master/da/encoder.py">GitHub/encoder.py</a></li>
+<li>Verifier Specification: <a href="https://github.com/logos-co/nomos-specs/blob/master/da/verifier.py">GitHub/verifier.py</a></li>
+<li>Cryptographic protocol: <a href="https://www.notion.so/NomosDA-Cryptographic-Protocol-1fd261aa09df816fa97ac81304732e77?pvs=21">NomosDA Cryptographic Protocol</a></li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../nomos/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../nomos/raw/nomosda-encoding.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../nomos/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../nomos/raw/nomosda-encoding.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

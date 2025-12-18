@@ -1,0 +1,407 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Gossipsub Tor Push - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html" class="active"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<h2>title: GOSSIPSUB-TOR-PUSH
+name: Gossipsub Tor Push
+status: raw
+category: Standards Track
+tags:
+editor: Daniel Kaiser <a href="mailto:danielkaiser@status.im">danielkaiser@status.im</a>
+contributors:</h2>
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This document extends the <a href="https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md">libp2p gossipsub specification</a>
+specifying gossipsub Tor Push,
+a gossipsub-internal way of pushing messages into a gossipsub network via Tor.
+Tor Push adds sender identity protection to gossipsub.</p>
+<p><strong>Protocol identifier</strong>: /meshsub/1.1.0</p>
+<p>Note: Gossipsub Tor Push does not have a dedicated protocol identifier.
+It uses the same identifier as gossipsub and
+works with all <a href="https://github.com/libp2p/specs/tree/master/pubsub">pubsub</a>
+based protocols.
+This allows nodes that are oblivious to Tor Push to process messages received via
+Tor Push.</p>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>Without extensions, <a href="https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md">libp2p gossipsub</a>
+does not protect sender identities.</p>
+<p>A possible design of an anonymity extension to gossipsub
+is pushing messages through an anonymization network
+before they enter the gossipsub network.
+<a href="https://www.torproject.org/">Tor</a> is currently the largest anonymization network.
+It is well researched and works reliably.
+Basing our solution on Tor both inherits existing security research,
+as well as allows for a quick deployment.</p>
+<p>Using the anonymization network approach,
+even the first gossipsub node that relays a given message
+cannot link the message to its sender
+(within a relatively strong adversarial model).
+Taking the low bandwidth overhead and the low latency overhead into consideration,
+Tor offers very good anonymity properties.</p>
+<h2 id="functional-operation"><a class="header" href="#functional-operation">Functional Operation</a></h2>
+<p>Tor Push allows nodes to push messages over Tor into the gossipsub network.
+The approach specified in this document is fully backwards compatible.
+Gossipsub nodes that do not support Tor Push can receive and relay Tor Push messages,
+because Tor Push uses the same Protocol ID as gossipsub.</p>
+<p>Messages are sent over Tor via <a href="https://www.rfc-editor.org/rfc/rfc1928">SOCKS5</a>.
+Tor Push uses a dedicated libp2p context to prevent information leakage.
+To significantly increase resilience and mitigate circuit failures,
+Tor Push establishes several connections,
+each to a different randomly selected gossipsub node.</p>
+<h2 id="specification"><a class="header" href="#specification">Specification</a></h2>
+<p>This section specifies the format of Tor Push messages,
+as well as how Tor Push messages are received and sent, respectively.</p>
+<h3 id="wire-format"><a class="header" href="#wire-format">Wire Format</a></h3>
+<p>The wire format of a Tor Push message corresponds verbatim to a typical
+<a href="https://github.com/libp2p/specs/tree/master/pubsub#the-message">libp2p pubsub message</a>.</p>
+<pre><code class="language-protobuf">message Message {
+  optional string from = 1;
+  optional bytes data = 2;
+  optional bytes seqno = 3;
+  required string topic = 4;
+  optional bytes signature = 5;
+  optional bytes key = 6;
+}
+</code></pre>
+<h3 id="receiving-tor-push-messages"><a class="header" href="#receiving-tor-push-messages">Receiving Tor Push Messages</a></h3>
+<p>Any node supporting a protocol with ID <code>/meshsub/1.1.0</code> (e.g. gossipsub),
+can receive Tor Push messages.
+Receiving nodes are oblivious to Tor Push and
+will process incoming messages according to the respective <code>meshsub/1.1.0</code> specification.</p>
+<h3 id="sending-tor-push-messages"><a class="header" href="#sending-tor-push-messages">Sending Tor Push Messages</a></h3>
+<p>In the following, we refer to nodes sending Tor Push messages as Tp-nodes
+(Tor Push nodes).</p>
+<p>Tp-nodes MUST setup a separate libp2p context, i.e. <a href="https://docs.libp2p.io/concepts/multiplex/switch/">libp2p switch</a>,
+which MUST NOT be used for any purpose other than Tor Push.
+We refer to this context as Tp-context.
+The Tp-context MUST NOT share any data, e.g. peer lists, with the default context.</p>
+<p>Tp-peers are peers a Tp-node plans to send Tp-messages to.
+Tp-peers MUST support <code>/meshsub/1.1.0</code>.
+For retrieving Tp-peers,
+Tp-nodes SHOULD use an ambient peer discovery method
+that retrieves a random peer sample (from the set of all peers),
+e.g. <a href="../../waku/standards/core/33/discv5.html">33/WAKU2-DISCV5</a>.</p>
+<p>Tp-nodes MUST establish a connection as described in sub-section
+<a href="#connection-establishment">Tor Push Connection Establishment</a> to at least one Tp-peer.
+To significantly increase resilience,
+Tp-nodes SHOULD establish Tp-connections to <code>D</code> peers,
+where <code>D</code> is the <a href="https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.0.md#parameters">desired gossipsub out-degree</a>,
+with a default value of <code>8</code>.</p>
+<p>Each Tp-message MUST be sent via the Tp-context over at least one Tp-connection.
+To increase resilience,
+Tp-messages SHOULD be sent via the Tp-context over all available Tp-connections.</p>
+<p>Control messages of any kind, e.g. gossipsub graft, MUST NOT be sent via Tor Push.</p>
+<h4 id="connection-establishment"><a class="header" href="#connection-establishment">Connection Establishment</a></h4>
+<p>Tp-nodes establish a <code>/meshsub/1.1.0</code> connection to tp-peers via
+<a href="https://www.rfc-editor.org/rfc/rfc1928">SOCKS5</a> over <a href="https://www.torproject.org/">Tor</a>.</p>
+<p>Establishing connections, which in turn establishes the respective Tor circuits,
+can be done ahead of time.</p>
+<h4 id="epochs"><a class="header" href="#epochs">Epochs</a></h4>
+<p>Tor Push introduces epochs.
+The default epoch duration is 10 minutes.
+(We might adjust this default value based on experiments and
+evaluation in future versions of this document.
+It seems a good trade-off between traceablity and circuit building overhead.)</p>
+<p>For each epoch, the Tp-context SHOULD be refreshed, which includes</p>
+<ul>
+<li>libp2p peer-ID</li>
+<li>Tp-peer list</li>
+<li>connections to Tp-peers</li>
+</ul>
+<p>Both Tp-peer selection for the next epoch and
+establishing connections to the newly selected peers
+SHOULD be done during the current epoch
+and be completed before the new epoch starts.
+This avoids adding latency to message transmission.</p>
+<h2 id="securityprivacy-considerations"><a class="header" href="#securityprivacy-considerations">Security/Privacy Considerations</a></h2>
+<h3 id="fingerprinting-attacks"><a class="header" href="#fingerprinting-attacks">Fingerprinting Attacks</a></h3>
+<p>Protocols that feature distinct patterns are prone to fingerprinting attacks
+when using them over Tor Push.
+Both malicious guards and exit nodes could detect these patterns
+and link the sender and receiver, respectively, to transmitted traffic.
+As a mitigation, such protocols can introduce dummy messages and/or
+padding to hide patterns.</p>
+<h3 id="dos"><a class="header" href="#dos">DoS</a></h3>
+<h4 id="general-dos-against-tor"><a class="header" href="#general-dos-against-tor">General DoS against Tor</a></h4>
+<p>Using untargeted DoS to prevent Tor Push messages
+from entering the gossipsub network would cost vast resources,
+because Tor Push transmits messages over several circuits and
+the Tor network is well established.</p>
+<h4 id="targeting-the-guard"><a class="header" href="#targeting-the-guard">Targeting the Guard</a></h4>
+<p>Denying the service of a specific guard node
+blocks Tp-nodes using the respective guard.
+Tor guard selection will replace this guard [TODO elaborate].
+Still, messages might be delayed during this window
+which might be critical to certain applications.</p>
+<h4 id="targeting-the-gossipsub-network"><a class="header" href="#targeting-the-gossipsub-network">Targeting the Gossipsub Network</a></h4>
+<p>Without sophisticated rate limiting (for example using <a href="../../waku/standards/core/17/rln-relay.html">17/WAKU2-RLN-RELAY</a>),
+attackers can spam the gossipsub network.
+It is not enough to just block peers that send too many messages,
+because these messages might actually come from a Tor exit node
+that many honest Tp-nodes use.
+Without Tor Push,
+protocols on top of gossipsub could block peers
+if they exceed a certain message rate.
+With Tor Push, this would allow the reputation-based DoS attack described in
+<a href="https://ieeexplore.ieee.org/abstract/document/7163022">Bitcoin over Tor isn't a Good Idea</a>.</p>
+<h4 id="peer-discovery"><a class="header" href="#peer-discovery">Peer Discovery</a></h4>
+<p>The discovery mechanism could be abused to link requesting nodes
+to their Tor connections to discovered nodes.
+An attacker that controls both the node that responds to a discovery query,
+and the node who’s ENR the response contains,
+can link the requester to a Tor connection
+that is expected to be opened to the node represented by the returned ENR soon after.</p>
+<p>Further, the discovery mechanism (e.g. discv5)
+could be abused to distribute disproportionately many malicious nodes.
+For instance if p% of the nodes in the network are malicious,
+an attacker could manipulate the discovery to return malicious nodes with 2p% probability.
+The discovery mechanism needs to be resilient against this attack.</p>
+<h3 id="roll-out-phase"><a class="header" href="#roll-out-phase">Roll-out Phase</a></h3>
+<p>During the roll-out phase of Tor Push, during which only a few nodes use Tor Push,
+attackers can narrow down the senders of Tor messages
+to the set of gossipsub nodes that do not originate messages.
+Nodes who want anonymity guarantees even during the roll-out phase
+can use separate network interfaces for their default context and
+Tp-context, respectively.
+For the best protection, these contexts should run on separate physical machines.</p>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ul>
+<li><a href="https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md">libp2p gossipsub</a></li>
+<li><a href="https://github.com/libp2p/specs/tree/master/pubsub">libp2p pubsub</a></li>
+<li><a href="https://github.com/libp2p/specs/tree/master/pubsub#the-message">libp2p pubsub message</a></li>
+<li><a href="https://docs.libp2p.io/concepts/multiplex/switch">libp2p switch</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc1928">SOCKS5</a></li>
+<li><a href="https://www.torproject.org/">Tor</a></li>
+<li><a href="../../waku/standards/core/33/discv5.html">33/WAKU2-DISCV5</a></li>
+<li><a href="https://ieeexplore.ieee.org/abstract/document/7163022">Bitcoin over Tor isn't a Good Idea</a></li>
+<li><a href="../../waku/standards/core/17/rln-relay.html">17/WAKU2-RLN-RELAY</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../vac/raw/deleted/eth-secpm.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../vac/raw/logos-capability-discovery.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../vac/raw/deleted/eth-secpm.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../vac/raw/logos-capability-discovery.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

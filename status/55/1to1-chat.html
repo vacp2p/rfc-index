@@ -1,0 +1,462 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>55/1-to-1 Chat - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html" class="active"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>slug: 55
+title: 55/STATUS-1TO1-CHAT
+name: Status 1-to-1 Chat
+status: draft
+category: Standards Track
+tags: waku-application
+description: A chat protocol to send public and private messages to a single recipient by the Status app.
+editor: Aaryamann Challani <a href="mailto:p1ge0nh8er@proton.me">p1ge0nh8er@proton.me</a>
+contributors:</p>
+<ul>
+<li>Andrea Piana <a href="mailto:andreap@status.im">andreap@status.im</a></li>
+<li>Pedro Pombeiro <a href="mailto:pedro@status.im">pedro@status.im</a></li>
+<li>Corey Petty <a href="mailto:corey@status.im">corey@status.im</a></li>
+<li>Oskar Thorén <a href="mailto:oskarth@titanproxy.com">oskarth@titanproxy.com</a></li>
+<li>Dean Eigenmann <a href="mailto:dean@status.im">dean@status.im</a></li>
+</ul>
+<hr />
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification describes how the Status 1-to-1 chat protocol is implemented
+on top of the Waku v2 protocol.
+This protocol can be used to send messages to a single recipient.</p>
+<h2 id="terminology"><a class="header" href="#terminology">Terminology</a></h2>
+<ul>
+<li><strong>Participant</strong>: A participant is a user that is able to send and receive messages.</li>
+<li><strong>1-to-1 chat</strong>: A chat between two participants.</li>
+<li><strong>Public chat</strong>: A chat where any participant can join and read messages.</li>
+<li><strong>Private chat</strong>: A chat where only invited participants can join and read messages.</li>
+<li><strong>Group chat</strong>: A chat where multiple select participants can join and read messages.</li>
+<li><strong>Group admin</strong>: A participant that is able to
+add/remove participants from a group chat.</li>
+</ul>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>This document describes how 2 peers communicate with each other
+to send messages in a 1-to-1 chat, with privacy and authenticity guarantees.</p>
+<h2 id="specification"><a class="header" href="#specification">Specification</a></h2>
+<h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
+<p>This protocol MAY use any key-exchange mechanism previously discussed -</p>
+<ol>
+<li><a href="../../waku/standards/application/53/x3dh.html">53/WAKU2-X3DH</a></li>
+<li><a href="https://github.com/waku-org/specs/blob/master/standards/application/noise.md">WAKU2-NOISE</a></li>
+</ol>
+<p>This protocol can provide end-to-end encryption
+to give peers a strong degree of privacy and security.
+Public chat messages are publicly readable by anyone since
+there's no permission model for who is participating in a public chat.</p>
+<h2 id="chat-flow"><a class="header" href="#chat-flow">Chat Flow</a></h2>
+<h3 id="negotiation-of-a-11-chat"><a class="header" href="#negotiation-of-a-11-chat">Negotiation of a 1:1 chat</a></h3>
+<p>There are two phases in the initial negotiation of a 1:1 chat:</p>
+<ol>
+<li><strong>Identity verification</strong>
+(e.g., face-to-face contact exchange through QR code, Identicon matching).
+A QR code serves two purposes simultaneously -
+identity verification and initial key material retrieval;</li>
+<li><strong>Asynchronous initial key exchange</strong></li>
+</ol>
+<p>For more information on account generation and trust establishment, see <a href="../65/account-address.html">65/ACCOUNT-ADDRESS</a></p>
+<h3 id="post-negotiation"><a class="header" href="#post-negotiation">Post Negotiation</a></h3>
+<p>After the peers have shared their public key material,
+a 1:1 chat can be established using the methods described in the
+key-exchange protocols mentioned above.</p>
+<h3 id="session-management"><a class="header" href="#session-management">Session management</a></h3>
+<p>The 1:1 chat is made robust by having sessions between peers.
+It is handled by the key-exchange protocol used. For example,</p>
+<ol>
+<li>
+<p><a href="../../waku/standards/application/53/x3dh.html">53/WAKU2-X3DH</a>,
+the session management is described in <a href="../../waku/standards/application/54/x3dh-sessions.html">54/WAKU2-X3DH-SESSIONS</a></p>
+</li>
+<li>
+<p><a href="https://github.com/waku-org/specs/blob/master/standards/application/noise.md">WAKU2-NOISE</a>,
+the session management is described in <a href="https://github.com/waku-org/specs/blob/master/standards/application/noise-sessions.md">WAKU2-NOISE-SESSIONS</a></p>
+</li>
+</ol>
+<h2 id="negotiation-of-a-11-chat-amongst-multiple-participants-group-chat"><a class="header" href="#negotiation-of-a-11-chat-amongst-multiple-participants-group-chat">Negotiation of a 1:1 chat amongst multiple participants (group chat)</a></h2>
+<p>A small, private group chat can be constructed by having multiple participants
+negotiate a 1:1 chat amongst each other.
+Each participant MUST
+maintain a session with all other participants in the group chat.
+This allows for a group chat to be created with a small number of participants.</p>
+<p>However, this method does not scale as the number of participants increases,
+for the following reasons -</p>
+<ol>
+<li>The number of messages sent over the network increases with the number of participants.</li>
+<li>Handling the X3DH key exchange for each participant is computationally expensive.</li>
+</ol>
+<p>The above issues are addressed in <a href="../56/communities.html">56/STATUS-COMMUNITIES</a>,
+with other trade-offs.</p>
+<h3 id="flow"><a class="header" href="#flow">Flow</a></h3>
+<p>The following flow describes how a group chat is created and maintained.</p>
+<h4 id="membership-update-flow"><a class="header" href="#membership-update-flow">Membership Update Flow</a></h4>
+<p>Membership updates have the following wire format:</p>
+<pre><code class="language-protobuf">message MembershipUpdateMessage {
+  // The chat id of the private group chat
+  // derived in the following way:
+  // chat_id = hex(chat_creator_public_key) + "-" + random_uuid
+  // This chat_id MUST be validated by all participants
+  string chat_id = 1;
+  // A list of events for this group chat, first 65 bytes are the signature, 
+  then is a 
+  // protobuf encoded MembershipUpdateEvent
+  repeated bytes events = 2;
+  oneof chat_entity {
+    // An optional chat message
+    ChatMessage message = 3;
+    // An optional reaction to a message
+    EmojiReaction emoji_reaction = 4; 
+  }
+}
+</code></pre>
+<p>Note that in <code>events</code>, the first element is the signature, and
+all other elements after are encoded <code>MembershipUpdateEvent</code>'s.</p>
+<p>where <code>MembershipUpdateEvent</code> is defined as follows:</p>
+<pre><code class="language-protobuf">message MembershipUpdateEvent {
+  // Lamport timestamp of the event
+  uint64 clock = 1;
+  // Optional list of public keys of the targets of the action
+  repeated string members = 2;
+  // Name of the chat for the CHAT_CREATED/NAME_CHANGED event types
+  string name = 3;
+  // The type of the event
+  EventType type = 4;
+  // Color of the chat for the CHAT_CREATED/COLOR_CHANGED event types
+  string color = 5;
+  // Chat image
+  bytes image = 6;
+
+  enum EventType {
+    UNKNOWN = 0;
+    CHAT_CREATED = 1; // See [CHAT_CREATED](#chat-created)
+    NAME_CHANGED = 2; // See [NAME_CHANGED](#name-changed)
+    MEMBERS_ADDED = 3; // See [MEMBERS_ADDED](#members-added)
+    MEMBER_JOINED = 4; // See [MEMBER_JOINED](#member-joined)
+    MEMBER_REMOVED = 5; // See [MEMBER_REMOVED](#member-removed)
+    ADMINS_ADDED = 6; // See [ADMINS_ADDED](#admins-added)
+    ADMIN_REMOVED = 7; // See [ADMIN_REMOVED](#admin-removed)
+    COLOR_CHANGED = 8; // See [COLOR_CHANGED](#color-changed)
+    IMAGE_CHANGED = 9; // See [IMAGE_CHANGED](#image-changed)
+  }
+}
+</code></pre>
+<!-- Note: 
+I don't like defining wire formats which are out of the scope of the rfc this way. 
+Should explore alternatives -->
+<p>Note that the definitions for <code>ChatMessage</code> and
+<code>EmojiReaction</code> can be found in
+<a href="https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/chat_message.proto#L1">chat_message.proto</a>
+and <a href="https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/emoji_reaction.proto">emoji_reaction.proto</a>.</p>
+<h5 id="chat-created"><a class="header" href="#chat-created">Chat Created</a></h5>
+<p>When creating a group chat, this is the first event that MUST be sent.
+Any event with a clock value lower than this MUST be discarded.
+Upon receiving this event a client MUST validate the <code>chat_id</code>
+provided with the update and
+create a chat with identified by <code>chat_id</code>.</p>
+<p>By default, the creator of the group chat is the only group admin.</p>
+<h5 id="name-changed"><a class="header" href="#name-changed">Name Changed</a></h5>
+<p>To change the name of the group chat, group admins MUST use a <code>NAME_CHANGED</code> event.
+Upon receiving this event,
+a client MUST validate the <code>chat_id</code> provided with the updates and
+MUST ensure the author of the event is an admin of the chat,
+otherwise the event MUST be ignored.
+If the event is valid the chat name SHOULD be changed according to the provided message.</p>
+<h5 id="members-added"><a class="header" href="#members-added">Members Added</a></h5>
+<p>To add members to the chat, group admins MUST use a <code>MEMBERS_ADDED</code> event.
+Upon receiving this event,
+a participant MUST validate the <code>chat_id</code> provided with the updates and
+MUST ensure the author of the event is an admin of the chat,
+otherwise the event MUST be ignored.
+If the event is valid,
+a participant MUST update the list of members of the chat who have not joined,
+adding the members received.</p>
+<h5 id="member-joined"><a class="header" href="#member-joined">Member Joined</a></h5>
+<p>To signal the intent to start receiving messages from a given chat,
+new participants MUST use a <code>MEMBER_JOINED</code> event.
+Upon receiving this event,
+a participant MUST validate the <code>chat_id</code> provided with the updates.
+If the event is valid a participant,
+a participant MUST add the new participant to the list of participants stored locally.
+Any message sent to the group chat MUST now include the new participant.</p>
+<h5 id="member-removed"><a class="header" href="#member-removed">Member Removed</a></h5>
+<p>There are two ways in which a member MAY be removed from a group chat:</p>
+<ul>
+<li>A member MAY leave the chat by sending a <code>MEMBER_REMOVED</code> event,
+with the <code>members</code> field containing their own public key.</li>
+<li>An admin MAY remove a member by sending a <code>MEMBER_REMOVED</code> event,
+with the <code>members</code> field containing the public key of the member to be removed.</li>
+</ul>
+<p>Each participant MUST validate the <code>chat_id</code> provided with the updates and
+MUST ensure the author of the event is an admin of the chat,
+otherwise the event MUST be ignored.
+If the event is valid, a participant MUST update the local list of members accordingly.</p>
+<h5 id="admins-added"><a class="header" href="#admins-added">Admins Added</a></h5>
+<p>To promote participants to group admin, group admins MUST use an <code>ADMINS_ADDED</code> event.
+Upon receiving this event,
+a participant MUST validate the <code>chat_id</code> provided with the updates,
+MUST ensure the author of the event is an admin of the chat,
+otherwise the event MUST be ignored.
+If the event is valid,
+a participant MUST update the list of admins of the chat accordingly.</p>
+<h5 id="admin-removed"><a class="header" href="#admin-removed">Admin Removed</a></h5>
+<p>Group admins MUST NOT be able to remove other group admins.
+An admin MAY remove themselves by sending an <code>ADMIN_REMOVED</code> event,
+with the <code>members</code> field containing their own public key.
+Each participant MUST validate the <code>chat_id</code> provided with the updates and
+MUST ensure the author of the event is an admin of the chat,
+otherwise the event MUST be ignored.
+If the event is valid, a participant MUST update the list of admins of the chat accordingly.</p>
+<h5 id="color-changed"><a class="header" href="#color-changed">Color Changed</a></h5>
+<p>To change the text color of the group chat name,
+group admins MUST use a <code>COLOR_CHANGED</code> event.</p>
+<h5 id="image-changed"><a class="header" href="#image-changed">Image Changed</a></h5>
+<p>To change the display image of the group chat,
+group admins MUST use an <code>IMAGE_CHANGED</code> event.</p>
+<h2 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h2>
+<ol>
+<li>Inherits the security considerations of the key-exchange mechanism used,
+e.g., <a href="../../waku/standards/application/53/x3dh.html">53/WAKU2-X3DH</a> or <a href="https://github.com/waku-org/specs/blob/master/standards/application/noise.md">WAKU2-NOISE</a></li>
+</ol>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ol>
+<li><a href="../../waku/standards/application/53/x3dh.html">53/WAKU2-X3DH</a></li>
+<li><a href="https://github.com/waku-org/specs/blob/master/standards/application/noise.md">WAKU2-NOISE</a></li>
+<li><a href="../65/account-address.html">65/STATUS-ACCOUNT</a></li>
+<li><a href="../../waku/standards/application/54/x3dh-sessions.html">54/WAKU2-X3DH-SESSIONS</a></li>
+<li><a href="https://github.com/waku-org/specs/blob/master/standards/application/noise-sessions.md">WAKU2-NOISE-SESSIONS</a></li>
+<li><a href="../56/communities.html">56/STATUS-COMMUNITIES</a></li>
+<li><a href="https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/chat_message.proto#L1">chat_message.proto</a></li>
+<li><a href="https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/emoji_reaction.proto">emoji_reaction.proto</a></li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../status/28/featuring.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../status/56/communities.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../status/28/featuring.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../status/56/communities.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

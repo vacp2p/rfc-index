@@ -1,0 +1,901 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Claro - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html" class="active"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html" class="active"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: CONSENSUS-CLARO
+name: Claro Consensus Protocol
+status: deprecated
+category: Standards Track
+tags:</p>
+<ul>
+<li>logos/consensus
+editor: Corey Petty <a href="mailto:corey@status.im">corey@status.im</a>
+created: 01-JUL-2022
+revised: &lt;2022-08-26 Fri 13:11Z&gt;
+uri: &lt;https://rdf.logos.co/protocol/Claro/1/0/0#&lt;2022-08-26%20Fri$2013:11Z&gt;
+contributors:</li>
+<li>Álvaro Castro-Castilla</li>
+<li>Mark Evenson</li>
+</ul>
+<hr />
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This document specifies Claro: a Byzantine, fault-tolerant, binary decision
+agreement algorithm that utilizes bounded memory for its execution.
+Claro is a novel variant of the Snow family providing a probabilistic
+leaderless BFT consensus algorithm that achieves metastablity via
+network sub-sampling.  We present an application context of the use of
+Claro in an efficient, leaderless, probabilistic permission-less
+consensus mechanism.  We outline a simple taxonomy of Byzantine
+adversaries, leaving explicit explorations of to subsequent
+publication.</p>
+<p>NOTE: We have renamed this variant to <code>Claro</code> from <code>Glacier</code>
+in order to disambiguate from a previously released research endeavor by
+<a href="https://arxiv.org/pdf/2210.03423.pdf">Amores-Sesar, Cachin, and Tedeschi</a>.
+Their naming was coincidentally named the same as our work but
+is sufficiently differentiated from how ours works.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>This work is a part of a larger research endeavor to
+explore highly scalable Byzantine Fault Tolerant (BFT) consensus protocols.
+Consensus lies at the heart of many decentralized protocols, and
+thus its characteristics and properties are inherited by applications built on top.
+Thus, we seek to improve upon the current state of the art in two main directions:
+base-layer scalability and censorship resistance.</p>
+<p>Avalanche has shown to exibit the former in a production environment in a way
+that is differentiated from Nakamoto consensus and
+other Proof of Stake (PoS) protocols based in practical Byzantine Fault Tolerant
+(pBFT) methodologies.
+We aim to understand its limitations and improve upon them.</p>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>Our starting point is Avalanche’s Binary Byzantine Agreement algorithm,
+called Snowball.
+As long as modifications allow a DAG to be constructed later on,
+this simplifies the design significantly.
+The DAG stays the same in principle: it supports confidence,
+but the core algorithm can be modeled without.</p>
+<p>The concept of the Snowball algorithm is relatively simple.
+Following is a simplified description (lacking some details, but giving an overview).
+For further details, please refer to the <a href="https://assets.website-files.com/5d80307810123f5ffbb34d6e/6009805681b416f34dcae012_Avalanche%20Consensus%20Whitepaper.pdf">Avalanche paper</a>.</p>
+<ol>
+<li>The objective is to vote yes/no on a decision
+(this decision could be a single bit or,
+in our DAG use case, whether a vertex should be included or not).</li>
+<li>Every node has an eventually-consistent complete view of the network.
+It will select at random k nodes, and
+will ask their opinion on the decision (yes/no).</li>
+<li>After this sampling is finished,
+if there is a vote that has more than an <code>alpha</code> threshold,
+it accumulates one count for this opinion,
+as well as changes its opinion to this one.
+But, if a different opinion is received, the counter is reset to 1.
+If no threshold <code>alpha</code> is reached, the counter is reset to 0 instead.</li>
+<li>After several iterations of this algorithm,
+we will reach a threshold <code>beta</code>, and decide on that as final.</li>
+</ol>
+<p>Next, we will proceed to describe our new algorithm, based on Snowball.</p>
+<p>We have identified a shortcoming of the Snowball algorithm
+that was a perfect starting point for devising improvements.
+The scenario is as follows:</p>
+<ul>
+<li>There is a powerful adversary in the network,
+that controls a large percentage of the node population: 10% to ~50%.</li>
+<li>This adversary follows a strategy that allows them to
+rapidly change the decision bit
+(possibly even in a coordinated way) so as to maximally confuse the honest nodes.</li>
+<li>Under normal conditions,
+honest nodes will accumulate supermajorities soon enough, and
+reach the <code>beta</code> threshold.
+However, when an honest node performs a query and does not reach the threshold
+<code>alpha</code> of responses, the counter will be set to 0.</li>
+<li>The highest threat to Snowball is an adversary
+that keeps it from reaching the <code>beta</code> threshold,
+managing to continuously reset the counter, and
+steering Snowball away from making a decision.</li>
+</ul>
+<p>This document only outlines the specification to Claro.
+Subsequent analysis work on Claro
+(both on its performance and how it differentiates with Snowball)
+will be published shortly and this document will be updated.</p>
+<h2 id="claro-algorithm-specification"><a class="header" href="#claro-algorithm-specification">Claro Algorithm Specification</a></h2>
+<p>The Claro consensus algorithm computes a boolean decision on a
+proposition via a set of distributed computational nodes.  Claro is
+a leaderless, probabilistic, binary consensus algorithm with fast
+finality that provides good reliability for network and Byzantine
+fault tolerance.</p>
+<h3 id="algorithmic-concept"><a class="header" href="#algorithmic-concept">Algorithmic concept</a></h3>
+<p>Claro is an evolution of the Snowball Byzantine Binary Agreement (BBA) algorithm,
+in which we tackle specifically the perceived weakness described above.
+The main focus is going to be the counter and the triggering of the reset.
+Following, we elaborate the different modifications and
+features that have been added to the reference algorithm:</p>
+<ol>
+<li>Instead of allowing the latest evidence to change the opinion completely,
+we take into account all accumulated evidence,
+to reduce the impact of high variability when there is already a
+large amount of evidence collected.</li>
+<li>Eliminate the counter and threshold scheme,
+and introduce instead two regimes of operation:
+<ul>
+<li>One focused on grabbing opinions and reacting as soon as possible.
+This part is somewhat closer conceptually to the reference algorithm.</li>
+<li>Another one focused on interpreting the accumulated data
+instead of reacting to the latest information gathered.</li>
+</ul>
+</li>
+<li>Finally, combine those two phases via a transition function.
+This avoids the creation of a step function, or
+a sudden change in behavior that could complicate analysis and
+understanding of the dynamics.
+Instead, we can have a single algorithm that transfers weight
+from one operation to the other as more evidence is gathered.</li>
+<li>Additionally, we introduce a function for weighted sampling.
+This will allow the combination of different forms of weighting:
+<ul>
+<li>Staking</li>
+<li>Heuristic reputation</li>
+<li>Manual reputation.</li>
+</ul>
+</li>
+</ol>
+<p>It’s worth delving a bit into the way the data is interpreted
+in order to reach a decision.
+Our approach is based conceptually on the paper <a href="https://cis.temple.edu/~pwang/Publication/confidence.pdf">Confidence as Higher-Order Uncertainty</a>,
+which describes a frequentist approach to decision certainty.
+The first-order certainty, measured by frequency,
+is caused by known positive evidence, and
+the higher-order certainty is caused by potential positive evidence.
+Because confidence is a relative measurement defined on evidence,
+it naturally follows comparing the amount of evidence the system knows
+with the amount that it will know in the near future (defining “near” as a constant).</p>
+<p>Intuitively, we are looking for a function of evidence, <strong><code>w</code></strong>,
+call it <strong><code>c</code></strong> for confidence, that satisfies the following conditions:</p>
+<ol>
+<li>Confidence <code>c</code> is a continuous and monotonically increasing function of <code>w</code>.
+(More evidence, higher confidence.)</li>
+<li>When <code>w = 0</code>, <code>c = 0</code>. (Without any evidence, confidence is minimum.)</li>
+<li>When <code>w</code> goes to infinity, <code>c</code> converges to 1.
+(With infinite evidence, confidence is maximum.)</li>
+</ol>
+<p>The paper describes also a set of operations for the evidence/confidence pairs,
+so that different sources of knowledge could be combined.
+However, we leave here the suggestion of a possible research line in the future
+combining an algebra of evidence/confidence pairs with
+swarm-propagation algorithm like the one described in
+<a href="http://replicated.cc/files/schmebulock.pdf">this paper</a>.</p>
+<h3 id="initial-opinion"><a class="header" href="#initial-opinion">Initial opinion</a></h3>
+<p>A proposal is formulated to which consensus of truth or falsity is
+desired.  Each node that participates starts the protocol with an
+opinion on the proposal, represented in the sequel as <code>NO</code>, <code>NONE</code>,
+and <code>YES</code>.</p>
+<p>A new proposition is discovered either by local creation or in
+response to a query, a node checks its local opinion.  If the node can
+compute a justification of the proposal, it sets its opinion to one of
+<code>YES</code> or <code>NO</code>.  If it cannot form an opinion, it leaves its opinion as
+<code>NONE</code>.</p>
+<p>For now, we will ignore the proposal dissemination process and
+assume all nodes participating have an initial opinion
+to respond to within a given request.
+Further research will relax this assumption and
+analyze timing attacks on proposal propagation through the network.</p>
+<p>The node then participates in a number of query rounds in which it
+solicits other node's opinion in query rounds.  Given a set of <code>N</code>
+leaderless computational nodes, a gossip-based protocol is presumed to
+exist which allows members to discover, join, and leave a weakly
+transitory maximally connected graph.  Joining this graph allows each
+node to view a possibly incomplete node membership list of all other
+nodes.  This view may change as the protocol advances, as nodes join
+and leave.  Under generalized Internet conditions, the membership of
+the graph would experience a churn rate varying across different
+time-scales, as the protocol rounds progress.  As such, a given node
+may not have a view on the complete members participating in the
+consensus on a proposal in a given round.</p>
+<p>The algorithm is divided into 4 phases:</p>
+<ol>
+<li>Querying</li>
+<li>Computing <code>confidence</code>, <code>evidence</code>, and <code>accumulated evidence</code></li>
+<li>Transition function</li>
+<li>Opinion and Decision</li>
+</ol>
+<!-- NOTE from CP: not sure this fits, commenting for now -->
+<!-- ### Proposal Identification
+
+The node has a semantics and serialization of the proposal, of which
+it sets an initial opinion:
+
+     opinion
+        <-- initial opinion on truth of the proposal
+            as one of: {NO, NONE, YES}
+    
+The proposal proceeds in asynchronous rounds, in which each node
+queries `k` randomly sampled nodes for their opinions until a decision
+about local finality is achieved.  The liveness of the algorithm is
+severely constrained in the absence of timeouts for a round to
+proceed.  When a given node has finalized its decision on the
+proposal, it enters a quiescent state in which it optionally discards
+all information gathered during the query process retaining only the
+final opinion on the truth of the proposal. -->
+<h3 id="setup-parameters"><a class="header" href="#setup-parameters">Setup Parameters</a></h3>
+<p>The node initializes the following integer ratios as constants:</p>
+<pre><code class="language-markdown"># The following values are constants chosen with justification from experiments
+# performed with the adversarial models
+
+# 
+confidence_threshold
+  &lt;-- 1   
+         
+# constant look ahead for number of rounds we expect to finalize a
+# decision.  Could be set dependent on number of nodes 
+# visible in the current gossip graph.
+look_ahead 
+  &lt;-- 19
+
+# the confidence weighting parameter (aka alpha_1)
+certainty 
+  &lt;-- 4 / 5  
+doubt ;; the lack of confidence weighting parameter (aka alpha_2)
+  &lt;-- 2 / 5 
+
+k_multiplier     ;; neighbor threshold multiplier
+  &lt;-- 2
+
+;;; maximal threshold multiplier, i.e. we will never exceed 
+;;; questioning k_initial * k_multiplier ^ max_k_multiplier_power peers
+max_k_multiplier_power 
+  &lt;-- 4
+    
+;;; Initial number of nodes queried in a round
+k_initial 
+  &lt;-- 7
+
+;;; maximum query rounds before termination
+max_rounds ;; placeholder for simulation work, no justification yet
+   &lt;-- 100 
+</code></pre>
+<p>The following variables are needed to keep the state of Claro:</p>
+<pre><code class="language-markdown">;; current number of nodes to attempt to query in a round
+k 
+  &lt;-- k_original
+  
+;; total number of votes examined over all rounds
+total_votes 
+   &lt;-- 0 
+;; total number of YES (i.e. positive) votes for the truth of the proposal
+total_positive 
+   &lt;-- 0
+;; the current query round, an integer starting from zero
+round
+  &lt;-- 0
+</code></pre>
+<h3 id="phase-one-query"><a class="header" href="#phase-one-query">Phase One: Query</a></h3>
+<p>A node selects <code>k</code> nodes randomly from the complete pool of peers in the
+network. This query is can optionally be weighted, so the probability
+of selecting nodes is proportional to their</p>
+<p>Node Weighting
+$$
+P(i) = \frac{w_i}{\sum_{j=0}^{j=N} w_j}
+$$</p>
+<p>where <code>w</code> is evidence.
+The list of nodes is maintained by a separate protocol (the network layer),
+and eventual consistency of this knowledge in the network
+suffices. Even if there are slight divergences in the network view
+from different nodes, the algorithm is resilient to those.</p>
+<p>A query is sent to each neighbor with the node's current <code>opinion</code> of
+the proposal.</p>
+<p>Each node replies with their current opinion on the proposal.</p>
+<p>See <a href="#wire-protocol">the wire protocol Interoperability section</a> for
+details on the semantics and syntax of the "on the wire"
+representation of this query.</p>
+<p><strong>Adaptive querying</strong>. An additional optimization in the query
+consists of adaptively growing the <em><code>k</code></em> constant in the event of
+<strong>high confusion</strong>. We define high confusion as the situation in
+which neither opinion is strongly held in a query (<em>i.e.</em> a
+threshold is not reached for either yes or no). For this, we will
+use the <em><code>alpha</code></em> threshold defined below. This adaptive growth of
+the query size is done as follows:</p>
+<p>Every time the threshold is not reached, we multiply <em><code>k</code></em> by a
+constant. In our experiments, we found that a constant of 2 works
+well, but what really matters is that it stays within that order of
+magnitude.</p>
+<p>The growth is capped at 4 times the initial <em><code>k</code></em> value. Again, this
+is an experimental value, and could potentially be increased. This
+depends mainly on complex factors such as the size of the query
+messages, which could saturate the node bandwidth if the number of
+nodes queried is too high.</p>
+<p>When the query finishes, the node now initializes the following two
+values:</p>
+<pre><code class="language-markdown">    new_votes 
+      &lt;-- |total vote replies received in this round to the current query|
+    positive_votes 
+      &lt;-- |YES votes received from the query| 
+</code></pre>
+<h3 id="phase-two-computation"><a class="header" href="#phase-two-computation">Phase Two: Computation</a></h3>
+<p>When the query returns, three ratios are used later on to compute the
+transition function and the opinion forming. Confidence encapsulates
+the notion of how much we know (as a node) in relation to how much we
+will know in the near future (this being encoded in the look-ahead
+parameter <em><code>l</code></em>.) Evidence accumulated keeps the ratio of total positive
+votes vs the total votes received (positive and negative), whereas the
+evidence per round stores the ratio of the current round only.</p>
+<p>Parameters
+$$
+\begin{array}{lc}
+\text{Look-ahead parameter}      &amp; l = 20 \newline
+\text{First evidence parameter}  &amp; \alpha_1 = 0.8 \newline
+\text{Second evidence parameter} &amp; \alpha_2 = 0.5 \newline
+\end{array}
+$$</p>
+<p>Computation
+$$
+\begin{array}{lc}
+\text{Confidence}                &amp; c_{accum} \impliedby \frac{total\ votes}
+{total\ votes + l} \newline
+\text{Total accumulated evidence}&amp; e_{accum} \impliedby \frac{total\ positive<br />
+votes}{total\ votes} \newline
+\text{Evidence per round}        &amp; e_{round} \impliedby \frac{round\ positive<br />
+votes}{round\ votes} \newline
+\end{array}
+$$</p>
+<p>The node runs the <code>new_votes</code> and <code>positive_votes</code> parameters received
+in the query round through the following algorithm:</p>
+<pre><code class="language-markdown">
+    total_votes 
+      +== new_votes
+    total_positive 
+      +== positive_votes
+    confidence 
+      &lt;-- total_votes / (total_votes + look_ahead) 
+    total_evidence 
+      &lt;-- total_positive / total_votes
+    new_evidence 
+      &lt;-- positive_votes / new_votes
+    evidence 
+      &lt;-- new_evidence * ( 1 - confidence ) + total_evidence * confidence 
+    alpha 
+      &lt;-- doubt * ( 1 - confidence ) + certainty * confidence 
+</code></pre>
+<h3 id="phase-three-computation"><a class="header" href="#phase-three-computation">Phase Three: Computation</a></h3>
+<p>In order to eliminate the need for a step function (a conditional in
+the code), we introduce a transition function from one regime to the
+other. Our interest in removing the step function is twofold:</p>
+<ol>
+<li>
+<p>Simplify the algorithm. With this change the number of branches is
+reduced, and everything is expressed as a set of equations.</p>
+</li>
+<li>
+<p>The transition function makes the regime switch smooth,
+making it harder to potentially exploit the sudden regime change in
+some unforeseen manner. Such a swift change in operation mode could
+potentially result in a more complex behavior than initially
+understood, opening the door to elaborated attacks. The transition
+function proposed is linear with respect to the confidence.</p>
+</li>
+</ol>
+<p>Transition Function
+$$
+\begin{array}{cl}
+evidence &amp; \impliedby e_{round} (1 - c_{accum}) + e_{accum} c_{accum} \newline
+\alpha &amp;  \impliedby \alpha_1 (1 - c_{accum}) + \alpha_2 c_{accum} \newline
+\end{array}
+$$</p>
+<p>Since the confidence is modeled as a ratio that depends on the
+constant <em><code>l</code></em>, we can visualize the transition function at
+different values of <em><code>l</code></em>. Recall that this constant encapsulates
+the idea of “near future” in the frequentist certainty model: the
+higher it is, the more distant in time we consider the next
+valuable input of evidence to happen.</p>
+<p>We have observed via experiment that for a transition function to be
+useful, we need establish two requirements:</p>
+<ol>
+<li>
+<p>The change has to be balanced and smooth, giving an
+opportunity to the first regime to operate and not jump directly
+to the second regime.</p>
+</li>
+<li>
+<p>The convergence to 1.0 (fully operating in the second regime)
+should happen within a reasonable time-frame. We’ve set this
+time-frame experimentally at 1000 votes, which is in the order of
+~100 queries given a <em><code>k</code></em> of 9.</p>
+</li>
+</ol>
+<p>[[ Note: Avalanche uses k = 20, as an experimental result from their
+deployment. Due to the fundamental similarities between the
+algorithms, it’s a good start for us. ]]</p>
+<p>The node updates its local opinion on the consensus proposal by
+examining the relationship between the evidence accumulated for a
+proposal with the confidence encoded in the <code>alpha</code> parameter:</p>
+<pre><code class="language-php">    IF
+      evidence &gt; alpha
+    THEN 
+      opinion &lt;-- YES
+    ELSE IF       
+      evidence &lt; 1 - alpha
+    THEN 
+      opinion &lt;-- NO
+</code></pre>
+<p>If the opinion of the node is <code>NONE</code> after evaluating the relation
+between <code>evidence</code> and <code>alpha</code>, adjust the number of uniform randomly
+queried nodes by multiplying the neighbors <code>k</code> by the <code>k_multiplier</code>
+up to the limit of <code>k_max_multiplier_power</code> query size increases.</p>
+<pre><code class="language-php">
+    ;; possibly increase number nodes to uniformly randomly query in next round
+    WHEN
+         opinion is NONE
+      AND 
+         k &lt; k_original * k_multiplier ^ max_k_multiplier_power
+    THEN 
+       k &lt;-- k * k_multiplier
+</code></pre>
+<h3 id="decision"><a class="header" href="#decision">Decision</a></h3>
+<p>The next step is a simple one: change our opinion if the threshold
+<em><code>alpha</code></em> is reached. This needs to be done separately for the <code>YES/NO</code>
+decision, checking both boundaries. The last step is then to <em><code>decide</code></em>
+on the current opinion. For that, a confidence threshold is
+employed. This threshold is derived from the network size, and is
+directly related to the number of total votes received.</p>
+<p>Decision
+$$
+\begin{array}{cl}
+evidence &gt; \alpha &amp; \implies \text{opinion YES} \newline
+evidence &lt; 1 - \alpha &amp; \implies \text{opinion NO} \newline
+if\ \text{confidence} &gt; c_{target} &amp; THEN \ \text{finalize decision} \newline
+\end{array}
+$$</p>
+<p>After the <code>OPINION</code> phase is executed, the current value of <code>confidence</code>
+is considered: if <code>confidence</code> exceeds a threshold derived from the
+network size and directly related to the total votes received, an
+honest node marks the decision as final, and always returns this
+opinion is response to further queries from other nodes on the
+network.</p>
+<pre><code class="language-php">
+    IF 
+      confidence &gt; confidence_threshold
+    OR 
+      round &gt; max_rounds
+    THEN
+      finalized &lt;-- T
+      QUERY LOOP TERMINATES
+    ELSE 
+      round +== 1
+      QUERY LOOP CONTINUES
+</code></pre>
+<p>Thus, after the decision phase, either a decision has been finalized
+and the local node becomes quiescent never initiating a new query, or
+it initiates a <a href="query">new query</a>.</p>
+<h3 id="termination"><a class="header" href="#termination">Termination</a></h3>
+<p>A local round of Claro terminates in one of the following
+execution model considerations:</p>
+<ol>
+<li>
+<p>No queries are received for any newly initiated round for temporal
+periods observed via a locally computed passage of time.  See <a href="#clock">the
+following point on local time</a>.</p>
+</li>
+<li>
+<p>The <code>confidence</code> on the proposal exceeds our threshold for
+finalization.</p>
+</li>
+<li>
+<p>The number of <code>rounds</code> executed would be greater than
+<code>max_rounds</code>.</p>
+</li>
+</ol>
+<h4 id="quiescence"><a class="header" href="#quiescence">Quiescence</a></h4>
+<p>After a local node has finalized an <code>opinion</code> into a <code>decision</code>, it enters a quiescent
+state whereby it never solicits new votes on the proposal.  The local
+node MUST reply with the currently finalized <code>decision</code>.</p>
+<h4 id="clock"><a class="header" href="#clock">Clock</a></h4>
+<p>The algorithm only requires that nodes have computed the drift of
+observation of the passage of local time, not that that they have
+coordinated an absolute time with their peers.  For an implementation
+of a phase locked-loop feedback to measure local clock drift see
+<a href="https://www.rfc-editor.org/rfc/rfc5905.html">NTP</a>.</p>
+<h2 id="further-points"><a class="header" href="#further-points">Further points</a></h2>
+<h3 id="node-receives-information-during-round"><a class="header" href="#node-receives-information-during-round">Node receives information during round</a></h3>
+<p>In the query step, the node is envisioned as packing information into
+the query to cut down on the communication overhead a query to each of
+this <code>k</code> nodes containing the node's own current opinion on the
+proposal (<code>YES</code>, <code>NO</code>, or <code>NONE</code>).  The algorithm does not currently
+specify how a given node utilizes this incoming information.  A
+possible use may be to count unsolicited votes towards a currently
+active round, and discard the information if the node is in a
+quiescent state.</p>
+<h4 id="problems-with-weighting-node-value-of-opinions"><a class="header" href="#problems-with-weighting-node-value-of-opinions">Problems with Weighting Node Value of Opinions</a></h4>
+<p>If the view of other nodes is incomplete, then the sum of the optional
+weighting will not be a probability distribution normalized to 1.</p>
+<p>The current algorithm doesn't describe how the initial opinions are formed.</p>
+<h2 id="implementation-status"><a class="header" href="#implementation-status">Implementation status</a></h2>
+<p>The following implementations have been created for various testing and
+simulation purposes:</p>
+<ul>
+<li><a href="https://github.com/logos-co/consensus-research">Rust</a></li>
+<li><a href="none">Python</a> - FILL THIS IN WITH NEWLY CREATED REPO</li>
+<li><a href="none">Common Lisp</a> - FILL THIS IN WITH NEWLY CREATED REPO</li>
+</ul>
+<h2 id="wire-protocol"><a class="header" href="#wire-protocol">Wire Protocol</a></h2>
+<p>For interoperability we present a wire protocol semantics by requiring
+the validity of the following statements expressed in Notation3 (aka
+<code>n3</code>) about any query performed by a query node:</p>
+<pre><code class="language-n3">@prefix rdf:         &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix rdfs:        &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix xsd:         &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+@prefix Claro      &lt;https://rdf.logos.co/protocol/Claro#&gt; .
+
+Claro:query
+  :holds (
+    :_0 [ rdfs:label "round";
+          a xsd:postitiveInteger; ],
+          rdfs:comment """
+The current round of this query 
+
+A value of zero corresponds to the initial round.
+""" ;
+
+    :_1 [ rdfs:label "uri";
+          rdfs:comment """
+A unique URI for the proposal.
+
+It MAY be possible to examine the proposal by resolving this resource, 
+and its associated URIs.
+""" ;
+          a xsd:anyURI ],
+          
+    :_2 [ rdfs:label "opinion";
+          rdfs:comment """
+The opinion on the proposal
+
+One of the strings "YES" "NO" or "NONE".
+""" ;
+          # TODO constrain as an enumeration on three values efficiently
+          a xsd:string ] 
+    ) .
+</code></pre>
+<p>Nodes are advised to use Waku messages to include their own
+metadata in serializations as needed.</p>
+<h2 id="syntax"><a class="header" href="#syntax">Syntax</a></h2>
+<p>The semantic description presented above can be reliably round-tripped
+through a suitable serialization mechanism.  JSON-LD provides a
+canonical mapping to UTF-8 JSON.</p>
+<p>At their core, the query messages are a simple enumeration of the
+three possible values of the opinion:</p>
+<blockquote>
+<p>{ NO, NONE, YES }</p>
+</blockquote>
+<p>When represented via integers, such as choosing</p>
+<blockquote>
+<p>{ -1, 0, +1 }</p>
+</blockquote>
+<p>the parity summations across network invariants often become easier to
+manipulate.</p>
+<h2 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h2>
+<h3 id="privacy"><a class="header" href="#privacy">Privacy</a></h3>
+<p>In practice, each honest node gossips its current opinion which
+reduces the number of messages that need to be gossiped for a given
+proposal.  The resulting impact on the privacy of the node's opinion
+is not currently analyzed.</p>
+<h3 id="security-with-respect-to-various-adversarial-models"><a class="header" href="#security-with-respect-to-various-adversarial-models">Security with respect to various Adversarial Models</a></h3>
+<p>Adversarial models have been tested for which the values for current
+parameters of Claro have been tuned.  Exposition of the
+justification of this tuning need to be completed.</p>
+<h3 id="local-strategies"><a class="header" href="#local-strategies">Local Strategies</a></h3>
+<h4 id="random-adversaries"><a class="header" href="#random-adversaries">Random Adversaries</a></h4>
+<p>A random adversary optionally chooses to respond to all queries with a
+random decision.  Note that this adversary may be in some sense
+Byzantine but not malicious.  The random adversary also models some
+software defects involved in not "understanding" how to derive a truth
+value for a given proposition.</p>
+<h4 id="infantile-adversary"><a class="header" href="#infantile-adversary">Infantile Adversary</a></h4>
+<p>Like a petulant child, an infantile adversary responds with the
+opposite vote of the honest majority on an opinion.</p>
+<h3 id="omniscient-adversaries"><a class="header" href="#omniscient-adversaries">Omniscient Adversaries</a></h3>
+<p>Omniscient adversaries have somehow gained an "unfair" participation in
+consensus by being able to control <code>f</code> of <code>N</code> nodes with a out-of-band
+"supra-liminal" coordination mechanism.  Such adversaries use this
+coordinated behavior to delay or sway honest majority consensus.</p>
+<h4 id="passive-gossip-adversary"><a class="header" href="#passive-gossip-adversary">Passive Gossip Adversary</a></h4>
+<p>The passive network omniscient adversary is fully aware at all times
+of the network state. Such an adversary can always chose to vote in
+the most efficient way to block the distributed consensus from
+finalizing.</p>
+<h4 id="active-gossip-adversary"><a class="header" href="#active-gossip-adversary">Active Gossip Adversary</a></h4>
+<p>An omniscient gossip adversary somehow not only controls <code>f</code> of <code>N</code>
+nodes, but has also has corrupted communications between nodes such
+that she may inspect, delay, and drop arbitrary messages.  Such an
+adversary uses capability to corrupt consensus away from honest
+decisions to ones favorable to itself.  This adversary will, of
+course, choose to participate in an honest manner until defecting is
+most advantageous.</p>
+<h3 id="future-directions"><a class="header" href="#future-directions">Future Directions</a></h3>
+<p>Although we have proposed a normative description of the
+implementation of the underlying binary consensus algorithm (Claro),
+we believe we have prepared for analysis its adversarial performance
+in a manner that is amenable to replacement by another member of the
+<a href="snow">snow*</a> family.</p>
+<p>We have presumed the existence of a general family of algorithms that
+can be counted on to vote on nodes in the DAG in a fair manner.
+Avalanche provides an example of the construction of votes on UTXO
+transactions.  One can express all state machine, i.e. account-based
+models as checkpoints anchored in UTXO trust, so we believe that this
+presupposition has some justification.  We can envision a need for
+tooling abstraction that allow one to just program the DAG itself, as
+they should be of stable interest no matter if Claro isn't.</p>
+<h2 id="informative-references"><a class="header" href="#informative-references">Informative References</a></h2>
+<ol start="0">
+<li>
+<p><a href="https://logos.co/">Logos</a></p>
+</li>
+<li>
+<p><a href="https://dahliamalkhi.github.io/posts/2022/06/dag-bft/">On BFT Consensus Evolution: From Monolithic to
+DAG</a></p>
+</li>
+<li>
+<p><a href="https://ipfs.io/ipfs/QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV">snow-ipfs</a></p>
+</li>
+<li>
+<p><a href="https://www.avalabs.org/whitepapers">snow*</a> The Snow family of
+algorithms</p>
+</li>
+<li>
+<p><a href="https://cloud.google.com/composer/docs/how-to/using/writing-dags">Move</a>
+Move: a Language for Writing DAG Abstractions</p>
+</li>
+<li>
+<p><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#">rdf</a></p>
+</li>
+<li>
+<p><a href="http://www.w3.org/2000/01/rdf-schema#">rdfs</a></p>
+</li>
+<li>
+<p><a href="http://www.w3.org/2001/XMLSchema#">xsd</a></p>
+</li>
+<li>
+<p><a href="https://www.w3.org/TeamSubmission/n3/">n3-w3c-notes</a></p>
+</li>
+<li>
+<p><a href="https://www.ntp.org/downloads.html">ntp</a></p>
+</li>
+</ol>
+<h2 id="normative-references"><a class="header" href="#normative-references">Normative References</a></h2>
+<ol start="0">
+<li>
+<p><a href="https://rdf.logos.co/protocol/Claro/1/0/0/raw">Claro</a></p>
+</li>
+<li>
+<p><a href="https://www.w3.org/DesignIssues/Notation3.html">n3</a></p>
+</li>
+<li>
+<p><a href="https://json-ld.org/">json-ld</a></p>
+</li>
+</ol>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via
+<a href="https://creativecommons.org/public">CC0</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../nomos/raw/sdp.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../nomos/deprecated/claro.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../nomos/raw/sdp.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../nomos/deprecated/claro.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

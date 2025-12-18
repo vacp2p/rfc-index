@@ -1,0 +1,543 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Payloads - Vac RFC</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Vac</li><li class="chapter-item expanded "><a href="../../vac/1/coss.html"><strong aria-hidden="true">1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../vac/2/mvds.html"><strong aria-hidden="true">2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../vac/3/remote-log.html"><strong aria-hidden="true">3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../vac/4/mvds-meta.html"><strong aria-hidden="true">4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../vac/25/libp2p-dns-discovery.html"><strong aria-hidden="true">5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/32/rln-v1.html"><strong aria-hidden="true">6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../vac/raw/index.html"><strong aria-hidden="true">7.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../vac/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">7.1.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../vac/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">7.2.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-offchain.html"><strong aria-hidden="true">7.3.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/eth-mls-onchain.html"><strong aria-hidden="true">7.4.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../vac/raw/deleted/eth-secpm.html"><strong aria-hidden="true">7.5.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../vac/raw/gossipsub-tor-push.html"><strong aria-hidden="true">7.6.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../vac/raw/logos-capability-discovery.html"><strong aria-hidden="true">7.7.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../vac/raw/mix.html"><strong aria-hidden="true">7.8.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../vac/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">7.9.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-interep-spec.html"><strong aria-hidden="true">7.10.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-stealth-commitments.html"><strong aria-hidden="true">7.11.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../vac/raw/rln-v2.html"><strong aria-hidden="true">7.12.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../vac/raw/sds.html"><strong aria-hidden="true">7.13.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../vac/template.html"><strong aria-hidden="true">8.</strong> Template</a></li><li class="chapter-item expanded affix "><li class="part-title">Waku</li><li class="chapter-item expanded "><a href="../../waku/index.html"><strong aria-hidden="true">9.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/core/10/waku2.html"><strong aria-hidden="true">10.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/11/relay.html"><strong aria-hidden="true">10.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/12/filter.html"><strong aria-hidden="true">10.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/13/store.html"><strong aria-hidden="true">10.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/14/message.html"><strong aria-hidden="true">10.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/15/bridge.html"><strong aria-hidden="true">10.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/17/rln-relay.html"><strong aria-hidden="true">10.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/19/lightpush.html"><strong aria-hidden="true">10.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/31/enr.html"><strong aria-hidden="true">10.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/33/discv5.html"><strong aria-hidden="true">10.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/34/peer-exchange.html"><strong aria-hidden="true">10.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/36/bindings-api.html"><strong aria-hidden="true">10.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/64/network.html"><strong aria-hidden="true">10.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../waku/standards/core/66/metadata.html"><strong aria-hidden="true">10.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">11.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/26/payload.html"><strong aria-hidden="true">11.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/53/x3dh.html"><strong aria-hidden="true">11.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../waku/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">11.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/standards/legacy/6/waku1.html"><strong aria-hidden="true">12.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/7/data.html"><strong aria-hidden="true">12.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/8/mail.html"><strong aria-hidden="true">12.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../waku/standards/legacy/9/rpc.html"><strong aria-hidden="true">12.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/informational/22/toy-chat.html"><strong aria-hidden="true">13.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../waku/informational/23/topics.html"><strong aria-hidden="true">13.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../waku/informational/27/peers.html"><strong aria-hidden="true">13.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../waku/informational/29/config.html"><strong aria-hidden="true">13.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../waku/informational/30/adaptive-nodes.html"><strong aria-hidden="true">13.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../waku/deprecated/index.html"><strong aria-hidden="true">14.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../waku/deprecated/5/waku0.html"><strong aria-hidden="true">14.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/16/rpc.html"><strong aria-hidden="true">14.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/18/swap.html"><strong aria-hidden="true">14.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../waku/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">14.4.</strong> Fault Tolerant Store</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Nomos</li><li class="chapter-item expanded "><a href="../../nomos/index.html"><strong aria-hidden="true">15.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-encoding.html"><strong aria-hidden="true">16.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/nomosda-network.html"><strong aria-hidden="true">16.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">16.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-nat-solution.html"><strong aria-hidden="true">16.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">16.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/p2p-network.html"><strong aria-hidden="true">16.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../nomos/raw/sdp.html"><strong aria-hidden="true">16.7.</strong> SDP</a></li></ol></li><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../nomos/deprecated/claro.html"><strong aria-hidden="true">17.1.</strong> Claro</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Codex</li><li class="chapter-item expanded "><a href="../../codex/index.html"><strong aria-hidden="true">18.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../codex/raw/codex-block-exchange.html"><strong aria-hidden="true">19.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../codex/raw/codex-marketplace.html"><strong aria-hidden="true">19.2.</strong> Marketplace</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Status</li><li class="chapter-item expanded "><a href="../../status/index.html"><strong aria-hidden="true">20.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../../status/24/curation.html"><strong aria-hidden="true">21.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../status/28/featuring.html"><strong aria-hidden="true">22.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../status/55/1to1-chat.html"><strong aria-hidden="true">23.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../status/56/communities.html"><strong aria-hidden="true">24.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../status/61/community-history-service.html"><strong aria-hidden="true">25.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../status/62/payloads.html"><strong aria-hidden="true">26.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../status/63/keycard-usage.html"><strong aria-hidden="true">27.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../status/65/account-address.html"><strong aria-hidden="true">28.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../status/71/push-notification-server.html"><strong aria-hidden="true">29.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/raw/simple-scaling.html"><strong aria-hidden="true">30.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-app-protocols.html"><strong aria-hidden="true">30.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../status/raw/status-mvds.html"><strong aria-hidden="true">30.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-data.html"><strong aria-hidden="true">30.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../status/raw/url-scheme.html"><strong aria-hidden="true">30.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../status/deprecated/3rd-party.html"><strong aria-hidden="true">31.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/account.html"><strong aria-hidden="true">31.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/client.html"><strong aria-hidden="true">31.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">31.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/eips.html"><strong aria-hidden="true">31.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/ethereum-usage.html"><strong aria-hidden="true">31.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/group-chat.html"><strong aria-hidden="true">31.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">31.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">31.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/notifications.html"><strong aria-hidden="true">31.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/payloads.html" class="active"><strong aria-hidden="true">31.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/push-notification-server.html"><strong aria-hidden="true">31.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/secure-transport.html"><strong aria-hidden="true">31.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-mailserver.html"><strong aria-hidden="true">31.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/waku-usage.html"><strong aria-hidden="true">31.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">31.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../status/deprecated/whisper-usage.html"><strong aria-hidden="true">31.17.</strong> Whisper Usage</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Vac RFC</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: PAYLOADS
+name: Payloads
+status: deprecated
+description: Payload of messages in Status, regarding chat and chat-related use cases.
+editor: Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a>
+contributors:</p>
+<ul>
+<li>Adam Babik <a href="mailto:adam@status.im">adam@status.im</a></li>
+<li>Andrea Maria Piana <a href="mailto:andreap@status.im">andreap@status.im</a></li>
+<li>Oskar Thorén <a href="mailto:oskar@status.im">oskar@status.im</a></li>
+</ul>
+<hr />
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification describes how the payload of each message in Status looks like.
+It is primarily centered around chat and chat-related use cases.</p>
+<p>The payloads aims to be flexible enough to support messaging but also cases
+described in the <a href="https://status.im/whitepaper.pdf">Status Whitepaper</a>
+as well as various clients created using different technologies.</p>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>This document describes the payload format and some special considerations.</p>
+<h2 id="payload-wrapper"><a class="header" href="#payload-wrapper">Payload wrapper</a></h2>
+<p>The node wraps all payloads in a <a href="https://developers.google.com/protocol-buffers/">protobuf record</a>:</p>
+<pre><code class="language-protobuf">message ApplicationMetadataMessage {
+  bytes signature = 1;
+  bytes payload = 2;
+
+  Type type = 3;
+
+  enum Type {
+    UNKNOWN = 0;
+    CHAT_MESSAGE = 1;
+    CONTACT_UPDATE = 2;
+    MEMBERSHIP_UPDATE_MESSAGE = 3;
+    PAIR_INSTALLATION = 4;
+    SYNC_INSTALLATION = 5;
+    REQUEST_ADDRESS_FOR_TRANSACTION = 6;
+    ACCEPT_REQUEST_ADDRESS_FOR_TRANSACTION = 7;
+    DECLINE_REQUEST_ADDRESS_FOR_TRANSACTION = 8;
+    REQUEST_TRANSACTION = 9;
+    SEND_TRANSACTION = 10;
+    DECLINE_REQUEST_TRANSACTION = 11;
+    SYNC_INSTALLATION_CONTACT = 12;
+    SYNC_INSTALLATION_ACCOUNT = 13;
+    SYNC_INSTALLATION_PUBLIC_CHAT = 14;
+    CONTACT_CODE_ADVERTISEMENT = 15;
+    PUSH_NOTIFICATION_REGISTRATION = 16;
+    PUSH_NOTIFICATION_REGISTRATION_RESPONSE = 17;
+    PUSH_NOTIFICATION_QUERY = 18;
+    PUSH_NOTIFICATION_QUERY_RESPONSE = 19;
+    PUSH_NOTIFICATION_REQUEST = 20;
+    PUSH_NOTIFICATION_RESPONSE = 21;
+  }
+}
+</code></pre>
+<p><code>signature</code> is the bytes of the signed <code>SHA3-256</code> of the payload,
+signed with the key of the author of the message.
+The node needs the signature to validate authorship of the message,
+so that the message can be relayed to third parties.
+If a signature is not present, but an author is provided by a layer below,
+the message is not to be relayed to third parties, and it is considered plausibly deniable.</p>
+<p><code>payload</code> is the protobuf encoded content of the message, with the corresponding <code>type</code> set.</p>
+<h2 id="encoding"><a class="header" href="#encoding">Encoding</a></h2>
+<p>The node encodes the payload using <a href="https://developers.google.com/protocol-buffers">Protobuf</a></p>
+<h2 id="types-of-messages"><a class="header" href="#types-of-messages">Types of messages</a></h2>
+<h3 id="message"><a class="header" href="#message">Message</a></h3>
+<p>The type <code>ChatMessage</code> represents a chat message exchanged between clients.</p>
+<h4 id="payload"><a class="header" href="#payload">Payload</a></h4>
+<p>The protobuf description is:</p>
+<pre><code class="language-protobuf">message ChatMessage {
+  // Lamport timestamp of the chat message
+  uint64 clock = 1;
+  // Unix timestamps in milliseconds, currently not used as we use Whisper/Waku as more reliable, but here
+  // so that we don't rely on it
+  uint64 timestamp = 2;
+  // Text of the message
+  string text = 3;
+  // Id of the message that we are replying to
+  string response_to = 4;
+  // Ens name of the sender
+  string ens_name = 5;
+  // Chat id, this field is symmetric for public-chats and private group chats,
+  // but asymmetric in case of one-to-ones, as the sender will use the chat-id
+  // of the received, while the receiver will use the chat-id of the sender.
+  // Probably should be the concatenation of sender-pk &amp; receiver-pk in alphabetical order
+  string chat_id = 6;
+
+  // The type of message (public/one-to-one/private-group-chat)
+  MessageType message_type = 7;
+  // The type of the content of the message
+  ContentType content_type = 8;
+
+  oneof payload {
+    StickerMessage sticker = 9;
+  }
+
+  enum MessageType {
+    UNKNOWN_MESSAGE_TYPE = 0;
+    ONE_TO_ONE = 1;
+    PUBLIC_GROUP = 2;
+    PRIVATE_GROUP = 3;
+    // Only local
+    SYSTEM_MESSAGE_PRIVATE_GROUP = 4;}
+  enum ContentType {
+    UNKNOWN_CONTENT_TYPE = 0;
+    TEXT_PLAIN = 1;
+    STICKER = 2;
+    STATUS = 3;
+    EMOJI = 4;
+    TRANSACTION_COMMAND = 5;
+    // Only local
+    SYSTEM_MESSAGE_CONTENT_PRIVATE_GROUP = 6;
+  }
+}
+</code></pre>
+<p>Payload</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>1</td><td>clock</td><td><code>uint64</code></td><td>The clock of the chat</td></tr>
+<tr><td>2</td><td>timestamp</td><td><code>uint64</code></td><td>The sender timestamp at message creation</td></tr>
+<tr><td>3</td><td>text</td><td><code>string</code></td><td>The content of the message</td></tr>
+<tr><td>4</td><td>response_to</td><td><code>string</code></td><td>The ID of the message replied to</td></tr>
+<tr><td>5</td><td>ens_name</td><td><code>string</code></td><td>The ENS name of the user sending the message</td></tr>
+<tr><td>6</td><td>chat_id</td><td><code>string</code></td><td>The local ID of the chat the message is sent to</td></tr>
+<tr><td>7</td><td>message_type</td><td><code>MessageType</code></td><td>The type of message, different for one-to-one, public or group chats</td></tr>
+<tr><td>8</td><td>content_type</td><td><code>ContentType</code></td><td>The type of the content of the message</td></tr>
+<tr><td>9</td><td>payload</td><td><code>Sticker|nil</code></td><td>The payload of the message based on the content type</td></tr>
+</tbody></table>
+</div>
+<h4 id="content-types"><a class="header" href="#content-types">Content types</a></h4>
+<p>A node requires content types for a proper interpretation of incoming messages. Not each message is plain text but may carry different information.</p>
+<p>The following content types MUST be supported:</p>
+<ul>
+<li><code>TEXT_PLAIN</code> identifies a message which content is a plaintext.</li>
+</ul>
+<p>There are other content types that MAY be implemented by the client:</p>
+<ul>
+<li><code>STICKER</code></li>
+<li><code>STATUS</code></li>
+<li><code>EMOJI</code></li>
+<li><code>TRANSACTION_COMMAND</code></li>
+</ul>
+<h5 id="mentions"><a class="header" href="#mentions">Mentions</a></h5>
+<p>A mention MUST be represented as a string with the <code>@0xpk</code> format, where <code>pk</code> is the public key of the <a href="/status/deprecated/account.html">user account</a> to be mentioned,
+within the <code>text</code> field of a message with content_type <code>TEXT_PLAIN</code>.
+A message MAY contain more than one mention.
+This specification RECOMMENDs that the application does not require the user to enter the entire pk.
+This specification RECOMMENDs that the application allows the user to create a mention
+by typing @ followed by the related ENS or 3-word pseudonym.
+This specification RECOMMENDs that the application provides the user auto-completion functionality to create a mention.
+For better user experience, the client SHOULD display a known <a href="/status/deprecated/account.html#contact-verification">ens name or the 3-word pseudonym corresponding to the key</a> instead of the <code>pk</code>.</p>
+<h5 id="sticker-content-type"><a class="header" href="#sticker-content-type">Sticker content type</a></h5>
+<p>A <code>ChatMessage</code> with <code>STICKER</code> <code>Content/Type</code> MUST also specify the ID of the <code>Pack</code> and
+the <code>Hash</code> of the pack, in the <code>Sticker</code> field of <code>ChatMessage</code></p>
+<pre><code class="language-protobuf">message StickerMessage {
+  string hash = 1;
+  int32 pack = 2;
+}
+</code></pre>
+<h4 id="message-types"><a class="header" href="#message-types">Message types</a></h4>
+<p>A node requires message types to decide how to encrypt a particular message
+and what metadata needs to be attached when passing a message to the transport layer.
+For more on this, see <a href="/status/deprecated/whisper-usage.html">WHISPER-USAGE</a>
+and <a href="/status/deprecated/waku-usage.html">WAKU-USAGE</a>.</p>
+<!-- TODO: This reference is a bit odd, considering the layer payloads should interact with is Secure Transport, and not Whisper/Waku. This requires more detail -->
+<p>The following messages types MUST be supported:</p>
+<ul>
+<li><code>ONE_TO_ONE</code> is a message to the public group</li>
+<li><code>PUBLIC_GROUP</code> is a private message</li>
+<li><code>PRIVATE_GROUP</code> is a message to the private group.</li>
+</ul>
+<h4 id="clock-vs-timestamp-and-message-ordering"><a class="header" href="#clock-vs-timestamp-and-message-ordering">Clock vs Timestamp and message ordering</a></h4>
+<p>If a user sends a new message before the messages sent
+while the user was offline are received,
+the newmessage is supposed to be displayed last in a chat.
+This is where the basic algorithm of Lamport timestamp would fall short
+as it's only meant to order causally related events.</p>
+<p>The status client therefore makes a "bid", speculating that it will beat the current chat-timestamp, s.t. the status client's
+Lamport timestamp format is: <code>clock = max({timestamp}, chat_clock + 1)</code></p>
+<p>This will satisfy the Lamport requirement, namely: a -&gt; b then T(a) &lt; T(b)</p>
+<p><code>timestamp</code> MUST be Unix time calculated, when the node creates the message, in milliseconds.
+This field SHOULD not be relied upon for message ordering.</p>
+<p><code>clock</code> SHOULD be calculated using the algorithm of <a href="https://en.wikipedia.org/wiki/Lamport_timestamps">Lamport timestamps</a>.
+When there are messages available in a chat,
+the node calculates <code>clock</code>'s value based on the last received message in a particular chat: <code>max(timeNowInMs, last-message-clock-value + 1)</code>.
+If there are no messages, <code>clock</code> is initialized with <code>timestamp</code>'s value.</p>
+<p>Messages with a <code>clock</code> greater than <code>120</code> seconds over the Whisper/Waku timestamp SHOULD be discarded,
+in order to avoid malicious users to increase the <code>clock</code> of a chat arbitrarily.</p>
+<p>Messages with a <code>clock</code> less than <code>120</code> seconds under the Whisper/Waku timestamp
+might indicate an attempt to insert messages in the chat history which is not distinguishable from a <code>datasync</code> layer re-transit event.
+A client MAY mark this messages with a warning to the user, or discard them.</p>
+<p>The node uses <code>clock</code> value for the message ordering.
+The algorithm used, and the distributed nature of the system produces casual ordering, which might produce counter-intuitive results in some edge cases.
+For example, when a user joins a public chat and sends a message
+before receiving the exist messages, their message <code>clock</code> value might be lower
+and the message will end up in the past when the historical messages are fetched.</p>
+<h4 id="chats"><a class="header" href="#chats">Chats</a></h4>
+<p>Chat is a structure that helps organize messages.
+It's usually desired to display messages only from a single recipient,
+or a group of recipients at a time and chats help to achieve that.</p>
+<p>All incoming messages can be matched against a chat.
+The below table describes how to calculate a chat ID for each message type.</p>
+<div class="table-wrapper"><table><thead><tr><th>Message Type</th><th>Chat ID Calculation</th><th>Direction</th><th>Comment</th></tr></thead><tbody>
+<tr><td>PUBLIC_GROUP</td><td>chat ID is equal to a public channel name; it should equal <code>chatId</code> from the message</td><td>Incoming/Outgoing</td><td></td></tr>
+<tr><td>ONE_TO_ONE</td><td>let <code>P</code> be a public key of the recipient; <code>hex-encode(P)</code> is a chat ID; use it as <code>chatId</code> value in the message</td><td>Outgoing</td><td></td></tr>
+<tr><td>user-message</td><td>let <code>P</code> be a public key of message's signature; <code>hex-encode(P)</code> is a chat ID; discard <code>chat-id</code> from message</td><td>Incoming</td><td>if there is no matched chat, it might be the first message from public key <code>P</code>; the node MAY discard the message or MAY create a new chat; Status official clients create a new chat</td></tr>
+<tr><td>PRIVATE_GROUP</td><td>use <code>chatId</code> from the message</td><td>Incoming/Outgoing</td><td>find an existing chat by <code>chatId</code>; if none is found, the user is not a member of that chat or the user hasn't joined that chat, the message MUST be discarded</td></tr>
+</tbody></table>
+</div>
+<h3 id="contact-update"><a class="header" href="#contact-update">Contact Update</a></h3>
+<p><code>ContactUpdate</code> is a message exchange to notify peers that either the
+user has been added as a contact, or that information about the sending user have
+changed.</p>
+<pre><code class="language-protobuf">message ContactUpdate {
+  uint64 clock = 1;
+  string ens_name = 2;
+  string profile_image = 3;
+}
+</code></pre>
+<p>Payload</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>1</td><td>clock</td><td><code>uint64</code></td><td>The clock of the chat with the user</td></tr>
+<tr><td>2</td><td>ens_name</td><td><code>string</code></td><td>The ENS name if set</td></tr>
+<tr><td>3</td><td>profile_image</td><td><code>string</code></td><td>The base64 encoded profile picture of the user</td></tr>
+</tbody></table>
+</div>
+<h4 id="contact-update-1"><a class="header" href="#contact-update-1">Contact update</a></h4>
+<p>A client SHOULD send a <code>ContactUpdate</code> to all the contacts each time:</p>
+<ul>
+<li>The ens_name has changed</li>
+<li>A user edits the profile image</li>
+</ul>
+<p>A client SHOULD also periodically send a <code>ContactUpdate</code> to all the contacts, the interval is up to the client,
+the Status official client sends these updates every 48 hours.</p>
+<h3 id="syncinstallationcontact"><a class="header" href="#syncinstallationcontact">SyncInstallationContact</a></h3>
+<p>The node uses <code>SyncInstallationContact</code> messages to synchronize in a best-effort the contacts to other devices.</p>
+<pre><code class="language-protobuf">message SyncInstallationContact {
+  uint64 clock = 1;
+  string id = 2;
+  string profile_image = 3;
+  string ens_name = 4;
+  uint64 last_updated = 5;
+  repeated string system_tags = 6;
+}
+</code></pre>
+<p>Payload</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>1</td><td>clock</td><td><code>uint64</code></td><td>clock value of the chat</td></tr>
+<tr><td>2</td><td>id</td><td><code>string</code></td><td>id of the contact synced</td></tr>
+<tr><td>3</td><td>profile_image</td><td><code>string</code></td><td><code>base64</code> encoded profile picture of the user</td></tr>
+<tr><td>4</td><td>ens_name</td><td><code>string</code></td><td>ENS name of the contact</td></tr>
+<tr><td>5</td><td><code>array[string]</code></td><td>Array of <code>system_tags</code> for the user, this can currently be: <code>":contact/added", ":contact/blocked", ":contact/request-received"</code></td><td></td></tr>
+</tbody></table>
+</div>
+<h3 id="syncinstallationpublicchat"><a class="header" href="#syncinstallationpublicchat">SyncInstallationPublicChat</a></h3>
+<p>The node uses <code>SyncInstallationPublicChat</code> message to synchronize in a best-effort the public chats to other devices.</p>
+<pre><code class="language-protobuf">message SyncInstallationPublicChat {
+  uint64 clock = 1;
+  string id = 2;
+}
+</code></pre>
+<p>Payload</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>1</td><td>clock</td><td><code>uint64</code></td><td>clock value of the chat</td></tr>
+<tr><td>2</td><td>id</td><td><code>string</code></td><td>id of the chat synced</td></tr>
+</tbody></table>
+</div>
+<h3 id="pairinstallation"><a class="header" href="#pairinstallation">PairInstallation</a></h3>
+<p>The node uses <code>PairInstallation</code> messages to propagate information about a device to its paired devices.</p>
+<pre><code class="language-protobuf">message PairInstallation {
+  uint64 clock = 1;
+  string installation_id = 2;
+  string device_type = 3;
+  string name = 4;
+}
+</code></pre>
+<p>Payload</p>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>1</td><td>clock</td><td><code>uint64</code></td><td>clock value of the chat</td></tr>
+<tr><td>2</td><td>installation_id</td><td><code>string</code></td><td>A randomly generated id that identifies this device</td></tr>
+<tr><td>3</td><td>device_type</td><td><code>string</code></td><td>The OS of the device <code>ios</code>,<code>android</code> or <code>desktop</code></td></tr>
+<tr><td>4</td><td>name</td><td><code>string</code></td><td>The self-assigned name of the device</td></tr>
+</tbody></table>
+</div>
+<h3 id="membershipupdatemessage-and-membershipupdateevent"><a class="header" href="#membershipupdatemessage-and-membershipupdateevent">MembershipUpdateMessage and MembershipUpdateEvent</a></h3>
+<p><code>MembershipUpdateEvent</code> is a message used to propagate information about group membership changes in a group chat.
+The details are in the <a href="/status/deprecated/group-chat.html">Group chats specs</a>.</p>
+<h2 id="upgradability"><a class="header" href="#upgradability">Upgradability</a></h2>
+<p>There are two ways to upgrade the protocol without breaking compatibility:</p>
+<ul>
+<li>A node always supports accretion</li>
+<li>A node does not support deletion of existing fields or messages, which might break compatibility</li>
+</ul>
+<h2 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h2>
+<h2 id="changelog"><a class="header" href="#changelog">Changelog</a></h2>
+<h3 id="version-03"><a class="header" href="#version-03">Version 0.3</a></h3>
+<p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
+<ul>
+<li>Added language to include Waku in all relevant places</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<p><a href="https://status.im/whitepaper.pdf">Status Whitepaper</a><br />
+<a href="https://developers.google.com/protocol-buffers/">protobuf record</a><br />
+<a href="https://developers.google.com/protocol-buffers">Protobuf</a><br />
+<a href="/status/deprecated/account.html">Status user account</a><br />
+<a href="deprecated/account/#contact-verification">ens name or the 3-word pseudonym corresponding to the key</a><br />
+<a href="/status/deprecated/whisper-usage.html">WHISPER-USAGE</a><br />
+<a href="/status/deprecated/waku-usage.html">WAKU-USAGE</a><br />
+<a href="https://en.wikipedia.org/wiki/Lamport_timestamps">Lamport timestamps</a><br />
+<a href="/status/deprecated/group-chat.html">Group chats specs</a><br />
+<a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020 change commit</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../status/deprecated/notifications.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../status/deprecated/push-notification-server.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../status/deprecated/notifications.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../status/deprecated/push-notification-server.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
