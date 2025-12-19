@@ -409,22 +409,35 @@ and the Steward does not provide an MLS proposal and commit.
 This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
 therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
 
-### Peer Scoring
+## Peer Scoring
 
 To improve fairness in member and steward management, de-MLS SHOULD incorporate a
 lightweight peer-scoring mechanism.
-In this approach, each node maintains a local peer score table mapping `member_id` to a score, 
+In this approach, each node maintains a local peer score table mapping `member_id` to a score,
 with new members starting from a configurable default value `default_peer_score`.
 Peer scores may decrease due to violations and increase due to honest behavior;
 such score adjustments are derived from observable protocol events, such as
-successful commits or emergency criteria proposals, and each peer updates its
-local table accordingly.
+successful commits or emergency criteria proposals, and each peer updates its local table accordingly.
 Stewards periodically check whether any peer’s score falls below a predefined threshold `threshold_peer_score`;
 only in that case is a removal operation included in the next commit.
 This mechanism allows accidental or transient failures to be tolerated while still enabling
 decisive action against repeated or harmful behavior.
 The exact scoring rules, recovery mechanisms, and escalation criteria are left for future discussion.
 
+## Timer-Based Anti-Deadlock Mechanism
+
+In de-MLS, a deadlock refers to a prolonged period during which no valid commit is produced
+despite a sufficient number of active and online members capable of finalizing consensus.
+To mitigate deadlock risks in de-MLS, a timer-based anti-deadlock mechanism SHOULD be introduced.
+Each member maintains a local timer that resets whenever a valid commit is observed,
+with a `threshold_duration` defined in configuration.
+If the `threshold_duration` is exceeded, the member waits an additional buffer period to account
+for network delays and then triggers a high-priority `emergency proposal` indicating a potential deadlock.
+If the proposal returns YES, temporarily allowing any member to commit and restore liveness.
+Since timers may expire at different times in a P2P setting, the buffer period mitigates false positives,
+while commit filtering is required to prevent commit flooding during recovery.
+Emergency proposals that return NO MUST incur a peer-score penalty for the
+creator of the proposal to reduce abuse.
 
 ## Security Considerations
 
