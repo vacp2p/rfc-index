@@ -64,13 +64,15 @@ for the Proof of Quota.
 
 ### Construction
 
-The Proof of Quota (PoQ) consists of two parts:
+The Proof of Quota (PoQ) can be satisfied by one of two proof types,
+depending on the node's role in the network:
 
 1. **Proof of Core Quota (PoQ_C)**: Ensures that the core node is declared
    and hasn't already produced more keys than the core quota Q_C.
 
 2. **Proof of Leadership Quota (PoQ_L)**: Ensures that the leader node
    would win the proof of stake for current Cryptarchia epoch
+   (see [Cryptarchia Consensus](#references))
    and hasn't already produced more keys than the leadership quota Q_L.
    This doesn't guarantee that the node is indeed winning
    because the PoQ doesn't check if the note is unspent,
