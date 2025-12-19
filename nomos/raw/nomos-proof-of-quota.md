@@ -43,7 +43,7 @@ to serve different audiences and use cases:
 for implementing an interoperable Blend Protocol node.
 This section defines the cryptographic primitives, message formats,
 network protocols, and behavioral requirements that all implementations
-MUST follow to ensure compatibility and maintain the protocol's
+must follow to ensure compatibility and maintain the protocol's
 privacy guarantees.
 Protocol designers, auditors, and those seeking to understand the core
 mechanisms should focus on this part.
