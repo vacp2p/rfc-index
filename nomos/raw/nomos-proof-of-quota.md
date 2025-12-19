@@ -75,7 +75,8 @@ depending on the node's role in the network:
    (see [Cryptarchia Consensus](#references))
    and hasn't already produced more keys than the leadership quota Q_L.
    This doesn't guarantee that the node is indeed winning
-   because the PoQ doesn't check if the note is unspent,
+   because the PoQ doesn't check if the Proof of Leadership note
+   (representing staked value) is unspent,
    enabling generation of the proof ahead of time preventing extreme delays.
 
 **Validity**: The final proof PoQ is valid if either PoQ_C or PoQ_L holds.
