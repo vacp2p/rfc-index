@@ -172,7 +172,8 @@ The following constraints MUST hold for a valid proof:
 
 The prover selects an index for the chosen key.
 This index MUST be lower than the allowed quota and not already used.
-This index is used to derive the key nullifier in Step 4.
+This index is used to derive the key nullifier in
+[Step 4: Key Nullifier Derivation](#step-4-key-nullifier-derivation).
 
 **Purpose**: Limiting the possible values of this index limits the possible
 nullifiers created,
