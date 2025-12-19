@@ -479,8 +479,8 @@ Implementations SHOULD handle:
 
 ### Normative
 
-- Proof of Quota (original paper/specification)
-- Service Declaration Protocol (SDP)
+- NOMOS-BLEND-PROTOCOL - Blend Protocol specification for Nomos
+- Service Declaration Protocol (SDP) - Protocol for declaring core nodes
 - Mantle Specification
 - Circuit Constraints (Cryptarchia)
 - Proof of Selection
