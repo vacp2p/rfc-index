@@ -209,7 +209,7 @@ If the prover indicated that the node is a core node for the proof
 #### Step 3: Leader Node Verification
 
 If the prover indicated that the node is a potential leader node for the proof
-(`selector = 1`), the proof checks that:
+(`selector` is 1), the proof checks that:
 
 1. **Leadership Lottery**: The leader node possesses a note
    that would win a slot in the consensus lottery.
