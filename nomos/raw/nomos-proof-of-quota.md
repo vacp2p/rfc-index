@@ -189,7 +189,9 @@ If the prover indicated that the node is a core node for the proof
 (`selector = 0`), the proof checks that:
 
 1. **Core Node Registration**: The core node is registered
-   in the set N = SDP(session).
+   in the set N = SDP(session),
+   where SDP is the Service Declaration Protocol
+   (see [Service Declaration Protocol](#references)).
    This is proven by demonstrating knowledge of a `core_sk`
    that corresponds to a declared `zk_id`,
    which is a valid SDP registry for the current session.
