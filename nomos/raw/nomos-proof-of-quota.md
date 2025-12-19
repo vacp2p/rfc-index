@@ -32,7 +32,7 @@ This constrains the number of messages a node can introduce to the Blend network
 The mechanism regulating these messages is similar to rate-limiting nullifiers.
 
 The proof verifies that a node's public key is within a limit
-for either a core node or a leader node.
+for a node.
 
 ## Document Structure
 
