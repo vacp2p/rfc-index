@@ -182,6 +182,10 @@ Since users are typically online to receive service,
 monitoring quality and pausing or closing streams
 is a reasonable expectation.
 
+Providers SHOULD monitor the stream on-chain
+and SHOULD stop providing service when a stream
+is not ACTIVE.
+
 ## Off-Chain Protocol
 
 This section describes off-chain communication
@@ -306,6 +310,26 @@ and may cause the entire close operation to fail if claim fails.
 
 Assessing these trade-offs requires clarity on Nescience architecture,
 particularly gas model, batching techniques, and timing privacy.
+
+### Activation Fee
+
+A user MAY exploit the pause/resume mechanism
+by keeping a stream paused and resuming only briefly to query a service.
+This results in minimal payment for actual service usage.
+
+The activation fee extension addresses this attack.
+When enabled, the stream MUST accrue a fixed activation fee
+immediately upon entering ACTIVE state.
+The fee applies to stream creation, resume, and top-up operations.
+Note that only user actions transition a stream to ACTIVE state.
+
+The activation fee SHOULD reflect
+the minimum acceptable payment for a service session.
+If the fee exceeds the value of a single query,
+the attack becomes economically unviable.
+
+Providers MAY alternatively address this attack via off-chain policy
+by refusing service to users who pause and resume excessively.
 
 ## Implementation Considerations
 
