@@ -396,3 +396,93 @@ allow one deposit to back multiple streams.
 - [Sablier Lockup](https://github.com/sablier-labs/lockup)
 - [LlamaPay V2](https://github.com/LlamaPay/llamapay-v2)
 - [Superfluid Protocol](https://github.com/superfluid-org/protocol-monorepo)
+
+## Appendix A: Illustrative EVM Implementation
+
+This appendix provides an illustrative EVM-based implementation outline.
+The actual implementation will target Logos with LSSA.
+
+### A.1 Contract Structure
+
+```solidity
+contract PaymentVault {
+    enum StreamState { ACTIVE, PAUSED, CLOSED }
+
+    struct Stream {
+        address token;
+        address provider;
+        uint128 ratePerSecond;
+        uint128 allocation;
+        uint64  lastUpdatedAt;
+        uint128 accruedBalance;
+        StreamState state;
+    }
+
+    address public user;
+    mapping(address token => uint256) public vaultBalance;
+    uint256 public nextStreamId;
+    mapping(uint256 => Stream) public streams;
+}
+```
+
+### A.2 Vault Operations
+
+```solidity
+event Deposited(address indexed token, uint256 amount);
+event Withdrawn(address indexed token, uint256 amount, address indexed to);
+
+function deposit(address token, uint256 amount) external;
+function withdraw(address token, uint256 amount, address to) external;
+```
+
+### A.3 Stream Lifecycle
+
+```solidity
+event StreamCreated(
+    uint256 indexed streamId,
+    address indexed provider,
+    address indexed token,
+    uint128 ratePerSecond,
+    uint128 allocation
+);
+event StreamPaused(uint256 indexed streamId);
+event StreamResumed(uint256 indexed streamId);
+event StreamToppedUp(uint256 indexed streamId, uint128 additionalAllocation);
+event StreamClosed(uint256 indexed streamId, uint128 refundedToVault);
+event Claimed(uint256 indexed streamId, address indexed provider, uint128 amount);
+
+/// @notice Create a new stream in ACTIVE state (user only)
+function createStream(
+    address provider,
+    address token,
+    uint128 ratePerSecond,
+    uint128 allocation
+) external returns (uint256 streamId);
+
+/// @notice Pause an ACTIVE stream (user only)
+function pauseStream(uint256 streamId) external;
+
+/// @notice Resume a PAUSED stream (user only)
+function resumeStream(uint256 streamId) external;
+
+/// @notice Add funds to stream allocation; transitions to ACTIVE (user only)
+function topUpStream(uint256 streamId, uint128 additionalAllocation) external;
+
+/// @notice Close stream permanently; refunds unaccrued funds to vault
+/// @dev Callable by user or provider
+function closeStream(uint256 streamId) external;
+
+/// @notice Provider claims accrued funds from a stream
+function claim(uint256 streamId) external;
+```
+
+### A.4 Internal Accrual
+
+```solidity
+/// @notice Update accruedBalance based on elapsed time since lastUpdatedAt
+/// @dev Called by pauseStream, topUpStream, closeStream, and claim
+///      before modifying stream state. Caps accrual at allocation and
+///      transitions to PAUSED when fully accrued (lazy evaluation:
+///      state updates on next interaction, not at exact depletion time).
+function _accrue(uint256 streamId) internal;
+```
