@@ -70,6 +70,17 @@ Streams avoid relying on a centralized mint entity,
 typical for e-cash and ticket protocols,
 improving resilience and privacy.
 
+Different service patterns suit different payment mechanisms.
+Ongoing services align well with streams
+that provide time-based automatic fund accrual.
+One-time or on-demand services are better suited
+for payment channels with one-off payments.
+
+This specification targets streams
+for services with steady usage patterns.
+Addressing burst services with one-off payments
+remains future work.
+
 Nescience is a privacy-focused blockchain under development
 for the Logos Blockchain stack.
 Its core innovation is state separation architecture (NSSA),
