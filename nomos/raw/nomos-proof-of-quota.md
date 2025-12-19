@@ -21,7 +21,8 @@ of the Proof of Quota (PoQ),
 which ensures that there is a limited number of message encapsulations
 that a node can perform,
 thereby constraining the number of messages a node can introduce
-to the Blend network.
+to the Blend network used in Nomos
+(see [NOMOS-BLEND-PROTOCOL](#references)).
 
 ## Overview
 
