@@ -3,7 +3,7 @@ title: PAYMENT-STREAMS
 name: Payment Streams Protocol for Logos Services
 status: raw
 category: Standards Track
-tags: logos, nescience, payment-streams
+tags: logos, lssa, payment-streams
 editor: Sergei Tikhomirov <sergei@status.im>
 contributors: Akhil Peddireddy <akhil@status.im>
 ---
@@ -17,10 +17,10 @@ A payment stream is an off-chain protocol
 where a payer's deposit releases gradually to a payee.
 The blockchain determines fund accrual based on elapsed time.
 
-The protocol targets Nescience,
-a privacy-focused blockchain in the Logos stack.
+The protocol targets Logos blockchain,
+which uses the Logos State-Separation Architecture (LSSA).
 This document clarifies MVP requirements
-and facilitates discussion with Nescience developers
+and facilitates discussion with Logos developers
 on implementation feasibility and challenges.
 
 ## Language
@@ -81,15 +81,13 @@ for services with steady usage patterns.
 Addressing burst services with one-off payments
 remains future work.
 
-Nescience is a privacy-focused blockchain under development
-for the Logos Blockchain stack.
-Its core innovation is state separation architecture (NSSA),
+Logos blockchain uses the Logos State-Separation Architecture (LSSA),
 which enables both transparent and shielded execution.
-Nescience is a natural fit
+LSSA is a natural fit
 for the on-chain component of the payment protocol.
 
 This document provides clarity on MVP requirements
-and facilitates discussion with Nescience developers on:
+and facilitates discussion with Logos developers on:
 whether the required functionality can be implemented,
 which parts are most challenging and how to simplify them,
 and other implementation considerations.
@@ -101,18 +99,16 @@ and other implementation considerations.
 The protocol has two roles:
 
 - User: the party paying for services (payer).
-- Provider: the party delivering services
-and receiving payment (payee).
+- Provider: the party delivering services and receiving payment (payee).
 
 The protocol uses a two-level architecture
 of vaults and streams.
 
 A vault holds a user's deposit and backs multiple streams.
 A user MAY have multiple vaults.
+One vault MAY back streams to different providers.
 To start using the protocol,
 the user MUST deposit funds into a vault.
-A vault holds the total balance available for that vault's streams.
-One vault MAY have multiple streams to different providers.
 The user MAY withdraw unallocated funds from the vault at any time.
 Vault withdrawals send funds to addresses,
 which MAY be external addresses or other vaults.
@@ -138,37 +134,32 @@ Stream states:
 
 - ACTIVE: Funds accrue to the provider at the agreed rate.
 - PAUSED: Accrual is stopped.
-The stream transitions to PAUSED by user action
-or automatically when allocated funds are fully accrued.
-The stream MAY be resumed by the user.
+  The stream transitions to PAUSED by user action
+  or automatically when allocated funds are fully accrued.
+  The user MAY resume the stream.
 - CLOSED: Stream is permanently terminated.
-The stream MUST NOT transition to any other state.
+  The stream MUST NOT transition to any other state.
 
 Stream state transitions:
 
 - Create: User creates a stream in ACTIVE state
-by allocating funds from the vault.
+  by allocating funds from the vault.
 - Pause: User pauses an ACTIVE stream, stopping accrual.
-The stream also transitions automatically from ACTIVE to PAUSED
-when allocated funds are fully accrued.
+  The stream also transitions automatically from ACTIVE to PAUSED
+  when allocated funds are fully accrued.
 - Resume: User resumes a PAUSED stream, restarting accrual.
-Resume MUST fail if remaining allocation is zero.
+  Resume MUST fail if remaining allocation is zero.
 - Top-Up: User MAY add funds to stream allocation.
-Top-up MUST transition the stream to ACTIVE state.
-If the user wants to add funds without resuming,
-the user MUST pause the stream after top-up.
+  Top-up MUST transition the stream to ACTIVE state.
+  If the user wants to add funds without resuming,
+  the user MUST pause the stream after top-up.
 - Close: Either user or provider MAY close the stream
-from any non-CLOSED state.
-- Withdraw: User MAY withdraw only unaccrued funds
-from a CLOSED stream.
-A withdraw operation MUST return funds to the vault.
-The user MUST NOT withdraw from any non-CLOSED stream.
-When a stream is closed,
-unaccrued funds MUST automatically return to the user's vault.
-Accrued funds remain available for provider to claim.
-- Claim: Provider MAY claim accrued funds
-from a stream in any state.
-A claim operation does not change stream state.
+  from any non-CLOSED state.
+  When a stream is closed,
+  unaccrued funds MUST automatically return to the user's vault.
+  Accrued funds remain available for provider to claim.
+- Claim: Provider MAY claim accrued funds from a stream in any state.
+  A claim operation does not change stream state.
 
 ### Stream State Transition Diagram
 
@@ -194,8 +185,7 @@ monitoring quality and pausing or closing streams
 is a reasonable expectation.
 
 Providers SHOULD monitor the stream on-chain
-and SHOULD stop providing service when a stream
-is not ACTIVE.
+and SHOULD stop providing service when a stream is not ACTIVE.
 
 ## Off-Chain Protocol
 
@@ -314,25 +304,27 @@ by ensuring closed streams hold no funds,
 eliminating the need to track balances in closed streams.
 
 However, auto-claim has potential issues:
-prevents provider from batching claims,
-may create timing correlations that leak privacy,
-requires user to pay for provider's claim operation,
-and may cause the entire close operation to fail if claim fails.
 
-Assessing these trade-offs requires clarity on Nescience architecture,
+- Prevents provider from batching claims.
+- May create timing correlations that leak privacy.
+- Requires user to pay for provider's claim operation.
+- May cause the entire close operation to fail if claim fails.
+
+Assessing these trade-offs requires clarity on LSSA,
 particularly gas model, batching techniques, and timing privacy.
 
 ### Activation Fee
 
-A user MAY exploit the pause/resume mechanism
-by keeping a stream paused and resuming only briefly to query a service.
+A user can exploit the pause/resume mechanism
+by keeping a stream paused
+and resuming briefly only when querying a service.
 This results in minimal payment for actual service usage.
 
 The activation fee extension addresses this attack.
 When enabled, the stream MUST accrue a fixed activation fee
 immediately upon entering ACTIVE state.
-The fee applies to stream creation, resume, and top-up operations.
-Note that only user actions transition a stream to ACTIVE state.
+The fee applies to stream creation, resume, and top-up operations,
+as only user actions transition a stream to ACTIVE state.
 
 The activation fee SHOULD reflect
 the minimum acceptable payment for a service session.
@@ -346,14 +338,14 @@ by refusing service to users who pause and resume excessively.
 
 This section captures implementation questions:
 
-- Mapping streams to NSSA:
-How does the stream protocol map onto Nescience architecture?
+- Mapping streams to LSSA:
+  How does the stream protocol map onto LSSA?
 - Timestamp-based accrual calculation:
-Can shielded execution access block timestamps
-to calculate accrued amounts based on elapsed time?
+  Can shielded execution access block timestamps
+  to calculate accrued amounts based on elapsed time?
 - Encoding and enforcing state transitions:
-How to encode and enforce state machine transition rules
-for the stream lifecycle states?
+  How to encode and enforce state machine transition rules
+  for the stream lifecycle states?
 
 ## Security and Privacy Considerations
 
@@ -361,16 +353,16 @@ This section captures security and privacy questions:
 
 - Can or should all protocol operations be within shielded execution?
 - If not, where is the boundary
-between transparent and shielded execution?
+  between transparent and shielded execution?
 - Who decides whether to use transparent or shielded execution:
-user, provider, both, or fixed by protocol design?
+  user, provider, both, or fixed by protocol design?
 - What data is stored in the user's account
-and who can see it in transparent vs shielded execution?
+  and who can see it in transparent vs shielded execution?
 - How to ensure external observers cannot correlate
-streams from the same vault across different providers?
+  streams from the same vault across different providers?
 - How to ensure providers cannot see
-streams from the same user to other providers,
-while still being able to verify balance constraints?
+  streams from the same user to other providers,
+  while still being able to verify balance constraints?
 
 ## Copyright
 
@@ -383,7 +375,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 #### Related Work
 
 - [Off-Chain Payment Protocols: Classification and Architectural Choice](https://forum.vac.dev/t/off-chain-payment-protocols-classification-and-architectural-choice/596)
-- [Nescience: A User-Centric State-Separation Architecture](https://vac.dev/rlog/Nescience-state-separation-architecture)
+- [LSSA](https://github.com/logos-blockchain/lssa)
 
 #### Payment Streaming Protocols
 
