@@ -87,6 +87,10 @@ depending on the node's role in the network:
 A proof attesting that for the following public values
 derived from blockchain parameters:
 
+**Type Definition:**
+`zkhash` represents a 256-bit hash value used in zero-knowledge circuits,
+typically a Poseidon hash output compatible with the BN256 scalar field.
+
 ```python
 class ProofOfQuotaPublic:
     session: int              # Session number (uint64)
