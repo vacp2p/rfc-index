@@ -271,11 +271,11 @@ so that members can identify which steward will be responsible in each epoch
 and detect any unauthorized steward commits.
 3. `Emergency criteria proposal`: If there is a malicious member or steward,
 this event MUST be voted on to finalize it.
-If this returns YES, the next epoch MUST include the removal of the member or steward.
-In a specific case where a steward is removed from the group, causing the total number of stewards to fall below `sn_min`,  
-it is required to repeat the `steward election proposal`.
-`Proposal.payload` MUST consist of the evidence of the dishonesty as described in the Steward violation list,
-and the identifier of the malicious member or steward.
+If the proposal returns YES, a score penalty MUST be applied to the targeted member or steward
+by decreasing their peer score, and a score reward MUST be granted to the creator of the proposal;
+if the proposal returns NO, a score penalty MUST be applied to the creator of the proposal.
+`Proposal.payload` MUST include evidence of dishonesty as defined in the Steward Violation List,
+along with the identifier of the malicious member or steward.
 This proposal can be created by any member in any epoch.
 
 The order of consensus proposal messages is important to achieving a consistent result.
@@ -363,9 +363,8 @@ then the steward list size MUST be equal to the total member count.
 and group changes are ready to be committed as specified in single steward section
 with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
 otherwise anyone can create `emergency criteria proposal`.
-4. If the `epoch steward` violates the changing process as mentioned in the section Steward violation list,
-one of the members MUST initialize the `emergency criteria proposal` to remove the malicious Steward.
-Then `backup steward` fulfills the epoch by committing again correctly.
+4. If the `epoch steward` violates the changing process as described in the Steward Violation List,
+one of the members MUST initialize an `emergency criteria proposal` to apply a peer score penalty to the malicious steward.
 
 A large consensus group provides better decentralization, but it requires significant coordination,
 which MAY not be suitable for groups with more than 1000 members.
@@ -409,6 +408,23 @@ and can be identified by checking the hash of `Proposal.payload` and `MLSProposa
 and the Steward does not provide an MLS proposal and commit.
 This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
 therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
+
+### Peer Scoring
+
+To improve fairness in member and steward management, de-MLS SHOULD incorporate a
+lightweight peer-scoring mechanism.
+In this approach, each node maintains a local peer score table mapping `member_id` to a score, 
+with new members starting from a configurable default value `default_peer_score`.
+Peer scores may decrease due to violations and increase due to honest behavior;
+such score adjustments are derived from observable protocol events, such as
+successful commits or emergency criteria proposals, and each peer updates its
+local table accordingly.
+Stewards periodically check whether any peer’s score falls below a predefined threshold `threshold_peer_score`;
+only in that case is a removal operation included in the next commit.
+This mechanism allows accidental or transient failures to be tolerated while still enabling
+decisive action against repeated or harmful behavior.
+The exact scoring rules, recovery mechanisms, and escalation criteria are left for future discussion.
+
 
 ## Security Considerations
 
