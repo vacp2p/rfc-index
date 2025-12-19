@@ -186,7 +186,7 @@ enabling up to 2^20 messages per node per session.
 #### Step 2: Core Node Verification
 
 If the prover indicated that the node is a core node for the proof
-(`selector = 0`), the proof checks that:
+(`selector` is 0), the proof checks that:
 
 1. **Core Node Registration**: The core node is registered
    in the set N = SDP(session),
