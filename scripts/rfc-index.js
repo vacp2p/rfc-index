@@ -1,4 +1,93 @@
 (() => {
+  function linkMenuTitle() {
+    const menuTitle = document.querySelector(".menu-title");
+    if (!menuTitle || menuTitle.dataset.linked === "true") {
+      return;
+    }
+
+    const existingLink = menuTitle.closest("a");
+    if (existingLink) {
+      menuTitle.dataset.linked = "true";
+      return;
+    }
+
+    const root = (typeof path_to_root !== "undefined" && path_to_root) ? path_to_root : "";
+    const link = document.createElement("a");
+    link.href = `${root}index.html`;
+    link.className = "menu-title-link";
+    link.setAttribute("aria-label", "Back to home");
+
+    const parent = menuTitle.parentNode;
+    parent.replaceChild(link, menuTitle);
+    link.appendChild(menuTitle);
+    menuTitle.dataset.linked = "true";
+  }
+
+  document.addEventListener("DOMContentLoaded", linkMenuTitle);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const printLink = document.querySelector("a[href$='print.html']");
+    if (!printLink) return;
+    printLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.print();
+    });
+  });
+
+  function initSidebarCollapsible(root) {
+    if (!root) return;
+    const items = root.querySelectorAll("li.chapter-item");
+    items.forEach((item) => {
+      const section = item.querySelector(":scope > ol.section");
+      const link = item.querySelector(":scope > .chapter-link-wrapper > a");
+      if (!section || !link) return;
+
+      if (!link.querySelector(".section-toggle")) {
+        const toggle = document.createElement("span");
+        toggle.className = "section-toggle";
+        toggle.setAttribute("role", "button");
+        toggle.setAttribute("aria-label", "Toggle section");
+        toggle.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          item.classList.toggle("collapsed");
+        });
+        link.prepend(toggle);
+      }
+
+      const hasActive = item.querySelector(".active");
+      if (!hasActive) {
+        item.classList.add("collapsed");
+      }
+    });
+  }
+
+  function bindSidebarCollapsible() {
+    const sidebar = document.querySelector("#mdbook-sidebar .sidebar-scrollbox");
+    if (sidebar) {
+      initSidebarCollapsible(sidebar);
+    }
+
+    const iframe = document.querySelector(".sidebar-iframe-outer");
+    if (iframe) {
+      const onLoad = () => {
+        try {
+          initSidebarCollapsible(iframe.contentDocument);
+        } catch (e) {
+          // ignore access errors
+        }
+      };
+      iframe.addEventListener("load", onLoad);
+      onLoad();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    bindSidebarCollapsible();
+    // toc.js may inject the sidebar after load
+    setTimeout(bindSidebarCollapsible, 100);
+  });
+
   const searchInput = document.getElementById("rfc-search");
   const resultsCount = document.getElementById("results-count");
   const tableContainer = document.getElementById("rfc-table-container");
