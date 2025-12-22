@@ -7,4 +7,5 @@ src = "docs"
 [output.html]
 default-theme = "ayu"
 additional-css = ["custom.css"]
+additional-js = ["rfc-index.js"]
 git-repository-url = "https://github.com/vacp2p/rfc-index"
