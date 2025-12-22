@@ -1,13 +1,12 @@
 # CLIENT
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Client</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Client |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Adam Babik <adam@status.im>, Andrea Maria Piana <andreap@status.im>, Dean Eigenmann <dean@status.im>, Corey Petty <corey@status.im>, Oskar Thorén <oskar@status.im>, Samuel Hawksby-Robinson <samuel@status.im> |
+
 ## Abstract
 
 This specification describes how to write a Status client for communicating  

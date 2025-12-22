@@ -1,13 +1,12 @@
 # 25/LIBP2P-DNS-DISCOVERY
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Libp2p Peer Discovery via DNS</td></tr>
-<tr><th>Slug</th><td>25</td></tr>
-<tr><th>Status</th><td>deleted</td></tr>
-<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Libp2p Peer Discovery via DNS |
+| Slug | 25 |
+| Status | deleted |
+| Editor | Hanno Cornelius <hanno@status.im> |
+
 `25/LIBP2P-DNS-DISCOVERY` specifies a scheme to implement [`libp2p`](https://libp2p.io/)
 peer discovery via DNS for Waku v2.
 The generalised purpose is to retrieve an arbitrarily long, authenticated,

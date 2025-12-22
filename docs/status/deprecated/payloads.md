@@ -1,13 +1,12 @@
 # PAYLOADS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Payloads</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Payloads |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Adam Babik <adam@status.im>, Andrea Maria Piana <andreap@status.im>, Oskar Thorén <oskar@status.im> |
+
 ## Abstract
 
 This specification describes how the payload of each message in Status looks like.

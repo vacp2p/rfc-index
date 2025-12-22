@@ -24,14 +24,6 @@ An IETF-style index of Vac-managed RFCs across Waku, Nomos, Codex, and Status. U
       <span class="chip" data-project="codex" data-label="Codex">Codex</span>
     </div>
   </div>
-  <div class="quick-links">
-    <a href="./vac/1/coss.html">1/COSS (Process)</a>
-    <a href="./vac/README.html">Vac index</a>
-    <a href="./waku/README.html">Waku index</a>
-    <a href="./status/README.html">Status index</a>
-    <a href="./nomos/README.html">Nomos index</a>
-    <a href="./codex/README.html">Codex index</a>
-  </div>
 </div>
 
 <div class="results-row">

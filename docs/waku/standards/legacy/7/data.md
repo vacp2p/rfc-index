@@ -1,14 +1,13 @@
 # 7/WAKU-DATA
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku Envelope data field</td></tr>
-<tr><th>Slug</th><td>7</td></tr>
-<tr><th>Status</th><td>stable</td></tr>
-<tr><th>Editor</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
-<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Kim De Mey &lt;kimdemey@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku Envelope data field |
+| Slug | 7 |
+| Status | stable |
+| Editor | Oskar Thorén <oskarth@titanproxy.com> |
+| Contributors | Dean Eigenmann <dean@status.im>, Kim De Mey <kimdemey@status.im> |
+
 This specification describes the encryption,
 decryption and signing of the content in the [data field used in Waku](../6/waku1.md/#abnf-specification).
 

@@ -1,14 +1,13 @@
 # NOMOS-P2P-NETWORK
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Nomos P2P Network Specification</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Category</th><td>networking</td></tr>
-<tr><th>Editor</th><td>Daniel Sanchez-Quiros &lt;danielsq@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Nomos P2P Network Specification |
+| Status | draft |
+| Category | networking |
+| Editor | Daniel Sanchez-Quiros <danielsq@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
+
 ## Abstract
 
 This specification defines the peer-to-peer (P2P) network layer for Nomos blockchain nodes. The network serves as the comprehensive communication infrastructure enabling transaction dissemination through mempool and block propagation. The specification leverages established libp2p protocols to ensure robust, scalable performance with low bandwidth requirements and minimal latency while maintaining accessibility for diverse hardware configurations and network environments.

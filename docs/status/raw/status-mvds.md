@@ -1,13 +1,12 @@
 # STATUS-MVDS-USAGE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>MVDS Usage in Status</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Best Current Practice</td></tr>
-<tr><th>Editor</th><td>Kaichao Sun &lt;kaichao@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | MVDS Usage in Status |
+| Status | raw |
+| Category | Best Current Practice |
+| Editor | Kaichao Sun <kaichao@status.im> |
+
 ## Abstract
 
 This document lists the types of messages that are using [MVDS](/vac/2/mvds.md)

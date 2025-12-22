@@ -1,14 +1,13 @@
 # 62/STATUS-PAYLOADS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Status Message Payloads</td></tr>
-<tr><th>Slug</th><td>62</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>r4bbit &lt;r4bbit@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Oskar Thoren &lt;oskarth@titanproxy.com&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Status Message Payloads |
+| Slug | 62 |
+| Status | draft |
+| Editor | r4bbit <r4bbit@status.im> |
+| Contributors | Adam Babik <adam@status.im>, Andrea Maria Piana <andreap@status.im>, Oskar Thoren <oskarth@titanproxy.com>, Samuel Hawksby-Robinson <samuel@status.im> |
+
 ## Abstract
 
 This specification describes how the payload of each message in Status looks

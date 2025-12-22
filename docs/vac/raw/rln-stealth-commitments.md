@@ -1,13 +1,12 @@
 # RLN-STEALTH-COMMITMENTS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>RLN Stealth Commitment Usage</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
-<tr><th>Contributors</th><td>Jimmy Debe &lt;jimmy@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | RLN Stealth Commitment Usage |
+| Category | Standards Track |
+| Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
+| Contributors | Jimmy Debe <jimmy@status.im> |
+
 ## Abstract
 
 This specification describes the usage of stealth commitments

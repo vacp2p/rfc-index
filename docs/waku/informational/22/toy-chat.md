@@ -1,14 +1,13 @@
 # 22/TOY-CHAT
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku v2 Toy Chat</td></tr>
-<tr><th>Slug</th><td>22</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku v2 Toy Chat |
+| Slug | 22 |
+| Status | draft |
+| Editor | Franck Royer <franck@status.im> |
+| Contributors | Hanno Cornelius <hanno@status.im> |
+
 **Content Topic**: `/toy-chat/2/huilong/proto`.
 
 This specification explains a toy chat example using Waku v2.

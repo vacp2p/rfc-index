@@ -1,15 +1,14 @@
 # 34/WAKU2-PEER-EXCHANGE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku2 Peer Exchange</td></tr>
-<tr><th>Slug</th><td>34</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku2 Peer Exchange |
+| Slug | 34 |
+| Status | draft |
+| Category | Standards Track |
+| Editor | Hanno Cornelius <hanno@status.im> |
+| Contributors | Daniel Kaiser <danielkaiser@status.im> |
+
 ## Abstract
 
 This document specifies a simple request-response peer exchange protocol.

@@ -1,13 +1,12 @@
 # 3RD-PARTY
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>3rd party</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Volodymyr Kozieiev &lt;volodymyr@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | 3rd party |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Volodymyr Kozieiev <volodymyr@status.im> |
+
 ## Abstract
 
 This specification discusses 3rd party APIs that Status relies on.  

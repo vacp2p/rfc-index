@@ -1,14 +1,13 @@
 # STATUS-SIMPLE-SCALING
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Status Simple Scaling</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Informational</td></tr>
-<tr><th>Editor</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Alvaro Revuelta &lt;alrevuelta@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Status Simple Scaling |
+| Status | raw |
+| Category | Informational |
+| Editor | Daniel Kaiser <danielkaiser@status.im> |
+| Contributors | Alvaro Revuelta <alrevuelta@status.im> |
+
 ## Abstract
 
 This document describes how to scale

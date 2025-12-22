@@ -1,14 +1,13 @@
 # 30/ADAPTIVE-NODES
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Adaptive nodes</td></tr>
-<tr><th>Slug</th><td>30</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
-<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Adaptive nodes |
+| Slug | 30 |
+| Status | draft |
+| Editor | Oskar Thorén <oskarth@titanproxy.com> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
+
 This is an informational spec that show cases the concept of adaptive nodes.
 
 ## Node types - a continuum

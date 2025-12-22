@@ -1,13 +1,12 @@
 # 20/TOY-ETH-PM
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Toy Ethereum Private Message</td></tr>
-<tr><th>Slug</th><td>20</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Toy Ethereum Private Message |
+| Slug | 20 |
+| Status | draft |
+| Editor | Franck Royer <franck@status.im> |
+
 **Content Topics**:
 
 - Public Key Broadcast: `/eth-pm/1/public-key/proto`

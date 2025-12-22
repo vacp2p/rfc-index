@@ -1,13 +1,12 @@
 # STATUS-URL-SCHEME
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Status URL Scheme</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Felicio Mununga &lt;felicio@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Status URL Scheme |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Felicio Mununga <felicio@status.im> |
+
 ## Abstract
 
 This document describes URL scheme for previewing and

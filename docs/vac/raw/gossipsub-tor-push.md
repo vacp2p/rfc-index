@@ -1,13 +1,12 @@
 # GOSSIPSUB-TOR-PUSH
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Gossipsub Tor Push</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Gossipsub Tor Push |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Daniel Kaiser <danielkaiser@status.im> |
+
 ## Abstract
 
 This document extends the [libp2p gossipsub specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)

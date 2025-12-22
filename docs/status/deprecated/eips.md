@@ -1,13 +1,12 @@
 # EIPS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>EIPS</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Ricardo Guilherme Schmidt &lt;ricardo3@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>None</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | EIPS |
+| Status | deprecated |
+| Editor | Ricardo Guilherme Schmidt <ricardo3@status.im> |
+| Contributors | None |
+
 ## Abstract
 
 This specification describes how Status relates with EIPs.

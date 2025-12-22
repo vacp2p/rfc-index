@@ -75,30 +75,12 @@ main h1, main h2, main h3, main h4 {
     margin-bottom: 0.6em;
 }
 
-.rfc-meta {
+main h1 + table {
     margin: 1rem 0 1.5rem 0;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--table-border-color);
-    background: var(--bg);
 }
 
-.rfc-meta table {
-    margin: 0;
-    border: none;
-}
-
-.rfc-meta th,
-.rfc-meta td {
-    border: none;
-    padding: 0.2rem 0.4rem 0.2rem 0;
-    text-align: left;
-    vertical-align: top;
-}
-
-.rfc-meta th {
+main h1 + table th {
     width: 10rem;
-    color: var(--sidebar-fg);
-    font-weight: 600;
 }
 
 main p, main li {
@@ -310,4 +292,43 @@ main h1 {
         width: 100%;
         min-width: 0;
     }
+}
+
+
+.menu-title-link {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-decoration: none;
+    color: inherit;
+}
+
+.menu-title-link .menu-title {
+    text-decoration: none;
+}
+
+.chapter-item > .chapter-link-wrapper > a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.section-toggle::before {
+    content: "▸";
+    display: inline-block;
+    font-size: 0.9em;
+    line-height: 1;
+    transition: transform 0.15s ease;
+}
+
+.chapter-item:not(.collapsed) > a .section-toggle::before {
+    transform: rotate(90deg);
+}
+
+.chapter-item.collapsed > ol.section {
+    display: none;
+}
+
+.chapter-item.collapsed > .chapter-link-wrapper > a .section-toggle::before {
+    transform: rotate(0deg);
 }

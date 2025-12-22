@@ -1,14 +1,13 @@
 # 29/WAKU2-CONFIG
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku v2 Client Parameter Configuration Recommendations</td></tr>
-<tr><th>Slug</th><td>29</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku v2 Client Parameter Configuration Recommendations |
+| Slug | 29 |
+| Status | draft |
+| Editor | Hanno Cornelius <hanno@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
+
 `29/WAKU2-CONFIG` describes the RECOMMENDED values
 to assign to configurable parameters for Waku v2 clients.
 Since Waku v2 is built on [libp2p](https://github.com/libp2p/specs),

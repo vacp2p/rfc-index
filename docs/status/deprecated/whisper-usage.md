@@ -1,13 +1,12 @@
 # WHISPER-USAGE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Whisper Usage</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Andrea Piana &lt;andreap@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Whisper Usage |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Adam Babik <adam@status.im>, Andrea Piana <andreap@status.im>, Corey Petty <corey@status.im>, Oskar Thorén <oskar@status.im> |
+
 ## Abstract
 
 Status uses [Whisper](https://eips.ethereum.org/EIPS/eip-627) to provide

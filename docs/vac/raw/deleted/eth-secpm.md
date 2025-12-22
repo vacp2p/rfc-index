@@ -1,13 +1,12 @@
 # ETH-SECPM
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Secure channel setup using Ethereum accounts</td></tr>
-<tr><th>Status</th><td>deleted</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Ramses Fernandez &lt;ramses@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Secure channel setup using Ethereum accounts |
+| Status | deleted |
+| Category | Standards Track |
+| Editor | Ramses Fernandez <ramses@status.im> |
+
 ## NOTE
 
 The content of this specification has been split between

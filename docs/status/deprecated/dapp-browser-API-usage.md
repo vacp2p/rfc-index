@@ -1,12 +1,11 @@
 # Dapp browser API usage
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Dapp browser API usage</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Dapp browser API usage |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+
 ## Abstract
 
 This document describes requirements that an application must fulfill in order to provide a proper environment for Dapps running inside a browser.

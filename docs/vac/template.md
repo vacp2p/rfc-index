@@ -1,14 +1,13 @@
 # TEMPLATE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>RFC Template</td></tr>
-<tr><th>Slug</th><td>XX</td></tr>
-<tr><th>Status</th><td>raw/draft/stable/deprecated</td></tr>
-<tr><th>Category</th><td>Standards Track/Informational/Best Current Practice</td></tr>
-<tr><th>Editor</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | RFC Template |
+| Slug | XX |
+| Status | raw/draft/stable/deprecated |
+| Category | Standards Track/Informational/Best Current Practice |
+| Editor | Daniel Kaiser <danielkaiser@status.im> |
+
 ## (Info, remove this section)
 
 This section contains meta info about writing RFCs.

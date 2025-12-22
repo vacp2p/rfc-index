@@ -1,14 +1,13 @@
 # STATUS-URL-DATA
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Status URL Data</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Felicio Mununga &lt;felicio@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Aaryamann Challani &lt;aaryamann@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Status URL Data |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Felicio Mununga <felicio@status.im> |
+| Contributors | Aaryamann Challani <aaryamann@status.im> |
+
 ## Abstract
 
 This document specifies serialization, compression, and
