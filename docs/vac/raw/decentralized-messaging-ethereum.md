@@ -1,13 +1,12 @@
 # ETH-DCGKA
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Decentralized Key and Session Setup for Secure Messaging over Ethereum</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>informational</td></tr>
-<tr><th>Editor</th><td>Ramses Fernandez-Valencia &lt;ramses@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Decentralized Key and Session Setup for Secure Messaging over Ethereum |
+| Status | raw |
+| Category | informational |
+| Editor | Ramses Fernandez-Valencia <ramses@status.im> |
+
 ## Abstract
 
 This document introduces a decentralized group messaging protocol

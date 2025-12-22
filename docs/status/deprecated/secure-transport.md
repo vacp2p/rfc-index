@@ -1,13 +1,12 @@
 # SECURE-TRANSPORT
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Secure Transport</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Pedro Pombeiro &lt;pedro@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Secure Transport |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Andrea Maria Piana <andreap@status.im>, Corey Petty <corey@status.im>, Dean Eigenmann <dean@status.im>, Oskar Thorén <oskar@status.im>, Pedro Pombeiro <pedro@status.im> |
+
 ## Abstract
 
 This document describes how Status provides a secure channel between two peers,

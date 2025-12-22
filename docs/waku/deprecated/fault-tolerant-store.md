@@ -1,13 +1,12 @@
 # 21/WAKU2-FAULT-TOLERANT-STORE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku v2 Fault-Tolerant Store</td></tr>
-<tr><th>Slug</th><td>21</td></tr>
-<tr><th>Status</th><td>deleted</td></tr>
-<tr><th>Editor</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku v2 Fault-Tolerant Store |
+| Slug | 21 |
+| Status | deleted |
+| Editor | Sanaz Taheri <sanaz@status.im> |
+
  The reliability of [13/WAKU2-STORE](../../core/13/store.md)
 protocol heavily relies on the fact that full nodes i.e.,
 those who persist messages have high availability and

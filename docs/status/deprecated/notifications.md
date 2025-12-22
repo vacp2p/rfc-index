@@ -1,13 +1,12 @@
 # NOTIFICATIONS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Notifications</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Eric Dvorsak &lt;eric@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Notifications |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Eric Dvorsak <eric@status.im> |
+
 
 ## Local Notifications
 

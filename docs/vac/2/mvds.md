@@ -1,14 +1,13 @@
 # 2/MVDS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Minimum Viable Data Synchronization</td></tr>
-<tr><th>Slug</th><td>2</td></tr>
-<tr><th>Status</th><td>stable</td></tr>
-<tr><th>Editor</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Minimum Viable Data Synchronization |
+| Slug | 2 |
+| Status | stable |
+| Editor | Sanaz Taheri <sanaz@status.im> |
+| Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskarth@titanproxy.com> |
+
 In this specification, we describe a minimum viable protocol for
 data synchronization inspired by the Bramble Synchronization Protocol ([BSP](https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BSP.md)).
 This protocol is designed to ensure reliable messaging

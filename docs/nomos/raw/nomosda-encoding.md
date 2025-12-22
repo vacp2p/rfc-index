@@ -1,13 +1,12 @@
 # NOMOSDA-ENCODING
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>NomosDA Encoding Protocol</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Editor</th><td>Daniel Sanchez-Quiros &lt;danielsq@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Daniel Kashepava &lt;danielkashepava@status.im&gt;<br>Álvaro Castro-Castilla &lt;alvaro@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;<br>Thomas Lavaur &lt;thomaslavaur@status.im&gt;<br>Mehmet Gonen &lt;mehmet@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | NomosDA Encoding Protocol |
+| Status | raw |
+| Editor | Daniel Sanchez-Quiros <danielsq@status.im> |
+| Contributors | Daniel Kashepava <danielkashepava@status.im>, Álvaro Castro-Castilla <alvaro@status.im>, Filip Dimitrijevic <filip@status.im>, Thomas Lavaur <thomaslavaur@status.im>, Mehmet Gonen <mehmet@status.im> |
+
 ## Introduction
 
 This document describes the encoding and verification processes of NomosDA, which is the data availability (DA) solution used by the Nomos blockchain. NomosDA provides an assurance that all data from Nomos blobs are accessible and verifiable by every network participant.

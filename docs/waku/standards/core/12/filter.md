@@ -1,14 +1,13 @@
 # 12/WAKU2-FILTER
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku v2 Filter</td></tr>
-<tr><th>Slug</th><td>12</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Ebube Ud &lt;ebube@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku v2 Filter |
+| Slug | 12 |
+| Status | draft |
+| Editor | Hanno Cornelius <hanno@status.im> |
+| Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskar@status.im>, Sanaz Taheri <sanaz@status.im>, Ebube Ud <ebube@status.im> |
+
 previous versions: [00](/waku/standards/core/12/previous-versions/00/filter.md)
 
 **Protocol identifiers**:

@@ -1,15 +1,14 @@
 # 61/STATUS-Community-History-Service
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Status Community History Service</td></tr>
-<tr><th>Slug</th><td>61</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>r4bbit &lt;r4bbit@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;<br>John Lea &lt;john@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Status Community History Service |
+| Slug | 61 |
+| Status | draft |
+| Category | Standards Track |
+| Editor | r4bbit <r4bbit@status.im> |
+| Contributors | Sanaz Taheri <sanaz@status.im>, John Lea <john@status.im> |
+
 ## Abstract
 
 Messages are stored permanently by store nodes

@@ -1,13 +1,12 @@
 # GROUP-CHAT
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Group Chat</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Andrea Piana &lt;andreap@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Group Chat |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Andrea Piana <andreap@status.im> |
+
 ## Abstract
 
 This document describes the group chat protocol used by the Status application.

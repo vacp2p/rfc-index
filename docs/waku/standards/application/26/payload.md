@@ -1,14 +1,13 @@
 # 26/WAKU2-PAYLOAD
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku Message Payload Encryption</td></tr>
-<tr><th>Slug</th><td>26</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Oskar Thoren &lt;oskarth@titanproxy.com&gt;</td></tr>
-<tr><th>Contributors</th><td>Oskar Thoren &lt;oskarth@titanproxy.com&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku Message Payload Encryption |
+| Slug | 26 |
+| Status | draft |
+| Editor | Oskar Thoren <oskarth@titanproxy.com> |
+| Contributors | Oskar Thoren <oskarth@titanproxy.com> |
+
 ## Abstract
 
 This specification describes how Waku provides confidentiality, authenticity, and

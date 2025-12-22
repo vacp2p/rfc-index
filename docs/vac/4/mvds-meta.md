@@ -1,14 +1,13 @@
 # 4/MVDS-META
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>MVDS Metadata Field</td></tr>
-<tr><th>Slug</th><td>4</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | MVDS Metadata Field |
+| Slug | 4 |
+| Status | draft |
+| Editor | Sanaz Taheri <sanaz@status.im> |
+| Contributors | Dean Eigenmann <dean@status.im>, Andrea Maria Piana <andreap@status.im>, Oskar Thorén <oskarth@titanproxy.com> |
+
 In this specification, we describe a method to construct message history that
 will aid the consistency guarantees of [2/MVDS](../2/mvds.md).
 Additionally,

@@ -1,14 +1,13 @@
 # 3/REMOTE-LOG
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Remote log specification</td></tr>
-<tr><th>Slug</th><td>3</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
-<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Remote log specification |
+| Slug | 3 |
+| Status | draft |
+| Editor | Oskar Thorén <oskarth@titanproxy.com> |
+| Contributors | Dean Eigenmann <dean@status.im> |
+
 A remote log is a replication of a local log.
 This means a node can read data that originally came from a node that is offline.
 

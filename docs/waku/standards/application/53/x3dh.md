@@ -1,15 +1,14 @@
 # 53/WAKU2-X3DH
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>X3DH usage for Waku payload encryption</td></tr>
-<tr><th>Slug</th><td>53</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
-<tr><th>Contributors</th><td>Andrea Piana &lt;andreap@status.im&gt;<br>Pedro Pombeiro &lt;pedro@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | X3DH usage for Waku payload encryption |
+| Slug | 53 |
+| Status | draft |
+| Category | Standards Track |
+| Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
+| Contributors | Andrea Piana <andreap@status.im>, Pedro Pombeiro <pedro@status.im>, Corey Petty <corey@status.im>, Oskar Thorén <oskarth@titanproxy.com>, Dean Eigenmann <dean@status.im>, Filip Dimitrijevic <filip@status.im> |
+
 ## Abstract
 
 This document describes a method that can be used to provide a secure channel

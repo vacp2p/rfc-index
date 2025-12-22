@@ -1,13 +1,12 @@
 # SDS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Scalable Data Sync protocol for distributed logs</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Akhil Peddireddy &lt;akhil@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Scalable Data Sync protocol for distributed logs |
+| Status | raw |
+| Editor | Hanno Cornelius <hanno@status.im> |
+| Contributors | Akhil Peddireddy <akhil@status.im> |
+
 ## Abstract
 
 This specification introduces the Scalable Data Sync (SDS) protocol

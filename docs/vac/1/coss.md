@@ -1,15 +1,14 @@
 # 1/COSS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Consensus-Oriented Specification System</td></tr>
-<tr><th>Slug</th><td>1</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Category</th><td>Best Current Practice</td></tr>
-<tr><th>Editor</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Oskar Thoren &lt;oskarth@titanproxy.com&gt;<br>Pieter Hintjens &lt;ph@imatix.com&gt;<br>André Rebentisch &lt;andre@openstandards.de&gt;<br>Alberto Barrionuevo &lt;abarrio@opentia.es&gt;<br>Chris Puttick &lt;chris.puttick@thehumanjourney.net&gt;<br>Yurii Rashkovskii &lt;yrashk@gmail.com&gt;<br>Jimmy Debe &lt;jimmy@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Consensus-Oriented Specification System |
+| Slug | 1 |
+| Status | draft |
+| Category | Best Current Practice |
+| Editor | Daniel Kaiser <danielkaiser@status.im> |
+| Contributors | Oskar Thoren <oskarth@titanproxy.com>, Pieter Hintjens <ph@imatix.com>, André Rebentisch <andre@openstandards.de>, Alberto Barrionuevo <abarrio@opentia.es>, Chris Puttick <chris.puttick@thehumanjourney.net>, Yurii Rashkovskii <yrashk@gmail.com>, Jimmy Debe <jimmy@status.im> |
+
 This document describes a consensus-oriented specification system (COSS)
 for building interoperable technical specifications.
 COSS is based on a lightweight editorial process that

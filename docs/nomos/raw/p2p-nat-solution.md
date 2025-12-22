@@ -1,14 +1,13 @@
 # P2P-NAT-SOLUTION
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Nomos P2P Network NAT Solution Specification</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>networking</td></tr>
-<tr><th>Editor</th><td>Antonio Antonino &lt;antonio@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Álvaro Castro-Castilla &lt;alvaro@status.im&gt;<br>Daniel Sanchez-Quiros &lt;danielsq@status.im&gt;<br>Petar Radovic &lt;petar@status.im&gt;<br>Gusto Bacvinka &lt;augustinas@status.im&gt;<br>Youngjoon Lee &lt;youngjoon@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Nomos P2P Network NAT Solution Specification |
+| Status | raw |
+| Category | networking |
+| Editor | Antonio Antonino <antonio@status.im> |
+| Contributors | Álvaro Castro-Castilla <alvaro@status.im>, Daniel Sanchez-Quiros <danielsq@status.im>, Petar Radovic <petar@status.im>, Gusto Bacvinka <augustinas@status.im>, Youngjoon Lee <youngjoon@status.im>, Filip Dimitrijevic <filip@status.im> |
+
 ## Abstract
 
 This specification defines a comprehensive NAT (Network Address Translation) traversal solution for the Nomos P2P network. The solution enables nodes to automatically determine their NAT status and establish both outbound and inbound connections regardless of network configuration. The strategy combines [AutoNAT](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md), dynamic port mapping protocols, and continuous verification to maximize public reachability while maintaining decentralized operation.

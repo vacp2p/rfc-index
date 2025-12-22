@@ -1,14 +1,13 @@
 # 66/WAKU2-METADATA
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku Metadata Protocol</td></tr>
-<tr><th>Slug</th><td>66</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;<br>Alvaro Revuelta &lt;alrevuelta@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku Metadata Protocol |
+| Slug | 66 |
+| Status | draft |
+| Editor | Franck Royer <franck@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im>, Alvaro Revuelta <alrevuelta@status.im> |
+
 ## Abstract
 
 This specification describes the metadata

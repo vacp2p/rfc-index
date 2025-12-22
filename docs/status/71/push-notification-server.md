@@ -1,15 +1,14 @@
 # 71/STATUS-PUSH-NOTIFICATION-SERVER
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Push Notification Server</td></tr>
-<tr><th>Slug</th><td>71</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Jimmy Debe &lt;jimmy@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Push Notification Server |
+| Slug | 71 |
+| Status | draft |
+| Category | Standards Track |
+| Editor | Jimmy Debe <jimmy@status.im> |
+| Contributors | Andrea Maria Piana <andreap@status.im> |
+
 ## Abstract
 
 A push notification server implementation for IOS devices and Android devices.

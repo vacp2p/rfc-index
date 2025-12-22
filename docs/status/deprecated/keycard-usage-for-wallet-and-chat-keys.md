@@ -1,13 +1,12 @@
 # Keycard Usage for Wallet and Chat Keys
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Keycard Usage for Wallet and Chat Keys</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Roman Volosovskyi &lt;roman@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Keycard Usage for Wallet and Chat Keys |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Roman Volosovskyi <roman@status.im> |
+
 ## Abstract
 
 In this specification, we describe how Status communicates with Keycard to create, store and use multiaccount.

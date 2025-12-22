@@ -1,13 +1,12 @@
 # ETHEREUM-USAGE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Status interactions with the Ethereum blockchain</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Status interactions with the Ethereum blockchain |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Andrea Maria Piana <andreap@status.im> |
+
 ## Abstract
 
 This specification documents all the interactions that the Status client has

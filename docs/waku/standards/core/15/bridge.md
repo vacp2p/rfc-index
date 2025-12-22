@@ -1,13 +1,12 @@
 # 15/WAKU-BRIDGE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku Bridge</td></tr>
-<tr><th>Slug</th><td>15</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku Bridge |
+| Slug | 15 |
+| Status | draft |
+| Editor | Hanno Cornelius <hanno@status.im> |
+
 ## Abstract
 
 This specification describes how [6/WAKU1](/waku/standards/legacy/6/waku1.md)

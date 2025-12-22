@@ -1,14 +1,13 @@
 # 36/WAKU2-BINDINGS-API
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku v2 C Bindings API</td></tr>
-<tr><th>Slug</th><td>36</td></tr>
-<tr><th>Status</th><td>draft</td></tr>
-<tr><th>Editor</th><td>Richard Ramos &lt;richard@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku v2 C Bindings API |
+| Slug | 36 |
+| Status | draft |
+| Editor | Richard Ramos <richard@status.im> |
+| Contributors | Franck Royer <franck@status.im> |
+
 ## Introduction
 
 Native applications that wish to integrate Waku may not be able to use nwaku and

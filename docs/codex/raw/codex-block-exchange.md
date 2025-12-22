@@ -1,14 +1,13 @@
 # CODEX-BLOCK-EXCHANGE
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Codex Block Exchange Protocol</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Codex Team</td></tr>
-<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Codex Block Exchange Protocol |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Codex Team |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
+
 ## Specification Status
 
 This specification contains a mix of:

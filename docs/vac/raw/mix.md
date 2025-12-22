@@ -1,14 +1,13 @@
 # LIBP2P-MIX
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Libp2p Mix Protocol</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Prem Prathi &lt;premprathi@proton.me&gt;</td></tr>
-<tr><th>Contributors</th><td>A<br>k<br>s<br>h<br>a<br>y<br>a<br> <br>M<br>a<br>n<br>i<br> <br>&lt;<br>a<br>k<br>s<br>h<br>a<br>y<br>a<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>&gt;<br>,<br> <br>D<br>a<br>n<br>i<br>e<br>l<br> <br>K<br>a<br>i<br>s<br>e<br>r<br> <br>&lt;<br>d<br>a<br>n<br>i<br>e<br>l<br>k<br>a<br>i<br>s<br>e<br>r<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Libp2p Mix Protocol |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Prem Prathi <premprathi@proton.me> |
+| Contributors | Akshaya Mani <akshaya@status.im>, Daniel Kaiser <danielkaiser@status.im> |
+
 ## Abstract
 
 The Mix Protocol defines a decentralized anonymous message routing layer for libp2p networks.

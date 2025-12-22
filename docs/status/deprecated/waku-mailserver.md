@@ -1,13 +1,12 @@
 # WAKU-MAILSERVER
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Waku Mailserver</td></tr>
-<tr><th>Status</th><td>deprecated</td></tr>
-<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Waku Mailserver |
+| Status | deprecated |
+| Editor | Filip Dimitrijevic <filip@status.im> |
+| Contributors | Adam Babik <adam@status.im>, Oskar Thorén <oskar@status.im>, Samuel Hawksby-Robinson <samuel@status.im> |
+
 ## Abstract
 
 Being mostly offline is an intrinsic property of mobile clients.

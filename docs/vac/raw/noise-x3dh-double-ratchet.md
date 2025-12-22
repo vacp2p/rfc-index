@@ -1,13 +1,12 @@
 # NOISE-X3DH-DOUBLE-RATCHET
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Secure 1-to-1 channel setup using X3DH and the double ratchet</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>Standards Track</td></tr>
-<tr><th>Editor</th><td>Ramses Fernandez &lt;ramses@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Secure 1-to-1 channel setup using X3DH and the double ratchet |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Ramses Fernandez <ramses@status.im> |
+
 ## Motivation
 
 The need for secure communications has become paramount.

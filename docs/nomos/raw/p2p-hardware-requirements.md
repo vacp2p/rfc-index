@@ -1,14 +1,13 @@
 # P2P-HARDWARE-REQUIREMENTS
 
-<div class="rfc-meta">
-<table>
-<tr><th>Name</th><td>Nomos p2p Network Hardware Requirements Specification</td></tr>
-<tr><th>Status</th><td>raw</td></tr>
-<tr><th>Category</th><td>infrastructure</td></tr>
-<tr><th>Editor</th><td>Daniel Sanchez-Quiros &lt;danielsq@status.im&gt;</td></tr>
-<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
-</table>
-</div>
+| Field | Value |
+| --- | --- |
+| Name | Nomos p2p Network Hardware Requirements Specification |
+| Status | raw |
+| Category | infrastructure |
+| Editor | Daniel Sanchez-Quiros <danielsq@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
+
 ## Abstract
 
 This specification defines the hardware requirements for running various types of Nomos blockchain nodes. Hardware needs vary significantly based on the node's role, from lightweight verification nodes to high-performance Zone Executors. The requirements are designed to support diverse participation levels while ensuring network security and performance.
