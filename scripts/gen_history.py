@@ -130,6 +130,28 @@ def build_markdown_history(
     return "\n".join(lines).rstrip() + "\n"
 
 
+def find_metadata_table_end(lines: List[str]) -> Optional[int]:
+    header_idx = None
+    for idx, line in enumerate(lines[:80]):
+        if line.strip() == "| Field | Value |":
+            header_idx = idx
+            break
+    if header_idx is None:
+        return None
+
+    if header_idx + 1 >= len(lines):
+        return None
+
+    if not lines[header_idx + 1].strip().startswith("|"):
+        return None
+
+    end_idx = header_idx + 2
+    while end_idx < len(lines) and lines[end_idx].strip().startswith("|"):
+        end_idx += 1
+
+    return end_idx
+
+
 def inject_timeline(file_path: Path, timeline_md: str) -> bool:
     """
     Insert or replace a timeline block near the top of the file.
@@ -155,15 +177,16 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
             return True
         return False
 
+    lines = content.splitlines()
     insert_pos = 0
-    if '<div class="rfc-meta">' in content:
-        meta_end = content.find("</div>", content.find('<div class="rfc-meta">'))
-        if meta_end != -1:
-            insert_pos = meta_end + len("</div>")
-    elif content.startswith("---"):
-        second = content.find("\n---", 3)
-        if second != -1:
-            insert_pos = second + len("\n---")
+    table_end = find_metadata_table_end(lines)
+    if table_end is not None:
+        insert_pos = len("\n".join(lines[:table_end]))
+    else:
+        for idx, line in enumerate(lines):
+            if line.startswith("# "):
+                insert_pos = len("\n".join(lines[: idx + 1]))
+                break
 
     new_content = content[:insert_pos] + "\n\n" + block + "\n" + content[insert_pos:]
     if new_content != content:
@@ -172,15 +195,28 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
     return False
 
 
+def is_rfc_file(path: Path) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return False
+
+    if "# " not in text:
+        return False
+
+    if "| Field | Value |" not in text:
+        return False
+
+    return True
+
+
 def find_rfc_files(root: Path) -> List[Path]:
     candidates: List[Path] = []
     for path in root.rglob("*.md"):
         if path.name in {"README.md", "SUMMARY.md", "template.md"}:
             continue
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        if '<div class="rfc-meta">' not in text:
-            continue
-        candidates.append(path)
+        if is_rfc_file(path):
+            candidates.append(path)
     return sorted(candidates)
 
 
