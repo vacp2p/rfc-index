@@ -34,6 +34,60 @@
     });
   });
 
+  function initSidebarCollapsible(root) {
+    if (!root) return;
+    const items = root.querySelectorAll("li.chapter-item");
+    items.forEach((item) => {
+      const section = item.querySelector(":scope > ol.section");
+      const link = item.querySelector(":scope > .chapter-link-wrapper > a");
+      if (!section || !link) return;
+
+      if (!link.querySelector(".section-toggle")) {
+        const toggle = document.createElement("span");
+        toggle.className = "section-toggle";
+        toggle.setAttribute("role", "button");
+        toggle.setAttribute("aria-label", "Toggle section");
+        toggle.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          item.classList.toggle("collapsed");
+        });
+        link.prepend(toggle);
+      }
+
+      const hasActive = item.querySelector(".active");
+      if (!hasActive) {
+        item.classList.add("collapsed");
+      }
+    });
+  }
+
+  function bindSidebarCollapsible() {
+    const sidebar = document.querySelector("#mdbook-sidebar .sidebar-scrollbox");
+    if (sidebar) {
+      initSidebarCollapsible(sidebar);
+    }
+
+    const iframe = document.querySelector(".sidebar-iframe-outer");
+    if (iframe) {
+      const onLoad = () => {
+        try {
+          initSidebarCollapsible(iframe.contentDocument);
+        } catch (e) {
+          // ignore access errors
+        }
+      };
+      iframe.addEventListener("load", onLoad);
+      onLoad();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    bindSidebarCollapsible();
+    // toc.js may inject the sidebar after load
+    setTimeout(bindSidebarCollapsible, 100);
+  });
+
   const searchInput = document.getElementById("rfc-search");
   const resultsCount = document.getElementById("results-count");
   const tableContainer = document.getElementById("rfc-table-container");

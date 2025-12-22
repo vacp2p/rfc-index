@@ -21,41 +21,6 @@ EXCLUDE_FILES = {"README.md", "SUMMARY.md"}
 EXCLUDE_PARTS = {"previous-versions"}
 
 
-def parse_meta_from_html(text: str) -> Optional[Dict[str, str]]:
-    if '<div class="rfc-meta">' not in text:
-        return None
-
-    meta: Dict[str, str] = {}
-    for match in re.findall(r"<tr><th>([^<]+)</th><td>(.*?)</td></tr>", text, flags=re.DOTALL):
-        key = match[0].strip().lower()
-        value = match[1].replace("<br>", "\n").strip()
-        value = html.unescape(value)
-        meta[key] = value
-
-    return meta or None
-
-
-def parse_front_matter(text: str) -> Optional[Dict[str, str]]:
-    if not text.startswith("---"):
-        return None
-
-    end = text.find("\n---", 3)
-    if end == -1:
-        return None
-
-    front = text[3:end].strip().splitlines()
-    meta: Dict[str, str] = {}
-    for line in front:
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        key = key.strip().lower()
-        value = value.strip().strip('"').strip("'")
-        if key and value:
-            meta[key] = value
-    return meta or None
-
-
 def parse_meta_from_markdown_table(text: str) -> Optional[Dict[str, str]]:
     lines = text.splitlines()
     meta: Dict[str, str] = {}
@@ -99,11 +64,7 @@ def collect() -> List[Dict[str, str]]:
 
         text = path.read_text(encoding="utf-8", errors="ignore")
 
-        meta = parse_front_matter(text)
-        if meta is None:
-            meta = parse_meta_from_markdown_table(text)
-        if meta is None:
-            meta = parse_meta_from_html(text) or {}
+        meta = parse_meta_from_markdown_table(text) or {}
 
         slug = meta.get("slug")
         title = meta.get("title") or meta.get("name") or parse_title_from_h1(text) or rel.stem
