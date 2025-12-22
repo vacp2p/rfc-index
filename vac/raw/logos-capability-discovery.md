@@ -642,12 +642,15 @@ Discoverers MUST verify the `signature` field of each advertisement before accep
 
 **CloserPeers Field:**
 
-MUST contain a list of Peer objects to help populate the discoverer's `DiscT(service_id_hash)` table. Each Peer object SHOULD include:
+MUST contain a list of Peer objects to help populate the discoverer's `DiscT(service_id_hash)` table.
+Each Peer object SHOULD include:
+
 - `id` (bytes) = Peer ID
 - `addrs` (repeated bytes) = Multiaddrs of the peer
 - `connection` (ConnectionType) = Optional connection status
 
-The registrar SHOULD return one peer from each bucket of its `RegT(service_id_hash)` table using the `GETPEERS()` algorithm.
+The registrar SHOULD return one peer from each bucket of
+its `RegT(service_id_hash)` table using the `GETPEERS()` algorithm.
 
 **Example Response Structure:**
 
