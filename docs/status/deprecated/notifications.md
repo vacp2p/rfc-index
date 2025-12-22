@@ -7,7 +7,6 @@
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Eric Dvorsak <eric@status.im> |
 
-
 ## Local Notifications
 
 A client should implement local notifications to offer notifications

@@ -55,10 +55,10 @@ where `b>c`.
 
 From A's point of view:
 
-A/B | Cooperate | Defect
------|----------|-------
-Cooperate | b-c | -c
-Defect | b | 0
+| A/B | Cooperate | Defect |
+| --- | --- | --- |
+| Cooperate | b-c | -c |
+| Defect | b | 0 |
 
 What this means is that if A and B cooperates,
 A gets some benefit `b` minus a cost `c`.
@@ -68,10 +68,10 @@ If both defect they get neither benefit nor cost.
 
 The generalized form of PD is:
 
-A/B | Cooperate | Defect
------|----------|-------
-Cooperate | R | S
-Defect | T | P
+| A/B | Cooperate | Defect |
+| --- | --- | --- |
+| Cooperate | R | S |
+| Defect | T | P |
 
 With R=reward, S=Sucker's payoff, T=temptation, P=punishment
 
