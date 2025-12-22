@@ -2,7 +2,7 @@
 """
 Generate a JSON index of RFC metadata for the landing page filters.
 
-Scans the docs/ tree for Markdown files with YAML front matter and writes
+Scans the docs/ tree for Markdown files and writes
 `docs/rfc-index.json`.
 """
 from __future__ import annotations
@@ -12,8 +12,6 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import html
 import re
-
-import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
@@ -37,6 +35,27 @@ def parse_meta_from_html(text: str) -> Optional[Dict[str, str]]:
     return meta or None
 
 
+def parse_front_matter(text: str) -> Optional[Dict[str, str]]:
+    if not text.startswith("---"):
+        return None
+
+    end = text.find("\n---", 3)
+    if end == -1:
+        return None
+
+    front = text[3:end].strip().splitlines()
+    meta: Dict[str, str] = {}
+    for line in front:
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        key = key.strip().lower()
+        value = value.strip().strip('"').strip("'")
+        if key and value:
+            meta[key] = value
+    return meta or None
+
+
 def parse_title_from_h1(text: str) -> Optional[str]:
     match = re.search(r"^#\\s+(.+)$", text, flags=re.MULTILINE)
     if not match:
@@ -56,11 +75,7 @@ def collect() -> List[Dict[str, str]]:
 
         text = path.read_text(encoding="utf-8", errors="ignore")
 
-        meta = None
-        if text.startswith("---"):
-            parts = text.split("---", 2)
-            if len(parts) >= 3:
-                meta = yaml.safe_load(parts[1]) or {}
+        meta = parse_front_matter(text)
         if meta is None:
             meta = parse_meta_from_html(text) or {}
 
