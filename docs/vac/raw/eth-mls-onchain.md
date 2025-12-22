@@ -1,13 +1,14 @@
----
-title: ETH-MLS-ONCHAIN
-name: Secure channel setup using decentralized MLS and Ethereum accounts
-status: raw
-category: Standards Track
-tags:
-editor: Ramses Fernandez <ramses@status.im>
-contributors: Aaryamann Challani <aaryamann@status.im>, Ekaterina Broslavskaya <ekaterina@status.im>, Ugur Sen <ugur@status.im>, Ksr <ksr@status.im>
----
+# ETH-MLS-ONCHAIN
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Secure channel setup using decentralized MLS and Ethereum accounts</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Ramses Fernandez &lt;ramses@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>A<br>a<br>r<br>y<br>a<br>m<br>a<br>n<br>n<br> <br>C<br>h<br>a<br>l<br>l<br>a<br>n<br>i<br> <br>&lt;<br>a<br>a<br>r<br>y<br>a<br>m<br>a<br>n<br>n<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>&gt;<br>,<br> <br>E<br>k<br>a<br>t<br>e<br>r<br>i<br>n<br>a<br> <br>B<br>r<br>o<br>s<br>l<br>a<br>v<br>s<br>k<br>a<br>y<br>a<br> <br>&lt;<br>e<br>k<br>a<br>t<br>e<br>r<br>i<br>n<br>a<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>&gt;<br>,<br> <br>U<br>g<br>u<br>r<br> <br>S<br>e<br>n<br> <br>&lt;<br>u<br>g<br>u<br>r<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>&gt;<br>,<br> <br>K<br>s<br>r<br> <br>&lt;<br>k<br>s<br>r<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>&gt;</td></tr>
+</table>
+</div>
 ## Motivation
 
 The need for secure communications has become paramount.  

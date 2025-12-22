@@ -1,13 +1,13 @@
----
-title: STATUS-URL-SCHEME
-name: Status URL Scheme
-status: raw
-category: Standards Track
-tags:
-editor: Felicio Mununga <felicio@status.im>
-contributors:
----
+# STATUS-URL-SCHEME
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status URL Scheme</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Felicio Mununga &lt;felicio@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This document describes URL scheme for previewing and

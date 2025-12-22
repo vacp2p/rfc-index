@@ -1,15 +1,14 @@
----
-slug: 8
-title: 8/WAKU-MAIL
-name: Waku Mailserver
-status: stable
-editor: Andrea Maria Piana <andreap@status.im>
-contributors:
-  - Adam Babik <adam@status.im>
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
----
+# 8/WAKU-MAIL
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku Mailserver</td></tr>
+<tr><th>Slug</th><td>8</td></tr>
+<tr><th>Status</th><td>stable</td></tr>
+<tr><th>Editor</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 In this specification, we describe Mailservers.

@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
+import html
+import re
 
 import yaml
 
@@ -19,6 +21,27 @@ OUTPUT = DOCS / "rfc-index.json"
 
 EXCLUDE_FILES = {"README.md", "SUMMARY.md"}
 EXCLUDE_PARTS = {"previous-versions"}
+
+
+def parse_meta_from_html(text: str) -> Optional[Dict[str, str]]:
+    if '<div class="rfc-meta">' not in text:
+        return None
+
+    meta: Dict[str, str] = {}
+    for match in re.findall(r"<tr><th>([^<]+)</th><td>(.*?)</td></tr>", text, flags=re.DOTALL):
+        key = match[0].strip().lower()
+        value = match[1].replace("<br>", "\n").strip()
+        value = html.unescape(value)
+        meta[key] = value
+
+    return meta or None
+
+
+def parse_title_from_h1(text: str) -> Optional[str]:
+    match = re.search(r"^#\\s+(.+)$", text, flags=re.MULTILINE)
+    if not match:
+        return None
+    return match.group(1).strip()
 
 
 def collect() -> List[Dict[str, str]]:
@@ -32,16 +55,17 @@ def collect() -> List[Dict[str, str]]:
             continue
 
         text = path.read_text(encoding="utf-8", errors="ignore")
-        if not text.startswith("---"):
-            continue
 
-        parts = text.split("---", 2)
-        if len(parts) < 3:
-            continue
+        meta = None
+        if text.startswith("---"):
+            parts = text.split("---", 2)
+            if len(parts) >= 3:
+                meta = yaml.safe_load(parts[1]) or {}
+        if meta is None:
+            meta = parse_meta_from_html(text) or {}
 
-        meta = yaml.safe_load(parts[1]) or {}
         slug = meta.get("slug")
-        title = meta.get("title") or meta.get("name") or rel.stem
+        title = meta.get("title") or meta.get("name") or parse_title_from_h1(text) or rel.stem
         status = meta.get("status") or "unknown"
         category = meta.get("category") or "unspecified"
         project = rel.parts[0]

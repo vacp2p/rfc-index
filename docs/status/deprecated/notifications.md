@@ -1,13 +1,13 @@
----
-title: NOTIFICATIONS
-name: Notifications
-status: deprecated
-description: A client should implement local notifications to offer notifications for any event in the app without the privacy cost and dependency on third party services.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Eric Dvorsak <eric@status.im>
----
+# NOTIFICATIONS
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Notifications</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Eric Dvorsak &lt;eric@status.im&gt;</td></tr>
+</table>
+</div>
 ## Local Notifications
 
 A client should implement local notifications to offer notifications

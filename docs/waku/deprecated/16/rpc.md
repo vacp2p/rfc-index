@@ -1,12 +1,13 @@
----
-slug: 16
-title: 16/WAKU2-RPC
-name: Waku v2 RPC API
-status: deprecated
-tags: waku-core
-editor: Hanno Cornelius <hanno@status.im>
----
+# 16/WAKU2-RPC
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 RPC API</td></tr>
+<tr><th>Slug</th><td>16</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+</table>
+</div>
 ## Introduction
 
 This specification describes the JSON-RPC API that Waku v2 nodes MAY adhere to.

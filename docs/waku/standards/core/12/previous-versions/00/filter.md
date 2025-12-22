@@ -1,19 +1,14 @@
----
-slug: 12
-title: 12/WAKU2-FILTER
-name: Waku v2 Filter
-status: draft
-tags: waku-core
-version: v00
-editor: Hanno Cornelius <hanno@status.im>
-contributors:
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
-  - Sanaz Taheri <sanaz@status.im>
-  - Ebube Ud <ebube@status.im>
----
+# 12/WAKU2-FILTER
 
-
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Filter</td></tr>
+<tr><th>Slug</th><td>12</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Ebube Ud &lt;ebube@status.im&gt;</td></tr>
+</table>
+</div>
 `WakuFilter` is a protocol that enables subscribing to messages that a peer receives.
 This is a more lightweight version of `WakuRelay`
 specifically designed for bandwidth restricted devices.

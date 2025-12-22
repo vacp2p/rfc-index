@@ -1,16 +1,15 @@
----
-slug: 61
-title: 61/STATUS-Community-History-Service
-name: Status Community History Service
-status: draft
-category: Standards Track
-description: Explains how new members of a Status community can request historical messages from archive nodes.
-editor: r4bbit <r4bbit@status.im>
-contributors:
-  - Sanaz Taheri <sanaz@status.im>
-  - John Lea <john@status.im>
----
+# 61/STATUS-Community-History-Service
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Community History Service</td></tr>
+<tr><th>Slug</th><td>61</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>r4bbit &lt;r4bbit@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;<br>John Lea &lt;john@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 Messages are stored permanently by store nodes

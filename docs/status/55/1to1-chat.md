@@ -1,20 +1,15 @@
----
-slug: 55
-title: 55/STATUS-1TO1-CHAT
-name: Status 1-to-1 Chat
-status: draft
-category: Standards Track
-tags: waku-application
-description: A chat protocol to send public and private messages to a single recipient by the Status app.
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
-- Andrea Piana <andreap@status.im>
-- Pedro Pombeiro <pedro@status.im>
-- Corey Petty <corey@status.im>
-- Oskar Thorén <oskarth@titanproxy.com>
-- Dean Eigenmann <dean@status.im>
----
+# 55/STATUS-1TO1-CHAT
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status 1-to-1 Chat</td></tr>
+<tr><th>Slug</th><td>55</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+<tr><th>Contributors</th><td>Andrea Piana &lt;andreap@status.im&gt;<br>Pedro Pombeiro &lt;pedro@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes how the Status 1-to-1 chat protocol is implemented

@@ -1,17 +1,14 @@
----
-slug: 13
-title: 13/WAKU2-STORE
-name: Waku Store Query
-status: draft
-tags: waku-core
-version: 01
-editor: Hanno Cornelius <hanno@status.im>
-contributors:
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
-  - Aaryamann Challani <p1ge0nh8er@proton.me>
-  - Sanaz Taheri <sanaz@status.im>
----
+# 13/WAKU2-STORE
+
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku Store Query</td></tr>
+<tr><th>Slug</th><td>13</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;</td></tr>
+</table>
+</div>
 Previous version: [00](/waku/standards/core/13/previous-versions/00/store.md)
 
 ## Abstract

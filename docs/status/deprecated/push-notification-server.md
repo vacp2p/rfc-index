@@ -1,13 +1,13 @@
----
-title: PUSH-NOTIFICATION-SERVER
-name: Push notification server
-status: deprecated
-description: Status provides a set of Push notification services that can be used to achieve this functionality.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Andrea Maria Piana <andreap@status.im>
----
+# PUSH-NOTIFICATION-SERVER
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Push notification server</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;</td></tr>
+</table>
+</div>
 ## Reason
 
 Push notifications for iOS devices and some Android devices can only be implemented by relying on [APN service](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1) for iOS or [Firebase](https://firebase.google.com/).

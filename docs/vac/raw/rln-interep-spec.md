@@ -1,13 +1,12 @@
----
-title: RLN-INTEREP-SPEC
-name: Interep as group management for RLN
-status: raw
-category:  
-tags: rln
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
----
+# RLN-INTEREP-SPEC
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Interep as group management for RLN</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This spec integrates [Interep](https://interep.link)

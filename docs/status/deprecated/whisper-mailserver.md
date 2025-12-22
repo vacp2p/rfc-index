@@ -1,14 +1,13 @@
----
-title: WHISPER-MAILSERVER
-name: Whisper mailserver
-status: deprecated
-description: Whisper Mailserver is a Whisper extension that allows to store messages permanently and deliver them to the clients even though they are already not available in the network and expired.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Adam Babik <adam@status.im>
-  - Oskar Thorén <oskar@status.im>
----
+# WHISPER-MAILSERVER
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Whisper mailserver</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 Being mostly offline is an intrinsic property of mobile clients.

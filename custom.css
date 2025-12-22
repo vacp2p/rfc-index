@@ -75,6 +75,32 @@ main h1, main h2, main h3, main h4 {
     margin-bottom: 0.6em;
 }
 
+.rfc-meta {
+    margin: 1rem 0 1.5rem 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--table-border-color);
+    background: var(--bg);
+}
+
+.rfc-meta table {
+    margin: 0;
+    border: none;
+}
+
+.rfc-meta th,
+.rfc-meta td {
+    border: none;
+    padding: 0.2rem 0.4rem 0.2rem 0;
+    text-align: left;
+    vertical-align: top;
+}
+
+.rfc-meta th {
+    width: 10rem;
+    color: var(--sidebar-fg);
+    font-weight: 600;
+}
+
 main p, main li {
     color: var(--fg);
 }

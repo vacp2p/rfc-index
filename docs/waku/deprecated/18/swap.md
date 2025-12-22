@@ -1,12 +1,13 @@
----
-slug: 18
-title: 18/WAKU2-SWAP
-name: Waku SWAP Accounting
-status: deprecated
-editor: Oskar Thorén <oskarth@titanproxy.com>
-contributor: Ebube Ud <ebube@status.im>
----
+# 18/WAKU2-SWAP
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku SWAP Accounting</td></tr>
+<tr><th>Slug</th><td>18</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification outlines how we do accounting and settlement based on the provision

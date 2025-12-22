@@ -1,17 +1,15 @@
----
-slug: 56
-title: 56/STATUS-COMMUNITIES
-name: Status Communities that run over Waku v2
-status: draft
-category: Standards Track
-tags: waku-application
-description: Status Communities allow multiple users to communicate in a discussion space. This is a key feature of the Status application.
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
-- Andrea Piana <andreap@status.im>
-- Prem Chaitanya Prathi <prem@waku.org>
----
+# 56/STATUS-COMMUNITIES
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Communities that run over Waku v2</td></tr>
+<tr><th>Slug</th><td>56</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+<tr><th>Contributors</th><td>Andrea Piana &lt;andreap@status.im&gt;<br>Prem Chaitanya Prathi &lt;prem@waku.org&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This document describes the design of Status Communities over Waku v2,

@@ -1,20 +1,13 @@
----
-title: NOMOS-SDP
-name: Nomos Service Declaration Protocol Specification
-status: raw
-category: 
-tags: participation, validators, declarations
-editor: Marcin Pawlowski <marcin@status.im>
-contributors:
-- Mehmet <mehmet@status.im>
-- Daniel Sanchez Quiros <danielsq@status.im>
-- Álvaro Castro-Castilla <alvaro@status.im>
-- Thomas Lavaur <thomaslavaur@status.im>
-- Filip Dimitrijevic <filip@status.im>
-- Gusto Bacvinka <augustinas@status.im>
-- David Rusu <davidrusu@status.im>
----
+# NOMOS-SDP
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Nomos Service Declaration Protocol Specification</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Editor</th><td>Marcin Pawlowski &lt;marcin@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Mehmet &lt;mehmet@status.im&gt;<br>Daniel Sanchez Quiros &lt;danielsq@status.im&gt;<br>Álvaro Castro-Castilla &lt;alvaro@status.im&gt;<br>Thomas Lavaur &lt;thomaslavaur@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;<br>Gusto Bacvinka &lt;augustinas@status.im&gt;<br>David Rusu &lt;davidrusu@status.im&gt;</td></tr>
+</table>
+</div>
 ## Introduction
 
 This document defines a mechanism enabling validators to declare their participation in specific protocols that require a known and agreed-upon list of participants. Some examples of this are Data Availability and the Blend Network. We create a single repository of identifiers which is used to establish secure communication between validators and provide services. Before being admitted to the repository, the validator proves that it locked at least a minimum stake.

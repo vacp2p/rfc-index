@@ -1,12 +1,13 @@
----
-title: RLN-V2
-name: Rate Limit Nullifier V2
-status: raw
-editor: Rasul Ibragimov <curryrasul@gmail.com>
-contributors: 
-- Lev Soukhanov <0xdeadfae@gmail.com>
----
+# RLN-V2
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Rate Limit Nullifier V2</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Editor</th><td>Rasul Ibragimov &lt;curryrasul@gmail.com&gt;</td></tr>
+<tr><th>Contributors</th><td>Lev Soukhanov &lt;0xdeadfae@gmail.com&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 The protocol specified in this document is an improvement of [32/RLN-V1](../32/rln-v1.md),

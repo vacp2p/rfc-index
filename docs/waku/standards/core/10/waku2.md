@@ -1,17 +1,14 @@
----
-slug: 10
-title: 10/WAKU2
-name: Waku v2
-status: draft
-editor: Hanno Cornelius <hanno@status.im> 
-contributors:
-  - Sanaz Taheri <sanaz@status.im>
-  - Hanno Cornelius <hanno@status.im>
-  - Reeshav Khan <reeshav@status.im>
-  - Daniel Kaiser <danielkaiser@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
----
+# 10/WAKU2
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2</td></tr>
+<tr><th>Slug</th><td>10</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Hanno Cornelius &lt;hanno@status.im&gt;<br>Reeshav Khan &lt;reeshav@status.im&gt;<br>Daniel Kaiser &lt;danielkaiser@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 <!-- timeline:start -->
 
 ## Timeline

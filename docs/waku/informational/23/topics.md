@@ -1,16 +1,15 @@
----
-slug: 23
-title: 23/WAKU2-TOPICS
-name: Waku v2 Topic Usage Recommendations
-status: draft
-category: Informational
-editor: Oskar Thoren <oskarth@titanproxy.com>
-contributors:
-  - Hanno Cornelius <hanno@status.im>
-  - Daniel Kaiser <danielkaiser@status.im>
-  - Filip Dimitrijevic <filip@status.im>
----
+# 23/WAKU2-TOPICS
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Topic Usage Recommendations</td></tr>
+<tr><th>Slug</th><td>23</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Informational</td></tr>
+<tr><th>Editor</th><td>Oskar Thoren &lt;oskarth@titanproxy.com&gt;</td></tr>
+<tr><th>Contributors</th><td>Hanno Cornelius &lt;hanno@status.im&gt;<br>Daniel Kaiser &lt;danielkaiser@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 This document outlines recommended usage of topic names in Waku v2.
 In [10/WAKU2 spec](/waku/standards/core/10/waku2.md) there are two types of topics:
 

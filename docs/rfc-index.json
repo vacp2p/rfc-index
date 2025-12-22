@@ -1,8 +1,8 @@
 [
   {
     "project": "codex",
-    "slug": "CODEX-BLOCK-EXCHANGE",
-    "title": "CODEX-BLOCK-EXCHANGE",
+    "slug": "Codex Block Exchange Protocol",
+    "title": "Codex Block Exchange Protocol",
     "status": "raw",
     "category": "Standards Track",
     "path": "codex/raw/codex-block-exchange.html"
@@ -10,79 +10,79 @@
   {
     "project": "codex",
     "slug": "codex-marketplace",
-    "title": "CODEX-MARKETPLACE",
+    "title": "Codex Storage Marketplace",
     "status": "raw",
     "category": "Standards Track",
     "path": "codex/raw/codex-marketplace.html"
   },
   {
     "project": "nomos",
-    "slug": "CONSENSUS-CLARO",
-    "title": "CONSENSUS-CLARO",
+    "slug": "Claro Consensus Protocol",
+    "title": "Claro Consensus Protocol",
     "status": "deprecated",
     "category": "Standards Track",
     "path": "nomos/deprecated/claro.html"
   },
   {
     "project": "nomos",
-    "slug": "NOMOS-DA-NETWORK",
-    "title": "NOMOS-DA-NETWORK",
+    "slug": "Nomos P2P Network Bootstrapping Specification",
+    "title": "Nomos P2P Network Bootstrapping Specification",
     "status": "raw",
-    "category": "unspecified",
-    "path": "nomos/raw/nomosda-network.html"
-  },
-  {
-    "project": "nomos",
-    "slug": "NOMOS-P2P-NETWORK",
-    "title": "NOMOS-P2P-NETWORK",
-    "status": "draft",
     "category": "networking",
-    "path": "nomos/raw/p2p-network.html"
+    "path": "nomos/raw/p2p-network-bootstrapping.html"
   },
   {
     "project": "nomos",
-    "slug": "NOMOS-SDP",
-    "title": "NOMOS-SDP",
-    "status": "raw",
-    "category": "unspecified",
-    "path": "nomos/raw/sdp.html"
-  },
-  {
-    "project": "nomos",
-    "slug": "NOMOSDA-ENCODING",
-    "title": "NOMOSDA-ENCODING",
-    "status": "raw",
-    "category": "unspecified",
-    "path": "nomos/raw/nomosda-encoding.html"
-  },
-  {
-    "project": "nomos",
-    "slug": "P2P-HARDWARE-REQUIREMENTS",
-    "title": "P2P-HARDWARE-REQUIREMENTS",
-    "status": "raw",
-    "category": "infrastructure",
-    "path": "nomos/raw/p2p-hardware-requirements.html"
-  },
-  {
-    "project": "nomos",
-    "slug": "P2P-NAT-SOLUTION",
-    "title": "P2P-NAT-SOLUTION",
+    "slug": "Nomos P2P Network NAT Solution Specification",
+    "title": "Nomos P2P Network NAT Solution Specification",
     "status": "raw",
     "category": "networking",
     "path": "nomos/raw/p2p-nat-solution.html"
   },
   {
     "project": "nomos",
-    "slug": "P2P-NETWORK-BOOTSTRAPPING",
-    "title": "P2P-NETWORK-BOOTSTRAPPING",
-    "status": "raw",
+    "slug": "Nomos P2P Network Specification",
+    "title": "Nomos P2P Network Specification",
+    "status": "draft",
     "category": "networking",
-    "path": "nomos/raw/p2p-network-bootstrapping.html"
+    "path": "nomos/raw/p2p-network.html"
+  },
+  {
+    "project": "nomos",
+    "slug": "Nomos Service Declaration Protocol Specification",
+    "title": "Nomos Service Declaration Protocol Specification",
+    "status": "raw",
+    "category": "unspecified",
+    "path": "nomos/raw/sdp.html"
+  },
+  {
+    "project": "nomos",
+    "slug": "Nomos p2p Network Hardware Requirements Specification",
+    "title": "Nomos p2p Network Hardware Requirements Specification",
+    "status": "raw",
+    "category": "infrastructure",
+    "path": "nomos/raw/p2p-hardware-requirements.html"
+  },
+  {
+    "project": "nomos",
+    "slug": "NomosDA Encoding Protocol",
+    "title": "NomosDA Encoding Protocol",
+    "status": "raw",
+    "category": "unspecified",
+    "path": "nomos/raw/nomosda-encoding.html"
+  },
+  {
+    "project": "nomos",
+    "slug": "NomosDA Network",
+    "title": "NomosDA Network",
+    "status": "raw",
+    "category": "unspecified",
+    "path": "nomos/raw/nomosda-network.html"
   },
   {
     "project": "status",
     "slug": "24",
-    "title": "24/STATUS-CURATION",
+    "title": "Status Community Directory Curation Voting using Waku v2",
     "status": "draft",
     "category": "unspecified",
     "path": "status/24/curation.html"
@@ -90,15 +90,15 @@
   {
     "project": "status",
     "slug": "28",
-    "title": "28/STATUS-FEATURING",
+    "title": "Status community featuring using waku v2",
     "status": "draft",
     "category": "unspecified",
     "path": "status/28/featuring.html"
   },
   {
     "project": "status",
-    "slug": "3RD-PARTY",
-    "title": "3RD-PARTY",
+    "slug": "3rd party",
+    "title": "3rd party",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/3rd-party.html"
@@ -106,7 +106,7 @@
   {
     "project": "status",
     "slug": "55",
-    "title": "55/STATUS-1TO1-CHAT",
+    "title": "Status 1-to-1 Chat",
     "status": "draft",
     "category": "Standards Track",
     "path": "status/55/1to1-chat.html"
@@ -114,7 +114,7 @@
   {
     "project": "status",
     "slug": "56",
-    "title": "56/STATUS-COMMUNITIES",
+    "title": "Status Communities that run over Waku v2",
     "status": "draft",
     "category": "Standards Track",
     "path": "status/56/communities.html"
@@ -122,7 +122,7 @@
   {
     "project": "status",
     "slug": "61",
-    "title": "61/STATUS-Community-History-Service",
+    "title": "Status Community History Service",
     "status": "draft",
     "category": "Standards Track",
     "path": "status/61/community-history-service.html"
@@ -130,7 +130,7 @@
   {
     "project": "status",
     "slug": "62",
-    "title": "62/STATUS-PAYLOADS",
+    "title": "Status Message Payloads",
     "status": "draft",
     "category": "unspecified",
     "path": "status/62/payloads.html"
@@ -138,7 +138,7 @@
   {
     "project": "status",
     "slug": "63",
-    "title": "63/STATUS-Keycard-Usage",
+    "title": "Status Keycard Usage",
     "status": "draft",
     "category": "Standards Track",
     "path": "status/63/keycard-usage.html"
@@ -146,7 +146,7 @@
   {
     "project": "status",
     "slug": "65",
-    "title": "65/STATUS-ACCOUNT-ADDRESS",
+    "title": "Status Account Address",
     "status": "draft",
     "category": "Standards Track",
     "path": "status/65/account-address.html"
@@ -154,23 +154,23 @@
   {
     "project": "status",
     "slug": "71",
-    "title": "71/STATUS-PUSH-NOTIFICATION-SERVER",
+    "title": "Push Notification Server",
     "status": "draft",
     "category": "Standards Track",
     "path": "status/71/push-notification-server.html"
   },
   {
     "project": "status",
-    "slug": "ACCOUNT",
-    "title": "ACCOUNT",
+    "slug": "Account",
+    "title": "Account",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/account.html"
   },
   {
     "project": "status",
-    "slug": "CLIENT",
-    "title": "CLIENT",
+    "slug": "Client",
+    "title": "Client",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/client.html"
@@ -193,24 +193,16 @@
   },
   {
     "project": "status",
-    "slug": "ETHEREUM-USAGE",
-    "title": "ETHEREUM-USAGE",
-    "status": "deprecated",
-    "category": "unspecified",
-    "path": "status/deprecated/ethereum-usage.html"
-  },
-  {
-    "project": "status",
-    "slug": "GROUP-CHAT",
-    "title": "GROUP-CHAT",
+    "slug": "Group Chat",
+    "title": "Group Chat",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/group-chat.html"
   },
   {
     "project": "status",
-    "slug": "IPFS-gateway-for-Sticker-Pack",
-    "title": "IPFS-gateway-for-Sticker-Pack",
+    "slug": "IPFS gateway for Sticker Pack",
+    "title": "IPFS gateway for Sticker Pack",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/IPFS-gateway-for-sticker-Pack.html"
@@ -225,112 +217,120 @@
   },
   {
     "project": "status",
-    "slug": "NOTIFICATIONS",
-    "title": "NOTIFICATIONS",
-    "status": "deprecated",
-    "category": "unspecified",
-    "path": "status/deprecated/notifications.html"
-  },
-  {
-    "project": "status",
-    "slug": "PAYLOADS",
-    "title": "PAYLOADS",
-    "status": "deprecated",
-    "category": "unspecified",
-    "path": "status/deprecated/payloads.html"
-  },
-  {
-    "project": "status",
-    "slug": "PUSH-NOTIFICATION-SERVER",
-    "title": "PUSH-NOTIFICATION-SERVER",
-    "status": "deprecated",
-    "category": "unspecified",
-    "path": "status/deprecated/push-notification-server.html"
-  },
-  {
-    "project": "status",
-    "slug": "SECURE-TRANSPORT",
-    "title": "SECURE-TRANSPORT",
-    "status": "deprecated",
-    "category": "unspecified",
-    "path": "status/deprecated/secure-transport.html"
-  },
-  {
-    "project": "status",
-    "slug": "STATUS-MVDS-USAGE",
-    "title": "STATUS-MVDS-USAGE",
+    "slug": "MVDS Usage in Status",
+    "title": "MVDS Usage in Status",
     "status": "raw",
     "category": "Best Current Practice",
     "path": "status/raw/status-mvds.html"
   },
   {
     "project": "status",
-    "slug": "STATUS-PROTOCOLS",
-    "title": "STATUS-PROTOCOLS",
+    "slug": "Notifications",
+    "title": "Notifications",
+    "status": "deprecated",
+    "category": "unspecified",
+    "path": "status/deprecated/notifications.html"
+  },
+  {
+    "project": "status",
+    "slug": "Payloads",
+    "title": "Payloads",
+    "status": "deprecated",
+    "category": "unspecified",
+    "path": "status/deprecated/payloads.html"
+  },
+  {
+    "project": "status",
+    "slug": "Push notification server",
+    "title": "Push notification server",
+    "status": "deprecated",
+    "category": "unspecified",
+    "path": "status/deprecated/push-notification-server.html"
+  },
+  {
+    "project": "status",
+    "slug": "Secure Transport",
+    "title": "Secure Transport",
+    "status": "deprecated",
+    "category": "unspecified",
+    "path": "status/deprecated/secure-transport.html"
+  },
+  {
+    "project": "status",
+    "slug": "Status Protocol Stack",
+    "title": "Status Protocol Stack",
     "status": "raw",
     "category": "Standards Track",
     "path": "status/raw/status-app-protocols.html"
   },
   {
     "project": "status",
-    "slug": "STATUS-SIMPLE-SCALING",
-    "title": "STATUS-SIMPLE-SCALING",
+    "slug": "Status Simple Scaling",
+    "title": "Status Simple Scaling",
     "status": "raw",
     "category": "Informational",
     "path": "status/raw/simple-scaling.html"
   },
   {
     "project": "status",
-    "slug": "STATUS-URL-DATA",
-    "title": "STATUS-URL-DATA",
+    "slug": "Status URL Data",
+    "title": "Status URL Data",
     "status": "raw",
     "category": "Standards Track",
     "path": "status/raw/url-data.html"
   },
   {
     "project": "status",
-    "slug": "STATUS-URL-SCHEME",
-    "title": "STATUS-URL-SCHEME",
+    "slug": "Status URL Scheme",
+    "title": "Status URL Scheme",
     "status": "raw",
     "category": "Standards Track",
     "path": "status/raw/url-scheme.html"
   },
   {
     "project": "status",
-    "slug": "WAKU-MAILSERVER",
-    "title": "WAKU-MAILSERVER",
+    "slug": "Status interactions with the Ethereum blockchain",
+    "title": "Status interactions with the Ethereum blockchain",
+    "status": "deprecated",
+    "category": "unspecified",
+    "path": "status/deprecated/ethereum-usage.html"
+  },
+  {
+    "project": "status",
+    "slug": "Waku Mailserver",
+    "title": "Waku Mailserver",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/waku-mailserver.html"
   },
   {
     "project": "status",
-    "slug": "WAKU-USAGE",
-    "title": "WAKU-USAGE",
+    "slug": "Waku Usage",
+    "title": "Waku Usage",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/waku-usage.html"
   },
   {
     "project": "status",
-    "slug": "WHISPER-MAILSERVER",
-    "title": "WHISPER-MAILSERVER",
-    "status": "deprecated",
-    "category": "unspecified",
-    "path": "status/deprecated/whisper-mailserver.html"
-  },
-  {
-    "project": "status",
-    "slug": "WHISPER-USAGE",
-    "title": "WHISPER-USAGE",
+    "slug": "Whisper Usage",
+    "title": "Whisper Usage",
     "status": "deprecated",
     "category": "unspecified",
     "path": "status/deprecated/whisper-usage.html"
   },
   {
+    "project": "status",
+    "slug": "Whisper mailserver",
+    "title": "Whisper mailserver",
+    "status": "deprecated",
+    "category": "unspecified",
+    "path": "status/deprecated/whisper-mailserver.html"
+  },
+  {
     "project": "vac",
     "slug": "1",
-    "title": "1/COSS",
+    "title": "Consensus-Oriented Specification System",
     "status": "draft",
     "category": "Best Current Practice",
     "path": "vac/1/coss.html"
@@ -338,7 +338,7 @@
   {
     "project": "vac",
     "slug": "2",
-    "title": "2/MVDS",
+    "title": "Minimum Viable Data Synchronization",
     "status": "stable",
     "category": "unspecified",
     "path": "vac/2/mvds.html"
@@ -346,7 +346,7 @@
   {
     "project": "vac",
     "slug": "25",
-    "title": "25/LIBP2P-DNS-DISCOVERY",
+    "title": "Libp2p Peer Discovery via DNS",
     "status": "deleted",
     "category": "unspecified",
     "path": "vac/25/libp2p-dns-discovery.html"
@@ -354,7 +354,7 @@
   {
     "project": "vac",
     "slug": "3",
-    "title": "3/REMOTE-LOG",
+    "title": "Remote log specification",
     "status": "draft",
     "category": "unspecified",
     "path": "vac/3/remote-log.html"
@@ -362,7 +362,7 @@
   {
     "project": "vac",
     "slug": "32",
-    "title": "32/RLN-V1",
+    "title": "Rate Limit Nullifier",
     "status": "draft",
     "category": "unspecified",
     "path": "vac/32/rln-v1.html"
@@ -370,119 +370,119 @@
   {
     "project": "vac",
     "slug": "4",
-    "title": "4/MVDS-META",
+    "title": "MVDS Metadata Field",
     "status": "draft",
     "category": "unspecified",
     "path": "vac/4/mvds-meta.html"
   },
   {
     "project": "vac",
-    "slug": "ETH-DCGKA",
-    "title": "ETH-DCGKA",
+    "slug": "Decentralized Key and Session Setup for Secure Messaging over Ethereum",
+    "title": "Decentralized Key and Session Setup for Secure Messaging over Ethereum",
     "status": "raw",
     "category": "informational",
     "path": "vac/raw/decentralized-messaging-ethereum.html"
   },
   {
     "project": "vac",
-    "slug": "ETH-MLS-OFFCHAIN",
-    "title": "ETH-MLS-OFFCHAIN",
-    "status": "raw",
-    "category": "Standards Track",
-    "path": "vac/raw/eth-mls-offchain.html"
-  },
-  {
-    "project": "vac",
-    "slug": "ETH-MLS-ONCHAIN",
-    "title": "ETH-MLS-ONCHAIN",
-    "status": "raw",
-    "category": "Standards Track",
-    "path": "vac/raw/eth-mls-onchain.html"
-  },
-  {
-    "project": "vac",
-    "slug": "ETH-SECPM",
-    "title": "ETH-SECPM",
-    "status": "deleted",
-    "category": "Standards Track",
-    "path": "vac/raw/deleted/eth-secpm.html"
-  },
-  {
-    "project": "vac",
-    "slug": "GOSSIPSUB-TOR-PUSH",
-    "title": "GOSSIPSUB-TOR-PUSH",
+    "slug": "Gossipsub Tor Push",
+    "title": "Gossipsub Tor Push",
     "status": "raw",
     "category": "Standards Track",
     "path": "vac/raw/gossipsub-tor-push.html"
   },
   {
     "project": "vac",
-    "slug": "HASHGRAPHLIKE CONSENSUS",
-    "title": "HASHGRAPHLIKE CONSENSUS",
+    "slug": "Hashgraphlike Consensus Protocol",
+    "title": "Hashgraphlike Consensus Protocol",
     "status": "raw",
     "category": "Standards Track",
     "path": "vac/raw/consensus-hashgraphlike.html"
   },
   {
     "project": "vac",
-    "slug": "LIBP2P-MIX",
-    "title": "LIBP2P-MIX",
-    "status": "raw",
-    "category": "Standards Track",
-    "path": "vac/raw/mix.html"
-  },
-  {
-    "project": "vac",
-    "slug": "LOGOS-CAPABILITY-DISCOVERY",
-    "title": "LOGOS-CAPABILITY-DISCOVERY",
-    "status": "raw",
-    "category": "Standards Track",
-    "path": "vac/raw/logos-capability-discovery.html"
-  },
-  {
-    "project": "vac",
-    "slug": "NOISE-X3DH-DOUBLE-RATCHET",
-    "title": "NOISE-X3DH-DOUBLE-RATCHET",
-    "status": "raw",
-    "category": "Standards Track",
-    "path": "vac/raw/noise-x3dh-double-ratchet.html"
-  },
-  {
-    "project": "vac",
-    "slug": "RLN-INTEREP-SPEC",
-    "title": "RLN-INTEREP-SPEC",
+    "slug": "Interep as group management for RLN",
+    "title": "Interep as group management for RLN",
     "status": "raw",
     "category": "unspecified",
     "path": "vac/raw/rln-interep-spec.html"
   },
   {
     "project": "vac",
-    "slug": "RLN-STEALTH-COMMITMENTS",
-    "title": "RLN-STEALTH-COMMITMENTS",
+    "slug": "Libp2p Mix Protocol",
+    "title": "Libp2p Mix Protocol",
+    "status": "raw",
+    "category": "Standards Track",
+    "path": "vac/raw/mix.html"
+  },
+  {
+    "project": "vac",
+    "slug": "Logos Capability Discovery Protocol",
+    "title": "Logos Capability Discovery Protocol",
+    "status": "raw",
+    "category": "Standards Track",
+    "path": "vac/raw/logos-capability-discovery.html"
+  },
+  {
+    "project": "vac",
+    "slug": "RLN Stealth Commitment Usage",
+    "title": "RLN Stealth Commitment Usage",
     "status": "unknown",
     "category": "Standards Track",
     "path": "vac/raw/rln-stealth-commitments.html"
   },
   {
     "project": "vac",
-    "slug": "RLN-V2",
-    "title": "RLN-V2",
+    "slug": "Rate Limit Nullifier V2",
+    "title": "Rate Limit Nullifier V2",
     "status": "raw",
     "category": "unspecified",
     "path": "vac/raw/rln-v2.html"
   },
   {
     "project": "vac",
-    "slug": "SDS",
-    "title": "SDS",
+    "slug": "Scalable Data Sync protocol for distributed logs",
+    "title": "Scalable Data Sync protocol for distributed logs",
     "status": "raw",
     "category": "unspecified",
     "path": "vac/raw/sds.html"
   },
   {
+    "project": "vac",
+    "slug": "Secure 1-to-1 channel setup using X3DH and the double ratchet",
+    "title": "Secure 1-to-1 channel setup using X3DH and the double ratchet",
+    "status": "raw",
+    "category": "Standards Track",
+    "path": "vac/raw/noise-x3dh-double-ratchet.html"
+  },
+  {
+    "project": "vac",
+    "slug": "Secure channel setup using Ethereum accounts",
+    "title": "Secure channel setup using Ethereum accounts",
+    "status": "deleted",
+    "category": "Standards Track",
+    "path": "vac/raw/deleted/eth-secpm.html"
+  },
+  {
+    "project": "vac",
+    "slug": "Secure channel setup using decentralized MLS and Ethereum accounts",
+    "title": "Secure channel setup using decentralized MLS and Ethereum accounts",
+    "status": "raw",
+    "category": "Standards Track",
+    "path": "vac/raw/eth-mls-onchain.html"
+  },
+  {
+    "project": "vac",
+    "slug": "Secure channel setup using decentralized MLS and Ethereum accounts",
+    "title": "Secure channel setup using decentralized MLS and Ethereum accounts",
+    "status": "raw",
+    "category": "Standards Track",
+    "path": "vac/raw/eth-mls-offchain.html"
+  },
+  {
     "project": "waku",
     "slug": "10",
-    "title": "10/WAKU2",
+    "title": "Waku v2",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/10/waku2.html"
@@ -490,7 +490,7 @@
   {
     "project": "waku",
     "slug": "11",
-    "title": "11/WAKU2-RELAY",
+    "title": "Waku v2 Relay",
     "status": "stable",
     "category": "unspecified",
     "path": "waku/standards/core/11/relay.html"
@@ -498,7 +498,7 @@
   {
     "project": "waku",
     "slug": "12",
-    "title": "12/WAKU2-FILTER",
+    "title": "Waku v2 Filter",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/12/filter.html"
@@ -506,7 +506,7 @@
   {
     "project": "waku",
     "slug": "13",
-    "title": "13/WAKU2-STORE",
+    "title": "Waku Store Query",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/13/store.html"
@@ -514,7 +514,7 @@
   {
     "project": "waku",
     "slug": "14",
-    "title": "14/WAKU2-MESSAGE",
+    "title": "Waku v2 Message",
     "status": "stable",
     "category": "Standards Track",
     "path": "waku/standards/core/14/message.html"
@@ -522,7 +522,7 @@
   {
     "project": "waku",
     "slug": "15",
-    "title": "15/WAKU-BRIDGE",
+    "title": "Waku Bridge",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/15/bridge.html"
@@ -530,7 +530,7 @@
   {
     "project": "waku",
     "slug": "16",
-    "title": "16/WAKU2-RPC",
+    "title": "Waku v2 RPC API",
     "status": "deprecated",
     "category": "unspecified",
     "path": "waku/deprecated/16/rpc.html"
@@ -538,7 +538,7 @@
   {
     "project": "waku",
     "slug": "17",
-    "title": "17/WAKU2-RLN-RELAY",
+    "title": "Waku v2 RLN Relay",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/17/rln-relay.html"
@@ -546,7 +546,7 @@
   {
     "project": "waku",
     "slug": "18",
-    "title": "18/WAKU2-SWAP",
+    "title": "Waku SWAP Accounting",
     "status": "deprecated",
     "category": "unspecified",
     "path": "waku/deprecated/18/swap.html"
@@ -554,7 +554,7 @@
   {
     "project": "waku",
     "slug": "19",
-    "title": "19/WAKU2-LIGHTPUSH",
+    "title": "Waku v2 Light Push",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/19/lightpush.html"
@@ -562,7 +562,7 @@
   {
     "project": "waku",
     "slug": "20",
-    "title": "20/TOY-ETH-PM",
+    "title": "Toy Ethereum Private Message",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/application/20/toy-eth-pm.html"
@@ -570,7 +570,7 @@
   {
     "project": "waku",
     "slug": "21",
-    "title": "21/WAKU2-FAULT-TOLERANT-STORE",
+    "title": "Waku v2 Fault-Tolerant Store",
     "status": "deleted",
     "category": "unspecified",
     "path": "waku/deprecated/fault-tolerant-store.html"
@@ -578,7 +578,7 @@
   {
     "project": "waku",
     "slug": "22",
-    "title": "22/TOY-CHAT",
+    "title": "Waku v2 Toy Chat",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/informational/22/toy-chat.html"
@@ -586,7 +586,7 @@
   {
     "project": "waku",
     "slug": "23",
-    "title": "23/WAKU2-TOPICS",
+    "title": "Waku v2 Topic Usage Recommendations",
     "status": "draft",
     "category": "Informational",
     "path": "waku/informational/23/topics.html"
@@ -594,7 +594,7 @@
   {
     "project": "waku",
     "slug": "26",
-    "title": "26/WAKU2-PAYLOAD",
+    "title": "Waku Message Payload Encryption",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/application/26/payload.html"
@@ -602,7 +602,7 @@
   {
     "project": "waku",
     "slug": "27",
-    "title": "27/WAKU2-PEERS",
+    "title": "Waku v2 Client Peer Management Recommendations",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/informational/27/peers.html"
@@ -610,7 +610,7 @@
   {
     "project": "waku",
     "slug": "29",
-    "title": "29/WAKU2-CONFIG",
+    "title": "Waku v2 Client Parameter Configuration Recommendations",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/informational/29/config.html"
@@ -618,7 +618,7 @@
   {
     "project": "waku",
     "slug": "30",
-    "title": "30/ADAPTIVE-NODES",
+    "title": "Adaptive nodes",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/informational/30/adaptive-nodes.html"
@@ -626,7 +626,7 @@
   {
     "project": "waku",
     "slug": "31",
-    "title": "31/WAKU2-ENR",
+    "title": "Waku v2 usage of ENR",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/31/enr.html"
@@ -634,7 +634,7 @@
   {
     "project": "waku",
     "slug": "33",
-    "title": "33/WAKU2-DISCV5",
+    "title": "Waku v2 Discv5 Ambient Peer Discovery",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/33/discv5.html"
@@ -642,7 +642,7 @@
   {
     "project": "waku",
     "slug": "34",
-    "title": "34/WAKU2-PEER-EXCHANGE",
+    "title": "Waku2 Peer Exchange",
     "status": "draft",
     "category": "Standards Track",
     "path": "waku/standards/core/34/peer-exchange.html"
@@ -650,7 +650,7 @@
   {
     "project": "waku",
     "slug": "36",
-    "title": "36/WAKU2-BINDINGS-API",
+    "title": "Waku v2 C Bindings API",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/36/bindings-api.html"
@@ -658,7 +658,7 @@
   {
     "project": "waku",
     "slug": "5",
-    "title": "5/WAKU0",
+    "title": "Waku v0",
     "status": "deprecated",
     "category": "unspecified",
     "path": "waku/deprecated/5/waku0.html"
@@ -666,7 +666,7 @@
   {
     "project": "waku",
     "slug": "53",
-    "title": "53/WAKU2-X3DH",
+    "title": "X3DH usage for Waku payload encryption",
     "status": "draft",
     "category": "Standards Track",
     "path": "waku/standards/application/53/x3dh.html"
@@ -674,7 +674,7 @@
   {
     "project": "waku",
     "slug": "54",
-    "title": "54/WAKU2-X3DH-SESSIONS",
+    "title": "Session management for Waku X3DH",
     "status": "draft",
     "category": "Standards Track",
     "path": "waku/standards/application/54/x3dh-sessions.html"
@@ -682,7 +682,7 @@
   {
     "project": "waku",
     "slug": "6",
-    "title": "6/WAKU1",
+    "title": "Waku v1",
     "status": "stable",
     "category": "unspecified",
     "path": "waku/standards/legacy/6/waku1.html"
@@ -690,7 +690,7 @@
   {
     "project": "waku",
     "slug": "64",
-    "title": "64/WAKU2-NETWORK",
+    "title": "Waku v2 Network",
     "status": "draft",
     "category": "Best Current Practice",
     "path": "waku/standards/core/64/network.html"
@@ -698,7 +698,7 @@
   {
     "project": "waku",
     "slug": "66",
-    "title": "66/WAKU2-METADATA",
+    "title": "Waku Metadata Protocol",
     "status": "draft",
     "category": "unspecified",
     "path": "waku/standards/core/66/metadata.html"
@@ -706,7 +706,7 @@
   {
     "project": "waku",
     "slug": "7",
-    "title": "7/WAKU-DATA",
+    "title": "Waku Envelope data field",
     "status": "stable",
     "category": "unspecified",
     "path": "waku/standards/legacy/7/data.html"
@@ -714,7 +714,7 @@
   {
     "project": "waku",
     "slug": "8",
-    "title": "8/WAKU-MAIL",
+    "title": "Waku Mailserver",
     "status": "stable",
     "category": "unspecified",
     "path": "waku/standards/legacy/8/mail.html"
@@ -722,7 +722,7 @@
   {
     "project": "waku",
     "slug": "9",
-    "title": "9/WAKU-RPC",
+    "title": "Waku RPC API",
     "status": "stable",
     "category": "unspecified",
     "path": "waku/standards/legacy/9/rpc.html"

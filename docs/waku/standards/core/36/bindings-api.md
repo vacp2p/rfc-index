@@ -1,14 +1,14 @@
----
-slug: 36
-title: 36/WAKU2-BINDINGS-API
-name: Waku v2 C Bindings API
-status: draft
-tags: waku-core
-editor: Richard Ramos <richard@status.im>
-contributors:
-- Franck Royer <franck@status.im>
----
+# 36/WAKU2-BINDINGS-API
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 C Bindings API</td></tr>
+<tr><th>Slug</th><td>36</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Richard Ramos &lt;richard@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
+</table>
+</div>
 ## Introduction
 
 Native applications that wish to integrate Waku may not be able to use nwaku and

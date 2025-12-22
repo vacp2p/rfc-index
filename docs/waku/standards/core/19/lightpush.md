@@ -1,14 +1,14 @@
----
-slug: 19
-title: 19/WAKU2-LIGHTPUSH
-name: Waku v2 Light Push
-status: draft
-editor: Hanno Cornelius <hanno@status.im> 
-contributors: 
-  - Daniel Kaiser <danielkaiser@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
----
+# 19/WAKU2-LIGHTPUSH
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Light Push</td></tr>
+<tr><th>Slug</th><td>19</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 **Protocol identifier**: `/vac/waku/lightpush/2.0.0-beta1`
 
 ## Motivation and Goals

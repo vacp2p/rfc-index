@@ -1,19 +1,15 @@
----
-slug: 14
-title: 14/WAKU2-MESSAGE
-name: Waku v2 Message
-status: stable
-category: Standards Track
-tags: waku/core-protocol
-editor: Hanno Cornelius <hanno@status.im>
-contributors:
-  - Sanaz Taheri <sanaz@status.im>
-  - Aaryamann Challani <p1ge0nh8er@proton.me>
-  - Lorenzo Delgado <lorenzo@status.im>
-  - Abhimanyu Rawat <abhi@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
----
+# 14/WAKU2-MESSAGE
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Message</td></tr>
+<tr><th>Slug</th><td>14</td></tr>
+<tr><th>Status</th><td>stable</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;<br>Lorenzo Delgado &lt;lorenzo@status.im&gt;<br>Abhimanyu Rawat &lt;abhi@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 [10/WAKU2](/waku/standards/core/10/waku2.md) is a family of modular peer-to-peer protocols

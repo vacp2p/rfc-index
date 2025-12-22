@@ -1,13 +1,14 @@
----
-slug: 30
-title: 30/ADAPTIVE-NODES
-name: Adaptive nodes
-status: draft
-editor: Oskar Thorén <oskarth@titanproxy.com>
-contributors:
- - Filip Dimitrijevic <filip@status.im>
----
+# 30/ADAPTIVE-NODES
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Adaptive nodes</td></tr>
+<tr><th>Slug</th><td>30</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 This is an informational spec that show cases the concept of adaptive nodes.
 
 ## Node types - a continuum

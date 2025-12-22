@@ -1,14 +1,14 @@
----
-title: ETH-MLS-OFFCHAIN
-name: Secure channel setup using decentralized MLS and Ethereum accounts
-status: raw
-category: Standards Track
-tags:
-editor: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
-contributors: seemenkina [ekaterina@status.im](mailto:ekaterina@status.im)
+# ETH-MLS-OFFCHAIN
 
----
-
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Secure channel setup using decentralized MLS and Ethereum accounts</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Ugur Sen [ugur@status.im](mailto:ugur@status.im)</td></tr>
+<tr><th>Contributors</th><td>s<br>e<br>e<br>m<br>e<br>n<br>k<br>i<br>n<br>a<br> <br>[<br>e<br>k<br>a<br>t<br>e<br>r<br>i<br>n<br>a<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>]<br>(<br>m<br>a<br>i<br>l<br>t<br>o<br>:<br>e<br>k<br>a<br>t<br>e<br>r<br>i<br>n<br>a<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>)</td></tr>
+</table>
+</div>
 ## Abstract
 
 The following document specifies Ethereum authenticated scalable

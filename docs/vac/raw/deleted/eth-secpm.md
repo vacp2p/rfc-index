@@ -1,13 +1,13 @@
----
-title: ETH-SECPM
-name: Secure channel setup using Ethereum accounts
-status: deleted
-category: Standards Track
-tags:
-editor: Ramses Fernandez <ramses@status.im>
-contributors:
----
+# ETH-SECPM
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Secure channel setup using Ethereum accounts</td></tr>
+<tr><th>Status</th><td>deleted</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Ramses Fernandez &lt;ramses@status.im&gt;</td></tr>
+</table>
+</div>
 ## NOTE
 
 The content of this specification has been split between
