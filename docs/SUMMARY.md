@@ -2,7 +2,7 @@
 
 [Introduction](README.md)
 
-- [Vac]()
+- [Vac](vac/README.md)
   - [1/COSS](vac/1/coss.md)
   - [2/MVDS](vac/2/mvds.md)
   - [3/Remote Log](vac/3/remote-log.md)
@@ -25,8 +25,7 @@
     - [SDS](vac/raw/sds.md)
   - [Template](vac/template.md)
 
-- [Waku]()
-  - [Overview](waku/README.md)
+- [Waku](waku/README.md)
   - [Standards - Core](waku/standards/core/README.md)
     - [10/Waku2](waku/standards/core/10/waku2.md)
     - [11/Relay](waku/standards/core/11/relay.md)
@@ -64,8 +63,7 @@
     - [18/Swap](waku/deprecated/18/swap.md)
     - [Fault Tolerant Store](waku/deprecated/fault-tolerant-store.md)
 
-- [Nomos]()
-  - [Overview](nomos/README.md)
+- [Nomos](nomos/README.md)
   - [Raw](nomos/raw/README.md)
     - [NomosDA Encoding](nomos/raw/nomosda-encoding.md)
     - [NomosDA Network](nomos/raw/nomosda-network.md)
@@ -77,14 +75,12 @@
   - [Deprecated](nomos/deprecated/README.md)
     - [Claro](nomos/deprecated/claro.md)
 
-- [Codex]()
-  - [Overview](codex/README.md)
+- [Codex](codex/README.md)
   - [Raw](codex/raw/README.md)
     - [Block Exchange](codex/raw/codex-block-exchange.md)
     - [Marketplace](codex/raw/codex-marketplace.md)
 
-- [Status]()
-  - [Overview](status/README.md)
+- [Status](status/README.md)
   - [24/Curation](status/24/curation.md)
   - [28/Featuring](status/28/featuring.md)
   - [55/1-to-1 Chat](status/55/1to1-chat.md)

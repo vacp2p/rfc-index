@@ -8,6 +8,7 @@
 <tr><th>Contributors</th><td>Eric Dvorsak &lt;eric@status.im&gt;</td></tr>
 </table>
 </div>
+
 ## Local Notifications
 
 A client should implement local notifications to offer notifications

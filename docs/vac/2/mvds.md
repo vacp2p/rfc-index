@@ -10,7 +10,7 @@
 </table>
 </div>
 In this specification, we describe a minimum viable protocol for
-data synchronization inspired by the Bramble Synchronization Protocol[^1].
+data synchronization inspired by the Bramble Synchronization Protocol ([BSP](https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BSP.md)).
 This protocol is designed to ensure reliable messaging
 between peers across an unreliable peer-to-peer (P2P) network where
 they may be unreachable or unresponsive.
@@ -187,5 +187,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## Footnotes
 
-[^1]: akwizgran et al. [BSP](https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BSP.md). Briar.
 [^2]: <https://github.com/vacp2p/mvds>
