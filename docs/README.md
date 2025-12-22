@@ -1,47 +1,135 @@
-# Vac Request For Comments(RFC)
+# Vac RFC Index
 
-*NOTE*: This repo is WIP. We are currently restructuring the RFC process.
+An IETF-style index of Vac-managed RFCs across Waku, Nomos, Codex, and Status. Use the filters below to jump straight to a specification.
 
-This repository contains specifications from the [Waku](https://waku.org/), [Nomos](https://nomos.tech/),
-[Codex](https://codex.storage/), and
-[Status](https://status.app/) projects that are part of the [IFT portfolio](https://free.technology/).
-[Vac](https://vac.dev) is an
-[IFT service](https://free.technology/services) that will manage the RFC,
-[Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments),
-process within this repository.
+<div class="landing-hero">
+  <div class="filter-row">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status, project…" aria-label="Search RFCs">
+    <div class="chips" id="status-chips">
+      <span class="chip active" data-status="all">All</span>
+      <span class="chip" data-status="stable">Stable</span>
+      <span class="chip" data-status="draft">Draft</span>
+      <span class="chip" data-status="raw">Raw</span>
+      <span class="chip" data-status="deprecated">Deprecated</span>
+      <span class="chip" data-status="deleted">Deleted</span>
+    </div>
+  </div>
+  <div class="filter-row">
+    <div class="chips" id="project-chips">
+      <span class="chip active" data-project="all">All projects</span>
+      <span class="chip" data-project="vac">Vac</span>
+      <span class="chip" data-project="waku">Waku</span>
+      <span class="chip" data-project="status">Status</span>
+      <span class="chip" data-project="nomos">Nomos</span>
+      <span class="chip" data-project="codex">Codex</span>
+    </div>
+  </div>
+  <div class="quick-links">
+    <a href="./vac/1/coss.html">1/COSS (Process)</a>
+    <a href="./vac/README.html">Vac index</a>
+    <a href="./waku/README.html">Waku index</a>
+    <a href="./status/README.html">Status index</a>
+    <a href="./nomos/README.html">Nomos index</a>
+    <a href="./codex/README.html">Codex index</a>
+  </div>
+</div>
 
-## New RFC Process
+<div id="rfc-table-container"></div>
 
-This repository replaces the previous `rfc.vac.dev` resource.
-Each project will maintain initial specifications in separate repositories,
-which may be considered as a **raw** specification.
-All [Vac](https://vac.dev) **raw** specifications and
-discussions will live in the Vac subdirectory.
-When projects have reached some level of maturity
-for a specification living in their repository,
-the process of updating the status to **draft** may begin in this repository.
-Specifications will adhere to
-[1/COSS](./vac/1/coss.md) before obtaining **draft** status.
+<script>
+let rfcData = [];
+const container = document.getElementById('rfc-table-container');
 
-Implementations should follow specifications as described,
-and all contributions will be discussed before the **stable** status is obtained.
-The goal of this RFC process will to engage all interseted parities and
-reach a rough consensus for techcinal specifications.
+const table = document.createElement('table');
+table.className = 'rfc-table';
+table.innerHTML = `
+  <thead>
+    <tr>
+      <th style="width: 10%">RFC</th>
+      <th style="width: 40%">Title</th>
+      <th style="width: 15%">Project</th>
+      <th style="width: 15%">Status</th>
+      <th style="width: 20%">Category</th>
+    </tr>
+</thead>
+  <tbody></tbody>
+`;
+container.appendChild(table);
 
-## Contributing
+let statusFilter = 'all';
+let projectFilter = 'all';
 
-Please see [1/COSS](./vac/1/coss.md) for general guidelines and specification lifecycle.
+function badge(status) {
+  const cls = `badge status-${status.toLowerCase().split('/')[0]}`;
+  return `<span class="${cls}">${status}</span>`;
+}
 
-Feel free to join the [Vac discord](https://discord.gg/Vy54fEWuqC).
+function render() {
+  const tbody = table.querySelector('tbody');
+  const query = (document.getElementById('rfc-search').value || '').toLowerCase();
+  tbody.innerHTML = '';
 
-Here's the project board used by core contributors and maintainers: [Projects](https://github.com/orgs/vacp2p/projects/5)
+  const filtered = rfcData.filter(item => {
+    const statusOk = statusFilter === 'all' || item.status.toLowerCase().startsWith(statusFilter);
+    const projectOk = projectFilter === 'all' || item.project === projectFilter;
+    const text = `${item.slug} ${item.title} ${item.project} ${item.status} ${item.category}`.toLowerCase();
+    const textOk = !query || text.includes(query);
+    return statusOk && projectOk && textOk;
+  });
 
-## IFT Projects' Raw Specifications
+  filtered.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><a href="./${item.path}">${item.slug}</a></td>
+      <td>${item.title}</td>
+      <td>${item.project}</td>
+      <td>${badge(item.status)}</td>
+      <td>${item.category}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
-The repository for each project **raw** specifications:
+document.getElementById('rfc-search').addEventListener('input', render);
 
-- [Vac Raw Specifications](./vac/raw)
-- [Status Raw Specifications](./status/raw)
-- [Waku Raw Specificiations](https://github.com/waku-org/specs/tree/master)
-- [Codex Raw Specifications](none)
-- [Nomos Raw Specifications](https://github.com/logos-co/nomos-specs)
+document.getElementById('status-chips').addEventListener('click', (e) => {
+  if (!e.target.dataset.status) return;
+  statusFilter = e.target.dataset.status;
+  document.querySelectorAll('#status-chips .chip').forEach(ch => ch.classList.toggle('active', ch.dataset.status === statusFilter));
+  render();
+});
+
+document.getElementById('project-chips').addEventListener('click', (e) => {
+  if (!e.target.dataset.project) return;
+  projectFilter = e.target.dataset.project;
+  document.querySelectorAll('#project-chips .chip').forEach(ch => ch.classList.toggle('active', ch.dataset.project === projectFilter));
+  render();
+});
+
+function setStatus(text) {
+  let statusEl = document.getElementById('table-status');
+  if (!statusEl) {
+    statusEl = document.createElement('div');
+    statusEl.id = 'table-status';
+    statusEl.style.margin = '0.4rem 0';
+    container.prepend(statusEl);
+  }
+  statusEl.textContent = text;
+}
+
+setStatus('Loading index…');
+fetch('./rfc-index.json')
+  .then(resp => {
+    if (!resp.ok) throw new Error(resp.statusText);
+    return resp.json();
+  })
+  .then(data => {
+    rfcData = data.filter(item => item.slug !== 'XX');
+    setStatus(`${rfcData.length} RFCs loaded`);
+    render();
+  })
+  .catch(err => {
+    console.error(err);
+    setStatus('Failed to load RFC index. Please reload.');
+  });
+</script>
