@@ -459,6 +459,7 @@ The REGISTER message is used by advertisers to register their advertisements wit
 **Record Field Encoding:**
 
 The `record` field MUST encode the Advertisement as follows:
+
 - `record.key` = `service_id_hash` (MUST match message `key` field)
 - `record.value` = Serialized Advertisement protobuf containing:
   - `service_id_hash` (bytes)
@@ -472,6 +473,7 @@ The `record` field MUST encode the Advertisement as follows:
 **Ticket Field (if present):**
 
 When retrying registration, the `ticket` field MUST contain:
+
 - `ad` (Advertisement) = Copy of original advertisement
 - `t_init` (uint64) = Initial ticket creation timestamp (Unix seconds)
 - `t_mod` (uint64) = Last modification timestamp (Unix seconds)
@@ -516,6 +518,7 @@ Message {
 | `clusterLevelRaw` | UNUSED | Not used |
 
 **Status Field Values:**
+
 - `CONFIRMED` (0): Advertisement accepted and stored in `ad_cache`
 - `WAIT` (1): Advertisement not yet accepted, ticket provided with waiting time
 - `REJECTED` (2): Advertisement rejected (signature invalid, duplicate, or other error)
@@ -523,6 +526,7 @@ Message {
 **Ticket Field (when status = WAIT):**
 
 MUST contain:
+
 - `ad` (Advertisement) = Copy of the advertisement from request
 - `t_init` (uint64) = Ticket creation timestamp (set on first attempt, preserved on retries)
 - `t_mod` (uint64) = Current timestamp (updated on each response)
@@ -531,12 +535,16 @@ MUST contain:
 
 **CloserPeers Field:**
 
-MUST contain a list of Peer objects to help populate the advertiser's `AdvT(service_id_hash)` table. Each Peer object SHOULD include:
+MUST contain a list of Peer objects to help populate
+the advertiser's `AdvT(service_id_hash)` table.
+Each Peer object SHOULD include:
+
 - `id` (bytes) = Peer ID
 - `addrs` (repeated bytes) = Multiaddrs of the peer
 - `connection` (ConnectionType) = Optional connection status
 
-The registrar SHOULD return one peer from each bucket of its `RegT(service_id_hash)` table using the `GETPEERS()` algorithm.
+The registrar SHOULD return one peer from each bucket of
+its `RegT(service_id_hash)` table using the `GETPEERS()` algorithm.
 
 **Example Response Structure (WAIT):**
 
@@ -620,7 +628,9 @@ Message {
 
 **Ads Field:**
 
-MUST contain up to `F_return` (default: 10) Advertisement objects retrieved from the registrar's `ad_cache`. Each Advertisement MUST include:
+MUST contain up to `F_return` Advertisement objects retrieved from the registrar's `ad_cache`.
+Each Advertisement MUST include:
+
 - `service_id_hash` (bytes) = Hash of the service protocol ID
 - `peerID` (bytes) = Peer ID of the advertiser
 - `addrs` (repeated bytes) = Multiaddrs of the advertiser
@@ -678,17 +688,23 @@ Registrars MUST validate incoming REGISTER requests:
 1. **Type field**: MUST be `REGISTER` (6)
 2. **Key field**: MUST be 32 bytes (valid SHA-256 hash)
 3. **Record field**: MUST be present and properly formatted:
+
    - `record.key` MUST equal message `key` field
    - `record.value` MUST contain valid serialized Advertisement
+
 4. **Advertisement validation**:
+
    - `service_id_hash` MUST be 32 bytes
    - `peerID` MUST be valid libp2p peer ID
    - `addrs` MUST contain at least one valid multiaddr
    - `signature` MUST be valid Ed25519 signature over (service_id_hash || peerID || addrs)
+
 5. **Ticket validation** (if present):
+
    - `ticket.signature` MUST be valid and issued by this registrar
    - `ticket.ad` MUST match current request's advertisement
    - Current time MUST be within registration window: `ticket.t_mod + ticket.t_wait_for ≤ NOW() ≤ ticket.t_mod + ticket.t_wait_for + δ`
+
 6. **Duplicate check**: Advertisement MUST NOT already exist in `ad_cache`
 
 If any validation fails, registrar MUST respond with `status = REJECTED`.
