@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import argparse
 import subprocess
 from typing import List, Tuple, Optional, Dict
 from pathlib import Path
@@ -157,7 +156,11 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
         return False
 
     insert_pos = 0
-    if content.startswith("---"):
+    if '<div class="rfc-meta">' in content:
+        meta_end = content.find("</div>", content.find('<div class="rfc-meta">'))
+        if meta_end != -1:
+            insert_pos = meta_end + len("</div>")
+    elif content.startswith("---"):
         second = content.find("\n---", 3)
         if second != -1:
             insert_pos = second + len("\n---")
@@ -169,41 +172,52 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
     return False
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file", help="File path inside repo")
-    parser.add_argument("--repo-url", help="Override repo URL")
-    parser.add_argument("--write", action="store_true", help="Inject timeline into the file")
-    args = parser.parse_args()
+def find_rfc_files(root: Path) -> List[Path]:
+    candidates: List[Path] = []
+    for path in root.rglob("*.md"):
+        if path.name in {"README.md", "SUMMARY.md", "template.md"}:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        if '<div class="rfc-meta">' not in text:
+            continue
+        candidates.append(path)
+    return sorted(candidates)
 
+
+def main():
     log("Starting history generation")
 
-    repo_url = args.repo_url or get_repo_https_url()
+    repo_url = get_repo_https_url()
     if not repo_url:
         raise SystemExit("[ERROR] Could not determine GitHub repo URL")
 
     log(f"Repo URL: {repo_url}")
 
-    repo_file_path = get_repo_file_path(args.file)
+    root = Path("docs")
+    files = find_rfc_files(root)
+    if not files:
+        raise SystemExit(f"[ERROR] No RFCs found under {root}")
 
-    commits = get_file_commits(repo_file_path)
-    if not commits:
-        raise SystemExit(f"[ERROR] No history found for {repo_file_path}")
+    updated = 0
+    for file_path in files:
+        repo_file_path = get_repo_file_path(str(file_path))
+        commits = get_file_commits(repo_file_path)
+        if not commits:
+            log(f"[WARN] No history found for {repo_file_path}")
+            continue
 
-    markdown = build_markdown_history(
-        repo_url=repo_url,
-        file_path=repo_file_path,
-        commits=commits,
-    )
+        markdown = build_markdown_history(
+            repo_url=repo_url,
+            file_path=repo_file_path,
+            commits=commits,
+        )
 
-    if args.write:
-        modified = inject_timeline(Path(args.file), markdown)
+        modified = inject_timeline(file_path, markdown)
         if modified:
-            log(f"Timeline injected into {args.file}")
-        else:
-            log("No changes made (timeline already up to date).")
-    else:
-        print("\n" + markdown)
+            updated += 1
+            log(f"Timeline injected into {file_path}")
+
+    log(f"Timelines updated in {updated} files")
 
 
 if __name__ == "__main__":
