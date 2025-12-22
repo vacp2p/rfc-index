@@ -1,13 +1,13 @@
----
-title: IPFS-gateway-for-Sticker-Pack
-name: IPFS gateway for Sticker Pack
-status: deprecated
-description: This specification describes how Status uses the IPFS gateway to store stickers. 
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Gheorghe Pinzaru <gheorghe@status.im>
----
+# IPFS-gateway-for-Sticker-Pack
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>IPFS gateway for Sticker Pack</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Gheorghe Pinzaru &lt;gheorghe@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes how Status uses the IPFS gateway  

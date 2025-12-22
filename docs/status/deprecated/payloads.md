@@ -1,15 +1,13 @@
----
-title: PAYLOADS
-name: Payloads
-status: deprecated
-description: Payload of messages in Status, regarding chat and chat-related use cases.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-- Adam Babik <adam@status.im>
-- Andrea Maria Piana <andreap@status.im>
-- Oskar Thorén <oskar@status.im>
----
+# PAYLOADS
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Payloads</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes how the payload of each message in Status looks like.

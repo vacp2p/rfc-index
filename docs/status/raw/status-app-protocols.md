@@ -1,16 +1,14 @@
----
-title: STATUS-PROTOCOLS
-name: Status Protocol Stack
-status: raw
-category: Standards Track
-description: Specifies the Status application protocol stack.
-editor: Hanno Cornelius <hanno@status.im>
-contributors: 
-- Jimmy Debe <jimmy@status.im>
-- Aaryamann Challani <p1ge0nh8er@proton.me>
+# STATUS-PROTOCOLS
 
----
-
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Protocol Stack</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Jimmy Debe &lt;jimmy@status.im&gt;<br>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes the Status Application protocol stack.

@@ -1,15 +1,14 @@
----
-title: STATUS-SIMPLE-SCALING
-name: Status Simple Scaling
-status: raw
-category: Informational
-tags: waku/application
-description: Describes how to scale Status Communities and Status 1-to-1 chats using Waku v2 protocol and components.
-editor: Daniel Kaiser <danielkaiser@status.im>
-contributors:
-- Alvaro Revuelta <alrevuelta@status.im>
----
+# STATUS-SIMPLE-SCALING
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Simple Scaling</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Informational</td></tr>
+<tr><th>Editor</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Alvaro Revuelta &lt;alrevuelta@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This document describes how to scale

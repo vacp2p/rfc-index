@@ -1,15 +1,13 @@
----
-title: ACCOUNT
-name: Account
-status: deprecated
-description: This specification explains what a Status account is, and how a node establishes trust.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Corey Petty <corey@status.im>
-  - Oskar Thorén <oskar@status.im>
-  - Samuel Hawksby-Robinson <samuel@status.im>
----
+# ACCOUNT
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Account</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification explains what a Status account is,  

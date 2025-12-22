@@ -1,13 +1,13 @@
----
-title: 3RD-PARTY
-name: 3rd party
-status: deprecated
-description: This specification discusses 3rd party APIs that Status relies on.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Volodymyr Kozieiev <volodymyr@status.im>
----
+# 3RD-PARTY
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>3rd party</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Volodymyr Kozieiev &lt;volodymyr@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification discusses 3rd party APIs that Status relies on.  

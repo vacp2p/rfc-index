@@ -1,13 +1,13 @@
----
-slug: 24
-title: 24/STATUS-CURATION
-name: Status Community Directory Curation Voting using Waku v2
-status: draft
-tags: waku-application
-description: A voting protocol for SNT holders to submit votes to a smart contract. Voting is immutable, which helps avoid sabotage from malicious peers.
-editor: Szymon Szlachtowicz <szymon.s@ethworks.io>
----
+# 24/STATUS-CURATION
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Community Directory Curation Voting using Waku v2</td></tr>
+<tr><th>Slug</th><td>24</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Szymon Szlachtowicz &lt;szymon.s@ethworks.io&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification is a voting protocol for peers to submit votes to a smart contract.

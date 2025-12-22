@@ -1,13 +1,14 @@
----
-slug: 27
-title: 27/WAKU2-PEERS
-name: Waku v2 Client Peer Management Recommendations
-status: draft
-editor: Hanno Cornelius <hanno@status.im>
-contributors:
- - Filip Dimitrijevic <filip@status.im>
----
+# 27/WAKU2-PEERS
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Client Peer Management Recommendations</td></tr>
+<tr><th>Slug</th><td>27</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 `27/WAKU2-PEERS` describes a recommended minimal set of peer storage and
 peer management features to be implemented by Waku v2 clients.
 

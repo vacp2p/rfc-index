@@ -1,47 +1,46 @@
-# Vac Request For Comments(RFC)
+# Vac RFC Index
 
-*NOTE*: This repo is WIP. We are currently restructuring the RFC process.
+An IETF-style index of Vac-managed RFCs across Waku, Nomos, Codex, and Status. Use the filters below to jump straight to a specification.
 
-This repository contains specifications from the [Waku](https://waku.org/), [Nomos](https://nomos.tech/),
-[Codex](https://codex.storage/), and
-[Status](https://status.app/) projects that are part of the [IFT portfolio](https://free.technology/).
-[Vac](https://vac.dev) is an
-[IFT service](https://free.technology/services) that will manage the RFC,
-[Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments),
-process within this repository.
+<div class="landing-hero">
+  <div class="filter-row">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status, project..." aria-label="Search RFCs">
+    <div class="chips" id="status-chips">
+      <span class="chip active" data-status="all" data-label="All">All</span>
+      <span class="chip" data-status="stable" data-label="Stable">Stable</span>
+      <span class="chip" data-status="draft" data-label="Draft">Draft</span>
+      <span class="chip" data-status="raw" data-label="Raw">Raw</span>
+      <span class="chip" data-status="deprecated" data-label="Deprecated">Deprecated</span>
+      <span class="chip" data-status="deleted" data-label="Deleted">Deleted</span>
+    </div>
+  </div>
+  <div class="filter-row">
+    <div class="chips" id="project-chips">
+      <span class="chip active" data-project="all" data-label="All projects">All projects</span>
+      <span class="chip" data-project="vac" data-label="Vac">Vac</span>
+      <span class="chip" data-project="waku" data-label="Waku">Waku</span>
+      <span class="chip" data-project="status" data-label="Status">Status</span>
+      <span class="chip" data-project="nomos" data-label="Nomos">Nomos</span>
+      <span class="chip" data-project="codex" data-label="Codex">Codex</span>
+    </div>
+  </div>
+  <div class="quick-links">
+    <a href="./vac/1/coss.html">1/COSS (Process)</a>
+    <a href="./vac/README.html">Vac index</a>
+    <a href="./waku/README.html">Waku index</a>
+    <a href="./status/README.html">Status index</a>
+    <a href="./nomos/README.html">Nomos index</a>
+    <a href="./codex/README.html">Codex index</a>
+  </div>
+</div>
 
-## New RFC Process
+<div class="results-row">
+  <div id="results-count" class="results-count">Loading RFC index...</div>
+  <div class="results-hint">Click a column to sort</div>
+</div>
 
-This repository replaces the previous `rfc.vac.dev` resource.
-Each project will maintain initial specifications in separate repositories,
-which may be considered as a **raw** specification.
-All [Vac](https://vac.dev) **raw** specifications and
-discussions will live in the Vac subdirectory.
-When projects have reached some level of maturity
-for a specification living in their repository,
-the process of updating the status to **draft** may begin in this repository.
-Specifications will adhere to
-[1/COSS](./vac/1/coss.md) before obtaining **draft** status.
+<div id="rfc-table-container" class="table-wrap"></div>
 
-Implementations should follow specifications as described,
-and all contributions will be discussed before the **stable** status is obtained.
-The goal of this RFC process will to engage all interseted parities and
-reach a rough consensus for techcinal specifications.
-
-## Contributing
-
-Please see [1/COSS](./vac/1/coss.md) for general guidelines and specification lifecycle.
-
-Feel free to join the [Vac discord](https://discord.gg/Vy54fEWuqC).
-
-Here's the project board used by core contributors and maintainers: [Projects](https://github.com/orgs/vacp2p/projects/5)
-
-## IFT Projects' Raw Specifications
-
-The repository for each project **raw** specifications:
-
-- [Vac Raw Specifications](./vac/raw)
-- [Status Raw Specifications](./status/raw)
-- [Waku Raw Specificiations](https://github.com/waku-org/specs/tree/master)
-- [Codex Raw Specifications](none)
-- [Nomos Raw Specifications](https://github.com/logos-co/nomos-specs)
+<noscript>
+  <p class="noscript-note">JavaScript is required to load the RFC index table.</p>
+</noscript>

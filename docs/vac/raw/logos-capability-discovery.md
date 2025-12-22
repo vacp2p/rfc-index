@@ -1,14 +1,14 @@
----
-title: LOGOS-CAPABILITY-DISCOVERY
-name: Logos Capability Discovery Protocol
-status: raw
-category: Standards Track
-tags:
-editor: Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im)
-contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
+# LOGOS-CAPABILITY-DISCOVERY
 
----
-
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Logos Capability Discovery Protocol</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im)</td></tr>
+<tr><th>Contributors</th><td>U<br>g<br>u<br>r<br> <br>S<br>e<br>n<br> <br>[<br>u<br>g<br>u<br>r<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>]<br>(<br>m<br>a<br>i<br>l<br>t<br>o<br>:<br>u<br>g<br>u<br>r<br>@<br>s<br>t<br>a<br>t<br>u<br>s<br>.<br>i<br>m<br>)</td></tr>
+</table>
+</div>
 > **Note:** This specification is currently a WIP and undergoing a high rate of changes.
 
 ## Abstract

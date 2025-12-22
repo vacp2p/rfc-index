@@ -2,9 +2,6 @@ name: markdown-linting
 
 on:
 
-  push:
-    branches: 
-      - '**'
   pull_request:
     branches: 
       - '**'

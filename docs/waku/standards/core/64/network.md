@@ -1,14 +1,14 @@
----
-slug: 64
-title: 64/WAKU2-NETWORK
-name: Waku v2 Network
-status: draft
-category: Best Current Practice
-tags: waku/application
-editor: Hanno Cornelius <hanno@status.im>
-contributors:
----
+# 64/WAKU2-NETWORK
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Network</td></tr>
+<tr><th>Slug</th><td>64</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Best Current Practice</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes an opinionated deployment of [10/WAKU2](../10/waku2.md)

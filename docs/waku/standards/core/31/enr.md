@@ -1,13 +1,13 @@
----
-slug: 31
-title: 31/WAKU2-ENR
-name: Waku v2 usage of ENR
-status: draft
-tags: [waku/core-protocol]
-editor: Franck Royer <franck@status.im>
-contributors:
----
+# 31/WAKU2-ENR
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 usage of ENR</td></tr>
+<tr><th>Slug</th><td>31</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes the usage of the ENR (Ethereum Node Records)

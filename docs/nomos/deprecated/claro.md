@@ -1,19 +1,14 @@
----
-title: CONSENSUS-CLARO
-name: Claro Consensus Protocol
-status: deprecated
-category: Standards Track
-tags:
-  - logos/consensus
-editor: Corey Petty <corey@status.im>
-created: 01-JUL-2022
-revised: <2022-08-26 Fri 13:11Z>
-uri: <https://rdf.logos.co/protocol/Claro/1/0/0#<2022-08-26%20Fri$2013:11Z>
-contributors:
-  - Álvaro Castro-Castilla
-  - Mark Evenson
----
+# CONSENSUS-CLARO
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Claro Consensus Protocol</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Corey Petty &lt;corey@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Álvaro Castro-Castilla<br>Mark Evenson</td></tr>
+</table>
+</div>
 ## Abstract
 
 This document specifies Claro: a Byzantine, fault-tolerant, binary decision

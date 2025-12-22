@@ -1,13 +1,13 @@
----
-slug: 20
-title: 20/TOY-ETH-PM
-name: Toy Ethereum Private Message
-status: draft
-tags: waku/application
-editor: Franck Royer <franck@status.im>
-contributors:
----
+# 20/TOY-ETH-PM
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Toy Ethereum Private Message</td></tr>
+<tr><th>Slug</th><td>20</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Franck Royer &lt;franck@status.im&gt;</td></tr>
+</table>
+</div>
 **Content Topics**:
 
 - Public Key Broadcast: `/eth-pm/1/public-key/proto`

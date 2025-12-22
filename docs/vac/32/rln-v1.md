@@ -1,18 +1,14 @@
----
-slug: 32
-title: 32/RLN-V1
-name: Rate Limit Nullifier
-status: draft
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
-- Barry Whitehat <barrywhitehat@protonmail.com>
-- Sanaz Taheri <sanaz@status.im>
-- Oskar Thorén <oskarth@titanproxy.com>
-- Onur Kilic <onurkilic1004@gmail.com>
-- Blagoj Dimovski <blagoj.dimovski@yandex.com>
-- Rasul Ibragimov <curryrasul@gmail.com>
----
+# 32/RLN-V1
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Rate Limit Nullifier</td></tr>
+<tr><th>Slug</th><td>32</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+<tr><th>Contributors</th><td>Barry Whitehat &lt;barrywhitehat@protonmail.com&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Onur Kilic &lt;onurkilic1004@gmail.com&gt;<br>Blagoj Dimovski &lt;blagoj.dimovski@yandex.com&gt;<br>Rasul Ibragimov &lt;curryrasul@gmail.com&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 The following specification covers the RLN construct

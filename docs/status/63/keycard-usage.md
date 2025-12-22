@@ -1,15 +1,15 @@
----
-slug: 63
-title: 63/STATUS-Keycard-Usage
-name: Status Keycard Usage
-status: draft
-category: Standards Track
-description: Describes how an application can use the Status Keycard to create, store and transact with different account addresses.
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
-  - Jimmy Debe <jimmy@status.im>
----
+# 63/STATUS-Keycard-Usage
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Keycard Usage</td></tr>
+<tr><th>Slug</th><td>63</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+<tr><th>Contributors</th><td>Jimmy Debe &lt;jimmy@status.im&gt;</td></tr>
+</table>
+</div>
 ## Terminology
 
 - **Account**: A valid

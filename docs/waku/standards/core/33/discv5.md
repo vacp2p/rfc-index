@@ -1,13 +1,14 @@
----
-slug: 33
-title: 33/WAKU2-DISCV5
-name: Waku v2 Discv5 Ambient Peer Discovery
-status: draft
-editor: Daniel Kaiser <danielkaiser@status.im>
-contributors: 
- - Filip Dimitrijevic <filip@status.im>
----
+# 33/WAKU2-DISCV5
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Discv5 Ambient Peer Discovery</td></tr>
+<tr><th>Slug</th><td>33</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Daniel Kaiser &lt;danielkaiser@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 `33/WAKU2-DISCV5` specifies a modified version of

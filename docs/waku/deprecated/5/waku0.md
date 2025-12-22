@@ -1,16 +1,14 @@
----
-slug: 5
-title: 5/WAKU0
-name: Waku v0
-status: deprecated
-editor: Oskar Thorén <oskarth@titanproxy.com>
-contributors:
-  - Adam Babik <adam@status.im>
-  - Andrea Maria Piana <andreap@status.im>
-  - Dean Eigenmann <dean@status.im>
-  - Kim De Mey <kimdemey@status.im>
----
+# 5/WAKU0
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v0</td></tr>
+<tr><th>Slug</th><td>5</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;<br>Kim De Mey &lt;kimdemey@status.im&gt;</td></tr>
+</table>
+</div>
 This specification describes the format of Waku messages within the ÐΞVp2p Wire Protocol.
 This spec substitutes [EIP-627](https://eips.ethereum.org/EIPS/eip-627).
 Waku is a fork of the original Whisper protocol that enables better usability

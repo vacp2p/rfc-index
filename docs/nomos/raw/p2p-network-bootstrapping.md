@@ -1,19 +1,14 @@
----
-title: P2P-NETWORK-BOOTSTRAPPING
-name: Nomos P2P Network Bootstrapping Specification
-status: raw
-category: networking
-tags: [p2p, networking, bootstrapping, peer-discovery, libp2p]
-editor: Daniel Sanchez-Quiros <danielsq@status.im>
-contributors:
-- Álvaro Castro-Castilla <alvaro@status.im>
-- Petar Radovic <petar@status.im>
-- Gusto Bacvinka <augustinas@status.im>
-- Antonio Antonino <antonio@status.im>
-- Youngjoon Lee <youngjoon@status.im>
-- Filip Dimitrijevic <filip@status.im>
----
+# P2P-NETWORK-BOOTSTRAPPING
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Nomos P2P Network Bootstrapping Specification</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>networking</td></tr>
+<tr><th>Editor</th><td>Daniel Sanchez-Quiros &lt;danielsq@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Álvaro Castro-Castilla &lt;alvaro@status.im&gt;<br>Petar Radovic &lt;petar@status.im&gt;<br>Gusto Bacvinka &lt;augustinas@status.im&gt;<br>Antonio Antonino &lt;antonio@status.im&gt;<br>Youngjoon Lee &lt;youngjoon@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 ## Introduction
 
 Nomos network bootstrapping is the process by which a new node discovers peers and synchronizes with the existing decentralized network. It ensures that a node can:

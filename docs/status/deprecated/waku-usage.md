@@ -1,16 +1,13 @@
----
-title: WAKU-USAGE
-name: Waku Usage
-status: deprecated
-description: Status uses Waku to provide privacy-preserving routing and messaging on top of devP2P.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Adam Babik <adam@status.im>
-  - Corey Petty <corey@status.im>
-  - Oskar Thorén <oskar@status.im>
-  - Samuel Hawksby-Robinson <samuel@status.im>
----
+# WAKU-USAGE
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku Usage</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 Status uses [Waku](/waku/standards/legacy/6/waku1.md) to provide privacy-preserving routing

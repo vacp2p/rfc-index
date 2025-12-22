@@ -1,19 +1,15 @@
----
-slug: codex-marketplace
-title: CODEX-MARKETPLACE
-name: Codex Storage Marketplace
-status: raw
-category: Standards Track
-tags: codex, storage, marketplace, smart-contract
-editor: Codex Team and Dmitriy Ryajov <dryajov@status.im>
-contributors:
-  - Mark Spanbroek <mark@codex.storage>
-  - Adam Uhlíř <adam@codex.storage>
-  - Eric Mastro <eric@codex.storage>
-  - Jimmy Debe <jimmy@status.im>
-  - Filip Dimitrijevic <filip@status.im>
----
+# CODEX-MARKETPLACE
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Codex Storage Marketplace</td></tr>
+<tr><th>Slug</th><td>codex-marketplace</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Codex Team and Dmitriy Ryajov &lt;dryajov@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Mark Spanbroek &lt;mark@codex.storage&gt;<br>Adam Uhlíř &lt;adam@codex.storage&gt;<br>Eric Mastro &lt;eric@codex.storage&gt;<br>Jimmy Debe &lt;jimmy@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 Codex Marketplace and its interactions are defined by a smart contract deployed on an EVM-compatible blockchain. This specification describes these interactions for the various roles within the network.

@@ -1,17 +1,13 @@
----
-title: NOMOS-DA-NETWORK
-name: NomosDA Network
-status: raw
-category:
-tags: network, data-availability, da-nodes, executors, sampling
-editor: Daniel Sanchez Quiros <danielsq@status.im>
-contributors:
-- Álvaro Castro-Castilla <alvaro@status.im>
-- Daniel Kashepava <danielkashepava@status.im>
-- Gusto Bacvinka <augustinas@status.im>
-- Filip Dimitrijevic <filip@status.im>
----
+# NOMOS-DA-NETWORK
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>NomosDA Network</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Editor</th><td>Daniel Sanchez Quiros &lt;danielsq@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Álvaro Castro-Castilla &lt;alvaro@status.im&gt;<br>Daniel Kashepava &lt;danielkashepava@status.im&gt;<br>Gusto Bacvinka &lt;augustinas@status.im&gt;<br>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 ## Introduction
 
 NomosDA is the scalability solution protocol for data availability within the Nomos network.

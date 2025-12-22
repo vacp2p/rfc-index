@@ -1,16 +1,16 @@
----
-slug: 2
-title: 2/MVDS
-name: Minimum Viable Data Synchronization
-status: stable
-editor: Sanaz Taheri <sanaz@status.im>
-contributors:
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
----
+# 2/MVDS
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Minimum Viable Data Synchronization</td></tr>
+<tr><th>Slug</th><td>2</td></tr>
+<tr><th>Status</th><td>stable</td></tr>
+<tr><th>Editor</th><td>Sanaz Taheri &lt;sanaz@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 In this specification, we describe a minimum viable protocol for
-data synchronization inspired by the Bramble Synchronization Protocol[^1].
+data synchronization inspired by the Bramble Synchronization Protocol ([BSP](https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BSP.md)).
 This protocol is designed to ensure reliable messaging
 between peers across an unreliable peer-to-peer (P2P) network where
 they may be unreachable or unresponsive.
@@ -187,5 +187,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## Footnotes
 
-[^1]: akwizgran et al. [BSP](https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BSP.md). Briar.
 [^2]: <https://github.com/vacp2p/mvds>

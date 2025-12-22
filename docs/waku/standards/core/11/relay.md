@@ -1,15 +1,14 @@
----
-slug: 11
-title: 11/WAKU2-RELAY
-name: Waku v2 Relay
-status: stable
-tags: waku-core
-editor: Hanno Cornelius <hanno@status.im>
-contributors:
-  - Oskar Thorén <oskarth@titanproxy.com>
-  - Sanaz Taheri <sanaz@status.im>
----
+# 11/WAKU2-RELAY
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Relay</td></tr>
+<tr><th>Slug</th><td>11</td></tr>
+<tr><th>Status</th><td>stable</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;</td></tr>
+</table>
+</div>
 `11/WAKU2-RELAY` specifies a [Publish/Subscribe approach](https://docs.libp2p.io/concepts/publish-subscribe/)
 to peer-to-peer messaging with a strong focus on privacy,
 censorship-resistance, security and scalability.

@@ -1,19 +1,14 @@
----
-slug: 13
-title: 13/WAKU2-STORE
-name: Waku v2 Store
-status: draft
-tags: waku-core
-version: 00
-editor: Simon-Pierre Vivier <simvivier@status.im>
-contributors:
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
-  - Aaryamann Challani <p1ge0nh8er@proton.me>
-  - Sanaz Taheri <sanaz@status.im>
-  - Hanno Cornelius <hanno@status.im>
----
+# 13/WAKU2-STORE
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 Store</td></tr>
+<tr><th>Slug</th><td>13</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Simon-Pierre Vivier &lt;simvivier@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification explains the `13/WAKU2-STORE` protocol

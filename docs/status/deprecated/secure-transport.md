@@ -1,17 +1,13 @@
----
-title: SECURE-TRANSPORT
-name: Secure Transport
-status: deprecated
-description: This document describes how Status provides a secure channel between two peers, providing confidentiality, integrity, authenticity, and forward secrecy.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Andrea Maria Piana <andreap@status.im>
-  - Corey Petty <corey@status.im>
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskar@status.im>
-  - Pedro Pombeiro <pedro@status.im>
----
+# SECURE-TRANSPORT
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Secure Transport</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;<br>Corey Petty &lt;corey@status.im&gt;<br>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Pedro Pombeiro &lt;pedro@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This document describes how Status provides a secure channel between two peers,

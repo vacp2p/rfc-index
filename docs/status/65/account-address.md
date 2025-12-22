@@ -1,17 +1,15 @@
----
-slug: 65
-title: 65/STATUS-ACCOUNT-ADDRESS
-name: Status Account Address
-status: draft
-category: Standards Track
-description: Details of what a Status account address is and how account addresses are created and used.
-editor: Aaryamann Challani <p1ge0nh8er@proton.me>
-contributors:
-- Corey Petty <corey@status.im>
-- Oskar Thorén <oskarth@titanproxy.com>
-- Samuel Hawksby-Robinson <samuel@status.im>
----
+# 65/STATUS-ACCOUNT-ADDRESS
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Status Account Address</td></tr>
+<tr><th>Slug</th><td>65</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;</td></tr>
+<tr><th>Contributors</th><td>Corey Petty &lt;corey@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification details what a Status account address is and

@@ -1,14 +1,14 @@
----
-slug: 9
-title: 9/WAKU-RPC
-name: Waku RPC API
-status: stable
-editor: Andrea Maria Piana <andreap@status.im>
-contributors:
-  - Dean Eigenmann <dean@status.im>
-  - Oskar Thorén <oskarth@titanproxy.com>
----
+# 9/WAKU-RPC
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku RPC API</td></tr>
+<tr><th>Slug</th><td>9</td></tr>
+<tr><th>Status</th><td>stable</td></tr>
+<tr><th>Editor</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Dean Eigenmann &lt;dean@status.im&gt;<br>Oskar Thorén &lt;oskarth@titanproxy.com&gt;</td></tr>
+</table>
+</div>
 This specification describes the RPC API that Waku nodes MAY adhere to.
 The unified API allows clients to easily
 be able to connect to any node implementation.

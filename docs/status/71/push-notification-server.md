@@ -1,15 +1,15 @@
----
-slug: 71
-title: 71/STATUS-PUSH-NOTIFICATION-SERVER
-name: Push Notification Server
-status: draft
-category: Standards Track
-description: A set of methods to allow Status clients to use push notification services in mobile environments.
-editor: Jimmy Debe <jimmy@status.im>
-contributors: 
-  - Andrea Maria Piana <andreap@status.im>
----
+# 71/STATUS-PUSH-NOTIFICATION-SERVER
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Push Notification Server</td></tr>
+<tr><th>Slug</th><td>71</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Jimmy Debe &lt;jimmy@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Andrea Maria Piana &lt;andreap@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 A push notification server implementation for IOS devices and Android devices.

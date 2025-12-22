@@ -1,15 +1,13 @@
----
-title: WAKU-MAILSERVER
-name: Waku Mailserver
-status: deprecated
-description: Waku Mailserver is a specification that allows messages to be stored permanently and to allow the stored messages to be delivered to requesting client nodes, regardless if the messages are not available in the network due to the message TTL expiring.
-editor: Filip Dimitrijevic <filip@status.im>
-contributors:
-  - Adam Babik <adam@status.im>
-  - Oskar Thorén <oskar@status.im>
-  - Samuel Hawksby-Robinson <samuel@status.im>
----
+# WAKU-MAILSERVER
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku Mailserver</td></tr>
+<tr><th>Status</th><td>deprecated</td></tr>
+<tr><th>Editor</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Adam Babik &lt;adam@status.im&gt;<br>Oskar Thorén &lt;oskar@status.im&gt;<br>Samuel Hawksby-Robinson &lt;samuel@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 Being mostly offline is an intrinsic property of mobile clients.

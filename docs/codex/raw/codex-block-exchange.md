@@ -1,14 +1,14 @@
----
-title: CODEX-BLOCK-EXCHANGE
-name: Codex Block Exchange Protocol
-status: raw
-category: Standards Track
-tags: codex, block-exchange, p2p, data-distribution
-editor: Codex Team
-contributors:
-  - Filip Dimitrijevic <filip@status.im>
----
+# CODEX-BLOCK-EXCHANGE
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Codex Block Exchange Protocol</td></tr>
+<tr><th>Status</th><td>raw</td></tr>
+<tr><th>Category</th><td>Standards Track</td></tr>
+<tr><th>Editor</th><td>Codex Team</td></tr>
+<tr><th>Contributors</th><td>Filip Dimitrijevic &lt;filip@status.im&gt;</td></tr>
+</table>
+</div>
 ## Specification Status
 
 This specification contains a mix of:

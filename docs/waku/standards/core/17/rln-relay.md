@@ -1,17 +1,14 @@
----
-slug: 17
-title: 17/WAKU2-RLN-RELAY
-name: Waku v2 RLN Relay
-status: draft
-tags: waku-core
-editor: Alvaro Revuelta <alvaro@status.im>
-contributors:
-  - Oskar Thorén <oskarth@titanproxy.com>
-  - Aaryamann Challani <p1ge0nh8er@proton.me>
-  - Sanaz Taheri <sanaz@status.im>
-  - Hanno Cornelius <hanno@status.im>
----
+# 17/WAKU2-RLN-RELAY
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku v2 RLN Relay</td></tr>
+<tr><th>Slug</th><td>17</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Alvaro Revuelta &lt;alvaro@status.im&gt;</td></tr>
+<tr><th>Contributors</th><td>Oskar Thorén &lt;oskarth@titanproxy.com&gt;<br>Aaryamann Challani &lt;p1ge0nh8er@proton.me&gt;<br>Sanaz Taheri &lt;sanaz@status.im&gt;<br>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes the `17/WAKU2-RLN-RELAY` protocol,

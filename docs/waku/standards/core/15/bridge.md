@@ -1,12 +1,13 @@
----
-slug: 15
-title: 15/WAKU-BRIDGE
-name: Waku Bridge
-status: draft
-tags: waku-core
-editor: Hanno Cornelius <hanno@status.im>
----
+# 15/WAKU-BRIDGE
 
+<div class="rfc-meta">
+<table>
+<tr><th>Name</th><td>Waku Bridge</td></tr>
+<tr><th>Slug</th><td>15</td></tr>
+<tr><th>Status</th><td>draft</td></tr>
+<tr><th>Editor</th><td>Hanno Cornelius &lt;hanno@status.im&gt;</td></tr>
+</table>
+</div>
 ## Abstract
 
 This specification describes how [6/WAKU1](/waku/standards/legacy/6/waku1.md)
