@@ -23,9 +23,17 @@
     menuTitle.dataset.linked = "true";
   }
 
-  document.addEventListener("DOMContentLoaded", linkMenuTitle);
+  function onReady(fn) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", fn, { once: true });
+    } else {
+      fn();
+    }
+  }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  onReady(linkMenuTitle);
+
+  onReady(() => {
     const printLink = document.querySelector("a[href$='print.html']");
     if (!printLink) return;
     printLink.addEventListener("click", (event) => {
@@ -34,13 +42,31 @@
     });
   });
 
+  function getSectionInfo(item) {
+    const direct = item.querySelector(":scope > ol.section");
+    if (direct) {
+      return { section: direct, container: item, isSibling: false };
+    }
+
+    const sibling = item.nextElementSibling;
+    if (sibling && sibling.tagName === "LI") {
+      const siblingSection = sibling.querySelector(":scope > ol.section");
+      if (siblingSection) {
+        sibling.classList.add("section-container");
+        return { section: siblingSection, container: sibling, isSibling: true };
+      }
+    }
+
+    return null;
+  }
+
   function initSidebarCollapsible(root) {
     if (!root) return;
     const items = root.querySelectorAll("li.chapter-item");
     items.forEach((item) => {
-      const section = item.querySelector(":scope > ol.section");
-      const link = item.querySelector(":scope > .chapter-link-wrapper > a");
-      if (!section || !link) return;
+      const sectionInfo = getSectionInfo(item);
+      const link = item.querySelector(":scope > a, :scope > .chapter-link-wrapper > a");
+      if (!sectionInfo || !link) return;
 
       if (!link.querySelector(".section-toggle")) {
         const toggle = document.createElement("span");
@@ -55,15 +81,18 @@
         link.prepend(toggle);
       }
 
-      const hasActive = item.querySelector(".active");
-      if (!hasActive) {
-        item.classList.add("collapsed");
+      if (item.dataset.collapsibleInit !== "true") {
+        const hasActive = link.classList.contains("active");
+        const hasActiveInSection = !!sectionInfo.section.querySelector(".active");
+        item.classList.toggle("collapsed", !(hasActive || hasActiveInSection));
+        item.dataset.collapsibleInit = "true";
       }
     });
   }
 
   function bindSidebarCollapsible() {
-    const sidebar = document.querySelector("#mdbook-sidebar .sidebar-scrollbox");
+    const sidebar = document.querySelector("#mdbook-sidebar .sidebar-scrollbox")
+      || document.querySelector("#sidebar .sidebar-scrollbox");
     if (sidebar) {
       initSidebarCollapsible(sidebar);
     }
@@ -82,10 +111,19 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  function observeSidebar() {
+    const target = document.querySelector("#mdbook-sidebar") || document.querySelector("#sidebar");
+    if (!target) return;
+    const observer = new MutationObserver(() => bindSidebarCollapsible());
+    observer.observe(target, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 1500);
+  }
+
+  onReady(() => {
     bindSidebarCollapsible();
     // toc.js may inject the sidebar after load
     setTimeout(bindSidebarCollapsible, 100);
+    observeSidebar();
   });
 
   const searchInput = document.getElementById("rfc-search");

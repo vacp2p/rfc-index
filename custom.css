@@ -307,7 +307,8 @@ main h1 {
     text-decoration: none;
 }
 
-.chapter-item > .chapter-link-wrapper > a {
+.chapter-item > .chapter-link-wrapper > a,
+.chapter-item > a {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -321,7 +322,8 @@ main h1 {
     transition: transform 0.15s ease;
 }
 
-.chapter-item:not(.collapsed) > a .section-toggle::before {
+.chapter-item:not(.collapsed) > a .section-toggle::before,
+.chapter-item:not(.collapsed) > .chapter-link-wrapper > a .section-toggle::before {
     transform: rotate(90deg);
 }
 
@@ -329,6 +331,11 @@ main h1 {
     display: none;
 }
 
-.chapter-item.collapsed > .chapter-link-wrapper > a .section-toggle::before {
+.chapter-item.collapsed + li.section-container > ol.section {
+    display: none;
+}
+
+.chapter-item.collapsed > .chapter-link-wrapper > a .section-toggle::before,
+.chapter-item.collapsed > a .section-toggle::before {
     transform: rotate(0deg);
 }
