@@ -1,4 +1,39 @@
 (() => {
+  function linkMenuTitle() {
+    const menuTitle = document.querySelector(".menu-title");
+    if (!menuTitle || menuTitle.dataset.linked === "true") {
+      return;
+    }
+
+    const existingLink = menuTitle.closest("a");
+    if (existingLink) {
+      menuTitle.dataset.linked = "true";
+      return;
+    }
+
+    const root = (typeof path_to_root !== "undefined" && path_to_root) ? path_to_root : "";
+    const link = document.createElement("a");
+    link.href = `${root}index.html`;
+    link.className = "menu-title-link";
+    link.setAttribute("aria-label", "Back to home");
+
+    const parent = menuTitle.parentNode;
+    parent.replaceChild(link, menuTitle);
+    link.appendChild(menuTitle);
+    menuTitle.dataset.linked = "true";
+  }
+
+  document.addEventListener("DOMContentLoaded", linkMenuTitle);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const printLink = document.querySelector("a[href$='print.html']");
+    if (!printLink) return;
+    printLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.print();
+    });
+  });
+
   const searchInput = document.getElementById("rfc-search");
   const resultsCount = document.getElementById("results-count");
   const tableContainer = document.getElementById("rfc-table-container");

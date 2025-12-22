@@ -293,3 +293,16 @@ main h1 {
         min-width: 0;
     }
 }
+
+
+.menu-title-link {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-decoration: none;
+    color: inherit;
+}
+
+.menu-title-link .menu-title {
+    text-decoration: none;
+}
