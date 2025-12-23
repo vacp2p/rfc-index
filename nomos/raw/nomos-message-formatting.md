@@ -51,15 +51,6 @@ and can significantly improve performance and reliability.
 
 ## Protocol Specification
 
-### Overview
-
-The Message contains a header and a payload.
-The header informs the protocol about the version of the protocol
-and the payload type.
-The Message contains a drop or a non-drop payload.
-The length of a payload is fixed to prevent adversaries from
-distinguishing types of messages based on their length.
-
 ### Construction
 
 #### Message
@@ -106,7 +97,7 @@ class PublicHeader:
 The private_header must be generated as the outcome of
 the Message Encapsulation Mechanism.
 
-The private header contains a set of encrypted blending headers
+The private header contains a set of encrypted BlendingHeader entries
 $\mathbf{h} = (\mathbf{b}_{1},...,\mathbf{b}_{h_{max}})$.
 
 ```python
@@ -205,7 +196,7 @@ PAYLOAD_HEADER_SIZE = 3
 
 - The protocol limits the private header to $\beta_{max}=3$ BlendingHeader entries
 - This limit is defined in the Global Parameters
-- Each blending header represents one layer of message encapsulation
+- Each BlendingHeader represents one layer of Message encapsulation
 - The limit balances privacy (more layers) with performance and overhead
 
 ### Integration Points
