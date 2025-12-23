@@ -15,9 +15,9 @@ contributors:
 ## Abstract
 
 This document specifies the Message Formatting for the Blend Protocol.
-The message contains a header and a payload,
+The Message contains a header and a payload,
 where the header informs the protocol about the version and the payload type.
-The message contains either a drop or a non-drop payload,
+The Message contains either a drop or a non-drop payload,
 with fixed-length payloads to prevent adversaries from
 distinguishing message types based on length.
 This specification reuses notation from the Notation document
@@ -53,10 +53,10 @@ and can significantly improve performance and reliability.
 
 ### Overview
 
-The message contains a header and a payload.
+The Message contains a header and a payload.
 The header informs the protocol about the version of the protocol
 and the payload type.
-The message contains a drop or a non-drop payload.
+The Message contains a drop or a non-drop payload.
 The length of a payload is fixed to prevent adversaries from
 distinguishing types of messages based on their length.
 
