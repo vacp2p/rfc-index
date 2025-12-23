@@ -407,6 +407,8 @@ The following example explains why $T_\text{offline}$ should not be set too long
 - If the malicious peer sends the fork to the restarted node
   faster than the honest peer,
   the restarted node will commit to the fork because it has $k$ new blocks.
+  Even if the node later receives the honest chain from the honest peer,
+  it cannot revert blocks that are already immutable.
 
 ### Offline Duration Measurement
 
