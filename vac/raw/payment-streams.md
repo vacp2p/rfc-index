@@ -224,6 +224,7 @@ This message MUST include:
 
 - status: ACCEPTED or REJECTED
 - reason: explanation if rejected (OPTIONAL)
+- load_cap: maximum load the provider will serve (REQUIRED if ACCEPTED)
 
 If accepted, the user creates the stream on-chain.
 Acceptance commits the provider to deliver the specified service
@@ -333,6 +334,26 @@ the attack becomes economically unviable.
 
 Providers MAY alternatively address this attack via off-chain policy
 by refusing service to users who pause and resume excessively.
+
+### Load Cap
+
+The provider MAY advertise a load cap
+(requests per unit time or another service-dependent metric)
+representing the maximum load the provider is willing to serve.
+A separate discovery protocol SHOULD enable providers
+to advertise their load caps (out of scope for this spec).
+
+When responding to StreamRequest with ACCEPTED status,
+the provider MUST include the load cap in StreamResponse.
+The user MUST NOT exceed the load cap.
+
+If the user exceeds the load cap during stream operation,
+the provider SHOULD terminate service.
+The provider MUST send a ServiceTermination message
+before closing the stream on-chain.
+
+A user who requires a higher load cap
+SHOULD open multiple streams to the same provider.
 
 ## Implementation Considerations
 
