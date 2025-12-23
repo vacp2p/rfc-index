@@ -408,6 +408,19 @@ The following example explains why $T_\text{offline}$ should not be set too long
   faster than the honest peer,
   the restarted node will commit to the fork because it has $k$ new blocks.
 
+### Offline Duration Measurement
+
+> **TODO**: This section is referenced in the source document
+> but not yet defined.
+> Content to be added describing recommended ways to measure offline duration.
+
+### Checkpoint Provider HTTP API
+
+> **TODO**: This section is referenced in the source document
+> but not yet defined.
+> Content to be added describing the HTTP API
+> for downloading checkpoint blocks and ledger state.
+
 ## References
 
 ### Normative
