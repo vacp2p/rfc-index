@@ -14,8 +14,7 @@ contributors:
 
 ## Abstract
 
-This document defines an implementation-friendly specification of
-the Message Formatting for the Blend Protocol.
+This document specifies the Message Formatting for the Blend Protocol.
 The message contains a header and a payload,
 where the header informs the protocol about the version and the payload type.
 The message contains either a drop or a non-drop payload,
