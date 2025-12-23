@@ -29,27 +29,6 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in RFC 2119.
 
-## Introduction
-
-When a new node joins the network or a previously-bootstrapped node has been offline
-for a while,
-it cannot follow the most recent honest chain solely by receiving only new blocks
-because those new blocks cannot be added to the block tree
-that does not have their parent block.
-These nodes MUST first catch up with the most recent honest chain
-by fetching missing blocks from their peers
-before they start listening for new blocks.
-
-This document specifies a protocol for nodes to bootstrap with the honest chain
-efficiently while mitigating long range attacks.
-It also defines how to handle the case which the node falls behind
-after the bootstrapping is complete.
-
-This protocol adheres to the key invariant:
-We MUST never roll back blocks that are deeper than the latest immutable block
-$B_\text{imm}$ in the local chain $c_{loc}$,
-as defined in Cryptarchia v1 Protocol Specification.
-
 ## Overview
 
 This protocol defines the bootstrapping mechanism
@@ -88,7 +67,7 @@ the node downloads missing ancestors using the same mechanism as above.
 ### Constants
 
 | Constant | Name | Description | Value |
-|----------|------|-------------|-------|
+| -------- | ---- | ----------- | ----- |
 | $T_\text{offline}$ | Offline Grace Period | A period during which a node can be restarted without switching to the Bootstrap rule. | 20 minutes |
 | $T_\text{boot}$ | Prolonged Bootstrap Period | A period during which Bootstrap fork choice rule must be continuously used after Initial Block Download is completed. This gives nodes additional time to compare their synced chain with a broader set of peers. | 24 hours |
 | $s_\text{gen}$ | Density Check Slot Window | A number of slots used by density check of Bootstrap rule. This constant is defined in Cryptarchia Fork Choice Rule - Definitions. | $\lfloor\frac{k}{4f}\rfloor$ (=4h30m) |
@@ -429,24 +408,27 @@ The following example explains why $T_\text{offline}$ should not be set too long
   faster than the honest peer,
   the restarted node will commit to the fork because it has $k$ new blocks.
 
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
 ## References
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
-  \- Key words for use in RFCs to Indicate Requirement Levels
-- [Cryptarchia v1 Protocol Specification](https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c)
+- [Cryptarchia v1 Protocol Specification][cryptarchia-v1]
   \- Parent protocol specification
-- [Cryptarchia Fork Choice Rule](https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule)
+- [Cryptarchia Fork Choice Rule][fork-choice]
   \- Fork choice rule specification
 
 ### Informative
 
-- [Cryptarchia v1 Bootstrapping & Synchronization](https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization-1fd261aa09df81ac94b5fb6a4eff32a6)
+- [Cryptarchia v1 Bootstrapping & Synchronization][bootstrap-origin]
   \- Original bootstrapping and synchronization documentation
-- [Libp2p Streaming](https://docs.libp2p.io/)
+- [Libp2p Streaming][libp2p]
   \- Peer-to-peer networking library
+
+[cryptarchia-v1]: https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c
+[fork-choice]: https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule
+[bootstrap-origin]: https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization-1fd261aa09df81ac94b5fb6a4eff32a6
+[libp2p]: https://docs.libp2p.io/
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
