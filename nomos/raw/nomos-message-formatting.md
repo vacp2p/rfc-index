@@ -155,12 +155,12 @@ the [Message Encapsulation Mechanism][message-encapsulation].
 
 #### Maximum Payload Length
 
-The Max_Payload_Length parameter defines the maximum length of the payload,
-which for version 1 of the Blend Protocol is fixed as Max_Payload_Length=34003.
-That is, 34kB for the payload body (Max_Body_Length)
+The `MAX_PAYLOAD_LENGTH` parameter defines the maximum length of the payload,
+which for version 1 of the Blend Protocol is fixed as `MAX_PAYLOAD_LENGTH=34003`.
+That is, 34kB for the payload body (`MAX_BODY_LENGTH`)
 and 3 bytes for the payload header.
 More information about payload formatting can be found in
-Payload Formatting Specification.
+[Payload Formatting Specification][payload-formatting].
 
 ```python
 MAX_PAYLOAD_LENGTH = 34003
