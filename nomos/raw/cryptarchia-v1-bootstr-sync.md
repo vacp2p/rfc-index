@@ -427,10 +427,31 @@ Upon restart, it can use this timestamp to calculate how long it has been offlin
 
 ### Checkpoint Provider HTTP API
 
-> **TODO**: This section is referenced in the source document
-> but not yet defined.
-> Content to be added describing the HTTP API
-> for downloading checkpoint blocks and ledger state.
+A trusted checkpoint provider serves the `GET /checkpoint` API,
+allowing users (which are not connected via p2p)
+to download the latest checkpoint block and its corresponding ledger state.
+
+```yaml
+openapi: 3.0
+
+paths:
+  /checkpoint:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            multipart/mixed:
+              schema:
+                type: object
+                properties:
+                  checkpoint_block:
+                    type: string
+                    format: binary
+                  checkpoint_ledger_state:
+                    type: string
+                    format: binary
+```
 
 ## References
 
