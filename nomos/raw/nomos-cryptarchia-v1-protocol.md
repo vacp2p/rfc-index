@@ -33,14 +33,6 @@ interpreted as described in RFC 2119.
 
 ## Introduction
 
-Cryptarchia is the consensus protocol of Nomos Bedrock.
-This document specifies how Bedrock comes to agreement to a single history of blocks.
-
-The values that Cryptarchia optimizes for are **resilience and privacy**.
-These come at the cost of block times and finality.
-These values have significant implications on user experience
-and we should understand them well.
-
 ### Resilience
 
 In consensus, we are presented with a choice of prioritizing either safety or liveness
@@ -581,40 +573,51 @@ this may be improved upon in the future,
 borrowing ideas from Ouroboros Chronos: Permissionless Clock Synchronization
 via Proof-of-Stake.
 
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
 ## References
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
-  \- Key words for use in RFCs to Indicate Requirement Levels
-- [Proof of Leadership Specification](https://nomos-tech.notion.site/Proof-of-Leadership-215261aa09df8145a0f2c0d059aed59c)
+- [Proof of Leadership Specification][proof-of-leadership]
   \- ZK proof specification for leadership lottery
-- [Anonymous Leaders Reward Protocol](https://nomos-tech.notion.site/Anonymous-Leaders-Reward-Protocol)
+- [Anonymous Leaders Reward Protocol][leaders-reward]
   \- Leader reward mechanism
-- [Cryptarchia Fork Choice Rule](https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule)
+- [Cryptarchia Fork Choice Rule][fork-choice]
   \- Fork choice rule specification
-- [Block Construction, Validation and Execution Specification](https://nomos-tech.notion.site/Block-Construction-Validation-and-Execution-Specification)
+- [Block Construction, Validation and Execution Specification][block-construction]
   \- Block structure details
-- [Common Cryptographic Components](https://nomos-tech.notion.site/Common-Cryptographic-Components)
+- [Common Cryptographic Components][crypto-components]
   \- Cryptographic primitives (Blake2b, Poseidon2)
-- [Cryptarchia v1 Bootstrapping & Synchronization](https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization)
+- [Cryptarchia v1 Bootstrapping & Synchronization][bootstrap-sync]
   \- Bootstrap and synchronization procedures
-- [Total Stake Inference](https://nomos-tech.notion.site/Total-Stake-Inference)
+- [Total Stake Inference][stake-inference]
   \- Stake inference mechanism
-- [Block Times & Blend Network Analysis](https://nomos-tech.notion.site/Block-Times-Blend-Network-Analysis)
+- [Block Times & Blend Network Analysis][block-times]
   \- Analysis for slot activation coefficient
 
 ### Informative
 
-- [Cryptarchia v1 Protocol Specification](https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c)
+- [Cryptarchia v1 Protocol Specification][cryptarchia-origin]
   \- Original Cryptarchia v1 Protocol documentation
-- [Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake](https://eprint.iacr.org/2018/1132.pdf)
+- [Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake][ouroboros-crypsinous]
   \- Foundation for Cryptarchia design
-- [Ouroboros Chronos: Permissionless Clock Synchronization via Proof-of-Stake](https://eprint.iacr.org/2019/838.pdf)
+- [Ouroboros Chronos: Permissionless Clock Synchronization via Proof-of-Stake][ouroboros-chronos]
   \- Clock synchronization research
-- [Blend Network Specification](https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084)
+- [Blend Network Specification][blend-network]
   \- Network privacy layer
+
+[proof-of-leadership]: https://nomos-tech.notion.site/Proof-of-Leadership-215261aa09df8145a0f2c0d059aed59c
+[leaders-reward]: https://nomos-tech.notion.site/Anonymous-Leaders-Reward-Protocol
+[fork-choice]: https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule
+[block-construction]: https://nomos-tech.notion.site/Block-Construction-Validation-and-Execution-Specification
+[crypto-components]: https://nomos-tech.notion.site/Common-Cryptographic-Components
+[bootstrap-sync]: https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization
+[stake-inference]: https://nomos-tech.notion.site/Total-Stake-Inference
+[block-times]: https://nomos-tech.notion.site/Block-Times-Blend-Network-Analysis
+[cryptarchia-origin]: https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c
+[ouroboros-crypsinous]: https://eprint.iacr.org/2018/1132.pdf
+[ouroboros-chronos]: https://eprint.iacr.org/2019/838.pdf
+[blend-network]: https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
