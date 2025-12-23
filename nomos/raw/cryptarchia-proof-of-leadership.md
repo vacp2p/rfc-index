@@ -321,6 +321,8 @@ def get_ledger_root(note_set: list[NoteId]):
 
 ### Zero-knowledge Proof Statement
 
+![Proof of Leadership Circuit Diagram](assets/pol-short-diagram.webp)
+
 #### Circuit Public Inputs
 
 The prover (the leader) and the verifiers (nodes of the chain)
