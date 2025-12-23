@@ -11,6 +11,7 @@ contributors:
   - Daniel Sanchez Quiros <daniel@status.im>
   - Álvaro Castro-Castilla <alvaro@status.im>
   - David Rusu <david@status.im>
+  - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -30,21 +31,6 @@ with recent cryptographic developments.
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in RFC 2119.
-
-## Introduction
-
-The Proof of Leadership enables a leader to produce a zero-knowledge proof
-attesting to the fact that they have an eligible note
-that has won the leadership lottery.
-This proof MUST be as lightweight as possible to generate and verify,
-due to the following reasons:
-
-- Impose minimal restrictions on access to the role of leader
-  and thus maximize the decentralization of that role.
-- Similarly, the proof and its context MUST be efficiently verifiable for validators.
-
-This document extends the work presented in the Ouroboros Crypsinous paper
-with recent cryptographic developments.
 
 ## Overview
 
@@ -531,16 +517,10 @@ The material used for the benchmarks is the following:
 
 ![Average proving time vs number of threads (100 Runs)](assets/pol-benchmark-proving-time.webp)
 
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
 ## References
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
-  \- Key words for use in RFCs to Indicate Requirement Levels
 - [Cryptarchia v1 Protocol Specification](https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c)
   \- Parent protocol specification
 
@@ -550,3 +530,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
   \- Original Proof of Leadership documentation
 - [Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake](https://eprint.iacr.org/2018/1132.pdf)
   \- Foundation for the PoL design
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
