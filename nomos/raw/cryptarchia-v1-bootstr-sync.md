@@ -410,9 +410,20 @@ The following example explains why $T_\text{offline}$ should not be set too long
 
 ### Offline Duration Measurement
 
-> **TODO**: This section is referenced in the source document
-> but not yet defined.
-> Content to be added describing recommended ways to measure offline duration.
+As defined in [Setting the Fork Choice Rule](#setting-the-fork-choice-rule),
+when a node is restarted,
+it should be able to choose a proper fork choice rule
+depending on how long it has been offline since it last used the Online rule.
+
+It is considered unsafe to rely on any external information
+(e.g. the slot or height of peer's tip) to check how long the node has been offline,
+since such information could be manipulated as an attack vector.
+Instead, it is recommended to employ a local method to measure the offline duration.
+
+While the specific implementation is left to the discretion of implementers,
+one approach is for the node to periodically record the current time to a local file
+while it is running with the **Online** fork choice rule.
+Upon restart, it can use this timestamp to calculate how long it has been offline.
 
 ### Checkpoint Provider HTTP API
 
