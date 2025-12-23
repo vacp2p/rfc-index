@@ -51,11 +51,6 @@ and can significantly improve performance and reliability.
 
 ## Protocol Specification
 
-### Introduction
-
-This document defines an implementation-friendly specification of the Message Formatting,
-which is introduced in the Formatting section.
-
 ### Overview
 
 The message contains a header and a payload.
