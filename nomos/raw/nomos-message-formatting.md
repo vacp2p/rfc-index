@@ -148,9 +148,10 @@ class BlendingHeader:
 
 #### Payload
 
-The payload must be formatted according to the Payload Formatting Specification.
-The formatted payload must be generated as the outcome of
-the Message Encapsulation Mechanism.
+The payload MUST be formatted according to the
+[Payload Formatting Specification][payload-formatting].
+The formatted payload MUST be generated as the outcome of
+the [Message Encapsulation Mechanism][message-encapsulation].
 
 #### Maximum Payload Length
 
@@ -255,6 +256,9 @@ PAYLOAD_HEADER_SIZE = 3
   \- Original Message Formatting documentation
 - [Blend Protocol Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81a3b3ebc1f438209467)
   \- High-level overview of message formatting in Blend Protocol
+
+[payload-formatting]: https://nomos-tech.notion.site/Payload-Formatting-215261aa09df81b2a3e1d913a0df9ad9
+[message-encapsulation]: https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b
 
 ## Copyright
 
