@@ -149,7 +149,7 @@ cryptography, consensus and network engineering.
 ### Constants
 
 | Symbol | Name | Description | Value |
-|--------|------|-------------|-------|
+| ------ | ---- | ----------- | ----- |
 | $f$ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. (See Block Times & Blend Network Analysis for analysis leading to the choice of value.) | 1/30 |
 | $k$ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
 | none | slot length | The duration of a single slot. | 1 second |
@@ -159,7 +159,7 @@ cryptography, consensus and network engineering.
 ### Notation
 
 | Symbol | Name | Description | Value |
-|--------|------|-------------|-------|
+| ------ | ---- | ----------- | ----- |
 | $s$ | slot security parameter | Sufficient slots such that $k$ blocks have been produced with high probability. | $3\lfloor \frac{k}{f}\rfloor$ |
 | $T$ | the block tree | This is the block tree observed by a node. | |
 | $F_T$ | tips of block tree $T$ | The set of concurrent forks of some block tree $T$. | $F_T=\{b\in T:\forall c \in T\space \textbf{parent}(c) \neq b \}$ |
@@ -214,7 +214,7 @@ and is done w.r.t. the epoch schedule.
 An epoch is divided into 3 phases, as outlined below.
 
 | Epoch Phase | Phase Length | Description |
-|-------------|--------------|-------------|
+| ----------- | ------------ | ----------- |
 | Stake Distribution Snapshot | $s$ slots | A snapshot of note commitments are taken at the beginning of the epoch. We wait for this value to finalize before entering the next phase. |
 | Buffer phase | $s$ slots | After the stake distribution is finalized, we wait another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage. |
 | Lottery Constants Finalization | $s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots | On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. We wait another $4\frac{k}{f}$ slots for these values to finalize. |
@@ -228,7 +228,7 @@ The epoch state holds the variables derived over the course of the epoch schedul
 It is the 3-tuple $(\mathbb{C}_\text{LEAD}, \eta, D)$ described below.
 
 | Symbol | Name | Description | Value |
-|--------|------|-------------|-------|
+| ------ | ---- | ----------- | ----- |
 | $\mathbb{C}_{\text{LEAD}}$ | Eligible Leader Notes Commitment | A commitment to the set of notes eligible for leadership. | See Eligible Leader Notes |
 | $\eta$ | Epoch Nonce | Randomness used in the leadership lottery (selected once per epoch) | See Epoch Nonce |
 | $D$ | Inferred Total Stake (Lottery Difficulty) | Total stake inferred from watching the results of the lottery during the course of the epoch. $D$ is used as the stake relativization constant for the following epoch. | See Total Stake Inference |
