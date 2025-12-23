@@ -241,8 +241,6 @@ PAYLOAD_HEADER_SIZE = 3
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
-  \- Key words for use in RFCs to Indicate Requirement Levels
 - [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b)
   \- Cryptographic operations for building and processing messages
 - [Payload Formatting Specification](https://nomos-tech.notion.site/Payload-Formatting-215261aa09df81b2a3e1d913a0df9ad9)
