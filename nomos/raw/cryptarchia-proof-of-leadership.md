@@ -519,6 +519,18 @@ we pre-compute $t_0$ and $t_1$ outside of the circuit.
 | 95% | 2.46% | -0.0406% |
 | 100% | 2.59% | -0.0444% |
 
+### Benchmarks
+
+The material used for the benchmarks is the following:
+
+- CPU: 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
+- RAM: 32GB - Speed: 5600 MT/s
+- Motherboard: Micro-Star International Co., Ltd. MS-17S1
+- OS: Ubuntu 22.04.5 LTS
+- Kernel: 6.8.0-59-generic
+
+![Average proving time vs number of threads (100 Runs)](assets/pol-benchmark-proving-time.webp)
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
