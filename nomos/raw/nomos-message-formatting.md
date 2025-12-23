@@ -148,9 +148,9 @@ class BlendingHeader:
 
 #### Payload
 
-The payload MUST be formatted according to the
+The Payload is formatted according to the
 [Payload Formatting Specification][payload-formatting].
-The formatted payload MUST be generated as the outcome of
+The formatted Payload is generated as the outcome of
 the [Message Encapsulation Mechanism][message-encapsulation].
 
 #### Maximum Payload Length
