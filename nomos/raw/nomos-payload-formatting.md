@@ -32,25 +32,11 @@ document are to be interpreted as described in
 
 ## Protocol Specification
 
-### Introduction
-
-This document defines an implementation-friendly specification of the Payload Formatting,
-which is introduced in the Formatting section.
-
-### Overview
-
-The payload contains a header and a body.
-The header informs the protocol about the way the body must be handled.
-The body contains a raw message (data/proposal or cover message).
-The payload must be of a fixed length to prevent adversaries from
-distinguishing types of messages based on their length.
-Therefore, shorter messages must be padded with random data.
-
 ### Construction
 
 #### Payload
 
-The Payload is a structure that contains a header and a body.
+The Payload is a structure that contains a Header and a body.
 
 ```python
 class Payload:
@@ -60,7 +46,7 @@ class Payload:
 
 #### Header
 
-The header is a structure that contains a body_type and a body_length.
+The Header is a structure that contains a body_type and a body_length.
 
 ```python
 class Header:
@@ -93,22 +79,23 @@ The body_length must be set to the length of the body of the payload message
 
 #### Body
 
-The Max_Body_Length parameter defines the maximum length of the body.
+The `MAX_BODY_LENGTH` parameter defines the maximum length of the body.
 Currently, we assume that the maximal length of a raw data message
 is 33129 (Block Proposal),
-so the Max_Body_Length=33129.
+so the `MAX_BODY_LENGTH=33129`.
 
-The body length is fixed to Max_Body_Length bytes.
-Therefore, if the length of the raw message is shorter than the Max_Body_Length,
+The body length is fixed to `MAX_BODY_LENGTH` bytes.
+Therefore, if the length of the raw message is shorter than `MAX_BODY_LENGTH`,
 then it must be padded with random data.
 
 ```python
 MAX_BODY_LENGTH = 33129
 ```
 
-**Note:** The MAX_BODY_LENGTH (33129 bytes) defined here differs from
-MAX_PAYLOAD_LENGTH (34003 bytes) in the Message Formatting specification.
-The Message Formatting spec includes additional message headers beyond the payload body.
+**Note:** The `MAX_BODY_LENGTH` (33129 bytes) defined here differs from
+`MAX_PAYLOAD_LENGTH` (34003 bytes) in the Message Formatting specification.
+The Message Formatting spec includes additional Message headers
+beyond the Payload body.
 
 ## Implementation Considerations
 
@@ -254,22 +241,27 @@ MAX_PAYLOAD_LENGTH = HEADER_SIZE + MAX_BODY_LENGTH  # 33132 bytes
 5. Extract raw_message using body_length
 6. Process or discard based on body_type
 
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
 ## References
 
 ### Normative
 
-- [Message Formatting Specification](https://nomos-tech.notion.site/Message-Formatting-Specification-215261aa09df81c79e3acd9e921bcc30)
-  \- Defines the overall message structure containing the payload
-- [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b)
-  \- Cryptographic operations for encrypting and encapsulating the payload
-- [Blend Protocol](https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084)
+- [Message Formatting Specification][message-formatting]
+  \- Defines the overall message structure containing the Payload
+- [Message Encapsulation Mechanism][message-encapsulation]
+  \- Cryptographic operations for encrypting and encapsulating the Payload
+- [Blend Protocol][blend-protocol]
   \- Protocol-wide constants and configuration values
 
 ### Informative
 
-- [Payload Formatting Specification](https://nomos-tech.notion.site/Payload-Formatting-Specification-215261aa09df8153a456c555b7dcbe1c)
+- [Payload Formatting Specification][payload-formatting-origin]
   \- Original Payload Formatting documentation
+
+[message-formatting]: https://nomos-tech.notion.site/Message-Formatting-Specification-215261aa09df81c79e3acd9e921bcc30
+[message-encapsulation]: https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b
+[blend-protocol]: https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084
+[payload-formatting-origin]: https://nomos-tech.notion.site/Payload-Formatting-Specification-215261aa09df8153a456c555b7dcbe1c
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
