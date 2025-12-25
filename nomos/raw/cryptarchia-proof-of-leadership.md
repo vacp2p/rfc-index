@@ -67,7 +67,7 @@ The protocol is comprised of two parts: setup and PoL generation.
 
 ### Comparison with Original Crypsinous PoL
 
-Our description differs from the original paper proposition,
+This description differs from the original paper proposition,
 proving that a note is unspent directly
 instead of delegating the verification to validators.
 This design choice brings the following tradeoffs:
@@ -81,7 +81,7 @@ This design choice brings the following tradeoffs:
 2. There is no leader note evolution mechanism anymore (see the paper for details).
    - There are no orphan proofs anymore,
      removing the need to include valid PoL proofs from abandoned forks.
-   - Crypsinous forced us to maintain a parallel note commitment set
+   - Crypsinous required maintaining a parallel note commitment set
      integrating evolving notes over time.
      This requirement is removed now.
    - The derivation of the slot secret and its Merkle proof
@@ -89,7 +89,7 @@ This design choice brings the following tradeoffs:
 
 **Disadvantages:**
 
-1. We cannot compute the PoL far in advance
+1. The PoL cannot be computed far in advance
    because the leader MUST know the latest ledger state of Mantle.
 
 ## Protocol
@@ -106,9 +106,10 @@ The Ouroboros Crypsinous paper integrates protection against adaptive adversarie
 > (p. 2)
 
 To avoid a leaked note being reused to maliciously regenerate past PoLs,
-we adopt the solution proposed in the paper using slightly different parameters.
+this specification adopts the solution proposed in the paper
+using slightly different parameters.
 
-We recall here the solution proposed in the paper:
+The solution proposed in the paper is as follows:
 
 > We solve the former issue, by adding a cheap key-erasure scheme
 > into the NIZK for leadership proofs.
@@ -129,7 +130,7 @@ The paper proposed a tree of depth 24.
 - This implies that the note is usable for PoS for only 194 days approximately
   (because 1 slot is 1 second).
 - After this period, the note MUST be refreshed to include new randomness.
-  We will keep it simple and design the refresh mechanism
+  For simplicity, the refresh mechanism is designed
   as a classical transaction modifying the nullifier secret key.
 - This solution has good performance:
 
@@ -148,7 +149,7 @@ The disadvantages of this solution are that:
 2. The note will not be reusable directly after refresh
    as only old enough notes are usable for PoS.
 
-We propose a tree with a depth of 25,
+This specification proposes a tree with a depth of 25,
 extending the note's eligibility to around 388 days,
 with a maximum of **two epochs remaining ineligible** not counted in these days.
 Note that this requirement applies specifically to proving leadership in PoS
@@ -438,8 +439,8 @@ binding the proof to the key.
 - Managing floating point numbers and mathematical functions
   involving floating points like exponentiations or logarithms in circuits
   is very inefficient.
-- We compared the Taylor expansion of order 1 and 2
-  and used the Taylor expansion of order 2 method
+- Comparing the Taylor expansion of order 1 and 2,
+  the Taylor expansion of order 2 method is used
   to approximate the Ouroboros Genesis (and Crypsinous) function
   by the following linear function:
   - $\stackrel{0}{\sim}$ means nearly equal in the neighborhood of 0
@@ -477,7 +478,7 @@ we pre-compute $t_0$ and $t_1$ outside of the circuit.
 
 - For $f = 0.05$.
   The error percentage is computed with $100 \cdot \frac{estimation - real\_value}{real\_value}$.
-- We will consider that inferred_total_stake is 23.5B as in Cardano.
+- This analysis considers inferred_total_stake to be 23.5B as in Cardano.
 - Original function: $1 - (1-f)^{\frac{stake}{\text{inferred\_total\_stake}}}$
 - Taylor expansion of order 1:
   $-\frac{stake}{\text{inferred\_total\_stake}} \ln(1-f) := stake \cdot t_0$
