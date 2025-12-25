@@ -8,6 +8,7 @@ editor: David Rusu <davidrusu@status.im>
 contributors:
   - Alexander Mozeika <alexander.mozeika@status.im>
   - Daniel Kashepava <danielkashepava@status.im>
+  - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -50,7 +51,7 @@ that the total stake estimate is not accurate and must be adjusted.
 This algorithm has been analyzed and shown to have good accuracy,
 precision, and convergence speed.
 A caveat to note is that accuracy decreases with increased network delays.
-The analysis can be found in [Total Stake Inference Analysis](#references).
+The analysis can be found in [Total Stake Inference Analysis][stake-analysis].
 
 ## Construction
 
@@ -59,7 +60,7 @@ The analysis can be found in [Total Stake Inference Analysis](#references).
 #### beta (learning rate)
 
 - **Value:** 1.0
-- **Description:** Controls how quickly we adjust to new participation levels.
+- **Description:** Controls how quickly the algorithm adjusts to new participation levels.
   Lower values for `beta` give a more stable/gradual adjustment,
   while higher values give faster convergence but at the cost of less stability.
 
@@ -70,13 +71,13 @@ The analysis can be found in [Total Stake Inference Analysis](#references).
 
 #### f (slot activation coefficient)
 
-- **Value:** inherited from [Cryptarchia v1 Protocol](#references)
+- **Value:** inherited from [Cryptarchia v1 Protocol][cryptarchia-v1]
 - **Description:** The target rate of occupied slots.
   Not all slots contain blocks, many are empty.
 
 #### k (security parameter)
 
-- **Value:** inherited from [Cryptarchia v1 Protocol](#references)
+- **Value:** inherited from [Cryptarchia v1 Protocol][cryptarchia-v1]
 - **Description:** Block depth finality.
   Blocks deeper than `k` on any given chain are considered immutable.
 
@@ -138,12 +139,16 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Normative
 
-- [Cryptarchia v1 Protocol](https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-22d261aa09df80c4a0a1f8af0ddf65ca)
+- [Cryptarchia v1 Protocol][cryptarchia-v1]
   \- Protocol specification defining `f` and `k` constants
+
+[cryptarchia-v1]: https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-22d261aa09df80c4a0a1f8af0ddf65ca
 
 ### Informative
 
 - [Total Stake Inference](https://nomos-tech.notion.site/Total-Stake-Inference-22d261aa09df8051a454caa46ec54b34)
   \- Original Total Stake Inference documentation
-- [Total Stake Inference Analysis](https://nomos-tech.notion.site/Total-Stake-Inference-Analysis-237261aa09df800285cccbb00b3aeb0a)
+- [Total Stake Inference Analysis][stake-analysis]
   \- Analysis of algorithm accuracy, precision, and convergence speed
+
+[stake-analysis]: https://nomos-tech.notion.site/Total-Stake-Inference-Analysis-237261aa09df800285cccbb00b3aeb0a
