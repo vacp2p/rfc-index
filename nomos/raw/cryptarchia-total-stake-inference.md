@@ -12,8 +12,8 @@ contributors:
 
 ## Abstract
 
-This document defines the Total Stake Inference algorithm for Cryptarchia.
-In Proof of Stake consensus protocols,
+This document defines the total stake inference algorithm for Cryptarchia.
+In proof-of-stake consensus protocols,
 the probability that an eligible participant wins the right to propose a block
 depends on that participant's stake relative to the total active stake.
 Because leader selection in Cryptarchia is private,
@@ -105,6 +105,30 @@ def total_stake_inference(total_stake_estimate, epoch_slot):
     coefficient = total_stake_estimate * beta
     return total_stake_estimate - coefficient * slot_activation_error
 ```
+
+## Security Considerations
+
+### Stake Estimation Accuracy
+
+The accuracy of the total stake inference depends on the observed slot occupancy rate.
+Implementations SHOULD be aware of the following security considerations:
+
+- **Network delays**: Accuracy decreases with increased network delays,
+  as delayed blocks may not be included in density calculations.
+- **Adversarial manipulation**: An adversary with significant stake
+  could potentially influence the slot occupancy rate by withholding blocks.
+- **Convergence period**: During periods of rapid stake changes,
+  the estimate may lag behind the actual total stake.
+
+### Privacy Considerations
+
+The stake inference algorithm is designed to maintain leader privacy:
+
+- Leaders calculate their relative stake locally
+  using the shared total stake estimate.
+- Individual stake amounts are never revealed to the network.
+- The algorithm relies only on publicly observable chain growth,
+  not on private stake information.
 
 ## Copyright
 
