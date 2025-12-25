@@ -14,14 +14,9 @@ contributors:
 
 ## Abstract
 
-This document defines an implementation-friendly specification of
-the Payload Formatting for the Blend Protocol.
-The payload contains a header and a body,
-where the header informs the protocol about the way the body must be handled.
-The body contains a raw message (data/proposal or cover message).
-The payload must be of a fixed length to prevent adversaries from
-distinguishing types of messages based on their length.
-Therefore, shorter messages must be padded with random data.
+This specification defines the Payload formatting for the Blend Protocol.
+The Payload has a fixed length to prevent traffic analysis attacks,
+with shorter messages padded using random data.
 
 ## Semantics
 
@@ -36,7 +31,7 @@ document are to be interpreted as described in
 
 #### Payload
 
-The Payload is a structure that contains a Header and a body.
+The `Payload` is a structure that contains a `Header` and a `body`.
 
 ```python
 class Payload:
@@ -46,7 +41,7 @@ class Payload:
 
 #### Header
 
-The Header is a structure that contains a body_type and a body_length.
+The `Header` is a structure that contains a `body_type` and a `body_length`.
 
 ```python
 class Header:
@@ -56,45 +51,48 @@ class Header:
 
 **Fields:**
 
-- **body_type**: A single byte indicating the type of message in the body
-- **body_length**: A uint16 (encoded as little-endian)
+- `body_type`: A single byte indicating the type of message in the body
+- `body_length`: A uint16 (encoded as little-endian)
   indicating the actual length of the raw message
 
 #### Type
 
-We define the following values of the body_type:
+Messages are classified into two types:
 
-- **body_type=0x00**: Informs that the body contains a cover message
-- **body_type=0x01**: Informs that the body contains a data message
+- **Cover message**: Traffic used to obscure network patterns and enhance privacy
+- **Data message**: Traffic containing actual protocol data (e.g., block proposals)
 
-Any other value of type means that the message was not decapsulated correctly
-and must be discarded.
+The `body_type` field indicates the message classification:
+
+- `body_type=0x00`: The body contains a cover message
+- `body_type=0x01`: The body contains a data message
+
+Implementations MUST discard messages with any other `body_type` value,
+as this indicates the message was not decapsulated correctly.
 
 #### Length
 
-We define the body_length as uint16 (encoded as little-endian).
-Therefore, the theoretical limit of the length of the body is 65535 bytes.
-The body_length must be set to the length of the body of the payload message
-(body_length=len(raw_message)).
+The `body_length` field is a uint16 (encoded as little-endian),
+with a theoretical maximum of 65535 bytes.
+The `body_length` MUST be set to the actual length of the raw message in bytes.
 
 #### Body
 
 The `MAX_BODY_LENGTH` parameter defines the maximum length of the body.
-Currently, we assume that the maximal length of a raw data message
-is 33129 (Block Proposal),
-so the `MAX_BODY_LENGTH=33129`.
+The maximal length of a raw data message is 33129 bytes (Block Proposal),
+so `MAX_BODY_LENGTH=33129`.
 
 The body length is fixed to `MAX_BODY_LENGTH` bytes.
-Therefore, if the length of the raw message is shorter than `MAX_BODY_LENGTH`,
-then it must be padded with random data.
+If the length of the raw message is shorter than `MAX_BODY_LENGTH`,
+it MUST be padded with random data.
 
 ```python
 MAX_BODY_LENGTH = 33129
 ```
 
 **Note:** The `MAX_BODY_LENGTH` (33129 bytes) defined here differs from
-`MAX_PAYLOAD_LENGTH` (34003 bytes) in the Message Formatting specification.
-The Message Formatting spec includes additional Message headers
+`MAX_PAYLOAD_LENGTH` (34003 bytes) in the [Message Formatting specification][message-formatting].
+The Message Formatting specification includes additional Message headers
 beyond the Payload body.
 
 ## Implementation Considerations
@@ -197,17 +195,16 @@ MAX_PAYLOAD_LENGTH = HEADER_SIZE + MAX_BODY_LENGTH  # 33132 bytes
 
 **Required Specifications:**
 
-- **Message Formatting Specification**: Defines the overall message structure
+- [Message Formatting Specification][message-formatting]: Defines the overall message structure
   that contains the payload
-- **Message Encapsulation Mechanism**: Handles encryption and encapsulation
+- [Message Encapsulation Mechanism][message-encapsulation]: Handles encryption and encapsulation
   of the formatted payload
-- **Formatting Section**: Provides high-level overview of payload formatting
-  in Blend Protocol
+- [Blend Protocol][blend-protocol]: Provides high-level overview of payload formatting
 
 **Relationship to Message Formatting:**
 
-- The Payload Formatting spec defines the internal structure of the payload
-- The Message Formatting spec defines how the payload is included
+- The Payload Formatting specification defines the internal structure of the payload
+- The Message Formatting specification defines how the payload is included
   in the complete message
 - The MAX_PAYLOAD_LENGTH in Message Formatting (34003 bytes)
   accounts for this payload structure
