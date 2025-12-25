@@ -466,7 +466,7 @@ we pre-compute $t_0$ and $t_1$ outside of the circuit.
   using 256-bit precision integers following:
 
 | Variable | Formula |
-|----------|---------|
+| -------- | ------- |
 | $p$ | `0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001` |
 | $t_0\_constant$ | `0x1a3fb997fd58374772808c13d1c2ddacb5ab3ea77413f86fd6e0d3d978e5438` |
 | $t_1\_constant$ | `0x71e790b41991052e30c93934b5612412e7958837bac8b1c524c24d84cc7d0` |
