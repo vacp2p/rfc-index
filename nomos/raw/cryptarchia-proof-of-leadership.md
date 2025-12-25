@@ -19,7 +19,7 @@ contributors:
 The Proof of Leadership (PoL) enables a leader to produce a zero-knowledge proof
 attesting to the fact that they have an eligible note
 that has won the leadership lottery.
-This proof MUST be as lightweight as possible to generate and verify,
+This proof is designed to be as lightweight as possible to generate and verify,
 to impose minimal restrictions on access to the role of leader
 and maximize the decentralization of that role.
 This document specifies the PoL mechanism for Cryptarchia,
