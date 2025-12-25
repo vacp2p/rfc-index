@@ -413,6 +413,14 @@ therefore each member can verify that there is no `MLS proposal` corresponding t
 
 To improve fairness in member and steward management, de-MLS SHOULD incorporate a
 lightweight peer-scoring mechanism.
+Unfairness is not an intrinsic property of a member.
+Instead, it arises as a consequence of punitive actions such as removal following an observed malicious behavior.
+However, behaviors that appear malicious are not always the result of intent.
+Network faults, temporary partitions, message delays, or client-side failures may lead to unintended protocol deviations.
+A peer-scoring mechanism allows de-MLS to account for such transient and non-adversarial conditions by accumulating evidence over time.
+This enables the system to distinguish persistent and intentional misbehavior from accidental faults.
+Member removal should be triggered only in cases of sustained and intentional malicious activity,
+thereby preserving fairness while maintaining security and liveness.
 In this approach, each node maintains a local peer score table mapping `member_id` to a score,
 with new members starting from a configurable default value `default_peer_score`.
 Peer scores may decrease due to violations and increase due to honest behavior;
