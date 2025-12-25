@@ -426,8 +426,8 @@ with new members starting from a configurable default value `default_peer_score`
 Peer scores may decrease due to violations and increase due to honest behavior;
 such score adjustments are derived from observable protocol events, such as
 successful commits or emergency criteria proposals, and each peer updates its local table accordingly.
-Stewards periodically check whether any peer’s score falls below a predefined threshold `threshold_peer_score`;
-only in that case is a removal operation included in the next commit.
+Stewards MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.  
+A removal operation MUST be included in the next commit only if a peer’s score is observed to fall below `threshold_peer_score`.
 This mechanism allows accidental or transient failures to be tolerated while still enabling
 decisive action against repeated or harmful behavior.
 The exact scoring rules, recovery mechanisms, and escalation criteria are left for future discussion.
