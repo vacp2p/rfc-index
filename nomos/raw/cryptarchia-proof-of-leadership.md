@@ -49,7 +49,7 @@ The protocol is comprised of two parts: setup and PoL generation.
 4. The leader receives their stake in a note that uses this generated secret key.
    The leader either transfers this stake to themselves
    or obtains it from a different user.
-5. The note becomes eligible for PoS when it has aged sufficiently,
+5. The note becomes eligible for Proof of Stake (PoS) when it has aged sufficiently,
    and the actual slot number is greater than or equal to
    the starting slot of the note.
 
