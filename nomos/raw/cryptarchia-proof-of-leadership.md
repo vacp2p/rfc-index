@@ -160,7 +160,7 @@ is only necessary to demonstrate that you are a leader.
 
 **Setup:** When refreshing their notes, potential leaders will:
 
-1. Uniformly randomly draw a seed $r_1 \stackrel{\$}{\leftarrow} \mathbb{F}_p$.
+1. Uniformly randomly draw a seed $r_1 \xleftarrow{\$} \mathbb{F}_p$.
 
 2. Construct a Merkle Tree of root $R$ containing $2^{25}$ slot secrets
    (that are random numbers).
