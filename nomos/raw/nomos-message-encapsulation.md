@@ -27,16 +27,14 @@ using cryptographic keys and proofs for layer security and authentication,
 applying verifiable random node selection for message routing,
 and using shared key derivation for secure inter-node communication.
 
-This document is part of the Formatting section and outlines the cryptographic
-notation, data structures, and algorithms essential to the encapsulation process,
-providing a complete specification for implementing this mechanism
-within the Blend Protocol.
+This document outlines the cryptographic notation, data structures,
+and algorithms essential to the encapsulation process.
 
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ## Document Structure
 
@@ -47,7 +45,7 @@ to serve different audiences and use cases:
 for implementing an interoperable Blend Protocol node.
 This section defines the cryptographic primitives, message formats,
 network protocols, and behavioral requirements that all implementations
-MUST follow to ensure compatibility and maintain the protocol's
+must follow to ensure compatibility and maintain the protocol's
 privacy guarantees.
 Protocol designers, auditors, and those seeking to understand the core
 mechanisms should focus on this part.
@@ -65,33 +63,11 @@ and can significantly improve performance and reliability.
 
 ### Introduction
 
-The message encapsulation mechanism is part of the Blend Protocol
+The message encapsulation mechanism is part of the [Blend Protocol][blend-protocol]
 and it describes the cryptographic operations necessary for building
 and processing messages by a Blend node.
-
-This document is part of the Formatting section.
-Please read through that document to better understand the context
-of the encapsulation mechanism and constructions used here.
-
-### Overview
-
-The Message Encapsulation Mechanism is a core component of the Blend Protocol
-that ensures privacy and security during node-to-node message transmission.
-By implementing multiple encryption layers and cryptographic operations,
-this mechanism keeps messages confidential while concealing their origins.
-
-The encapsulation process includes:
-
-- Building a multi-layered structure with public headers,
-  private headers, and encrypted payloads
-- Using cryptographic keys and proofs for layer security and authentication
-- Applying verifiable random node selection for message routing
-- Using shared key derivation for secure inter-node communication
-
-This document outlines the cryptographic notation, data structures,
-and algorithms essential to the encapsulation process,
-providing a complete specification for implementing this mechanism
-within the Blend Protocol.
+See the [Blend Protocol Formatting][blend-formatting] specification
+for additional context on message structure and formatting conventions.
 
 ### Notation
 
@@ -123,19 +99,20 @@ class ProofOfQuota:
 ```
 
 For more information about key generation mechanism
-please refer to Key Types and Generation Specification.
+please refer to the [Key Types and Generation Specification][key-types].
 
-For more information about proof of quota please refer to Proof of Quota.
+For more information about proof of quota
+please refer to the [Proof of Quota Specification][proof-of-quota].
 
 **Service Declaration Protocol:**
 
 $P^n$ is a public key of the node $n$,
 which is globally accessible using the Service Declaration Protocol (SDP).
-We are using this notation to distinguish the origin of the key,
+This notation is used to distinguish the origin of the key,
 hence the following simplified notation.
 
 For more information about Service Declaration Protocol
-please refer to Service Declaration Protocol.
+please refer to the [Service Declaration Protocol][sdp].
 
 $\mathcal{N} = \text{SDP}(s)$ is the set of nodes globally accessible using the SDP.
 
@@ -168,7 +145,7 @@ PROOF_OF_SELECTION_SIZE = 32
 ```
 
 For more information about the proof of selection,
-please refer to Proof of Selection.
+please refer to the [Proof of Selection Specification][proof-of-selection].
 
 **Hash Functions:**
 
@@ -268,8 +245,8 @@ def decrypt(data: bytes, key: bytes) -> bytes:
 
 #### Message Structure
 
-We start with a definition of the message structure
-that must be used to provide the protocol with the envisioned capabilities.
+The following defines the message structure
+that provides the protocol with the envisioned capabilities.
 
 A node $n$ constructs a message $\mathbf M = (\mathbf H, \mathbf h, \mathbf P)$
 according to the format presented below.
@@ -359,7 +336,7 @@ class PayloadType(Enum):
 #### Keys and Proof Generation
 
 For simplicity of the presentation,
-we do not distinguish between signing and encryption keys.
+this specification does not distinguish between signing and encryption keys.
 However, in practice, such a distinction is necessary, that is:
 
 - The $\mathbf K^n_h$ contains Ephemeral Signing Keys (ESK)
@@ -419,15 +396,15 @@ class ProofOfQuotaPublic:
 The ProofOfQuotaWitness (Witness) structure must be filled as follows:
 
 1. If the message contains cover traffic then:
-   1. We assume that the core quota is used and the selector=0 value must be specified.
+   1. The core quota is used and the selector=0 value must be specified.
    2. The index counts the number of cover messages and must be below core_quota.
    3. The core_sk, core_path, core_path_selector are filled by the node to prove that the node is the core node.
    4. The rest of the ProofOfQuotaWitness, is filled with arbitrary data.
 2. If the message contains data then:
-   1. We assume that the leader quota is used and the selector=1 value must be specified.
+   1. The leader quota is used and the selector=1 value must be specified.
    2. The index counts the number of data messages and must be below leader_quota.
    3. The core_sk, core_path, core_path_selector are filled with arbitrary data.
-   4. The rest is filled with Proof of Leadership (PoL — Proof of Leadership Specification) related data.
+   4. The rest is filled with [Proof of Leadership][proof-of-leadership] (PoL) related data.
 
 ```python
 class ProofOfQuotaWitness:
@@ -550,7 +527,7 @@ first for constructing and emitting a message
 and then for claiming a reward for it.
 
 For more information about proof of selection
-please refer to Proof of Selection.
+please refer to the [Proof of Selection Specification][proof-of-selection].
 
 #### Message Initialization
 
@@ -896,8 +873,8 @@ def decapsulate(
 
 ### Example: Complete Encapsulation and Decapsulation
 
-Let us look at an example of the above mechanism. Let us assume that $\beta_{max}=4,h=3$.
-We are omitting protocol version in the header for simplicity.
+The following example demonstrates the above mechanism with $\beta_{max}=4,h=3$.
+The protocol version in the header is omitted for simplicity.
 
 #### Initialization
 
@@ -976,7 +953,9 @@ $\mathbf{P} = \mathbf P_3= E_{H_{\mathbf P_0}(\kappa^{n,l_3}3)}E{H_{\mathbf P}(\
 
 #### Decapsulation
 
-Now let us take the above message and decapsulate it. We verify that the node doing the processing is the rightful recipient of the message and that the public header is correct.
+This section demonstrates decapsulation of the above message.
+The node doing the processing is the rightful recipient of the message
+and the public header is verified to be correct.
 
 **Node l=l_3:**
 
@@ -1022,8 +1001,16 @@ Similar decapsulation steps are performed by subsequent nodes in the blending pa
   \- Original Message Encapsulation documentation
 - [Blend Protocol](https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084)
   \- Context for message structure and formatting conventions
-- [Blend Protocol Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81a3b3ebc1f438209467)
+- [Blend Protocol Formatting][blend-formatting]
   \- Message formatting conventions
+
+[blend-protocol]: https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084
+[blend-formatting]: https://nomos-tech.notion.site/Formatting-215261aa09df81a3b3ebc1f438209467
+[key-types]: https://nomos-tech.notion.site/Key-Types-and-Generation-Specification-215261aa09df81088b8fd7c3089162e8
+[proof-of-quota]: https://nomos-tech.notion.site/Proof-of-Quota-Specification-215261aa09df81d88118ee22205cbafe
+[proof-of-selection]: https://nomos-tech.notion.site/Proof-of-Selection-215261aa09df81f2bbadc13ce0a2c3e2
+[sdp]: https://www.notion.so/Service-Declaration-Protocol
+[proof-of-leadership]: https://nomos-tech.notion.site/Proof-of-Leadership-215261aa09df8145a0f2c0d059aed59c
 
 ## Copyright
 
