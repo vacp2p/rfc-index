@@ -77,7 +77,7 @@ message Proposal {
   uint32 expected_voters_count = 15; // Maximum number of distinct voters
   uint32 round = 16;                 // Number of rounds 
   uint64 timestamp = 17;             // Creation time of proposal
-  uint64 expiration_timestamp = 18;  // The time interval that the proposal is active.  
+  uint64 expiration_timestamp = 18;  // The timestamp at which the proposal becomes outdated  
   bool liveness_criteria_yes = 19;   // Shows how managing the silent peers vote
 }
 
