@@ -405,9 +405,11 @@ such as commit and proposal incompatibility. Specifically, the broken commit can
 This activity is identified by the `members` since both `MLS proposal` and `voting proposal` are visible
 and can be identified by checking the hash of `Proposal.payload` and `MLSProposal.payload` is the same as RFC9240 section 12.1. Proposals.
 3. Censorship and inactivity: The situation where there is a voting proposal that is visible for every member,
-and the Steward does not provide an MLS proposal and commit.
+and the Steward does not provide an MLS proposal and commit within the configured `threshold_duration`,
+after which the voting process is considered finalized by the majority timer.
 This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
-therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
+therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`,
+or commit was produced for a voting proposal that has already been finalized due to timer expiration.
 
 ## Peer Scoring
 
