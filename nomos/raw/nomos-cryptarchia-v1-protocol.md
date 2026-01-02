@@ -13,6 +13,7 @@ contributors:
   - Marcin Pawlowski <marcin@status.im>
   - Daniel Sanchez Quiros <daniel@status.im>
   - Youngjoon Lee <youngjoon@status.im>
+  - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -25,17 +26,20 @@ Cryptarchia is a probabilistic consensus protocol with properties similar to
 Bitcoin's Nakamoto Consensus,
 dividing time into slots with a leadership lottery run at each slot.
 
+**Keywords:** consensus, proof-of-stake, leadership lottery, fork choice,
+block validation, epoch, slot, immutability
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+interpreted as described in [RFC 2119][rfc-2119].
 
-## Introduction
+## Background
 
 ### Resilience
 
-In consensus, we are presented with a choice of prioritizing either safety or liveness
+In consensus, there is a trade-off between prioritizing either safety or liveness
 in the presence of catastrophic failure (this is a re-formalization of the CAP theorem).
 Choosing safety means the chain never forks,
 instead the chain halts until the network heals.
@@ -104,26 +108,26 @@ throughout the protocol, including that:
 
 ### Limitations of Cryptarchia V1
 
-Despite our best efforts, we cannot provide perfect privacy and censorship resistance
+Despite best efforts, it is not possible to provide perfect privacy and censorship resistance
 to all parties. In particular:
 
-- We are unable to protect leaders from leaking information about themselves
+- It is not possible to protect leaders from leaking information about themselves
   based on the contents of blocks they propose.
   The tagging attack is an example of this,
   where an adversary may distribute a transaction to only a small subset of the network.
   If the block proposal includes this transaction,
   the adversary learns that the leader was one of those nodes in that subset.
 - The leader is a single point of failure (SPOF).
-  Despite all the efforts we go through to protect the leader,
+  Despite all the efforts to protect the leader,
   the network can be easily censored by the leader.
   The leader may choose to exclude certain types of transactions from blocks,
   leading to a worse UX for targeted parties.
 
-As far as we can tell, these limitations are not insurmountable
-and we have sketches towards solutions that we will develop
+These limitations are not considered insurmountable
+and there are sketches towards solutions that will be developed
 in following iterations of the protocol.
 
-## Overview
+## Design Overview
 
 Cryptarchia is a probabilistic consensus protocol with properties similar to
 Bitcoin's Nakamoto Consensus.
@@ -139,7 +143,7 @@ thus higher valued notes lead to increased chances of winning.
 To ensure privacy and avoid revealing the note value,
 this lottery result is proven within a ZK proof system.
 
-Our design starts from the solid foundation provided by
+The design starts from the solid foundation provided by
 Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake
 and builds upon it, incorporating the latest research at the intersection of
 cryptography, consensus and network engineering.
@@ -184,7 +188,7 @@ Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are add
 unless the Online fork choice rule is used.
 
 The details of fork choice rule transitions are defined in the bootstrap spec:
-Cryptarchia v1 Bootstrapping & Synchronization.
+[Cryptarchia v1 Bootstrapping & Synchronization][bootstrap-sync].
 
 ### Slot
 
@@ -197,7 +201,7 @@ otherwise the slot is said to be unoccupied.
 ### Epoch
 
 Cryptarchia has a few global variables that are adjusted periodically
-in order for consensus to function. Namely, we need:
+in order for consensus to function. Namely, the protocol requires:
 
 - Dynamic participation, thus the eligible notes must be refreshed regularly.
 - An unpredictable source of randomness for the leadership lottery.
@@ -215,9 +219,9 @@ An epoch is divided into 3 phases, as outlined below.
 
 | Epoch Phase | Phase Length | Description |
 | ----------- | ------------ | ----------- |
-| Stake Distribution Snapshot | $s$ slots | A snapshot of note commitments are taken at the beginning of the epoch. We wait for this value to finalize before entering the next phase. |
-| Buffer phase | $s$ slots | After the stake distribution is finalized, we wait another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage. |
-| Lottery Constants Finalization | $s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots | On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. We wait another $4\frac{k}{f}$ slots for these values to finalize. |
+| Stake Distribution Snapshot | $s$ slots | A snapshot of note commitments are taken at the beginning of the epoch. The protocol waits for this value to finalize before entering the next phase. |
+| Buffer phase | $s$ slots | After the stake distribution is finalized, the protocol waits another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage. |
+| Lottery Constants Finalization | $s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots | On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. The protocol waits another $4\frac{k}{f}$ slots for these values to finalize. |
 
 The **epoch length** is the sum of the individual phases:
 $3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor = 10 \lfloor \frac{k}{f} \rfloor$ slots.
@@ -273,8 +277,8 @@ where $B'$ is the last block before the start of the
 ### Total Stake Inference
 
 Given that stake is private in Cryptarchia,
-and that we want to maintain an approximately constant block rate,
-we must therefore adjust the difficulty of the slot lottery somehow
+and that the goal is to maintain an approximately constant block rate,
+the difficulty of the slot lottery must be adjusted
 based on the level of participation.
 The details can be found in the Total Stake Inference specification.
 
@@ -292,8 +296,8 @@ case ep = 0:
 
 otherwise:
     The epoch state is derived w.r.t. observations in the previous epoch.
-    Here we compute the slot at the start of the previous epoch.
-    We will query observations relative to this slot.
+    First, compute the slot at the start of the previous epoch.
+    Observations will be queried relative to this slot.
 
     sl_{ep-1} := (ep-1) · EPOCH_LENGTH
 
@@ -310,7 +314,7 @@ otherwise:
     Total active stake is inferred from the number of blocks produced
     in the previous epoch during the stake freezing phase.
     It is also derived from the previous estimate of total stake,
-    thus we recurse here to retrieve the previous epochs estimate D^{ep-1}
+    thus recursion is used here to retrieve the previous epochs estimate D^{ep-1}
 
     (_, _, D^{ep-1}) := compute_epoch_state(ep-1, tip)
 
@@ -327,7 +331,7 @@ otherwise:
 ## Leadership Lottery
 
 A lottery is run for every slot to decide who is eligible to propose a block.
-For each slot, we can have 0 or more winners.
+For each slot, there can be 0 or more winners.
 In fact, it's desirable to have short slots and many empty slots
 to allow for the network to propagate blocks
 and to reduce the chances of two leaders winning the same slot
@@ -348,15 +352,15 @@ The rewarding protocol is specified in Anonymous Leaders Reward Protocol.
 
 ### Fork Choice Rule
 
-We use two fork choice rules,
+Two fork choice rules are used,
 one during bootstrapping and a second once a node completes bootstrapping.
 
-During bootstrapping, we must be resilient to malicious peers feeding us false chains,
+During bootstrapping, the protocol must be resilient to malicious peers feeding false chains,
 this calls for a more expensive fork choice rule that can differentiate
 between malicious long-range attacks and honest chains.
 
-After bootstrapping we commit to the most honest looking chain we found
-and switch to a fork choice rule that rejects chains that diverge
+After bootstrapping, the node commits to the most honest looking chain found
+and switches to a fork choice rule that rejects chains that diverge
 by more than $k$ blocks.
 
 The details are specified in Cryptarchia Fork Choice Rule.
@@ -411,7 +415,7 @@ Given block $B=(header, transactions)$ and the block tree $T$ where:
 - $header$ is the header defined in Header
 - $transactions$ is the sequence of transactions in the block
 
-We say $\textbf{valid\_header}(B)$ returns True
+The function $\textbf{valid\_header}(B)$ returns True
 if all of the following constraints hold,
 otherwise it returns False.
 
@@ -436,7 +440,7 @@ otherwise it returns False.
    See Clocks for discussion around clock synchronization.
 
 7. `header.parent ∈ T`
-   Ensure we have already accepted the block's parent into the block tree.
+   Ensure the block's parent has already been accepted into the block tree.
 
 8. `height(B) > height(B_imm)`
    Ensure the block comes after the latest immutable block.
@@ -463,8 +467,8 @@ otherwise it returns False.
 
 ### Chain Maintenance
 
-We define the chain maintenance procedure `on_block(state, B)`
-that governs how the block tree $T$ is updated.
+The chain maintenance procedure `on_block(state, B)`
+governs how the block tree $T$ is updated.
 
 **Note:** It's assumed that block contents have already been validated
 by the execution layer w.r.t. the parent block's execution state.
@@ -475,7 +479,7 @@ define on_block(state, B) → state':
 (c_loc, B_imm, T) := state
 
 if B ∈ T ∨ ¬valid_header(B):
-    Either we've already seen B or it's invalid, in both cases we ignore this block
+    Either B has already been seen or it's invalid, in both cases the block is ignored
     return state
 
 T' := T ∪ {B}
@@ -493,7 +497,7 @@ return (c_loc', B_imm, T')
 
 ### Commit
 
-We define the procedure that commits to the block,
+The following procedure commits to the block
 which is $depth$ deep from $c_{loc}$.
 This procedure computes the new latest immutable block $B_\text{imm}$.
 
@@ -514,7 +518,7 @@ return (T', B_imm)
 
 ### Fork Pruning
 
-We define the fork pruning procedure that removes all blocks
+The fork pruning procedure removes all blocks
 which are part of forks diverged deeper than a certain block.
 
 ```text
@@ -548,7 +552,7 @@ Protocol versions are signalled through the `bedrock_version` field
 of the block header.
 Protocol upgrades need to be co-ordinated well in advance
 to ensure that node operators have enough time to update their node.
-We will use block height to schedule the activation of protocol updates.
+Block height is used to schedule the activation of protocol updates.
 E.g. bedrock version 35 will be active after block height 32000.
 
 ## Implementation Considerations
@@ -561,14 +565,14 @@ they can provide a new public key for each block they mine
 ensuring that their blocks cannot be connected by this identity,
 and PoW is not susceptible to long range attacks as is PoS.
 Unfortunately, it is wasteful and demands that leaders have powerful machines.
-We want to ensure strong decentralization by having a low barrier to entry
-and we believe we can achieve a good enough level of security
-given by having participants have an economic stake in the protocol.
+The goal is to ensure strong decentralization by having a low barrier to entry
+and a good enough level of security can be achieved
+by having participants have an economic stake in the protocol.
 
 ### Clocks
 
 Cryptarchia depends on honest nodes having relatively in-sync clocks.
-We currently rely on NTP to synchronize clocks,
+The protocol currently relies on NTP to synchronize clocks,
 this may be improved upon in the future,
 borrowing ideas from Ouroboros Chronos: Permissionless Clock Synchronization
 via Proof-of-Stake.
@@ -617,6 +621,7 @@ via Proof-of-Stake.
 [ouroboros-crypsinous]: https://eprint.iacr.org/2018/1132.pdf
 [ouroboros-chronos]: https://eprint.iacr.org/2019/838.pdf
 [blend-network]: https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084
+[rfc-2119]: https://www.ietf.org/rfc/rfc2119.txt
 
 ## Copyright
 
