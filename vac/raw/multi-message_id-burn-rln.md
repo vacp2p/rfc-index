@@ -10,23 +10,31 @@ contributors:
 ## Abstract
 
 This document specifies multi-message_id burn RLN which the users
-can use their multiple message rights at once unlike previous versions of RLN.
+can use their multiple message rights at once unlike previous versions of RLN
+that require a separate execution per `message_id`.
 
 ## Motivation
 
-RLN is the decentralized rate limitting mechanism for anonymous networks.
-RLNv2, the latest version of RLN, the users can apply different rate limits
-arbitrarily. This is possible with setting a rate limit over the `message_id`.
-But this version lacks of usage of multiple message rights over this `message_id`.
-Other saying, if the user wants to burn two different `message_id`, it need to compute
-two separated proofs. This is not always fair since, if there are two big signal,
-the users can send these two signal with burning only one `message_id`.
-The trivial solution would be the computing the multiple proof which cannot be the
-efficient.
-This multiple burning feature may unlock the usage of RLN for big signals,
-which can be a message or transaction in a single proof.
-This document specifies the mechanism the users can burn multiple `message_id` for a
-big signals at a single proof with changing existing RLNv2 circuit slightly.
+RLN is a decentralized rate-limiting mechanism designed for anonymous networks.
+In RLVv2, the latest version of the protocol, users can apply arbitrary rate limits
+by defining a specific limit over the `message_id`.
+However, this version does not support the simultaneous exercise
+of multiple messaging rights under a single `message_id`.
+In other words, if a user needs to consume multiple `message_id` units,
+they must compute separate proofs for each one.
+
+This lack of flexibility creates an imbalance: users sending signals
+of significantly different sizes still consume only one `message_id` per proof.
+While computing multiple proofs is a trivial workaround,
+it is neither computationally efficient nor manageable for high-throughput applications.
+
+Multiple burning refers to the mechanism where a fixed number of `message_id` units are processed
+within the circuit to generate multiple corresponding nullifiers inside a single cryptographic proof.
+This multiple burning feature may unlock the usage of RLN for big signals
+such as large messages or complex transactions, by validating their resource consumption in a single proof.
+
+This document specifies the mechanism that allows users to burn multiple `message_id` units
+at once by slightly modifying the existing [RLNv2](./rln-v2.md) circuit.
 
 ## Format Specification
 
