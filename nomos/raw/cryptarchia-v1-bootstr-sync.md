@@ -10,6 +10,7 @@ contributors:
   - Giacomo Pasini <giacomo@status.im>
   - Álvaro Castro-Castilla <alvaro@status.im>
   - Daniel Sanchez Quiros <daniel@status.im>
+  - Filip Dimitrijevic <filip@status.im>
 ---
 
 ## Abstract
@@ -17,11 +18,14 @@ contributors:
 This document specifies the bootstrapping and synchronization protocol
 for Cryptarchia v1 consensus.
 When a new node joins the network or a previously-bootstrapped node has been offline,
-it MUST catch up with the most recent honest chain
+it must catch up with the most recent honest chain
 by fetching missing blocks from peers before listening for new blocks.
 The protocol defines mechanisms for setting fork choice rules,
 downloading blocks, and handling orphan blocks
 while mitigating long range attacks.
+
+**Keywords:** bootstrapping, synchronization, fork choice, initial block download,
+orphan blocks, long range attacks, checkpoint
 
 ## Semantics
 
@@ -29,7 +33,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in RFC 2119.
 
-## Overview
+## Background
 
 This protocol defines the bootstrapping mechanism
 that covers all of the following cases:
@@ -54,8 +58,8 @@ as defined in Setting the Fork Choice Rule.
 If the Bootstrap rule is selected, it is maintained for the Prolonged Bootstrap Period,
 after which the node switches to the Online rule.
 
-Using the fork choice rule chosen, the node **downloads blocks**
-to catch up with the tip of the local chain $c_{loc}$ of each peer.
+Using the chosen fork choice rule, a node will **download blocks**
+to catch up with the head (also known as the tip) of each peer's local chain $c_{loc}$.
 
 After downloading is done, the node starts **listening for new blocks**.
 Upon receiving a new block, the node validates and adds it to its local block tree.
@@ -307,8 +311,8 @@ def download_blocks(local_tree: Tree, peer: Node,
 
         req = DownloadBlocksRequest(
             # If target_block is None, specify the current peer's tip
-            # each time when we build DownloadBlocksRequest,
-            # so that we can catch up with the most recent peer's tip.
+            # each time when building DownloadBlocksRequest,
+            # so that the node can catch up with the most recent peer's tip.
             target_block=target_block,
             known_blocks=KnownBlocks(
                 local_tip=local_tree.tip().id,
@@ -349,6 +353,8 @@ when a `DownloadBlocksRequest` is constructed.
 Instead of bootstrapping from the Genesis block or from the local block tree,
 a node can choose to bootstrap the honest chain
 starting from a checkpoint block obtained from a trusted checkpoint provider.
+A checkpoint provider is a trusted service (which MAY be a Nomos node
+or a dedicated server) that provides recent blockchain snapshots.
 In this case, the node fully trusts the checkpoint provider
 and considers blocks deeper than the checkpoint block as immutable
 (including the checkpoint block itself).
@@ -393,7 +399,7 @@ Here are the advantages and disadvantages of a short period:
 - Even a short offline duration can too sensitively trigger the Bootstrap rule,
   which then lasts for the long Prolonged Bootstrap Period.
 
-The following example explains why $T_\text{offline}$ should not be set too long:
+The following example explains why $T_\text{offline}$ SHOULD NOT be set too long:
 
 - A local node stopped in the following situation.
   A malicious peer is building a fork which is now a little shorter ($k - d$)
