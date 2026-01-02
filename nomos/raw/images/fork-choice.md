@@ -100,7 +100,24 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 - $s_{gen}$ : sufficient time measured in slots to measure the density of block production with enough statistical significance.
     
 In practice, $s_{gen} = \frac{k}{4f}$, where $f$ is the active slot coefficient from the leader lottery,
-see [Theorem 2 of Badertscher et al., 2018 “Ouroborus Genesis”](https://eprint.iacr.org/2018/378.pdf)*)*
+see [Theorem 2 of Badertscher et al., 2018 “Ouroborus Genesis”](https://eprint.iacr.org/2018/378.pdf)
+for more information.
+
+- $\textbf{common\_prefix\_depth}(b_1, b_2) \rarr (\mathbb{N},\mathbb{N})$
+
+Returns the minimum block depth at which the two branches converge to a common chain.
+
+Examples:
+    
+1. $\textbf{common\_prefix\_depth}(b_1, b_2) = (0, 4)$ implies that $b_2$ is ahead of $b_1$ by 4 blocks
+
+
+2. $\textbf{common\_prefix\_depth}(b_2, b_5) = (2, 3)$ would represent a forking tree like the one illustrated below:
+
+4. - $\textbf{density}(b_i, d, s_{gen})$
+Returns the number of blocks produced in the $s$ slots following block $b_{i-d}$.
+For example, in the following diagram,
+count the number of blocks produced in the $s_{gen}$ slots of the highlighted area.
 
 ### Bootstrap Fork Choice Rule
 
