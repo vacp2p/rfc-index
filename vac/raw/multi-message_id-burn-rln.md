@@ -45,9 +45,9 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 ## Recap of RLNv2
 
 Since the multi-message_id RLN is achieved by modifying the existing RLNv2 protocol,
-better to recap the RLNv2.
-Note that this modification only affects the signalling section.
-The rest of sections, registration, verifying and slashing stay the same with RLNv2.
+it is helpful to first recap RLNv2.
+Note that this modification only affects the signaling section;
+the remaining sections—registration, verification, and slashing—remain identical to RLNv2.
 
 ### RLNv2 Registration
 
@@ -103,11 +103,11 @@ since it is now a public input of the Circuit.
 
 ## Multi-message_id Burn RLN (Multi-burn RLN)
 
-The multi-burn overview is similar witht the previous versions.
-Therefore, it consists of registration, signaling and verification/slashing sections.
+The multi-burn protocol follows previous versions by comprising
+registration, signaling, and verification/slashing sections.
 
-As we mentioned before the, registration and erification/slashing, so in this section,
-it is enough to specify the signalling section.
+Since the registration and verification/slashing mechanisms remain unchanged,
+this section focuses exclusively on the modifications to the signaling process.
 
 ### Multi-burn RLN Signalling
 
@@ -131,9 +131,9 @@ Private Inputs
 
 Outputs
 
-* `y`
+* `y []`
 * `root`
-* `internal_nullifier []`
+* `internal_nullifiers []`
 
 ```js
 {
@@ -144,7 +144,7 @@ Outputs
 
 ```
 
-The output `[root, y [], internal_nullifier []]` is calculated in the following way:
+The output `(root, y [], internal_nullifiers [])` is calculated in the following way:
 
 ```js
 
@@ -153,7 +153,7 @@ a_1i = poseidonHash([a0, external_nullifier, message_id [i]]);
 
 y_i = a_0 + x * a_1i;
 
-internal_nullifier = poseidonHash([a_1]);
+internal_nullifiers_i = poseidonHash([a_1i]);
 
 ```
 
