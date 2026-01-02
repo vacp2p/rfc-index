@@ -113,17 +113,17 @@ Returns the minimum block depth at which the two branches converge to a common c
 
 Examples:
 
-1. $$\textbf{CommonPrefixDepth}(b_1, b_2) = (0, 4)$$
+1- $$\textbf{CommonPrefixDepth}(b_1, b_2) = (0, 4)$$
 implies that $b_2$ is ahead of $b_1$ by 4 blocks
 
 ![image](./images/image1.jpeg)
 
-2. $$\textbf{CommonPrefixDepth}(b_2, b_5) = (2, 3)$$
+2- $$\textbf{CommonPrefixDepth}(b_2, b_5) = (2, 3)$$
 would represent a forking tree like the one illustrated below:
 
 ![image2](./images/commonprefix2.jpeg)
 
-3. $$\textbf{density}(b_i, d, s_{gen})$$
+3- $$\textbf{density}(b_i, d, s_{gen})$$
 
 ![image3](./images/density.jpeg)
 
