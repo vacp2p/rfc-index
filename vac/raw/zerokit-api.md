@@ -31,8 +31,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ### Important Note
 
-All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md).
-More details are available in the [technical overview](../32/rln-v1.md#technical-overview).
+All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md), along with the introduction of `message_id` in [RLN-V2](./rln-v2.md).
 
 ### Architecture Overview
 
@@ -392,7 +391,7 @@ implement safeguards to prevent accidental violations.
 
 ### Normative
 
-- [32/RLN-V1](../32/rln-v1.md) - Rate Limit Nullifier V1 specification
+- [RLN-V1 Specification](../32/rln-v1.md) - Rate Limit Nullifier V1 protocol
 
 ### Informative
 
