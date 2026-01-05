@@ -26,7 +26,8 @@ Zerokit is the reference implementation of the RLN-V2 protocol.
 ## Format Specification
 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
-“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document
+are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ### Important Note
 
@@ -121,46 +122,68 @@ Function signatures documented below are from the Rust perspective.
 
 ### Initialization
 
-`RLN::new(tree_depth, tree_config)` creates a new RLN instance by loading circuit resources from the default folder. The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string, a direct config object (with pmtree feature), or an empty string for defaults. Not available in WASM. Not available when `stateless` feature is enabled.
+`RLN::new(tree_depth, tree_config)` creates a new RLN instance by loading circuit resources from the default folder.
+The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string,
+a direct config object (with pmtree feature), or an empty string for defaults.
+Not available in WASM. Not available when `stateless` feature is enabled.
 
-`RLN::new()` creates a new stateless RLN instance by loading circuit resources from the default folder. Only available when `stateless` feature is enabled. Not available in WASM.
+`RLN::new()` creates a new stateless RLN instance by loading circuit resources from the default folder.
+Only available when `stateless` feature is enabled. Not available in WASM.
 
-`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` creates a new RLN instance with pre-loaded circuit parameters passed as byte vectors. The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait. Not available in WASM. Not available when `stateless` feature is enabled.
+`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` creates a new RLN instance
+with pre-loaded circuit parameters passed as byte vectors.
+The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait.
+Not available in WASM. Not available when `stateless` feature is enabled.
 
-`RLN::new_with_params(zkey_data, graph_data)` creates a new stateless RLN instance with pre-loaded circuit parameters. Only available when `stateless` feature is enabled. Not available in WASM.
+`RLN::new_with_params(zkey_data, graph_data)` creates a new stateless RLN instance with pre-loaded circuit parameters.
+Only available when `stateless` feature is enabled. Not available in WASM.
 
-`RLN::new_with_params(zkey_data)` creates a new stateless RLN instance for WASM with pre-loaded zkey data. Graph data is not required as witness calculation is handled externally in WASM environments. Only available in WASM with `stateless` feature enabled.
+`RLN::new_with_params(zkey_data)` creates a new stateless RLN instance for WASM with pre-loaded zkey data.
+Graph data is not required as witness calculation is handled externally in WASM environments.
+Only available in WASM with `stateless` feature enabled.
 
 ### Key Generation
 
 `keygen()` generates a random identity keypair returning `(identity_secret, id_commitment)`.
 
-`seeded_keygen(seed)` generates a deterministic identity keypair from a seed returning `(identity_secret, id_commitment)`.
+`seeded_keygen(seed)` generates a deterministic identity keypair
+from a seed returning `(identity_secret, id_commitment)`.
 
-`extended_keygen()` generates a random extended identity keypair returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+`extended_keygen()` generates a random extended identity keypair
+returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
 
-`extended_seeded_keygen(seed)` generates a deterministic extended identity keypair from a seed returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+`extended_seeded_keygen(seed)` generates a deterministic extended identity keypair
+from a seed returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
 
 ### Merkle Tree Management
 
 All tree management functions are only available when
 `stateless` feature is NOT enabled.
 
-`set_tree(tree_depth)` initializes the internal Merkle tree with the specified depth. Leaves are set to the default zero value.
+`set_tree(tree_depth)` initializes the internal Merkle tree with the specified depth.
+Leaves are set to the default zero value.
 
 `set_leaf(index, leaf)` sets a leaf value at the specified index.
 
 `get_leaf(index)` returns the leaf value at the specified index.
 
-`set_leaves_from(index, leaves)` sets multiple leaves starting from the specified index. Updates `next_index` to `max(next_index, index + n)`. If n leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
+`set_leaves_from(index, leaves)` sets multiple leaves starting from the specified index.
+Updates `next_index` to `max(next_index, index + n)`.
+If n leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
 
-`init_tree_with_leaves(leaves)` resets the tree state to default and initializes it with the provided leaves starting from index 0. This resets the internal `next_index` to 0 before setting the leaves.
+`init_tree_with_leaves(leaves)` resets the tree state to default and initializes it
+with the provided leaves starting from index 0.
+This resets the internal `next_index` to 0 before setting the leaves.
 
-`atomic_operation(index, leaves, indices)` atomically inserts leaves starting from index and removes leaves at the specified indices. Updates `next_index` to `max(next_index, index + n)` where n is the number of leaves inserted.
+`atomic_operation(index, leaves, indices)` atomically inserts leaves starting from index
+and removes leaves at the specified indices.
+Updates `next_index` to `max(next_index, index + n)` where n is the number of leaves inserted.
 
-`set_next_leaf(leaf)` sets a leaf at the next available index and increments `next_index`. The leaf is set at the current `next_index` value, then `next_index` is incremented.
+`set_next_leaf(leaf)` sets a leaf at the next available index and increments `next_index`.
+The leaf is set at the current `next_index` value, then `next_index` is incremented.
 
-`delete_leaf(index)` sets the leaf at the specified index to the default zero value. Does not change the internal `next_index` value.
+`delete_leaf(index)` sets the leaf at the specified index to the default zero value.
+Does not change the internal `next_index` value.
 
 `leaves_set()` returns the number of leaves that have been set in the tree.
 
@@ -172,21 +195,26 @@ All tree management functions are only available when
 
 `get_empty_leaves_indices()` returns indices of leaves set to zero up to the final leaf that was set.
 
-`set_metadata(metadata)` stores arbitrary metadata in the RLN object for application use. This metadata is not used by the RLN module.
+`set_metadata(metadata)` stores arbitrary metadata in the RLN object for application use.
+This metadata is not used by the RLN module.
 
 `get_metadata()` returns the metadata stored in the RLN object.
 
-`flush()` closes the connection to the Merkle tree database. Should be called before dropping the RLN object when using persistent storage.
+`flush()` closes the connection to the Merkle tree database.
+Should be called before dropping the RLN object when using persistent storage.
 
 ### Witness Construction
 
-`RLNWitnessInput::new(identity_secret, user_message_limit, message_id, path_elements, identity_path_index, x, external_nullifier)` constructs a witness input for proof generation. Validates that `message_id < user_message_limit`.
+`RLNWitnessInput::new(identity_secret, user_message_limit, message_id, path_elements, identity_path_index, x, external_nullifier)` constructs
+a witness input for proof generation. Validates that `message_id < user_message_limit`.
 
 ### Witness Calculation
 
-For native (non-WASM) environments, witness calculation is handled internally by the proof generation functions. The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
+For native (non-WASM) environments, witness calculation is handled internally by the proof generation functions.
+The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
 
-For WASM environments, witness calculation must be performed externally using a JavaScript witness calculator. The workflow is:
+For WASM environments, witness calculation must be performed externally using a JavaScript witness calculator.
+The workflow is:
 
 1. Create a `WasmRLNWitnessInput` with the required parameters
 2. Export to JSON format using `toBigIntJson()` method
@@ -197,23 +225,39 @@ The witness calculator computes all intermediate values required by the RLN circ
 
 ### Proof Generation
 
-`generate_zk_proof(witness)` generates a Groth16 zkSNARK proof from a witness. Extract proof values separately using `proof_values_from_witness`. Not available in WASM.
+`generate_zk_proof(witness)` generates a Groth16 zkSNARK proof from a witness.
+Extract proof values separately using `proof_values_from_witness`.
+Not available in WASM.
 
-`generate_rln_proof(witness)` generates a complete RLN proof returning both the zkSNARK proof and proof values as `(proof, proof_values)`. This combines proof generation and proof values extraction. Not available in WASM.
+`generate_rln_proof(witness)` generates a complete RLN proof returning both the zkSNARK proof and proof values as `(proof, proof_values)`.
+This combines proof generation and proof values extraction.
+Not available in WASM.
 
-`generate_rln_proof_with_witness(calculated_witness, witness)` generates an RLN proof using a pre-calculated witness from an external witness calculator. The `calculated_witness` should be a `Vec<BigInt>` obtained from the external witness calculator. Returns `(proof, proof_values)`. This is the primary proof generation method for WASM where witness calculation is handled by JavaScript.
+`generate_rln_proof_with_witness(calculated_witness, witness)` generates an RLN proof using
+a pre-calculated witness from an external witness calculator.
+The `calculated_witness` should be a `Vec<BigInt>` obtained from the external witness calculator.
+Returns `(proof, proof_values)`.
+This is the primary proof generation method for WASM where witness calculation is handled by JavaScript.
 
 ### Proof Verification
 
-`verify_zk_proof(proof, proof_values)` verifies only the zkSNARK proof without root or signal validation. Returns `true` if the proof is valid.
+`verify_zk_proof(proof, proof_values)` verifies only the zkSNARK proof without root or signal validation.
+Returns `true` if the proof is valid.
 
-`verify_rln_proof(proof, proof_values, x)` verifies the proof against the internal Merkle tree root and validates that `x` matches the proof signal. Returns an error if verification fails (invalid proof, invalid root, or invalid signal). Only available when `stateless` feature is NOT enabled.
+`verify_rln_proof(proof, proof_values, x)` verifies the proof against the internal Merkle tree root and
+validates that `x` matches the proof signal.
+Returns an error if verification fails (invalid proof, invalid root, or invalid signal).
+Only available when `stateless` feature is NOT enabled.
 
-`verify_with_roots(proof, proof_values, x, roots)` verifies the proof against a set of acceptable roots and validates the signal. If the roots slice is empty, root verification is skipped. Returns an error if verification fails.
+`verify_with_roots(proof, proof_values, x, roots)` verifies the proof against a set of acceptable roots and
+validates the signal.
+If the roots slice is empty, root verification is skipped. Returns an error if verification fails.
 
 ### Slashing
 
-`recover_id_secret(proof_values_1, proof_values_2)` recovers the identity secret from two proof values that share the same external nullifier. Used to detect and penalize rate limit violations.
+`recover_id_secret(proof_values_1, proof_values_2)` recovers the identity secret from two proof values
+that share the same external nullifier.
+Used to detect and penalize rate limit violations.
 
 ### Hash Utilities
 
