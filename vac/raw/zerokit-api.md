@@ -31,7 +31,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ### Important Note
 
-All terms and parameters used remain the same as in [32/RLN-V1](../32/rln-v1.md), along with the introduction of `message_id` in [RLN-V2](./rln-v2.md).
+All terms and parameters used remain the same as in [RLN-V2](./rln-v2.md) and [RLN-V1](../32/rln-v1.md#technical-overview).
 
 ### Architecture Overview
 
@@ -397,7 +397,7 @@ implement safeguards to prevent accidental violations.
 
 - [Zerokit GitHub Repository](https://github.com/vacp2p/zerokit) - Reference implementation
 - [RLN-V2 Specification](./rln-v2.md) - Rate Limit Nullifier V2 protocol
-- [Sled Database](https://sled.rs) - Embedded database used for persistent Merkle tree storage
+- [Sled Database](https://sled.rs) - Embedded database for persistent Merkle tree storage
 
 ## Copyright
 
