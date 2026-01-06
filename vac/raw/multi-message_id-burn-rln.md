@@ -220,3 +220,8 @@ are not considered consumed and MAY be reused in subsequent proofs in which the 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+### References
+
+- [RLNv1](https://rfc.vac.dev/vac/32/rln-v1)
+- [RLNv2](https://rfc.vac.dev/vac/raw/rln-v2)
