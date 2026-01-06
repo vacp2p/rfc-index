@@ -153,7 +153,8 @@ where 0 < `i` ≤ `max_out`,  `max_out` is a new parameter that is fixed for a a
 To define this fixed number makes the circuit is flexiable with a single circuit that is maintable.
 Since the user is free to burn arbitrary number of `message_id` at once up to `max_out`.
 
-Note that within a given epoch, the `external_nullifier` MUST be identical for all messages,
+Note that within a given epoch, the `external_nullifier` MUST be identical for all messages
+as shown in NULL (unused) output [section](#null-unused-outputs),
 as it is computed deterministically from the epoch value and the `rln_identifier` as follows:
 
 ```js
