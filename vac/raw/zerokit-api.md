@@ -6,7 +6,7 @@ category: Standards Track
 tags: [zerokit, rln, api]
 editor: Vac Team
 contributors:
-  - vinhtc27 <vinh@status.im>
+  - Vinh Trinh <vinh@status.im>
 ---
 
 ## Abstract
@@ -40,8 +40,7 @@ Zerokit follows a layered architecture where
 the core RLN logic is implemented once in Rust and
 exposed through platform-specific bindings.
 The protocol layer handles zero-knowledge proof generation and verification,
-Merkle tree operations,
-and cryptographic primitives.
+Merkle tree operations, and cryptographic primitives.
 This core is wrapped by three interface layers:
 native Rust for direct library integration,
 FFI for C-compatible bindings consumed by languages (such as C and Nim),
@@ -122,6 +121,9 @@ Function signatures documented below are from the Rust perspective.
 
 ### Initialization
 
+Functions with the same name but different signatures are conditional compilation variants.
+Only one variant exists at compile time based on enabled feature flags.
+
 `RLN::new(tree_depth, tree_config)` creates a new RLN instance by loading circuit resources from the default folder.
 The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string,
 a direct config object (with pmtree feature), or an empty string for defaults.
@@ -139,7 +141,7 @@ Not available in WASM. Not available when `stateless` feature is enabled.
 Only available when `stateless` feature is enabled. Not available in WASM.
 
 `RLN::new_with_params(zkey_data)` creates a new stateless RLN instance for WASM with pre-loaded zkey data.
-Graph data is not required as witness calculation is handled externally in WASM environments.
+Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
 Only available in WASM with `stateless` feature enabled.
 
 ### Key Generation
@@ -330,7 +332,7 @@ The window size depends on network propagation delays and epoch duration.
 
 ### Stateful with Fixed Root
 
-Applies when membership is established once and remains static during operation.
+Applies when membership is established once and remains static during an operation period.
 
 Initialize the tree using `init_tree_with_leaves` with the complete membership set.
 No root history is required.
@@ -360,6 +362,8 @@ This requires COOP/COEP headers for SharedArrayBuffer support.
 #### Epoch and Rate Limit Configuration
 
 The external nullifier is computed as `poseidon_hash([epoch, rln_identifier])`.
+The `rln_identifier` is a field element that uniquely identifies your application (e.g., a hash of your app name).
+
 Each application SHOULD use a unique `rln_identifier` to
 prevent cross-application nullifier collisions.
 
@@ -399,6 +403,7 @@ implement safeguards to prevent accidental violations.
 - [Zerokit GitHub Repository](https://github.com/vacp2p/zerokit) - Reference implementation
 - [RLN-V2 Specification](./rln-v2.md) - Rate Limit Nullifier V2 protocol
 - [Sled Database](https://sled.rs) - Embedded database for persistent Merkle tree storage
+- [Witness Calculator](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js) - JavaScript witness calculator for WASM environments
 
 ## Copyright
 
