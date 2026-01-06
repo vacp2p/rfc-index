@@ -216,3 +216,7 @@ slots does not result in additional burns, as their corresponding outputs are
 fully masked and ignored during verification.
 Moreover, `message_id` values that are provided to the circuit but correspond to unused slots (`selector_used[k] = 0`)
 are not considered consumed and MAY be reused in subsequent proofs in which the corresponding selector bit is set to `1`.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
