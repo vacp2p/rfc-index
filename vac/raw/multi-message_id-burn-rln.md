@@ -33,6 +33,18 @@ within the circuit to generate multiple corresponding nullifiers inside a single
 This multiple burning feature may unlock the usage of RLN for big signals
 such as large messages or complex transactions, by validating their resource consumption in a single proof.
 
+Alternatively, multiple burning could be realized by defining a separate circuit
+for each possible number of `message_id` units to be consumed.
+While such an approach would allow precise specialization, it would significantly increase
+operational complexity by requiring the management, deployment, and verification
+of multiple circuit variants.
+
+To avoid this complexity, this document adopts a single, fixed-size but flexible
+circuit design, where a bounded number of `message_id` units can be selectively
+burned using selector bits.
+This approach preserves the simplicity of a single
+circuit while enabling efficient multi-burn proofs within a single execution.
+
 This document specifies the mechanism that allows users to burn multiple `message_id` units
 at once by slightly modifying the existing [RLNv2](./rln-v2.md) circuit.
 
