@@ -156,9 +156,7 @@ Since the user is free to burn arbitrary number of `message_id` at once up to `m
 Note that within a given epoch, the `external_nullifier` MUST be identical for all messages,
 as it is computed deterministically from the epoch value and the `rln_identifier` as follows:
 
-
 ```js
 external_nullifier = poseidonHash([epoch, rln_identifier]);
 
 ```
-
