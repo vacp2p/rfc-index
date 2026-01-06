@@ -4,8 +4,9 @@ name: Zerokit API
 status: raw
 category: Standards Track
 tags: [zerokit, rln, api]
-editor:
+editor: Vac Team
 contributors:
+  - vinhtc27 <vinh@status.im>
 ---
 
 ## Abstract
