@@ -16,7 +16,7 @@ that require a separate execution per `message_id`.
 ## Motivation
 
 RLN is a decentralized rate-limiting mechanism designed for anonymous networks.
-In RLVv2, the latest version of the protocol, users can apply arbitrary rate limits
+In [RLNv2](./rln-v2.md), the latest version of the protocol, users can apply arbitrary rate limits
 by defining a specific limit over the `message_id`.
 However, this version does not support the simultaneous exercise
 of multiple messaging rights under a single `message_id`.
@@ -87,7 +87,7 @@ The output `[y, internal_nullifier]` is calculated in the following way:
 ```js
 
 a_0 = identity_secret_hash;
-a_1 = poseidonHash([a0, external_nullifier]);
+a_1 = poseidonHash([a0, external_nullifier, message_id]);
 
 y = a_0 + x * a_1;
 
@@ -135,15 +135,6 @@ Outputs
 * `root`
 * `internal_nullifiers []`
 
-```js
-{
-    identity_secret_hash: bigint, 
-    external_nullifier: bigint,
-    x: bigint
-}
-
-```
-
 The output `(root, y [], internal_nullifiers [])` is calculated in the following way:
 
 ```js
@@ -161,3 +152,13 @@ where 0 ≤ `i` ≤ `max_out`,  `max_out` is a new parameter that is fixed for a
 `max_out` is arranged the requirements of the application.
 To define this fixed number makes the circuit is flexiable with a single circuit that is maintable.
 Since the user is free to burn arbitrary number of `message_id` at once up to `max_out`.
+
+Note that within a given epoch, the `external_nullifier` MUST be identical for all messages,
+as it is computed deterministically from the epoch value and the `rln_identifier` as follows:
+
+
+```js
+external_nullifier = poseidonHash([epoch, rln_identifier]);
+
+```
+
