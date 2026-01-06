@@ -119,7 +119,7 @@ Public Inputs
 
 * `x`
 * `external_nullifier`
-* `i`
+* `selector_used []`
 
 Private Inputs
 
@@ -148,7 +148,7 @@ internal_nullifiers_i = poseidonHash([a_1i]);
 
 ```
 
-where 0 ≤ `i` ≤ `max_out`,  `max_out` is a new parameter that is fixed for a application.
+where 0 < `i` ≤ `max_out`,  `max_out` is a new parameter that is fixed for a application.
 `max_out` is arranged the requirements of the application.
 To define this fixed number makes the circuit is flexiable with a single circuit that is maintable.
 Since the user is free to burn arbitrary number of `message_id` at once up to `max_out`.
@@ -160,3 +160,46 @@ as it is computed deterministically from the epoch value and the `rln_identifier
 external_nullifier = poseidonHash([epoch, rln_identifier]);
 
 ```
+
+#### NULL (unused) outputs
+
+Since the number of used `message_id` values MAY be less than `max_out`, the difference
+`j = max_out - i`, where `0 ≤ j ≤ max_out − 1`, denotes the number of unused output slots.
+
+These `j` outputs are referred to as **NULL outputs**. NULL outputs carry no semantic meaning and
+**MUST** be identical to one another in order to unambiguously indicate that they correspond to
+unused `message_id` slots and do not represent valid proofs.
+
+To compute NULL outputs, the circuit makes use of a selector bit array `selector_used []`,
+where `selector_used[i] = 1` denotes a used `message_id` slot and `selector_used[i] = 0` denotes
+an unused slot.
+
+The `message_id` values are provided to the circuit incrementally
+(e.g., `1, 2, 3, ...`), independently of whether a slot is used or unused.
+The circuit computes the corresponding intermediate values for all slots
+according to the RLNv2 equations.
+
+For each slot `k`, the final outputs are masked using the selector bits as
+follows:
+
+```js
+
+a_0 = identity_secret_hash;
+a_1i = poseidonHash([a0, external_nullifier, message_id [i]]);
+
+y_i = selector_used[i] * a_0 + x * a_1i;
+
+internal_nullifiers_i = selector_used[i] * poseidonHash([a_1i]);
+
+```
+
+Since multiplication by zero yields the additive identity in the field,
+all unused slots (`selector_used[k] = 0`) result in
+`y[k] = 0` and `internal_nullifiers[k] = 0`, which are interpreted as
+NULL outputs and carry no semantic meaning.
+
+As a consequence, the presence of valid-looking `message_id` values in unused
+slots does not result in additional burns, as their corresponding outputs are
+fully masked and ignored during verification.
+Moreover, `message_id` values that are provided to the circuit but correspond to unused slots (`selector_used[k] = 0`)
+are not considered consumed and MAY be reused in subsequent proofs in which the corresponding selector bit is set to `1`.
