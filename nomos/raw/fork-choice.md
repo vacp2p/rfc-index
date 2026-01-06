@@ -133,7 +133,7 @@ count the number of blocks produced in the $s_{gen}$ slots of the highlighted ar
 
 ### Bootstrap Fork Choice Rule
 
-During bootstrapping, the Ouroboros Genesis fork choice rule (`maxvalid-bg`)
+During bootstrapping, the Ouroboros Genesis fork choice rule (`maxvalid-bg`).
 
 ```python
 
@@ -193,3 +193,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Ouroboros Genesis](https://eprint.iacr.org/2018/378.pdf)
 - [Ouroboros Praos](https://eprint.iacr.org/2017/573.pdf)
 - [CRYPTARCHIA-V1-BOOTSTRAPPING-SYNCHRONIZATION](./bootstrap.md)
+- [Nomos Fork CHoice Orignial Specification](https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule-21b261aa09df811584dfd362abb26627#21b261aa09df812caa08ce2f637a6278)
