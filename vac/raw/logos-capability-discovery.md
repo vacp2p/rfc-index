@@ -1093,12 +1093,34 @@ from across the registrar’s routing table `RegT(service_id_hash)`.
 While responding to both `REGISTER` requests by advertisers
 and `GET_ADS` request by discoverers,
 registrars play an important role in helping nodes discover the network topology.
+The registrar table `RegT(service_id_hash)` is a routing structure
+that SHOULD be maintained by registrars
+to provide better peer suggestions to advertisers and discoverers.
+
+Registrars SHOULD use the formula specified in the [Distance](#distance) section
+to add peers to `RegT(service_id_hash)`.
+Peers are added under the following circumstances:
+
+- Registrars MAY initialize their registrar table `RegT(service_id_hash)`
+from their `KadDHT(peerID)` routing table.
+- When an advertiser sends a `REGISTER` request,
+the registrar SHOULD add the advertiser's `peerID` to `RegT(service_id_hash)`.
+- When a discoverer sends a `GET_ADS` request,
+the registrar SHOULD add the discoverer's `peerID` to `RegT(service_id_hash)`.
+- When registrars receive responses from other registrars
+(if acting as advertiser or discoverer themselves),
+they SHOULD add peers from `closerPeers` fields
+to relevant `RegT(service_id_hash)` tables.
+
+> Note: The advertisement cache `ad_cache`
+and registrar table `RegT(service_id_hash)`
+are completely different data structures
+that serve different purposes and are independent of each other.
+They do NOT need to be synchronized,
+and entries in one do NOT automatically correspond to entries in the other.
 
 When responding to requests, registrars:
 
-- May initialize their registrar table `RegT(service_id_hash)`
-from their `KadDHT(peerID)` routing table using
-the formula specified in the [Distance](#distance) section.
 - SHOULD return a list of peers to help advertisers
 populate their `AdvT(service_id_hash)` tables and
 discoverers populate their `DiscT(service_id_hash)` tables.
