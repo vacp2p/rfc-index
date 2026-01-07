@@ -4,8 +4,8 @@ name: Libp2p Mix Protocol
 status: raw
 category: Standards Track
 tags:
-editor: Prem Prathi <premprathi@proton.me>
-contributors: Akshaya Mani <akshaya@status.im>, Daniel Kaiser <danielkaiser@status.im>
+editor: Prem Prathi <prem@status.im>
+contributors: Akshaya Mani <akshaya@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius <hanno@status.im>
 ---
 
 ## Abstract
@@ -322,17 +322,17 @@ Delay strategies SHOULD introduce enough uncertainty to prevent adversaries from
 
 ### 6.3 Spam Protection
 
-The Mix Protocol supports optional spam protection mechanism to defend the mixnet against denial-of-service (DoS) or resource exhaustion attacks.
+The Mix Protocol supports an optional, pluggable spam protection mechanism to defend the mixnet against denial-of-service (DoS) or resource exhaustion attacks.
 Without spam protection, malicious actors could flood mix nodes with valid Sphinx packets, exhausting computational resources or bandwidth of the mix nodes eventually making them unusable.
 Spam protection is critical to make the mixnet robust enough to be used in a production environment.
 
-Spam protection mechanism is considered pluggable because different deployments may require different trade-offs between computational overhead, attack resistance, and Sybil resistance.
-The specific mechanism used MUST be followed by all participating mix nodes within a deployment to ensure interoperability.
+The spam protection mechanism is pluggable because different deployments may require different trade-offs between computational overhead, attack resistance, and Sybil resistance.
+For a specific mix deployment, the same spam protection mechanism MUST be followed by all participating mix nodes to ensure interoperability.
 
-Two primary architectural approaches exist for integrating spam protection: sender-generated per-hop proofs and per-Hop Generated Proofs.
+Two primary architectural approaches exist for integrating spam protection: sender-generated proofs and per-hop generated proofs.
 Each approach has distinct implications for computational overhead, latency, security properties, Sybil resistance, and implementation complexity.
 
-Detailed design requirements, architectural approaches, packet structure considerations, node responsibilities, and recommendedions are specified in [Section 9](#9-spam-protection-architecture).
+Detailed design requirements, architectural approaches, packet structure considerations, node responsibilities, and recommendations are specified in [Section 9](#9-spam-protection-architecture).
 
 Note that application-level or origin-protocol spam protection mechanisms are out of scope for the Mix Protocol and MUST be handled by the appropriate protocol layer itself.
 For example, Waku protocols use RLN (Rate Limiting Nullifiers) for spam protection, which is handled by [Waku-Relay](https://rfc.vac.dev/waku/standards/core/17/rln-relay) protocol, and the RLN proof would be included as part of the mix payload.
@@ -1152,7 +1152,7 @@ Once the node determines its role as an exit following the steps in [Section 8.6
      - the origin protocol codec
      - the serialized application message
 
-   - SURB extraction, and protocol codec identification, consistent with the format and extensions applied by the initiator.
+   - Extract SURBs , and identify protocol codec , consistent with the format and extensions applied by the initiator.
      The application message itself MUST remain serialized.
 
    - If parsing fails at any stage, discard $m$ and terminate processing.
@@ -1177,14 +1177,14 @@ Any spam protection mechanism integrated with the Mix Protocol MUST satisfy the 
 - Each mix node in the path MUST verify proofs before applying delay and forwarding or taking further action (in the case of exit nodes).
 
 - Spam protection data and verification MUST NOT enable linking or correlating packets across hops.
-  Spam protection proofs MUST be unique per hop.
+  Therefore, spam protection proofs MUST be unique per hop.
 
 - Spam protection proofs MUST NOT be reusable across different packets or hops.
   Each hop SHOULD be able to detect replayed or forged proofs (e.g., via cryptographic binding to packet-specific or hop-specific data).
 
-- Proofs SHOULD be bound to fresh, packet-specific data (_e.g.,_ payload states, timestamps) that cannot be known in advance, preventing adversaries from pre-computing large batches of proofs offline for spam attacks.
+- Proofs SHOULD be bound to unique signals per message that cannot be known in advance, preventing adversaries from pre-computing large batches of proofs offline for spam attacks.
 
-- Verification overhead MUST be significantly lower than proof generation cost.
+- Verification overhead MUST be low to minimise per-hop delays.
   Otherwise, the spam protection mechanism would add substantial delay at each hop.
 
 - Proof generation and verification methods MUST preserve unlinkability of the sender and MUST NOT leak any additional metadata about the sender or node.
@@ -1196,7 +1196,7 @@ Any spam protection mechanism integrated with the Mix Protocol MUST satisfy the 
 Two primary architectural approaches exist for integrating spam protection with the Mix Protocol, each with distinct trade-offs.
 This section elaborates on each approach and also lists down trade-offs and provides a comparison which helps in making a decision for deployments.
 
-#### 9.2.1 Sender-Generated Per-Hop Proofs
+#### 9.2.1 Sender-Generated Proofs
 
 In this approach, the sender generates spam protection proofs for all hops in the mix path during Sphinx packet construction.
 Proofs are embedded within each hop's routing block in the encrypted header $\beta$.
@@ -1251,9 +1251,9 @@ e.g. If using RLN, where proof + metadata ~= $300$ bytes, Header size becomes: $
 
 #### 9.2.2 Per-Hop Generated Proofs
 
-In this approach, each mix node generates a completely fresh spam protection proof for the next hop after verifying proof for the incoming packet.
+In this approach, each mix node generates a new spam protection proof for the next hop after verifying proof for the incoming packet.
 The proof is added as an additional packet header field (e.g., $\sigma$) that is updated at each hop, similar to how $\alpha$, $\beta$, and $\gamma$ are transformed during Sphinx processing.
-The proof MAY be generated by binding to all the components of outgoing sphinx packet $(\alpha', \beta', \gamma', \delta')$.
+The proof MAY be bound to all the components of outgoing sphinx packet $(\alpha', \beta', \gamma', \delta')$.
 
 ##### 9.2.2.1 How It Works
 
@@ -1261,7 +1261,7 @@ The proof MAY be generated by binding to all the components of outgoing sphinx p
    The proof MAY be cryptographically bound to the outgoing Sphinx packet structure.
    This is included as a new header field in the Sphinx packet.
 2. The first hop verifies $\sigma_0$ using the provided metadata before processing the Sphinx packet.
-3. After successful verification and Sphinx processing, the hop generates a completely new proof $\sigma_1$ (with updated metadata) for the next hop bound to the transformed packet state.
+3. After successful verification and Sphinx processing, the hop generates a new proof $\sigma_1$ (with updated metadata) for the next hop bound to the transformed packet state.
 4. The updated packet $(\alpha', \beta', \gamma', \delta', \sigma_1)$ is forwarded to the next hop.
 5. This process repeats at each intermediate hop until the packet reaches the exit.
 
@@ -1308,7 +1308,7 @@ e.g. If using RLN, where metadata + proof ~= $300$ bytes, Header size becomes: $
 
 The following table provides a brief comparison between both integration approaches.
 
-| Aspect                             | Sender-Generated Per-Hop Proofs         | Per-Hop Generated Proofs                   |
+| Aspect                             | Sender-Generated Proofs                 | Per-Hop Generated Proofs                   |
 | ---------------------------------- | --------------------------------------- | ------------------------------------------ |
 | **DoS protection**                 | Weaker (verify after Sphinx decryption) | Stronger (verify before Sphinx decryption) |
 | **Sender burden**                  | High (generates $L$ proofs)             | Low (generates 1 proof)                    |
@@ -1324,7 +1324,7 @@ Separate specifications defining concrete spam protection mechanisms SHOULD spec
 
 In addition to the standard Sphinx processing responsibilities described in [Section 8](#8-sphinx-packet-format), nodes MUST implement the following spam protection responsibilities based on the chosen architectural approach.
 
-#### 9.3.1 For Sender-Generated Per-Hop Proofs
+#### 9.3.1 For Sender-Generated Proofs
 
 - **Sender nodes**: MUST generate spam protection proofs for each hop during packet construction as described in [Section 9.2.1.1](#9211-how-it-works).
   The sender MUST NOT include any identifying information in the proofs.
@@ -1367,7 +1367,7 @@ Specific spam protection methods fall outside this specification's scope.
 Common strategies that MAY be adapted include:
 
 - **PoW style approaches**: Approaches like [EquiHash](https://github.com/khovratovich/equihash) or [VDF Client puzzles](https://www.researchgate.net/publication/356450648_Non-Interactive_VDF_Client_Puzzle_for_DoS_Mitigation) that satisfy spam protection requirements can be used.
-  But these do not provide Sybil resistance and hence would require to augment with another approach.
+  These, however, do not provide Sybil resistance, which would require a separate mechanism.
 
 - **Privacy preserving Rate-limiting**: Rate limiting approaches like [RLN](https://rate-limiting-nullifier.github.io/rln-docs/rln_in_details.html) with zero-knowledge cryptography that preserve user's privacy can be used.
   Requires careful design of state access patterns.
@@ -1378,7 +1378,7 @@ Deployments MUST evaluate each method's computational overhead, latency impact, 
 ### 9.6 Spam Protection Interface
 
 This section defines the standardized interface that spam protection mechanisms MUST implement to integrate with the Mix Protocol.
-The interface is designed to be architecture-agnostic, supporting both sender-generated per-hop proofs and Per-Hop Generated Proofs approaches described in [Section 9.2](#92-integration-architecture).
+The interface is designed to be architecture-agnostic, supporting both sender-generated proofs and Per-Hop Generated Proofs approaches described in [Section 9.2](#92-integration-architecture).
 
 Initialization and configuration of spam protection mechanisms is out of scope for this interface specification.
 Implementations are expected to handle their own initialization, configuration management, and runtime state independently before being integrated with the Mix Protocol.
@@ -1395,7 +1395,7 @@ The following parameters MUST be agreed upon and configured consistently across 
 
 - **Integration Architecture**: The spam protection integration architecture used by the deployment.
   Must be one of:
-  - `SENDER_GENERATED_PER_HOP`: Sender generates proofs for each hop (see [Section 9.6.3.1](#9631-for-sender-generated-per-hop-proofs))
+  - `SENDER_GENERATED_PER_HOP`: Sender generates proofs for each hop (see [Section 9.6.3.1](#9631-for-sender-generated-proofs))
   - `PER_HOP_GENERATION`: Each node generates a fresh proof for the next hop (see [Section 9.6.3.2](#9632-for-per-hop-generated-proofs))
 
 All nodes in a deployment MUST use the same integration architecture.
@@ -1414,7 +1414,7 @@ Generate a spam protection proof bound to specific packet data.
 **Parameters**:
 
 - `binding_data`: The packet-specific data to which the proof MAY be cryptographically bound.
-  For sender-generated per-hop proofs, this is $\delta_{i+1}$ (the decrypted payload that hop $i$ will see).
+  For sender-generated proofs, this is $\delta_{i+1}$ (the decrypted payload that hop $i$ will see).
   For per-hop generated proofs, this is the complete outgoing Sphinx packet state $(\alpha', \beta', \gamma', \delta')$.
 
 **Returns**:
@@ -1455,7 +1455,7 @@ Verify that a spam protection proof is valid and correctly bound to the provided
 
 The Mix Protocol invokes spam protection procedures at specific points in Sphinx packet construction and processing:
 
-##### 9.6.3.1 For Sender-Generated Per-Hop Proofs
+##### 9.6.3.1 For Sender-Generated Proofs
 
 **Sender Nodes - During Packet Construction** ([Section 8.5.2](#852-construction-steps)):
 
