@@ -52,7 +52,7 @@ and the `record` in the response MUST be verified, invalid records and `closerPe
 
 ### Attack Vectors
 
-To make the system more resiliant extended peer records could be stored randomly in the key space
+To make the system more resilient extended peer records could be stored randomly in the key space
 but doing so would result in increased bandwidth requirements
 because of the need to first find random nodes to store the records at.
 When used in conjuction with [capability discovery](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/logos-capability-discovery.md),
