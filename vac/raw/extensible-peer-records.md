@@ -21,7 +21,7 @@ allowing discoverers to filter for peers matching a desired set of capability cr
 Extensible Peer Records maintain backwards compatibility with standard libp2p routing records,
 while adding an extensible service information field that supports finer-grained capability communication.
 
-> *_A note on terminology:_* We opt to call this structure a "_peer record_", even though the corresponding libp2p specification refers to a "_routing record_".
+> **_A note on terminology:_** We opt to call this structure a "_peer record_", even though the corresponding libp2p specification refers to a "_routing record_".
 This is because the libp2p specification itself defines an internal [`PeerRecord` type](https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md#address-record-format),
 and, when serialised into a signed envelope, this is most often called a "_signed peer record_" (see, for example, [here](https://github.com/libp2p/go-libp2p/blob/479b24baab77b4b99d7e31462b91cc04f89f1de4/p2p/protocol/identify/pb/identify.proto#L37)).
 
