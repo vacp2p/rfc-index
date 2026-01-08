@@ -28,9 +28,24 @@ Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/sp
 
 ### Record Propagation
 
-A node SHOULD store it's extended peer record at the `k` closest peers
-according to it's own routing table via `PUT_VALUE`
-and SHOULD repeat this procedure every 30 minutes.
+A node that wants to make itself discoverable,
+also known as an _advertiser_,
+MUST encode its discoverable information in an [Extensible Peer Record]().
+The encoded information MUST be sufficient for discoverers to connect to this advertiser.
+It MAY choose to encode some or all of its capabilities (and related information)
+as `services` in the `ExtensiblePeerRecord`.
+This will allow future discoverers to filter discovered records based on desired capabilities.
+
+In order to advertise this record,
+the advertiser SHOULD first retrieve the `k` closest peers to its own peer ID
+in its own [Kademlia routing table](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#kademlia-routing-table).
+This assumes that the routing table has been previously initialised
+and follows the regular [bootstrap process](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#bootstrap-process) as per the libp2p Kad-DHT specification.
+The advertiser SHOULD then perform a [Kad-DHT `PUT_VALUE`](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#value-storage-and-retrieval) to these `k` peers
+to store the `ExtensiblePeerRecord` against its own peer ID.
+This process SHOULD be repeated periodically to maintain the advertised record.
+We RECOMMEND an interval of once every `30` minutes,
+for each discoverable `ExtensiblePeerRecord` the node wants to advertise.
 
 ### Record Discovery
 
