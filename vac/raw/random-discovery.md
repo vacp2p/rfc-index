@@ -46,7 +46,9 @@ A random discovery procedure (`FIND_RANDOM`) consist of the following steps;
 
 5. Repeat step 3 and 4 with new peers found via `FIND_NODE`.
 `FIND_RANDOM` MAY terminate when the `k` closest peers to `R_KEY` are found.
-
+The discoverer MAY choose to filter discovered `ExtensiblePeerRecords`
+based on advertised `services`
+to find peers matching a set of desired capabilities. 
 > `GET_VALUE` messages MUST always contain the peer id of the recipiant as the `key`
 and the `record` in the response MUST be verified, invalid records and `closerPeers` MUST be discarded. Valid records MAY be filtered for specific services.
 
