@@ -809,7 +809,7 @@ using the formula described in the [Distance](#distance) section.
 based on the response status field:
   - If the `status` is `Confirmed`, the registration is maintained
   in the registrar's `ad_cache` for `E` seconds.
-  After `E` seconds it MUST removed from the ongoing registrations for that bucket.
+  After `E` seconds the advertiser MUST remove the registration from the ongoing registrations for that bucket.
   - If the `status` indicates `Wait`,
   the next registration is scheduled based on
   the `ticket.t_wait_for` value included in the response.
