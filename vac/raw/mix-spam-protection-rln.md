@@ -1,35 +1,33 @@
 ---
 title: RLN-Spam-Protection-Mixnet
-name: RLN spam protection protocol for libp2p mixnets
+name: RLN spam and sybil protection protocol for libp2p based mixnets
+status: raw
 category: Standards Track
-tags: mix, rln, logos-messaging
-editor: Prem Prathi <premprathi@proton.me>
+tags: mix, rln
+editor: Prem Prathi <prem@status.im>
 contributors:
 ---
 
 ## Abstract
 
-This document specifies the integration of Rate Limiting Nullifiers (RLN) to provide spam and sybil protection for mixnets, which are based on the [libp2p mix](https://github.com/vacp2p/rfc-index/blob/ad26780dfc2681c300209820f356cc33ce249d94/vac/raw/mix.md) protocol.
-
-An example is an instantiation of [Waku-mix](https://github.com/logos-messaging/specs/blob/c5fe03e5166e5f8032c445d02a23d57a88a5fe81/standards/core/mix.md) where a new mix path is randomly selected for each published message.
-The RLN mechanism enables cryptographic rate limiting while preserving privacy, allowing mix nodes to detect and reject spam without identifying legitimate users.
+This document defines a spam and sybil protection protocol for [libp2p mix](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md) based mixnets.
+The protocol specifies how [Rate Limiting Nullifiers (RLN)](https://vac.dev/rln) can be integrated into libp2p mix.
+RLN allows mix nodes to detect and reject spam without identifying legitimate users, addressing spam attacks.
+RLN requires membership for mix nodes to send or forward messages, addressing the sybil attack vector.
+This specification describes how RLN satisfies the spam protection [requirements](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#91-spam-protection-mechanism-requirements) defined in the libp2p mix protocol.
 
 ## Background / Rationale / Motivation
 
-Mixnets provide strong privacy guarantees by routing messages through multiple intermediate nodes (mix nodes) that re-encrypt and delay traffic to prevent correlation attacks. However, the [libp2p mix](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/mix.md) protocol specification identifies two critical vulnerabilities that must be addressed for production deployments:
+Mixnets provide strong privacy guarantees by routing messages through multiple mix nodes using layered encryption and per-hop delays to obscure both routing paths and timing correlations. In order to have a production-ready mixnet using the [libp2p mix](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md), two critical vulnerabilities must be addressed:
 
-1. **Spam attacks**: Abusive or unsolicited traffic targeting mix nodes, which can exhaust computational, memory, or bandwidth resources
-2. **Sybil attacks**: Adversaries operating multiple node identities to increase the probability of path compromise, enabling deanonymization through traffic correlation or timing analysis
+1. **Spam attacks**: An attacker can generate valid sphinx traffic targeting mix nodes and can exhaust their resources.
+   In case of mixnets, it is easy to attack a later hop in the mix path by choosing different first hop nodes.
+   An attacker with minimal resources can launch spam/DoS attacks against individual nodes. By targeting all nodes in this manner, the attacker can render the entire mixnet unusable.
+2. **Sybil attacks**: Adversaries operating multiple node identities can increase the probability of path compromise, enabling deanonymization through traffic correlation or timing analysis.
 
-To make a libp2p mix based mixnet production-ready and resilient to attacks mentioned above, spam protection and sybil resistance mechanisms MUST be implemented.
-
-The [libp2p mix](https://github.com/vacp2p/rfc-index/blob/ad26780dfc2681c300209820f356cc33ce249d94/vac/raw/mix.md) protocol provides an extension for integrating spam protection mechanisms.
-This specification adopts [RLN](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md) (Rate Limiting Nullifiers) as the spam prevention and sybil protection mechanism for the following reasons:
-
-- Requires stake registration, making spam attacks costly and limiting sybil node creation
-- Uses zero-knowledge proofs to enforce rate limits without revealing user identities
-- Can operate in resource-constrained environments, suitable for diverse network participants
-- Enables on-chain slashing for provable violations, creating strong economic deterrence
+The [libp2p mix](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md) protocol provides an extension for integrating spam protection mechanisms.
+This specification proposes to use [RLN](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md) (Rate Limiting Nullifiers) as the spam prevention and sybil protection mechanism.
+This approach introduces trade-offs including additional per-hop latency for proof generation and membership registration friction, which are discussed in the [Tradeoffs](#tradeoffs) section.
 
 ## Terminology
 
@@ -38,10 +36,11 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 ### Node Roles
 
-The following types of nodes are possible in the mixnet.
+Mix protocol defines 3 roles for the nodes in the mix network - sender, exit, intermediary.
 
-- Edge nodes (Entry role) - Nodes that only send messages in the mixnet. These nodes do not forward any messages generated by other nodes.
-- Core nodes - (Intermediate and/or exit role) - Nodes that can send messages or forward messages received via mix. These nodes also send replies via SURB.
+- An sender node is the originator node of a message, i.e a node that wishes to publish/query messages to/from the waku network.
+- An exit node is responsible for delivering messages to destination peer in the network.
+- An intermediary node is responsible for forwarding a mix packet to the next mix node in the path.
 
 ### Messaging Rate
 
@@ -58,95 +57,81 @@ See section [Recommended System Parameters](#recommended-system-parameters) for 
 
 ### Overview
 
-The proposed way to integrate RLN into libp2p mix based mixnets is using the [per-hop generated proof approach](https://github.com/vacp2p/rfc-index/blob/ad26780dfc2681c300209820f356cc33ce249d94/vac/raw/mix.md#922-per-hop-generated-proofs).
-Each mix node operating as an entry node, intermediate node or an exit MUST have an RLN membership in order to send/process mix traffic.
+The best way to integrate RLN into libp2p mix based mixnets is using the [per-hop generated proof approach](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs), where each node in the mix path independently generates and attaches an RLN proof to the packet it forwards.
+Each mix node MUST have an RLN group membership in order to send or forward messages in the mixnet.
 
-RLN enforces cryptographic rate limits on each node's message throughput.
-Nodes that exceed their allowed rate can be cryptographically detected and slashed.
-By requiring stake-backed membership for each mix node, RLN makes it economically costly to operate multiple identities, mitigating sybil attacks that could compromise mix path selection.
+#### Spam Detection Mechanics
 
-Intermediate nodes may experience a multiplier effect, many entry nodes may select the same intermediate node simultaneously within an epoch, resulting in higher aggregate traffic.
-Therefore, intermediate nodes require higher rate limits than entry nodes to avoid rejecting legitimate traffic.
-RLN-Diff as explained in RLNv2 can be used to achieve the same.
+While spam can be generated by a mix node with any role, it can only be detected by intermediary and exit nodes that receive and verify incoming mix packets.
+Sender-only nodes only originate messages and do not process incoming mix packets requiring spam verification.
 
-Mix nodes (intermediate and exit) MUST track nullifiers used within each epoch.
-This prevents nodes from reusing nullifiers to exceed their rate limit.
+Since each message in the mixnet doesn't go through all nodes, a spammer could use double signalling on different paths to avoid detection by any single node.
+To address this, intermediary and exit nodes MUST participate in a coordination layer to broadcast [messaging metadata (i.e. spent nullifiers and key shares)](#messaging-metadata).
+This enables all intermediary and exit nodes to identify double signalling across different paths, derive the spammer's private key, and initiate slashing.
 
-The global membership state SHOULD be synchronized across all mix nodes to ensure they use the latest Merkle root when generating or verifying RLN proofs.
-Stale roots may cause legitimate proofs to be rejected.
-However, to accommodate network delays and registration latency, nodes SHOULD maintain a window of recent valid roots (see `acceptable_root_window_size` in [Recommended System Parameters](#recommended-system-parameters)).
+This coordination layer (e.g via a gossip protocol or some other mechanism) enables network-wide spam detection by preventing nullifier reuse to exceed rate limits.
+When a node detects spam, it can reconstruct the spammer's secret key using the shared key shares and initiate slashing.
+Sender-only mix nodes need not participate in this coordination layer as they only originate messages into the mix network.
 
-### Setup and registration
+#### Why RLN for Mix Networks
 
-A mixnet that is spam-protected requires all mix nodes in it to form a [RLN group](../../../../vac/32/rln-v1.md).
+RLN is well-suited for spam and sybil protection in libp2p mix based mixnets due to the following properties:
+
+- Sybil Resistance:
+
+  - Requiring membership for each mix node creates friction to participate in the mixnet to send or forward messages
+  - Operating multiple identities becomes costly, mitigating sybil attacks that could compromise mix path selection
+
+- Privacy-Preserving Spam Protection:
+
+  - Uses zero-knowledge proofs to enforce rate limits without revealing sender identities
+  - Ties spam protection proof to the message content, making proofs non-reusable across messages
+  - Enables economic deterrence through slashing without compromising anonymity
+
+- Performance and Usability:
+
+  - Low proof verification overhead suitable for real-time message processing
+  - Works in resource-constrained environments, suitable for edge nodes such as mobile devices
+
+- Network-Level Benefits:
+  - RLN enables setting a deterministic rate limit for the mixnet, which translates to predictable bandwidth requirements (messages per epoch × sphinx packet size).
+  - This makes it easier to provision and estimate resource usage for nodes participating in the mixnet.
+  - The rate limit combined with cover traffic (if enabled) helps preserve anonymity of the mixnet even when organic traffic is low.
+
+### Setup
+
+A mixnet that is spam-protected requires all mix nodes in it to form a [RLN group](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#flow).
 
 - Mix nodes MUST be registered to the RLN group to be able to publish or forward messages.
 - Registration MAY be moderated through a smart contract deployed on a blockchain.
 
-Each mix node has an [RLN key pair](../../../../vac/32/rln-v1.md) denoted by `sk`
-and `pk`.
+Each mix node has an [RLN key pair](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md) denoted by `sk` and `pk`.
+The secret key `sk` MUST be persisted securely by the mix node.
 
-- The secret key `sk` is secret data and MUST be persisted securely by the mix node.
-- The state of the membership contract SHOULD contain a list of all registered members' public identity keys i.e., `pk`s.
+The criteria for membership is out of scope of the spec and should be implementation specific (e.g requiring stake)
 
-For registration, a mix node MUST create a transaction to invoke the registration function on the contract, which registers its `pk` in the RLN group.
+The RLN membership group SHOULD be synchronized across all mix nodes to ensure they use the latest Merkle root for RLN proof generation and verification.
+Stale roots may cause legitimate proofs to be rejected.
+However, to accommodate network delays and registration latency, nodes SHOULD maintain a window of recent valid roots (see `acceptable_root_window_size` in [Recommended System Parameters](#recommended-system-parameters)).
 
-- The transaction MUST transfer additional tokens to the contract to be staked.
-  This amount is denoted by `staked_fund` and is a system parameter.
-  The mix node who has the secret key `sk` associated with a registered `pk` would be able to withdraw a portion `reward_portion` of the staked fund by providing valid proof.
+Intermediary and exit mix nodes MUST start subscribing to the coordination layer.
+This participation ensures that the mix node are aware of [messaging metadata](#messaging-metadata) that can be used for slashing such as spent nullifiers in an epoch.
 
-`reward_portion` is also a system parameter.
-
-> **NOTE:** Initially `sk` is only known to its owning mix node however,
-> it may get exposed to other mix nodes in case the owner attempts spamming the system
-> i.e., sending more than rate limit per `epoch`.
-
-An overview of registration is illustrated in Figure 1.
-
-```mermaid
-sequenceDiagram
-    participant MixNode as Mix Node
-    participant Contract as Contract (Merkle tree)
-    participant Others as Other Mix Nodes
-
-    Note over MixNode: Generate key pair (sk, pk)
-
-    MixNode->>Contract: register(pk) + staked_fund
-
-    Contract->>Contract: Add pk at index i
-
-    Contract-->>MixNode: Confirmed Index i
-
-    Contract-->>Others: Event MemberRegistered
-    Contract-->>MixNode: Event MemberRegistered
-
-    Note over Others: Update local tree
-
-    Note over MixNode: Can publish messages
-```
-
-### Sending messages
+### Sending and Forwarding messages
 
 ### Group Synchronization and tree maintenance
 
 Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `authPath` which both require access to the membership Merkle tree.
-Getting access to the Merkle tree can be done in various ways:
 
-1. Mix nodes construct the tree locally.
-   This can be done by listening to the registration and deletion events emitted by the membership contract.
-   Mix nodes MUST update the local Merkle tree on a per-block basis.
-   This is discussed further in the [Merkle Root Validation](#merkle-root-validation) section.
-
-2. For synchronizing the state of slashed `pk`s, disseminate such information through a logos-messaging `contentTopic` to which all mix nodes are subscribed.
-   A deletion transaction SHOULD occur on the membership contract.
-   The benefit of an off-chain slashing is that it allows real-time removal of spammers as opposed to on-chain slashing in which mix nodes get informed with a delay, where the delay is due to mining the slashing transaction.
+Mix nodes construct the tree locally.
+This can be done by listening to the registration and deletion events emitted by the membership contract.
+Mix nodes MUST update the local Merkle tree on a per-block basis.
+This is discussed further in the [Merkle Root Validation](#merkle-root-validation) section.
 
 For the group synchronization, one important security consideration is that peers MUST make sure they always use the most recent Merkle tree root in their proof generation.
 The reason is that using an old root can allow inference about the index of the user's `pk` in the membership tree hence compromising user privacy and breaking message unlinkability.
 
-### Forwarding
-
-#### Spent Nullifier Synchronization
+#### Coordination Layer
 
 #### Epoch validation
 
@@ -154,14 +139,13 @@ The reason is that using an old root can allow inference about the index of the 
 
 #### Spam detection
 
-#### Slashing??
+#### Slashing
 
-how to deal with scenario where an intermediate node received too many messages in the epoch which has already crossed its rate limit to forward?
+## Wire Format Specification / Syntax
 
 ### Payload format to be added to Sphinx packet
 
 ```
-
 syntax = "proto3";
 
 message RateLimitProof {
@@ -186,7 +170,26 @@ Below is the description of the fields of `RateLimitProof` and their types.
 | `share_x` and `share_y` | array of 32 bytes each                   | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the Poseidon hash of the `WakuMessage`'s `payload` concatenated with its `contentTopic` . `share_y` is calculated using [Shamir secret sharing scheme](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md) |
 |             `nullifier` | array of 32 bytes                        | internal nullifier derived from `epoch` and peer's `sk` as explained in [RLN construct](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md)                                                                                                                                           |
 
-### Flow diagrams
+### Messaging Metadata
+
+[Messaging metadata](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#notes-from-implementation) helps identifies duplicate signalling in order to identify spam and punish spammers in the network.
+
+```
+syntax = "proto3";
+
+message ExternalNullifier {
+   bytes internal_nullifier = 1;
+   repeated bytes x_shares = 2;
+   repeated bytes y_shares = 3;
+}
+
+message MessagingMetadata{
+   repeated external_nullifier nullifiers = 1;
+}
+
+```
+
+## Implementation Suggestions
 
 ### Recommended System Parameters (Review)
 
@@ -201,58 +204,14 @@ and the RECOMMENDED values for a subset of them are presented next.
 |               `max_epoch_gap` | the maximum allowed gap between the `epoch` of a routing peer and the incoming message |
 | `acceptable_root_window_size` | The maximum number of past Merkle roots to store                                       |
 
-#### Epoch Length
-
-A sensible value for the `period` depends on the application for which the spam protection is going to be used.
-For example, while the `period` of `1` second i.e., messaging rate of `1` per second, might be acceptable for a chat application, might be too low for communication among Ethereum network validators.
-One should look at the desired throughput of the application to decide on a proper `period` value.
-
 #### Maximum Epoch Gap
-
-We discussed in the [Forwarding](#forwarding) section that the gap between the epoch observed by the mix node and the one attached to the incoming message should not exceed a threshold denoted by `max_epoch_gap`.
-The value of `max_epoch_gap` can be measured based on the following factors.
-
-- Network delay `Network_Delay`: the maximum time that it takes for a message to reach the next node.
-- Clock asynchrony `Clock_Asynchrony`: The maximum difference between the Unix epoch clocks perceived by mix nodes which can be due to clock drifts.
-
-With a reasonable approximation of the preceding values, one can set `max_epoch_gap` as
-
-`max_epoch_gap`
-$= \lceil \frac{\text{Network Delay} + \text{Clock Asynchrony}}{\text{Epoch Length}}\rceil$ where `period` is the length of the `epoch` in seconds. `Network_Delay` and `Clock_Asynchrony` MUST have the same resolution as `period`.
-By this formulation, `max_epoch_gap` indeed measures the maximum number of `epoch`s that can elapse since a message gets routed from its origin to all the other peers in the network.
-
-`acceptable_root_window_size` depends upon the underlying chain's average blocktime, `block_time`
-
-The lower bound for the `acceptable_root_window_size` SHOULD be set as $acceptable_root_window_size=(Network_Delay)/block_time$
-
-`Network_Delay` MUST have the same resolution as `block_time`.
-
-By this formulation, `acceptable_root_window_size` will provide a lower bound of how many roots can be acceptable by a mix node.
-
-The `acceptable_root_window_size` should indicate how many blocks may have been mined during the time it takes for a mix node to receive a message.
-This formula represents a lower bound of the number of acceptable roots.
-
-## Wire Format Specification / Syntax
-
-This section SHOULD not contain explanations of semantics and focus on concisely defining the wire format.
-Implementations SHOULD adhere to these exact formats to interoperate with other implementations.
-It is fine, if parts of the previous section that touch on the wire format are repeated.
-The purpose of this section is having a concise definition of what an implementation sends and accepts.
-Parts that are not specified here are considered implementation details.
-Implementors are free to decide on how to implement these details.
-
-## Implementation Suggestions
-
-- Interface for RLN to align with mix suggested plugin
-
-## (Further Optional Sections)
 
 ## Security/Privacy Considerations
 
 - Mention that mixnode/RLN membership distribution is out of scope of this rfc
 - Analyze and list down security assumptions or any limitations that can be exploited
 
-## Limitations
+## Tradeoffs
 
 ### Additional Latency due to proof generation in every hop
 
@@ -262,14 +221,17 @@ TBD
 
 TBD
 
+### Cost of ZK Proof Generation
+
 ## Future Work
 
-In order to reduce latency introduced at each hop, RLN can be used with pre-computed proofs as explained [here](https://forum.vac.dev/t/rln-with-pre-computed-proofs/606). This approach can be explored further and then can replace current proposed RLN.
+In order to reduce latency introduced at each hop
+
+- RLN can be used with pre-computed proofs as explained [here](https://forum.vac.dev/t/rln-with-pre-computed-proofs/606). This approach can be explored further and then can replace current proposed RLN.
+- Research other proving systems which would generate faster ZKProofs.
 
 Augment RLN with additional sybil resistance mechanisms with some sort of reputation based lists something similar to what Tor’s “directory authorities”.
 They help clients build circuits that are probably not entirely controlled by Sybils through a range of techniques that limits nodes’ possible influence based on some metrics that could indicate trustworthiness
-
-- Do we need to augement with some local reputation?
 
 ## Copyright
 
@@ -277,7 +239,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-libp2p mix protocol - https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/mix.md
-waku mix - https://github.com/logos-messaging/specs/blob/c5fe03e5166e5f8032c445d02a23d57a88a5fe81/standards/core/mix.md
+libp2p mix protocol - https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md
 Rate Limiting Nullifiers - https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md
 RLN with precomputed proofs - https://forum.vac.dev/t/rln-with-pre-computed-proofs/606
