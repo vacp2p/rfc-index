@@ -521,8 +521,8 @@ to encode both peer information and service capabilities:
   (SHOULD be ≤ 33 bytes)
 
 The `record` MUST be wrapped in a signed envelope with:
-- Domain: `libp2p-routing-state`
 
+- Domain: `libp2p-routing-state`
 - Payload type: `/libp2p/extensible-peer-record/`
 
 **Simplified Encoding (Alternative):**
