@@ -62,8 +62,8 @@
           <a href="${root}codex/index.html">Codex</a>
         </div>
       </details>
-      <button class="nav-link back-to-top-link" type="button">Back to top</button>
       <a class="nav-link" href="${root}about.html">About</a>
+      <button class="nav-link back-to-top-link" type="button">Back to top</button>
     `;
 
     const rightButtons = menuBar.querySelector(".right-buttons");
@@ -84,6 +84,11 @@
       backToTop.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
+      const toggleBackToTop = () => {
+        backToTop.classList.toggle("is-visible", window.scrollY > 240);
+      };
+      toggleBackToTop();
+      window.addEventListener("scroll", toggleBackToTop, { passive: true });
     }
   }
 
@@ -287,6 +292,7 @@
 
   const rootPrefix = (typeof path_to_root !== "undefined" && path_to_root) ? path_to_root : "";
   const projectScope = tableContainer.dataset.project || "";
+  const showProjectColumn = !projectScope;
 
   let rfcData = [];
   const statusOrder = { stable: 0, draft: 1, raw: 2, deprecated: 3, deleted: 4, unknown: 5 };
@@ -306,11 +312,11 @@
     codex: "Codex"
   };
   const headers = [
-    { key: "slug", label: "RFC", width: "10%" },
-    { key: "title", label: "Title", width: "34%" },
-    { key: "project", label: "Project", width: "12%" },
+    { key: "slug", label: "RFC", width: showProjectColumn ? "10%" : "12%" },
+    { key: "title", label: "Title", width: showProjectColumn ? "34%" : "40%" },
+    ...(showProjectColumn ? [{ key: "project", label: "Project", width: "12%" }] : []),
     { key: "status", label: "Status", width: "14%" },
-    { key: "category", label: "Category", width: "18%" },
+    { key: "category", label: "Category", width: showProjectColumn ? "18%" : "20%" },
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
@@ -533,7 +539,7 @@
 
     if (!sorted.length) {
       const tr = document.createElement("tr");
-      tr.innerHTML = "<td colspan=\"6\">No RFCs match your filters.</td>";
+      tr.innerHTML = `<td colspan="${headers.length}">No RFCs match your filters.</td>`;
       tbody.appendChild(tr);
       return;
     }
@@ -541,10 +547,11 @@
     sorted.forEach((item) => {
       const tr = document.createElement("tr");
       const updated = item.updated || "—";
+      const projectCell = showProjectColumn ? `<td>${formatProject(item.project)}</td>` : "";
       tr.innerHTML = `
         <td><a href="${rootPrefix}${item.path}">${item.slug}</a></td>
         <td>${item.title}</td>
-        <td>${formatProject(item.project)}</td>
+        ${projectCell}
         <td><span class="badge status-${normalizeStatus(item.status)}">${formatStatus(item.status)}</span></td>
         <td>${formatCategory(item.category)}</td>
         <td>${updated}</td>

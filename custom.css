@@ -75,14 +75,6 @@ main h1, main h2, main h3, main h4 {
     margin-bottom: 0.5em;
 }
 
-main h1 + table {
-    margin: 1rem 0 1.5rem 0;
-}
-
-main h1 + table th {
-    width: 10rem;
-}
-
 main p, main li {
     color: var(--fg);
 }
@@ -255,6 +247,8 @@ thead {
 .rfc-meta-table th {
     width: 9rem;
     text-align: left;
+    background: var(--table-header-bg);
+    font-weight: 600;
 }
 
 .rfc-meta-table td {
@@ -414,17 +408,26 @@ main h1 {
 
 .back-to-top-link {
     color: var(--links);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.back-to-top-link.is-visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .site-footer {
-    margin: 2rem auto 1.5rem auto;
-    padding-top: 1rem;
+    margin: 2.5rem auto 1.25rem auto;
+    padding-top: 0.75rem;
     border-top: 1px solid var(--table-border-color);
     color: var(--sidebar-fg);
-    font-size: 0.9em;
+    font-size: 0.85em;
     display: flex;
     justify-content: center;
     gap: 0.6rem;
+    max-width: var(--content-max-width);
 }
 
 .site-footer a {
@@ -438,6 +441,29 @@ main h1 {
 
 .footer-sep {
     color: var(--sidebar-fg);
+}
+
+.on-this-page {
+    margin-left: 16px;
+    border-inline-start: 3px solid var(--sidebar-header-border-color);
+    padding-left: 8px;
+    margin-top: 0.4rem;
+    font-size: 0.92em;
+}
+
+.on-this-page::before {
+    content: "On this page";
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--sidebar-fg);
+    font-weight: 600;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.on-this-page > ol {
+    padding-left: 0;
 }
 
 @media (max-width: 900px) {
