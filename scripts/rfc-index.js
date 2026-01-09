@@ -42,6 +42,60 @@
     });
   });
 
+  function addTopNav() {
+    const menuBar = document.querySelector("#mdbook-menu-bar, #menu-bar");
+    if (!menuBar || menuBar.querySelector(".site-nav")) return;
+
+    const root = (typeof path_to_root !== "undefined" && path_to_root) ? path_to_root : "";
+    const nav = document.createElement("nav");
+    nav.className = "site-nav";
+    nav.setAttribute("aria-label", "Primary");
+    nav.innerHTML = `
+      <a class="nav-link" href="${root}index.html">Home</a>
+      <details class="nav-dropdown">
+        <summary class="nav-link">Projects</summary>
+        <div class="nav-menu">
+          <a href="${root}vac/index.html">Vac</a>
+          <a href="${root}waku/index.html">Waku</a>
+          <a href="${root}status/index.html">Status</a>
+          <a href="${root}nomos/index.html">Nomos</a>
+          <a href="${root}codex/index.html">Codex</a>
+        </div>
+      </details>
+      <a class="nav-link" href="https://github.com/vacp2p/rfc-index">About</a>
+    `;
+
+    const rightButtons = menuBar.querySelector(".right-buttons");
+    if (rightButtons) {
+      menuBar.insertBefore(nav, rightButtons);
+    } else {
+      menuBar.appendChild(nav);
+    }
+
+    document.addEventListener("click", (event) => {
+      if (!nav.contains(event.target)) {
+        nav.querySelectorAll("details[open]").forEach((detail) => detail.removeAttribute("open"));
+      }
+    });
+  }
+
+  function addFooter() {
+    if (document.querySelector(".site-footer")) return;
+    const page = document.querySelector(".page");
+    if (!page) return;
+
+    const footer = document.createElement("footer");
+    footer.className = "site-footer";
+    footer.innerHTML = `
+      <a href="https://vac.dev">Vac</a>
+      <span class="footer-sep">·</span>
+      <a href="https://www.ietf.org">IETF</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/vacp2p/rfc-index">GitHub</a>
+    `;
+    page.appendChild(footer);
+  }
+
   function getSectionInfo(item) {
     const direct = item.querySelector(":scope > ol.section");
     if (direct) {
@@ -123,6 +177,8 @@
   }
 
   onReady(() => {
+    addTopNav();
+    addFooter();
     bindSidebarCollapsible();
     // toc.js may inject the sidebar after load
     setTimeout(bindSidebarCollapsible, 100);
@@ -136,6 +192,9 @@
   if (!searchInput || !resultsCount || !tableContainer) {
     return;
   }
+
+  const rootPrefix = (typeof path_to_root !== "undefined" && path_to_root) ? path_to_root : "";
+  const projectScope = tableContainer.dataset.project || "";
 
   let rfcData = [];
   const statusOrder = { stable: 0, draft: 1, raw: 2, deprecated: 3, deleted: 4, unknown: 5 };
@@ -382,7 +441,7 @@
 
     if (!sorted.length) {
       const tr = document.createElement("tr");
-      tr.innerHTML = "<td colspan=\"5\">No RFCs match your filters.</td>";
+      tr.innerHTML = "<td colspan=\"6\">No RFCs match your filters.</td>";
       tbody.appendChild(tr);
       return;
     }
@@ -391,7 +450,7 @@
       const tr = document.createElement("tr");
       const updated = item.updated || "—";
       tr.innerHTML = `
-        <td><a href="./${item.path}">${item.slug}</a></td>
+        <td><a href="${rootPrefix}${item.path}">${item.slug}</a></td>
         <td>${item.title}</td>
         <td>${formatProject(item.project)}</td>
         <td><span class="badge status-${normalizeStatus(item.status)}">${formatStatus(item.status)}</span></td>
@@ -404,41 +463,50 @@
 
   searchInput.addEventListener("input", render);
 
-  document.getElementById("status-chips").addEventListener("click", (e) => {
-    if (!e.target.dataset.status) return;
-    statusFilter = e.target.dataset.status;
-    document.querySelectorAll("#status-chips .chip").forEach((chip) => {
-      chip.classList.toggle("active", chip.dataset.status === statusFilter);
+  const statusChips = document.getElementById("status-chips");
+  if (statusChips) {
+    statusChips.addEventListener("click", (e) => {
+      if (!e.target.dataset.status) return;
+      statusFilter = e.target.dataset.status;
+      document.querySelectorAll("#status-chips .chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.status === statusFilter);
+      });
+      render();
     });
-    render();
-  });
+  }
 
-  document.getElementById("project-chips").addEventListener("click", (e) => {
-    if (!e.target.dataset.project) return;
-    projectFilter = e.target.dataset.project;
-    document.querySelectorAll("#project-chips .chip").forEach((chip) => {
-      chip.classList.toggle("active", chip.dataset.project === projectFilter);
+  const projectChips = document.getElementById("project-chips");
+  if (projectChips) {
+    projectChips.addEventListener("click", (e) => {
+      if (!e.target.dataset.project) return;
+      projectFilter = e.target.dataset.project;
+      document.querySelectorAll("#project-chips .chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.project === projectFilter);
+      });
+      render();
     });
-    render();
-  });
+  }
 
-  document.getElementById("date-chips").addEventListener("click", (e) => {
-    if (!e.target.dataset.date) return;
-    dateFilter = e.target.dataset.date;
-    document.querySelectorAll("#date-chips .chip").forEach((chip) => {
-      chip.classList.toggle("active", chip.dataset.date === dateFilter);
+  const dateChips = document.getElementById("date-chips");
+  if (dateChips) {
+    dateChips.addEventListener("click", (e) => {
+      if (!e.target.dataset.date) return;
+      dateFilter = e.target.dataset.date;
+      document.querySelectorAll("#date-chips .chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.date === dateFilter);
+      });
+      render();
     });
-    render();
-  });
+  }
 
   resultsCount.textContent = "Loading RFC index...";
-  fetch("./rfc-index.json")
+  fetch(`${rootPrefix}rfc-index.json`)
     .then((resp) => {
       if (!resp.ok) throw new Error(resp.statusText);
       return resp.json();
     })
     .then((data) => {
-      rfcData = data;
+      rfcData = projectScope ? data.filter((item) => item.project === projectScope) : data;
       updateChipCounts();
       render();
     })

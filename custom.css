@@ -307,6 +307,98 @@ main h1 {
     text-decoration: none;
 }
 
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+    margin-right: 1rem;
+    font-size: 0.95em;
+}
+
+.site-nav .nav-link {
+    color: var(--fg);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.site-nav .nav-link:hover {
+    color: var(--links);
+}
+
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown summary {
+    list-style: none;
+}
+
+.nav-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.nav-dropdown .nav-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.35rem);
+    background: var(--bg);
+    border: 1px solid var(--table-border-color);
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+    min-width: 10rem;
+    z-index: 10;
+}
+
+.nav-dropdown[open] .nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.nav-dropdown .nav-menu a {
+    color: var(--fg);
+    text-decoration: none;
+    padding: 0.2rem 0.2rem;
+    border-radius: 4px;
+}
+
+.nav-dropdown .nav-menu a:hover {
+    background: var(--theme-hover);
+    color: var(--links);
+}
+
+.site-footer {
+    margin: 2rem auto 1.5rem auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--table-border-color);
+    color: var(--sidebar-fg);
+    font-size: 0.9em;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.site-footer a {
+    color: var(--links);
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    text-decoration: underline;
+}
+
+.footer-sep {
+    color: var(--sidebar-fg);
+}
+
+@media (max-width: 900px) {
+    .site-nav {
+        display: none;
+    }
+}
+
 .chapter-item > .chapter-link-wrapper > a,
 .chapter-item > a {
     display: flex;
