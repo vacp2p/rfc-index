@@ -863,18 +863,19 @@ the `ticket` MUST also be included in the REGISTER message.
 - On receipt of a Response,
 SHOULD add the closer peers indicated in the response to `AdvT(service_id_hash)`
 using the formula described in the [Distance](#distance) section.
-- SHOULD schedule a next registration to the same registrar,
-based on the response status field:
+- MUST interpret the response `status` field and schedule actions accordingly:
   - If the `status` is `Confirmed`, the registration is maintained
   in the registrar's `ad_cache` for `E` seconds.
-  After `E` seconds the advertiser MUST remove the registration from the ongoing registrations for that bucket.
-  - If the `status` indicates `Wait`,
-  the next registration is scheduled based on
-  the `ticket.t_wait_for` value included in the response.
-  In this case, the `Response` also contains a `ticket`,
-  which SHOULD be included in the next registration attempt to this registrar.
-  - On `status` is `Rejected` then
-  the registrar SHOULD be from the ongoing registrations for that bucket.
+  After `E` seconds the advertiser MUST remove the registration
+  from the ongoing registrations for that bucket.
+  - If the `status` is `Wait`,
+  the advertiser MUST schedule a next registration attempt to the same registrar
+  based on the `ticket.t_wait_for` value included in the response.
+  The Response contains a `ticket`,
+  which MUST be included in the next registration attempt to this registrar.
+  - If the `status` is `Rejected`,
+  the advertiser MUST remove the registrar from the ongoing registrations for that bucket
+  and SHOULD NOT attempt further registrations with this registrar for this advertisement.
 
 ### Advertisement Algorithm
 
