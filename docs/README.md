@@ -24,6 +24,13 @@ An IETF-style index of Vac-managed RFCs across Waku, Nomos, Codex, and Status. U
       <span class="chip" data-project="codex" data-label="Codex">Codex</span>
     </div>
   </div>
+  <div class="filter-row">
+    <div class="chips" id="date-chips">
+      <span class="chip active" data-date="all" data-label="All time">All time</span>
+      <span class="chip" data-date="latest" data-label="Latest" data-count="false">Latest</span>
+      <span class="chip" data-date="last90" data-label="Last 90 days">Last 90 days</span>
+    </div>
+  </div>
 </div>
 
 <div class="results-row">

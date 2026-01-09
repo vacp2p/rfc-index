@@ -45,15 +45,14 @@
   function getSectionInfo(item) {
     const direct = item.querySelector(":scope > ol.section");
     if (direct) {
-      return { section: direct, container: item, isSibling: false };
+      return { section: direct };
     }
 
     const sibling = item.nextElementSibling;
     if (sibling && sibling.tagName === "LI") {
       const siblingSection = sibling.querySelector(":scope > ol.section");
       if (siblingSection) {
-        sibling.classList.add("section-container");
-        return { section: siblingSection, container: sibling, isSibling: true };
+        return { section: siblingSection };
       }
     }
 
@@ -76,7 +75,7 @@
         toggle.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          item.classList.toggle("collapsed");
+          item.classList.toggle("expanded");
         });
         link.prepend(toggle);
       }
@@ -84,7 +83,11 @@
       if (item.dataset.collapsibleInit !== "true") {
         const hasActive = link.classList.contains("active");
         const hasActiveInSection = !!sectionInfo.section.querySelector(".active");
-        item.classList.toggle("collapsed", !(hasActive || hasActiveInSection));
+        if (hasActive || hasActiveInSection) {
+          item.classList.add("expanded");
+        } else {
+          item.classList.remove("expanded");
+        }
         item.dataset.collapsibleInit = "true";
       }
     });
@@ -152,15 +155,17 @@
     codex: "Codex"
   };
   const headers = [
-    { key: "slug", label: "RFC", width: "12%" },
-    { key: "title", label: "Title", width: "38%" },
+    { key: "slug", label: "RFC", width: "10%" },
+    { key: "title", label: "Title", width: "34%" },
     { key: "project", label: "Project", width: "12%" },
-    { key: "status", label: "Status", width: "15%" },
-    { key: "category", label: "Category", width: "23%" }
+    { key: "status", label: "Status", width: "14%" },
+    { key: "category", label: "Category", width: "18%" },
+    { key: "updated", label: "Updated", width: "12%" }
   ];
 
   let statusFilter = "all";
   let projectFilter = "all";
+  let dateFilter = "all";
   let sortKey = "slug";
   let sortDir = "asc";
 
@@ -235,6 +240,14 @@
       resultsCount.textContent = "No RFCs found.";
       return;
     }
+    if (dateFilter === "latest") {
+      resultsCount.textContent = `Showing the ${count} most recently updated RFCs.`;
+      return;
+    }
+    if (dateFilter === "last90") {
+      resultsCount.textContent = `Showing ${count} RFCs updated in the last 90 days.`;
+      return;
+    }
     resultsCount.textContent = `Showing ${count} of ${total} RFCs`;
   }
 
@@ -242,6 +255,10 @@
     document.querySelectorAll(`#${containerId} .chip`).forEach((chip) => {
       const key = chip.dataset[dataAttr];
       const label = chip.dataset.label || chip.textContent;
+      if (chip.dataset.count === "false") {
+        chip.textContent = label;
+        return;
+      }
       const count = key === "all" ? total : (counts[key] || 0);
       chip.textContent = `${label} (${count})`;
     });
@@ -250,15 +267,51 @@
   function updateChipCounts() {
     const statusCounts = {};
     const projectCounts = {};
+    let last90Count = 0;
+    let datedCount = 0;
 
     rfcData.forEach((item) => {
       const statusKey = normalizeStatus(item.status);
       statusCounts[statusKey] = (statusCounts[statusKey] || 0) + 1;
       projectCounts[item.project] = (projectCounts[item.project] || 0) + 1;
+      if (parseDate(item.updated)) {
+        datedCount += 1;
+        if (isWithinDays(item.updated, 90)) {
+          last90Count += 1;
+        }
+      }
     });
 
     updateChipGroup("status-chips", "status", statusCounts, rfcData.length);
     updateChipGroup("project-chips", "project", projectCounts, rfcData.length);
+    updateChipGroup(
+      "date-chips",
+      "date",
+      { latest: Math.min(20, datedCount), last90: last90Count },
+      rfcData.length
+    );
+  }
+
+  function parseDate(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return date;
+  }
+
+  function isWithinDays(value, days) {
+    const date = parseDate(value);
+    if (!date) return false;
+    const now = new Date();
+    const diffMs = now - date;
+    return diffMs >= 0 && diffMs <= days * 24 * 60 * 60 * 1000;
+  }
+
+  function passesDateFilter(item) {
+    if (dateFilter === "all") return true;
+    if (dateFilter === "last90") return isWithinDays(item.updated, 90);
+    if (dateFilter === "latest") return true;
+    return true;
   }
 
   function compareItems(a, b) {
@@ -266,6 +319,15 @@
       const aKey = normalizeStatus(a.status);
       const bKey = normalizeStatus(b.status);
       return (statusOrder[aKey] ?? 99) - (statusOrder[bKey] ?? 99);
+    }
+
+    if (sortKey === "updated") {
+      const aDate = parseDate(a.updated);
+      const bDate = parseDate(b.updated);
+      if (!aDate && !bDate) return 0;
+      if (!aDate) return 1;
+      if (!bDate) return -1;
+      return aDate - bDate;
     }
 
     if (sortKey === "slug") {
@@ -291,15 +353,29 @@
 
   function render() {
     const query = (searchInput.value || "").toLowerCase();
-    const filtered = rfcData.filter((item) => {
+    let filtered = rfcData.filter((item) => {
       const statusOk = statusFilter === "all" || normalizeStatus(item.status) === statusFilter;
       const projectOk = projectFilter === "all" || item.project === projectFilter;
+      const dateOk = passesDateFilter(item);
       const text = `${item.slug} ${item.title} ${item.project} ${item.status} ${item.category}`.toLowerCase();
       const textOk = !query || text.includes(query);
-      return statusOk && projectOk && textOk;
+      return statusOk && projectOk && dateOk && textOk;
     });
 
-    const sorted = sortItems(filtered);
+    let sorted = sortItems(filtered);
+    if (dateFilter === "latest") {
+      sorted = sorted
+        .slice()
+        .sort((a, b) => {
+          const aDate = parseDate(a.updated);
+          const bDate = parseDate(b.updated);
+          if (!aDate && !bDate) return 0;
+          if (!aDate) return 1;
+          if (!bDate) return -1;
+          return bDate - aDate;
+        })
+        .slice(0, 20);
+    }
     updateResultsCount(sorted.length, rfcData.length);
     updateHeaderIndicators();
     tbody.innerHTML = "";
@@ -313,12 +389,14 @@
 
     sorted.forEach((item) => {
       const tr = document.createElement("tr");
+      const updated = item.updated || "—";
       tr.innerHTML = `
         <td><a href="./${item.path}">${item.slug}</a></td>
         <td>${item.title}</td>
         <td>${formatProject(item.project)}</td>
         <td><span class="badge status-${normalizeStatus(item.status)}">${formatStatus(item.status)}</span></td>
         <td>${formatCategory(item.category)}</td>
+        <td>${updated}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -340,6 +418,15 @@
     projectFilter = e.target.dataset.project;
     document.querySelectorAll("#project-chips .chip").forEach((chip) => {
       chip.classList.toggle("active", chip.dataset.project === projectFilter);
+    });
+    render();
+  });
+
+  document.getElementById("date-chips").addEventListener("click", (e) => {
+    if (!e.target.dataset.date) return;
+    dateFilter = e.target.dataset.date;
+    document.querySelectorAll("#date-chips .chip").forEach((chip) => {
+      chip.classList.toggle("active", chip.dataset.date === dateFilter);
     });
     render();
   });

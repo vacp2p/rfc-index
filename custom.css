@@ -322,20 +322,20 @@ main h1 {
     transition: transform 0.15s ease;
 }
 
-.chapter-item:not(.collapsed) > a .section-toggle::before,
-.chapter-item:not(.collapsed) > .chapter-link-wrapper > a .section-toggle::before {
+.chapter-item.expanded > a .section-toggle::before,
+.chapter-item.expanded > .chapter-link-wrapper > a .section-toggle::before {
     transform: rotate(90deg);
 }
 
-.chapter-item.collapsed > ol.section {
+.chapter-item:not(.expanded) > ol.section {
     display: none;
 }
 
-.chapter-item.collapsed + li.section-container > ol.section {
+.chapter-item:not(.expanded) + li > ol.section {
     display: none;
 }
 
-.chapter-item.collapsed > .chapter-link-wrapper > a .section-toggle::before,
-.chapter-item.collapsed > a .section-toggle::before {
+.chapter-item:not(.expanded) > .chapter-link-wrapper > a .section-toggle::before,
+.chapter-item:not(.expanded) > a .section-toggle::before {
     transform: rotate(0deg);
 }

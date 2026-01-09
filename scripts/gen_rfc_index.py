@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import html
 import re
+import subprocess
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
@@ -51,6 +52,24 @@ def parse_title_from_h1(text: str) -> Optional[str]:
         return None
     return match.group(1).strip()
 
+def run_git(args: List[str]) -> str:
+    result = subprocess.run(
+        ["git"] + args,
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout.strip()
+
+
+def get_last_updated(path: Path) -> str:
+    rel = path.relative_to(ROOT).as_posix()
+    output = run_git(["log", "-1", "--format=%ad", "--date=short", "--", rel])
+    return output
+
 
 def collect() -> List[Dict[str, str]]:
     entries: List[Dict[str, str]] = []
@@ -79,6 +98,8 @@ def collect() -> List[Dict[str, str]]:
         # mdBook renders Markdown to .html, keep links consistent
         html_path = rel.with_suffix(".html").as_posix()
 
+        updated = get_last_updated(path)
+
         entries.append(
             {
                 "project": project,
@@ -86,6 +107,7 @@ def collect() -> List[Dict[str, str]]:
                 "title": title,
                 "status": status,
                 "category": category,
+                "updated": updated,
                 "path": html_path,
             }
         )
