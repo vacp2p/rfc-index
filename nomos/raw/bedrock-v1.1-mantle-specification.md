@@ -142,7 +142,7 @@ The hash function used,
 as well as other cryptographic primitives like ZK proofs and signature schemes,
 are described in [NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS][common-crypto].
 
-A Mantle Transaction must include all relevant signatures and proofs
+A Mantle Transaction MUST include all relevant signatures and proofs
 for each Operation,
 as well as for the Ledger Transaction.
 
@@ -912,7 +912,7 @@ declarations[declare_id] = DeclarationInfo(
 Notice that locked notes **cannot** refresh their keys
 to update their slot secrets required for Proof of Leadership participation
 (see [NOMOS-PROOF-OF-LEADERSHIP - Protection Against Adaptive Adversaries][pol-adversaries]).
-It's recommended to refresh the note before locking it,
+It's RECOMMENDED to refresh the note before locking it,
 which guarantees a key life of more than a year.
 After this period,
 the note cannot be used in PoL until its private key is refreshed
