@@ -478,7 +478,8 @@ message Message {
 
 ### REGISTER Message
 
-The REGISTER message is used by advertisers to register their advertisements with registrars.
+The REGISTER message is used by advertisers
+to register their advertisements with registrars.
 
 #### REGISTER Request
 
@@ -498,19 +499,24 @@ The REGISTER message is used by advertisers to register their advertisements wit
 
 **Record Field Encoding:**
 
-The `record` field encodes the Advertisement for compatibility with base Kad-DHT's key-value semantics:
+The `record` field encodes the Advertisement
+for compatibility with base Kad-DHT's key-value semantics:
 
 - `record.key` = `service_id_hash` (MUST match message `key` field)
-- `record.value` = Serialized Advertisement protobuf (see [Advertisement](#advertisement) structure)
-- `record.timeReceived` = Empty/not set (populated by registrar upon storage)
+- `record.value` = Serialized Advertisement protobuf
+(see [Advertisement](#advertisement) structure)
+- `record.timeReceived` = Empty/not set
+(populated by registrar upon storage)
 
 **Simplified Encoding (Alternative):**
 
-To eliminate redundancy, implementations MAY use a simplified approach:
+To eliminate redundancy,
+implementations MAY use a simplified approach:
 
 - `record.key` = `service_id_hash`
 - `record.value` = Empty or minimal identifier
-- Construct the Advertisement from message-level fields or `message.ticket.ad`
+- Construct the Advertisement
+from message-level fields or `message.ticket.ad`
 
 However, for compatibility with existing Kad-DHT tooling
 that expects key-value pairs in Records,
@@ -840,7 +846,7 @@ The advertiser SHOULD try to maintain up to `K_register`
 active registrations per bucket.
 It does so by selecting random registrars
 from each bucket of `AdvT(service_id_hash)`
-and following the registration maintenance procedure.
+and following the [registration maintenance procedure](#registration-maintenance-requirements).
 These ongoing registrations MAY be tracked in a separate data structure.
 Ongoing registrations include those registrars
 which has an active `ad` or the advertiser is
@@ -850,10 +856,10 @@ trying to register its `ad` into that registrar.
 
 To maintain each registration, the advertiser:
 
-- SHOULD send a [REGISTER message](#register-message) to the registrar.
+- MUST send a [REGISTER message](#register-message) to the registrar.
 If there is already a cached `ticket` from a previous registration attempt
 for the same `ad` in the same registrar,
-the `ticket` SHOULD also be included in the REGISTER message.
+the `ticket` MUST also be included in the REGISTER message.
 - On receipt of a Response,
 SHOULD add the closer peers indicated in the response to `AdvT(service_id_hash)`
 using the formula described in the [Distance](#distance) section.
