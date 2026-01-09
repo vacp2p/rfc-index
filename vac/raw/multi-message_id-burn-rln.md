@@ -200,7 +200,7 @@ follows:
 a_0 = identity_secret_hash;
 a_1i = poseidonHash([a0, external_nullifier, message_id [i]]);
 
-y_i = selector_used[i] * a_0 + x * a_1i;
+y_i = selector_used[i] * (a_0 + x * a_1i);
 
 internal_nullifiers_i = selector_used[i] * poseidonHash([a_1i]);
 
