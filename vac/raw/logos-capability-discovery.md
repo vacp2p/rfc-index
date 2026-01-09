@@ -390,6 +390,46 @@ prefixed with message length as unsigned varint, sent over libp2p streams.
 All Logos discovery messages extend the standard Kad-DHT protobuf message:
 
 ```protobuf
+// Advertisement protobuf definition
+message Advertisement {
+    // Service identifier (32-byte SHA-256 hash)
+    bytes service_id_hash = 1;
+
+    // Peer ID of advertiser (32-byte hash of public key)
+    bytes peerID = 2;
+
+    // Multiaddrs of advertiser
+    repeated bytes addrs = 3;
+
+    // Ed25519 signature over (service_id_hash || peerID || addrs)
+    bytes signature = 4;
+
+    // Optional: Service-specific metadata
+    optional bytes metadata = 5;
+
+    // Unix timestamp in seconds
+    uint64 timestamp = 6;
+}
+
+// Ticket protobuf definition
+message Ticket {
+    // Copy of the original advertisement
+    Advertisement ad = 1;
+
+    // Ticket creation timestamp (Unix time in seconds)
+    uint64 t_init = 2;
+
+    // Last modification timestamp (Unix time in seconds)
+    uint64 t_mod = 3;
+
+    // Remaining wait time in seconds
+    uint32 t_wait_for = 4;
+
+    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+    bytes signature = 5;
+}
+
+// Main Logos discovery message extending Kad-DHT
 message Message {
     enum MessageType {
         PUT_VALUE = 0;
@@ -458,17 +498,29 @@ The REGISTER message is used by advertisers to register their advertisements wit
 
 **Record Field Encoding:**
 
-The `record` field MUST encode the Advertisement as follows:
+The `record` field encodes the Advertisement for compatibility with base Kad-DHT's key-value semantics:
 
 - `record.key` = `service_id_hash` (MUST match message `key` field)
-- `record.value` = Serialized Advertisement protobuf containing:
-  - `service_id_hash` (bytes)
-  - `peerID` (bytes)
-  - `addrs` (repeated bytes)
-  - `signature` (bytes, Ed25519 over service_id_hash || peerID || addrs)
-  - `metadata` (optional bytes)
-  - `timestamp` (optional uint64)
-- `record.timeReceived` = Empty/not set (populated by registrar on storage)
+- `record.value` = Serialized Advertisement protobuf (see [Advertisement](#advertisement) structure)
+- `record.timeReceived` = Empty/not set (populated by registrar upon storage)
+
+**Simplified Encoding (Alternative):**
+
+To eliminate redundancy, implementations MAY use a simplified approach:
+
+- `record.key` = `service_id_hash`
+- `record.value` = Empty or minimal identifier
+- Construct the Advertisement from message-level fields or `message.ticket.ad`
+
+However, for compatibility with existing Kad-DHT tooling
+that expects key-value pairs in Records,
+the full encoding approach
+(serializing the complete Advertisement in `record.value`)
+is RECOMMENDED.
+
+> **Note:** The redundancy between `record.value` and message-level fields
+exists to maintain compatibility with Kad-DHT's Record-based storage model
+while extending the protocol with new message types.
 
 **Ticket Field (if present):**
 
@@ -1112,7 +1164,7 @@ the registrar SHOULD add the discoverer's `peerID` to `RegT(service_id_hash)`.
 they SHOULD add peers from `closerPeers` fields
 to relevant `RegT(service_id_hash)` tables.
 
-> Note: The advertisement cache `ad_cache`
+> **Note:** The advertisement cache `ad_cache`
 and registrar table `RegT(service_id_hash)`
 are completely different data structures
 that serve different purposes and are independent of each other.
