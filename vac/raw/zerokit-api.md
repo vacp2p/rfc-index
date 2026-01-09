@@ -119,6 +119,23 @@ Function signatures documented below are from the Rust perspective.
 - FFI: <https://github.com/vacp2p/zerokit/tree/master/rln/src/ffi>
 - WASM: <https://github.com/vacp2p/zerokit/tree/master/rln-wasm>
 
+### Error Handling
+
+Error handling differs across platform bindings.
+
+For native Rust,
+functions return `Result<T, RLNError>` where `RLNError` is an enum
+representing specific error conditions.
+The enum variants provide type-safe error handling and
+pattern matching capabilities.
+
+For WASM and FFI bindings,
+errors are returned as human-readable string messages.
+This simplifies cross-language error propagation at
+the cost of type safety.
+Applications consuming these bindings SHOULD parse error strings or
+use error message prefixes to distinguish error types when needed.
+
 ### Initialization
 
 Functions with the same name but different signatures are conditional compilation variants.
@@ -302,6 +319,7 @@ WASM bindings wrap the Rust API with JavaScript-compatible types. Key difference
 - Witness input uses `WasmRLNWitnessInput` constructor and `toBigIntJson()` for witness calculator integration.
 - Proof generation requires external witness calculation via `generateRLNProofWithWitness(calculatedWitness, witness)`.
 - When `parallel` feature is enabled, call `initThreadPool()` to initialize the thread pool.
+- Errors are returned as JavaScript strings that can be caught via try-catch blocks.
 
 ### FFI-Specific Notes
 
@@ -309,6 +327,7 @@ FFI bindings use C-compatible types with the `ffi_` prefix. Key differences:
 
 - Field elements are wrapped as `CFr` with corresponding conversion functions.
 - Results use `CResult` or `CBoolResult` structs with `ok` and `err` fields.
+- Errors are returned as C-compatible strings in the `err` field of result structs.
 - Memory must be explicitly freed using `ffi_*_free` functions.
 - Vectors use `repr_c::Vec` with `ffi_vec_*` helper functions.
 - Configuration is passed via file path to a JSON configuration file.
