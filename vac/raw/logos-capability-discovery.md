@@ -390,6 +390,12 @@ prefixed with message length as unsigned varint, sent over libp2p streams.
 All Logos discovery messages extend the standard Kad-DHT protobuf message:
 
 ```protobuf
+syntax = "proto3";
+
+// Import ExtensiblePeerRecord from separate protobuf
+// This is defined in the Extensible Peer Records RFC
+import "peer/extensible_peer_record.proto";
+
 // Advertisement protobuf definition
 message Advertisement {
     // Service identifier (32-byte SHA-256 hash)
@@ -459,7 +465,7 @@ message Message {
     MessageType type = 1;
     int32 clusterLevelRaw = 10;  // NOT USED
     bytes key = 2;
-    Record record = 3;
+    peer.pb.ExtensiblePeerRecord record = 3;
     repeated Peer closerPeers = 8;
     repeated Peer providerPeers = 9;
 
@@ -499,14 +505,24 @@ to register their advertisements with registrars.
 
 **Record Field Encoding:**
 
-The `record` field encodes the Advertisement
-for compatibility with base Kad-DHT's key-value semantics:
+The `record` field uses `ExtensiblePeerRecord`
+(defined in the Extensible Peer Records RFC)
+to encode both peer information and service capabilities:
 
-- `record.key` = `service_id_hash` (MUST match message `key` field)
-- `record.value` = Serialized Advertisement protobuf
-(see [Advertisement](#advertisement) structure)
-- `record.timeReceived` = Empty/not set
-(populated by registrar upon storage)
+- `record.peer_id` = Advertiser's peer ID
+(MUST match `Advertisement.peerID`)
+- `record.seq` = Monotonically-increasing sequence counter
+- `record.addresses` = List of advertiser's multiaddrs
+(MUST match `Advertisement.addrs`)
+- `record.services` = List of supported services, where:
+  - For the advertised service: `ServiceInfo.id` =
+  service protocol identifier (e.g., `/waku/store/1.0.0`)
+  - `ServiceInfo.data` = Optional service-specific metadata
+  (SHOULD be ≤ 33 bytes)
+
+The `record` MUST be wrapped in a signed envelope with:
+- Domain: `libp2p-routing-state`
+- Payload type: `/libp2p/extensible-peer-record/`
 
 **Simplified Encoding (Alternative):**
 
