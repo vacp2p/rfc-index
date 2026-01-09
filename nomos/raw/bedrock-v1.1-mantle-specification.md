@@ -40,6 +40,7 @@ in this document are to be interpreted as described in [RFC 2119](https://www.ie
 | SDP | Service Declaration Protocol for node participation in Nomos Services. |
 | ZkSignature | Zero Knowledge Signature proving ownership without revealing the private key. |
 | NMO | The native token of the Nomos network. |
+| DA | Data Availability, ephemeral storage for blob data. |
 
 ## Introduction
 
@@ -58,7 +59,7 @@ a Sovereign Rollup node posting an update to Bedrock,
 or a node operator declaring its participation in the Blend Network,
 would be done through the corresponding Operations within a Mantle Transaction.
 
-Mantle manages assets using a Note-based ledger that follows an UTXO model.
+Mantle manages assets using a Note-based blockchain ledger that follows an UTXO model.
 Each Mantle Transaction includes a Ledger Transaction,
 and any excess balance serves as the fee payment.
 
@@ -70,7 +71,7 @@ The features of Nomos are exposed through Mantle Transactions.
 Each transaction can contain zero or more [Operations](#operations)
 and one [Ledger Transaction](#ledger-transactions).
 Mantle Transactions enable users to execute multiple Operations atomically.
-The Ledger Transaction serves two purposes:
+The Ledger Transaction serves two purposes,
 it can pay the transaction fee and allows users to issue transfers.
 
 ### Operations
@@ -152,7 +153,7 @@ class SignedMantleTx:
     ledger_tx_proof: ZkSignature  # ZK proof of ownership of the spent notes
 ```
 
-Each proof (op proof and signature) must be cryptographically bound
+Each proof (`op_proofs` and `ledger_tx_proof`) must be cryptographically bound
 to the `MantleTx` through the `mantle_txhash` to prevent replay attacks.
 This binding is achieved by including the `MantleTx` hash
 as a public input in every ZK proof.
