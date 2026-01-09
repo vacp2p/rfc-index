@@ -71,8 +71,8 @@ main h1, main h2, main h3, main h4 {
     font-family: "Source Serif Pro", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
     color: var(--fg);
     font-weight: 600;
-    margin-top: 1.2em;
-    margin-bottom: 0.6em;
+    margin-top: 1.1em;
+    margin-bottom: 0.5em;
 }
 
 main h1 + table {
@@ -101,7 +101,7 @@ table {
 
 th, td {
     border: 1px solid var(--table-border-color);
-    padding: 0.5em 0.75em;
+    padding: 0.4em 0.6em;
 }
 
 thead {
@@ -222,6 +222,45 @@ thead {
     color: var(--fg);
 }
 
+.rfc-header {
+    margin: 0.5rem 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--table-border-color);
+}
+
+.rfc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0.75rem 0;
+}
+
+.rfc-badges .badge {
+    font-weight: 600;
+    background: var(--theme-hover);
+}
+
+.badge.category-standards,
+.badge.category-bcp,
+.badge.category-informational,
+.badge.category-experimental,
+.badge.category-other {
+    font-weight: 500;
+}
+
+.rfc-meta-table {
+    font-size: 0.95em;
+}
+
+.rfc-meta-table th {
+    width: 9rem;
+    text-align: left;
+}
+
+.rfc-meta-table td {
+    vertical-align: top;
+}
+
 
 /* Landing polish */
 main h1 {
@@ -320,6 +359,10 @@ main h1 {
     color: var(--fg);
     text-decoration: none;
     cursor: pointer;
+    background: transparent;
+    border: 0;
+    font: inherit;
+    padding: 0;
 }
 
 .site-nav .nav-link:hover {
@@ -366,6 +409,10 @@ main h1 {
 
 .nav-dropdown .nav-menu a:hover {
     background: var(--theme-hover);
+    color: var(--links);
+}
+
+.back-to-top-link {
     color: var(--links);
 }
 

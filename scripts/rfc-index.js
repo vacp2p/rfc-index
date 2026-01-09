@@ -62,7 +62,8 @@
           <a href="${root}codex/index.html">Codex</a>
         </div>
       </details>
-      <a class="nav-link" href="https://github.com/vacp2p/rfc-index">About</a>
+      <button class="nav-link back-to-top-link" type="button">Back to top</button>
+      <a class="nav-link" href="${root}about.html">About</a>
     `;
 
     const rightButtons = menuBar.querySelector(".right-buttons");
@@ -77,6 +78,13 @@
         nav.querySelectorAll("details[open]").forEach((detail) => detail.removeAttribute("open"));
       }
     });
+
+    const backToTop = nav.querySelector(".back-to-top-link");
+    if (backToTop) {
+      backToTop.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
   }
 
   function addFooter() {
@@ -94,6 +102,89 @@
       <a href="https://github.com/vacp2p/rfc-index">GitHub</a>
     `;
     page.appendChild(footer);
+  }
+
+  function enhanceRfcHeader() {
+    const main = document.querySelector("#mdbook-content main, #content main");
+    if (!main || main.querySelector(".rfc-header")) return;
+
+    const h1 = main.querySelector("h1");
+    if (!h1) return;
+
+    let cursor = h1.nextElementSibling;
+    while (cursor && cursor.tagName === "DIV" && cursor.classList.contains("table-wrapper") === false) {
+      if (cursor.textContent.trim() !== "") break;
+      cursor = cursor.nextElementSibling;
+    }
+
+    let table = null;
+    let wrapper = null;
+    if (cursor && cursor.classList.contains("table-wrapper")) {
+      wrapper = cursor;
+      table = cursor.querySelector("table");
+    } else if (cursor && cursor.tagName === "TABLE") {
+      table = cursor;
+    }
+
+    if (!table) return;
+    const headerCell = table.querySelector("th");
+    if (!headerCell || headerCell.textContent.trim().toLowerCase() !== "field") return;
+
+    const meta = {};
+    table.querySelectorAll("tbody tr").forEach((row) => {
+      const keyCell = row.querySelector("td, th");
+      const valCell = row.querySelectorAll("td, th")[1];
+      if (!keyCell || !valCell) return;
+      const key = keyCell.textContent.trim().toLowerCase();
+      const value = valCell.textContent.trim();
+      if (key) meta[key] = value;
+    });
+
+    const header = document.createElement("div");
+    header.className = "rfc-header";
+
+    const badges = document.createElement("div");
+    badges.className = "rfc-badges";
+
+    if (meta.status) {
+      const status = meta.status.toLowerCase().split("/")[0].replace(/\s+/g, "-");
+      const badge = document.createElement("span");
+      badge.className = `badge status-${status}`;
+      badge.textContent = meta.status;
+      badges.appendChild(badge);
+    }
+
+    if (meta.category && meta.category.toLowerCase() !== "unspecified") {
+      const category = meta.category.toLowerCase();
+      let cls = "category-other";
+      if (category.includes("best current practice") || category.includes("bcp")) {
+        cls = "category-bcp";
+      } else if (category.includes("standards")) {
+        cls = "category-standards";
+      } else if (category.includes("informational")) {
+        cls = "category-informational";
+      } else if (category.includes("experimental")) {
+        cls = "category-experimental";
+      }
+      const badge = document.createElement("span");
+      badge.className = `badge ${cls}`;
+      badge.textContent = meta.category;
+      badges.appendChild(badge);
+    }
+
+    if (badges.children.length) {
+      header.appendChild(badges);
+    }
+
+    table.classList.add("rfc-meta-table");
+    if (wrapper) {
+      wrapper.classList.add("rfc-meta-table-wrapper");
+      main.insertBefore(header, wrapper);
+      header.appendChild(wrapper);
+    } else {
+      main.insertBefore(header, table);
+      header.appendChild(table);
+    }
   }
 
   function getSectionInfo(item) {
@@ -179,6 +270,7 @@
   onReady(() => {
     addTopNav();
     addFooter();
+    enhanceRfcHeader();
     bindSidebarCollapsible();
     // toc.js may inject the sidebar after load
     setTimeout(bindSidebarCollapsible, 100);
