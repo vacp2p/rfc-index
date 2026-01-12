@@ -18,6 +18,6 @@ help route it.
 
 ## Links
 
-- Vac: https://vac.dev
-- IETF RFC Series: https://www.rfc-editor.org/
-- Repository: https://github.com/vacp2p/rfc-index
+- Vac: <https://vac.dev>
+- IETF RFC Series: <https://www.rfc-editor.org/>
+- Repository: <https://github.com/vacp2p/rfc-index>
