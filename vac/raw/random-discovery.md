@@ -1,11 +1,11 @@
 ---
-title: random-discovery
-name: Random Discovery
+title: extended-kademlia-discovery
+name: Extended Kademlia Discovery
 status: raw
 category: Standards Track
 tags:
 editor: Simon-Pierre Vivier <simvivier@status.im>
-contributors: 
+contributors: Hanno Cornelius <hanno@status.im>
 ---
 
 ## Abstract
@@ -22,7 +22,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document
 are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md) and [extended peer records specification](TODO) for terminology used in this document.
+Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md) (`KAD-DHT`) and [extended peer records specification](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/extensible-peer-records.md) (`XPR`) for terminology used in this document.
 
 ## Protocol
 
@@ -30,53 +30,40 @@ Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/sp
 
 A node that wants to make itself discoverable,
 also known as an _advertiser_,
-MUST encode its discoverable information in an [Extensible Peer Record]().
+MUST encode its discoverable information in an [`XPR`](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/extensible-peer-records.md#extensible-peer-records).
 The encoded information MUST be sufficient for discoverers to connect to this advertiser.
 It MAY choose to encode some or all of its capabilities (and related information)
-as `services` in the `ExtensiblePeerRecord`.
+as `services` in the `XPR`.
 This will allow future discoverers to filter discovered records based on desired capabilities.
 
 In order to advertise this record,
 the advertiser SHOULD first retrieve the `k` closest peers to its own peer ID
-in its own [Kademlia routing table](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#kademlia-routing-table).
+in its own `KAD-DHT` [routing table](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#kademlia-routing-table).
 This assumes that the routing table has been previously initialised
-and follows the regular [bootstrap process](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#bootstrap-process) as per the libp2p Kad-DHT specification.
-The advertiser SHOULD then perform a [Kad-DHT `PUT_VALUE`](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#value-storage-and-retrieval) to these `k` peers
-to store the `ExtensiblePeerRecord` against its own peer ID.
+and follows the regular [bootstrap process](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#bootstrap-process) as per the `KAD-DHT` specification.
+The advertiser SHOULD then send a `PUT_VALUE` message to these `k` peers
+to store the `XPR` against its own peer ID.
 This process SHOULD be repeated periodically to maintain the advertised record.
-We RECOMMEND an interval of once every `30` minutes,
-for each discoverable `ExtensiblePeerRecord` the node wants to advertise.
+We RECOMMEND an interval of once every `30` minutes.
 
 ### Record Discovery
 
-A random discovery procedure (`FIND_RANDOM`) consist of the following steps;
+A random walk discovery procedure (`FIND_RANDOM`) consist of the following steps;
 
 1. A random value in the key space MUST be chosen (`R_KEY`).
 
-2. A `GET_VALUE` message MUST be sent to the `k` closest nodes to `R_KEY`.
+2. Start the `KAD-DHT` [peer routing](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#peer-routing) algorithm.
 
-3. A `FIND_NODE` message MUST be sent to the `k` closest nodes to `R_KEY`.
+3. For each peers in `closerPeers` from `FIND_NODE` response messages, a `GET_VALUE` message MUST be sent but already seen peers MUST be ignored.
 
-4. For each peers in `closerPeers` from `FIND_NODE` responses, a `GET_VALUE` message MUST be sent but already seen peers MUST be ignored.
-
-5. Repeat step 3 and 4 with new peers found via `FIND_NODE`.
-`FIND_RANDOM` MAY terminate when the `k` closest peers to `R_KEY` are found.
-The discoverer MAY choose to filter discovered `ExtensiblePeerRecords`
-based on advertised `services`
-to find peers matching a set of desired capabilities. 
 > `GET_VALUE` messages MUST always contain the peer id of the recipiant as the `key`
-and the `record` in the response MUST be verified, invalid records and `closerPeers` MUST be discarded. Valid records MAY be filtered for specific services.
+and the `record` in the response MUST be verified, invalid records and `closerPeers` MUST be discarded. Valid `XPR` in the records MAY be filtered to find peers matching a set of desired capabilities.
 
-### Attack Vectors
+> `FIND_RANDOM` MAY terminate when `KAD-DHT` peer routing algorithm no longer returns new peers.
 
-To make the system more resilient extended peer records could be stored randomly in the key space
-but doing so would result in increased bandwidth requirements
-because of the need to first find random nodes to store the records at.
-When used in conjuction with [capability discovery](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/logos-capability-discovery.md),
-eclipse attacks effectiveness are greatly reduced
-because a node can always be discovered via it's advertised services regardless of the random discoverability of it's records.
-For this reason, we decided that this trade-off was worth it.
+### Future Improvements
 
+To make the system resilient to eclipse attacks, a node `XPR` are stored at the `k` closest nodes. Future version of this protocol could also retrieve `XPR` on more nodes than only the originator.
 
 ## Copyright
 
