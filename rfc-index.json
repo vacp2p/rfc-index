@@ -1,10 +1,20 @@
 [
   {
+    "project": "about.md",
+    "slug": "about",
+    "title": "about",
+    "status": "unknown",
+    "category": "unspecified",
+    "updated": "2026-01-12",
+    "path": "about.html"
+  },
+  {
     "project": "codex",
     "slug": "Codex Block Exchange Protocol",
     "title": "Codex Block Exchange Protocol",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "codex/raw/codex-block-exchange.html"
   },
   {
@@ -13,6 +23,7 @@
     "title": "Codex Storage Marketplace",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "codex/raw/codex-marketplace.html"
   },
   {
@@ -21,6 +32,7 @@
     "title": "Claro Consensus Protocol",
     "status": "deprecated",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "nomos/deprecated/claro.html"
   },
   {
@@ -29,6 +41,7 @@
     "title": "Nomos P2P Network Bootstrapping Specification",
     "status": "raw",
     "category": "networking",
+    "updated": "2025-12-22",
     "path": "nomos/raw/p2p-network-bootstrapping.html"
   },
   {
@@ -37,6 +50,7 @@
     "title": "Nomos P2P Network NAT Solution Specification",
     "status": "raw",
     "category": "networking",
+    "updated": "2025-12-22",
     "path": "nomos/raw/p2p-nat-solution.html"
   },
   {
@@ -45,6 +59,7 @@
     "title": "Nomos P2P Network Specification",
     "status": "draft",
     "category": "networking",
+    "updated": "2025-12-22",
     "path": "nomos/raw/p2p-network.html"
   },
   {
@@ -53,6 +68,7 @@
     "title": "Nomos Service Declaration Protocol Specification",
     "status": "raw",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "nomos/raw/sdp.html"
   },
   {
@@ -61,6 +77,7 @@
     "title": "Nomos p2p Network Hardware Requirements Specification",
     "status": "raw",
     "category": "infrastructure",
+    "updated": "2025-12-22",
     "path": "nomos/raw/p2p-hardware-requirements.html"
   },
   {
@@ -69,6 +86,7 @@
     "title": "NomosDA Encoding Protocol",
     "status": "raw",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "nomos/raw/nomosda-encoding.html"
   },
   {
@@ -77,6 +95,7 @@
     "title": "NomosDA Network",
     "status": "raw",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "nomos/raw/nomosda-network.html"
   },
   {
@@ -85,6 +104,7 @@
     "title": "Status Community Directory Curation Voting using Waku v2",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/24/curation.html"
   },
   {
@@ -93,6 +113,7 @@
     "title": "Status community featuring using waku v2",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/28/featuring.html"
   },
   {
@@ -101,6 +122,7 @@
     "title": "3rd party",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/3rd-party.html"
   },
   {
@@ -109,6 +131,7 @@
     "title": "Status 1-to-1 Chat",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/55/1to1-chat.html"
   },
   {
@@ -117,6 +140,7 @@
     "title": "Status Communities that run over Waku v2",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/56/communities.html"
   },
   {
@@ -125,6 +149,7 @@
     "title": "Status Community History Service",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/61/community-history-service.html"
   },
   {
@@ -133,6 +158,7 @@
     "title": "Status Message Payloads",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/62/payloads.html"
   },
   {
@@ -141,6 +167,7 @@
     "title": "Status Keycard Usage",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/63/keycard-usage.html"
   },
   {
@@ -149,6 +176,7 @@
     "title": "Status Account Address",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/65/account-address.html"
   },
   {
@@ -157,6 +185,7 @@
     "title": "Push Notification Server",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/71/push-notification-server.html"
   },
   {
@@ -165,6 +194,7 @@
     "title": "Account",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/account.html"
   },
   {
@@ -173,6 +203,7 @@
     "title": "Client",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/client.html"
   },
   {
@@ -181,6 +212,7 @@
     "title": "Dapp browser API usage",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/dapp-browser-API-usage.html"
   },
   {
@@ -189,6 +221,7 @@
     "title": "EIPS",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/eips.html"
   },
   {
@@ -197,6 +230,7 @@
     "title": "Group Chat",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/group-chat.html"
   },
   {
@@ -205,6 +239,7 @@
     "title": "IPFS gateway for Sticker Pack",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/IPFS-gateway-for-sticker-Pack.html"
   },
   {
@@ -213,6 +248,7 @@
     "title": "Keycard Usage for Wallet and Chat Keys",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"
   },
   {
@@ -221,6 +257,7 @@
     "title": "MVDS Usage in Status",
     "status": "raw",
     "category": "Best Current Practice",
+    "updated": "2025-12-22",
     "path": "status/raw/status-mvds.html"
   },
   {
@@ -229,6 +266,7 @@
     "title": "Notifications",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/notifications.html"
   },
   {
@@ -237,6 +275,7 @@
     "title": "Payloads",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/payloads.html"
   },
   {
@@ -245,6 +284,7 @@
     "title": "Push notification server",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/push-notification-server.html"
   },
   {
@@ -253,6 +293,7 @@
     "title": "Secure Transport",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/secure-transport.html"
   },
   {
@@ -261,6 +302,7 @@
     "title": "Status Protocol Stack",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/raw/status-app-protocols.html"
   },
   {
@@ -269,6 +311,7 @@
     "title": "Status Simple Scaling",
     "status": "raw",
     "category": "Informational",
+    "updated": "2025-12-22",
     "path": "status/raw/simple-scaling.html"
   },
   {
@@ -277,6 +320,7 @@
     "title": "Status URL Data",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/raw/url-data.html"
   },
   {
@@ -285,6 +329,7 @@
     "title": "Status URL Scheme",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "status/raw/url-scheme.html"
   },
   {
@@ -293,6 +338,7 @@
     "title": "Status interactions with the Ethereum blockchain",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/ethereum-usage.html"
   },
   {
@@ -301,6 +347,7 @@
     "title": "Waku Mailserver",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/waku-mailserver.html"
   },
   {
@@ -309,6 +356,7 @@
     "title": "Waku Usage",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/waku-usage.html"
   },
   {
@@ -317,6 +365,7 @@
     "title": "Whisper Usage",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/whisper-usage.html"
   },
   {
@@ -325,6 +374,7 @@
     "title": "Whisper mailserver",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "status/deprecated/whisper-mailserver.html"
   },
   {
@@ -333,6 +383,7 @@
     "title": "Consensus-Oriented Specification System",
     "status": "draft",
     "category": "Best Current Practice",
+    "updated": "2025-12-22",
     "path": "vac/1/coss.html"
   },
   {
@@ -341,6 +392,7 @@
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/2/mvds.html"
   },
   {
@@ -349,6 +401,7 @@
     "title": "Libp2p Peer Discovery via DNS",
     "status": "deleted",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/25/libp2p-dns-discovery.html"
   },
   {
@@ -357,6 +410,7 @@
     "title": "Remote log specification",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/3/remote-log.html"
   },
   {
@@ -365,6 +419,7 @@
     "title": "Rate Limit Nullifier",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/32/rln-v1.html"
   },
   {
@@ -373,6 +428,7 @@
     "title": "MVDS Metadata Field",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/4/mvds-meta.html"
   },
   {
@@ -381,6 +437,7 @@
     "title": "Decentralized Key and Session Setup for Secure Messaging over Ethereum",
     "status": "raw",
     "category": "informational",
+    "updated": "2025-12-22",
     "path": "vac/raw/decentralized-messaging-ethereum.html"
   },
   {
@@ -389,6 +446,7 @@
     "title": "Gossipsub Tor Push",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/gossipsub-tor-push.html"
   },
   {
@@ -397,6 +455,7 @@
     "title": "Hashgraphlike Consensus Protocol",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/consensus-hashgraphlike.html"
   },
   {
@@ -405,6 +464,7 @@
     "title": "Interep as group management for RLN",
     "status": "raw",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/raw/rln-interep-spec.html"
   },
   {
@@ -413,6 +473,7 @@
     "title": "Libp2p Mix Protocol",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/mix.html"
   },
   {
@@ -421,6 +482,7 @@
     "title": "Logos Capability Discovery Protocol",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/logos-capability-discovery.html"
   },
   {
@@ -429,6 +491,7 @@
     "title": "RLN Stealth Commitment Usage",
     "status": "unknown",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/rln-stealth-commitments.html"
   },
   {
@@ -437,6 +500,7 @@
     "title": "Rate Limit Nullifier V2",
     "status": "raw",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/raw/rln-v2.html"
   },
   {
@@ -445,6 +509,7 @@
     "title": "Scalable Data Sync protocol for distributed logs",
     "status": "raw",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "vac/raw/sds.html"
   },
   {
@@ -453,6 +518,7 @@
     "title": "Secure 1-to-1 channel setup using X3DH and the double ratchet",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/noise-x3dh-double-ratchet.html"
   },
   {
@@ -461,6 +527,7 @@
     "title": "Secure channel setup using Ethereum accounts",
     "status": "deleted",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/deleted/eth-secpm.html"
   },
   {
@@ -469,6 +536,7 @@
     "title": "Secure channel setup using decentralized MLS and Ethereum accounts",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/eth-mls-onchain.html"
   },
   {
@@ -477,6 +545,7 @@
     "title": "Secure channel setup using decentralized MLS and Ethereum accounts",
     "status": "raw",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "vac/raw/eth-mls-offchain.html"
   },
   {
@@ -485,6 +554,7 @@
     "title": "Waku v2",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/10/waku2.html"
   },
   {
@@ -493,6 +563,7 @@
     "title": "Waku v2 Relay",
     "status": "stable",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/11/relay.html"
   },
   {
@@ -501,6 +572,7 @@
     "title": "Waku v2 Filter",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/12/filter.html"
   },
   {
@@ -509,6 +581,7 @@
     "title": "Waku Store Query",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/13/store.html"
   },
   {
@@ -517,6 +590,7 @@
     "title": "Waku v2 Message",
     "status": "stable",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/14/message.html"
   },
   {
@@ -525,6 +599,7 @@
     "title": "Waku Bridge",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/15/bridge.html"
   },
   {
@@ -533,6 +608,7 @@
     "title": "Waku v2 RPC API",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/deprecated/16/rpc.html"
   },
   {
@@ -541,6 +617,7 @@
     "title": "Waku v2 RLN Relay",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/17/rln-relay.html"
   },
   {
@@ -549,6 +626,7 @@
     "title": "Waku SWAP Accounting",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/deprecated/18/swap.html"
   },
   {
@@ -557,6 +635,7 @@
     "title": "Waku v2 Light Push",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/19/lightpush.html"
   },
   {
@@ -565,6 +644,7 @@
     "title": "Toy Ethereum Private Message",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/application/20/toy-eth-pm.html"
   },
   {
@@ -573,6 +653,7 @@
     "title": "Waku v2 Fault-Tolerant Store",
     "status": "deleted",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/deprecated/fault-tolerant-store.html"
   },
   {
@@ -581,6 +662,7 @@
     "title": "Waku v2 Toy Chat",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/informational/22/toy-chat.html"
   },
   {
@@ -589,6 +671,7 @@
     "title": "Waku v2 Topic Usage Recommendations",
     "status": "draft",
     "category": "Informational",
+    "updated": "2025-12-22",
     "path": "waku/informational/23/topics.html"
   },
   {
@@ -597,6 +680,7 @@
     "title": "Waku Message Payload Encryption",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/application/26/payload.html"
   },
   {
@@ -605,6 +689,7 @@
     "title": "Waku v2 Client Peer Management Recommendations",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/informational/27/peers.html"
   },
   {
@@ -613,6 +698,7 @@
     "title": "Waku v2 Client Parameter Configuration Recommendations",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/informational/29/config.html"
   },
   {
@@ -621,6 +707,7 @@
     "title": "Adaptive nodes",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/informational/30/adaptive-nodes.html"
   },
   {
@@ -629,6 +716,7 @@
     "title": "Waku v2 usage of ENR",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/31/enr.html"
   },
   {
@@ -637,6 +725,7 @@
     "title": "Waku v2 Discv5 Ambient Peer Discovery",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/33/discv5.html"
   },
   {
@@ -645,6 +734,7 @@
     "title": "Waku2 Peer Exchange",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/34/peer-exchange.html"
   },
   {
@@ -653,6 +743,7 @@
     "title": "Waku v2 C Bindings API",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/36/bindings-api.html"
   },
   {
@@ -661,6 +752,7 @@
     "title": "Waku v0",
     "status": "deprecated",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/deprecated/5/waku0.html"
   },
   {
@@ -669,6 +761,7 @@
     "title": "X3DH usage for Waku payload encryption",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "waku/standards/application/53/x3dh.html"
   },
   {
@@ -677,6 +770,7 @@
     "title": "Session management for Waku X3DH",
     "status": "draft",
     "category": "Standards Track",
+    "updated": "2025-12-22",
     "path": "waku/standards/application/54/x3dh-sessions.html"
   },
   {
@@ -685,6 +779,7 @@
     "title": "Waku v1",
     "status": "stable",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/legacy/6/waku1.html"
   },
   {
@@ -693,6 +788,7 @@
     "title": "Waku v2 Network",
     "status": "draft",
     "category": "Best Current Practice",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/64/network.html"
   },
   {
@@ -701,6 +797,7 @@
     "title": "Waku Metadata Protocol",
     "status": "draft",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/core/66/metadata.html"
   },
   {
@@ -709,6 +806,7 @@
     "title": "Waku Envelope data field",
     "status": "stable",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/legacy/7/data.html"
   },
   {
@@ -717,6 +815,7 @@
     "title": "Waku Mailserver",
     "status": "stable",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/legacy/8/mail.html"
   },
   {
@@ -725,6 +824,7 @@
     "title": "Waku RPC API",
     "status": "stable",
     "category": "unspecified",
+    "updated": "2025-12-22",
     "path": "waku/standards/legacy/9/rpc.html"
   }
 ]
