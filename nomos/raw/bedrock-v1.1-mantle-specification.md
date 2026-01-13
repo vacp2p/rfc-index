@@ -20,6 +20,9 @@ exposing a safe and constrained set of Operations
 to interact with lower-level Bedrock services,
 similar to syscalls in an operating system.
 
+**Keywords:** Bedrock, Mantle, transactions, operations, ledger, UTXO,
+Note, NMO, fees, gas, Sovereign Rollups
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -42,28 +45,7 @@ in this document are to be interpreted as described in [RFC 2119](https://www.ie
 | NMO | The native token of the Nomos network. |
 | DA | Data Availability, ephemeral storage for blob data. |
 
-## Introduction
-
-Mantle is a foundational element of Bedrock,
-designed to provide a minimal and efficient execution layer
-that connects together Nomos Services
-in order to provide the necessary functionality for Sovereign Rollups.
-It can be viewed as the system call interface of Bedrock,
-exposing a safe and constrained set of Operations
-to interact with lower-level Bedrock services,
-similar to syscalls in an operating system.
-
-Mantle Transactions provide Operations for interacting with Nomos Services.
-For example,
-a Sovereign Rollup node posting an update to Bedrock,
-or a node operator declaring its participation in the Blend Network,
-would be done through the corresponding Operations within a Mantle Transaction.
-
-Mantle manages assets using a Note-based blockchain ledger that follows an UTXO model.
-Each Mantle Transaction includes a Ledger Transaction,
-and any excess balance serves as the fee payment.
-
-## Overview
+## Background
 
 ### Transactions
 
