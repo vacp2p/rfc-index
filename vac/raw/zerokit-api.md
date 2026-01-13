@@ -90,7 +90,7 @@ Applications MUST provide the Merkle root and
 membership proof externally when generating proofs.
 
 When `stateless` is not enabled,
-the library operates in stateful mode and
+the library operates in **Stateful** mode and
 requires one of the Merkle tree backends.
 
 #### Parallelization
@@ -139,93 +139,133 @@ use error message prefixes to distinguish error types when needed.
 ### Initialization
 
 Functions with the same name but different signatures are conditional compilation variants.
-Only one variant exists at compile time based on enabled feature flags.
+This means that multiple definitions exist in the source code,
+but only one variant is compiled and available at runtime based on the enabled feature flags.
 
-`RLN::new(tree_depth, tree_config)` creates a new RLN instance by loading circuit resources from the default folder.
-The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string,
-a direct config object (with pmtree feature), or an empty string for defaults.
-Not available in WASM. Not available when `stateless` feature is enabled.
+`RLN::new(tree_depth, tree_config)` - **Available in Rust, FFI | Stateful mode**
 
-`RLN::new()` creates a new stateless RLN instance by loading circuit resources from the default folder.
-Not available in WASM. Only available when `stateless` feature is enabled.
+- Creates a new RLN instance by loading circuit resources from the default folder.
+- The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string, a direct config object (with `pmtree` feature), or an empty string for defaults.
 
-`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` creates a new RLN instance
-with pre-loaded circuit parameters passed as byte vectors.
-The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait.
-Not available in WASM. Not available when `stateless` feature is enabled.
+`RLN::new()` - **Available in Rust, FFI | Stateless mode**
 
-`RLN::new_with_params(zkey_data, graph_data)` creates a new stateless RLN instance with pre-loaded circuit parameters.
-Not available in WASM. Only available when `stateless` feature is enabled.
+- Creates a new stateless RLN instance by loading circuit resources from the default folder.
 
-`RLN::new_with_params(zkey_data)` creates a new stateless RLN instance for WASM with pre-loaded zkey data.
-Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
-Only available in WASM with `stateless` feature enabled.
+`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` - **Available in Rust, FFI | Stateful mode**
+
+- Creates a new RLN instance with pre-loaded circuit parameters passed as byte vectors.
+- The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait.
+
+`RLN::new_with_params(zkey_data, graph_data)` - **Available in Rust, FFI | Stateless mode**
+
+- Creates a new stateless RLN instance with pre-loaded circuit parameters.
+
+`RLN::new_with_params(zkey_data)` - **Available in WASM | Stateless mode**
+
+- Creates a new stateless RLN instance for WASM with pre-loaded zkey data.
+- Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
 
 ### Key Generation
 
-`keygen()` generates a random identity keypair returning `(identity_secret, id_commitment)`.
+`keygen()`
 
-`seeded_keygen(seed)` generates a deterministic identity keypair
-from a seed returning `(identity_secret, id_commitment)`.
+- Generates a random identity keypair returning `(identity_secret, id_commitment)`.
 
-`extended_keygen()` generates a random extended identity keypair
-returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+`seeded_keygen(seed)`
 
-`extended_seeded_keygen(seed)` generates a deterministic extended identity keypair
-from a seed returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+- Generates a deterministic identity keypair from a seed returning `(identity_secret, id_commitment)`.
+
+`extended_keygen()`
+
+- Generates a random extended identity keypair returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+
+`extended_seeded_keygen(seed)`
+
+- Generates a deterministic extended identity keypair from a seed returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
 
 ### Merkle Tree Management
 
-All tree management functions are only available when
-`stateless` feature is NOT enabled.
+All tree management functions are only available when `stateless` feature is NOT enabled.
 
-`set_tree(tree_depth)` initializes the internal Merkle tree with the specified depth.
-Leaves are set to the default zero value.
+`set_tree(tree_depth)`
 
-`set_leaf(index, leaf)` sets a leaf value at the specified index.
+- Initializes the internal Merkle tree with the specified depth.
+- Leaves are set to the default zero value.
 
-`get_leaf(index)` returns the leaf value at the specified index.
+`set_leaf(index, leaf)`
 
-`set_leaves_from(index, leaves)` sets multiple leaves starting from the specified index.
-Updates `next_index` to `max(next_index, index + n)`.
-If `n` leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
+- Sets a leaf value at the specified index.
 
-`init_tree_with_leaves(leaves)` resets the tree state to default and initializes it
-with the provided leaves starting from index 0.
-This resets the internal `next_index` to 0 before setting the leaves.
+`get_leaf(index)`
 
-`atomic_operation(index, leaves, indices)` atomically inserts leaves starting from index
-and removes leaves at the specified indices.
-Updates `next_index` to `max(next_index, index + n)` where `n` is the number of leaves inserted.
+- Returns the leaf value at the specified index.
 
-`set_next_leaf(leaf)` sets a leaf at the next available index and increments `next_index`.
-The leaf is set at the current `next_index` value, then `next_index` is incremented.
+`set_leaves_from(index, leaves)`
 
-`delete_leaf(index)` sets the leaf at the specified index to the default zero value.
-Does not change the internal `next_index` value.
+- Sets multiple leaves starting from the specified index.
+- Updates `next_index` to `max(next_index, index + n)`.
+- If `n` leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
 
-`leaves_set()` returns the number of leaves that have been set in the tree.
+`init_tree_with_leaves(leaves)`
 
-`get_root()` returns the current Merkle tree root.
+- Resets the tree state to default and initializes it with the provided leaves starting from index 0.
+- Resets the internal `next_index` to 0 before setting the leaves.
 
-`get_subtree_root(level, index)` returns the root of a subtree at the specified level and index.
+`atomic_operation(index, leaves, indices)`
 
-`get_merkle_proof(index)` returns the Merkle proof for the leaf at the specified index as `(path_elements, identity_path_index)`.
+- Atomically inserts leaves starting from index and removes leaves at the specified indices.
+- Updates `next_index` to `max(next_index, index + n)` where `n` is the number of leaves inserted.
 
-`get_empty_leaves_indices()` returns indices of leaves set to zero up to the final leaf that was set.
+`set_next_leaf(leaf)`
 
-`set_metadata(metadata)` stores arbitrary metadata in the RLN object for application use.
-This metadata is not used by the RLN module.
+- Sets a leaf at the next available index and increments `next_index`.
+- The leaf is set at the current `next_index` value, then `next_index` is incremented.
 
-`get_metadata()` returns the metadata stored in the RLN object.
+`delete_leaf(index)`
 
-`flush()` closes the connection to the Merkle tree database.
-Should be called before dropping the RLN object when using persistent storage.
+- Sets the leaf at the specified index to the default zero value.
+- Does not change the internal `next_index` value.
+
+`leaves_set()`
+
+- Returns the number of leaves that have been set in the tree.
+
+`get_root()`
+
+- Returns the current Merkle tree root.
+
+`get_subtree_root(level, index)`
+
+- Returns the root of a subtree at the specified level and index.
+
+`get_merkle_proof(index)`
+
+- Returns the Merkle proof for the leaf at the specified index as `(path_elements, identity_path_index)`.
+
+`get_empty_leaves_indices()`
+
+- Returns indices of leaves set to zero up to the final leaf that was set.
+
+`set_metadata(metadata)`
+
+- Stores arbitrary metadata in the RLN object for application use.
+- This metadata is not used by the RLN module.
+
+`get_metadata()`
+
+- Returns the metadata stored in the RLN object.
+
+`flush()`
+
+- Closes the connection to the Merkle tree database.
+- Should be called before dropping the RLN object when using persistent storage.
 
 ### Witness Construction
 
-`RLNWitnessInput::new(identity_secret, user_message_limit, message_id, path_elements, identity_path_index, x, external_nullifier)` constructs
-a witness input for proof generation. Validates that `message_id <= user_message_limit` and `path_elements` and `identity_path_index` have the same length.
+`RLNWitnessInput::new(identity_secret, user_message_limit, message_id, path_elements, identity_path_index, x, external_nullifier)`
+
+- Constructs a witness input for proof generation.
+- Validates that `message_id <= user_message_limit` and `path_elements` and `identity_path_index` have the same length.
 
 ### Witness Calculation
 
@@ -244,69 +284,103 @@ The witness calculator computes all intermediate values required by the RLN circ
 
 ### Proof Generation
 
-`generate_zk_proof(witness)` generates a Groth16 zkSNARK proof from a witness.
-Extract proof values separately using `proof_values_from_witness`.
-Not available in WASM.
+`generate_zk_proof(witness)` - **Available in Rust, FFI**
 
-`generate_rln_proof(witness)` generates a complete RLN proof returning both the zkSNARK proof and proof values as `(proof, proof_values)`.
-This combines proof generation and proof values extraction.
-Not available in WASM.
+- Generates a Groth16 zkSNARK proof from a witness.
+- Extract proof values separately using `proof_values_from_witness`.
 
-`generate_rln_proof_with_witness(calculated_witness, witness)` generates an RLN proof using
-a pre-calculated witness from an external witness calculator.
-The `calculated_witness` should be a `Vec<BigInt>` obtained from the external witness calculator.
-Returns `(proof, proof_values)`.
-This is the primary proof generation method for WASM where witness calculation is handled by JavaScript.
+`generate_rln_proof(witness)` - **Available in Rust, FFI**
+
+- Generates a complete RLN proof returning both the zkSNARK proof and proof values as `(proof, proof_values)`.
+- Combines proof generation and proof values extraction.
+
+`generate_rln_proof_with_witness(calculated_witness, witness)`
+
+- Generates an RLN proof using a pre-calculated witness from an external witness calculator.
+- The `calculated_witness` should be a `Vec<BigInt>` obtained from the external witness calculator.
+- Returns `(proof, proof_values)`.
+- This is the primary proof generation method for WASM where witness calculation is handled by JavaScript.
 
 ### Proof Verification
 
-`verify_zk_proof(proof, proof_values)` verifies only the zkSNARK proof without root or signal validation.
-Returns `true` if the proof is valid.
+`verify_zk_proof(proof, proof_values)`
 
-`verify_rln_proof(proof, proof_values, x)` verifies the proof against the internal Merkle tree root and
-validates that `x` matches the proof signal.
-Returns an error if verification fails (invalid proof, invalid root, or invalid signal).
-Only available when `stateless` feature is NOT enabled.
+- Verifies only the zkSNARK proof without root or signal validation.
+- Returns `true` if the proof is valid.
 
-`verify_with_roots(proof, proof_values, x, roots)` verifies the proof against a set of acceptable roots and
-validates the signal.
-If the roots slice is empty, root verification is skipped. Returns an error if verification fails.
+`verify_rln_proof(proof, proof_values, x)` - **Stateful mode**
+
+- Verifies the proof against the internal Merkle tree root and validates that `x` matches the proof signal.
+- Returns an error if verification fails (invalid proof, invalid root, or invalid signal).
+
+`verify_with_roots(proof, proof_values, x, roots)`
+
+- Verifies the proof against a set of acceptable roots and validates the signal.
+- If the roots slice is empty, root verification is skipped.
+- Returns an error if verification fails.
 
 ### Slashing
 
-`recover_id_secret(proof_values_1, proof_values_2)` recovers the identity secret from two proof values
-that share the same external nullifier.
-Used to detect and penalize rate limit violations.
+`recover_id_secret(proof_values_1, proof_values_2)`
+
+- Recovers the identity secret from two proof values that share the same external nullifier.
+- Used to detect and penalize rate limit violations.
 
 ### Hash Utilities
 
-`poseidon_hash(inputs)` computes the Poseidon hash of the input field elements.
+`poseidon_hash(inputs)`
 
-`hash_to_field_le(input)` hashes arbitrary bytes to a field element using little-endian byte order.
+- Computes the Poseidon hash of the input field elements.
 
-`hash_to_field_be(input)` hashes arbitrary bytes to a field element using big-endian byte order.
+`hash_to_field_le(input)`
+
+- Hashes arbitrary bytes to a field element using little-endian byte order.
+
+`hash_to_field_be(input)`
+
+- Hashes arbitrary bytes to a field element using big-endian byte order.
 
 ### Serialization Utilities
 
-`rln_witness_to_bytes_le` / `rln_witness_to_bytes_be` serializes an RLN witness to bytes.
+`rln_witness_to_bytes_le` / `rln_witness_to_bytes_be`
 
-`bytes_le_to_rln_witness` / `bytes_be_to_rln_witness` deserializes bytes to an RLN witness.
+- Serializes an RLN witness to bytes.
 
-`rln_proof_to_bytes_le` / `rln_proof_to_bytes_be` serializes an RLN proof to bytes.
+`bytes_le_to_rln_witness` / `bytes_be_to_rln_witness`
 
-`bytes_le_to_rln_proof` / `bytes_be_to_rln_proof` deserializes bytes to an RLN proof.
+- Deserializes bytes to an RLN witness.
 
-`rln_proof_values_to_bytes_le` / `rln_proof_values_to_bytes_be` serializes proof values to bytes.
+`rln_proof_to_bytes_le` / `rln_proof_to_bytes_be`
 
-`bytes_le_to_rln_proof_values` / `bytes_be_to_rln_proof_values` deserializes bytes to proof values.
+- Serializes an RLN proof to bytes.
 
-`fr_to_bytes_le` / `fr_to_bytes_be` serializes a field element to 32 bytes.
+`bytes_le_to_rln_proof` / `bytes_be_to_rln_proof`
 
-`bytes_le_to_fr` / `bytes_be_to_fr` deserializes 32 bytes to a field element.
+- Deserializes bytes to an RLN proof.
 
-`vec_fr_to_bytes_le` / `vec_fr_to_bytes_be` serializes a vector of field elements to bytes.
+`rln_proof_values_to_bytes_le` / `rln_proof_values_to_bytes_be`
 
-`bytes_le_to_vec_fr` / `bytes_be_to_vec_fr` deserializes bytes to a vector of field elements.
+- Serializes proof values to bytes.
+
+`bytes_le_to_rln_proof_values` / `bytes_be_to_rln_proof_values`
+
+- Deserializes bytes to proof values.
+
+`fr_to_bytes_le` / `fr_to_bytes_be`
+
+- Serializes a field element to 32 bytes.
+
+`bytes_le_to_fr` / `bytes_be_to_fr`
+
+- Deserializes 32 bytes to a field element.
+
+`vec_fr_to_bytes_le` / `vec_fr_to_bytes_be`
+
+- Serializes a vector of field elements to bytes.
+
+`bytes_le_to_vec_fr` / `bytes_be_to_vec_fr`
+
+- Deserializes bytes to a vector of field elements.
 
 ### WASM-Specific Notes
 
