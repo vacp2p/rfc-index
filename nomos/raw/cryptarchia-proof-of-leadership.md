@@ -26,15 +26,18 @@ This document specifies the PoL mechanism for Cryptarchia,
 extending the work presented in the Ouroboros Crypsinous paper
 with recent cryptographic developments.
 
+**Keywords:** Cryptarchia, proof-of-leadership, zero-knowledge, consensus,
+note, stake, lottery, Merkle tree
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-## Overview
+## Background
 
-### Overview of the Protocol
+### Protocol Overview
 
 The PoL mechanism ensures that a note has legitimately won the leadership election
 while protecting the leader's privacy.
