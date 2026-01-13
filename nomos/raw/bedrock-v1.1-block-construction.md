@@ -23,6 +23,9 @@ rather than complete transactions,
 compressing the proposal size from up to 1 MB down to 33 kB
 to save bandwidth necessary to broadcast new blocks.
 
+**Keywords:** Bedrock, block construction, validation, execution,
+leader, transaction, Proof of Leadership
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
