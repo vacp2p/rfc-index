@@ -14,7 +14,7 @@ contributors:
 - Filip Dimitrijevic <filip@status.im>
 ---
 
-## Introduction
+## Abstract
 
 This document defines an implementation-friendly specification
 of the Proof of Quota (PoQ),
@@ -23,16 +23,10 @@ that a node can perform,
 thereby constraining the number of messages a node can introduce
 to the Blend network used in Nomos
 (see [NOMOS-BLEND-PROTOCOL](#references)).
-
-## Overview
-
-The PoQ ensures that there is a limited number of message encapsulations
-that a node can perform.
-This constrains the number of messages a node can introduce to the Blend network.
 The mechanism regulating these messages is similar to rate-limiting nullifiers.
 
-The proof verifies that a node's public key is within a limit
-for a node.
+**Keywords:** cryptography, zero-knowledge, Blend, quota, rate-limiting,
+PoQ, nullifier
 
 ## Document Structure
 
