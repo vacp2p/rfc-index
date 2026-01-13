@@ -68,9 +68,9 @@ share identical serialization formats for inputs and outputs.
 ### Supported Features
 
 Zerokit provides compile-time feature flags that
-control Merkle tree storage backends,
-operational modes,
-and parallelization.
+select the Merkle tree storage backend,
+configure the RLN operational mode (e.g., stateful vs. stateless),
+and enable or disable parallel execution.
 
 #### Merkle Tree Backends
 
@@ -147,7 +147,7 @@ a direct config object (with pmtree feature), or an empty string for defaults.
 Not available in WASM. Not available when `stateless` feature is enabled.
 
 `RLN::new()` creates a new stateless RLN instance by loading circuit resources from the default folder.
-Only available when `stateless` feature is enabled. Not available in WASM.
+Not available in WASM. Only available when `stateless` feature is enabled.
 
 `RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` creates a new RLN instance
 with pre-loaded circuit parameters passed as byte vectors.
@@ -155,7 +155,7 @@ The `tree_config` parameter accepts multiple types via the `TreeConfigInput` tra
 Not available in WASM. Not available when `stateless` feature is enabled.
 
 `RLN::new_with_params(zkey_data, graph_data)` creates a new stateless RLN instance with pre-loaded circuit parameters.
-Only available when `stateless` feature is enabled. Not available in WASM.
+Not available in WASM. Only available when `stateless` feature is enabled.
 
 `RLN::new_with_params(zkey_data)` creates a new stateless RLN instance for WASM with pre-loaded zkey data.
 Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
@@ -188,7 +188,7 @@ Leaves are set to the default zero value.
 
 `set_leaves_from(index, leaves)` sets multiple leaves starting from the specified index.
 Updates `next_index` to `max(next_index, index + n)`.
-If n leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
+If `n` leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
 
 `init_tree_with_leaves(leaves)` resets the tree state to default and initializes it
 with the provided leaves starting from index 0.
@@ -196,7 +196,7 @@ This resets the internal `next_index` to 0 before setting the leaves.
 
 `atomic_operation(index, leaves, indices)` atomically inserts leaves starting from index
 and removes leaves at the specified indices.
-Updates `next_index` to `max(next_index, index + n)` where n is the number of leaves inserted.
+Updates `next_index` to `max(next_index, index + n)` where `n` is the number of leaves inserted.
 
 `set_next_leaf(leaf)` sets a leaf at the next available index and increments `next_index`.
 The leaf is set at the current `next_index` value, then `next_index` is incremented.
@@ -225,7 +225,7 @@ Should be called before dropping the RLN object when using persistent storage.
 ### Witness Construction
 
 `RLNWitnessInput::new(identity_secret, user_message_limit, message_id, path_elements, identity_path_index, x, external_nullifier)` constructs
-a witness input for proof generation. Validates that `message_id < user_message_limit`.
+a witness input for proof generation. Validates that `message_id <= user_message_limit` and `path_elements` and `identity_path_index` have the same length.
 
 ### Witness Calculation
 
@@ -383,12 +383,16 @@ This requires COOP/COEP headers for SharedArrayBuffer support.
 The external nullifier is computed as `poseidon_hash([epoch, rln_identifier])`.
 The `rln_identifier` is a field element that uniquely identifies your application (e.g., a hash of your app name).
 
+All values that will be hashed MUST be represented as field elements.
+For converting arbitrary data to field elements,
+use `hash_to_field_le` or `hash_to_field_be` functions which internally use Poseidon hash.
+
 Each application SHOULD use a unique `rln_identifier` to
 prevent cross-application nullifier collisions.
 
-The `user_message_limit` in the rate commitment determines messages allowed per epoch.
-The `message_id` must be less than `user_message_limit` and
+The `user_message_limit` in the rate commitment determines messages allowed per epoch. The `message_id` must be less than `user_message_limit` and
 should increment with each message.
+
 Applications MUST persist the `message_id` counter to avoid violations after restarts.
 
 ## Security/Privacy Considerations
