@@ -98,7 +98,7 @@ message ExtensiblePeerRecord {
     optional bytes data = 2;
   }
 
-   // Extensible list of advertised services
+  // Extensible list of advertised services
   repeated ServiceInfo services = 4;
 }
 ```
@@ -150,7 +150,7 @@ Extensible Peer Records MUST use the UTF8 string `/libp2p/extensible-peer-record
 as the `payload_type` value.
 
 > **_Note:_** this will make Extensible Peer Records a subtype of the "namespace" [multicodec](https://github.com/multiformats/multicodec/blob/0c6c7d75f1580af329847dbc9900859a445ed980/table.csv).
-In future we may define a more compact multicodec type for Extensible Peer Records. 
+In future we may define a more compact multicodec type for Extensible Peer Records.
 
 ## Copyright
 
