@@ -561,7 +561,7 @@ prevent resource exhaustion attacks.
 - [libp2p multiaddr][multiaddr] - Multiaddr addressing scheme
 
 [mantle]: https://nomos-tech.notion.site/v1-1-Mantle-Specification-269261aa09df80dda501f568697930fd
-[origin-ref]: https://nomos-tech.notion.site/Service-Declaration-Protocol-1d9261aa09df80b09210d3f81e1a90ea
+[origin-ref]: https://nomos-tech.notion.site/Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d
 [multiaddr]: https://github.com/multiformats/multiaddr
 
 ## Copyright
