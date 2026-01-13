@@ -61,16 +61,22 @@ and the `record` in the response MUST be verified, invalid records and `closerPe
 
 > `FIND_RANDOM` MAY terminate when `KAD-DHT` peer routing algorithm no longer returns new peers.
 
+### Privacy Enhancements
+
+To prevent network topology mapping,
+`KAD-DHT` nodes MUST NOT disclose connection information in [response messages](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#rpc-messages).
+The `connection` field MUST always be set to `NOT_CONNECTED`.
+
 ### Future Improvements
 
-To make the system resilient to eclipse attacks, a node `XPR` are stored at the `k` closest nodes. Future version of this protocol could also retrieve `XPR` on more nodes than only the originator.
+To make the system resilient to eclipse attacks, since a node `XPR` are stored at the `k` closest nodes, future version of this document could specify how to retrieve `XPR` on more nodes than only the originator via a new libp2p protocol that returns all `XPR` a node stores regardless of the associated key.
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
-- [extended peer records specification](TODO)
+- [extended peer records specification](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/extensible-peer-records.md)
 - [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md)
 - [RFC002 Signed Envelope](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0002-signed-envelopes.md)
 - [RFC003 Routing Records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md)
