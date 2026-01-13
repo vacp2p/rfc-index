@@ -18,6 +18,8 @@ This specification defines the Payload formatting for the Blend Protocol.
 The Payload has a fixed length to prevent traffic analysis attacks,
 with shorter messages padded using random data.
 
+**Keywords:** Blend, payload formatting, padding, fixed length, traffic analysis
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
