@@ -37,14 +37,14 @@ All terms and parameters used remain the same as in [RLN-V2](./rln-v2.md) and [R
 ### Architecture Overview
 
 Zerokit follows a layered architecture where
-the core RLN logic is implemented once in Rust and
+the core RLN logic is implemented once in **Rust** and
 exposed through platform-specific bindings.
 The protocol layer handles zero-knowledge proof generation and verification,
 Merkle tree operations, and cryptographic primitives.
 This core is wrapped by three interface layers:
-native Rust for direct library integration,
-FFI for C-compatible bindings consumed by languages (such as C and Nim),
-and WASM for browser and Node.js environments.
+**native Rust** for direct library integration,
+**FFI** for C-compatible bindings consumed by languages (such as C and Nim),
+and **WASM** for browser and Node.js environments.
 All three interfaces maintain functional parity and
 share identical serialization formats for inputs and outputs.
 
@@ -123,13 +123,13 @@ Function signatures documented below are from the Rust perspective.
 
 Error handling differs across platform bindings.
 
-For native Rust,
+For **native Rust**,
 functions return `Result<T, RLNError>` where `RLNError` is an enum
 representing specific error conditions.
 The enum variants provide type-safe error handling and
 pattern matching capabilities.
 
-For WASM and FFI bindings,
+For **WASM** and **FFI** bindings,
 errors are returned as human-readable string messages.
 This simplifies cross-language error propagation at
 the cost of type safety.
@@ -138,29 +138,29 @@ use error message prefixes to distinguish error types when needed.
 
 ### Initialization
 
-Functions with the same name but different signatures are conditional compilation variants.
+Functions with the same name but different signatures are **conditional compilation variants**.
 This means that multiple definitions exist in the source code,
 but only one variant is compiled and available at runtime based on the enabled feature flags.
 
-`RLN::new(tree_depth, tree_config)` - **Available in Rust, FFI | Stateful mode**
+`RLN::new(tree_depth, tree_config)` - *Available in Rust, FFI | Stateful mode*
 
 - Creates a new RLN instance by loading circuit resources from the default folder.
 - The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string, a direct config object (with `pmtree` feature), or an empty string for defaults.
 
-`RLN::new()` - **Available in Rust, FFI | Stateless mode**
+`RLN::new()` - *Available in Rust, FFI | Stateless mode*
 
 - Creates a new stateless RLN instance by loading circuit resources from the default folder.
 
-`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` - **Available in Rust, FFI | Stateful mode**
+`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` - *Available in Rust, FFI | Stateful mode*
 
 - Creates a new RLN instance with pre-loaded circuit parameters passed as byte vectors.
 - The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait.
 
-`RLN::new_with_params(zkey_data, graph_data)` - **Available in Rust, FFI | Stateless mode**
+`RLN::new_with_params(zkey_data, graph_data)` - *Available in Rust, FFI | Stateless mode*
 
 - Creates a new stateless RLN instance with pre-loaded circuit parameters.
 
-`RLN::new_with_params(zkey_data)` - **Available in WASM | Stateless mode**
+`RLN::new_with_params(zkey_data)` - *Available in WASM | Stateless mode*
 
 - Creates a new stateless RLN instance for WASM with pre-loaded zkey data.
 - Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
@@ -185,7 +185,7 @@ but only one variant is compiled and available at runtime based on the enabled f
 
 ### Merkle Tree Management
 
-All tree management functions are only available when `stateless` feature is NOT enabled.
+All tree management functions are only available when `stateless` feature is **NOT** enabled.
 
 `set_tree(tree_depth)`
 
@@ -269,10 +269,10 @@ All tree management functions are only available when `stateless` feature is NOT
 
 ### Witness Calculation
 
-For native (non-WASM) environments, witness calculation is handled internally by the proof generation functions.
+For **native (non-WASM)** environments, witness calculation is handled internally by the proof generation functions.
 The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
 
-For WASM environments, witness calculation must be performed externally using a JavaScript witness calculator.
+For **WASM** environments, witness calculation must be performed externally using a JavaScript witness calculator.
 The workflow is:
 
 1. Create a `WasmRLNWitnessInput` with the required parameters
@@ -284,12 +284,12 @@ The witness calculator computes all intermediate values required by the RLN circ
 
 ### Proof Generation
 
-`generate_zk_proof(witness)` - **Available in Rust, FFI**
+`generate_zk_proof(witness)` - *Available in Rust, FFI*
 
 - Generates a Groth16 zkSNARK proof from a witness.
 - Extract proof values separately using `proof_values_from_witness`.
 
-`generate_rln_proof(witness)` - **Available in Rust, FFI**
+`generate_rln_proof(witness)` - *Available in Rust, FFI*
 
 - Generates a complete RLN proof returning both the zkSNARK proof and proof values as `(proof, proof_values)`.
 - Combines proof generation and proof values extraction.
@@ -299,7 +299,7 @@ The witness calculator computes all intermediate values required by the RLN circ
 - Generates an RLN proof using a pre-calculated witness from an external witness calculator.
 - The `calculated_witness` should be a `Vec<BigInt>` obtained from the external witness calculator.
 - Returns `(proof, proof_values)`.
-- This is the primary proof generation method for WASM where witness calculation is handled by JavaScript.
+- This is the primary proof generation method for **WASM** where witness calculation is handled by **JavaScript**.
 
 ### Proof Verification
 
@@ -308,7 +308,7 @@ The witness calculator computes all intermediate values required by the RLN circ
 - Verifies only the zkSNARK proof without root or signal validation.
 - Returns `true` if the proof is valid.
 
-`verify_rln_proof(proof, proof_values, x)` - **Stateful mode**
+`verify_rln_proof(proof, proof_values, x)` - *Stateful mode*
 
 - Verifies the proof against the internal Merkle tree root and validates that `x` matches the proof signal.
 - Returns an error if verification fails (invalid proof, invalid root, or invalid signal).
