@@ -23,6 +23,8 @@ distinguishing message types based on length.
 This specification reuses notation from the Notation document
 and integrates with the Message Encapsulation Mechanism.
 
+**Keywords:** Blend, message formatting, header, payload, drop, non-drop
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
