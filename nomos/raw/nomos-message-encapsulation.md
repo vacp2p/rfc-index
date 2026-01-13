@@ -30,6 +30,9 @@ and using shared key derivation for secure inter-node communication.
 This document outlines the cryptographic notation, data structures,
 and algorithms essential to the encapsulation process.
 
+**Keywords:** Blend, message encapsulation, encryption, privacy,
+layered encryption, cryptographic proof, routing
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
