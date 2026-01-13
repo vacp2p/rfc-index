@@ -14,10 +14,13 @@ contributors:
 - Filip Dimitrijevic <filip@status.im>
 ---
 
-## Introduction
+## Abstract
 
 This document defines the key types used in the Blend protocol
 and describes the process of generating them.
+
+**Keywords:** cryptography, keys, Blend, encryption, signing,
+NQK, NSK, ESK, NEK, EEK
 
 ## Background
 
@@ -275,7 +278,7 @@ This section provides guidance for implementing the protocol specification.
 ### Key Usage Matrix
 
 | Key Type | Algorithm | Storage | Lifecycle | Primary Use | Derived From |
-|----------|-----------|---------|-----------|-------------|--------------|
+| -------- | --------- | ------- | --------- | ----------- | ------------ |
 | **NQK** | ZkSignature | Nomos blockchain (`zk_id`) | Non-ephemeral | Core node proof | Generated |
 | **NSK** | Ed25519 | Nomos blockchain (`provider_id`) | Non-ephemeral | Authentication | Generated |
 | **NEK** | X25519 | Derived | Non-ephemeral | Shared secret derivation | NSK public key |
