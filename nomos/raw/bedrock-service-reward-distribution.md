@@ -20,6 +20,9 @@ in Nomos services such as Data Availability and Blend Network.
 The protocol enables deterministic, efficient, and verifiable reward distribution
 to validators based on their activity within each service.
 
+**Keywords:** Bedrock, rewards, services, validators, Data Availability,
+Blend Network, session, activity
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
