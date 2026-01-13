@@ -21,6 +21,9 @@ Because leader selection in Cryptarchia is private,
 the total active stake is not directly observable.
 Instead, nodes must infer it from observable chain growth.
 
+**Keywords:** Cryptarchia, stake inference, proof-of-stake, epoch,
+slot occupancy, leadership lottery
+
 ## Semantics
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
