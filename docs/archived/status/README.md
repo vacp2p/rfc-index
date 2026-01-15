@@ -29,7 +29,7 @@ Specifications can also be viewed at [Status](https://status.app/specs).
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-project="status"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="status"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

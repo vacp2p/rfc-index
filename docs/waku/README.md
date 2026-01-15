@@ -32,7 +32,7 @@ for new Waku specifications under discussion.
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-project="waku"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="waku"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

@@ -34,7 +34,7 @@ To learn more, visit [IFT-TS Research](https://vac.dev/)
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-project=ift-ts"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="ift-ts"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>
