@@ -23,7 +23,7 @@ while adding an extensible service information field that supports finer-grained
 
 > **_A note on terminology:_** We opt to call this structure a "_peer record_", even though the corresponding libp2p specification refers to a "_routing record_".
 This is because the libp2p specification itself defines an internal [`PeerRecord` type](https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md#address-record-format),
-and, when serialised into a signed envelope, this is most often called a "_signed peer record_" (see, for example, [here](https://github.com/libp2p/go-libp2p/blob/479b24baab77b4b99d7e31462b91cc04f89f1de4/p2p/protocol/identify/pb/identify.proto#L37)).
+and, when serialised into a signed envelope, this is most often called a "_signed peer record_" (see, for example, [go-libp2p identify protocol](https://github.com/libp2p/go-libp2p/blob/479b24baab77b4b99d7e31462b91cc04f89f1de4/p2p/protocol/identify/pb/identify.proto#L37)).
 
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”,
 “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
@@ -150,7 +150,7 @@ Extensible Peer Records MUST use the UTF8 string `/libp2p/extensible-peer-record
 as the `payload_type` value.
 
 > **_Note:_** this will make Extensible Peer Records a subtype of the "namespace" [multicodec](https://github.com/multiformats/multicodec/blob/0c6c7d75f1580af329847dbc9900859a445ed980/table.csv).
-In future we may define a more compact multicodec type for Extensible Peer Records. 
+In future we may define a more compact multicodec type for Extensible Peer Records.
 
 ## Copyright
 
