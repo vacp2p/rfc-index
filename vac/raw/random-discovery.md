@@ -46,6 +46,12 @@ to store the `XPR` against its own peer ID.
 This process SHOULD be repeated periodically to maintain the advertised record.
 We RECOMMEND an interval of once every `30` minutes.
 
+#### Use of `XPR` in `identify`
+
+Advertisers SHOULD include their `XPR`s as the `signedPeerRecord`
+in libp2p [`Identify` messages](https://github.com/libp2p/go-libp2p/blob/636d44e15abc7bfbd1da09cc9fef674249625ae6/p2p/protocol/identify/pb/identify.proto#L37).
+For more information, see the [`identify` protocol specification](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/identify/README.md).
+
 ### Record Discovery
 
 A node that wants to discover peers to connect to,
