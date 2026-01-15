@@ -1,10 +1,10 @@
-# Waku RFCs
+# Messaging RFCs
 
-Waku builds a family of privacy-preserving,
+Messaging builds a family of privacy-preserving,
 censorship-resistant communication protocols for web3 applications.
 
-Contributors can visit [Waku RFCs](https://github.com/waku-org/specs)
-for new Waku specifications under discussion.
+Contributors can visit [Messaging RFCs](https://github.com/waku-org/specs)
+for new Messaging specifications under discussion.
 
 <div class="landing-hero">
   <div class="filter-row">
@@ -32,7 +32,7 @@ for new Waku specifications under discussion.
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-component="waku"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="messaging"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

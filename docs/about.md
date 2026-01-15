@@ -1,7 +1,7 @@
 # About
 
-The Logos LIP Index collects specifications maintained by IFT-TS across Waku, Nomos,
-Codex, and Status. Each RFC documents a protocol, process, or system in a
+The Logos LIP Index collects specifications maintained by IFT-TS across Messaging, Blockchain,
+and Storage. Each RFC documents a protocol, process, or system in a
 consistent, reviewable format.
 
 This site is generated with mdBook from the repository:
