@@ -48,7 +48,9 @@ We RECOMMEND an interval of once every `30` minutes.
 
 ### Record Discovery
 
-A random walk discovery procedure (`FIND_RANDOM`) consist of the following steps;
+A node that wants to discover peers to connect to,
+also known as a _discoverer_,
+SHOULD perform the following random walk discovery procedure (`FIND_RANDOM`):
 
 1. A random value in the key space MUST be chosen (`R_KEY`).
 
