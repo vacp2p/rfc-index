@@ -90,7 +90,7 @@ def collect() -> List[Dict[str, str]]:
         status = meta.get("status") or "unknown"
         category = meta.get("category") or "unspecified"
         archived = rel.parts[0] == "archived"
-        project = rel.parts[1] if archived and len(rel.parts) > 1 else rel.parts[0]
+        component = rel.parts[1] if archived and len(rel.parts) > 1 else rel.parts[0]
 
         # Skip the template placeholder
         if slug == "XX":
@@ -103,7 +103,7 @@ def collect() -> List[Dict[str, str]]:
 
         entries.append(
             {
-                "project": project,
+                "component": component,
                 "slug": str(slug) if slug is not None else title,
                 "title": title,
                 "status": status,
@@ -114,7 +114,7 @@ def collect() -> List[Dict[str, str]]:
             }
         )
 
-    entries.sort(key=lambda r: (r["project"], r["slug"]))
+    entries.sort(key=lambda r: (r["component"], r["slug"]))
     return entries
 
 

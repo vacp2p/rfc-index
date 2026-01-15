@@ -13,7 +13,7 @@
 This section contains meta info about writing RFCs.
 This section (including its subsections) MUST be removed.
 
-[COSS](https://rfc.vac.dev/spec/1/) explains the Vac RFC process.
+[COSS](https://rfc.vac.dev/spec/1/) explains the Logos LIP process.
 
 ## Tags
 

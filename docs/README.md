@@ -1,6 +1,6 @@
-# Vac RFC Index
+# Logos LIP Index
 
-An IETF-style index of Vac-managed RFCs across Vac, Waku, Nomos, and Codex. Use the filters below to jump straight to a specification.
+An IETF-style index of Logos-managed LIPs across Storage, Messaging, Blockchain and IFT-TS components. Use the filters below to jump straight to a specification.
 
 <div class="landing-hero">
   <div class="filter-row">
@@ -15,12 +15,12 @@ An IETF-style index of Vac-managed RFCs across Vac, Waku, Nomos, and Codex. Use 
     </div>
   </div>
   <div class="filter-row">
-    <div class="chips" id="project-chips">
-      <span class="chip active" data-project="all" data-label="All components">All components</span>
-      <span class="chip" data-project="vac" data-label="Vac">Vac</span>
-      <span class="chip" data-project="waku" data-label="Waku">Waku</span>
-      <span class="chip" data-project="nomos" data-label="Nomos">Nomos</span>
-      <span class="chip" data-project="codex" data-label="Codex">Codex</span>
+    <div class="chips" id="component-chips">
+      <span class="chip active" data-component="all" data-label="All components">All components</span>
+      <span class="chip" data-component="IFT-TS" data-label="IFT-TS">IFT-TS</span>
+      <span class="chip" data-component="waku" data-label="Waku">Waku</span>
+      <span class="chip" data-component="nomos" data-label="Nomos">Nomos</span>
+      <span class="chip" data-component="codex" data-label="Codex">Codex</span>
     </div>
   </div>
   <div class="filter-row">

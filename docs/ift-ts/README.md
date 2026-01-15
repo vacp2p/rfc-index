@@ -1,12 +1,12 @@
-# Vac RFCs
+# Logos LIPs
 
-Vac builds public good protocols for the decentralised web.
-Vac acts as a custodian for the protocols that live in the RFC-Index repository.
+IFT-TS builds public good protocols for the decentralised web.
+IFT-TS acts as a custodian for the protocols that live in the RFC-Index repository.
 With the goal of widespread adoption,
-Vac will make sure the protocols adhere to a set of principles,
+IFT-TS will make sure the protocols adhere to a set of principles,
 including but not limited to liberty, security, privacy, decentralisation and inclusivity.
 
-To learn more, visit [Vac Research](https://vac.dev/)
+To learn more, visit [IFT-TS Research](https://vac.dev/)
 
 <div class="landing-hero">
   <div class="filter-row">
@@ -34,7 +34,7 @@ To learn more, visit [Vac Research](https://vac.dev/)
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-project="vac"></div>
+<div id="rfc-table-container" class="table-wrap" data-project=ift-ts"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

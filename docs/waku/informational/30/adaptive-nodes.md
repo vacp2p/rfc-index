@@ -102,7 +102,7 @@ a topic in Waku v1 (Status chat), WalletConnect, and SuperRare community.
 
 This is a separate component with its own topology.
 
-Behavior and interaction with other protocols specified in Vac RFCs,
+Behavior and interaction with other protocols specified in Logos LIPs,
 e.g. [25/LIBP2P-DNS-DISCOVERY](/vac/25/libp2p-dns-discovery.md)
 and [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md).
 

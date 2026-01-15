@@ -1,6 +1,6 @@
 [
   {
-    "project": "about.md",
+    "component": "about.md",
     "slug": "about",
     "title": "about",
     "status": "unknown",
@@ -10,7 +10,7 @@
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "Codex Block Exchange Protocol",
     "title": "Codex Block Exchange Protocol",
     "status": "raw",
@@ -20,7 +20,7 @@
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "codex-marketplace",
     "title": "Codex Storage Marketplace",
     "status": "raw",
@@ -30,77 +30,87 @@
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "codex-merkle-tree",
     "title": "Codex Merkle Tree",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/codex-merkle-tree.html",
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "codex-prover",
     "title": "Codex Prover Module",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/codex-prover.html",
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "codex-store",
     "title": "Codex Store Module",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/codex-store.html",
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "community-history",
     "title": "Codex Community History",
     "status": "raw",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/community-history.html",
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "dht",
     "title": "Codex Discovery",
     "status": "raw",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/dht.html",
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "erasure-coding",
     "title": "Codex Erasue Coding",
     "status": "raw",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/erasure-coding.html",
     "archived": false
   },
   {
-    "project": "codex",
+    "component": "codex",
     "slug": "slot-buIlder",
     "title": "Codex Slot Builder",
     "status": "raw",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "codex/raw/slot-buIlder.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "docs",
+    "slug": "bedrock-service-declaration-protocol",
+    "title": "bedrock-service-declaration-protocol",
+    "status": "unknown",
+    "category": "unspecified",
+    "updated": "2026-01-15",
+    "path": "docs/nomos/raw/bedrock-service-declaration-protocol.html",
+    "archived": false
+  },
+  {
+    "component": "nomos",
     "slug": "Claro Consensus Protocol",
     "title": "Claro Consensus Protocol",
     "status": "deprecated",
@@ -110,7 +120,7 @@
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "Nomos P2P Network Bootstrapping Specification",
     "title": "Nomos P2P Network Bootstrapping Specification",
     "status": "raw",
@@ -120,7 +130,7 @@
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "Nomos P2P Network NAT Solution Specification",
     "title": "Nomos P2P Network NAT Solution Specification",
     "status": "raw",
@@ -130,7 +140,7 @@
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "Nomos P2P Network Specification",
     "title": "Nomos P2P Network Specification",
     "status": "draft",
@@ -140,17 +150,7 @@
     "archived": false
   },
   {
-    "project": "nomos",
-    "slug": "Nomos Service Declaration Protocol Specification",
-    "title": "Nomos Service Declaration Protocol Specification",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2025-12-22",
-    "path": "nomos/raw/sdp.html",
-    "archived": false
-  },
-  {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "Nomos p2p Network Hardware Requirements Specification",
     "title": "Nomos p2p Network Hardware Requirements Specification",
     "status": "raw",
@@ -160,7 +160,7 @@
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "NomosDA Encoding Protocol",
     "title": "NomosDA Encoding Protocol",
     "status": "raw",
@@ -170,7 +170,7 @@
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "NomosDA Network",
     "title": "NomosDA Network",
     "status": "raw",
@@ -180,667 +180,677 @@
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "bedrock-anonymous-leaders-reward",
     "title": "Bedrock Anonymous Leaders Reward Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/bedrock-anonymous-leaders-reward.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "bedrock-genesis-block",
     "title": "Bedrock Genesis Block Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/bedrock-genesis-block.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
+    "slug": "bedrock-service-declaration-protocol",
+    "title": "Bedrock Service Declaration Protocol",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-15",
+    "path": "nomos/raw/bedrock-service-declaration-protocol.html",
+    "archived": false
+  },
+  {
+    "component": "nomos",
     "slug": "bedrock-service-reward-distribution",
     "title": "Bedrock v1.2 Service Reward Distribution Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/bedrock-service-reward-distribution.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "bedrock-v1.1-block-construction",
     "title": "Bedrock v1.1 Block Construction, Validation and Execution Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/bedrock-v1.1-block-construction.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "bedrock-v1.1-mantle-specification",
     "title": "Bedrock v1.1 Mantle Specification",
     "status": "raw",
     "category": "Informational",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/bedrock-v1.1-mantle-specification.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "cryptarchia-proof-of-leadership",
     "title": "Cryptarchia Proof of Leadership Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/cryptarchia-proof-of-leadership.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "cryptarchia-total-stake-inference",
     "title": "Cryptarchia Total Stake Inference",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/cryptarchia-total-stake-inference.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "cryptarchia-v1-bootstr-sync",
     "title": "Cryptarchia v1 Bootstrapping & Synchronization",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/cryptarchia-v1-bootstr-sync.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-blend-protocol",
     "title": "Nomos Blend Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-blend-protocol.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-cryptarchia-v1-protocol",
     "title": "Nomos Cryptarchia v1 Protocol Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-cryptarchia-v1-protocol.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-key-types-and-generation",
     "title": "Nomos Key Types and Generation",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-key-types-and-generation.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-message-encapsulation",
     "title": "Nomos Message Encapsulation Mechanism",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-message-encapsulation.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-message-formatting",
     "title": "Nomos Message Formatting Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-message-formatting.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-payload-formatting",
     "title": "Nomos Payload Formatting Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-payload-formatting.html",
     "archived": false
   },
   {
-    "project": "nomos",
+    "component": "nomos",
     "slug": "nomos-proof-of-quota",
     "title": "Nomos Proof of Quota Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "nomos/raw/nomos-proof-of-quota.html",
     "archived": false
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "24",
     "title": "Status Community Directory Curation Voting using Waku v2",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/24/curation.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "28",
     "title": "Status community featuring using waku v2",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/28/featuring.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "3rd party",
     "title": "3rd party",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/3rd-party.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "55",
     "title": "Status 1-to-1 Chat",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/55/1to1-chat.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "56",
     "title": "Status Communities that run over Waku v2",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/56/communities.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "61",
     "title": "Status Community History Service",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/61/community-history-service.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "62",
     "title": "Status Message Payloads",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/62/payloads.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "63",
     "title": "Status Keycard Usage",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/63/keycard-usage.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "65",
     "title": "Status Account Address",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/65/account-address.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "71",
     "title": "Push Notification Server",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/71/push-notification-server.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Account",
     "title": "Account",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/account.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Client",
     "title": "Client",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/client.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Dapp browser API usage",
     "title": "Dapp browser API usage",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/dapp-browser-API-usage.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "EIPS",
     "title": "EIPS",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/eips.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Group Chat",
     "title": "Group Chat",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/group-chat.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "IPFS gateway for Sticker Pack",
     "title": "IPFS gateway for Sticker Pack",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Keycard Usage for Wallet and Chat Keys",
     "title": "Keycard Usage for Wallet and Chat Keys",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "MVDS Usage in Status",
     "title": "MVDS Usage in Status",
     "status": "raw",
     "category": "Best Current Practice",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/raw/status-mvds.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Notifications",
     "title": "Notifications",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/notifications.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Payloads",
     "title": "Payloads",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/payloads.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Push notification server",
     "title": "Push notification server",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/push-notification-server.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Secure Transport",
     "title": "Secure Transport",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/secure-transport.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Status Protocol Stack",
     "title": "Status Protocol Stack",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/raw/status-app-protocols.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Status Simple Scaling",
     "title": "Status Simple Scaling",
     "status": "raw",
     "category": "Informational",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/raw/simple-scaling.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Status URL Data",
     "title": "Status URL Data",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/raw/url-data.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Status URL Scheme",
     "title": "Status URL Scheme",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/raw/url-scheme.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Status interactions with the Ethereum blockchain",
     "title": "Status interactions with the Ethereum blockchain",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/ethereum-usage.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Waku Mailserver",
     "title": "Waku Mailserver",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/waku-mailserver.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Waku Usage",
     "title": "Waku Usage",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/waku-usage.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Whisper Usage",
     "title": "Whisper Usage",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/whisper-usage.html",
     "archived": true
   },
   {
-    "project": "status",
+    "component": "status",
     "slug": "Whisper mailserver",
     "title": "Whisper mailserver",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "archived/status/deprecated/whisper-mailserver.html",
     "archived": true
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "1",
     "title": "Consensus-Oriented Specification System",
     "status": "draft",
     "category": "Best Current Practice",
     "updated": "2025-12-22",
-    "path": "vac/1/coss.html",
+    "path": "IFT-TS/1/coss.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/2/mvds.html",
+    "path": "IFT-TS/2/mvds.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "25",
     "title": "Libp2p Peer Discovery via DNS",
     "status": "deleted",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/25/libp2p-dns-discovery.html",
+    "path": "IFT-TS/25/libp2p-dns-discovery.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "3",
     "title": "Remote log specification",
     "status": "draft",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/3/remote-log.html",
+    "path": "IFT-TS/3/remote-log.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "32",
     "title": "Rate Limit Nullifier",
     "status": "draft",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/32/rln-v1.html",
+    "path": "IFT-TS/32/rln-v1.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "4",
     "title": "MVDS Metadata Field",
     "status": "draft",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/4/mvds-meta.html",
+    "path": "IFT-TS/4/mvds-meta.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Decentralized Key and Session Setup for Secure Messaging over Ethereum",
     "title": "Decentralized Key and Session Setup for Secure Messaging over Ethereum",
     "status": "raw",
     "category": "informational",
     "updated": "2025-12-22",
-    "path": "vac/raw/decentralized-messaging-ethereum.html",
+    "path": "IFT-TS/raw/decentralized-messaging-ethereum.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Gossipsub Tor Push",
     "title": "Gossipsub Tor Push",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/gossipsub-tor-push.html",
+    "path": "IFT-TS/raw/gossipsub-tor-push.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Interep as group management for RLN",
     "title": "Interep as group management for RLN",
     "status": "raw",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/raw/rln-interep-spec.html",
+    "path": "IFT-TS/raw/rln-interep-spec.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Logos Capability Discovery Protocol",
     "title": "Logos Capability Discovery Protocol",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/logos-capability-discovery.html",
+    "path": "IFT-TS/raw/logos-capability-discovery.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "RLN Stealth Commitment Usage",
     "title": "RLN Stealth Commitment Usage",
     "status": "unknown",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/rln-stealth-commitments.html",
+    "path": "IFT-TS/raw/rln-stealth-commitments.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Rate Limit Nullifier V2",
     "title": "Rate Limit Nullifier V2",
     "status": "raw",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "vac/raw/rln-v2.html",
+    "path": "IFT-TS/raw/rln-v2.html",
     "archived": false
   },
   {
-    "project": "vac",
-    "slug": "Scalable Data Sync protocol for distributed logs",
-    "title": "Scalable Data Sync protocol for distributed logs",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2025-12-22",
-    "path": "vac/raw/sds.html",
-    "archived": false
-  },
-  {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Secure 1-to-1 channel setup using X3DH and the double ratchet",
     "title": "Secure 1-to-1 channel setup using X3DH and the double ratchet",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/noise-x3dh-double-ratchet.html",
+    "path": "IFT-TS/raw/noise-x3dh-double-ratchet.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Secure channel setup using Ethereum accounts",
     "title": "Secure channel setup using Ethereum accounts",
     "status": "deleted",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/deleted/eth-secpm.html",
+    "path": "IFT-TS/raw/deleted/eth-secpm.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Secure channel setup using decentralized MLS and Ethereum accounts",
     "title": "Secure channel setup using decentralized MLS and Ethereum accounts",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/eth-mls-onchain.html",
+    "path": "IFT-TS/raw/eth-mls-onchain.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "Secure channel setup using decentralized MLS and Ethereum accounts",
     "title": "Secure channel setup using decentralized MLS and Ethereum accounts",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "vac/raw/eth-mls-offchain.html",
+    "path": "IFT-TS/raw/eth-mls-offchain.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "consensus-hashgraphlike",
     "title": "Hashgraphlike Consensus Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2025-12-22",
-    "path": "vac/raw/consensus-hashgraphlike.html",
+    "updated": "2026-01-15",
+    "path": "IFT-TS/raw/consensus-hashgraphlike.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "extensible-peer-records",
     "title": "Extensible Peer Records",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "",
-    "path": "vac/raw/extensible-peer-records.html",
+    "updated": "2026-01-15",
+    "path": "IFT-TS/raw/extensible-peer-records.html",
     "archived": false
   },
   {
-    "project": "vac",
+    "component": "IFT-TS",
     "slug": "mix",
     "title": "mix",
     "status": "unknown",
     "category": "unspecified",
-    "updated": "2025-12-22",
-    "path": "vac/raw/mix.html",
+    "updated": "2026-01-15",
+    "path": "IFT-TS/raw/mix.html",
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "IFT-TS",
+    "slug": "sds",
+    "title": "sds",
+    "status": "unknown",
+    "category": "unspecified",
+    "updated": "2026-01-15",
+    "path": "IFT-TS/raw/sds.html",
+    "archived": false
+  },
+  {
+    "component": "waku",
     "slug": "10",
     "title": "Waku v2",
     "status": "draft",
@@ -850,7 +860,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "11",
     "title": "Waku v2 Relay",
     "status": "stable",
@@ -860,7 +870,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "12",
     "title": "Waku v2 Filter",
     "status": "draft",
@@ -870,7 +880,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "13",
     "title": "Waku Store Query",
     "status": "draft",
@@ -880,17 +890,17 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "14",
     "title": "Waku v2 Message",
     "status": "stable",
     "category": "Standards Track",
-    "updated": "2025-12-22",
+    "updated": "2026-01-15",
     "path": "waku/standards/core/14/message.html",
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "15",
     "title": "Waku Bridge",
     "status": "draft",
@@ -900,7 +910,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "16",
     "title": "Waku v2 RPC API",
     "status": "deprecated",
@@ -910,7 +920,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "17",
     "title": "Waku v2 RLN Relay",
     "status": "draft",
@@ -920,7 +930,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "18",
     "title": "Waku SWAP Accounting",
     "status": "deprecated",
@@ -930,7 +940,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "19",
     "title": "Waku v2 Light Push",
     "status": "draft",
@@ -940,17 +950,17 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "20",
     "title": "Toy Ethereum Private Message",
     "status": "draft",
     "category": "unspecified",
-    "updated": "2025-12-22",
+    "updated": "2026-01-15",
     "path": "waku/standards/application/20/toy-eth-pm.html",
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "21",
     "title": "Waku v2 Fault-Tolerant Store",
     "status": "deleted",
@@ -960,7 +970,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "22",
     "title": "Waku v2 Toy Chat",
     "status": "draft",
@@ -970,7 +980,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "23",
     "title": "Waku v2 Topic Usage Recommendations",
     "status": "draft",
@@ -980,17 +990,17 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "26",
     "title": "Waku Message Payload Encryption",
     "status": "draft",
     "category": "unspecified",
-    "updated": "2025-12-22",
+    "updated": "2026-01-15",
     "path": "waku/standards/application/26/payload.html",
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "27",
     "title": "Waku v2 Client Peer Management Recommendations",
     "status": "draft",
@@ -1000,7 +1010,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "29",
     "title": "Waku v2 Client Parameter Configuration Recommendations",
     "status": "draft",
@@ -1010,7 +1020,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "30",
     "title": "Adaptive nodes",
     "status": "draft",
@@ -1020,7 +1030,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "31",
     "title": "Waku v2 usage of ENR",
     "status": "draft",
@@ -1030,7 +1040,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "33",
     "title": "Waku v2 Discv5 Ambient Peer Discovery",
     "status": "draft",
@@ -1040,7 +1050,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "34",
     "title": "Waku2 Peer Exchange",
     "status": "draft",
@@ -1050,7 +1060,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "36",
     "title": "Waku v2 C Bindings API",
     "status": "draft",
@@ -1060,7 +1070,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "5",
     "title": "Waku v0",
     "status": "deprecated",
@@ -1070,7 +1080,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "53",
     "title": "X3DH usage for Waku payload encryption",
     "status": "draft",
@@ -1080,7 +1090,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "54",
     "title": "Session management for Waku X3DH",
     "status": "draft",
@@ -1090,7 +1100,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "6",
     "title": "Waku v1",
     "status": "stable",
@@ -1100,7 +1110,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "64",
     "title": "Waku v2 Network",
     "status": "draft",
@@ -1110,7 +1120,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "66",
     "title": "Waku Metadata Protocol",
     "status": "draft",
@@ -1120,7 +1130,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "7",
     "title": "Waku Envelope data field",
     "status": "stable",
@@ -1130,7 +1140,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "8",
     "title": "Waku Mailserver",
     "status": "stable",
@@ -1140,7 +1150,7 @@
     "archived": false
   },
   {
-    "project": "waku",
+    "component": "waku",
     "slug": "9",
     "title": "Waku RPC API",
     "status": "stable",

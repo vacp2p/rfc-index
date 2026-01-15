@@ -30,7 +30,7 @@ and helps implementers to quickly comprehend the specification
 - specifications MUST feature a header providing specific meta information
 - raw specifications will not be assigned numbers
 - section explaining the [IFT](https://free.technology/)
-Request For Comments specification process managed by the Vac service department
+Request For Comments specification process managed by the IFT-TS service department
 
 ## License
 
@@ -265,23 +265,23 @@ This will enable programmatic access to specification metadata.
 | **editor**       | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
 | **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com> - André Rebentisch <andre@openstandards.de> - Alberto Barrionuevo <abarrio@opentia.es> - Chris Puttick <chris.puttick@thehumanjourney.net> - Yurii Rashkovskii <yrashk@gmail.com> |
 
-### IFT/Vac RFC Process
+### IFT/Logos LIP Process
 
 > [!Note]
 This section is introduced to allow contributors to understand the IFT
-(Institute of Free Technology) Vac RFC specification process.
+(Institute of Free Technology) Logos LIP specification process.
 Other organizations may make changes to this section according to their needs.
 
-Vac is a department under the IFT organization that provides RFC (Request For Comments)
+IFT-TS is a department under the IFT organization that provides RFC (Request For Comments)
 specification services.
 This service works to help facilitate the RFC process, assuring standards are followed.
 Contributors within the service SHOULD assist a *sub-domain* in creating a new specification,
 editing a specification, and
 promoting the status of a specification along with other tasks.
 Once a specification reaches some level of maturity by rough consensus,
-the specification SHOULD enter the [Vac RFC](https://rfc.vac.dev/) process.
+the specification SHOULD enter the [Logos LIP](https://rfc.vac.dev/) process.
 Similar to the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html),
-the Vac RFC process SHOULD facilitate all updates to the specification.
+the Logos LIP process SHOULD facilitate all updates to the specification.
 
 Specifications are introduced by projects,
 under a specific *domain*, with the intention of becoming technically mature documents.
@@ -295,9 +295,9 @@ The IFT domain currently houses the following projects:
 
 When a specification is promoted to *draft* status,
 the number that is assigned MAY be incremental
-or by the *sub-domain* and the Vac RFC process.
+or by the *sub-domain* and the Logos LIP process.
 Standards track specifications MUST be based on the
-[Vac RFC template](../template.md) before obtaining a new status.
+[Logos LIP template](../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
 ## Conventions

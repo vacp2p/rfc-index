@@ -53,9 +53,9 @@
     nav.innerHTML = `
       <a class="nav-link" href="${root}index.html">Home</a>
       <details class="nav-dropdown">
-        <summary class="nav-link">Projects</summary>
+        <summary class="nav-link">Components</summary>
         <div class="nav-menu">
-          <a href="${root}vac/index.html">Vac</a>
+          <a href="${root}vac/index.html">IFT-TS</a>
           <a href="${root}waku/index.html">Waku</a>
           <a href="${root}nomos/index.html">Nomos</a>
           <a href="${root}codex/index.html">Codex</a>
@@ -99,7 +99,7 @@
     const footer = document.createElement("footer");
     footer.className = "site-footer";
     footer.innerHTML = `
-      <a href="https://vac.dev">Vac</a>
+      <a href="https://vac.dev">IFT-TS</a>
       <span class="footer-sep">·</span>
       <a href="https://www.ietf.org">IETF</a>
       <span class="footer-sep">·</span>
@@ -290,8 +290,8 @@
   }
 
   const rootPrefix = (typeof path_to_root !== "undefined" && path_to_root) ? path_to_root : "";
-  const projectScope = tableContainer.dataset.project || "";
-  const showProjectColumn = !projectScope;
+  const componentScope = tableContainer.dataset.component || "";
+  const showComponentColumn = !componentScope;
 
   let rfcData = [];
   const statusOrder = { stable: 0, draft: 1, raw: 2, deprecated: 3, deleted: 4, unknown: 5 };
@@ -303,23 +303,23 @@
     deleted: "Deleted",
     unknown: "Unknown"
   };
-  const projectLabels = {
-    vac: "Vac",
+  const componentLabels = {
+    vac: "IFT-TS",
     waku: "Waku",
     nomos: "Nomos",
     codex: "Codex"
   };
   const headers = [
-    { key: "slug", label: "RFC", width: showProjectColumn ? "10%" : "12%" },
-    { key: "title", label: "Title", width: showProjectColumn ? "34%" : "40%" },
-    ...(showProjectColumn ? [{ key: "project", label: "Project", width: "12%" }] : []),
+    { key: "slug", label: "RFC", width: showComponentColumn ? "10%" : "12%" },
+    { key: "title", label: "Title", width: showComponentColumn ? "34%" : "40%" },
+    ...(showComponentColumn ? [{ key: "component", label: "Component", width: "12%" }] : []),
     { key: "status", label: "Status", width: "14%" },
-    { key: "category", label: "Category", width: showProjectColumn ? "18%" : "20%" },
+    { key: "category", label: "Category", width: showComponentColumn ? "18%" : "20%" },
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
   let statusFilter = "all";
-  let projectFilter = "all";
+  let componentFilter = "all";
   let dateFilter = "all";
   let sortKey = "slug";
   let sortDir = "asc";
@@ -367,8 +367,8 @@
     return statusLabels[key] || status;
   }
 
-  function formatProject(project) {
-    return projectLabels[project] || project;
+  function formatComponent(component) {
+    return componentLabels[component] || component;
   }
 
   function formatCategory(category) {
@@ -421,14 +421,14 @@
 
   function updateChipCounts() {
     const statusCounts = {};
-    const projectCounts = {};
+    const componentCounts = {};
     let last90Count = 0;
     let datedCount = 0;
 
     rfcData.forEach((item) => {
       const statusKey = normalizeStatus(item.status);
       statusCounts[statusKey] = (statusCounts[statusKey] || 0) + 1;
-      projectCounts[item.project] = (projectCounts[item.project] || 0) + 1;
+      componentCounts[item.component] = (componentCounts[item.component] || 0) + 1;
       if (parseDate(item.updated)) {
         datedCount += 1;
         if (isWithinDays(item.updated, 90)) {
@@ -438,7 +438,7 @@
     });
 
     updateChipGroup("status-chips", "status", statusCounts, rfcData.length);
-    updateChipGroup("project-chips", "project", projectCounts, rfcData.length);
+    updateChipGroup("component-chips", "component", componentCounts, rfcData.length);
     updateChipGroup(
       "date-chips",
       "date",
@@ -510,11 +510,11 @@
     const query = (searchInput.value || "").toLowerCase();
     let filtered = rfcData.filter((item) => {
       const statusOk = statusFilter === "all" || normalizeStatus(item.status) === statusFilter;
-      const projectOk = projectFilter === "all" || item.project === projectFilter;
+      const componentOk = componentFilter === "all" || item.component === componentFilter;
       const dateOk = passesDateFilter(item);
-      const text = `${item.slug} ${item.title} ${item.project} ${item.status} ${item.category}`.toLowerCase();
+      const text = `${item.slug} ${item.title} ${item.component} ${item.status} ${item.category}`.toLowerCase();
       const textOk = !query || text.includes(query);
-      return statusOk && projectOk && dateOk && textOk;
+      return statusOk && componentOk && dateOk && textOk;
     });
 
     let sorted = sortItems(filtered);
@@ -545,11 +545,11 @@
     sorted.forEach((item) => {
       const tr = document.createElement("tr");
       const updated = item.updated || "—";
-      const projectCell = showProjectColumn ? `<td>${formatProject(item.project)}</td>` : "";
+      const componentCell = showComponentColumn ? `<td>${formatComponent(item.component)}</td>` : "";
       tr.innerHTML = `
         <td><a href="${rootPrefix}${item.path}">${item.slug}</a></td>
         <td>${item.title}</td>
-        ${projectCell}
+        ${componentCell}
         <td><span class="badge status-${normalizeStatus(item.status)}">${formatStatus(item.status)}</span></td>
         <td>${formatCategory(item.category)}</td>
         <td>${updated}</td>
@@ -572,13 +572,13 @@
     });
   }
 
-  const projectChips = document.getElementById("project-chips");
-  if (projectChips) {
-    projectChips.addEventListener("click", (e) => {
-      if (!e.target.dataset.project) return;
-      projectFilter = e.target.dataset.project;
-      document.querySelectorAll("#project-chips .chip").forEach((chip) => {
-        chip.classList.toggle("active", chip.dataset.project === projectFilter);
+  const componentChips = document.getElementById("component-chips");
+  if (componentChips) {
+    componentChips.addEventListener("click", (e) => {
+      if (!e.target.dataset.component) return;
+      componentFilter = e.target.dataset.component;
+      document.querySelectorAll("#component-chips .chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.component === componentFilter);
       });
       render();
     });
@@ -603,7 +603,7 @@
       return resp.json();
     })
     .then((data) => {
-      rfcData = projectScope ? data.filter((item) => item.project === projectScope) : data.filter((item) => !item.archived);
+      rfcData = componentScope ? data.filter((item) => item.component === componentScope) : data.filter((item) => !item.archived);
       updateChipCounts();
       render();
     })

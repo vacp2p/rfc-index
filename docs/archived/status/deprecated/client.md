@@ -250,7 +250,7 @@ is not currently under active development, and it has several drawbacks. Among o
 - There are no incentives to run a node
 
 Finding a more suitable transport privacy is an ongoing research effort,
-together with [Vac](https://vac.dev/vac-overview) and other teams in the space.
+together with [IFT-TS](https://vac.dev/vac-overview) and other teams in the space.
 
 ### Why is PoW for Waku set so low?
 
@@ -408,7 +408,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Swarm adaptive nodes](https://github.com/ethersphere/SWIPs/pull/12)
 - [Whisper vs PSS](https://our.status.im/whisper-pss-comparison/)
 - [Waku specs](/waku/)
-- [Vac](https://vac.dev/vac-overview)
+- [IFT-TS](https://vac.dev/vac-overview)
 - [theoretical scaling model](https://github.com/vacp2p/research/tree/dcc71f4779be832d3b5ece9c4e11f1f7ec24aac2/whisper_scalability)
 - [Anonymity](https://eprint.iacr.org/2017/954.pdf)
 - [trilemma](https://petsymposium.org/2019/files/hotpets/slides/coordination-helps-anonymity-slides.pdf)
