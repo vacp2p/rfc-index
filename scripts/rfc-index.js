@@ -55,7 +55,7 @@
       <details class="nav-dropdown">
         <summary class="nav-link">Components</summary>
         <div class="nav-menu">
-          <a href="${root}vac/index.html">IFT-TS</a>
+          <a href="${root}ift-ts/index.html">IFT-TS</a>
           <a href="${root}waku/index.html">Waku</a>
           <a href="${root}nomos/index.html">Nomos</a>
           <a href="${root}codex/index.html">Codex</a>
