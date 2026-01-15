@@ -98,7 +98,7 @@ message ExtensiblePeerRecord {
     optional bytes data = 2;
   }
 
-   // Extensible list of advertised services
+  // Extensible list of advertised services
   repeated ServiceInfo services = 4;
 }
 ```
