@@ -1,10 +1,10 @@
 # Vac RFC Index
 
-An IETF-style index of Vac-managed RFCs across Waku, Nomos, Codex, and Status. Use the filters below to jump straight to a specification.
+An IETF-style index of Vac-managed RFCs across Vac, Waku, Nomos, and Codex. Use the filters below to jump straight to a specification.
 
 <div class="landing-hero">
   <div class="filter-row">
-    <input id="rfc-search" type="search" placeholder="Search by number, title, status, project..." aria-label="Search RFCs">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status, component..." aria-label="Search RFCs">
     <div class="chips" id="status-chips">
       <span class="chip active" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>
@@ -16,10 +16,9 @@ An IETF-style index of Vac-managed RFCs across Waku, Nomos, Codex, and Status. U
   </div>
   <div class="filter-row">
     <div class="chips" id="project-chips">
-      <span class="chip active" data-project="all" data-label="All projects">All projects</span>
+      <span class="chip active" data-project="all" data-label="All components">All components</span>
       <span class="chip" data-project="vac" data-label="Vac">Vac</span>
       <span class="chip" data-project="waku" data-label="Waku">Waku</span>
-      <span class="chip" data-project="status" data-label="Status">Status</span>
       <span class="chip" data-project="nomos" data-label="Nomos">Nomos</span>
       <span class="chip" data-project="codex" data-label="Codex">Codex</span>
     </div>

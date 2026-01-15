@@ -122,7 +122,7 @@ the recipient is vulnerable to DoS attacks from a malicious `Mailserver` node.
 Released [May 22, 2020](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)
 
 * Created document
-* Forked from [whisper-mailserver](/status/deprecated/whisper-mailserver.md)
+* Forked from [whisper-mailserver](/archived/status/deprecated/whisper-mailserver.md)
 * Change to keep `Mailserver` term consistent
 * Replaced Whisper references with Waku
 

@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Hashgraphlike Consensus Protocol |
+| Slug | consensus-hashgraphlike |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |
@@ -74,11 +75,11 @@ message Proposal {
   string payload = 11;               // Proposal description
   uint32 proposal_id = 12;           // Unique identifier of the proposal
   bytes proposal_owner = 13;         // Public key of the creator 
-  repeated Votes = 14;               // Vote list in the proposal
+  repeated Vote votes = 14;              // Vote list in the proposal
   uint32 expected_voters_count = 15; // Maximum number of distinct voters
-  uint32 round = 16;                 // Number of Votes 
+  uint32 round = 16;                 // Number of rounds 
   uint64 timestamp = 17;             // Creation time of proposal
-  uint64 expiration_time = 18;       // The time interval that the proposal is active.  
+  uint64 expiration_timestamp = 18;  // The timestamp at which the proposal becomes outdated  
   bool liveness_criteria_yes = 19;   // Shows how managing the silent peers vote
 }
 
@@ -86,7 +87,7 @@ message Vote {
   uint32 vote_id = 20;            // Unique identifier of the vote
   bytes vote_owner = 21;          // Voter's public key
   uint32 proposal_id = 22;        // Linking votes and proposals
-  int64 timestamp = 23;           // Time when the vote was cast
+  uint64 timestamp = 23;          // Time when the vote was cast
   bool vote = 24;                 // Vote bool value (true/false)
   bytes parent_hash = 25;         // Hash of previous owner's Vote
   bytes received_hash = 26;       // Hash of previous received Vote
@@ -139,7 +140,7 @@ check that the hash of the former vote is equal to the `parent_hash` of the late
   
    5.3. Increase the round by one, namely `P_2.round = P_1.round + 1`.
   
-   5.4. Verify that the proposal has not expired by checking that: `P_2.timestamp - current_time < P_1.expiration_time`.
+   5.4. Verify that the proposal has not expired by checking that: `current_time in [P_timestamp, P_expiration_timestamp]`.
     If this does not hold, other peers ignore the message.
 
 After the peer creates the proposal `P_2` with its vote `V_2`,

@@ -21,7 +21,7 @@ otherwise it will not be able to interact with the Ethereum blockchain.
 Status nodes rely on these Infura nodes
 to validate the integrity of the transaction and report a consistent history.
 
-Key handling is described [here](/status/deprecated/account.md)
+Key handling is described [here](/archived/status/deprecated/account.md)
 
 1. [Wallet](#wallet)
 2. [ENS](#ens)
@@ -216,7 +216,7 @@ Usernames MUST be in a specific format, otherwise they MAY be slashed:
 - [Slash a username too similar to an address](https://github.com/status-im/ens-usernames/blob/77d9394d21a5b6213902473b7a16d62a41d9cd09/contracts/registry/UsernameRegistrar.sol#L215)
 - [Slash a username that is too short](https://github.com/status-im/ens-usernames/blob/77d9394d21a5b6213902473b7a16d62a41d9cd09/contracts/registry/UsernameRegistrar.sol#L200)
 
-ENS names are propagated through `ChatMessage` and `ContactUpdate` [payload](/status/deprecated/payloads.md).
+ENS names are propagated through `ChatMessage` and `ContactUpdate` [payload](/archived/status/deprecated/payloads.md).
 A client SHOULD verify ens names against the public key of the sender on receiving the message against the [ENS contract](https://github.com/ensdomains/ens)
 
 ## Copyright
@@ -228,7 +228,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Ethereum Developers](https://ethereum.org/developers/)
 - [JSON-RPC](https://github.com/ethereum/wiki/wiki/JSON-RPC)
 - [Infura](https://infura.io/)
-- [Key Handling](/status/deprecated/account.md)
+- [Key Handling](/archived/status/deprecated/account.md)
 - [ERC-20 Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 - [ERC-721 Non-Fungible Token Standard](https://eips.ethereum.org/EIPS/eip-721)
 - [Supported Tokens Source Code](https://github.com/status-im/status-mobile/blob/develop/src/status_im/ethereum/tokens.cljs)

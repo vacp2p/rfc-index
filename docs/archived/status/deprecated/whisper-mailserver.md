@@ -138,7 +138,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 - [Whisper](https://eips.ethereum.org/EIPS/eip-627)
 - [EIP-627](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-627.md)
-- [SECURE-TRANSPORT](/status/deprecated/secure-transport.md)
+- [SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md)
 - [`shh_generateSymKeyFromPassword`](https://github.com/ethereum/go-ethereum/wiki/Whisper-v6-RPC-API#shh_generatesymkeyfrompassword)
 - [Whisper v6](https://eips.ethereum.org/EIPS/eip-627)
 - [Waku V0](/waku/deprecated/5/waku0.md)

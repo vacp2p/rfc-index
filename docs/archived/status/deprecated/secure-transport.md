@@ -47,13 +47,13 @@ Types used in this specification are defined using [Protobuf](https://developers
 
 ### Transport Layer
 
-[Whisper](status/deprecated/whisper-usage) and [Waku](status/deprecated/waku-usage) serves as the transport layers for the Status chat protocol.
+[Whisper](/archived/status/deprecated/whisper-usage) and [Waku](/archived/status/deprecated/waku-usage) serves as the transport layers for the Status chat protocol.
 
 ### User flow for 1-to-1 communications
 
 #### Account generation
 
-See [Account specification](status/deprecated/account)
+See [Account specification](/archived/status/deprecated/account)
 
 #### Account recovery
 
@@ -111,7 +111,7 @@ Every client initially generates some key material which is stored locally:
 - A signed prekey based on secp256k1 - `SPK`
 - A prekey signature - `Sig(IK, Encode(SPK))`
 
-More details can be found in the `X3DH Prekey bundle creation` section of [2/ACCOUNT](/status/deprecated/account.md#x3dh-prekey-bundles).
+More details can be found in the `X3DH Prekey bundle creation` section of [2/ACCOUNT](/archived/status/deprecated/account.md#x3dh-prekey-bundles).
 
 Prekey bundles can be extracted from any user's messages,
 or found via searching for their specific topic, `{IK}-contact-code`.
@@ -155,7 +155,7 @@ There are two phases in the initial negotiation of a 1:1 chat:
 A QR code serves two purposes simultaneously - identity verification and initial bundle retrieval;
 1. **Asynchronous initial key exchange**, using X3DH.
 
-For more information on account generation and trust establishment, see [2/ACCOUNT](/status/deprecated/account.md)
+For more information on account generation and trust establishment, see [2/ACCOUNT](/archived/status/deprecated/account.md)
 
 #### Initial key exchange flow (X3DH)
 
@@ -567,12 +567,12 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [X3DH](https://signal.org/docs/specifications/x3dh/)
 - [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Protobuf](https://developers.google.com/protocol-buffers/)
-- [Whisper](/status/deprecated/whisper-usage.md)
-- [Waku](/status/deprecated/waku-usage.md)
-- [Account specification](/status/deprecated/account.md)
+- [Whisper](/archived/status/deprecated/whisper-usage.md)
+- [Waku](/archived/status/deprecated/waku-usage.md)
+- [Account specification](/archived/status/deprecated/account.md)
 - [Status implementation](https://github.com/status-im/doubleratchet/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
 - [X3DH](https://signal.org/docs/specifications/x3dh/)
-- [ACCOUNT](/status/deprecated/account.md)
+- [ACCOUNT](/archived/status/deprecated/account.md)
 - [Sesame](https://signal.org/docs/specifications/sesame/)
 - [May 22, 2020 commit change](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)

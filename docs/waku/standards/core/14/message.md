@@ -240,7 +240,7 @@ Applications using [10/WAKU2](/waku/standards/core/10/waku2.md) messages’ `tim
 are RECOMMENDED to use additional methods for more robust message ordering.
 An example of how to deal with message ordering against adversarial message timestamps
 can be found in the Status protocol,
-see [62/STATUS-PAYLOADS](/status/62/payloads.md/#clock-vs-timestamp-and-message-ordering).
+see [62/STATUS-PAYLOADS](/archived/status/62/payloads.md/#clock-vs-timestamp-and-message-ordering).
 
 ### Reliability of the `ephemeral` attribute
 
@@ -265,4 +265,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [protocol buffers v3](https://developers.google.com/protocol-buffers/)
 - [26/WAKU-PAYLOAD](/waku/standards/application/26/payload.md)
 - [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
-- [62/STATUS-PAYLOADS](/status/62/payloads.md/#clock-vs-timestamp-and-message-ordering)
+- [62/STATUS-PAYLOADS](/archived/status/62/payloads.md/#clock-vs-timestamp-and-message-ordering)

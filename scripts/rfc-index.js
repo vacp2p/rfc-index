@@ -57,7 +57,6 @@
         <div class="nav-menu">
           <a href="${root}vac/index.html">Vac</a>
           <a href="${root}waku/index.html">Waku</a>
-          <a href="${root}status/index.html">Status</a>
           <a href="${root}nomos/index.html">Nomos</a>
           <a href="${root}codex/index.html">Codex</a>
         </div>
@@ -307,7 +306,6 @@
   const projectLabels = {
     vac: "Vac",
     waku: "Waku",
-    status: "Status",
     nomos: "Nomos",
     codex: "Codex"
   };
@@ -605,7 +603,7 @@
       return resp.json();
     })
     .then((data) => {
-      rfcData = projectScope ? data.filter((item) => item.project === projectScope) : data;
+      rfcData = projectScope ? data.filter((item) => item.project === projectScope) : data.filter((item) => !item.archived);
       updateChipCounts();
       render();
     })

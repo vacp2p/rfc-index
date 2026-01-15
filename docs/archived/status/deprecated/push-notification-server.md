@@ -58,10 +58,10 @@ A Status client that wants to send push notifications
 
 A client MAY register with one or more Push Notification services of their choice.
 
-A `PNR message` (Push Notification Registration) MUST be sent to the [partitioned topic](status/deprecated/waku-usage/#partitioned-topic)
+A `PNR message` (Push Notification Registration) MUST be sent to the [partitioned topic](/archived/status/deprecated/waku-usage/#partitioned-topic)
 for the public key of the node, encrypted with this key.
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payload/#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payload/#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION`.
 
 The marshaled protobuf payload MUST also be encrypted with AES-GCM
 using the Diffie–Hellman key generated from the client and server identity.
@@ -124,8 +124,8 @@ If the response is successful `success` MUST be set to `true` otherwise a respon
 
 `request_id` should be set to the `SHAKE-256` of the encrypted payload.
 
-The response MUST be sent on the [partitioned topic](status/deprecated/waku-usage.md#partitioned-topic) of the sender
-and MUST not be encrypted using the [secure transport](status/deprecated/secure-transport) to facilitate the usage of ephemeral keys.
+The response MUST be sent on the [partitioned topic](/archived/status/deprecated/waku-usage.md#partitioned-topic) of the sender
+and MUST not be encrypted using the [secure transport](/archived/status/deprecated/secure-transport) to facilitate the usage of ephemeral keys.
 
 The payload of the response is:
 
@@ -145,9 +145,9 @@ message PushNotificationRegistrationResponse {
 }
 ```
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION_RESPONSE`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION_RESPONSE`.
 
-A client SHOULD listen for a response sent on the [partitioned topic](status/deprecated/waku-usage/#partitioned-topic)
+A client SHOULD listen for a response sent on the [partitioned topic](/archived/status/deprecated/waku-usage/#partitioned-topic)
 that the key used to register.
 
 If `success` is `true` the client has registered successfully.
@@ -173,7 +173,7 @@ On successful registration the server MUST be listening to the topic derived fro
    0XHexEncode(Shake256(CompressedClientPublicKey))
 ```
 
-Using the topic derivation algorithm described [here](status/deprecated/waku-usage/#public-chats)
+Using the topic derivation algorithm described [here](/archived/status/deprecated/waku-usage/#public-chats)
 and listen for client queries.
 
 ### Server grant
@@ -236,13 +236,13 @@ message ContactCodeAdvertisement {
 }
 ```
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payloads/#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY_INFO`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads/#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY_INFO`.
 
 If no filtering is done based on public keys,
 the access token SHOULD be included in the advertisement.
 Otherwise it SHOULD be left empty.
 
-This SHOULD be advertised on the [contact code topic](/status/deprecated/waku-usage.md#contact-code-topic)
+This SHOULD be advertised on the [contact code topic](/archived/status/deprecated/waku-usage.md#contact-code-topic)
 and SHOULD be coupled with normal contact-code advertisement.
 
 Every time a user register or re-register with a push notification service, their
@@ -252,7 +252,7 @@ Multiple servers MAY be advertised for the same `installation_id` for redundancy
 
 ## Discovering a push notification server
 
-To discover a push notification service for a given user, their [contact code topic](status/deprecated/waku-usage/#contact-code-topic)
+To discover a push notification service for a given user, their [contact code topic](/archived/status/deprecated/waku-usage/#contact-code-topic)
 SHOULD be listened to.
 A mailserver can be queried for the specific topic to retrieve the most up-to-date
 contact code.
@@ -270,12 +270,12 @@ message PushNotificationQuery {
 }
 ```
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payloads/#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads/#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY`.
 
 MUST be sent to the server on the topic derived from the hashed public key of the
 key we are querying, as [described above](#query-topic).
 
-An ephemeral key SHOULD be used and SHOULD NOT be encrypted using the [secure transport](status/deprecated/secure-transport.md).
+An ephemeral key SHOULD be used and SHOULD NOT be encrypted using the [secure transport](/archived/status/deprecated/secure-transport.md).
 
 If the server has information about the client a response MUST be sent:
 
@@ -297,7 +297,7 @@ message PushNotificationQueryResponse {
 }
 ```
 
-A `PushNotificationQueryResponse` message MUST be wrapped in a [`ApplicationMetadataMessage`](status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY_RESPONSE`.
+A `PushNotificationQueryResponse` message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY_RESPONSE`.
 
 Otherwise a response MUST NOT be sent.
 
@@ -314,8 +314,8 @@ target client and itself
 If AES decryption succeeds it will return a valid [`uuid`](https://tools.ietf.org/html/rfc4122) which is what is used for access_token.
 The token SHOULD be used to send push notifications.
 
-The response MUST be sent on the [partitioned topic](status/deprecated/waku-usage/#partitioned-topic) of the sender
-and MUST not be encrypted using the [secure transport](status/deprecated/secure-transport.md) to facilitate
+The response MUST be sent on the [partitioned topic](/archived/status/deprecated/waku-usage/#partitioned-topic) of the sender
+and MUST not be encrypted using the [secure transport](/archived/status/deprecated/secure-transport.md) to facilitate
 the usage of ephemeral keys.
 
 On receiving a response a client MUST verify `grant` to ensure that the server
@@ -357,7 +357,7 @@ message PushNotificationRequest {
 }
 ```
 
-A `PushNotificationRequest` message MUST be wrapped in a [`ApplicationMetadataMessage`](/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REQUEST`.
+A `PushNotificationRequest` message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REQUEST`.
 
 Where `message` is the encrypted payload of the message and `chat_id` is the
 `SHAKE-256` of the `chat_id`.
@@ -417,12 +417,12 @@ message PushNotificationResponse {
 }
 ```
 
-A `PushNotificationResponse` message MUST be wrapped in a [`ApplicationMetadataMessage`](/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_RESPONSE`.
+A `PushNotificationResponse` message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_RESPONSE`.
 
 Where `message_id` is the `message_id` sent by the client.
 
-The response MUST be sent on the [partitioned topic](/status/deprecated/waku-usage.md#partitioned-topic) of the sender
-and MUST not be encrypted using the [secure transport](/status/deprecated/secure-transport.md) to facilitate
+The response MUST be sent on the [partitioned topic](/archived/status/deprecated/waku-usage.md#partitioned-topic) of the sender
+and MUST not be encrypted using the [secure transport](/archived/status/deprecated/secure-transport.md) to facilitate
 the usage of ephemeral keys.
 
 If the request is accepted `success` MUST be set to `true`.
@@ -467,7 +467,7 @@ If `error` is `INTERNAL_ERROR` the client MAY retry the request.
 `token_type`: the type of token. Currently supported is `APN_TOKEN` for Apple Push
 `device_token`: the actual push notification token sent by `Firebase` or `APN`
 and `FIREBASE_TOKEN` for firebase.
-`installation_id`: the [`installation_id`](/status/deprecated/account.md) of the device
+`installation_id`: the [`installation_id`](/archived/status/deprecated/account.md) of the device
 `access_token`: the access token that will be given to clients to send push notifications
 `enabled`: whether the device wants to be sent push notifications
 `version`: a monotonically increasing number identifying the current `PushNotificationRegistration`. Any time anything is changed in the record it MUST be increased by the client, otherwise the request will not be accepted.
@@ -551,7 +551,7 @@ Data disclosed
 ### PushNotificationRequest
 
 `requests`: a list of `PushNotification`
-`message_id`: the [status message id](/status/deprecated/payloads.md)
+`message_id`: the [status message id](/archived/status/deprecated/payloads.md)
 
 Data disclosed
 
@@ -582,7 +582,7 @@ This will hide their real chat key.
 This public key is effectively a secret and SHOULD only be disclosed to clients that you the user wants to be notified by.
 
 A client MAY advertise the access token on the contact-code topic of the key generated.
-A client MAY share their public key through [contact updates](/status/deprecated/payloads.md#contact-update)
+A client MAY share their public key through [contact updates](/archived/status/deprecated/payloads.md#contact-update)
 
 A client receiving a push notification public key SHOULD listen to the contact code
 topic of the push notification public key for updates.
@@ -591,7 +591,7 @@ The method described above effectively does not share the identity of the sender
 nor the receiver to the server, but MAY result in missing push notifications as
 the propagation of the secret is left to the client.
 
-This can be mitigated by [device syncing](/status/deprecated/payloads.md), but not completely
+This can be mitigated by [device syncing](/archived/status/deprecated/payloads.md), but not completely
 addressed.
 
 ## Security considerations
@@ -745,8 +745,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Firebase](https://firebase.google.com/)
 - [Gorush](https://github.com/appleboy/gorush)
 - [UUID Specification](https://tools.ietf.org/html/rfc4122)
-- [Secure Transport](/status/deprecated/secure-transport.md)
+- [Secure Transport](/archived/status/deprecated/secure-transport.md)
 - [Silent Notifications on iOS](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/pushing_background_updates_to_your_app)
-- [Waku Usage](/status/deprecated/waku-usage.md)
+- [Waku Usage](/archived/status/deprecated/waku-usage.md)
 - [ENS Contract](https://github.com/ensdomains/ens)
-- [Payloads](/status/deprecated/payloads.md)
+- [Payloads](/archived/status/deprecated/payloads.md)

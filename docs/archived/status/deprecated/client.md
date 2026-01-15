@@ -160,15 +160,15 @@ to use Whisper and/or Waku to communicate with other Status nodes.
 Once a Whisper and/or Waku node is up and running there are some specific settings required
 to communicate with other Status nodes.
 
-See [WHISPER-USAGE](/status/deprecated/whisper-usage.md) and [WAKU-USAGE](/status/deprecated/waku-usage.md) for more details.
+See [WHISPER-USAGE](/archived/status/deprecated/whisper-usage.md) and [WAKU-USAGE](/archived/status/deprecated/waku-usage.md) for more details.
 
-For providing an offline inbox, see the complementary [WHISPER-MAILSERVER](/status/deprecated/whisper-mailserver.md) and [WAKU-MAILSERVER](/status/deprecated/waku-mailserver.md).
+For providing an offline inbox, see the complementary [WHISPER-MAILSERVER](/archived/status/deprecated/whisper-mailserver.md) and [WAKU-MAILSERVER](/archived/status/deprecated/waku-mailserver.md).
 
 ### Secure Transport
 
 In order to provide confidentiality, integrity, authentication and forward
 secrecy of messages the node implements a secure transport on top of Whisper and Waku. This is
-used in 1:1 chats and group chats, but not for public chats. See [SECURE-TRANSPORT](/status/deprecated/secure-transport.md) for more.
+used in 1:1 chats and group chats, but not for public chats. See [SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md) for more.
 
 ### Data Sync
 
@@ -182,12 +182,12 @@ Whisper or Waku which also encrypts it.
 
 On top of secure transport, various types of data sync clients and
 the node uses payload formats for things like 1:1 chat, group chat and public chat. These have
-various degrees of standardization. Please refer to [PAYLOADS](/status/deprecated/payloads.md) for more details.
+various degrees of standardization. Please refer to [PAYLOADS](/archived/status/deprecated/payloads.md) for more details.
 
 ### BIPs and EIPs Standards support
 
 For a list of EIPs and BIPs that SHOULD be supported by Status client, please
-see [EIPS](/status/deprecated/eips.md).
+see [EIPS](/archived/status/deprecated/eips.md).
 
 ## Security Considerations
 
@@ -395,14 +395,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Rendezvous Protocol modifications](https://github.com/status-im/rendezvous#differences-with-original-rendezvous)
 - [Fleets Status](https://fleets.status.im)
 - [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459#client-protocol)
-- [WHISPER-USAGE](/status/deprecated/whisper-usage.md)
-- [WAKU-USAGE](/status/deprecated/waku-usage.md)
-- [WHISPER-MAILSERVER](/status/deprecated/whisper-mailserver.md)
-- [WAKU-MAILSERVER](/status/deprecated/waku-mailserver.md)
-- [SECURE-TRANSPORT](/status/deprecated/secure-transport.md)
+- [WHISPER-USAGE](/archived/status/deprecated/whisper-usage.md)
+- [WAKU-USAGE](/archived/status/deprecated/waku-usage.md)
+- [WHISPER-MAILSERVER](/archived/status/deprecated/whisper-mailserver.md)
+- [WAKU-MAILSERVER](/archived/status/deprecated/waku-mailserver.md)
+- [SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md)
 - [MVDS](/vac/2/mvds.md)
-- [PAYLOADS](/status/deprecated/payloads.md)
-- [EIPS](/status/deprecated/eips.md)
+- [PAYLOADS](/archived/status/deprecated/payloads.md)
+- [EIPS](/archived/status/deprecated/eips.md)
 - [Murmur](https://github.com/status-im/murmur)
 - [Re-enable LES as option](https://github.com/status-im/status-go/issues/1025)
 - [Swarm adaptive nodes](https://github.com/ethersphere/SWIPs/pull/12)

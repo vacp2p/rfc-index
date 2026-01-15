@@ -1,0 +1,1 @@
+# Bedrock Service Declaration Protocol

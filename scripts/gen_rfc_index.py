@@ -89,7 +89,8 @@ def collect() -> List[Dict[str, str]]:
         title = meta.get("title") or meta.get("name") or parse_title_from_h1(text) or rel.stem
         status = meta.get("status") or "unknown"
         category = meta.get("category") or "unspecified"
-        project = rel.parts[0]
+        archived = rel.parts[0] == "archived"
+        project = rel.parts[1] if archived and len(rel.parts) > 1 else rel.parts[0]
 
         # Skip the template placeholder
         if slug == "XX":
@@ -109,6 +110,7 @@ def collect() -> List[Dict[str, str]]:
                 "category": category,
                 "updated": updated,
                 "path": html_path,
+                "archived": archived,
             }
         )
 
