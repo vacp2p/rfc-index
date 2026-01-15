@@ -10,7 +10,7 @@
 
 ## (Info, remove this section)
 
-This section contains meta info about writing RFCs.
+This section contains meta info about writing LIPs.
 This section (including its subsections) MUST be removed.
 
 [COSS](https://rfc.vac.dev/spec/1/) explains the Logos LIP process.
@@ -65,7 +65,7 @@ if available, point to existing implementations for reference.
 
 A standard track RFC in `stable` status MUST feature this section.
 A standard track RFC in `raw` or `draft` status SHOULD feature this section.
-Informational RFCs (in any state) may feature this section.
+Informational LIPs (in any state) may feature this section.
 If there are none, this section MUST explicitly state that fact.
 This section MAY contain additional relevant information,
 e.g. an explanation as to why there are no security consideration

@@ -977,7 +977,7 @@ Similar decapsulation steps are performed by subsequent nodes in the blending pa
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in RFCs to Indicate Requirement Levels
+- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in LIPs to Indicate Requirement Levels
 - [Key Types and Generation Specification](https://nomos-tech.notion.site/Key-Types-and-Generation-Specification-215261aa09df81088b8fd7c3089162e8)
   \- Defines the cryptographic key types used in the Blend protocol
 - [Proof of Quota Specification](https://nomos-tech.notion.site/Proof-of-Quota-Specification-215261aa09df81d88118ee22205cbafe)

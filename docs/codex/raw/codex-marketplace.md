@@ -780,7 +780,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in RFCs to Indicate Requirement Levels
+- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in LIPs to Indicate Requirement Levels
 - [Reed-Solomon algorithm](https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA) - Erasure coding algorithm used for data encoding
 - [CIDv1](https://github.com/multiformats/cid#cidv1) - Content Identifier specification
 - [multihash](https://github.com/multiformats/multihash) - Self-describing hashes

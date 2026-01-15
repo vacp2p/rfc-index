@@ -1,4 +1,4 @@
-# Codex RFCs
+# Codex LIPs
 
 Specifications related the Codex decentralised data storage platform.
 Visit [Codex specs](https://github.com/codex-storage/codex-spec)
@@ -6,7 +6,7 @@ to view the new Codex specifications currently under discussion.
 
 <div class="landing-hero">
   <div class="filter-row">
-    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search RFCs">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
     <div class="chips" id="status-chips">
       <span class="chip active" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>

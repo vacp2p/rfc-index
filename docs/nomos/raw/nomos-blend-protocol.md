@@ -918,7 +918,7 @@ bias (< 2^{-128} for N < 2^{128}), acceptable for expected network sizes (<
 
 ### Normative
 
-- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in RFCs
+- [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use in LIPs
   to Indicate Requirement Levels
 - [Service Declaration Protocol](https://www.notion.so/Service-Declaration-Protocol)
   \- Nomos SDP specification

@@ -1577,7 +1577,7 @@ assert voucher_nullifier == zkhash(
 ### Normative
 
 - [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt):
-  Key words for use in RFCs to Indicate Requirement Levels
+  Key words for use in LIPs to Indicate Requirement Levels
 - [NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS][common-crypto]:
   Common Cryptographic Components
 - [NOMOS-GAS-COST-DETERMINATION][gas-cost]:

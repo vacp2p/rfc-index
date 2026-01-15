@@ -1,4 +1,4 @@
-# Nomos RFCs
+# Nomos LIPs
 
 Nomos is building a secure, flexible, and
 scalable infrastructure for developers creating applications for the network state.
@@ -7,7 +7,7 @@ Published Specifications are currently available here,
 
 <div class="landing-hero">
   <div class="filter-row">
-    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search RFCs">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
     <div class="chips" id="status-chips">
       <span class="chip active" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>

@@ -392,18 +392,18 @@
 
   function updateResultsCount(count, total) {
     if (total === 0) {
-      resultsCount.textContent = "No RFCs found.";
+      resultsCount.textContent = "No LIPs found.";
       return;
     }
     if (dateFilter === "latest") {
-      resultsCount.textContent = `Showing the ${count} most recently updated RFCs.`;
+      resultsCount.textContent = `Showing the ${count} most recently updated LIPs.`;
       return;
     }
     if (dateFilter === "last90") {
-      resultsCount.textContent = `Showing ${count} RFCs updated in the last 90 days.`;
+      resultsCount.textContent = `Showing ${count} LIPs updated in the last 90 days.`;
       return;
     }
-    resultsCount.textContent = `Showing ${count} of ${total} RFCs`;
+    resultsCount.textContent = `Showing ${count} of ${total} LIPs`;
   }
 
   function updateChipGroup(containerId, dataAttr, counts, total) {
@@ -537,7 +537,7 @@
 
     if (!sorted.length) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td colspan="${headers.length}">No RFCs match your filters.</td>`;
+      tr.innerHTML = `<td colspan="${headers.length}">No LIPs match your filters.</td>`;
       tbody.appendChild(tr);
       return;
     }

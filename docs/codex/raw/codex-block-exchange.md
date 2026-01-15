@@ -1698,7 +1698,7 @@ Copyright and related rights waived via
 ### Normative
 
 - [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) - Key words for use
-  in RFCs to Indicate Requirement Levels
+  in LIPs to Indicate Requirement Levels
 - **libp2p**: <https://libp2p.io>
 - **Protocol Buffers**: <https://protobuf.dev>
 - **Multihash**: <https://multiformats.io/multihash/>

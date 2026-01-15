@@ -1,14 +1,14 @@
-# Messaging RFCs
+# Messaging LIPs
 
 Messaging builds a family of privacy-preserving,
 censorship-resistant communication protocols for web3 applications.
 
-Contributors can visit [Messaging RFCs](https://github.com/waku-org/specs)
+Contributors can visit [Messaging LIPs](https://github.com/waku-org/specs)
 for new Messaging specifications under discussion.
 
 <div class="landing-hero">
   <div class="filter-row">
-    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search RFCs">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
     <div class="chips" id="status-chips">
       <span class="chip active" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>
