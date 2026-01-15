@@ -1,5 +1,5 @@
 ---
-title: extended-kademlia-discovery
+title: extended-kad-disco
 name: Extended Kademlia Discovery
 status: raw
 category: Standards Track
@@ -49,8 +49,8 @@ We RECOMMEND an interval of once every `30` minutes.
 #### Use of `XPR` in `identify`
 
 Advertisers SHOULD include their `XPR`s as the `signedPeerRecord`
-in libp2p [`Identify` messages](https://github.com/libp2p/go-libp2p/blob/636d44e15abc7bfbd1da09cc9fef674249625ae6/p2p/protocol/identify/pb/identify.proto#L37).
-For more information, see the [`identify` protocol specification](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/identify/README.md).
+in libp2p `Identify` [messages](https://github.com/libp2p/specs/blob/master/identify/README.md#the-identify-message).
+For more information, see the `Identify` [protocol specification](https://github.com/libp2p/specs/blob/master/identify/README.md).
 
 ### Record Discovery
 
@@ -58,9 +58,9 @@ A node that wants to discover peers to connect to,
 also known as a _discoverer_,
 SHOULD perform the following random walk discovery procedure (`FIND_RANDOM`):
 
-1. A random value in the key space MUST be chosen (`R_KEY`).
+1. A random value in the `Kad-DHT` key space MUST be chosen (`R_KEY`).
 
-2. Start the `KAD-DHT` [peer routing](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#peer-routing) algorithm.
+2. Follow the `KAD-DHT` [peer routing](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#peer-routing) algorithm, with `R_KEY` as the target.
 
 3. For each peers in `closerPeers` from `FIND_NODE` response messages, a `GET_VALUE` message MUST be sent but already seen peers MUST be ignored.
 
@@ -71,9 +71,9 @@ and the `record` in the response MUST be verified, invalid records and `closerPe
 
 ### Privacy Enhancements
 
-To prevent network topology mapping,
-`KAD-DHT` nodes MUST NOT disclose connection information in [response messages](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#rpc-messages).
-The `connection` field MUST always be set to `NOT_CONNECTED`.
+To prevent network topology mapping and eclipse attacks,
+`KAD-DHT` nodes MUST NOT disclose connection type in [response messages](https://github.com/libp2p/specs/blob/master/kad-dht/README.md#rpc-messages).
+The `connection` field of every `Peer` MUST always be set to `NOT_CONNECTED`.
 
 ### Future Improvements
 
@@ -84,6 +84,7 @@ To make the system resilient to eclipse attacks, since a node `XPR` are stored a
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
+
 - [extended peer records specification](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/extensible-peer-records.md)
 - [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md)
 - [RFC002 Signed Envelope](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0002-signed-envelopes.md)
