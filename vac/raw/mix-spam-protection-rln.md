@@ -98,7 +98,7 @@ RLN is well-suited for spam and sybil protection in libp2p mix based mixnets due
 Each mix node has an RLN key pair consisting of a secret key `sk` and public key `pk` as defined in [RLN](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md).
 The secret key `sk` MUST be persisted securely by the mix node.
 
-A mixnet that is spam-protected requires all mix nodes in it to form a [RLN group](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#flow).
+A mixnet that is spam-protected requires all mix nodes in it to form an [RLN group](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#flow).
 
 - Mix nodes MUST be registered to the RLN group to be able to send or forward messages.
 - Registration MAY be moderated through a smart contract deployed on a blockchain.
@@ -130,7 +130,9 @@ When generating an RLN proof, the node MUST:
 
 **Intermediary and Exit nodes**:
 
-- MUST verify the incoming packet's RLN proof (see [Message validation](#message-validation))
+MUST do the following for every incoming mix packet:
+
+- verify the incoming packet's RLN proof (see [Message validation](#message-validation))
 - Process the sphinx packet according to the mix protocol
 - Generate a NEW RLN proof for the outgoing packet
 - Attach the new proof before forwarding to the next hop
@@ -144,6 +146,7 @@ Stale roots may cause legitimate proofs to be rejected.
 Using an old root can allow inference about the index of the user's `pk` in the membership tree hence compromising user privacy and breaking message unlinkability.
 
 In order to accommodate network delays, nodes MUST maintain a window of recent valid roots (see `acceptable_root_window_size` in [System Parameters](#system-parameters)).
+We recommend `5` for `acceptable_root_window_size`.
 
 ### Coordination Layer
 
@@ -155,8 +158,9 @@ Intermediary and exit nodes MUST participate by both subscribing to receive meta
 Sender-only nodes need not participate in this coordination layer as they only originate messages and do not forward or validate messages from others.
 
 The coordination layer MUST have its own spam and sybil protection mechanism in order to prevent from these attacks.
-
-[Waku-Relay](https://rfc.vac.dev/spec/11/) with RLN spam protection is a suitable coordination layer, as it provides both broadcast capabilities and its own spam/sybil protection mechanism.
+We recommend using [WAKU-RLN-RELAY](https://github.com/vacp2p/rfc-index/blob/72196d89c1084d625c22b1d5cb775ad7729ad577/waku/standards/core/17/rln-relay.md)
+In this case, the Messaging Metadata MUST be encoded as the Waku Message payload.
+We recommend using the [public Waku Network](https://github.com/vacp2p/rfc-index/blob/72196d89c1084d625c22b1d5cb775ad7729ad577/waku/standards/core/64/network.md) with a content topic agreed by all mix nodes.
 
 ### Message validation
 
@@ -170,7 +174,11 @@ If all checks pass, the node proceeds to [spam detection](#spam-detection-and-sl
 
 #### Spam detection and Slashing
 
-To enable local spam detection and slashing, mix nodes MUST store the [messaging metadata](#messaging-metadata) received via coordination layer in a local cache.
+To enable local spam detection and slashing, mix nodes MUST store the [messaging metadata](#messaging-metadata) in a local cache. This includes metadata from:
+
+- messages processed locally by the mix layer
+- messages received via the coordination layer
+
 The cache SHOULD be cleared for epoch data older than `max_epoch_gap`.
 To identify spam messages, the node checks whether a message with an identical `nullifier` is present in the epoch's cache.
 
