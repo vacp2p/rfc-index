@@ -1,0 +1,1499 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Bedrock v1.1 Mantle Specification - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html" class="active"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="bedrock-v11-mantle-specification"><a class="header" href="#bedrock-v11-mantle-specification">BEDROCK-V1.1-MANTLE-SPECIFICATION</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Bedrock v1.1 Mantle Specification</td></tr>
+<tr><td>Slug</td><td>bedrock-v1.1-mantle-specification</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Informational</td></tr>
+<tr><td>Editor</td><td>Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a></td></tr>
+<tr><td>Contributors</td><td>David Rusu <a href="mailto:davidrusu@status.im">davidrusu@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This document specifies the Mantle layer of Bedrock,
+the foundational execution layer that connects Nomos Services
+to provide functionality for Sovereign Rollups.
+Mantle serves as the system call interface of Bedrock,
+exposing a safe and constrained set of Operations
+to interact with lower-level Bedrock services,
+similar to syscalls in an operating system.</p>
+<p><strong>Keywords:</strong> Bedrock, Mantle, transactions, operations, ledger, UTXO,
+Note, NMO, fees, gas, Sovereign Rollups</p>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Terminology</th><th>Description</th></tr></thead><tbody>
+<tr><td>Mantle</td><td>The foundational execution layer of Bedrock that connects Nomos Services for Sovereign Rollups.</td></tr>
+<tr><td>Mantle Transaction</td><td>A transaction containing zero or more Operations and one Ledger Transaction.</td></tr>
+<tr><td>Operation</td><td>An action within a Mantle Transaction that interacts with Nomos Services.</td></tr>
+<tr><td>Ledger Transaction</td><td>A transaction component that manages asset transfers using a transparent UTXO model.</td></tr>
+<tr><td>Note</td><td>A UTXO-like asset unit composed of a value and a public key (owner).</td></tr>
+<tr><td>Locked Note</td><td>A Note serving as collateral for Service Declarations, locked until withdrawal.</td></tr>
+<tr><td>Channel</td><td>A virtual chain overlaying the Cryptarchia blockchain for Rollup updates.</td></tr>
+<tr><td>SDP</td><td>Service Declaration Protocol for node participation in Nomos Services.</td></tr>
+<tr><td>ZkSignature</td><td>Zero Knowledge Signature proving ownership without revealing the private key.</td></tr>
+<tr><td>NMO</td><td>The native token of the Nomos network.</td></tr>
+<tr><td>DA</td><td>Data Availability, ephemeral storage for blob data.</td></tr>
+</tbody></table>
+</div>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<h3 id="transactions"><a class="header" href="#transactions">Transactions</a></h3>
+<p>The features of Nomos are exposed through Mantle Transactions.
+Each transaction can contain zero or more <a href="#operations">Operations</a>
+and one <a href="#ledger-transactions">Ledger Transaction</a>.
+Mantle Transactions enable users to execute multiple Operations atomically.
+The Ledger Transaction serves two purposes,
+it can pay the transaction fee and allows users to issue transfers.</p>
+<h3 id="operations"><a class="header" href="#operations">Operations</a></h3>
+<p>Nomos features are exposed through Mantle Operations,
+which can be combined and executed together in a single Mantle Transaction.
+These Operations enable functions such as on-chain data posting,
+SDP interaction,
+and leader reward claims.</p>
+<h3 id="ledger"><a class="header" href="#ledger">Ledger</a></h3>
+<p>The Mantle Ledger enables asset transfers using a transparent UTXO model.
+While a Ledger Transaction can consume more NMO than it creates,
+the Mantle Transaction excess balance must exactly pay for the fees.</p>
+<h3 id="fees"><a class="header" href="#fees">Fees</a></h3>
+<p>Mantle Transaction fees are derived from a gas model.
+Nomos has three different Gas markets,
+accounting for permanent data storage,
+ephemeral data storage through DA,
+and execution costs.
+Permanent data storage is paid at the Mantle Transaction level,
+while ephemeral data storage is paid at the Blob Operation level.
+Each Operation and Ledger Transaction has an associated Execution Gas cost.
+Users can specify their Gas prices in their Mantle Transactions
+or in the Blob Operation to incentivize the network to include their transaction.</p>
+<div class="table-wrapper"><table><thead><tr><th>Gas Market</th><th>Charged On</th><th>Pricing Basis</th></tr></thead><tbody>
+<tr><td>Execution Gas</td><td>Ledger Transaction and Operations</td><td>Fixed per Operation</td></tr>
+<tr><td>Permanent Storage Gas</td><td>Signed Mantle Transaction</td><td>Proportional to encoded size</td></tr>
+<tr><td>DA Storage Gas</td><td>Blob Operation</td><td>Proportional to blob size</td></tr>
+</tbody></table>
+</div>
+<h2 id="mantle-transaction"><a class="header" href="#mantle-transaction">Mantle Transaction</a></h2>
+<p>Mantle Transactions form the core of Mantle,
+enabling users to combine multiple Operations to access different Nomos functions.
+Each transaction contains zero or more Operations plus a Ledger Transaction.
+The system executes all Operations atomically,
+while using the Mantle Transaction's excess balance
+(calculated as the difference between consumed and created value) as the fee payment.</p>
+<pre><code class="language-python">class MantleTx:
+    ops: list[Op]
+    ledger_tx: LedgerTx  # excess balance is used for fee payment
+    permanent_storage_gas_price: int  # 8 bytes
+    execution_gas_price: int  # 8 bytes
+
+class Op:
+    opcode: byte
+    payload: bytes
+
+def mantle_txhash(tx: MantleTx) -&gt; ZkHash:
+    tx_bytes = encode(tx)
+    h = Hasher()
+    h.update(FiniteField(b"NOMOS_MANTLE_TXHASH_V1", byte_order="little", modulus=p))
+    for i in range((len(tx_bytes)+30)//31):
+        chunk = tx_bytes[i*31:(i+1)*31]
+        fr = FiniteField(chunk, byte_order="little", modulus=p)
+        h.update(fr)
+    return h.digest()
+</code></pre>
+<p>The hash function used,
+as well as other cryptographic primitives like ZK proofs and signature schemes,
+are described in <a href="https://nomos-tech.notion.site/Common-Cryptographic-Components">NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS</a>.</p>
+<p>A Mantle Transaction MUST include all relevant signatures and proofs
+for each Operation,
+as well as for the Ledger Transaction.</p>
+<pre><code class="language-python">class SignedMantleTx:
+    tx: MantleTx
+    op_proofs: list[OpProof | None]  # each Op has at most 1 associated proof
+    ledger_tx_proof: ZkSignature  # ZK proof of ownership of the spent notes
+</code></pre>
+<p>Each proof (<code>op_proofs</code> and <code>ledger_tx_proof</code>) must be cryptographically bound
+to the <code>MantleTx</code> through the <code>mantle_txhash</code> to prevent replay attacks.
+This binding is achieved by including the <code>MantleTx</code> hash
+as a public input in every ZK proof.</p>
+<p>The transaction fee is a sum of two components:
+the multiplication of the total Execution Gas by the <code>execution_gas_price</code>,
+and the total size of the encoded signed Mantle Transaction
+multiplied by the <code>permanent_storage_gas_price</code>.
+If the Mantle Transaction contains Blob Operations,
+the fee also accounts for ephemeral data storage.
+In this case,
+the <code>blob_size</code> of each blob is multiplied by the <code>DA_storage_gas_price</code>
+stored in the Blob Operation
+and added to the previous amounts to determine the final fee.</p>
+<pre><code class="language-python">def gas_fees(signed_tx: SignedMantleTx) -&gt; int:
+    mantle_tx = signed_tx.tx
+    permanent_storage_fees = len(encode(signed_mantle_tx)) * mantle_tx.permanent_storage_gas_price
+    execution_fees = execution_gas(mantle_tx.ledger_tx) * mantle_tx.execution_gas_price
+    da_storage_fees = 0
+    for op in mantle_tx.ops:
+        if op.opcode == CHANNEL_BLOB:
+            blob = decode_blob(op.payload)
+            da_storage_fees += blob.da_storage_gas_price * blob.blob_size
+        # Compute the execution gas of this operation as defined
+        # in the gas cost determination specification.
+        execution_fees += execution_gas(op) * mantle_tx.execution_gas_price
+    return execution_fees + da_storage_fees + permanent_storage_fees
+</code></pre>
+<h3 id="mantletx-validation"><a class="header" href="#mantletx-validation">MantleTx Validation</a></h3>
+<p>Given:</p>
+<pre><code class="language-python">signed_tx = SignedMantleTx(
+    tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price, ledger_tx),
+    op_proofs,
+    ledger_tx_proof
+)
+</code></pre>
+<p>Mantle validators will ensure the following:</p>
+<ol>
+<li>The ledger transaction is valid according to <a href="#ledger-validation">Ledger Validation</a>.</li>
+</ol>
+<pre><code class="language-python">validate_ledger_tx(ledger_tx, ledger_tx_proof, mantle_txhash(tx))
+</code></pre>
+<ol>
+<li>There is a proof or a <code>None</code> value for each operation.</li>
+</ol>
+<pre><code class="language-python">assert len(op_proofs) == len(ops)
+</code></pre>
+<ol>
+<li>Each Operation is valid.</li>
+</ol>
+<pre><code class="language-python">for op, op_proof in zip(ops, op_proofs):
+    assert op.opcode in MANTLE_OPCODES
+    validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+
+def validate_mantle_op(txhash, opcode, payload, op_proof):
+    if opcode == INSCRIBE:
+        validate_inscribe(txhash, payload, op_proof)
+    # elif opcode == ...
+    # ...
+</code></pre>
+<ol>
+<li>The Mantle Transaction excess balance pays for the transaction fees.</li>
+</ol>
+<pre><code class="language-python">tx_fee = get_fees(signed_tx)
+assert tx_fee == get_transaction_balance(signed_tx)
+
+def get_transaction_balance(signed_tx):
+    balance = 0
+    for op in signed_tx.tx.ops:
+        if op.opcode == LEADER_CLAIM:
+            balance += get_leader_reward()
+    for inp in signed_tx.tx.ledger_tx.inputs:
+        balance += get_value_from_note_id(inp)
+    for out in signed_tx.tx.ledger_tx.outputs:
+        balance -= out.value
+</code></pre>
+<h3 id="mantletx-execution"><a class="header" href="#mantletx-execution">MantleTx Execution</a></h3>
+<p>Given:</p>
+<pre><code class="language-python">SignedMantleTx(
+    tx=MantleTx(ops, permanent_storage_gas_price, execution_gas_price, ledger_tx),
+    op_proofs,
+    ledger_tx_proof
+)
+</code></pre>
+<p>Mantle Validators execute the following:</p>
+<ol>
+<li>
+<p>Execute the Ledger Transaction as described in <a href="#ledger-validation">Ledger Validation</a>.</p>
+</li>
+<li>
+<p>Execute sequentially each Operation in <code>ops</code> according to its opcode.</p>
+</li>
+</ol>
+<h2 id="mantle-operations"><a class="header" href="#mantle-operations">Mantle Operations</a></h2>
+<h3 id="opcodes"><a class="header" href="#opcodes">Opcodes</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Operation</th><th>Opcode</th><th>Description</th></tr></thead><tbody>
+<tr><td>CHANNEL_INSCRIBE</td><td>0x00</td><td>Write a message permanently onto Mantle.</td></tr>
+<tr><td>CHANNEL_BLOB</td><td>0x01</td><td>Store a blob in DA.</td></tr>
+<tr><td>CHANNEL_SET_KEYS</td><td>0x02</td><td>Manage the list of keys accredited to post to a channel.</td></tr>
+<tr><td>RESERVED</td><td>0x03 - 0x1F</td><td></td></tr>
+<tr><td>SDP_DECLARE</td><td>0x20</td><td>Declare intention to participate as a node in a Nomos Service, locking funds as collateral.</td></tr>
+<tr><td>SDP_WITHDRAW</td><td>0x21</td><td>Withdraw participation from a Nomos Service, unlocking your funds in the process.</td></tr>
+<tr><td>SDP_ACTIVE</td><td>0x22</td><td>Signal that you are still an active participant of a Nomos Service.</td></tr>
+<tr><td>RESERVED</td><td>0x23 - 0x2F</td><td></td></tr>
+<tr><td>LEADER_CLAIM</td><td>0x30</td><td>Claim leader reward anonymously.</td></tr>
+<tr><td>RESERVED</td><td>0x31 - 0xFF</td><td></td></tr>
+</tbody></table>
+</div>
+<p>Full nodes will track and process every Operation.
+In contrast,
+nodes focused on a specific rollup will also track all Operations
+but will only fully process blobs that target their own rollup
+referenced by a channel ID.</p>
+<h2 id="channel-operations"><a class="header" href="#channel-operations">Channel Operations</a></h2>
+<p>Channels allow Rollups to post their updates on chain.
+Channels form virtual chains that overlay on top of the Cryptarchia blockchain.
+Clients and dependents of Rollups can watch the Rollups channels
+to learn the state of that Rollup.</p>
+<h3 id="channel-sequencing"><a class="header" href="#channel-sequencing">Channel Sequencing</a></h3>
+<p>These channels form virtual chains
+by having each message reference its parent message.
+The order of messages in these channels is enforced by the sequencer
+by building a hash chain of messages,
+i.e. new messages reference the previous messages through a parent hash.
+Given that Cryptarchia has long finality times,
+these message parent references allow the Rollup sequencers
+to continue to post new updates to channels without having to wait for finality.
+No matter how Cryptarchia forks and reorgs,
+the channel messages will eventually be re-included
+in a way that satisfies the virtual chain order.</p>
+<p>The first time a message is sent to an unclaimed channel,
+the message signing key that signs the initial message
+becomes both the administrator and an accredited key.
+The administrator can update the list of accredited keys
+who are authorized to write messages to that channel.</p>
+<p>Validators must keep the following state for processing channel Operations:</p>
+<pre><code class="language-python">channels: dict[ChannelId, ChannelState]
+
+class ChannelState:
+    tip: hash
+    accredited_keys: list[Ed25519PublicKey]
+</code></pre>
+<h3 id="channel_inscribe"><a class="header" href="#channel_inscribe">CHANNEL_INSCRIBE</a></h3>
+<p>Write a message to a channel
+with the message data being permanently stored on the Nomos blockchain.</p>
+<h4 id="channel_inscribe-payload"><a class="header" href="#channel_inscribe-payload">CHANNEL_INSCRIBE Payload</a></h4>
+<pre><code class="language-python">class Inscribe:
+    channel: ChannelID  # Channel being written to
+    inscription: bytes  # Message to be written on the blockchain
+    parent: hash  # Previous message in the channel
+    signer: Ed25519PublicKey  # Identity of message sender
+</code></pre>
+<h4 id="channel_inscribe-proof"><a class="header" href="#channel_inscribe-proof">CHANNEL_INSCRIBE Proof</a></h4>
+<pre><code class="language-text">Ed25519Signature
+</code></pre>
+<p>A signature from <code>signer</code> over the Mantle txhash containing this inscription.</p>
+<h4 id="channel_inscribe-execution-gas"><a class="header" href="#channel_inscribe-execution-gas">CHANNEL_INSCRIBE Execution Gas</a></h4>
+<p>Channel Inscribe Operations have a fixed Execution Gas cost of
+<code>EXECUTION_CHANNEL_INSCRIBE_GAS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="channel_inscribe-validation"><a class="header" href="#channel_inscribe-validation">CHANNEL_INSCRIBE Validation</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">txhash: zkhash
+msg: Inscribe
+sig: Ed25519Signature
+channels: dict[ChannelID, ChannelState]
+</code></pre>
+<p>Validate:</p>
+<pre><code class="language-python"># Ensure the msg signer signature
+assert Ed25519_verify(msg.signer, txhash, sig)
+
+if msg.channel in channels:
+    chan = channels[msg.channel]
+    # Ensure signer is authorized to write to the channel
+    assert msg.signer is in chan.accredited_keys
+    # Ensure message is continuing the channel sequence
+    assert msg.parent == chan.tip
+else:
+    # Channel will be created automatically upon execution
+    # Ensure that this message is the genesis message (parent==ZERO)
+    assert msg.parent == ZERO
+</code></pre>
+<h4 id="channel_inscribe-execution"><a class="header" href="#channel_inscribe-execution">CHANNEL_INSCRIBE Execution</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">msg: Inscribe
+sig: Ed25519Signature
+channels: dict[ChannelId, ChannelState]
+</code></pre>
+<p>Execute:</p>
+<ol>
+<li>If the channel does not exist, create it just-in-time.</li>
+</ol>
+<pre><code class="language-python">if msg.channel is not in channels:
+    channels[msg.channel] = ChannelState(
+        tip=ZERO,
+        accredited_keys=[msg.signer]
+    )
+</code></pre>
+<ol>
+<li>Update the channel tip.</li>
+</ol>
+<pre><code class="language-python">chan = channels[msg.channel]
+chan.tip = hash(encode(msg))
+</code></pre>
+<h4 id="channel_inscribe-example"><a class="header" href="#channel_inscribe-example">CHANNEL_INSCRIBE Example</a></h4>
+<p>Sending a greeting to all followers of Sovereign Rollup Earth.</p>
+<pre><code class="language-python"># Build the inscription
+greeting = Inscription(
+    channel=CHANNEL_EARTH,
+    inscription=b"Live long and prosper",
+    parent=ZERO,
+    signer=spock_pk
+)
+
+# Wrap it in a transaction
+tx = MantleTx(
+    ops=[Op(opcode=INSCRIBE, payload=encode(greeting))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(inputs=[&lt;spocks_note_id&gt;], outputs=[&lt;change_note&gt;]),
+)
+
+# Sign the transaction
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[Ed25519_sign(mantle_txhash(tx), spock_sk)],
+    ledger_tx_proof=tx.ledger_tx.prove(spock_sk)
+)
+
+# Send the transaction to the mempool
+mempool.push(signed_tx)
+</code></pre>
+<h3 id="channel_blob"><a class="header" href="#channel_blob">CHANNEL_BLOB</a></h3>
+<p>Write a message to a channel
+where the message data is stored temporarily in NomosDA.
+Data stored in NomosDA will eventually expire
+but its commitment (BlobID) remains permanently on chain.
+Anyone with access to the original data
+can confirm that it matches this commitment.</p>
+<h4 id="channel_blob-payload"><a class="header" href="#channel_blob-payload">CHANNEL_BLOB Payload</a></h4>
+<pre><code class="language-python">class Blob:
+    channel: ChannelID  # Channel this message is written to
+    session: SessionNumber  # Session during which dispersal happened
+    blob: BlobID  # Blob commitment
+    blob_size: int  # Size of blob before encoding in bytes
+    da_storage_gas_price: int  # 8 bytes
+    parent: hash  # Previous message written to the channel
+    signer: Ed25519PublicKey  # Identity of the message sender
+</code></pre>
+<p><code>blob_size</code> is reported here to ensure the DA Storage fee
+of this transaction can still be calculated after the Blob is expired from NomosDA.</p>
+<h4 id="channel_blob-proof"><a class="header" href="#channel_blob-proof">CHANNEL_BLOB Proof</a></h4>
+<pre><code class="language-text">Ed25519Signature
+</code></pre>
+<p>A signature from <code>signer</code> over the Mantle txhash containing this blob.</p>
+<h4 id="channel_blob-execution-gas"><a class="header" href="#channel_blob-execution-gas">CHANNEL_BLOB Execution Gas</a></h4>
+<p>The Execution Gas consumed by a Blob Operation
+is proportional to the size of the sample verified by the nodes.
+The bigger the sample, the harder it is to verify it.
+The size of this sample is:</p>
+<pre><code class="language-python">NUMBER_OF_DA_COLUMNS = 1024  # before RS encoding
+ELEMENT_SIZE = 31  # in bytes
+SAMPLE_SIZE = blob_size / (NUMBER_OF_DA_COLUMNS * ELEMENT_SIZE)
+</code></pre>
+<p>Channel Blob Operations have an Execution Gas cost proportional to the blob size:</p>
+<pre><code class="language-text">EXECUTION_CHANNEL_BLOB_BASE_GAS + EXECUTION_CHANNEL_BLOB_SIZED_GAS * SAMPLE_SIZE
+</code></pre>
+<p>See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="channel_blob-da-storage-gas"><a class="header" href="#channel_blob-da-storage-gas">CHANNEL_BLOB DA Storage Gas</a></h4>
+<p>Channel Blob Operations have a DA Storage Gas consumption proportional to Blob size:</p>
+<pre><code class="language-python">CHANNEL_BLOB_DA_STORAGE_GAS = blob_size * da_storage_gas_price
+</code></pre>
+<h4 id="channel_blob-validation"><a class="header" href="#channel_blob-validation">CHANNEL_BLOB Validation</a></h4>
+<p>Validators will perform DA sampling to ensure availability.
+From these samples,
+the Blob size can be determined and checked against
+what is written in the Blob payload.</p>
+<p>Given:</p>
+<pre><code class="language-python">txhash: zkhash
+msg: Blob
+sig: Ed25519Signature
+block_slot: int
+channels: dict[ChannelID, ChannelState]
+</code></pre>
+<p>Validate:</p>
+<pre><code class="language-python"># Verify the msg signature
+assert Ed25519_verify(msg.signer, txhash, sig)
+
+if msg.channel in channels:
+    chan = channels[msg.channel]
+    # Ensure signer is authorized to write to the channel
+    assert msg.signer is in chan.accredited_keys
+    # Ensure message is continuing the channel sequence
+    assert msg.parent == chan.tip
+else:
+    # Channel will be created automatically upon execution
+    # Ensure that this message is the Genesis message
+    assert msg.parent == ZERO
+
+if NomosDA.should_validate_block_availability(block_slot):
+    # Validate Blobs that are still held in DA
+    assert NomosDA.validate_availability(msg.session, msg.blob)
+    # Derive Blob size from DA sample
+    actual_blob_size = NomosDA.derive_blob_size(msg.blob)
+    assert msg.blob_size == actual_blob_size
+</code></pre>
+<h4 id="channel_blob-execution"><a class="header" href="#channel_blob-execution">CHANNEL_BLOB Execution</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">msg: Blob
+sig: Ed25519Signature
+channels: dict[ChannelId, ChannelState]
+</code></pre>
+<p>Execute:</p>
+<pre><code class="language-python"># If the channel does not exist, create it JIT
+if msg.channel is not in channels:
+    channels[msg.channel] = ChannelState(
+        tip=ZERO,
+        accredited_keys=[msg.signer]
+    )
+
+chan = channels[msg.channel]
+chan.tip = hash(encode(msg))
+</code></pre>
+<h4 id="channel_blob-example"><a class="header" href="#channel_blob-example">CHANNEL_BLOB Example</a></h4>
+<p>Suppose a sequencer for Rollup A wants to post a Rollup update.
+They would first build the <code>Blob</code> payload:</p>
+<pre><code class="language-python"># Given a rollup update and the previous txhash
+rollup_update: bytes = encode([tx1, tx2, tx3])
+last_channel_msg_hash: hash
+
+# The sequencer encodes the rollup update and builds the blob payload
+blob_id, blob_size = NomosDA.upload_blob(rollup_update)
+
+msg = Blob(
+    channel=ROLLUP_A,
+    current_session=current_session,
+    blob=blob_id,
+    blob_size=blob_size,
+    da_storage_gas_price=10,
+    parent=last_channel_msg_hash,
+    signer=sequencer_pk,
+)
+
+tx = MantleTx(
+    ops=[Op(opcode=BLOB, payload=encode(msg))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(inputs=[sequencer_funds], outputs=[&lt;change_note&gt;])
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[sequencer_sk.sign(mantle_txhash(tx))],
+    ledger_tx_proof=[tx.ledger_tx.prove(sequencer_sk)]
+)
+</code></pre>
+<p>The Signed Mantle Transaction is then sent to DA nodes for dispersal
+and added to the mempool for inclusion in a block
+(see <a href="https://nomos-tech.notion.site/NomosDA-Dispersal">NOMOS-DA-DISPERSAL</a>).</p>
+<h3 id="channel_set_keys"><a class="header" href="#channel_set_keys">CHANNEL_SET_KEYS</a></h3>
+<p>Overwrite the list of accredited keys to post Blobs to a channel.</p>
+<h4 id="channel_set_keys-payload"><a class="header" href="#channel_set_keys-payload">CHANNEL_SET_KEYS Payload</a></h4>
+<pre><code class="language-python">class ChannelSetKeys:
+    channel: ChannelID
+    keys: list[Ed25519PublicKey]
+</code></pre>
+<h4 id="channel_set_keys-proof"><a class="header" href="#channel_set_keys-proof">CHANNEL_SET_KEYS Proof</a></h4>
+<pre><code class="language-python">Ed25519Signature  # signature from `administrator` over the Mantle tx hash.
+</code></pre>
+<h4 id="channel_set_keys-execution-gas"><a class="header" href="#channel_set_keys-execution-gas">CHANNEL_SET_KEYS Execution Gas</a></h4>
+<p>Channel Set Keys Operations have a fixed Execution Gas cost of
+<code>EXECUTION_CHANNEL_SET_KEYS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="channel_set_keys-validation"><a class="header" href="#channel_set_keys-validation">CHANNEL_SET_KEYS Validation</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">txhash: zkhash
+setkeys: ChannelSetKeys
+sig: Ed25519Signature
+channels: dict[ChannelID, ChannelState]
+</code></pre>
+<p>Validate:</p>
+<pre><code class="language-python"># Ensure at least one key
+assert len(setkeys.keys) &gt; 0
+
+if setkeys.channel in channels:
+    chan = channels[setkeys.channel]
+    admin_pk = chan.accredited_keys[0]
+    assert Ed25519_verify(txhash, admin_pk, sig)
+</code></pre>
+<p>The first key of the list is the administration key.</p>
+<h4 id="channel_set_keys-execution"><a class="header" href="#channel_set_keys-execution">CHANNEL_SET_KEYS Execution</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">setkeys: ChannelSetKeys
+channels: dict[ChannelID, ChannelState]
+</code></pre>
+<p>Execute:</p>
+<pre><code class="language-python"># Create the channel if it does not exist
+if setkeys.channel not in channels:
+    channels[setkeys.channel] = ChannelState(
+        tip=CHANNEL_GENESIS,
+        accredited_keys=[],
+    )
+
+# Update the set of accredited keys
+channels[setkeys.channel].accredited_keys = setkeys.keys
+</code></pre>
+<h4 id="channel_set_keys-example"><a class="header" href="#channel_set_keys-example">CHANNEL_SET_KEYS Example</a></h4>
+<p>Suppose the administrator of Rollup A wants to add a key
+to the list of accredited keys:</p>
+<pre><code class="language-python"># Given a key to add
+sequencer_pk: Ed25519PublicKey
+
+# The administrator encodes the update and builds the payload
+setkeys = ChannelSetKeys(
+    channel=ROLLUP_A,
+    keys=[admin_pk, sequencer_pk],
+)
+
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_SET_KEYS, payload=encode(setkeys))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(inputs=[admin_funds], outputs=[&lt;change note&gt;])
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[Ed25519_sign(mantle_txhash(tx), admin_sk)],
+    ledger_tx_proof=tx.ledger_tx.prove(admin_sk),
+)
+</code></pre>
+<h2 id="service-declaration-protocol-sdp-operations"><a class="header" href="#service-declaration-protocol-sdp-operations">Service Declaration Protocol (SDP) Operations</a></h2>
+<p>These Operations implement the <a href="https://nomos-tech.notion.site/Service-Declaration-Protocol">NOMOS-SERVICE-DECLARATION-PROTOCOL</a>.</p>
+<p>Validators must keep the following state when implementing SDP Operations:</p>
+<pre><code class="language-python">locked_notes: dict[NoteID, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+
+class LockedNote:
+    declarations: set[DeclarationID]
+    locked_until: BlockNumber
+</code></pre>
+<h3 id="common-sdp-structures"><a class="header" href="#common-sdp-structures">Common SDP Structures</a></h3>
+<pre><code class="language-python">class ServiceType(Enum):
+    BN="BN"  # Blend Network
+    DA="DA"  # Data Availability
+
+class Locator(str):
+    def validate(self):
+        assert len(self) &lt;= 329
+        assert validate_multiaddr(self)
+
+class MinStake:
+    stake_threshold: int  # stake value
+    timestamp: int  # block number
+
+class ServiceParameters:
+    lock_period: int  # number of blocks
+    inactivity_period: int  # number of blocks
+    retention_period: int  # number of blocks
+    timestamp: int  # block number
+
+class DeclarationInfo:
+    service: ServiceType
+    locators: list[Locator]
+    provider_id: Ed25519PublicKey
+    zk_id: ZkPublicKey
+    locked_note_id: NoteId
+    created: BlockNumber
+    active: BlockNumber
+    withdrawn: BlockNumber
+    # SDP ops updating a declaration must use monotonically increasing nonces
+    nonce: int
+</code></pre>
+<h3 id="sdp_declare"><a class="header" href="#sdp_declare">SDP_DECLARE</a></h3>
+<p>The service registration follows the definition given in
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#declaration-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Declaration Message</a>.</p>
+<h4 id="sdp_declare-payload"><a class="header" href="#sdp_declare-payload">SDP_DECLARE Payload</a></h4>
+<pre><code class="language-python">class DeclarationMessage:
+    service_type: ServiceType
+    locators: list[Locator]
+    provider_id: Ed25519PublicKey
+    zk_id: ZkPublicKey
+    locked_note_id: NoteId
+</code></pre>
+<p>Locked notes are introduced in <a href="#locked-notes">Locked notes</a> and serve as Service collaterals.
+They cannot be spent before the owner withdraws its participation
+from the declared service(s).</p>
+<h4 id="sdp_declare-proof"><a class="header" href="#sdp_declare-proof">SDP_DECLARE Proof</a></h4>
+<pre><code class="language-python">class DeclarationProof:
+    zk_sig: ZkSignature  # signature proving ownership over locked note and zk_id
+    provider_sig: Ed25519Signature  # signature proving ownership of provider key
+</code></pre>
+<p>See <a href="https://nomos-tech.notion.site/Common-Cryptographic-Components">NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS</a> for the Zero Knowledge Signature Scheme (ZkSignature).</p>
+<h4 id="sdp_declare-execution-gas"><a class="header" href="#sdp_declare-execution-gas">SDP_DECLARE Execution Gas</a></h4>
+<p>SDP Declare Operations have a fixed Execution Gas cost of
+<code>EXECUTION_SDP_DECLARE_GAS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="sdp_declare-validation"><a class="header" href="#sdp_declare-validation">SDP_DECLARE Validation</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">txhash: zkhash  # the txhash of the transaction being validated
+declaration: DeclarationMessage  # the declaration being validated
+proof: DeclarationProof
+min_stake: MinStake  # the (global) minimum stake setting
+ledger: Ledger  # the set of unspent notes
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[NoteId, DeclarationInfo]
+</code></pre>
+<p>Validate:</p>
+<p>The declaration is verified according to
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#declaration-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Declare</a>.</p>
+<ol>
+<li>Ensure ownership over the locked note, <code>zk_id</code> and <code>provider_id</code>.</li>
+</ol>
+<pre><code class="language-python">assert ZkSignature_verify(
+    txhash,
+    proof.zk_sig,
+    [note.public_key, declaration.zk_id]
+)
+assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
+</code></pre>
+<ol>
+<li>Ensure declaration does not already exist.</li>
+</ol>
+<pre><code class="language-python">assert declaration_id(declaration) not in declarations
+</code></pre>
+<ol>
+<li>Ensure it has no more than 8 locators.</li>
+</ol>
+<pre><code class="language-python">assert len(declaration.locators) &lt;= 8
+</code></pre>
+<ol>
+<li>Ensure locked note exists and value of locked note is sufficient for joining the service.</li>
+</ol>
+<pre><code class="language-python">assert ledger.is_unspent(declaration.locked_note_id)
+note = ledger.get_note(declaration.locked_note_id)
+assert note.value &gt;= min_stake.stake_threshold
+</code></pre>
+<ol>
+<li>Ensure the note has not already been locked for this service.</li>
+</ol>
+<pre><code class="language-python">if declaration.locked_note in locked_notes:
+    locked_note = locked_notes[declaration.locked_note]
+    services = [declarations[declare_id] for declare_id in locked_note.declarations]
+    assert declaration.service_type not in services
+</code></pre>
+<h4 id="sdp_declare-execution"><a class="header" href="#sdp_declare-execution">SDP_DECLARE Execution</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">declaration: DeclarationMessage  # the declaration being executed
+service_parameters: dict[ServiceType, ServiceParameters]
+current_block_height: int
+locked_notes: dict[NoteId, LockedNote]
+</code></pre>
+<p>Execute:</p>
+<ol>
+<li>Create the locked note state if it doesn't already exist.</li>
+</ol>
+<pre><code class="language-python">if declaration.locked_note not in locked_notes:
+    locked_notes[declaration.locked_note_id] = \
+        LockedNote(declarations=set(), locked_until=0)
+
+locked_note = locked_notes[declaration.locked_note_id]
+</code></pre>
+<ol>
+<li>Update the locked notes timeout using this services lock period.</li>
+</ol>
+<pre><code class="language-python">lock_period = service_parameters[declaration.service_type].lock_period
+service_lock = current_block_height + lock_period
+locked_note.locked_until = max(service_lock, locked_note.locked_until)
+</code></pre>
+<ol>
+<li>Add this declaration to the locked note.</li>
+</ol>
+<pre><code class="language-python">declare_id = declaration_id(declaration)
+locked_note.declarations.add(declare_id)
+</code></pre>
+<ol>
+<li>Store the declaration as explained in
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#declaration-storage">NOMOS-SERVICE-DECLARATION-PROTOCOL - Declaration Storage</a>.</li>
+</ol>
+<pre><code class="language-python">declarations[declare_id] = DeclarationInfo(
+    service: declaration.service,
+    locators: declaration.locators,
+    provider_id: declaration.provider_id,
+    zk_id: declaration.zk_id,
+    locked_note_id: declaration.locked_note_id,
+    created=current_block_height,
+    active=current_block_height,
+    withdrawn=0,
+    nonce=0
+)
+</code></pre>
+<p>Notice that locked notes <strong>cannot</strong> refresh their keys
+to update their slot secrets required for Proof of Leadership participation
+(see <a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification#protection-against-adaptive-adversaries">NOMOS-PROOF-OF-LEADERSHIP - Protection Against Adaptive Adversaries</a>).
+It's RECOMMENDED to refresh the note before locking it,
+which guarantees a key life of more than a year.
+After this period,
+the note cannot be used in PoL until its private key is refreshed
+(see leader key setup).</p>
+<h4 id="sdp_declare-example"><a class="header" href="#sdp_declare-example">SDP_DECLARE Example</a></h4>
+<pre><code class="language-python"># Assume `alice_note` is in the ledger:
+alice_note = Utxo(
+    txhash=0x2948904F2F0F479B8F8197694B30184B0D2ED1C1CD2A1EC0FB85D299A,
+    output_number=3,
+    note=Note(value=500, public_key=alice_pk_1),
+)
+
+# Alice wishes to lock it to join the DA network
+declaration = DeclarationMessage(
+    service_type=ServiceType.DA,
+    locators=["/ip4/203.0.113.10/tcp/4001"],
+    provider_id=alice_provider_pk,
+    zk_id=alice_pk_2,
+    locked_note_id=alice_note.id()
+)
+
+tx = MantleTx(
+    ops=[Op(opcode=SDP_DECLARE, payload=encode(declaration))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(inputs=[fee_note_id], outputs=[]),
+)
+
+txhash = mantle_txhash(tx)
+
+declaration_proof = DeclarationProof(
+    # proof of ownership of the staked note and zk_id
+    zk_sig=ZkSignature([alice_sk_1, alice_sk_2], txhash),
+    # proof of ownership of the provider id
+    provider_sig=Ed25519Signature(alice_provider_sk, txhash),
+)
+
+SignedMantleTx(
+    tx=tx,
+    ledger_tx_proof=LedgerTxProof,
+    op_proofs=[declaration_proof],
+    ledger_proof=prove_ledger_tx(tx.ledger_tx, [alice_sk_1]),
+)
+</code></pre>
+<h3 id="sdp_withdraw"><a class="header" href="#sdp_withdraw">SDP_WITHDRAW</a></h3>
+<p>The service withdrawal follows the definition given in
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#withdraw-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Withdraw Message</a>.</p>
+<h4 id="sdp_withdraw-payload"><a class="header" href="#sdp_withdraw-payload">SDP_WITHDRAW Payload</a></h4>
+<pre><code class="language-python">class WithdrawMessage:
+    declaration: DeclarationID
+    locked_note_id: NoteId
+    nonce: int
+</code></pre>
+<h4 id="sdp_withdraw-proof"><a class="header" href="#sdp_withdraw-proof">SDP_WITHDRAW Proof</a></h4>
+<p>A signature from the <code>zk_id</code> and the locked note <code>pk</code> attached to the declaration
+is required for withdrawing from a service,
+(see <a href="https://nomos-tech.notion.site/Common-Cryptographic-Components">NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS</a>).</p>
+<pre><code class="language-text">ZkSignature
+</code></pre>
+<h4 id="sdp_withdraw-execution-gas"><a class="header" href="#sdp_withdraw-execution-gas">SDP_WITHDRAW Execution Gas</a></h4>
+<p>SDP Withdraw Operations have a fixed Execution Gas cost of
+<code>EXECUTION_SDP_WITHDRAW_GAS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="sdp_withdraw-validation"><a class="header" href="#sdp_withdraw-validation">SDP_WITHDRAW Validation</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">txhash: zkhash  # Mantle transaction hash of the tx containing this operation
+withdraw: WithdrawMessage
+signature: ZkSignature
+block_height: int  # block height of the current block
+ledger: Ledger
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p>Validate:</p>
+<ol>
+<li>Ensure that the locked note exists, is locked and bound to this declaration.</li>
+</ol>
+<pre><code class="language-python">assert ledger.is_unspent(withdraw.locked_note_id)
+assert withdraw.locked_note_id in locked_notes
+locked_note = locked_notes[withdraw.locked_note_id]
+assert withdraw.declaration in locked_note.declarations
+</code></pre>
+<ol>
+<li>Ensure that the locked note has expired.</li>
+</ol>
+<pre><code class="language-python">assert locked_note.locked_until &lt;= block_height
+</code></pre>
+<ol>
+<li>Validate SDP withdrawal according to
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#withdraw-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Withdraw</a>.</li>
+</ol>
+<p>a. Ensure declaration exists.</p>
+<pre><code class="language-python">assert withdraw.declaration in declarations
+declare_info = declarations[withdraw.declaration]
+</code></pre>
+<p>b. Ensure locked note <code>pk</code> and <code>zk_id</code> attached to this declaration authorized this Operation.</p>
+<pre><code class="language-python">locked_note = ledger[withdraw.locked_note_id]
+assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
+</code></pre>
+<p>c. Ensure the declaration has not already been withdrawn.</p>
+<pre><code class="language-python">assert declare_info.withdrawn == 0
+</code></pre>
+<p>d. Ensure that the nonce is greater than the previous one.</p>
+<pre><code class="language-python">assert withdraw.nonce &gt; declare_info.nonce
+</code></pre>
+<h4 id="sdp_withdraw-execution"><a class="header" href="#sdp_withdraw-execution">SDP_WITHDRAW Execution</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">withdraw: WithdrawMessage
+signature: ZkSignature
+block_height: int  # block height of the current block
+ledger: Ledger
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p>Execute:</p>
+<p>Executes the withdrawal protocol
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#withdraw-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Withdraw</a>.</p>
+<ol>
+<li>Update declaration info with nonce and withdrawn timestamp.</li>
+</ol>
+<pre><code class="language-python">declare_info = declarations[withdraw.declaration]
+declare_info.nonce = withdraw.nonce
+declare_info.withdrawn = block_height
+</code></pre>
+<ol>
+<li>Remove this declaration from the locked note.</li>
+</ol>
+<pre><code class="language-python">locked_note = locked_notes[withdraw.locked_note_id]
+locked_note.declarations.remove(withdraw.declaration)
+</code></pre>
+<ol>
+<li>Remove the locked note if it is no longer bound to any declarations.</li>
+</ol>
+<pre><code class="language-python">if len(locked_note.declarations) == 0:
+    del locked_notes[withdraw.locked_note_id]
+</code></pre>
+<h4 id="sdp_withdraw-example"><a class="header" href="#sdp_withdraw-example">SDP_WITHDRAW Example</a></h4>
+<pre><code class="language-python">withdraw = Withdraw(
+    declaration=alice_declaration_id,
+    locked_note_id=alices_locked_note_id,
+    nonce=1579532
+)
+
+tx = MantleTx(
+    ops=[Op(opcode=SDP_WITHDRAW, payload=encode(withdraw))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(
+        inputs=[alices_locked_note_id],
+        outputs=[Note(100, alice_note_pk)]
+    ),
+)
+
+SignedMantleTx(
+    tx=tx,
+    ledger_tx_proof=tx.ledger_tx.prove(alice_sk),
+    # proof ownership of the withdrawn note and zk id
+    op_proofs=[ZkSignature_sign([alice_note_sk, alice_sk], mantle_txhash(tx))]
+)
+</code></pre>
+<h3 id="sdp_active"><a class="header" href="#sdp_active">SDP_ACTIVE</a></h3>
+<p>The service active action follows the definition given in
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#active-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Active Message</a>.</p>
+<h4 id="sdp_active-payload"><a class="header" href="#sdp_active-payload">SDP_ACTIVE Payload</a></h4>
+<pre><code class="language-python">class Active:
+    declaration: DeclarationID
+    nonce: int
+    metadata: bytes  # a service-specific node activeness metadata
+</code></pre>
+<h4 id="sdp_active-proof"><a class="header" href="#sdp_active-proof">SDP_ACTIVE Proof</a></h4>
+<pre><code class="language-text">ZkSignature
+</code></pre>
+<p>Signature from the <code>zk_id</code> attached to the declaration over the transaction hash.</p>
+<h4 id="sdp_active-execution-gas"><a class="header" href="#sdp_active-execution-gas">SDP_ACTIVE Execution Gas</a></h4>
+<p>SDP Active Operations have a fixed Execution Gas cost of
+<code>EXECUTION_SDP_ACTIVE_GAS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="sdp_active-validation"><a class="header" href="#sdp_active-validation">SDP_ACTIVE Validation</a></h4>
+<p>Given:</p>
+<pre><code class="language-python">txhash: zkhash  # Mantle transaction hash of the tx containing this operation
+active: Active
+signature: ZkSignature
+declarations: dict[DeclarationId, DeclarationInfo]
+</code></pre>
+<p>Validate:</p>
+<pre><code class="language-python">assert active.declaration in declarations
+declaration_info = declarations[active.declaration]
+assert active.nonce &gt; declaration_info.nonce
+assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
+</code></pre>
+<h4 id="sdp_active-execution"><a class="header" href="#sdp_active-execution">SDP_ACTIVE Execution</a></h4>
+<p>Executes the active protocol
+<a href="https://nomos-tech.notion.site/Service-Declaration-Protocol#active-message">NOMOS-SERVICE-DECLARATION-PROTOCOL - Active</a>.
+The activation,
+i.e. setting the <code>declaration.active</code>,
+is handled by the service-specific logic.</p>
+<h4 id="sdp_active-example"><a class="header" href="#sdp_active-example">SDP_ACTIVE Example</a></h4>
+<pre><code class="language-python">active = Active(
+    declaration=alice_declaration_id,
+    nonce=1579532,
+    metadata=b"Look, I am still doing my job"
+)
+
+tx = MantleTx(
+    ops=[Op(opcode=SDP_ACTIVE, payload=encode(active))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(inputs=[fee_note_id], outputs=[]),
+)
+
+txhash = mantle_txhash(tx)
+
+SignedMantleTx(
+    tx=tx,
+    ledger_tx_proof=tx.ledger_tx.prove(fee_note_sk),
+    op_proofs=[Ed25519_sign(txhash, validator_sk)]
+)
+</code></pre>
+<h2 id="leader-operations"><a class="header" href="#leader-operations">Leader Operations</a></h2>
+<h3 id="leader_claim"><a class="header" href="#leader_claim">LEADER_CLAIM</a></h3>
+<p>This Operation claims the leader's block reward anonymously.</p>
+<h4 id="leader_claim-payload"><a class="header" href="#leader_claim-payload">LEADER_CLAIM Payload</a></h4>
+<pre><code class="language-python">class ClaimRequest:
+    rewards_root: zkhash  # Merkle root used in the proof for voucher membership
+    voucher_nf: zkhash
+</code></pre>
+<h4 id="leader_claim-proof"><a class="header" href="#leader_claim-proof">LEADER_CLAIM Proof</a></h4>
+<p>The provider proves that they have won a proof of Leadership
+before the start of the current epoch,
+i.e., their reward voucher is indeed in the voucher set.</p>
+<h4 id="leader_claim-execution-gas"><a class="header" href="#leader_claim-execution-gas">LEADER_CLAIM Execution Gas</a></h4>
+<p>Leader Claim Operations have a fixed Execution Gas cost of
+<code>EXECUTION_LEADER_CLAIM_GAS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="leader_claim-validation"><a class="header" href="#leader_claim-validation">LEADER_CLAIM Validation</a></h4>
+<pre><code class="language-python"># Given
+mantle_txhash: zkhash
+claim: ClaimRequest
+last_voucher_root: zkhash  # The last root of the voucher Merkle tree at the start of the epoch
+voucher_nullifier_set: set[zkhash]
+proof: ProofOfClaim
+
+# Validate
+assert claim.voucher_nf not in voucher_nullifier_set
+assert claim.rewards_root == last_voucher_root
+validate_proof(claim, proof, mantle_txhash)
+</code></pre>
+<h4 id="leader_claim-execution"><a class="header" href="#leader_claim-execution">LEADER_CLAIM Execution</a></h4>
+<ol>
+<li>
+<p>Add <code>claim.voucher_nf</code> to the <code>voucher_nullifier_set</code>.</p>
+</li>
+<li>
+<p>Increase the balance of the Mantle Transaction by the leader reward amount
+according to <a href="https://nomos-tech.notion.site/Anonymous-Leaders-Reward-Protocol">NOMOS-ANONYMOUS-LEADERS-REWARD-PROTOCOL - Leaders Reward</a>.</p>
+</li>
+<li>
+<p>Reduce the leader's reward <code>leaders_rewards</code> value by the same amount
+(without ZK proof).</p>
+</li>
+</ol>
+<h4 id="leader_claim-example"><a class="header" href="#leader_claim-example">LEADER_CLAIM Example</a></h4>
+<pre><code class="language-python">secret_voucher = 0xDEADBEAF
+reward_voucher = leader_claim_voucher(secret_voucher)
+voucher_nullifier = leader_claim_nullifier(secret_voucher)
+
+claim = ClaimRequest(
+    rewards_root=REWARDS_MERKLE_TREE.root(),
+    voucher_nf=voucher_nullifier,
+)
+
+tx = MantleTx(
+    ops=[Op(opcode=LEADER_CLAIM, payload=encode(claim))],
+    permanent_storage_gas_price=150,
+    execution_gas_price=70,
+    ledger_tx=LedgerTx(inputs=[&lt;fee_note&gt;], outputs=[&lt;change_note&gt;]),
+)
+
+claim_proof = claim.prove(
+    secret_voucher,
+    REWARDS_MERKLE_TREE.path(leaf=reward_voucher),
+    mantle_txhash(tx)
+)
+
+SignedMantleTx(
+    tx=tx,
+    ledger_tx_proof=tx.ledger_tx.prove(fee_note_sk),
+    op_proofs=[claim_proof]
+)
+</code></pre>
+<h2 id="mantle-ledger"><a class="header" href="#mantle-ledger">Mantle Ledger</a></h2>
+<h3 id="notes"><a class="header" href="#notes">Notes</a></h3>
+<p>Notes are composed of two fields representing their value and their owner:</p>
+<pre><code class="language-python">class Note:
+    value: int  # 8 bytes
+    public_key: ZkPublicKey  # 32 bytes
+</code></pre>
+<h3 id="note-id"><a class="header" href="#note-id">Note Id</a></h3>
+<p>Any note can be uniquely identified
+by the Ledger Transaction that created it and its output number:
+<code>(txhash, output_number)</code>.
+However,
+it is often useful to have a commitment to the note fields
+for use in ZK proofs (e.g., for PoL),
+so the note is included in the note identifier derivation.</p>
+<pre><code class="language-python">def derive_note_id(txhash: zkhash, output_number: int, note: Note) -&gt; NoteId:
+    return zkhash(
+        FiniteField(b"NOMOS_NOTE_ID_V1", byte_order="little", modulus=p),
+        txhash,
+        FiniteField(output_number, byte_order="little", modulus=p),
+        FiniteField(note.value, byte_order="little", modulus=p),
+        note.public_key
+    )
+</code></pre>
+<p>These note identifiers uniquely define notes in the system
+and cannot be chosen by the user.
+Nodes maintain the set of notes through a dictionary
+mapping the NoteId to the note.</p>
+<h3 id="locked-notes"><a class="header" href="#locked-notes">Locked notes</a></h3>
+<p>Locked notes are special notes in Mantle
+that serve as collateral for Service Declarations.
+A note can become locked after executing a Declare Operation,
+preventing it from being spent until explicitly released
+through a Withdraw Operation.
+The system maintains a mapping of locked note IDs to their supporting declarations.
+Though locked,
+these notes remain in the Ledger
+and can still participate in Proof of Stake.
+When service providers withdraw all their declarations,
+the associated note(s) become unlocked and available for spending again.</p>
+<h3 id="ledger-transactions"><a class="header" href="#ledger-transactions">Ledger Transactions</a></h3>
+<p>Transactions must prove the ownership of spent notes.
+In classical blockchains, this is done through a signature.
+To stay compatible with this architecture,
+the signature is done by a ZK proof
+(see <a href="https://nomos-tech.notion.site/Common-Cryptographic-Components">NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS</a>),
+proving the knowledge of the secret key associated with the public key.</p>
+<p>Transactions allow complete transaction linkability
+and the public key spending the note is not hidden.</p>
+<h4 id="ledgertx-structure"><a class="header" href="#ledgertx-structure">LedgerTx Structure</a></h4>
+<pre><code class="language-python">class LedgerTx:
+    inputs: list[NoteId]  # the list of consumed note identifiers
+    outputs: list[Note]
+</code></pre>
+<h4 id="ledgertx-proof"><a class="header" href="#ledgertx-proof">LedgerTx Proof</a></h4>
+<p>A transaction proves the ownership of the consumed notes
+using a Zero Knowledge Signature Scheme (ZkSignature).</p>
+<pre><code class="language-text">ZkSignature
+</code></pre>
+<p>ZkSignature proving ownership over the input notes
+and signing the Mantle Transaction containing this Ledger Transaction.</p>
+<h4 id="ledgertx-execution-gas"><a class="header" href="#ledgertx-execution-gas">LedgerTx Execution Gas</a></h4>
+<p>Ledger Transactions have a fixed Execution Gas cost of
+<code>EXECUTION_LEDGER_TX_GAS</code>.
+See <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a> for the Execution Gas values.</p>
+<h4 id="ledgertx-hash"><a class="header" href="#ledgertx-hash">LedgerTx Hash</a></h4>
+<pre><code class="language-python">def ledger_txhash(tx: LedgerTx) -&gt; ZkHash:
+    tx_bytes = encode(tx)
+    h = Hasher()
+    h.update(FiniteField(b"NOMOS_LEDGER_TXHASH_V1", byte_order="little", modulus=p))
+    for i in range((len(tx_bytes)+30)//31):
+        chunk = tx_bytes[i*31:(i+1)*31]
+        fr = FiniteField(chunk, byte_order="little", modulus=p)
+        h.update(fr)
+    return h.digest()
+</code></pre>
+<h3 id="ledger-validation"><a class="header" href="#ledger-validation">Ledger Validation</a></h3>
+<p>Given:</p>
+<pre><code class="language-python">mantle_txhash: ZkHash  # ZkHash of mantle tx containing this ledger tx
+ledger_tx: LedgerTx
+ledger_tx_proof: ZkSignature
+ledger: Ledger
+locked_notes: dict[NoteId, LockedNote]
+</code></pre>
+<p>Validate:</p>
+<ol>
+<li>Ensure all inputs are unspent.</li>
+</ol>
+<pre><code class="language-python">assert all(ledger.is_unspent(note_id) for note_id in ledger_tx.inputs)
+</code></pre>
+<ol>
+<li>Validate ledger proof to show ownership over input notes.</li>
+</ol>
+<pre><code class="language-python">input_notes = [ledger[input_note_id] for input_note_id in ledger_tx.inputs]
+input_pks = [note.public_key for note in input_notes]
+assert ZkSignature_verify(mantle_txhash, ledger_tx_proof, input_pks)
+</code></pre>
+<ol>
+<li>Ensure inputs are not locked.</li>
+</ol>
+<pre><code class="language-python"># Ensure inputs are not locked
+for note_id in ledger_tx.inputs:
+    assert note_id not in locked_notes
+</code></pre>
+<ol>
+<li>Ensure outputs are valid.</li>
+</ol>
+<pre><code class="language-python">for output in ledger_tx.outputs:
+    assert output.value &gt; 0
+    assert output.value &lt; 2**64
+</code></pre>
+<h3 id="ledger-execution"><a class="header" href="#ledger-execution">Ledger Execution</a></h3>
+<p>Given:</p>
+<pre><code class="language-python">ledger_tx: LedgerTx
+ledger_tx_proof: ZkSignature
+ledger: Ledger
+</code></pre>
+<p>Execute:</p>
+<ol>
+<li>Remove inputs from the ledger.</li>
+</ol>
+<pre><code class="language-python">for note_id in ledger_tx.inputs:
+    # updates the merkle tree to zero out the leaf for this entry
+    # and adds that leaf index to the list of unused leaves
+    ledger.remove(note_id)
+</code></pre>
+<ol>
+<li>Add outputs to the ledger.</li>
+</ol>
+<pre><code class="language-python">txhash = ledger_txhash(ledger_tx)
+for (output_number, output_note) in enumerate(tx.outputs):
+    output_note_id = derive_note_id(txhash, output_number, output_note)
+    ledger.add(output_note_id)
+</code></pre>
+<h3 id="ledger-example"><a class="header" href="#ledger-example">Ledger Example</a></h3>
+<pre><code class="language-python">alice_note_id = ...  # assume Alice holds a note worth 501 NMO
+bob_note = Note(
+    value=500,
+    public_key=bob_pk,
+)
+
+ledger_tx = LedgerTx(
+    inputs=[alice_note_id],
+    outputs=[bob_note],
+)
+</code></pre>
+<h2 id="appendix"><a class="header" href="#appendix">Appendix</a></h2>
+<h3 id="gas-determination"><a class="header" href="#gas-determination">Gas Determination</a></h3>
+<p>From <a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a>,
+the following gas values are used:</p>
+<div class="table-wrapper"><table><thead><tr><th>Variable</th><th>Value</th></tr></thead><tbody>
+<tr><td>EXECUTION_LEDGER_TX_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_CHANNEL_INSCRIBE_GAS</td><td>56</td></tr>
+<tr><td>EXECUTION_CHANNEL_BLOB_BASE_GAS</td><td>6356</td></tr>
+<tr><td>EXECUTION_CHANNEL_BLOB_SIZED_GAS</td><td>1600</td></tr>
+<tr><td>EXECUTION_CHANNEL_SET_KEYS</td><td>56</td></tr>
+<tr><td>EXECUTION_SDP_DECLARE_GAS</td><td>646</td></tr>
+<tr><td>EXECUTION_SDP_WITHDRAW_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_SDP_ACTIVE_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_LEADER_CLAIM_GAS</td><td>580</td></tr>
+</tbody></table>
+</div>
+<h3 id="zero-knowledge-signature-scheme-zksignature"><a class="header" href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a></h3>
+<p>A proof attesting that for the following public values:</p>
+<pre><code class="language-python">class ZkSignaturePublic:
+    public_keys: list[ZkPublicKey]  # public keys signing the message (len = 32)
+    msg: zkhash  # zkhash of the message
+</code></pre>
+<p>The prover knows a witness:</p>
+<pre><code class="language-python">class ZkSignatureWitness:
+    # The list of secret keys used to sign the message
+    secret_keys: list[ZkSecretKey]  # (len = 32)
+</code></pre>
+<p>Such that the following constraints hold:</p>
+<ul>
+<li>The number of secret keys is equal to the number of public keys.</li>
+</ul>
+<pre><code class="language-python">assert len(secret_keys) == len(public_keys)
+</code></pre>
+<ul>
+<li>Each public key is derived from the corresponding secret key.</li>
+</ul>
+<pre><code class="language-python">assert all(
+    notes[i].public_key == zkhash(
+        FiniteField(b"NOMOS_KDF", byte_order="little", modulus=p),
+        secret_keys[i])
+    for i in range(len(public_keys))
+)
+</code></pre>
+<ul>
+<li>The proof is bound to <code>msg</code> (the <code>mantle_tx_hash</code> in case of transactions).</li>
+</ul>
+<blockquote>
+<p>For implementation,
+the ZkSignature circuit will take a maximum of 32 public keys as inputs.
+To prove ownership of fewer keys,
+the remaining inputs will be padded with the public key
+corresponding to the secret key 0 and ignored during execution.
+The outputs have no size limit
+since they are included in the hashed message.</p>
+</blockquote>
+<h3 id="proof-of-claim"><a class="header" href="#proof-of-claim">Proof of Claim</a></h3>
+<p>A proof attesting that given these public values:</p>
+<pre><code class="language-python">class ProofOfClaimPublic:
+    voucher_root: zkhash  # Merkle root of the reward_voucher maintained by everyone
+    voucher_nullifier: zkhash
+    mantle_tx_hash: zkhash  # attached hash
+</code></pre>
+<p>The prover knows the following witness:</p>
+<pre><code class="language-python">class ProofOfClaimWitness:
+    secret_voucher: zkhash
+    voucher_merkle_path: list[zkhash]
+    voucher_merkle_path_selectors: list[bool]
+</code></pre>
+<p>Such that the following constraints hold:</p>
+<ul>
+<li>The reward voucher is derived from the secret voucher.</li>
+</ul>
+<pre><code class="language-python">assert reward_voucher == zkhash(
+    FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus=p),
+    secret_voucher)
+</code></pre>
+<ul>
+<li>There exists a valid Merkle path from the reward voucher as a leaf to the Merkle root.</li>
+</ul>
+<pre><code class="language-python">assert voucher_root == path_root(
+    leaf=reward_voucher,
+    path=voucher_merkle_path,
+    selectors=voucher_merkle_path_selectors)
+</code></pre>
+<ul>
+<li>The voucher nullifier is derived from the secret voucher correctly.</li>
+</ul>
+<pre><code class="language-python">assert voucher_nullifier == zkhash(
+    FiniteField(b"VOUCHER_NF", byte_order="little", modulus=p),
+    secret_voucher)
+</code></pre>
+<ul>
+<li>The proof is bound to the <code>mantle_tx_hash</code>.</li>
+</ul>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>:
+Key words for use in LIPs to Indicate Requirement Levels</li>
+<li><a href="https://nomos-tech.notion.site/Common-Cryptographic-Components">NOMOS-COMMON-CRYPTOGRAPHIC-COMPONENTS</a>:
+Common Cryptographic Components</li>
+<li><a href="https://nomos-tech.notion.site/Gas-Cost-Determination">NOMOS-GAS-COST-DETERMINATION</a>:
+Gas Cost Determination</li>
+<li><a href="https://nomos-tech.notion.site/Service-Declaration-Protocol">NOMOS-SERVICE-DECLARATION-PROTOCOL</a>:
+Service Declaration Protocol</li>
+<li><a href="https://nomos-tech.notion.site/NomosDA-Dispersal">NOMOS-DA-DISPERSAL</a>:
+NomosDA Dispersal</li>
+<li><a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification">NOMOS-PROOF-OF-LEADERSHIP</a>:
+Proof of Leadership Specification</li>
+<li><a href="https://nomos-tech.notion.site/Anonymous-Leaders-Reward-Protocol">NOMOS-ANONYMOUS-LEADERS-REWARD-PROTOCOL</a>:
+Anonymous Leaders Reward Protocol</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/v1-1-Mantle-Specification-269261aa09df80dda501f568697930fd">v1.1 Mantle Specification</a>:
+Original specification document</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/bedrock-v1.1-block-construction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/cryptarchia-proof-of-leadership.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/bedrock-v1.1-block-construction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/cryptarchia-proof-of-leadership.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

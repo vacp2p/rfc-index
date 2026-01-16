@@ -1,0 +1,699 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Codex Prover - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html" class="active"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="codex-prover"><a class="header" href="#codex-prover">CODEX-PROVER</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Codex Prover Module</td></tr>
+<tr><td>Slug</td><td>codex-prover</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Codex Team</td></tr>
+<tr><td>Contributors</td><td>Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/storage/raw/codex-prover.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification defines the Proving module for
+<a href="https://github.com/codex-storage/nim-codex">Codex</a>,
+which provides a succinct, publicly verifiable way to check that storage
+providers still hold the data they committed to.
+The proving module samples cells from stored slots,
+and generates zero-knowledge proofs that tie those samples and Merkle paths
+back to the published dataset root commitment.
+The marketplace contract verifies these proofs on-chain and uses the result
+to manage incentives such as payments and slashing.</p>
+<h2 id="background--rationale--motivation"><a class="header" href="#background--rationale--motivation">Background / Rationale / Motivation</a></h2>
+<p>In decentralized storage networks such as
+<a href="https://github.com/codex-storage/nim-codex">Codex</a>,
+one of the main challenges is ensuring durability and availability of data
+stored by storage providers.
+To achieve durability, random sampling combined with erasure coding is used
+to provide probabilistic guarantees while touching only a tiny fraction of
+the stored data per challenge.</p>
+<p>The proving module addresses this challenge by:</p>
+<ul>
+<li>Checking for storage proof requests from the marketplace</li>
+<li>Sampling cells from slots in the stored dataset and constructing Merkle proofs</li>
+<li>Generating zero-knowledge proofs for randomly selected cells in stored slots</li>
+<li>Submitting proofs to the on-chain marketplace smart contract for verification</li>
+</ul>
+<p>The proving module consists of three main sub-components:</p>
+<ol>
+<li><strong>Sampler</strong>: Derives random sample indices from public entropy and slot commitments, then generates the proof input</li>
+<li><strong>Prover</strong>: Produces succinct ZK proofs for valid proof inputs and verifies such proofs</li>
+<li><strong>ZK Circuit</strong>: Defines the logic for sampling, cell hashing, and Merkle tree membership checks</li>
+</ol>
+<p>The proving module relies on <code>BlockStore</code> for block-level storage access
+and <code>SlotsBuilder</code> to build initial commitments to the stored data.
+<code>BlockStore</code> is Codex's local storage abstraction that provides
+block retrieval by CID.
+<code>SlotsBuilder</code> constructs the Merkle tree commitments for slots and datasets
+(see <a href="#references">CODEX-SLOT-BUILDER</a> for details).
+The incentives involved, including collateral and slashing,
+are handled by the marketplace logic.</p>
+<h2 id="theory--semantics"><a class="header" href="#theory--semantics">Theory / Semantics</a></h2>
+<h3 id="terminology"><a class="header" href="#terminology">Terminology</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>Storage Client (SC)</strong></td><td>A node that participates in Codex to buy storage.</td></tr>
+<tr><td><strong>Storage Provider (SP)</strong></td><td>A node that participates in Codex by selling disk space to other nodes.</td></tr>
+<tr><td><strong>Dataset</strong></td><td>A set of fixed-size slots provided by possibly different storage clients.</td></tr>
+<tr><td><strong>Cell</strong></td><td>Smallest circuit sampling unit (e.g., 2 KiB), its bytes are packed into field elements and hashed.</td></tr>
+<tr><td><strong>Block</strong></td><td>Network transfer unit (e.g., 64 KiB) consists of multiple cells, used for transport.</td></tr>
+<tr><td><strong>Slot</strong></td><td>The erasure-coded fragment of a dataset stored by a single storage provider. Proof requests are related to slots.</td></tr>
+<tr><td><strong>Commitment</strong></td><td>Cryptographic binding (and hiding if needed) to specific data. In Codex this is a Poseidon2 Merkle root (e.g., Dataset Root or Slot Root). It allows anyone to verify proofs against the committed content.</td></tr>
+<tr><td><strong>Dataset Root / Slot Root</strong></td><td>Poseidon2 Merkle roots used as public commitments in the circuit. Not the SHA-256 content tree used for CIDs.</td></tr>
+<tr><td><strong>Entropy</strong></td><td>Public randomness (e.g., blockhash) used to derive random sample indices.</td></tr>
+<tr><td><strong>Witness</strong></td><td>Private zk circuit inputs.</td></tr>
+<tr><td><strong>Public Inputs</strong></td><td>Values known to or shared with the verifier.</td></tr>
+<tr><td><strong>Groth16</strong></td><td>Succinct zk-SNARK proof system used by Codex.</td></tr>
+<tr><td><strong>Proof Window</strong></td><td>The time/deadline within which the storage provider must submit a valid proof.</td></tr>
+</tbody></table>
+</div>
+<h3 id="data-commitment"><a class="header" href="#data-commitment">Data Commitment</a></h3>
+<p>In Codex, a dataset is split into <code>numSlots</code> slots which are the ones sampled. Each slot is split into <code>nCells</code> fixed-size cells. Since networking operates on blocks, cells are combined to form blocks where each block contains <code>BLOCKSIZE/CELLSIZE</code> cells. The following describes how raw bytes become commitments in Codex (cells -&gt; blocks -&gt; slots -&gt; dataset):</p>
+<p><strong>Cell hashing:</strong></p>
+<ul>
+<li>Split each cell's bytes into chunks (31-byte for BN254), map to field elements (little-endian). Pad the last chunk with <code>10*</code>.</li>
+<li>Hash the resulting field-element stream with a Poseidon2 sponge.</li>
+</ul>
+<p><strong>Block tree (cell -&gt; block):</strong></p>
+<ul>
+<li>A network block in Codex is 64 KiB and contains 32 cells of 2 KiB each.</li>
+<li>Build a Merkle tree of depth 5 over the 32 cell hashes. The root is the block hash.</li>
+</ul>
+<p><strong>Slot tree (block -&gt; slot):</strong></p>
+<ul>
+<li>For all blocks in a slot, build a Merkle tree over their block hashes
+(root of block trees).
+The number of leaves is expected to be a power of two
+(in Codex, the <code>SlotsBuilder</code> pads the slots).
+The Slot tree root is the public commitment that is sampled.
+See <a href="#references">CODEX-SLOT-BUILDER</a> for the detailed slot building process.</li>
+</ul>
+<p><strong>Dataset tree (slot -&gt; dataset):</strong></p>
+<ul>
+<li>Build a Merkle tree over the slot trees roots to obtain the dataset root
+(this is different from SHA-256 CID used for content addressing).
+The dataset root is the public commitment to all slots hosted by a single
+storage provider.</li>
+</ul>
+<h3 id="codex-merkle-tree-conventions"><a class="header" href="#codex-merkle-tree-conventions">Codex Merkle Tree Conventions</a></h3>
+<p>Codex extends the standard Merkle tree with a keyed compression that depends on
+(a) whether a node is on the bottom (i.e. leaf layer) and
+(b) whether a node is odd (has a single child) or even (two children).
+These two bits are encoded as <code>{0,1,2,3}</code> and fed into the hash so tree shape
+cannot be manipulated.</p>
+<p><strong>Steps in building the Merkle tree (bytes/leaves -&gt; root):</strong></p>
+<p>Cell bytes are split into 31-byte chunks to fit in BN254,
+each mapped little-endian into a BN254 field element.
+<code>10*</code> padding is used.</p>
+<p>Leaves (cells) are hashed with a Poseidon2 sponge with state size <code>t=3</code>
+and rate <code>r=2</code>.
+The sponge is initialized with IV <code>(0,0, domSep)</code> where:</p>
+<pre><code class="language-text">domSep := 2^64 + 256*t + rate
+</code></pre>
+<p>This is a domain-separation constant.</p>
+<p>When combining two child nodes <code>x</code> and <code>y</code>, Codex uses the keyed compression:</p>
+<pre><code class="language-text">compress(x, y, key) = Poseidon2_permutation(x, y, key)[0]
+</code></pre>
+<p>where <code>key</code> encodes the two bits:</p>
+<ul>
+<li><strong>bit 0</strong>: 1 if we're at the bottom layer, else 0</li>
+<li><strong>bit 1</strong>: 1 if this is an odd node (only one child present), else 0</li>
+</ul>
+<p><strong>Special cases:</strong></p>
+<ul>
+<li><strong>Odd node</strong> with single child <code>x</code>: <code>compress(x, 0, key)</code> (i.e., the missing sibling is zero).</li>
+<li><strong>Singleton tree</strong> (only one element in the tree): still apply one compression round.</li>
+<li><strong>Merkle Paths</strong> need only sibling hashes:
+left/right direction is inferred from the binary decomposition of the
+leaf index, so you don't transmit direction flags.</li>
+</ul>
+<h3 id="sampling"><a class="header" href="#sampling">Sampling</a></h3>
+<p><strong>Sampling request:</strong></p>
+<p>Sampling begins when a proof is requested containing the entropy
+(also called <code>ProofChallenge</code>).
+A <code>DataSampler</code> instance is created for a specific slot and then used to
+produce <code>Sample</code> records.</p>
+<p>The sampler needs:</p>
+<ul>
+<li><code>slotIndex</code>: the index of the slot being proven.
+This is fixed when the <code>DataSampler</code> is constructed.</li>
+<li><code>entropy</code>: public randomness (e.g., blockhash).</li>
+<li><code>nSamples</code>: the number of cells to sample.</li>
+</ul>
+<p><strong>Derive indices:</strong></p>
+<p>The sampler derives deterministic cell indices from the challenge entropy and the slot commitment:</p>
+<pre><code class="language-text">idx = H(entropy || slotRoot || counter) mod nCells
+</code></pre>
+<p>where <code>counter = 1..nSamples</code> and <code>H</code> is the Poseidon2 sponge (rate = 2)
+with <code>10*</code> padding.
+The result is a sequence of indices in <code>[0, nCells)</code>,
+identical for any honest party given the same <code>(entropy, slotRoot, nSamples)</code>.
+Note that there is a chance however small that you would have multiple of
+the same cell index samples purely by chance.
+The chance of that depends on the slot and cell sizes;
+the larger the slot and smaller the cell,
+the lower the chance of landing on the same cell index.</p>
+<p><strong>Generate per-sample data:</strong></p>
+<ul>
+<li>Fetch the <code>cellData</code> via the <code>BlockStore</code> and <code>builder</code>,
+and fetch the stored <code>cell -&gt; block</code>, <code>block -&gt; slot</code>, <code>slot -&gt; dataset</code>
+Merkle paths.
+Note that <code>cell -&gt; block</code> can be built on the fly and <code>slot -&gt; dataset</code>
+can be reused for all samples in that slot.</li>
+</ul>
+<p><strong>Collect Proof Inputs:</strong></p>
+<p>The <code>DataSampler</code> collects the <code>ProofInputs</code> required for the zk proof system
+which contains the following:</p>
+<ul>
+<li><code>entropy</code>: the challenge randomness.</li>
+<li><code>datasetRoot</code>: the root of the dataset Merkle tree.</li>
+<li><code>slotIndex</code>: the index of the proven slot.</li>
+<li><code>slotRoot</code>: the Merkle root of the slot tree.</li>
+<li><code>nCellsPerSlot</code>: total number of cells in the slot.</li>
+<li><code>nSlotsPerDataSet</code>: total number of slots in the dataset.</li>
+<li><code>slotProof</code>: the <code>slot -&gt; dataset</code> Merkle path.</li>
+<li><code>samples</code>: a list where each element is:
+<ul>
+<li><code>cellData</code>: the sampled cell encoded as field elements.</li>
+<li><code>merklePaths</code>: the concatenation <code>(cell -&gt; block) || (block -&gt; slot)</code>.</li>
+</ul>
+</li>
+</ul>
+<p>These <code>ProofInputs</code> are then passed to the prover to generate the succinct
+ZK proof.</p>
+<h3 id="proof-generation"><a class="header" href="#proof-generation">Proof Generation</a></h3>
+<p>To produce a zk storage proof, Codex uses a pluggable proving backend.
+In practice, Groth16 over BN254 (altbn128) is used with circuits written
+in Circom.
+The <code>Prover</code> with <code>ProofInputs</code> calls the backend to create a succinct proof,
+and optionally verifies it locally before submission.</p>
+<h3 id="zk-circuit-specification"><a class="header" href="#zk-circuit-specification">ZK Circuit Specification</a></h3>
+<p><strong>Circuit parameters (compile-time constants):</strong></p>
+<pre><code class="language-text">MAXDEPTH     # max depth of slot tree (block -&gt; slot)
+MAXSLOTS     # max number of slots in dataset (slot -&gt; dataset)
+CELLSIZE     # cell size in bytes (e.g., 2048)
+BLOCKSIZE    # block size in bytes (e.g., 65536)
+NSAMPLES     # number of sampled cells per challenge (e.g. 100)
+</code></pre>
+<p><strong>Public inputs:</strong></p>
+<pre><code class="language-text">datasetRoot  # root of the dataset (slot -&gt; dataset)
+slotIndex    # index of the slot being proven
+entropy      # public randomness used to derive sample indices
+</code></pre>
+<p><strong>Witness (private inputs):</strong></p>
+<pre><code class="language-text">slotRoot     # root of the slot (block -&gt; slot) tree
+slotProof    # Merkle path for slot -&gt; dataset
+samples[]:   # one entry per sampled cell:
+  cellData     # the sampled cell encoded as field elements
+  merklePaths  # (cell -&gt; block) || (block -&gt; slot) Merkle path
+</code></pre>
+<p><strong>Constraints (informal):</strong></p>
+<p>For each sampled cell, the circuit enforces:</p>
+<ol>
+<li><strong>Cell hashing:</strong> recompute the cell digest from <code>cellData</code> using the Poseidon2 sponge (rate=2, <code>10*</code> padding).</li>
+<li><strong>Cell -&gt; Block:</strong> verify inclusion of the cell digest in the block tree using the provided <code>cell -&gt; block</code> path.</li>
+<li><strong>Block -&gt; Slot:</strong> verify inclusion of the block digest in the slot tree using the <code>block -&gt; slot</code> path.</li>
+<li><strong>Slot -&gt; Dataset:</strong> verify inclusion of <code>slotRoot</code> in dataset tree using <code>slotProof</code>.</li>
+<li><strong>Sampling indices:</strong> recompute the required sample indices from <code>(entropy, slotRoot, NSAMPLES)</code> and check that the supplied samples correspond exactly to those indices.</li>
+</ol>
+<p><strong>Output (proof):</strong></p>
+<ul>
+<li><strong>Groth16 proof</strong> over BN254: the tuple (A ∈ G₁, B ∈ G₂, C ∈ G₁), referred to in code as <code>CircomProof</code>.</li>
+</ul>
+<p><strong>Verification:</strong></p>
+<ul>
+<li>The verifier (on-chain or off-chain) checks the <code>proof</code> against the <code>public inputs</code> using the circuit's <code>verifying key</code> (derived from the <code>CRS</code> generated at setup).</li>
+<li>On EVM chains, verification leverages BN254 precompiles.</li>
+</ul>
+<h3 id="functional-requirements"><a class="header" href="#functional-requirements">Functional Requirements</a></h3>
+<p><strong>Data Commitment:</strong></p>
+<ul>
+<li>Fetch existing slot commitments using <code>BlockStore</code> and <code>SlotsBuilder</code>: <code>cell -&gt; block -&gt; slot</code> Merkle trees for each slot in the locally stored dataset.</li>
+<li>Fetch dataset commitment: <code>slot -&gt; dataset</code> verification tree root.</li>
+<li>Proof material: retrieve cell data (as field elements).</li>
+</ul>
+<p><strong>Sampling:</strong></p>
+<ul>
+<li>Checks for marketplace challenges per slot.</li>
+<li>Random sampling: Derive <code>nSamples</code> cell indices for the <code>slotIndex</code> from <code>(entropy, slotRoot)</code>.</li>
+<li>For each sampled cell, fetch: <code>cellData</code> (as field elements) and Merkle paths (all <code>cell -&gt; block -&gt; slot -&gt; dataset</code>)</li>
+<li>Generate <code>ProofInputs</code> containing the public inputs (<code>datasetRoot</code>, <code>slotIndex</code>, <code>entropy</code>) and private witness (<code>cellData</code>, <code>slotRoot</code>, <code>MerklePaths</code>).</li>
+</ul>
+<p><strong>Proof Generation:</strong></p>
+<ul>
+<li>Given <code>ProofInputs</code>, use the configured backend (Groth16 over BN254) to create a succinct Groth16 proof.</li>
+<li>The circuit enforces the same Merkle layout and Poseidon2 hashing used for commitments.</li>
+</ul>
+<h3 id="non-functional-requirements"><a class="header" href="#non-functional-requirements">Non-Functional Requirements</a></h3>
+<p><strong>Performance / Latency:</strong></p>
+<ul>
+<li>End-to-end (sample -&gt; prove -&gt; submit) completes within the on-chain proof window with some safety margin.</li>
+<li>Small Proof size, e.g. Groth16/BN254 plus public inputs.</li>
+<li>On-chain verification cost is minimal.</li>
+<li>Support concurrent proving for multiple slots.</li>
+</ul>
+<p><strong>Security &amp; Correctness:</strong></p>
+<ul>
+<li>Soundness and completeness: only accept valid proofs, invalid inputs must not yield accepted proofs.</li>
+<li>Commitment integrity: proofs are checked against the publicly available Merkle commitments to the stored data.</li>
+<li>Entropy binding: sample indices must be derived from the on-chain entropy and the slot commitment. This binds the proofs to specific cell indices and time period, and makes the challenge unpredictable until the period begins. This prevents storage providers from precomputing the proofs or selectively retaining a set of cells.</li>
+</ul>
+<h2 id="wire-format-specification--syntax"><a class="header" href="#wire-format-specification--syntax">Wire Format Specification / Syntax</a></h2>
+<h3 id="data-models"><a class="header" href="#data-models">Data Models</a></h3>
+<h4 id="slotsbuilder"><a class="header" href="#slotsbuilder">SlotsBuilder</a></h4>
+<pre><code class="language-nim">SlotsBuilder*[T, H] = ref object of RootObj
+  store: BlockStore
+  manifest: Manifest # current manifest
+  strategy: IndexingStrategy # indexing strategy
+  cellSize: NBytes # cell size
+  numSlotBlocks: Natural
+    # number of blocks per slot (should yield a power of two number of cells)
+  slotRoots: seq[H] # roots of the slots
+  emptyBlock: seq[byte] # empty block
+  verifiableTree: ?T # verification tree (dataset tree)
+  emptyDigestTree: T # empty digest tree for empty blocks
+</code></pre>
+<p>Contains references to the <code>BlockStore</code>, current <code>Manifest</code>, indexing strategy, cell size, number of blocks per slot, slot roots, empty block data, the verification tree (dataset tree), and empty digest tree for empty blocks.</p>
+<h4 id="datasampler"><a class="header" href="#datasampler">DataSampler</a></h4>
+<pre><code class="language-nim">DataSampler*[T, H] = ref object of RootObj
+  index: Natural
+  blockStore: BlockStore
+  builder: SlotsBuilder[T, H]
+</code></pre>
+<p>Contains the slot index, reference to <code>BlockStore</code>, and reference to <code>SlotsBuilder</code>.</p>
+<h4 id="prover"><a class="header" href="#prover">Prover</a></h4>
+<pre><code class="language-nim">Prover* = ref object of RootObj
+    backend: AnyBackend
+    store: BlockStore
+    nSamples: int
+</code></pre>
+<p>Contains the proving backend, reference to <code>BlockStore</code>, and number of samples.</p>
+<h4 id="sample"><a class="header" href="#sample">Sample</a></h4>
+<pre><code class="language-nim">Sample*[H] = object
+  cellData*: seq[H]
+  merklePaths*: seq[H]
+</code></pre>
+<p>Contains the sampled cell data as a sequence of hash elements and the Merkle paths as a sequence of hash elements.</p>
+<h4 id="publicinputs"><a class="header" href="#publicinputs">PublicInputs</a></h4>
+<pre><code class="language-nim">PublicInputs*[H] = object
+  slotIndex*: int
+  datasetRoot*: H
+  entropy*: H
+</code></pre>
+<p>Contains the slot index, dataset root hash, and entropy hash.</p>
+<h4 id="proofinputs"><a class="header" href="#proofinputs">ProofInputs</a></h4>
+<pre><code class="language-nim">ProofInputs*[H] = object
+  entropy*: H
+  datasetRoot*: H
+  slotIndex*: Natural
+  slotRoot*: H
+  nCellsPerSlot*: Natural
+  nSlotsPerDataSet*: Natural
+  slotProof*: seq[H]
+  samples*: seq[Sample[H]]
+</code></pre>
+<p>Contains entropy, dataset root, slot index, slot root, number of cells per slot, number of slots per dataset, slot proof as a sequence of hashes, and samples as a sequence of <code>Sample</code> objects.</p>
+<h4 id="circomcompat"><a class="header" href="#circomcompat">CircomCompat</a></h4>
+<pre><code class="language-nim">CircomCompat* = object
+  slotDepth: int # max depth of the slot tree
+  datasetDepth: int # max depth of dataset  tree
+  blkDepth: int # depth of the block merkle tree (pow2 for now)
+  cellElms: int # number of field elements per cell
+  numSamples: int # number of samples per slot
+  r1csPath: string # path to the r1cs file
+  wasmPath: string # path to the wasm file
+  zkeyPath: string # path to the zkey file
+  backendCfg: ptr CircomBn254Cfg
+  vkp*: ptr CircomKey
+</code></pre>
+<p>Contains configuration for Circom compatibility including tree depths, paths to circuit artifacts (r1cs, wasm, zkey), backend configuration pointer, and verifying key pointer.</p>
+<h4 id="proof"><a class="header" href="#proof">Proof</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Proof {
+    pub a: G1,
+    pub b: G2,
+    pub c: G1,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Groth16 proof structure containing three elements: <code>a</code> and <code>c</code> in G₁, and <code>b</code> in G₂.</p>
+<h4 id="g1"><a class="header" href="#g1">G1</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct G1 {
+    pub x: [u8; 32],
+    pub y: [u8; 32],
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Elliptic curve point in G₁ with x and y coordinates as 32-byte arrays.</p>
+<h4 id="g2"><a class="header" href="#g2">G2</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct G2 {
+    pub x: [[u8; 32]; 2],
+    pub y: [[u8; 32]; 2],
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Elliptic curve point in G₂ with x and y coordinates, each consisting of two 32-byte arrays.</p>
+<h4 id="verifyingkey"><a class="header" href="#verifyingkey">VerifyingKey</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct VerifyingKey {
+    pub alpha1: G1,
+    pub beta2: G2,
+    pub gamma2: G2,
+    pub delta2: G2,
+    pub ic: *const G1,
+    pub ic_len: usize,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Groth16 verifying key structure containing <code>alpha1</code> in G₁, <code>beta2</code>, <code>gamma2</code>, and <code>delta2</code> in G₂, and an array of G₁ points (<code>ic</code>) with its length.</p>
+<h3 id="interfaces"><a class="header" href="#interfaces">Interfaces</a></h3>
+<h4 id="sampler-interfaces"><a class="header" href="#sampler-interfaces">Sampler Interfaces</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Interface</th><th>Description</th><th>Input</th><th>Output</th></tr></thead><tbody>
+<tr><td><code>new[T,H]</code></td><td>Construct a <code>DataSampler</code> for a specific slot index.</td><td><code>index: Natural</code>, <code>blockStore: BlockStore</code>, <code>builder: SlotsBuilder[T,H]</code></td><td><code>DataSampler[T,H]</code></td></tr>
+<tr><td><code>getSample</code></td><td>Retrieve one sampled cell and its Merkle path(s) for a given slot.</td><td><code>cellIdx: int</code>, <code>slotTreeCid: Cid</code>, <code>slotRoot: H</code></td><td><code>Sample[H]</code></td></tr>
+<tr><td><code>getProofInput</code></td><td>Generate the full proof inputs for the proving circuit (calls <code>getSample</code> internally).</td><td><code>entropy: ProofChallenge</code>, <code>nSamples: Natural</code></td><td><code>ProofInputs[H]</code></td></tr>
+</tbody></table>
+</div>
+<h4 id="prover-interfaces"><a class="header" href="#prover-interfaces">Prover Interfaces</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Interface</th><th>Description</th><th>Input</th><th>Output</th></tr></thead><tbody>
+<tr><td><code>new</code></td><td>Construct a <code>Prover</code> with a block store and the backend proof system.</td><td><code>blockStore: BlockStore</code>, <code>backend: AnyBackend</code>, <code>nSamples: int</code></td><td><code>Prover</code></td></tr>
+<tr><td><code>prove</code></td><td>Produce a succinct proof for the given slot and entropy.</td><td><code>slotIdx: int</code>, <code>manifest: Manifest</code>, <code>entropy: ProofChallenge</code></td><td><code>(proofInputs, proof)</code></td></tr>
+<tr><td><code>verify</code></td><td>Verify a proof against its public inputs.</td><td><code>proof: AnyProof</code>, <code>proofInputs: AnyProofInputs</code></td><td><code>bool</code></td></tr>
+</tbody></table>
+</div>
+<h4 id="circuit-interfaces"><a class="header" href="#circuit-interfaces">Circuit Interfaces</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Template</th><th>Description</th><th>Parameters</th><th>Inputs (signals)</th><th>Outputs (signals)</th></tr></thead><tbody>
+<tr><td><code>SampleAndProve</code></td><td>Main component in the circuit. Verifies <code>nSamples</code> cells (<code>cell-&gt;block-&gt;slot</code>) and the <code>slot-&gt;dataset</code> path, binding the proof to <code>dataSetRoot</code>, <code>slotIndex</code>, and <code>entropy</code>.</td><td><code>maxDepth</code>, <code>maxLog2NSlots</code>, <code>blockTreeDepth</code>, <code>nFieldElemsPerCell</code>, <code>nSamples</code></td><td><code>entropy</code>, <code>dataSetRoot</code>, <code>slotIndex</code>, <code>slotRoot</code>, <code>nCellsPerSlot</code>, <code>nSlotsPerDataSet</code>, <code>slotProof[maxLog2NSlots]</code>, <code>cellData[nSamples][nFieldElemsPerCell]</code>, <code>merklePaths[nSamples][maxDepth]</code></td><td>-</td></tr>
+<tr><td><code>ProveSingleCell</code></td><td>Verifies one sampled cell: hashes <code>cellData</code> with Poseidon2 and checks the concatenated Merkle path up to <code>slotRoot</code>.</td><td><code>nFieldElemsPerCell</code>, <code>botDepth</code>, <code>maxDepth</code></td><td><code>slotRoot</code>, <code>data[nFieldElemsPerCell]</code>, <code>lastBits[maxDepth]</code>, <code>indexBits[maxDepth]</code>, <code>maskBits[maxDepth+1]</code>, <code>merklePath[maxDepth]</code></td><td>-</td></tr>
+<tr><td><code>RootFromMerklePath</code></td><td>Reconstructs a Merkle root from a leaf and path using <code>KeyedCompression</code>.</td><td><code>maxDepth</code></td><td><code>leaf</code>, <code>pathBits[maxDepth]</code>, <code>lastBits[maxDepth]</code>, <code>maskBits[maxDepth+1]</code>, <code>merklePath[maxDepth]</code></td><td><code>recRoot</code></td></tr>
+<tr><td><code>CalculateCellIndexBits</code></td><td>Derives the index bits for a sampled cell from <code>(entropy, slotRoot, counter)</code>, masked by <code>cellIndexBitMask</code>.</td><td><code>maxLog2N</code></td><td><code>entropy</code>, <code>slotRoot</code>, <code>counter</code>, <code>cellIndexBitMask[maxLog2N]</code></td><td><code>indexBits[maxLog2N]</code></td></tr>
+</tbody></table>
+</div>
+<p>All parameters are compile-time constants that are defined when building the circuit.</p>
+<h4 id="circuit-utility-templates"><a class="header" href="#circuit-utility-templates">Circuit Utility Templates</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Template</th><th>Description</th><th>Parameters</th><th>Inputs (signals)</th><th>Outputs (signals)</th></tr></thead><tbody>
+<tr><td><code>Poseidon2_hash_rate2</code></td><td>Poseidon2 fixed-length hash (rate = 2). Used for hashing cell field-elements.</td><td><code>n</code>: number of field elements to hash.</td><td><code>inp[n]</code>: array of field elements to hash.</td><td><code>out</code>: Poseidon2 hash digest.</td></tr>
+<tr><td><code>PoseidonSponge</code></td><td>Generic Poseidon2 sponge (absorb/squeeze).</td><td><code>t</code>: sponge state width, <code>capacity</code>: capacity part of the state, <code>input_len</code>: number of elements to absorb, <code>output_len</code>: number of elements to squeeze</td><td><code>inp[input_len]</code>: field elements to absorb.</td><td><code>out[output_len]</code>: field elements squeezed.</td></tr>
+<tr><td><code>KeyedCompression</code></td><td>Keyed 2-&gt;1 compression where key ∈ {0,1,2,3}.</td><td>-</td><td><code>key</code>, <code>inp[2]</code>: left and right child node digests.</td><td><code>out</code>: parent node digest</td></tr>
+<tr><td><code>ExtractLowerBits</code></td><td>Extracts the lower <code>n</code> bits of <code>inp</code> (LSB-first).</td><td><code>n</code>: number of low bits to extract</td><td><code>inp</code>: field elements to extract.</td><td><code>out[n]</code>: extracted bits.</td></tr>
+<tr><td><code>Log2</code></td><td>Checks <code>inp == 2^out</code> with <code>0 &lt; out &lt;= n</code>. Also emits a mask vector with ones for indices <code>&lt; out</code>.</td><td><code>n</code>: max allowed bit width.</td><td><code>inp</code>: field element.</td><td><code>out</code>: exponent, <code>mask[n+1]</code>: prefix mask.</td></tr>
+<tr><td><code>CeilingLog2</code></td><td>Computes <code>ceil(log2(inp))</code> and returns the bit-decomposition and a mask.</td><td><code>n</code>: bit width of input and output.</td><td><code>inp</code>: field element.</td><td><code>out</code>: <code>ceil(log2(inp))</code>, <code>bits[n]</code>: bit decomposition, <code>mask[n+1]</code>: prefix mask</td></tr>
+<tr><td><code>BinaryCompare</code></td><td>Compares two n-bit numbers <code>A</code> and <code>B</code> (LSB-first); outputs <code>-1</code> if <code>A&lt;B</code>, <code>0</code> if equal, <code>+1</code> if <code>A&gt;B</code>.</td><td><code>n</code>: bit width of <code>A</code> and <code>B</code></td><td><code>A[n]</code>, <code>B[n]</code></td><td><code>out</code>: comparison result.</td></tr>
+</tbody></table>
+</div>
+<h2 id="securityprivacy-considerations"><a class="header" href="#securityprivacy-considerations">Security/Privacy Considerations</a></h2>
+<h3 id="entropy-binding"><a class="header" href="#entropy-binding">Entropy Binding</a></h3>
+<p>Sample indices must be derived from the on-chain entropy and the slot commitment. This binds the proofs to specific cell indices and time period, and makes the challenge unpredictable until the period begins. This prevents storage providers from precomputing the proofs or selectively retaining a set of cells.</p>
+<h3 id="commitment-integrity"><a class="header" href="#commitment-integrity">Commitment Integrity</a></h3>
+<p>Proofs are checked against the publicly available Merkle commitments to the stored data. The proving module uses Poseidon2 Merkle roots as public commitments which allow anyone to verify proofs against the committed content.</p>
+<h3 id="soundness-and-completeness"><a class="header" href="#soundness-and-completeness">Soundness and Completeness</a></h3>
+<p>The zero-knowledge proof system must only accept valid proofs. Invalid inputs must not yield accepted proofs. The circuit enforces:</p>
+<ul>
+<li>Cell hashing using Poseidon2 sponge</li>
+<li>Merkle tree membership checks at all levels (cell -&gt; block, block -&gt; slot, slot -&gt; dataset)</li>
+<li>Correct sampling index derivation from entropy and slot root</li>
+</ul>
+<h3 id="keyed-merkle-tree-compression"><a class="header" href="#keyed-merkle-tree-compression">Keyed Merkle Tree Compression</a></h3>
+<p>Codex extends the standard Merkle tree with a keyed compression that encodes whether a node is on the bottom layer and whether a node is odd or even. These bits are fed into the hash so tree shape cannot be manipulated.</p>
+<h3 id="proof-window"><a class="header" href="#proof-window">Proof Window</a></h3>
+<p>Storage providers must submit valid proofs within the proof window deadline. This time constraint ensures timely verification and allows the marketplace to manage incentives appropriately.</p>
+<h2 id="rationale"><a class="header" href="#rationale">Rationale</a></h2>
+<p>This specification is based on the Proving module component specification from the <a href="https://github.com/codex-storage/nim-codex">Codex project</a>.</p>
+<h3 id="probabilistic-verification"><a class="header" href="#probabilistic-verification">Probabilistic Verification</a></h3>
+<p>The proving module uses random sampling combined with erasure coding to provide probabilistic guarantees of data availability while touching only a tiny fraction of the stored data per challenge. This approach balances security with efficiency, as verifying the entire dataset for every challenge would be prohibitively expensive.</p>
+<h3 id="groth16-over-bn254"><a class="header" href="#groth16-over-bn254">Groth16 over BN254</a></h3>
+<p>The specification uses Groth16 zero-knowledge proofs over the BN254 elliptic curve. This choice provides:</p>
+<ul>
+<li><strong>Succinct proofs</strong>: Small proof size enables efficient on-chain verification</li>
+<li><strong>EVM compatibility</strong>: BN254 precompiles on EVM chains minimize verification costs</li>
+<li><strong>Strong security</strong>: Groth16 provides computational zero-knowledge and soundness</li>
+</ul>
+<h3 id="poseidon2-hash-function"><a class="header" href="#poseidon2-hash-function">Poseidon2 Hash Function</a></h3>
+<p>Poseidon2 is used for all cryptographic commitments (cell hashing, Merkle tree construction). Poseidon2 is optimized for zero-knowledge circuits, resulting in significantly fewer constraints compared to traditional hash functions like SHA-256.</p>
+<h3 id="keyed-compression-design"><a class="header" href="#keyed-compression-design">Keyed Compression Design</a></h3>
+<p>The keyed compression scheme that depends on node position (bottom layer vs. internal) and child count (odd vs. even) prevents tree shape manipulation attacks. By feeding these bits into the hash function, the commitment binds to the exact tree structure.</p>
+<h3 id="pluggable-backend-architecture"><a class="header" href="#pluggable-backend-architecture">Pluggable Backend Architecture</a></h3>
+<p>The proving module uses a pluggable proving backend abstraction. While the current implementation uses Groth16 over BN254 with Circom circuits, this architecture allows for future flexibility to adopt different proof systems or curves without changing the core proving module logic.</p>
+<h3 id="entropy-based-sampling"><a class="header" href="#entropy-based-sampling">Entropy-Based Sampling</a></h3>
+<p>Deriving sample indices deterministically from public entropy (e.g., blockhash) and the slot commitment ensures that:</p>
+<ul>
+<li>Challenges are unpredictable until the period begins</li>
+<li>Storage providers cannot precompute proofs</li>
+<li>Storage providers cannot selectively retain only a subset of cells</li>
+<li>Any honest party can verify the sampling was done correctly</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><strong>Codex</strong>: <a href="https://github.com/codex-storage/nim-codex">GitHub - codex-storage/nim-codex</a></li>
+<li><strong>Codex Prover Specification</strong>: <a href="https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Prover.md">Codex Docs - Component Specification - Prover</a></li>
+<li><strong>CODEX-SLOT-BUILDER</strong>: Codex Slot Builder specification (defines <code>SlotsBuilder</code>
+and slot commitment construction)</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><strong>Codex Storage Proofs Circuits</strong>: <a href="https://github.com/codex-storage/codex-storage-proofs-circuits">GitHub - codex-storage/codex-storage-proofs-circuits</a> - Circom implementations of Codex's proof circuits targeting Groth16 over BN254</li>
+<li><strong>Nim Circom Compat</strong>: <a href="https://github.com/codex-storage/nim-circom-compat">GitHub - codex-storage/nim-circom-compat</a> - Nim bindings that load compiled Circom artifacts</li>
+<li><strong>Circom Compat FFI</strong>: <a href="https://github.com/codex-storage/circom-compat-ffi">GitHub - codex-storage/circom-compat-ffi</a> - Rust library with C ABI for running Arkworks Groth16 proving and verification on BN254</li>
+<li><strong>Groth16</strong>: Jens Groth. "On the Size of Pairing-based Non-interactive Arguments." EUROCRYPT 2016</li>
+<li><strong>Poseidon2</strong>: Lorenzo Grassi, Dmitry Khovratovich, Markus Schofnegger. "Poseidon2: A Faster Version of the Poseidon Hash Function." IACR ePrint 2023/323</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../storage/raw/codex-marketplace.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../storage/raw/codex-store.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../storage/raw/codex-marketplace.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../storage/raw/codex-store.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Nomos Key Types and Generation - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html" class="active"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="nomos-key-types-generation"><a class="header" href="#nomos-key-types-generation">NOMOS-KEY-TYPES-GENERATION</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Nomos Key Types and Generation</td></tr>
+<tr><td>Slug</td><td>nomos-key-types-and-generation</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Mehmet Gonen <a href="mailto:mehmet@status.im">mehmet@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Marcin Pawlowski <a href="mailto:marcin@status.im">marcin@status.im</a>, Youngjoon Lee <a href="mailto:youngjoon@status.im">youngjoon@status.im</a>, Alexander Mozeika <a href="mailto:alexander@status.im">alexander@status.im</a>, Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a>, Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/nomos-key-types-and-generation.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This document defines the key types used in the Blend protocol
+and describes the process of generating them.</p>
+<p><strong>Keywords:</strong> cryptography, keys, Blend, encryption, signing,
+NQK, NSK, ESK, NEK, EEK</p>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>The Blend protocol is a mix network protocol
+that provides anonymous communication in the Nomos network.
+It uses layered encryption and message mixing
+to prevent traffic analysis and ensure sender anonymity.
+For more details, see <a href="#references">Blend Protocol</a>.</p>
+<p>This document ensures that the keys are used and generated in a common manner,
+which is necessary for making the Blend protocol work.</p>
+<p><strong>Core nodes</strong> are nodes that participate in the Blend network
+by mixing and forwarding messages.
+They are registered through the Service Declaration Protocol (SDP)
+and store their credentials on the Nomos blockchain ledger.</p>
+<p><strong>Blend messages</strong> are encrypted messages
+that are routed through the mix network.
+Each message is encapsulated with multiple layers of encryption,
+one for each hop in the network.</p>
+<p>The keys defined in this specification include:</p>
+<ul>
+<li><strong>Non-ephemeral Quota Key (NQK)</strong> —
+used for proving that a node is a core node.</li>
+<li><strong>Non-ephemeral Signing Key (NSK)</strong> —
+used to authenticate the node on the network level
+and derive the Non-ephemeral Encryption Key.</li>
+<li><strong>Ephemeral Signing Key (ESK)</strong> —
+used for signing Blend messages, one per encapsulation.</li>
+<li><strong>Non-ephemeral Encryption Key (NEK)</strong> —
+used for deriving shared secrets for message encryption.</li>
+<li><strong>Ephemeral Encryption Key (EEK)</strong> —
+used for encrypting Blend messages, one per encapsulation.</li>
+</ul>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in
+<a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h2 id="document-structure"><a class="header" href="#document-structure">Document Structure</a></h2>
+<p>This specification is organized into two distinct parts
+to serve different audiences and use cases:</p>
+<p><strong>Protocol Specification</strong> contains the normative requirements necessary
+for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives, message formats,
+network protocols, and behavioral requirements that all implementations
+must follow to ensure compatibility and maintain the protocol's
+privacy guarantees.
+Protocol designers, auditors, and those seeking to understand the core
+mechanisms should focus on this part.</p>
+<p><strong>Implementation Considerations</strong> provides non-normative guidance
+for implementers.
+This section offers practical recommendations, optimization strategies,
+and detailed examples that help developers build efficient and robust
+implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations
+and can significantly improve performance and reliability.</p>
+<h2 id="protocol-specification"><a class="header" href="#protocol-specification">Protocol Specification</a></h2>
+<p>This section defines the normative cryptographic protocol requirements
+for interoperability.</p>
+<h3 id="construction"><a class="header" href="#construction">Construction</a></h3>
+<h4 id="non-ephemeral-quota-key"><a class="header" href="#non-ephemeral-quota-key">Non-ephemeral Quota Key</a></h4>
+<p>A node generates a Non-ephemeral Quota Key (NQK)
+that is a ZkSignature (Zero Knowledge Signature Scheme).
+The NQK is stored on the Nomos blockchain ledger
+as the <code>zk_id</code> field in the <code>DeclarationInfo</code>
+(see <a href="#references">Service Declaration Protocol</a>)
+of the node's outcome of the participation in the
+Service Declaration Protocol (SDP).</p>
+<p>The NQK is used to prove that the node is part of the set of core nodes
+as indicated through the SDP.</p>
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Type</strong>: ZkSignature (Zero Knowledge Signature Scheme)</li>
+<li><strong>Storage</strong>: Nomos blockchain ledger (<code>zk_id</code> field in <code>DeclarationInfo</code>)</li>
+<li><strong>Purpose</strong>: Prove core node membership</li>
+<li><strong>Lifecycle</strong>: Non-ephemeral (persistent across sessions)</li>
+</ul>
+<h4 id="non-ephemeral-signing-key"><a class="header" href="#non-ephemeral-signing-key">Non-ephemeral Signing Key</a></h4>
+<p>A node generates a Non-ephemeral Signing Key (NSK)
+using the Ed25519 algorithm (see <a href="#references">RFC 8032</a>).
+The NSK is stored on the Nomos blockchain ledger
+as the <code>provider_id</code> field in the <code>DeclarationInfo</code>
+(see <a href="#references">Service Declaration Protocol</a>)
+of the node's outcome of the participation in the
+Service Declaration Protocol (SDP).</p>
+<p>The NSK is used to authenticate the node on the network level
+and to derive the Non-ephemeral Encryption Key.</p>
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Type</strong>: Ed25519 (see <a href="#references">RFC 8032</a>)</li>
+<li><strong>Storage</strong>: Nomos blockchain ledger (<code>provider_id</code> field in <code>DeclarationInfo</code>)</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Network-level node authentication</li>
+<li>Derivation of Non-ephemeral Encryption Key (NEK)</li>
+</ul>
+</li>
+<li><strong>Lifecycle</strong>: Non-ephemeral (persistent across sessions)</li>
+</ul>
+<h4 id="ephemeral-signing-key"><a class="header" href="#ephemeral-signing-key">Ephemeral Signing Key</a></h4>
+<p>A node generates Ephemeral Signing Keys (ESK) that are proved to be limited
+in number by the Proof of Quota (PoQ).
+The PoQ for core nodes requires a valid NQK for the session for which the
+PoQ is generated.</p>
+<p>A unique signing key MUST be generated for every encapsulation as required
+by the Message Encapsulation Mechanism.</p>
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Type</strong>: Ed25519</li>
+<li><strong>Quantity</strong>: Limited by Proof of Quota (PoQ)</li>
+<li><strong>Requirements</strong>: Valid NQK for the session</li>
+<li><strong>Purpose</strong>: Signing Blend messages</li>
+<li><strong>Lifecycle</strong>: Ephemeral (one per encapsulation)</li>
+</ul>
+<p><strong>Security Requirements:</strong></p>
+<ul>
+<li>The key MUST NOT be reused.
+Otherwise, the messages that reuse the same key can be linked together.</li>
+<li>The node is responsible for not reusing the key.</li>
+<li>A unique signing key MUST be generated for every encapsulation.</li>
+</ul>
+<h4 id="non-ephemeral-encryption-key"><a class="header" href="#non-ephemeral-encryption-key">Non-ephemeral Encryption Key</a></h4>
+<p>A node generates a Non-ephemeral Encryption Key (NEK).
+It is an X25519 curve key (see <a href="#references">RFC 7748</a>)
+derived from the NSK (Ed25519) public key retrieved from the <code>provider_id</code>,
+which is stored on the Nomos blockchain ledger
+when the node executes the SDP protocol.</p>
+<p>The NEK key is used for deriving a shared secret
+(alongside EEK defined below) for the Blend message encapsulation purposes.</p>
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Type</strong>: X25519 (see <a href="#references">RFC 7748</a>)</li>
+<li><strong>Derivation</strong>: Derived from NSK (Ed25519) public key</li>
+<li><strong>Source</strong>: <code>provider_id</code> field from Nomos blockchain ledger</li>
+<li><strong>Purpose</strong>: Deriving shared secrets for message encryption</li>
+<li><strong>Lifecycle</strong>: Non-ephemeral (persistent across sessions)</li>
+</ul>
+<p><strong>Derivation Process:</strong></p>
+<ol>
+<li>Retrieve NSK (Ed25519) public key from <code>provider_id</code> on Nomos blockchain ledger</li>
+<li>Derive X25519 curve key from Ed25519 public key</li>
+<li>Use resulting NEK for shared secret derivation</li>
+</ol>
+<h4 id="ephemeral-encryption-key"><a class="header" href="#ephemeral-encryption-key">Ephemeral Encryption Key</a></h4>
+<p>A node derives an Ephemeral Encryption Key (EEK) pair
+using the X25519 curve (see <a href="#references">RFC 7748</a>) from the ESK.</p>
+<p>A unique encryption key MUST be generated for every encapsulation
+as required by the Message Encapsulation Mechanism.</p>
+<p><strong>Properties:</strong></p>
+<ul>
+<li><strong>Type</strong>: X25519 (see <a href="#references">RFC 7748</a>)</li>
+<li><strong>Derivation</strong>: Derived from ESK (Ed25519)</li>
+<li><strong>Purpose</strong>: Encrypting Blend messages</li>
+<li><strong>Lifecycle</strong>: Ephemeral (one per encapsulation)</li>
+</ul>
+<p><strong>Shared Secret Derivation:</strong></p>
+<p>The derivation of a shared secret for the encryption of an encapsulated
+message requires:</p>
+<ul>
+<li><strong>Sender</strong>: EEK (Ephemeral Encryption Key of sender)</li>
+<li><strong>Recipient</strong>: X25519 key derived from NEK
+(Non-ephemeral Encryption Key of recipient)</li>
+</ul>
+<p>The shared secret is computed using the X25519 Diffie-Hellman key exchange
+between the sender's EEK and the recipient's derived NEK.</p>
+<h3 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h3>
+<h4 id="key-reuse"><a class="header" href="#key-reuse">Key Reuse</a></h4>
+<ul>
+<li><strong>CRITICAL</strong>: Ephemeral keys (ESK, EEK) MUST NOT be reused across
+different encapsulations</li>
+<li>Key reuse enables message linking, breaking anonymity guarantees</li>
+<li>Implementations MUST enforce unique key generation per encapsulation</li>
+</ul>
+<h4 id="key-derivation"><a class="header" href="#key-derivation">Key Derivation</a></h4>
+<ul>
+<li>NEK derivation from NSK MUST use standard Ed25519 to X25519 conversion</li>
+<li>EEK derivation from ESK MUST use standard Ed25519 to X25519 conversion</li>
+<li>Derivations MUST be deterministic for the same input</li>
+</ul>
+<h4 id="proof-of-quota"><a class="header" href="#proof-of-quota">Proof of Quota</a></h4>
+<ul>
+<li>ESK generation MUST be limited by valid Proof of Quota (PoQ)</li>
+<li>PoQ MUST include valid NQK for the current session</li>
+<li>Implementations MUST verify PoQ before accepting ephemeral signatures</li>
+</ul>
+<h4 id="ledger-storage"><a class="header" href="#ledger-storage">Ledger Storage</a></h4>
+<ul>
+<li>NQK and NSK MUST be retrievable from Nomos blockchain ledger via SDP protocol</li>
+<li>Ledger data MUST be integrity-protected</li>
+<li>Implementations SHOULD verify ledger data authenticity before use</li>
+</ul>
+<h2 id="implementation-considerations"><a class="header" href="#implementation-considerations">Implementation Considerations</a></h2>
+<p>This section provides guidance for implementing the protocol specification.</p>
+<h3 id="key-hierarchy-summary"><a class="header" href="#key-hierarchy-summary">Key Hierarchy Summary</a></h3>
+<pre><code class="language-text">┌─────────────────────────────────────────────────────────────┐
+│              Nomos Blockchain Ledger (SDP Protocol)         │
+├─────────────────────────────────────────────────────────────┤
+│  DeclarationInfo:                                           │
+│    - zk_id: NQK (ZkSignature)                              │
+│    - provider_id: NSK (Ed25519)                            │
+└─────────────────────────────────────────────────────────────┘
+                           │
+                           │ Derivation
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Non-ephemeral Keys (Persistent)            │
+├─────────────────────────────────────────────────────────────┤
+│  NQK (ZkSignature) ──► Proves core node membership          │
+│  NSK (Ed25519)     ──► Network authentication               │
+│  NEK (X25519)      ──► Derived from NSK for encryption      │
+└─────────────────────────────────────────────────────────────┘
+                           │
+                           │ Per-encapsulation
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Ephemeral Keys (Per Encapsulation)             │
+├─────────────────────────────────────────────────────────────┤
+│  ESK (Ed25519) ──► Signs Blend messages (via PoQ + NQK)     │
+│  EEK (X25519)  ──► Derived from ESK for encryption          │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="key-usage-matrix"><a class="header" href="#key-usage-matrix">Key Usage Matrix</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Key Type</th><th>Algorithm</th><th>Storage</th><th>Lifecycle</th><th>Primary Use</th><th>Derived From</th></tr></thead><tbody>
+<tr><td><strong>NQK</strong></td><td>ZkSignature</td><td>Nomos blockchain (<code>zk_id</code>)</td><td>Non-ephemeral</td><td>Core node proof</td><td>Generated</td></tr>
+<tr><td><strong>NSK</strong></td><td>Ed25519</td><td>Nomos blockchain (<code>provider_id</code>)</td><td>Non-ephemeral</td><td>Authentication</td><td>Generated</td></tr>
+<tr><td><strong>NEK</strong></td><td>X25519</td><td>Derived</td><td>Non-ephemeral</td><td>Shared secret derivation</td><td>NSK public key</td></tr>
+<tr><td><strong>ESK</strong></td><td>Ed25519</td><td>Memory</td><td>Ephemeral</td><td>Message signing</td><td>Generated (PoQ-limited)</td></tr>
+<tr><td><strong>EEK</strong></td><td>X25519</td><td>Memory</td><td>Ephemeral</td><td>Message encryption</td><td>ESK</td></tr>
+</tbody></table>
+</div>
+<h3 id="implementation-requirements"><a class="header" href="#implementation-requirements">Implementation Requirements</a></h3>
+<p>Implementations of this specification MUST:</p>
+<ol>
+<li>Generate NQK as ZkSignature and store in <code>DeclarationInfo.zk_id</code></li>
+<li>Generate NSK as Ed25519 and store in <code>DeclarationInfo.provider_id</code></li>
+<li>Derive NEK from NSK using Ed25519 to X25519 conversion</li>
+<li>Generate unique ESK per encapsulation, limited by PoQ</li>
+<li>Derive EEK from ESK using Ed25519 to X25519 conversion</li>
+<li>Never reuse ephemeral keys across encapsulations</li>
+<li>Verify PoQ includes valid NQK before generating ESK</li>
+</ol>
+<p>Implementations SHOULD:</p>
+<ol>
+<li>Securely erase ephemeral keys after use</li>
+<li>Implement key generation auditing</li>
+<li>Validate all derived keys before use</li>
+<li>Monitor for key reuse attempts</li>
+</ol>
+<h3 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h3>
+<h4 id="secure-key-management"><a class="header" href="#secure-key-management">Secure Key Management</a></h4>
+<ul>
+<li>Store non-ephemeral keys in secure storage
+(HSM, secure enclave, or encrypted memory)</li>
+<li>Implement secure key erasure for ephemeral keys immediately after use</li>
+<li>Use constant-time operations for key comparisons to prevent timing attacks</li>
+</ul>
+<h4 id="operational-security"><a class="header" href="#operational-security">Operational Security</a></h4>
+<ul>
+<li>Log key generation events (without logging key material)</li>
+<li>Monitor for anomalous key usage patterns</li>
+<li>Implement rate limiting on key generation to prevent resource
+exhaustion</li>
+<li>Regularly audit key lifecycle management</li>
+</ul>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li>Blend Protocol - Mix network protocol for anonymous communication in Nomos</li>
+<li>Service Declaration Protocol (SDP) - Protocol for registering core nodes
+and storing <code>DeclarationInfo</code> on the Nomos blockchain ledger</li>
+<li>Proof of Quota Specification (PoQ)</li>
+<li>Message Encapsulation Mechanism</li>
+<li>Zero Knowledge Signature Scheme (ZkSignature)</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Key-Types-and-Generation-Specification-215261aa09df81088b8fd7c3089162e8">Key Types and Generation Specification</a>
+- Original Key Types and Generation documentation</li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc8032">RFC 8032</a> - Edwards-Curve Digital Signature Algorithm (EdDSA)</li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc7748">RFC 7748</a> - Elliptic Curves for Security (X25519)</li>
+<li>Ed25519 to Curve25519 conversion: Standard practice for deriving X25519 keys from Ed25519 keys</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/nomos-message-encapsulation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/nomos-message-encapsulation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

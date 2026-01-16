@@ -1,0 +1,710 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Bedrock Service Declaration Protocol - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html" class="active"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="bedrock-service-declaration-protocol"><a class="header" href="#bedrock-service-declaration-protocol">BEDROCK-SERVICE-DECLARATION-PROTOCOL</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Bedrock Service Declaration Protocol</td></tr>
+<tr><td>Slug</td><td>bedrock-service-declaration-protocol</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Marcin Pawlowski <a href="mailto:marcin@status.im">marcin@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Mehmet Gonen <a href="mailto:mehmet@status.im">mehmet@status.im</a>, Daniel Sanchez Quiros <a href="mailto:danielsq@status.im">danielsq@status.im</a>, Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a>, Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a>, Gusto Bacvinka <a href="mailto:augustinas@status.im">augustinas@status.im</a>, David Rusu <a href="mailto:davidrusu@status.im">davidrusu@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-service-declaration-protocol.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification defines the Service Declaration Protocol (SDP),
+a mechanism enabling validators to declare their participation
+in specific protocols that require a known and agreed-upon list of participants.
+Examples include Data Availability (DA) and the Blend Network.
+SDP creates a single repository of identifiers
+used to establish secure communication between validators and provide services.
+Before being admitted to the repository,
+a validator proves that it has locked at least a minimum stake.</p>
+<p><strong>Keywords:</strong> service declaration, validator, stake, declaration, withdrawal,
+session, minimum stake, provider, locator, Blend Network, Data Availability</p>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
+<!-- markdownlint-disable MD013 -->
+<div class="table-wrapper"><table><thead><tr><th>Terminology</th><th>Description</th></tr></thead><tbody>
+<tr><td>SDP</td><td>Service Declaration Protocol for node participation in Nomos Services.</td></tr>
+<tr><td>Declaration</td><td>A message confirming a validator's willingness to provide a specific service.</td></tr>
+<tr><td>Service Type</td><td>The type of service being declared (e.g., BN for Blend Network, DA for Data Availability).</td></tr>
+<tr><td>Minimum Stake</td><td>The minimum amount of stake a node MUST lock to declare for a service.</td></tr>
+<tr><td>Session</td><td>A fixed-length window defined per service via <code>session_length</code>.</td></tr>
+<tr><td>Lock Period</td><td>The minimum time during which a declaration cannot be withdrawn.</td></tr>
+<tr><td>Inactivity Period</td><td>The maximum time during which an activation message MUST be sent.</td></tr>
+<tr><td>Retention Period</td><td>The time after which a declaration can be safely deleted.</td></tr>
+<tr><td>Provider ID</td><td>An Ed25519 public key used to sign SDP messages and establish secure links.</td></tr>
+<tr><td>ZK ID</td><td>A public key used for zero-knowledge operations including rewarding.</td></tr>
+<tr><td>Locator</td><td>The network address of a validator following the multiaddr scheme.</td></tr>
+<tr><td>Declaration ID</td><td>A unique identifier for a declaration, computed as a hash.</td></tr>
+</tbody></table>
+</div><!-- markdownlint-enable MD013 -->
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>In many protocols, a known and agreed-upon list of participants is required.
+Examples include Data Availability and the Blend Network.
+SDP enables nodes to declare their eligibility to serve a specific service
+and withdraw their declarations.</p>
+<h3 id="requirements"><a class="header" href="#requirements">Requirements</a></h3>
+<p>The protocol requirements are:</p>
+<ul>
+<li>A declaration MUST be backed by confirmation
+that the sender owns a certain value of stake.</li>
+<li>A declaration is valid until it is withdrawn
+or is not used for a service-specific amount of time.</li>
+</ul>
+<h3 id="actions-overview"><a class="header" href="#actions-overview">Actions Overview</a></h3>
+<p>The protocol defines the following actions:</p>
+<ul>
+<li><strong>Declare</strong>: A node sends a declaration confirming its willingness
+to provide a specific service, backed by locking a threshold of stake.</li>
+<li><strong>Active</strong>: A node marks that its participation in the protocol is active
+according to the service-specific activity logic.
+This action enables the protocol to monitor the node's activity.
+It is crucial to exclude inactive nodes from the set of active nodes,
+as it enhances the stability of services.</li>
+<li><strong>Withdraw</strong>: A node withdraws its declaration and stops providing a service.</li>
+</ul>
+<h3 id="protocol-flow"><a class="header" href="#protocol-flow">Protocol Flow</a></h3>
+<ol>
+<li>
+<p>A node sends a declaration message for a specific service
+and proves it has a minimum stake.</p>
+</li>
+<li>
+<p>The declaration is registered on the blockchain ledger,
+and the node can commence its service
+according to the service-specific logic.</p>
+</li>
+<li>
+<p>After a service-specific service-providing time, the node confirms its activity.</p>
+</li>
+<li>
+<p>The node MUST confirm its activity with a service-specific minimum frequency;
+otherwise, its declaration is inactive.</p>
+</li>
+<li>
+<p>After the service-specific locking period,
+the node can send a withdrawal message,
+and its declaration is removed from the blockchain ledger
+(after the necessary retention period),
+meaning the node will no longer provide the service.</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong>: Protocol messages are subject to finality,
+meaning messages become part of the immutable ledger after a delay.
+The delay is defined by the consensus.</p>
+</blockquote>
+<h2 id="protocol-specification"><a class="header" href="#protocol-specification">Protocol Specification</a></h2>
+<h3 id="service-types"><a class="header" href="#service-types">Service Types</a></h3>
+<p>The following services are defined for service declaration:</p>
+<ul>
+<li><code>BN</code>: Blend Network service.</li>
+<li><code>DA</code>: Data Availability service.</li>
+</ul>
+<pre><code class="language-python">class ServiceType(Enum):
+    BN = "BN"  # Blend Network
+    DA = "DA"  # Data Availability
+</code></pre>
+<p>A declaration can be generated for any of the services above.
+Any declaration that is not one of the above MUST be rejected.
+The number of services MAY grow in the future.</p>
+<h3 id="minimum-stake"><a class="header" href="#minimum-stake">Minimum Stake</a></h3>
+<p>The minimum stake is a global value
+defining the minimum stake a node MUST have to perform any service.</p>
+<p>The <code>MinStake</code> structure holds the value of the stake <code>stake_threshold</code>
+and the block number at which it was set (<code>timestamp</code>).</p>
+<pre><code class="language-python">class MinStake:
+    stake_threshold: StakeThreshold
+    timestamp: BlockNumber
+</code></pre>
+<p>The <code>stake_thresholds</code> structure aggregates all defined <code>MinStake</code> values:</p>
+<pre><code class="language-python">stake_thresholds: list[MinStake]
+</code></pre>
+<h3 id="service-parameters"><a class="header" href="#service-parameters">Service Parameters</a></h3>
+<p>The service parameters structure defines the parameters necessary
+for handling interaction between the protocol and services.
+Each service type MUST be mapped to the following parameters:</p>
+<ul>
+<li><code>session_length</code>: The session length expressed as the number of blocks.
+Sessions are counted from block <code>timestamp</code>.</li>
+<li><code>lock_period</code>: The minimum time (as a number of sessions)
+during which the declaration cannot be withdrawn.
+This time MUST include the period necessary for finalizing the declaration
+and provision of a service for at least a single session.
+It can be expressed as blocks by multiplying by <code>session_length</code>.</li>
+<li><code>inactivity_period</code>: The maximum time (as a number of sessions)
+during which an activation message MUST be sent;
+otherwise, the declaration is considered inactive.
+It can be expressed as blocks by multiplying by <code>session_length</code>.</li>
+<li><code>retention_period</code>: The time (as a number of sessions)
+after which the declaration can be safely deleted
+by the Garbage Collection mechanism.
+It can be expressed as blocks by multiplying by <code>session_length</code>.</li>
+<li><code>timestamp</code>: The block number at which the parameter was set.</li>
+</ul>
+<pre><code class="language-python">class ServiceParameters:
+    session_length: NumberOfBlocks
+    lock_period: NumberOfSessions
+    inactivity_period: NumberOfSessions
+    retention_period: NumberOfSessions
+    timestamp: BlockNumber
+</code></pre>
+<p>The <code>parameters</code> structure aggregates all defined <code>ServiceParameters</code> values:</p>
+<pre><code class="language-python">parameters: list[ServiceParameters]
+</code></pre>
+<h3 id="session-tracking"><a class="header" href="#session-tracking">Session Tracking</a></h3>
+<p>A session is a fixed-length window defined per service
+via <code>ServiceParameters.session_length</code>.
+The session length MUST be at least <code>k</code>, the consensus finality parameter.</p>
+<p>Session numbers start at 0 and are computed as follows:</p>
+<pre><code class="language-python">def get_session_number(current_block_number, service_parameters):
+    return current_block_number // service_parameters.session_length
+</code></pre>
+<p>At the start of session <code>n</code>,
+each node takes a snapshot (<code>get_snapshot_at_block</code>) of the SDP registry
+at a specified block height from the finalized part of the chain:</p>
+<pre><code class="language-python">def get_session_snapshot(session_number, service_parameters):
+    if session_number &lt; 2:
+        # Take the genesis block for the first two sessions
+        return get_snapshot_at_block(0)
+    # Take the last block of the previous session for the rest
+    return get_snapshot_at_block(
+        (session_number - 1) * service_parameters.session_length - 1
+    )
+</code></pre>
+<p>The function <code>get_snapshot_at_block(block_number)</code> returns the state
+of the SDP registry at <code>block_number</code>,
+including state changes made by that block.
+This snapshot defines the declaration state for the session—
+each snapshot updates the common view of the registry.
+Changes to the declaration registry take effect with a one-session delay:
+messages sent during session <code>n</code> are included
+in the next snapshot (for session <code>n+1</code>).</p>
+<p>Sessions 0 and 1 read the snapshot at block 0,
+because the chain has not yet progressed far enough
+to provide a later finalized block.</p>
+<h3 id="identifiers"><a class="header" href="#identifiers">Identifiers</a></h3>
+<p>The following identifiers are used for service-specific cryptographic operations:</p>
+<ul>
+<li><code>provider_id</code>: Used to sign SDP messages
+and establish secure links between validators.
+It is an <code>Ed25519PublicKey</code>.</li>
+<li><code>zk_id</code>: Used for zero-knowledge operations by the validator,
+including rewarding (Zero Knowledge Signature Scheme).</li>
+</ul>
+<h3 id="locators"><a class="header" href="#locators">Locators</a></h3>
+<p>A <code>Locator</code> is the address of a validator
+used to establish secure communication between validators.
+It follows the multiaddr addressing scheme from libp2p,
+but it MUST contain only the location part
+and MUST NOT contain the node identity (<code>peer_id</code>).</p>
+<p>The <code>provider_id</code> MUST be used as the node identity.
+Therefore, the <code>Locator</code> MUST be completed
+by adding the <code>provider_id</code> at the end of it,
+making the <code>Locator</code> usable in the context of libp2p.</p>
+<p>The length of the <code>Locator</code> is restricted to 329 characters.</p>
+<p>The syntax of every <code>Locator</code> entry MUST be validated.</p>
+<p>Common formatting of every <code>Locator</code> MUST be applied
+to maintain its unambiguity and make deterministic ID generation work consistently.
+The <code>Locator</code> MUST at least contain only lowercase letters
+and every part of the address MUST be explicit (no implicit defaults).</p>
+<h3 id="declaration-message"><a class="header" href="#declaration-message">Declaration Message</a></h3>
+<p>The construction of the declaration message is as follows:</p>
+<pre><code class="language-python">class DeclarationMessage:
+    service_type: ServiceType
+    locators: list[Locator]
+    provider_id: Ed25519PublicKey
+    locked_note_id: NoteId
+    zk_id: ZkPublicKey
+</code></pre>
+<p>The <code>locators</code> list length MUST be limited to reduce the potential for abuse.
+The length of the list MUST NOT be longer than 8.</p>
+<p>The message MUST be signed by the <code>provider_id</code> key
+to prove ownership of the key used for network-level authentication.</p>
+<p>The <code>locked_note_id</code> points to a locked note
+used for minimum stake threshold verification purposes.</p>
+<p>The message MUST also be signed by the <code>zk_id</code> key.</p>
+<h3 id="declaration-storage"><a class="header" href="#declaration-storage">Declaration Storage</a></h3>
+<p>Only valid declaration messages can be stored on the blockchain ledger.
+The <code>DeclarationInfo</code> structure is defined as follows:</p>
+<pre><code class="language-python">class DeclarationInfo:
+    service: ServiceType
+    provider_id: Ed25519PublicKey
+    locked_note_id: NoteId
+    zk_id: ZkPublicKey
+    locators: list[Locator]
+    created: BlockNumber
+    active: BlockNumber
+    withdrawn: BlockNumber
+    nonce: Nonce
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>service</code>: The service type of the declaration.</li>
+<li><code>provider_id</code>: An <code>Ed25519PublicKey</code> used to sign the message by the validator.</li>
+<li><code>locked_note_id</code>: A <code>NoteId</code> used for minimum stake threshold verification.</li>
+<li><code>zk_id</code>: Used for zero-knowledge operations including rewarding.</li>
+<li><code>locators</code>: A copy of the locators from the <code>DeclarationMessage</code>.</li>
+<li><code>created</code>: The block number of the block that contained the declaration.</li>
+<li><code>active</code>: The latest block number for which the active message was sent
+(set to <code>created</code> by default).</li>
+<li><code>withdrawn</code>: The block number for which the service declaration was withdrawn
+(set to 0 by default).</li>
+<li><code>nonce</code>: MUST be set to 0 for the declaration message
+and MUST increase monotonically by every message sent for the <code>declaration_id</code>.</li>
+</ul>
+<p>The <code>declaration_id</code> (of type <code>DeclarationId</code>)
+is the unique identifier of <code>DeclarationInfo</code>,
+calculated as a hash of the concatenation of
+<code>service</code>, <code>provider_id</code>, <code>zk_id</code>, and <code>locators</code>.
+The hash function implementation is blake2b using 256 bits of output:</p>
+<pre><code class="language-python">declaration_id = Hash(service || provider_id || zk_id || locators)
+</code></pre>
+<p>The <code>declaration_id</code> is not stored as part of <code>DeclarationInfo</code>
+but is used to index it.
+All <code>DeclarationInfo</code> references are stored in <code>declarations</code>
+and are indexed by <code>declaration_id</code>:</p>
+<pre><code class="language-python">declarations: list[declaration_id]
+</code></pre>
+<h3 id="active-message"><a class="header" href="#active-message">Active Message</a></h3>
+<p>The construction of the active message is as follows:</p>
+<pre><code class="language-python">class ActiveMessage:
+    declaration_id: DeclarationId
+    nonce: Nonce
+    metadata: Metadata
+</code></pre>
+<p>Where <code>metadata</code> is service-specific node activeness metadata.</p>
+<p>The message MUST be signed by the <code>zk_id</code> key
+associated with the <code>declaration_id</code>.</p>
+<p>The <code>nonce</code> MUST increase monotonically
+by every message sent for the <code>declaration_id</code>.</p>
+<h3 id="withdraw-message"><a class="header" href="#withdraw-message">Withdraw Message</a></h3>
+<p>The construction of the withdraw message is as follows:</p>
+<pre><code class="language-python">class WithdrawMessage:
+    declaration_id: DeclarationId
+    locked_note_id: NoteId
+    nonce: Nonce
+</code></pre>
+<p>The message MUST be signed by the <code>zk_id</code> key from the <code>declaration_id</code>.</p>
+<p>The <code>locked_note_id</code> is a <code>NoteId</code>
+that was used for minimum stake threshold verification purposes
+and will be unlocked after withdrawal.</p>
+<p>The <code>nonce</code> MUST increase monotonically
+by every message sent for the <code>declaration_id</code>.</p>
+<h3 id="indexing"><a class="header" href="#indexing">Indexing</a></h3>
+<p>Every event MUST be correctly indexed
+to enable lighter synchronization of the changes.
+Events are indexed by <code>EventType</code>, <code>ServiceType</code>, and <code>Timestamp</code>,
+where <code>EventType = { "created", "active", "withdrawn" }</code>
+corresponds to the type of message:</p>
+<pre><code class="language-python">events = {
+    event_type: {
+        service_type: {
+            timestamp: {
+                declarations: list[declaration_id]
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="protocol-actions"><a class="header" href="#protocol-actions">Protocol Actions</a></h2>
+<h3 id="declare"><a class="header" href="#declare">Declare</a></h3>
+<p>The Declare action associates a validator with a service it wants to provide.
+It requires sending a valid <code>DeclarationMessage</code>,
+which is then processed and stored.</p>
+<p>The declaration message is considered valid when all of the following are met:</p>
+<ul>
+<li>The sender meets the stake requirements and its <code>locked_note_id</code> is valid.</li>
+<li>The <code>declaration_id</code> is unique.</li>
+<li>The sender knows the secret behind the <code>provider_id</code> identifier.</li>
+<li>The length of the <code>locators</code> list MUST NOT be longer than 8.</li>
+<li>The <code>nonce</code> increases monotonically.</li>
+</ul>
+<p>If all conditions are fulfilled,
+the message is stored on the blockchain ledger;
+otherwise, the message is discarded.</p>
+<h3 id="active"><a class="header" href="#active">Active</a></h3>
+<p>The Active action enables marking the provider as actively providing a service.
+It requires sending a valid <code>ActiveMessage</code>,
+which is relayed to the service-specific node activity logic.</p>
+<p>The Active action updates the <code>active</code> value of the <code>DeclarationInfo</code>,
+which also activates inactive (but not expired) providers.</p>
+<p>The SDP active action logic is:</p>
+<ol>
+<li>
+<p>A node sends an <code>ActiveMessage</code> transaction.</p>
+</li>
+<li>
+<p>The <code>ActiveMessage</code> is verified by the SDP logic:</p>
+<ol>
+<li>The <code>declaration_id</code> returns an existing <code>DeclarationInfo</code>.</li>
+<li>The transaction containing <code>ActiveMessage</code> is signed by the <code>zk_id</code>.</li>
+<li>The <code>withdrawn</code> from the <code>DeclarationInfo</code> is set to zero.</li>
+<li>The <code>nonce</code> increases monotonically.</li>
+</ol>
+</li>
+<li>
+<p>If any of these conditions fail, discard the message and stop processing.</p>
+</li>
+<li>
+<p>The message is processed by the service-specific activity logic
+alongside the <code>active</code> value indicating the period
+since the last active message was sent.
+The <code>active</code> value comes from the <code>DeclarationInfo</code>.</p>
+</li>
+<li>
+<p>If the service-specific activity logic approves the node active message,
+then the <code>active</code> field of the <code>DeclarationInfo</code>
+is set to the current block height.</p>
+</li>
+</ol>
+<h3 id="withdraw"><a class="header" href="#withdraw">Withdraw</a></h3>
+<p>The Withdraw action enables withdrawal of a service declaration.
+It requires sending a valid <code>WithdrawMessage</code>.
+The withdrawal cannot happen before the end of the locking period,
+defined as the number of blocks counted since <code>created</code>.
+This lock period is stored as <code>lock_period</code> in the Service Parameters.</p>
+<p>The logic of the withdraw action is:</p>
+<ol>
+<li>
+<p>A node sends a <code>WithdrawMessage</code> transaction.</p>
+</li>
+<li>
+<p>The <code>WithdrawMessage</code> is verified by the SDP logic:</p>
+<ol>
+<li>The <code>declaration_id</code> returns an existing <code>DeclarationInfo</code>.</li>
+<li>The transaction containing <code>WithdrawMessage</code> is signed by the <code>zk_id</code>.</li>
+<li>The <code>withdrawn</code> from <code>DeclarationInfo</code> is set to zero.</li>
+<li>The <code>nonce</code> increases monotonically.</li>
+</ol>
+</li>
+<li>
+<p>If any of the above is not correct, discard the message and stop.</p>
+</li>
+<li>
+<p>Set the <code>withdrawn</code> from the <code>DeclarationInfo</code> to the current block height.</p>
+</li>
+<li>
+<p>Unlock the stake (release the <code>locked_note_id</code>).</p>
+</li>
+</ol>
+<h3 id="garbage-collection"><a class="header" href="#garbage-collection">Garbage Collection</a></h3>
+<p>The protocol requires a garbage collection mechanism
+that periodically removes unused <code>DeclarationInfo</code> entries.</p>
+<p>The logic of garbage collection is:</p>
+<p>For every <code>DeclarationInfo</code> in the <code>declarations</code> set,
+remove the entry if either:</p>
+<ol>
+<li>
+<p>The entry is past the retention period:
+<code>withdrawn + (retention_period * session_length) &lt; current_block_height</code>.</p>
+</li>
+<li>
+<p>The entry is inactive beyond the inactivity and retention periods:
+<code>active + (inactivity_period + retention_period) * session_length &lt; current_block_height</code>.</p>
+</li>
+</ol>
+<h3 id="query-interface"><a class="header" href="#query-interface">Query Interface</a></h3>
+<p>The protocol MUST enable querying the blockchain ledger
+with at least the following queries:</p>
+<ul>
+<li><code>GetAllProviderId(timestamp)</code>:
+Returns all <code>provider_id</code>s associated with the timestamp.</li>
+<li><code>GetAllProviderIdSince(timestamp)</code>:
+Returns all <code>provider_id</code>s since the timestamp.</li>
+<li><code>GetAllDeclarationInfo(timestamp)</code>:
+Returns all <code>DeclarationInfo</code> entries associated with the timestamp.</li>
+<li><code>GetAllDeclarationInfoSince(timestamp)</code>:
+Returns all <code>DeclarationInfo</code> entries since the timestamp.</li>
+<li><code>GetDeclarationInfo(provider_id)</code>:
+Returns the <code>DeclarationInfo</code> entry identified by the <code>provider_id</code>.</li>
+<li><code>GetDeclarationInfo(declaration_id)</code>:
+Returns the <code>DeclarationInfo</code> entry identified by the <code>declaration_id</code>.</li>
+<li><code>GetAllServiceParameters(timestamp)</code>:
+Returns all entries of the <code>ServiceParameters</code> store for the timestamp.</li>
+<li><code>GetAllServiceParametersSince(timestamp)</code>:
+Returns all entries of the <code>ServiceParameters</code> store since the timestamp.</li>
+<li><code>GetServiceParameters(service_type, timestamp)</code>:
+Returns the service parameter entry for a <code>service_type</code> at a timestamp.</li>
+<li><code>GetMinStake(timestamp)</code>:
+Returns the <code>MinStake</code> structure at the requested timestamp.</li>
+<li><code>GetMinStakeSince(timestamp)</code>:
+Returns a set of <code>MinStake</code> structures since the requested timestamp.</li>
+</ul>
+<p>The query MUST return an error
+if the retention period for the declaration has passed
+and the requested information is not available.</p>
+<p>The list of queries MAY be extended.</p>
+<p>Every query MUST return information for a finalized state only.</p>
+<h2 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h2>
+<h3 id="stake-requirements"><a class="header" href="#stake-requirements">Stake Requirements</a></h3>
+<p>Validators MUST lock a minimum stake before declaring for a service.
+This prevents Sybil attacks
+by ensuring economic commitment to the network.</p>
+<h3 id="message-authentication"><a class="header" href="#message-authentication">Message Authentication</a></h3>
+<p>All SDP messages MUST be cryptographically signed:</p>
+<ul>
+<li><code>DeclarationMessage</code> MUST be signed by both <code>provider_id</code> and <code>zk_id</code>.</li>
+<li><code>ActiveMessage</code> MUST be signed by <code>zk_id</code>.</li>
+<li><code>WithdrawMessage</code> MUST be signed by <code>zk_id</code>.</li>
+</ul>
+<h3 id="nonce-monotonicity"><a class="header" href="#nonce-monotonicity">Nonce Monotonicity</a></h3>
+<p>The <code>nonce</code> MUST increase monotonically for each <code>declaration_id</code>
+to prevent replay attacks.</p>
+<h3 id="locator-validation"><a class="header" href="#locator-validation">Locator Validation</a></h3>
+<p>The syntax of every <code>Locator</code> entry MUST be validated
+to prevent malformed addresses from being registered.
+The length restriction of 329 characters
+and the limit of 8 locators per declaration
+prevent resource exhaustion attacks.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/v1-1-Mantle-Specification-269261aa09df80dda501f568697930fd">BEDROCK-MANTLE-SPECIFICATION</a> - Mantle Transaction and Operation specification</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d">Service Declaration Protocol</a> - Original specification document</li>
+<li><a href="https://github.com/multiformats/multiaddr">libp2p multiaddr</a> - Multiaddr addressing scheme</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/p2p-network.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/p2p-network.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

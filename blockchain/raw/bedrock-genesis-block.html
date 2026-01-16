@@ -1,0 +1,609 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Bedrock Genesis Block - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html" class="active"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="bedrock-genesis-block"><a class="header" href="#bedrock-genesis-block">BEDROCK-GENESIS-BLOCK</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Bedrock Genesis Block Specification</td></tr>
+<tr><td>Slug</td><td>bedrock-genesis-block</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>David Rusu <a href="mailto:davidrusu@status.im">davidrusu@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Hong-Sheng Zhou, Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a>, Marcin Pawlowski <a href="mailto:marcin@status.im">marcin@status.im</a>, Mehmet Gonen <a href="mailto:mehmet@status.im">mehmet@status.im</a>, Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a>, Daniel Sanchez Quiros <a href="mailto:danielsq@status.im">danielsq@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-genesis-block.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification defines the Genesis Block for the Bedrock chain,
+including the initial bedrock service providers, NMO token distribution,
+and protocol parameters.
+The Genesis Block is the root of trust for all subsequent protocol operations
+and must be constructed in a way that is deterministic, verifiable,
+and robust against long-range or bootstrap attacks.</p>
+<p><strong>Keywords:</strong> genesis block, token distribution, epoch nonce, service providers,
+Cryptarchia initialization, ledger state</p>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Terminology</th><th>Description</th></tr></thead><tbody>
+<tr><td>Genesis Block</td><td>The first block in the Bedrock chain establishing the initial state.</td></tr>
+<tr><td>NMO</td><td>The native token of the Nomos network.</td></tr>
+<tr><td>Epoch Nonce</td><td>The source of randomness for the Cryptarchia lottery.</td></tr>
+<tr><td>Service Provider</td><td>A node participating in DA or Blend network services.</td></tr>
+<tr><td>Ledger Transaction</td><td>A transaction that modifies the token ledger state.</td></tr>
+<tr><td>Mantle Transaction</td><td>A transaction containing operations and a ledger transaction.</td></tr>
+</tbody></table>
+</div>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<p>The block body is a single Mantle Transaction
+containing a Ledger Transaction distributing the notes to initial token holders.
+The bedrock services are initialized through <code>SDP_DECLARE</code> Operations
+embedded in the Mantle Transaction's Operations list
+and protocol initializing constants are encoded through a <code>CHANNEL_INSCRIBE</code> Operation
+also embedded in the Operations list.</p>
+<p>Not all protocol constants are encoded in the Genesis block.
+The principle used to decide
+whether a value should be in the Genesis block or not
+is whether it is a value that is derived from blockchain activity
+or whether it is updated through a protocol update (hard / soft fork).
+For example, the epoch nonce is updated through normal blockchain Operations
+and therefore it should be specified in the Genesis block.
+Gas constants are only changed through protocol updates and hard forks
+and therefore they will be hardcoded in the node implementation.</p>
+<h2 id="genesis-block-data-structure"><a class="header" href="#genesis-block-data-structure">Genesis Block Data Structure</a></h2>
+<p>The Genesis Block is composed of the Genesis Block Header
+and the Genesis Mantle Transaction
+(there is a single transaction in the genesis block).
+The Mantle Transaction contains all information necessary
+for initializing Bedrock Services and Cryptarchia state,
+as well as distributing the initial tokens to stakeholders.</p>
+<h3 id="initial-token-distribution"><a class="header" href="#initial-token-distribution">Initial Token Distribution</a></h3>
+<p>Initial tokens will be distributed through a Ledger Transaction
+containing zero inputs and one output note for each initial stakeholder.
+Note that since the Ledger is transparent,
+the initial stake allocation is visible to everyone.
+Those wishing to hide their initial stake may opt to subdivide their note
+into a few different notes of equal value.</p>
+<p>In order to participate in the Cryptarchia lottery,
+stakeholders must generate their note keys in accordance with
+the Proof of Leadership protocol specified at
+<a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification">Proof of Leadership Specification - Protocol</a>.</p>
+<p>The initial state of the Ledger will be derived
+through normal execution of this Ledger Transaction,
+that is, each output's note ID will be added to the unspent notes set.</p>
+<h4 id="initial-token-distribution-example"><a class="header" href="#initial-token-distribution-example">Initial Token Distribution Example</a></h4>
+<pre><code class="language-python">STAKE_DISTRIBUTION_TX = LedgerTx(
+    inputs=[],
+    outputs=[
+        Note(value=1000, public_key=STAKE_HOLDER_0_PK),
+        Note(value=2000, public_key=STAKE_HOLDER_1_PK),
+        Note(value=1500, public_key=STAKE_HOLDER_2_PK),
+        # ...
+    ]
+)
+</code></pre>
+<h3 id="initial-service-declarations"><a class="header" href="#initial-service-declarations">Initial Service Declarations</a></h3>
+<p>Data Availability (DA) and Blend Network MUST initialize their set of providers.
+This is done through a set of <code>SDP_DECLARE</code> Operations
+in the Genesis Mantle Transaction.</p>
+<p>Both Blend and DA enforce a minimal network size for the service to be active.
+Thus, in order to have active Blend and DA services at Genesis,
+there MUST be at least as many declarations for each service
+in the Genesis block to meet each service's minimal network size:</p>
+<ul>
+<li><strong>DA</strong> — <a href="https://nomos-tech.notion.site/NomosDA-Specification">NomosDA Specification - Minimum Network Size</a></li>
+<li><strong>Blend</strong> — <a href="https://nomos-tech.notion.site/Blend-Protocol">Blend Protocol - Minimal Network Size</a></li>
+</ul>
+<h4 id="initial-service-declarations-example"><a class="header" href="#initial-service-declarations-example">Initial Service Declarations Example</a></h4>
+<pre><code class="language-python">DA_DECLARATIONS = [
+    Declaration(
+        msg=DeclarationMessage(
+            ServiceType.DA,
+            ["ip://1.1.1.1:3000"],
+            PROVIDER_ID_0,
+            ZK_ID_0
+        ),
+        locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+    ),
+    # ... 40 total declarations
+]
+
+BLEND_DECLARATIONS = [
+    Declaration(
+        msg=DeclarationMessage(
+            ServiceType.BLEND,
+            ["ip://1.1.1.1:3000"],
+            PROVIDER_ID_0,
+            ZK_ID_0
+        ),
+        locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+    ),
+    # ... 32 total declarations
+]
+
+SERVICE_DECLARATIONS = DA_DECLARATIONS + BLEND_DECLARATIONS
+</code></pre>
+<h3 id="cryptarchia-parameters"><a class="header" href="#cryptarchia-parameters">Cryptarchia Parameters</a></h3>
+<p>Cryptarchia is initialized with the following parameters:</p>
+<ul>
+<li>
+<p><code>genesis_time</code>: ISO 8601 encoded timestamp.</p>
+<p>Cryptarchia uses slots as a measure of time offset from some start time.
+This timestamp must be agreed upon by all nodes in order to have a common clock.</p>
+</li>
+<li>
+<p><code>chain_id</code>: string.</p>
+<p>It is useful to differentiate testnets from mainnet.
+To avoid confusion, the chain ID is placed in the Genesis block
+to guarantee that the networks are disjoint.</p>
+</li>
+<li>
+<p><code>genesis_epoch_nonce</code>: 32 bytes, hex encoded.</p>
+<p>The initial source of randomness for the Cryptarchia lottery.
+The process for selecting this value is described in detail
+at <a href="#epoch-nonce-ceremony">Epoch Nonce Ceremony</a>.</p>
+</li>
+</ul>
+<p>These parameters are encoded in the Genesis block
+as an inscription sent to the null channel.</p>
+<h4 id="cryptarchia-parameters-example"><a class="header" href="#cryptarchia-parameters-example">Cryptarchia Parameters Example</a></h4>
+<pre><code class="language-python">CRYPTARCHIA_PARAMS = {
+    "chain_id": "nomos-mainnet",
+    "genesis_time": "2026-01-05T19:20:35Z",
+    "genesis_epoch_nonce": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+}
+
+CRYPTARCHIA_INSCRIPTION = Inscribe(
+    channel=bytes(32),
+    inscription=json.dumps(CRYPTARCHIA_PARAMS).encode("utf-8"),
+    parent=bytes(32),
+    signer=Ed25519PublicKey_ZERO,
+)
+</code></pre>
+<h2 id="epoch-nonce-ceremony"><a class="header" href="#epoch-nonce-ceremony">Epoch Nonce Ceremony</a></h2>
+<p>The initial epoch nonce value governs the Cryptarchia lottery randomness
+for the first epoch.
+It must be revealed AFTER the initial stake distribution has been frozen.
+This is done to prevent any stakeholders from gaining an unfair advantage
+from prior knowledge of the lottery randomness.</p>
+<p>The protocol for generating the initial randomness nonce can be found below.</p>
+<h3 id="schedule-epoch-nonce-ceremony-event"><a class="header" href="#schedule-epoch-nonce-ceremony-event">Schedule Epoch Nonce Ceremony Event</a></h3>
+<p>The time of the epoch nonce ceremony must be fixed well in advance;
+let <code>t</code> denote the time of the Epoch Nonce Ceremony, broadcast <code>t</code> widely.</p>
+<p>The <code>STAKE_DISTRIBUTION_TX</code> must be finalized before <code>t</code>
+to ensure a fair Cryptarchia slot lottery.</p>
+<h3 id="randomness-collection"><a class="header" href="#randomness-collection">Randomness Collection</a></h3>
+<p>The entropy is collected from multiple randomness sources:</p>
+<ul>
+<li>
+<p><strong>Bitcoin block hash</strong> immediately after time <code>t</code>, denoted as r₁.
+Block hash can be found on <code>blockchain.com</code>'s bitcoin block explorer,
+e.g. <a href="https://www.blockchain.com/explorer/blocks/btc/905030">blockchain.com/explorer/blocks/btc/905030</a>.</p>
+</li>
+<li>
+<p><strong>Ethereum block hash</strong> immediately after time <code>t</code>, denoted as r₂.
+Block hash can be found in the <code>more details</code> section
+when viewing a block on etherscan,
+e.g. <a href="https://etherscan.io/block/22894116">etherscan.io/block/22894116</a>.</p>
+</li>
+<li>
+<p><strong>DRAND beacon value</strong> for the round immediately after <code>t</code>, denoted as r₃.
+Use the <code>default</code> beacon, and find the round number corresponding to <code>t</code>.
+<a href="https://api.drand.sh/v2/beacons/default/rounds/1234">api.drand.sh/v2/beacons/default/rounds/1234</a>.</p>
+</li>
+</ul>
+<h3 id="randomness-derivation"><a class="header" href="#randomness-derivation">Randomness Derivation</a></h3>
+<p>Once all above entropy contributions, i.e., r₁, r₂, r₃ are collected,
+the initial epoch randomness η_GENESIS is computed as:</p>
+<pre><code class="language-text">η_GENESIS = H(r₁, r₂, r₃)
+</code></pre>
+<p>where H is a collision-resistant zkhash function.</p>
+<h2 id="genesis-mantle-transaction"><a class="header" href="#genesis-mantle-transaction">Genesis Mantle Transaction</a></h2>
+<p>The initial stake distribution, service declarations and Cryptarchia inscription
+are components of the Genesis Mantle Transaction.
+This is the single transaction that forms the body of the Genesis block.</p>
+<pre><code class="language-python">GENESIS_MANTLE_TX = MantleTx(
+    ops=[CRYPTARCHIA_INSCRIPTION] + SERVICE_DECLARATIONS,
+    ledger_tx=STAKE_DISTRIBUTION_TX,
+    permanent_storage_gas_price=0,
+    execution_gas_price=0
+)
+</code></pre>
+<h2 id="block-header-fields"><a class="header" href="#block-header-fields">Block Header Fields</a></h2>
+<p>The Genesis Block header fields are set to the following values:</p>
+<ul>
+<li><code>bedrock_version</code>: Protocol version (e.g., 1).</li>
+<li><code>parent_block</code>: 0 (as this is the first block).</li>
+<li><code>slot</code>: 0 (the Genesis slot).</li>
+<li><code>block_root</code>: Block Merkle root over the (single) initial transaction.</li>
+<li><code>proof_of_leadership</code>: Stubbed leadership proof.
+<ul>
+<li><code>leader_voucher</code>: 0 (as there is no leader block reward for the initial block).</li>
+<li><code>entropy_contribution</code>: 0 (no entropy is provided through the initial PoL).</li>
+<li><code>proof</code>: Null Groth16Proof, all values are set to zero.</li>
+<li><code>leader_key</code>: Null PublicKey.</li>
+</ul>
+</li>
+</ul>
+<h3 id="block-header-fields-example"><a class="header" href="#block-header-fields-example">Block Header Fields Example</a></h3>
+<pre><code class="language-python">GENESIS_HEADER = Header(
+    bedrock_version=1,
+    parent_block=0,
+    slot=0,
+    block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+    proof_of_leadership=ProofOfLeadership(
+        leader_voucher=bytes(32),
+        entropy_contribution=bytes(32),
+        proof=Groth16Proof(G1_ZERO, G2_ZERO, G1_ZERO),
+        leader_key=Ed25519PublicKey_ZERO,
+    )
+)
+</code></pre>
+<h2 id="sample-genesis-block"><a class="header" href="#sample-genesis-block">Sample Genesis Block</a></h2>
+<pre><code class="language-python"># distribute NMO to all stakeholders
+STAKE_DISTRIBUTION_TX = LedgerTx(
+    inputs=[],
+    outputs=[
+        Note(value=1000, public_key=STAKE_HOLDER_0_PK),
+        Note(value=2000, public_key=STAKE_HOLDER_1_PK),
+        Note(value=1500, public_key=STAKE_HOLDER_2_PK),
+        # ...
+    ]
+)
+
+# set Cryptarchia parameters
+CRYPTARCHIA_PARAMS = {
+    "chain_id": "nomos-mainnet",
+    "genesis_time": "2026-01-05T19:20:35Z",
+    "genesis_epoch_nonce": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+}
+
+CRYPTARCHIA_INSCRIPTION = Inscribe(
+    channel=bytes(32),
+    inscription=json.dumps(CRYPTARCHIA_PARAMS).encode("utf-8"),
+    parent=bytes(32),
+    signer=Ed25519PublicKey_ZERO,
+)
+
+# service declarations
+DA_DECLARATIONS = [
+    Declaration(
+        msg=DeclarationMessage(ServiceType.DA, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0),
+        locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+    ),
+    # ... more declarations
+]
+
+BLEND_DECLARATIONS = [
+    Declaration(
+        msg=DeclarationMessage(ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0),
+        locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+    ),
+    # ... more declarations
+]
+
+SERVICE_DECLARATIONS = DA_DECLARATIONS + BLEND_DECLARATIONS
+
+# build the genesis Mantle Transaction
+GENESIS_MANTLE_TX = MantleTx(
+    ops=[CRYPTARCHIA_INSCRIPTION] + SERVICE_DECLARATIONS,
+    ledger_tx=STAKE_DISTRIBUTION_TX,
+    gas_price=0,
+)
+
+GENESIS_HEADER = Header(
+    bedrock_version=1,
+    parent_block=bytes(32),
+    slot=0,
+    block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+    proof_of_leadership=ProofOfLeadership(
+        leader_voucher=bytes(32),
+        entropy_contribution=bytes(32),
+        proof=Groth16Proof(G1.ZERO, G2.ZERO, G1.ZERO),
+        leader_key=Ed25519PublicKey_ZERO,
+    )
+)
+
+GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
+</code></pre>
+<h2 id="initializing-bedrock"><a class="header" href="#initializing-bedrock">Initializing Bedrock</a></h2>
+<p>Bedrock is initialized by executing the Mantle Transaction
+without validating the Ledger Transaction and Mantle Operations.
+No validation or execution is done for the Genesis block header;
+in particular, processing of <code>proof_of_leadership</code> is skipped.</p>
+<h3 id="mantle-ledger-initialization"><a class="header" href="#mantle-ledger-initialization">Mantle Ledger Initialization</a></h3>
+<p>The Ledger Transaction should be executed
+without checking that the transaction is balanced.
+However, other validations are checked,
+e.g. that output note values are positive and smaller than the maximum allowed value.
+The result of normal transaction execution adds all transaction outputs to the Ledger.</p>
+<h3 id="cryptarchia-initialization"><a class="header" href="#cryptarchia-initialization">Cryptarchia Initialization</a></h3>
+<p>The Mantle Transaction contains an inscription sent to the null channel
+containing the parameters for initializing Cryptarchia.</p>
+<p>The Cryptarchia slot clock is initialized to <code>genesis_time</code>,
+<code>LIB</code> is set to the Genesis block and the epoch state is then initialized:</p>
+<h4 id="initial-epoch-state"><a class="header" href="#initial-epoch-state">Initial Epoch State</a></h4>
+<p>Cryptarchia progresses in epochs
+where the variables governing the lottery are fixed for the duration of an epoch
+and the activity during that epoch is used
+to derive the values of those variables for the next epoch.
+These variables taken together are called the Epoch State.
+(see <a href="https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification">Cryptarchia v1 Protocol Specification - Epoch State</a>).</p>
+<p>To initialize the Epoch State, the epoch variables are derived from the genesis block.</p>
+<ol>
+<li>
+<p>η: the epoch nonce is taken directly from the <code>genesis_epoch_nonce</code>.</p>
+</li>
+<li>
+<p>C_LEAD: Eligible leader commitment is set to the Ledger Root
+over all notes from the initial token distribution.
+The derivation of this root is specified in
+<a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification">Proof of Leadership Specification - Ledger Root</a>.</p>
+</li>
+<li>
+<p>D: The initial estimate of total stake
+will be the total tokens distributed at genesis.</p>
+</li>
+</ol>
+<h3 id="bedrock-services-initialization"><a class="header" href="#bedrock-services-initialization">Bedrock Services Initialization</a></h3>
+<p>DA and Blend network are initialized through normal Mantle Transaction execution.
+The <code>SDP_DECLARE</code> Operations in the Genesis Mantle Transaction
+will create the initial set of providers in each service.</p>
+<p>During normal operations, DA/Blend services would wait until a block is deep enough
+to be finalized,
+but for the Genesis block, it is considered finalized by definition
+and so DA/Blend will immediately use the provider set
+without the usual finalization delay.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification">Proof of Leadership Specification</a> - Protocol for generating note keys</li>
+<li><a href="https://nomos-tech.notion.site/NomosDA-Specification">NomosDA Specification</a> - Minimum Network Size requirements</li>
+<li><a href="https://nomos-tech.notion.site/Blend-Protocol">Blend Protocol</a> - Minimal Network Size requirements</li>
+<li><a href="https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification">Cryptarchia v1 Protocol Specification</a> - Epoch State specification</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Bedrock-Genesis-Block-21d261aa09df80bb8dc3c768802eb527">Bedrock Genesis Block</a> - Original specification document</li>
+<li><a href="https://eprint.iacr.org/2017/573.pdf">Ouroboros Praos</a> - Ouroboros Praos protocol</li>
+<li><a href="https://eprint.iacr.org/2018/378.pdf">Ouroboros Genesis</a> - Ouroboros Genesis protocol</li>
+<li><a href="https://eprint.iacr.org/2018/1132.pdf">Ouroboros Crypsinous</a> - Ouroboros Crypsinous protocol</li>
+<li><a href="https://cardanocourse.gitbook.io/cardano-course/handbook/protocol-parameters-and-configuration-files/shelley-genesis-file">Cardano Shelley Genesis File Format</a> - Cardano genesis file format</li>
+<li><a href="https://cips.cardano.org/cip/CIP-16">Cardano CIP-16 Key Serialisation</a> - Cardano key serialisation</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/bedrock-service-reward-distribution.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/bedrock-service-reward-distribution.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

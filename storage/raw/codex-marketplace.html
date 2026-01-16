@@ -1,0 +1,895 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Marketplace - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html" class="active"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="codex-marketplace"><a class="header" href="#codex-marketplace">CODEX-MARKETPLACE</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Codex Storage Marketplace</td></tr>
+<tr><td>Slug</td><td>codex-marketplace</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Codex Team and Dmitriy Ryajov <a href="mailto:dryajov@status.im">dryajov@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Mark Spanbroek <a href="mailto:mark@codex.storage">mark@codex.storage</a>, Adam Uhlíř <a href="mailto:adam@codex.storage">adam@codex.storage</a>, Eric Mastro <a href="mailto:eric@codex.storage">eric@codex.storage</a>, Jimmy Debe <a href="mailto:jimmy@status.im">jimmy@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/storage/raw/codex-marketplace.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+<li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/codex/raw/codex-marketplace.md"><code>0f1855e</code></a> — Chore/fix headers (#239)</li>
+<li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/codex/raw/codex-marketplace.md"><code>b1a5783</code></a> — Chore/mdbook updates (#237)</li>
+<li><strong>2025-12-18</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/codex/raw/codex-marketplace.md"><code>d03e699</code></a> — ci: add mdBook configuration (#233)</li>
+<li><strong>2025-11-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/d2df7e0c2dbb38d5b01a504f0b8ccbaea95fe821/codex/raw/codex-marketplace.md"><code>d2df7e0</code></a> — Created codex/raw/codex-marketplace.md file, without integration of Sales a… (#208)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>Codex Marketplace and its interactions are defined by a smart contract deployed on an EVM-compatible blockchain. This specification describes these interactions for the various roles within the network.</p>
+<p>The document is intended for implementors of Codex nodes.</p>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">2119</a>.</p>
+<h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Terminology</th><th>Description</th></tr></thead><tbody>
+<tr><td>Storage Provider (SP)</td><td>A node in the Codex network that provides storage services to the marketplace.</td></tr>
+<tr><td>Validator</td><td>A node that assists in identifying missing storage proofs.</td></tr>
+<tr><td>Client</td><td>A node that interacts with other nodes in the Codex network to store, locate, and retrieve data.</td></tr>
+<tr><td>Storage Request or Request</td><td>A request created by a client node to persist data on the Codex network.</td></tr>
+<tr><td>Slot or Storage Slot</td><td>A space allocated by the storage request to store a piece of the request's dataset.</td></tr>
+<tr><td>Smart Contract</td><td>A smart contract implementing the marketplace functionality.</td></tr>
+<tr><td>Token</td><td>The ERC20-based token used within the Codex network.</td></tr>
+</tbody></table>
+</div>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>The Codex network aims to create a peer-to-peer storage engine with robust data durability, data persistence guarantees, and a comprehensive incentive structure.</p>
+<p>The marketplace is a critical component of the Codex network, serving as a platform where all involved parties interact to ensure data persistence. It provides mechanisms to enforce agreements and facilitate data repair when SPs fail to fulfill their duties.</p>
+<p>Implemented as a smart contract on an EVM-compatible blockchain, the marketplace enables various scenarios where nodes assume one or more roles to maintain a reliable persistence layer for users. This specification details these interactions.</p>
+<p>The marketplace contract manages storage requests, maintains the state of allocated storage slots, and orchestrates SP rewards, collaterals, and storage proofs.</p>
+<p>A node that wishes to participate in the Codex persistence layer MUST implement one or more roles described in this document.</p>
+<h3 id="roles"><a class="header" href="#roles">Roles</a></h3>
+<p>A node can assume one of the three main roles in the network: the client, SP, and validator.</p>
+<p>A client is a potentially short-lived node in the network with the purpose of persisting its data in the Codex persistence layer.</p>
+<p>An SP is a long-lived node providing storage for clients in exchange for profit. To ensure a reliable, robust service for clients, SPs are required to periodically provide proofs that they are persisting the data.</p>
+<p>A validator ensures that SPs have submitted valid proofs each period where the smart contract required a proof to be submitted for slots filled by the SP.</p>
+<hr />
+<h2 id="part-i-protocol-specification"><a class="header" href="#part-i-protocol-specification">Part I: Protocol Specification</a></h2>
+<p>This part defines the <strong>normative requirements</strong> for the Codex Marketplace protocol. All implementations MUST comply with these requirements to participate in the Codex network. The protocol is defined by smart contract interactions on an EVM-compatible blockchain.</p>
+<h2 id="storage-request-lifecycle"><a class="header" href="#storage-request-lifecycle">Storage Request Lifecycle</a></h2>
+<p>The diagram below depicts the lifecycle of a storage request:</p>
+<pre><code class="language-text">                      ┌───────────┐
+                      │ Cancelled │
+                      └───────────┘
+                            ▲
+                            │ Not all
+                            │ Slots filled
+                            │
+    ┌───────────┐    ┌──────┴─────────────┐           ┌─────────┐
+    │ Submitted ├───►│ Slots Being Filled ├──────────►│ Started │
+    └───────────┘    └────────────────────┘ All Slots └────┬────┘
+                                            Filled         │
+                                                           │
+                                   ┌───────────────────────┘
+                           Proving ▼
+    ┌────────────────────────────────────────────────────────────┐
+    │                                                            │
+    │                 Proof submitted                            │
+    │       ┌─────────────────────────► All good                 │
+    │       │                                                    │
+    │ Proof required                                             │
+    │       │                                                    │
+    │       │         Proof missed                               │
+    │       └─────────────────────────► After some time slashed  │
+    │                                   eventually Slot freed    │
+    │                                                            │
+    └────────┬─┬─────────────────────────────────────────────────┘
+             │ │                                      ▲
+             │ │                                      │
+             │ │ SP kicked out and Slot freed ┌───────┴────────┐
+All good     │ ├─────────────────────────────►│ Repair process │
+Time ran out │ │                              └────────────────┘
+             │ │
+             │ │ Too many Slots freed         ┌────────┐
+             │ └─────────────────────────────►│ Failed │
+             ▼                                └────────┘
+       ┌──────────┐
+       │ Finished │
+       └──────────┘
+</code></pre>
+<h2 id="client-role"><a class="header" href="#client-role">Client Role</a></h2>
+<p>A node implementing the client role mediates the persistence of data within the Codex network.</p>
+<p>A client has two primary responsibilities:</p>
+<ul>
+<li>Requesting storage from the network by sending a storage request to the smart contract.</li>
+<li>Withdrawing funds from the storage requests previously created by the client.</li>
+</ul>
+<h3 id="creating-storage-requests"><a class="header" href="#creating-storage-requests">Creating Storage Requests</a></h3>
+<p>When a user prompts the client node to create a storage request, the client node SHOULD receive the input parameters for the storage request from the user.</p>
+<p>To create a request to persist a dataset on the Codex network, client nodes MUST split the dataset into data chunks, $(c_1, c_2, c_3, \ldots, c_{n})$. Using the erasure coding method and the provided input parameters, the data chunks are encoded and distributed over a number of slots. The applied erasure coding method MUST use the <a href="https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA">Reed-Solomon algorithm</a>. The final slot roots and other metadata MUST be placed into a <code>Manifest</code> (TODO: Manifest RFC). The CID for the <code>Manifest</code> MUST then be used as the <code>cid</code> for the stored dataset.</p>
+<p>After the dataset is prepared, a client node MUST call the smart contract function <code>requestStorage(request)</code>, providing the desired request parameters in the <code>request</code> parameter. The <code>request</code> parameter is of type <code>Request</code>:</p>
+<pre><code class="language-solidity">struct Request {
+  address client;
+  Ask ask;
+  Content content;
+  uint64 expiry;
+  bytes32 nonce;
+}
+
+struct Ask {
+  uint256 proofProbability;
+  uint256 pricePerBytePerSecond;
+  uint256 collateralPerByte;
+  uint64 slots;
+  uint64 slotSize;
+  uint64 duration;
+  uint64 maxSlotLoss;
+}
+
+struct Content {
+  bytes cid;
+  bytes32 merkleRoot;
+}
+</code></pre>
+<p>The table below provides the description of the <code>Request</code> and the associated types attributes:</p>
+<div class="table-wrapper"><table><thead><tr><th>attribute</th><th>type</th><th>description</th></tr></thead><tbody>
+<tr><td><code>client</code></td><td><code>address</code></td><td>The Codex node requesting storage.</td></tr>
+<tr><td><code>ask</code></td><td><code>Ask</code></td><td>Parameters of Request.</td></tr>
+<tr><td><code>content</code></td><td><code>Content</code></td><td>The dataset that will be hosted with the storage request.</td></tr>
+<tr><td><code>expiry</code></td><td><code>uint64</code></td><td>Timeout in seconds during which all the slots have to be filled, otherwise Request will get cancelled. The final deadline timestamp is calculated at the moment the transaction is mined.</td></tr>
+<tr><td><code>nonce</code></td><td><code>bytes32</code></td><td>Random value to differentiate from other requests of same parameters. It SHOULD be a random byte array.</td></tr>
+<tr><td><code>pricePerBytePerSecond</code></td><td><code>uint256</code></td><td>Amount of tokens that will be awarded to SPs for finishing the storage request. It MUST be an amount of tokens offered per slot per second per byte. The Ethereum address that submits the <code>requestStorage()</code> transaction MUST have <a href="https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-">approval</a> for the transfer of at least an equivalent amount of full reward (<code>pricePerBytePerSecond * duration * slots * slotSize</code>) in tokens.</td></tr>
+<tr><td><code>collateralPerByte</code></td><td><code>uint256</code></td><td>The amount of tokens per byte of slot's size that SPs submit when they fill slots. Collateral is then slashed or forfeited if SPs fail to provide the service requested by the storage request (more information in the [Slashing](#### Slashing) section).</td></tr>
+<tr><td><code>proofProbability</code></td><td><code>uint256</code></td><td>Determines the average frequency that a proof is required within a period: $\frac{1}{proofProbability}$. SPs are required to provide proofs of storage to the marketplace contract when challenged. To prevent hosts from only coming online when proofs are required, the frequency at which proofs are requested from SPs is stochastic and is influenced by the <code>proofProbability</code> parameter.</td></tr>
+<tr><td><code>duration</code></td><td><code>uint64</code></td><td>Total duration of the storage request in seconds. It MUST NOT exceed the limit specified in the configuration <code>config.requestDurationLimit</code>.</td></tr>
+<tr><td><code>slots</code></td><td><code>uint64</code></td><td>The number of requested slots. The slots will all have the same size.</td></tr>
+<tr><td><code>slotSize</code></td><td><code>uint64</code></td><td>Amount of storage per slot in bytes.</td></tr>
+<tr><td><code>maxSlotLoss</code></td><td><code>uint64</code></td><td>Max slots that can be lost without data considered to be lost.</td></tr>
+<tr><td><code>cid</code></td><td><code>bytes</code></td><td>An identifier used to locate the Manifest representing the dataset. It MUST be a <a href="https://github.com/multiformats/cid#cidv1">CIDv1</a>, SHA-256 <a href="https://github.com/multiformats/multihash">multihash</a> and the data it represents SHOULD be discoverable in the network, otherwise the request will be eventually canceled.</td></tr>
+<tr><td><code>merkleRoot</code></td><td><code>bytes32</code></td><td>Merkle root of the dataset, used to verify storage proofs</td></tr>
+</tbody></table>
+</div>
+<h4 id="renewal-of-storage-requests"><a class="header" href="#renewal-of-storage-requests">Renewal of Storage Requests</a></h4>
+<p>It should be noted that the marketplace does not support extending requests. It is REQUIRED that if the user wants to extend the duration of a request, a new request with the same CID must be [created](### Creating Storage Requests) <strong>before the original request completes</strong>.</p>
+<p>This ensures that the data will continue to persist in the network at the time when the new (or existing) SPs need to retrieve the complete dataset to fill the slots of the new request.</p>
+<h3 id="monitoring-and-state-management"><a class="header" href="#monitoring-and-state-management">Monitoring and State Management</a></h3>
+<p>Client nodes MUST implement the following smart contract interactions for monitoring and state management:</p>
+<ul>
+<li>
+<p><strong>getRequest(requestId)</strong>: Retrieve the full <code>StorageRequest</code> data from the marketplace. This function is used for recovery and state verification after restarts or failures.</p>
+</li>
+<li>
+<p><strong>requestState(requestId)</strong>: Query the current state of a storage request. Used for monitoring request progress and determining the appropriate client actions.</p>
+</li>
+<li>
+<p><strong>requestExpiresAt(requestId)</strong>: Query when the request will expire if not fulfilled.</p>
+</li>
+<li>
+<p><strong>getRequestEnd(requestId)</strong>: Query when a fulfilled request will end (used to determine when to call <code>freeSlot</code> or <code>withdrawFunds</code>).</p>
+</li>
+</ul>
+<p>Client nodes MUST subscribe to the following marketplace events:</p>
+<ul>
+<li>
+<p><strong>RequestFulfilled(requestId)</strong>: Emitted when a storage request has enough filled slots to start. Clients monitor this event to determine when their request becomes active and transitions from the submission phase to the active phase.</p>
+</li>
+<li>
+<p><strong>RequestFailed(requestId)</strong>: Emitted when a storage request fails due to proof failures or other reasons. Clients observe this event to detect failed requests and initiate fund withdrawal.</p>
+</li>
+</ul>
+<h3 id="withdrawing-funds"><a class="header" href="#withdrawing-funds">Withdrawing Funds</a></h3>
+<p>The client node MUST monitor the status of the requests it created. When a storage request enters the <code>Cancelled</code>, <code>Failed</code>, or <code>Finished</code> state, the client node MUST initiate the withdrawal of the remaining or refunded funds from the smart contract using the <code>withdrawFunds(requestId)</code> function.</p>
+<p>Request states are determined as follows:</p>
+<ul>
+<li>The request is considered <code>Cancelled</code> if no <code>RequestFulfilled(requestId)</code> event is observed during the timeout specified by the value returned from the <code>requestExpiresAt(requestId)</code> function.</li>
+<li>The request is considered <code>Failed</code> when the <code>RequestFailed(requestId)</code> event is observed.</li>
+<li>The request is considered <code>Finished</code> after the interval specified by the value returned from the <code>getRequestEnd(requestId)</code> function has elapsed.</li>
+</ul>
+<h2 id="storage-provider-role"><a class="header" href="#storage-provider-role">Storage Provider Role</a></h2>
+<p>A Codex node acting as an SP persists data across the network by hosting slots requested by clients in their storage requests.</p>
+<p>The following tasks need to be considered when hosting a slot:</p>
+<ul>
+<li>Filling a slot</li>
+<li>Proving</li>
+<li>Repairing a slot</li>
+<li>Collecting request reward and collateral</li>
+</ul>
+<h3 id="filling-slots"><a class="header" href="#filling-slots">Filling Slots</a></h3>
+<p>When a new request is created, the <code>StorageRequested(requestId, ask, expiry)</code> event is emitted with the following properties:</p>
+<ul>
+<li><code>requestId</code> - the ID of the request.</li>
+<li><code>ask</code> - the specification of the request parameters. For details, see the definition of the <code>Request</code> type in the [Creating Storage Requests](### Creating Storage Requests) section above.</li>
+<li><code>expiry</code> - a Unix timestamp specifying when the request will be canceled if all slots are not filled by then.</li>
+</ul>
+<p>It is then up to the SP node to decide, based on the emitted parameters and node's operator configuration, whether it wants to participate in the request and attempt to fill its slot(s) (note that one SP can fill more than one slot). If the SP node decides to ignore the request, no further action is required. However, if the SP decides to fill a slot, it MUST follow the remaining steps described below.</p>
+<p>The node acting as an SP MUST decide which slot, specified by the slot index, it wants to fill. The SP MAY attempt to fill more than one slot. To fill a slot, the SP MUST first reserve the slot in the smart contract using <code>reserveSlot(requestId, slotIndex)</code>. If reservations for this slot are full, or if the SP has already reserved the slot, the transaction will revert. If the reservation was unsuccessful, then the SP is not allowed to fill the slot. If the reservation was successful, the node MUST then download the slot data using the CID of the manifest (<strong>TODO: Manifest RFC</strong>) and the slot index. The CID is specified in <code>request.content.cid</code>, which can be retrieved from the smart contract using <code>getRequest(requestId)</code>. Then, the node MUST generate a proof over the downloaded data (<strong>TODO: Proving RFC</strong>).</p>
+<p>When the proof is ready, the SP MUST call <code>fillSlot()</code> on the smart contract with the following REQUIRED parameters:</p>
+<ul>
+<li><code>requestId</code> - the ID of the request.</li>
+<li><code>slotIndex</code> - the slot index that the node wants to fill.</li>
+<li><code>proof</code> - the <code>Groth16Proof</code> proof structure, generated over the slot data.</li>
+</ul>
+<p>The Ethereum address of the SP node from which the transaction originates MUST have <a href="https://docs.openzeppelin.com/contracts/2.x/api/token/erc20#IERC20-approve-address-uint256-">approval</a> for the transfer of at least the amount of tokens required as collateral for the slot (<code>collateralPerByte * slotSize</code>).</p>
+<p>If the proof delivered by the SP is invalid or the slot was already filled by another SP, then the transaction will revert. Otherwise, a <code>SlotFilled(requestId, slotIndex)</code> event is emitted. If the transaction is successful, the SP SHOULD transition into the <strong>proving</strong> state, where it will need to submit proof of data possession when challenged by the smart contract.</p>
+<p>It should be noted that if the SP node observes a <code>SlotFilled</code> event for the slot it is currently downloading the dataset for or generating the proof for, it means that the slot has been filled by another node in the meantime. In response, the SP SHOULD stop its current operation and attempt to fill a different, unfilled slot.</p>
+<h3 id="proving"><a class="header" href="#proving">Proving</a></h3>
+<p>Once an SP fills a slot, it MUST submit proofs to the marketplace contract when a challenge is issued by the contract. SPs SHOULD detect that a proof is required for the current period using the <code>isProofRequired(slotId)</code> function, or that it will be required using the <code>willProofBeRequired(slotId)</code> function in the case that the <a href="https://github.com/codex-storage/codex-research/blob/41c4b4409d2092d0a5475aca0f28995034e58d14/design/storage-proof-timing.md">proving clock pointer is in downtime</a>.</p>
+<p>Once an SP knows it has to provide a proof it MUST get the proof challenge using <code>getChallenge(slotId)</code>, which then
+MUST be incorporated into the proof generation as described in Proving RFC (<strong>TODO: Proving RFC</strong>).</p>
+<p>When the proof is generated, it MUST be submitted by calling the <code>submitProof(slotId, proof)</code> smart contract function.</p>
+<h4 id="slashing"><a class="header" href="#slashing">Slashing</a></h4>
+<p>There is a slashing scheme orchestrated by the smart contract to incentivize correct behavior and proper proof submissions by SPs. This scheme is configured at the smart contract level and applies uniformly to all participants in the network. The configuration of the slashing scheme can be obtained via the <code>configuration()</code> contract call.</p>
+<p>The slashing works as follows:</p>
+<ul>
+<li>When SP misses a proof and a validator trigger detection of this event using the <code>markProofAsMissing()</code> call, the SP is slashed by <code>config.collateral.slashPercentage</code> <strong>of the originally required collateral</strong> (hence the slashing amount is always the same for a given request).</li>
+<li>If the number of slashes exceeds <code>config.collateral.maxNumberOfSlashes</code>, the slot is freed, the remaining collateral is burned, and the slot is offered to other nodes for repair. The smart contract also emits the <code>SlotFreed(requestId, slotIndex)</code> event.</li>
+</ul>
+<p>If, at any time, the number of freed slots exceeds the value specified by the <code>request.ask.maxSlotLoss</code> parameter, the dataset is considered lost, and the request is deemed <em>failed</em>. The collateral of all SPs that hosted the slots associated with the storage request is burned, and the <code>RequestFailed(requestId)</code> event is emitted.</p>
+<h3 id="repair"><a class="header" href="#repair">Repair</a></h3>
+<p>When a slot is freed due to too many missed proofs, which SHOULD be detected by listening to the <code>SlotFreed(requestId, slotIndex)</code> event, an SP node can decide whether to participate in repairing the slot. Similar to filling a slot, the node SHOULD consider the operator's configuration when making this decision. The SP that originally hosted the slot but failed to comply with proving requirements MAY also participate in the repair. However, by refilling the slot, the SP <strong>will not</strong> recover its original collateral and must submit new collateral using the <code>fillSlot()</code> call.</p>
+<p>The repair process is similar to filling slots. If the original slot dataset is no longer present in the network, the SP MAY use erasure coding to reconstruct the dataset. Reconstructing the original slot dataset requires retrieving other pieces of the dataset stored in other slots belonging to the request. For this reason, the node that successfully repairs a slot is entitled to an additional reward. (<strong>TODO: Implementation</strong>)</p>
+<p>The repair process proceeds as follows:</p>
+<ol>
+<li>The SP observes the <code>SlotFreed</code> event and decides to repair the slot.</li>
+<li>The SP MUST reserve the slot with the <code>reserveSlot(requestId, slotIndex)</code> call. For more information see the [Filling Slots](###filling slots) section.</li>
+<li>The SP MUST download the chunks of data required to reconstruct the freed slot's data. The node MUST use the <a href="https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA">Reed-Solomon algorithm</a> to reconstruct the missing data.</li>
+<li>The SP MUST generate proof over the reconstructed data.</li>
+<li>The SP MUST call the <code>fillSlot()</code> smart contract function with the same parameters and collateral allowance as described in the [Filling Slots](###filling slots) section.</li>
+</ol>
+<h3 id="collecting-funds"><a class="header" href="#collecting-funds">Collecting Funds</a></h3>
+<p>An SP node SHOULD monitor the requests and the associated slots it hosts.</p>
+<p>When a storage request enters the <code>Cancelled</code>, <code>Finished</code>, or <code>Failed</code> state, the SP node SHOULD call the <code>freeSlot(slotId)</code> smart contract function.</p>
+<p>The aforementioned storage request states (<code>Cancelled</code>, <code>Finished</code>, and <code>Failed</code>) can be detected as follows:</p>
+<ul>
+<li>A storage request is considered <code>Cancelled</code> if no <code>RequestFulfilled(requestId)</code> event is observed within the time indicated by the <code>expiry</code> request parameter. Note that a <code>RequestCancelled</code> event may also be emitted, but the node SHOULD NOT rely on this event to assert the request expiration, as the <code>RequestCancelled</code> event is not guaranteed to be emitted at the time of expiry.</li>
+<li>A storage request is considered <code>Finished</code> when the time indicated by the value returned from the <code>getRequestEnd(requestId)</code> function has elapsed.</li>
+<li>A node concludes that a storage request has <code>Failed</code> upon observing the <code>RequestFailed(requestId)</code> event.</li>
+</ul>
+<p>For each of the states listed above, different funds are handled as follows:</p>
+<ul>
+<li>In the <code>Cancelled</code> state, the collateral is returned along with a proportional payout based on the time the node actually hosted the dataset before the expiry was reached.</li>
+<li>In the <code>Finished</code> state, the full reward for hosting the slot, along with the collateral, is collected.</li>
+<li>In the <code>Failed</code> state, no funds are collected. The reward is returned to the client, and the collateral is burned. The slot is removed from the list of slots and is no longer included in the list of slots returned by the <code>mySlots()</code> function.</li>
+</ul>
+<h2 id="validator-role"><a class="header" href="#validator-role">Validator Role</a></h2>
+<p>In a blockchain, a contract cannot change its state without a transaction and gas initiating the state change. Therefore, our smart contract requires an external trigger to periodically check and confirm that a storage proof has been delivered by the SP. This is where the validator role is essential.</p>
+<p>The validator role is fulfilled by nodes that help to verify that SPs have submitted the required storage proofs.</p>
+<p>It is the smart contract that checks if the proof requested from an SP has been delivered. The validator only triggers the decision-making function in the smart contract. To incentivize validators, they receive a reward each time they correctly mark a proof as missing corresponding to the percentage of the slashed collateral defined by <code>config.collateral.validatorRewardPercentage</code>.</p>
+<p>Each time a validator observes the <code>SlotFilled</code> event, it SHOULD add the slot reported in the <code>SlotFilled</code> event to the validator's list of watched slots. Then, after the end of each period, a validator has up to <code>config.proofs.timeout</code> seconds (a configuration parameter retrievable with <code>configuration()</code>) to validate all the slots. If a slot lacks the required proof, the validator SHOULD call the <code>markProofAsMissing(slotId, period)</code> function on the smart contract. This function validates the correctness of the claim, and if right, will send a reward to the validator.</p>
+<p>If validating all the slots observed by the validator is not feasible within the specified <code>timeout</code>, the validator MAY choose to validate only a subset of the observed slots.</p>
+<hr />
+<h2 id="part-ii-implementation-suggestions"><a class="header" href="#part-ii-implementation-suggestions">Part II: Implementation Suggestions</a></h2>
+<blockquote>
+<p><strong>IMPORTANT</strong>: The sections above (Abstract through Validator Role) define the normative Codex Marketplace protocol requirements. All implementations MUST comply with those protocol requirements to participate in the Codex network.</p>
+<p><strong>The sections below are non-normative</strong>. They document implementation approaches used in the nim-codex reference implementation. These are suggestions to guide implementors but are NOT required by the protocol. Alternative implementations MAY use different approaches as long as they satisfy the protocol requirements defined in Part I.</p>
+</blockquote>
+<h2 id="implementation-suggestions"><a class="header" href="#implementation-suggestions">Implementation Suggestions</a></h2>
+<p>This section describes implementation approaches used in reference implementations. These are <strong>suggestions and not normative requirements</strong>. Implementations are free to use different internal architectures, state machines, and data structures as long as they correctly implement the protocol requirements defined above.</p>
+<h3 id="storage-provider-implementation"><a class="header" href="#storage-provider-implementation">Storage Provider Implementation</a></h3>
+<p>The nim-codex reference implementation provides a complete Storage Provider implementation with state machine management, slot queueing, and resource management. This section documents the nim-codex approach.</p>
+<h4 id="state-machine"><a class="header" href="#state-machine">State Machine</a></h4>
+<p>The Sales module implements a deterministic state machine for each slot, progressing through the following states:</p>
+<ol>
+<li><strong>SalePreparing</strong> - Find a matching availability and create a reservation</li>
+<li><strong>SaleSlotReserving</strong> - Reserve the slot on the marketplace</li>
+<li><strong>SaleDownloading</strong> - Stream and persist the slot's data</li>
+<li><strong>SaleInitialProving</strong> - Wait for stable challenge and generate initial proof</li>
+<li><strong>SaleFilling</strong> - Compute collateral and fill the slot</li>
+<li><strong>SaleFilled</strong> - Post-filling operations and expiry updates</li>
+<li><strong>SaleProving</strong> - Generate and submit proofs periodically</li>
+<li><strong>SalePayout</strong> - Free slot and calculate collateral</li>
+<li><strong>SaleFinished</strong> - Terminal success state</li>
+<li><strong>SaleFailed</strong> - Free slot on market and transition to error</li>
+<li><strong>SaleCancelled</strong> - Cancellation path</li>
+<li><strong>SaleIgnored</strong> - Sale ignored (no matching availability or other conditions)</li>
+<li><strong>SaleErrored</strong> - Terminal error state</li>
+<li><strong>SaleUnknown</strong> - Recovery state for crash recovery</li>
+<li><strong>SaleProvingSimulated</strong> - Proving with injected failures for testing</li>
+</ol>
+<p>All states move to <code>SaleErrored</code> if an error is raised.</p>
+<h5 id="salepreparing"><a class="header" href="#salepreparing">SalePreparing</a></h5>
+<ul>
+<li>Find a matching availability based on the following criteria: <code>freeSize</code>, <code>duration</code>, <code>collateralPerByte</code>, <code>minPricePerBytePerSecond</code> and <code>until</code></li>
+<li>Create a reservation</li>
+<li>Move to <code>SaleSlotReserving</code> if successful</li>
+<li>Move to <code>SaleIgnored</code> if no availability is found or if <code>BytesOutOfBoundsError</code> is raised because of no space available.</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="saleslotreserving"><a class="header" href="#saleslotreserving">SaleSlotReserving</a></h5>
+<ul>
+<li>Check if the slot can be reserved</li>
+<li>Move to <code>SaleDownloading</code> if successful</li>
+<li>Move to <code>SaleIgnored</code> if <code>SlotReservationNotAllowedError</code> is raised or the slot cannot be reserved. The collateral is returned.</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="saledownloading"><a class="header" href="#saledownloading">SaleDownloading</a></h5>
+<ul>
+<li>Select the correct data expiry:
+<ul>
+<li>When the request is started, the request end date is used</li>
+<li>Otherwise the expiry date is used</li>
+</ul>
+</li>
+<li>Stream and persist data via <code>onStore</code></li>
+<li>For each written batch, release bytes from the reservation</li>
+<li>Move to <code>SaleInitialProving</code> if successful</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+<li>Move to <code>SaleFilled</code> on <code>SlotFilled</code> event from the <code>marketplace</code></li>
+</ul>
+<h5 id="saleinitialproving"><a class="header" href="#saleinitialproving">SaleInitialProving</a></h5>
+<ul>
+<li>Wait for a stable initial challenge</li>
+<li>Produce the initial proof via <code>onProve</code></li>
+<li>Move to <code>SaleFilling</code> if successful</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="salefilling"><a class="header" href="#salefilling">SaleFilling</a></h5>
+<ul>
+<li>Get the slot collateral</li>
+<li>Fill the slot</li>
+<li>Move to <code>SaleFilled</code> if successful</li>
+<li>Move to <code>SaleIgnored</code> on <code>SlotStateMismatchError</code>. The collateral is returned.</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="salefilled"><a class="header" href="#salefilled">SaleFilled</a></h5>
+<ul>
+<li>Ensure that the current host has filled the slot by checking the signer address</li>
+<li>Notify by calling <code>onFilled</code> hook</li>
+<li>Call <code>onExpiryUpdate</code> to change the data expiry from expiry date to request end date</li>
+<li>Move to <code>SaleProving</code> (or <code>SaleProvingSimulated</code> for simulated mode)</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="saleproving"><a class="header" href="#saleproving">SaleProving</a></h5>
+<ul>
+<li>For each period: fetch challenge, call <code>onProve</code>, and submit proof</li>
+<li>Move to <code>SalePayout</code> when the slot request ends</li>
+<li>Re-raise <code>SlotFreedError</code> when the slot is freed</li>
+<li>Raise <code>SlotNotFilledError</code> when the slot is not filled</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="saleprovingsimulated"><a class="header" href="#saleprovingsimulated">SaleProvingSimulated</a></h5>
+<ul>
+<li>Submit invalid proofs every <code>N</code> periods (<code>failEveryNProofs</code> in configuration) to test failure scenarios</li>
+</ul>
+<h5 id="salepayout"><a class="header" href="#salepayout">SalePayout</a></h5>
+<ul>
+<li>Get the current collateral and try to free the slot to ensure that the slot is freed after payout.</li>
+<li>Forward the returned collateral to cleanup</li>
+<li>Move to <code>SaleFinished</code> if successful</li>
+<li>Move to <code>SaleFailed</code> on <code>RequestFailed</code> event from the <code>marketplace</code></li>
+<li>Move to <code>SaleCancelled</code> on cancelled timer elapsed, set to storage contract expiry</li>
+</ul>
+<h5 id="salefinished"><a class="header" href="#salefinished">SaleFinished</a></h5>
+<ul>
+<li>Call <code>onClear</code> hook</li>
+<li>Call <code>onCleanUp</code> hook</li>
+</ul>
+<h5 id="salefailed"><a class="header" href="#salefailed">SaleFailed</a></h5>
+<ul>
+<li>Free the slot</li>
+<li>Move to <code>SaleErrored</code> with the failure message</li>
+</ul>
+<h5 id="salecancelled"><a class="header" href="#salecancelled">SaleCancelled</a></h5>
+<ul>
+<li>Ensure that the node hosting the slot frees the slot</li>
+<li>Call <code>onClear</code> hook</li>
+<li>Call <code>onCleanUp</code> hook with the current collateral</li>
+</ul>
+<h5 id="saleignored"><a class="header" href="#saleignored">SaleIgnored</a></h5>
+<ul>
+<li>Call <code>onCleanUp</code> hook with the current collateral</li>
+</ul>
+<h5 id="saleerrored"><a class="header" href="#saleerrored">SaleErrored</a></h5>
+<ul>
+<li>Call <code>onClear</code> hook</li>
+<li>Call <code>onCleanUp</code> hook</li>
+</ul>
+<h5 id="saleunknown"><a class="header" href="#saleunknown">SaleUnknown</a></h5>
+<ul>
+<li>Recovery entry: get the <code>on-chain</code> state and jump to the appropriate state</li>
+</ul>
+<h4 id="slot-queue"><a class="header" href="#slot-queue">Slot Queue</a></h4>
+<p>Slot queue schedules slot work and instantiates one <code>SalesAgent</code> per item with bounded concurrency.</p>
+<ul>
+<li>Accepts <code>(requestId, slotIndex, …)</code> items and orders them by priority</li>
+<li>Spawns one <code>SalesAgent</code> for each dequeued item, in other words, one item for one agent</li>
+<li>Caps concurrent agents to <code>maxWorkers</code></li>
+<li>Supports pause/resume</li>
+<li>Allows controlled requeue when an agent finishes with <code>reprocessSlot</code></li>
+</ul>
+<h5 id="slot-ordering"><a class="header" href="#slot-ordering">Slot Ordering</a></h5>
+<p>The criteria are in the following order:</p>
+<ol>
+<li><strong>Unseen before seen</strong> - Items that have not been seen are dequeued first.</li>
+<li><strong>More profitable first</strong> - Higher <code>profitability</code> wins. <code>profitability</code> is <code>duration * pricePerSlotPerSecond</code>.</li>
+<li><strong>Less collateral first</strong> - The item with the smaller <code>collateral</code> wins.</li>
+<li><strong>Later expiry first</strong> - If both items carry an <code>expiry</code>, the one with the greater timestamp wins.</li>
+</ol>
+<p>Within a single request, per-slot items are shuffled before enqueuing so the default slot-index order does not influence priority.</p>
+<h5 id="pause--resume"><a class="header" href="#pause--resume">Pause / Resume</a></h5>
+<p>When the Slot queue processes an item with <code>seen = true</code>, it means that the item was already evaluated against the current availabilities and did not match.
+To avoid draining the queue with untenable requests (due to insufficient availability), the queue pauses itself.</p>
+<p>The queue resumes when:</p>
+<ul>
+<li><code>OnAvailabilitySaved</code> fires after an availability update that increases one of: <code>freeSize</code>, <code>duration</code>, <code>minPricePerBytePerSecond</code>, or <code>totalRemainingCollateral</code>.</li>
+<li>A new unseen item (<code>seen = false</code>) is pushed.</li>
+<li><code>unpause()</code> is called explicitly.</li>
+</ul>
+<h5 id="reprocess"><a class="header" href="#reprocess">Reprocess</a></h5>
+<p>Availability matching occurs in <code>SalePreparing</code>.
+If no availability fits at that time, the sale is ignored with <code>reprocessSlot</code> to true, meaning that the slot is added back to the queue with the flag <code>seen</code> to true.</p>
+<h5 id="startup"><a class="header" href="#startup">Startup</a></h5>
+<p>On <code>SlotQueue.start()</code>, the sales module first deletes reservations associated with inactive storage requests, then starts a new <code>SalesAgent</code> for each active storage request:</p>
+<ul>
+<li>Fetch the active <code>on-chain</code> active slots.</li>
+<li>Delete the local reservations for slots that are not in the active list.</li>
+<li>Create a new agent for each slot and assign the <code>onCleanUp</code> callback.</li>
+<li>Start the agent in the <code>SaleUnknown</code> state.</li>
+</ul>
+<h4 id="main-behaviour"><a class="header" href="#main-behaviour">Main Behaviour</a></h4>
+<p>When a new slot request is received, the sales module extracts the pair <code>(requestId, slotIndex, …)</code> from the request.
+A <code>SlotQueueItem</code> is then created with metadata such as <code>profitability</code>, <code>collateral</code>, <code>expiry</code>, and the <code>seen</code> flag set to <code>false</code>.
+This item is pushed into the <code>SlotQueue</code>, where it will be prioritised according to the ordering rules.</p>
+<h4 id="salesagent"><a class="header" href="#salesagent">SalesAgent</a></h4>
+<p>SalesAgent is the instance that executes the state machine for a single slot.</p>
+<ul>
+<li>Executes the sale state machine across the slot lifecycle</li>
+<li>Holds a <code>SalesContext</code> with dependencies and host hooks</li>
+<li>Supports crash recovery via the <code>SaleUnknown</code> state</li>
+<li>Handles errors by entering <code>SaleErrored</code>, which runs cleanup routines</li>
+</ul>
+<h4 id="salescontext"><a class="header" href="#salescontext">SalesContext</a></h4>
+<p>SalesContext is a container for dependencies used by all sales.</p>
+<ul>
+<li>Provides external interfaces: <code>Market</code> (marketplace) and <code>Clock</code></li>
+<li>Provides access to <code>Reservations</code></li>
+<li>Provides host hooks: <code>onStore</code>, <code>onProve</code>, <code>onExpiryUpdate</code>, <code>onClear</code>, <code>onSale</code></li>
+<li>Shares the <code>SlotQueue</code> handle for scheduling work</li>
+<li>Provides configuration such as <code>simulateProofFailures</code></li>
+<li>Passed to each <code>SalesAgent</code></li>
+</ul>
+<h4 id="marketplace-subscriptions"><a class="header" href="#marketplace-subscriptions">Marketplace Subscriptions</a></h4>
+<p>The sales module subscribes to on-chain events to keep the queue and agents consistent.</p>
+<h5 id="storagerequested"><a class="header" href="#storagerequested">StorageRequested</a></h5>
+<p>When the marketplace signals a new request, the sales module:</p>
+<ul>
+<li>Computes collateral for free slots.</li>
+<li>Creates per-slot <code>SlotQueueItem</code> entries (one per <code>slotIndex</code>) with <code>seen = false</code>.</li>
+<li>Pushes the items into the <code>SlotQueue</code>.</li>
+</ul>
+<h5 id="slotfreed"><a class="header" href="#slotfreed">SlotFreed</a></h5>
+<p>When the marketplace signals a freed slot (needs repair), the sales module:</p>
+<ul>
+<li>Retrieves the request data for the <code>requestId</code>.</li>
+<li>Computes collateral for repair.</li>
+<li>Creates a <code>SlotQueueItem</code>.</li>
+<li>Pushes the item into the <code>SlotQueue</code>.</li>
+</ul>
+<h5 id="requestcancelled"><a class="header" href="#requestcancelled">RequestCancelled</a></h5>
+<p>When a request is cancelled, the sales module removes all queue items for that <code>requestId</code>.</p>
+<h5 id="requestfulfilled"><a class="header" href="#requestfulfilled">RequestFulfilled</a></h5>
+<p>When a request is fulfilled, the sales module removes all queue items for that <code>requestId</code> and notifies active agents bound to the request.</p>
+<h5 id="requestfailed"><a class="header" href="#requestfailed">RequestFailed</a></h5>
+<p>When a request fails, the sales module removes all queue items for that <code>requestId</code> and notifies active agents bound to the request.</p>
+<h5 id="slotfilled"><a class="header" href="#slotfilled">SlotFilled</a></h5>
+<p>When a slot is filled, the sales module removes the queue item for that specific <code>(requestId, slotIndex)</code> and notifies the active agent for that slot.</p>
+<h5 id="slotreservationsfull"><a class="header" href="#slotreservationsfull">SlotReservationsFull</a></h5>
+<p>When the marketplace signals that reservations are full, the sales module removes the queue item for that specific <code>(requestId, slotIndex)</code>.</p>
+<h4 id="reservations"><a class="header" href="#reservations">Reservations</a></h4>
+<p>The Reservations module manages both Availabilities and Reservations.
+When an Availability is created, it reserves bytes in the storage module so no other modules can use those bytes.
+Before a dataset for a slot is downloaded, a Reservation is created, and the freeSize of the Availability is reduced.
+When bytes are downloaded, the reservation of those bytes in the storage module is released.
+Accounting of both reserved bytes in the storage module and freeSize in the Availability are cleaned up upon completion of the state machine.</p>
+<pre><code class="language-mermaid">graph TD
+    A[Availability] --&gt;|creates| R[Reservation]
+    A --&gt;|reserves bytes in| SM[Storage Module]
+    R --&gt;|reduces| AF[Availability.freeSize]
+    R --&gt;|downloads data| D[Dataset]
+    D --&gt;|releases bytes to| SM
+    TC[Terminal State] --&gt;|triggers cleanup| C[Cleanup]
+    C --&gt;|returns bytes to| AF
+    C --&gt;|deletes| R
+    C --&gt;|returns collateral to| A
+</code></pre>
+<h4 id="hooks"><a class="header" href="#hooks">Hooks</a></h4>
+<ul>
+<li><strong>onStore</strong>: streams data into the node's storage</li>
+<li><strong>onProve</strong>: produces proofs for initial and periodic proving</li>
+<li><strong>onExpiryUpdate</strong>: notifies the client node of a change in the expiry data</li>
+<li><strong>onSale</strong>: notifies that the host is now responsible for the slot</li>
+<li><strong>onClear</strong>: notification emitted once the state machine has concluded; used to reconcile Availability bytes and reserved bytes in the storage module</li>
+<li><strong>onCleanUp</strong>: cleanup hook called in terminal states to release resources, delete reservations, and return collateral to availabilities</li>
+</ul>
+<h4 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h4>
+<ul>
+<li>Always catch <code>CancelledError</code> from <code>nim-chronos</code> and log a trace, exiting gracefully</li>
+<li>Catch <code>CatchableError</code>, log it, and route to <code>SaleErrored</code></li>
+</ul>
+<h4 id="cleanup"><a class="header" href="#cleanup">Cleanup</a></h4>
+<p>Cleanup releases resources held by a sales agent and optionally requeues the slot.</p>
+<ul>
+<li>Return reserved bytes to the availability if a reservation exists</li>
+<li>Delete the reservation and return any remaining collateral</li>
+<li>If <code>reprocessSlot</code> is true, push the slot back into the queue marked as seen</li>
+<li>Remove the agent from the sales set and track the removal future</li>
+</ul>
+<h4 id="resource-management-approach"><a class="header" href="#resource-management-approach">Resource Management Approach</a></h4>
+<p>The nim-codex implementation uses Availabilities and Reservations to manage local storage resources:</p>
+<h5 id="reservation-management"><a class="header" href="#reservation-management">Reservation Management</a></h5>
+<ul>
+<li>Maintain <code>Availability</code> and <code>Reservation</code> records locally</li>
+<li>Match incoming slot requests to available capacity using prioritisation rules</li>
+<li>Lock capacity and collateral when creating a reservation</li>
+<li>Release reserved bytes progressively during download and free all remaining resources in terminal states</li>
+</ul>
+<p><strong>Note:</strong> Availabilities and Reservations are completely local to the Storage Provider implementation and are not visible at the protocol level. They provide one approach to managing storage capacity, but other implementations may use different resource management strategies.</p>
+<hr />
+<blockquote>
+<p><strong>Protocol Compliance Note</strong>: The Storage Provider implementation described above is specific to nim-codex. The only normative requirements for Storage Providers are defined in the <a href="#storage-provider-role">Storage Provider Role</a> section of Part I. Implementations must satisfy those protocol requirements but may use completely different internal designs.</p>
+</blockquote>
+<h3 id="client-implementation"><a class="header" href="#client-implementation">Client Implementation</a></h3>
+<p>The nim-codex reference implementation provides a complete Client implementation with state machine management for storage request lifecycles. This section documents the nim-codex approach.</p>
+<p>The nim-codex implementation uses a state machine pattern to manage purchase lifecycles, providing deterministic state transitions, explicit terminal states, and recovery support. The state machine definitions (state identifiers, transitions, state descriptions, requirements, data models, and interfaces) are documented in the subsections below.</p>
+<blockquote>
+<p><strong>Note</strong>: The Purchase module terminology and state machine design are specific to the nim-codex implementation. The protocol only requires that clients interact with the marketplace smart contract as specified in the Client Role section.</p>
+</blockquote>
+<h4 id="state-identifiers"><a class="header" href="#state-identifiers">State Identifiers</a></h4>
+<ul>
+<li>PurchasePending: <code>pending</code></li>
+<li>PurchaseSubmitted: <code>submitted</code></li>
+<li>PurchaseStarted: <code>started</code></li>
+<li>PurchaseFinished: <code>finished</code></li>
+<li>PurchaseErrored: <code>errored</code></li>
+<li>PurchaseCancelled: <code>cancelled</code></li>
+<li>PurchaseFailed: <code>failed</code></li>
+<li>PurchaseUnknown: <code>unknown</code></li>
+</ul>
+<h4 id="general-rules-for-all-states"><a class="header" href="#general-rules-for-all-states">General Rules for All States</a></h4>
+<ul>
+<li>If a <code>CancelledError</code> is raised, the state machine logs the cancellation message and takes no further action.</li>
+<li>If a <code>CatchableError</code> is raised, the state machine moves to <code>errored</code> with the error message.</li>
+</ul>
+<h4 id="state-transitions"><a class="header" href="#state-transitions">State Transitions</a></h4>
+<pre><code class="language-text">                                                                      |
+                                                                      v
+                                         ------------------------- unknown
+        |                               /                             /
+        v                              v                             /
+     pending ----&gt; submitted ----&gt; started ---------&gt; finished &lt;----/
+                        \              \                           /
+                         \              ------------&gt; failed &lt;----/
+                          \                                      /
+                           --&gt; cancelled &lt;-----------------------
+</code></pre>
+<p><strong>Note:</strong></p>
+<p>Any state can transition to errored upon a <code>CatchableError</code>.
+<code>failed</code> is an intermediate state before <code>errored</code>.
+<code>finished</code>, <code>cancelled</code>, and <code>errored</code> are terminal states.</p>
+<h4 id="state-descriptions"><a class="header" href="#state-descriptions">State Descriptions</a></h4>
+<p><strong>Pending State (<code>pending</code>)</strong></p>
+<p>A storage request is being created by making a call <code>on-chain</code>. If the storage request creation fails, the state machine moves to the <code>errored</code> state with the corresponding error.</p>
+<p><strong>Submitted State (<code>submitted</code>)</strong></p>
+<p>The storage request has been created and the purchase waits for the request to start. When it starts, an <code>on-chain</code> event <code>RequestFulfilled</code> is emitted, triggering the subscription callback, and the state machine moves to the <code>started</code> state. If the expiry is reached before the callback is called, the state machine moves to the <code>cancelled</code> state.</p>
+<p><strong>Started State (<code>started</code>)</strong></p>
+<p>The purchase is active and waits until the end of the request, defined by the storage request parameters, before moving to the <code>finished</code> state. A subscription is made to the marketplace to be notified about request failure. If a request failure is notified, the state machine moves to <code>failed</code>.</p>
+<p>Marketplace subscription signature:</p>
+<pre><code class="language-nim">method subscribeRequestFailed*(market: Market, requestId: RequestId, callback: OnRequestFailed): Future[Subscription] {.base, async.}
+</code></pre>
+<p><strong>Finished State (<code>finished</code>)</strong></p>
+<p>The purchase is considered successful and cleanup routines are called. The purchase module calls <code>marketplace.withdrawFunds</code> to release the funds locked by the marketplace:</p>
+<pre><code class="language-nim">method withdrawFunds*(market: Market, requestId: RequestId) {.base, async: (raises: [CancelledError, MarketError]).}
+</code></pre>
+<p>After that, the purchase is done; no more states are called and the state machine stops successfully.</p>
+<p><strong>Failed State (<code>failed</code>)</strong></p>
+<p>If the marketplace emits a <code>RequestFailed</code> event, the state machine moves to the <code>failed</code> state and the purchase module calls <code>marketplace.withdrawFunds</code> (same signature as above) to release the funds locked by the marketplace. After that, the state machine moves to <code>errored</code>.</p>
+<p><strong>Cancelled State (<code>cancelled</code>)</strong></p>
+<p>The purchase is cancelled and the purchase module calls <code>marketplace.withdrawFunds</code> to release the funds locked by the marketplace (same signature as above). After that, the purchase is terminated; no more states are called and the state machine stops with the reason of failure as error.</p>
+<p><strong>Errored State (<code>errored</code>)</strong></p>
+<p>The purchase is terminated; no more states are called and the state machine stops with the reason of failure as error.</p>
+<p><strong>Unknown State (<code>unknown</code>)</strong></p>
+<p>The purchase is in recovery mode, meaning that the state has to be determined. The purchase module calls the marketplace to get the request data (<code>getRequest</code>) and the request state (<code>requestState</code>):</p>
+<pre><code class="language-nim">method getRequest*(market: Market, id: RequestId): Future[?StorageRequest] {.base, async: (raises: [CancelledError]).}
+
+method requestState*(market: Market, requestId: RequestId): Future[?RequestState] {.base, async.}
+</code></pre>
+<p>Based on this information, it moves to the corresponding next state.</p>
+<blockquote>
+<p><strong>Note</strong>: Functional and non-functional requirements for the client role are summarized in the <a href="https://github.com/codex-storage/codex-spec/blob/master/specs/marketplace.md">Codex Marketplace Specification</a>. The requirements listed below are specific to the nim-codex Purchase module implementation.</p>
+</blockquote>
+<h4 id="functional-requirements"><a class="header" href="#functional-requirements">Functional Requirements</a></h4>
+<h5 id="purchase-definition"><a class="header" href="#purchase-definition">Purchase Definition</a></h5>
+<ul>
+<li>Every purchase MUST represent exactly one <code>StorageRequest</code></li>
+<li>The purchase MUST have a unique, deterministic identifier <code>PurchaseId</code> derived from <code>requestId</code></li>
+<li>It MUST be possible to restore any purchase from its <code>requestId</code> after a restart</li>
+<li>A purchase is considered expired when the expiry timestamp in its <code>StorageRequest</code> is reached before the request start, i.e, an event <code>RequestFulfilled</code> is emitted by the <code>marketplace</code></li>
+</ul>
+<h5 id="state-machine-progression"><a class="header" href="#state-machine-progression">State Machine Progression</a></h5>
+<ul>
+<li>New purchases MUST start in the <code>pending</code> state (submission flow)</li>
+<li>Recovered purchases MUST start in the <code>unknown</code> state (recovery flow)</li>
+<li>The state machine MUST progress step-by-step until a deterministic terminal state is reached</li>
+<li>The choice of terminal state MUST be based on the <code>RequestState</code> returned by the <code>marketplace</code></li>
+</ul>
+<h5 id="failure-handling"><a class="header" href="#failure-handling">Failure Handling</a></h5>
+<ul>
+<li>On marketplace failure events, the purchase MUST immediately transition to <code>errored</code> without retries</li>
+<li>If a <code>CancelledError</code> is raised, the state machine MUST log the cancellation and stop further processing</li>
+<li>If a <code>CatchableError</code> is raised, the state machine MUST transition to <code>errored</code> and record the error</li>
+</ul>
+<h4 id="non-functional-requirements"><a class="header" href="#non-functional-requirements">Non-Functional Requirements</a></h4>
+<h5 id="execution-model"><a class="header" href="#execution-model">Execution Model</a></h5>
+<p>A purchase MUST be handled by a single thread; only one worker SHOULD process a given purchase instance at a time.</p>
+<h5 id="reliability"><a class="header" href="#reliability">Reliability</a></h5>
+<p><code>load</code> supports recovery after process restarts.</p>
+<h5 id="performance"><a class="header" href="#performance">Performance</a></h5>
+<p>State transitions should be non-blocking; all I/O is async.</p>
+<h5 id="logging"><a class="header" href="#logging">Logging</a></h5>
+<p>All state transitions and errors should be clearly logged for traceability.</p>
+<h5 id="safety"><a class="header" href="#safety">Safety</a></h5>
+<ul>
+<li>Avoid side effects during <code>new</code> other than initialising internal fields; <code>on-chain</code> interactions are delegated to states using <code>marketplace</code> dependency.</li>
+<li>Retry policy for external calls.</li>
+</ul>
+<h5 id="testing"><a class="header" href="#testing">Testing</a></h5>
+<ul>
+<li>Unit tests check that each state handles success and error properly.</li>
+<li>Integration tests check that a full purchase flows correctly through states.</li>
+</ul>
+<hr />
+<blockquote>
+<p><strong>Protocol Compliance Note</strong>: The Client implementation described above is specific to nim-codex. The only normative requirements for Clients are defined in the <a href="#client-role">Client Role</a> section of Part I. Implementations must satisfy those protocol requirements but may use completely different internal designs.</p>
+</blockquote>
+<hr />
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a> - Key words for use in LIPs to Indicate Requirement Levels</li>
+<li><a href="https://hackmd.io/FB58eZQoTNm-dnhu0Y1XnA">Reed-Solomon algorithm</a> - Erasure coding algorithm used for data encoding</li>
+<li><a href="https://github.com/multiformats/cid#cidv1">CIDv1</a> - Content Identifier specification</li>
+<li><a href="https://github.com/multiformats/multihash">multihash</a> - Self-describing hashes</li>
+<li><a href="https://hackmd.io/2uRBltuIT7yX0CyczJevYg?view">Proof-of-Data-Possession</a> - Zero-knowledge proof system for storage verification</li>
+<li><a href="https://github.com/codex-storage/codex-spec/blob/master/specs/marketplace.md">Original Codex Marketplace Spec</a> - Source specification for this document</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://github.com/codex-storage/nim-codex">Codex Implementation</a> - Reference implementation in Nim</li>
+<li><a href="https://github.com/codex-storage/nim-codex/blob/master/codex/market.nim">Codex market implementation</a> - Marketplace module implementation</li>
+<li><a href="https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Sales.md">Codex Sales Component Spec</a> - Storage Provider implementation details</li>
+<li><a href="https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Purchase.md">Codex Purchase Component Spec</a> - Client implementation details</li>
+<li><a href="https://github.com/status-im/nim-chronos">Nim Chronos</a> - Async/await framework for Nim</li>
+<li><a href="https://github.com/codex-storage/codex-research/blob/41c4b4409d2092d0a5475aca0f28995034e58d14/design/storage-proof-timing.md">Storage proof timing design</a> - Proof timing mechanism</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../storage/raw/codex-merkle-tree.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../storage/raw/codex-prover.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../storage/raw/codex-merkle-tree.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../storage/raw/codex-prover.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

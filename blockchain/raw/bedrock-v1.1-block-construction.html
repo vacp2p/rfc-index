@@ -1,0 +1,790 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Bedrock v1.1 Block Construction - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html" class="active"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="bedrock-v1-1-block-construction"><a class="header" href="#bedrock-v1-1-block-construction">BEDROCK-V1-1-BLOCK-CONSTRUCTION</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Bedrock v1.1 Block Construction, Validation and Execution Specification</td></tr>
+<tr><td>Slug</td><td>bedrock-v1.1-block-construction</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Marcin Pawlowski <a href="mailto:marcin@status.im">marcin@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a>, Daniel Sanchez Quiros <a href="mailto:danielsq@status.im">danielsq@status.im</a>, David Rusu <a href="mailto:davidrusu@status.im">davidrusu@status.im</a>, Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a>, Mehmet Gonen <a href="mailto:mehmet@status.im">mehmet@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification defines the construction, validation,
+and execution of block proposals in the Nomos blockchain.
+It describes how block proposals contain references to transactions
+rather than complete transactions,
+compressing the proposal size from up to 1 MB down to 33 kB
+to save bandwidth necessary to broadcast new blocks.</p>
+<p><strong>Keywords:</strong> Bedrock, block construction, validation, execution,
+leader, transaction, Proof of Leadership</p>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Terminology</th><th>Description</th></tr></thead><tbody>
+<tr><td>Leader</td><td>A node elected through the leader lottery to construct a new block.</td></tr>
+<tr><td>Block Builder</td><td>The leader node that constructs a new block proposal.</td></tr>
+<tr><td>Block Proposer</td><td>The leader node that shares the constructed block with other network members.</td></tr>
+<tr><td>Block Proposal</td><td>A message structure containing a header and references to transactions.</td></tr>
+<tr><td>Proof of Leadership (PoL)</td><td>A proof confirming that a node is indeed the elected leader.</td></tr>
+<tr><td>Transaction Maturity</td><td>The assumption that transactions have had enough time to spread across the network.</td></tr>
+<tr><td>Validator</td><td>A node that validates and executes block proposals.</td></tr>
+</tbody></table>
+</div>
+<h2 id="high-level-flow"><a class="header" href="#high-level-flow">High-level Flow</a></h2>
+<p>This section presents a high-level description of the block lifecycle.
+The main focus of this section is to build an intuition
+on the block construction, validation, and execution.</p>
+<ol>
+<li>
+<p>A leader is selected. The leader becomes a block builder.</p>
+</li>
+<li>
+<p>The block builder <strong>constructs</strong> a block proposal.</p>
+<ol>
+<li>
+<p>The block builder selects the latest block (parent)
+as the reference point for the chain state update.</p>
+</li>
+<li>
+<p>The block builder constructs references to the deterministically generated
+Mantle Transactions that execute the <a href="https://nomos-tech.notion.site/Service-Reward-Distribution-Protocol">Service Reward Distribution Protocol</a>,
+if such transactions can be constructed.
+For example, there is no need to distribute rewards
+when all rewards have already been distributed.</p>
+</li>
+<li>
+<p>The block builder selects valid Mantle Transactions
+(as defined in <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification</a>)
+from its mempool and includes references to them in the proposal.</p>
+</li>
+<li>
+<p>The block builder populates the block header of the block proposal.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>The block proposer sends the block proposal to the Blend network.</p>
+</li>
+<li>
+<p>The validators receive the block proposal.</p>
+</li>
+<li>
+<p>The validators <strong>validate</strong> the block proposal.</p>
+<ol>
+<li>
+<p>They validate the block header.</p>
+</li>
+<li>
+<p>They verify distribution of service rewards through Mantle Transactions
+as specified in <a href="https://nomos-tech.notion.site/Service-Reward-Distribution-Protocol">Service Reward Distribution Protocol</a>.
+This is done by independently deriving the distribution transaction
+and confirming that it matches the first reference,
+if there are rewards to be distributed.</p>
+</li>
+<li>
+<p>They retrieve complete transactions from their mempool
+that are referred in the block.</p>
+</li>
+<li>
+<p>They validate each transaction included in the block.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>The validators <strong>execute</strong> the block proposal.</p>
+<ol>
+<li>
+<p>They derive the new blockchain state from the previous one
+by executing transactions as defined in <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification</a>.</p>
+</li>
+<li>
+<p>They update the different variables that need to be maintained over time.</p>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="constructions"><a class="header" href="#constructions">Constructions</a></h2>
+<h3 id="hash"><a class="header" href="#hash">Hash</a></h3>
+<p>This specification uses two hashing algorithms
+that have the same output length of 256 bits (32 bytes)
+that are Poseidon2 and Blake2b.</p>
+<h3 id="block-proposal"><a class="header" href="#block-proposal">Block Proposal</a></h3>
+<p>A block proposal,
+instead of containing complete Mantle Transactions of an unlimited size,
+contains references of fixed size to the transactions.
+Therefore, the size of the proposal is constant and it is 33129 bytes.</p>
+<p>The following message structure is defined:</p>
+<pre><code class="language-python">class Proposal:  # 33129 bytes
+    header: Header              # 297 bytes
+    references: References      # 32768 bytes
+    signature: Ed25519Signature # 64 bytes
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>header</code> is the header of the proposal; defined below: <a href="#header">Header</a>.</li>
+<li><code>references</code> is a set of 1024 references to transactions of a <code>hash</code> type;
+the size of the <code>hash</code> type is 32 bytes
+and is the transaction hash as defined in <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification - Mantle Transaction</a>.</li>
+<li><code>signature</code> is the signature of the complete <code>header</code> using the <code>leader_key</code>
+from the <code>ProofOfLeadership</code>;
+the size of the <code>Ed25519Signature</code> type is 64 bytes.</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: The length of the <code>references</code> list must be preserved
+to maintain the message's indistinguishability in the Blend protocol.
+Therefore, the list must be padded with zeros when necessary.</p>
+</blockquote>
+<h3 id="header"><a class="header" href="#header">Header</a></h3>
+<pre><code class="language-python">class Header:  # 297 bytes
+    bedrock_version: byte             # 1 bytes
+    parent_block: hash                # 32 bytes
+    slot: SlotNumber                  # 8 bytes
+    block_root: hash                  # 32 bytes
+    proof_of_leadership: ProofOfLeadership  # 224 bytes
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>bedrock_version</code> is the version of the proposal message structure
+that supports other protocols defined in <a href="https://nomos-tech.notion.site/Bedrock-Specification">Bedrock Specification</a>;
+the size of it is 1 byte and is fixed to <code>0x01</code>.</li>
+<li><code>parent_block</code> is the block ID (<a href="https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification">Cryptarchia v1 Protocol Specification</a>)
+of the parent block, validated and accepted by the block builder.
+It is used for the derivation of the <code>AgedLedger</code> and <code>LatestLedger</code> values
+necessary for validating the PoL;
+the size of the <code>hash</code> is 32 bytes.</li>
+<li><code>slot</code> is the consensus slot number;
+the size of the <code>SlotNumber</code> type is 8 bytes.</li>
+<li><code>block_root</code> is the root of the Merkle tree constructed from transaction hashes
+(defined in <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification - Mantle Transaction</a>)
+used for constructing the <code>references</code> list in the <code>transactions</code>;
+the size of the <code>hash</code> is 32 bytes.</li>
+<li><code>proof_of_leadership</code> is the proof confirming that the sender is the leader;
+defined below: <a href="#proof-of-leadership">Proof of Leadership</a>.</li>
+</ul>
+<h3 id="block-references"><a class="header" href="#block-references">Block References</a></h3>
+<pre><code class="language-python">class References:  # 32768 bytes
+    service_reward: list[zkhash]        # 1*32 bytes
+    mempool_transactions: list[zkhash]  # 1024-len(service_reward)*32 bytes
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>service_reward</code> is a set of up to 1 reference
+to a reward transaction of a <code>zkhash</code> type;
+the size of the <code>zkhash</code> type is 32 bytes
+and is the transaction hash as defined in
+<a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification - Mantle Transaction</a>.</li>
+<li><code>mempool_transactions</code> is a set of up to 1024 references
+to transactions of a <code>zkhash</code> type;
+the size of the <code>zkhash</code> type is 32 bytes
+and is the transaction hash as defined in
+<a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification - Mantle Transaction</a>.</li>
+</ul>
+<p>The <code>service_reward</code> transaction is created deterministically by the leader
+and is not obtained from the mempool.
+If this transaction were obtained from the mempool,
+it could expose the leader's identity as the transaction creator.
+To protect the leader's identity,
+only the <code>service_reward</code> reference is included in the proposal,
+and it is derived again by the nodes verifying the block.</p>
+<p>The <code>service_reward</code> transaction is a Service Rewards Distribution Transaction
+that distributes service rewards.
+It is a Mantle Transaction with no input
+and up to <code>service_count x 4</code> outputs,
+<code>service_count</code> being the number of services (global parameter).
+The outputs represent the validators rewarded (up to 4 per service).</p>
+<p>If the <code>service_reward</code> transaction cannot be created,
+then nothing is added to the list.
+Therefore, the <code>service_reward</code> list is allowed to have a length of 0.</p>
+<h3 id="proof-of-leadership"><a class="header" href="#proof-of-leadership">Proof of Leadership</a></h3>
+<pre><code class="language-python">class ProofOfLeadership:  # 224 bytes
+    leader_voucher: RewardVoucher       # 32 bytes
+    entropy_contribution: zkhash        # 32 bytes
+    proof: ProofOfLeadership            # 128 bytes
+    leader_key: Ed25519PublicKey        # 32 bytes
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>leader_voucher</code> is the voucher value
+used for retrieving the reward by the leader for proposal;
+the size of the <code>RewardVoucher</code> is 32 bytes.</li>
+<li><code>entropy_contribution</code> is the output of the PoL contribution
+for Cryptarchia entropy;
+the size of the <code>zkhash</code> type is 32 bytes.</li>
+<li><code>proof</code> is the proof confirming that the proposal
+is constructed by the leader;
+the size of the <code>ProofOfLeadership</code> type is 128 bytes
+(2 compressed G1 and 1 compressed G2 BN256 elements).</li>
+<li><code>leader_key</code> is the one-time <code>Ed25519PublicKey</code>
+used for signing the <code>Proposal</code>.
+This binds the content of the proposal with the <code>ProofOfLeadership</code>;
+the size of the <code>Ed25519PublicKey</code> type is 32 bytes.</li>
+</ul>
+<h2 id="proposal-construction"><a class="header" href="#proposal-construction">Proposal Construction</a></h2>
+<p>This section explains how the block proposal structure presented above
+is populated by the consensus leader.</p>
+<p>The block proposal is constructed by the leader of the current slot.
+The node becomes a leader only after successfully generating a valid PoL
+for a given <code>(Epoch, Slot)</code>.</p>
+<h3 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h3>
+<p>Before constructing the proposal, the block builder must:</p>
+<ol>
+<li>
+<p>Select a valid parent block referenced by <code>ParentBlock</code>
+on which they will extend the chain.</p>
+</li>
+<li>
+<p>Derive the required Ledger state snapshots <code>AgedLedger</code> and <code>LatestLedger</code>
+from the state of the chain including the last block.</p>
+</li>
+<li>
+<p>Select a valid unspent note winning the PoL.</p>
+</li>
+<li>
+<p>Generate a valid PoL proving leadership eligibility for <code>(Epoch, Slot)</code>
+based on the selected note.
+Attach the PoL to a one-time Ed25519 public key used to sign the block proposal.</p>
+</li>
+</ol>
+<p>Only after the PoL is generated can the block proposal be constructed
+(see <a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification">Proof of Leadership Specification</a>).</p>
+<h3 id="construction-procedure"><a class="header" href="#construction-procedure">Construction Procedure</a></h3>
+<ol>
+<li>
+<p>Initialize proposal metadata with the last known state of the blockchain.
+Set the:</p>
+<ul>
+<li><code>header</code>:
+<ul>
+<li><code>bedrock_version</code></li>
+<li><code>parent_block</code></li>
+<li><code>slot</code></li>
+<li><code>block_root</code></li>
+<li><code>proof_of_leadership</code>:
+<ul>
+<li><code>leader_voucher</code></li>
+<li><code>entropy_contribution</code></li>
+<li><code>proof</code></li>
+<li><code>leader_key</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Construct the <code>service_reward</code> object:</p>
+<ol>
+<li>If there are service rewards to be distributed,
+construct the transaction that distributes
+the service rewards from previous session
+and add its reference to the <code>service_reward</code> list.
+This transaction must be computed locally,
+do not disseminate this transaction.</li>
+</ol>
+</li>
+<li>
+<p>Construct the <code>mempool_transactions</code> object:</p>
+<ol>
+<li>
+<p>Select Mantle transactions:</p>
+<ul>
+<li>
+<p>Choose up to <code>1024-len(service_reward)</code> valid <code>SignedMantleTx</code>
+from the local mempool.</p>
+</li>
+<li>
+<p>Ensure each transaction:</p>
+<ul>
+<li>
+<p>Is valid according to <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification</a>.</p>
+</li>
+<li>
+<p>Has no conflicts with others
+(e.g., two transactions trying to spend the same note).</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Derive references values:</p>
+<pre><code class="language-python">references: list[zkhash] = [mantle_txhash(tx) for tx in service_reward + mempool_transactions]
+</code></pre>
+</li>
+<li>
+<p>Compute the <code>header.block_root</code> as the root of the Merkle tree constructed
+from the <code>list(service_reward) + mempool_transactions</code> transactions
+used to build <code>references</code>.</p>
+</li>
+<li>
+<p>Sign the block proposal header.</p>
+<pre><code class="language-python">signature = Ed25519.sign(leader_secret_key, header)
+</code></pre>
+</li>
+<li>
+<p>Assemble the block proposal.</p>
+<pre><code class="language-python">proposal = Proposal( header, references, signature )
+</code></pre>
+</li>
+</ol>
+<p>The PoL must have been generated beforehand
+and bound to the same Ledger view as mentioned in the <a href="#prerequisites">Prerequisites</a>.</p>
+<p>The constructed proposal can now be broadcast to the network for validation.</p>
+<h2 id="block-proposal-reconstruction"><a class="header" href="#block-proposal-reconstruction">Block Proposal Reconstruction</a></h2>
+<p>Given a block proposal, this specification assumes <em>transaction maturity</em>.
+This means that the block proposal must include transactions from the mempool
+that have had enough time to spread across the network to reach all nodes.
+This ensures that transactions are widely known and recognized
+before block reconstruction.</p>
+<p>This transaction maturity assumption holds true
+because the block proposal must be sent through the Blend Network
+before it reaches validators and can be reconstructed.
+The Blend Network introduces significant delay,
+ensuring that transactions referenced in the proposal
+have reached all network participants.</p>
+<p>This approach is crucial for maintaining smooth network operation
+and reducing the risk that proposals get rejected
+due to transactions being unavailable to some validators.
+Moreover, by increasing the number of nodes that have seen the transaction,
+anonymity is also enhanced as the set of nodes with the same view is larger.
+This may result in increased difficulty—or even practical prevention—of
+executing deanonymization attacks such as tagging attacks.</p>
+<p>Upon receipt of a block proposal,
+validators must confirm the presence of all referenced transactions
+within their local mempool.
+This verification is an absolute requirement—if even a single referenced transaction
+is missing from the validator's mempool, the entire proposal must be rejected.
+This stringent validation protocol ensures only widely-distributed transactions
+are included in the blockchain,
+safeguarding against potential network state fragmentation.</p>
+<p>The process works as follows:</p>
+<ol>
+<li>
+<p>Transaction is added to the node mempool.</p>
+</li>
+<li>
+<p>Node sends the transaction to all its neighbors.</p>
+</li>
+<li>
+<p>Neighbors add the transaction to their own mempools
+and propagate it to their neighbors—transaction
+is gossiped throughout the network.</p>
+</li>
+<li>
+<p>Block builder selects a transaction from its local mempool,
+which is guaranteed to be propagated through the network
+due to steps 1-3.</p>
+</li>
+<li>
+<p>Block builder constructs a block proposal
+with references to selected transactions.</p>
+</li>
+<li>
+<p>Block proposal is sent through the Blend Network,
+which requires multiple rounds of gossiping.
+This introduces a delay that ensures the transaction
+has reached most of the network participants' mempools.</p>
+</li>
+<li>
+<p>Block proposal is received by validators.</p>
+</li>
+<li>
+<p>Validators check their local mempools
+for all referenced transactions from the proposal.</p>
+</li>
+<li>
+<p>If any transaction is missing, the entire proposal is rejected.</p>
+</li>
+<li>
+<p>If all transactions are present,
+the block proposal is reconstructed and proceeds to further validation steps.</p>
+</li>
+</ol>
+<h2 id="block-proposal-validation"><a class="header" href="#block-proposal-validation">Block Proposal Validation</a></h2>
+<p>This section defines the procedure followed by a Nomos node
+to validate a received block proposal.</p>
+<p>Given a <code>Proposal</code>, a proposed block consisting of a <code>header</code> and <code>references</code>.
+This block proposal is considered valid if the following conditions are met:</p>
+<h3 id="block-validation"><a class="header" href="#block-validation">Block Validation</a></h3>
+<p>The <code>Proposal</code> must satisfy the rules defined in
+<a href="https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification">Cryptarchia v1 Protocol Specification - Block Header Validation</a>.</p>
+<h3 id="block-proposal-reconstruction-validation"><a class="header" href="#block-proposal-reconstruction-validation">Block Proposal Reconstruction Validation</a></h3>
+<p>The <code>references</code> must refer to either a <code>service_reward</code> transaction
+that is locally derivable
+or to existing <code>mempool_transaction</code> entries
+that are retrievable from the node's local mempool.</p>
+<h3 id="mempool-transactions-validation"><a class="header" href="#mempool-transactions-validation">Mempool Transactions Validation</a></h3>
+<p><code>mempool_transactions</code> must refer to a valid sequence
+of Mantle Transactions from the mempool.
+Each transaction must be valid according to the rules
+defined in the <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification</a>.
+In order to verify ZK proofs,
+they are batched for verification as explained in
+<a href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a>
+to get better performances.</p>
+<h3 id="rewards-validation"><a class="header" href="#rewards-validation">Rewards Validation</a></h3>
+<ol>
+<li>
+<p>Check if the first reference matches a deterministically derived
+Service Rewards Distribution Transaction
+that distributes previous session service fees
+as defined in <a href="https://nomos-tech.notion.site/Service-Reward-Distribution-Protocol">Service Reward Distribution Protocol</a>.
+It should take no input and output up to <code>service_count * 4</code> reward notes
+distributed to the correct validators.</p>
+</li>
+<li>
+<p>If the above rewarding transactions cannot be derived,
+then the first reference must refer to a <code>mempool_transaction</code>.</p>
+</li>
+</ol>
+<p>If any of the above checks fail, the block proposal must be rejected.</p>
+<h2 id="block-execution"><a class="header" href="#block-execution">Block Execution</a></h2>
+<p>This section specifies how a Nomos node executes a valid block proposal
+to update its local state.</p>
+<p>Given a <code>ValidBlock</code> that has successfully passed proposal validation,
+the node must:</p>
+<ol>
+<li>
+<p>Append the <code>leader_voucher</code> contained in the block to the set of reward vouchers
+<strong>when the following epoch starts</strong>.</p>
+</li>
+<li>
+<p>Execute the Mantle Transactions included in the block sequentially,
+using the execution rules defined in the <a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification</a>.</p>
+</li>
+</ol>
+<h2 id="annex"><a class="header" href="#annex">Annex</a></h2>
+<h3 id="batch-verification-of-zk-proofs"><a class="header" href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a></h3>
+<h4 id="blob-samples"><a class="header" href="#blob-samples">Blob Samples</a></h4>
+<ol>
+<li>
+<p>For each sample the verifier follows the classic cryptographic verification procedure
+as described in <a href="https://nomos-tech.notion.site/NomosDA-Cryptographic-Protocol">NomosDA Cryptographic Protocol - Verification</a>
+except the last step, once the verifier has a single commitment C^(i),
+an aggregated element v^(i) at position u^(i) and one proof π^(i) for each sample.</p>
+</li>
+<li>
+<p>The verifier draws a random value for each sample r_i ← $F_p.</p>
+</li>
+<li>
+<p>The verifier computes:</p>
+<ol>
+<li>
+<p>C' := Σ(i=1 to k) r_i · C^(i)</p>
+</li>
+<li>
+<p>v' := Σ(i=1 to k) r_i · v^(i)</p>
+</li>
+<li>
+<p>π' := Σ(i=1 to k) r_i · π^(i)</p>
+</li>
+<li>
+<p>u' := Σ(i=1 to k) r_i · u^(i) · π^(i)</p>
+</li>
+</ol>
+</li>
+<li>
+<p>They test if e(C' - v' · G1 + u', G2) = e(π', τ · G2).</p>
+</li>
+</ol>
+<h4 id="proofs-of-claim"><a class="header" href="#proofs-of-claim">Proofs of Claim</a></h4>
+<ol>
+<li>
+<p>For each proof of Claim the verifier collects
+the classic Groth16 elements required for verification.
+It includes the proof π^(i), and the public values x_j^(i)
+for each proof of claim.</p>
+</li>
+<li>
+<p>The verifier draws one random value for each proof r_i ← $F_p.</p>
+</li>
+<li>
+<p>The verifier computes:</p>
+<ol>
+<li>
+<p>π'_j := Σ(i=1 to k) r_i · π_j^(i) for j ∈ {A, B, C}.</p>
+</li>
+<li>
+<p>r' := Σ(i=1 to k) r_i</p>
+</li>
+<li>
+<p>IC := r' · Ψ_0 + Σ(j=1 to l) (Σ(i=1 to k) r_i · x_j^(i)) · Ψ_j</p>
+</li>
+</ol>
+</li>
+<li>
+<p>They test if Σ(i=1 to k) e(r_1 · π'_A, π'_B) = e(r' · [α]_1, [β]_2) + e(IC, [γ]_2) + e(π'_C, [δ]_2).</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong>: This batch verification of Groth16 proofs is the same
+as what is described in the Zcash paper, Appendix B.2.</p>
+</blockquote>
+<h4 id="zksignatures"><a class="header" href="#zksignatures">ZkSignatures</a></h4>
+<p>The verifier follows the same procedure as in <a href="#proofs-of-claim">Proofs of Claim</a>
+but with the Groth16 proofs of ZkSignatures.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Mantle-Specification">Mantle Specification</a> - Mantle transaction specification</li>
+<li><a href="https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification">Cryptarchia v1 Protocol Specification</a>
+- Cryptarchia consensus protocol</li>
+<li><a href="https://nomos-tech.notion.site/Bedrock-Specification">Bedrock Specification</a> - Bedrock protocol specification</li>
+<li><a href="https://nomos-tech.notion.site/Proof-of-Leadership-Specification">Proof of Leadership Specification</a>
+- Proof of Leadership specification</li>
+<li><a href="https://nomos-tech.notion.site/Service-Reward-Distribution-Protocol">Service Reward Distribution Protocol</a>
+- Service reward distribution protocol</li>
+<li><a href="https://nomos-tech.notion.site/NomosDA-Cryptographic-Protocol">NomosDA Cryptographic Protocol</a>
+- NomosDA cryptographic verification</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/v1-1-Block-Construction-Validation-and-Execution-Specification-269261aa09df807185a9e0764acffe22">v1.1 Block Construction, Validation and Execution Specification</a>
+- Original specification document</li>
+<li>Poseidon2 - Hash function</li>
+<li>Blake2b - Hash function</li>
+<li>Zcash paper, Appendix B.2 - Batch verification of Groth16 proofs</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/bedrock-service-reward-distribution.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/bedrock-service-reward-distribution.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>

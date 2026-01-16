@@ -1,0 +1,757 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Nomos Cryptarchia v1 Protocol - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/Waku2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/Filter</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/Store</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/Message</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/Bridge</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/RLN Relay</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/Lightpush</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/Discv5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/Peer Exchange</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/Bindings API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/Network</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/Metadata</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/Toy ETH PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/Payload</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/X3DH Sessions</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/Waku1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/Data</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/Mail</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/Toy Chat</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/Topics</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/Peers</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/Config</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/Adaptive Nodes</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/Waku0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/Swap</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> Fault Tolerant Store</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.1.</strong> NomosDA Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.2.</strong> NomosDA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.3.</strong> P2P Hardware Requirements</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.4.</strong> P2P NAT Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.5.</strong> P2P Network Bootstrapping</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.6.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.7.</strong> Bedrock Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.8.</strong> Bedrock Anonymous Leaders Reward</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.9.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.10.</strong> Bedrock Service Reward Distribution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.11.</strong> Bedrock v1.1 Block Construction</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.12.</strong> Bedrock v1.1 Mantle Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.13.</strong> Cryptarchia Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.14.</strong> Cryptarchia Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.15.</strong> Cryptarchia v1 Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.16.</strong> Nomos Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html" class="active"><strong aria-hidden="true">2.1.17.</strong> Nomos Cryptarchia v1 Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.18.</strong> Nomos Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.19.</strong> Nomos Message Encapsulation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.20.</strong> Nomos Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.21.</strong> Nomos Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html"><strong aria-hidden="true">2.1.22.</strong> Nomos Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> Claro</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> Block Exchange</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.2.</strong> Codex Merkle Tree</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-marketplace.html"><strong aria-hidden="true">3.1.3.</strong> Marketplace</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-prover.html"><strong aria-hidden="true">3.1.4.</strong> Codex Prover</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> Codex Store</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.6.</strong> Community History</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.7.</strong> DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/erasure-coding.html"><strong aria-hidden="true">3.1.8.</strong> Erasure Coding</a></li><li class="chapter-item expanded "><a href="../../storage/raw/slot-buIlder.html"><strong aria-hidden="true">3.1.9.</strong> Slot Builder</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/Remote Log</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS Meta</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/Libp2p DNS Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> Consensus Hashgraphlike</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.8.</strong> Decentralized Messaging Ethereum</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH MLS Offchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.10.</strong> ETH MLS Onchain</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.11.</strong> ETH SecPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> Extensible Peer Records</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> Gossipsub Tor Push</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.14.</strong> Logos Capability Discovery</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.15.</strong> Mix</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.16.</strong> Noise X3DH Double Ratchet</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.17.</strong> RLN Interep Spec</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.18.</strong> RLN Stealth Commitments</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.19.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.20.</strong> SDS</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> Template</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/Curation</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/Featuring</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/1-to-1 Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/Communities</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/Community History Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/Keycard Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/Account Address</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.1.</strong> Simple Scaling</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> Status App Protocols</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.3.</strong> Status MVDS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> URL Data</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> URL Scheme</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3rd Party</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> Account</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> Client</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp Browser API Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPs</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> Ethereum Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> Group Chat</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS Gateway for Sticker Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> Payloads</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> Push Notification Server</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> Secure Transport</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> Waku Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> Waku Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> Whisper Mailserver</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> Whisper Usage</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="nomos-cryptarchia-v1-protocol"><a class="header" href="#nomos-cryptarchia-v1-protocol">NOMOS-CRYPTARCHIA-V1-PROTOCOL</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Nomos Cryptarchia v1 Protocol Specification</td></tr>
+<tr><td>Slug</td><td>nomos-cryptarchia-v1-protocol</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>David Rusu <a href="mailto:david@status.im">david@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a>, Giacomo Pasini <a href="mailto:giacomo@status.im">giacomo@status.im</a>, Thomas Lavaur <a href="mailto:thomas@status.im">thomas@status.im</a>, Mehmet <a href="mailto:mehmet@status.im">mehmet@status.im</a>, Marcin Pawlowski <a href="mailto:marcin@status.im">marcin@status.im</a>, Daniel Sanchez Quiros <a href="mailto:daniel@status.im">daniel@status.im</a>, Youngjoon Lee <a href="mailto:youngjoon@status.im">youngjoon@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/nomos-cryptarchia-v1-protocol.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>Cryptarchia is the consensus protocol of Nomos Bedrock.
+This document specifies how Bedrock comes to agreement on a single history of blocks.
+The values that Cryptarchia optimizes for are resilience and privacy,
+which come at the cost of block times and finality.
+Cryptarchia is a probabilistic consensus protocol with properties similar to
+Bitcoin's Nakamoto Consensus,
+dividing time into slots with a leadership lottery run at each slot.</p>
+<p><strong>Keywords:</strong> consensus, proof-of-stake, leadership lottery, fork choice,
+block validation, epoch, slot, immutability</p>
+<h2 id="semantics"><a class="header" href="#semantics">Semantics</a></h2>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h2 id="background"><a class="header" href="#background">Background</a></h2>
+<h3 id="resilience"><a class="header" href="#resilience">Resilience</a></h3>
+<p>In consensus, there is a trade-off between prioritizing either safety or liveness
+in the presence of catastrophic failure (this is a re-formalization of the CAP theorem).
+Choosing safety means the chain never forks,
+instead the chain halts until the network heals.
+On the other hand, choosing liveness (a la Bitcoin/Ethereum) means that
+block production continues but finality will stall,
+leading to confusion around which blocks are on the honest chain.</p>
+<p>On the surface both options seem to provide similar guarantees.
+If finality is delayed indefinitely, is this not equivalent to a halted chain?
+The differences come down to how safety or liveness is implemented.</p>
+<h4 id="prioritizing-safety"><a class="header" href="#prioritizing-safety">Prioritizing Safety</a></h4>
+<p>Chains that provide a safety guarantee do so using quorum-based consensus.
+This requires a known set of participants (i.e. a permissioned network)
+and extensive communication between them to reach agreement.
+This restricts the number of participants in the network.
+Furthermore, quorum based consensus can only tolerate up to 1/3rd of
+the participants becoming faulty.</p>
+<p>A small participant set and low threshold for faults generally pushes these networks
+to put large barriers to entry,
+either through large staking requirements or politics.</p>
+<h4 id="prioritizing-liveness"><a class="header" href="#prioritizing-liveness">Prioritizing Liveness</a></h4>
+<p>Chains that prioritize liveness generally do so by relying on fork choice rules
+such as the longest chain rule from Nakamoto consensus.
+These protocols allow each participant to make a local choice
+about which fork to follow,
+and therefore do not require quorums and thus can be permissionless.</p>
+<p>Additionally, due to a lack of quorums, these protocols can be quite message efficient.
+Thus, participation does not need to be artificially reduced
+to remain within bandwidth restrictions.</p>
+<p>These protocols tolerate up to 1/2 of participants becoming faulty.
+The large fault tolerance threshold and the large number of participants
+provides for much higher resilience to corruption.</p>
+<h3 id="privacy"><a class="header" href="#privacy">Privacy</a></h3>
+<p>The motivation behind the design of Cryptarchia can be boiled down to this statement:</p>
+<p><em>A block proposer should not feel the need to self-censor when proposing a block.</em></p>
+<p>Working to give leaders confidence in this statement has had ripple effects
+throughout the protocol, including that:</p>
+<ul>
+<li><strong>The block proposals should not be linkable to a leader</strong>.
+An adversary should not be able to connect together
+the block proposals of a leader in order to build a profile.
+In particular, one should not be able to infer a proposer's stake
+from their past on-chain activity.</li>
+<li><strong>Cryptarchia must not reveal the stake of the leader</strong> -
+that is, it must be a Private Proof of Stake (PPoS) protocol.
+If the activity of the leader reveals their stake values
+(e.g. through weighted voting),
+then this value can be used to reduce the anonymity set for the leader
+by bucketing the leader as high/low stake and can open him up to targeting.</li>
+<li><strong>Leaders should be protected against network triangulation attacks</strong>.
+This is outside of the scope of this document,
+but it suffices to say that in-protocol cryptographic privacy
+is not sufficient to guarantee a leader's privacy.
+This topic is dealt with directly in Blend Network Specification.</li>
+</ul>
+<h3 id="limitations-of-cryptarchia-v1"><a class="header" href="#limitations-of-cryptarchia-v1">Limitations of Cryptarchia V1</a></h3>
+<p>Despite best efforts, it is not possible to provide perfect privacy and censorship resistance
+to all parties. In particular:</p>
+<ul>
+<li>It is not possible to protect leaders from leaking information about themselves
+based on the contents of blocks they propose.
+The tagging attack is an example of this,
+where an adversary may distribute a transaction to only a small subset of the network.
+If the block proposal includes this transaction,
+the adversary learns that the leader was one of those nodes in that subset.</li>
+<li>The leader is a single point of failure (SPOF).
+Despite all the efforts to protect the leader,
+the network can be easily censored by the leader.
+The leader may choose to exclude certain types of transactions from blocks,
+leading to a worse UX for targeted parties.</li>
+</ul>
+<p>These limitations are not considered insurmountable
+and there are sketches towards solutions that will be developed
+in following iterations of the protocol.</p>
+<h2 id="design-overview"><a class="header" href="#design-overview">Design Overview</a></h2>
+<p>Cryptarchia is a probabilistic consensus protocol with properties similar to
+Bitcoin's Nakamoto Consensus.</p>
+<p>At a high level, Cryptarchia divides time into slots and at each slot,
+a leadership lottery is run.
+To participate in the lottery, a node must have held stake in the chain
+in the form of a note for a minimum time period.
+Given a sufficiently aged note, you can check if it has won a slot lottery
+by cryptographically flipping a weighted coin.
+The weight of the coin is proportional to the value of your note,
+thus higher valued notes lead to increased chances of winning.
+To ensure privacy and avoid revealing the note value,
+this lottery result is proven within a ZK proof system.</p>
+<p>The design starts from the solid foundation provided by
+Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake
+and builds upon it, incorporating the latest research at the intersection of
+cryptography, consensus and network engineering.</p>
+<h2 id="protocol"><a class="header" href="#protocol">Protocol</a></h2>
+<h3 id="constants"><a class="header" href="#constants">Constants</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
+<tr><td>$f$</td><td>slot activation coefficient</td><td>The target rate of occupied slots. Not all slots contain blocks, many are empty. (See Block Times &amp; Blend Network Analysis for analysis leading to the choice of value.)</td><td>1/30</td></tr>
+<tr><td>$k$</td><td>security parameter</td><td>Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable.</td><td>2160 blocks</td></tr>
+<tr><td>none</td><td>slot length</td><td>The duration of a single slot.</td><td>1 second</td></tr>
+<tr><td>MAX_BLOCK_SIZE</td><td>max block size</td><td>The maximum size of the block body (not including the header)</td><td>1 MB</td></tr>
+<tr><td>MAX_BLOCK_TXS</td><td>max block transactions</td><td>The maximum number of transactions in a block</td><td>1024</td></tr>
+</tbody></table>
+</div>
+<h3 id="notation"><a class="header" href="#notation">Notation</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
+<tr><td>$s$</td><td>slot security parameter</td><td>Sufficient slots such that $k$ blocks have been produced with high probability.</td><td>$3\lfloor \frac{k}{f}\rfloor$</td></tr>
+<tr><td>$T$</td><td>the block tree</td><td>This is the block tree observed by a node.</td><td></td></tr>
+<tr><td>$F_T$</td><td>tips of block tree $T$</td><td>The set of concurrent forks of some block tree $T$.</td><td>$F_T={b\in T:\forall c \in T\space \textbf{parent}(c) \neq b }$</td></tr>
+<tr><td>$c_{loc}$</td><td>tip of local chain</td><td>The chain that a node considers to be the honest chain.</td><td>$c_{loc} \in F_{T}$</td></tr>
+<tr><td>$B_\text{imm}$</td><td>the latest immutable block</td><td>The latest block which was committed (finalized) by the chain maintenance.</td><td>$B_\text{imm} \in \textbf{ancestors}(c_{loc})$</td></tr>
+<tr><td>$sl$</td><td>slot number</td><td>Index of slot. $sl=0$ denotes the genesis slot.</td><td>$sl=0,1,2,3,\dots$</td></tr>
+<tr><td>$ep$</td><td>epoch number</td><td>Index of epoch. $ep=0$ denotes the genesis epoch.</td><td>$ep=0,1,2,3,\dots$</td></tr>
+</tbody></table>
+</div>
+<h3 id="latest-immutable-block"><a class="header" href="#latest-immutable-block">Latest Immutable Block</a></h3>
+<p>The latest immutable block $B_\text{imm}$ is the most recent block
+considered permanently finalized.
+The blocks deeper than $B_\text{imm}$ in the local chain $c_{loc}$
+are never to be reorganized.</p>
+<p>This is maintained locally by the Chain Maintenance procedure.
+When the Online fork choice rule is in use,
+$B_\text{imm}$ corresponds to the $k$-deep block.
+However, it may be deeper than the $k$-deep block if the fork choice rule
+has been switched from Online to Bootstrap.
+Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added
+unless the Online fork choice rule is used.</p>
+<p>The details of fork choice rule transitions are defined in the bootstrap spec:
+<a href="https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization">Cryptarchia v1 Bootstrapping &amp; Synchronization</a>.</p>
+<h3 id="slot"><a class="header" href="#slot">Slot</a></h3>
+<p>Time is divided up into slots of equal length,
+where one instance of the leadership lottery is held in each slot.
+A slot is said to be occupied if some validator has won the leadership lottery
+and proposed a block for that slot,
+otherwise the slot is said to be unoccupied.</p>
+<h3 id="epoch"><a class="header" href="#epoch">Epoch</a></h3>
+<p>Cryptarchia has a few global variables that are adjusted periodically
+in order for consensus to function. Namely, the protocol requires:</p>
+<ul>
+<li>Dynamic participation, thus the eligible notes must be refreshed regularly.</li>
+<li>An unpredictable source of randomness for the leadership lottery.
+This source of randomness is derived from in-protocol activity
+and thus must be selected carefully to avoid giving adversaries an advantage.</li>
+<li>Approximately constant block production rate achieved by dynamically adjusting
+the lottery difficulty based on observed participation levels.</li>
+</ul>
+<p>The order in which these variables are calculated is important
+and is done w.r.t. the epoch schedule.</p>
+<h4 id="epoch-schedule"><a class="header" href="#epoch-schedule">Epoch Schedule</a></h4>
+<p>An epoch is divided into 3 phases, as outlined below.</p>
+<div class="table-wrapper"><table><thead><tr><th>Epoch Phase</th><th>Phase Length</th><th>Description</th></tr></thead><tbody>
+<tr><td>Stake Distribution Snapshot</td><td>$s$ slots</td><td>A snapshot of note commitments are taken at the beginning of the epoch. The protocol waits for this value to finalize before entering the next phase.</td></tr>
+<tr><td>Buffer phase</td><td>$s$ slots</td><td>After the stake distribution is finalized, the protocol waits another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage.</td></tr>
+<tr><td>Lottery Constants Finalization</td><td>$s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots</td><td>On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. The protocol waits another $4\frac{k}{f}$ slots for these values to finalize.</td></tr>
+</tbody></table>
+</div>
+<p>The <strong>epoch length</strong> is the sum of the individual phases:
+$3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor = 10 \lfloor \frac{k}{f} \rfloor$ slots.</p>
+<h4 id="epoch-state"><a class="header" href="#epoch-state">Epoch State</a></h4>
+<p>The epoch state holds the variables derived over the course of the epoch schedule.
+It is the 3-tuple $(\mathbb{C}_\text{LEAD}, \eta, D)$ described below.</p>
+<div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
+<tr><td>$\mathbb{C}_{\text{LEAD}}$</td><td>Eligible Leader Notes Commitment</td><td>A commitment to the set of notes eligible for leadership.</td><td>See Eligible Leader Notes</td></tr>
+<tr><td>$\eta$</td><td>Epoch Nonce</td><td>Randomness used in the leadership lottery (selected once per epoch)</td><td>See Epoch Nonce</td></tr>
+<tr><td>$D$</td><td>Inferred Total Stake (Lottery Difficulty)</td><td>Total stake inferred from watching the results of the lottery during the course of the epoch. $D$ is used as the stake relativization constant for the following epoch.</td><td>See Total Stake Inference</td></tr>
+</tbody></table>
+</div>
+<h3 id="eligible-leader-notes"><a class="header" href="#eligible-leader-notes">Eligible Leader Notes</a></h3>
+<p>A note is eligible to participate in the leadership lottery if it has not been spent
+and was a member of the note set at the beginning of the previous epoch,
+i.e. they are members of $\mathbb{C}_\text{LEAD}$.</p>
+<h4 id="note-ageing"><a class="header" href="#note-ageing">Note Ageing</a></h4>
+<p>If an adversary knows the epoch nonce $\eta$,
+they may grind a note that wins the lottery more frequently
+than should be statistically expected.
+Thus, it's critical that notes participating in the lottery are sufficiently old
+to ensure that they have no predictive power over $\eta$.</p>
+<h3 id="epoch-nonce"><a class="header" href="#epoch-nonce">Epoch Nonce</a></h3>
+<p>The epoch nonce $\eta$ is evolved after each block.</p>
+<p>Given block $B = (parent, sl, \rho_\text{LEAD}, \dots)$ where:</p>
+<ul>
+<li>$parent$ is the parent of block $B$</li>
+<li>$sl$ is the slot that $B$ is occupying.</li>
+<li>$\rho_\text{LEAD}$ is the epoch nonce entropy contribution
+from the block's leadership proof</li>
+</ul>
+<p>Then, $\eta_B$ is derived as:</p>
+<p>$$\eta_{B} = \text{zkHASH}(\text{EPOCH_NONCE_V1}||\eta_{\text{parent}}||\rho_\text{LEAD}||\text{Fr}(sl))$$</p>
+<p>where $\text{Fr}(sl)$ maps the slot number to the corresponding scalar
+in Poseidon's scalar field and $\text{zkHASH}(..)$ is Poseidon2
+as specified in Common Cryptographic Components.</p>
+<p>The epoch nonce used in the next epoch is $\eta_{B'}$
+where $B'$ is the last block before the start of the
+"Lottery Constants Finalization" phase in the epoch schedule.</p>
+<h3 id="total-stake-inference"><a class="header" href="#total-stake-inference">Total Stake Inference</a></h3>
+<p>Given that stake is private in Cryptarchia,
+and that the goal is to maintain an approximately constant block rate,
+the difficulty of the slot lottery must be adjusted
+based on the level of participation.
+The details can be found in the Total Stake Inference specification.</p>
+<h3 id="epoch-state-pseudocode"><a class="header" href="#epoch-state-pseudocode">Epoch State Pseudocode</a></h3>
+<p>At the start of each epoch, each validator must derive the new epoch state variables.
+This is done through the following protocol:</p>
+<pre><code class="language-text">define compute_epoch_state(ep, tip ∈ T) → (C_LEAD^ep, η^ep, D^ep):
+
+case ep = 0:
+    The genesis epoch state is hardcoded upon chain initialization.
+    return (C_GENESIS, η_GENESIS, D_GENESIS)
+
+otherwise:
+    The epoch state is derived w.r.t. observations in the previous epoch.
+    First, compute the slot at the start of the previous epoch.
+    Observations will be queried relative to this slot.
+
+    sl_{ep-1} := (ep-1) · EPOCH_LENGTH
+
+    Notes eligible for leadership lottery are those present in the
+    commitment root at the start of the previous epoch.
+
+    C_LEAD^ep := commitment_root_at_slot(sl_{ep-1}, tip)
+
+    The epoch nonce for epoch ep is the value of η at the beginning
+    of the lottery constants finalization phase in the epoch schedule
+
+    η^ep := epoch_nonce_at_slot(sl_{ep-1} + ⌊6k/f⌋, tip)
+
+    Total active stake is inferred from the number of blocks produced
+    in the previous epoch during the stake freezing phase.
+    It is also derived from the previous estimate of total stake,
+    thus recursion is used here to retrieve the previous epochs estimate D^{ep-1}
+
+    (_, _, D^{ep-1}) := compute_epoch_state(ep-1, tip)
+
+    The number of blocks produced during the first 6k/f slots
+    of the previous epoch
+
+    N_BLOCKS^{ep-1} := |{B ∈ T | sl_{ep-1} ≤ sl_B &lt; sl_{ep-1} + ⌊6k/f⌋}|
+
+    D^ep := infer_total_active_stake(D^{ep-1}, N_BLOCKS^{ep-1})
+
+    return (C_LEAD^ep, η^ep, D^ep)
+</code></pre>
+<h2 id="leadership-lottery"><a class="header" href="#leadership-lottery">Leadership Lottery</a></h2>
+<p>A lottery is run for every slot to decide who is eligible to propose a block.
+For each slot, there can be 0 or more winners.
+In fact, it's desirable to have short slots and many empty slots
+to allow for the network to propagate blocks
+and to reduce the chances of two leaders winning the same slot
+which are guaranteed forks.</p>
+<h3 id="proof-of-leadership"><a class="header" href="#proof-of-leadership">Proof of Leadership</a></h3>
+<p>The specifications of how a leader can prove that they have won the lottery
+are specified in the Proof of Leadership Specification.</p>
+<h3 id="leader-rewards"><a class="header" href="#leader-rewards">Leader Rewards</a></h3>
+<p>As an incentive for producing blocks,
+leaders are rewarded with every block proposal.
+The rewarding protocol is specified in Anonymous Leaders Reward Protocol.</p>
+<h2 id="block-chain"><a class="header" href="#block-chain">Block Chain</a></h2>
+<h3 id="fork-choice-rule"><a class="header" href="#fork-choice-rule">Fork Choice Rule</a></h3>
+<p>Two fork choice rules are used,
+one during bootstrapping and a second once a node completes bootstrapping.</p>
+<p>During bootstrapping, the protocol must be resilient to malicious peers feeding false chains,
+this calls for a more expensive fork choice rule that can differentiate
+between malicious long-range attacks and honest chains.</p>
+<p>After bootstrapping, the node commits to the most honest looking chain found
+and switches to a fork choice rule that rejects chains that diverge
+by more than $k$ blocks.</p>
+<p>The details are specified in Cryptarchia Fork Choice Rule.</p>
+<h3 id="block-id"><a class="header" href="#block-id">Block ID</a></h3>
+<p>Block ID is defined by the hash of the block header,
+where hash is Blake2b as specified in Common Cryptographic Components.</p>
+<pre><code class="language-python">def block_id(header: Header) -&gt; hash:
+    return hash(
+        b"BLOCK_ID_V1",
+        header.bedrock_version,
+        header.parent_block,
+        header.slot.to_bytes(8, byteorder='little'),
+        header.block_root,
+        # PoL fields
+        header.proof_of_leadership.leader_voucher,
+        header.proof_of_leadership.entropy_contribution,
+        header.proof_of_leadership.proof.serialize(),
+        header.proof_of_leadership.leader_key.compressed(),
+    )
+</code></pre>
+<h3 id="block-header"><a class="header" href="#block-header">Block Header</a></h3>
+<pre><code class="language-python">class Header:                                    # 297 bytes
+    bedrock_version: byte                        # 1 byte
+    parent_block: hash                           # 32 bytes
+    slot: int                                    # 8 bytes
+    block_root: hash                             # 32 bytes
+    proof_of_leadership: ProofOfLeadership       # 224 bytes
+
+class ProofOfLeadership:                         # 224 bytes
+    leader_voucher: zkhash                       # 32 bytes
+    entropy_contribution: zkhash                 # 32 bytes
+    proof: Groth16Proof                          # 128 bytes
+    leader_key: Ed25519PublicKey                 # 32 bytes
+</code></pre>
+<h3 id="block"><a class="header" href="#block">Block</a></h3>
+<p>Block construction, validation and execution are specified in
+Block Construction, Validation and Execution Specification.</p>
+<h3 id="block-header-validation"><a class="header" href="#block-header-validation">Block Header Validation</a></h3>
+<p>Given block $B=(header, transactions)$ and the block tree $T$ where:</p>
+<ul>
+<li>$header$ is the header defined in Header</li>
+<li>$transactions$ is the sequence of transactions in the block</li>
+</ul>
+<p>The function $\textbf{valid_header}(B)$ returns True
+if all of the following constraints hold,
+otherwise it returns False.</p>
+<ol>
+<li>
+<p><code>header.version.bedrock_version = 1</code>
+Ensure bedrock version number.</p>
+</li>
+<li>
+<p><code>bytes(transactions) &lt; MAX_BLOCK_SIZE</code>
+Ensure block size is smaller than the maximum allowed block size.</p>
+</li>
+<li>
+<p><code>length(transactions) &lt; MAX_BLOCK_TXS</code>
+Ensure the number of transactions in the block is below the limit.</p>
+</li>
+<li>
+<p><code>merkle_root(transactions) = header.block_root</code>
+Ensure block root is over the transaction list.</p>
+</li>
+<li>
+<p><code>header.slot &gt; fetch_header(header.parent_block).slot</code>
+Ensure the block's slot comes after the parent block's slot.</p>
+</li>
+<li>
+<p><code>wallclock_time() &gt; slot_time(header.slot)</code>
+Ensure this block's slot time has elapsed.
+Local time is used in this validation.
+See Clocks for discussion around clock synchronization.</p>
+</li>
+<li>
+<p><code>header.parent ∈ T</code>
+Ensure the block's parent has already been accepted into the block tree.</p>
+</li>
+<li>
+<p><code>height(B) &gt; height(B_imm)</code>
+Ensure the block comes after the latest immutable block.
+Assuming that $T$ prunes all forks diverged deeper than $B_\text{imm}$,
+this step, along with step 5, ensures that $B$ is descendant from $B_\text{imm}$.
+If all forks cannot be pruned completely in the implementation,
+this step must be replaced with <code>is_ancestor(B_imm, B)</code>,
+which checks whether $B_\text{imm}$ is an ancestor of $B$.</p>
+</li>
+<li>
+<p>Verify the leader's right to propose
+and ensure it is the one proposing this block:
+Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL}, P_\text{LEAD}, \sigma)$,
+where:</p>
+<ul>
+<li>$\pi_\text{PoL}$ is the slot lottery win proof
+as defined in Proof of Leadership Specification</li>
+<li>$P_\text{LEAD}$ is the public key committed to in $\pi_\text{PoL}$</li>
+<li>$\sigma$ is a signature</li>
+</ul>
+</li>
+<li>
+<p>A leader's proposal is valid if:</p>
+<ul>
+<li><code>verify_PoL(T, parent, sl, P_LEAD, π_PoL) = True</code></li>
+<li><code>verify_signature(block_id(H), σ, P_LEAD) = True</code>
+Ensure that the leader who won the lottery is actually proposing this block
+since PoL's are not bound to blocks directly.</li>
+</ul>
+</li>
+</ol>
+<h3 id="chain-maintenance"><a class="header" href="#chain-maintenance">Chain Maintenance</a></h3>
+<p>The chain maintenance procedure <code>on_block(state, B)</code>
+governs how the block tree $T$ is updated.</p>
+<p><strong>Note:</strong> It's assumed that block contents have already been validated
+by the execution layer w.r.t. the parent block's execution state.</p>
+<pre><code class="language-text">define on_block(state, B) → state':
+
+(c_loc, B_imm, T) := state
+
+if B ∈ T ∨ ¬valid_header(B):
+    Either B has already been seen or it's invalid, in both cases the block is ignored
+    return state
+
+T' := T ∪ {B}
+
+c_loc' := B                              if parent(B) = c_loc
+          fork_choice(c_loc, F_T', k, s)  if parent(B) ≠ c_loc
+
+if fork_choice_rule = ONLINE:
+    Explicitly commit to the k-deep block
+    if the Online Fork Choice Rule is being used.
+    (T', B_imm) := commit(T', c_loc', k)
+
+return (c_loc', B_imm, T')
+</code></pre>
+<h3 id="commit"><a class="header" href="#commit">Commit</a></h3>
+<p>The following procedure commits to the block
+which is $depth$ deep from $c_{loc}$.
+This procedure computes the new latest immutable block $B_\text{imm}$.</p>
+<pre><code class="language-text">define commit(T, c_loc, depth) → (T', B_imm):
+
+assert fork_choice_rule = ONLINE
+
+Compute the latest immutable block, which is depth deep from c_loc.
+B_imm := block_at_depth(c_loc, depth)
+
+Prune all forks diverged deeper than B_imm,
+so that future blocks on those forks can be rejected by Block Header Validation.
+T' := prune_forks(T, B_imm, c_loc)
+
+return (T', B_imm)
+</code></pre>
+<h3 id="fork-pruning"><a class="header" href="#fork-pruning">Fork Pruning</a></h3>
+<p>The fork pruning procedure removes all blocks
+which are part of forks diverged deeper than a certain block.</p>
+<pre><code class="language-text">define prune_forks(T, B) → T':
+
+T' := T
+
+for each B_tip ∈ F_T:
+    If B_tip is a fork diverged deeper than B, prune the fork.
+    B_div := common_ancestor(B_tip, B)
+    if B_div ≠ B:
+        T' := prune_blocks(B_tip, B_div, T)
+
+return T'
+
+define prune_blocks(B_new, B_old, T) → T':
+
+Remove all blocks in the chain within range (B_old, B_new] from T.
+(B, T') := (B_new, T)
+
+while B ≠ B_old:
+    T' := T' \ {B}
+    B := parent(B)
+
+return T'
+</code></pre>
+<h3 id="versioning-and-protocol-upgrades"><a class="header" href="#versioning-and-protocol-upgrades">Versioning and Protocol Upgrades</a></h3>
+<p>Protocol versions are signalled through the <code>bedrock_version</code> field
+of the block header.
+Protocol upgrades need to be co-ordinated well in advance
+to ensure that node operators have enough time to update their node.
+Block height is used to schedule the activation of protocol updates.
+E.g. bedrock version 35 will be active after block height 32000.</p>
+<h2 id="implementation-considerations"><a class="header" href="#implementation-considerations">Implementation Considerations</a></h2>
+<h3 id="proof-of-stake-vs-proof-of-work"><a class="header" href="#proof-of-stake-vs-proof-of-work">Proof of Stake vs. Proof of Work</a></h3>
+<p>From a privacy and resiliency point of view, Proof of Work is highly attractive.
+The amount of hashing power of a node is private,
+they can provide a new public key for each block they mine
+ensuring that their blocks cannot be connected by this identity,
+and PoW is not susceptible to long range attacks as is PoS.
+Unfortunately, it is wasteful and demands that leaders have powerful machines.
+The goal is to ensure strong decentralization by having a low barrier to entry
+and a good enough level of security can be achieved
+by having participants have an economic stake in the protocol.</p>
+<h3 id="clocks"><a class="header" href="#clocks">Clocks</a></h3>
+<p>Cryptarchia depends on honest nodes having relatively in-sync clocks.
+The protocol currently relies on NTP to synchronize clocks,
+this may be improved upon in the future,
+borrowing ideas from Ouroboros Chronos: Permissionless Clock Synchronization
+via Proof-of-Stake.</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Proof-of-Leadership-215261aa09df8145a0f2c0d059aed59c">Proof of Leadership Specification</a>
+- ZK proof specification for leadership lottery</li>
+<li><a href="https://nomos-tech.notion.site/Anonymous-Leaders-Reward-Protocol">Anonymous Leaders Reward Protocol</a>
+- Leader reward mechanism</li>
+<li><a href="https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule">Cryptarchia Fork Choice Rule</a>
+- Fork choice rule specification</li>
+<li><a href="https://nomos-tech.notion.site/Block-Construction-Validation-and-Execution-Specification">Block Construction, Validation and Execution Specification</a>
+- Block structure details</li>
+<li><a href="https://nomos-tech.notion.site/Common-Cryptographic-Components">Common Cryptographic Components</a>
+- Cryptographic primitives (Blake2b, Poseidon2)</li>
+<li><a href="https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization">Cryptarchia v1 Bootstrapping &amp; Synchronization</a>
+- Bootstrap and synchronization procedures</li>
+<li><a href="https://nomos-tech.notion.site/Total-Stake-Inference">Total Stake Inference</a>
+- Stake inference mechanism</li>
+<li><a href="https://nomos-tech.notion.site/Block-Times-Blend-Network-Analysis">Block Times &amp; Blend Network Analysis</a>
+- Analysis for slot activation coefficient</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c">Cryptarchia v1 Protocol Specification</a>
+- Original Cryptarchia v1 Protocol documentation</li>
+<li><a href="https://eprint.iacr.org/2018/1132.pdf">Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake</a>
+- Foundation for Cryptarchia design</li>
+<li><a href="https://eprint.iacr.org/2019/838.pdf">Ouroboros Chronos: Permissionless Clock Synchronization via Proof-of-Stake</a>
+- Clock synchronization research</li>
+<li><a href="https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084">Blend Network Specification</a>
+- Network privacy layer</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/nomos-blend-protocol.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/nomos-key-types-and-generation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/nomos-blend-protocol.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/nomos-key-types-and-generation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>
