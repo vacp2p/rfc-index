@@ -5,7 +5,7 @@ status: raw
 category: Standards Track
 tags:
 editor: Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im)
-contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im)
+contributors: Ugur Sen [ugur@status.im](mailto:ugur@status.im), Hanno Cornelius [hanno@status.im](mailto:hanno@status.im)
 
 ---
 
@@ -120,6 +120,43 @@ The number of entries a bucket can hold is implementation-dependent.
 
 - Smaller buckets → lower memory usage but reduced resilience to churn
 - Larger buckets →  better redundancy but increased maintenance overhead
+
+Implementations SHOULD ensure that each bucket contains only unique peers.
+If the peer to be added is already present in the bucket,
+the implementation SHOULD NOT create a duplicate entry
+and SHOULD instead update the existing entry’s metadata.
+
+**Bucket Overflow Handling:**
+
+When a bucket reaches its maximum capacity and a new peer needs to be added,
+implementations SHOULD decide how to handle the overflow.
+The specific strategy is implementation-dependent,
+but implementations MAY consider one of the following approaches:
+
+1. **Least Recently Used (LRU) Eviction:**
+   Replace the peer that was least recently contacted or updated.
+   This keeps more active and responsive peers in the routing table.
+
+2. **Least Recently Seen (LRS) Eviction:**
+   Replace the peer that was seen (added to the bucket) earliest.
+   This provides a time-based rotation of peers.
+
+3. **Ping-based Eviction:**
+   When the bucket is full, ping the least recently contacted peer.
+   If the ping fails, replace it with the new peer.
+   If the ping succeeds, keep the existing peer and discard the new one.
+   This prioritizes responsive, reachable peers.
+
+4. **Reject New Peer:**
+   Keep existing peers and reject the new peer.
+   This strategy assumes existing peers are more stable or valuable.
+
+5. **Bucket Extension:**
+   Dynamically increase bucket capacity (within reasonable limits)
+   when overflow occurs, especially for buckets closer to the center ID.
+
+Implementations MAY combine these strategies or use alternative approaches
+based on their specific requirements for performance, security, and resilience.
 
 ### Service
 
