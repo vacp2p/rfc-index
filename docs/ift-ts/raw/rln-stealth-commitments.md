@@ -12,11 +12,11 @@
 
 This specification describes the usage of stealth commitments
 to add prospective users to a network-governed
-[32/RLN-V1](./32/rln-v1.md) membership set.
+[32/RLN-V1](32/rln-v1.md) membership set.
 
 ## Motivation
 
-When [32/RLN-V1](./32/rln-v1.md) is enforced in [10/Waku2](../waku/standards/core/10/waku2.md),
+When [32/RLN-V1](32/rln-v1.md) is enforced in [10/Waku2](../../messaging/standards/core/10/waku2.md),
 all users are required to register to a membership set.
 The membership set will store user identities
 allowing the secure interaction within an application.
@@ -29,14 +29,14 @@ to register identities on the user's behalf,
 while maintaining the user's anonymity.
 
 This document specifies a privacy-preserving mechanism,
-allowing a counterparty to utilize [32/RLN-V1](./32/rln-v1.md)
+allowing a counterparty to utilize [32/RLN-V1](32/rln-v1.md)
 to register an `identityCommitment` on-chain.
 Counterparties will be able to register members
 to a RLN membership set without exposing the user's private keys.
 
 ## Background
 
-The [32/RLN-V1](./32/rln-v1.md) protocol,
+The [32/RLN-V1](32/rln-v1.md) protocol,
 consists of a smart contract that stores a `idenitityCommitment`
 in a membership set.
 In order for a user to join the membership set,
@@ -45,17 +45,17 @@ A set of public keys is used to compute a stealth commitment for a user,
 as described in [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564).
 This specification is an implementation of the
 [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) scheme,
-tailored to the curve that is used in the [32/RLN-V1](./32/rln-v1.md) protocol.
+tailored to the curve that is used in the [32/RLN-V1](32/rln-v1.md) protocol.
 
 This can be used in a couple of ways in applications:
 
 1. Applications can add users
-to the [32/RLN-V1](./32/rln-v1.md) membership set in a batch.
+to the [32/RLN-V1](32/rln-v1.md) membership set in a batch.
 2. Users of the application
-can register other users to the [32/RLN-V1](./32/rln-v1.md) membership set.
+can register other users to the [32/RLN-V1](32/rln-v1.md) membership set.
 
 This is useful when the prospective user does not have access to funds
-on the network that [32/RLN-V1](./32/rln-v1.md) is deployed on.
+on the network that [32/RLN-V1](32/rln-v1.md) is deployed on.
 
 ## Wire Format Specification
 
@@ -122,6 +122,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [10/Waku2](../waku/standards/core/10/waku2.md)
-- [32/RLN-V1](./32/rln-v1.md)
+- [10/Waku2](../../messaging/standards/core/10/waku2.md)
+- [32/RLN-V1](32/rln-v1.md)
 - [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564)

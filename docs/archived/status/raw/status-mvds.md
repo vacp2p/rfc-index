@@ -9,7 +9,7 @@
 
 ## Abstract
 
-This document lists the types of messages that are using [MVDS](/vac/2/mvds.md)
+This document lists the types of messages that are using [MVDS](/ift-ts/raw/2/mvds.md)
 in the Status application.
 
 ## Background
@@ -125,4 +125,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [MVDS](/vac/2/mvds.md)
+- [MVDS](/ift-ts/raw/2/mvds.md)

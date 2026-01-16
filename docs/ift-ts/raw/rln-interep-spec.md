@@ -9,7 +9,7 @@
 ## Abstract
 
 This spec integrates [Interep](https://interep.link)
-into the [RLN](../32/rln-v1.md) spec.
+into the [RLN](32/rln-v1.md) spec.
 Interep is a group management protocol
 that allows for the creation of groups of users and
 the management of their membership.
@@ -98,11 +98,11 @@ in the RLN contract -
 
 ## Verification of messages
 
-Messages are verified the same way as in the [RLN spec](../32/rln-v1.md/#verification).
+Messages are verified the same way as in the [RLN spec](32/rln-v1.md#verification).
 
 ## Slashing
 
-The slashing mechanism is the same as in the [RLN spec](../32/rln-v1.md/#slashing).
+The slashing mechanism is the same as in the [RLN spec](32/rln-v1.md#slashing).
 It is important to note that the slashing
 may not have the intended effect on the user,
 since the only consequence is that they cannot send messages.
@@ -120,7 +120,7 @@ which integrates Interep with RLN.
 
 1. As mentioned in [Slashing](#slashing),
 the slashing mechanism may not have the intended effect on the user.
-2. This spec inherits the security considerations of the [RLN spec](../32/rln-v1.md/#security-considerations).
+2. This spec inherits the security considerations of the [RLN spec](32/rln-v1.md#security-considerations).
 3. This spec inherits the security considerations of [Interep](https://docs.interep.link/).
 4. A user may make multiple registrations using the same Interep proofs but
 different identity commitments.
@@ -129,7 +129,7 @@ previously in proof verification.
 
 ## References
 
-1. [RLN spec](../32/rln-v1.md)
+1. [RLN spec](32/rln-v1.md)
 2. [Interep](https://interep.link)
 3. [Semaphore](https://semaphore.appliedzkp.org/)
 4. [Decentralized cloudflare using Interep](https://ethresear.ch/t/decentralised-cloudflare-using-rln-and-rich-user-identities/10774)

@@ -375,7 +375,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [protobuf record](https://developers.google.com/protocol-buffers/)  
 [Protobuf](https://developers.google.com/protocol-buffers)  
 [Status user account](/archived/status/deprecated/account.md)  
-[ens name or the 3-word pseudonym corresponding to the key](deprecated/account/#contact-verification)  
+[ens name or the 3-word pseudonym corresponding to the key](account.md#contact-verification)  
 [WHISPER-USAGE](/archived/status/deprecated/whisper-usage.md)  
 [WAKU-USAGE](/archived/status/deprecated/waku-usage.md)  
 [Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamps)  

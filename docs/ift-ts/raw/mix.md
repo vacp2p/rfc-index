@@ -544,7 +544,7 @@ The header consists of the fields $α$, $β$, and $γ$, totaling a fixed size pe
   - **Combined address and delay width ($tκ$)**: The recommended $t=6$ accommodates standard libp2p relay multiaddress representations plus a 2-byte delay field. While the actual multiaddress and delay fields may be shorter, they are padded to $tκ$ bytes to maintain fixed field size. The structure and rationale for the $tκ$ block and its encoding are specified in [Section 8.4](#84-address-and-delay-encoding).
 
     Note:
-    This expands on the original [Sphinx packet format](<(https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf)>), which embeds a fixed $κ$-byte mix node identifier per hop in $β$.
+    This expands on the original [Sphinx packet format](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf), which embeds a fixed $κ$-byte mix node identifier per hop in $β$.
     The Mix Protocol generalizes this to $tκ$ bytes to accommodate libp2p multiaddresses and forwarding delays while preserving the cryptographic properties of the original design.
 
   - **Per-hop $γ$ size ($κ$)** (defined below): Accounts for the integrity tag included with each hop's routing information.

@@ -503,7 +503,7 @@ network.
 
 Thus, after the decision phase, either a decision has been finalized
 and the local node becomes quiescent never initiating a new query, or
-it initiates a [new query](query).
+it initiates a new query.
 
 ### Termination
 
@@ -560,8 +560,8 @@ The following implementations have been created for various testing and
 simulation purposes:
 
 - [Rust](https://github.com/logos-co/consensus-research)
-- [Python](none) - FILL THIS IN WITH NEWLY CREATED REPO
-- [Common Lisp](none) - FILL THIS IN WITH NEWLY CREATED REPO
+- Python - FILL THIS IN WITH NEWLY CREATED REPO
+- Common Lisp - FILL THIS IN WITH NEWLY CREATED REPO
 
 ## Wire Protocol
 
@@ -687,7 +687,7 @@ Although we have proposed a normative description of the
 implementation of the underlying binary consensus algorithm (Claro),
 we believe we have prepared for analysis its adversarial performance
 in a manner that is amenable to replacement by another member of the
-[snow*](snow) family.
+snow* family.
 
 We have presumed the existence of a general family of algorithms that
 can be counted on to vote on nodes in the DAG in a fair manner.

@@ -54,7 +54,7 @@ if not, see [gnu.org](http://www.gnu.org/licenses).
 
 ## Change Process
 
-This document is governed by the [1/COSS](./coss.md) (COSS).
+This document is governed by the [1/COSS](coss.md) (COSS).
 
 ## Language
 
@@ -141,7 +141,7 @@ the specification MAY begin the process to upgrade it's status.
 A specification has five possible states that reflect its maturity and
 contractual weight:
 
-![Lifecycle diagram](./images/lifecycle.png)
+![Lifecycle diagram](images/lifecycle.png)
 
 ### Raw Specifications
 
@@ -295,7 +295,7 @@ When a specification is promoted to *draft* status,
 the number that is assigned MAY be incremental
 or by the *sub-domain* and the Logos LIP process.
 Standards track specifications MUST be based on the
-[Logos LIP template](../template.md) before obtaining a new status.
+[Logos LIP template](../../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
 ## Conventions

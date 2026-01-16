@@ -12,7 +12,7 @@
 ## Abstract
 
 Messages are stored permanently by store nodes
-([13/WAKU2-STORE](../../waku/standards/core/13/store.md))
+([13/WAKU2-STORE](../../../messaging/standards/core/13/store.md))
 for up to a certain configurable period of time,
 limited by the overall storage provided by a store node.
 Messages older than that period are no longer provided by store nodes,
@@ -39,9 +39,9 @@ while others operate in the Status communities layer):
 
 | Name                 | References |
 | -------------------- | --- |
-| Waku node            | An Waku node ([10/WAKU2](../../waku/standards/core/10/waku2.md)) that implements [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)|
-| Store node           | A Waku node that implements [13/WAKU2-STORE](../../waku/standards/core/13/store.md) |
-| Waku network         | A group of Waku nodes forming a graph, connected via [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) |
+| Waku node            | An Waku node ([10/WAKU2](../../../messaging/standards/core/10/waku2.md)) that implements [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md)|
+| Store node           | A Waku node that implements [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md) |
+| Waku network         | A group of Waku nodes forming a graph, connected via [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md) |
 | Status user          | An Status account that is used in a Status consumer product, such as Status Mobile or Status Desktop |
 | Status node          | A Status client run by a Status application |
 | Control node      | A Status node that owns the private key for a Status community |
@@ -57,7 +57,7 @@ while others operate in the Status communities layer):
 This specification has the following assumptions:
 
 - Store nodes,
-([13/WAKU2-STORE](../../waku/standards/core/13/store.md)),
+([13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)),
  are available 24/7 ensuring constant live message availability.
 - The storage time range limit is 30 days.
 - Store nodes have enough storage to persist historical messages for up to 30 days.
@@ -141,7 +141,7 @@ message archive metadata exchange provided by the community
 (last 30 days) of all the community channels,
 including the special channel from store nodes
 4. Member node receives Waku message
-([14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md))
+([14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md))
 that contains the metadata magnet link from the special channel
 5. Member node extracts the magnet link from the Waku message and
 passes it to torrent client
@@ -157,7 +157,7 @@ as covered by the message history archive
 
 ## Storing live messages
 
-For archival data serving, the control node MUST store live messages as [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md).
+For archival data serving, the control node MUST store live messages as [14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md).
 This is in addition to their database of application messages.
 This is required to provide confidentiality, authenticity,
 and integrity of message data distributed via the BitTorrent layer, and
@@ -193,7 +193,7 @@ the `timestamp` has to lie within the day the latest message was received and
 the current day.
 
 Exported messages MUST be restored as
-[14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) for bundling.
+[14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md) for bundling.
 Waku messages that are older than 30 days and
 have been exported for bundling can be removed from the control node's database
 (control nodes still maintain a database of application messages).
@@ -207,7 +207,7 @@ Message history archives are implemented using the following protocol buffer.
 ### WakuMessageHistoryArchive
 
 The `from` field SHOULD contain a timestamp of the time range's lower bound.
-The type parallels the `timestamp` of [WakuMessage](../../waku/standards/core/14/message.md/).
+The type parallels the `timestamp` of [WakuMessage](../../../messaging/standards/core/14/message.md).
 
 The `to` field SHOULD contain a timestamp of the time range's the higher bound.
 
@@ -580,15 +580,15 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+- [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)
 - [BitTorrent](https://bittorrent.org)
-- [10/WAKU2](../../waku/standards/core/10/waku2.md)
-- [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+- [10/WAKU2](../../../messaging/standards/core/10/waku2.md)
+- [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md)
 - [Magnet URI scheme](https://en.wikipedia.org/wiki/Magnet_URI_scheme)
 - [forum discussion](https://forum.vac.dev/t/status-communities-protocol-and-product-point-of-view/114)
 - [org channels](https://github.com/status-im/specs/pull/151)
 - [UI feature spec](https://github.com/status-im/feature-specs/pull/36)
 - [Extensions for Peers to Send Metadata Files](https://www.bittorrent.org/beps/bep_0009.html)
 - [org channels spec](../56/communities.md)
-- [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
+- [14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md)
 - [62/STATUS-PAYLOADS](../62/payloads.md)

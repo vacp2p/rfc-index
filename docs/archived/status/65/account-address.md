@@ -54,7 +54,7 @@ that others may contact them.
 
 ### X3DH Prekey bundles
 
-- Refer to [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+- Refer to [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md)
 for details on the X3DH prekey bundle broadcasting, as well as regeneration.
 
 ## Optional Account additions
@@ -113,8 +113,8 @@ that belong to a user need to be paired.
 ## Security Considerations
 
 - This specification inherits security considerations of
-[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) and
-[54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md).
+[53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md) and
+[54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md).
 
 ## Copyright
 
@@ -124,8 +124,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
-- [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
-- [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
+- [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md)
+- [54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md)
 - [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
 
 ## informative
@@ -135,4 +135,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [EIP1581](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1581.md)
 - [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
 - [Ethereum Name System](https://ens.domains/)
-- [Status Multiaccount](../63/account-address.md)
+- [Status Multiaccount](../63/keycard-usage.md)

@@ -65,7 +65,7 @@ message MembershipUpdateEvent {
 | ----- | ---- | ---- | ---- |
 | 1 | chat-id | `string` | The chat id of the chat where the change is to take place |
 | 2 | events | See details | A list of events that describe the membership changes, in their encoded protobuf form |
-| 3 | message | `ChatMessage` | An optional message, described in [Message](/archived/status/deprecated/payloads.md/#message) |
+| 3 | message | `ChatMessage` | An optional message, described in [Message](/archived/status/deprecated/payloads.md#message) |
 
 `MembershipUpdateEvent`:
 

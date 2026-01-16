@@ -42,9 +42,9 @@ the querying nodes may retrieve the historical messages from multiple sources
 to achieve a full and intact view of the past.
 
 The concept of `ephemeral` messages introduced in
-[`14/WAKU2-MESSAGE`](../14/message.md) affects `13/WAKU2-STORE` as well.
+[`14/WAKU2-MESSAGE`](../../../14/message.md) affects `13/WAKU2-STORE` as well.
 Nodes running `13/WAKU2-STORE` SHOULD support `ephemeral` messages as specified in
-[14/WAKU2-MESSAGE](../14/message.md).
+[14/WAKU2-MESSAGE](../../../14/message.md).
 Nodes running `13/WAKU2-STORE` SHOULD NOT store messages
 with the `ephemeral` flag set to `true`.
 
@@ -136,7 +136,7 @@ is associated with a unique `Index` that encapsulates the following parts.
 
 - `digest`:  a sequence of bytes representing the SHA256 hash of a `WakuMessage`.
 The hash is computed over the concatenation of `contentTopic`
-and `payload` fields of a `WakuMessage` (see [14/WAKU2-MESSAGE](../14/message.md)).
+and `payload` fields of a `WakuMessage` (see [14/WAKU2-MESSAGE](../../../14/message.md)).
 - `receiverTime`: the UNIX time in nanoseconds
 at which the `WakuMessage` is received by the receiving node.
 - `senderTime`: the UNIX time in nanoseconds
@@ -160,7 +160,7 @@ which can be either `FORWARD` or `BACKWARD`.
 `ContentFilter` carries the information required for filtering historical messages.
 
 - `contentTopic` represents the content topic of the queried historical `WakuMessage`.
-  This field maps to the `contentTopic` field of the [14/WAKU2-MESSAGE](../14/message.md).
+  This field maps to the `contentTopic` field of the [14/WAKU2-MESSAGE](../../../14/message.md).
   
 #### HistoryQuery
 
@@ -169,7 +169,7 @@ RPC call to query historical messages.
 - The `pubsubTopic` field MUST indicate the pubsub topic
 of the historical messages to be retrieved.
 This field denotes the pubsub topic on which `WakuMessage`s are published.
-This field maps to `topicIDs` field of `Message` in [`11/WAKU2-RELAY`](../11/relay.md).
+This field maps to `topicIDs` field of `Message` in [`11/WAKU2-RELAY`](../../../11/relay.md).
 Leaving this field empty means no filter on the pubsub topic
 of message history is requested.
 This field SHOULD be left empty in order to retrieve the historical `WakuMessage`
@@ -225,7 +225,7 @@ nodes' clock asynchrony.
 RPC call to respond to a HistoryQuery call.
 
 - The `messages` field MUST contain the messages found,
-these are [14/WAKU2-MESSAGE](../14/message.md) types.
+these are [14/WAKU2-MESSAGE](../../../14/message.md) types.
 - `PagingInfo`  holds the paging information based
 on which the querying node can resume its further history queries.
 The `pageSize` indicates the number of returned Waku messages
@@ -238,7 +238,7 @@ the retrieved `messages` are always sorted in ascending order
 based on their timestamp as explained in the [sorting messages](#sorting-messages)section,
 that is, from the oldest to the most recent.
 The requester SHALL embed the returned `cursor` inside its next `HistoryQuery`
-to retrieve the next page of the [14/WAKU2-MESSAGE](../14/message.md).  
+to retrieve the next page of the [14/WAKU2-MESSAGE](../../../14/message.md).  
 The `cursor` obtained from one node SHOULD NOT be used in a request to another node
 because the result may be different.
 - The `error` field contains information about any error that has occurred
@@ -260,11 +260,11 @@ hence potentially compromising their privacy.
 
 - **Anonymous query**: This feature guarantees that nodes
 can anonymously query historical messages from other nodes i.e.,
-without disclosing the exact topics of [14/WAKU2-MESSAGE](../14/message.md)
+without disclosing the exact topics of [14/WAKU2-MESSAGE](../../../14/message.md)
 they are interested in.  
 As such, no adversary in the `13/WAKU2-STORE` protocol
 would be able to learn which peer is interested in which content filters i.e.,
-content topics of [14/WAKU2-MESSAGE](../14/message.md).
+content topics of [14/WAKU2-MESSAGE](../../../14/message.md).
 The current version of the `13/WAKU2-STORE` protocol does not provide anonymity
 for historical queries,
 as the querying node needs to directly connect to another node
@@ -347,7 +347,7 @@ Copyright and related rights waived via
 
 ## References
 
-1. [14/WAKU2-MESSAGE](../14/message.md)
+1. [14/WAKU2-MESSAGE](../../../14/message.md)
 2. [protocol buffers v3](https://developers.google.com/protocol-buffers/)
-3. [11/WAKU2-RELAY](../11/relay.md)
+3. [11/WAKU2-RELAY](../../../11/relay.md)
 4. [Open timestamps](https://opentimestamps.org/)

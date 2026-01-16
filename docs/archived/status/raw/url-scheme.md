@@ -68,4 +68,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [STATUS-URL-DATA](./url-data.md)
+- [STATUS-URL-DATA](url-data.md)

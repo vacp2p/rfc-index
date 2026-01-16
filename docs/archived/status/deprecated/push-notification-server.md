@@ -58,10 +58,10 @@ A Status client that wants to send push notifications
 
 A client MAY register with one or more Push Notification services of their choice.
 
-A `PNR message` (Push Notification Registration) MUST be sent to the [partitioned topic](/archived/status/deprecated/waku-usage/#partitioned-topic)
+A `PNR message` (Push Notification Registration) MUST be sent to the [partitioned topic](/archived/status/deprecated/waku-usage.md#partitioned-topic)
 for the public key of the node, encrypted with this key.
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payload/#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION`.
 
 The marshaled protobuf payload MUST also be encrypted with AES-GCM
 using the Diffie–Hellman key generated from the client and server identity.
@@ -125,7 +125,7 @@ If the response is successful `success` MUST be set to `true` otherwise a respon
 `request_id` should be set to the `SHAKE-256` of the encrypted payload.
 
 The response MUST be sent on the [partitioned topic](/archived/status/deprecated/waku-usage.md#partitioned-topic) of the sender
-and MUST not be encrypted using the [secure transport](/archived/status/deprecated/secure-transport) to facilitate the usage of ephemeral keys.
+and MUST not be encrypted using the [secure transport](/archived/status/deprecated/secure-transport.md) to facilitate the usage of ephemeral keys.
 
 The payload of the response is:
 
@@ -147,7 +147,7 @@ message PushNotificationRegistrationResponse {
 
 The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_REGISTRATION_RESPONSE`.
 
-A client SHOULD listen for a response sent on the [partitioned topic](/archived/status/deprecated/waku-usage/#partitioned-topic)
+A client SHOULD listen for a response sent on the [partitioned topic](/archived/status/deprecated/waku-usage.md#partitioned-topic)
 that the key used to register.
 
 If `success` is `true` the client has registered successfully.
@@ -173,7 +173,7 @@ On successful registration the server MUST be listening to the topic derived fro
    0XHexEncode(Shake256(CompressedClientPublicKey))
 ```
 
-Using the topic derivation algorithm described [here](/archived/status/deprecated/waku-usage/#public-chats)
+Using the topic derivation algorithm described [here](/archived/status/deprecated/waku-usage.md#public-chats)
 and listen for client queries.
 
 ### Server grant
@@ -236,7 +236,7 @@ message ContactCodeAdvertisement {
 }
 ```
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads/#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY_INFO`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY_INFO`.
 
 If no filtering is done based on public keys,
 the access token SHOULD be included in the advertisement.
@@ -252,7 +252,7 @@ Multiple servers MAY be advertised for the same `installation_id` for redundancy
 
 ## Discovering a push notification server
 
-To discover a push notification service for a given user, their [contact code topic](/archived/status/deprecated/waku-usage/#contact-code-topic)
+To discover a push notification service for a given user, their [contact code topic](/archived/status/deprecated/waku-usage.md#contact-code-topic)
 SHOULD be listened to.
 A mailserver can be queried for the specific topic to retrieve the most up-to-date
 contact code.
@@ -270,7 +270,7 @@ message PushNotificationQuery {
 }
 ```
 
-The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads/#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY`.
+The message MUST be wrapped in a [`ApplicationMetadataMessage`](/archived/status/deprecated/payloads.md#payload-wrapper) with type set to `PUSH_NOTIFICATION_QUERY`.
 
 MUST be sent to the server on the topic derived from the hashed public key of the
 key we are querying, as [described above](#query-topic).
@@ -314,7 +314,7 @@ target client and itself
 If AES decryption succeeds it will return a valid [`uuid`](https://tools.ietf.org/html/rfc4122) which is what is used for access_token.
 The token SHOULD be used to send push notifications.
 
-The response MUST be sent on the [partitioned topic](/archived/status/deprecated/waku-usage/#partitioned-topic) of the sender
+The response MUST be sent on the [partitioned topic](/archived/status/deprecated/waku-usage.md#partitioned-topic) of the sender
 and MUST not be encrypted using the [secure transport](/archived/status/deprecated/secure-transport.md) to facilitate
 the usage of ephemeral keys.
 

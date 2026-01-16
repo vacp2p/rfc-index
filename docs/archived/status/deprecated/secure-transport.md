@@ -47,13 +47,13 @@ Types used in this specification are defined using [Protobuf](https://developers
 
 ### Transport Layer
 
-[Whisper](/archived/status/deprecated/whisper-usage) and [Waku](/archived/status/deprecated/waku-usage) serves as the transport layers for the Status chat protocol.
+[Whisper](/archived/status/deprecated/whisper-usage.md) and [Waku](/archived/status/deprecated/waku-usage.md) serves as the transport layers for the Status chat protocol.
 
 ### User flow for 1-to-1 communications
 
 #### Account generation
 
-See [Account specification](/archived/status/deprecated/account)
+See [Account specification](/archived/status/deprecated/account.md)
 
 #### Account recovery
 
@@ -120,7 +120,7 @@ TODO: See below on bundle retrieval, this seems like enhancement and parameter f
 
 ### Bundle retrieval
 
-<!-- TODO: Potentially move this completely over to [Trust Establishment](./status-account-spec.md) -->
+<!-- TODO: Potentially move this completely over to Trust Establishment -->
 
 X3DH works by having client apps create and make available a bundle of prekeys (the X3DH bundle)
 that can later be requested by other interlocutors when they wish to start a conversation with a given user.

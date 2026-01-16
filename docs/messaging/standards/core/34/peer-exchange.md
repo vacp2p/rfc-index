@@ -23,7 +23,7 @@ The main purpose of this protocol is providing resource restricted devices with 
 
 It may not be feasible, on resource restricted devices,
 to take part in distributed random sampling ambient peer discovery protocols,
-such as [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md).
+such as [33/WAKU2-DISCV5](/messaging/standards/core/33/discv5.md).
 The Waku peer discovery protocol, specified in this document,
 allows resource restricted devices to request a list of peers from a service node.
 Network parameters necessary to connect to this service node COULD be learned
@@ -39,7 +39,7 @@ Downtime of such a node might significantly impact the network.
 However, the resource efficiency of this protocol comes at an anonymity cost,
 which is explained in the
 [Security/Privacy Considerations](#security-considerations) section.
-This protocol SHOULD only be used if [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md) is infeasible.
+This protocol SHOULD only be used if [33/WAKU2-DISCV5](/messaging/standards/core/33/discv5.md) is infeasible.
 
 ## Theory and Protocol Semantics
 
@@ -55,7 +55,7 @@ The responder replies with a list of ENRs as specified in [WAKU2-ENR](https://gi
 The [multiaddresses](https://docs.libp2p.io/concepts/addressing/)
 used to connect to the respective peers can be extracted from the ENRs.
 
-![Figure 1: The responder provides a list of ENRs to the requester. These ENRs contain the information necessary for connecting to the respective peers.](./images/protocol.svg)
+![Figure 1: The responder provides a list of ENRs to the requester. These ENRs contain the information necessary for connecting to the respective peers.](images/protocol.svg)
 
 In order to protect its anonymity,
 the responder MUST NOT provide peers from its actively used peer list
@@ -63,7 +63,7 @@ as this opens pathways to *Neighbourhood Surveillance* attacks, as described in 
 [Security/Privacy Considerations Section](#security-considerations).
 The responder SHOULD provide a set of peers
 that has been retrieved using ambient peer discovery methods supporting random sampling,
-e.g. [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md).
+e.g. [33/WAKU2-DISCV5](/messaging/standards/core/33/discv5.md).
 This both protects the responder's anonymity as well as helps distributing load.
 
 To allow for fast responses, responders SHOULD retrieve peers unsolicited
@@ -137,7 +137,7 @@ depends on the average number of requested peers,
 which is expected to be the outbound degree of the underlying
 [libp2p gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 mesh network.
-The RECOMMENDED value for this outbound degree is 6 (see parameter `D` in [29/WAKU2-CONFIG](/waku/informational/29/config.md)).
+The RECOMMENDED value for this outbound degree is 6 (see parameter `D` in [29/WAKU2-CONFIG](/messaging/informational/29/config.md)).
 It is RECOMMENDED for the cache to hold at least 10 times as many peers (60).
 
 The RECCOMENDED cache size also depends on the number of requesters a responder
@@ -187,7 +187,7 @@ It takes away the first hurdle of the *neighbourhood surveillance* attack:
 The attacker knows which peers to try to connect to.
 This increased vulnerability can be avoided by only responding
 with randomly sampled sets of peers,
-e.g. by requesting a random peer set via [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md).
+e.g. by requesting a random peer set via [33/WAKU2-DISCV5](/messaging/standards/core/33/discv5.md).
 (As stated in the [Theory and Protocol Semantics Section](#theory-and-protocol-semantics),
 these peer sets SHOULD be retrieved unsolicitedly before
 receiving requests to achieve faster response times.)
@@ -205,7 +205,7 @@ The `seen cache` MAY be used in conjunction to provide additional mitigation.
 ### Further Considerations
 
 The response field contains ENRs as specified in [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md).
-While ENRs contain signatures, they do not violate the [Waku relay no-sign policy](/waku/standards/core/11/relay.md#signature-policy),
+While ENRs contain signatures, they do not violate the [Waku relay no-sign policy](/messaging/standards/core/11/relay.md#signature-policy),
 because they are part of the discovery domain and
 are not propagated in the relay domain.
 However, there might still be some form of leakage:
@@ -218,13 +218,13 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-* [33/WAKU2-DISCV5](/waku/standards/core/33/discv5.md)
+* [33/WAKU2-DISCV5](/messaging/standards/core/33/discv5.md)
 * [EIP-1459: Node Discovery via DNS](https://eips.ethereum.org/EIPS/eip-1459)
 * [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 * [multiaddress](https://docs.libp2p.io/concepts/addressing/)
 * [libp2p discovery interface in nim](https://github.com/status-im/nim-libp2p/issues/140)
 * [libp2p discovery interface in javascript](https://github.com/libp2p/js-libp2p-interfaces/tree/master/packages/interface-peer-discovery)
 * [libp2p gossipsub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
-* [29/WAKU2-CONFIG](/waku/informational/29/config.md)
+* [29/WAKU2-CONFIG](/messaging/informational/29/config.md)
 * [Waku Relay Anonymity](https://vac.dev/wakuv2-relay-anon)
-* [Waku relay no-sign policy](/waku/standards/core/11/relay.md#signature-policy)
+* [Waku relay no-sign policy](/messaging/standards/core/11/relay.md#signature-policy)

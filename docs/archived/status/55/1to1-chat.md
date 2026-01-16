@@ -36,7 +36,7 @@ to send messages in a 1-to-1 chat, with privacy and authenticity guarantees.
 
 This protocol MAY use any key-exchange mechanism previously discussed -
 
-1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+1. [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md)
 2. [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
 
 This protocol can provide end-to-end encryption
@@ -69,8 +69,8 @@ key-exchange protocols mentioned above.
 The 1:1 chat is made robust by having sessions between peers.
 It is handled by the key-exchange protocol used. For example,
 
-1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md),
-the session management is described in [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
+1. [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md),
+the session management is described in [54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md)
 
 2. [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md),
 the session management is described in [WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/master/standards/application/noise-sessions.md)
@@ -249,7 +249,7 @@ group admins MUST use an `IMAGE_CHANGED` event.
 ## Security Considerations
 
 1. Inherits the security considerations of the key-exchange mechanism used,
-e.g., [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) or [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
+e.g., [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md) or [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
 
 ## Copyright
 
@@ -257,10 +257,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+1. [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md)
 2. [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
 3. [65/STATUS-ACCOUNT](../65/account-address.md)
-4. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
+4. [54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md)
 5. [WAKU2-NOISE-SESSIONS](https://github.com/waku-org/specs/blob/master/standards/application/noise-sessions.md)
 6. [56/STATUS-COMMUNITIES](../56/communities.md)
 7. [chat_message.proto](https://github.com/status-im/status-go/blob/5fd9e93e9c298ed087e6716d857a3951dbfb3c1e/protocol/protobuf/chat_message.proto#L1)

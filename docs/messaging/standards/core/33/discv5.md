@@ -13,7 +13,7 @@
 `33/WAKU2-DISCV5` specifies a modified version of
 [Ethereum's Node Discovery Protocol v5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 as a means for ambient node discovery.
-[10/WAKU2](/waku/standards/core/10/waku2.md) uses the `33/WAKU2-DISCV5` ambient node discovery network
+[10/WAKU2](/messaging/standards/core/10/waku2.md) uses the `33/WAKU2-DISCV5` ambient node discovery network
 for establishing a decentralized network of interconnected Waku2 nodes.
 In its current version,
 the `33/WAKU2-DISCV5` discovery network
@@ -25,7 +25,7 @@ compared to the total number of Ethereum nodes.
 ## Disclaimer
 
 This version of `33/WAKU2-DISCV5` has a focus on timely deployment
-of an efficient discovery method for [10/WAKU2](/waku/standards/core/10/waku2.md).
+of an efficient discovery method for [10/WAKU2](/messaging/standards/core/10/waku2.md).
 Establishing a separate discovery network is in line with this focus.
 However, we are aware of potential resilience problems
 (see section on security considerations) and
@@ -34,19 +34,19 @@ and researching hybrid approaches.
 
 ## Background and Rationale
 
-[11/WAKU2-RELAY](/waku/standards/core/11/relay.md) assumes the existence of a network of Waku2 nodes.
+[11/WAKU2-RELAY](/messaging/standards/core/11/relay.md) assumes the existence of a network of Waku2 nodes.
 For establishing and growing this network,
 new nodes trying to join the Waku2 network
 need a means of discovering nodes within the network.
-[10/WAKU2](/waku/standards/core/10/waku2.md) supports the following discovery methods
+[10/WAKU2](/messaging/standards/core/10/waku2.md) supports the following discovery methods
 in order of increasing decentralization
 
 * hard coded bootstrap nodes
-* [`DNS discovery`](/waku/standards/10/waku2.md/#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
-* [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
+* [`DNS discovery`](../10/waku2.md#discovery-domain) (based on [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459))
+* [`34/WAKU2-PEER-EXCHANGE`](/messaging/standards/core/34/peer-exchange.md)
 * `33/WAKU2-DISCV5` (specified in this document)
 
-The purpose of ambient node discovery within [10/WAKU2](/waku/standards/core/10/waku2.md)
+The purpose of ambient node discovery within [10/WAKU2](/messaging/standards/core/10/waku2.md)
 is discovering Waku2 nodes in a decentralized way.
 The unique selling point of `33/WAKU2-DISCV5` is its holistic view of the network,
 which allows avoiding hotspots and allows merging the network after a split.
@@ -63,7 +63,7 @@ during which the querying node was offline.
 
 `33/WAKU2-DISCV5` spans an overlay network separate from the
 [GossipSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)
-network [11/WAKU2-RELAY](/waku/standards/core/11/relay.md) builds on.
+network [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md) builds on.
 Because it is a P2P network on its own, it also depends on bootstrap nodes.
 Having a separate discovery network reduces load on the bootstrap nodes,
 because the actual work is done by randomly discovered nodes.
@@ -205,9 +205,9 @@ raises research questions that we will address in future stages of our discv5 ro
 
 ## References
 
-1. [10/WAKU2](/waku/standards/core/10/waku2.md)
-2. [`34/WAKU2-PEER-EXCHANGE`](/waku/standards/core/34/peer-exchange.md)
-3. [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+1. [10/WAKU2](/messaging/standards/core/10/waku2.md)
+2. [`34/WAKU2-PEER-EXCHANGE`](/messaging/standards/core/34/peer-exchange.md)
+3. [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md)
 4. [WAKU2-ENR](https://github.com/waku-org/specs/blob/master/standards/core/enr.md)
 5. [Node Discovery Protocol v5 (`discv5`)](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 6. [`discv5` semantics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md).

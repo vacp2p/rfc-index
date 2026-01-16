@@ -13,12 +13,12 @@
 This specification describes how Waku provides confidentiality, authenticity, and
 integrity, as well as some form of unlinkability.
 Specifically, it describes how encryption, decryption and
-signing works in [6/WAKU1](waku/standards/legacy/6/waku1.md) and
-in [10/WAKU2](waku/standards/core/10/waku2.md) with [14/WAKU-MESSAGE](waku/standards/core/14/message.md/#version1).
+signing works in [6/WAKU1](../../legacy/6/waku1.md) and
+in [10/WAKU2](../../core/10/waku2.md) with [14/WAKU-MESSAGE](../../core/14/message.md#version1).
 
-This specification effectively replaces [7/WAKU-DATA](waku/standards/legacy/7/data.md)
-as well as [6/WAKU1 Payload encryption](waku/standards/legacy/6/waku1.md/#payload-encryption)
-but written in a way that is agnostic and self-contained for [6/WAKU1](waku/standards/legacy/6/waku1.md) and [10/WAKU2](waku/standards/core/10/waku2.md).
+This specification effectively replaces [7/WAKU-DATA](../../legacy/7/data.md)
+as well as [6/WAKU1 Payload encryption](../../legacy/6/waku1.md#payload-encryption)
+but written in a way that is agnostic and self-contained for [6/WAKU1](../../legacy/6/waku1.md) and [10/WAKU2](../../core/10/waku2.md).
 
 Large sections of the specification originate from
 [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627) as well from
@@ -31,11 +31,11 @@ The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL N
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-For [6/WAKU1](waku/standards/legacy/6/waku1.md),
-the `data` field is used in the [waku envelope](waku/standards/legacy/6/waku1.md#abnf-specification)
+For [6/WAKU1](../../legacy/6/waku1.md),
+the `data` field is used in the [waku envelope](../../legacy/6/waku1.md#abnf-specification)
 and the field MAY contain the encrypted payload.
 
-For [10/WAKU2](waku/standards/core/10/waku2.md),
+For [10/WAKU2](../../core/10/waku2.md),
 the `payload` field is used in `WakuMessage`
 and MAY contain the encrypted payload.
 
@@ -203,10 +203,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [6/WAKU1](waku/standards/legacy/6/waku1.md)
-2. [10/WAKU2 spec](waku/standards/core/10/waku2.md)
-3. [14/WAKU-MESSAGE version 1](waku/standards/core/14/message.md/#version1)
-4. [7/WAKU-DATA](waku/standards/legacy/7/data.md)
+1. [6/WAKU1](../../legacy/6/waku1.md)
+2. [10/WAKU2 spec](../../core/10/waku2.md)
+3. [14/WAKU-MESSAGE version 1](../../core/14/message.md#version1)
+4. [7/WAKU-DATA](../../legacy/7/data.md)
 5. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
 6. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
 7. [Status 5/SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md)

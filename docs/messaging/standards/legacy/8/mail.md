@@ -88,7 +88,7 @@ Historic envelopes MUST be sent to a peer as a packet with a P2P Message code (`
 followed by an array of Waku envelopes.
 A Mailserver MUST limit the amount of messages sent,
 either by the `Limit` specified in the request or
-limited to the maximum [RLPx packet size](./waku#maximum-packet-size),
+limited to the maximum [RLPx packet size](../../../README.md#maximum-packet-size),
 whichever limit comes first.
 
 In order to receive historic envelopes from a mailserver,

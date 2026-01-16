@@ -147,7 +147,7 @@ mechanism is currently planned but underspecified.
 #### MessagePush
 
 A filter node that has received a filter request SHOULD push all messages that
-match this filter to a light node. These [`WakuMessage`'s](../14/message.md)
+match this filter to a light node. These [`WakuMessage`'s](../../../14/message.md)
 are likely to come from the
 `relay` protocol and be kept at the Node, but there MAY be other sources or
 protocols where this comes from. This is up to the consumer of the protocol.

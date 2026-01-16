@@ -10,7 +10,7 @@
 ## NOTE
 
 The content of this specification has been split between
-[ETH-DEMLS](vac/raw/eth-demls.md) and [NOISE-X3DH-RATCHET](vac/raw/noise-x3dh-ratchet.md)
+[ETH-MLS-OFFCHAIN](/ift-ts/raw/eth-mls-offchain.md) and [NOISE-X3DH-DOUBLE-RATCHET](/ift-ts/raw/noise-x3dh-double-ratchet.md)
 LIPs.
 
 ## Motivation
@@ -23,7 +23,7 @@ offering a robust solution to address these challenges.
 
 This specification outlines a private messaging service using the
 Ethereum blockchain as authentication service.
-Rooted in the existing [model](../../waku/standards/application/20/toy-eth-pm.md),
+Rooted in the existing [model](../../../messaging/standards/application/20/toy-eth-pm.md),
 this proposal addresses the deficiencies related
 to forward privacy and authentication inherent
 in the current framework.
@@ -421,7 +421,7 @@ Credentials MUST follow the specifications of section 5.3 of
 
 Below follows the flow diagram for the generation of credentials.
 Users MUST generate key pairs by themselves.
-![figure1](/vac/raw/images/eth-secpm_credential.png)
+![figure1](/ift-ts/raw/images/eth-secpm_credential.png)
 
 ### Message framing
 
@@ -764,10 +764,10 @@ CredentialType credential_types<V>;
 
 The flow diagram shows the procedure to fetch key material from other
 users:
-![figure2](/vac/raw/images/eth-secpm_fetching.png)
+![figure2](/ift-ts/raw/images/eth-secpm_fetching.png)
 
 Below follows the flow diagram for the creation of a group:
-![figure3](/vac/raw/images/eth-secpm_creation.png)
+![figure3](/ift-ts/raw/images/eth-secpm_creation.png)
 
 ### Group evolution
 
@@ -842,15 +842,15 @@ The client MUST apply the proposals in the list in the order described
 in Section 12.3 of [RFC9420](https://datatracker.ietf.org/docrfc9420/).
 
 Below follows the flow diagram for the addition of a member to a group:
-![figure4](/vac/raw/images/eth-secpm_add.png)
+![figure4](/ift-ts/raw/images/eth-secpm_add.png)
 
 The diagram below shows the procedure to remove a group member:
 
-![figure5](/vac/raw/images/eth-secpm_remove.png)
+![figure5](/ift-ts/raw/images/eth-secpm_remove.png)
 
 The flow diagram below shows an update procedure:
 
-![figure6](/vac/raw/images/eth-secpm_update.png)
+![figure6](/ift-ts/raw/images/eth-secpm_update.png)
 
 ### Commit messages
 
@@ -1292,7 +1292,7 @@ and checks that it corresponds to an address contained in the ACL.
 7. Off-chain - Alice sends a welcome message to Bob.
 8. Off-chain - Alice SHOULD broadcasts a message announcing the
 addition of Bob to other users of the group.
-![figure7](/vac/raw/images/eth-secpm_onchain-register-1.png)
+![figure7](/ift-ts/raw/images/eth-secpm_onchain-register-1.png)
 
 #### Alice does not know Bob’s Ethereum address
 
@@ -1315,7 +1315,7 @@ contract.
 8. Off-chain - Alice SHOULD broadcasts a message announcing the
 addition of Bob to other users of the group.
 
-![figure8](/vac/raw/images/eth-secpm_onchain-register-2.png)
+![figure8](/ift-ts/raw/images/eth-secpm_onchain-register-2.png)
 
 ### Considerations regarding smart contracts
 
@@ -1335,7 +1335,7 @@ off-chain message.
   - The creator of the contract MUST update the ACL, and send
 messages to the group for key update.
 
-![figure9](/vac/raw/images/eth-secpm_onchain-update.png)
+![figure9](/ift-ts/raw/images/eth-secpm_onchain-update.png)
 
 > It is important to note that both
 user removal and updates of any kind

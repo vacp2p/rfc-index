@@ -32,7 +32,7 @@ is better than a fully centralized solution.
 [56/STATUS-COMMUNITIES](../56/communities.md) as well as
 [55/STATUS-1TO1-CHAT](../55/1to1-chat.md) use Waku v2 protocols.
 Both use Waku content topics
-(see [23/WAKU2-TOPICS](../../waku/informational/23/topics.md))
+(see [23/WAKU2-TOPICS](../../../messaging/informational/23/topics.md))
 for content based filtering.
 
 Waku v2 currently has scaling limitations in two dimensions:
@@ -58,7 +58,7 @@ efficient way will be part of a future document.
 
 ## Relay Shards
 
-Sharding the [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+Sharding the [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md)
 network is an integral part of scaling the Status app.
 
 [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
@@ -199,7 +199,7 @@ shardIndex = 768 + mod(publicKey, shardNum)
 
 ## Infrastructure Nodes
 
-As described in [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md),
+As described in [30/ADAPTIVE-NODES](../../../messaging/informational/30/adaptive-nodes.md),
 Waku supports a continuum of node types with respect to available resources.
 Infrastructure nodes are powerful nodes that have a high bandwidth connection and
 a high up-time.
@@ -249,7 +249,7 @@ We could improve on this in the future, and research the applicability of PIR
 
 Waku messages are typically relayed in larger mesh networks
 comprised of nodes with varying resource profiles
-(see [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md)).
+(see [30/ADAPTIVE-NODES](../../../messaging/informational/30/adaptive-nodes.md)).
 To maximise scaling, relaying of specific message types can be dedicated to shards
 where only infrastructure nodes with very strong resource profiles relay messages.
 This comes as a trade-off to decentralization.
@@ -305,8 +305,8 @@ have a low bandwidth connection or a connection with usage-based billing.
 
 Light protocols comprise
 
-* [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) for sending messages
-* [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+* [19/WAKU2-LIGHTPUSH](../../../messaging/standards/core/19/lightpush.md) for sending messages
+* [12/WAKU2-FILTER](../../../messaging/standards/core/12/filter.md)
 for requesting messages with specific attributes
 * [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
 for discovering peers
@@ -314,9 +314,9 @@ for discovering peers
 ## Waku Archive
 
 Archive nodes are Waku nodes that offer the Waku archive service via
-the Waku store protocol ([13/WAKU2-STORE](../../waku/standards/core/13/store.md)).
+the Waku store protocol ([13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)).
 They are part of a set of shards and store all messages disseminated in these shards.
-Nodes can request history messages via the [13/WAKU2-STORE](../../waku/standards/core/13/store.md).
+Nodes can request history messages via the [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md).
 
 The store service is not limited to a Status fleet.
 Anybody can run a Waku Archive node in the Status shards.
@@ -343,9 +343,9 @@ Nodes can check whether they are behind a restrictive NAT using the
 [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md).
 
 > *Note:* The following will move into [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md),
-or [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md):
+or [33/WAKU2-DISCV5](../../../messaging/standards/core/33/discv5.md):
 Nodes behind restrictive NATs SHOULD not announce their publicly unreachable address
-via [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md) discovery.
+via [33/WAKU2-DISCV5](../../../messaging/standards/core/33/discv5.md) discovery.
 
 It is RECOMMENDED that nodes that are part of the relay network also
 act as rendezvous points.
@@ -610,18 +610,18 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 * [56/STATUS-COMMUNITIES](../56/communities.md)
 * [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
-* [23/WAKU2-TOPICS](../../waku/informational/23/topics.md)
-* [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
+* [23/WAKU2-TOPICS](../../../messaging/informational/23/topics.md)
+* [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md)
 * [WAKU2-RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)
 * [WAKU2-RELAY-STATIC-SHARD-ALLOC](https://github.com/waku-org/specs/blob/master/informational/relay-static-shard-alloc.md)
-* [30/ADAPTIVE-NODES](../../waku/informational/30/adaptive-nodes.md)
-* [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
-* [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+* [30/ADAPTIVE-NODES](../../../messaging/informational/30/adaptive-nodes.md)
+* [19/WAKU2-LIGHTPUSH](../../../messaging/standards/core/19/lightpush.md)
+* [12/WAKU2-FILTER](../../../messaging/standards/core/12/filter.md)
 * [WAKU2-PEER-EXCHANGE](https://github.com/waku-org/specs/blob/master/standards/core/peer-exchange.md)
-* [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+* [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)
 * [libp2p rendezvous](https://github.com/libp2p/specs/blob/master/rendezvous/README.md)
 * [libp2p AutoNAT protocol](https://github.com/libp2p/specs/blob/master/autonat/README.md)
-* [33/WAKU2-DISCV5](../../waku/standards/core/33/discv5.md)
+* [33/WAKU2-DISCV5](../../../messaging/standards/core/33/discv5.md)
 * [libp2p circuit relay](https://github.com/libp2p/specs/blob/6634ca7abb2f955645243d48d1cd2fd02a8e8880/relay/circuit-v2.md)
 * [limiting](https://github.com/libp2p/specs/blob/6634ca7abb2f955645243d48d1cd2fd02a8e8880/relay/circuit-v2.md#reservation)
 * [DCUtR](https://github.com/libp2p/specs/blob/master/relay/DCUtR.md)

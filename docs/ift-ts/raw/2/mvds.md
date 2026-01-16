@@ -130,7 +130,7 @@ the `MESSAGE` is removed from the state for the given peer.
 - All records that require retransmission are added to the payload,
 given `Send Epoch` has been reached.
 
-![notification](./images/interactive.png)
+![notification](images/interactive.png)
 
 Figure 1: Delivery without retransmissions in interactive mode.
 
@@ -147,7 +147,7 @@ given `Send Epoch` has been reached.
 
 <!-- diagram -->
 
-![notification](./images/batch.png)
+![notification](images/batch.png)
 
 Figure 2: Delivery without retransmissions in batch mode.
 
