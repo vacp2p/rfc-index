@@ -277,6 +277,6 @@ Copyright and related rights waived via
 
 1. [PubSub interface for libp2p (r2, 2019-02-01)](https://github.com/libp2p/specs/blob/master/pubsub/README.md)
 
-1. [Waku v1 spec](../6/waku1.md)
+1. [Waku v1 spec](../../legacy/6/waku1.md)
 
 1. [Whisper spec (EIP627)](https://eips.ethereum.org/EIPS/eip-627)

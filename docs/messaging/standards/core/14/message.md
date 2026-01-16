@@ -11,17 +11,17 @@
 
 ## Abstract
 
-[10/WAKU2](/waku/standards/core/10/waku2.md) is a family of modular peer-to-peer protocols
+[10/WAKU2](/messaging/standards/core/10/waku2.md) is a family of modular peer-to-peer protocols
 for secure communication.
 These protocols are designed to be secure, privacy-preserving,
 and censorship-resistant and can run in resource-restricted environments.
 At a high level,
-[10/WAKU2](/waku/standards/core/10/waku2.md) implements a publish/subscribe messaging pattern over libp2p and
+[10/WAKU2](/messaging/standards/core/10/waku2.md) implements a publish/subscribe messaging pattern over libp2p and
 adds capabilities.
 
-The present document specifies the [10/WAKU2](/waku/standards/core/10/waku2.md) message format.
+The present document specifies the [10/WAKU2](/messaging/standards/core/10/waku2.md) message format.
 A way to encapsulate the messages sent with specific information security goals,
-and Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) backward compatibility.
+and Whisper/[6/WAKU1](/messaging/standards/legacy/6/waku1.md) backward compatibility.
 
 ## Motivation
 
@@ -29,7 +29,7 @@ When sending messages over Waku, there are multiple requirements:
 
 - One may have a separate encryption layer as part of the application.
 - One may want to provide efficient routing for resource-restricted devices.
-- One may want to provide compatibility with [6/WAKU1](/waku/standards/legacy/6/waku1.md) envelopes.
+- One may want to provide compatibility with [6/WAKU1](/messaging/standards/legacy/6/waku1.md) envelopes.
 - One may want encrypted payloads by default.
 - One may want to provide unlinkability to get metadata protection.
 
@@ -58,13 +58,13 @@ The data payload is also treated as a `WakuMessage` attribute for convenience.
 
 - The `content_topic` attribute MUST specify a string identifier
 that can be used for content-based filtering,
-as described in [23/WAKU2-TOPICS](/waku/informational/23/topics.md).
+as described in [23/WAKU2-TOPICS](/messaging/informational/23/topics.md).
 
 - The `meta` attribute, if present,
 contains an arbitrary application-specific variable-length byte array
 with a maximum length limit of 64 bytes.
 This attribute can be utilized to convey supplementary details
-to various [10/WAKU2](/waku/standards/core/10/waku2.md) protocols,
+to various [10/WAKU2](/messaging/standards/core/10/waku2.md) protocols,
 thereby enabling customized processing based on its contents.
 
 - The `version` attribute, if present,
@@ -77,7 +77,7 @@ This attribute MAY contain the Unix epoch time in nanoseconds.
 If the attribute is omitted, it SHOULD be interpreted as timestamp 0.
 
 - The `rate_limit_proof` attribute, if present,
-contains a rate limit proof encoded as per [17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md).
+contains a rate limit proof encoded as per [17/WAKU2-RLN-RELAY](/messaging/standards/core/17/rln-relay.md).
 
 - The `ephemeral` attribute, if present, signifies the transient nature of the message.
 For example, an ephemeral message SHOULD not be persisted by other nodes on the same network.
@@ -117,7 +117,7 @@ the schema used to encrypt the payload data.
   at the application layer.
 
 - **Version 1:**
-The payload SHOULD be encrypted using [6/WAKU1](/waku/standards/legacy/6/waku1.md) payload encryption specified in [26/WAKU-PAYLOAD](/waku/standards/application/26/payload.md).
+The payload SHOULD be encrypted using [6/WAKU1](/messaging/standards/legacy/6/waku1.md) payload encryption specified in [26/WAKU-PAYLOAD](/messaging/standards/application/26/payload.md).
 This provides asymmetric and symmetric encryption.
 The key agreement is performed out of band.
 And provides an encrypted signature and padding for some form of unlinkability.
@@ -129,16 +129,16 @@ The Waku Noise protocol provides symmetric encryption and asymmetric key exchang
 Any `version` value not included in this list is reserved for future specification.
 And, in this case, the payload SHOULD be interpreted as unencrypted by the Waku layer.
 
-## Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) envelope compatibility
+## Whisper/[6/WAKU1](/messaging/standards/legacy/6/waku1.md) envelope compatibility
 
-Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) envelopes are compatible with Waku messages format.
+Whisper/[6/WAKU1](/messaging/standards/legacy/6/waku1.md) envelopes are compatible with Waku messages format.
 
-- Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) `topic` field
+- Whisper/[6/WAKU1](/messaging/standards/legacy/6/waku1.md) `topic` field
 SHOULD be mapped to Waku message's `content_topic` attribute.
-- Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) `data` field SHOULD be mapped to Waku message's `payload` attribute.
+- Whisper/[6/WAKU1](/messaging/standards/legacy/6/waku1.md) `data` field SHOULD be mapped to Waku message's `payload` attribute.
 
-[10/WAKU2](/waku/standards/core/10/waku2.md) implements a publish/subscribe messaging pattern over libp2p.
-This makes some Whisper/[6/WAKU1](/waku/standards/legacy/6/waku1.md) envelope fields redundant
+[10/WAKU2](/messaging/standards/core/10/waku2.md) implements a publish/subscribe messaging pattern over libp2p.
+This makes some Whisper/[6/WAKU1](/messaging/standards/legacy/6/waku1.md) envelope fields redundant
 (e.g., `expiry`, `ttl`, `topic`, etc.), so they can be ignored.
 
 ## Deterministic message hashing
@@ -149,7 +149,7 @@ and languages.
 It is also unstable across different builds with schema changes due to unknown fields.
 
 To overcome this interoperability limitation,
-a [10/WAKU2](/waku/standards/core/10/waku2.md) message's hash MUST be computed following this schema:
+a [10/WAKU2](/messaging/standards/core/10/waku2.md) message's hash MUST be computed following this schema:
 
 ```js
 message_hash = sha256(concat(pubsub_topic, message.payload, message.content_topic, message.meta, message.timestamp))
@@ -224,7 +224,7 @@ message_hash = 0x483ea950cb63f9b9d6926b262bb36194d3f40a0463ce8446228350bd44e96de
 The level of confidentiality, integrity, and
 authenticity of the `WakuMessage` payload is discretionary.
 Accordingly, the application layer shall utilize the encryption and
-signature schemes supported by [10/WAKU2](/waku/standards/core/10/waku2.md),
+signature schemes supported by [10/WAKU2](/messaging/standards/core/10/waku2.md),
 to meet the application-specific privacy needs.
 
 ### Reliability of the `timestamp` attribute
@@ -236,11 +236,11 @@ It should not solely be relied upon for operations such as message ordering.
 For example, a malicious actor can arbitrarily set the `timestamp` of a `WakuMessage`
 to a high value so that it always shows up as the most recent message
 in a chat application.
-Applications using [10/WAKU2](/waku/standards/core/10/waku2.md) messages’ `timestamp` attribute
+Applications using [10/WAKU2](/messaging/standards/core/10/waku2.md) messages’ `timestamp` attribute
 are RECOMMENDED to use additional methods for more robust message ordering.
 An example of how to deal with message ordering against adversarial message timestamps
 can be found in the Status protocol,
-see [62/STATUS-PAYLOADS](/archived/status/62/payloads.md/#clock-vs-timestamp-and-message-ordering).
+see [62/STATUS-PAYLOADS](/archived/status/62/payloads.md#clock-vs-timestamp-and-message-ordering).
 
 ### Reliability of the `ephemeral` attribute
 
@@ -257,12 +257,12 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [10/WAKU2](/waku/standards/core/10/waku2.md)
-- [6/WAKU1](/waku/standards/legacy/6/waku1.md)
-- [23/WAKU2-TOPICS](/waku/informational/23/topics.md)
-- [17/WAKU2-RLN-RELAY](/waku/standards/core/17/rln-relay.md)
-- [64/WAKU2-NETWORK](/waku/standards/core/64/network.md)
+- [10/WAKU2](/messaging/standards/core/10/waku2.md)
+- [6/WAKU1](/messaging/standards/legacy/6/waku1.md)
+- [23/WAKU2-TOPICS](/messaging/informational/23/topics.md)
+- [17/WAKU2-RLN-RELAY](/messaging/standards/core/17/rln-relay.md)
+- [64/WAKU2-NETWORK](/messaging/standards/core/64/network.md)
 - [protocol buffers v3](https://developers.google.com/protocol-buffers/)
-- [26/WAKU-PAYLOAD](/waku/standards/application/26/payload.md)
+- [26/WAKU-PAYLOAD](/messaging/standards/application/26/payload.md)
 - [WAKU2-NOISE](https://github.com/waku-org/specs/blob/master/standards/application/noise.md)
-- [62/STATUS-PAYLOADS](/archived/status/62/payloads.md/#clock-vs-timestamp-and-message-ordering)
+- [62/STATUS-PAYLOADS](/archived/status/62/payloads.md#clock-vs-timestamp-and-message-ordering)

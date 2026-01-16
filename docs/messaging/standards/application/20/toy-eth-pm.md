@@ -56,11 +56,11 @@ The proposed protocol MUST adhere to the following design requirements:
 2. Bob is willing to participate to Eth-PM, and publishes `B'`
 3. Bob's ownership of `B'` MUST be verifiable
 4. Alice wants to send message `M` to Bob
-5. Bob SHOULD be able to get `M` using [10/WAKU2](waku/standards/core/10/waku2.md)
+5. Bob SHOULD be able to get `M` using [10/WAKU2](../../core/10/waku2.md)
 6. Participants only have access to their Ethereum Wallet via the Web3 API
 7. Carole MUST NOT be able to read `M`'s content,
 even if she is storing it or relaying it
-8. [Waku Message Version 1](waku/standards/application/26/payload.md) Asymmetric Encryption
+8. [Waku Message Version 1](../26/payload.md) Asymmetric Encryption
 is used for encryption purposes.
 
 ## Limitations
@@ -162,7 +162,7 @@ message PublicKeyMessage {
 }
 ```
 
-This MUST be wrapped in a [14/WAKU-MESSAGE](/waku/standards/core/14/message.md) version 0,
+This MUST be wrapped in a [14/WAKU-MESSAGE](/messaging/standards/core/14/message.md) version 0,
 with the Public Key Broadcast content topic.
 Finally, Bob SHOULD publish the message on Waku.
 
@@ -175,7 +175,7 @@ it is not enough in itself to deduce Bob's Public Key.
 This is why the protocol dictates that Bob MUST send his Public Key first,
 and Alice MUST receive it before she can send him a message.
 
-Moreover, nwaku, the reference implementation of [13/WAKU2-STORE](/waku/standards/core/13/store.md),
+Moreover, nwaku, the reference implementation of [13/WAKU2-STORE](/messaging/standards/core/13/store.md),
 stores messages for a maximum period of 30 days.
 This means that Bob would need to broadcast his public key
 at least every 30 days to be reachable.
@@ -242,12 +242,12 @@ are valid as per EIP-712.
 She SHOULD drop any message without a signature or with an invalid signature.
 
 Using Bob's Encryption Public Key,
-retrieved via [10/WAKU2](/waku/standards/core/10/waku2.md),
+retrieved via [10/WAKU2](/messaging/standards/core/10/waku2.md),
 Alice MAY now send an encrypted message to Bob.
 
 If she wishes to do so,
 Alice MUST encrypt her message `M` using Bob's Encryption Public Key `B'`,
-as per [26/WAKU-PAYLOAD Asymmetric Encryption specs](waku/standards/application/26/payload.md/#asymmetric).
+as per [26/WAKU-PAYLOAD Asymmetric Encryption specs](../26/payload.md#asymmetric).
 
 Alice SHOULD now publish this message on the Private Message content topic.
 
@@ -257,11 +257,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [10/WAKU2](/waku/standards/core/10/waku2.md)
-- [Waku Message Version 1](waku/standards/application/26/payload.md)
+- [10/WAKU2](/messaging/standards/core/10/waku2.md)
+- [Waku Message Version 1](../26/payload.md)
 - [X3DH](https://www.signal.org/docs/specifications/x3dh/)
 - [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Status secure transport specification](/archived/status/deprecated/secure-transport.md)
 - [EIP-712](https://eips.ethereum.org/EIPS/eip-712)
-- [13/WAKU2-STORE](/waku/standards/core/13/store.md)
+- [13/WAKU2-STORE](/messaging/standards/core/13/store.md)
 - [The Graph](https://thegraph.com/)

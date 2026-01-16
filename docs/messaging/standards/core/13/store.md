@@ -8,12 +8,10 @@
 | Editor | Hanno Cornelius <hanno@status.im> |
 | Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskarth@titanproxy.com>, Aaryamann Challani <p1ge0nh8er@proton.me>, Sanaz Taheri <sanaz@status.im> |
 
-Previous version: [00](/waku/standards/core/13/previous-versions/00/store.md)
-
 ## Abstract
 
 This specification explains the `WAKU2-STORE` protocol,
-which enables querying of [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)s.
+which enables querying of [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md)s.
 
 **Protocol identifier***: `/vac/waku/store-query/3.0.0`
 
@@ -32,8 +30,8 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 ### Design Requirements
 
-The concept of `ephemeral` messages introduced in [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) affects `WAKU2-STORE` as well.
-Nodes running `WAKU2-STORE` SHOULD support `ephemeral` messages as specified in [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md).
+The concept of `ephemeral` messages introduced in [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) affects `WAKU2-STORE` as well.
+Nodes running `WAKU2-STORE` SHOULD support `ephemeral` messages as specified in [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md).
 Nodes running `WAKU2-STORE` SHOULD NOT store messages with the `ephemeral` flag set to `true`.
 
 ### Payloads
@@ -90,16 +88,16 @@ message StoreQueryResponse {
 #### Waku Message Key-Value Pairs
 
 The store query protocol operates as a query protocol for a key-value store of historical messages,
-with each entry having a [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
+with each entry having a [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md)
 and associated `pubsub_topic` as the value,
-and [deterministic message hash](/waku/standards/core/14/message.md#deterministic-message-hashing) as the key.
+and [deterministic message hash](/messaging/standards/core/14/message.md#deterministic-message-hashing) as the key.
 The store can be queried to return either a set of keys or a set of key-value pairs.
 
 Within the store query protocol,
-the [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) keys and
+the [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) keys and
 values MUST be represented in a `WakuMessageKeyValue` message.
 This message MUST contain the deterministic `message_hash` as the key.
-It MAY contain the full [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) and
+It MAY contain the full [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) and
 associated pubsub topic as the value in the `message` and
 `pubsub_topic` fields, depending on the use case as set out below.
 
@@ -112,7 +110,7 @@ Both fields MUST either be set or unset.
 
 In order for a message to be eligible for storage:
 
-- it MUST be a _valid_ [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md).
+- it MUST be a _valid_ [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md).
 - the `timestamp` field MUST be populated with the Unix epoch time,
 at which the message was generated in nanoseconds.
 If at the time of storage the `timestamp` deviates by more than 20 seconds
@@ -122,7 +120,7 @@ the store node MAY reject the message.
 
 #### Waku message sorting
 
-The key-value entries in the store MUST be time-sorted by the [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) `timestamp` attribute.
+The key-value entries in the store MUST be time-sorted by the [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) `timestamp` attribute.
 Where two or more key-value entries have identical `timestamp` values,
 the entries MUST be further sorted by the natural order of their message hash keys.
 Within the context of traversing over key-value entries in the store,
@@ -162,7 +160,7 @@ A client node MUST send all historical message queries within a `StoreQueryReque
 This request MUST contain a `request_id`.
 The `request_id` MUST be a uniquely generated string.
 
-If the store query client requires the store service node to include [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) values in the query response,
+If the store query client requires the store service node to include [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) values in the query response,
 it MUST set `include_data` to `true`.
 If the store query client requires the store service node to return only message hash keys in the query response,
 it SHOULD set `include_data` to `false`.
@@ -362,9 +360,9 @@ Specifically, the communication channels are assumed to be secure.
 ### Future Work
 
 - **Anonymous query**: This feature guarantees that nodes can anonymously query historical messages from other nodes i.e.,
-without disclosing the exact topics of [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) they are interested in.  
+without disclosing the exact topics of [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) they are interested in.  
 As such, no adversary in the `WAKU2-STORE` protocol would be able to learn which peer is interested in which content filters i.e.,
-content topics of [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md).
+content topics of [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md).
 The current version of the `WAKU2-STORE` protocol does not provide anonymity for historical queries,
 as the querying node needs to directly connect to another node in the `WAKU2-STORE` protocol and
 explicitly disclose the content filters of its interest to retrieve the corresponding messages.
@@ -432,8 +430,12 @@ seconds (e.g., in Ethereum 2.0) from the time of origination.
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
+## Previous versions
+
+- [00](previous-versions/00/store.md)
+
 ## References
 
-1. [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
+1. [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md)
 2. [protocol buffers v3](https://developers.google.com/protocol-buffers/)
 3. [Open timestamps](https://opentimestamps.org/)

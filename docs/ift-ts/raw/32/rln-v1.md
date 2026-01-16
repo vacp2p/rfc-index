@@ -28,7 +28,7 @@ an e-voting system can integrate RLN to contain the voting rate while
 protecting the voters-vote unlinkability.
 Another use case is to protect an anonymous messaging system against DDoS and
 spam attacks by constraining messaging rate of users.
-This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](../../waku/standards/core/17/rln-relay.md).
+This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](../../../messaging/standards/core/17/rln-relay.md).
 
 ## Wire Format Specification
 
@@ -768,7 +768,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [17/WAKU2-RLN-RELAY RFC](../../waku/standards/core/17/rln-relay.md)
+- [17/WAKU2-RLN-RELAY RFC](../../../messaging/standards/core/17/rln-relay.md)
 - [Interep](https://interep.link/)
 - [incremental Merkle tree algorithm](https://github.com/appliedzkp/incrementalquintree/blob/master/ts/IncrementalQuinTree.ts)
 - [Shamir's Secret sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)

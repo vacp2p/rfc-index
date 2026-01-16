@@ -7,7 +7,7 @@
 | Status | deleted |
 | Editor | Sanaz Taheri <sanaz@status.im> |
 
- The reliability of [13/WAKU2-STORE](../../core/13/store.md)
+ The reliability of [13/WAKU2-STORE](../standards/core/13/store.md)
 protocol heavily relies on the fact that full nodes i.e.,
 those who persist messages have high availability and
 uptime and do not miss any messages.
@@ -27,7 +27,7 @@ as a full node.
 ## Method description
 
  As the first step
-towards making the [13/WAKU2-STORE](../../core/13/store.md) protocol fault-tolerant,
+towards making the [13/WAKU2-STORE](../standards/core/13/store.md) protocol fault-tolerant,
 we introduce a new type of time-based query through which nodes fetch message history
 from each other based on their desired time window.
 This method operates based on the assumption that the querying node
@@ -44,7 +44,7 @@ which can lead to inference attacks.
 
 ## Wire Specification
 
-We extend the [HistoryQuery](../../core/13/store.md/#payloads) protobuf message
+We extend the [HistoryQuery](../standards/core/13/store.md/#payloads) protobuf message
 with two fields of `start_time` and `end_time` to signify the time range to be queried.
 
 ### Payloads
@@ -71,17 +71,17 @@ RPC call to query historical messages.
 this field MAY be filled out to signify the starting point of the queried time window.
 This field holds the Unix epoch time in nanoseconds.  
 The `messages` field of the corresponding
-[`HistoryResponse`](../../core/13/store.md/#HistoryResponse)
+[`HistoryResponse`](../standards/core/13/store.md/#HistoryResponse)
 MUST contain historical waku messages whose
-[`timestamp`](../../core/14/message.md/#Payloads)
+[`timestamp`](../standards/core/14/message.md/#Payloads)
 is larger than or equal to the `start_time`.
 - `end_time`:
 this field MAY be filled out to signify the ending point of the queried time window.
 This field holds the Unix epoch time in nanoseconds.
 The `messages` field of the corresponding
-[`HistoryResponse`](../../core/13/store.md/#HistoryResponse)
+[`HistoryResponse`](../standards/core/13/store.md/#HistoryResponse)
 MUST contain historical waku messages whose
-[`timestamp`](../../core/14/message.md/#Payloads) is less than or equal to the `end_time`.
+[`timestamp`](../standards/core/14/message.md/#Payloads) is less than or equal to the `end_time`.
 
 A time-based query is considered valid if
 its `end_time` is larger than or equal to the `start_time`.
@@ -100,7 +100,7 @@ then the history query SHOULD be made for `[start_time: l - 20s, end_time: r + 2
 
 Note that `HistoryQuery` preserves `AND` operation among the queried attributes.
 As such, the `messages` field of the corresponding
-[`HistoryResponse`](../../core/13/store.md/#HistoryResponse)
+[`HistoryResponse`](../standards/core/13/store.md/#HistoryResponse)
 MUST contain historical waku messages that satisfy the indicated  `pubsubtopic` AND
 `contentFilters` AND the time range [`start_time`, `end_time`].
 
@@ -111,5 +111,5 @@ Copyright and related rights waived via
 
 ## References
 
-- [13/WAKU2-STORE](../../core/13/store.md)
-- [`timestamp`](../../standards/core/14/message.md/#Payloads)
+- [13/WAKU2-STORE](../standards/core/13/store.md)
+- [`timestamp`](../standards/core/14/message.md/#Payloads)

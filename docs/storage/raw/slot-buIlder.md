@@ -26,7 +26,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 A Codex client wanting to present a dataset to the network will present a set of erasure encoded data blocks,
-as described in the [CODEX-ERASURE-CODING](./erasure-coding.md) specification.
+as described in the [CODEX-ERASURE-CODING](erasure-coding.md) specification.
 These data blocks will be placed into slots for storage providers to access.
 The slot building process MUST construct a block digest Merkle tree from the data blocks.
 The root hashes from this tree are used as the leaves in a slot merkle tree.
@@ -35,7 +35,7 @@ The prepared dataset is presented to storage providers in the form of slots.
 A slot represents the location of a data block cell with an open storage contract.
 Storage providers SHOULD be able to locate a specific data block and
 all the details of the storage contract.
-See, the [CODEX-MARKETPLACE](./marketplace.md) specification.
+See, the [CODEX-MARKETPLACE](./codex-marketplace.md) specification.
 
 ### Construct a Slot Tree
 
@@ -127,6 +127,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [CODEX-ERASURE-CODING](./erasure-coding.md)
-- [CODEX-MARKETPLACE](./marketplace.md)
+- [CODEX-ERASURE-CODING](erasure-coding.md)
+- [CODEX-MARKETPLACE](./codex-marketplace.md)
 - [Poseidon2](https://eprint.iacr.org/2023/323)

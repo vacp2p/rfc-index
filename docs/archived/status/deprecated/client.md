@@ -56,7 +56,7 @@ allows for TCP-based communication between nodes.
 
 On top of this RLPx-based subprotocols are ran, the client
 SHOULD NOT use [Whisper V6](https://eips.ethereum.org/EIPS/eip-627), the client
-SHOULD use [Waku V1](/waku/standards/legacy/6/waku1.md)
+SHOULD use [Waku V1](/messaging/standards/legacy/6/waku1.md)
 for privacy-preserving messaging and efficient usage of a node's bandwidth.
 
 #### Node discovery and roles
@@ -172,9 +172,9 @@ used in 1:1 chats and group chats, but not for public chats. See [SECURE-TRANSPO
 
 ### Data Sync
 
-[MVDS](/vac/2/mvds.md) is used for 1:1 and group chats, however it is currently not in use for public chats.
+[MVDS](/ift-ts/raw/2/mvds.md) is used for 1:1 and group chats, however it is currently not in use for public chats.
 [Status payloads](#payloads-and-clients) are serialized and then wrapped inside an
-MVDS message which is added to an [MVDS payload](/vac/2/mvds.md#payloads),
+MVDS message which is added to an [MVDS payload](/ift-ts/raw/2/mvds.md#payloads),
 the node encrypts this payload (if necessary for 1-to-1 / group-chats) and sends it using
 Whisper or Waku which also encrypts it.
 
@@ -232,7 +232,7 @@ computer.
 ### Why do you use Waku?
 
 Waku is a direct upgrade and replacement for Whisper, the main motivation for
-developing and implementing Waku can be found in the [Waku specs](/waku/).
+developing and implementing Waku can be found in the [Waku specs](/messaging/README.md).
 
 >Waku was created to incrementally improve in areas that Whisper is lacking in,
 >with special attention to resource restricted devices. We specify the standard for
@@ -390,7 +390,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)
 - [RLPx Transport Protocol, v5](https://github.com/ethereum/devp2p/blob/master/rlpx.md)
 - [Whisper V6](https://eips.ethereum.org/EIPS/eip-627)
-- [Waku V1](/waku/standards/legacy/6/waku1.md)
+- [Waku V1](/messaging/standards/legacy/6/waku1.md)
 - [Rendezvous Protocol](https://github.com/libp2p/specs/tree/master/rendezvous)
 - [Rendezvous Protocol modifications](https://github.com/status-im/rendezvous#differences-with-original-rendezvous)
 - [Fleets Status](https://fleets.status.im)
@@ -400,14 +400,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [WHISPER-MAILSERVER](/archived/status/deprecated/whisper-mailserver.md)
 - [WAKU-MAILSERVER](/archived/status/deprecated/waku-mailserver.md)
 - [SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md)
-- [MVDS](/vac/2/mvds.md)
+- [MVDS](/ift-ts/raw/2/mvds.md)
 - [PAYLOADS](/archived/status/deprecated/payloads.md)
 - [EIPS](/archived/status/deprecated/eips.md)
 - [Murmur](https://github.com/status-im/murmur)
 - [Re-enable LES as option](https://github.com/status-im/status-go/issues/1025)
 - [Swarm adaptive nodes](https://github.com/ethersphere/SWIPs/pull/12)
 - [Whisper vs PSS](https://our.status.im/whisper-pss-comparison/)
-- [Waku specs](/waku/)
+- [Waku specs](/messaging/README.md)
 - [IFT-TS](https://vac.dev/vac-overview)
 - [theoretical scaling model](https://github.com/vacp2p/research/tree/dcc71f4779be832d3b5ece9c4e11f1f7ec24aac2/whisper_scalability)
 - [Anonymity](https://eprint.iacr.org/2017/954.pdf)

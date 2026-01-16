@@ -8,8 +8,6 @@
 | Editor | Hanno Cornelius <hanno@status.im> |
 | Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskar@status.im>, Sanaz Taheri <sanaz@status.im>, Ebube Ud <ebube@status.im> |
 
-previous versions: [00](/waku/standards/core/12/previous-versions/00/filter.md)
-
 **Protocol identifiers**:
 
 - _filter-subscribe_: `/vac/waku/filter-subscribe/2.0.0-beta1`
@@ -21,7 +19,7 @@ previous versions: [00](/waku/standards/core/12/previous-versions/00/filter.md)
 
 This specification describes the `12/WAKU2-FILTER` protocol,
 which enables a client to subscribe to a subset of real-time messages from a Waku peer.
-This is a more lightweight version of [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
+This is a more lightweight version of [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md),
 useful for bandwidth restricted devices.
 This is often used by nodes with lower resource limits to subscribe to full Relay nodes and
 only receive the subset of messages they desire,
@@ -29,7 +27,7 @@ based on content topic interest.
 
 ## Motivation
 
-Unlike the [13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol
+Unlike the [13/WAKU2-STORE](/messaging/standards/core/13/store.md) protocol
 for historical messages, this protocol allows for native lower latency scenarios,
 such as instant messaging.
 It is thus complementary to it.
@@ -42,7 +40,7 @@ Gossip domain, this is suitable for light nodes which put a premium on bandwidth
 No gossiping takes place.
 
 It is worth noting that a light node could get by with only using the
-[13/WAKU2-STORE](/waku/standards/core/13/store.md) protocol to
+[13/WAKU2-STORE](/messaging/standards/core/13/store.md) protocol to
 query for a recent time window, provided it is acceptable to do frequent polling.
 
 ## Semantics
@@ -143,7 +141,7 @@ conditional to the selected `filter_subscribe_type`.
 If the request contains filter criteria,
 it MUST contain a `pubsub_topic`
 and the `content_topics` set MUST NOT be empty.
-A [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md) matches filter criteria
+A [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md) matches filter criteria
 when its `content_topic` is in the `content_topics` set
 and it was published on a matching `pubsub_topic`.
 
@@ -220,8 +218,8 @@ matching registered subscriptions to this client.
 A filter service node SHOULD push all messages
 matching the filter criteria in a registered subscription
 to the subscribed filter client.
-These [`WakuMessage`s](/waku/standards/core/14/message.md)
-are likely to come from [`11/WAKU2-RELAY`](/waku/standards/core/11/relay.md),
+These [`WakuMessage`s](/messaging/standards/core/14/message.md)
+are likely to come from [`11/WAKU2-RELAY`](/messaging/standards/core/11/relay.md),
 but there MAY be other sources or protocols where this comes from.
 This is up to the consumer of the protocol.
 
@@ -317,14 +315,17 @@ and one-way Private Set Intersections (PSI).
 Copyright and related rights waived via
 [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
+## Previous versions
+
+- [00](previous-versions/00/filter.md)
+
 ## References
 
-- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
+- [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md)
 - [message-based filtering](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern#Message_filtering)
-- [13/WAKU2-STORE](/waku/standards/core/13/store.md)
-- [14/WAKU2-MESSAGE](/waku/standards/core/14/message.md)
+- [13/WAKU2-STORE](/messaging/standards/core/13/store.md)
+- [14/WAKU2-MESSAGE](/messaging/standards/core/14/message.md)
 - [Oblivious Transfers](https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains)
-- 12/WAKU2-FILTER previous version: [00](waku/standards/core/12/previous-versions/00/filter.md)
 
 ### Informative
 

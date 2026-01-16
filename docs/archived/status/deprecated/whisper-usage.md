@@ -328,12 +328,12 @@ In order to maintain compatibility between Whisper and Waku nodes,
 a Status network that implements both Whisper and Waku messaging protocols
 MUST have at least one node that is capable of discovering peers and implements
 [Whisper v6](https://eips.ethereum.org/EIPS/eip-627),
-[Waku V0](/waku/deprecated/5/waku0.md) and
-[Waku V1](/waku/standards/legacy/6/waku1.md) specifications.
+[Waku V0](/messaging/deprecated/5/waku0.md) and
+[Waku V1](/messaging/standards/legacy/6/waku1.md) specifications.
 
 Additionally, any Status network that implements both Whisper and Waku messaging protocols
 MUST implement bridging capabilities as detailed in
-[Waku V1#Bridging](/waku/standards/legacy/6/waku1.md#waku-whisper-bridging).  
+[Waku V1#Bridging](/messaging/standards/legacy/6/waku1.md#waku-whisper-bridging).  
 
 ## Whisper V6 extensions
 
@@ -392,6 +392,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md)
 * [`shh_generateSymKeyFromPassword`](https://github.com/ethereum/go-ethereum/wiki/Whisper-v6-RPC-API#shh_generatesymkeyfrompassword)
 * [Whisper v6](https://eips.ethereum.org/EIPS/eip-627)
-* [Waku V0](/waku/deprecated/5/waku0.md)
-* [Waku V1](/waku/standards/legacy/6/waku1.md)
+* [Waku V0](/messaging/deprecated/5/waku0.md)
+* [Waku V1](/messaging/standards/legacy/6/waku1.md)
 * [May 22, 2020 change commit](https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8)

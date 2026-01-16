@@ -68,7 +68,7 @@ The main cryptographic protocol is a Double Ratchet protocol,
 which is derived from the
 [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html),
 using a different ratchet.
-[The Waku v2 protocol](/waku/standards/core/10/waku2.md)
+[The Waku v2 protocol](/messaging/standards/core/10/waku2.md)
 subsequently encrypts the message payload, using symmetric key encryption.
 Furthermore, the concept of prekeys
 (through the use of [X3DH](https://signal.org/docs/specifications/x3dh/))
@@ -284,7 +284,7 @@ The message key MUST be used to encrypt the next message to be sent.
 1. Inherits the security considerations of [X3DH](https://signal.org/docs/specifications/x3dh/#security-considerations)
 and [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/#security-considerations).
 
-2. Inherits the security considerations of the [Waku v2 protocol](/waku/standards/core/10/waku2.md).
+2. Inherits the security considerations of the [Waku v2 protocol](/messaging/standards/core/10/waku2.md).
 
 3. The protocol is designed to be used in a decentralized manner, however,
 it is possible to use a centralized server to serve prekey bundles.
@@ -307,7 +307,7 @@ Copyright and related rights waived via
 - [Signal's Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 - [Protobuf](https://developers.google.com/protocol-buffers/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
-- [The Waku v2 protocol](/waku/standards/core/10/waku2.md)
+- [The Waku v2 protocol](/messaging/standards/core/10/waku2.md)
 - [HKDF](https://www.rfc-editor.org/rfc/rfc5869)
 - [2/ACCOUNT](https://specs.status.im/spec/2#x3dh-prekey-bundles)
 - [reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L12)

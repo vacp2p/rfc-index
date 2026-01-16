@@ -143,7 +143,7 @@ Bob only needs read-only access to NS and CAS.
 
 <!-- diagram -->
 
-![notification](./images/remote-log.png)
+![notification](images/remote-log.png)
 
 <!-- Document the flow wrt operations -->
 

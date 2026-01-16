@@ -29,7 +29,7 @@ to differentiate them from Communities.
 
 For group chats based on [55/STATUS-1TO1-CHAT](../55/1to1-chat.md),
 the key exchange mechanism MUST be X3DH,
-as described in [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md).
+as described in [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md).
 
 However, this method does not scale as the number of participants increases,
 for the following reasons -
@@ -69,7 +69,7 @@ derived from the public key of the Community.
 10. Community members run their own Waku nodes,
 with the configuration described in [Waku-Protocols](#waku-protocols).
 Light nodes solely implementing
-[19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
+[19/WAKU2-LIGHTPUSH](../../../messaging/standards/core/19/lightpush.md)
 may not be able to run their own Waku node with the configuration described.
 
 ## Design
@@ -340,9 +340,9 @@ symKey = pbkdf2(password:universalChatID, salt:nil, iteration-count:65356,key-le
 
 ### Content topic usage
 
-"Content topic" refers to the field in [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md/#message-attributes),
-further elaborated in [10/WAKU2](../../waku/standards/core/10/waku2.md/#overview-of-protocol-interaction).
-The content-topic usage follows the guidelines specified at [23/topics](../../waku/informational/23/topics.md#content-topic-usage-guidelines)
+"Content topic" refers to the field in [14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md#message-attributes),
+further elaborated in [10/WAKU2](../../../messaging/standards/core/10/waku2.md#overview-of-protocol-interaction).
+The content-topic usage follows the guidelines specified at [23/topics](../../../messaging/informational/23/topics.md#content-topic-usage-guidelines)
 
 #### Advertising a Community
 
@@ -502,22 +502,22 @@ to ensure that the banned member is unable to decrypt any messages.
 
 The following Waku protocols SHOULD be used to implement Status Communities -
 
-1. [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md) -
+1. [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md) -
 To send and receive messages
-2. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) -
+2. [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md) -
 To encrypt and decrypt messages
-3. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)-
+3. [54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md)-
 To handle session keys
-4. [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md) -
+4. [14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md) -
 To wrap community messages in a Waku message
-5. [13/WAKU2-STORE](../../waku/standards/core/13/store.md) -
+5. [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md) -
 To store and retrieve messages for offline devices
 
 The following Waku protocols MAY be used to implement Status Communities -
 
-1. [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md) -
+1. [12/WAKU2-FILTER](../../../messaging/standards/core/12/filter.md) -
 Content filtering for resource restricted devices
-2. [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md) -
+2. [19/WAKU2-LIGHTPUSH](../../../messaging/standards/core/19/lightpush.md) -
 Allows Light clients to participate in the network
 
 ### Backups
@@ -528,7 +528,7 @@ sending it to a given content topic.
 The member MAY then rely on this backup to restore their local settings,
 in case of a data loss.
 This feature relies on
-[13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+[13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)
 for storing and retrieving messages.
 
 ### Clock
@@ -545,7 +545,7 @@ where messages may be received out of order.
 If the Community owner is compromised, the Community is compromised.
 
 2. Follows the same security considerations as the
-[53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md) protocol.
+[53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md) protocol.
 
 ## Future work
 
@@ -567,14 +567,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [55/STATUS-1TO1-CHAT](../55/1to1-chat.md)
-- [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
-- [19/WAKU2-LIGHTPUSH](../../waku/standards/core/19/lightpush.md)
-- [14/WAKU2-MESSAGE](../../waku/standards/core/14/message.md)
-- [10/WAKU2](../../waku/standards/core/10/waku2.md)
-- [11/WAKU2-RELAY](../../waku/standards/core/11/relay.md)
-- [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
-- [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
-- [12/WAKU2-FILTER](../../waku/standards/core/12/filter.md)
+- [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md)
+- [19/WAKU2-LIGHTPUSH](../../../messaging/standards/core/19/lightpush.md)
+- [14/WAKU2-MESSAGE](../../../messaging/standards/core/14/message.md)
+- [10/WAKU2](../../../messaging/standards/core/10/waku2.md)
+- [11/WAKU2-RELAY](../../../messaging/standards/core/11/relay.md)
+- [54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md)
+- [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)
+- [12/WAKU2-FILTER](../../../messaging/standards/core/12/filter.md)
 
 ### informative
 

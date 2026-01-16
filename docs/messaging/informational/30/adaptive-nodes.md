@@ -16,7 +16,7 @@ We can look at node types as a continuum,
 from more restricted to less restricted,
 fewer resources to more resources.
 
-![Node types - a continuum](./images/adaptive_node_continuum2.png)
+![Node types - a continuum](images/adaptive_node_continuum2.png)
 
 ### Possible limitations
 
@@ -58,9 +58,9 @@ Incentives to run a node is currently planned around:
 
 Each node can choose which protocols to support, depending on its resources and goals.
 
-![Protocol selection](./images/adaptive_node_protocol_selection2.png)
+![Protocol selection](images/adaptive_node_protocol_selection2.png)
 
-Protocols like [11/WAKU2-RELAY](/waku/standards/core/11/relay.md),
+Protocols like [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md),
 as well as [12], [13], [19], and [21], correspond to libp2p protocols.
 
 However, other protocols like 16/WAKU2-RPC
@@ -82,13 +82,13 @@ We can better visualize the network with some illustrative examples.
 This illustration shows an example topology with different PubSub topics
 for the relay protocol.
 
-![Waku Network visualization](./images/adaptive_node_network_topology_protocols2.png)
+![Waku Network visualization](images/adaptive_node_network_topology_protocols2.png)
 
 ### Legend
 
 This illustration shows an example of content topics a node is interested in.
 
-![Waku Network visualization legend](./images/adaptive_node_network_topology_protocols_legend.png)
+![Waku Network visualization legend](images/adaptive_node_network_topology_protocols_legend.png)
 
 The dotted box shows what content topics (application-specific)
 a node is interested in.
@@ -103,15 +103,15 @@ a topic in Waku v1 (Status chat), WalletConnect, and SuperRare community.
 This is a separate component with its own topology.
 
 Behavior and interaction with other protocols specified in Logos LIPs,
-e.g. [25/LIBP2P-DNS-DISCOVERY](/vac/25/libp2p-dns-discovery.md)
-and [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md).
+e.g. [25/LIBP2P-DNS-DISCOVERY](/ift-ts/raw/25/libp2p-dns-discovery.md)
+and [15/WAKU-BRIDGE](/messaging/standards/core/15/bridge.md).
 
 ### Node Cross Section
 
 This one shows a cross-section of nodes in different dimensions and
 shows how the connections look different for different protocols.
 
-![Node Cross Section](./images/adaptive_node_cross_section2.png)
+![Node Cross Section](images/adaptive_node_cross_section2.png)
 
 ## Copyright
 
@@ -120,6 +120,6 @@ Copyright and related rights waived via
 
 ## References
 
-- [11/WAKU2-RELAY](/waku/standards/core/11/relay.md)
-- [25/LIBP2P-DNS-DISCOVERY](/vac/25/libp2p-dns-discovery.md)
-- [15/WAKU-BRIDGE](/waku/standards/core/15/bridge.md)
+- [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md)
+- [25/LIBP2P-DNS-DISCOVERY](/ift-ts/raw/25/libp2p-dns-discovery.md)
+- [15/WAKU-BRIDGE](/messaging/standards/core/15/bridge.md)

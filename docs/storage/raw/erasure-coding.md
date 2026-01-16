@@ -70,7 +70,7 @@ struct encodingParms {
 
 After the erasure coding process,
 a protected manifest SHOULD be generated for the dataset, which would store the CID of the root Merkle tree.
-The content of the protected manifest below, see [CODEX-MANIFEST](./manifest.md) for more information:
+The content of the protected manifest below, see CODEX-MANIFEST for more information:
 
 ```js
 
@@ -104,7 +104,7 @@ The content of the protected manifest below, see [CODEX-MANIFEST](./manifest.md)
 ```
 
 After the encoding process,
-is ready to be stored on the network via the [CODEX-MARKETPLACE](./marketplace.md).
+is ready to be stored on the network via the [CODEX-MARKETPLACE](./codex-marketplace.md).
 The Merkle tree root SHOULD be included in the manifest so other nodes are able to locate and
 reconstruct a dataset from the erasure encoded blocks.
 
@@ -116,7 +116,7 @@ reconstruct the merkle tree.
 When a missing branch of the tree is not retrievable from an SP, data repair will be REQUIRED.
 The validator will open a request for a new SP to reconstruct the Merkle tree and
 store the missing data blocks.
-The validator role is described in the [CODEX-MARKETPLACE](./marketplace.md) specification.
+The validator role is described in the [CODEX-MARKETPLACE](./codex-marketplace.md) specification.
 
 ### Decode Data
 
@@ -155,5 +155,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [Leapard Codec](https://github.com/catid/leopard)
-- [CODEX-MANIFEST](./manifest.md)
-- [CODEX-MARKETPLACE](./marketplace.md)
+- CODEX-MANIFEST
+- [CODEX-MARKETPLACE](./codex-marketplace.md)

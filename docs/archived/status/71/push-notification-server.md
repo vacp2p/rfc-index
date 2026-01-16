@@ -52,7 +52,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”,
 | client | A node that implements the Status specifications. |
 | user | The owner of a device that runs a client. |
 | server | A service that performs push notifications. |
-| Waku-Store | A Waku node that decides to provide functionality to store messages permanently and deliver the messages to requesting clients. As described in [13/WAKU-STORE](../../waku/standards/core/13/store.md) specification.|
+| Waku-Store | A Waku node that decides to provide functionality to store messages permanently and deliver the messages to requesting clients. As described in [13/WAKU-STORE](../../../messaging/standards/core/13/store.md) specification.|
 
 ### Server Components
 
@@ -75,11 +75,11 @@ The party releasing the app MUST run its own [gorush](https://github.com/applebo
 
 #### Registration Process
 
-![registration](./images/registration.png)
+![registration](images/registration.png)
 
 #### Sending and Receiving Notification Process
 
-![notification](./images/notification.png)
+![notification](images/notification.png)
 
 ### Registering Client
 
@@ -92,7 +92,7 @@ more push notification services in order to increase availability.
 have the same information about their tokens.
 
 - A `PNR message` (Push Notification Registration) MUST be sent to the
-[partitioned topic](../../waku/standards/application/54/x3dh-sessions.md)
+[partitioned topic](../../../messaging/standards/application/54/x3dh-sessions.md)
 for the public key of the node, encrypted with this key.
 
 - The message MUST be wrapped in a
@@ -173,7 +173,7 @@ message PushNotificationRegistrationResponse {
 ```
 
 A client SHOULD listen for a response sent on the
-[partitioned topic](../../waku/standards/application/54/x3dh-sessions.md)
+[partitioned topic](../../../messaging/standards/application/54/x3dh-sessions.md)
 that the key used to register.
 If success is true the client has registered successfully.
 
@@ -205,7 +205,7 @@ a response MUST be sent with `success` set to `false`.
 of the encrypted payload.
 
 - The response MUST be sent on the
-[partitioned topic](../../waku/standards/application/54/x3dh-sessions.md)
+[partitioned topic](../../../messaging/standards/application/54/x3dh-sessions.md)
 of the sender and MUST not be encrypted using
 the secure transport to facilitate the usage of ephemeral keys.
 
@@ -289,7 +289,7 @@ message ContactCodeAdvertisement {
 the access token SHOULD be included in the advertisement.
   Otherwise it SHOULD be left empty.
 - This SHOULD be advertised on the
-[contact code topic](../../waku/standards/application/53/x3dh.md) and
+[contact code topic](../../../messaging/standards/application/53/x3dh.md) and
 SHOULD be coupled with normal contact-code advertisement.
 - When a user register or re-register with a push notification service,
 their contact-code SHOULD be re-advertised.
@@ -299,7 +299,7 @@ their contact-code SHOULD be re-advertised.
 #### Discovering a Server
 
 To discover a push notification service for a given user, their
-[contact code topic](../../waku/standards/application/53/x3dh.md)
+[contact code topic](../../../messaging/standards/application/53/x3dh.md)
 SHOULD be listened to.
 A Waku-Store node can be queried for the specific topic
 to retrieve the most up-to-date contact code.
@@ -325,7 +325,7 @@ message PushNotificationQuery {
 - it MUST be sent to the server on the topic derived from the hashed public key
 of the key we are querying,
 [as described above](#query-topic).
-- An ephemeral key SHOULD be used and SHOULD NOT be encrypted using the [secure transport](../../waku/standards/application/53/x3dh.md).
+- An ephemeral key SHOULD be used and SHOULD NOT be encrypted using the [secure transport](../../../messaging/standards/application/53/x3dh.md).
 
 If the server has information about the client a response MUST be sent:
 
@@ -371,10 +371,10 @@ it will return a valid `uuid` which is what is used for access_token.
 The token SHOULD be used to send push notifications.
 
 - The response MUST be sent on the
-[partitioned topic](../../waku/standards/application/54/x3dh-sessions.md)
+[partitioned topic](../../../messaging/standards/application/54/x3dh-sessions.md)
 of the sender and
 MUST NOT be encrypted using the
-[secure transport](../../waku/standards/application/53/x3dh.md)
+[secure transport](../../../messaging/standards/application/53/x3dh.md)
 to facilitate the usage of ephemeral keys.
 
 - On receiving a response,
@@ -499,10 +499,10 @@ Where `message_id` is the `message_id` sent by the client.
 [`ApplicationMetadataMessage`](../62/payloads.md) with type set to `PUSH_NOTIFICATION_RESPONSE`.
 
 - The response MUST be sent on the
-[partitioned topic](../../waku/standards/application/54/x3dh-sessions.md)
+[partitioned topic](../../../messaging/standards/application/54/x3dh-sessions.md)
 of the sender and
 MUST not be encrypted using the
-[secure transport](../../waku/standards/application/53/x3dh.md)
+[secure transport](../../../messaging/standards/application/53/x3dh.md)
 to facilitate the usage of ephemeral keys.
 
 - If the request is accepted `success` MUST be set to `true`.
@@ -668,7 +668,7 @@ This will hide their real chat key. This public key is effectively a secret and
 SHOULD only be disclosed to clients approved to notify a user.
 
 - A client MAY advertise the access token on the
-[contact-code topic](../../waku/standards/application/53/x3dh.md)
+[contact-code topic](../../../messaging/standards/application/53/x3dh.md)
 of the key generated.
 
 - A client MAY share their public key contact updates in the
@@ -717,10 +717,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 1. [PUSH-NOTIFICATION-SERVER, Initial Specification](https://github.com/status-im/specs/blob/master/docs/raw/push-notification-server.md)
 2. [Push Notification, Apple Developer](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1)
 3. [Firebase](https://firebase.google.com)
-4. [13/WAKU2-STORE](../../waku/standards/core/13/store.md)
+4. [13/WAKU2-STORE](../../../messaging/standards/core/13/store.md)
 5. [gorush](https://github.com/appleboy/gorush)
-6. [54/WAKU2-X3DH-SESSIONS](../../waku/standards/application/54/x3dh-sessions.md)
+6. [54/WAKU2-X3DH-SESSIONS](../../../messaging/standards/application/54/x3dh-sessions.md)
 7. [62/PAYLOAD](../62/payloads.md)
 8. [SHAKE-256](https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.202.pdf)
 9. [Protocol Buffers](https://developers.google.com/protocol-buffers)
-10. [53/WAKU2-X3DH](../../waku/standards/application/53/x3dh.md)
+10. [53/WAKU2-X3DH](../../../messaging/standards/application/53/x3dh.md)
