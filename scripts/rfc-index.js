@@ -271,6 +271,60 @@
     setTimeout(() => observer.disconnect(), 1500);
   }
 
+  function ensureOnThisPageFallback(attempts = 6) {
+    if (document.documentElement.dataset.onThisPageFallback === "true") return;
+
+    const sidebar = document.querySelector("#mdbook-sidebar .sidebar-scrollbox")
+      || document.querySelector("#sidebar .sidebar-scrollbox");
+    const activeLink = sidebar ? sidebar.querySelector("a.active") : null;
+
+    if (!sidebar || !activeLink) {
+      if (attempts > 0) {
+        setTimeout(() => ensureOnThisPageFallback(attempts - 1), 150);
+      }
+      return;
+    }
+
+    if (sidebar.querySelector(".on-this-page")) {
+      document.documentElement.dataset.onThisPageFallback = "true";
+      return;
+    }
+
+    const main = document.querySelector("#mdbook-content main, #content main, main");
+    if (!main) {
+      if (attempts > 0) {
+        setTimeout(() => ensureOnThisPageFallback(attempts - 1), 150);
+      }
+      return;
+    }
+
+    const headings = Array.from(main.querySelectorAll("h2, h3"))
+      .filter((heading) => heading.id);
+    if (!headings.length) {
+      document.documentElement.dataset.onThisPageFallback = "true";
+      return;
+    }
+
+    const container = document.createElement("div");
+    container.className = "on-this-page";
+
+    const list = document.createElement("ol");
+    list.className = "section";
+
+    headings.forEach((heading) => {
+      const li = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent.replace(/\s+/g, " ").trim();
+      li.appendChild(link);
+      list.appendChild(li);
+    });
+
+    container.appendChild(list);
+    activeLink.parentElement.after(container);
+    document.documentElement.dataset.onThisPageFallback = "true";
+  }
+
   onReady(() => {
     addTopNav();
     addFooter();
@@ -279,6 +333,7 @@
     // toc.js may inject the sidebar after load
     setTimeout(bindSidebarCollapsible, 100);
     observeSidebar();
+    ensureOnThisPageFallback();
   });
 
   const searchInput = document.getElementById("rfc-search");
