@@ -8,8 +8,6 @@
 | Editor | Prem Prathi <prem@status.im>|
 | Contributors | Akshaya Mani <akshaya@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius |
 
-
-
 ## Abstract
 
 The Mix Protocol defines a decentralized anonymous message routing layer for libp2p networks.

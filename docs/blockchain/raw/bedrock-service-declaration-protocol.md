@@ -102,6 +102,7 @@ The protocol defines the following actions:
 > **Note**: Protocol messages are subject to finality,
 > meaning messages become part of the immutable ledger after a delay.
 > The delay is defined by the consensus.
+
 ## Protocol Specification
 
 ### Service Types
