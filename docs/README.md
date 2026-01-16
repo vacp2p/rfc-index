@@ -17,10 +17,10 @@ An IETF-style index of Logos-managed LIPs across Storage, Messaging, Blockchain 
   <div class="filter-row">
     <div class="chips" id="component-chips">
       <span class="chip active" data-component="all" data-label="All components">All components</span>
-      <span class="chip" data-component="ift-ts" data-label="ift-ts">IFT-TS</span>
       <span class="chip" data-component="messaging" data-label="Messaging">Messaging</span>
-      <span class="chip" data-component="nomos" data-label="Nomos">Nomos</span>
-      <span class="chip" data-component="codex" data-label="Codex">Codex</span>
+      <span class="chip" data-component="blockchain" data-label="Blockchain">Blockchain</span>
+      <span class="chip" data-component="storage" data-label="Storage">Storage</span>
+      <span class="chip" data-component="ift-ts" data-label="IFT-TS">IFT-TS</span>
     </div>
   </div>
   <div class="filter-row">

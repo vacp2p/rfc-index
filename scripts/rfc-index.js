@@ -55,10 +55,10 @@
       <details class="nav-dropdown">
         <summary class="nav-link">Components</summary>
         <div class="nav-menu">
+          <a href="${root}messaging/index.html">Messaging</a>
+          <a href="${root}blockchain/index.html">Blockchain</a>
+          <a href="${root}storage/index.html">Storage</a>
           <a href="${root}ift-ts/index.html">IFT-TS</a>
-          <a href="${root}waku/index.html">Messaging</a>
-          <a href="${root}nomos/index.html">Nomos</a>
-          <a href="${root}codex/index.html">Codex</a>
         </div>
       </details>
       <a class="nav-link" href="${root}about.html">About</a>
@@ -304,10 +304,10 @@
     unknown: "Unknown"
   };
   const componentLabels = {
-    vac: "IFT-TS",
     waku: "Messaging",
-    nomos: "Nomos",
-    codex: "Codex"
+    nomos: "Blockchain",
+    codex: "Storage",
+    vac: "IFT-TS",
   };
   const headers = [
     { key: "slug", label: "RFC", width: showComponentColumn ? "10%" : "12%" },

@@ -10,103 +10,13 @@
     "archived": false
   },
   {
-    "component": "codex",
-    "slug": "Codex Block Exchange Protocol",
-    "title": "Codex Block Exchange Protocol",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2025-12-22",
-    "path": "codex/raw/codex-block-exchange.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "codex-marketplace",
-    "title": "Codex Storage Marketplace",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2025-12-22",
-    "path": "codex/raw/codex-marketplace.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "codex-merkle-tree",
-    "title": "Codex Merkle Tree",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-15",
-    "path": "codex/raw/codex-merkle-tree.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "codex-prover",
-    "title": "Codex Prover Module",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-15",
-    "path": "codex/raw/codex-prover.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "codex-store",
-    "title": "Codex Store Module",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-15",
-    "path": "codex/raw/codex-store.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "community-history",
-    "title": "Codex Community History",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-15",
-    "path": "codex/raw/community-history.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "dht",
-    "title": "Codex Discovery",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-15",
-    "path": "codex/raw/dht.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "erasure-coding",
-    "title": "Codex Erasue Coding",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-15",
-    "path": "codex/raw/erasure-coding.html",
-    "archived": false
-  },
-  {
-    "component": "codex",
-    "slug": "slot-buIlder",
-    "title": "Codex Slot Builder",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-15",
-    "path": "codex/raw/slot-buIlder.html",
-    "archived": false
-  },
-  {
     "component": "docs",
     "slug": "bedrock-service-declaration-protocol",
     "title": "bedrock-service-declaration-protocol",
     "status": "unknown",
     "category": "unspecified",
     "updated": "2026-01-15",
-    "path": "docs/nomos/raw/bedrock-service-declaration-protocol.html",
+    "path": "docs/blockchain/raw/bedrock-service-declaration-protocol.html",
     "archived": false
   },
   {
@@ -315,7 +225,7 @@
     "title": "Waku v2",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/10/waku2.html",
     "archived": false
   },
@@ -325,7 +235,7 @@
     "title": "Waku v2 Relay",
     "status": "stable",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/11/relay.html",
     "archived": false
   },
@@ -335,7 +245,7 @@
     "title": "Waku v2 Filter",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/12/filter.html",
     "archived": false
   },
@@ -345,7 +255,7 @@
     "title": "Waku Store Query",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/13/store.html",
     "archived": false
   },
@@ -355,7 +265,7 @@
     "title": "Waku v2 Message",
     "status": "stable",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/14/message.html",
     "archived": false
   },
@@ -365,7 +275,7 @@
     "title": "Waku Bridge",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/15/bridge.html",
     "archived": false
   },
@@ -375,7 +285,7 @@
     "title": "Waku v2 RPC API",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/deprecated/16/rpc.html",
     "archived": false
   },
@@ -385,7 +295,7 @@
     "title": "Waku v2 RLN Relay",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/17/rln-relay.html",
     "archived": false
   },
@@ -395,7 +305,7 @@
     "title": "Waku SWAP Accounting",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/deprecated/18/swap.html",
     "archived": false
   },
@@ -405,7 +315,7 @@
     "title": "Waku v2 Light Push",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/19/lightpush.html",
     "archived": false
   },
@@ -415,7 +325,7 @@
     "title": "Toy Ethereum Private Message",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/application/20/toy-eth-pm.html",
     "archived": false
   },
@@ -425,7 +335,7 @@
     "title": "Waku v2 Fault-Tolerant Store",
     "status": "deleted",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/deprecated/fault-tolerant-store.html",
     "archived": false
   },
@@ -435,7 +345,7 @@
     "title": "Waku v2 Toy Chat",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/informational/22/toy-chat.html",
     "archived": false
   },
@@ -445,7 +355,7 @@
     "title": "Waku v2 Topic Usage Recommendations",
     "status": "draft",
     "category": "Informational",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/informational/23/topics.html",
     "archived": false
   },
@@ -455,7 +365,7 @@
     "title": "Waku Message Payload Encryption",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/application/26/payload.html",
     "archived": false
   },
@@ -465,7 +375,7 @@
     "title": "Waku v2 Client Peer Management Recommendations",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/informational/27/peers.html",
     "archived": false
   },
@@ -475,7 +385,7 @@
     "title": "Waku v2 Client Parameter Configuration Recommendations",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/informational/29/config.html",
     "archived": false
   },
@@ -485,7 +395,7 @@
     "title": "Adaptive nodes",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/informational/30/adaptive-nodes.html",
     "archived": false
   },
@@ -495,7 +405,7 @@
     "title": "Waku v2 usage of ENR",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/31/enr.html",
     "archived": false
   },
@@ -505,7 +415,7 @@
     "title": "Waku v2 Discv5 Ambient Peer Discovery",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/33/discv5.html",
     "archived": false
   },
@@ -515,7 +425,7 @@
     "title": "Waku2 Peer Exchange",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/34/peer-exchange.html",
     "archived": false
   },
@@ -525,7 +435,7 @@
     "title": "Waku v2 C Bindings API",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/36/bindings-api.html",
     "archived": false
   },
@@ -535,7 +445,7 @@
     "title": "Waku v0",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/deprecated/5/waku0.html",
     "archived": false
   },
@@ -545,7 +455,7 @@
     "title": "X3DH usage for Waku payload encryption",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/application/53/x3dh.html",
     "archived": false
   },
@@ -555,7 +465,7 @@
     "title": "Session management for Waku X3DH",
     "status": "draft",
     "category": "Standards Track",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/application/54/x3dh-sessions.html",
     "archived": false
   },
@@ -565,7 +475,7 @@
     "title": "Waku v1",
     "status": "stable",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/legacy/6/waku1.html",
     "archived": false
   },
@@ -575,7 +485,7 @@
     "title": "Waku v2 Network",
     "status": "draft",
     "category": "Best Current Practice",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/64/network.html",
     "archived": false
   },
@@ -585,7 +495,7 @@
     "title": "Waku Metadata Protocol",
     "status": "draft",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/core/66/metadata.html",
     "archived": false
   },
@@ -595,7 +505,7 @@
     "title": "Waku Envelope data field",
     "status": "stable",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/legacy/7/data.html",
     "archived": false
   },
@@ -605,7 +515,7 @@
     "title": "Waku Mailserver",
     "status": "stable",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/legacy/8/mail.html",
     "archived": false
   },
@@ -615,238 +525,238 @@
     "title": "Waku RPC API",
     "status": "stable",
     "category": "unspecified",
-    "updated": "",
+    "updated": "2026-01-15",
     "path": "messaging/standards/legacy/9/rpc.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "Claro Consensus Protocol",
     "title": "Claro Consensus Protocol",
     "status": "deprecated",
     "category": "Standards Track",
     "updated": "2025-12-22",
-    "path": "nomos/deprecated/claro.html",
+    "path": "blockchain/deprecated/claro.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "Nomos P2P Network Bootstrapping Specification",
     "title": "Nomos P2P Network Bootstrapping Specification",
     "status": "raw",
     "category": "networking",
     "updated": "2025-12-22",
-    "path": "nomos/raw/p2p-network-bootstrapping.html",
+    "path": "blockchain/raw/p2p-network-bootstrapping.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "Nomos P2P Network NAT Solution Specification",
     "title": "Nomos P2P Network NAT Solution Specification",
     "status": "raw",
     "category": "networking",
     "updated": "2025-12-22",
-    "path": "nomos/raw/p2p-nat-solution.html",
+    "path": "blockchain/raw/p2p-nat-solution.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "Nomos P2P Network Specification",
     "title": "Nomos P2P Network Specification",
     "status": "draft",
     "category": "networking",
     "updated": "2025-12-22",
-    "path": "nomos/raw/p2p-network.html",
+    "path": "blockchain/raw/p2p-network.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "Nomos p2p Network Hardware Requirements Specification",
     "title": "Nomos p2p Network Hardware Requirements Specification",
     "status": "raw",
     "category": "infrastructure",
     "updated": "2025-12-22",
-    "path": "nomos/raw/p2p-hardware-requirements.html",
+    "path": "blockchain/raw/p2p-hardware-requirements.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "NomosDA Encoding Protocol",
     "title": "NomosDA Encoding Protocol",
     "status": "raw",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "nomos/raw/nomosda-encoding.html",
+    "path": "blockchain/raw/nomosda-encoding.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "NomosDA Network",
     "title": "NomosDA Network",
     "status": "raw",
     "category": "unspecified",
     "updated": "2025-12-22",
-    "path": "nomos/raw/nomosda-network.html",
+    "path": "blockchain/raw/nomosda-network.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "bedrock-anonymous-leaders-reward",
     "title": "Bedrock Anonymous Leaders Reward Protocol",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/bedrock-anonymous-leaders-reward.html",
+    "path": "blockchain/raw/bedrock-anonymous-leaders-reward.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "bedrock-genesis-block",
     "title": "Bedrock Genesis Block Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/bedrock-genesis-block.html",
+    "path": "blockchain/raw/bedrock-genesis-block.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "bedrock-service-declaration-protocol",
     "title": "Bedrock Service Declaration Protocol",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/bedrock-service-declaration-protocol.html",
+    "path": "blockchain/raw/bedrock-service-declaration-protocol.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "bedrock-service-reward-distribution",
     "title": "Bedrock v1.2 Service Reward Distribution Protocol",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/bedrock-service-reward-distribution.html",
+    "path": "blockchain/raw/bedrock-service-reward-distribution.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "bedrock-v1.1-block-construction",
     "title": "Bedrock v1.1 Block Construction, Validation and Execution Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/bedrock-v1.1-block-construction.html",
+    "path": "blockchain/raw/bedrock-v1.1-block-construction.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "bedrock-v1.1-mantle-specification",
     "title": "Bedrock v1.1 Mantle Specification",
     "status": "raw",
     "category": "Informational",
     "updated": "2026-01-15",
-    "path": "nomos/raw/bedrock-v1.1-mantle-specification.html",
+    "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "cryptarchia-proof-of-leadership",
     "title": "Cryptarchia Proof of Leadership Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/cryptarchia-proof-of-leadership.html",
+    "path": "blockchain/raw/cryptarchia-proof-of-leadership.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "cryptarchia-total-stake-inference",
     "title": "Cryptarchia Total Stake Inference",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/cryptarchia-total-stake-inference.html",
+    "path": "blockchain/raw/cryptarchia-total-stake-inference.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "cryptarchia-v1-bootstr-sync",
     "title": "Cryptarchia v1 Bootstrapping & Synchronization",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/cryptarchia-v1-bootstr-sync.html",
+    "path": "blockchain/raw/cryptarchia-v1-bootstr-sync.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-blend-protocol",
     "title": "Nomos Blend Protocol",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-blend-protocol.html",
+    "path": "blockchain/raw/nomos-blend-protocol.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-cryptarchia-v1-protocol",
     "title": "Nomos Cryptarchia v1 Protocol Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-cryptarchia-v1-protocol.html",
+    "path": "blockchain/raw/nomos-cryptarchia-v1-protocol.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-key-types-and-generation",
     "title": "Nomos Key Types and Generation",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-key-types-and-generation.html",
+    "path": "blockchain/raw/nomos-key-types-and-generation.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-message-encapsulation",
     "title": "Nomos Message Encapsulation Mechanism",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-message-encapsulation.html",
+    "path": "blockchain/raw/nomos-message-encapsulation.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-message-formatting",
     "title": "Nomos Message Formatting Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-message-formatting.html",
+    "path": "blockchain/raw/nomos-message-formatting.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-payload-formatting",
     "title": "Nomos Payload Formatting Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-payload-formatting.html",
+    "path": "blockchain/raw/nomos-payload-formatting.html",
     "archived": false
   },
   {
-    "component": "nomos",
+    "component": "blockchain",
     "slug": "nomos-proof-of-quota",
     "title": "Nomos Proof of Quota Specification",
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-15",
-    "path": "nomos/raw/nomos-proof-of-quota.html",
+    "path": "blockchain/raw/nomos-proof-of-quota.html",
     "archived": false
   },
   {
@@ -1158,5 +1068,95 @@
     "updated": "2026-01-15",
     "path": "archived/status/deprecated/whisper-mailserver.html",
     "archived": true
+  },
+  {
+    "component": "storage",
+    "slug": "Codex Block Exchange Protocol",
+    "title": "Codex Block Exchange Protocol",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "",
+    "path": "storage/raw/codex-block-exchange.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "codex-marketplace",
+    "title": "Codex Storage Marketplace",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "",
+    "path": "storage/raw/codex-marketplace.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "codex-merkle-tree",
+    "title": "Codex Merkle Tree",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "",
+    "path": "storage/raw/codex-merkle-tree.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "codex-prover",
+    "title": "Codex Prover Module",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "",
+    "path": "storage/raw/codex-prover.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "codex-store",
+    "title": "Codex Store Module",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "",
+    "path": "storage/raw/codex-store.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "community-history",
+    "title": "Codex Community History",
+    "status": "raw",
+    "category": "unspecified",
+    "updated": "",
+    "path": "storage/raw/community-history.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "dht",
+    "title": "Codex Discovery",
+    "status": "raw",
+    "category": "unspecified",
+    "updated": "",
+    "path": "storage/raw/dht.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "erasure-coding",
+    "title": "Codex Erasue Coding",
+    "status": "raw",
+    "category": "unspecified",
+    "updated": "",
+    "path": "storage/raw/erasure-coding.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "slot-buIlder",
+    "title": "Codex Slot Builder",
+    "status": "raw",
+    "category": "unspecified",
+    "updated": "",
+    "path": "storage/raw/slot-buIlder.html",
+    "archived": false
   }
 ]

@@ -1,9 +1,9 @@
-# Nomos LIPs
+# Blockchain LIPs
 
-Nomos is building a secure, flexible, and
+Blockchain is building a secure, flexible, and
 scalable infrastructure for developers creating applications for the network state.
 Published Specifications are currently available here,
-[Nomos Specifications](https://nomos-tech.notion.site/project).
+[Blockchain Specifications](https://nomos-tech.notion.site/project).
 
 <div class="landing-hero">
   <div class="filter-row">
@@ -31,7 +31,7 @@ Published Specifications are currently available here,
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-component="nomos"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="blockchain"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

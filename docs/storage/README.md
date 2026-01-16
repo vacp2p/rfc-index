@@ -1,8 +1,8 @@
-# Codex LIPs
+# Storage LIPs
 
-Specifications related the Codex decentralised data storage platform.
-Visit [Codex specs](https://github.com/codex-storage/codex-spec)
-to view the new Codex specifications currently under discussion.
+Specifications related the Storage decentralised data platform.
+Visit [Storage specs](https://github.com/codex-storage/codex-spec)
+to view the new Storage specifications currently under discussion.
 
 <div class="landing-hero">
   <div class="filter-row">
@@ -30,7 +30,7 @@ to view the new Codex specifications currently under discussion.
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap" data-component="codex"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="storage"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

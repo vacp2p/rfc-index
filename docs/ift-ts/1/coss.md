@@ -287,11 +287,9 @@ Specifications are introduced by projects,
 under a specific *domain*, with the intention of becoming technically mature documents.
 The IFT domain currently houses the following projects:
 
-- [Status](https://status.app/)
-- [Waku](https://waku.org/)
-- [Codex](https://codex.storage/)
-- [Nimbus](https://nimbus.team/)
-- [Nomos](https://nomos.tech/)
+- [Messaging](https://waku.org/)
+- [Storage](https://codex.storage/)
+- [Blockchain](https://nomos.tech/)
 
 When a specification is promoted to *draft* status,
 the number that is assigned MAY be incremental

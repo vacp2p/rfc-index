@@ -1,11 +1,11 @@
-# Status LIPs
+# Status RFCs
 
 Status is a communication tool providing privacy features for the user.
 Specifications can also be viewed at [Status](https://status.app/specs).
 
 <div class="landing-hero">
   <div class="filter-row">
-    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search RFCs">
     <div class="chips" id="status-chips">
       <span class="chip active" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>

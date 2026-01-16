@@ -1,4 +1,4 @@
-# Logos LIPs
+# IFT-TS LIPs
 
 IFT-TS builds public good protocols for the decentralised web.
 IFT-TS acts as a custodian for the protocols that live in the RFC-Index repository.
