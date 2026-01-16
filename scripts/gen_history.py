@@ -232,7 +232,7 @@ def main():
     root = Path("docs")
     files = find_rfc_files(root)
     if not files:
-        raise SystemExit(f"[ERROR] No RFCs found under {root}")
+        raise SystemExit(f"[ERROR] No LIPs found under {root}")
 
     updated = 0
     for file_path in files:

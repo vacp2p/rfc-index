@@ -1,10 +1,16 @@
-# Logos LIP Index
+# IFT-TS LIPs
 
-An IETF-style index of Logos-managed LIPs across Storage, Messaging, Blockchain and IFT-TS components. Use the filters below to jump straight to a specification.
+IFT-TS builds public good protocols for the decentralised web.
+IFT-TS acts as a custodian for the protocols that live in the RFC-Index repository.
+With the goal of widespread adoption,
+IFT-TS will make sure the protocols adhere to a set of principles,
+including but not limited to liberty, security, privacy, decentralisation and inclusivity.
+
+To learn more, visit [IFT-TS Research](https://vac.dev/)
 
 <div class="landing-hero">
   <div class="filter-row">
-    <input id="rfc-search" type="search" placeholder="Search by number, title, status, component..." aria-label="Search LIPs">
+    <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
     <div class="chips" id="status-chips">
       <span class="chip active" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>
@@ -12,15 +18,6 @@ An IETF-style index of Logos-managed LIPs across Storage, Messaging, Blockchain 
       <span class="chip" data-status="raw" data-label="Raw">Raw</span>
       <span class="chip" data-status="deprecated" data-label="Deprecated">Deprecated</span>
       <span class="chip" data-status="deleted" data-label="Deleted">Deleted</span>
-    </div>
-  </div>
-  <div class="filter-row">
-    <div class="chips" id="component-chips">
-      <span class="chip active" data-component="all" data-label="All components">All components</span>
-      <span class="chip" data-component="messaging" data-label="Messaging">Messaging</span>
-      <span class="chip" data-component="blockchain" data-label="Blockchain">Blockchain</span>
-      <span class="chip" data-component="storage" data-label="Storage">Storage</span>
-      <span class="chip" data-component="ift-ts" data-label="IFT-TS">IFT-TS</span>
     </div>
   </div>
   <div class="filter-row">
@@ -37,7 +34,7 @@ An IETF-style index of Logos-managed LIPs across Storage, Messaging, Blockchain 
   <div class="results-hint">Click a column to sort</div>
 </div>
 
-<div id="rfc-table-container" class="table-wrap"></div>
+<div id="rfc-table-container" class="table-wrap" data-component="ift-ts"></div>
 
 <noscript>
   <p class="noscript-note">JavaScript is required to load the RFC index table.</p>

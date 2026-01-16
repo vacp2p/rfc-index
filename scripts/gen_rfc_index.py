@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from datetime import date
 from typing import Dict, List, Optional
 import html
 import re
@@ -18,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 OUTPUT = DOCS / "rfc-index.json"
 
-EXCLUDE_FILES = {"README.md", "SUMMARY.md"}
+EXCLUDE_FILES = {"README.md", "SUMMARY.md", "about.md"}
 EXCLUDE_PARTS = {"previous-versions"}
 
 
@@ -68,7 +69,9 @@ def run_git(args: List[str]) -> str:
 def get_last_updated(path: Path) -> str:
     rel = path.relative_to(ROOT).as_posix()
     output = run_git(["log", "-1", "--format=%ad", "--date=short", "--", rel])
-    return output
+    if output:
+        return output
+    return date.today().isoformat()
 
 
 def collect() -> List[Dict[str, str]]:
@@ -89,7 +92,8 @@ def collect() -> List[Dict[str, str]]:
         title = meta.get("title") or meta.get("name") or parse_title_from_h1(text) or rel.stem
         status = meta.get("status") or "unknown"
         category = meta.get("category") or "unspecified"
-        project = rel.parts[0]
+        archived = rel.parts[0] == "archived"
+        component = rel.parts[1] if archived and len(rel.parts) > 1 else rel.parts[0]
 
         # Skip the template placeholder
         if slug == "XX":
@@ -102,17 +106,18 @@ def collect() -> List[Dict[str, str]]:
 
         entries.append(
             {
-                "project": project,
+                "component": component,
                 "slug": str(slug) if slug is not None else title,
                 "title": title,
                 "status": status,
                 "category": category,
                 "updated": updated,
                 "path": html_path,
+                "archived": archived,
             }
         )
 
-    entries.sort(key=lambda r: (r["project"], r["slug"]))
+    entries.sort(key=lambda r: (r["component"], r["slug"]))
     return entries
 
 
