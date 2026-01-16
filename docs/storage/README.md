@@ -1,6 +1,6 @@
 # Storage LIPs
 
-Specifications related the Storage decentralised data platform.
+Specifications related the Logos Storage decentralised data platform.
 Visit [Storage specs](https://github.com/codex-storage/codex-spec)
 to view the new Storage specifications currently under discussion.
 

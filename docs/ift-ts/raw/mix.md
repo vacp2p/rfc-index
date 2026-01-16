@@ -1,11 +1,13 @@
----
-title: LIBP2P-MIX
-name: Libp2p Mix Protocol
-status: raw
-category: Standards Track
-tags:
-editor: Prem Prathi <prem@status.im>
-contributors: Akshaya Mani <akshaya@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius 
+# MIX
+
+| Field | Value |
+| --- | --- |
+| Name | LIBP2P-MIX|
+| Status | raw |
+| Category | Standards Track |
+| Editor | Prem Prathi <prem@status.im>|
+| Contributors | Akshaya Mani <akshaya@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius |
+
 
 
 ## Abstract

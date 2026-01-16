@@ -1,6 +1,6 @@
 # Blockchain LIPs
 
-Blockchain is building a secure, flexible, and
+Logos Blockchain is building a secure, flexible, and
 scalable infrastructure for developers creating applications for the network state.
 Published Specifications are currently available here,
 [Blockchain Specifications](https://nomos-tech.notion.site/project).

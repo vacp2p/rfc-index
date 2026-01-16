@@ -1,6 +1,6 @@
 # Messaging LIPs
 
-Messaging builds a family of privacy-preserving,
+Logos Messaging builds a family of privacy-preserving,
 censorship-resistant communication protocols for web3 applications.
 
 Contributors can visit [Messaging LIPs](https://github.com/waku-org/specs)

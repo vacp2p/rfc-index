@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from datetime import date
 from typing import Dict, List, Optional
 import html
 import re
@@ -18,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 OUTPUT = DOCS / "rfc-index.json"
 
-EXCLUDE_FILES = {"README.md", "SUMMARY.md"}
+EXCLUDE_FILES = {"README.md", "SUMMARY.md", "about.md"}
 EXCLUDE_PARTS = {"previous-versions"}
 
 
@@ -68,7 +69,9 @@ def run_git(args: List[str]) -> str:
 def get_last_updated(path: Path) -> str:
     rel = path.relative_to(ROOT).as_posix()
     output = run_git(["log", "-1", "--format=%ad", "--date=short", "--", rel])
-    return output
+    if output:
+        return output
+    return date.today().isoformat()
 
 
 def collect() -> List[Dict[str, str]]:
