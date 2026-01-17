@@ -187,9 +187,10 @@ To compute NULL outputs, the circuit makes use of a selector bit array `selector
 where `selector_used[i] = 1` denotes a used `message_id` slot and `selector_used[i] = 0` denotes
 an unused slot.
 
-The `message_id` values MUST be provided to the circuit incrementally (e.g., `1, 2, 3, ...`),
+The `message_id` values MUST NOT be checked in the circuit incrementally (e.g., `1, 2, 3, ...`),
 independently of whether a slot is used or unused.
-The application tracks unused `message_id` values across executions to ensure that subsequent executions
+For the best practice the application MAY pass the `message_id` values incrementally and
+tracks unused `message_id` values across executions to ensure that subsequent executions
 continue from the last assigned `message_id` without reuse or skipping.
 The circuit computes the corresponding intermediate values for all slots according to the RLNv2 equations.
 
