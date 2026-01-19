@@ -140,17 +140,18 @@ The corresponding `ExtensiblePeerRecord` message is serialised into the signed e
 
 #### Signed Envelope Domain
 
-Extensible Peer Records MUST use `libp2p-routing-state` as domain separator string
+Extensible Peer Records MUST use `libp2p-peer-record` as domain separator string
 for the envelope signature.
-This is the same as for ordinary libp2p [routing records](https://github.com/libp2p/specs/blob/7740c076350b6636b868a9e4a411280eea34d335/RFC/0003-routing-records.md#signed-envelope-domain).
+This is the same as for ordinary libp2p [peer records](https://github.com/multiformats/multicodec/blob/4ec5fce8cbdd233edc27ad85cb44079dc0f7da24/table.csv#L146n).
 
 #### Signed Envelope Payload Type
 
-Extensible Peer Records MUST use the UTF8 string `/libp2p/extensible-peer-record/`
-as the `payload_type` value.
+Extensible Peer Records MUST use `0x0301` as the `payload_type` value.
+This is the [`libp2p-peer-record` multicodec code](https://github.com/multiformats/multicodec/blob/4ec5fce8cbdd233edc27ad85cb44079dc0f7da24/table.csv#L146).
 
-> **_Note:_** this will make Extensible Peer Records a subtype of the "namespace" [multicodec](https://github.com/multiformats/multicodec/blob/0c6c7d75f1580af329847dbc9900859a445ed980/table.csv).
-In future we may define a more compact multicodec type for Extensible Peer Records.
+> **_Note:_** this will ensure Extensible Peer Records are backwards compatible with other signed peer records, for now.
+In future we may define a separate multicodec type for Extensible Peer Records,
+if incompatibilities are introduced.
 
 ## Copyright
 
