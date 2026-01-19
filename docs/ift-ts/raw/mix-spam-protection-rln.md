@@ -108,7 +108,7 @@ Note: The criteria for membership is out of scope of the spec and should be impl
 The group membership data MUST be synchronized initially so that the mix node has the latest Merkle root in order to generate or verify RLN proofs.
 See [Group Synchronization](#group-synchronization) for details on maintaining synchronization.
 
-Intermediary and exit mix nodes MUST subscribe to the coordination layer in order to synchronize messaging metadata.
+Intermediary and exit mix nodes SHOULD subscribe to the coordination layer (defined [below](#coordination-layer)) in order to detect rate limit violations collaboratively.
 This ensures that mix nodes can detect spam and trigger slashing.
 
 ### Sending and forwarding messages
@@ -189,7 +189,8 @@ To identify spam messages, the node checks whether a message with an identical `
    The node MUST discard the message and MUST NOT forward it.
 3. If the `share_x` and `share_y` fields in the local cache are identical to the incoming message, then the message is a duplicate and MUST be discarded.
 
-After successfully validating a message, intermediary and exit nodes MUST broadcast the [message's metadata](#messaging-metadata) using the coordination layer to enable network-wide spam detection.
+After successfully validating a message, intermediary and exit nodes SHOULD broadcast the [message's metadata](#messaging-metadata) using the coordination layer to enable network-wide spam detection.
+The broadcast on the coordination layer MAY be batched atleast once per epoch to reduce constant traffic on coordination layer.
 
 ## Wire Format Specification / Syntax
 
