@@ -512,7 +512,6 @@ Used by advertisers to register with registrars.
 |-------|-------|-------|
 | `type` | REQUIRED | `REGISTER` (6) |
 | `key` | REQUIRED | `service_id_hash` (32 bytes) |
-| `record` | OPTIONAL | ExtensiblePeerRecord with advertiser info (for kad-DHT compatibility) |
 | `ticket` | OPTIONAL | Ticket from previous attempt |
 | All other fields | UNUSED | Empty/not set |
 
@@ -522,11 +521,6 @@ Used by advertisers to register with registrars.
 Message {
     type: REGISTER
     key: <service_id_hash>
-    record: {  // Optional
-        peer_id: <advertiser_peer_id>
-        addresses: [<addr1>, <addr2>]
-        services: [{id: "/service/1.0.0"}]
-    }
     ticket: {  // Optional, only on retry
         ad: <encoded_advertisement>
         t_init: 1234567890
