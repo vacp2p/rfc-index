@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | MVDS Usage in Status |
+| Slug | 116 |
 | Status | raw |
 | Category | Best Current Practice |
 | Editor | Kaichao Sun <kaichao@status.im> |

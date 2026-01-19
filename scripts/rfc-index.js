@@ -607,7 +607,7 @@
         ${componentCell}
         <td><span class="badge status-${normalizeStatus(item.status)}">${formatStatus(item.status)}</span></td>
         <td>${formatCategory(item.category)}</td>
-        <td>${updated}</td>
+        <td class="rfc-updated">${updated}</td>
       `;
       tbody.appendChild(tr);
     });

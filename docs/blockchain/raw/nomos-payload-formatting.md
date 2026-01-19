@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Payload Formatting Specification |
-| Slug | nomos-payload-formatting |
+| Slug | 97 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski <marcin@status.im> |

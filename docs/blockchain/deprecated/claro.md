@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Claro Consensus Protocol |
+| Slug | 140 |
 | Status | deprecated |
 | Category | Standards Track |
 | Editor | Corey Petty <corey@status.im> |

@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Logos Capability Discovery Protocol |
+| Slug | 107 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im) |

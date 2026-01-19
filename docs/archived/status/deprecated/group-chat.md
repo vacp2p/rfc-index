@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Group Chat |
+| Slug | 120 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Andrea Piana <andreap@status.im> |

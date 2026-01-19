@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Account |
+| Slug | 132 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Corey Petty <corey@status.im>, Oskar Thorén <oskar@status.im>, Samuel Hawksby-Robinson <samuel@status.im> |

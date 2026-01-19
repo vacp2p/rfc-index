@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos P2P Network NAT Solution Specification |
+| Slug | 138 |
 | Status | raw |
 | Category | networking |
 | Editor | Antonio Antonino <antonio@status.im> |

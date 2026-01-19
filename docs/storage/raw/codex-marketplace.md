@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Storage Marketplace |
-| Slug | codex-marketplace |
+| Slug | 77 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Codex Team and Dmitriy Ryajov <dryajov@status.im> |

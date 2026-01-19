@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Secure Transport |
+| Slug | 119 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Andrea Maria Piana <andreap@status.im>, Corey Petty <corey@status.im>, Dean Eigenmann <dean@status.im>, Oskar Thorén <oskar@status.im>, Pedro Pombeiro <pedro@status.im> |

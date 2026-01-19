@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Extensible Peer Records |
-| Slug | extensible-peer-records |
+| Slug | 74 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Hanno Cornelius <hanno@status.im> |

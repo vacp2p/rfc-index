@@ -1,0 +1,41 @@
+{
+  "name": "rfc-index",
+  "private": true,
+  "devDependencies": {
+    "@1stg/remark-preset": "^3.1.2",
+    "remark-cli": "^11.0.0",
+    "remark-gfm": "^3.0.1",
+    "remark-lint-emphasis-marker": "^3.0.0",
+    "remark-lint-file-extension": "^3.0.0",
+    "remark-lint-first-heading-level": "^3.0.0",
+    "remark-lint-heading-increment": "^3.0.0",
+    "remark-lint-heading-style": "^3.0.0",
+    "remark-lint-list-item-indent": "^3.0.0",
+    "remark-lint-list-item-spacing": "^3.0.0",
+    "remark-lint-maximum-heading-length": "^3.0.0",
+    "remark-lint-maximum-line-length": "^3.0.0",
+    "remark-lint-no-duplicate-headings": "^3.0.0",
+    "remark-lint-no-duplicate-headings-in-section": "^3.0.0",
+    "remark-lint-no-emphasis-as-heading": "^3.0.0",
+    "remark-lint-no-html": "^3.0.0",
+    "remark-lint-no-undefined-references": "^3.0.0",
+    "remark-lint-ordered-list-marker-value": "^3.0.0",
+    "remark-lint-table-pipe-alignment": "^3.0.0",
+    "remark-mdx": "^3.0.1",
+    "remark-preset-lint-consistent": "^5.0.0",
+    "remark-preset-lint-markdown-style-guide": "^6.0.0",
+    "remark-preset-lint-recommended": "^6.0.0",
+    "remark-preset-prettier": "^2.0.0",
+    "remark-preset-wooorm": "^9.0.0",
+    "remark-retext": "^5.0.0",
+    "retext-contractions": "^5.0.0",
+    "retext-english": "^5.0.0",
+    "retext-preset-wooorm": "^5.0.0",
+    "retext-quotes": "^5.0.0",
+    "retext-sentence-spacing": "^5.0.0",
+    "unified": "^11.0.0"
+  },
+  "scripts": {
+    "lint:remark": "remark --frail --rc-path .remarkrc.mjs \"docs/**/*.md\""
+  }
+}

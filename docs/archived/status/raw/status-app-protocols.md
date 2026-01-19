@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Status Protocol Stack |
+| Slug | 113 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Hanno Cornelius <hanno@status.im> |

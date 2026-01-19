@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Erasue Coding |
-| Slug | erasure-coding |
+| Slug | 79 |
 | Status | raw |
 
 ## Abstract

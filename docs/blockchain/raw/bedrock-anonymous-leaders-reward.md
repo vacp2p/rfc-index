@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock Anonymous Leaders Reward Protocol |
-| Slug | bedrock-anonymous-leaders-reward |
+| Slug | 85 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Thomas Lavaur <thomaslavaur@status.im> |

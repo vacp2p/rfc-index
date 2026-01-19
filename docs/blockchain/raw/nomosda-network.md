@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | NomosDA Network |
+| Slug | 136 |
 | Status | raw |
 | Editor | Daniel Sanchez Quiros <danielsq@status.im> |
 | Contributors | Álvaro Castro-Castilla <alvaro@status.im>, Daniel Kashepava <danielkashepava@status.im>, Gusto Bacvinka <augustinas@status.im>, Filip Dimitrijevic <filip@status.im> |

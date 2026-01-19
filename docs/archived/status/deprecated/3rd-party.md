@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | 3rd party |
+| Slug | 122 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Volodymyr Kozieiev <volodymyr@status.im> |

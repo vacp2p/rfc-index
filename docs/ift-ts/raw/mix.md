@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | LIBP2P-MIX|
+| Slug | 99 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Prem Prathi <prem@status.im>|

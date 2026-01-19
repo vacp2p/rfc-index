@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | NomosDA Encoding Protocol |
+| Slug | 139 |
 | Status | raw |
 | Editor | Daniel Sanchez-Quiros <danielsq@status.im> |
 | Contributors | Daniel Kashepava <danielkashepava@status.im>, Álvaro Castro-Castilla <alvaro@status.im>, Filip Dimitrijevic <filip@status.im>, Thomas Lavaur <thomaslavaur@status.im>, Mehmet Gonen <mehmet@status.im> |

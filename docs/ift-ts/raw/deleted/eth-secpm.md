@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Secure channel setup using Ethereum accounts |
+| Slug | 110 |
 | Status | deleted |
 | Category | Standards Track |
 | Editor | Ramses Fernandez <ramses@status.im> |

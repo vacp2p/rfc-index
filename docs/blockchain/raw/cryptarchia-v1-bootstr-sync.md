@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Cryptarchia v1 Bootstrapping & Synchronization |
-| Slug | cryptarchia-v1-bootstr-sync |
+| Slug | 96 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Youngjoon Lee <youngjoon@status.im> |

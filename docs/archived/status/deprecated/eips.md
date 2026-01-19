@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | EIPS |
+| Slug | 128 |
 | Status | deprecated |
 | Editor | Ricardo Guilherme Schmidt <ricardo3@status.im> |
 | Contributors | None |

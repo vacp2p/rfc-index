@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Gossipsub Tor Push |
+| Slug | 105 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Daniel Kaiser <danielkaiser@status.im> |

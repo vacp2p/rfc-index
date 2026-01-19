@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Status Simple Scaling |
+| Slug | 115 |
 | Status | raw |
 | Category | Informational |
 | Editor | Daniel Kaiser <danielkaiser@status.im> |

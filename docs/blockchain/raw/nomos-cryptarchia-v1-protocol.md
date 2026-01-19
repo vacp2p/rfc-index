@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Cryptarchia v1 Protocol Specification |
-| Slug | nomos-cryptarchia-v1-protocol |
+| Slug | 92 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | David Rusu <david@status.im> |

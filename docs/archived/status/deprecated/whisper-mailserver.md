@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Whisper mailserver |
+| Slug | 127 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Adam Babik <adam@status.im>, Oskar Thorén <oskar@status.im> |

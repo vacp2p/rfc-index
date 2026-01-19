@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Hashgraphlike Consensus Protocol |
-| Slug | consensus-hashgraphlike |
+| Slug | 73 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |

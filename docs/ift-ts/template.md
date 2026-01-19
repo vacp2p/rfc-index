@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | RFC Template |
-| Slug | XX |
+| Slug | 72 |
 | Status | raw/draft/stable/deprecated |
 | Category | Standards Track/Informational/Best Current Practice |
 | Editor | Daniel Kaiser <danielkaiser@status.im> |

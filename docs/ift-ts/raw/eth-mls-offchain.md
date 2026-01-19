@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Secure channel setup using decentralized MLS and Ethereum accounts |
+| Slug | 104 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |

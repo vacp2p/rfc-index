@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Payloads |
+| Slug | 121 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Adam Babik <adam@status.im>, Andrea Maria Piana <andreap@status.im>, Oskar Thorén <oskar@status.im> |

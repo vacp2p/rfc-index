@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Secure channel setup using decentralized MLS and Ethereum accounts |
+| Slug | 101 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ramses Fernandez <ramses@status.im> |

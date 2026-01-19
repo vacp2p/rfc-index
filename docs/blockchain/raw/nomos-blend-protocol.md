@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Blend Protocol |
-| Slug | nomos-blend-protocol |
+| Slug | 95 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski |

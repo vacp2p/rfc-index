@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Decentralized Key and Session Setup for Secure Messaging over Ethereum |
+| Slug | 103 |
 | Status | raw |
 | Category | informational |
 | Editor | Ramses Fernandez-Valencia <ramses@status.im> |

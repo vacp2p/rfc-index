@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Interep as group management for RLN |
+| Slug | 100 |
 | Status | raw |
 | Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
 

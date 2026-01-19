@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Key Types and Generation |
-| Slug | nomos-key-types-and-generation |
+| Slug | 84 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Mehmet Gonen <mehmet@status.im> |

@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Status URL Data |
+| Slug | 112 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Felicio Mununga <felicio@status.im> |

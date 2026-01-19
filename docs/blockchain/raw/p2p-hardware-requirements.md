@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos p2p Network Hardware Requirements Specification |
+| Slug | 137 |
 | Status | raw |
 | Category | infrastructure |
 | Editor | Daniel Sanchez-Quiros <danielsq@status.im> |

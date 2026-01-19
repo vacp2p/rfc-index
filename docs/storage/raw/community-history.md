@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Community History |
-| Slug | community-history |
+| Slug | 76 |
 | Status | raw |
 | Contributors | Jimmy Debe <jimmy@status.im> |
 

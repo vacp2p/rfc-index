@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Whisper Usage |
+| Slug | 131 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Adam Babik <adam@status.im>, Andrea Piana <andreap@status.im>, Corey Petty <corey@status.im>, Oskar Thorén <oskar@status.im> |

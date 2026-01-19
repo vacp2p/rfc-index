@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Dapp browser API usage |
+| Slug | 126 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 

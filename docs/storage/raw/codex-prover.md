@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Prover Module |
-| Slug | codex-prover |
+| Slug | 81 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Codex Team |
