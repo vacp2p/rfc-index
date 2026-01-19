@@ -12,7 +12,7 @@ contributors:
 ## Abstract
 
 This document specifies the Zerokit API, an implementation of the RLN-V2 protocol.
-The specification covers the unified interface exposed through native Rust,
+The specification covers the unified interface exposed through **native Rust**,
 C-compatible Foreign Function Interface (FFI) bindings,
 and WebAssembly (WASM) bindings.
 
@@ -269,7 +269,7 @@ All tree management functions are only available when `stateless` feature is **N
 
 ### Witness Calculation
 
-For **native (non-WASM)** environments, witness calculation is handled internally by the proof generation functions.
+For **native Rust**** environments, witness calculation is handled internally by the proof generation functions.
 The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
 
 For **WASM** environments, witness calculation must be performed externally using a JavaScript witness calculator.
