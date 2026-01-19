@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Message Formatting Specification |
-| Slug | nomos-message-formatting |
+| Slug | 89 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski |

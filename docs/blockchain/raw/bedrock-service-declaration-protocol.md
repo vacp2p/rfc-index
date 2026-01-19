@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock Service Declaration Protocol |
-| Slug | bedrock-service-declaration-protocol |
+| Slug | 87 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski <marcin@status.im> |

@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Block Exchange Protocol |
+| Slug | 111 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Codex Team |

@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | RLN Stealth Commitment Usage |
+| Slug | 102 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |

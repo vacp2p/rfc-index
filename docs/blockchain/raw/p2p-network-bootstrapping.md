@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos P2P Network Bootstrapping Specification |
+| Slug | 134 |
 | Status | raw |
 | Category | networking |
 | Editor | Daniel Sanchez-Quiros <danielsq@status.im> |

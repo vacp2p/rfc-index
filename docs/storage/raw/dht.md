@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Discovery |
-| Slug | dht |
+| Slug | 75 |
 | Status | raw |
 | Contributors | Jimmy Debe <jimmy@status.im>, Giuliano Mega <giuliano@status.im> |
 

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock v1.2 Service Reward Distribution Protocol |
-| Slug | bedrock-service-reward-distribution |
+| Slug | 86 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Thomas Lavaur <thomaslavaur@status.im> |

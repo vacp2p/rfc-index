@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Merkle Tree |
-| Slug | codex-merkle-tree |
+| Slug | 82 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Codex Team |

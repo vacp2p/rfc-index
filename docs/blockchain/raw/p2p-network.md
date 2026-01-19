@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos P2P Network Specification |
+| Slug | 135 |
 | Status | draft |
 | Category | networking |
 | Editor | Daniel Sanchez-Quiros <danielsq@status.im> |

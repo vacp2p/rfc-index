@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock v1.1 Block Construction, Validation and Execution Specification |
-| Slug | bedrock-v1.1-block-construction |
+| Slug | 93 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski <marcin@status.im> |

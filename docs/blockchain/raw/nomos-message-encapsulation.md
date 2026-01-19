@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Message Encapsulation Mechanism |
-| Slug | nomos-message-encapsulation |
+| Slug | 91 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski |

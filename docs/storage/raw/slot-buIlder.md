@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Slot Builder |
-| Slug | slot-buIlder |
+| Slug | 78 |
 | Status | raw |
 | Contributors | Jimmy Debe <jimmy@status.im> |
 

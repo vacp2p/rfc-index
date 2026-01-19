@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Status interactions with the Ethereum blockchain |
+| Slug | 125 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Andrea Maria Piana <andreap@status.im> |

@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Secure 1-to-1 channel setup using X3DH and the double ratchet |
+| Slug | 108 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ramses Fernandez <ramses@status.im> |

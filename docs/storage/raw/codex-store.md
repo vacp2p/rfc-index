@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Store Module |
-| Slug | codex-store |
+| Slug | 80 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Codex Team |

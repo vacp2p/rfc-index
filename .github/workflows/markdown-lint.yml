@@ -18,3 +18,20 @@ jobs:
         with:
           config: .github/workflows/.markdownlint.json
           globs: '**/*.md'
+
+  remark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Remark Linter
+        run: npm run lint:remark

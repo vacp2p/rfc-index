@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Keycard Usage for Wallet and Chat Keys |
+| Slug | 129 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Roman Volosovskyi <roman@status.im> |

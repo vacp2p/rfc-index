@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Proof of Quota Specification |
-| Slug | nomos-proof-of-quota |
+| Slug | 88 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Mehmet Gonen <mehmet@status.im> |

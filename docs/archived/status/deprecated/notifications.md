@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Notifications |
+| Slug | 130 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Eric Dvorsak <eric@status.im> |

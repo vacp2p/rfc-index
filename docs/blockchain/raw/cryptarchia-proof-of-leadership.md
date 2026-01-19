@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Cryptarchia Proof of Leadership Specification |
-| Slug | cryptarchia-proof-of-leadership |
+| Slug | 83 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Thomas Lavaur <thomas@status.im> |

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock Genesis Block Specification |
-| Slug | bedrock-genesis-block |
+| Slug | 90 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | David Rusu <davidrusu@status.im> |

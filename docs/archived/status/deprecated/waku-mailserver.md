@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Waku Mailserver |
+| Slug | 118 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Adam Babik <adam@status.im>, Oskar Thorén <oskar@status.im>, Samuel Hawksby-Robinson <samuel@status.im> |

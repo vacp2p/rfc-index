@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Rate Limit Nullifier V2 |
+| Slug | 106 |
 | Status | raw |
 | Editor | Rasul Ibragimov <curryrasul@gmail.com> |
 | Contributors | Lev Soukhanov <0xdeadfae@gmail.com> |

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock v1.1 Mantle Specification |
-| Slug | bedrock-v1.1-mantle-specification |
+| Slug | 98 |
 | Status | raw |
 | Category | Informational |
 | Editor | Thomas Lavaur <thomaslavaur@status.im> |

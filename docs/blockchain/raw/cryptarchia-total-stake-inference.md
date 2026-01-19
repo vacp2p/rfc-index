@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Cryptarchia Total Stake Inference |
-| Slug | cryptarchia-total-stake-inference |
+| Slug | 94 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | David Rusu <davidrusu@status.im> |

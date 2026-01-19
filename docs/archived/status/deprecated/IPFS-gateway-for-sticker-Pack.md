@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | IPFS gateway for Sticker Pack |
+| Slug | 117 |
 | Status | deprecated |
 | Editor | Filip Dimitrijevic <filip@status.im> |
 | Contributors | Gheorghe Pinzaru <gheorghe@status.im> |

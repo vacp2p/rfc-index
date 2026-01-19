@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Scalable Data Sync protocol for distributed logs |
+| Slug | 109 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Hanno Cornelius <hanno@status.im>|
