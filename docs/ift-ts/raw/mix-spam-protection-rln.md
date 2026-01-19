@@ -61,7 +61,7 @@ See section [System Parameters](#system-parameters) for details on the `period` 
 
 ### Overview
 
-The protocol implements RLN using a [per-hop generated proof approach](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs) approach, where each node in the mix path generates and verifies proofs.
+The protocol implements RLN using a [per-hop generated proof approach](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs), where each node in the mix path generates and verifies proofs.
 This enables network-wide spam protection while preserving user privacy.
 
 Each mix node MUST have an RLN group membership in order to send or forward messages in the mixnet.
@@ -121,7 +121,7 @@ When generating an RLN proof, the node MUST:
 
 1. Use its secret key `sk` and the current `epoch`
 2. Obtain the current Merkle root and [`path_elements`](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#obtaining-merkle-proof) from the synchronized membership tree
-3. Include all components of the **outgoing** sphinx packet [(α', β', γ', δ')](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#81-packet-structure-overview) in the proof signal. This prevents proof reuse across different messages.
+3. Generate a keccak256 hash of all components of the **outgoing** sphinx packet [(α', β', γ', δ')](https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#81-packet-structure-overview) and set it as the proof signal. This prevents proof reuse across different messages.
 
 **Sender nodes**:
 
@@ -207,7 +207,6 @@ message RateLimitProof {
    bytes share_x = 4;
    bytes share_y = 5;
    bytes nullifier = 6;
-   bytes rlnidentifier = 7;
 }
 ```
 
@@ -222,7 +221,6 @@ Below is the description of the fields of `RateLimitProof` and their types.
 |                 `epoch` | array of 32 bytes                        | the current epoch at time of sending the message                                                                                                                                                                                                                     |
 | `share_x` and `share_y` | array of 32 bytes each                   | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the hash of the message. `share_y` is calculated using [Shamir secret sharing scheme](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md) |
 |             `nullifier` | array of 32 bytes                        | internal nullifier derived from `epoch` and node's `sk` as explained in [RLN construct](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md)                                                                          |
-|         `rlnidentifier` | array of 32 bytes                        | application specific identifier as explained in [RLN](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#slashing-and-shamirs-secret-sharing)                                                                        |
 
 ### Messaging Metadata
 
