@@ -404,11 +404,11 @@ as the latter is required to contact peers.
 In this RFC, we simplify representation by listing only peer IDs,
 but full implementations SHOULD include address information.
 
-# RPC Messages
+## RPC Messages
 
 All RPC messages use the libp2p Kad-DHT message format with extensions for Logos discovery operations.
 
-## Base Message Structure
+### Base Message Structure
 
 ```protobuf
 syntax = "proto3";
@@ -467,7 +467,7 @@ message Message {
 }
 ```
 
-## Advertisement Encoding
+### Advertisement Encoding
 
 Advertisements in the `ads` field are encoded as `bytes`.
 Implementations are RECOMMENDED to use
@@ -502,11 +502,11 @@ The XPR MUST be wrapped in a signed envelope with:
 
 Alternative encodings MAY be used if they provide equivalent functionality.
 
-## REGISTER Message
+### REGISTER Message
 
 Used by advertisers to register with registrars.
 
-### REGISTER Request
+#### REGISTER Request
 
 | Field | Usage | Value |
 |-------|-------|-------|
@@ -517,6 +517,7 @@ Used by advertisers to register with registrars.
 | All other fields | UNUSED | Empty/not set |
 
 **Example:**
+
 ```protobuf
 Message {
     type: REGISTER
@@ -536,7 +537,7 @@ Message {
 }
 ```
 
-### REGISTER Response
+#### REGISTER Response
 
 | Field | Usage | Value |
 |-------|-------|-------|
@@ -547,11 +548,13 @@ Message {
 | All other fields | UNUSED | Empty/not set |
 
 **Status values:**
+
 - `CONFIRMED`: Advertisement stored in cache
 - `WAIT`: Not yet accepted, wait and retry with ticket
 - `REJECTED`: Invalid signature, duplicate, or error
 
 **Example (WAIT):**
+
 ```protobuf
 Message {
     type: REGISTER
@@ -571,6 +574,7 @@ Message {
 ```
 
 **Example (CONFIRMED):**
+
 ```protobuf
 Message {
     type: REGISTER
@@ -582,11 +586,11 @@ Message {
 }
 ```
 
-## GET_ADS Message
+### GET_ADS Message
 
 Used by discoverers to retrieve advertisements from registrars.
 
-### GET_ADS Request
+#### GET_ADS Request
 
 | Field | Usage | Value |
 |-------|-------|-------|
@@ -595,6 +599,7 @@ Used by discoverers to retrieve advertisements from registrars.
 | All other fields | UNUSED | Empty/not set |
 
 **Example:**
+
 ```protobuf
 Message {
     type: GET_ADS
@@ -602,7 +607,7 @@ Message {
 }
 ```
 
-### GET_ADS Response
+#### GET_ADS Response
 
 | Field | Usage | Value |
 |-------|-------|-------|
@@ -615,6 +620,7 @@ Each advertisement in `ads` is encoded as `bytes` (RECOMMENDED: XPR).
 Discoverers MUST verify signatures before accepting.
 
 **Example:**
+
 ```protobuf
 Message {
     type: GET_ADS
@@ -631,9 +637,9 @@ Message {
 }
 ```
 
-## Message Validation
+### Message Validation
 
-### REGISTER Request Validation
+#### REGISTER Request Validation
 
 Registrars MUST validate:
 
@@ -647,7 +653,7 @@ Registrars MUST validate:
 
 Respond with `status = REJECTED` if validation fails.
 
-### GET_ADS Request Validation
+#### GET_ADS Request Validation
 
 Registrars MUST validate:
 
@@ -656,7 +662,7 @@ Registrars MUST validate:
 
 Return empty response or close stream if validation fails.
 
-### Advertisement Signature Verification
+#### Advertisement Signature Verification
 
 Discoverers MUST verify advertisement signatures. For XPR-encoded advertisements:
 
@@ -686,16 +692,17 @@ Logos discovery uses `service_id_hash = SHA256(ServiceInfo.id)` for routing.
 When verifying, implementations MUST hash the
 protocol string and compare with `service_id_hash`.
 
-## Stream Management
+### Stream Management
 
 Following kad-DHT behavior:
+
 - Implementations MAY reuse streams for sequential requests
 - Implementations MUST handle multiple requests per stream
 - Reset stream on errors
 - Prefix messages with length as unsigned varint per
 [multiformats spec](https://github.com/multiformats/unsigned-varint)
 
-## Error Handling
+### Error Handling
 
 | Error | Handling |
 |-------|----------|
@@ -705,9 +712,10 @@ Following kad-DHT behavior:
 | Cache full | Issue ticket with waiting time |
 | Unknown service_id_hash | Empty `ads` list but include `closerPeers` |
 
-## Backwards Compatibility
+### Backwards Compatibility
 
 Logos extends kad-DHT without breaking compatibility:
+
 - Standard kad-DHT messages (FIND_NODE, GET_VALUE, etc.) unchanged
 - Nodes without Logos support ignore REGISTER and GET_ADS
 - Protocol negotiation distinguishes Logos-capable nodes
