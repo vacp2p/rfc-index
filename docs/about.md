@@ -16,6 +16,9 @@ This site is generated with mdBook from the repository:
 If you are unsure where a document belongs, open an issue first and we will
 help route it.
 
+We keep RFCs in Markdown within this repository; updates happen through
+pull requests.
+
 ## Links
 
 - IFT-TS: <https://vac.dev>
