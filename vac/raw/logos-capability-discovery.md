@@ -406,20 +406,76 @@ but full implementations SHOULD include address information.
 
 ## RPC Messages
 
-All RPC messages use the libp2p Kad-DHT message format with extensions for Logos discovery operations.
+All RPC messages use the libp2p Kad-DHT message format
+with extensions for Logos discovery operations.
 
 ### Base Message Structure
 
 ```protobuf
-syntax = "proto3";
+syntax = "proto2";
 
-message Ticket {
-    bytes ad = 1;              // Encoded advertisement (RECOMMENDED: XPR bytes)
-    uint64 t_init = 2;         // Ticket creation timestamp (Unix seconds)
-    uint64 t_mod = 3;          // Last modification timestamp (Unix seconds)
-    uint32 t_wait_for = 4;     // Remaining wait time in seconds
-    bytes signature = 5;       // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+message Register {
+    // Used in response to indicate the status of the registration
+    enum RegistrationStatus {
+        CONFIRMED = 0;
+        WAIT = 1;
+        REJECTED = 2;
+    }
+
+    // Ticket protobuf definition
+    message Ticket {
+        // Copy of the original advertisement
+        bytes advertisement = 1;
+
+        // Ticket creation timestamp (Unix time in seconds)
+        uint64 t_init = 2;
+
+        // Last modification timestamp (Unix time in seconds)
+        uint64 t_mod = 3;
+
+        // Remaining wait time in seconds
+        uint32 t_wait_for = 4;
+
+        // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+        bytes signature = 5;
+    }
+
+    // Used to indicate the encoded advertisement against the key (service ID)
+    bytes advertisement = 1;
+
+    // Used in response to indicate the status of the registration
+    RegistrationStatus status = 2;
+
+    // Used in response to provide a ticket if status is WAIT
+    // Used in request to provide a ticket if previously received
+    optional Ticket ticket = 3;
 }
+
+message GetAds {
+    // Used in response to provide a list of encoded advertisements
+    repeated bytes advertisements = 1;
+}
+
+// Record represents a dht record that contains a value
+// for a key value pair
+message Record {
+    // The key that references this record
+    bytes key = 1;
+
+    // The actual value this record is storing
+    bytes value = 2;
+
+    // Note: These fields were removed from the Record message
+    //
+    // Hash of the authors public key
+    // optional string author = 3;
+    // A PKI signature for the key+value+author
+    // optional bytes signature = 4;
+
+    // Time the record was received, set by receiver
+    // Formatted according to https://datatracker.ietf.org/doc/html/rfc3339
+    string timeReceived = 5;
+};
 
 message Message {
     enum MessageType {
@@ -429,57 +485,87 @@ message Message {
         GET_PROVIDERS = 3;
         FIND_NODE = 4;
         PING = 5;
-        REGISTER = 6;          // Logos extension
-        GET_ADS = 7;           // Logos extension
+        REGISTER = 6; // New DISC-NG capability discovery type
+        GET_ADS = 7; // New DISC-NG capability discovery type
     }
 
     enum ConnectionType {
+        // sender does not have a connection to peer, and no extra information (default)
         NOT_CONNECTED = 0;
+
+        // sender has a live connection to peer
         CONNECTED = 1;
+
+        // sender recently connected to peer
         CAN_CONNECT = 2;
+
+        // sender recently tried to connect to peer repeatedly but failed to connect
+        // ("try" here is loose, but this should signal "made strong effort, failed")
         CANNOT_CONNECT = 3;
     }
 
     message Peer {
+        // ID of a given peer.
         bytes id = 1;
+
+        // multiaddrs for a given peer
         repeated bytes addrs = 2;
+
+        // used to signal the sender's connection capabilities to the peer
         ConnectionType connection = 3;
     }
 
-    enum RegistrationStatus {
-        CONFIRMED = 0;
-        WAIT = 1;
-        REJECTED = 2;
-    }
-
-    // Core kad-DHT fields (unchanged for backwards compatibility)
+    // defines what type of message it is.
     MessageType type = 1;
-    bytes key = 2;
-    peer.pb.ExtensiblePeerRecord record = 3;
-    repeated Peer closerPeers = 8;
-    repeated Peer providerPeers = 9;
-    int32 clusterLevelRaw = 10;
 
-    // Logos discovery extensions
-    RegistrationStatus status = 11;
-    Ticket ticket = 12;
-    repeated bytes ads = 13;
+    // defines what coral cluster level this query/response belongs to.
+    // in case we want to implement coral's cluster rings in the future.
+    int32 clusterLevelRaw = 10; // NOT USED
+
+    // Used to specify the key associated with this message.
+    // PUT_VALUE, GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+    // New DISC-NG capability discovery contains service ID hash for types REGISTER, GET_ADS
+    bytes key = 2;
+
+    // Used to return a value
+    // PUT_VALUE, GET_VALUE
+    Record record = 3;
+
+    // Used to return peers closer to a key in a query
+    // GET_VALUE, GET_PROVIDERS, FIND_NODE
+    repeated Peer closerPeers = 8;
+
+    // Used to return Providers
+    // GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+    repeated Peer providerPeers = 9;
+
+    // Used in REGISTER request and response
+    Register register = 21;
+
+    // Used in GET_ADS response
+    GetAds getAds = 22;
 }
 ```
 
+**Key Design Principles:**
+
+- Standard Kad-DHT message types (`PUT_VALUE`, `GET_VALUE`, `ADD_PROVIDER`, `GET_PROVIDERS`, `FIND_NODE`, `PING`) remain completely unchanged
+- The `Record` message is preserved as-is for Kad-DHT routing table operations
+- Logos adds two new message types (`REGISTER`, `GET_ADS`) without modifying existing types
+- Advertisements are encoded as generic `bytes` to avoid coupling the protocol to specific formats
+- The existing `key` field is reused for `service_id_hash` in Logos operations
+
 ### Advertisement Encoding
 
-Advertisements in the `ads` field are encoded as `bytes`.
-Implementations are RECOMMENDED to use
-[ExtensiblePeerRecord (XPR)](https://github.com/vacp2p/rfc-index/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md):
+Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](https://github.com/vacp2p/rfc-index/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md):
 
 ```protobuf
 ExtensiblePeerRecord {
     peer_id: <advertiser_peer_id>
     seq: <monotonic_sequence>
     addresses: [
-        AddressInfo { multiaddr:  },
-        AddressInfo { multiaddr:  }
+        AddressInfo { multiaddr: <addr1> },
+        AddressInfo { multiaddr: <addr2> }
     ]
     services: [
         ServiceInfo {
@@ -500,11 +586,11 @@ The XPR MUST be wrapped in a signed envelope with:
 - Domain: `libp2p-routing-state`
 - Payload type: `/libp2p/extensible-peer-record/`
 
-Alternative encodings MAY be used if they provide equivalent functionality.
+Alternative encodings MAY be used if they provide equivalent functionality and can be verified by discoverers.
 
 ### REGISTER Message
 
-Used by advertisers to register with registrars.
+Used by advertisers to register their advertisements with registrars.
 
 #### REGISTER Request
 
@@ -512,21 +598,37 @@ Used by advertisers to register with registrars.
 |-------|-------|-------|
 | `type` | REQUIRED | `REGISTER` (6) |
 | `key` | REQUIRED | `service_id_hash` (32 bytes) |
-| `ticket` | OPTIONAL | Ticket from previous attempt |
+| `register.advertisement` | REQUIRED | Encoded advertisement as `bytes` (RECOMMENDED: XPR) |
+| `register.ticket` | OPTIONAL | Ticket from previous registration attempt |
 | All other fields | UNUSED | Empty/not set |
 
-**Example:**
+**Example (First attempt):**
 
 ```protobuf
 Message {
     type: REGISTER
     key: <service_id_hash>
-    ticket: {  // Optional, only on retry
-        ad: <encoded_advertisement>
-        t_init: 1234567890
-        t_mod: 1234567900
-        t_wait_for: 300
-        signature: <registrar_signature>
+    register: {
+        advertisement: <encoded_xpr_bytes>
+    }
+}
+```
+
+**Example (Retry with ticket):**
+
+```protobuf
+Message {
+    type: REGISTER
+    key: <service_id_hash>
+    register: {
+        advertisement: <encoded_xpr_bytes>
+        ticket: {
+            ad: <encoded_xpr_bytes>
+            t_init: 1234567890
+            t_mod: 1234567900
+            t_wait_for: 300
+            signature: <registrar_signature>
+        }
     }
 }
 ```
@@ -536,9 +638,9 @@ Message {
 | Field | Usage | Value |
 |-------|-------|-------|
 | `type` | REQUIRED | `REGISTER` (6) |
-| `status` | REQUIRED | `CONFIRMED`, `WAIT`, or `REJECTED` |
+| `register.status` | REQUIRED | `CONFIRMED`, `WAIT`, or `REJECTED` |
 | `closerPeers` | REQUIRED | List of peers for advertise table |
-| `ticket` | CONDITIONAL | Present if status = `WAIT` |
+| `register.ticket` | CONDITIONAL | Present if status = `WAIT` |
 | All other fields | UNUSED | Empty/not set |
 
 **Status values:**
@@ -552,13 +654,15 @@ Message {
 ```protobuf
 Message {
     type: REGISTER
-    status: WAIT
-    ticket: {
-        ad: <encoded_advertisement>
-        t_init: 1234567890
-        t_mod: 1234567905
-        t_wait_for: 295
-        signature: <registrar_signature>
+    register: {
+        status: WAIT
+        ticket: {
+            ad: <encoded_xpr_bytes>
+            t_init: 1234567890
+            t_mod: 1234567905
+            t_wait_for: 295
+            signature: <registrar_signature>
+        }
     }
     closerPeers: [
         {id: <peer1_id>, addrs: [<addr1>]},
@@ -572,11 +676,24 @@ Message {
 ```protobuf
 Message {
     type: REGISTER
-    status: CONFIRMED
+    register: {
+        status: CONFIRMED
+    }
     closerPeers: [
         {id: <peer1_id>, addrs: [<addr1>]},
         {id: <peer2_id>, addrs: [<addr2>]}
     ]
+}
+```
+
+**Example (REJECTED):**
+
+```protobuf
+Message {
+    type: REGISTER
+    register: {
+        status: REJECTED
+    }
 }
 ```
 
@@ -606,24 +723,24 @@ Message {
 | Field | Usage | Value |
 |-------|-------|-------|
 | `type` | REQUIRED | `GET_ADS` (7) |
-| `ads` | REQUIRED | List of encoded advertisements (up to `F_return` = 10) |
+| `getAds.advertisements` | REQUIRED | List of encoded advertisements (up to `F_return` = 10) |
 | `closerPeers` | REQUIRED | List of peers for search table |
 | All other fields | UNUSED | Empty/not set |
 
-Each advertisement in `ads` is encoded as `bytes` (RECOMMENDED: XPR).
-Discoverers MUST verify signatures before accepting.
+Each advertisement in `getAds.advertisements` is encoded as `bytes` (RECOMMENDED: XPR). Discoverers MUST verify signatures before accepting.
 
 **Example:**
 
 ```protobuf
 Message {
     type: GET_ADS
-    key: <service_id_hash>
-    ads: [
-        <encoded_xpr_bytes_1>,
-        <encoded_xpr_bytes_2>,
-        ...  // up to F_return
-    ]
+    getAds: {
+        advertisements: [
+            <encoded_xpr_bytes_1>,
+            <encoded_xpr_bytes_2>,
+            ...  // up to F_return
+        ]
+    }
     closerPeers: [
         {id: <peer1_id>, addrs: [<addr1>]},
         {id: <peer2_id>, addrs: [<addr2>]}
@@ -639,13 +756,15 @@ Registrars MUST validate:
 
 1. `type` = `REGISTER` (6)
 2. `key` = 32 bytes (valid SHA-256)
-3. If `ticket` present:
+3. `register.advertisement` is present and non-empty
+4. If `register.ticket` present:
    - Valid signature issued by this registrar
-   - `ticket.ad` matches current request
+   - `ticket.ad` matches `register.advertisement`
    - Retry within window: `ticket.t_mod + ticket.t_wait_for ≤ NOW() ≤ ticket.t_mod + ticket.t_wait_for + δ`
-4. Advertisement not already in `ad_cache`
+5. Advertisement signature is valid (see [Advertisement Signature Verification](#advertisement-signature-verification))
+6. Advertisement not already in `ad_cache`
 
-Respond with `status = REJECTED` if validation fails.
+Respond with `register.status = REJECTED` if validation fails.
 
 #### GET_ADS Request Validation
 
@@ -654,14 +773,14 @@ Registrars MUST validate:
 1. `type` = `GET_ADS` (7)
 2. `key` = 32 bytes (valid SHA-256)
 
-Return empty response or close stream if validation fails.
+Return empty `getAds.advertisements` list or close stream if validation fails.
 
 #### Advertisement Signature Verification
 
-Discoverers MUST verify advertisement signatures. For XPR-encoded advertisements:
+Both registrars (on REGISTER) and discoverers (on GET_ADS response) MUST verify advertisement signatures. For XPR-encoded advertisements:
 
 ```text
-VERIFY_ADVERTISEMENT(encoded_ad_bytes):
+VERIFY_ADVERTISEMENT(encoded_ad_bytes, service_id_hash):
     envelope = DECODE_SIGNED_ENVELOPE(encoded_ad_bytes)
     assert(envelope.domain == "libp2p-routing-state")
     assert(envelope.payload_type == "/libp2p/extensible-peer-record/")
@@ -678,23 +797,18 @@ VERIFY_ADVERTISEMENT(encoded_ad_bytes):
     assert(service_found)
 ```
 
-Discard advertisements with invalid signatures.
+Discard advertisements with invalid signatures or that don't advertise the requested service.
 
->**Note:** ExtensiblePeerRecord uses protocol strings
-(e.g., `/waku/store/1.0.0`) in `ServiceInfo.id`.
-Logos discovery uses `service_id_hash = SHA256(ServiceInfo.id)` for routing.
-When verifying, implementations MUST hash the
-protocol string and compare with `service_id_hash`.
+> **Note:** ExtensiblePeerRecord uses protocol strings (e.g., `/waku/store/1.0.0`) in `ServiceInfo.id`. Logos discovery uses `service_id_hash = SHA256(ServiceInfo.id)` for routing. When verifying, implementations MUST hash the protocol string and compare with the `key` field (`service_id_hash`).
 
 ### Stream Management
 
-Following kad-DHT behavior:
+Following standard Kad-DHT behavior:
 
 - Implementations MAY reuse streams for sequential requests
 - Implementations MUST handle multiple requests per stream
-- Reset stream on errors
-- Prefix messages with length as unsigned varint per
-[multiformats spec](https://github.com/multiformats/unsigned-varint)
+- Reset stream on protocol errors or validation failures
+- Prefix messages with length as unsigned varint per [multiformats spec](https://github.com/multiformats/unsigned-varint)
 
 ### Error Handling
 
@@ -702,19 +816,23 @@ Following kad-DHT behavior:
 |-------|----------|
 | Invalid message format | Close stream |
 | Signature verification failure | `REJECTED` for REGISTER; discard invalid ads for GET_ADS |
-| Timeout | Close stream |
-| Cache full | Issue ticket with waiting time |
-| Unknown service_id_hash | Empty `ads` list but include `closerPeers` |
+| Timeout | Close stream, retry with exponential backoff |
+| Cache full (registrar) | Issue ticket with waiting time |
+| Unknown service_id_hash | Empty `advertisements` list but include `closerPeers` |
+| Missing required fields | Close stream |
 
 ### Backwards Compatibility
 
-Logos extends kad-DHT without breaking compatibility:
+Logos extends Kad-DHT without breaking compatibility:
 
-- Standard kad-DHT messages (FIND_NODE, GET_VALUE, etc.) unchanged
-- Nodes without Logos support ignore REGISTER and GET_ADS
-- Protocol negotiation distinguishes Logos-capable nodes
+- Standard Kad-DHT messages (`PUT_VALUE`, `GET_VALUE`, `ADD_PROVIDER`, `GET_PROVIDERS`, `FIND_NODE`, `PING`) are unchanged
+- The `Record` message structure is preserved for Kad-DHT routing operations
+- Nodes without Logos support will ignore `REGISTER` and `GET_ADS` messages
+- Protocol negotiation via libp2p's multistream-select distinguishes Logos-capable nodes
 
 **Protocol identifier:** `/logos/capability-discovery/1.0.0`
+
+Implementations SHOULD support both standard Kad-DHT operations and Logos discovery operations simultaneously. Nodes operating in Kad-DHT-only mode will simply not respond to `REGISTER` or `GET_ADS` requests.
 
 ## Sequence Diagram
 
