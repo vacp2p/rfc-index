@@ -66,7 +66,7 @@ share identical serialization formats for inputs and outputs.
 
 ### Supported Features
 
-Zerokit provides compile-time feature flags that
+Zerokit provides [compile-time feature flags](https://github.com/vacp2p/zerokit/blob/c35e62a63517b0d32e91677422de4603760e41fa/rln/Cargo.toml#L65) that
 select the Merkle tree storage backend,
 configure the RLN operational mode (e.g., stateful vs. stateless),
 and enable or disable parallel execution.
