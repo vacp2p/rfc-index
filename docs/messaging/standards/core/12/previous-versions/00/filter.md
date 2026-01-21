@@ -194,25 +194,6 @@ about the content filter as well as the messages pushed to the subscribing node.
 Examples of such 2PC protocols are [Oblivious Transfers](https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains.)
 and one-way Private Set Intersections (PSI).
 
-## Changelog
-
-### Next
-
-- Added initial threat model and security analysis.
-
-### 2.0.0-beta2
-
-Initial draft version. Released [2020-10-28](https://github.com/vacp2p/specs/commit/5ceeb88cee7b918bb58f38e7c4de5d581ff31e68)
-
-- Fix: Ensure contentFilter is a repeated field, on implementation
-- Change: Add ability to unsubscribe from filters.
-Make `subscribe` an explicit boolean indication.
-Edit protobuf field order to be consistent with libp2p.
-
-### 2.0.0-beta1
-
-Initial draft version. Released [2020-10-05](https://github.com/vacp2p/specs/commit/31857c7434fa17efc00e3cd648d90448797d107b)
-
 ## Copyright
 
 Copyright and related rights waived via

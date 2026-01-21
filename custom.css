@@ -221,6 +221,23 @@ main h1 {
     }
 }
 
+@media (max-width: 700px) {
+    #mdbook-menu-bar {
+        flex-wrap: nowrap;
+    }
+
+    #mdbook-menu-bar .right-buttons {
+        margin-left: auto;
+    }
+
+    #mdbook-menu-bar .menu-title {
+        max-width: 40vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
 
 .menu-title-link {
     position: absolute;
