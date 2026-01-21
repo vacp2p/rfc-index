@@ -1483,6 +1483,7 @@ and one-way Private Set Intersections (PSI).</li>
 </div><!-- timeline:start -->
 <h2 id="timeline-3"><a class="header" href="#timeline-3">Timeline</a></h2>
 <ul>
+<li><strong>2026-01-21</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/a00f16ed60dc8479361f247328ccd2d25338c5f1/docs/messaging/standards/core/12/previous-versions/00/filter.md"><code>a00f16e</code></a> — chore: mdbook fixes (#265)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/messaging/standards/core/12/previous-versions/00/filter.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/standards/core/12/previous-versions/00/filter.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
 <li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/standards/core/12/previous-versions/00/filter.md"><code>0f1855e</code></a> — Chore/fix headers (#239)</li>
@@ -1651,21 +1652,6 @@ about the content filter as well as the messages pushed to the subscribing node.
 Examples of such 2PC protocols are <a href="https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-5906-5_9#:~:text=Oblivious%20transfer%20(OT)%20is%20a,information%20the%20receiver%20actually%20obtains.">Oblivious Transfers</a>
 and one-way Private Set Intersections (PSI).</li>
 </ul>
-<h2 id="changelog"><a class="header" href="#changelog">Changelog</a></h2>
-<h3 id="next"><a class="header" href="#next">Next</a></h3>
-<ul>
-<li>Added initial threat model and security analysis.</li>
-</ul>
-<h3 id="200-beta2"><a class="header" href="#200-beta2">2.0.0-beta2</a></h3>
-<p>Initial draft version. Released <a href="https://github.com/vacp2p/specs/commit/5ceeb88cee7b918bb58f38e7c4de5d581ff31e68">2020-10-28</a></p>
-<ul>
-<li>Fix: Ensure contentFilter is a repeated field, on implementation</li>
-<li>Change: Add ability to unsubscribe from filters.
-Make <code>subscribe</code> an explicit boolean indication.
-Edit protobuf field order to be consistent with libp2p.</li>
-</ul>
-<h3 id="200-beta1"><a class="header" href="#200-beta1">2.0.0-beta1</a></h3>
-<p>Initial draft version. Released <a href="https://github.com/vacp2p/specs/commit/31857c7434fa17efc00e3cd648d90448797d107b">2020-10-05</a></p>
 <h2 id="copyright-3"><a class="header" href="#copyright-3">Copyright</a></h2>
 <p>Copyright and related rights waived via
 <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
@@ -7133,7 +7119,7 @@ to avoid too much traffic on a single topic.</p>
 <p>Resource restricted devices SHOULD use <a href="https://eips.ethereum.org/EIPS/eip-1459">EIP-1459</a>
 to discover nodes.</p>
 <p>Known static nodes MAY also be used.</p>
-<h2 id="changelog-1"><a class="header" href="#changelog-1">Changelog</a></h2>
+<h2 id="changelog"><a class="header" href="#changelog">Changelog</a></h2>
 <h3 id="initial-release"><a class="header" href="#initial-release"><a href="https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8">Initial Release</a></a></h3>
 <ul>
 <li>Add section on P2P Request Complete packet and update packet code table.</li>
@@ -7446,7 +7432,7 @@ their direct peers which is discussed in the security considerations of <a href=
 <p><strong>Mailserver trusted connection:</strong></p>
 <p>A mailserver has a direct TCP connection, which means they are trusted to send traffic.
 This means a malicious or malfunctioning mailserver can overwhelm an individual node.</p>
-<h2 id="changelog-2"><a class="header" href="#changelog-2">Changelog</a></h2>
+<h2 id="changelog-1"><a class="header" href="#changelog-1">Changelog</a></h2>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Version</th><th>Comment</th></tr></thead><tbody>
 <tr><td style="text-align: center"><a href="https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8">1.0.0</a></td><td>marked stable as it is in use.</td></tr>
 <tr><td style="text-align: center">0.2.0</td><td>Add topic interest to reduce bandwidth usage</td></tr>
@@ -7838,7 +7824,7 @@ It can not be both.</em></p>
 <code>true</code> on success or
 an <a href="https://www.jsonrpc.org/specification#error_object">error</a> on failure.</li>
 </ul>
-<h2 id="changelog-3"><a class="header" href="#changelog-3">Changelog</a></h2>
+<h2 id="changelog-2"><a class="header" href="#changelog-2">Changelog</a></h2>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Version</th><th>Comment</th></tr></thead><tbody>
 <tr><td style="text-align: center"><a href="https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8">1.0.0</a></td><td>Initial release.</td></tr>
 </tbody></table>
@@ -8966,7 +8952,7 @@ to avoid too much traffic on a single topic.</p>
 <p>Resource restricted devices SHOULD use
 <a href="https://eips.ethereum.org/EIPS/eip-1459">EIP-1459</a> to discover nodes.</p>
 <p>Known static nodes MAY also be used.</p>
-<h2 id="changelog-4"><a class="header" href="#changelog-4">Changelog</a></h2>
+<h2 id="changelog-3"><a class="header" href="#changelog-3">Changelog</a></h2>
 <h3 id="version-06-1"><a class="header" href="#version-06-1">Version 0.6</a></h3>
 <p>Released <a href="https://github.com/vacp2p/specs/commit/9e650995f24179844857520c68fa3e8f6018b125">April 21,2020</a></p>
 <ul>
@@ -35498,7 +35484,7 @@ they've revealed when requesting to join a community.</p>
 which might break compatibility</li>
 </ul>
 <h2 id="security-considerations-31"><a class="header" href="#security-considerations-31">Security Considerations</a></h2>
-<h2 id="changelog-5"><a class="header" href="#changelog-5">Changelog</a></h2>
+<h2 id="changelog-4"><a class="header" href="#changelog-4">Changelog</a></h2>
 <h3 id="version-05-2"><a class="header" href="#version-05-2">Version 0.5</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/968fafff23cdfc67589b34dd64015de29aaf41f0">August 25, 2020</a></p>
 <ul>
@@ -37982,7 +37968,7 @@ Status’s privacy policy is hosted on Iubenda.</p>
 <p><strong>Concerns</strong><br />
 If Iubenda becomes unavailable,<br />
 users will be unable to view the app's privacy policy.</p>
-<h2 id="changelog-6"><a class="header" href="#changelog-6">Changelog</a></h2>
+<h2 id="changelog-5"><a class="header" href="#changelog-5">Changelog</a></h2>
 <div class="table-wrapper"><table><thead><tr><th>Version</th><th>Comment</th></tr></thead><tbody>
 <tr><td>0.1.0</td><td>Initial release</td></tr>
 </tbody></table>
@@ -38376,7 +38362,7 @@ that the user MUST provide a serialized public key for deserialization. Else the
 <ul>
 <li></li>
 </ul>
-<h2 id="changelog-7"><a class="header" href="#changelog-7">Changelog</a></h2>
+<h2 id="changelog-6"><a class="header" href="#changelog-6">Changelog</a></h2>
 <h3 id="version-04-3"><a class="header" href="#version-04-3">Version 0.4</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/e98a9b76b7d4e1ce93e0b692e1521c2d54f72c59">June 24, 2020</a></p>
 <ul>
@@ -38683,7 +38669,7 @@ though the trade-off space is likely suboptimal in terms of the <a href="https:/
 <p>See <a href="https://github.com/status-im/status-mobile/issues/6351">https://github.com/status-im/status-mobile/issues/6351</a> for some discussion.</p>
 <h2 id="acknowledgments-2"><a class="header" href="#acknowledgments-2">Acknowledgments</a></h2>
 <p>Jacek Sieka</p>
-<h2 id="changelog-8"><a class="header" href="#changelog-8">Changelog</a></h2>
+<h2 id="changelog-7"><a class="header" href="#changelog-7">Changelog</a></h2>
 <h3 id="version-03-4"><a class="header" href="#version-03-4">Version 0.3</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
@@ -38817,7 +38803,7 @@ Thus it is possible to inject a function call passing Status node response back 
 <li><a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1102.md">EIP1102</a>: <code>eth_requestAccounts</code> support</li>
 <li><a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md">EIP1193</a>: <code>connect</code>, <code>disconnect</code>, <code>chainChanged</code>, and <code>accountsChanged</code> event support is not implemented</li>
 </ul>
-<h2 id="changelog-9"><a class="header" href="#changelog-9">Changelog</a></h2>
+<h2 id="changelog-8"><a class="header" href="#changelog-8">Changelog</a></h2>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Version</th><th>Comment</th></tr></thead><tbody>
 <tr><td style="text-align: center">0.1.0</td><td>Initial Release</td></tr>
 </tbody></table>
@@ -40154,7 +40140,7 @@ The details are in the <a href="archived/status/deprecated//archived/status/depr
 <li>A node does not support deletion of existing fields or messages, which might break compatibility</li>
 </ul>
 <h2 id="security-considerations-36"><a class="header" href="#security-considerations-36">Security Considerations</a></h2>
-<h2 id="changelog-10"><a class="header" href="#changelog-10">Changelog</a></h2>
+<h2 id="changelog-9"><a class="header" href="#changelog-9">Changelog</a></h2>
 <h3 id="version-03-5"><a class="header" href="#version-03-5">Version 0.3</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
@@ -40722,7 +40708,7 @@ But you can register with multiple servers (desktop, status, etc) if that's a co
 <h3 id="can-someone-else-ie-not-status-run-this"><a class="header" href="#can-someone-else-ie-not-status-run-this">Can someone else (i.e not status) run this?</a></h3>
 <p>Push notification servers can be run by anyone. Gorush can be run by anyone I take,
 but we are in charge of the certificate, so they would not be able to notify status-clients.</p>
-<h2 id="changelog-11"><a class="header" href="#changelog-11">Changelog</a></h2>
+<h2 id="changelog-10"><a class="header" href="#changelog-10">Changelog</a></h2>
 <h3 id="version-01-2"><a class="header" href="#version-01-2">Version 0.1</a></h3>
 <p><a href="https://github.com/status-im/specs/commit/">Released</a></p>
 <ul>
@@ -41242,7 +41228,7 @@ The node sends messages using pairwise encryption, including their own devices.<
 it is possible that a device will receive a message that is not targeted to its own <code>installation-id</code>.
 In this case an empty message containing bundle information is sent back,
 which will notify the receiving end of including this device in any further communication.</p>
-<h2 id="changelog-12"><a class="header" href="#changelog-12">Changelog</a></h2>
+<h2 id="changelog-11"><a class="header" href="#changelog-11">Changelog</a></h2>
 <h3 id="version-03-6"><a class="header" href="#version-03-6">Version 0.3</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
@@ -41357,7 +41343,7 @@ when it is online as well as many metadata like IP address.</p>
 <h3 id="denial-of-service"><a class="header" href="#denial-of-service">Denial-of-service</a></h3>
 <p>Since a <code>Mailserver</code> is delivering expired envelopes and has a direct TCP connection with the recipient,
 the recipient is vulnerable to DoS attacks from a malicious <code>Mailserver</code> node.</p>
-<h2 id="changelog-13"><a class="header" href="#changelog-13">Changelog</a></h2>
+<h2 id="changelog-12"><a class="header" href="#changelog-12">Changelog</a></h2>
 <h3 id="version-01-3"><a class="header" href="#version-01-3">Version 0.1</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
@@ -41657,7 +41643,7 @@ To move further back in time, use <code>cursor</code> and <code>limit</code>.</p
 <code>Boolean</code> - returns <code>true</code> if the request was sent.</p>
 <p>The above <code>topics</code> is then converted into a bloom filter and then and sent to the <code>Mailserver</code>.</p>
 <!-- TODO: Clarify actual request with bloom filter to mailserver -->
-<h2 id="changelog-14"><a class="header" href="#changelog-14">Changelog</a></h2>
+<h2 id="changelog-13"><a class="header" href="#changelog-13">Changelog</a></h2>
 <h3 id="version-01-4"><a class="header" href="#version-01-4">Version 0.1</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
@@ -41799,7 +41785,7 @@ when it is online as well as many metadata like IP address.</p>
 <h3 id="denial-of-service-1"><a class="header" href="#denial-of-service-1">Denial-of-service</a></h3>
 <p>Since a <code>Mailserver</code> is delivering expired envelopes and has a direct TCP connection with the recipient,
 the recipient is vulnerable to DoS attacks from a malicious <code>Mailserver</code> node.</p>
-<h2 id="changelog-15"><a class="header" href="#changelog-15">Changelog</a></h2>
+<h2 id="changelog-14"><a class="header" href="#changelog-14">Changelog</a></h2>
 <h3 id="version-03-7"><a class="header" href="#version-03-7">Version 0.3</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
@@ -42122,7 +42108,7 @@ To move further back in time, use <code>cursor</code> and <code>limit</code>.</p
 <code>Boolean</code> - returns <code>true</code> if the request was sent.</p>
 <p>The above <code>topics</code> is then converted into a bloom filter and then and sent to the <code>Mailserver</code>.</p>
 <!-- TODO: Clarify actual request with bloom filter to mailserver -->
-<h2 id="changelog-16"><a class="header" href="#changelog-16">Changelog</a></h2>
+<h2 id="changelog-15"><a class="header" href="#changelog-15">Changelog</a></h2>
 <h3 id="version-03-8"><a class="header" href="#version-03-8">Version 0.3</a></h3>
 <p>Released <a href="https://github.com/status-im/specs/commit/664dd1c9df6ad409e4c007fefc8c8945b8d324e8">May 22, 2020</a></p>
 <ul>
