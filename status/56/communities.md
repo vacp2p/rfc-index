@@ -257,8 +257,6 @@ message CommunityCancelRequestToJoin {
   bytes community_id = 4;
   // The display name of the requester
   string display_name = 5;
-  // Magnet uri for community history protocol
-  string magnet_uri = 6;
 }
 
 message CommunityRequestToJoinResponse {
