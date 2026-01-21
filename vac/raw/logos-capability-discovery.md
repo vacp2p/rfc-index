@@ -124,7 +124,7 @@ The number of entries a bucket can hold is implementation-dependent.
 Implementations SHOULD ensure that each bucket contains only unique peers.
 If the peer to be added is already present in the bucket,
 the implementation SHOULD NOT create a duplicate entry
-and SHOULD instead update the existing entry’s metadata.
+and SHOULD instead update the existing entry.
 
 **Bucket Overflow Handling:**
 
@@ -268,12 +268,10 @@ message Advertisement {
     bytes peerID = 2;            // Peer ID of advertiser
     repeated bytes addrs = 3;    // Multiaddrs of advertiser
     bytes signature = 4;         // Ed25519 signature over (service_id_hash || peerID || addrs)
-    optional bytes metadata = 5; // Service-specific metadata
 }
 ```
 
 Advertisements MUST include `service_id_hash`, `peerID`, `addrs` and `signature`.
-Advertisements MAY include `metadata`.
 The `signature` field MUST be a Ed25519 signature over the concatenation of
 (`service_id_hash` || `peerID` || `addrs`).
 Refer to [Signature](#signature) section for more details.
@@ -1279,7 +1277,6 @@ if there are no other active `ad` in `ad_cache` from the same IP.
 
 #### `ADD_IP_TO_TREE()` algorithm
 
-We RECOMMEND the `ADD_IP_TO_TREE()` algorithm for adding IPv4 addresses to the IP tree.
 The algorithm traverses the tree following the IP's binary representation,
 incrementing counters at each visited node.
 
@@ -1300,7 +1297,6 @@ end procedure
 
 #### `CALCULATE_IP_SCORE()` algorithm
 
-We RECOMMEND the `CALCULATE_IP_SCORE()` algorithm for calculating IP similarity scores.
 The algorithm traverses the tree following the IP's binary representation
 to detect how many IPs share common prefixes, providing a Sybil attack measure.
 At each node, if the `IP_counter` is larger than expected in a perfectly balanced tree,
@@ -1327,7 +1323,6 @@ end procedure
 
 #### `REMOVE_FROM_IP_TREE()` algorithm
 
-We RECOMMEND the `REMOVE_FROM_IP_TREE()` algorithm for removing IPv4 addresses from the IP tree.
 This algorithm traverses the tree following the IP's binary representation,
 decrementing counters at each visited node.
 
@@ -1562,8 +1557,6 @@ Implementations should consider these trade-offs carefully when selecting approp
 Refer to the [Registration Flow section](#registration-flow) for the pseudocode
 
 1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
-Duplicates are not allowed.
-An advertiser can place at most one `ad` for a specific `service_id_hash` in the `ad_cache` of a given registrar.
 2. Prepare a response ticket `response.ticket` linked to this `ad`.
 3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
 Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for details.
@@ -1596,26 +1589,25 @@ to the response (the advertiser uses this to update `AdvT(service_id_hash)`).
 
 Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
 before trying to register again with the same registrar.
-Each new registration attempt must include the latest ticket issued by that registrar.
 
-A ticket can only be used within a limited **registration window** `δ`,
-which is chosen to cover the maximum expected delay between the advertiser and registrar.
-This rule prevents attackers from collecting many tickets, accumulating waiting times,
-and submitting them all at once to overload the registrar.
+Tickets can only be used within registration window `δ`,
+preventing attackers from accumulating and batch-submitting tickets.
+Clock synchronization is not required as advertisers only use `t_wait_for` values.
 
-Advertisers only read the waiting time `t_wait` from the ticket —
-they do **not** use the creation time `t_init` or the modification time `t_mod`.
-Therefore, **clock** synchronization between advertisers and registrars is not required.
+Waiting times are recalculated on each retry based on current cache state, ensuring advertisers accumulate waiting time and are eventually admitted. This stateless design protects registrars from memory exhaustion and DoS attacks.
 
 The waiting time `t_wait` is not fixed.
 Each time an advertiser tries to register,
-the registrar recalculates a new waiting time based on its current cache state.
+the registrar recalculates a new waiting time.
 The remaining time `t_remaining` is then computed as the difference between
-the new waiting time and the time the advertiser has already waited, as recorded in the ticket.
+the new waiting time and the time the advertiser has already waited,
+as recorded in the ticket.
 With every retry, the advertiser accumulates waiting time and will eventually be admitted.
 However, if the advertiser misses its registration window or fails to include the last ticket,
-it loses all accumulated waiting time and must restart the registration process from the beginning.
-Implementations must consider these factors while deciding the registration window `δ` time.
+it loses all accumulated waiting time and
+must restart the registration process from the beginning.
+Implementations must consider these factors
+while deciding the registration window `δ` time.
 
 This design lets registrars prioritize advertisers that have waited longer
 without keeping any per-request state before the `ad` is admitted to the cache.
