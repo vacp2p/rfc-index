@@ -351,6 +351,26 @@
   },
   {
     "component": "ift-ts",
+    "slug": "141",
+    "title": "Multi-message_id burn feature RLN",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-21",
+    "path": "ift-ts/raw/multi-message_id-burn-rln.html",
+    "archived": false
+  },
+  {
+    "component": "ift-ts",
+    "slug": "142",
+    "title": "Zerokit API",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-21",
+    "path": "ift-ts/raw/zerokit-api.html",
+    "archived": false
+  },
+  {
+    "component": "ift-ts",
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
