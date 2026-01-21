@@ -6,8 +6,19 @@ status: draft
 tags: waku-core
 editor: Richard Ramos <richard@status.im>
 contributors:
-- Franck Royer <franck@status.im>
+ - Franck Royer <franck@status.im>
+ - Filip Dimitrijevic <filip@status.im>
 ---
+
+Based on your comprehensive RFC specification, here's an abstract that captures the essence of your work:
+
+## Abstract
+
+This specification defines a standardized C API for integrating Waku v2 functionality into native applications that cannot use nwaku's JSON RPC API due to packaging, performance, or executable constraints. The API provides a generic interface that can be implemented by both nwaku and go-waku C bindings, enabling consumption from multiple programming languages including C#, Kotlin, Swift, Rust, and C++.
+
+The API uses JSON as the primary data exchange format and provides comprehensive support for all core Waku protocols including Relay (pub/sub messaging), Filter (lightweight message filtering), Lightpush (resource-constrained publishing), and Store (historical message retrieval). Additionally, the specification includes message encryption and decryption capabilities using both symmetric and asymmetric cryptography, peer discovery mechanisms through DNS Discovery and DiscoveryV5, and comprehensive node lifecycle management.
+
+All API functions use callback-based asynchronous execution patterns with standardized status codes and error handling. The specification aims to provide a complete, production-ready interface for native applications to leverage the full capabilities of the Waku v2 decentralized messaging protocol while maintaining cross-platform compatibility and implementation flexibility.
 
 ## Introduction
 
@@ -41,9 +52,9 @@ structure, protobuf) if it brings limitations that need to be lifted.
 
 #### `WakuCallBack` type
 
-All the API functions require passing callbacks
+All the API functions require passing callbacks,
 which will be executed depending on the result of the execution result.
-These callbacks are defined as
+These callbacks are defined as:
 
 ```c
 typedef void (*WakuCallBack) (const char* msg, size_t len_0);
@@ -70,10 +81,10 @@ A Waku Message in JSON Format:
 
 ```ts
 {
-    payload: string;
-    contentTopic: string;
-    version: number;
-    timestamp: number;
+  payload: string;   
+  contentTopic: string;
+  version: number;
+  timestamp: number;
 }
 ```
 
@@ -92,11 +103,10 @@ A payload once decoded, used when a received Waku Message is encrypted:
 
 ```ts
 interface DecodedPayload {
-    pubkey?: string;
-    signature?: string;
-    data: string;
-    padding: string;
-  }
+  pubkey?: string;
+  signature?: string;
+  data: string;
+}
 ```
 
 Fields:
@@ -112,10 +122,9 @@ hex encoded with `0x` prefix,
 The criteria to create subscription to a light node in JSON Format:
 
 ```ts
-{
-    contentFilters: ContentFilter[];
-    pubsubTopic: string?;
-}
+type FilterSubscription* = object
+peerId*: string
+filterCriteria*: seq[FilterTopic]
 ```
 
 Fields:
@@ -128,7 +137,7 @@ being subscribed to / unsubscribed from.
 
 ```ts
 {
-    contentTopic: string;
+  contentTopic: string;
 }
 ```
 
@@ -142,12 +151,12 @@ Criteria used to retrieve historical messages
 
 ```ts
 interface StoreQuery {
-    pubsubTopic?: string;
-    contentFilters?: ContentFilter[];
-    startTime?: number;
-    endTime?: number;
-    pagingOptions?: PagingOptions
-  }
+  pubsubTopic?: string;
+  contentFilters?: ContentFilter[];
+  startTime?: number;
+  endTime?: number;
+  pagingOptions?: PagingOptions
+}
 ```
 
 Fields:
@@ -167,9 +176,9 @@ The response received after doing a query to a store node:
 
 ```ts
 interface StoreResponse {
-    messages: JsonMessage[];
-    pagingOptions?: PagingOptions;
-  }
+  messages: JsonMessage[];
+  pagingOptions?: PagingOptions;
+}
 ```
 
 Fields:
@@ -183,10 +192,10 @@ from which to resume further historical queries
 
 ```ts
 interface PagingOptions {
-    pageSize: number;
-    cursor?: Index;
-    forward: bool;
-  }
+  pageSize: number;
+  cursor?: Index;
+  forward: bool;
+}
 ```
 
 Fields:
@@ -203,11 +212,11 @@ paging will be performed from the end of the list.
 
 ```ts
 interface Index {
-    digest: string;
-    receiverTime: number;
-    senderTime: number;
-    pubsubTopic: string;
-  }
+  digest: string;
+  receiverTime: number;
+  senderTime: number;
+  pubsubTopic: string;
+}
 ```
 
 Fields:
@@ -230,8 +239,8 @@ this callback will be triggered receiving a JSON string of type `JsonSignal`.
 
 ```ts
 {
-    type: string;
-    event: any;
+  type: string;
+  event: any;
 }
 ```
 
@@ -268,9 +277,9 @@ Type of `event` field for a `message` event:
 
 ```ts
 {
-    pubsubTopic: string;
-    messageId: string;
-    wakuMessage: JsonMessage;
+  pubsubTopic: string;
+  messageId: string;
+  wakuMessage: JsonMessage;
 }
 ```
 
@@ -299,25 +308,25 @@ Type holding a node configuration:
 
 ```ts
 interface JsonConfig {
-    host?: string;
-    port?: number;
-    advertiseAddr?: string;
-    nodeKey?: string;
-    keepAliveInterval?: number;
-    relay?: boolean;
-    relayTopics?: Array<string>;
-    gossipsubParameters?: GossipSubParameters;
-    minPeersToPublish?: number
-    legacyFilter?: boolean;
-    discV5?: boolean;
-    discV5BootstrapNodes?: Array<string>;
-    discV5UDPPort?: number;
-    store?: boolean;
-    databaseURL?: string;
-    storeRetentionMaxMessages?: number;
-    storeRetentionTimeSeconds?: number;
-    websocket?: Websocket;
-    dns4DomainName?: string;
+  host?: string;
+  port?: number;
+  advertiseAddr?: string;
+  nodeKey?: string;
+  keepAliveInterval?: number;
+  relay?: boolean;
+  relayTopics?: Array<string>;
+  gossipsubParameters?: GossipSubParameters;
+  minPeersToPublish?: number
+  legacyFilter?: boolean;
+  discV5?: boolean;
+  discV5BootstrapNodes?: Array<string>;
+  discV5UDPPort?: number;
+  store?: boolean;
+  databaseURL?: string;
+  storeRetentionMaxMessages?: number;
+  storeRetentionTimeSeconds?: number;
+  websocket?: Websocket;
+  dns4DomainName?: string;
 }
 ```
 
@@ -343,8 +352,7 @@ Interval in seconds for pinging peers to keep the connection alive.
   Default `20`.
 - `relay`: Enable relay protocol.
   Default `true`.
-- `relayTopics`:
-Array of pubsub topics that WakuRelay will automatically subscribe to
+- `relayTopics`: Array of pubsub topics that WakuRelay will automatically subscribe to
 when the node starts
   Default `[]`
 - `gossipSubParameters`: custom gossipsub parameters.
@@ -392,34 +400,34 @@ Type holding custom gossipsub configuration:
 
 ```ts
 interface GossipSubParameters {
-    D?: number;
-    D_low?: number;
-    D_high?: number;
-    D_score?: number;
-    D_out?: number;
-    HistoryLength?: number;
-    HistoryGossip?: number;
-    D_lazy?: number;
-    GossipFactor?: number;
-    GossipRetransmission?: number;
-    HeartbeatInitialDelayMs?: number;
-    HeartbeatIntervalSeconds?: number;
-    SlowHeartbeatWarning?: number;
-    FanoutTTLSeconds?: number;
-    PrunePeers?: number;
-    PruneBackoffSeconds?: number;
-    UnsubscribeBackoffSeconds?: number;
-    Connectors?: number;
-    MaxPendingConnections?: number;
-    ConnectionTimeoutSeconds?: number;
-    DirectConnectTicks?: number;
-    DirectConnectInitialDelaySeconds?: number;
-    OpportunisticGraftTicks?: number;
-    OpportunisticGraftPeers?: number;
-    GraftFloodThresholdSeconds?: number;
-    MaxIHaveLength?: number;
-    MaxIHaveMessages?: number;
-    IWantFollowupTimeSeconds?: number;
+  D?: number;
+  D_low?: number;
+  D_high?: number;
+  D_score?: number;
+  D_out?: number;
+  HistoryLength?: number;
+  HistoryGossip?: number;
+  D_lazy?: number;
+  GossipFactor?: number;
+  GossipRetransmission?: number;
+  HeartbeatInitialDelayMs?: number;
+  HeartbeatIntervalSeconds?: number;
+  SlowHeartbeatWarning?: number;
+  FanoutTTLSeconds?: number;
+  PrunePeers?: number;
+  PruneBackoffSeconds?: number;
+  UnsubscribeBackoffSeconds?: number;
+  Connectors?: number;
+  MaxPendingConnections?: number;
+  ConnectionTimeoutSeconds?: number;
+  DirectConnectTicks?: number;
+  DirectConnectInitialDelaySeconds?: number;
+  OpportunisticGraftTicks?: number;
+  OpportunisticGraftPeers?: number;
+  GraftFloodThresholdSeconds?: number;
+  MaxIHaveLength?: number;
+  MaxIHaveMessages?: number;
+  IWantFollowupTimeSeconds?: number;
 }
 ```
 
@@ -511,12 +519,12 @@ Type holding custom websocket support configuration:
 
 ```ts
 interface Websocket {
-    enabled?: bool;
-    host?: string;
-    port?: number;
-    secure?: bool;
-    certPath?: string;
-    keyPath?: string;
+  enabled?: bool;
+  host?: string;
+  port?: number;
+  secure?: bool;
+  certPath?: string;
+  keyPath?: string;
 }
 ```
 
@@ -530,13 +538,13 @@ Unless selfsigned certificates are used,
 it will probably make sense in the `JsonConfiguration`
 to specify the domain name used in the certificate in the `dns4DomainName` attribute.
 
-- `enabled`:  indicates if websockets support will be enabled
+- `enabled`: indicates if websockets support will be enabled
   Default `false`
 - `host`: listening address for websocket connections
   Default `0.0.0.0`
 - `port`: TCP listening port for websocket connection
 (`0` for random, binding to `443` requires root access)
-  Default `60001`, if secure websockets support is enabled, the default is `6443“`
+  Default `60001`, if secure websockets support is enabled, the default is `6443"`
 - `secure`: enable secure websockets support
   Default `false`
 - `certPath`: secure websocket certificate path
@@ -554,8 +562,8 @@ Parameters
 
 1. `char* jsonConfig`:
 JSON string containing the options used to initialize a waku node.
-   Type [`JsonConfig`](#jsonconfig-type).
-   It can be `NULL` to use defaults.
+  Type [`JsonConfig`](#jsonconfig-type).
+  It can be `NULL` to use defaults.
 2. `WakuCallBack onErrCb`: [`WakuCallBack`](#wakucallback-type).
 Callback to be executed if the function fails
 
@@ -659,9 +667,9 @@ The multiaddresses are `string`s. For example:
 
 ```json
 [
-    "/ip4/127.0.0.1/tcp/30303",
-    "/ip4/1.2.3.4/tcp/30303",
-    "/dns4/waku.node.example/tcp/8000/wss"
+  "/ip4/127.0.0.1/tcp/30303",
+  "/ip4/1.2.3.4/tcp/30303",
+  "/dns4/waku.node.example/tcp/8000/wss"
 ]
 ```
 
@@ -677,7 +685,7 @@ The multiaddresses are `string`s. For example:
 extern int waku_add_peer(char* address, char* protocolId, WakuCallBack onOkCb, WakuCallBack onErrCb){}
 ```
 
-Add a node multiaddress and protocol to the waku node's peerstore.
+Add a node multiaddress and protocol to the Waku node's peerstore.
 
 Parameters
 
@@ -708,9 +716,9 @@ Parameters
 
 1. `char* address`: A multiaddress to reach the peer being dialed.
 2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
-   If the function execution takes longer than this value,
-   the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+  If the function execution takes longer than this value,
+  the execution will be canceled and an error returned.
+  Use `0` for no timeout.
 3. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
@@ -733,13 +741,13 @@ Dial peer using its peer ID.
 Parameters
 
 1. `char* peerID`: Peer ID to dial.
-   The peer must be already known.
-   It must have been added before with [`waku_add_peer`](#waku_add_peer)
-   or previously dialed with [`waku_connect`](#waku_add_peer).
+  The peer must be already known.
+  It must have been added before with [`waku_add_peer`](#waku_add_peer)
+  or previously dialed with [`waku_connect`](#waku_add_peer).
 2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
-   If the function execution takes longer than this value,
-   the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+  If the function execution takes longer than this value,
+  the execution will be canceled and an error returned.
+  Use `0` for no timeout.
 3. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
@@ -846,7 +854,7 @@ This list has this format:
 extern int waku_content_topic(char* applicationName, unsigned int applicationVersion, char* contentTopicName, char* encoding, WakuCallBack onOkCb){}
 ```
 
-Create a content topic string according to [RFC 23](../../../informational/23/topics.md).
+Create a content topic string according to [RFC 23](/waku/informational/23/topics.md).
 
 Parameters
 
@@ -861,7 +869,7 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will receive the content topic formatted according to [RFC 23](../../../informational/23/topics.md):
+`onOkCb` will receive the content topic formatted according to [RFC 23](/waku/informational/23/topics.md):
 `/{application-name}/{version-of-the-application}/{content-topic-name}/{encoding}`
 - 1 - The operation failed for any reason.
 - 2 - The function is missing the `onOkCb` callback
@@ -872,7 +880,7 @@ Returns
 extern int waku_pubsub_topic(char* name, char* encoding, WakuCallBack onOkCb){}
 ```
 
-Create a pubsub topic string according to [RFC 23](../../../informational/23/topics.md).
+Create a pubsub topic string according to [RFC 23](/waku/informational/23/topics.md).
 
 Parameters
 
@@ -885,7 +893,7 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will get populated with a pubsub topic formatted according to [RFC 23](../../../informational/23/topics.md):
+`onOkCb` will get populated with a pubsub topic formatted according to [RFC 23](/waku/informational/23/topics.md):
 `/waku/2/{topic-name}/{encoding}`
 - 1 - The operation failed for any reason.
 - 2 - The function is missing the `onOkCb` callback
@@ -896,8 +904,8 @@ Returns
 extern int waku_default_pubsub_topic(WakuCallBack onOkCb){}
 ```
 
-Returns the default pubsub topic used for exchanging waku messages
-defined in [RFC 10](../10/waku2.md).
+Returns the default pubsub topic used for exchanging Waku messages
+defined in [RFC 10](/waku/standards/core/10/waku2.md).
 
 Parameters
 
@@ -923,7 +931,7 @@ Publish a message using Waku Relay.
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md)
+JSON string containing the [Waku Message](/waku/standards/core/14/message.md)
 as [`JsonMessage`](#jsonmessage-type).
 2. `char* pubsubTopic`: pubsub topic on which to publish the message.
    If `NULL`, it uses the default pubsub topic.
@@ -983,23 +991,23 @@ Subscribe to a Waku Relay pubsub topic to receive messages.
 Parameters
 
 1. `char* topic`: Pubsub topic to subscribe to.
-   If `NULL`, it subscribes to the default pubsub topic.
+   If `NULL`, it subscribes to the default pubsub topic
 2. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
+- 0 - The operation was completed successfuly
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onErrCb` callback
 
 Events
 
 When a message is received,
 a `"message"` event is emitted containing the message, pubsub topic,
-and node ID in which
+and node ID in which,
 the message was received.
 
 The `event` type is [`JsonMessageEvent`](#jsonmessageevent-type).
@@ -1028,7 +1036,8 @@ For Example:
 extern int waku_relay_unsubscribe(char* topic, WakuCallBack onErrCb)
 ```
 
-Closes the pubsub subscription to a pubsub topic. No more messages will be received
+Closes the pubsub subscription to a pubsub topic.
+No more messages will be received
 from this pubsub topic.
 
 Parameters
@@ -1041,8 +1050,8 @@ Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
-- 1 - The operation failed for any reason.
+- 0 - The operation was completed successfuly
+- 1 - The operation failed for any reason
 - 2 - The function is missing the `onErrCb` callback
 
 ### waku_relay_topics
@@ -1062,11 +1071,11 @@ Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
+- 0 - The operation was completed successfuly
 `onOkCb` will receive a json array of pubsub topics
 i.e `["pubsubTopic1", "pubsubTopic2"]`
-- 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+- 1 - The operation failed for any reason
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## Waku Filter
@@ -1077,22 +1086,22 @@ i.e `["pubsubTopic1", "pubsubTopic2"]`
 extern int waku_filter_subscribe(char* filterJSON, char* peerID, int timeoutMs, WakuCallBack onOkCb, WakuCallBack onErrCb)
 ```
 
-Creates a subscription to a filter full node matching a content filter..
+Creates a subscription to a filter full node matching a content filter.
 
 Parameters
 
 1. `char* filterJSON`:
 JSON string containing the [`FilterSubscription`](#filtersubscription-type)
-to subscribe to.
+to subscribe to
 2. `char* peerID`: Peer ID to subscribe to.
    The peer must be already known.
    It must have been added before with [`waku_add_peer`](#waku_add_peer)
    or previously dialed with [`waku_connect_peer`](#waku_connect).
-   Use `NULL` to automatically select a node.
+   Use `NULL` to automatically select a node
 3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 5. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1112,7 +1121,7 @@ Returns
 ```
 
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 Events
@@ -1154,20 +1163,20 @@ Parameters
 1. `char* peerID`: Peer ID to check for an active subscription
    The peer must be already known.
    It must have been added before with [`waku_add_peer`](#waku_connect)
-   or previously dialed with [`waku_connect_peer`](#waku_connect).
+   or previously dialed with [`waku_connect_peer`](#waku_connect)
 2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 3. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
+- 0 - The operation was completed successfuly
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onErrCb` callback
 
 ### waku_filter_unsubscribe
@@ -1176,10 +1185,10 @@ Returns
 extern int waku_filter_unsubscribe(filterJSON *C.char, char* peerID, int timeoutMs, WakuCallBack onErrCb){}
 ```
 
-Sends a requests to a service node to stop pushing messages matching this filter
-to this client.
+Sends a requests to a service node to stop pushing messages
+matching this filter to this client.
 It might be used to modify an existing subscription by
-providing a subset of the original filter criteria
+providing a subset of the original filter criteria.
 
 Parameters
 
@@ -1188,20 +1197,20 @@ criteria to unsubscribe from
 2. `char* peerID`: Peer ID to unsubscribe from
    The peer must be already known.
    It must have been added before with [`waku_add_peer`](#waku_add_peer)
-   or previously dialed with [`waku_connect_peer`](#waku_connect).
+   or previously dialed with [`waku_connect_peer`](#waku_connect)
 3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
+- 0 - The operation was completed successfuly
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ### waku_filter_unsubscribe_all
@@ -1222,7 +1231,7 @@ Parameters
 2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 3. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1245,7 +1254,7 @@ with information about the state of each unsubscription attempt (one per peer)
 ```
 
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## Waku Legacy Filter
@@ -1263,25 +1272,25 @@ Parameters
 
 1. `char* filterJSON`:
 JSON string containing the [`LegacyFilterSubscription`](#waku_legacy_filter_subscribe)
-to subscribe to.
+to subscribe to
 2. `char* peerID`: Peer ID to subscribe to.
    The peer must be already known.
    It must have been added before with [`waku_add_peer`](#waku_add_peer)
    or previously dialed with [`waku_connect_peer`](#waku_connect).
-   Use `NULL` to automatically select a node.
+   Use `NULL` to automatically select a node
 3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
-- 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+- 0 - The operation was completed successfuly
+- 1 - The operation failed for any reason
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onErrCb` callback
 
 Events
@@ -1321,20 +1330,20 @@ optionally, a [PubSub `topic`](https://github.com/libp2p/specs/blob/master/pubsu
 
 Parameters
 
-1. `char* filterJSON`: JSON string containing the [`LegacyFilterSubscription`](#filtersubscription-type).
+1. `char* filterJSON`: JSON string containing the [`LegacyFilterSubscription`](#filtersubscription-type)
 2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 3. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
 Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
+- 0 - The operation was completed successfuly
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onErrCb` callback
 
 ## Waku Lightpush
@@ -1350,18 +1359,18 @@ Publish a message using Waku Lightpush.
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
+JSON string containing the [Waku Message](/waku/standards/core/14/message.md) as [`JsonMessage`](#jsonmessage-type)
 2. `char* pubsubTopic`: pubsub topic on which to publish the message.
-   If `NULL`, it uses the default pubsub topic.
+   If `NULL`, it uses the default pubsub topic
 3. `char* peerID`: Peer ID supporting the lightpush protocol.
    The peer must be already known.
    It must have been added before with [`waku_add_peer`](#waku_add_peer)
    or previously dialed with [`waku_connect_peer`](#waku_connect).
-   Use `NULL` to automatically select a node.
+   Use `NULL` to automatically select a node
 4. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 5. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 6. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1374,7 +1383,7 @@ Returns
 - 0 - The operation was completed successfuly.
 `onOkCb` will receive the message ID
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## Waku Store
@@ -1396,15 +1405,15 @@ must contain a cursor pointing to the Index from which a new page can be request
 
 Parameters
 
-1. `char* queryJSON`: JSON string containing the [`StoreQuery`](#storequery-type).
+1. `char* queryJSON`: JSON string containing the [`StoreQuery`](#storequery-type)
 2. `char* peerID`: Peer ID supporting the store protocol.
    The peer must be already known.
    It must have been added before with [`waku_add_peer`](#waku_add_peer)
-   or previously dialed with [`waku_connect_peer`](#waku_connect).
+   or previously dialed with [`waku_connect_peer`](#waku_connect)
 3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 5. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1413,9 +1422,9 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will receive a [`StoreResponse`](#storeresponse-type).
+`onOkCb` will receive a [`StoreResponse`](#storeresponse-type)
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ### waku_store_local_query
@@ -1435,11 +1444,11 @@ must contain a cursor pointing to the Index from which a new page can be request
 
 Parameters
 
-1. `char* queryJSON`: JSON string containing the [`StoreQuery`](#storequery-type).
+1. `char* queryJSON`: JSON string containing the [`StoreQuery`](#storequery-type)
 2. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 3. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1447,9 +1456,9 @@ Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly. `onOkCb` will receive a [`StoreResponse`](#storeresponse-type).
+- 0 - The operation was completed successfuly. `onOkCb` will receive a [`StoreResponse`](#storeresponse-type)
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## Encrypting messages
@@ -1465,9 +1474,9 @@ Encrypt a message using symmetric encryption and optionally sign the message
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
-2. `char* symmetricKey`: hex encoded secret key to be used for encryption.
-3. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
+JSON string containing the [Waku Message](/waku/standards/core/14/message.md) as [`JsonMessage`](#jsonmessage-type)
+2. `char* symmetricKey`: hex encoded secret key to be used for encryption
+3. `char* optionalSigningKey`: hex encoded private key to be used to sign the message
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 5. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1479,9 +1488,9 @@ Returns
 
 - 0 - The operation was completed successfuly.
 `onOkCb` will receive the encrypted waku message which can be broadcasted with relay
-or lightpush protocol publish functions.
+or lightpush protocol publish functions
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ### waku_encode_asymmetric
@@ -1495,9 +1504,9 @@ Encrypt a message using asymmetric encryption and optionally sign the message
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
-2. `char* publicKey`: hex encoded public key to be used for encryption.
-3. `char* optionalSigningKey`: hex encoded private key to be used to sign the message.
+JSON string containing the [Waku Message](/waku/standards/core/14/message.md) as [`JsonMessage`](#jsonmessage-type)
+2. `char* publicKey`: hex encoded public key to be used for encryption
+3. `char* optionalSigningKey`: hex encoded private key to be used to sign the message
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 5. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1509,9 +1518,9 @@ Returns
 
 - 0 - The operation was completed successfuly.
 `onOkCb` will receive the encrypted waku message which can be broadcasted with relay
-or lightpush protocol publish functions.
+or lightpush protocol publish functions
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## Decrypting messages
@@ -1527,8 +1536,8 @@ Decrypt a message using a symmetric key
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
-2. `char* symmetricKey`: 32 byte symmetric key hex encoded.
+JSON string containing the [Waku Message](/waku/standards/core/14/message.md) as [`JsonMessage`](#jsonmessage-type)
+2. `char* symmetricKey`: 32 byte symmetric key hex encoded
 3. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1539,7 +1548,7 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will receive the decoded payload as a [`DecodedPayload`](#decodedpayload-type).
+`onOkCb` will receive the decoded payload as a [`DecodedPayload`](#decodedpayload-type):
 
 ```json
 {
@@ -1551,7 +1560,7 @@ Returns
 ```
 
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ### waku_decode_asymmetric
@@ -1565,8 +1574,8 @@ Decrypt a message using a secp256k1 private key
 Parameters
 
 1. `char* messageJson`:
-JSON string containing the [Waku Message](../14/message.md) as [`JsonMessage`](#jsonmessage-type).
-2. `char* privateKey`: secp256k1 private key hex encoded.
+JSON string containing the [Waku Message](/waku/standards/core/14/message.md) as [`JsonMessage`](#jsonmessage-type)
+2. `char* privateKey`: secp256k1 private key hex encoded
 3. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 4. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1577,7 +1586,7 @@ Returns
 `int` with a status code. Possible values:
 
 - 0 - The operation was completed successfuly.
-`onOkCb` will receive the decoded payload as a [`DecodedPayload`](#decodedpayload-type).
+`onOkCb` will receive the decoded payload as a [`DecodedPayload`](#decodedpayload-type):
 
 ```json
 {
@@ -1589,7 +1598,7 @@ Returns
 ```
 
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onOkCb` or `onErrCb` callback
 
 ## DNS Discovery
@@ -1606,11 +1615,11 @@ Parameters
 
 1. `char* url`: URL containing a discoverable ENR tree
 2. `char* nameserver`: The nameserver to resolve the ENR tree url.
-   If `NULL` or empty, it will automatically use the default system dns.
+   If `NULL` or empty, it will automatically use the default system dns
 3. `int timeoutMs`: Timeout value in milliseconds to execute the call.
    If the function execution takes longer than this value,
    the execution will be canceled and an error returned.
-   Use `0` for no timeout.
+   Use `0` for no timeout
 4. `WakuCallBack onOkCb`: callback to be executed if the function is succesful
 5. `WakuCallBack onErrCb`: callback to be executed if the function fails
 
@@ -1620,7 +1629,7 @@ Returns
 
 - 0 - The operation was completed successfuly.
 `onOkCb` will receive an array objects describing the multiaddresses,
-enr and peerID each node found.
+enr and peerID each node found:
 
 ```json
 [
@@ -1659,12 +1668,48 @@ Returns
 
 `int` with a status code. Possible values:
 
-- 0 - The operation was completed successfuly.
+- 0 - The operation was completed successfuly
 - 1 - The operation failed for any reason.
-`onErrCb` will be executed with the reason the function execution failed.
+`onErrCb` will be executed with the reason the function execution failed
 - 2 - The function is missing the `onErrCb` callback
+
+## Security Considerations
+
+### Key Management
+
+Private keys MUST be handled securely in memory and SHOULD NOT be logged or stored in plain text. Applications SHOULD implement proper key storage mechanisms such as hardware security modules or secure enclaves when available.
+
+Symmetric keys MUST be generated using cryptographically secure random number generators and SHOULD be rotated periodically.
+
+### Message Security
+
+Applications SHOULD validate message signatures when present to ensure message authenticity and integrity.
+
+Encrypted messages MUST use approved cryptographic algorithms. The current implementation uses standard symmetric and asymmetric encryption schemes.
+
+Applications SHOULD implement proper message filtering and validation to prevent spam and malicious content.
+
+### Network Security
+
+Peer connections SHOULD be authenticated when possible to prevent man-in-the-middle attacks.
+
+Applications SHOULD implement rate limiting for message processing to prevent denial of service attacks.
+
+Bootstrap nodes and discovery mechanisms SHOULD use trusted sources to prevent eclipse attacks.
+
+### Privacy Considerations
+
+Applications SHOULD be aware that network-level metadata (such as IP addresses and connection patterns) may be observable by network adversaries even when message content is encrypted.
+
+The use of content topics and pubsub topics can provide metadata that may be used to identify application usage patterns.
 
 ## Copyright
 
-Copyright and related rights waived via
-[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+- [RFC 23](/waku/informational/23/topics.md)
+- [RFC 10](/waku/standards/core/10/waku2.md)
+- [Waku Message](/waku/standards/core/14/message.md)
+- [PubSub `topic`](https://github.com/libp2p/specs/blob/master/pubsub/README.md#the-topic-descriptor)
