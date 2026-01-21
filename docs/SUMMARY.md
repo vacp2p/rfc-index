@@ -102,7 +102,9 @@
     - [Noise X3DH Double Ratchet](ift-ts/raw/noise-x3dh-double-ratchet.md)
     - [RLN Interep Spec](ift-ts/raw/rln-interep-spec.md)
     - [RLN Stealth Commitments](ift-ts/raw/rln-stealth-commitments.md)
+    - [Multi-message_id Burn RLN](ift-ts/raw/multi-message_id-burn-rln.md)
     - [RLN-V2](ift-ts/raw/rln-v2.md)
+    - [Zerokit API](ift-ts/raw/zerokit-api.md)
     - [SDS](ift-ts/raw/sds.md)
   - [Template](ift-ts/template.md)
 
