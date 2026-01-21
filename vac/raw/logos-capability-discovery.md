@@ -325,7 +325,7 @@ Implementations SHOULD modify them as needed based on specific requirements.
 | `P_occ` | 10 | Occupancy exponent for waiting time calculation |
 | `G` | 10⁻⁷ | Safety parameter for waiting time calculation |
 | `δ` | 1 second | Registration window time |
-| `m`  | 16 | Number of buckets for advertise table, search table |
+| `m`  | 16 | Number of buckets for service-specific tables |
 
 ### Distance
 
@@ -1456,7 +1456,7 @@ Each bucket corresponds to a particular distance from the `service_id_hash`.
     at the cost of increased communication and storage costs.
     3. Pick a random registrar from bucket `i` of `AdvT(service_id_hash)` to advertise to.
         - `AdvT(service_id_hash).getBucket(i)` → returns a list of registrars in bucket `i`
-        from the advertise table `AdvT(service_id_hash)`
+        from `AdvT(service_id_hash)`
         - `.getRandomNode()` → function returns a random registrar node.
         The advertiser tries to place its advertisement into that registrar.
         The function remembers already returned nodes
@@ -1503,12 +1503,12 @@ Refer to the [Lookup Algorithm section](#lookup-algorithm) for the pseudocode.
 bootstrapping peers from the discoverer’s `KadDHT(peerID)`
 using the formula described in the [Distance section](#distance).
 2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
-3. Go through each bucket of the search table `DiscT(service_id_hash)` —
+3. Go through each bucket of `DiscT(service_id_hash)` —
 from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `service_id_hash`.
 For each bucket, query up to `K_lookup` random peers.
-    1. Pick a random registrar node from bucket `i` of the search table `DiscT(service_id_hash)` to query
+    1. Pick a random registrar node from bucket `i` of `DiscT(service_id_hash)` to query
         1. `DiscT(service_id_hash).getBucket(i)` → returns a list of registrars
-        in bucket `i` from the search table `DiscT(service_id_hash)`
+        in bucket `i` from `DiscT(service_id_hash)`
         2. `.getRandomNode()` → function returns a random registrar node.
         The discover queries this node to get `ads` for a particular service ID `service_id_hash`.
         The function remembers already returned nodes and never returns the same one twice.
@@ -1590,7 +1590,7 @@ the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting ti
         3. Update the ticket last modification time `t_mod`
         4. Sign the ticket again. The advertiser will retry later using this new ticket.
 6. Add a list of peers closer to the `ad.service_id_hash` using the `GETPEERS()` function
-to the response (the advertiser uses this to update its advertise table `AdvT(service_id_hash)`).
+to the response (the advertiser uses this to update `AdvT(service_id_hash)`).
 7. Send the full response back to the advertiser
 
 Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
