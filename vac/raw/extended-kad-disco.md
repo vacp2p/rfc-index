@@ -10,25 +10,25 @@ contributors: Hanno Cornelius <hanno@status.im>
 
 ## Abstract
 
-This specification defines a lightweight peer discovery mechanism 
+This specification defines a lightweight peer discovery mechanism
 built on top of the libp2p Kademlia DHT.
-It allows nodes to advertise themselves by storing a new type of peer record under 
-their own peer ID and enables other nodes to discover peers in the network via 
+It allows nodes to advertise themselves by storing a new type of peer record under
+their own peer ID and enables other nodes to discover peers in the network via
 random walks through the DHT.
-The mechanism supports capability-based filtering of `services` entries, 
-making it suitable for overlay networks that 
+The mechanism supports capability-based filtering of `services` entries,
+making it suitable for overlay networks that
 require connectivity to peers offering specific protocols or features.
 
 ## Motivation
 
-The standard libp2p Kademlia DHT provides 
-content routing and peer routing toward specific keys or peer IDs, 
-but offers limited support for general-purpose random peer discovery 
+The standard libp2p Kademlia DHT provides
+content routing and peer routing toward specific keys or peer IDs,
+but offers limited support for general-purpose random peer discovery
 — i.e. finding *any well-connected peer* in the network.
 
-Existing alternatives such as mDNS, 
-Rendezvous, 
-or bootstrap lists do not always satisfy the needs of 
+Existing alternatives such as mDNS,
+Rendezvous,
+or bootstrap lists do not always satisfy the needs of
 large-scale decentralized overlay networks that require:
 
 - Organic growth of connectivity without strong trust in bootstrap nodes
@@ -51,7 +51,7 @@ Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/sp
 ### Record Propagation
 
 A node that wants to make itself discoverable,
-also known as an _advertiser_,
+also known as an *advertiser*,
 MUST encode its discoverable information in an [`XPR`](https://github.com/vacp2p/rfc-index/blob/31dfa0c8c2f3e7f7365156246c4eb7b7c390e76e/vac/raw/extensible-peer-records.md#extensible-peer-records).
 The encoded information MUST be sufficient for discoverers to connect to this advertiser.
 It MAY choose to encode some or all of its capabilities (and related information)
@@ -78,28 +78,28 @@ as this extention is not part of the specification.
 ### Record Discovery
 
 A node that wants to discover peers to connect to,
-also known as a _discoverer_,
+also known as a *discoverer*,
 SHOULD perform the following random walk discovery procedure (`FIND_RANDOM`):
 
 1. Choose a random value in the `Kad-DHT` key space. (`R_KEY`).
 
 2. Follow the `Kad-DHT` [peer routing](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#peer-routing) algorithm,
- with `R_KEY` as the target. This procedure loops the `Kad-DHT` `FIND_NODE` procedure to the target key, each time receiving closer peers (`closerPeers`) to the target key in response, until no new closer peers can be found. Since the target is random, the discoverer SHOULD consider each _previously unseen_ peer in each response's `closerPeers` field, as a randomly discovered node of potential interest. The discoverer MUST keep track of such peers as `discoveredPeer`s.
+ with `R_KEY` as the target. This procedure loops the `Kad-DHT` `FIND_NODE` procedure to the target key, each time receiving closer peers (`closerPeers`) to the target key in response, until no new closer peers can be found. Since the target is random, the discoverer SHOULD consider each *previously unseen* peer in each response's `closerPeers` field, as a randomly discovered node of potential interest. The discoverer MUST keep track of such peers as `discoveredPeer`s.
 
 3. For each `discoveredPeer`, attempt to retrieve a corresponding `XPR`.
-This can be done in one of two ways: 
+This can be done in one of two ways:
 
-    3.1 If the `discoveredPeer` in the response contains at least one multiaddress in the `addrs` field, 
+    3.1 If the `discoveredPeer` in the response contains at least one multiaddress in the `addrs` field,
     attempt a connection to that peer and wait to receive the `XPR` as part of the [`identify` procedure](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/identify/README.md).
 
-    3.2 If the `discoveredPeer` does not include `addrs` information, 
-    or the connection attempt to included `addrs` fails, 
-    or more service information is required before a connection can be attempted, 
+    3.2 If the `discoveredPeer` does not include `addrs` information,
+    or the connection attempt to included `addrs` fails,
+    or more service information is required before a connection can be attempted,
     MAY perform a [value retrieval](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#value-retrieval) procedure to the `discoveredPeer` ID.
 
-4. For each retrieved `XPR`, validate the signature against the peer ID. 
-In addition, the discoverer MAY filter discovered peers based on the capabilities encoded within the `services` field of the `XPR`. 
-The discoverer SHOULD ignore (and disconnect, if already connected) discovered peers 
+4. For each retrieved `XPR`, validate the signature against the peer ID.
+In addition, the discoverer MAY filter discovered peers based on the capabilities encoded within the `services` field of the `XPR`.
+The discoverer SHOULD ignore (and disconnect, if already connected) discovered peers
 with invalid `XPR`s or that does not advertise the `services` of interest to the discoverer.
 
 ### Privacy Enhancements
