@@ -1022,6 +1022,7 @@ The registrar SHOULD return response with status `Wait` and the new signed `tick
 using the algorithm described in [Peer Table Updates](#peer-table-updates) section.
 
 **`ad_cache` Maintenance:**
+
 - Size limited by capacity `C`
 - Ads expire after time `E` from admission and are removed
 - No duplicate ads allowed
