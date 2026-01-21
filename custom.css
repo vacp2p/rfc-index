@@ -136,6 +136,11 @@
 
 .rfc-meta-table {
     font-size: 0.95em;
+    width: 100%;
+}
+
+.rfc-meta-table-wrapper {
+    width: 100%;
 }
 
 .rfc-meta-table th {
