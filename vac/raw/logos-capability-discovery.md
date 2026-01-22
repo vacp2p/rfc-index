@@ -523,7 +523,7 @@ message Message {
 - Logos adds two new message types (`REGISTER`, `GET_ADS`) without modifying existing types
 - Advertisements are encoded as generic `bytes` to avoid coupling the protocol to specific formats
 - The existing `key` field is reused for `service_id_hash` in Logos operations
-- Nodes without Logos support will ignore `REGISTER` and `GET_ADS` messages
+- Nodes without Logos Capability Discovery support will ignore `REGISTER` and `GET_ADS` messages
 - Protocol negotiation via libp2p's multistream-select distinguishes Logos-capable nodes
 
 ### Advertisement Encoding
