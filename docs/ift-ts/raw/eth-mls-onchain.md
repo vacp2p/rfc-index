@@ -31,10 +31,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Motivation
 
 The need for secure communications has become paramount.  

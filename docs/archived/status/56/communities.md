@@ -29,10 +29,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document describes the design of Status Communities over Waku v2,

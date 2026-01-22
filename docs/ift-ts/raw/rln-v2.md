@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The protocol specified in this document is an improvement of [32/RLN-V1](32/rln-v1.md),

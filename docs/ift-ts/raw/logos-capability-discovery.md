@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 > **Note:** This specification is currently a WIP and undergoing a high rate of changes.
 
 ## Abstract

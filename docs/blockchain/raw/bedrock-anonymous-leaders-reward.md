@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification defines the mechanism for anonymous reward distribution

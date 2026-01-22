@@ -23,10 +23,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The following document specifies Ethereum authenticated scalable

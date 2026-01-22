@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document defines the key types used in the Blend protocol

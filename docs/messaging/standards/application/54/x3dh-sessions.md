@@ -30,10 +30,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies how to manage sessions based on an X3DH key exchange.

@@ -19,10 +19,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes the usage of the ENR (Ethereum Node Records)

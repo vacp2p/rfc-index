@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification defines the Genesis Block for the Bedrock chain,

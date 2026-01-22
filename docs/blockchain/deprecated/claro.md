@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies Claro: a Byzantine, fault-tolerant, binary decision

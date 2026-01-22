@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 In this specification, we describe a method to construct message history that
 will aid the consistency guarantees of [2/MVDS](../2/mvds.md).
 Additionally,

@@ -23,10 +23,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document lists the types of messages that are using [MVDS](/ift-ts/raw/2/mvds.md)

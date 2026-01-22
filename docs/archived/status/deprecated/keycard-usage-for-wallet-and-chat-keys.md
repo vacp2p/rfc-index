@@ -21,10 +21,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 In this specification, we describe how Status communicates with Keycard to create, store and use multiaccount.

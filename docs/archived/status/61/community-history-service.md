@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 Messages are stored permanently by store nodes

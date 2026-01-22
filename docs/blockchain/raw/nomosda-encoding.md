@@ -21,10 +21,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Introduction
 
 This document describes the encoding and verification processes of NomosDA, which is the data availability (DA) solution used by the Nomos blockchain. NomosDA provides an assurance that all data from Nomos blobs are accessible and verifiable by every network participant.

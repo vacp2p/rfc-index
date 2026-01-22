@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
  The reliability of [13/WAKU2-STORE](../standards/core/13/store.md)
 protocol heavily relies on the fact that full nodes i.e.,
 those who persist messages have high availability and

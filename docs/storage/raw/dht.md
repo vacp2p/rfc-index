@@ -16,10 +16,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document explains the Codex DHT (Distributed Hash Table) component. The DHT maps content IDs (CIDs) into providers of that

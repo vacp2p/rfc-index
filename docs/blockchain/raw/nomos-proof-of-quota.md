@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document defines an implementation-friendly specification

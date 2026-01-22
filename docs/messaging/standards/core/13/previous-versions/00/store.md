@@ -28,10 +28,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification explains the `13/WAKU2-STORE` protocol

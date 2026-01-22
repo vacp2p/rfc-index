@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document introduces a decentralized group messaging protocol

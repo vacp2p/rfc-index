@@ -30,10 +30,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 [10/WAKU2](/messaging/standards/core/10/waku2.md) is a family of modular peer-to-peer protocols

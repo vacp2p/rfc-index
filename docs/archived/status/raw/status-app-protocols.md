@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes the Status Application protocol stack.

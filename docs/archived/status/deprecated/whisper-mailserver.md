@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 Being mostly offline is an intrinsic property of mobile clients.

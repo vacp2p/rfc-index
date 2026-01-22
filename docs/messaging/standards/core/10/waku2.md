@@ -35,9 +35,6 @@
 
 <!-- timeline:end -->
 
-
-
-
 ## Abstract
 
 Waku is a family of modular peer-to-peer protocols for secure communication.

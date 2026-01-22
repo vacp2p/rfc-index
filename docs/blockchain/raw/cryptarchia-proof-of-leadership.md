@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The Proof of Leadership (PoL) enables a leader to produce a zero-knowledge proof

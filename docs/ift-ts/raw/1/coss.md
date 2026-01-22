@@ -30,10 +30,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 This document describes a consensus-oriented specification system (COSS)
 for building interoperable technical specifications.
 COSS is based on a lightweight editorial process that

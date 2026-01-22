@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 **Content Topics**:
 
 - Public Key Broadcast: `/eth-pm/1/public-key/proto`

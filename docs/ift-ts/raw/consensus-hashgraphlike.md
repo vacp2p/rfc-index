@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies a scalable, decentralized, and Byzantine Fault Tolerant (BFT)

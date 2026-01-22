@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This spec integrates [Interep](https://interep.link)

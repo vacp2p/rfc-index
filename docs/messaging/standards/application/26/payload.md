@@ -27,10 +27,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes how Waku provides confidentiality, authenticity, and

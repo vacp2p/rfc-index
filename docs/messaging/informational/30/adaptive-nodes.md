@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 This is an informational spec that show cases the concept of adaptive nodes.
 
 ## Node types - a continuum

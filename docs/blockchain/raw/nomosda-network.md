@@ -21,10 +21,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Introduction
 
 NomosDA is the scalability solution protocol for data availability within the Nomos network.

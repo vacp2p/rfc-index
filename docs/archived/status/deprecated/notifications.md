@@ -21,10 +21,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Local Notifications
 
 A client should implement local notifications to offer notifications

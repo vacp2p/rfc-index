@@ -28,10 +28,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 **Protocol identifiers**:
 
 - _filter-subscribe_: `/vac/waku/filter-subscribe/2.0.0-beta1`

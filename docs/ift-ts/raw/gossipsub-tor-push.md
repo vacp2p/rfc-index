@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document extends the [libp2p gossipsub specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/README.md)

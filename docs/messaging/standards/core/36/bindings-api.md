@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Introduction
 
 Native applications that wish to integrate Waku may not be able to use nwaku and

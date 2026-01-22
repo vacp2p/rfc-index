@@ -29,10 +29,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification explains the `WAKU2-STORE` protocol,

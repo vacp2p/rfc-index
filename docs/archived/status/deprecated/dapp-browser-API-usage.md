@@ -20,10 +20,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document describes requirements that an application must fulfill in order to provide a proper environment for Dapps running inside a browser.

@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification details what a Status account address is and

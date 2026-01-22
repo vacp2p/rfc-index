@@ -27,10 +27,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 `11/WAKU2-RELAY` specifies a [Publish/Subscribe approach](https://docs.libp2p.io/concepts/publish-subscribe/)
 to peer-to-peer messaging with a strong focus on privacy,
 censorship-resistance, security and scalability.

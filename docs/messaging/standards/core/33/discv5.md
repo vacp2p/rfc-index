@@ -31,10 +31,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 `33/WAKU2-DISCV5` specifies a modified version of

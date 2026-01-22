@@ -27,10 +27,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The following specification covers the RLN construct

@@ -21,10 +21,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes how Status relates with EIPs.

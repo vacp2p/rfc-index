@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 Status uses [Waku](/messaging/standards/legacy/6/waku1.md) to provide privacy-preserving routing

@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document describes URL scheme for previewing and

@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes how to write a Status client for communicating  

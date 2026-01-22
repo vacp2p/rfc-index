@@ -32,10 +32,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 This document outlines recommended usage of topic names in Waku v2.
 In [10/WAKU2 spec](/messaging/standards/core/10/waku2.md) there are two types of topics:
 

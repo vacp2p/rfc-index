@@ -29,10 +29,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes how the Status 1-to-1 chat protocol is implemented

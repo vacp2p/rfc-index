@@ -31,10 +31,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## NOTE
 
 The content of this specification has been split between

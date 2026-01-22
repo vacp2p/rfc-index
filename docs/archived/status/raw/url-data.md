@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies serialization, compression, and

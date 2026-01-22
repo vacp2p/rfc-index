@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification outlines how we do accounting and settlement based on the provision

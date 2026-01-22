@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The Blend Protocol is an anonymous broadcasting protocol for the Nomos network that provides network-level privacy for block proposers.

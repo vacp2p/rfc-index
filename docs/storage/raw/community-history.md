@@ -17,10 +17,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document describes how nodes in Status Communities archive historical message data of their communities.

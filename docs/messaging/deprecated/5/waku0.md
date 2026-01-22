@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 This specification describes the format of Waku messages within the ÐΞVp2p Wire Protocol.
 This spec substitutes [EIP-627](https://eips.ethereum.org/EIPS/eip-627).
 Waku is a fork of the original Whisper protocol that enables better usability

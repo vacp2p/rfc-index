@@ -27,10 +27,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 In this specification, we describe Mailservers.

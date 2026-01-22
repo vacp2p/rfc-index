@@ -29,10 +29,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 `WakuFilter` is a protocol that enables subscribing to messages that a peer receives.
 This is a more lightweight version of `WakuRelay`
 specifically designed for bandwidth restricted devices.

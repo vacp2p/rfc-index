@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 In this specification, we describe a minimum viable protocol for
 data synchronization inspired by the Bramble Synchronization Protocol ([BSP](https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BSP.md)).
 This protocol is designed to ensure reliable messaging

@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies a simple request-response peer exchange protocol.

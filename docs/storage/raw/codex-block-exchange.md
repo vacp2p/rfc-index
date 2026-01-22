@@ -23,10 +23,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Specification Status
 
 This specification contains a mix of:

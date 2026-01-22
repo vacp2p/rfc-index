@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes the usage of stealth commitments

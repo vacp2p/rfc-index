@@ -30,10 +30,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document describes a method that can be used to provide a secure channel

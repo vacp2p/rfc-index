@@ -23,10 +23,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 **Content Topic**: `/toy-chat/2/huilong/proto`.
 
 This specification explains a toy chat example using Waku v2.

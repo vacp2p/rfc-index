@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 Status uses [Whisper](https://eips.ethereum.org/EIPS/eip-627) to provide

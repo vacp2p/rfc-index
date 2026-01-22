@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The message encapsulation mechanism is a core component of the Blend Protocol

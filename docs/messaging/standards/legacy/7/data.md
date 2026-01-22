@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 This specification describes the encryption,
 decryption and signing of the content in the [data field used in Waku](../6/waku1.md/#abnf-specification).
 

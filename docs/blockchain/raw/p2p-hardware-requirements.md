@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification defines the hardware requirements for running various types of Nomos blockchain nodes. Hardware needs vary significantly based on the node's role, from lightweight verification nodes to high-performance Zone Executors. The requirements are designed to support diverse participation levels while ensuring network security and performance.

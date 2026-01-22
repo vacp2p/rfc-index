@@ -18,10 +18,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 Cryptarchia is the consensus protocol of Nomos Bedrock.

@@ -31,10 +31,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes the `17/WAKU2-RLN-RELAY` protocol,

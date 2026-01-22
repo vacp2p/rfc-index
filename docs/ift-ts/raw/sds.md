@@ -33,10 +33,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification introduces the Scalable Data Sync (SDS) protocol

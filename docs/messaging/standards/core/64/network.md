@@ -24,10 +24,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes an opinionated deployment of [10/WAKU2](../10/waku2.md)

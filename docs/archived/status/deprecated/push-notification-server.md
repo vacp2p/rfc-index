@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Reason
 
 Push notifications for iOS devices and some Android devices can only be implemented by relying on [APN service](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1) for iOS or [Firebase](https://firebase.google.com/).

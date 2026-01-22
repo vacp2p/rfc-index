@@ -25,10 +25,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification describes how [6/WAKU1](/messaging/standards/legacy/6/waku1.md)

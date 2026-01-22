@@ -16,10 +16,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies the Zerokit API, an implementation of the RLN-V2 protocol.

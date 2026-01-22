@@ -16,10 +16,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This document specifies multi-message_id burn RLN which the users

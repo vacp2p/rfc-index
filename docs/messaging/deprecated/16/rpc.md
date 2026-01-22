@@ -26,10 +26,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Introduction
 
 This specification describes the JSON-RPC API that Waku v2 nodes MAY adhere to.

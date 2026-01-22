@@ -22,10 +22,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 This specification defines a comprehensive NAT (Network Address Translation) traversal solution for the Nomos P2P network. The solution enables nodes to automatically determine their NAT status and establish both outbound and inbound connections regardless of network configuration. The strategy combines [AutoNAT](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md), dynamic port mapping protocols, and continuous verification to maximize public reachability while maintaining decentralized operation.

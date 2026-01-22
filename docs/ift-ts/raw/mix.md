@@ -32,10 +32,6 @@
 
 <!-- timeline:end -->
 
-
-
-
-
 ## Abstract
 
 The Mix Protocol defines a decentralized anonymous message routing layer for libp2p networks.
