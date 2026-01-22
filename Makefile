@@ -1,4 +1,4 @@
-.PHONY: install build serve
+.PHONY: install lint build serve
 
 MDBOOK_VERSION ?= 0.4.52
 
@@ -12,3 +12,7 @@ serve:
 build:
 	python scripts/run_runtime_generators.py
 	mdbook build
+
+lint:
+	npx markdownlint-cli2@0.12.1 "docs/**/*.md" --config .github/workflows/.markdownlint.json
+	npm run lint:remark
