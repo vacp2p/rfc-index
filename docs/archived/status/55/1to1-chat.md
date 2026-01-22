@@ -9,6 +9,26 @@
 | Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
 | Contributors | Andrea Piana <andreap@status.im>, Pedro Pombeiro <pedro@status.im>, Corey Petty <corey@status.im>, Oskar Thorén <oskarth@titanproxy.com>, Dean Eigenmann <dean@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/55/1to1-chat.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/55/1to1-chat.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/55/1to1-chat.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/55/1to1-chat.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/55/1to1-chat.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/55/1to1-chat.md) — Fix Files for Linting (#94)
+- **2024-09-12** — [`0b4d151`](https://github.com/vacp2p/rfc-index/blob/0b4d15163850762de0c62445ac093bfd2315a076/status/55/1to1-chat.md) — Update 1to1-chat.md (#92)
+- **2024-08-05** — [`eb25cd0`](https://github.com/vacp2p/rfc-index/blob/eb25cd06d679e94409072a96841de16a6b3910d5/status/55/1to1-chat.md) — chore: replace email addresses (#86)
+- **2024-03-21** — [`2eaa794`](https://github.com/vacp2p/rfc-index/blob/2eaa7949c4abe7d14e2b9560e8c045bf2e937c9a/status/55/1to1-chat.md) — Broken Links + Change Editors (#26)
+- **2024-02-07** — [`e95c5c6`](https://github.com/vacp2p/rfc-index/blob/e95c5c694731481588b25fedadba913461413f31/status/55/1to1-chat.md) — Update 1to1-chat.md
+- **2024-02-05** — [`44baefd`](https://github.com/vacp2p/rfc-index/blob/44baefd1e692b3c0a9a8258840b85885d945d1ee/status/55/1to1-chat.md) — Update 1to1-chat.md
+- **2024-02-01** — [`e105bea`](https://github.com/vacp2p/rfc-index/blob/e105bea76bf0324660226a752f36c509559bdf93/status/55/1to1-chat.md) — Update and rename 1TO1-CHAT.md to 1to1-chat.md
+- **2024-01-27** — [`4a8585b`](https://github.com/vacp2p/rfc-index/blob/4a8585b25be704a52e668f1cf0a0e0546809b66c/status/55/1TO1-CHAT.md) — Create 1TO1-CHAT.md
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This specification describes how the Status 1-to-1 chat protocol is implemented

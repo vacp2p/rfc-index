@@ -28,7 +28,7 @@ pipeline {
   stages {
     stage('Build') {
       steps { script {
-        nix.develop('python scripts/gen_rfc_index.py && python scripts/gen_history.py && mdbook build')
+        nix.develop('make build')
         jenkins.genBuildMetaJSON('book/build.json')
       } }
     }

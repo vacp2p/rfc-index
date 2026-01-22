@@ -4,14 +4,22 @@ from typing import List, Tuple, Optional, Dict
 from pathlib import Path
 import re
 
+VERBOSE = False
+
 
 def log(msg: str):
     print(f"[INFO] {msg}", flush=True)
 
 
-def run_git(args: list) -> str:
+def debug(msg: str):
+    if VERBOSE:
+        print(f"[DEBUG] {msg}", flush=True)
+
+
+def run_git(args: list, log_cmd: bool = True) -> str:
     cmd = ["git"] + args
-    log("Running: " + " ".join(cmd))
+    if log_cmd:
+        debug("Running: " + " ".join(cmd))
 
     result = subprocess.run(
         cmd,
@@ -28,6 +36,49 @@ def run_git(args: list) -> str:
         )
 
     return result.stdout.strip()
+
+
+def run_git_optional(args: list) -> Optional[str]:
+    cmd = ["git"] + args
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def normalize_without_timeline(text: str) -> str:
+    pattern = re.compile(
+        r"<!-- timeline:start -->.*?<!-- timeline:end -->",
+        re.DOTALL,
+    )
+    cleaned = pattern.sub("", text)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
+def get_file_at_commit(commit: str, path: str) -> Optional[str]:
+    return run_git_optional(["show", f"{commit}:{path}"])
+
+
+def is_timeline_only_change(commit: str, path: str) -> bool:
+    current = get_file_at_commit(commit, path)
+    if current is None:
+        return False
+
+    parent = run_git_optional(["rev-parse", f"{commit}^"])
+    if parent is None:
+        return False
+
+    parent_text = get_file_at_commit(parent, path)
+    if parent_text is None:
+        return False
+
+    return normalize_without_timeline(current) == normalize_without_timeline(parent_text)
 
 
 def get_repo_https_url() -> Optional[str]:
@@ -52,9 +103,9 @@ def get_repo_https_url() -> Optional[str]:
 
 
 def get_repo_file_path(path: str) -> str:
-    log(f"Resolving file path via git: {path}")
+    debug(f"Resolving file path via git: {path}")
     try:
-        out = run_git(["ls-files", "--full-name", path])
+        out = run_git(["ls-files", "--full-name", path], log_cmd=False)
     except subprocess.CalledProcessError:
         raise SystemExit(f"[ERROR] {path!r} is not tracked by git")
 
@@ -62,12 +113,12 @@ def get_repo_file_path(path: str) -> str:
         raise SystemExit(f"[ERROR] {path!r} is not tracked by git")
 
     resolved = out.splitlines()[0]
-    log(f"Resolved path inside repo: {resolved}")
+    debug(f"Resolved path inside repo: {resolved}")
     return resolved
 
 
 def get_file_commits(path: str) -> List[Tuple[str, str, str, str]]:
-    log(f"Collecting commit history for: {path}")
+    debug(f"Collecting commit history for: {path}")
 
     log_output = run_git([
         "log",
@@ -80,7 +131,7 @@ def get_file_commits(path: str) -> List[Tuple[str, str, str, str]]:
     ])
 
     if not log_output:
-        log("No history found.")
+        debug("No history found.")
         return []
 
     commits: List[Tuple[str, str, str, str]] = []
@@ -104,8 +155,19 @@ def get_file_commits(path: str) -> List[Tuple[str, str, str, str]]:
         commits.append((current["commit"], current["date"], current["subject"], current.get("path", path)))
 
     commits.reverse()
-    log(f"Found {len(commits)} commits.")
+    debug(f"Found {len(commits)} commits.")
     return commits
+
+
+def filter_timeline_commits(
+    commits: List[Tuple[str, str, str, str]]
+) -> List[Tuple[str, str, str, str]]:
+    filtered: List[Tuple[str, str, str, str]] = []
+    for commit, date, subject, path_at_commit in commits:
+        if is_timeline_only_change(commit, path_at_commit):
+            continue
+        filtered.append((commit, date, subject, path_at_commit))
+    return filtered
 
 
 def build_markdown_history(
@@ -113,7 +175,7 @@ def build_markdown_history(
     file_path: str,
     commits: List[Tuple[str, str, str, str]],
 ) -> str:
-    log(f"Generating markdown history...")
+    debug("Generating markdown history...")
     entries = []
 
     # newest first
@@ -163,7 +225,7 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
     block = (
         f"{start_marker}\n\n"
         f"{timeline_md.strip()}\n\n"
-        f"{end_marker}\n"
+        f"{end_marker}"
     )
 
     if start_marker in content and end_marker in content:
@@ -172,6 +234,11 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
             re.DOTALL,
         )
         new_content, count = pattern.subn(block, content, count=1)
+        new_content = re.sub(
+            re.escape(end_marker) + r"\n{3,}",
+            end_marker + "\n\n",
+            new_content,
+        )
         if count and new_content != content:
             file_path.write_text(new_content, encoding="utf-8")
             return True
@@ -188,7 +255,12 @@ def inject_timeline(file_path: Path, timeline_md: str) -> bool:
                 insert_pos = len("\n".join(lines[: idx + 1]))
                 break
 
-    new_content = content[:insert_pos] + "\n\n" + block + "\n" + content[insert_pos:]
+    new_content = content[:insert_pos] + "\n\n" + block + "\n\n" + content[insert_pos:]
+    new_content = re.sub(
+        re.escape(end_marker) + r"\n{3,}",
+        end_marker + "\n\n",
+        new_content,
+    )
     if new_content != content:
         file_path.write_text(new_content, encoding="utf-8")
         return True
@@ -238,8 +310,9 @@ def main():
     for file_path in files:
         repo_file_path = get_repo_file_path(str(file_path))
         commits = get_file_commits(repo_file_path)
+        commits = filter_timeline_commits(commits)
         if not commits:
-            log(f"[WARN] No history found for {repo_file_path}")
+            debug(f"[WARN] No history found for {repo_file_path}")
             continue
 
         markdown = build_markdown_history(
@@ -251,7 +324,7 @@ def main():
         modified = inject_timeline(file_path, markdown)
         if modified:
             updated += 1
-            log(f"Timeline injected into {file_path}")
+            debug(f"Timeline injected into {file_path}")
 
     log(f"Timelines updated in {updated} files")
 

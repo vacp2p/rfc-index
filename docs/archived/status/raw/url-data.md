@@ -9,6 +9,21 @@
 | Editor | Felicio Mununga <felicio@status.im> |
 | Contributors | Aaryamann Challani <aaryamann@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/url-data.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/url-data.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/raw/url-data.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/raw/url-data.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/raw/url-data.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/raw/url-data.md) — ci: add mdBook configuration (#233)
+- **2024-11-20** — [`ff87c84`](https://github.com/vacp2p/rfc-index/blob/ff87c84dc71d4f933bab188993914069fea12baa/status/raw/url-data.md) — Update Waku Links (#104)
+- **2024-09-17** — [`36f64f0`](https://github.com/vacp2p/rfc-index/blob/36f64f01f0979412fcbdf0c89143ef39442b7675/status/raw/url-data.md) — feat(59/STATUS-URL-DATA): initial draft (#13)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document specifies serialization, compression, and

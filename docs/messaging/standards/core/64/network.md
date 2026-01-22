@@ -8,6 +8,22 @@
 | Category | Best Current Practice |
 | Editor | Hanno Cornelius <hanno@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/messaging/standards/core/64/network.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/standards/core/64/network.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/standards/core/64/network.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/waku/standards/core/64/network.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/waku/standards/core/64/network.md) — ci: add mdBook configuration (#233)
+- **2025-02-25** — [`0277fd0`](https://github.com/vacp2p/rfc-index/blob/0277fd0c4dbd907dfb2f0c28b6cde94a335e1fae/waku/standards/core/64/network.md) — docs: update dead links in 64/Network (#133)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/waku/standards/core/64/network.md) — Fix Files for Linting (#94)
+- **2024-07-09** — [`77029a2`](https://github.com/vacp2p/rfc-index/blob/77029a2e648317bff0f50623e7e03862115cee5c/waku/standards/core/64/network.md) — Add RLNv2 to TheWakuNetwork (#82)
+- **2024-05-10** — [`e5b859a`](https://github.com/vacp2p/rfc-index/blob/e5b859abfb3e42fde4336e5fc5b4e7250126f8ce/waku/standards/core/64/network.md) — Update WAKU2-NETWORK: Move to draft (#5)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This specification describes an opinionated deployment of [10/WAKU2](../10/waku2.md)

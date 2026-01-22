@@ -9,6 +9,19 @@
 | Editor | Antonio Antonino <antonio@status.im> |
 | Contributors | Álvaro Castro-Castilla <alvaro@status.im>, Daniel Sanchez-Quiros <danielsq@status.im>, Petar Radovic <petar@status.im>, Gusto Bacvinka <augustinas@status.im>, Youngjoon Lee <youngjoon@status.im>, Filip Dimitrijevic <filip@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/blockchain/raw/p2p-nat-solution.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/p2p-nat-solution.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/nomos/raw/p2p-nat-solution.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/nomos/raw/p2p-nat-solution.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/nomos/raw/p2p-nat-solution.md) — ci: add mdBook configuration (#233)
+- **2025-09-25** — [`cfb3b78`](https://github.com/vacp2p/rfc-index/blob/cfb3b78c71ed75f7859299c38704b809f3e33613/nomos/raw/p2p-nat-solution.md) — Created nomos/raw/p2p-nat-solution.md draft (#174)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This specification defines a comprehensive NAT (Network Address Translation) traversal solution for the Nomos P2P network. The solution enables nodes to automatically determine their NAT status and establish both outbound and inbound connections regardless of network configuration. The strategy combines [AutoNAT](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md), dynamic port mapping protocols, and continuous verification to maximize public reachability while maintaining decentralized operation.

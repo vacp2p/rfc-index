@@ -9,6 +9,19 @@
 | Editor | Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im) |
 | Contributors | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/logos-capability-discovery.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/logos-capability-discovery.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/vac/raw/logos-capability-discovery.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/vac/raw/logos-capability-discovery.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/vac/raw/logos-capability-discovery.md) — ci: add mdBook configuration (#233)
+- **2025-12-09** — [`aaf158a`](https://github.com/vacp2p/rfc-index/blob/aaf158aa59edb2ce0841a345725d16355218c196/vac/raw/logos-capability-discovery.md) — VAC/RAW/LOGOS-DISCOVERY-CAPABILITY RFC  (#212)
+
+<!-- timeline:end -->
+
 > **Note:** This specification is currently a WIP and undergoing a high rate of changes.
 
 ## Abstract

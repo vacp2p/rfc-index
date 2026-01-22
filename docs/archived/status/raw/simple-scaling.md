@@ -9,6 +9,30 @@
 | Editor | Daniel Kaiser <danielkaiser@status.im> |
 | Contributors | Alvaro Revuelta <alrevuelta@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/simple-scaling.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/simple-scaling.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/raw/simple-scaling.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/raw/simple-scaling.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/raw/simple-scaling.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/raw/simple-scaling.md) — ci: add mdBook configuration (#233)
+- **2024-11-20** — [`ff87c84`](https://github.com/vacp2p/rfc-index/blob/ff87c84dc71d4f933bab188993914069fea12baa/status/raw/simple-scaling.md) — Update Waku Links (#104)
+- **2024-09-17** — [`9b5e219`](https://github.com/vacp2p/rfc-index/blob/9b5e2194cf2a2464740de6798fddd21a24b2dc7e/status/raw/simple-scaling.md) — Update simple-scaling (#93)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/raw/simple-scaling.md) — Fix Files for Linting (#94)
+- **2024-06-14** — [`a189a72`](https://github.com/vacp2p/rfc-index/blob/a189a72146978307ede84708d89c580dab5bc142/status/raw/simple-scaling.md) — fix: messageHash in 57 (#22)
+- **2024-03-01** — [`61a39e2`](https://github.com/vacp2p/rfc-index/blob/61a39e26d7b8a1ced4c9e56b971a20c72679556d/status/raw/simple-scaling.md) — Update and rename vac/raw/57/simple-scaling.md to status/raw/simple-scaling.md
+- **2024-02-28** — [`18a16ae`](https://github.com/vacp2p/rfc-index/blob/18a16ae6954f49fba0046d8e418f7bc55ae4c7aa/vac/raw/57/simple-scaling.md) — Update and rename simple-scaling.md to simple-scaling.md
+- **2024-02-12** — [`f19a136`](https://github.com/vacp2p/rfc-index/blob/f19a136ea6c0ae18c4a8afaed88a81b0aaa30262/status/raw/57/simple-scaling.md) — Update and rename status/57/simple-scaling.md to status/raw/57/simple-scaling.md
+- **2024-02-07** — [`27fae4f`](https://github.com/vacp2p/rfc-index/blob/27fae4fe9168cb2318f54ee94852150019be5652/status/57/simple-scaling.md) — Update simple-scaling.md
+- **2024-02-05** — [`fa8c750`](https://github.com/vacp2p/rfc-index/blob/fa8c750dd762ccef1cc6c8d775f57a57a6f9bd21/status/57/simple-scaling.md) — Update simple-scaling.md
+- **2024-02-01** — [`5919040`](https://github.com/vacp2p/rfc-index/blob/59190400c67b7a2d9b7bfa1ab5504eabb3637317/status/57/simple-scaling.md) — Update simple-scaling.md
+- **2024-01-27** — [`f7a51b9`](https://github.com/vacp2p/rfc-index/blob/f7a51b9fdfc3155fa09795cf6902f5d4d82f83b7/status/57/simple-scaling.md) — Create simple-scaling.md
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document describes how to scale

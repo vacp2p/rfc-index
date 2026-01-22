@@ -7,6 +7,20 @@
 | Status | draft |
 | Editor | Szymon Szlachtowicz <szymon.s@ethworks.io> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/28/featuring.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/28/featuring.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/28/featuring.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/28/featuring.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/28/featuring.md) — Fix Files for Linting (#94)
+- **2024-02-05** — [`1255162`](https://github.com/vacp2p/rfc-index/blob/1255162d40f33f6a037596174690a9eb4d99c572/status/28/featuring.md) — Update featuring.md
+- **2024-01-27** — [`86cafd8`](https://github.com/vacp2p/rfc-index/blob/86cafd8523ee34e6c5aa28a54b22e5a8483ff638/status/28/featuring.md) — Create featuring.md
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This specification describes a voting method to feature different active Status Communities.

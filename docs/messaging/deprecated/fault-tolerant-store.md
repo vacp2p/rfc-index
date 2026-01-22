@@ -7,6 +7,23 @@
 | Status | deleted |
 | Editor | Sanaz Taheri <sanaz@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/messaging/deprecated/fault-tolerant-store.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/deprecated/fault-tolerant-store.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/deprecated/fault-tolerant-store.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/waku/deprecated/fault-tolerant-store.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/waku/deprecated/fault-tolerant-store.md) — ci: add mdBook configuration (#233)
+- **2025-11-04** — [`cb4d0de`](https://github.com/vacp2p/rfc-index/blob/cb4d0de84f64b37539af64b6de1e3084ffd74c6a/waku/deprecated/fault-tolerant-store.md) — Update 21/WAKU2-FAULT-TOLERANT-STORE: Deleted (#181)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/waku/standards/application/21/fault-tolerant-store.md) — Fix Files for Linting (#94)
+- **2024-03-21** — [`2eaa794`](https://github.com/vacp2p/rfc-index/blob/2eaa7949c4abe7d14e2b9560e8c045bf2e937c9a/waku/standards/application/21/fault-tolerant-store.md) — Broken Links + Change Editors (#26)
+- **2024-01-31** — [`5da8a11`](https://github.com/vacp2p/rfc-index/blob/5da8a111ca9856ee53ee5b8598a7d5ecf5a2dce4/waku/standards/application/21/fault-tolerant-store.md) — Update and rename FAULT-TOLERANT-STORE.md to fault-tolerant-store.md
+- **2024-01-27** — [`206133e`](https://github.com/vacp2p/rfc-index/blob/206133edd978d85993f7680bd2ce384ba0079c1f/waku/standards/application/21/FAULT-TOLERANT-STORE.md) — Create FAULT-TOLERANT-STORE.md
+
+<!-- timeline:end -->
+
  The reliability of [13/WAKU2-STORE](../standards/core/13/store.md)
 protocol heavily relies on the fact that full nodes i.e.,
 those who persist messages have high availability and

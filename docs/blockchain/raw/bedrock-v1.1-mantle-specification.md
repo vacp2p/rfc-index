@@ -9,6 +9,15 @@
 | Editor | Thomas Lavaur <thomaslavaur@status.im> |
 | Contributors | David Rusu <davidrusu@status.im>, Filip Dimitrijevic <filip@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md) — Chore/mdbook updates (#258)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document specifies the Mantle layer of Bedrock,

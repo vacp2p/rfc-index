@@ -4,8 +4,20 @@
 | --- | --- |
 | Name | Codex Slot Builder |
 | Slug | 78 |
-| Status | raw |
+| Status | deprecated |
 | Contributors | Jimmy Debe <jimmy@status.im> |
+
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-22** — [`5eebc99`](https://github.com/vacp2p/rfc-index/blob/5eebc99b52bc5097b173191220eb51e721b6d24c/docs/storage/deprecated/slot-buIlder.md) — chore: add makefile
+- **2026-01-22** — [`af45aae`](https://github.com/vacp2p/rfc-index/blob/af45aae01271637142fa931e673dc7c8627f480e/docs/storage/deprecated/slot-buIlder.md) — chore: deprecate Marketplace-related specs (#268)
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/storage/raw/slot-buIlder.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/storage/raw/slot-buIlder.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/storage/raw/slot-buIlder.md) — Chore/mdbook updates (#258)
+
+<!-- timeline:end -->
 
 ## Abstract
 

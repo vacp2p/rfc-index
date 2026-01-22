@@ -8,6 +8,14 @@
 | Category | Standards Track |
 | Editor | Ugur Sen <ugur@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-21** — [`70f3cfb`](https://github.com/vacp2p/rfc-index/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/multi-message_id-burn-rln.md) — chore: mdbook font fix (#266)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document specifies multi-message_id burn RLN which the users

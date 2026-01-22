@@ -9,6 +9,26 @@
 | Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
 | Contributors | Andrea Piana <andreap@status.im>, Prem Chaitanya Prathi <prem@waku.org> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/56/communities.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/56/communities.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/56/communities.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/56/communities.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/56/communities.md) — ci: add mdBook configuration (#233)
+- **2025-03-07** — [`f4b34af`](https://github.com/vacp2p/rfc-index/blob/f4b34afd1a1e198b0d99b911bf8b371b5b13a6b8/status/56/communities.md) — Fix Linting Errors (#135)
+- **2025-02-21** — [`9bed57e`](https://github.com/vacp2p/rfc-index/blob/9bed57e4ad5d6609202a18f581a00b2fd81f6acb/status/56/communities.md) — docs: define basic sharding for Communities (#132)
+- **2025-01-02** — [`dc7497a`](https://github.com/vacp2p/rfc-index/blob/dc7497a3123623f2834d80ebd3a7c77e0d605074/status/56/communities.md) — add usage guidelines for waku content topics (#117)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/56/communities.md) — Fix Files for Linting (#94)
+- **2024-08-05** — [`eb25cd0`](https://github.com/vacp2p/rfc-index/blob/eb25cd06d679e94409072a96841de16a6b3910d5/status/56/communities.md) — chore: replace email addresses (#86)
+- **2024-02-05** — [`11bdc3b`](https://github.com/vacp2p/rfc-index/blob/11bdc3bbb705afe1b493bbb40d61e2e6d7af6a6a/status/56/communities.md) — Update communities.md
+- **2024-02-01** — [`8350742`](https://github.com/vacp2p/rfc-index/blob/83507420c3060f93acac0454276a69df40c4b52c/status/56/communities.md) — Update and rename COMMUNITIES.md to communities.md
+- **2024-01-27** — [`a786356`](https://github.com/vacp2p/rfc-index/blob/a786356887a5443d4624a076e878314b30aa4609/status/56/COMMUNITIES.md) — Create COMMUNITIES.md
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document describes the design of Status Communities over Waku v2,

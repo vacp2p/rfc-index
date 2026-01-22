@@ -17,7 +17,7 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
           config: .github/workflows/.markdownlint.json
-          globs: '**/*.md'
+          globs: 'docs/**/*.md'
 
   remark:
     runs-on: ubuntu-latest

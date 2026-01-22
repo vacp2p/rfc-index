@@ -9,6 +9,22 @@
 | Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
 | Contributors | Jimmy Debe <jimmy@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/63/keycard-usage.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/63/keycard-usage.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/63/keycard-usage.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/63/keycard-usage.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/63/keycard-usage.md) — Fix Files for Linting (#94)
+- **2024-08-05** — [`eb25cd0`](https://github.com/vacp2p/rfc-index/blob/eb25cd06d679e94409072a96841de16a6b3910d5/status/63/keycard-usage.md) — chore: replace email addresses (#86)
+- **2024-02-05** — [`928173d`](https://github.com/vacp2p/rfc-index/blob/928173d2fc1ea67035db433561de65592c1f0a24/status/63/keycard-usage.md) — Update keycard-usage.md
+- **2024-02-05** — [`68e6d45`](https://github.com/vacp2p/rfc-index/blob/68e6d453c2f932d5bf5feff6f20e4cce0342af13/status/63/keycard-usage.md) — Update keycard-usage.md
+- **2024-01-27** — [`100e0e8`](https://github.com/vacp2p/rfc-index/blob/100e0e86afb9b9525b8050aa83a360555258bc49/status/63/keycard-usage.md) — Create keycard-usage.md
+
+<!-- timeline:end -->
+
 ## Terminology
 
 - **Account**: A valid
