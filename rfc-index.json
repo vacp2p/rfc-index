@@ -1115,8 +1115,8 @@
     "title": "Codex Storage Marketplace",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-19",
-    "path": "storage/raw/codex-marketplace.html",
+    "updated": "2026-01-22",
+    "path": "storage/deprecated/codex-marketplace.html",
     "archived": false
   },
   {
@@ -1125,8 +1125,8 @@
     "title": "Codex Slot Builder",
     "status": "raw",
     "category": "unspecified",
-    "updated": "2026-01-19",
-    "path": "storage/raw/slot-buIlder.html",
+    "updated": "2026-01-22",
+    "path": "storage/deprecated/slot-buIlder.html",
     "archived": false
   },
   {
@@ -1135,8 +1135,8 @@
     "title": "Codex Erasue Coding",
     "status": "raw",
     "category": "unspecified",
-    "updated": "2026-01-19",
-    "path": "storage/raw/erasure-coding.html",
+    "updated": "2026-01-22",
+    "path": "storage/deprecated/erasure-coding.html",
     "archived": false
   },
   {
@@ -1155,8 +1155,8 @@
     "title": "Codex Prover Module",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-19",
-    "path": "storage/raw/codex-prover.html",
+    "updated": "2026-01-22",
+    "path": "storage/deprecated/codex-prover.html",
     "archived": false
   },
   {
