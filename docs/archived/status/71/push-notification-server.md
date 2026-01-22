@@ -9,6 +9,27 @@
 | Editor | Jimmy Debe <jimmy@status.im> |
 | Contributors | Andrea Maria Piana <andreap@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/71/push-notification-server.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/71/push-notification-server.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/71/push-notification-server.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/71/push-notification-server.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/71/push-notification-server.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/71/push-notification-server.md) — Fix Files for Linting (#94)
+- **2024-02-07** — [`3e21cc0`](https://github.com/vacp2p/rfc-index/blob/3e21cc0aabe72b00bf2e6ce51ed889e929e4a047/status/71/push-notification-server.md) — Update push-notification-server.md
+- **2024-02-05** — [`5bce327`](https://github.com/vacp2p/rfc-index/blob/5bce32702ae3dcb1c05f491804a745724533db7e/status/71/push-notification-server.md) — Update push-notification-server.md
+- **2024-02-02** — [`8df3f00`](https://github.com/vacp2p/rfc-index/blob/8df3f006cf6a9dd64c3cfa8c99256330cc696df7/status/71/push-notification-server.md) — Update and rename PUSH-NOTIFICATIONS.md to push-notification-server.md
+- **2024-01-27** — [`eb7c5bf`](https://github.com/vacp2p/rfc-index/blob/eb7c5bf71edd47cf0b5d0f0919013cdea17c4f43/status/71/PUSH-NOTIFICATIONS.md) — Create PUSH-NOTIFICATIONS.md
+
+<!-- timeline:end -->
+
+
+
+
+
 ## Abstract
 
 A push notification server implementation for IOS devices and Android devices.

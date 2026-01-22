@@ -8,6 +8,18 @@
 | Category | Standards Track |
 | Editor | Vinh Trinh <vinh@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-21** — [`70f3cfb`](https://github.com/vacp2p/rfc-index/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/zerokit-api.md) — chore: mdbook font fix (#266)
+
+<!-- timeline:end -->
+
+
+
+
+
 ## Abstract
 
 This document specifies the Zerokit API, an implementation of the RLN-V2 protocol.

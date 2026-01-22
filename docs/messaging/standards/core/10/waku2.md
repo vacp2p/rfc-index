@@ -12,6 +12,10 @@
 
 ## Timeline
 
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/messaging/standards/core/10/waku2.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/standards/core/10/waku2.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/standards/core/10/waku2.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/waku/standards/core/10/waku2.md) — Chore/mdbook updates (#237)
 - **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/waku/standards/core/10/waku2.md) — ci: add mdBook configuration (#233)
 - **2025-04-15** — [`34aa3f3`](https://github.com/vacp2p/rfc-index/blob/34aa3f3647cd5f0ae6a9af7fad47c3c8ee32c866/waku/standards/core/10/waku2.md) — Fix links 10/WAKU2 (#153)
 - **2025-04-09** — [`cafa04f`](https://github.com/vacp2p/rfc-index/blob/cafa04fb93c461034e1754cf750409a6236cf6ee/waku/standards/core/10/waku2.md) — 10/WAKU2: Update (#125)
@@ -30,6 +34,9 @@
 - **2024-01-24** — [`330c35b`](https://github.com/vacp2p/rfc-index/blob/330c35b56eecf3876c8246fbddb9e40b5211b566/waku/10/README.md) — Create README.md
 
 <!-- timeline:end -->
+
+
+
 
 ## Abstract
 

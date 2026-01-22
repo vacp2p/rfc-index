@@ -7,6 +7,24 @@
 | Status | draft |
 | Editor | Szymon Szlachtowicz <szymon.s@ethworks.io> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/24/curation.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/24/curation.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/24/curation.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/24/curation.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/24/curation.md) — Fix Files for Linting (#94)
+- **2024-02-05** — [`60fcdd5`](https://github.com/vacp2p/rfc-index/blob/60fcdd5737ad55b4d9da90e09610ffa06fa4032c/status/24/curation.md) — Update curation.md
+- **2024-01-27** — [`de29833`](https://github.com/vacp2p/rfc-index/blob/de298338905426f9f2cb0e374e11b789ecc543bf/status/24/curation.md) — Create curation.md
+
+<!-- timeline:end -->
+
+
+
+
+
 ## Abstract
 
 This specification is a voting protocol for peers to submit votes to a smart contract.

@@ -8,6 +8,26 @@
 | Editor | Oskar Thorén <oskarth@titanproxy.com> |
 | Contributors | Adam Babik <adam@status.im>, Andrea Maria Piana <andreap@status.im>, Dean Eigenmann <dean@status.im>, Kim De Mey <kimdemey@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/messaging/deprecated/5/waku0.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/deprecated/5/waku0.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/deprecated/5/waku0.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/waku/deprecated/5/waku0.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/waku/deprecated/5/waku0.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/waku/deprecated/5/waku0.md) — Fix Files for Linting (#94)
+- **2024-01-31** — [`9770963`](https://github.com/vacp2p/rfc-index/blob/97709637ad5a6ba7364191b4a4a3d1397ff41912/waku/deprecated/5/waku0.md) — Rename WAKU0.md to waku0.md
+- **2024-01-31** — [`ac8fe6d`](https://github.com/vacp2p/rfc-index/blob/ac8fe6dbedc162e54c2faaa997b63a58ce364e7f/waku/deprecated/5/WAKU0.md) — Rename waku/rfc/deprecated/5/WAKU0.md to waku/deprecated/5/WAKU0.md
+- **2024-01-27** — [`61f7641`](https://github.com/vacp2p/rfc-index/blob/61f7641fdd055e71646ccabdc9c873899417323d/waku/rfc/deprecated/5/WAKU0.md) — Create WAKU0.md
+
+<!-- timeline:end -->
+
+
+
+
+
 This specification describes the format of Waku messages within the ÐΞVp2p Wire Protocol.
 This spec substitutes [EIP-627](https://eips.ethereum.org/EIPS/eip-627).
 Waku is a fork of the original Whisper protocol that enables better usability

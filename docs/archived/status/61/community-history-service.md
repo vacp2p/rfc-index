@@ -9,6 +9,26 @@
 | Editor | r4bbit <r4bbit@status.im> |
 | Contributors | Sanaz Taheri <sanaz@status.im>, John Lea <john@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/61/community-history-service.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/61/community-history-service.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/61/community-history-service.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/61/community-history-service.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/61/community-history-service.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/status/61/community-history-service.md) — Fix Files for Linting (#94)
+- **2024-03-21** — [`2eaa794`](https://github.com/vacp2p/rfc-index/blob/2eaa7949c4abe7d14e2b9560e8c045bf2e937c9a/status/61/community-history-service.md) — Broken Links + Change Editors (#26)
+- **2024-02-07** — [`d8ba50e`](https://github.com/vacp2p/rfc-index/blob/d8ba50ea62a367f476cd07f0de00b5cd66b128be/status/61/community-history-service.md) — Update community-history-service.md
+- **2024-02-05** — [`ad72c49`](https://github.com/vacp2p/rfc-index/blob/ad72c49f1ec7780549a78164e4c248584e52793b/status/61/community-history-service.md) — Create community-history-service.md
+
+<!-- timeline:end -->
+
+
+
+
+
 ## Abstract
 
 Messages are stored permanently by store nodes

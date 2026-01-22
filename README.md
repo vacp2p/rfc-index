@@ -1,29 +1,66 @@
-# rfc-index
+# Logos LIP (RFC) Index
 
-Logos LIP index built with mdBook.
+NOTE: This repo is still evolving while the LIP process is refined.
+
+This repository contains specifications from the Messaging, Blockchain, Storage,
+and IFT-TS components of the IFT portfolio. LIPs are Requests for Comments that
+document protocols, processes, and system interfaces in a consistent, reviewable
+format.
+
+## LIP process
+
+This repository replaces the old rfc.vac.dev resource. Specs are maintained in
+Markdown here and progress through statuses such as raw, draft, stable, or
+deprecated. The process and lifecycle are defined in:
+
+- 1/COSS: `docs/ift-ts/raw/1/coss.md`
+
+## Contributing
+
+1. Open a pull request against this repo.
+2. Add or update the LIP in the appropriate component folder.
+3. Include status and category metadata in the header table.
+
+If you are unsure where a document belongs, open an issue first and we will
+help route it.
+
+## Component indexes
+
+- Messaging: `docs/messaging/README.md`
+- Blockchain: `docs/blockchain/README.md`
+- Storage: `docs/storage/README.md`
+- IFT-TS: `docs/ift-ts/README.md`
+- Archived specs: `docs/archived/README.md`
 
 ## Local setup
 
 1. Install mdBook (pick the version that matches your Rust toolchain).
 2. Install Python dependencies if needed.
 
-## Build & serve
+To install mdBook via Make:
+
+```bash
+make install
+```
+
+## Build and serve
 
 Run the generators before building or serving:
 
 ```bash
-python scripts/gen_rfc_index.py
-python scripts/gen_history.py
+python scripts/run_runtime_generators.py
 mdbook build
 ```
 
 To serve locally:
 
 ```bash
-python scripts/gen_rfc_index.py
-python scripts/gen_history.py
-mdbook serve -p 3000 -n 0.0.0.0
+make serve
 ```
 
-Note: `docs/rfc-index.json` is generated and gitignored, so make sure to run
-`scripts/gen_rfc_index.py` whenever RFC metadata changes.
+Or run the commands directly:
+
+```bash
+python scripts/run_runtime_generators.py
+mdbook serve -p 3000 -n 0.0.0.0
+```

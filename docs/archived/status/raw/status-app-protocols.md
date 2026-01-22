@@ -9,6 +9,27 @@
 | Editor | Hanno Cornelius <hanno@status.im> |
 | Contributors | Jimmy Debe <jimmy@status.im>, Aaryamann Challani <p1ge0nh8er@proton.me> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/status-app-protocols.md) — Chore/updates mdbook (#262)
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/status-app-protocols.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/raw/status-app-protocols.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/raw/status-app-protocols.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/status/raw/status-app-protocols.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/status/raw/status-app-protocols.md) — ci: add mdBook configuration (#233)
+- **2025-03-07** — [`f4b34af`](https://github.com/vacp2p/rfc-index/blob/f4b34afd1a1e198b0d99b911bf8b371b5b13a6b8/status/raw/status-app-protocols.md) — Fix Linting Errors (#135)
+- **2025-02-21** — [`9bed57e`](https://github.com/vacp2p/rfc-index/blob/9bed57e4ad5d6609202a18f581a00b2fd81f6acb/status/raw/status-app-protocols.md) — docs: define basic sharding for Communities (#132)
+- **2024-11-20** — [`776c1b7`](https://github.com/vacp2p/rfc-index/blob/776c1b76cda73aa1feaf5746a4cdb56b6836b4be/status/raw/status-app-protocols.md) — rfc-index: Update (#110)
+- **2024-10-25** — [`37b3edf`](https://github.com/vacp2p/rfc-index/blob/37b3edfba3a103ef138a345a2a0cac7f28c07f7a/status/raw/status-app-protocols.md) — docs: add spec for status protocol stack, deprecate waku-usage spec (#105)
+
+<!-- timeline:end -->
+
+
+
+
+
 ## Abstract
 
 This specification describes the Status Application protocol stack.

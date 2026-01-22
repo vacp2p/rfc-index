@@ -7,6 +7,22 @@
 | Status | draft |
 | Editor | Franck Royer <franck@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/standards/core/31/enr.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/standards/core/31/enr.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/waku/standards/core/31/enr.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/waku/standards/core/31/enr.md) — ci: add mdBook configuration (#233)
+- **2025-10-16** — [`e4f5f28`](https://github.com/vacp2p/rfc-index/blob/e4f5f28ea3d44ecf6fde2f59cd1d5e094073ec35/waku/standards/core/31/enr.md) — Update WAKU-ENR: Move to Draft (#180)
+
+<!-- timeline:end -->
+
+
+
+
+
 ## Abstract
 
 This specification describes the usage of the ENR (Ethereum Node Records)

@@ -8,6 +8,29 @@
 | Editor | Hanno Cornelius <hanno@status.im> |
 | Contributors | Oskar Thorén <oskarth@titanproxy.com>, Sanaz Taheri <sanaz@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/messaging/standards/core/11/relay.md) — chore: fix links (#260)
+- **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/standards/core/11/relay.md) — Chore/mdbook updates (#258)
+- **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/waku/standards/core/11/relay.md) — Chore/fix headers (#239)
+- **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/waku/standards/core/11/relay.md) — Chore/mdbook updates (#237)
+- **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/waku/standards/core/11/relay.md) — ci: add mdBook configuration (#233)
+- **2024-09-13** — [`3ab314d`](https://github.com/vacp2p/rfc-index/blob/3ab314d87d4525ff1296bf3d9ec634d570777b91/waku/standards/core/11/relay.md) — Fix Files for Linting (#94)
+- **2024-02-01** — [`b346ad2`](https://github.com/vacp2p/rfc-index/blob/b346ad2cbb99404b5237f55d2d222f4563c7d249/waku/standards/core/11/relay.md) — Update relay.md
+- **2024-02-01** — [`0904a8b`](https://github.com/vacp2p/rfc-index/blob/0904a8b592174f9cf3e02453f8e73db32cb725c1/waku/standards/core/11/relay.md) — Update and rename RELAY.md to relay.md
+- **2024-01-27** — [`8ff46fa`](https://github.com/vacp2p/rfc-index/blob/8ff46fac5d37d8a508140586530134ec3f1c0720/waku/standards/core/11/RELAY.md) — Rename WAKU2-RELAY.md to RELAY.md
+- **2024-01-27** — [`4c4591c`](https://github.com/vacp2p/rfc-index/blob/4c4591c92b516c98e410c5f4cac5f4535abb96f7/waku/standards/core/11/WAKU2-RELAY.md) — Rename README.md to WAKU2-RELAY.md
+- **2024-01-27** — [`eef961b`](https://github.com/vacp2p/rfc-index/blob/eef961bfe3b1cf6aab66df5450555afd1d3543cb/waku/standards/core/11/README.md) — remove rfs folder
+- **2024-01-25** — [`6874961`](https://github.com/vacp2p/rfc-index/blob/6874961a27cbe8bd3ea5ac8497286bb974ea6e89/waku/rfcs/standards/core/11/README.md) — Create README.md
+
+<!-- timeline:end -->
+
+
+
+
+
 `11/WAKU2-RELAY` specifies a [Publish/Subscribe approach](https://docs.libp2p.io/concepts/publish-subscribe/)
 to peer-to-peer messaging with a strong focus on privacy,
 censorship-resistance, security and scalability.
