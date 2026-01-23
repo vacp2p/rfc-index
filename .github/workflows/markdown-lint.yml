@@ -2,9 +2,6 @@ name: markdown-linting
 
 on:
 
-  push:
-    branches: 
-      - '**'
   pull_request:
     branches: 
       - '**'
@@ -20,4 +17,21 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
           config: .github/workflows/.markdownlint.json
-          globs: '**/*.md'
+          globs: 'docs/**/*.md'
+
+  remark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Remark Linter
+        run: npm run lint:remark
