@@ -1,0 +1,680 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>NOMOS-PROOF-OF-QUOTA - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/index.html"><strong aria-hidden="true">1.1.</strong> Standards - Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/10/waku2.html"><strong aria-hidden="true">1.1.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/11/relay.html"><strong aria-hidden="true">1.1.2.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/filter.html"><strong aria-hidden="true">1.1.3.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/store.html"><strong aria-hidden="true">1.1.4.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/core/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.4.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/14/message.html"><strong aria-hidden="true">1.1.5.</strong> 14/WAKU2-MESSAGE</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/15/bridge.html"><strong aria-hidden="true">1.1.6.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/17/rln-relay.html"><strong aria-hidden="true">1.1.7.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/19/lightpush.html"><strong aria-hidden="true">1.1.8.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/31/enr.html"><strong aria-hidden="true">1.1.9.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/33/discv5.html"><strong aria-hidden="true">1.1.10.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/34/peer-exchange.html"><strong aria-hidden="true">1.1.11.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/36/bindings-api.html"><strong aria-hidden="true">1.1.12.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/64/network.html"><strong aria-hidden="true">1.1.13.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/core/66/metadata.html"><strong aria-hidden="true">1.1.14.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/index.html"><strong aria-hidden="true">1.2.</strong> Standards - Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/application/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.1.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/26/payload.html"><strong aria-hidden="true">1.2.2.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/53/x3dh.html"><strong aria-hidden="true">1.2.3.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/application/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.4.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/index.html"><strong aria-hidden="true">1.3.</strong> Standards - Legacy</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/6/waku1.html"><strong aria-hidden="true">1.3.1.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/7/data.html"><strong aria-hidden="true">1.3.2.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/8/mail.html"><strong aria-hidden="true">1.3.3.</strong> 8/WAKU-MAIL</a></li><li class="chapter-item expanded "><a href="../../messaging/standards/legacy/9/rpc.html"><strong aria-hidden="true">1.3.4.</strong> 9/WAKU-RPC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.4.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/22/toy-chat.html"><strong aria-hidden="true">1.4.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/23/topics.html"><strong aria-hidden="true">1.4.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/27/peers.html"><strong aria-hidden="true">1.4.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/29/config.html"><strong aria-hidden="true">1.4.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/30/adaptive-nodes.html"><strong aria-hidden="true">1.4.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/index.html"><strong aria-hidden="true">1.5.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/deprecated/5/waku0.html"><strong aria-hidden="true">1.5.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/16/rpc.html"><strong aria-hidden="true">1.5.2.</strong> 16/WAKU2-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/18/swap.html"><strong aria-hidden="true">1.5.3.</strong> 18/WAKU2-SWAP</a></li><li class="chapter-item expanded "><a href="../../messaging/deprecated/fault-tolerant-store.html"><strong aria-hidden="true">1.5.4.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/index.html"><strong aria-hidden="true">2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.1.</strong> BEDROCK-ANONYMOUS-LEADERS-REWARD</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.2.</strong> BEDROCK-GENESIS-BLOCK</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.</strong> BEDROCK-SERVICE-DECLARATION-PROTOCOL</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.4.</strong> BEDROCK-SERVICE-REWARD-DISTRIBUTION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.5.</strong> BEDROCK-V1-1-BLOCK-CONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.6.</strong> BEDROCK-V1.1-MANTLE-SPECIFICATION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.7.</strong> CRYPTARCHIA-PROOF-OF-LEADERSHIP</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.8.</strong> CRYPTARCHIA-TOTAL-STAKE-INFERENCE</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.9.</strong> CRYPTARCHIA-V1-BOOTSTRAPPING-SYNCHRONIZATION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-blend-protocol.html"><strong aria-hidden="true">2.1.10.</strong> NOMOS-BLEND-PROTOCOL</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.11.</strong> NOMOS-CRYPTARCHIA-V1-PROTOCOL</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-network.html"><strong aria-hidden="true">2.1.12.</strong> NOMOS-DA-NETWORK</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-key-types-and-generation.html"><strong aria-hidden="true">2.1.13.</strong> NOMOS-KEY-TYPES-GENERATION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-encapsulation.html"><strong aria-hidden="true">2.1.14.</strong> NOMOS-MESSAGE-ENCAPSULATION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-message-formatting.html"><strong aria-hidden="true">2.1.15.</strong> NOMOS-MESSAGE-FORMATTING</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network.html"><strong aria-hidden="true">2.1.16.</strong> NOMOS-P2P-NETWORK</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-payload-formatting.html"><strong aria-hidden="true">2.1.17.</strong> NOMOS-PAYLOAD-FORMATTING</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomos-proof-of-quota.html" class="active"><strong aria-hidden="true">2.1.18.</strong> NOMOS-PROOF-OF-QUOTA</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/nomosda-encoding.html"><strong aria-hidden="true">2.1.19.</strong> NOMOSDA-ENCODING</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.20.</strong> P2P-HARDWARE-REQUIREMENTS</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.21.</strong> P2P-NAT-SOLUTION</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.22.</strong> P2P-NETWORK-BOOTSTRAPPING</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/index.html"><strong aria-hidden="true">2.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.2.1.</strong> CONSENSUS-CLARO</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-merkle-tree.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.2.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.2.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.2.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.2.3.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.2.4.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/index.html"><strong aria-hidden="true">4.</strong> IFT-TS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../ift-ts/raw/1/coss.html"><strong aria-hidden="true">4.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/2/mvds.html"><strong aria-hidden="true">4.1.2.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/3/remote-log.html"><strong aria-hidden="true">4.1.3.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/4/mvds-meta.html"><strong aria-hidden="true">4.1.4.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.1.5.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/32/rln-v1.html"><strong aria-hidden="true">4.1.6.</strong> 32/RLN-V1</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.7.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-offchain.html"><strong aria-hidden="true">4.1.8.</strong> ETH-MLS-OFFCHAIN</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.9.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/deleted/eth-secpm.html"><strong aria-hidden="true">4.1.10.</strong> ETH-SECPM</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.11.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.12.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.13.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.14.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/logos-capability-discovery.html"><strong aria-hidden="true">4.1.15.</strong> LOGOS-CAPABILITY-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/mix.html"><strong aria-hidden="true">4.1.16.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.17.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.18.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.20.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/rln-v2.html"><strong aria-hidden="true">4.1.21.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/sds.html"><strong aria-hidden="true">4.1.22.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../ift-ts/raw/zerokit-api.html"><strong aria-hidden="true">4.1.23.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../ift-ts/template.html"><strong aria-hidden="true">4.2.</strong> TEMPLATE</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/index.html"><strong aria-hidden="true">5.</strong> Archived</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/index.html"><strong aria-hidden="true">5.1.</strong> Status</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/24/curation.html"><strong aria-hidden="true">5.1.1.</strong> 24/STATUS-CURATION</a></li><li class="chapter-item expanded "><a href="../../archived/status/28/featuring.html"><strong aria-hidden="true">5.1.2.</strong> 28/STATUS-FEATURING</a></li><li class="chapter-item expanded "><a href="../../archived/status/55/1to1-chat.html"><strong aria-hidden="true">5.1.3.</strong> 55/STATUS-1TO1-CHAT</a></li><li class="chapter-item expanded "><a href="../../archived/status/56/communities.html"><strong aria-hidden="true">5.1.4.</strong> 56/STATUS-COMMUNITIES</a></li><li class="chapter-item expanded "><a href="../../archived/status/61/community-history-service.html"><strong aria-hidden="true">5.1.5.</strong> 61/STATUS-Community-History-Service</a></li><li class="chapter-item expanded "><a href="../../archived/status/62/payloads.html"><strong aria-hidden="true">5.1.6.</strong> 62/STATUS-PAYLOADS</a></li><li class="chapter-item expanded "><a href="../../archived/status/63/keycard-usage.html"><strong aria-hidden="true">5.1.7.</strong> 63/STATUS-Keycard-Usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/65/account-address.html"><strong aria-hidden="true">5.1.8.</strong> 65/STATUS-ACCOUNT-ADDRESS</a></li><li class="chapter-item expanded "><a href="../../archived/status/71/push-notification-server.html"><strong aria-hidden="true">5.1.9.</strong> 71/STATUS-PUSH-NOTIFICATION-SERVER</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/index.html"><strong aria-hidden="true">5.1.10.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/raw/status-mvds.html"><strong aria-hidden="true">5.1.10.1.</strong> STATUS-MVDS-USAGE</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/status-app-protocols.html"><strong aria-hidden="true">5.1.10.2.</strong> STATUS-PROTOCOLS</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/simple-scaling.html"><strong aria-hidden="true">5.1.10.3.</strong> STATUS-SIMPLE-SCALING</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-data.html"><strong aria-hidden="true">5.1.10.4.</strong> STATUS-URL-DATA</a></li><li class="chapter-item expanded "><a href="../../archived/status/raw/url-scheme.html"><strong aria-hidden="true">5.1.10.5.</strong> STATUS-URL-SCHEME</a></li></ol></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/index.html"><strong aria-hidden="true">5.1.11.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../archived/status/deprecated/3rd-party.html"><strong aria-hidden="true">5.1.11.1.</strong> 3RD-PARTY</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/account.html"><strong aria-hidden="true">5.1.11.2.</strong> ACCOUNT</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/client.html"><strong aria-hidden="true">5.1.11.3.</strong> CLIENT</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/dapp-browser-API-usage.html"><strong aria-hidden="true">5.1.11.4.</strong> Dapp browser API usage</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/eips.html"><strong aria-hidden="true">5.1.11.5.</strong> EIPS</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/ethereum-usage.html"><strong aria-hidden="true">5.1.11.6.</strong> ETHEREUM-USAGE</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/group-chat.html"><strong aria-hidden="true">5.1.11.7.</strong> GROUP-CHAT</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html"><strong aria-hidden="true">5.1.11.8.</strong> IPFS-gateway-for-Sticker-Pack</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html"><strong aria-hidden="true">5.1.11.9.</strong> Keycard Usage for Wallet and Chat Keys</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/notifications.html"><strong aria-hidden="true">5.1.11.10.</strong> NOTIFICATIONS</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/payloads.html"><strong aria-hidden="true">5.1.11.11.</strong> PAYLOADS</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/push-notification-server.html"><strong aria-hidden="true">5.1.11.12.</strong> PUSH-NOTIFICATION-SERVER</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/secure-transport.html"><strong aria-hidden="true">5.1.11.13.</strong> SECURE-TRANSPORT</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-mailserver.html"><strong aria-hidden="true">5.1.11.14.</strong> WAKU-MAILSERVER</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/waku-usage.html"><strong aria-hidden="true">5.1.11.15.</strong> WAKU-USAGE</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-mailserver.html"><strong aria-hidden="true">5.1.11.16.</strong> WHISPER-MAILSERVER</a></li><li class="chapter-item expanded "><a href="../../archived/status/deprecated/whisper-usage.html"><strong aria-hidden="true">5.1.11.17.</strong> WHISPER-USAGE</a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/vacp2p/rfc-index" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="nomos-proof-of-quota"><a class="header" href="#nomos-proof-of-quota">NOMOS-PROOF-OF-QUOTA</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Nomos Proof of Quota Specification</td></tr>
+<tr><td>Slug</td><td>88</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Mehmet Gonen <a href="mailto:mehmet@status.im">mehmet@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Marcin Pawlowski <a href="mailto:marcin@status.im">marcin@status.im</a>, Thomas Lavaur <a href="mailto:thomaslavaur@status.im">thomaslavaur@status.im</a>, Youngjoon Lee <a href="mailto:youngjoon@status.im">youngjoon@status.im</a>, David Rusu <a href="mailto:davidrusu@status.im">davidrusu@status.im</a>, Álvaro Castro-Castilla <a href="mailto:alvaro@status.im">alvaro@status.im</a>, Filip Dimitrijevic <a href="mailto:filip@status.im">filip@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/blockchain/raw/nomos-proof-of-quota.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/nomos-proof-of-quota.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This document defines an implementation-friendly specification
+of the Proof of Quota (PoQ),
+which ensures that there is a limited number of message encapsulations
+that a node can perform,
+thereby constraining the number of messages a node can introduce
+to the Blend network used in Nomos
+(see <a href="#references">NOMOS-BLEND-PROTOCOL</a>).
+The mechanism regulating these messages is similar to rate-limiting nullifiers.</p>
+<p><strong>Keywords:</strong> cryptography, zero-knowledge, Blend, quota, rate-limiting,
+PoQ, nullifier</p>
+<h2 id="document-structure"><a class="header" href="#document-structure">Document Structure</a></h2>
+<p>This specification is organized into two distinct parts
+to serve different audiences and use cases:</p>
+<p><strong>Protocol Specification</strong> contains the normative requirements necessary
+for implementing an interoperable Blend Protocol node.
+This section defines the cryptographic primitives, message formats,
+network protocols, and behavioral requirements that all implementations
+must follow to ensure compatibility and maintain the protocol's
+privacy guarantees.
+Protocol designers, auditors, and those seeking to understand the core
+mechanisms should focus on this part.</p>
+<p><strong>Implementation Considerations</strong> provides non-normative guidance
+for implementers.
+This section offers practical recommendations, optimization strategies,
+and detailed examples that help developers build efficient and robust
+implementations.
+While these details are not required for interoperability,
+they represent best practices learned from reference implementations
+and can significantly improve performance and reliability.</p>
+<h2 id="protocol-specification"><a class="header" href="#protocol-specification">Protocol Specification</a></h2>
+<p>This section defines the normative cryptographic protocol requirements
+for the Proof of Quota.</p>
+<h3 id="construction"><a class="header" href="#construction">Construction</a></h3>
+<p>The Proof of Quota (PoQ) can be satisfied by one of two proof types,
+depending on the node's role in the network:</p>
+<ol>
+<li>
+<p><strong>Proof of Core Quota (PoQ_C)</strong>: Ensures that the core node is declared
+and hasn't already produced more keys than the core quota Q_C.</p>
+</li>
+<li>
+<p><strong>Proof of Leadership Quota (PoQ_L)</strong>: Ensures that the leader node
+would win the proof of stake for current Cryptarchia epoch
+(see <a href="#references">Cryptarchia Consensus</a>)
+and hasn't already produced more keys than the leadership quota Q_L.
+This doesn't guarantee that the node is indeed winning
+because the PoQ doesn't check if the Proof of Leadership note
+(representing staked value) is unspent,
+enabling generation of the proof ahead of time preventing extreme delays.</p>
+</li>
+</ol>
+<p><strong>Validity</strong>: The final proof PoQ is valid if either PoQ_C or PoQ_L holds.</p>
+<h3 id="zero-knowledge-proof-statement"><a class="header" href="#zero-knowledge-proof-statement">Zero-Knowledge Proof Statement</a></h3>
+<h4 id="public-values"><a class="header" href="#public-values">Public Values</a></h4>
+<p>A proof attesting that for the following public values
+derived from blockchain parameters:</p>
+<p><strong>Type Definition:</strong>
+<code>zkhash</code> represents a 256-bit hash value used in zero-knowledge circuits,
+typically a Poseidon hash output compatible with the BN256 scalar field.</p>
+<pre><code class="language-python">class ProofOfQuotaPublic:
+    session: int              # Session number (uint64)
+    core_quota: int           # Allowed messages per session for core nodes (20 bits)
+    leader_quota: int         # Allowed messages per session for potential leaders (20 bits)
+    core_root: zkhash         # Merkle root of zk_id of the core nodes
+    K_part_one: int           # First part of the signature public key (16 bytes)
+    K_part_two: int           # Second part of the signature public key (16 bytes)
+    pol_epoch_nonce: int      # PoL Epoch nonce
+    pol_t0: int               # PoL constant t0
+    pol_t1: int               # PoL constant t1
+    pol_ledger_aged: zkhash   # Merkle root of the PoL eligible notes
+
+    # Outputs:
+    key_nullifier: zkhash     # Derived from session, private index and private sk
+</code></pre>
+<p><strong>Field Descriptions:</strong></p>
+<ul>
+<li><code>session</code>: Unique session identifier for temporal partitioning</li>
+<li><code>core_quota</code>: Maximum number of message encapsulations allowed per session
+for core nodes (20-bit value)</li>
+<li><code>leader_quota</code>: Maximum number of message encapsulations allowed per session
+for potential leaders (20-bit value)</li>
+<li><code>core_root</code>: Root of Merkle tree containing zk_id values
+of all declared core nodes</li>
+<li><code>K_part_one</code>, <code>K_part_two</code>: Split representation of one-time signature
+public key (32 bytes total)</li>
+<li><code>pol_epoch_nonce</code>: Proof of Leadership epoch nonce for lottery</li>
+<li><code>pol_t0</code>, <code>pol_t1</code>: Proof of Leadership threshold constants</li>
+<li><code>pol_ledger_aged</code>: Root of Merkle tree containing eligible
+Proof of Leadership notes</li>
+<li><code>key_nullifier</code>: Output nullifier preventing key reuse within a session</li>
+</ul>
+<h4 id="witness"><a class="header" href="#witness">Witness</a></h4>
+<p>The prover knows a witness:</p>
+<pre><code class="language-python">class ProofOfQuotaWitness:
+    index: int                              # Index of the generated key (20 bits)
+    selector: bool                          # Indicates if it's a leader (=1) or core node (=0)
+
+    # This part is filled randomly by potential leaders
+    core_sk: zkhash                         # sk corresponding to the zk_id of the core node
+    core_path: list[zkhash]                 # Merkle path proving zk_id membership (len = 20)
+    core_path_selectors: list[bool]         # Indicates how to read the core_path
+
+    # This part is filled randomly by core nodes
+    pol_sl: int                             # PoL slot
+    pol_sk_starting_slot: int               # PoL starting slot of the slot secrets
+    pol_note_value: int                     # PoL note value
+    pol_note_tx_hash: zkhash                # PoL note transaction
+    pol_note_output_number: int             # PoL note transaction output number
+    pol_noteid_path: list[zkhash]           # PoL Merkle path proving noteID membership (len = 32)
+    pol_noteid_path_selectors: list[bool]   # Indicates how to read the note_path
+    pol_slot_secret: int                    # PoL slot secret corresponding to sl
+    pol_slot_secret_path: list[zkhash]      # PoL slot secret Merkle path (len = 25)
+</code></pre>
+<p><strong>Witness Field Descriptions:</strong></p>
+<ul>
+<li><code>index</code>: The index of the generated key.
+Limiting this index limits the maximum number of keys generated
+(20 bits enables up to 2^20 = 1,048,576 messages per node per session)</li>
+<li><code>selector</code>: Boolean flag indicating node type (1 for leader, 0 for core node)</li>
+<li><code>core_sk</code>: Secret key corresponding to the core node's zk_id</li>
+<li><code>core_path</code>: Merkle authentication path for core node membership</li>
+<li><code>core_path_selectors</code>: Navigation bits for Merkle path (left/right)</li>
+<li><code>pol_*</code>: Proof of Leadership witness fields (filled randomly by core nodes)</li>
+</ul>
+<p><strong>Note</strong>: All inputs and outputs of zero-knowledge proofs are scalar field elements.</p>
+<h3 id="constraints"><a class="header" href="#constraints">Constraints</a></h3>
+<p>The following constraints MUST hold for a valid proof:</p>
+<h4 id="step-1-index-selection-and-quota-limitation"><a class="header" href="#step-1-index-selection-and-quota-limitation">Step 1: Index Selection and Quota Limitation</a></h4>
+<p>The prover selects an index for the chosen key.
+This index MUST be lower than the allowed quota and not already used.
+This index is used to derive the key nullifier in
+<a href="#step-4-key-nullifier-derivation">Step 4: Key Nullifier Derivation</a>.</p>
+<p><strong>Purpose</strong>: Limiting the possible values of this index limits the possible
+nullifiers created,
+which produces the desired effect of limiting the generation of keys
+to a certain quota.</p>
+<p><strong>Specification</strong>: <code>index</code> is 20 bits,
+enabling up to 2^20 messages per node per session.</p>
+<h4 id="step-2-core-node-verification"><a class="header" href="#step-2-core-node-verification">Step 2: Core Node Verification</a></h4>
+<p>If the prover indicated that the node is a core node for the proof
+(<code>selector</code> is 0), the proof checks that:</p>
+<ol>
+<li>
+<p><strong>Core Node Registration</strong>: The core node is registered
+in the set N = SDP(session),
+where SDP is the Service Declaration Protocol
+(see <a href="#references">Service Declaration Protocol</a>).
+This is proven by demonstrating knowledge of a <code>core_sk</code>
+that corresponds to a declared <code>zk_id</code>,
+which is a valid SDP registry for the current session.</p>
+<ul>
+<li>The <code>zk_id</code> values are stored in a Merkle tree with a fixed depth of 20</li>
+<li>The root is provided as a public input</li>
+<li>To build the Merkle tree, <code>zk_id</code> values are ordered from smallest
+to biggest (when seen as natural numbers between 0 and p)</li>
+<li>Remaining empty leaves are represented by 0 after the sorting
+(appended at the end of the vector)</li>
+<li>This structure supports up to 1M validators</li>
+</ul>
+</li>
+<li>
+<p><strong>Index Validity</strong>: The index MUST satisfy: <code>index &lt; core_quota</code></p>
+</li>
+</ol>
+<h4 id="step-3-leader-node-verification"><a class="header" href="#step-3-leader-node-verification">Step 3: Leader Node Verification</a></h4>
+<p>If the prover indicated that the node is a potential leader node for the proof
+(<code>selector</code> is 1), the proof checks that:</p>
+<ol>
+<li>
+<p><strong>Leadership Lottery</strong>: The leader node possesses a note
+that would win a slot in the consensus lottery.
+Unlike leadership conditions,
+the proof of quota doesn't verify that the note is unspent.
+This enables potential provers to generate the PoQ well in advance.
+All other lottery constraints are the same as in Circuit Constraints.</p>
+</li>
+<li>
+<p><strong>Index Validity</strong>: The index MUST satisfy: <code>index &lt; leader_quota</code></p>
+</li>
+</ol>
+<h4 id="step-4-key-nullifier-derivation"><a class="header" href="#step-4-key-nullifier-derivation">Step 4: Key Nullifier Derivation</a></h4>
+<p>The prover derives a <code>key_nullifier</code> maintained by blend nodes
+during the session for message deduplication purposes:</p>
+<pre><code class="language-python">selection_randomness = zkhash(b"SELECTION_RANDOMNESS_V1", sk, index, session)
+key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
+</code></pre>
+<p>Where <code>sk</code> is:</p>
+<ul>
+<li>The <code>core_sk</code> as defined in the Mantle specification if the node is a core node</li>
+<li>The secret key of the PoL note if it's a leader node derived from inputs</li>
+</ul>
+<p><strong>Rationale</strong>: Two hashes are used because the selection randomness is used
+in the Proof of Selection to prove the ownership of a valid PoQ.</p>
+<h4 id="step-5-one-time-signature-key-attachment"><a class="header" href="#step-5-one-time-signature-key-attachment">Step 5: One-Time Signature Key Attachment</a></h4>
+<p>The prover attaches a one-time signature key used in the blend protocol.
+This public key is split into two 16-byte parts:
+<code>K_part_one</code> and <code>K_part_two</code>.</p>
+<p><strong>Encoding</strong>: When written in little-endian byte order,
+the complete public key equals the concatenation <code>K_part_one || K_part_two</code>.</p>
+<h3 id="circuit-implementation"><a class="header" href="#circuit-implementation">Circuit Implementation</a></h3>
+<pre><code class="language-python"># Verify selector is a boolean
+# selector = 1 if it's a potential leader and 0 if it's a core node
+selector * (1 - selector) == 0  # Check that selector is indeed a bit
+
+# Verify index is lower than quota
+# Equivalent to: index &lt; leader_quota if selector == 1
+#                or index &lt; core_quota if selector == 0
+index &lt; selector * (leader_quota - core_quota) + core_quota
+
+# Check if it's a registered core node
+zk_id = zkhash(b"NOMOS_KDF", core_sk)
+is_registered = merkle_verify(core_root, core_path, core_path_selectors, zk_id)
+
+# Check if it's a potential leader
+is_leader = would_win_leadership(
+    pol_epoch_nonce,
+    pol_t0,
+    pol_t1,
+    pol_ledger_aged,
+    pol_sl,
+    pol_sk_starting_slot,
+    pol_sk_secrets_root,
+    pol_note_value,
+    pol_note_tx_hash,
+    pol_note_output_number,
+    pol_noteid_path,
+    pol_noteid_path_selectors,
+    pol_slot_secret,
+    pol_slot_secret_path
+)
+
+# Verify that it's a core node or a leader
+assert(selector * (is_leader - is_registered) + is_registered == 1)
+
+# Get leader note secret key
+pol_sk_secrets_root = get_merkle_root(pol_sk_starting_slot, sl, pol_slot_secret_path)
+pol_note_sk = zkhash(b"NOMOS_POL_SK_V1", pol_sk_starting_slot, pol_sk_secrets_root)
+
+# Derive nullifier
+selection_randomness = zkhash(
+    b"SELECTION_RANDOMNESS_V1",
+    selector * (pol_note_sk - core_sk) + core_sk,
+    index,
+    session
+)
+key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
+</code></pre>
+<h3 id="proof-compression"><a class="header" href="#proof-compression">Proof Compression</a></h3>
+<p>The proof confirming that the PoQ is correct MUST be compressed
+to a size of 128 bytes.</p>
+<p><strong>Uncompressed Format</strong>: The UncompressedProof comprises 2 G1 and 1 G2
+BN256 elements:</p>
+<pre><code class="language-python">class UncompressedProof:
+    pi_a: G1  # BN256 element
+    pi_b: G2  # BN256 element
+    pi_c: G1  # BN256 element
+</code></pre>
+<p><strong>Compression Requirements</strong>:</p>
+<ul>
+<li>Compressed size: 128 bytes</li>
+<li>Curve: BN256 (also known as BN254 or alt_bn128)</li>
+<li>Compression MUST preserve proof validity</li>
+</ul>
+<h3 id="proof-serialization"><a class="header" href="#proof-serialization">Proof Serialization</a></h3>
+<p>The ProofOfQuota structure contains <code>key_nullifier</code> and the compressed proof
+transformed into bytes.</p>
+<pre><code class="language-python">class ProofOfQuota:
+    key_nullifier: zkhash  # 32 bytes
+    proof: bytes           # 128 bytes
+</code></pre>
+<p><strong>Serialization Format</strong>:</p>
+<ol>
+<li>Transform <code>key_nullifier</code> into 32 bytes</li>
+<li>Compress proof to 128 bytes</li>
+<li>Concatenate: <code>key_nullifier || proof</code></li>
+<li>Total size: 160 bytes</li>
+</ol>
+<p><strong>Deserialization</strong>:</p>
+<p>Interpret the 160-byte sequence as:</p>
+<ul>
+<li>Bytes 0-31: <code>key_nullifier</code></li>
+<li>Bytes 32-159: <code>proof</code></li>
+</ul>
+<h3 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h3>
+<h4 id="quota-enforcement"><a class="header" href="#quota-enforcement">Quota Enforcement</a></h4>
+<ul>
+<li>Implementations MUST track <code>key_nullifier</code> values during each session</li>
+<li>Duplicate <code>key_nullifier</code> values MUST be rejected</li>
+<li>Session transitions MUST clear the nullifier set</li>
+</ul>
+<h4 id="proof-verification"><a class="header" href="#proof-verification">Proof Verification</a></h4>
+<ul>
+<li>All Merkle path verifications MUST be performed</li>
+<li>The <code>selector</code> bit MUST be verified as boolean (0 or 1)</li>
+<li>Index bounds MUST be strictly enforced</li>
+<li>Implementations MUST reject proofs where neither core nor leader conditions hold</li>
+</ul>
+<h4 id="cryptographic-assumptions"><a class="header" href="#cryptographic-assumptions">Cryptographic Assumptions</a></h4>
+<ul>
+<li>Relies on soundness of the underlying zk-SNARK system</li>
+<li>Assumes collision resistance of <code>zkhash</code> function</li>
+<li>Assumes computational Diffie-Hellman assumption on BN256 curve</li>
+</ul>
+<h4 id="note-unspent-condition"><a class="header" href="#note-unspent-condition">Note Unspent Condition</a></h4>
+<ul>
+<li><strong>Critical</strong>: The PoQ does NOT verify that Proof of Leadership notes are unspent</li>
+<li>This allows pre-generation of proofs to avoid delays</li>
+<li>Implementations SHOULD implement additional checks for actual leadership</li>
+</ul>
+<h2 id="implementation-considerations"><a class="header" href="#implementation-considerations">Implementation Considerations</a></h2>
+<p>This section provides guidance for implementing the Proof of Quota protocol.</p>
+<h3 id="proof-generation"><a class="header" href="#proof-generation">Proof Generation</a></h3>
+<p><strong>Performance Characteristics</strong>:</p>
+<p>Implementations SHOULD consider:</p>
+<ul>
+<li>Proof generation is computationally intensive</li>
+<li>Pre-generation is recommended for leader nodes</li>
+<li>Witness preparation involves Merkle path computation</li>
+</ul>
+<h3 id="proof-verification-implementation"><a class="header" href="#proof-verification-implementation">Proof Verification Implementation</a></h3>
+<p><strong>Verification Steps</strong>:</p>
+<ol>
+<li>Deserialize proof into <code>key_nullifier</code> and <code>proof</code> components</li>
+<li>Verify proof size (160 bytes total)</li>
+<li>Check <code>key_nullifier</code> against session nullifier set</li>
+<li>Verify zk-SNARK proof with public inputs</li>
+<li>Add <code>key_nullifier</code> to session set if valid</li>
+</ol>
+<h3 id="merkle-tree-construction"><a class="header" href="#merkle-tree-construction">Merkle Tree Construction</a></h3>
+<h4 id="core-nodes-merkle-tree"><a class="header" href="#core-nodes-merkle-tree">Core Nodes Merkle Tree</a></h4>
+<p><strong>Specification</strong>:</p>
+<ul>
+<li>Depth: 20 levels</li>
+<li>Leaf values: <code>zk_id</code> of declared core nodes</li>
+<li>Ordering: Ascending numerical order (as natural numbers 0 to p)</li>
+<li>Empty leaves: Represented by 0, appended after sorted values</li>
+<li>Capacity: 2^20 = 1,048,576 validators</li>
+</ul>
+<p><strong>Construction Algorithm</strong>:</p>
+<pre><code class="language-python">def build_core_tree(zk_ids: list[int]) -&gt; MerkleTree:
+    # Sort zk_ids in ascending order
+    sorted_ids = sorted(zk_ids)
+
+    # Pad to 2^20 with zeros
+    padded = sorted_ids + [0] * (2**20 - len(sorted_ids))
+
+    # Build Merkle tree
+    return MerkleTree(padded, depth=20)
+</code></pre>
+<h4 id="pol-ledger-merkle-tree"><a class="header" href="#pol-ledger-merkle-tree">PoL Ledger Merkle Tree</a></h4>
+<p><strong>Specification</strong>:</p>
+<ul>
+<li>Depth: 32 levels</li>
+<li>Leaf values: Note IDs of eligible PoL notes</li>
+<li>Purpose: Prove note membership in aged ledger</li>
+</ul>
+<h3 id="session-management"><a class="header" href="#session-management">Session Management</a></h3>
+<p><strong>Session Lifecycle</strong>:</p>
+<ol>
+<li>
+<p><strong>Session Start</strong>:</p>
+<ul>
+<li>Initialize empty nullifier set</li>
+<li>Load current session parameters (quotas, roots)</li>
+<li>Prepare session number for proofs</li>
+</ul>
+</li>
+<li>
+<p><strong>During Session</strong>:</p>
+<ul>
+<li>Verify incoming proofs</li>
+<li>Track nullifiers in set</li>
+<li>Reject duplicate nullifiers</li>
+</ul>
+</li>
+<li>
+<p><strong>Session End</strong>:</p>
+<ul>
+<li>Clear nullifier set</li>
+<li>Archive session data</li>
+<li>Transition to next session</li>
+</ul>
+</li>
+</ol>
+<h3 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h3>
+<h4 id="nullifier-set-management"><a class="header" href="#nullifier-set-management">Nullifier Set Management</a></h4>
+<ul>
+<li>Use efficient data structure (hash set or Bloom filter with fallback)</li>
+<li>Implement atomic operations for nullifier insertion</li>
+<li>Consider memory constraints for long sessions</li>
+</ul>
+<h4 id="pre-generation-strategy"><a class="header" href="#pre-generation-strategy">Pre-Generation Strategy</a></h4>
+<p>For leader nodes:</p>
+<ul>
+<li>Generate proofs before slot assignment</li>
+<li>Cache proofs for multiple indices</li>
+<li>Monitor note status separately from PoQ</li>
+</ul>
+<h4 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h4>
+<p>Implementations SHOULD handle:</p>
+<ul>
+<li>Invalid proof format</li>
+<li>Duplicate nullifiers</li>
+<li>Index out of bounds</li>
+<li>Merkle path verification failures</li>
+<li>Invalid selector values</li>
+</ul>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
+<ul>
+<li>NOMOS-BLEND-PROTOCOL - Blend Protocol specification for Nomos</li>
+<li>Service Declaration Protocol (SDP) - Protocol for declaring core nodes</li>
+<li>Mantle Specification</li>
+<li>Circuit Constraints (Cryptarchia)</li>
+<li>Proof of Selection</li>
+<li><a href="https://rate-limiting-nullifier.github.io/rln-docs/">Rate-Limiting Nullifiers</a>
+- RLN documentation for rate-limiting mechanisms</li>
+</ul>
+<h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
+<ul>
+<li><a href="https://nomos-tech.notion.site/Proof-of-Quota-Specification-215261aa09df81d88118ee22205cbafe">Proof of Quota Specification</a>
+- Original Proof of Quota documentation</li>
+<li>BN256 Curve Specification</li>
+<li>zk-SNARKs (Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge)</li>
+<li><a href="https://arxiv.org/abs/2402.06408">Cryptarchia Consensus</a></li>
+<li>Merkle Trees and Authentication Paths</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/nomos-payload-formatting.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/nomosda-encoding.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/nomos-payload-formatting.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/nomosda-encoding.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../scripts/rfc-index.js"></script>
+
+
+    </div>
+    </body>
+</html>
