@@ -1,5 +1,5 @@
 ---
-title: extensible-peer-records
+title: EXTENSIBLE-PEER-RECORDS
 name: Extensible Peer Records
 status: raw
 category: Standards Track
