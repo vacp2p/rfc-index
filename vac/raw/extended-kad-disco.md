@@ -1,6 +1,6 @@
 ---
-title: extended-kad-disco
-name: Extended Kademlia Discovery
+title: EXTENDED-KADEMLIA-DISCOVERY
+name: Extended Kademlia Discovery with capability filtering
 status: raw
 category: Standards Track
 tags:
@@ -36,7 +36,8 @@ large-scale decentralized overlay networks that require:
 - Resilience against eclipse attacks and network partitioning
 - Low overhead compared to gossip-based or pubsub-based discovery
 
-By leveraging the already-deployed Kademlia routing table and random-walk behavior, This document define a simple, low-cost discovery primitive that reuses existing infrastructure while adding capability advertisement and filtering via a new record type.
+By leveraging the already-deployed Kademlia routing table and random-walk behavior,
+this document define a simple, low-cost discovery primitive that reuses existing infrastructure while adding capability advertisement and filtering via a new record type.
 
 ## Semantic
 
@@ -44,7 +45,8 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document
 are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md) (`KAD-DHT`) and [extended peer records specification](https://github.com/vacp2p/rfc-index/blob/31dfa0c8c2f3e7f7365156246c4eb7b7c390e76e/vac/raw/extensible-peer-records.md) (`XPR`) for terminology used in this document.
+Please refer to [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md) (`Kad-DHT`)
+and [extensible peer records specification](https://github.com/vacp2p/rfc-index/blob/31dfa0c8c2f3e7f7365156246c4eb7b7c390e76e/vac/raw/extensible-peer-records.md) (`XPR`) for terminology used in this document.
 
 ## Protocol
 
@@ -60,9 +62,9 @@ This will allow future discoverers to filter discovered records based on desired
 
 In order to advertise this record,
 the advertiser SHOULD first retrieve the `k` closest peers to its own peer ID
-in its own `KAD-DHT` [routing table](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#kademlia-routing-table).
+in its own `Kad-DHT` [routing table](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#kademlia-routing-table).
 This assumes that the routing table has been previously initialised
-and follows the regular [bootstrap process](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#bootstrap-process) as per the `KAD-DHT` specification.
+and follows the regular [bootstrap process](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#bootstrap-process) as per the `Kad-DHT` specification.
 The advertiser SHOULD then send a `PUT_VALUE` message to these `k` peers
 to store the `XPR` against its own peer ID.
 This process SHOULD be repeated periodically to maintain the advertised record.
@@ -72,8 +74,11 @@ We RECOMMEND an interval of once every `30` minutes.
 
 Advertisers SHOULD include their `XPR`s as the `signedPeerRecord`
 in libp2p `Identify` [messages](https://github.com/libp2p/specs/blob/0762325f693afb2e620d32d4f55ba962d1293ff9/identify/README.md#the-identify-message).
-For more information, see the `Identify` protocol implementation in various language
-as this extention is not part of the specification.
+
+> **Note:** For more information, see the `identify` protocol implementations,
+such as [go-libp2p](https://github.com/libp2p/go-libp2p/blob/636d44e15abc7bfbd1da09cc9fef674249625ae6/p2p/protocol/identify/pb/identify.proto#L37),
+as at the time of writing (Jan 2026)
+the `signedPeerRecord` field extension is not yet part of any official specification.
 
 ### Record Discovery
 
@@ -84,10 +89,17 @@ SHOULD perform the following random walk discovery procedure (`FIND_RANDOM`):
 1. Choose a random value in the `Kad-DHT` key space. (`R_KEY`).
 
 2. Follow the `Kad-DHT` [peer routing](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#peer-routing) algorithm,
- with `R_KEY` as the target. This procedure loops the `Kad-DHT` `FIND_NODE` procedure to the target key, each time receiving closer peers (`closerPeers`) to the target key in response, until no new closer peers can be found. Since the target is random, the discoverer SHOULD consider each _previously unseen_ peer in each response's `closerPeers` field, as a randomly discovered node of potential interest. The discoverer MUST keep track of such peers as `discoveredPeer`s.
+with `R_KEY` as the target.
+This procedure loops the `Kad-DHT` `FIND_NODE` procedure to the target key,
+each time receiving closer peers (`closerPeers`) to the target key in response,
+until no new closer peers can be found.
+Since the target is random,
+the discoverer SHOULD consider each _previously unseen_ peer in each response's `closerPeers` field,
+as a randomly discovered node of potential interest.
+The discoverer MUST keep track of such peers as `discoveredPeer`s.
 
 3. For each `discoveredPeer`, attempt to retrieve a corresponding `XPR`.
-This can be done in one of two ways: 
+This can be done in one of two ways:
 
     3.1 If the `discoveredPeer` in the response contains at least one multiaddress in the `addrs` field, 
     attempt a connection to that peer and wait to receive the `XPR` as part of the [`identify` procedure](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/identify/README.md).
@@ -98,19 +110,87 @@ This can be done in one of two ways:
     MAY perform a [value retrieval](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#value-retrieval) procedure to the `discoveredPeer` ID.
 
 4. For each retrieved `XPR`, validate the signature against the peer ID. 
-In addition, the discoverer MAY filter discovered peers based on the capabilities encoded within the `services` field of the `XPR`. 
+In addition, the discoverer MAY filter discovered peers
+based on the capabilities encoded within the `services` field of the `XPR`.
 The discoverer SHOULD ignore (and disconnect, if already connected) discovered peers 
-with invalid `XPR`s or that does not advertise the `services` of interest to the discoverer.
+with invalid `XPR`s
+or that do not advertise the `services` of interest to the discoverer.
 
 ### Privacy Enhancements
 
 To prevent network topology mapping and eclipse attacks,
-`KAD-DHT` nodes MUST NOT disclose connection type in [response messages](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#rpc-messages).
+`Kad-DHT` nodes MUST NOT disclose connection type in [response messages](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#rpc-messages).
 The `connection` field of every `Peer` MUST always be set to `NOT_CONNECTED`.
 
-### Future Improvements
+## API Specification
 
-To make the system resilient to eclipse attacks, since a node `XPR` are stored at the `k` closest nodes, future version of this document could specify how to retrieve `XPR` on more nodes than only the originator via a new libp2p protocol that returns all `XPR` a node stores regardless of the associated key.
+Implementers of this protocol,
+SHOULD wrap the implementation in a functional interface similar to the one defined below.
+
+In Extended Kademlia Discovery, the discovery protocol is based on a random DHT walk,
+optionally filtering the randomly discovered peers by capability.
+However, it's possible to define discovery protocols with better performance in finding peers with specific capabilities.
+The aim is to define an API that is compatible with Extended Kademlia Discovery
+and more sophisticated capability discovery protocols,
+maintaining similar function signatures even if the underlying protocol differs.
+This section may be extracted into a separate API specification once new capability discovery protocols are defined.
+
+The API is defined in the form of C-style bindings.
+However, this simply serves to illustrate the exposed functions
+and can be adapted into the conventions of any strongly typed language.
+Although unspecified in the API below,
+all functions SHOULD return an error result type appropriate to the implementation language.
+
+### `start()`
+
+Start the discovery protocol,
+including all tasks related to bootstrapping and maintaining the routing table
+and advertising this node and its capabilities.
+
+In the case of Extended Kademlia Discovery,
+`start()` will kick off the periodic task of [refreshing the propagated `XPR`](#record-propagation).
+
+### `stop()`
+
+Stop the discovery protocol,
+including all tasks related to maintaining the routing table
+and advertising this node and its capabilities.
+
+In the case of Extended Kademlia Discovery,
+`stop()` will cancel the periodic task of [refreshing the propagated `XPR`](#record-propagation).
+
+### `start_advertising(const char* service_id)`
+
+Start advertising this node against any capability
+encoded as an input `service_id` string.
+
+In the case of Extended Kademlia Discovery,
+`start_advertising()` will include the input `service_id`
+in the [regularly propagated `XPR`](#record-propagation).
+
+### `stop_advertising(const char* service_id)`
+
+Stop advertising this node against the capability
+encoded in the input `service_id` string.
+
+In the case of Extended Kademlia Discovery,
+`stop_advertising()` will exclude the `service_id`
+from the [regularly propagated `XPR`](#record-propagation),
+if it was previously included.
+
+### `ExtensiblePeerRecords* lookup(const char* service_id, ...)`
+
+Lookup and return records for peers supporting the capability encoded in the input `service_id` string,
+using the underlying discovery protocol.
+`service_id` is an OPTIONAL input argument.
+If unset, it indicates a lookup for peers supporting any (or zero) capabilities.
+
+In the case of Extended Kademlia Discovery,
+`lookup()` will trigger the random walk [record discovery](#record-discovery),
+filtering discovered records based on `service_id`, if specified.
+If no `service_id` is specified,
+Extended Kademlia Discovery will just return a random selection of peer records,
+matching any capability.
 
 ## Copyright
 
