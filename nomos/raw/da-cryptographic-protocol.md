@@ -136,7 +136,7 @@ based on the size of the block data and the number of DA nodes.
 *Figure 1: Data matrix structure showing chunks and columns.
 Each chunk is a 31-byte element, and each column contains $\ell$ chunks.*
 
-The encoding process consists of four steps:
+The encoding process consists of three steps:
 
 1. Calculating row commitments.
 1. Expanding the original data using RS coding.
@@ -204,10 +204,10 @@ and commitment $com_i = com(f_i)$.
 
 The encoder computes random scalar $h \in \mathbb{F}$ using the Fiat–Shamir heuristic,
 applying the BLAKE2b hash function with a 31-byte output,
-over the row commitments with a domain separation tag `NOMOS_DA_V1`
+over the row commitments with a domain separation tag `DA_V1`
 to ensure uniqueness and prevent cross-protocol collisions:
 
-$$h = \text{Hash}(\text{'NOMOS\_DA\_V1'} \| com_1 \| \ldots \| com_{\ell})$$
+$$h = \text{Hash}(\text{'DA\_V1'} \| com_1 \| \ldots \| com_{\ell})$$
 
 The resulting digest is interpreted as a field element
 in the scalar field of BLS12-381.
@@ -267,7 +267,7 @@ then verifies by calculating $h$, $com_C$, and $v_j$.*
 1. The DA node computes the scalar challenge $h \in \mathbb{F}$
    using a Fiat–Shamir hash over the row commitments with a domain separation tag:
 
-   $$h = \text{Hash}(\text{'NOMOS\_DA\_V1'} \| com_1 \| com_2 \| \ldots \| com_{\ell})$$
+   $$h = \text{Hash}(\text{'DA\_V1'} \| com_1 \| com_2 \| \ldots \| com_{\ell})$$
 
 1. The DA node computes the combined commitment $com_C$:
 
@@ -309,7 +309,7 @@ The verification process run by the sampling client proceeds as follows:
 
 1. Compute the scalar $h \in \mathbb{F}$ using the domain-separated Fiat–Shamir hash:
 
-   $$h = \text{Hash}(\text{'NOMOS\_DA\_V1'} \| com_1 \| com_2 \| \ldots \| com_{\ell})$$
+   $$h = \text{Hash}(\text{'DA\_V1'} \| com_1 \| com_2 \| \ldots \| com_{\ell})$$
 
 1. Compute the combined commitment $com_C$:
 
@@ -321,7 +321,7 @@ The verification process run by the sampling client proceeds as follows:
 
 1. Verify the evaluation proof:
 
-   $$\text{Verify}(com_C, w^{s-1}, v_s, \pi_s) \rightarrow \text{true/false}$$
+   $$\text{Verify}(com_C, w^{s-1}, v_t, \pi_s) \rightarrow \text{true/false}$$
 
 If these checks succeed, then this proves to the sampling client
 that the column $s$ is correctly encoded and matches the committed data.
@@ -333,7 +333,7 @@ to reach a local opinion on the availability of the entire data.
 ### Fiat–Shamir Security
 
 The random scalar $h$ MUST be computed using the Fiat–Shamir heuristic
-with the domain separation tag `NOMOS_DA_V1` to prevent cross-protocol attacks.
+with the domain separation tag `DA_V1` to prevent cross-protocol attacks.
 The hash function MUST be BLAKE2b with a 31-byte output.
 
 ### Chunk Size
