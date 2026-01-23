@@ -1,5 +1,5 @@
 #!/usr/bin/env groovy
-library 'status-jenkins-lib@v1.9.31'
+library 'status-jenkins-lib@v1.9.40'
 
 pipeline {
   agent {
@@ -54,6 +54,6 @@ pipeline {
   }
 }
 
-def isMainBranch() { GIT_BRANCH ==~ /.*main/ }
-def deployBranch() { isMainBranch() ? 'deploy-master' : 'deploy-develop' }
-def deployDomain() { isMainBranch() ? 'rfc.vac.dev' : 'dev-rfc.vac.dev' }
+def isMasterBranch() { GIT_BRANCH ==~ /.*master/ }
+def deployBranch() { isMasterBranch() ? 'deploy-master' : 'deploy-develop' }
+def deployDomain() { isMasterBranch() ? 'lip.logos.co' : 'dev-lip.logos.co' }
