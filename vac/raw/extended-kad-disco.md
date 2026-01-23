@@ -1,5 +1,5 @@
 ---
-title: extended-kad-disco
+title: EXTENDED-KADEMLIA-DISCOVERY
 name: Extended Kademlia Discovery with capability filtering
 status: raw
 category: Standards Track
