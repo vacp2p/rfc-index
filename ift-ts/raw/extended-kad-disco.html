@@ -188,7 +188,12 @@
 <tr><td>Editor</td><td>Simon-Pierre Vivier <a href="mailto:simvivier@status.im">simvivier@status.im</a></td></tr>
 <tr><td>Contributors</td><td>Hanno Cornelius <a href="mailto:hanno@status.im">hanno@status.im</a></td></tr>
 </tbody></table>
-</div>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-23</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/8164992534b14b2466fc1117bbeef2ae2d14f249/docs/ift-ts/raw/extended-kad-disco.md"><code>8164992</code></a> — chore: fix lint</li>
+</ul>
+<!-- timeline:end -->
 <h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
 <p>This specification defines a lightweight peer discovery mechanism
 built on top of the libp2p Kademlia DHT.
@@ -317,17 +322,17 @@ including all tasks related to maintaining the routing table
 and advertising this node and its capabilities.</p>
 <p>In the case of Extended Kademlia Discovery,
 <code>stop()</code> will cancel the periodic task of <a href="#record-propagation">refreshing the propagated <code>XPR</code></a>.</p>
-<h3 id="start_advertisingconst-char-service_id"><a class="header" href="#start_advertisingconst-char-service_id"><code>start_advertising(const char* service_id)</code></a></h3>
+<h3 id="startadvertisingconst-char-serviceid"><a class="header" href="#startadvertisingconst-char-serviceid"><code>start*advertising(const char* service*id)</code></a></h3>
 <p>Start advertising this node against any capability
 encoded as an input <code>service_id</code> string.</p>
 <p>In the case of Extended Kademlia Discovery,
-<code>start_advertising()</code> will include the input <code>service_id</code>
+<code>start*advertising()</code> will include the input <code>service*id</code>
 in the <a href="#record-propagation">regularly propagated <code>XPR</code></a>.</p>
-<h3 id="stop_advertisingconst-char-service_id"><a class="header" href="#stop_advertisingconst-char-service_id"><code>stop_advertising(const char* service_id)</code></a></h3>
+<h3 id="stopadvertisingconst-char-serviceid"><a class="header" href="#stopadvertisingconst-char-serviceid"><code>stop*advertising(const char* service*id)</code></a></h3>
 <p>Stop advertising this node against the capability
 encoded in the input <code>service_id</code> string.</p>
 <p>In the case of Extended Kademlia Discovery,
-<code>stop_advertising()</code> will exclude the <code>service_id</code>
+<code>stop*advertising()</code> will exclude the <code>service*id</code>
 from the <a href="#record-propagation">regularly propagated <code>XPR</code></a>,
 if it was previously included.</p>
 <h3 id="extensiblepeerrecords-lookupconst-char-service_id-"><a class="header" href="#extensiblepeerrecords-lookupconst-char-service_id-"><code>ExtensiblePeerRecords* lookup(const char* service_id, ...)</code></a></h3>

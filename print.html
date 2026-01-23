@@ -28697,7 +28697,12 @@ the prospective key package has not been already used.</li>
 <tr><td>Editor</td><td>Simon-Pierre Vivier <a href="mailto:ift-ts/raw/simvivier@status.im">simvivier@status.im</a></td></tr>
 <tr><td>Contributors</td><td>Hanno Cornelius <a href="mailto:ift-ts/raw/hanno@status.im">hanno@status.im</a></td></tr>
 </tbody></table>
-</div>
+</div><!-- timeline:start -->
+<h2 id="timeline-75"><a class="header" href="#timeline-75">Timeline</a></h2>
+<ul>
+<li><strong>2026-01-23</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/8164992534b14b2466fc1117bbeef2ae2d14f249/docs/ift-ts/raw/extended-kad-disco.md"><code>8164992</code></a> — chore: fix lint</li>
+</ul>
+<!-- timeline:end -->
 <h2 id="abstract-50"><a class="header" href="#abstract-50">Abstract</a></h2>
 <p>This specification defines a lightweight peer discovery mechanism
 built on top of the libp2p Kademlia DHT.
@@ -28826,17 +28831,17 @@ including all tasks related to maintaining the routing table
 and advertising this node and its capabilities.</p>
 <p>In the case of Extended Kademlia Discovery,
 <code>stop()</code> will cancel the periodic task of <a href="ift-ts/raw/extended-kad-disco.html#record-propagation">refreshing the propagated <code>XPR</code></a>.</p>
-<h3 id="start_advertisingconst-char-service_id"><a class="header" href="#start_advertisingconst-char-service_id"><code>start_advertising(const char* service_id)</code></a></h3>
+<h3 id="startadvertisingconst-char-serviceid"><a class="header" href="#startadvertisingconst-char-serviceid"><code>start*advertising(const char* service*id)</code></a></h3>
 <p>Start advertising this node against any capability
 encoded as an input <code>service_id</code> string.</p>
 <p>In the case of Extended Kademlia Discovery,
-<code>start_advertising()</code> will include the input <code>service_id</code>
+<code>start*advertising()</code> will include the input <code>service*id</code>
 in the <a href="ift-ts/raw/extended-kad-disco.html#record-propagation">regularly propagated <code>XPR</code></a>.</p>
-<h3 id="stop_advertisingconst-char-service_id"><a class="header" href="#stop_advertisingconst-char-service_id"><code>stop_advertising(const char* service_id)</code></a></h3>
+<h3 id="stopadvertisingconst-char-serviceid"><a class="header" href="#stopadvertisingconst-char-serviceid"><code>stop*advertising(const char* service*id)</code></a></h3>
 <p>Stop advertising this node against the capability
 encoded in the input <code>service_id</code> string.</p>
 <p>In the case of Extended Kademlia Discovery,
-<code>stop_advertising()</code> will exclude the <code>service_id</code>
+<code>stop*advertising()</code> will exclude the <code>service*id</code>
 from the <a href="ift-ts/raw/extended-kad-disco.html#record-propagation">regularly propagated <code>XPR</code></a>,
 if it was previously included.</p>
 <h3 id="extensiblepeerrecords-lookupconst-char-service_id-"><a class="header" href="#extensiblepeerrecords-lookupconst-char-service_id-"><code>ExtensiblePeerRecords* lookup(const char* service_id, ...)</code></a></h3>
@@ -28870,7 +28875,7 @@ matching any capability.</p>
 <tr><td>Contributors</td><td>Simon-Pierre Vivier <a href="mailto:ift-ts/raw/simvivier@status.im">simvivier@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-75"><a class="header" href="#timeline-75">Timeline</a></h2>
+<h2 id="timeline-76"><a class="header" href="#timeline-76">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/extensible-peer-records.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/extensible-peer-records.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -29021,7 +29026,7 @@ In future we may define a more compact multicodec type for Extensible Peer Recor
 <tr><td>Editor</td><td>Daniel Kaiser <a href="mailto:ift-ts/raw/danielkaiser@status.im">danielkaiser@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-76"><a class="header" href="#timeline-76">Timeline</a></h2>
+<h2 id="timeline-77"><a class="header" href="#timeline-77">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/gossipsub-tor-push.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/gossipsub-tor-push.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -29213,7 +29218,7 @@ For the best protection, these contexts should run on separate physical machines
 <tr><td>Contributors</td><td>seemenkina <a href="mailto:ekaterina@status.im">ekaterina@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-77"><a class="header" href="#timeline-77">Timeline</a></h2>
+<h2 id="timeline-78"><a class="header" href="#timeline-78">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/consensus-hashgraphlike.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/consensus-hashgraphlike.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -29447,7 +29452,7 @@ in different stages of the protocol, violating vote consistency and attempting t
 <tr><td>Contributors</td><td>Ugur Sen <a href="mailto:ugur@status.im">ugur@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-78"><a class="header" href="#timeline-78">Timeline</a></h2>
+<h2 id="timeline-79"><a class="header" href="#timeline-79">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/logos-capability-discovery.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/logos-capability-discovery.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -30571,7 +30576,7 @@ and DoS attacks caused by inactive or malicious advertisers.</p>
 <tr><td>Contributors</td><td>Akshaya Mani <a href="mailto:ift-ts/raw/akshaya@status.im">akshaya@status.im</a>, Daniel Kaiser <a href="mailto:ift-ts/raw/danielkaiser@status.im">danielkaiser@status.im</a>, Hanno Cornelius</td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-79"><a class="header" href="#timeline-79">Timeline</a></h2>
+<h2 id="timeline-80"><a class="header" href="#timeline-80">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/mix.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/mix.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -31970,7 +31975,7 @@ Any such mechanism MUST preserve sender unlinkability and SHOULD be evaluated ca
 <tr><td>Editor</td><td>Ugur Sen <a href="mailto:ift-ts/raw/ugur@status.im">ugur@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-80"><a class="header" href="#timeline-80">Timeline</a></h2>
+<h2 id="timeline-81"><a class="header" href="#timeline-81">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-21</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/multi-message_id-burn-rln.md"><code>70f3cfb</code></a> — chore: mdbook font fix (#266)</li>
 </ul>
@@ -32153,7 +32158,7 @@ are not considered consumed and MAY be reused in subsequent proofs in which the 
 <tr><td>Editor</td><td>Ramses Fernandez <a href="mailto:ift-ts/raw/ramses@status.im">ramses@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-81"><a class="header" href="#timeline-81">Timeline</a></h2>
+<h2 id="timeline-82"><a class="header" href="#timeline-82">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/noise-x3dh-double-ratchet.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/noise-x3dh-double-ratchet.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -32446,7 +32451,7 @@ communication.</p>
 <tr><td>Editor</td><td>Aaryamann Challani <a href="mailto:ift-ts/raw/p1ge0nh8er@proton.me">p1ge0nh8er@proton.me</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-82"><a class="header" href="#timeline-82">Timeline</a></h2>
+<h2 id="timeline-83"><a class="header" href="#timeline-83">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/rln-interep-spec.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/rln-interep-spec.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -32577,7 +32582,7 @@ previously in proof verification.</li>
 <tr><td>Contributors</td><td>Jimmy Debe <a href="mailto:ift-ts/raw/jimmy@status.im">jimmy@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-83"><a class="header" href="#timeline-83">Timeline</a></h2>
+<h2 id="timeline-84"><a class="header" href="#timeline-84">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/rln-stealth-commitments.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/rln-stealth-commitments.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -32693,7 +32698,7 @@ which also includes a test to generate a stealth commitment for a given user.</p
 <tr><td>Contributors</td><td>Lev Soukhanov <a href="mailto:ift-ts/raw/0xdeadfae@gmail.com">0xdeadfae@gmail.com</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-84"><a class="header" href="#timeline-84">Timeline</a></h2>
+<h2 id="timeline-85"><a class="header" href="#timeline-85">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/rln-v2.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/rln-v2.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -32897,7 +32902,7 @@ this spec inherits all the security considerations of <a href="ift-ts/raw/32/rln
 <tr><td>Contributors</td><td>Akhil Peddireddy <a href="mailto:ift-ts/raw/akhil@status.im">akhil@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-85"><a class="header" href="#timeline-85">Timeline</a></h2>
+<h2 id="timeline-86"><a class="header" href="#timeline-86">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/sds.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/sds.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -33352,7 +33357,7 @@ regardless of whether other participants have also recently broadcast a Periodic
 <tr><td>Editor</td><td>Vinh Trinh <a href="mailto:ift-ts/raw/vinh@status.im">vinh@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-86"><a class="header" href="#timeline-86">Timeline</a></h2>
+<h2 id="timeline-87"><a class="header" href="#timeline-87">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-21</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/zerokit-api.md"><code>70f3cfb</code></a> — chore: mdbook font fix (#266)</li>
 </ul>
@@ -33891,7 +33896,7 @@ Specifications can also be viewed at <a href="https://status.app/specs">Status</
 <tr><td>Editor</td><td>Szymon Szlachtowicz <a href="mailto:archived/status/24/szymon.s@ethworks.io">szymon.s@ethworks.io</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-87"><a class="header" href="#timeline-87">Timeline</a></h2>
+<h2 id="timeline-88"><a class="header" href="#timeline-88">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/24/curation.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
 <li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/24/curation.md"><code>0f1855e</code></a> — Chore/fix headers (#239)</li>
@@ -33980,7 +33985,7 @@ Also directory will be updated according to vote results
 <tr><td>Editor</td><td>Szymon Szlachtowicz <a href="mailto:archived/status/28/szymon.s@ethworks.io">szymon.s@ethworks.io</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-88"><a class="header" href="#timeline-88">Timeline</a></h2>
+<h2 id="timeline-89"><a class="header" href="#timeline-89">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/28/featuring.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
 <li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/28/featuring.md"><code>0f1855e</code></a> — Chore/fix headers (#239)</li>
@@ -34042,7 +34047,7 @@ up to previous Sunday 23:59:59 UTC are considered featured.</p>
 <tr><td>Contributors</td><td>Andrea Piana <a href="mailto:archived/status/55/andreap@status.im">andreap@status.im</a>, Pedro Pombeiro <a href="mailto:archived/status/55/pedro@status.im">pedro@status.im</a>, Corey Petty <a href="mailto:archived/status/55/corey@status.im">corey@status.im</a>, Oskar Thorén <a href="mailto:archived/status/55/oskarth@titanproxy.com">oskarth@titanproxy.com</a>, Dean Eigenmann <a href="mailto:archived/status/55/dean@status.im">dean@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-89"><a class="header" href="#timeline-89">Timeline</a></h2>
+<h2 id="timeline-90"><a class="header" href="#timeline-90">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/55/1to1-chat.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/55/1to1-chat.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -34282,7 +34287,7 @@ e.g., <a href="archived/status/55/../../../messaging/standards/application/53/x3
 <tr><td>Contributors</td><td>Andrea Piana <a href="mailto:archived/status/56/andreap@status.im">andreap@status.im</a>, Prem Chaitanya Prathi <a href="mailto:archived/status/56/prem@waku.org">prem@waku.org</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-90"><a class="header" href="#timeline-90">Timeline</a></h2>
+<h2 id="timeline-91"><a class="header" href="#timeline-91">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/56/communities.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/56/communities.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -34840,7 +34845,7 @@ since members of the community don't need to receive all the control messages.</
 <tr><td>Contributors</td><td>Sanaz Taheri <a href="mailto:archived/status/61/sanaz@status.im">sanaz@status.im</a>, John Lea <a href="mailto:archived/status/61/john@status.im">john@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-91"><a class="header" href="#timeline-91">Timeline</a></h2>
+<h2 id="timeline-92"><a class="header" href="#timeline-92">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/61/community-history-service.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/61/community-history-service.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -35339,7 +35344,7 @@ except for that one message).</p>
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/62/adam@status.im">adam@status.im</a>, Andrea Maria Piana <a href="mailto:archived/status/62/andreap@status.im">andreap@status.im</a>, Oskar Thoren <a href="mailto:archived/status/62/oskarth@titanproxy.com">oskarth@titanproxy.com</a>, Samuel Hawksby-Robinson <a href="mailto:archived/status/62/samuel@status.im">samuel@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-92"><a class="header" href="#timeline-92">Timeline</a></h2>
+<h2 id="timeline-93"><a class="header" href="#timeline-93">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/62/payloads.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/62/payloads.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -36316,7 +36321,7 @@ which might break compatibility</li>
 <tr><td>Contributors</td><td>Jimmy Debe <a href="mailto:archived/status/63/jimmy@status.im">jimmy@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-93"><a class="header" href="#timeline-93">Timeline</a></h2>
+<h2 id="timeline-94"><a class="header" href="#timeline-94">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/63/keycard-usage.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
 <li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/status/63/keycard-usage.md"><code>0f1855e</code></a> — Chore/fix headers (#239)</li>
@@ -36585,7 +36590,7 @@ MAY implement the following flows according to the actions listed above.</p>
 <tr><td>Contributors</td><td>Corey Petty <a href="mailto:archived/status/65/corey@status.im">corey@status.im</a>, Oskar Thorén <a href="mailto:archived/status/65/oskarth@titanproxy.com">oskarth@titanproxy.com</a>, Samuel Hawksby-Robinson <a href="mailto:archived/status/65/samuel@status.im">samuel@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-94"><a class="header" href="#timeline-94">Timeline</a></h2>
+<h2 id="timeline-95"><a class="header" href="#timeline-95">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/65/account-address.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/65/account-address.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -36734,7 +36739,7 @@ that belong to a user need to be paired.</p>
 <tr><td>Contributors</td><td>Andrea Maria Piana <a href="mailto:archived/status/71/andreap@status.im">andreap@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-95"><a class="header" href="#timeline-95">Timeline</a></h2>
+<h2 id="timeline-96"><a class="header" href="#timeline-96">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/71/push-notification-server.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/71/push-notification-server.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -37435,7 +37440,7 @@ but querying client’s chat key is not disclosed.</li>
 <tr><td>Editor</td><td>Kaichao Sun <a href="mailto:archived/status/raw/kaichao@status.im">kaichao@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-96"><a class="header" href="#timeline-96">Timeline</a></h2>
+<h2 id="timeline-97"><a class="header" href="#timeline-97">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/status-mvds.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/status-mvds.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -37567,7 +37572,7 @@ These are the three main types of chats in Status.</p>
 <tr><td>Contributors</td><td>Jimmy Debe <a href="mailto:archived/status/raw/jimmy@status.im">jimmy@status.im</a>, Aaryamann Challani <a href="mailto:archived/status/raw/p1ge0nh8er@proton.me">p1ge0nh8er@proton.me</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-97"><a class="header" href="#timeline-97">Timeline</a></h2>
+<h2 id="timeline-98"><a class="header" href="#timeline-98">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/status-app-protocols.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/status-app-protocols.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -37913,7 +37918,7 @@ and MUST be considered a "large message".</p>
 <tr><td>Contributors</td><td>Alvaro Revuelta <a href="mailto:archived/status/raw/alrevuelta@status.im">alrevuelta@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-98"><a class="header" href="#timeline-98">Timeline</a></h2>
+<h2 id="timeline-99"><a class="header" href="#timeline-99">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/simple-scaling.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/simple-scaling.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -38464,7 +38469,7 @@ for information on Waku Anonymity.</p>
 <tr><td>Contributors</td><td>Aaryamann Challani <a href="mailto:archived/status/raw/aaryamann@status.im">aaryamann@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-99"><a class="header" href="#timeline-99">Timeline</a></h2>
+<h2 id="timeline-100"><a class="header" href="#timeline-100">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/url-data.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/url-data.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -38607,7 +38612,7 @@ A list of additional references. -->
 <tr><td>Editor</td><td>Felicio Mununga <a href="mailto:archived/status/raw/felicio@status.im">felicio@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-100"><a class="header" href="#timeline-100">Timeline</a></h2>
+<h2 id="timeline-101"><a class="header" href="#timeline-101">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/raw/url-scheme.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/raw/url-scheme.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -38683,7 +38688,7 @@ for the respective document. -->
 <tr><td>Contributors</td><td>Volodymyr Kozieiev <a href="mailto:archived/status/deprecated/volodymyr@status.im">volodymyr@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-101"><a class="header" href="#timeline-101">Timeline</a></h2>
+<h2 id="timeline-102"><a class="header" href="#timeline-102">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/3rd-party.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/3rd-party.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -38794,7 +38799,7 @@ users will be unable to view the app's privacy policy.</p>
 <tr><td>Contributors</td><td>Corey Petty <a href="mailto:archived/status/deprecated/corey@status.im">corey@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a>, Samuel Hawksby-Robinson <a href="mailto:archived/status/deprecated/samuel@status.im">samuel@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-102"><a class="header" href="#timeline-102">Timeline</a></h2>
+<h2 id="timeline-103"><a class="header" href="#timeline-103">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/account.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/account.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -39205,7 +39210,7 @@ that the user MUST provide a serialized public key for deserialization. Else the
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/deprecated/adam@status.im">adam@status.im</a>, Andrea Maria Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a>, Dean Eigenmann <a href="mailto:archived/status/deprecated/dean@status.im">dean@status.im</a>, Corey Petty <a href="mailto:archived/status/deprecated/corey@status.im">corey@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a>, Samuel Hawksby-Robinson <a href="mailto:archived/status/deprecated/samuel@status.im">samuel@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-103"><a class="header" href="#timeline-103">Timeline</a></h2>
+<h2 id="timeline-104"><a class="header" href="#timeline-104">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/client.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/client.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -39527,7 +39532,7 @@ though the trade-off space is likely suboptimal in terms of the <a href="https:/
 <tr><td>Editor</td><td>Filip Dimitrijevic <a href="mailto:archived/status/deprecated/filip@status.im">filip@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-104"><a class="header" href="#timeline-104">Timeline</a></h2>
+<h2 id="timeline-105"><a class="header" href="#timeline-105">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/dapp-browser-API-usage.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/dapp-browser-API-usage.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -39633,7 +39638,7 @@ Thus it is possible to inject a function call passing Status node response back 
 <tr><td>Contributors</td><td>None</td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-105"><a class="header" href="#timeline-105">Timeline</a></h2>
+<h2 id="timeline-106"><a class="header" href="#timeline-106">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/eips.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/eips.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -39877,7 +39882,7 @@ Sourcecode: -</p>
 <tr><td>Contributors</td><td>Andrea Maria Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-106"><a class="header" href="#timeline-106">Timeline</a></h2>
+<h2 id="timeline-107"><a class="header" href="#timeline-107">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/ethereum-usage.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/ethereum-usage.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -40064,7 +40069,7 @@ A client SHOULD verify ens names against the public key of the sender on receivi
 <tr><td>Contributors</td><td>Andrea Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-107"><a class="header" href="#timeline-107">Timeline</a></h2>
+<h2 id="timeline-108"><a class="header" href="#timeline-108">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/group-chat.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/group-chat.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -40204,7 +40209,7 @@ MUST ensure that the author of the event is also the target of the event.</p>
 <tr><td>Contributors</td><td>Gheorghe Pinzaru <a href="mailto:archived/status/deprecated/gheorghe@status.im">gheorghe@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-108"><a class="header" href="#timeline-108">Timeline</a></h2>
+<h2 id="timeline-109"><a class="header" href="#timeline-109">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/IPFS-gateway-for-sticker-Pack.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/IPFS-gateway-for-sticker-Pack.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -40314,7 +40319,7 @@ In the callback, call <code>buyToken(uint256,address,uint256)</code>, first para
 <tr><td>Contributors</td><td>Roman Volosovskyi <a href="mailto:archived/status/deprecated/roman@status.im">roman@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-109"><a class="header" href="#timeline-109">Timeline</a></h2>
+<h2 id="timeline-110"><a class="header" href="#timeline-110">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -40602,7 +40607,7 @@ params:</p>
 <tr><td>Contributors</td><td>Eric Dvorsak <a href="mailto:archived/status/deprecated/eric@status.im">eric@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-110"><a class="header" href="#timeline-110">Timeline</a></h2>
+<h2 id="timeline-111"><a class="header" href="#timeline-111">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/notifications.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/notifications.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -40652,7 +40657,7 @@ they require a centralized service that is aware of who the notification needs t
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/deprecated/adam@status.im">adam@status.im</a>, Andrea Maria Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-111"><a class="header" href="#timeline-111">Timeline</a></h2>
+<h2 id="timeline-112"><a class="header" href="#timeline-112">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/payloads.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/payloads.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -40971,7 +40976,7 @@ The details are in the <a href="archived/status/deprecated//archived/status/depr
 <tr><td>Contributors</td><td>Andrea Maria Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-112"><a class="header" href="#timeline-112">Timeline</a></h2>
+<h2 id="timeline-113"><a class="header" href="#timeline-113">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/push-notification-server.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/push-notification-server.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -41541,7 +41546,7 @@ but we are in charge of the certificate, so they would not be able to notify sta
 <tr><td>Contributors</td><td>Andrea Maria Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a>, Corey Petty <a href="mailto:archived/status/deprecated/corey@status.im">corey@status.im</a>, Dean Eigenmann <a href="mailto:archived/status/deprecated/dean@status.im">dean@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a>, Pedro Pombeiro <a href="mailto:archived/status/deprecated/pedro@status.im">pedro@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-113"><a class="header" href="#timeline-113">Timeline</a></h2>
+<h2 id="timeline-114"><a class="header" href="#timeline-114">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/secure-transport.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/secure-transport.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -42063,7 +42068,7 @@ which will notify the receiving end of including this device in any further comm
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/deprecated/adam@status.im">adam@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a>, Samuel Hawksby-Robinson <a href="mailto:archived/status/deprecated/samuel@status.im">samuel@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-114"><a class="header" href="#timeline-114">Timeline</a></h2>
+<h2 id="timeline-115"><a class="header" href="#timeline-115">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/waku-mailserver.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/archived/status/deprecated/waku-mailserver.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -42170,7 +42175,7 @@ the recipient is vulnerable to DoS attacks from a malicious <code>Mailserver</co
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/deprecated/adam@status.im">adam@status.im</a>, Corey Petty <a href="mailto:archived/status/deprecated/corey@status.im">corey@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a>, Samuel Hawksby-Robinson <a href="mailto:archived/status/deprecated/samuel@status.im">samuel@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-115"><a class="header" href="#timeline-115">Timeline</a></h2>
+<h2 id="timeline-116"><a class="header" href="#timeline-116">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/waku-usage.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/waku-usage.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -42499,7 +42504,7 @@ To move further back in time, use <code>cursor</code> and <code>limit</code>.</p
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/deprecated/adam@status.im">adam@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-116"><a class="header" href="#timeline-116">Timeline</a></h2>
+<h2 id="timeline-117"><a class="header" href="#timeline-117">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/whisper-mailserver.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/whisper-mailserver.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
@@ -42616,7 +42621,7 @@ the recipient is vulnerable to DoS attacks from a malicious <code>Mailserver</co
 <tr><td>Contributors</td><td>Adam Babik <a href="mailto:archived/status/deprecated/adam@status.im">adam@status.im</a>, Andrea Piana <a href="mailto:archived/status/deprecated/andreap@status.im">andreap@status.im</a>, Corey Petty <a href="mailto:archived/status/deprecated/corey@status.im">corey@status.im</a>, Oskar Thorén <a href="mailto:archived/status/deprecated/oskar@status.im">oskar@status.im</a></td></tr>
 </tbody></table>
 </div><!-- timeline:start -->
-<h2 id="timeline-117"><a class="header" href="#timeline-117">Timeline</a></h2>
+<h2 id="timeline-118"><a class="header" href="#timeline-118">Timeline</a></h2>
 <ul>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/archived/status/deprecated/whisper-usage.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/archived/status/deprecated/whisper-usage.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
