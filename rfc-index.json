@@ -371,6 +371,16 @@
   },
   {
     "component": "ift-ts",
+    "slug": "143",
+    "title": "Extended Kademlia Discovery with capability filtering",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-23",
+    "path": "ift-ts/raw/extended-kad-disco.html",
+    "archived": false
+  },
+  {
+    "component": "ift-ts",
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
@@ -445,7 +455,7 @@
     "title": "Extensible Peer Records",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-22",
+    "updated": "2026-01-23",
     "path": "ift-ts/raw/extensible-peer-records.html",
     "archived": false
   },
