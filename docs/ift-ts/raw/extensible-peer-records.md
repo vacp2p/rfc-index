@@ -1,4 +1,4 @@
-# extensible-peer-records
+# EXTENSIBLE-PEER-RECORDS
 
 | Field | Value |
 | --- | --- |
