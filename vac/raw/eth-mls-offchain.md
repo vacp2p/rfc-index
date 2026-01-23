@@ -271,11 +271,11 @@ so that members can identify which steward will be responsible in each epoch
 and detect any unauthorized steward commits.
 3. `Emergency criteria proposal`: If there is a malicious member or steward,
 this event MUST be voted on to finalize it.
-If this returns YES, the next epoch MUST include the removal of the member or steward.
-In a specific case where a steward is removed from the group, causing the total number of stewards to fall below `sn_min`,  
-it is required to repeat the `steward election proposal`.
-`Proposal.payload` MUST consist of the evidence of the dishonesty as described in the Steward violation list,
-and the identifier of the malicious member or steward.
+If the proposal returns YES, a score penalty MUST be applied to the targeted member or steward
+by decreasing their peer score, and a score reward MUST be granted to the creator of the proposal;
+if the proposal returns NO, a score penalty MUST be applied to the creator of the proposal.
+`Proposal.payload` MUST include evidence of dishonesty as defined in the Steward Violation List,
+along with the identifier of the malicious member or steward.
 This proposal can be created by any member in any epoch.
 
 The order of consensus proposal messages is important to achieving a consistent result.
@@ -363,9 +363,8 @@ then the steward list size MUST be equal to the total member count.
 and group changes are ready to be committed as specified in single steward section
 with a difference which is members also check the committed steward is `epoch steward` or `backup steward`,
 otherwise anyone can create `emergency criteria proposal`.
-4. If the `epoch steward` violates the changing process as mentioned in the section Steward violation list,
-one of the members MUST initialize the `emergency criteria proposal` to remove the malicious Steward.
-Then `backup steward` fulfills the epoch by committing again correctly.
+4. If the `epoch steward` violates the changing process as described in the Steward Violation List,
+one of the members MUST initialize an `emergency criteria proposal` to apply a peer score penalty to the malicious steward.
 
 A large consensus group provides better decentralization, but it requires significant coordination,
 which MAY not be suitable for groups with more than 1000 members.
@@ -406,9 +405,49 @@ such as commit and proposal incompatibility. Specifically, the broken commit can
 This activity is identified by the `members` since both `MLS proposal` and `voting proposal` are visible
 and can be identified by checking the hash of `Proposal.payload` and `MLSProposal.payload` is the same as RFC9240 section 12.1. Proposals.
 3. Censorship and inactivity: The situation where there is a voting proposal that is visible for every member,
-and the Steward does not provide an MLS proposal and commit.
+and the Steward does not provide an MLS proposal and commit within the configured `threshold_duration`,
+after which the voting process is considered finalized by the majority timer.
 This activity is again identified by the `members`since `voting proposals` are visible to every member in the group,
-therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`.
+therefore each member can verify that there is no `MLS proposal` corresponding to `voting proposal`,
+or commit was produced for a voting proposal that has already been finalized due to timer expiration.
+
+## Peer Scoring
+
+To improve fairness in member and steward management, de-MLS SHOULD incorporate a
+lightweight peer-scoring mechanism.
+Unfairness is not an intrinsic property of a member.
+Instead, it arises as a consequence of punitive actions such as removal following an observed malicious behavior.
+However, behaviors that appear malicious are not always the result of intent.
+Network faults, temporary partitions, message delays, or client-side failures may lead to unintended protocol deviations.
+A peer-scoring mechanism allows de-MLS to account for such transient and non-adversarial conditions by accumulating evidence over time.
+This enables the system to distinguish persistent and intentional misbehavior from accidental faults.
+Member removal should be triggered only in cases of sustained and intentional malicious activity,
+thereby preserving fairness while maintaining security and liveness.
+In this approach, each node maintains a local peer score table mapping `member_id` to a score,
+with new members starting from a configurable default value `default_peer_score`.
+Peer scores may decrease due to violations and increase due to honest behavior;
+such score adjustments are derived from observable protocol events, such as
+successful commits or emergency criteria proposals, and each peer updates its local table accordingly.
+Stewards MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.  
+A removal operation MUST be included in the next commit only if a peer’s score is observed to fall below `threshold_peer_score`.
+This mechanism allows accidental or transient failures to be tolerated while still enabling
+decisive action against repeated or harmful behavior.
+The exact scoring rules, recovery mechanisms, and escalation criteria are left for future discussion.
+
+## Timer-Based Anti-Deadlock Mechanism
+
+In de-MLS, a deadlock refers to a prolonged period during which no valid commit is produced
+despite a sufficient number of active and online members capable of finalizing consensus.
+To mitigate deadlock risks in de-MLS, a timer-based anti-deadlock mechanism SHOULD be introduced.
+Each member maintains a local timer that resets whenever a valid commit is observed,
+with a `threshold_duration` defined in configuration.
+If the `threshold_duration` is exceeded, the member waits an additional buffer period to account
+for network delays and then triggers a high-priority `emergency proposal` indicating a potential deadlock.
+If the proposal returns YES, temporarily allowing any member to commit and restore liveness.
+Since timers may expire at different times in a P2P setting, the buffer period mitigates false positives,
+while commit filtering is required to prevent commit flooding during recovery.
+Emergency proposals that return NO MUST incur a peer-score penalty for the
+creator of the proposal to reduce abuse.
 
 ## Security Considerations
 
