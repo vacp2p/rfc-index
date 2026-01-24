@@ -455,7 +455,7 @@
     "title": "Extensible Peer Records",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-23",
+    "updated": "2026-01-24",
     "path": "ift-ts/raw/extensible-peer-records.html",
     "archived": false
   },
@@ -467,6 +467,16 @@
     "category": "Standards Track",
     "updated": "2026-01-22",
     "path": "ift-ts/raw/mix.html",
+    "archived": false
+  },
+  {
+    "component": "ift-ts",
+    "slug": "mix-spam-protection-rln",
+    "title": "mix-spam-protection-rln",
+    "status": "unknown",
+    "category": "unspecified",
+    "updated": "2026-01-24",
+    "path": "ift-ts/raw/mix-spam-protection-rln.html",
     "archived": false
   },
   {
