@@ -48,12 +48,15 @@ Message is the actual sphinx packet including headers and encrypted payload that
 
 ### Messaging Rate
 
-The messaging rate is defined by the `period` which indicates how many messages can be sent/forwarded in a given period. This term rate limit is also used for the same in the specification.
+The messaging rate is defined as the number of messages that can be sent/forwarded per fixed unit of time, termed an `epoch`.
+Since we're using this as shorthand for the maximum allowable rate, this is also known as the _rate limit_.
+The length of each epoch is constant and defined as the `period`.
+
 We define an `epoch` as $\lceil$ `unix_time` / `period` $\rceil$.
 For example, if `unix_time` is `1644810116` and we set `period` to `30`, then `epoch` is $\lceil$ `(unix_time/period)` $\rceil$ `= 54827004`.
 
 > **NOTE:** The `epoch` refers to the epoch in RLN and not Unix epoch.
-> This means a message can only be sent every period, where the `period` is up to the application.
+> This means that no more messages than the registered rate limit can be sent per epoch, where the epoch length (`period`) is up to the application.
 
 See section [System Parameters](#system-parameters) for details on the `period` parameter.
 
@@ -68,9 +71,9 @@ Each mix node MUST have an RLN group membership in order to send or forward mess
 Each mix node in the path (except the sender) verifies the incoming RLN proof before processing the message.
 After verification, each node generates and attaches a new RLN proof before forwarding the message to the next hop.
 
-To effectively detect spam, mix nodes MUST identify when a node exceeds its [messaging rate](#messaging-rate) by reusing the same nullifier across multiple messages within an epoch (known as "double signalling").
+To effectively detect spam, mix nodes SHOULD identify when a node exceeds its [messaging rate](#messaging-rate) by reusing the same nullifier across multiple messages within an epoch (known as "double signalling").
 Since a message does not traverse all the mix nodes in the network, a spammer could exploit different paths to avoid detection by any single mix node.
-To address this, intermediary and exit nodes MUST participate in a [coordination layer](#coordination-layer) that indicates already seen [messaging metadata](#messaging-metadata) across the mix nodes.
+To address this, intermediary and exit nodes SHOULD participate in a [coordination layer](#coordination-layer) that indicates already seen [messaging metadata](#messaging-metadata) across the mix nodes.
 This enables all participating mix nodes to detect double signalling across different paths, derive the spammer's private key, and initiate slashing.
 
 ### Rationale
@@ -78,12 +81,10 @@ This enables all participating mix nodes to detect double signalling across diff
 RLN is well-suited for spam and sybil protection in libp2p mix based mixnets due to the following properties:
 
 - Sybil Resistance:
-
   - Requiring membership for each mix node creates friction to participate in the mixnet to send or forward messages
   - Operating multiple identities becomes costly, mitigating sybil attacks that could compromise mix path selection
 
 - Privacy-Preserving Spam Protection:
-
   - Uses zero-knowledge proofs to enforce rate limits without revealing sender identities
   - Ties spam protection proof to the message content, making proofs non-reusable across messages
   - Enables economic deterrence through slashing without compromising anonymity
@@ -125,17 +126,17 @@ When generating an RLN proof, the node MUST:
 
 **Sender nodes**:
 
-- Generate an RLN proof for the initial sphinx packet
-- Attach the proof to the packet before sending to the next hop
+- generate an RLN proof for the initial sphinx packet
+- attach the proof to the packet before sending to the next hop
 
 **Intermediary and Exit nodes**:
 
 MUST do the following for every incoming mix packet:
 
 - verify the incoming packet's RLN proof (see [Message validation](#message-validation))
-- Process the sphinx packet according to the mix protocol
-- Generate a NEW RLN proof for the outgoing packet
-- Attach the new proof before forwarding to the next hop
+- process the sphinx packet according to the mix protocol
+- generate a NEW RLN proof for the outgoing packet
+- attach the new proof before forwarding to the next hop
 
 ### Group Synchronization
 
@@ -151,10 +152,10 @@ We recommend `5` for `acceptable_root_window_size`.
 ### Coordination Layer
 
 The coordination layer enables network-wide spam detection by preventing rate limit violations through nullifier reuse detection.
-The coordination layer MUST be used to broadcast [messaging metadata](#messaging-metadata).
+The coordination layer SHOULD be used to broadcast [messaging metadata](#messaging-metadata).
 When a node detects spam, it can reconstruct the spammer's secret key using the shared key shares and initiate [slashing](#spam-detection-and-slashing).
 
-Intermediary and exit nodes MUST participate by both subscribing to receive metadata and broadcasting metadata from messages they process.
+Intermediary and exit nodes that participate in the coordination layer MUST both subscribe to receive metadata and broadcast metadata from messages they process.
 Sender-only nodes need not participate in this coordination layer as they only originate messages and do not forward or validate messages from others.
 
 The coordination layer MUST have its own spam and sybil protection mechanism in order to prevent from these attacks.
@@ -307,11 +308,11 @@ This latency needs to be considered while deciding the approach to be used.
 
 Requiring RLN group membership for all mix nodes creates barriers to network participation:
 
-- **Stake requirement**: Nodes must stake funds to join, limiting casual participation
+- **Stake requirement**: Nodes MUST stake funds to join, limiting casual participation
 - **Registration overhead**: On-chain registration adds complexity and potential costs (gas fees)
 - **Benefit**: This friction is intentional and necessary for sybil resistance
 
-The appropriate stake amount must balance accessibility against attack economics (see [System Parameters](#system-parameters)).
+The appropriate stake amount MUST balance accessibility against attack economics (see [System Parameters](#system-parameters)).
 
 ### Cost of ZK Proof Generation
 
