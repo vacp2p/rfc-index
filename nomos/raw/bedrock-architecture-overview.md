@@ -51,11 +51,51 @@ Bedrock is in turn supported by the Bedrock Services: Blend Network and NomosDA.
 Together they provide an interface for building high-performance Sovereign Rollups
 that leverage the security and resilience of Nomos.
 
+```text
+┌─────────────┐   ┌──────────────────────┐   ┌─────────────────────────────────────────┐
+│   Clients   │   │    Sovereign Zone    │   │            Nomos Blockchain             │
+├─────────────┤   ├──────────────────────┤   ├───────────────────┬─────────────────────┤
+│             │   │                      │   │      Bedrock      │      Services       │
+│   Alice   ──┼──>│   DeFi Exchange SZ   │   │    ┌─────────┐    │  ┌───────────────┐  │
+│             │   │                      │   │    │ Mantle  │<───┼──│ Blend Network │  │
+│   Bob     ──┼──>│   Land Registry SZ   │──>│    └────┬────┘    │  └───────────────┘  │
+│             │   │                      │   │         │         │                     │
+│   Charlie ──┼──>│ Prediction Market SZ │   │         v         │                     │
+│             │   │                      │   │  ┌─────────────┐  │                     │
+└─────────────┘   └──────────────────────┘   │  │ Cryptarchia │  │                     │
+                                             │  └──────┬──────┘  │                     │
+                                             └─────────┼─────────┴─────────────────────┘
+                                                       │
+                                          ┌────────────┼────────────┐
+                                          │            │            │
+                                          v            v            v
+                                     ┌────────┐  ┌────────┐  ┌────────┐
+                                     │ Node_1 │  │ Node_2 │  │ Node_3 │
+                                     └────────┘  └────────┘  └────────┘
+```
+
 ## Bedrock Mantle
 
 Mantle forms the minimal execution layer of Nomos.
 Mantle Transactions consist of a sequence of Operations
 together with a Ledger Transaction used for paying fees and transferring funds.
+
+```text
+┌─────────────────────────────────┐
+│       Mantle Transaction        │
+├─────────────────────────────────┤
+│  Operations                     │
+│  ┌───────────────────────────┐  │
+│  │   CHANNEL_DEPOSIT(...)    │  │
+│  ├───────────────────────────┤  │
+│  │   CHANNEL_INSCRIBE(...)   │  │
+│  ├───────────────────────────┤  │
+│  │          ...              │  │
+│  └───────────────────────────┘  │
+├─────────────────────────────────┤
+│       Ledger Transaction        │
+└─────────────────────────────────┘
+```
 
 Sovereign Rollups make use of Mantle Transactions
 when posting their updates to Nomos.
@@ -76,6 +116,29 @@ Inscriptions store the message data permanently in-ledger,
 while Blobs store only a commitment to the message data permanently.
 The actual message data is stored temporarily in NomosDA,
 just long enough for interested parties to fetch a copy for themselves.
+
+```text
+┌───────────┐   ┌──────────────────┐   ┌───────────┐
+│ Channel A │   │ Nomos Blockchain │   │ Channel B │
+├───────────┤   ├──────────────────┤   ├───────────┤
+│    A_3    │   │     Block_6    <─┼───│    B_4    │
+│     │     │   │       │          │   │     │     │
+│     v     │   │       v          │   │     v     │
+│    A_2    │   │     Block_5      │   │    B_3    │
+│     │     │   │       │          │   │     │     │
+│     v     │──>│       v          │   │     v     │
+│    A_1    │   │     Block_4    <─┼───│    B_2    │
+│           │   │       │          │   │     │     │
+│           │   │       v          │   │     v     │
+│           │   │     Block_3      │   │    B_1    │
+│           │   │       │          │   │           │
+│           │   │       v          │   │           │
+│           │   │     Block_2      │   │           │
+│           │   │       │          │   │           │
+│           │   │       v          │   │           │
+│           │   │     Block_1      │   │           │
+└───────────┘   └──────────────────┘   └───────────┘
+```
 
 Channels A and B form virtual chains on top of the Nomos blockchain.
 Channel messages are included in blocks on the Nomos blockchain
@@ -131,6 +194,21 @@ to Nomos as an opaque data Blob.
 
 ### Transaction Flow
 
+```text
+┌─────────────┐   ┌─────────────────────────────────────────────┐   ┌──────────────────┐
+│   Clients   │   │              Sovereign Zone                 │   │ Nomos Blockchain │
+├─────────────┤   ├──────────────┬──────────────────────────────┤   ├──────────────────┤
+│             │   │  Sequencer   │        Inscription           │   │                  │
+│   Alice   ──┼──>│              │   ┌──────────────────────┐   │   │                  │
+│             │   │  Orders Txs  │   │      tx_Alice        │   │   │                  │
+│   Bob     ──┼──>│      │       │   ├──────────────────────┤   │   │  Bedrock Mantle  │
+│             │   │      v       │   │      tx_Bob          │──>│──>│                  │
+│   Charlie ──┼──>│  Bundle Txs  │   ├──────────────────────┤   │   │                  │
+│             │   │              │   │      tx_Charlie      │   │   │                  │
+│             │   │              │   └──────────────────────┘   │   │                  │
+└─────────────┘   └──────────────┴──────────────────────────────┘   └──────────────────┘
+```
+
 The following sequence describes the flow of transactions
 from clients through a Sovereign Rollup to finality on Nomos:
 
@@ -155,6 +233,24 @@ from clients through a Sovereign Rollup to finality on Nomos:
 1. The block finalizes after being buried by 2160 blocks.
 
 1. The client observes the Sovereign Rollup Blob finalized (finality).
+
+```mermaid
+sequenceDiagram
+    participant C as Clients
+    participant SZ as Sovereign Zone
+    box Nomos Blockchain
+        participant Mempool as Nomos Mempool
+        participant Cryptarchia
+    end
+    C->>SZ: Alice's Tx
+    C->>SZ: Bob's Tx
+    C->>SZ: Charlie's Tx
+    SZ-->>SZ: Order, Execute and Bundle Txs into a Blob
+    SZ->>Mempool: Blob Mantle Transaction
+    Mempool->>Cryptarchia: Leader includes transaction in next block
+    Cryptarchia-->>Cryptarchia: Block finalizes after being buried by 2160 blocks
+    Cryptarchia->>C: Client observes the SR Blob finalized (finality)
+```
 
 ### Architecture Benefits
 
