@@ -71,16 +71,6 @@ to store the `XPR` against its own peer ID.
 This process SHOULD be repeated periodically to maintain the advertised record.
 We RECOMMEND an interval of once every `30` minutes.
 
-#### Use of `XPR` in `identify`
-
-Advertisers SHOULD include their `XPR`s as the `signedPeerRecord`
-in libp2p `Identify` [messages](https://github.com/libp2p/specs/blob/0762325f693afb2e620d32d4f55ba962d1293ff9/identify/README.md#the-identify-message).
-
-> **Note:** For more information, see the `identify` protocol implementations,
-such as [go-libp2p](https://github.com/libp2p/go-libp2p/blob/636d44e15abc7bfbd1da09cc9fef674249625ae6/p2p/protocol/identify/pb/identify.proto#L37),
-as at the time of writing (Jan 2026)
-the `signedPeerRecord` field extension is not yet part of any official specification.
-
 ### Record Discovery
 
 A node that wants to discover peers to connect to,
@@ -117,11 +107,30 @@ The discoverer SHOULD ignore (and disconnect, if already connected) discovered p
 with invalid `XPR`s
 or that do not advertise the `services` of interest to the discoverer.
 
+### Use of `XPR` in `identify`
+
+Advertisers SHOULD include their `XPR`s as the `signedPeerRecord`
+in libp2p `Identify` [messages](https://github.com/libp2p/specs/blob/0762325f693afb2e620d32d4f55ba962d1293ff9/identify/README.md#the-identify-message).
+
+> **Note:** For more information, see the `identify` protocol implementations,
+such as [go-libp2p](https://github.com/libp2p/go-libp2p/blob/636d44e15abc7bfbd1da09cc9fef674249625ae6/p2p/protocol/identify/pb/identify.proto#L37),
+as at the time of writing (Jan 2026)
+the `signedPeerRecord` field extension is not yet part of any official specification.
+
 ### Privacy Enhancements
 
 To prevent network topology mapping and eclipse attacks,
 `Kad-DHT` nodes MUST NOT disclose connection type in [response messages](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md#rpc-messages).
 The `connection` field of every `Peer` MUST always be set to `NOT_CONNECTED`.
+
+### Protocol Id
+
+To separate our network from other `Kad-DHT` implementation,
+the libp2p protocol id used for our `Kad-DHT` MUST be `/logos/kad/1.0.0`.
+
+Future version of this document,
+could specify the use of the existing `Kad-DHT` protocol id for
+interoperability and resiliance via an increased network size.
 
 ## API Specification
 
