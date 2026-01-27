@@ -1,8 +1,10 @@
+# DATASETS
 
-| Name       | Logos Storage Datasets               |
-| ---------- | ------------------------------------ |
-| **Status** | **draft**                            |
-| **Editor** | **Giuliano Mega** giuliano@status.im |
+| Field  | Value                                |
+| ------ | ------------------------------------ |
+| Name   | Logos Storage Datasets               |
+| Status | draft                                |
+| Editor | Giuliano Mega <giuliano@status.im>   |
 
 ## Abstract
 
