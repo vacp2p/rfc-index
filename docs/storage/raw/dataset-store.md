@@ -167,5 +167,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-1. [10/DATASETS](/YOKL7w9nR6mVvtgpzBxifg)
+1. [DATASETS](/storage/raw/datasets.md)
 2. [Content Identifier Specification](https://github.com/multiformats/cid)
