@@ -133,25 +133,25 @@ implementations SHOULD decide how to handle the overflow.
 The specific strategy is implementation-dependent,
 but implementations MAY consider one of the following approaches:
 
-1. **Least Recently Used (LRU) Eviction:**
+- **Least Recently Used (LRU) Eviction:**
    Replace the peer that was least recently contacted or updated.
    This keeps more active and responsive peers in the routing table.
 
-2. **Least Recently Seen (LRS) Eviction:**
+- **Least Recently Seen (LRS) Eviction:**
    Replace the peer that was seen (added to the bucket) earliest.
    This provides a time-based rotation of peers.
 
-3. **Ping-based Eviction:**
+- **Ping-based Eviction:**
    When the bucket is full, ping the least recently contacted peer.
    If the ping fails, replace it with the new peer.
    If the ping succeeds, keep the existing peer and discard the new one.
    This prioritizes responsive, reachable peers.
 
-4. **Reject New Peer:**
+- **Reject New Peer:**
    Keep existing peers and reject the new peer.
    This strategy assumes existing peers are more stable or valuable.
 
-5. **Bucket Extension:**
+- **Bucket Extension:**
    Dynamically increase bucket capacity (within reasonable limits)
    when overflow occurs, especially for buckets closer to the center ID.
 
@@ -259,6 +259,7 @@ In this RFC we refer to advertisement objects as `ads`.
 For a single advertisement object we use `ad`.
 
 An advertisement logically represents:
+
 - **Service identification**: Which service the node participates in (via `service_id_hash`)
 - **Peer identification**: The advertiser's unique peer ID
 - **Network addresses**: How to reach the advertiser (multiaddrs)
@@ -274,6 +275,7 @@ Tickets are digitally signed objects issued by registrars to advertisers
 to track accumulated waiting time for admission into the advertisement cache.
 
 A ticket logically represents:
+
 - **Advertisement reference**: The advertisement this ticket is associated with
 - **Time tracking**: When the ticket was created (`t_init`) and last modified (`t_mod`)
 - **Waiting time**: How long the advertiser must wait before retrying (`t_wait_for`)
@@ -503,7 +505,8 @@ message Message {
 `ADD_PROVIDER`, `GET_PROVIDERS`, `FIND_NODE`, `PING`) remain completely unchanged
 - The `Record` message is preserved as-is for Kad-DHT routing table operations
 - Logos adds two new message types (`REGISTER`, `GET_ADS`) without modifying existing types
-- Advertisements are encoded as generic `bytes` to avoid coupling the protocol to specific formats
+- Advertisements are encoded as generic `bytes` (RECOMMENDED: ExtensiblePeerRecord/XPR)
+to avoid coupling the protocol to specific formats
 - The existing `key` field is reused for `service_id_hash` in Logos operations
 - Nodes without Logos Capability Discovery support will ignore `REGISTER` and `GET_ADS` messages
 
