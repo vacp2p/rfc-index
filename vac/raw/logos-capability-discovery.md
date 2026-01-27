@@ -258,51 +258,33 @@ An **advertisement** indicates that a specific node participates in a service.
 In this RFC we refer to advertisement objects as `ads`.
 For a single advertisement object we use `ad`.
 
-This structure defines the logical data model.
-At the wire protocol level, advertisements are transmitted as encoded `bytes`.
-See [Advertisement Encoding](#advertisement-encoding) for transmission format.
+An advertisement logically represents:
+- **Service identification**: Which service the node participates in (via `service_id_hash`)
+- **Peer identification**: The advertiser's unique peer ID
+- **Network addresses**: How to reach the advertiser (multiaddrs)
+- **Authentication**: Cryptographic proof that the advertiser controls the peer ID
 
-```protobuf
-message Advertisement {
-    bytes service_id_hash = 1;  // 32-byte SHA-256 hash
-    bytes peerID = 2;            // Peer ID of advertiser
-    repeated bytes addrs = 3;    // Multiaddrs of advertiser
-    bytes signature = 4;         // Ed25519 signature over (service_id_hash || peerID || addrs)
-}
-```
-
-Advertisements MUST include `service_id_hash`, `peerID`, `addrs` and `signature`.
-The `signature` field MUST be a Ed25519 signature over the concatenation of
-(`service_id_hash` || `peerID` || `addrs`).
-Refer to [Signature](#signature) section for more details.
+Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
+See the [Advertisement Encoding](#advertisement-encoding) section
+in the wire protocol specification for transmission format details.
 
 ### Ticket
 
-Tickets are digitally signed objects
-issued by registrars to advertisers
-to track accumulated waiting time for admission.
+Tickets are digitally signed objects issued by registrars to advertisers
+to track accumulated waiting time for admission into the advertisement cache.
 
-```protobuf
-message Ticket {
-    bytes ad = 1;              // Encoded advertisement (RECOMMENDED: XPR)
-    uint64 t_init = 2;         // Ticket creation timestamp (Unix seconds)
-    uint64 t_mod = 3;          // Last modification timestamp (Unix seconds)
-    uint32 t_wait_for = 4;     // Remaining wait time in seconds
-    bytes signature = 5;       // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
-}
-```
+A ticket logically represents:
+- **Advertisement reference**: The advertisement this ticket is associated with
+- **Time tracking**: When the ticket was created (`t_init`) and last modified (`t_mod`)
+- **Waiting time**: How long the advertiser must wait before retrying (`t_wait_for`)
+- **Authentication**: Cryptographic proof that the registrar issued this ticket
 
-Tickets MUST include `ad`, `t_init`, `t_mod`,
-`t_wait_for` and `signature` fields.
+Tickets enable stateless admission control at registrars.
+Advertisers accumulate waiting time across registration attempts
+by presenting tickets from previous attempts.
 
-The `ad` field contains the encoded advertisement as `bytes`.
-Implementations are RECOMMENDED to use ExtensiblePeerRecord encoding.
-
-The `signature` field MUST be an Ed25519 signature
-over the concatenation of (`ad` || `t_init` || `t_mod` || `t_wait_for`)
-where `ad` is the raw encoded bytes.
-
-Refer to [Signature](#signature) section for more details.
+See the [RPC Messages](#rpc-messages) section for the wire format specification of tickets
+and the [Registration Flow](#registration-flow) section for how tickets are used in the admission protocol.
 
 ## Protocol Specifications
 
@@ -524,7 +506,6 @@ message Message {
 - Advertisements are encoded as generic `bytes` to avoid coupling the protocol to specific formats
 - The existing `key` field is reused for `service_id_hash` in Logos operations
 - Nodes without Logos Capability Discovery support will ignore `REGISTER` and `GET_ADS` messages
-- Protocol negotiation via libp2p's multistream-select distinguishes Logos-capable nodes
 
 ### Advertisement Encoding
 
