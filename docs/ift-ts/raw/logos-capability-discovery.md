@@ -119,57 +119,18 @@ for computing distances with other peers and assigning peers to buckets.
 
 ### Bucket
 
-Each table is organized into buckets.
-A bucket is a container that stores information about peers
-at a particular distance range from the center ID.
+Each routing table is organized into buckets.
+A bucket is a logical container that stores information about peers
+at a particular distance range from a reference ID.
 
-For simplicity in this RFC, we represent each bucket as a list of peer IDs.
-However, in a full implementation, each entry in the bucket MUST store
-a complete peer information necessary to enable communication.
+Conceptually:
 
-**Bucket Size:**
+- Each bucket corresponds to a specific range in the XOR distance metric
+- Peers are assigned to buckets based on their XOR distance from the table's center ID
+- Buckets enable logarithmic routing by organizing the keyspace into manageable segments
 
-The number of entries a bucket can hold is implementation-dependent.
-
-- Smaller buckets → lower memory usage but reduced resilience to churn
-- Larger buckets →  better redundancy but increased maintenance overhead
-
-Implementations SHOULD ensure that each bucket contains only unique peers.
-If the peer to be added is already present in the bucket,
-the implementation SHOULD NOT create a duplicate entry
-and SHOULD instead update the existing entry.
-
-**Bucket Overflow Handling:**
-
-When a bucket reaches its maximum capacity and a new peer needs to be added,
-implementations SHOULD decide how to handle the overflow.
-The specific strategy is implementation-dependent,
-but implementations MAY consider one of the following approaches:
-
-- **Least Recently Used (LRU) Eviction:**
-   Replace the peer that was least recently contacted or updated.
-   This keeps more active and responsive peers in the routing table.
-
-- **Least Recently Seen (LRS) Eviction:**
-   Replace the peer that was seen (added to the bucket) earliest.
-   This provides a time-based rotation of peers.
-
-- **Ping-based Eviction:**
-   When the bucket is full, ping the least recently contacted peer.
-   If the ping fails, replace it with the new peer.
-   If the ping succeeds, keep the existing peer and discard the new one.
-   This prioritizes responsive, reachable peers.
-
-- **Reject New Peer:**
-   Keep existing peers and reject the new peer.
-   This strategy assumes existing peers are more stable or valuable.
-
-- **Bucket Extension:**
-   Dynamically increase bucket capacity (within reasonable limits)
-   when overflow occurs, especially for buckets closer to the center ID.
-
-Implementations MAY combine these strategies or use alternative approaches
-based on their specific requirements for performance, security, and resilience.
+The number of buckets and their organization is described in the [Distance](#distance) section.
+Implementation considerations for bucket management are detailed in [Bucket Management](#bucket-management) section.
 
 ### Service
 
@@ -1409,6 +1370,58 @@ This helps prevent free-riding behavior,
 ensures a fair distribution of network load,
 and maintains the overall resilience and availability of the discovery layer.
 Incentivization mechanisms are beyond the scope of this RFC.
+
+### Bucket Management
+
+#### Bucket Representation
+
+For simplicity in this RFC, we represent each bucket as a list of peer IDs.
+However, in a full implementation, each entry in the bucket
+MUST store complete peer information necessary to enable communication.
+
+#### Bucket Size
+
+The number of entries a bucket can hold is implementation-dependent:
+
+- Smaller buckets → lower memory usage but reduced resilience to churn
+- Larger buckets → better redundancy but increased maintenance overhead
+
+Implementations SHOULD ensure that each bucket contains only unique peers.
+If the peer to be added is already present in the bucket,
+the implementation SHOULD NOT create a duplicate entry and
+SHOULD instead update the existing entry.
+
+#### Bucket Overflow Handling
+
+When a bucket reaches its maximum capacity and a new peer needs to be added,
+implementations SHOULD decide how to handle the overflow.
+The specific strategy is implementation-dependent,
+but implementations MAY consider one of the following approaches:
+
+- **Least Recently Used (LRU) Eviction:**
+   Replace the peer that was least recently contacted or updated.
+   This keeps more active and responsive peers in the routing table.
+
+- **Least Recently Seen (LRS) Eviction:**
+   Replace the peer that was seen (added to the bucket) earliest.
+   This provides a time-based rotation of peers.
+
+- **Ping-based Eviction:**
+   When the bucket is full, ping the least recently contacted peer.
+   If the ping fails, replace it with the new peer.
+   If the ping succeeds, keep the existing peer and discard the new one.
+   This prioritizes responsive, reachable peers.
+
+- **Reject New Peer:**
+   Keep existing peers and reject the new peer.
+   This strategy assumes existing peers are more stable or valuable.
+
+- **Bucket Extension:**
+   Dynamically increase bucket capacity (within reasonable limits) when overflow occurs,
+   especially for buckets closer to the center ID.
+
+Implementations MAY combine these strategies or use alternative approaches
+based on their specific requirements for performance, security, and resilience.
 
 ## References
 
