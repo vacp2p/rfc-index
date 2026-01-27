@@ -1,6 +1,4 @@
-
 # DATASET-STORE
-
 
 | Field  | Value                                |
 | ------ | ------------------------------------ |
@@ -80,15 +78,15 @@ class DatasetStore:
 
       :raises DatasetExistsError: if the dataset already exists.
       """
-	  ...
+      ...
 
     def get_dataset(cid: CID) -> Optional[Dataset]:
-	  """Returns a `Dataset` previously stored on-disk, or
+      """Returns a `Dataset` previously stored on-disk, or
       None if the `Dataset` is not present.
 
       :param cid: The Manifest's CID.
       """
-	  ...
+      ...
 
     def delete_dataset(cid: CID) -> bool:
       """Removes a `Dataset` from disk, along with all of its
@@ -105,6 +103,7 @@ class DatasetStore:
       when the quota is about to run out."""
       ...
 ```
+
 **Listing 2.** DatasetStore interface.
 
 ```python
