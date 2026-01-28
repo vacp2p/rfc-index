@@ -14,7 +14,7 @@ This specification describes the Merkle tree construction adopted in Logos Stora
 
 Merkle trees can be implemented in a variety of ways and, if done naively, can be also attacked in a variety of ways (e.g [BitCoinOps25](#references)). For this reason, this document focuses a _concrete implementation_ of a Merkle tree which helps avoid common  pitfalls.
 
-We start by laying out some definitions in the [Definitions](#Definitions) section, followed by our [keyed hash construction](#Keyed-Hash-Construction), which guards the Merkle against certain padding and layer abuse attacks. We then discuss injective encodings and their role in the construction of secure Merkle trees that deal with finite field elements in the [Encoding](#Encoding) section. Next, we provide some brief guidance on serialization in the [Serialization/Deserialization](#Serializing--Deserializing) section. Finally, we present an abstract interface for a Merkle tree module in the [Interfaces](#interfaces) section.
+We start by laying out some definitions in the [Definitions](#definitions) section, followed by our [keyed hash construction](#keyed-hash-construction), which guards the Merkle against certain padding and layer abuse attacks. We then discuss injective encodings and their role in the construction of secure Merkle trees that deal with finite field elements in the [Encoding](#encoding) section. Next, we provide some brief guidance on serialization in the [Serialization/Deserialization](#serializing--deserializing) section. Finally, we present an abstract interface for a Merkle tree module in the [Interfaces](#interfaces) section.
 
 ### Definitions
 
@@ -35,13 +35,13 @@ The hash function `H` can also have different types `S` ("Source type") of input
 - as an alternative, the "Jive strategy" for binary compression (see [[Bouvier22](#references)]) can eliminate the "minus `k`" requirement (you can compress `t` into `t/2`)
 - A naive Merkle tree implementation could for example accept only a power-of-two sized sequence of `T`
 
-Notation: Let's denote a sequence of `T`-s by `[T]`; and an array of `T`-s of length `l` by `T[l]`. 
+Notation: Let's denote a sequence of `T`-s by `[T]`; and an array of `T`-s of length `l` by `T[l]`.
 
 ### Keyed Hash Construction
 
 One of the main goals of a secure Merkle tree construction is to avoid collision attacks; i.e., situations in which an attacker is able to obtain a tree with the same Merkle root as a legitimate tree, but using data that is different from the data used to construct the tree originally. In that sense, we are interested in two different types of attacks here.
 
-#### 1. Layer abuse attacks.
+#### 1. Layer abuse attacks
 
 A Merkle tree requires, at its minimum, two elements to be constructed:
 
@@ -50,15 +50,15 @@ A Merkle tree requires, at its minimum, two elements to be constructed:
 
 In some hashing functions like SHA256, one could express `C(a, b)` as `H(F(a, b))`, where `F(a, b) = a || b` (Fig. 1(a)) and `||` denotes byte string concatenation. This creates a type of symmetry one can then exploit - since a Merkle tree root does not encode its depth, one could pretend that `F(a, b)` is actually data, and construct a shorter Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., $T^{\prime}_3$ in the second tree is the same as $T_7$ in the original tree.
 
-![](images/layer-abuse.png)
+![layer abuse attack](images/layer-abuse.png)
 
 **Figure 1.** **(a)** original Merkle tree; **(b)** a different Merkle tree with the same Merkle root as the original; i.e., $T^{\prime}_3 = T_7$, constructed from a layer abuse attack.
 
-#### 2. Padding attacks.
+#### 2. Padding attacks
 
 Merkle trees can be unbalanced as the number of leaves will often not be a power of two. A common technique is then to pad the tree in some way by adding "synthetic" missing children to internal nodes that do not have both of them (Fig. 2(a)). If done carelessly, this can potentially allow an attacker to replace the padding with real data that is equivalent to such padding (Fig. 2(b)), and again generate the same Merkle root from data that is different from what had been intended.
 
-![](images/padding.png)
+![padding attack](images/padding.png)
 
 **Figure 2.** **(a)** Original padded Merkle tree, and **(b)** a Merkle tree with the same root as the original built from a padding attack.
 
@@ -141,6 +141,7 @@ def E(
 
   return encoded
 ```
+
 **Listing 1.** Constructing `E` from `E_s`.
 
 For the BN254 field, we can construct `E_s` by taking `M=31`, and having the 31 bytes interpreted as a _little-endian_ integer modulo `p`. This outputs one single field element per $31$ bytes.
@@ -188,8 +189,8 @@ To serialize the actual tree, just add enough metadata that the size of each lay
 
 ### Reference implementations:
 
-- in Haskell: https://github.com/logos-storage/logos-storage-proofs-circuits/blob/master/reference/haskell/src/Poseidon2/Merkle.hs
-- in Nim: https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/nim/proof_input/src/merkle.nim
+- in Haskell: <https://github.com/logos-storage/logos-storage-proofs-circuits/blob/master/reference/haskell/src/Poseidon2/Merkle.hs>
+- in Nim: <https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/nim/proof_input/src/merkle.nim>
 
 ## Interfaces
 
@@ -276,7 +277,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 [[BitCoinOps25](https://bitcoinops.org/en/topics/merkle-tree-vulnerabilities/)]: Merkle tree vulnerabilities. https://bitcoinops.org/en/topics/merkle-tree-vulnerabilities/
 
 [[CVE-2012-2459](https://bitcointalk.org/?topic=102395)]: Block Merkle Calculation Exploit. https://bitcointalk.org/?topic=102395
-
 
 [^1]: Some less-conforming implementation of these could take a sequence of bytes instead.
 
