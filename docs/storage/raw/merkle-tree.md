@@ -187,7 +187,7 @@ When `T` consists of prime field elements, simply take the smallest number of by
 
 To serialize the actual tree, just add enough metadata that the size of each layer is known, then you can simply concatenate the layers, and serialize like as above. This metadata can be as small as the size of the initial layer, that is, a single integer.
 
-### Reference implementations:
+### Reference Implementations
 
 - in Haskell: <https://github.com/logos-storage/logos-storage-proofs-circuits/blob/master/reference/haskell/src/Poseidon2/Merkle.hs>
 - in Nim: <https://github.com/codex-storage/codex-storage-proofs-circuits/blob/master/reference/nim/proof_input/src/merkle.nim>
@@ -264,6 +264,7 @@ def verify_proof(
   ...
 
 ```
+
 **Listing 2.** Abstract interface for a Merkle tree.
 
 ## Copyright
@@ -274,9 +275,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 [[Bouvier22](https://eprint.iacr.org/2022/840)]: Bouvier et al. "New Design Techniques for Efficient Arithmetization-Oriented Hash Functions: Anemoi Permutations and Jive Compression Mode", Cryptology ePrint Archive, 2022.
 
-[[BitCoinOps25](https://bitcoinops.org/en/topics/merkle-tree-vulnerabilities/)]: Merkle tree vulnerabilities. https://bitcoinops.org/en/topics/merkle-tree-vulnerabilities/
+[[BitCoinOps25](https://bitcoinops.org/en/topics/merkle-tree-vulnerabilities/)]: Merkle tree vulnerabilities. <https://bitcoinops.org/en/topics/merkle-tree-vulnerabilities/>
 
-[[CVE-2012-2459](https://bitcointalk.org/?topic=102395)]: Block Merkle Calculation Exploit. https://bitcointalk.org/?topic=102395
+[[CVE-2012-2459](https://bitcointalk.org/?topic=102395)]: Block Merkle Calculation Exploit. <https://bitcointalk.org/?topic=102395>
 
 [^1]: Some less-conforming implementation of these could take a sequence of bytes instead.
 
