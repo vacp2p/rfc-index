@@ -14,7 +14,7 @@ This specification describes the Merkle tree construction adopted in Logos Stora
 
 Merkle trees can be implemented in a variety of ways and, if done naively, can be also attacked in a variety of ways (e.g [BitCoinOps25](#references)). For this reason, this document focuses a _concrete implementation_ of a Merkle tree which helps avoid common  pitfalls.
 
-We start by laying out some definitions in the [Definitions](#Definitions) section, followed by our [keyed hash construction](#Keyed-Hash-Construction), which guards the Merkle against certain padding and layer abuse attacks. We then discuss the role of injective encodings in the [Encoding and (de)Serialization](#Encoding-and-deSerialization) section, and their role in secure Merkle tree constructions when dealing with hashing functions that operate on finite field elements. Next, we provide some brief guidance on serialization in the [Serialization/Deserialization](#Serializing--Deserializing) section. Finally, we present an abstract interface for a Merkle tree module in the [Interface](#interface) section.
+We start by laying out some definitions in the [Definitions](#Definitions) section, followed by our [keyed hash construction](#Keyed-Hash-Construction), which guards the Merkle against certain padding and layer abuse attacks. We then discuss injective encodings and their role in the construction of secure Merkle trees that deal with finite field elements in the [Encoding](#Encoding) section. Next, we provide some brief guidance on serialization in the [Serialization/Deserialization](#Serializing--Deserializing) section. Finally, we present an abstract interface for a Merkle tree module in the [Interface](#interface) section.
 
 ### Definitions
 
