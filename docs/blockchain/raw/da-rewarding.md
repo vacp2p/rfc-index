@@ -1,17 +1,13 @@
----
-title: NOMOSDA-REWARDING
-name: NomosDA Rewarding
-status: raw
-category: Standards Track
-tags: nomos, data availability, rewarding, incentives, peer evaluation
-editor: Marcin Pawlovski <marcin@status.im>
-contributors:
-- Alexander Mozeika <alexander.mozeika@status.im>
-- Mehmet Gonen <mehmet@status.im>
-- Daniel Sanchez Quiros <danielsq@status.im>
-- Álvaro Castro-Castilla <alvaro@status.im>
-- Filip Dimitrijevic <filip@status.im>
----
+# NOMOSDA-REWARDING
+
+| Field | Value |
+| --- | --- |
+| Name | NomosDA Rewarding |
+| Slug | |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Marcin Pawlowski <marcin@status.im> |
+| Contributors | Alexander Mozeika <alexander.mozeika@status.im>, Mehmet Gonen <mehmet@status.im>, Daniel Sanchez Quiros <danielsq@status.im>, Álvaro Castro-Castilla <alvaro@status.im>, Filip Dimitrijevic <filip@status.im> |
 
 ## Abstract
 
