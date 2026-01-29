@@ -31189,6 +31189,7 @@ message MessagingMetadata {
 </div><!-- timeline:start -->
 <h2 id="timeline-80"><a class="header" href="#timeline-80">Timeline</a></h2>
 <ul>
+<li><strong>2026-01-29</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/925aeac395050c948c1cceb1d5b0673836ebd442/docs/ift-ts/raw/mix.md"><code>925aeac</code></a> — chore: changes to how per-hop proof is added to sphinx packet which makes it simpler (#263)</li>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/mix.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/mix.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/mix.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -31716,6 +31717,8 @@ Implementers SHOULD align with widely used defaults to maximize anonymity set si
 <p>Similarly, parameters such as $r$ and $t$ are configurable.
 Changes to these parameters affect header size and therefore impact payload size if the total packet size remains fixed.
 However, if such changes alter the total packet size on the wire, the same anonymity set considerations apply.</p>
+<p>When spam protection is enabled (see <a href="ift-ts/raw/mix.html#9-spam-protection-architecture">Section 9</a>), the total wire size may increase depending on the integration approach.
+For per-hop generated proofs, the proof is appended after the Sphinx packet, and the proof size MUST be fixed to maintain packet indistinguishability.</p>
 <p>The following subsection defines how the next-hop or destination address and forwarding delay are encoded within $β$ to enable correct routing and mixing behavior.</p>
 <h3 id="84-address-and-delay-encoding"><a class="header" href="#84-address-and-delay-encoding">8.4 Address and Delay Encoding</a></h3>
 <p>Each hop's $β$ includes a fixed-size block containing the next-hop address and the forwarding delay, except for the final hop, which encodes the destination address and a delay-sized zero padding.
@@ -32228,16 +32231,15 @@ A separate Sybil resistance mechanism (such as membership proofs) would be requi
 <p>e.g. If using RLN, where proof + metadata ~= $300$ bytes, Header size becomes: $624 + 1500 = 2124$ bytes</p>
 <h4 id="922-per-hop-generated-proofs"><a class="header" href="#922-per-hop-generated-proofs">9.2.2 Per-Hop Generated Proofs</a></h4>
 <p>In this approach, each mix node generates a new spam protection proof for the next hop after verifying proof for the incoming packet.
-The proof is added as an additional packet header field (e.g., $\sigma$) that is updated at each hop, similar to how $\alpha$, $\beta$, and $\gamma$ are transformed during Sphinx processing.
-The proof MAY be bound to all the components of outgoing sphinx packet $(\alpha', \beta', \gamma', \delta')$.</p>
+The proof $\sigma$ is appended after the Sphinx packet, forming the wire format: <code>SphinxPacket || σ</code>.
+The proof MAY be bound to the complete outgoing Sphinx packet $(\alpha' | \beta' | \gamma' | \delta')$.</p>
 <h5 id="9221-how-it-works"><a class="header" href="#9221-how-it-works">9.2.2.1 How It Works</a></h5>
 <ol>
-<li>The sender generates an initial spam protection proof $\sigma_0$ for the first hop, along with any verification metadata required by the spam protection mechanism (such as merkle roots, epoch identifiers, public parameters, or identifiers).
-The proof MAY be cryptographically bound to the outgoing Sphinx packet structure.
-This is included as a new header field in the Sphinx packet.</li>
-<li>The first hop verifies $\sigma_0$ using the provided metadata before processing the Sphinx packet.</li>
-<li>After successful verification and Sphinx processing, the hop generates a new proof $\sigma_1$ (with updated metadata) for the next hop bound to the transformed packet state.</li>
-<li>The updated packet $(\alpha', \beta', \gamma', \delta', \sigma_1)$ is forwarded to the next hop.</li>
+<li>The sender generates an initial spam protection proof $\sigma$ for the first hop and appends it after the Sphinx packet.
+The proof MAY be cryptographically bound to the Sphinx packet and include any verification metadata required by the spam protection mechanism.</li>
+<li>The first hop extracts and verifies $\sigma$ before processing the Sphinx packet.</li>
+<li>After successful verification and Sphinx processing, the hop generates a new proof $\sigma'$ for the next hop bound to the transformed packet.</li>
+<li>The updated packet is forwarded to the next hop.</li>
 <li>This process repeats at each intermediate hop until the packet reaches the exit.</li>
 </ol>
 <h5 id="9222-advantages"><a class="header" href="#9222-advantages">9.2.2.2 Advantages</a></h5>
@@ -32257,21 +32259,12 @@ The proof generation latency can be overcome by doing pre-computation of proofs 
 This creates availability bottlenecks at popular nodes and unpredictable message delivery.
 This can be mitigated by assigning higher rate-limits to intermediate or popular nodes(e.g. tied to reputation).</li>
 </ul>
-<h5 id="9224-impact-on-header-size"><a class="header" href="#9224-impact-on-header-size">9.2.2.4 Impact on Header Size</a></h5>
-<p>A new header field $\sigma$ must be added to the Sphinx packet structure:</p>
-<pre><code class="language-text">+--------+----------+--------+----------+----------+
-|   α    |     β    |   γ    |    σ     |    δ     |
-| 32 B   | variable | 16 B   | variable | variable |
-+--------+----------+--------+----------+----------+
-</code></pre>
-<p>The size of $\sigma$ depends on the spam protection method.</p>
-<p>With the current recommended values:</p>
-<ul>
-<li>Original header size: $624$ bytes</li>
-<li>Header size increase: $|\sigma|$ bytes</li>
-</ul>
-<p>Note that $|\sigma|$ includes both the proof and all verification metadata.</p>
-<p>e.g. If using RLN, where metadata + proof ~= $300$ bytes, Header size becomes: $624 + 300 = 924$ bytes</p>
+<h5 id="9224-impact-on-packet-size"><a class="header" href="#9224-impact-on-packet-size">9.2.2.4 Impact on Packet Size</a></h5>
+<p>The proof $\sigma$ is appended after the Sphinx packet, increasing total wire size to $4608 + |\sigma|$ bytes.
+The internal Sphinx packet structure remains unchanged.</p>
+<p>Note that $|\sigma|$ includes both the proof and all verification metadata.
+The proof size MUST be fixed for a given spam protection mechanism to ensure all packets remain indistinguishable on the wire (see <a href="ift-ts/raw/mix.html#834-anonymity-set-considerations">Section 8.3.4</a>).</p>
+<p>e.g. If using RLN, where proof + metadata ~= $300$ bytes, total wire size becomes: $4608 + 300 = 4908$ bytes</p>
 <h4 id="923-comparison"><a class="header" href="#923-comparison">9.2.3 Comparison</a></h4>
 <p>The following table provides a brief comparison between both integration approaches.</p>
 <div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>Sender-Generated Proofs</th><th>Per-Hop Generated Proofs</th></tr></thead><tbody>
@@ -32281,7 +32274,7 @@ This can be mitigated by assigning higher rate-limits to intermediate or popular
 <tr><td><strong>Per-hop latency</strong></td><td>Minimal (fast verification)</td><td>Higher (mitigated with pre-computation)</td></tr>
 <tr><td><strong>Total end-to-end latency</strong></td><td>Lower</td><td>Higher (mitigated with pre-computation)</td></tr>
 <tr><td><strong>Sybil resistance</strong></td><td>Requires separate mechanism</td><td>Can be integrated</td></tr>
-<tr><td><strong>Header size increase</strong></td><td>$L \times \mathrm{spam_proof}$</td><td>$|\sigma|$</td></tr>
+<tr><td><strong>Packet size increase</strong></td><td>$L \times \mathrm{spam_proof}$</td><td>$|\sigma|$</td></tr>
 </tbody></table>
 </div>
 <p>Separate specifications defining concrete spam protection mechanisms SHOULD specify recommended approaches and provide detailed integration instructions.</p>
@@ -32302,16 +32295,16 @@ If verification fails, nodes MUST discard the packet and MAY apply penalties or 
 <h4 id="932-for-per-hop-generated-proofs"><a class="header" href="#932-for-per-hop-generated-proofs">9.3.2 For Per-Hop Generated Proofs</a></h4>
 <ul>
 <li>
-<p><strong>Sender nodes</strong>: MUST generate the initial spam protection proof $\sigma_0$ for the first hop as described in <a href="ift-ts/raw/mix.html#9221-how-it-works">Section 9.2.2.1</a>.
-The proof MAY be bound to the outgoing Sphinx packet and MUST NOT contain identifying information.</p>
+<p><strong>Sender nodes</strong>: MUST generate the initial spam protection proof $\sigma$ and append it after the Sphinx packet as described in <a href="ift-ts/raw/mix.html#9221-how-it-works">Section 9.2.2.1</a>.
+The proof MUST NOT contain identifying information.</p>
 </li>
 <li>
-<p><strong>Intermediate nodes</strong>: MUST verify the incoming proof $\sigma$ BEFORE any other Sphinx processing.
-If verification fails, nodes MUST discard the packet and MAY apply penalties or rate-limiting measures to the previous hop.
-If incoming proof is valid, nodes MUST generate a fresh proof $\sigma'$ for the next hop that is unlinkable from $\sigma$.</p>
+<p><strong>Intermediate nodes</strong>: MUST extract and verify the incoming proof $\sigma$ BEFORE any Sphinx processing.
+If verification fails, nodes MUST discard the packet and MAY apply penalties or rate-limiting measures.
+After verification and Sphinx processing, nodes MUST generate a fresh unlinkable proof $\sigma'$ and append it to the transformed packet before forwarding.</p>
 </li>
 <li>
-<p><strong>Exit nodes</strong>: MUST verify the incoming proof $\sigma$ before decrypting the final payload.
+<p><strong>Exit nodes</strong>: MUST extract and verify the incoming proof $\sigma$ before Sphinx processing.
 Exit nodes do not generate new proofs.</p>
 </li>
 </ul>
@@ -32440,20 +32433,22 @@ State updates (<em>e.g.,</em> recording nullifiers, updating rate-limit counters
 <li>If <code>valid = true</code>, continue with role-specific processing (intermediary or exit)</li>
 </ol>
 <h5 id="9632-for-per-hop-generated-proofs"><a class="header" href="#9632-for-per-hop-generated-proofs">9.6.3.2 For Per-Hop Generated Proofs</a></h5>
-<p><strong>Sender Nodes - During Packet Construction</strong> (<a href="ift-ts/raw/mix.html#852-construction-steps">Section 8.5.2</a>):</p>
-<p>After assembling the final Sphinx packet (Step 3.e), the sender MUST:</p>
+<p><strong>Entry Nodes - During Packet Construction</strong> (<a href="ift-ts/raw/mix.html#852-construction-steps">Section 8.5.2</a>):</p>
+<p>After assembling the final Sphinx packet (Step 3.e), the entry node MUST:</p>
 <ol>
-<li>Call <code>GenerateProof(binding_data)</code> to generate <code>encoded_proof_data</code> for the initial proof $\sigma_0$</li>
-<li>Include the <code>encoded_proof_data</code> as an additional header field $\sigma_0$ in the Sphinx packet</li>
+<li>Call <code>GenerateProof(binding_data)</code> where <code>binding_data</code> is the complete Sphinx packet bytes</li>
+<li>Append <code>encoded_proof_data</code> after the Sphinx packet and send to the first hop</li>
 </ol>
 <p><strong>Intermediate Nodes - During Packet Processing</strong> (<a href="ift-ts/raw/mix.html#86-sphinx-packet-handling">Section 8.6</a>):</p>
-<p><strong>Before</strong> any Sphinx decryption operations, the node MUST:</p>
+<p><strong>Before</strong> any Sphinx decryption operations, intermediate nodes MUST:</p>
 <ol>
-<li>Call <code>VerifyProof(encoded_proof_data, binding_data)</code> where <code>binding_data</code> is the received packet state $(\alpha, \beta, \gamma, \delta)$</li>
-<li>If the proof is not valid, discard the packet and terminate processing immediately (before session key derivation)</li>
-<li>If the proof is valid, generate fresh proof for next hop as explained above.</li>
+<li>Extract <code>encoded_proof_data</code> from the last <code>proofSize</code> bytes of the received packet</li>
+<li>Call <code>VerifyProof(encoded_proof_data, binding_data)</code> where <code>binding_data</code> is the Sphinx packet bytes</li>
+<li>If the proof is not valid, discard the packet and terminate processing immediately</li>
+<li>If valid, perform standard Sphinx processing, then call <code>GenerateProof(binding_data)</code> with the transformed packet as <code>binding_data</code></li>
+<li>Append the new <code>encoded_proof_data</code> to the transformed Sphinx packet and forward</li>
 </ol>
-<p><strong>Exit nodes</strong> verify the incoming proof but do not generate a new proof.</p>
+<p><strong>Exit nodes</strong> follow steps 1-3 but do not generate a new proof.</p>
 <h2 id="10-security-considerations"><a class="header" href="#10-security-considerations">10. Security Considerations</a></h2>
 <p>This section describes the security guarantees and limitations of the Mix Protocol.
 It begins by outlining the anonymity properties provided by the core protocol when routing messages through the mix network.
