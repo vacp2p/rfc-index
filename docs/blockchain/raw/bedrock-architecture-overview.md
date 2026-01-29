@@ -1,15 +1,13 @@
----
-title: BEDROCK-ARCHITECTURE-OVERVIEW
-name: Bedrock Architecture Overview
-status: raw
-category: Informational
-tags: nomos, bedrock, architecture, sovereign rollups, mantle, cryptarchia
-editor: David Rusu <davidrusu@status.im>
-contributors:
-- Álvaro Castro-Castilla <alvaro@status.im>
-- Daniel Kashepava <danielkashepava@status.im>
-- Filip Dimitrijevic <filip@status.im>
----
+# BEDROCK-ARCHITECTURE-OVERVIEW
+
+| Field | Value |
+| --- | --- |
+| Name | Bedrock Architecture Overview |
+| Slug | |
+| Status | raw |
+| Category | Informational |
+| Editor | David Rusu <davidrusu@status.im> |
+| Contributors | Álvaro Castro-Castilla <alvaro@status.im>, Daniel Kashepava <danielkashepava@status.im>, Filip Dimitrijevic <filip@status.im> |
 
 ## Abstract
 
