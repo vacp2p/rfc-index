@@ -1,18 +1,13 @@
----
-title: NOMOSDA-CRYPTOGRAPHIC-PROTOCOL
-name: NomosDA Cryptographic Protocol
-status: raw
-category: Standards Track
-tags: nomos, data availability, cryptography, KZG, erasure coding, polynomial commitment
-editor: Mehmet Gonen <mehmet@status.im>
-contributors:
-- Álvaro Castro-Castilla <alvaro@status.im>
-- Thomas Lavaur <thomaslavaur@status.im>
-- Daniel Kashepava <danielkashepava@status.im>
-- Marcin Pawlowski <marcin@status.im>
-- Daniel Sanchez Quiros <danielsq@status.im>
-- Filip Dimitrijevic <filip@status.im>
----
+# NOMOSDA-CRYPTOGRAPHIC-PROTOCOL
+
+| Field | Value |
+| --- | --- |
+| Name | NomosDA Cryptographic Protocol |
+| Slug | |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Mehmet Gonen <mehmet@status.im> |
+| Contributors | Álvaro Castro-Castilla <alvaro@status.im>, Thomas Lavaur <thomaslavaur@status.im>, Daniel Kashepava <danielkashepava@status.im>, Marcin Pawlowski <marcin@status.im>, Daniel Sanchez Quiros <danielsq@status.im>, Filip Dimitrijevic <filip@status.im> |
 
 ## Abstract
 
