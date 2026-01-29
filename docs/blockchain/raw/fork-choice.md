@@ -1,14 +1,13 @@
----
-title: CRYPTARCHIA-FORK-CHOICE
-name: Cryptarchia Fork Choice Rule
-status: raw
-category: Standards Track
-tags: nomos, cryptarchia, fork-choice, consensus
-editor: David Rusu <davidrusu@status.im>
-contributors:
-- Jimmy Debe <jimmy@status.im>
-- Filip Dimitrijevic <filip@status.im>
----
+# CRYPTARCHIA-FORK-CHOICE
+
+| Field | Value |
+| --- | --- |
+| Name | Cryptarchia Fork Choice Rule |
+| Slug | |
+| Status | raw |
+| Category | Standards Track |
+| Editor | David Rusu <davidrusu@status.im> |
+| Contributors | Jimmy Debe <jimmy@status.im>, Filip Dimitrijevic <filip@status.im> |
 
 ## Abstract
 
