@@ -54,7 +54,7 @@ and [extensible peer records specification](https://github.com/vacp2p/rfc-index/
 ### Record Propagation
 
 A node that wants to make itself discoverable,
-also known as an *advertiser*,
+also known as an _advertiser_,
 MUST encode its discoverable information in an [`XPR`](https://github.com/vacp2p/rfc-index/blob/31dfa0c8c2f3e7f7365156246c4eb7b7c390e76e/vac/raw/extensible-peer-records.md#extensible-peer-records).
 The encoded information MUST be sufficient for discoverers to connect to this advertiser.
 It MAY choose to encode some or all of its capabilities (and related information)
@@ -84,7 +84,7 @@ the `signedPeerRecord` field extension is not yet part of any official specifica
 ### Record Discovery
 
 A node that wants to discover peers to connect to,
-also known as a *discoverer*,
+also known as a _discoverer_,
 SHOULD perform the following random walk discovery procedure (`FIND_RANDOM`):
 
 1. Choose a random value in the `Kad-DHT` key space. (`R_KEY`).
@@ -95,7 +95,7 @@ This procedure loops the `Kad-DHT` `FIND_NODE` procedure to the target key,
 each time receiving closer peers (`closerPeers`) to the target key in response,
 until no new closer peers can be found.
 Since the target is random,
-the discoverer SHOULD consider each *previously unseen* peer in each response's `closerPeers` field,
+the discoverer SHOULD consider each _previously unseen_ peer in each response's `closerPeers` field,
 as a randomly discovered node of potential interest.
 The discoverer MUST keep track of such peers as `discoveredPeer`s.
 
@@ -160,22 +160,22 @@ and advertising this node and its capabilities.
 In the case of Extended Kademlia Discovery,
 `stop()` will cancel the periodic task of [refreshing the propagated `XPR`](#record-propagation).
 
-### `start*advertising(const char* service*id)`
+### `start_advertising(const char* service_id)`
 
 Start advertising this node against any capability
 encoded as an input `service_id` string.
 
 In the case of Extended Kademlia Discovery,
-`start*advertising()` will include the input `service*id`
+`start_advertising()` will include the input `service_id`
 in the [regularly propagated `XPR`](#record-propagation).
 
-### `stop*advertising(const char* service*id)`
+### `stop_advertising(const char* service_id)`
 
 Stop advertising this node against the capability
 encoded in the input `service_id` string.
 
 In the case of Extended Kademlia Discovery,
-`stop*advertising()` will exclude the `service*id`
+`stop_advertising()` will exclude the `service_id`
 from the [regularly propagated `XPR`](#record-propagation),
 if it was previously included.
 
