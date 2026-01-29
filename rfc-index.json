@@ -231,6 +231,16 @@
   },
   {
     "component": "blockchain",
+    "slug": "Cryptarchia Fork Choice Rule",
+    "title": "Cryptarchia Fork Choice Rule",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-29",
+    "path": "blockchain/raw/fork-choice.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
     "slug": "NomosDA Rewarding",
     "title": "NomosDA Rewarding",
     "status": "raw",
