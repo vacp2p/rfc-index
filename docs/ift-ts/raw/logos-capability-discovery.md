@@ -829,16 +829,12 @@ using the formula described in the [Distance](#distance) section.
 
 ### Advertisement Algorithm
 
-Advertisers place advertisements across multiple registrars
-using the `ADVERTISE()` algorithm.
-The advertisers run `ADVERTISE()` periodically.
-We RECOMMEND to use the following algorithm to implement the
+We RECOMMEND to use the `ADVERTISE()` to implement the
 [registration maintenance requirements](#registration-maintenance-requirements).
-
-**ADVERTISE() algorithm**
 
 The `ADVERTISE()` algorithm enables nodes to announce their participation in a service
 by distributing advertisements across strategically selected registrar peers.
+The advertisers run `ADVERTISE()` periodically.
 
 Initialization:
 
@@ -849,21 +845,20 @@ using the formula in [Distance section](#distance)
 
 The algorithm continuously iterates over all buckets in `AdvT(service_id_hash)`:
 
-1. For each bucket `i`, maintain up to `K_register` active registrations or ongoing registration attempts
-2. Select a random registrar peer using `AdvT(service_id_hash).getBucket(i).getRandomNode()`
-   - Returns a registrar that hasn't been contacted yet during the current advertisement cycle
+1. For each bucket `i`, maintain up to
+`K_register` active registrations or ongoing registration attempts
+2. Select a random registrar peer using
+`AdvT(service_id_hash).getBucket(i).getRandomNode()`
+   - Returns a registrar that hasn't been contacted yet
+   during the current advertisement cycle
    - Returns `None` if all peers in the bucket have been tried
 3. When a registrar is selected:
    - Construct an [advertisement object](#advertisement) and sign it
-   - Spawn an asynchronous registration attempt by invoking `ADVERTISE_SINGLE()`,
-   which handles the [registration maintenance requirements](#registration-maintenance-requirements)
+   - Spawn an asynchronous registration attempt by invoking `ADVERTISE_SINGLE()`
    - Add the selected registrar to `ongoing[i]` map to track the active attempt
 
-**ADVERTISE_SINGLE() algorithm**
-
 The `ADVERTISE_SINGLE()` procedure handles
-the complete registration workflow with a single registrar,
-implementing the [registration maintenance requirements](#registration-maintenance-requirements).
+the complete registration workflow with a single registrar.
 This process may require multiple round trips if the registrar's cache is full.
 
 The procedure begins with no ticket (`ticket = None`).
@@ -871,7 +866,7 @@ It then enters a retry loop that continues until
 the registrar either confirms successful registration
 or definitively rejects the advertisement.
 
-On each iteration, the advertiser sends a `Register` request following the requirements,
+On each iteration, the advertiser sends a `Register` request,
 and processes the response according to the `status` field handling described in
 [Registration Maintenance Requirements](#registration-maintenance-requirements).
 
@@ -954,14 +949,11 @@ Implementations can choose the interval based on their requirements.
 
 ### Lookup Algorithm
 
-We RECOMMEND to use the following algorithm to implement the
-[lookup requirements](#lookup-requirements).
-
-**LOOKUP(service_id_hash) algorithm**
+We RECOMMEND to use the following `LOOKUP(service_id_hash) algorithm`
+to implement the [lookup requirements](#lookup-requirements).
 
 The lookup process discovers peers providing a specific service
-by querying registrars distributed across the keyspace,
-implementing the [lookup requirements](#lookup-requirements).
+by querying registrars distributed across the keyspace.
 
 Initialization:
 
@@ -981,7 +973,7 @@ For each bucket `i`:
    - Returns a registrar that hasn't been queried yet in this lookup session
 2. For each selected registrar, send a `GET_ADS` request
 3. Process the response:
-   - Verify each advertisement's signature as required
+   - Verify each advertisement's signature
    - Add valid advertiser peer IDs to `foundPeers`
    - Incorporate closer peers into `DiscT(service_id_hash)`
 
@@ -1083,21 +1075,15 @@ using the algorithm described in [Peer Table Updates](#peer-table-updates) secti
 
 ### Registration Flow
 
-We RECOMMEND to use the following algorithm to implement the
+We RECOMMEND to use the `REGISTER() algorithm` algorithm to implement the
 [admission control requirements](#admission-control-requirements).
 
 Refer to the [Register Message section](#register-message)
 for the request and response structure of `REGISTER`.
 
-**REGISTER() algorithm**
-
-The registration process implements the [admission control requirements](#admission-control-requirements),
-managing registrar cache capacity while ensuring fairness through accumulated waiting time.
-
 Initial checks:
 
-1. Check whether the advertisement exists in `ad_cache` as required
-2. If found, return successful response immediately
+1. The `ad` should not be present in `ad_cache`
 
 Ticket and waiting time preparation:
 
