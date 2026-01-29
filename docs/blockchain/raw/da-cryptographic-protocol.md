@@ -131,7 +131,7 @@ The matrix representation has $k$ columns which include $\ell$ chunks each.
 The row and column numbers used in the representation are decided
 based on the size of the block data and the number of DA nodes.
 
-![Data Matrix Structure](images/da-data-matrix.png)
+![Data Matrix Structure](assets/da-data-matrix.png)
 
 *Figure 1: Data matrix structure showing chunks and columns.
 Each chunk is a 31-byte element, and each column contains $\ell$ chunks.*
@@ -174,7 +174,7 @@ The current design of NomosDA uses an expansion factor of 2,
 but it can also work with different factors.
 This expanded data matrix has rows of length $2k$.
 
-![Extended Data Matrix](images/da-extended-matrix.png)
+![Extended Data Matrix](assets/da-extended-matrix.png)
 
 *Figure 2: Extended data matrix showing original data ($k$ columns)
 and extended data ($2k$ columns total) after Reed-Solomon expansion.*
@@ -190,7 +190,7 @@ a more efficient technique using random linear combinations of row polynomials i
 allowing only one proof to be generated per column
 while still ensuring the validity of all underlying row data.
 
-![Encoding Pipeline](images/da-encoding-pipeline.png)
+![Encoding Pipeline](assets/da-encoding-pipeline.png)
 
 *Figure 3: Complete encoding pipeline showing row commitments (step 1),
 RS-encoding (step 2), and combined row commitment with column data (step 3).*
@@ -258,7 +258,7 @@ to every other node in the subnet.
 A DA node that receives the column information described above
 performs the following checks:
 
-![Dispersal and Verification](images/da-dispersal-verification.png)
+![Dispersal and Verification](assets/da-dispersal-verification.png)
 
 *Figure 4: Dispersal and verification flow from Encoder to DA Node.
 The DA Node receives row commitments, column data, and combined proof,
@@ -294,7 +294,7 @@ A sampling client, such as a light node, selects a random column index $s \in \{
 It sends a request for column $s$ to a DA node hosting that column's data.
 The DA node sends the client the column data $data^{s}_{i}$ and the combined proof $\pi_s$.
 
-![Sampling](images/da-sampling.png)
+![Sampling](assets/da-sampling.png)
 
 *Figure 5: Sampling flow between DA Node and Sampling Client.
 The client requests a random column index $s$, receives the column data and proof,
@@ -315,13 +315,13 @@ The verification process run by the sampling client proceeds as follows:
 
    $$com_C = com_1 + h \cdot com_2 + h^{2} \cdot com_3 + \cdots + h^{\ell-1} \cdot com_{\ell}$$
 
-1. Compute the combined evaluation value $v_t$ using the received column data:
+1. Compute the combined evaluation value $v_s$ using the received column data:
 
-   $$v_t = data^{s}_{1} + h \cdot data^{s}_{2} + h^{2} \cdot data^{s}_{3} + \cdots + h^{\ell-1} \cdot data^{s}_{\ell}$$
+   $$v_s = data^{s}_{1} + h \cdot data^{s}_{2} + h^{2} \cdot data^{s}_{3} + \cdots + h^{\ell-1} \cdot data^{s}_{\ell}$$
 
 1. Verify the evaluation proof:
 
-   $$\text{Verify}(com_C, w^{s-1}, v_t, \pi_s) \rightarrow \text{true/false}$$
+   $$\text{Verify}(com_C, w^{s-1}, v_s, \pi_s) \rightarrow \text{true/false}$$
 
 If these checks succeed, then this proves to the sampling client
 that the column $s$ is correctly encoded and matches the committed data.
