@@ -230,6 +230,16 @@
     "archived": false
   },
   {
+    "component": "blockchain",
+    "slug": "NomosDA Rewarding",
+    "title": "NomosDA Rewarding",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/da-rewarding.html",
+    "archived": false
+  },
+  {
     "component": "ift-ts",
     "slug": "1",
     "title": "Consensus-Oriented Specification System",
