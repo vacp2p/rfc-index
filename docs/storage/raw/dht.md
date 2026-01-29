@@ -1,13 +1,13 @@
----
-title: CODEX-DHT
-name: Codex Discovery
-status: raw
-category: Standards Track
-tags: codex, dht, discovery, discv5, peer-discovery
-editor: Jimmy Debe <jimmy@status.im>
-contributors:
-- Filip Dimitrijevic <filip@status.im>
----
+# CODEX-DHT
+
+| Field | Value |
+| --- | --- |
+| Name | Codex Discovery |
+| Slug | |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Jimmy Debe <jimmy@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
 
 ## Abstract
 
