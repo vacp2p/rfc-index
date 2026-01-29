@@ -7,7 +7,7 @@
 | Status | raw |
 | Category | Standards Track |
 | Editor | Arunima Chaudhuri [arunima@status.im](mailto:arunima@status.im) |
-| Contributors | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |
+| Contributors | Ugur Sen [ugur@status.im](mailto:ugur@status.im), Hanno Cornelius [hanno@status.im](mailto:hanno@status.im) |
 
 <!-- timeline:start -->
 
@@ -119,20 +119,18 @@ for computing distances with other peers and assigning peers to buckets.
 
 ### Bucket
 
-Each table is organized into buckets.
-A bucket is a container that stores information about peers
-at a particular distance range from the center ID.
+Each routing table is organized into buckets.
+A bucket is a logical container that stores information about peers
+at a particular distance range from a reference ID.
 
-For simplicity in this RFC, we represent each bucket as a list of peer IDs.
-However, in a full implementation, each entry in the bucket MUST store
-a complete peer information necessary to enable communication.
+Conceptually:
 
-**Bucket Size:**
+- Each bucket corresponds to a specific range in the XOR distance metric
+- Peers are assigned to buckets based on their XOR distance from the table's center ID
+- Buckets enable logarithmic routing by organizing the keyspace into manageable segments
 
-The number of entries a bucket can hold is implementation-dependent.
-
-- Smaller buckets → lower memory usage but reduced resilience to churn
-- Larger buckets →  better redundancy but increased maintenance overhead
+The number of buckets and their organization is described in the [Distance](#distance) section.
+Implementation considerations for bucket management are detailed in [Bucket Management](#bucket-management) section.
 
 ### Service
 
@@ -197,7 +195,7 @@ through interactions with advertisers and discoverers.
 Each bucket in the registrar table contains a list of peer nodes
 at a particular XOR distance range from `service_id_hash`.
 Registrars use this table to return
-`closerPeers` during `REGISTER` and `GET_ADS` responses,
+`closerPeers` in `REGISTER` and `GET_ADS` responses,
 enabling advertisers and discoverers to
 refine their service-specific routing tables.
 
@@ -230,70 +228,39 @@ not an individual advertisement field or parameter of an individual registrar.
 
 ### Advertisement
 
-An **advertisement** is a data structure
-indicating that a specific node participates in a service.
+An **advertisement** indicates that a specific node participates in a service.
 In this RFC we refer to advertisement objects as `ads`.
 For a single advertisement object we use `ad`.
 
-```protobuf
-message Advertisement {
-    // Service identifier (32-byte SHA-256 hash)
-    bytes service_id_hash = 1;
+An advertisement logically represents:
 
-    // Peer ID of advertiser (32-byte hash of public key)
-    bytes peerID = 2;
+- **Service identification**: Which service the node participates in (via `service_id_hash`)
+- **Peer identification**: The advertiser's unique peer ID
+- **Network addresses**: How to reach the advertiser (multiaddrs)
+- **Authentication**: Cryptographic proof that the advertiser controls the peer ID
 
-    // Multiaddrs of advertiser
-    repeated bytes addrs = 3;
-
-    // Ed25519 signature over (service_id_hash || peerID || addrs)
-    bytes signature = 4;
-
-    // Optional: Service-specific metadata
-    optional bytes metadata = 5;
-
-    // Unix timestamp in seconds
-    uint64 timestamp = 6;
-}
-```
-
-Advertisements MUST include `service_id_hash`, `peerID`, `addrs` and `signature` fields.
-Advertisements MAY include `metadata` and `timestamp` fields.
-The `signature` field MUST be a Ed25519 signature over the concatenation of
-(`service_id_hash` || `peerID` || `addrs`).
-Refer to [Signature](#signature) section for more details.
-Implementations MUST verify this signature before accepting an advertisement.
+Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
+See the [Advertisement Encoding](#advertisement-encoding) section
+in the wire protocol specification for transmission format details.
 
 ### Ticket
 
-Tickets are digitally signed objects
-issued by registrars to advertisers to reliably indicate
-how long an advertiser already waited for admission.
+Tickets are digitally signed objects issued by registrars to advertisers
+to track accumulated waiting time for admission into the advertisement cache.
 
-```protobuf
-message Ticket {
-    // Copy of the original advertisement
-    Advertisement ad = 1;
+A ticket logically represents:
 
-    // Ticket creation timestamp (Unix time in seconds)
-    uint64 t_init = 2;
+- **Advertisement reference**: The advertisement this ticket is associated with
+- **Time tracking**: When the ticket was created (`t_init`) and last modified (`t_mod`)
+- **Waiting time**: How long the advertiser must wait before retrying (`t_wait_for`)
+- **Authentication**: Cryptographic proof that the registrar issued this ticket
 
-    // Last modification timestamp (Unix time in seconds)
-    uint64 t_mod = 3;
+Tickets enable stateless admission control at registrars.
+Advertisers accumulate waiting time across registration attempts
+by presenting tickets from previous attempts.
 
-    // Remaining wait time in seconds
-    uint32 t_wait_for = 4;
-
-    // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
-    bytes signature = 5;
-}
-```
-
-Tickets MUST include `ad`, `t_init`, `t_mod`, `t_wait_for` and `signature` fields.
-The `signature` field MUST be an Ed25519 signature over the concatenation of
-(`ad` || `t_init` || `t_mod` || `t_wait_for`).
-Refer to [Signature](#signature) section for more details.
-Implementations MUST verify this signature before accepting a ticket.
+See the [RPC Messages](#rpc-messages) section for the wire format specification of tickets
+and the [Registration Flow](#registration-flow) section for how tickets are used in the admission protocol.
 
 ## Protocol Specifications
 
@@ -314,7 +281,7 @@ Implementations SHOULD modify them as needed based on specific requirements.
 | `P_occ` | 10 | Occupancy exponent for waiting time calculation |
 | `G` | 10⁻⁷ | Safety parameter for waiting time calculation |
 | `δ` | 1 second | Registration window time |
-| `m`  | 16 | Number of buckets for advertise table, search table |
+| `m`  | 16 | Number of buckets for service-specific tables |
 
 ### Distance
 
@@ -329,12 +296,15 @@ For every node in the network, the `peerID` is unique.
 In this system, both `peerID` and the `service_id_hash` are 256-bit SHA-256 hashes.
 Thus both belong to the same keyspace.
 
-Advertise table `AdvT(service_id_hash)`, search table `DiscT(service_id_hash)`
-and registrar table `RegT(service_id_hash)` MUST be centered on `service_id_hash`
-while `KadDHT(peerID)` table is centered on `peerID`.
+`KadDHT(peerID)` table is centered on `peerID`.
+`AdvT(service_id_hash)`, `DiscT(service_id_hash)`
+and `RegT(service_id_hash)` are service-specific tables
+and MUST be centered on `service_id_hash`.
+Bootstrapping of service-specific tables
+MAY be done from the `KadDHT(peerID)` table.
 
-When inserting a node into `AdvT(service_id_hash)`, `DiscT(service_id_hash)` or `RegT(service_id_hash)`,
-the bucket index into which the node will be inserted MUST be determined by:
+When inserting a peer into the service-specific tables,
+the bucket index into which the peer will be inserted MUST be determined by:
 
 - x = reference ID which is the `service_id_hash`
 - y = target peer ID `peerID`
@@ -342,15 +312,11 @@ the bucket index into which the node will be inserted MUST be determined by:
 - `m` = 16 = number of buckets in the advertise/search table
 - `d = x ⊕ y = service_id_hash ⊕ peerID` = bitwise XOR distance (interpreted as an unsigned integer)
 
-The bucket index `i` where `y` is placed in `x`'s advertise/search table is:
-
-- For `d > 0`, `i = min( ⌊ (m / 256) * (256 − 1 − ⌊log₂(d)⌋) ⌋ , m − 1 )`
-- For `d = 0`, `i = m - 1` which is the same ID case
-
-If we further simplify it, then:
+The bucket index `i` where `y` is placed in `x`'s table is calculated as:
 
 - Let `lz = CLZ(d)` = number of leading zeros in the 256-bit representation of `d`
 - `i = min( ⌊ (lz * m) / 256 ⌋ , m − 1 )`
+- Special case: For `d = 0` (same ID), `i = m - 1`
 
 Lower-index buckets represent peers far away from `service_id_hash` in the keyspace,
 while higher-index buckets contain peers closer to `service_id_hash`.
@@ -358,124 +324,439 @@ This property allows efficient logarithmic routing:
 each hop moves to a peer that shares a longer prefix of bits
 with the target `service_id_hash`.
 
-This formula MUST also used when we bootstrap peers.
-Bootstrapping MAY be done from the `KadDHT(peerID)` table.
-For every peer present in the table from where we bootstrap,
-we MUST use the same formula to place them in `AdvT(service_id_hash)`,
-`DiscT(service_id_hash)` and `RegT(service_id_hash)` buckets.
-
-Initially the density of peers in the search table `DiscT(service_id_hash)`
-and advertise table `AdvT(service_id_hash)` around `service_id_hash` might be low or even null
-particularly when `service_id_hash` and `peerID` are distant in the keyspace
-(as `KadDHT(peerID)` is centered on `peerID`).
-The buckets SHOULD be filled opportunistically
-while interacting with peers during the search or advertisement process.
-Registrars, apart from responding to queries,
-SHOULD return a list of peers as `response.closerPeers` .
-These peers SHOULD be added to buckets in `AdvT(service_id_hash)` and `DiscT(service_id_hash)`.
-While adding peers implementations MUST use the same formula.
-
-**Note:**
-
-The `response.closerPeers` field returned by registrars SHOULD include
-a list of peer information object which contains both peer IDs and addresses,
-as the latter is required to contact peers.
-In this RFC, we simplify representation by listing only peer IDs,
-but full implementations SHOULD include address information.
+Service-specific tables may initially have low peer density,
+especially when `service_id_hash` and `peerID` are distant in the keyspace.
+Buckets SHOULD be filled opportunistically through `response.closerPeers`
+during interactions (see [Peer Table Updates](#peer-table-updates))
+using the same formula.
 
 ## RPC Messages
 
-All RPC messages MUST be sent using the libp2p Kad-dht message format
-with new message types added for Logos discovery operations.
+All RPC messages use the libp2p Kad-DHT message format
+with extensions for Logos discovery operations.
 
-### Message Types
-
-The following message types MUST be added to the Kad-dht `Message.MessageType` enum:
+### Base Message Structure
 
 ```protobuf
-enum MessageType {
-    // ... existing Kad-dht message types ...
-    REGISTER = 6;
-    GET_ADS = 7;
+syntax = "proto2";
+
+message Register {
+    // Used in response to indicate the status of the registration
+    enum RegistrationStatus {
+        CONFIRMED = 0;
+        WAIT = 1;
+        REJECTED = 2;
+    }
+
+    // Ticket protobuf definition
+    message Ticket {
+        // Copy of the original advertisement
+        bytes advertisement = 1;
+
+        // Ticket creation timestamp (Unix time in seconds)
+        uint64 t_init = 2;
+
+        // Last modification timestamp (Unix time in seconds)
+        uint64 t_mod = 3;
+
+        // Remaining wait time in seconds
+        uint32 t_wait_for = 4;
+
+        // Ed25519 signature over (ad || t_init || t_mod || t_wait_for)
+        bytes signature = 5;
+    }
+
+    // Used to indicate the encoded advertisement against the key (service ID)
+    bytes advertisement = 1;
+
+    // Used in response to indicate the status of the registration
+    RegistrationStatus status = 2;
+
+    // Used in response to provide a ticket if status is WAIT
+    // Used in request to provide a ticket if previously received
+    optional Ticket ticket = 3;
+}
+
+message GetAds {
+    // Used in response to provide a list of encoded advertisements
+    repeated bytes advertisements = 1;
+}
+
+// Record represents a dht record that contains a value
+// for a key value pair
+message Record {
+    // The key that references this record
+    bytes key = 1;
+
+    // The actual value this record is storing
+    bytes value = 2;
+
+    // Note: These fields were removed from the Record message
+    //
+    // Hash of the authors public key
+    // optional string author = 3;
+    // A PKI signature for the key+value+author
+    // optional bytes signature = 4;
+
+    // Time the record was received, set by receiver
+    // Formatted according to https://datatracker.ietf.org/doc/html/rfc3339
+    string timeReceived = 5;
+};
+
+message Message {
+    enum MessageType {
+        PUT_VALUE = 0;
+        GET_VALUE = 1;
+        ADD_PROVIDER = 2;
+        GET_PROVIDERS = 3;
+        FIND_NODE = 4;
+        PING = 5;
+        REGISTER = 6; // New DISC-NG capability discovery type
+        GET_ADS = 7; // New DISC-NG capability discovery type
+    }
+
+    enum ConnectionType {
+        // sender does not have a connection to peer, and no extra information (default)
+        NOT_CONNECTED = 0;
+
+        // sender has a live connection to peer
+        CONNECTED = 1;
+
+        // sender recently connected to peer
+        CAN_CONNECT = 2;
+
+        // sender recently tried to connect to peer repeatedly but failed to connect
+        // ("try" here is loose, but this should signal "made strong effort, failed")
+        CANNOT_CONNECT = 3;
+    }
+
+    message Peer {
+        // ID of a given peer.
+        bytes id = 1;
+
+        // multiaddrs for a given peer
+        repeated bytes addrs = 2;
+
+        // used to signal the sender's connection capabilities to the peer
+        ConnectionType connection = 3;
+    }
+
+    // defines what type of message it is.
+    MessageType type = 1;
+
+    // defines what coral cluster level this query/response belongs to.
+    // in case we want to implement coral's cluster rings in the future.
+    int32 clusterLevelRaw = 10; // NOT USED
+
+    // Used to specify the key associated with this message.
+    // PUT_VALUE, GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+    // New DISC-NG capability discovery contains service ID hash for types REGISTER, GET_ADS
+    bytes key = 2;
+
+    // Used to return a value
+    // PUT_VALUE, GET_VALUE
+    Record record = 3;
+
+    // Used to return peers closer to a key in a query
+    // GET_VALUE, GET_PROVIDERS, FIND_NODE
+    repeated Peer closerPeers = 8;
+
+    // Used to return Providers
+    // GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+    repeated Peer providerPeers = 9;
+
+    // Used in REGISTER request and response
+    Register register = 21;
+
+    // Used in GET_ADS response
+    GetAds getAds = 22;
 }
 ```
+
+**Key Design Principles:**
+
+- Standard Kad-DHT message types (`PUT_VALUE`, `GET_VALUE`,
+`ADD_PROVIDER`, `GET_PROVIDERS`, `FIND_NODE`, `PING`) remain completely unchanged
+- The `Record` message is preserved as-is for Kad-DHT routing table operations
+- Logos adds two new message types (`REGISTER`, `GET_ADS`) without modifying existing types
+- Advertisements are encoded as generic `bytes` (RECOMMENDED: ExtensiblePeerRecord/XPR)
+to avoid coupling the protocol to specific formats
+- The existing `key` field is reused for `service_id_hash` in Logos operations
+- Nodes without Logos Capability Discovery support will ignore `REGISTER` and `GET_ADS` messages
+
+### Advertisement Encoding
+
+Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](https://github.com/vacp2p/rfc-index/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md):
+
+```protobuf
+ExtensiblePeerRecord {
+    peer_id: <advertiser_peer_id>
+    seq: <monotonic_sequence>
+    addresses: [
+        AddressInfo { multiaddr: <addr1> },
+        AddressInfo { multiaddr: <addr2> }
+    ]
+    services: [
+        ServiceInfo {
+            id: "/waku/store/1.0.0"  // service protocol identifier
+            data: <optional_metadata>
+        }
+    ]
+}
+```
+
+**Size constraints:**
+
+- Each `ServiceInfo.data` field SHOULD be ≤ 33 bytes
+- Total encoded XPR SHOULD be ≤ 1024 bytes
+
+The XPR MUST be wrapped in a signed envelope with:
+
+- Domain: `libp2p-routing-state`
+- Payload type: `/libp2p/extensible-peer-record/`
+
+Alternative encodings MAY be used if they provide equivalent functionality and can be verified by discoverers.
 
 ### REGISTER Message
 
+Used by advertisers to register their advertisements with registrars.
+
 #### REGISTER Request
 
-Advertisers SHOULD send `REGISTER` request message to registrars
-to admit the advertiser's advertisemnet for a service
-into the registrar's `ad_cache`.
+| Field | Usage | Value |
+|-------|-------|-------|
+| `type` | REQUIRED | `REGISTER` (6) |
+| `key` | REQUIRED | `service_id_hash` (32 bytes) |
+| `register.advertisement` | REQUIRED | Encoded advertisement as `bytes` (RECOMMENDED: XPR) |
+| `register.ticket` | OPTIONAL | Ticket from previous registration attempt |
+| All other fields | UNUSED | Empty/not set |
+
+**Example (First attempt):**
 
 ```protobuf
-message Message {
-    MessageType type = 1;  // REGISTER
-    bytes key = 2;         // service_id_hash
-    Advertisement ad = 3;   // The advertisement to register
-    optional Ticket ticket = 4;  // Optional: ticket from previous attempt
+Message {
+    type: REGISTER
+    key: <service_id_hash>
+    register: {
+        advertisement: <encoded_xpr_bytes>
+    }
 }
 ```
 
-Advertisers SHOULD include the `service_id_hash` in the `key` field
-and the advertisement in the `ad` field of the request.
-If this is a retry attempt, advertisers SHOULD include
-the latest `ticket` received from the registrar.
+**Example (Retry with ticket):**
+
+```protobuf
+Message {
+    type: REGISTER
+    key: <service_id_hash>
+    register: {
+        advertisement: <encoded_xpr_bytes>
+        ticket: {
+            ad: <encoded_xpr_bytes>
+            t_init: 1234567890
+            t_mod: 1234567900
+            t_wait_for: 300
+            signature: <registrar_signature>
+        }
+    }
+}
+```
 
 #### REGISTER Response
 
-`REGISTER` response SHOULD be sent by registrars to advertisers.
+| Field | Usage | Value |
+|-------|-------|-------|
+| `type` | REQUIRED | `REGISTER` (6) |
+| `register.status` | REQUIRED | `CONFIRMED`, `WAIT`, or `REJECTED` |
+| `closerPeers` | REQUIRED | List of peers for advertise table |
+| `register.ticket` | CONDITIONAL | Present if status = `WAIT` |
+| All other fields | UNUSED | Empty/not set |
+
+**Status values:**
+
+- `CONFIRMED`: Advertisement stored in cache
+- `WAIT`: Not yet accepted, wait and retry with ticket
+- `REJECTED`: Invalid signature, duplicate, or error
+
+**Example (WAIT):**
 
 ```protobuf
-enum RegistrationStatus {
-    CONFIRMED = 0;  // Advertisement accepted
-    WAIT = 1;       // wait, ticket provided
-    REJECTED = 2;   // Advertisement rejected
-}
-
-message Message {
-    MessageType type = 1;       // REGISTER
-    RegistrationStatus status = 2;
-    optional Ticket ticket = 3;  // Provided if status = WAIT
-    repeated Peer closerPeers = 4;  // Peers for populating advertise table
+Message {
+    type: REGISTER
+    register: {
+        status: WAIT
+        ticket: {
+            ad: <encoded_xpr_bytes>
+            t_init: 1234567890
+            t_mod: 1234567905
+            t_wait_for: 295
+            signature: <registrar_signature>
+        }
+    }
+    closerPeers: [
+        {id: <peer1_id>, addrs: [<addr1>]},
+        {id: <peer2_id>, addrs: [<addr2>]}
+    ]
 }
 ```
 
-Registrars SHOULD set the `status` field to indicate the result of the registration attempt.
-If `status` is `WAIT`, registrars MUST provide a valid `ticket`.
-Registrars SHOULD include `closerPeers` to help populate the advertiser's table.
+**Example (CONFIRMED):**
+
+```protobuf
+Message {
+    type: REGISTER
+    register: {
+        status: CONFIRMED
+    }
+    closerPeers: [
+        {id: <peer1_id>, addrs: [<addr1>]},
+        {id: <peer2_id>, addrs: [<addr2>]}
+    ]
+}
+```
+
+**Example (REJECTED):**
+
+```protobuf
+Message {
+    type: REGISTER
+    register: {
+        status: REJECTED
+    }
+}
+```
 
 ### GET_ADS Message
 
+Used by discoverers to retrieve advertisements from registrars.
+
 #### GET_ADS Request
 
-Discoverers send `GET_ADS` request message to registrars
-to get advertisements for a particular service.
+| Field | Usage | Value |
+|-------|-------|-------|
+| `type` | REQUIRED | `GET_ADS` (7) |
+| `key` | REQUIRED | `service_id_hash` (32 bytes) |
+| All other fields | UNUSED | Empty/not set |
+
+**Example:**
 
 ```protobuf
-message Message {
-    MessageType type = 1;  // GET_ADS
-    bytes key = 2;         // service_id_hash to look up
+Message {
+    type: GET_ADS
+    key: <service_id_hash>
 }
 ```
-
-Discoverers SHOULD include the `service_id_hash` they are searching for in the `key` field.
 
 #### GET_ADS Response
 
-Registrars SHOULD respond to discoverer's `GET_ADS` request
-using the following response structure.
+| Field | Usage | Value |
+|-------|-------|-------|
+| `type` | REQUIRED | `GET_ADS` (7) |
+| `getAds.advertisements` | REQUIRED | List of encoded advertisements (up to `F_return` = 10) |
+| `closerPeers` | REQUIRED | List of peers for search table |
+| All other fields | UNUSED | Empty/not set |
+
+Each advertisement in `getAds.advertisements` is encoded as `bytes` (RECOMMENDED: XPR).
+Discoverers MUST verify signatures before accepting.
+
+**Example:**
 
 ```protobuf
-message Message {
-    MessageType type = 1;              // GET_ADS
-    repeated Advertisement ads = 2;     // Up to F_return advertisements
-    repeated Peer closerPeers = 3;     // Peers for populating search table
+Message {
+    type: GET_ADS
+    getAds: {
+        advertisements: [
+            <encoded_xpr_bytes_1>,
+            <encoded_xpr_bytes_2>,
+            ...  // up to F_return
+        ]
+    }
+    closerPeers: [
+        {id: <peer1_id>, addrs: [<addr1>]},
+        {id: <peer2_id>, addrs: [<addr2>]}
+    ]
 }
 ```
 
-Registrars MUST return up to `F_return` advertisements for the requested service.
-Registrars SHOULD include `closerPeers` to help populate the discoverer's search table.
+### Message Validation
+
+#### REGISTER Request Validation
+
+Registrars MUST validate:
+
+1. `type` = `REGISTER` (6)
+2. `key` = 32 bytes (valid SHA-256)
+3. `register.advertisement` is present and non-empty
+4. If `register.ticket` present:
+   - Valid signature issued by this registrar
+   - `ticket.ad` matches `register.advertisement`
+   - Retry within window: `ticket.t_mod + ticket.t_wait_for ≤ NOW() ≤ ticket.t_mod + ticket.t_wait_for + δ`
+5. Advertisement signature is valid (see [Advertisement Signature Verification](#advertisement-signature-verification))
+6. Advertisement not already in `ad_cache`
+
+Respond with `register.status = REJECTED` if validation fails.
+
+#### GET_ADS Request Validation
+
+Registrars MUST validate:
+
+1. `type` = `GET_ADS` (7)
+2. `key` = 32 bytes (valid SHA-256)
+
+Return empty `getAds.advertisements` list or close stream if validation fails.
+
+#### Advertisement Signature Verification
+
+Both registrars (on REGISTER) and discoverers (on GET_ADS response) MUST verify advertisement signatures. For XPR-encoded advertisements:
+
+```text
+VERIFY_ADVERTISEMENT(encoded_ad_bytes, service_id_hash):
+    envelope = DECODE_SIGNED_ENVELOPE(encoded_ad_bytes)
+    assert(envelope.domain == "libp2p-routing-state")
+    assert(envelope.payload_type == "/libp2p/extensible-peer-record/")
+
+    xpr = DECODE_XPR(envelope.payload)
+    public_key = DERIVE_PUBLIC_KEY(xpr.peer_id)
+    assert(VERIFY_ENVELOPE_SIGNATURE(envelope, public_key))
+
+    // Verify service advertised
+    service_found = false
+    for service in xpr.services:
+        if SHA256(service.id) == service_id_hash:
+            service_found = true
+    assert(service_found)
+```
+
+Discard advertisements with invalid signatures or that don't advertise the requested service.
+
+> **Note:** ExtensiblePeerRecord uses protocol strings (e.g., `/waku/store/1.0.0`) in `ServiceInfo.id`. Logos discovery uses `service_id_hash = SHA256(ServiceInfo.id)` for routing. When verifying, implementations MUST hash the protocol string and compare with the `key` field (`service_id_hash`).
+
+### Stream Management
+
+Following standard Kad-DHT behavior:
+
+- Implementations MAY reuse streams for sequential requests
+- Implementations MUST handle multiple requests per stream
+- Reset stream on protocol errors or validation failures
+- Prefix messages with length as unsigned varint per [multiformats spec](https://github.com/multiformats/unsigned-varint)
+
+### Error Handling
+
+| Error | Handling |
+|-------|----------|
+| Invalid message format | Close stream |
+| Signature verification failure | `REJECTED` for REGISTER; discard invalid ads for GET_ADS |
+| Timeout | Close stream, retry with exponential backoff |
+| Cache full (registrar) | Issue ticket with waiting time |
+| Unknown service_id_hash | Empty `advertisements` list but include `closerPeers` |
+| Missing required fields | Close stream |
+
+**Protocol identifier:** `/logos/capability-discovery/1.0.0`
+
+Implementations SHOULD support both standard Kad-DHT operations
+and Logos discovery operations simultaneously.
+Nodes operating in Kad-DHT-only mode will
+simply not respond to `REGISTER` or `GET_ADS` requests.
 
 ## Sequence Diagram
 
@@ -485,17 +766,57 @@ Registrars SHOULD include `closerPeers` to help populate the discoverer's search
 
 ### Overview
 
-`ADVERTISE(service_id_hash)` lets advertisers publish itself
-as a participant in a particular `service_id_hash` .
+For each service, identified by `service_id_hash`,
+that an advertiser wants to advertise,
+the advertiser MUST instantiate a
+new `AdvT(service_id_hash)`,
+centered on that `service_id_hash`.
 
-It spreads advertisements for its service across multiple registrars,
-such that other peers can  find it efficiently.
+The advertiser MAY bootstrap `AdvT(service_id_hash)`
+from `KadDHT(peerID)` using the formula
+described in the [Distance section](#distance).
+The advertiser SHOULD try to maintain up to `K_register`
+active registrations per bucket.
+It does so by selecting random registrars
+from each bucket of `AdvT(service_id_hash)`
+and following the [registration maintenance procedure](#registration-maintenance-requirements).
+These ongoing registrations MAY be tracked in a separate data structure.
+Ongoing registrations include those registrars
+which has an active `ad` or the advertiser is
+trying to register its `ad` into that registrar.
+
+### Registration Maintenance Requirements
+
+To maintain each registration, the advertiser:
+
+- MUST send a [REGISTER message](#register-message) to the registrar.
+If there is already a cached `ticket` from a previous registration attempt
+for the same `ad` in the same registrar,
+the `ticket` MUST also be included in the REGISTER message.
+- On receipt of a Response,
+SHOULD add the closer peers indicated in the response to `AdvT(service_id_hash)`
+using the formula described in the [Distance](#distance) section.
+- MUST interpret the response `status` field and schedule actions accordingly:
+  - If the `status` is `Confirmed`, the registration is maintained
+  in the registrar's `ad_cache` for `E` seconds.
+  After `E` seconds the advertiser MUST remove the registration
+  from the ongoing registrations for that bucket.
+  - If the `status` is `Wait`,
+  the advertiser MUST schedule a next registration attempt to the same registrar
+  based on the `ticket.t_wait_for` value included in the response.
+  The Response contains a `ticket`,
+  which MUST be included in the next registration attempt to this registrar.
+  - If the `status` is `Rejected`,
+  the advertiser MUST remove the registrar from the ongoing registrations for that bucket
+  and SHOULD NOT attempt further registrations with this registrar for this advertisement.
 
 ### Advertisement Algorithm
 
-Advertisers place advertisements across multiple registrars using the `ADVERTISE()` algorithm.
+Advertisers place advertisements across multiple registrars
+using the `ADVERTISE()` algorithm.
 The advertisers run `ADVERTISE()` periodically.
-Implementations may choose the interval based on their requirements.
+We RECOMMEND that the following algorithms be used
+to implement the advertisement placement requirements specified above.
 
 ```text
 procedure ADVERTISE(service_id_hash):
@@ -511,7 +832,6 @@ procedure ADVERTISE(service_id_hash):
             ad.service_id_hash ← service_id_hash
             ad.peerID ← peerID
             ad.addrs ← node.addrs
-            ad.timestamp ← NOW()
             SIGN(ad)
             async(ADVERTISE_SINGLE(registrar, ad, i, service_id_hash))
         end while
@@ -551,13 +871,6 @@ provide a specific service identified by `service_id_hash`.
 For each service that a discoverer wants to find,
 it MUST instantiate a search table `DiscT(service_id_hash)`,
 centered on that `service_id_hash`.
-
-Discoverers MAY bootstrap `DiscT(service_id_hash)` by copying existing entries
-from `KadDHT(peerID)` already maintained by the node.
-For every peer present in the table from where we bootstrap,
-we MUST use the formula described in the [Distance](#distance) section to place them in buckets.
-`DiscT(service_id_hash)` SHOULD be maintained through interactions
-with registrars during lookup operations.
 
 #### Lookup Requirements
 
@@ -638,45 +951,37 @@ the registrar MUST process the request according to the following requirements:
 
 - The registrar MUST NOT admit an advertisement
 if an identical `ad` already exists in the `ad_cache`.
-- The Registrar MUST calculate waiting time for the advertisement
-using the formula specified in the
-[Waiting Time Calculation](#waiting-time-calculation) section.
-The waiting time determines how long the advertiser must wait
-before the `ad` can be admitted to the `ad_cache`.
+- The Registrar MUST calculate waiting time
+using the formula in [Waiting Time Calculation](#waiting-time-calculation).
 - If no `ticket` is provided in the `REGISTER` request then
 this is the advertiser's first registration attempt for the `ad`.
 The registrar MUST create a new `ticket`
 and return the signed `ticket` to the advertiser with status `Wait`.
-- If the advertiser provides a `ticket` in the `REGISTER` request from a previous attempt:
-  - The registrar MUST verify the `ticket.signature`
-  is valid and was issued by this registrar.
-  - The registrar MUST verify that `ticket.ad` matches the `ad` in the current request
-  - The registrar MUST verify that the `ad` is still not in the `ad_cache`
-  - The registrar MUST verify the retry is within the registration window
-  - If any verification fails, the registrar MUST reject the request
+- If a `ticket` is provided, the registrar MUST verify:
+  - valid signature issued by this registrar
+  - `ticket.ad` matches current `ad`
+  - `ad` is not in the `ad_cache`
+  - retry is within the registration window
+  - Reject if any verification fails
   - The registrar MUST recalculate the waiting time based on current cache state
   - The registrar MUST calculate remaining wait time:
     `t_remaining = t_wait - (NOW() - ticket.t_init)`.
     This ensures advertisers accumulate waiting time across retries
-- If `t_remaining ≤ 0`, the registrar MUST add the `ad` to the `ad_cache`
-with `ad.Timestamp` set to current Unix time.
+- If `t_remaining ≤ 0`, the registrar MUST add the `ad` to the `ad_cache`.
+The registrar MUST track the admission time internally for expiry management.
 The registrar SHOULD return response with `status = Confirmed`
 - If `t_remaining > 0`, the advertiser SHOULD continue waiting.
 The registrar MUST issue a new `ticket` with updated `ticket.t_mod` and `ticket.t_wait_for = MIN(E, t_remaining)`.
 The registrar MUST sign the new `ticket`.
 The registrar SHOULD return response with status `Wait` and the new signed `ticket`.
 - The registrar SHOULD include a list of closer peers (`response.closerPeers`)
-to help the advertiser improve its advertise table.
+using the algorithm described in [Peer Table Updates](#peer-table-updates) section.
 
-`ad_cache` maintainence:
+**`ad_cache` Maintenance:**
 
-- The total size of the `ad_cache` MUST be limited by its capacity `C`.
-- Each `ad` stored in the `ad_cache` MUST have an associated expiry time `E`,
-after which the `ad` is MUST be automatically removed.
-- When processing or periodically cleaning,
-the registrar MUST check `if currentTime - ad.Timestamp > E`.
-If true, the `ad` is expired and MUST be removed from the cache.
-- `ad_cache` MUST NOT store duplicate `ad`.
+- Size limited by capacity `C`
+- Ads expire after time `E` from admission and are removed
+- No duplicate ads allowed
 
 ### Registration Flow
 
@@ -723,10 +1028,22 @@ for detailed explanation.
 
 ## Lookup Response Algorithm
 
+### Overview
+
+Registrars SHOULD respond to [`GET_ADS`](#get_ads-message) requests from discoverers.
+When responding, registrars:
+
+- SHOULD return up to `F_return` advertisements
+from their `ad_cache` for the requested `service_id_hash`.
+- SHOULD include a list of closer peers
+to help discoverers populate their search table using the algorithm described in
+[Peer Table Updates](#peer-table-updates) section.
+
+### Recommended Lookup Response Algorithm
+
 Registrars respond to `GET_ADS` requests from discoverers
 using the `LOOKUP_RESPONSE()` algorithm.
-Refer to [GET_ADS Message section](#get_ads-message)
-for the request and response structure of `GET_ADS`.
+We RECOMMEND using the following algorithm.
 
 ```text
 procedure LOOKUP_RESPONSE(service_id_hash):
@@ -736,21 +1053,47 @@ procedure LOOKUP_RESPONSE(service_id_hash):
 end procedure
 ```
 
-1. Fetch all `ads` for `service_id_hash` from the registrar’s `ad_cache`.
-Then return up to `F_return` of them
-(a system parameter limiting how many `ads` are sent per query by a registrar).
-2. Call the `GETPEERS(service_id_hash)` function to get a list of peers
-from across the registrar’s routing table `RegT(service_id_hash)`.
-3. Send the assembled response (advertisements + closer peers) back to the discoverer.
-
 ## Peer Table Updates
+
+### Overview
 
 While responding to both `REGISTER` requests by advertisers
 and `GET_ADS` request by discoverers,
-the contacted registrar node also returns a list of peers.
-To get this list of peers, the registrar runs the `GETPEERS(service_id_hash)` algorithm.
-Both advertisers and discoverers update their
-service-specific tables using this list of peers.
+registrars play an important role in helping nodes discover the network topology.
+The registrar table `RegT(service_id_hash)` is a routing structure
+that SHOULD be maintained by registrars
+to provide better peer suggestions to advertisers and discoverers.
+
+Registrars SHOULD use the formula specified in the [Distance](#distance) section
+to add peers to `RegT(service_id_hash)`.
+Peers are added under the following circumstances:
+
+- Registrars MAY initialize their registrar table `RegT(service_id_hash)`
+from their `KadDHT(peerID)` using the formula described in the [Distance Section](#distance).
+- When an advertiser sends a `REGISTER` request,
+the registrar SHOULD add the advertiser's `peerID` to `RegT(service_id_hash)`.
+- When a discoverer sends a `GET_ADS` request,
+the registrar SHOULD add the discoverer's `peerID` to `RegT(service_id_hash)`.
+- When registrars receive responses from other registrars
+(if acting as advertiser or discoverer themselves),
+they SHOULD add peers from `closerPeers` fields
+to relevant `RegT(service_id_hash)` tables.
+
+> **Note:** The `ad_cache` and `RegT(service_id_hash)`
+are completely different data structures
+that serve different purposes and are independent of each other.
+
+When responding to requests, registrars:
+
+- SHOULD return a list of peers to help advertisers
+populate their `AdvT(service_id_hash)` tables and
+discoverers populate their `DiscT(service_id_hash)` tables.
+- SHOULD return peers that are diverse and distributed across different buckets
+to prevent malicious registrars from polluting routing tables.
+
+### Recommended Peer Selection Algorithm
+
+We RECOMMEND that the following algorithm be used to select peers to return in responses.
 
 ```text
 procedure GETPEERS(service_id_hash):
@@ -766,19 +1109,18 @@ procedure GETPEERS(service_id_hash):
 end procedure
 ```
 
-1. `peers` is initialized as an empty set to avoid storing duplicates
-2. The registrar table `RegT(service_id_hash)` is initialized from the node’s `KadDHT(peerID)` routing table.
-Refer to the [Distance section](#distance) on how to add peers.
-3. Go through all `m` buckets in the registrar’s table — from farthest to closest relative to the `service_id_hash`.
+1. `peers` is initialized as an empty set
+2. `RegT(service_id_hash)` is initialized from the node’s `KadDHT(peerID)`.
+3. Go through all `m` buckets in the registrar’s table —
     1. Pick one random peer from bucket `i`.
-    `getRandomNode()`  function remembers already returned nodes and never returns the same one twice.
-    2. If peer returned is not null then we move on to next bucket.
+    `getRandomNode()` function remembers already returned nodes
+    and never returns the same one twice.
+    2. If `peer` returned is not null then we move on to next bucket.
     Else we try to get another peer in the same bucket
 4. Return `peers` which contains one peer from every bucket of `RegT(service_id_hash)`.
 
-Malicious registrars could return large numbers of malicious nodes in a specific bucket.
-To limit this risk, a node communicating with a registrar asks it to return a single peer per bucket
-from registrar’s view of the routing table `RegT(service_id_hash)`.
+The algorithm returns one random peer per bucket to provide diverse suggestions
+and prevent malicious registrars from polluting routing tables.
 Contacting registrars in consecutive buckets divides the search space by a constant factor,
 and allows learning new peers from more densely-populated routing tables towards the destination.
 The procedure mitigates the risk of having malicious peers polluting the table
@@ -853,19 +1195,15 @@ from the same network or IP prefix.
 Registrars MUST use an IP similarity score to
 limit the number of `ads` coming from the same subnetwork
 by increasing their waiting time.
-The IP similarity mechanism:
+The IP similarity mechanism MUST:
 
-- MUST calculate a score ranging from 0 to 1, where:
-  - A score closer to 1 indicates IPs sharing similar prefixes
-  (potential Sybil behavior)
-  - A score closer to 0 indicates diverse IPs (legitimate behavior)
-- MUST track IP addresses of `ads` currently in the `ad_cache`.
+- Calculate a score (0-1): higher scores indicate similar IP prefixes (potential Sybil attacks)
+- Track IP addresses of `ads` currently in the `ad_cache`.
 - MUST update its tracking structure when:
   - A new `ad` is admitted to the `ad_cache`: MUST add the IP
   - An `ad` expires after time `E`:
   MUST remove IP if there are no other active `ads` from the same IP
-- MUST calculate the IP similarity score every time
-a waiting time is calculated for a new registration attempt.
+- Recalculate score for each registration attempt
 
 #### Tree Structure
 
@@ -877,34 +1215,28 @@ This data structure provides logarithmic time complexity
 for insertion, deletion, and score calculation.
 Implementations MAY use alternative data structures
 as long as they satisfy the requirements specified above.
-The recommended IP tree has the following structure:
+Apart from root, the IP tree is a 32-level binary tree where:
 
-- Each tree vertex stores a `IP_counter` showing how many IPs pass through that node.
-- Apart from root, the IP tree is a 32-level binary tree
-- The `IP_counter` of every vertex of the tree is initially set to 0.
-- edges represent consecutive 0s or 1s in a binary representation of IPv4 addresses.
-- While inserting an IPv4 address into the tree using `ADD_IP_TO_TREE()` algorithm,
-`IP_counter`s of all the visited vertices are increased by 1.
-The visited path is the binary representation of the IPv4 address.
-IPv4 addresses are inserted into the tree only when they are admitted to the `ad_cache`.
-- The IP tree is traversed to calculate the IP score using
-`CALCULATE_IP_SCORE()` every time the waiting time is calculated.
-- When an `ad` expires after `E` the `ad` is removed from the `ad_cache`
-and the IP tree is also updated using the `REMOVE_FROM_IP_TREE()` algorithm
-by decreasing the `IP_counter`s on the path.
-The path is the binary representation of the IPv4 address.
-- the root `IP_counter` stores the number of IPv4 addresses
-that are currently present in the `ad_cache`
+- Each vertex stores `IP_counter` (number of IPs passing through).
+It is initially set to 0.
+- Edges represent bits (0/1) in IPv4 binary representation
+- When an `ad` is admitted to the `ad_cache`,
+its IPv4 address is added to the IP tracking structure
+using the [`ADD_IP_TO_TREE()` algorithm](#add_ip_to_tree-algorithm).
+- Every time a waiting time is calculated for a registration attempt,
+the registrar calculates the IP similarity score for the advertiser's IP address.
+using [`CALCULATE_IP_SCORE()` algorithm](#calculate_ip_score-algorithm).
+- When an `ad` is removed from the `ad_cache` after `E`,
+The registrar also removes the IP from IP tracking structure
+using the [`REMOVE_FROM_IP_TREE()` algorithm](#remove_from_ip_tree-algorithm)
+if there are no other active `ad` in `ad_cache` from the same IP.
+- All the algorithms work efficiently with O(32) time complexity.
+- The root `IP_counter` tracks total IPs currently in `ad_cache`
 
 #### `ADD_IP_TO_TREE()` algorithm
 
-When an `ad` is admitted to the `ad_cache`,
-its IPv4 address MUST be added to the IP tracking structure.
-
-We RECOMMEND the `ADD_IP_TO_TREE()` algorithm for adding IPv4 addresses to the IP tree.
-This algorithm ensures efficient insertion with O(32) time complexity.
-Implementations MAY use alternative approaches as long as they maintain
-accurate IP tracking for similarity calculation.
+The algorithm traverses the tree following the IP's binary representation,
+incrementing counters at each visited node.
 
 ```text
 procedure ADD_IP_TO_TREE(tree, IP):
@@ -921,27 +1253,12 @@ procedure ADD_IP_TO_TREE(tree, IP):
 end procedure
 ```
 
-1. Start from the root node of the tree.
-Initialize current node variable `v` to root of the tree `tree.root`.
-2. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
-3. Go through each bit of the IP address, from the most significant (leftmost `0`) to the least (rightmost `31`).
-    1. Increase the `IP_counter` for the current node `v.IP_counter`.
-    This records that another IP passed through this vertex `v` (i.e., shares this prefix).
-    2. Move to the next node in the tree. Go left `v.left` if the current bit `bits[i]` is `0`.
-    Go right `v.right` if it’s `1`.
-    This follows the path corresponding to the IP’s binary representation.
-
 #### `CALCULATE_IP_SCORE()` algorithm
 
-Every time a waiting time is calculated for a registration attempt,
-the registrar MUST calculate the IP similarity score for the advertiser's IP address.
-This score determines how similar the IP is to other IPs already in the cache.
-
-We RECOMMEND the `CALCULATE_IP_SCORE()` algorithm for calculating IP similarity scores.
-This algorithm traverses the IP tree to detect how many IPs share common prefixes,
-providing an effective measure of potential Sybil behavior.
-Implementations MAY use alternative approaches
-as long as they accurately measure IP similarity on a 0-1 scale.
+The algorithm traverses the tree following the IP's binary representation
+to detect how many IPs share common prefixes, providing a Sybil attack measure.
+At each node, if the `IP_counter` is larger than expected in a perfectly balanced tree,
+it indicates too many IPs share that prefix, incrementing the similarity score.
 
 ```text
 procedure CALCULATE_IP_SCORE(tree, IP):
@@ -962,30 +1279,10 @@ procedure CALCULATE_IP_SCORE(tree, IP):
 end procedure
 ```
 
-1. Start from the root node of the tree.
-2. Initialize the similarity score `score` to 0.
-This score will later show how common the IP’s prefix is among existing IPs.
-3. Convert the IP address into its binary form (32 bits) and sore in variable `bits`
-4. Go through each bit of the IP address,
-from the most significant (leftmost `0`) to the least (rightmost `31`).
-    1. Move to the next node in the tree.
-    Go left `v.left` if the current bit `bits[i]` is `0`. Go right `v.right` if it’s `1`.
-    This follows the path corresponding to the IP’s binary representation.
-    2. Check if this node’s `IP_counter` is larger than expected in a perfectly balanced tree.
-    If it is, that means too many IPs share this prefix,
-    so increase the similarity score `score` by 1.
-5. Divide the total score by 32 (the number of bits in the IP) and return it.
-
 #### `REMOVE_FROM_IP_TREE()` algorithm
 
-When an `ad` expires after time `E`,
-the registrar MUST remove the `ad` from the `ad_cache`.
-The registrar MUST also remove the IP from IP tracking structure
-if there are no other active `ad` in `ad_cache` from the same IP.
-
-We RECOMMEND the `REMOVE_FROM_IP_TREE()` algorithm for removing IPv4 addresses from the IP tree.
-This algorithm ensures efficient deletion with O(32) time complexity.
-Implementations MAY use alternative approaches as long as they maintain accurate IP tracking.
+This algorithm traverses the tree following the IP's binary representation,
+decrementing counters at each visited node.
 
 ```text
 procedure REMOVE_FROM_IP_TREE(tree, IP):
@@ -1074,13 +1371,65 @@ ensures a fair distribution of network load,
 and maintains the overall resilience and availability of the discovery layer.
 Incentivization mechanisms are beyond the scope of this RFC.
 
+### Bucket Management
+
+#### Bucket Representation
+
+For simplicity in this RFC, we represent each bucket as a list of peer IDs.
+However, in a full implementation, each entry in the bucket
+MUST store complete peer information necessary to enable communication.
+
+#### Bucket Size
+
+The number of entries a bucket can hold is implementation-dependent:
+
+- Smaller buckets → lower memory usage but reduced resilience to churn
+- Larger buckets → better redundancy but increased maintenance overhead
+
+Implementations SHOULD ensure that each bucket contains only unique peers.
+If the peer to be added is already present in the bucket,
+the implementation SHOULD NOT create a duplicate entry and
+SHOULD instead update the existing entry.
+
+#### Bucket Overflow Handling
+
+When a bucket reaches its maximum capacity and a new peer needs to be added,
+implementations SHOULD decide how to handle the overflow.
+The specific strategy is implementation-dependent,
+but implementations MAY consider one of the following approaches:
+
+- **Least Recently Used (LRU) Eviction:**
+   Replace the peer that was least recently contacted or updated.
+   This keeps more active and responsive peers in the routing table.
+
+- **Least Recently Seen (LRS) Eviction:**
+   Replace the peer that was seen (added to the bucket) earliest.
+   This provides a time-based rotation of peers.
+
+- **Ping-based Eviction:**
+   When the bucket is full, ping the least recently contacted peer.
+   If the ping fails, replace it with the new peer.
+   If the ping succeeds, keep the existing peer and discard the new one.
+   This prioritizes responsive, reachable peers.
+
+- **Reject New Peer:**
+   Keep existing peers and reject the new peer.
+   This strategy assumes existing peers are more stable or valuable.
+
+- **Bucket Extension:**
+   Dynamically increase bucket capacity (within reasonable limits) when overflow occurs,
+   especially for buckets closer to the center ID.
+
+Implementations MAY combine these strategies or use alternative approaches
+based on their specific requirements for performance, security, and resilience.
+
 ## References
 
 [0] [Kademlia: A Peer-to-Peer Information System Based on the XOR Metric](https://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf)
 
 [1] [DISC-NG: Robust Service Discovery in the Ethereum Global Network](https://ieeexplore.ieee.org/document/10629017)
 
-[2] [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/master/kad-dht/README.md)
+[2] [libp2p Kademlia DHT specification](https://github.com/libp2p/specs/blob/e87cb1c32a666c2229d3b9bb8f9ce1d9cfdaa8a9/kad-dht/README.md)
 
 [3] [Go implementation](https://github.com/libp2p/go-libp2p-kad-dht)
 
@@ -1098,9 +1447,9 @@ Refer to the [Advertisement Algorithm section](#advertisement-algorithm) for the
 #### ADVERTISE() algorithm explanation
 
 1. Initialize a map `ongoing` for tracking which registrars are currently being advertised to.
-2. Initialize the advertise table `AdvT(service_id_hash)` by bootstrapping peers from
-the advertiser’s `KadDHT(peerID)` routing table.
-(Refer to the [Distance section](#distance))
+2. Initialize `AdvT(service_id_hash)` by bootstrapping peers
+from the advertiser’s `KadDHT(peerID)`
+using the formula described in the [Distance section](#distance).
 3. Iterate over all buckets (i = 0 through `m-1`),
 where `m` is the number of buckets in `AdvT(service_id_hash)` and `ongoing` map.
 Each bucket corresponds to a particular distance from the `service_id_hash`.
@@ -1113,15 +1462,15 @@ Each bucket corresponds to a particular distance from the `service_id_hash`.
     at the cost of increased communication and storage costs.
     3. Pick a random registrar from bucket `i` of `AdvT(service_id_hash)` to advertise to.
         - `AdvT(service_id_hash).getBucket(i)` → returns a list of registrars in bucket `i`
-        from the advertise table `AdvT(service_id_hash)`
+        from `AdvT(service_id_hash)`
         - `.getRandomNode()` → function returns a random registrar node.
         The advertiser tries to place its advertisement into that registrar.
         The function remembers already returned nodes
         and never returns the same one twice during the same `ad` placement process.
         If there are no peers, it returns `None`.
     4. if we get a peer then we add that to that bucket `ongoing[i]`
-    5. Build the advertisement object `ad` containing `service_id_hash`, `peerID`, `addrs`, and `timestamp`
-    (Refer to the [Advertisement section](#advertisement)) .
+    5. Build the advertisement object `ad` containing `service_id_hash`, `peerID`, and `addrs`
+    (Refer to the [Advertisement section](#advertisement)).
     Then it is signed by the advertiser using the node’s private key (Ed25519 signature)
     6. Then send this `ad` asynchronously to the selected registrar.
     The helper `ADVERTISE_SINGLE()` will handle registration to a single registrar.
@@ -1138,9 +1487,8 @@ Each bucket corresponds to a particular distance from the `service_id_hash`.
     If we already have a ticket, include it in the request.
     2. The registrar replies with a `response`.
     Refer to the [Register Message Structure section](#register-message) for the response structure
-    3. Add the list of peers returned by the registrar `response.closerPeers` to the advertise table `AdvT(service_id_hash)`.
+    3. Add the list of peers returned by the registrar `response.closerPeers` to `AdvT(service_id_hash)`.
     Refer to the [Distance](#distance section) on how to add.
-    These help improve the table for future use.
     4. If the registrar accepted the advertisement successfully,
     wait for `E` seconds,
     then stop retrying because the `ad` is already registered.
@@ -1157,16 +1505,16 @@ since we’ve finished trying with it.
 
 Refer to the [Lookup Algorithm section](#lookup-algorithm) for the pseudocode.
 
-1. The **Discovery Table** `DiscT(service_id_hash)` is initialized by
-bootstrapping peers from the discoverer’s `KadDHT(peerID)` routing table.
-(refer to the [Distance section](#distance))
+1. `DiscT(service_id_hash)` is initialized by
+bootstrapping peers from the discoverer’s `KadDHT(peerID)`
+using the formula described in the [Distance section](#distance).
 2. Create an empty set `foundPeers` to store unique advertisers peer IDs discovered during the lookup.
-3. Go through each bucket of the search table `DiscT(service_id_hash)` —
+3. Go through each bucket of `DiscT(service_id_hash)` —
 from farthest (`b₀`) to closest (`bₘ₋₁`) to the service ID `service_id_hash`.
 For each bucket, query up to `K_lookup` random peers.
-    1. Pick a random registrar node from bucket `i` of the search table `DiscT(service_id_hash)` to query
+    1. Pick a random registrar node from bucket `i` of `DiscT(service_id_hash)` to query
         1. `DiscT(service_id_hash).getBucket(i)` → returns a list of registrars
-        in bucket `i` from the search table `DiscT(service_id_hash)`
+        in bucket `i` from `DiscT(service_id_hash)`
         2. `.getRandomNode()` → function returns a random registrar node.
         The discover queries this node to get `ads` for a particular service ID `service_id_hash`.
         The function remembers already returned nodes and never returns the same one twice.
@@ -1181,8 +1529,8 @@ For each bucket, query up to `K_lookup` random peers.
         1. Verify its digital signature for authenticity.
         2. Add the advertiser’s peer ID `ad.peerID` to the list `foundPeers`.
     4. The `response` also contains a list of peers `response.closerPeers`
-    that is inserted into the search table `DiscT(service_id_hash)`.
-    Refer to the [Distance section](#distance) for how it is added.
+    that is inserted into `DiscT(service_id_hash)`
+    using the formula described in the [Distance section](#distance).
     5. Stop early if enough advertiser peers (`F_lookup`) have been found — no need to continue searching.
     For popular services `F_lookup` advertisers are generally found in the initial phase
     from the farther buckets and the search terminates.
@@ -1219,8 +1567,6 @@ Implementations should consider these trade-offs carefully when selecting approp
 Refer to the [Registration Flow section](#registration-flow) for the pseudocode
 
 1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
-Duplicates are not allowed.
-An advertiser can place at most one `ad` for a specific `service_id_hash` in the `ad_cache` of a given registrar.
 2. Prepare a response ticket `response.ticket` linked to this `ad`.
 3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
 Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for details.
@@ -1248,31 +1594,30 @@ the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting ti
         3. Update the ticket last modification time `t_mod`
         4. Sign the ticket again. The advertiser will retry later using this new ticket.
 6. Add a list of peers closer to the `ad.service_id_hash` using the `GETPEERS()` function
-to the response (the advertiser uses this to update its advertise table `AdvT(service_id_hash)`).
+to the response (the advertiser uses this to update `AdvT(service_id_hash)`).
 7. Send the full response back to the advertiser
 
 Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
 before trying to register again with the same registrar.
-Each new registration attempt must include the latest ticket issued by that registrar.
 
-A ticket can only be used within a limited **registration window** `δ`,
-which is chosen to cover the maximum expected delay between the advertiser and registrar.
-This rule prevents attackers from collecting many tickets, accumulating waiting times,
-and submitting them all at once to overload the registrar.
+Tickets can only be used within registration window `δ`,
+preventing attackers from accumulating and batch-submitting tickets.
+Clock synchronization is not required as advertisers only use `t_wait_for` values.
 
-Advertisers only read the waiting time `t_wait` from the ticket —
-they do **not** use the creation time `t_init` or the modification time `t_mod`.
-Therefore, **clock** synchronization between advertisers and registrars is not required.
+Waiting times are recalculated on each retry based on current cache state, ensuring advertisers accumulate waiting time and are eventually admitted. This stateless design protects registrars from memory exhaustion and DoS attacks.
 
 The waiting time `t_wait` is not fixed.
 Each time an advertiser tries to register,
-the registrar recalculates a new waiting time based on its current cache state.
+the registrar recalculates a new waiting time.
 The remaining time `t_remaining` is then computed as the difference between
-the new waiting time and the time the advertiser has already waited, as recorded in the ticket.
+the new waiting time and the time the advertiser has already waited,
+as recorded in the ticket.
 With every retry, the advertiser accumulates waiting time and will eventually be admitted.
 However, if the advertiser misses its registration window or fails to include the last ticket,
-it loses all accumulated waiting time and must restart the registration process from the beginning.
-Implementations must consider these factors while deciding the registration window `δ` time.
+it loses all accumulated waiting time and
+must restart the registration process from the beginning.
+Implementations must consider these factors
+while deciding the registration window `δ` time.
 
 This design lets registrars prioritize advertisers that have waited longer
 without keeping any per-request state before the `ad` is admitted to the cache.
