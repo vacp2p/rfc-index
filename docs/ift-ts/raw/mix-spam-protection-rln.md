@@ -1,12 +1,13 @@
----
-title: RLN-Spam-Protection-Mixnet
-name: RLN spam and sybil protection protocol for libp2p based mixnets
-status: raw
-category: Standards Track
-tags: mix, rln
-editor: Prem Prathi <prem@status.im>
-contributors:
----
+# RLN DoS Protection for Mixnet
+
+| Field        | Value                         |
+| ------------ | ----------------------------- |
+| Name         | RLN DoS Protection for Mixnet |
+| Slug         | 144                           |
+| Status       | raw                           |
+| Category     | Standards Track               |
+| Editor       | Prem Prathi <prem@status.im>  |
+| Contributors |                               |
 
 ## Abstract
 
