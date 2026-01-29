@@ -381,6 +381,16 @@
   },
   {
     "component": "ift-ts",
+    "slug": "144",
+    "title": "RLN DoS Protection for Mixnet",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-29",
+    "path": "ift-ts/raw/mix-spam-protection-rln.html",
+    "archived": false
+  },
+  {
+    "component": "ift-ts",
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
@@ -467,16 +477,6 @@
     "category": "Standards Track",
     "updated": "2026-01-22",
     "path": "ift-ts/raw/mix.html",
-    "archived": false
-  },
-  {
-    "component": "ift-ts",
-    "slug": "mix-spam-protection-rln",
-    "title": "mix-spam-protection-rln",
-    "status": "unknown",
-    "category": "unspecified",
-    "updated": "2026-01-24",
-    "path": "ift-ts/raw/mix-spam-protection-rln.html",
     "archived": false
   },
   {
