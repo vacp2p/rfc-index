@@ -1,4 +1,4 @@
-# MIX
+# RLN DoS Protection for Mixnet
 
 | Field        | Value                         |
 | ------------ | ----------------------------- |
