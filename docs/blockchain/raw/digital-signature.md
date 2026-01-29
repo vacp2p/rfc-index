@@ -1,13 +1,13 @@
----
-title: NOMOS-DIGITAL-SIGNATURE
-name: Nomos Digital Signature
-status: raw
-category: Standards Track
-tags: nomos, cryptography, digital-signature, eddsa, zk-proof
-editor: Jimmy Debe <jimmy@status.im>
-contributors:
-- Filip Dimitrijevic <filip@status.im>
----
+# NOMOS-DIGITAL-SIGNATURE
+
+| Field | Value |
+| --- | --- |
+| Name | Nomos Digital Signature |
+| Slug | |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Jimmy Debe <jimmy@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
 
 ## Abstract
 
