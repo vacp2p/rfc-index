@@ -49,6 +49,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 - The nodes in the P2P network can discover other nodes or will connect to other nodes when subscribing to same topic in a gossipsub.
 - We MAY have non-reliable (silent) nodes.
 - We MUST have a consensus that is lightweight, scalable and finalized in a specific time.
+- The network MUST enforce a rate-limiting mechanism for all entities in order to mitigate spam.
 
 ## Roles
 
@@ -222,10 +223,9 @@ allowing more than one steward to obtain `KeyPackages` to commit.
 based on the outcome of the voting process.
 6. Any `member` start to create `voting proposals` for adding or removing users,
 and present them to the voting in the MLS group as an application message.
-
 However, unlimited use of `voting proposals` within the group may be misused by
 malicious or overly active members.
-Therefore, an application-level constraint can be introduced to limit the number
+Therefore, an application-level constraint MUST introduced to limit the number
 or frequency of proposals initiated by each member to prevent spam or abuse.
 7. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
 that have received affirmative votes from members via application messages.
