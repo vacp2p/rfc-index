@@ -61,6 +61,46 @@
   },
   {
     "component": "blockchain",
+    "slug": "146",
+    "title": "Bedrock Architecture Overview",
+    "status": "raw",
+    "category": "Informational",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/bedrock-architecture-overview.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
+    "slug": "147",
+    "title": "Cryptarchia Fork Choice Rule",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/fork-choice.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
+    "slug": "148",
+    "title": "NomosDA Cryptographic Protocol",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/da-cryptographic-protocol.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
+    "slug": "149",
+    "title": "NomosDA Rewarding",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/da-rewarding.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
     "slug": "83",
     "title": "Cryptarchia Proof of Leadership Specification",
     "status": "raw",
@@ -217,46 +257,6 @@
     "category": "Informational",
     "updated": "2026-01-22",
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html",
-    "archived": false
-  },
-  {
-    "component": "blockchain",
-    "slug": "Bedrock Architecture Overview",
-    "title": "Bedrock Architecture Overview",
-    "status": "raw",
-    "category": "Informational",
-    "updated": "2026-01-30",
-    "path": "blockchain/raw/bedrock-architecture-overview.html",
-    "archived": false
-  },
-  {
-    "component": "blockchain",
-    "slug": "Cryptarchia Fork Choice Rule",
-    "title": "Cryptarchia Fork Choice Rule",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-29",
-    "path": "blockchain/raw/fork-choice.html",
-    "archived": false
-  },
-  {
-    "component": "blockchain",
-    "slug": "NomosDA Cryptographic Protocol",
-    "title": "NomosDA Cryptographic Protocol",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-30",
-    "path": "blockchain/raw/da-cryptographic-protocol.html",
-    "archived": false
-  },
-  {
-    "component": "blockchain",
-    "slug": "NomosDA Rewarding",
-    "title": "NomosDA Rewarding",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-30",
-    "path": "blockchain/raw/da-rewarding.html",
     "archived": false
   },
   {
@@ -1137,6 +1137,16 @@
     "category": "Standards Track",
     "updated": "2026-01-22",
     "path": "storage/raw/codex-block-exchange.html",
+    "archived": false
+  },
+  {
+    "component": "storage",
+    "slug": "145",
+    "title": "Codex Manifest",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "storage/raw/manifest.html",
     "archived": false
   },
   {
