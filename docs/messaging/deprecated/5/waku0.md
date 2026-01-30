@@ -71,7 +71,7 @@ A node SHOULD relay messages to all connected nodes
 if an envelope matches their PoW and bloom filter settings.
 If a node works in light mode, it MAY choose not to forward envelopes.
 A node MUST NOT send expired envelopes,
-unless the envelopes are sent as a [mailserver](/archived/status/deprecated/waku-mailserver.md) response.
+unless the envelopes are sent as a [mailserver](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md) response.
 A node SHOULD NOT send a message to a peer that it has already sent before.
 
 ## Wire Specification
@@ -408,7 +408,7 @@ a corresponding confirmation is broadcast by one or more peers.
 #### P2P Request
 
 This packet is used for sending Dapp-level peer-to-peer requests,
-e.g. Waku Mail Client requesting old messages from the [Waku Mail Server](/archived/status/deprecated/waku-mailserver.md).
+e.g. Waku Mail Client requesting old messages from the [Waku Mail Server](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md).
 
 #### P2P Message
 
@@ -448,7 +448,7 @@ Here we list these capabilities, how they are identified,
 what properties they have and what invariants they must maintain.
 
 Additionally there is the capability of a mailserver
-which is documented in its on [specification](/archived/status/deprecated/waku-mailserver.md).
+which is documented in its on [specification](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md).
 
 ### Light node
 
@@ -587,7 +587,7 @@ when receiving `status-options` with unknown option keys.
 There are several security considerations to take into account when running Waku.
 Chief among them are: scalability, DDoS-resistance and privacy.
 These also vary depending on what capabilities are used.
-The security considerations for extra capabilities such as [mailservers](/archived/status/deprecated/waku-mailserver.md#security-considerations)
+The security considerations for extra capabilities such as [mailservers](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md#security-considerations)
 can be found in their respective specifications.
 
 ### Scalability and UX

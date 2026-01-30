@@ -30,7 +30,6 @@ help route it.
 - Blockchain: `docs/blockchain/README.md`
 - Storage: `docs/storage/README.md`
 - IFT-TS: `docs/ift-ts/README.md`
-- Archived specs: `docs/archived/README.md`
 
 ## Local setup
 

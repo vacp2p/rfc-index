@@ -228,7 +228,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 4. [7/WAKU-DATA](../../legacy/7/data.md)
 5. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
 6. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
-7. [Status 5/SECURE-TRANSPORT](/archived/status/deprecated/secure-transport.md)
+7. [Status 5/SECURE-TRANSPORT](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/secure-transport.md)
 8. [Augmented Backus-Naur form (ABNF)](https://tools.ietf.org/html/rfc5234)
 9. [Ethereum "Yellow paper": Appendix F Signing transactions](https://ethereum.github.io/yellowpaper/paper.pdf)
 10. [authenticated encryption](https://en.wikipedia.org/wiki/Authenticated_encryption)

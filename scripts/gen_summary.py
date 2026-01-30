@@ -17,7 +17,7 @@ OUTPUT = DOCS / "SUMMARY.md"
 
 SKIP_FILES = {"README.md", "SUMMARY.md"}
 
-TOP_LEVEL = ["messaging", "blockchain", "storage", "ift-ts", "archived"]
+TOP_LEVEL = ["messaging", "blockchain", "storage", "ift-ts"]
 
 LABEL_OVERRIDES = {
     "ift-ts": "IFT-TS",
@@ -31,9 +31,6 @@ LABEL_OVERRIDES = {
     "storage/raw": "Raw",
     "storage/deprecated": "Deprecated",
     "ift-ts/raw": "Raw",
-    "archived/status": "Status",
-    "archived/status/raw": "Raw",
-    "archived/status/deprecated": "Deprecated",
 }
 
 ORDER_OVERRIDES = {
@@ -47,8 +44,6 @@ ORDER_OVERRIDES = {
     "blockchain": ["raw", "deprecated"],
     "storage": ["raw", "deprecated"],
     "ift-ts": ["raw"],
-    "archived": ["status"],
-    "archived/status": ["raw", "deprecated"],
 }
 
 ACRONYMS = {
@@ -196,8 +191,6 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
 
     items.sort(key=item_sort_key)
 
-    if rel_base.as_posix() in {"archived/status"}:
-        return items + sections
     return sections + items
 
 
