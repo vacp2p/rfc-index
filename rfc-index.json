@@ -221,6 +221,16 @@
   },
   {
     "component": "blockchain",
+    "slug": "Bedrock Architecture Overview",
+    "title": "Bedrock Architecture Overview",
+    "status": "raw",
+    "category": "Informational",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/bedrock-architecture-overview.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
     "slug": "Cryptarchia Fork Choice Rule",
     "title": "Cryptarchia Fork Choice Rule",
     "status": "raw",
