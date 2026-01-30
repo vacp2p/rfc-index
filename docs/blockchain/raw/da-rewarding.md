@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | NomosDA Rewarding |
-| Slug | |
+| Slug | 149 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Marcin Pawlowski <marcin@status.im> |

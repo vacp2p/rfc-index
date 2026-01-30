@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Codex Manifest |
-| Slug | 75 |
+| Slug | 145 |
 | Status | raw |
 | Category | Standards Track |
 | Tags | codex, manifest, metadata, cid |
