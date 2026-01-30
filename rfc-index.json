@@ -234,6 +234,15 @@
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {
+    "component": "blockchain",
+    "slug": "Nomos Digital Signature",
+    "title": "Nomos Digital Signature",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/digital-signature.html"
+  },
+  {
     "component": "ift-ts",
     "slug": "1",
     "title": "Consensus-Oriented Specification System",
