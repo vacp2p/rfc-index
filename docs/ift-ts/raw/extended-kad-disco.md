@@ -9,6 +9,15 @@
 | Editor | Simon-Pierre Vivier <simvivier@status.im> |
 | Contributors | Hanno Cornelius <hanno@status.im>|
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-26** — [`8bba444`](https://github.com/vacp2p/rfc-index/blob/8bba4441aa3601cef6fb75ff5d48b1cd27350a5c/docs/ift-ts/raw/extended-kad-disco.md) — chore: fix lint (#275)
+- **2026-01-23** — [`8164992`](https://github.com/vacp2p/rfc-index/blob/8164992534b14b2466fc1117bbeef2ae2d14f249/docs/ift-ts/raw/extended-kad-disco.md) — chore: fix lint
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This specification defines a lightweight peer discovery mechanism

@@ -265,7 +265,7 @@ The `content_Topic` of that special channel follows the following format:
 ```
 
 All messages sent with this special channel's `content_Topic` MUST be instances of `ApplicationMetadataMessage`,
-with a [62/STATUS-PAYLOADS](/archived/status/62/payloads.md) of `CommunityMessageArchiveIndex`.
+with a [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md) of `CommunityMessageArchiveIndex`.
 
 Only the control node MAY post to the special channel.
 Other messages on this specified channel MUST be ignored by clients.
@@ -305,7 +305,7 @@ Two RECOMMENDED scenarios in which community member nodes can receive such a mag
 (this is the case when a new community member joins a community.)
 3. Downloading message archives
 
-When community member nodes receive a message with a `CommunityMessageHistoryArchive` [62/STATUS-PAYLOADS](/archived/status/62/payloads.md),
+When community member nodes receive a message with a `CommunityMessageHistoryArchive` [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md),
 they MUST extract the `magnet_uri`.
 Then SHOULD pass it to their underlying BitTorrent client to fetch the latest message history archive index,
 which is the index file of the torrent, see [Creating message archive torrents].
@@ -383,4 +383,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [10/WAKU2](../../messaging/standards/core/10/waku2.md)
 - [11/WAKU2-RELAY](../../messaging/standards/core/11/relay.md)
 - [14/WAKU2-MESSAGE](../../messaging/standards/core/14/message.md)
-- [62/STATUS-PAYLOADS](/archived/status/62/payloads.md)
+- [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md)
