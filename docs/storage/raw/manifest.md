@@ -1,13 +1,15 @@
----
-title: CODEX-MANIFEST
-name: Codex Manifest
-status: raw
-category: Standards Track
-tags: codex, manifest, metadata, cid
-editor: Jimmy Debe <jimmy@status.im>
-contributors:
-- Filip Dimitrijevic <filip@status.im>
----
+# CODEX-MANIFEST
+
+| Field | Value |
+| --- | --- |
+| Name | Codex Manifest |
+| Slug | 75 |
+| Status | raw |
+| Category | Standards Track |
+| Tags | codex, manifest, metadata, cid |
+| Editor | Jimmy Debe <jimmy@status.im> |
+| Contributors | Filip Dimitrijevic <filip@status.im> |
+
 
 ## Abstract
 
