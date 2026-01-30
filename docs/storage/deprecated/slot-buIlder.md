@@ -11,7 +11,7 @@
 
 ## Timeline
 
-- **2026-01-22** — [`5eebc99`](https://github.com/vacp2p/rfc-index/blob/5eebc99b52bc5097b173191220eb51e721b6d24c/docs/storage/deprecated/slot-buIlder.md) — chore: add makefile
+- **2026-01-22** — [`e356a07`](https://github.com/vacp2p/rfc-index/blob/e356a076aea06653764515babc71c8d69b26358d/docs/storage/deprecated/slot-buIlder.md) — Chore/add makefile (#271)
 - **2026-01-22** — [`af45aae`](https://github.com/vacp2p/rfc-index/blob/af45aae01271637142fa931e673dc7c8627f480e/docs/storage/deprecated/slot-buIlder.md) — chore: deprecate Marketplace-related specs (#268)
 - **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/storage/raw/slot-buIlder.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/storage/raw/slot-buIlder.md) — chore: fix links (#260)
