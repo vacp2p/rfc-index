@@ -51,16 +51,6 @@
   },
   {
     "component": "blockchain",
-    "slug": "139",
-    "title": "NomosDA Encoding Protocol",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "blockchain/raw/nomosda-encoding.html",
-    "archived": false
-  },
-  {
-    "component": "blockchain",
     "slug": "140",
     "title": "Claro Consensus Protocol",
     "status": "deprecated",
@@ -237,6 +227,16 @@
     "category": "Standards Track",
     "updated": "2026-01-29",
     "path": "blockchain/raw/fork-choice.html",
+    "archived": false
+  },
+  {
+    "component": "blockchain",
+    "slug": "NomosDA Cryptographic Protocol",
+    "title": "NomosDA Cryptographic Protocol",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-01-30",
+    "path": "blockchain/raw/da-cryptographic-protocol.html",
     "archived": false
   },
   {
