@@ -10,7 +10,6 @@
 | Editor | Jimmy Debe <jimmy@status.im> |
 | Contributors | Filip Dimitrijevic <filip@status.im> |
 
-
 ## Abstract
 
 This specification defines the Codex Manifest,
