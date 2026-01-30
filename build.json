@@ -1,15 +1,15 @@
 {
-    "timestamp": "2026-01-30T06:57:43Z",
+    "timestamp": "2026-01-30T08:03:06Z",
     "git": {
-        "commit": "0ef87b1ba9491c854e48c8dfd7574d34ec69c704",
+        "commit": "d5a9240c6c6c859eddd30742b2251f8a13480cf9",
         "branch": "origin/master",
         "url": "git@github.com:vacp2p/rfc-index.git"
     },
     "build": {
-        "id": "729",
-        "number": "729",
+        "id": "730",
+        "number": "730",
         "name": "website/lip.logos.co",
         "slave": "linux-01",
-        "url": "https://ci.infra.status.im/job/website/job/lip.logos.co/729/"
+        "url": "https://ci.infra.status.im/job/website/job/lip.logos.co/730/"
     }
 }

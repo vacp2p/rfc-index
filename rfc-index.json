@@ -6,8 +6,7 @@
     "status": "raw",
     "category": "networking",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/p2p-network-bootstrapping.html",
-    "archived": false
+    "path": "blockchain/raw/p2p-network-bootstrapping.html"
   },
   {
     "component": "blockchain",
@@ -16,8 +15,7 @@
     "status": "draft",
     "category": "networking",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/p2p-network.html",
-    "archived": false
+    "path": "blockchain/raw/p2p-network.html"
   },
   {
     "component": "blockchain",
@@ -26,8 +24,7 @@
     "status": "raw",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomosda-network.html",
-    "archived": false
+    "path": "blockchain/raw/nomosda-network.html"
   },
   {
     "component": "blockchain",
@@ -36,8 +33,7 @@
     "status": "raw",
     "category": "infrastructure",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/p2p-hardware-requirements.html",
-    "archived": false
+    "path": "blockchain/raw/p2p-hardware-requirements.html"
   },
   {
     "component": "blockchain",
@@ -46,8 +42,7 @@
     "status": "raw",
     "category": "networking",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/p2p-nat-solution.html",
-    "archived": false
+    "path": "blockchain/raw/p2p-nat-solution.html"
   },
   {
     "component": "blockchain",
@@ -56,8 +51,7 @@
     "status": "deprecated",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/deprecated/claro.html",
-    "archived": false
+    "path": "blockchain/deprecated/claro.html"
   },
   {
     "component": "blockchain",
@@ -66,8 +60,7 @@
     "status": "raw",
     "category": "Informational",
     "updated": "2026-01-30",
-    "path": "blockchain/raw/bedrock-architecture-overview.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-architecture-overview.html"
   },
   {
     "component": "blockchain",
@@ -76,8 +69,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-30",
-    "path": "blockchain/raw/fork-choice.html",
-    "archived": false
+    "path": "blockchain/raw/fork-choice.html"
   },
   {
     "component": "blockchain",
@@ -86,8 +78,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-30",
-    "path": "blockchain/raw/da-cryptographic-protocol.html",
-    "archived": false
+    "path": "blockchain/raw/da-cryptographic-protocol.html"
   },
   {
     "component": "blockchain",
@@ -96,8 +87,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-30",
-    "path": "blockchain/raw/da-rewarding.html",
-    "archived": false
+    "path": "blockchain/raw/da-rewarding.html"
   },
   {
     "component": "blockchain",
@@ -106,8 +96,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/cryptarchia-proof-of-leadership.html",
-    "archived": false
+    "path": "blockchain/raw/cryptarchia-proof-of-leadership.html"
   },
   {
     "component": "blockchain",
@@ -116,8 +105,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-key-types-and-generation.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-key-types-and-generation.html"
   },
   {
     "component": "blockchain",
@@ -126,8 +114,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/bedrock-anonymous-leaders-reward.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-anonymous-leaders-reward.html"
   },
   {
     "component": "blockchain",
@@ -136,8 +123,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/bedrock-service-reward-distribution.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-service-reward-distribution.html"
   },
   {
     "component": "blockchain",
@@ -146,8 +132,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/bedrock-service-declaration-protocol.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-service-declaration-protocol.html"
   },
   {
     "component": "blockchain",
@@ -156,8 +141,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-proof-of-quota.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-proof-of-quota.html"
   },
   {
     "component": "blockchain",
@@ -166,8 +150,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-message-formatting.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-message-formatting.html"
   },
   {
     "component": "blockchain",
@@ -176,8 +159,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/bedrock-genesis-block.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-genesis-block.html"
   },
   {
     "component": "blockchain",
@@ -186,8 +168,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-message-encapsulation.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-message-encapsulation.html"
   },
   {
     "component": "blockchain",
@@ -196,8 +177,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-cryptarchia-v1-protocol.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-cryptarchia-v1-protocol.html"
   },
   {
     "component": "blockchain",
@@ -206,8 +186,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/bedrock-v1.1-block-construction.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-v1.1-block-construction.html"
   },
   {
     "component": "blockchain",
@@ -216,8 +195,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/cryptarchia-total-stake-inference.html",
-    "archived": false
+    "path": "blockchain/raw/cryptarchia-total-stake-inference.html"
   },
   {
     "component": "blockchain",
@@ -226,8 +204,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-blend-protocol.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-blend-protocol.html"
   },
   {
     "component": "blockchain",
@@ -236,8 +213,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/cryptarchia-v1-bootstr-sync.html",
-    "archived": false
+    "path": "blockchain/raw/cryptarchia-v1-bootstr-sync.html"
   },
   {
     "component": "blockchain",
@@ -246,8 +222,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/nomos-payload-formatting.html",
-    "archived": false
+    "path": "blockchain/raw/nomos-payload-formatting.html"
   },
   {
     "component": "blockchain",
@@ -256,8 +231,7 @@
     "status": "raw",
     "category": "Informational",
     "updated": "2026-01-22",
-    "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html",
-    "archived": false
+    "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {
     "component": "ift-ts",
@@ -266,8 +240,7 @@
     "status": "draft",
     "category": "Best Current Practice",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/1/coss.html",
-    "archived": false
+    "path": "ift-ts/raw/1/coss.html"
   },
   {
     "component": "ift-ts",
@@ -276,8 +249,7 @@
     "status": "raw",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/rln-interep-spec.html",
-    "archived": false
+    "path": "ift-ts/raw/rln-interep-spec.html"
   },
   {
     "component": "ift-ts",
@@ -286,8 +258,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/eth-mls-onchain.html",
-    "archived": false
+    "path": "ift-ts/raw/eth-mls-onchain.html"
   },
   {
     "component": "ift-ts",
@@ -296,8 +267,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/rln-stealth-commitments.html",
-    "archived": false
+    "path": "ift-ts/raw/rln-stealth-commitments.html"
   },
   {
     "component": "ift-ts",
@@ -306,8 +276,7 @@
     "status": "raw",
     "category": "informational",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/decentralized-messaging-ethereum.html",
-    "archived": false
+    "path": "ift-ts/raw/decentralized-messaging-ethereum.html"
   },
   {
     "component": "ift-ts",
@@ -316,8 +285,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/eth-mls-offchain.html",
-    "archived": false
+    "path": "ift-ts/raw/eth-mls-offchain.html"
   },
   {
     "component": "ift-ts",
@@ -326,8 +294,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/gossipsub-tor-push.html",
-    "archived": false
+    "path": "ift-ts/raw/gossipsub-tor-push.html"
   },
   {
     "component": "ift-ts",
@@ -336,8 +303,7 @@
     "status": "raw",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/rln-v2.html",
-    "archived": false
+    "path": "ift-ts/raw/rln-v2.html"
   },
   {
     "component": "ift-ts",
@@ -345,9 +311,8 @@
     "title": "Logos Capability Discovery Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-27",
-    "path": "ift-ts/raw/logos-capability-discovery.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "ift-ts/raw/logos-capability-discovery.html"
   },
   {
     "component": "ift-ts",
@@ -356,8 +321,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/noise-x3dh-double-ratchet.html",
-    "archived": false
+    "path": "ift-ts/raw/noise-x3dh-double-ratchet.html"
   },
   {
     "component": "ift-ts",
@@ -366,8 +330,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/sds.html",
-    "archived": false
+    "path": "ift-ts/raw/sds.html"
   },
   {
     "component": "ift-ts",
@@ -376,8 +339,7 @@
     "status": "deleted",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/deleted/eth-secpm.html",
-    "archived": false
+    "path": "ift-ts/raw/deleted/eth-secpm.html"
   },
   {
     "component": "ift-ts",
@@ -386,8 +348,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/multi-message_id-burn-rln.html",
-    "archived": false
+    "path": "ift-ts/raw/multi-message_id-burn-rln.html"
   },
   {
     "component": "ift-ts",
@@ -396,8 +357,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/zerokit-api.html",
-    "archived": false
+    "path": "ift-ts/raw/zerokit-api.html"
   },
   {
     "component": "ift-ts",
@@ -405,9 +365,8 @@
     "title": "Extended Kademlia Discovery with capability filtering",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-26",
-    "path": "ift-ts/raw/extended-kad-disco.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "ift-ts/raw/extended-kad-disco.html"
   },
   {
     "component": "ift-ts",
@@ -416,8 +375,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-29",
-    "path": "ift-ts/raw/mix-spam-protection-rln.html",
-    "archived": false
+    "path": "ift-ts/raw/mix-spam-protection-rln.html"
   },
   {
     "component": "ift-ts",
@@ -426,8 +384,7 @@
     "status": "stable",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/2/mvds.html",
-    "archived": false
+    "path": "ift-ts/raw/2/mvds.html"
   },
   {
     "component": "ift-ts",
@@ -436,8 +393,7 @@
     "status": "deleted",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/25/libp2p-dns-discovery.html",
-    "archived": false
+    "path": "ift-ts/raw/25/libp2p-dns-discovery.html"
   },
   {
     "component": "ift-ts",
@@ -446,8 +402,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/3/remote-log.html",
-    "archived": false
+    "path": "ift-ts/raw/3/remote-log.html"
   },
   {
     "component": "ift-ts",
@@ -456,8 +411,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/32/rln-v1.html",
-    "archived": false
+    "path": "ift-ts/raw/32/rln-v1.html"
   },
   {
     "component": "ift-ts",
@@ -466,8 +420,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/4/mvds-meta.html",
-    "archived": false
+    "path": "ift-ts/raw/4/mvds-meta.html"
   },
   {
     "component": "ift-ts",
@@ -476,8 +429,7 @@
     "status": "raw/draft/stable/deprecated",
     "category": "Standards Track/Informational/Best Current Practice",
     "updated": "2026-01-19",
-    "path": "ift-ts/template.html",
-    "archived": false
+    "path": "ift-ts/template.html"
   },
   {
     "component": "ift-ts",
@@ -486,8 +438,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "ift-ts/raw/consensus-hashgraphlike.html",
-    "archived": false
+    "path": "ift-ts/raw/consensus-hashgraphlike.html"
   },
   {
     "component": "ift-ts",
@@ -496,8 +447,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-24",
-    "path": "ift-ts/raw/extensible-peer-records.html",
-    "archived": false
+    "path": "ift-ts/raw/extensible-peer-records.html"
   },
   {
     "component": "ift-ts",
@@ -505,9 +455,8 @@
     "title": "LIBP2P-MIX",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-29",
-    "path": "ift-ts/raw/mix.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "ift-ts/raw/mix.html"
   },
   {
     "component": "messaging",
@@ -516,8 +465,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/10/waku2.html",
-    "archived": false
+    "path": "messaging/standards/core/10/waku2.html"
   },
   {
     "component": "messaging",
@@ -526,8 +474,7 @@
     "status": "stable",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/11/relay.html",
-    "archived": false
+    "path": "messaging/standards/core/11/relay.html"
   },
   {
     "component": "messaging",
@@ -536,8 +483,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/12/filter.html",
-    "archived": false
+    "path": "messaging/standards/core/12/filter.html"
   },
   {
     "component": "messaging",
@@ -546,8 +492,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/13/store.html",
-    "archived": false
+    "path": "messaging/standards/core/13/store.html"
   },
   {
     "component": "messaging",
@@ -555,9 +500,8 @@
     "title": "Waku v2 Message",
     "status": "stable",
     "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "messaging/standards/core/14/message.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "messaging/standards/core/14/message.html"
   },
   {
     "component": "messaging",
@@ -566,8 +510,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/15/bridge.html",
-    "archived": false
+    "path": "messaging/standards/core/15/bridge.html"
   },
   {
     "component": "messaging",
@@ -576,8 +519,7 @@
     "status": "deprecated",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/deprecated/16/rpc.html",
-    "archived": false
+    "path": "messaging/deprecated/16/rpc.html"
   },
   {
     "component": "messaging",
@@ -586,8 +528,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/17/rln-relay.html",
-    "archived": false
+    "path": "messaging/standards/core/17/rln-relay.html"
   },
   {
     "component": "messaging",
@@ -596,8 +537,7 @@
     "status": "deprecated",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/deprecated/18/swap.html",
-    "archived": false
+    "path": "messaging/deprecated/18/swap.html"
   },
   {
     "component": "messaging",
@@ -606,8 +546,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/19/lightpush.html",
-    "archived": false
+    "path": "messaging/standards/core/19/lightpush.html"
   },
   {
     "component": "messaging",
@@ -615,9 +554,8 @@
     "title": "Toy Ethereum Private Message",
     "status": "draft",
     "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "messaging/standards/application/20/toy-eth-pm.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "messaging/standards/application/20/toy-eth-pm.html"
   },
   {
     "component": "messaging",
@@ -626,8 +564,7 @@
     "status": "deleted",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/deprecated/fault-tolerant-store.html",
-    "archived": false
+    "path": "messaging/deprecated/fault-tolerant-store.html"
   },
   {
     "component": "messaging",
@@ -636,8 +573,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/informational/22/toy-chat.html",
-    "archived": false
+    "path": "messaging/informational/22/toy-chat.html"
   },
   {
     "component": "messaging",
@@ -646,8 +582,7 @@
     "status": "draft",
     "category": "Informational",
     "updated": "2026-01-22",
-    "path": "messaging/informational/23/topics.html",
-    "archived": false
+    "path": "messaging/informational/23/topics.html"
   },
   {
     "component": "messaging",
@@ -655,9 +590,8 @@
     "title": "Waku Message Payload Encryption",
     "status": "draft",
     "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "messaging/standards/application/26/payload.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "messaging/standards/application/26/payload.html"
   },
   {
     "component": "messaging",
@@ -666,8 +600,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/informational/27/peers.html",
-    "archived": false
+    "path": "messaging/informational/27/peers.html"
   },
   {
     "component": "messaging",
@@ -676,8 +609,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/informational/29/config.html",
-    "archived": false
+    "path": "messaging/informational/29/config.html"
   },
   {
     "component": "messaging",
@@ -686,8 +618,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/informational/30/adaptive-nodes.html",
-    "archived": false
+    "path": "messaging/informational/30/adaptive-nodes.html"
   },
   {
     "component": "messaging",
@@ -696,8 +627,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/31/enr.html",
-    "archived": false
+    "path": "messaging/standards/core/31/enr.html"
   },
   {
     "component": "messaging",
@@ -706,8 +636,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/33/discv5.html",
-    "archived": false
+    "path": "messaging/standards/core/33/discv5.html"
   },
   {
     "component": "messaging",
@@ -716,8 +645,7 @@
     "status": "draft",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/34/peer-exchange.html",
-    "archived": false
+    "path": "messaging/standards/core/34/peer-exchange.html"
   },
   {
     "component": "messaging",
@@ -726,8 +654,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/36/bindings-api.html",
-    "archived": false
+    "path": "messaging/standards/core/36/bindings-api.html"
   },
   {
     "component": "messaging",
@@ -735,9 +662,8 @@
     "title": "Waku v0",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "messaging/deprecated/5/waku0.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "messaging/deprecated/5/waku0.html"
   },
   {
     "component": "messaging",
@@ -746,8 +672,7 @@
     "status": "draft",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "messaging/standards/application/53/x3dh.html",
-    "archived": false
+    "path": "messaging/standards/application/53/x3dh.html"
   },
   {
     "component": "messaging",
@@ -756,8 +681,7 @@
     "status": "draft",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "messaging/standards/application/54/x3dh-sessions.html",
-    "archived": false
+    "path": "messaging/standards/application/54/x3dh-sessions.html"
   },
   {
     "component": "messaging",
@@ -766,8 +690,7 @@
     "status": "stable",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/legacy/6/waku1.html",
-    "archived": false
+    "path": "messaging/standards/legacy/6/waku1.html"
   },
   {
     "component": "messaging",
@@ -776,8 +699,7 @@
     "status": "draft",
     "category": "Best Current Practice",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/64/network.html",
-    "archived": false
+    "path": "messaging/standards/core/64/network.html"
   },
   {
     "component": "messaging",
@@ -786,8 +708,7 @@
     "status": "draft",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/core/66/metadata.html",
-    "archived": false
+    "path": "messaging/standards/core/66/metadata.html"
   },
   {
     "component": "messaging",
@@ -796,8 +717,7 @@
     "status": "stable",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/legacy/7/data.html",
-    "archived": false
+    "path": "messaging/standards/legacy/7/data.html"
   },
   {
     "component": "messaging",
@@ -806,8 +726,7 @@
     "status": "stable",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/legacy/8/mail.html",
-    "archived": false
+    "path": "messaging/standards/legacy/8/mail.html"
   },
   {
     "component": "messaging",
@@ -816,318 +735,7 @@
     "status": "stable",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "messaging/standards/legacy/9/rpc.html",
-    "archived": false
-  },
-  {
-    "component": "status",
-    "slug": "112",
-    "title": "Status URL Data",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/raw/url-data.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "113",
-    "title": "Status Protocol Stack",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/raw/status-app-protocols.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "114",
-    "title": "Status URL Scheme",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/raw/url-scheme.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "115",
-    "title": "Status Simple Scaling",
-    "status": "raw",
-    "category": "Informational",
-    "updated": "2026-01-22",
-    "path": "archived/status/raw/simple-scaling.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "116",
-    "title": "MVDS Usage in Status",
-    "status": "raw",
-    "category": "Best Current Practice",
-    "updated": "2026-01-22",
-    "path": "archived/status/raw/status-mvds.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "117",
-    "title": "IPFS gateway for Sticker Pack",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/IPFS-gateway-for-sticker-Pack.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "118",
-    "title": "Waku Mailserver",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/waku-mailserver.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "119",
-    "title": "Secure Transport",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/secure-transport.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "120",
-    "title": "Group Chat",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/group-chat.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "121",
-    "title": "Payloads",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/payloads.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "122",
-    "title": "3rd party",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/3rd-party.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "123",
-    "title": "Client",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/client.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "124",
-    "title": "Waku Usage",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/waku-usage.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "125",
-    "title": "Status interactions with the Ethereum blockchain",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/ethereum-usage.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "126",
-    "title": "Dapp browser API usage",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/dapp-browser-API-usage.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "127",
-    "title": "Whisper mailserver",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/whisper-mailserver.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "128",
-    "title": "EIPS",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/eips.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "129",
-    "title": "Keycard Usage for Wallet and Chat Keys",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/keycard-usage-for-wallet-and-chat-keys.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "130",
-    "title": "Notifications",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/notifications.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "131",
-    "title": "Whisper Usage",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/whisper-usage.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "132",
-    "title": "Account",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/account.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "133",
-    "title": "Push notification server",
-    "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/deprecated/push-notification-server.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "24",
-    "title": "Status Community Directory Curation Voting using Waku v2",
-    "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/24/curation.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "28",
-    "title": "Status community featuring using waku v2",
-    "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/28/featuring.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "55",
-    "title": "Status 1-to-1 Chat",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/55/1to1-chat.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "56",
-    "title": "Status Communities that run over Waku v2",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/56/communities.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "61",
-    "title": "Status Community History Service",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/61/community-history-service.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "62",
-    "title": "Status Message Payloads",
-    "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "archived/status/62/payloads.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "63",
-    "title": "Status Keycard Usage",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/63/keycard-usage.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "65",
-    "title": "Status Account Address",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/65/account-address.html",
-    "archived": true
-  },
-  {
-    "component": "status",
-    "slug": "71",
-    "title": "Push Notification Server",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "archived/status/71/push-notification-server.html",
-    "archived": true
+    "path": "messaging/standards/legacy/9/rpc.html"
   },
   {
     "component": "storage",
@@ -1136,8 +744,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "storage/raw/codex-block-exchange.html",
-    "archived": false
+    "path": "storage/raw/codex-block-exchange.html"
   },
   {
     "component": "storage",
@@ -1146,8 +753,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-30",
-    "path": "storage/raw/manifest.html",
-    "archived": false
+    "path": "storage/raw/manifest.html"
   },
   {
     "component": "storage",
@@ -1156,8 +762,7 @@
     "status": "raw",
     "category": "unspecified",
     "updated": "2026-01-22",
-    "path": "storage/raw/dht.html",
-    "archived": false
+    "path": "storage/raw/dht.html"
   },
   {
     "component": "storage",
@@ -1165,9 +770,8 @@
     "title": "Codex Community History",
     "status": "raw",
     "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "storage/raw/community-history.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "storage/raw/community-history.html"
   },
   {
     "component": "storage",
@@ -1175,9 +779,8 @@
     "title": "Codex Storage Marketplace",
     "status": "deprecated",
     "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "storage/deprecated/codex-marketplace.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "storage/deprecated/codex-marketplace.html"
   },
   {
     "component": "storage",
@@ -1185,9 +788,8 @@
     "title": "Codex Slot Builder",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "storage/deprecated/slot-buIlder.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "storage/deprecated/slot-buIlder.html"
   },
   {
     "component": "storage",
@@ -1195,9 +797,8 @@
     "title": "Codex Erasue Coding",
     "status": "deprecated",
     "category": "unspecified",
-    "updated": "2026-01-22",
-    "path": "storage/deprecated/erasure-coding.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "storage/deprecated/erasure-coding.html"
   },
   {
     "component": "storage",
@@ -1206,8 +807,7 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "storage/raw/codex-store.html",
-    "archived": false
+    "path": "storage/raw/codex-store.html"
   },
   {
     "component": "storage",
@@ -1215,9 +815,8 @@
     "title": "Codex Prover Module",
     "status": "deprecated",
     "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "storage/deprecated/codex-prover.html",
-    "archived": false
+    "updated": "2026-01-30",
+    "path": "storage/deprecated/codex-prover.html"
   },
   {
     "component": "storage",
@@ -1226,7 +825,6 @@
     "status": "raw",
     "category": "Standards Track",
     "updated": "2026-01-22",
-    "path": "storage/raw/codex-merkle-tree.html",
-    "archived": false
+    "path": "storage/raw/codex-merkle-tree.html"
   }
 ]
