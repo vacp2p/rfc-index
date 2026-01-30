@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Bedrock Architecture Overview |
-| Slug | |
+| Slug | 146 |
 | Status | raw |
 | Category | Informational |
 | Editor | David Rusu <davidrusu@status.im> |

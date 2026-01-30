@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | NomosDA Cryptographic Protocol |
-| Slug | |
+| Slug | 148 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Mehmet Gonen <mehmet@status.im> |

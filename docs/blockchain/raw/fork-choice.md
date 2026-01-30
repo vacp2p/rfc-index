@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Cryptarchia Fork Choice Rule |
-| Slug | |
+| Slug | 147 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | David Rusu <davidrusu@status.im> |
