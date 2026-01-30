@@ -9,6 +9,15 @@
 | Editor | Marcin Pawlowski <marcin@status.im> |
 | Contributors | Alexander Mozeika <alexander.mozeika@status.im>, Mehmet Gonen <mehmet@status.im>, Daniel Sanchez Quiros <danielsq@status.im>, Álvaro Castro-Castilla <alvaro@status.im>, Filip Dimitrijevic <filip@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-30** — [`0ef87b1`](https://github.com/vacp2p/rfc-index/blob/0ef87b1ba9491c854e48c8dfd7574d34ec69c704/docs/blockchain/raw/da-rewarding.md) — New RFC: CODEX-MANIFEST (#191)
+- **2026-01-30** — [`3f76dd8`](https://github.com/vacp2p/rfc-index/blob/3f76dd87a0b6580c16caa401c7fd5ec7dd9a7d6b/docs/blockchain/raw/da-rewarding.md) — Add NomosDA Rewarding specification (#269)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document specifies the opinion-based rewarding mechanism

@@ -13,6 +13,7 @@
 
 ## Timeline
 
+- **2026-01-29** — [`925aeac`](https://github.com/vacp2p/rfc-index/blob/925aeac395050c948c1cceb1d5b0673836ebd442/docs/ift-ts/raw/mix.md) — chore: changes to how per-hop proof is added to sphinx packet which makes it simpler (#263)
 - **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/mix.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/mix.md) — chore: fix links (#260)
 - **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/mix.md) — Chore/mdbook updates (#258)

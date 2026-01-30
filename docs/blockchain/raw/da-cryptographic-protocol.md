@@ -9,6 +9,15 @@
 | Editor | Mehmet Gonen <mehmet@status.im> |
 | Contributors | Álvaro Castro-Castilla <alvaro@status.im>, Thomas Lavaur <thomaslavaur@status.im>, Daniel Kashepava <danielkashepava@status.im>, Marcin Pawlowski <marcin@status.im>, Daniel Sanchez Quiros <danielsq@status.im>, Filip Dimitrijevic <filip@status.im> |
 
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-01-30** — [`0ef87b1`](https://github.com/vacp2p/rfc-index/blob/0ef87b1ba9491c854e48c8dfd7574d34ec69c704/docs/blockchain/raw/da-cryptographic-protocol.md) — New RFC: CODEX-MANIFEST (#191)
+- **2026-01-30** — [`25ebb3a`](https://github.com/vacp2p/rfc-index/blob/25ebb3ac05e44da058c15db438fa371f10f57003/docs/blockchain/raw/da-cryptographic-protocol.md) — Replace nomosda-encoding with da-cryptographic-protocol (#264)
+
+<!-- timeline:end -->
+
 ## Abstract
 
 This document describes the cryptographic protocol underlying NomosDA,
