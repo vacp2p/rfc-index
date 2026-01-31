@@ -97,7 +97,7 @@ If Bob's private key is compromised, past and future messages could be decrypted
 A solution combining regular [X3DH](https://www.signal.org/docs/specifications/x3dh/)
 bundle broadcast with [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
 encryption would remove these limitations;
-See the [Status secure transport specification](/archived/status/deprecated/secure-transport.md)
+See the [Status secure transport specification](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/secure-transport.md)
 for an example of a protocol that achieves this in a peer-to-peer setting.
 
 Bob MUST decide to participate in the protocol before Alice can send him a message.
@@ -280,7 +280,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Waku Message Version 1](../26/payload.md)
 - [X3DH](https://www.signal.org/docs/specifications/x3dh/)
 - [Double Ratchet](https://signal.org/docs/specifications/doubleratchet/)
-- [Status secure transport specification](/archived/status/deprecated/secure-transport.md)
+- [Status secure transport specification](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/secure-transport.md)
 - [EIP-712](https://eips.ethereum.org/EIPS/eip-712)
 - [13/WAKU2-STORE](/messaging/standards/core/13/store.md)
 - [The Graph](https://thegraph.com/)
