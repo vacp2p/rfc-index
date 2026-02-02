@@ -53,7 +53,7 @@ We target the following requirements:
 
 - Performance: Efficient payments with low latency and fees.
 - Security: Limited loss exposure through spending controls.
-- Privacy: Unlinkable payments across different providers.
+- Privacy: On-chain deposit identity unlinkable to off-chain service requests.
 - Extendability: Simple initial design with room for enhancements.
 
 After reviewing prior work on payment channels, streams,
@@ -202,7 +202,7 @@ Users MAY pause or close streams without prior notice.
 Providers SHOULD track on-chain state for their streams.
 
 If the provider stops serving the user,
-the provider MUST notify the user off-chain
+the provider SHOULD notify the user off-chain
 before closing the stream on-chain.
 
 ### Message Types
@@ -213,7 +213,7 @@ StreamRequest:
 The user sends a StreamRequest to initiate a stream.
 This message MUST include:
 
-- service_type: identifier of the requested service
+- service_id: identifier of the requested service
 - stream_rate: proposed accrual rate (tokens per time unit)
 - stream_allocation: proposed initial allocation
 - public_key: key for signing subsequent service requests
