@@ -141,12 +141,8 @@ It represents a specific capability a node supports
 — for example, a particular protocol or functionality it offers.
 A service MUST be identified by a libp2p protocol ID via the
 [identify protocol](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/identify).
-
-> Note: The service protocol ID (e.g., `/waku/store/1.0.0`)
-identifies the *capability being discovered*.
-> It is distinct from the Logos Capability Discovery *wire protocol ID*
-(see [Protocol identifier](#protocol-id) below),
-> which is used to exchange `REGISTER` / `GET_ADS` messages.
+This service protocol ID (e.g., `/waku/store/1.0.0`)
+identifies the capability being discovered.
 
 ### Service ID
 
@@ -766,24 +762,6 @@ Following standard Kad-DHT behavior:
 | Cache full (registrar) | Issue ticket with waiting time |
 | Unknown service_id_hash | Empty `advertisements` list but include `closerPeers` |
 | Missing required fields | Close stream |
-
-### Protocol ID
-
-All `REGISTER` and `GET_ADS` messages MUST be exchanged over a libp2p stream
-negotiated with the protocol ID:
-
-- `/logos/capability-discovery/1.0.0`
-
-If a remote peer does not support Logos Capability Discovery,
-it will not negotiate this protocol ID and stream establishment will fail.
-Implementations SHOULD treat this as the peer not supporting Logos discovery;
-such a peer may still participate in standard Kad-DHT operations
-but will not act as a registrar for this protocol.
-
-Implementations SHOULD support standard Kad-DHT operations
-and Logos discovery operations simultaneously.
-Nodes operating in Kad-DHT-only mode simply do not negotiate the Logos discovery protocol
-and therefore do not handle `REGISTER` or `GET_ADS` messages.
 
 ## Sequence Diagram
 
