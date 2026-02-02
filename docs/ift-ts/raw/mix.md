@@ -13,6 +13,7 @@
 
 ## Timeline
 
+- **2026-01-29** — [`925aeac`](https://github.com/vacp2p/rfc-index/blob/925aeac395050c948c1cceb1d5b0673836ebd442/docs/ift-ts/raw/mix.md) — chore: changes to how per-hop proof is added to sphinx packet which makes it simpler (#263)
 - **2026-01-19** — [`f24e567`](https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/mix.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/mix.md) — chore: fix links (#260)
 - **2026-01-16** — [`89f2ea8`](https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/mix.md) — Chore/mdbook updates (#258)
@@ -648,6 +649,9 @@ Similarly, parameters such as $r$ and $t$ are configurable.
 Changes to these parameters affect header size and therefore impact payload size if the total packet size remains fixed.
 However, if such changes alter the total packet size on the wire, the same anonymity set considerations apply.
 
+When spam protection is enabled (see [Section 9](#9-spam-protection-architecture)), the total wire size may increase depending on the integration approach.
+For per-hop generated proofs, the proof is appended after the Sphinx packet, and the proof size MUST be fixed to maintain packet indistinguishability.
+
 The following subsection defines how the next-hop or destination address and forwarding delay are encoded within $β$ to enable correct routing and mixing behavior.
 
 ### 8.4 Address and Delay Encoding
@@ -1276,17 +1280,16 @@ e.g. If using RLN, where proof + metadata ~= $300$ bytes, Header size becomes: $
 #### 9.2.2 Per-Hop Generated Proofs
 
 In this approach, each mix node generates a new spam protection proof for the next hop after verifying proof for the incoming packet.
-The proof is added as an additional packet header field (e.g., $\sigma$) that is updated at each hop, similar to how $\alpha$, $\beta$, and $\gamma$ are transformed during Sphinx processing.
-The proof MAY be bound to all the components of outgoing sphinx packet $(\alpha', \beta', \gamma', \delta')$.
+The proof $\sigma$ is appended after the Sphinx packet, forming the wire format: `SphinxPacket || σ`.
+The proof MAY be bound to the complete outgoing Sphinx packet $(\alpha' | \beta' | \gamma' | \delta')$.
 
 ##### 9.2.2.1 How It Works
 
-1. The sender generates an initial spam protection proof $\sigma_0$ for the first hop, along with any verification metadata required by the spam protection mechanism (such as merkle roots, epoch identifiers, public parameters, or identifiers).
-   The proof MAY be cryptographically bound to the outgoing Sphinx packet structure.
-   This is included as a new header field in the Sphinx packet.
-2. The first hop verifies $\sigma_0$ using the provided metadata before processing the Sphinx packet.
-3. After successful verification and Sphinx processing, the hop generates a new proof $\sigma_1$ (with updated metadata) for the next hop bound to the transformed packet state.
-4. The updated packet $(\alpha', \beta', \gamma', \delta', \sigma_1)$ is forwarded to the next hop.
+1. The sender generates an initial spam protection proof $\sigma$ for the first hop and appends it after the Sphinx packet.
+   The proof MAY be cryptographically bound to the Sphinx packet and include any verification metadata required by the spam protection mechanism.
+2. The first hop extracts and verifies $\sigma$ before processing the Sphinx packet.
+3. After successful verification and Sphinx processing, the hop generates a new proof $\sigma'$ for the next hop bound to the transformed packet.
+4. The updated packet is forwarded to the next hop.
 5. This process repeats at each intermediate hop until the packet reaches the exit.
 
 ##### 9.2.2.2 Advantages
@@ -1306,27 +1309,15 @@ The proof MAY be bound to all the components of outgoing sphinx packet $(\alpha'
   This creates availability bottlenecks at popular nodes and unpredictable message delivery.
   This can be mitigated by assigning higher rate-limits to intermediate or popular nodes(e.g. tied to reputation).
 
-##### 9.2.2.4 Impact on Header Size
+##### 9.2.2.4 Impact on Packet Size
 
-A new header field $\sigma$ must be added to the Sphinx packet structure:
-
-```text
-+--------+----------+--------+----------+----------+
-|   α    |     β    |   γ    |    σ     |    δ     |
-| 32 B   | variable | 16 B   | variable | variable |
-+--------+----------+--------+----------+----------+
-```
-
-The size of $\sigma$ depends on the spam protection method.
-
-With the current recommended values:
-
-- Original header size: $624$ bytes
-- Header size increase: $|\sigma|$ bytes
+The proof $\sigma$ is appended after the Sphinx packet, increasing total wire size to $4608 + |\sigma|$ bytes.
+The internal Sphinx packet structure remains unchanged.
 
 Note that $|\sigma|$ includes both the proof and all verification metadata.
+The proof size MUST be fixed for a given spam protection mechanism to ensure all packets remain indistinguishable on the wire (see [Section 8.3.4](#834-anonymity-set-considerations)).
 
-e.g. If using RLN, where metadata + proof ~= $300$ bytes, Header size becomes: $624 + 300 = 924$ bytes
+e.g. If using RLN, where proof + metadata ~= $300$ bytes, total wire size becomes: $4608 + 300 = 4908$ bytes
 
 #### 9.2.3 Comparison
 
@@ -1340,7 +1331,7 @@ The following table provides a brief comparison between both integration approac
 | **Per-hop latency**                | Minimal (fast verification)             | Higher (mitigated with pre-computation)    |
 | **Total end-to-end latency**       | Lower                                   | Higher (mitigated with pre-computation)    |
 | **Sybil resistance**               | Requires separate mechanism             | Can be integrated                          |
-| **Header size increase**           | $L \times \mathrm{spam\_proof}$         | $\|\sigma\|$                               |
+| **Packet size increase**           | $L \times \mathrm{spam\_proof}$         | $\|\sigma\|$                               |
 
 Separate specifications defining concrete spam protection mechanisms SHOULD specify recommended approaches and provide detailed integration instructions.
 
@@ -1359,14 +1350,14 @@ In addition to the standard Sphinx processing responsibilities described in [Sec
 
 #### 9.3.2 For Per-Hop Generated Proofs
 
-- **Sender nodes**: MUST generate the initial spam protection proof $\sigma_0$ for the first hop as described in [Section 9.2.2.1](#9221-how-it-works).
-  The proof MAY be bound to the outgoing Sphinx packet and MUST NOT contain identifying information.
+- **Sender nodes**: MUST generate the initial spam protection proof $\sigma$ and append it after the Sphinx packet as described in [Section 9.2.2.1](#9221-how-it-works).
+  The proof MUST NOT contain identifying information.
 
-- **Intermediate nodes**: MUST verify the incoming proof $\sigma$ BEFORE any other Sphinx processing.
-  If verification fails, nodes MUST discard the packet and MAY apply penalties or rate-limiting measures to the previous hop.
-  If incoming proof is valid, nodes MUST generate a fresh proof $\sigma'$ for the next hop that is unlinkable from $\sigma$.
+- **Intermediate nodes**: MUST extract and verify the incoming proof $\sigma$ BEFORE any Sphinx processing.
+  If verification fails, nodes MUST discard the packet and MAY apply penalties or rate-limiting measures.
+  After verification and Sphinx processing, nodes MUST generate a fresh unlinkable proof $\sigma'$ and append it to the transformed packet before forwarding.
 
-- **Exit nodes**: MUST verify the incoming proof $\sigma$ before decrypting the final payload.
+- **Exit nodes**: MUST extract and verify the incoming proof $\sigma$ before Sphinx processing.
   Exit nodes do not generate new proofs.
 
 ### 9.4 Anonymity and Security Considerations
@@ -1500,22 +1491,24 @@ After decrypting the routing block $\beta$ and payload $\delta'$ (Steps 4-5), th
 
 ##### 9.6.3.2 For Per-Hop Generated Proofs
 
-**Sender Nodes - During Packet Construction** ([Section 8.5.2](#852-construction-steps)):
+**Entry Nodes - During Packet Construction** ([Section 8.5.2](#852-construction-steps)):
 
-After assembling the final Sphinx packet (Step 3.e), the sender MUST:
+After assembling the final Sphinx packet (Step 3.e), the entry node MUST:
 
-1. Call `GenerateProof(binding_data)` to generate `encoded_proof_data` for the initial proof $\sigma_0$
-2. Include the `encoded_proof_data` as an additional header field $\sigma_0$ in the Sphinx packet
+1. Call `GenerateProof(binding_data)` where `binding_data` is the complete Sphinx packet bytes
+2. Append `encoded_proof_data` after the Sphinx packet and send to the first hop
 
 **Intermediate Nodes - During Packet Processing** ([Section 8.6](#86-sphinx-packet-handling)):
 
-**Before** any Sphinx decryption operations, the node MUST:
+**Before** any Sphinx decryption operations, intermediate nodes MUST:
 
-1. Call `VerifyProof(encoded_proof_data, binding_data)` where `binding_data` is the received packet state $(\alpha, \beta, \gamma, \delta)$
-2. If the proof is not valid, discard the packet and terminate processing immediately (before session key derivation)
-3. If the proof is valid, generate fresh proof for next hop as explained above.
+1. Extract `encoded_proof_data` from the last `proofSize` bytes of the received packet
+2. Call `VerifyProof(encoded_proof_data, binding_data)` where `binding_data` is the Sphinx packet bytes
+3. If the proof is not valid, discard the packet and terminate processing immediately
+4. If valid, perform standard Sphinx processing, then call `GenerateProof(binding_data)` with the transformed packet as `binding_data`
+5. Append the new `encoded_proof_data` to the transformed Sphinx packet and forward
 
-**Exit nodes** verify the incoming proof but do not generate a new proof.
+**Exit nodes** follow steps 1-3 but do not generate a new proof.
 
 ## 10. Security Considerations
 
