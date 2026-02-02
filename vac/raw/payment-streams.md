@@ -3,7 +3,7 @@ title: PAYMENT-STREAMS
 name: Payment Streams Protocol for Logos Services
 status: raw
 category: Standards Track
-tags: logos, lssa, payment-streams
+tags: logos, lee, payment-streams
 editor: Sergei Tikhomirov <sergei@status.im>
 contributors: Akhil Peddireddy <akhil@status.im>
 ---
