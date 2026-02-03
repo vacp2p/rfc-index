@@ -358,6 +358,12 @@ with three account types:
 Stream lifecycle rules and balance constraints
 are encoded and enforced through program logic.
 
+Stream state is evaluated lazily.
+On-chain storage holds stream parameters,
+but effective state depends on block timestamp at execution time.
+State transitions (such as auto-pause) are reflected on-chain
+only when an on-chain operation is executed.
+
 Whether shielded execution can access block timestamps
 for time-based accrual calculation is an open question.
 Given a mechanism for elapsed time in shielded execution,
