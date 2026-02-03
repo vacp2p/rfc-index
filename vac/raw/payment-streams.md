@@ -201,10 +201,6 @@ and enables service delivery.
 Users MAY pause or close streams without prior notice.
 Providers SHOULD track on-chain state for their streams.
 
-If the provider stops serving the user,
-the provider SHOULD notify the user off-chain
-before closing the stream on-chain.
-
 ### Message Types
 
 #### Stream Establishment
@@ -229,8 +225,8 @@ This message MUST include:
 If accepted, the user creates the stream on-chain.
 Acceptance commits the provider to deliver the specified service
 while payment accrues at the agreed rate.
-The provider MAY later terminate service
-but MUST send a ServiceTermination message first.
+The provider MAY terminate service prematurely
+(see Service Termination).
 
 #### Service Request
 
@@ -241,17 +237,13 @@ Each request MUST include:
 - request_data: service-specific payload
 - signature: signature over request_data using the committed public key
 
-The signature proves the request originates from the stream owner.
-The provider tracks on-chain state to verify the stream remains active.
-
-This design assumes the underlying blockchain provides funding privacy.
-Stream creation MUST NOT reveal which vault funded the stream.
-Vault deposits MUST NOT reveal the depositor's identity.
+The signature proves the request is paid for by the respective stream.
+The provider SHOULD verify on-chain that the stream remains active.
 
 #### Service Termination
 
 ServiceTermination:
-The provider sends this message when stopping service.
+The provider SHOULD send this message before stopping service.
 This message MUST include:
 
 - termination_type: TEMPORARY or PERMANENT
@@ -321,16 +313,16 @@ by keeping a stream paused
 and resuming briefly only when querying a service.
 This results in minimal payment for actual service usage.
 
-The activation fee extension addresses this attack.
-When enabled, the stream MUST accrue a fixed activation fee
-immediately upon entering ACTIVE state.
-The fee applies to stream creation, resume, and top-up operations,
-as only user actions transition a stream to ACTIVE state.
-
+Activation fee addresses this attack.
+When activation fee is enabled,
+a fixed amount MUST accrue to the provider
+immediately upon the stream becoming ACTIVE.
 The activation fee SHOULD reflect
 the minimum acceptable payment for a service session.
-If the fee exceeds the value of a single query,
-the attack becomes economically unviable.
+The activation fee applies to stream creation, resume, and top-up operations,
+as only user actions transition a stream to ACTIVE state.
+If stream allocation is lower than activation fee,
+stream activation MUST fail.
 
 Providers MAY alternatively address this attack via off-chain policy
 by refusing service to users who pause and resume excessively.
@@ -348,9 +340,7 @@ the provider MUST include the load cap in StreamResponse.
 The user MUST NOT exceed the load cap.
 
 If the user exceeds the load cap during stream operation,
-the provider SHOULD terminate service.
-The provider MUST send a ServiceTermination message
-before closing the stream on-chain.
+the provider SHOULD terminate service (see Service Termination).
 
 A user who requires a higher load cap
 SHOULD open multiple streams to the same provider.
@@ -368,8 +358,6 @@ This section captures implementation questions:
   How to encode and enforce state machine transition rules
   for the stream lifecycle states?
 
-## Security and Privacy Considerations
-
 This section captures security and privacy questions:
 
 - Can or should all protocol operations be within shielded execution?
@@ -384,6 +372,22 @@ This section captures security and privacy questions:
 - How to ensure providers cannot see
   streams from the same user to other providers,
   while still being able to verify balance constraints?
+
+
+## Security and Privacy Considerations
+
+Our initial privacy goal is unlinkability
+between off-chain requests and on-chain funding.
+Vault deposits MUST NOT reveal the depositor's identity.
+Stream creation SHOULD NOT reveal which vault funded the stream.
+
+Under LSSA mechanics,
+it is the user (stream creator) who decides
+whether a stream operates under transparent or shielded execution.
+This MAY imply maintaining stream state as part of public state.
+In any case, on-chain state of a stream
+MUST be verifiable by both parties.
+
 
 ## Copyright
 
