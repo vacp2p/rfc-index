@@ -3,7 +3,7 @@ title: PAYMENT-STREAMS
 name: Payment Streams Protocol for Logos Services
 status: raw
 category: Standards Track
-tags: logos, lee, payment-streams
+tags: logos, lez, payment-streams
 editor: Sergei Tikhomirov <sergei@status.im>
 contributors: Akhil Peddireddy <akhil@status.im>
 ---
@@ -18,7 +18,7 @@ where a payer's deposit releases gradually to a payee.
 The blockchain determines fund accrual based on elapsed time.
 
 The protocol targets Logos blockchain,
-which uses the Logos State-Separation Architecture (LSSA).
+which includes the Logos Execution Zone (LEZ).
 This document clarifies MVP requirements
 and facilitates discussion with Logos developers
 on implementation feasibility and challenges.
@@ -44,9 +44,9 @@ with both P2P and request-response structures.
 The backbone P2P protocols use tit-for-tat mechanisms.
 We plan to introduce incentivization
 for auxiliary request-response protocols
-where client and server roles are well defined.
+with well-defined user and provider roles.
 One such protocol is Store,
-which allows clients to query historical messages
+which allows users to query historical messages
 from Logos Messaging relay nodes.
 
 We target the following requirements:
@@ -73,21 +73,20 @@ improving resilience and privacy.
 Different service patterns suit different payment mechanisms.
 Ongoing services align well with streams
 that provide time-based automatic fund accrual.
-One-time or on-demand services are better suited
-for payment channels with one-off payments.
+One-time or on-demand services suit
+payment channels with one-off payments.
 
 This specification targets streams
 for services with steady usage patterns.
 Addressing burst services with one-off payments
 remains future work.
 
-Logos blockchain uses the Logos State-Separation Architecture (LSSA),
+Logos blockchain uses the Logos Execution Zone (LEZ),
 which enables both transparent and shielded execution.
-LSSA is a natural fit
+LEZ is a natural fit
 for the on-chain component of the payment protocol.
 
-This document provides clarity on MVP requirements
-and facilitates discussion with Logos developers on:
+This document facilitates discussion with Logos developers on
 whether the required functionality can be implemented,
 which parts are most challenging and how to simplify them,
 and other implementation considerations.
@@ -157,7 +156,7 @@ Stream state transitions:
   from any non-CLOSED state.
   When a stream is closed,
   unaccrued funds MUST automatically return to the user's vault.
-  Accrued funds remain available for provider to claim.
+  Accrued funds remain available for the provider to claim.
 - Claim: Provider MAY claim accrued funds from a stream in any state.
   A claim operation does not change stream state.
 
@@ -237,7 +236,7 @@ Each request MUST include:
 - request_data: service-specific payload
 - signature: signature over request_data using the committed public key
 
-The signature proves the request is paid for by the respective stream.
+The signature links the request to the paying stream.
 The provider SHOULD verify on-chain that the stream remains active.
 
 #### Service Termination
@@ -303,7 +302,7 @@ However, auto-claim has potential issues:
 - Requires user to pay for provider's claim operation.
 - May cause the entire close operation to fail if claim fails.
 
-Assessing these trade-offs requires clarity on LSSA,
+Assessing these trade-offs requires clarity on LEZ,
 particularly gas model, batching techniques, and timing privacy.
 
 ### Activation Fee
@@ -347,32 +346,22 @@ SHOULD open multiple streams to the same provider.
 
 ## Implementation Considerations
 
-This section captures implementation questions:
+This section outlines how the protocol maps onto LEZ.
 
-- Mapping streams to LSSA:
-  How does the stream protocol map onto LSSA?
-- Timestamp-based accrual calculation:
-  Can shielded execution access block timestamps
-  to calculate accrued amounts based on elapsed time?
-- Encoding and enforcing state transitions:
-  How to encode and enforce state machine transition rules
-  for the stream lifecycle states?
+The stream protocol MAY be deployed as an LEZ program
+with three account types:
 
-This section captures security and privacy questions:
+- StreamDefinition: stream parameters and status.
+- VaultDefinition: list of streams backed by a vault, controlled by payer.
+- VaultHolding: token account funded by payer, used to pay providers.
 
-- Can or should all protocol operations be within shielded execution?
-- If not, where is the boundary
-  between transparent and shielded execution?
-- Who decides whether to use transparent or shielded execution:
-  user, provider, both, or fixed by protocol design?
-- What data is stored in the user's account
-  and who can see it in transparent vs shielded execution?
-- How to ensure external observers cannot correlate
-  streams from the same vault across different providers?
-- How to ensure providers cannot see
-  streams from the same user to other providers,
-  while still being able to verify balance constraints?
+Stream lifecycle rules and balance constraints
+are encoded and enforced through program logic.
 
+Whether shielded execution can access block timestamps
+for time-based accrual calculation is an open question.
+Given a mechanism for elapsed time in shielded execution,
+all protocol operations MAY be performed within shielded execution.
 
 ## Security and Privacy Considerations
 
@@ -381,13 +370,14 @@ between off-chain requests and on-chain funding.
 Vault deposits MUST NOT reveal the depositor's identity.
 Stream creation SHOULD NOT reveal which vault funded the stream.
 
-Under LSSA mechanics,
-it is the user (stream creator) who decides
-whether a stream operates under transparent or shielded execution.
-This MAY imply maintaining stream state as part of public state.
-In any case, on-chain state of a stream
-MUST be verifiable by both parties.
+Each account MAY be public or private, configured per-account.
+The payer decides whether stream operations use
+transparent or shielded execution.
+The protocol design SHOULD NOT fix this decision.
+A provider MAY reject stream requests
+that do not match their privacy preferences.
 
+On-chain state of a stream MUST be verifiable by both parties.
 
 ## Copyright
 
@@ -400,7 +390,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 #### Related Work
 
 - [Off-Chain Payment Protocols: Classification and Architectural Choice](https://forum.vac.dev/t/off-chain-payment-protocols-classification-and-architectural-choice/596)
-- [LSSA](https://github.com/logos-blockchain/lssa)
+- [LSSA](https://github.com/logos-blockchain/lssa) (now called LEZ)
 
 #### Payment Streaming Protocols
 
@@ -425,7 +415,7 @@ allow one deposit to back multiple streams.
 ## Appendix A: Illustrative EVM Implementation
 
 This appendix provides an illustrative EVM-based implementation outline.
-The actual implementation will target Logos with LSSA.
+The actual implementation will target LEZ.
 
 ### A.1 Contract Structure
 
