@@ -20,7 +20,7 @@ The blockchain determines fund accrual based on elapsed time.
 The protocol targets Logos blockchain,
 which includes the Logos Execution Zone (LEZ).
 This document clarifies MVP requirements
-and facilitates discussion with Logos developers
+and facilitates discussion with Logos blockchain and LEZ developers
 on implementation feasibility and challenges.
 
 ## Language
@@ -126,6 +126,7 @@ The sum of all stream allocations MUST NOT exceed vault balance.
 A claim is the operation
 where the provider retrieves accrued funds from a stream.
 The provider MAY claim accrued funds from a stream in any state.
+A claim MUST transfer the full accrued balance to the provider.
 
 ### Stream Lifecycle
 
@@ -158,6 +159,8 @@ Stream state transitions:
   unaccrued funds MUST automatically return to the user's vault.
   Accrued funds remain available for the provider to claim.
 - Claim: Provider MAY claim accrued funds from a stream in any state.
+  A claim MUST transfer the full accrued balance;
+  partial claims are not supported.
   A claim operation does not change stream state.
 
 ### Stream State Transition Diagram
@@ -473,6 +476,7 @@ event StreamClosed(uint256 indexed streamId, uint128 refundedToVault);
 event Claimed(uint256 indexed streamId, address indexed provider, uint128 amount);
 
 /// @notice Create a new stream in ACTIVE state (user only)
+/// @dev MUST revert if allocation exceeds available vault balance
 function createStream(
     address provider,
     address token,
@@ -484,16 +488,21 @@ function createStream(
 function pauseStream(uint256 streamId) external;
 
 /// @notice Resume a PAUSED stream (user only)
+/// @dev MUST revert if remaining allocation (allocation - accruedBalance) is zero
 function resumeStream(uint256 streamId) external;
 
 /// @notice Add funds to stream allocation; transitions to ACTIVE (user only)
+/// @dev MUST revert if additionalAllocation exceeds available vault balance
 function topUpStream(uint256 streamId, uint128 additionalAllocation) external;
 
-/// @notice Close stream permanently; refunds unaccrued funds to vault
-/// @dev Callable by user or provider
+/// @notice Close stream permanently
+/// @dev Callable by user or provider. Unaccrued funds (allocation - accruedBalance)
+///      MUST be returned to vaultBalance. Accrued funds remain claimable by provider.
 function closeStream(uint256 streamId) external;
 
 /// @notice Provider claims accrued funds from a stream
+/// @dev Callable in any state (ACTIVE, PAUSED, or CLOSED).
+///      Transfers full accruedBalance to provider and resets it to zero.
 function claim(uint256 streamId) external;
 ```
 
@@ -501,7 +510,7 @@ function claim(uint256 streamId) external;
 
 ```solidity
 /// @notice Update accruedBalance based on elapsed time since lastUpdatedAt
-/// @dev Called by pauseStream, topUpStream, closeStream, and claim
+/// @dev Called by pauseStream, resumeStream, topUpStream, closeStream, and claim
 ///      before modifying stream state. Caps accrual at allocation and
 ///      transitions to PAUSED when fully accrued (lazy evaluation:
 ///      state updates on next interaction, not at exact depletion time).
