@@ -844,5 +844,14 @@
     "category": "unspecified",
     "updated": "2026-02-05",
     "path": "storage/raw/dataset-store.html"
+  },
+  {
+    "component": "storage",
+    "slug": "Logos Storage Datasets",
+    "title": "Logos Storage Datasets",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-02-05",
+    "path": "storage/raw/datasets.html"
   }
 ]
