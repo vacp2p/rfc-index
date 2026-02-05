@@ -1,10 +1,11 @@
 # DATASETS
 
-| Field  | Value                                |
-| ------ | ------------------------------------ |
-| Name   | Logos Storage Datasets               |
-| Status | draft                                |
-| Editor | Giuliano Mega <giuliano@status.im>   |
+| Field    | Value                                |
+| -------- | ------------------------------------ |
+| Name     | Logos Storage Datasets               |
+| Category | Standards Track                      |
+| Status   | raw                                  |
+| Editor   | Giuliano Mega <giuliano@status.im>   |
 
 ## Abstract
 
@@ -42,8 +43,18 @@ The content type, when present, MUST be a valid [RFC6838](https://datatracker.ie
 
 A dataset MUST be identified by the hash of its serialized manifest, $m$. The encoding of this serialization is specified in its `codec` attribute, which MUST contain [a libp2p multicodec type](https://github.com/multiformats/multicodec/blob/master/table.csv). This means a block within a file MUST be uniquely addressable within the network by the tuple $(m, i)$, where $i$ is an integer $1 \leq i \leq n$.
 
-It is important to note that different values for `file_name` and `content_type` will produce different datasets, even if the set of blocks contained in $F$ remains the same. If this turns out to be undesirable, future versions of this spec might adopt an approach in which a subset of the attributes of the manifest gets hashed instead; akin to how Bittorrent does with its [info dictionaries](https://www.bittorrent.org/beps/bep_0003.html), is used instead.
+It is important to note that different values for `file_name` and `content_type` will produce different datasets, even if the set of blocks contained in $F$ remains the same. If this turns out to be undesirable, future versions of this spec might adopt an approach in which a subset of the attributes of the manifest gets hashed instead; akin to how Bittorrent does with its [info dictionaries](https://www.bittorrent.org/beps/bep_0003.html).
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## References
+
+### Normative
+1. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
+2. [RFC 6838](https://datatracker.ietf.org/doc/html/rfc6838)
+
+### Informative
+3. [libp2p multicodec](https://github.com/multiformats/multicodec/blob/master/table.csv)
+4. [BEP 0003](https://www.bittorrent.org/beps/bep_0003.html)
