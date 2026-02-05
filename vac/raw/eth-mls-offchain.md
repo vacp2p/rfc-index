@@ -480,17 +480,24 @@ The exact scoring rules, recovery mechanisms, and escalation criteria are left f
 ## Timer-Based Anti-Deadlock Mechanism
 
 In de-MLS, a deadlock refers to a prolonged period during which no valid commit is produced
-despite a sufficient number of active and online members capable of finalizing consensus.
+despite the presence of at least one `finalized commit proposal` that require a group state change.
 To mitigate deadlock risks in de-MLS, a timer-based anti-deadlock mechanism SHOULD be introduced.
-Each member maintains a local timer that resets whenever a valid commit is observed,
-with a `threshold_duration` defined in configuration.
-If the `threshold_duration` is exceeded, the member waits an additional buffer period to account
-for network delays and then triggers a high-priority `emergency proposal` indicating a potential deadlock.
-If the proposal returns YES, temporarily allowing any member to commit and restore liveness.
-Since timers may expire at different times in a P2P setting, the buffer period mitigates false positives,
-while commit filtering is required to prevent commit flooding during recovery.
-Emergency proposals that return NO MUST incur a peer score penalty for the
-creator of the proposal to reduce abuse.
+
+Each member maintains a local timer with a configured `threshold_duration`.
+The timer MUST start when the member observes a `finalized commit proposal` that requires a corresponding commit
+(e.g., add/remove membership changes) and MUST reset only when
+the [commit validation service](#commit-validation-service) outputs a valid commit for the current commit context.
+
+If the `threshold_duration` is exceeded, the member waits an additional buffer period to account for network delays
+and then triggers a high-priority `emergency proposal` indicating a potential deadlock.
+If the proposal returns YES, the protocol SHOULD temporarily allow any member to commit in order to restore liveness.
+Since timers may expire at different times in a P2P setting,
+the buffer period mitigates false positives, while commit filtering is required
+to prevent commit flooding during recovery.
+
+This timer-based method is used only for anti-deadlock detection.
+Cases where a commit message includes fewer finalized voting proposals than expected are handled by [section](#steward-violation-list).
+Emergency proposals that return NO, MUST incur a peer score penalty for the creator of the proposal to reduce abuse.
 
 ## Security Considerations
 
