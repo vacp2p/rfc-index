@@ -193,7 +193,7 @@ the MLS proposal by the `steward` and following commit message that starts the n
 
 All `members` including `stewards` MUST maintain a local store of finalized voting proposals
 for at least the duration `threshold_duration` mentioned in [section](#steward-violation-list),
-required to validate incoming commits and perform [commit filtering](#filtering-proposals-against-the-multiple-comitting).
+required to validate incoming commits and perform [commit filtering](#commit-validation-service).
 
 ## Creating welcome message
 
@@ -406,14 +406,32 @@ It is particularly suitable for large user groups, where involving every member 
 The flow is similar to the big consensus including the `steward list` finalization with all members consensus
 only the difference here, the commit messages requires `commit proposal` only among the stewards.
 
-## Filtering proposals against the multiple comitting
+### Commit validation service
 
-Since stewards are allowed to produce a commit even when they are not the designated `epoch steward`,
-multiple commits may appear within the same epoch, often reflecting recurring versions of the same proposal.
-To ensure a consistent outcome, the valid commit for the epoch SHOULD be selected as the one derived
-from the longest proposal chain, ordered by the ascending value of each proposal as `SHA256(proposal)`.
-All other cases, such as invalid commits or commits based on proposals that were not approved through voting,
-can be easily detected and discarded by the members.
+Since `stewards` are allowed to produce a commit even when they are not the designated `epoch steward`,
+multiple commits may appear within the same commit context, often reflecting recurring versions of the same proposals.
+To ensure a consistent and deterministic outcome, all members MUST locally perform
+commit validation over the set of candidate commits.
+
+This validation process takes as input the set of `finalized voting proposals` locally stored by the member,
+as remarked in [Creating Voting Proposal](#creating-voting-proposal), and multiple candidate `commit messages`
+with different lengths and contents, each containing `voting proposals`.
+The process deterministically selects at most a single valid commit as output.
+In cases where protocol violations are detected, the process MAY additionally trigger peer scoring penalties.
+
+A commit is considered valid only if it references governance proposals
+that have been finalized through voting and are known to the member.
+Commits that reference non-finalized voting proposals MUST be rejected and
+MUST trigger a peer score penalty for the commit author,
+as this behavior constitutes a protocol violation.
+Commits that omit one or more finalized voting proposals MAY be discarded without penalty,
+as such omissions may arise from benign network delays or partial views of the finalized proposal set.
+
+Among the valid candidate commits, the commit derived from the longest
+deterministic proposal sequence SHOULD be selected as the single valid commit.
+The proposal sequence is ordered by the ascending value of each proposal as `SHA256(proposal)`.
+Therefore, commit messages that contain the same set of voting proposals
+are identical in content and can be easily deduplicated.
 
 ## Steward violation list
 
@@ -439,12 +457,12 @@ or commit was produced for a voting proposal that has already been finalized due
 ## Peer Scoring
 
 To improve fairness in member and steward management, de-MLS SHOULD incorporate a
-lightweight peer-scoring mechanism.
+lightweight peer scoring mechanism.
 Unfairness is not an intrinsic property of a member.
 Instead, it arises as a consequence of punitive actions such as removal following an observed malicious behavior.
 However, behaviors that appear malicious are not always the result of intent.
 Network faults, temporary partitions, message delays, or client-side failures may lead to unintended protocol deviations.
-A peer-scoring mechanism allows de-MLS to account for such transient and non-adversarial conditions by accumulating evidence over time.
+A peer scoring mechanism allows de-MLS to account for such transient and non-adversarial conditions by accumulating evidence over time.
 This enables the system to distinguish persistent and intentional misbehavior from accidental faults.
 Member removal should be triggered only in cases of sustained and intentional malicious activity,
 thereby preserving fairness while maintaining security and liveness.
@@ -471,7 +489,7 @@ for network delays and then triggers a high-priority `emergency proposal` indica
 If the proposal returns YES, temporarily allowing any member to commit and restore liveness.
 Since timers may expire at different times in a P2P setting, the buffer period mitigates false positives,
 while commit filtering is required to prevent commit flooding during recovery.
-Emergency proposals that return NO MUST incur a peer-score penalty for the
+Emergency proposals that return NO MUST incur a peer score penalty for the
 creator of the proposal to reduce abuse.
 
 ## Security Considerations
