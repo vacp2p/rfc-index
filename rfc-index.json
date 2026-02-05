@@ -835,5 +835,14 @@
     "category": "Standards Track",
     "updated": "2026-01-22",
     "path": "storage/raw/codex-merkle-tree.html"
+  },
+  {
+    "component": "storage",
+    "slug": "Dataset Store",
+    "title": "Dataset Store",
+    "status": "raw",
+    "category": "unspecified",
+    "updated": "2026-02-05",
+    "path": "storage/raw/dataset-store.html"
   }
 ]
