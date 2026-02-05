@@ -291,6 +291,26 @@ Therefore, messages MUST be prioritized by type in the following order, from hig
 This means that if a higher-priority consensus proposal is present in the network,
 lower-priority messages MUST be withheld from transmission until the higher-priority proposals have been finalized.
 
+#### Partial Freeze Semantics
+
+This prioritization is realized through a partial freeze of lower-priority governance traffic.
+When an active `Emergency criteria proposal` is observed and has not yet been finalized,
+honest nodes MUST temporarily suspend the propagation and creation of lower-priority consensus proposal messages,
+including Steward election proposals and Commit proposals.
+Such messages MUST be dropped and MUST NOT be forwarded over the network until the emergency proposal is finalized.
+
+This partial freeze applies only to governance-related messages,
+MLS application messages MAY continue to be transmitted normally.
+
+If a malicious member attempts to generate or propagate
+lower-priority proposals during an active emergency,
+these messages will not be observed by the majority of honest nodes
+due to deterministic message filtering.
+Implementations MAY additionally penalize such behavior using peer scoring mechanisms.
+
+To enforce this behavior, members MUST be able to identify the type of incoming consensus messages
+and apply priority-based filtering accordingly.
+
 ### Steward list creation
 
 The `steward list` consists of steward nominees who will become actual stewards if the `steward election proposal` is finalized with YES,
