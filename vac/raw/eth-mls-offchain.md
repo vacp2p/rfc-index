@@ -191,6 +191,10 @@ This consensus result MUST be finalized within the epoch as YES or NO.
 If the voting result is YES, this points out the voting proposal will be converted into
 the MLS proposal by the `steward` and following commit message that starts the new epoch.
 
+All `members` including `stewards` MUST maintain a local store of finalized voting proposals
+for at least the duration `threshold_duration` mentioned in [section](#steward-violation-list),
+required to validate incoming commits and perform [commit filtering](#filtering-proposals-against-the-multiple-comitting).
+
 ## Creating welcome message
 
 When a MLS `MLS proposal message` is created by the `steward`,
