@@ -3,7 +3,7 @@
 | Field  | Value                                |
 | ------ | ------------------------------------ |
 | Name   | Dataset Store                        |
-| Status | draft                                |
+| Status | raw                                  |
 | Editor | Giuliano Mega <giuliano@status.im>   |
 
 ## Abstract
@@ -12,22 +12,22 @@ This specification contains the interface for a simple local storage component, 
 
 ## Specification
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.txt).
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 ### Interface
 
 The interface is specified as pseudo-Python. The focus here is on primitive semantics, not code realism. In particular, we will ignore:
 
-1. whether the operations are ran synchronously or asynchronously, in a single thread or in multiple threads;
+1. whether the operations are run synchronously or asynchronously, in a single thread or in multiple threads;
 2. error conditions which are not domain specific; e.g. `IOError` does not belong here, whereas `QuotaExceededError` perhaps does. Errors are presented as exceptions, but these can be mapped into result types in languages that support or have a preference for them;
 3. methods which could be present for efficiency reasons. Those can be added at the discretion of the implementor.
 
-A DatasetStore is typically mounted on a local folder. Implementations will therefore typically provide, at it simplest:
+A DatasetStore is typically mounted on a local folder. Implementations will therefore typically provide, at its simplest:
 
 ```python
 def new_dataset_store(path: Path, quota: uint): DatasetStore
   """Creates a new `DatasetStore`, which can hold up to `quota`
-  bytes worth of `Datasets`.
+  bytes worth of `Datasets`."""
   ...
 ```
 
@@ -40,68 +40,75 @@ The `DatasetStore`/`Dataset` interfaces rely on a few external pseudotypes:
 1. `BytesIO` represents a generic read or write byte stream;
 2. `Bitset` is a fixed-size set - typically represented as a bit array - which encodes an integer set. Bit $i$ in this array is set to $1$ if $i$ is in the set, or $0$ otherwise;
 3. `CID` represents a libp2p [Content Identifier](https://github.com/multiformats/cid);
-4. `Manifest` represents a [Logos Storage Manifest](/YOKL7w9nR6mVvtgpzBxifg);
+4. `Manifest` represents a [Logos Storage Manifest](./datasets.md);
 5. `Block` represents an arbitrary chunk of data;
 6. `MerkleProof` represents a Merkle inclusion proof for a `Block`.
+
+We omit the `self` parameter from all method signatures for brevity.
 
 ```python
 class DatasetStore:
 
-   def remaining() -> uint:
-     """Returns the free available space in this DatasetStore, in bytes.
-     This MUST be equal to the quota minus the size of all Datasets
-     in this store. Partially completed Datasets MUST count with their
-     full size, even if not all of the Dataset blocks are available locally.
-     """
-     ...
+  def remaining() -> uint:
+    """Returns the free available space in this DatasetStore, in bytes.
+    This MUST be equal to the quota minus the size of all Datasets
+    in this store. Partially completed Datasets MUST count with their
+    full size, even if not all of the Dataset blocks are available locally.
+    """
+    ...
 
-   def create_dataset(
-      stream: BytesIO,
-      block_size: uint,
-      file_name: Optional[string] = None,
-      mime_type: Optional[MimeType] = None,
-   ) -> Dataset:
-      """Creates a new Dataset from a byte stream and stores
-      it on disk. Store quota SHOULD be deduced as the stream gets
-      processed. Errors in this method SHOULD cause the
-      `DatasetStore` to clean up the partially created `Dataset`,
-      and return the quota back to the pool.
+  def create_dataset(
+    stream: BytesIO,
+    block_size: uint,
+    file_name: Optional[string] = None,
+    mime_type: Optional[MimeType] = None,
+  ) -> Dataset:
+    """Creates a new Dataset from a byte stream and stores
+    it on disk. Store quota SHOULD be deducted as the stream gets
+    processed. Errors in this method SHOULD cause the
+    `DatasetStore` to clean up the partially created `Dataset`,
+    and return the quota back to the pool.
 
-      :raises QuotaExceededError: if quota is exceeded.
-      """
-      ...
+    :raises QuotaExceededError: if quota is exceeded.
+    """
+    ...
 
-    def create_empty(manifest: Manifest) -> Dataset:
-      """Creates a `Dataset` with the size described in the
-      `Manifest`, but no completed blocks; i.e., and empty
-      `Dataset`.
+  def create_empty(manifest: Manifest) -> Dataset:
+    """Creates a `Dataset` with the size described in the
+    `Manifest`, but no completed blocks; i.e., an empty
+    `Dataset`.
 
-      :raises DatasetExistsError: if the dataset already exists.
-      """
-      ...
+    :raises DatasetExistsError: if the dataset already exists.
+    :raises QuotaExceededError: if quota would be exceeded by creating this dataset.
+    """
+    ...
 
-    def get_dataset(cid: CID) -> Optional[Dataset]:
-      """Returns a `Dataset` previously stored on-disk, or
-      None if the `Dataset` is not present.
+  def get_dataset(cid: CID) -> Optional[Dataset]:
+    """Returns a `Dataset` previously stored on-disk, or
+    None if the `Dataset` is not present.
 
-      :param cid: The Manifest's CID.
-      """
-      ...
+    :param cid: The Manifest's CID.
+    """
+    ...
 
-    def delete_dataset(cid: CID) -> bool:
-      """Removes a `Dataset` from disk, along with all of its
-      associated metadata.
+  def delete_dataset(cid: CID) -> bool:
+    """Removes a `Dataset` from disk, along with all of its
+    associated metadata.
 
-      :return: `false` if no `Dataset` corresponding to the
-      provided CID is found on-disk; `true` otherwise.
-      """
-      ...
+    :return: `false` if no `Dataset` corresponding to the
+    provided CID is found on-disk; `true` otherwise.
+    """
+    ...
 
-    def lru() -> Iterator[Dataset]:
-      """Returns datasets in Least-Recently Used order.
-      Nodes can use this to implement cache eviction; e.g.,
-      when the quota is about to run out."""
-      ...
+  def lru() -> Iterator[Dataset]:
+    """Returns datasets in Least-Recently Used order.
+    Nodes can use this to implement cache eviction; e.g.,
+    when the quota is about to run out.
+
+    LRU order is defined by the last time a dataset was accessed
+    (read or written, both at the dataset or block level).
+    """
+    ...
 ```
 
 **Listing 2.** DatasetStore interface.
@@ -111,6 +118,7 @@ class Dataset:
   def manifest() -> Manifest:
     """Returns the `Manifest` for this dataset.
     """
+    ...
 
   def blockmap() -> Bitset:
     """Returns a `Bitset` in which the indexes of
@@ -119,14 +127,15 @@ class Dataset:
     """
     ...
 
-  def completion() -> (uint, uint):
+  def completion() -> Tuple[uint, uint]:
     """Returns a tuple (a, b) where:
       * a = blockmap.cardinality(), and;
       * b = manifest.block_count
 
-    If a == b, then then we have all the blocks on disk;
+    If a == b, then we have all the blocks on disk;
     i.e., the dataset is complete.
     """
+    ...
 
   def put_block(
     block: Block,
@@ -135,7 +144,8 @@ class Dataset:
   ) -> None:
     """Stores the given `Block` as the index-th block
     of this `Dataset`, verifying and storing its Merkle
-    inclusion as part of that process.
+    inclusion as part of that process. Calling this method
+    for a block that is already present is a no-op.
 
     :raises InvalidProofError: if the Merkle proof provided
       in `proof` fails to verify.
@@ -144,7 +154,7 @@ class Dataset:
 
   def get_block(
     index: uint,
-  ) -> Optional[[Block, MerkleProof]]:
+  ) -> Optional[Tuple[Block, MerkleProof]]:
     """Retrieves and returns the block at index `index`, together
     with its Merkle proof, if present. Otherwise returns None.
     """
@@ -155,10 +165,11 @@ class Dataset:
     The stream MUST block if it bumps into an incomplete
     block, until the block is again available.
     """
+    ...
 
 ```
 
-**Listing 3** Dataset interface.
+**Listing 3.** Dataset interface.
 
 ## Copyright
 
