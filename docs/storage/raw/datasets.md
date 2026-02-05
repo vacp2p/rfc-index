@@ -52,9 +52,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 ### Normative
+
 1. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt)
 2. [RFC 6838](https://datatracker.ietf.org/doc/html/rfc6838)
 
 ### Informative
-3. [libp2p multicodec](https://github.com/multiformats/multicodec/blob/master/table.csv)
-4. [BEP 0003](https://www.bittorrent.org/beps/bep_0003.html)
+
+1. [libp2p multicodec](https://github.com/multiformats/multicodec/blob/master/table.csv)
+2. [BEP 0003](https://www.bittorrent.org/beps/bep_0003.html)
