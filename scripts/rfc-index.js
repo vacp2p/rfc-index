@@ -658,7 +658,7 @@
       return resp.json();
     })
     .then((data) => {
-      rfcData = componentScope ? data.filter((item) => item.component === componentScope) : data.filter((item) => !item.archived);
+      rfcData = componentScope ? data.filter((item) => item.component === componentScope) : data;
       updateChipCounts();
       render();
     })
