@@ -1,47 +1,65 @@
-# Vac Request For Comments(RFC)
+# Logos LIP (RFC) Index
 
-*NOTE*: This repo is WIP. We are currently restructuring the RFC process.
+NOTE: This repo is still evolving while the LIP process is refined.
 
-This repository contains specifications from the [Waku](https://waku.org/), [Nomos](https://nomos.tech/),
-[Codex](https://codex.storage/), and
-[Status](https://status.app/) projects that are part of the [IFT portfolio](https://free.technology/).
-[Vac](https://vac.dev) is an
-[IFT service](https://free.technology/services) that will manage the RFC,
-[Request for Comments](https://en.wikipedia.org/wiki/Request_for_Comments),
-process within this repository.
+This repository contains specifications from the Messaging, Blockchain, Storage,
+and IFT-TS components of the IFT portfolio. LIPs are Requests for Comments that
+document protocols, processes, and system interfaces in a consistent, reviewable
+format.
 
-## New RFC Process
+## LIP process
 
-This repository replaces the previous `rfc.vac.dev` resource.
-Each project will maintain initial specifications in separate repositories,
-which may be considered as a **raw** specification.
-All [Vac](https://vac.dev) **raw** specifications and
-discussions will live in the Vac subdirectory.
-When projects have reached some level of maturity
-for a specification living in their repository,
-the process of updating the status to **draft** may begin in this repository.
-Specifications will adhere to
-[1/COSS](./vac/1/coss.md) before obtaining **draft** status.
+This repository replaces the old rfc.vac.dev resource. Specs are maintained in
+Markdown here and progress through statuses such as raw, draft, stable, or
+deprecated. The process and lifecycle are defined in:
 
-Implementations should follow specifications as described,
-and all contributions will be discussed before the **stable** status is obtained.
-The goal of this RFC process will to engage all interseted parities and
-reach a rough consensus for techcinal specifications.
+- 1/COSS: `docs/ift-ts/raw/1/coss.md`
 
 ## Contributing
 
-Please see [1/COSS](./vac/1/coss.md) for general guidelines and specification lifecycle.
+1. Open a pull request against this repo.
+2. Add or update the LIP in the appropriate component folder.
+3. Include status and category metadata in the header table.
 
-Feel free to join the [Vac discord](https://discord.gg/Vy54fEWuqC).
+If you are unsure where a document belongs, open an issue first and we will
+help route it.
 
-Here's the project board used by core contributors and maintainers: [Projects](https://github.com/orgs/vacp2p/projects/5)
+## Component indexes
 
-## IFT Projects' Raw Specifications
+- Messaging: `docs/messaging/README.md`
+- Blockchain: `docs/blockchain/README.md`
+- Storage: `docs/storage/README.md`
+- IFT-TS: `docs/ift-ts/README.md`
 
-The repository for each project **raw** specifications:
+## Local setup
 
-- [Vac Raw Specifications](./vac/raw)
-- [Status Raw Specifications](./status/raw)
-- [Waku Raw Specificiations](https://github.com/waku-org/specs/tree/master)
-- [Codex Raw Specifications](none)
-- [Nomos Raw Specifications](https://github.com/logos-co/nomos-specs)
+1. Install mdBook (pick the version that matches your Rust toolchain).
+2. Install Python dependencies if needed.
+
+To install mdBook via Make:
+
+```bash
+make install
+```
+
+## Build and serve
+
+Run the generators before building or serving:
+
+```bash
+python scripts/run_runtime_generators.py
+mdbook build
+```
+
+To serve locally:
+
+```bash
+make serve
+```
+
+Or run the commands directly:
+
+```bash
+python scripts/run_runtime_generators.py
+mdbook serve -p 3000 -n 0.0.0.0
+```
