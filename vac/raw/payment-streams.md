@@ -17,6 +17,14 @@ A payment stream is an off-chain protocol
 where a payer's deposit releases gradually to a payee.
 The blockchain determines fund accrual based on elapsed time.
 
+This specification defines stream-backed eligibility proof types
+for the incentivization framework
+defined in the incentivization spec
+(see [References](#references)).
+The incentivization spec is defined
+in the context of Logos Messaging request-response protocols.
+This spec MAY be extended to non-Messaging services.
+
 The protocol targets Logos blockchain,
 which includes the Logos Execution Zone (LEZ).
 This document clarifies MVP requirements
@@ -177,8 +185,23 @@ graph LR;
 
 Parties MUST agree on stream parameters before creation.
 A separate discovery protocol SHOULD enable
-providers to advertise services and expected payment,
-or enable users and providers to negotiate parameters.
+providers to advertise services and accepted payment terms.
+
+The provider SHOULD announce
+accepted eligibility proof types and service parameters
+via the discovery protocol.
+
+The following is an informal list of discoverable parameters
+(to be formally defined in the context of the discovery spec):
+
+- accepted eligibility proof types
+- accepted tokens
+- required rate (tokens per time unit)
+- minimum allocation
+- required vault buffer percentage (RECOMMENDED default: 5%)
+- load cap (cumulative resource limit per stream per time window)
+- `VaultProof` response cap
+  (maximum response size for `VaultProof`-backed requests)
 
 Users SHOULD monitor service delivery
 and take action when providers stop delivering service.
@@ -187,12 +210,12 @@ monitoring quality and pausing or closing streams
 is a reasonable expectation.
 
 Providers SHOULD monitor the stream on-chain
-and SHOULD stop providing service when a stream is not ACTIVE.
+and SHOULD stop providing service when a stream is not `ACTIVE`.
 
 ## Off-Chain Protocol
 
 This section describes off-chain communication
-for stream establishment, service delivery, and closure.
+for stream establishment, service delivery, and termination.
 
 ### Design Rationale
 
@@ -200,62 +223,211 @@ On-chain state is the source of truth for fund allocation and accrual.
 Off-chain communication coordinates lifecycle events
 and enables service delivery.
 
-Users MAY pause or close streams without prior notice.
-Providers SHOULD track on-chain state for their streams.
+This spec does not re-define the service provision protocol.
+The incentivization spec (see [References](#references))
+defines the generic request-response framework
+with `EligibilityProof` and `EligibilityStatus`.
+This spec extends `EligibilityProof`
+with two new types for stream-backed service provision,
+defined in the following subsection.
+
+### Eligibility Proof Types
+
+The incentivization spec's `EligibilityProof`
+is extended with two new optional fields:
+`stream_proposal` and `stream_proof`.
+These fields are mutually exclusive.
+The first `ServiceRequest` MUST use `stream_proposal`;
+its semantics: "I want to open a stream to you
+with these parameters;
+here is proof I have a vault to back it;
+here is my first request."
+All subsequent requests MUST use `stream_proof`.
+
+```protobuf
+message EligibilityProof {
+  // existing, from incentivization spec
+  optional bytes proof_of_payment = 1;
+  // new, for stream-backed service provision
+  optional bytes stream_proposal = 2;
+  optional bytes stream_proof = 3;
+}
+```
+
+#### StreamProposal
+
+```protobuf
+message StreamProposal {
+  VaultProof vault_proof = 1;
+  StreamParams stream_params = 2;
+  bytes public_key = 3;  // key for signing subsequent service requests
+}
+```
+
+#### VaultProof
+
+A `VaultProof` proves that the user controls a vault
+with sufficient unallocated funds
+to back the proposed stream.
+
+```protobuf
+message VaultProof {
+  bytes vault_id = 1;           // on-chain identifier of the vault
+  bytes provider_id = 2;        // target provider (prevents replay)
+  uint64 balance_commitment = 3; // asserted unallocated balance
+  bytes owner_signature = 4;    // signature covering all fields above
+}
+```
+
+The provider SHOULD verify on-chain
+that the vault's unallocated balance is at least
+`stream_allocation * (1 + buffer)`,
+where `stream_allocation` is from the accompanying `StreamParams`
+and `buffer` is the provider's required vault buffer percentage
+(RECOMMENDED default: 5%).
+
+The user MAY issue `VaultProof`s to different providers
+only if the sum of their promised allocations
+does not exceed the vault's unallocated balance.
+
+#### StreamParams
+
+`StreamParams` contains proposed stream parameters.
+
+```protobuf
+message StreamParams {
+  bytes service_id = 1;              // identifier of the requested service
+  uint64 stream_rate = 2;           // proposed accrual rate (tokens per time unit)
+  uint64 stream_allocation = 3;     // proposed initial allocation
+  uint32 stream_establishment_timeout = 4;  // seconds; RECOMMENDED default: 300
+}
+```
+
+#### StreamProof
+
+A `StreamProof` links a request to an active on-chain stream.
+
+```protobuf
+message StreamProof {
+  bytes stream_id = 1;    // on-chain identifier of the stream
+  bytes signature = 2;    // signature over request_data using committed public_key
+}
+```
+
+The provider SHOULD verify on-chain
+that the stream is `ACTIVE`,
+that the signature matches the committed `public_key`,
+and that the stream parameters match
+those originally proposed.
 
 ### Message Types
 
-#### Stream Establishment
+The off-chain protocol uses three message types:
+`ServiceRequest`, `ServiceResponse`, and `ServiceTermination`.
 
-StreamRequest:
-The user sends a StreamRequest to initiate a stream.
+#### ServiceRequest
+
+A `ServiceRequest` has two top-level fields,
+consistent with the incentivization spec pattern:
+
+- `request_data`: service-specific payload
+- `eligibility_proof`: an `EligibilityProof`
+  containing either a `stream_proposal` or a `stream_proof`
+  (see [Eligibility Proof Types](#eligibility-proof-types))
+
+#### ServiceResponse
+
+A `ServiceResponse` MUST include:
+
+- `eligibility_status`: an `EligibilityStatus`
+  (from the incentivization spec) with:
+  - `status_code`: indicating acceptance,
+    parameter rejection, proof invalidity, etc.
+  - `status_desc`: human-readable description
+    (RECOMMENDED to include actionable guidance
+    on parameter rejection)
+- `response_data`: service-specific payload
+  (included if and only if the request is served)
+
+Status codes specific to this spec:
+
+- `OK`: request served
+- `PARAMS_REJECTED`: stream parameters unacceptable;
+  `VaultProof` NOT marked as spent;
+  user MAY retry with adjusted parameters
+- `PROOF_INVALID`: `VaultProof` or `StreamProof` verification failed
+- `STREAM_NOT_ACTIVE`: referenced stream
+  is no longer active on-chain
+
+The provider SHOULD limit parameter-rejection retries
+to a RECOMMENDED maximum of 5 per vault
+within a RECOMMENDED time window of 600 seconds.
+
+#### ServiceTermination
+
+The provider SHOULD send a `ServiceTermination` message
+before stopping service.
+A `ServiceTermination` message MAY be sent regardless of whether
+a stream has been established on-chain.
+
 This message MUST include:
 
-- service_id: identifier of the requested service
-- stream_rate: proposed accrual rate (tokens per time unit)
-- stream_allocation: proposed initial allocation
-- public_key: key for signing subsequent service requests
-
-StreamResponse:
-The provider responds with acceptance or rejection.
-This message MUST include:
-
-- status: ACCEPTED or REJECTED
-- reason: explanation if rejected (OPTIONAL)
-- load_cap: maximum load the provider will serve (REQUIRED if ACCEPTED)
-
-If accepted, the user creates the stream on-chain.
-Acceptance commits the provider to deliver the specified service
-while payment accrues at the agreed rate.
-The provider MAY terminate service prematurely
-(see Service Termination).
-
-#### Service Request
-
-ServiceRequest:
-The user sends service requests during stream operation.
-Each request MUST include:
-
-- request_data: service-specific payload
-- signature: signature over request_data using the committed public key
-
-The signature links the request to the paying stream.
-The provider SHOULD verify on-chain that the stream remains active.
-
-#### Service Termination
-
-ServiceTermination:
-The provider SHOULD send this message before stopping service.
-This message MUST include:
-
-- termination_type: TEMPORARY or PERMANENT
-- resume_after: timestamp after which service MAY resume
-  (REQUIRED for TEMPORARY, empty for PERMANENT)
+- `termination_type`: `TEMPORARY` or `PERMANENT`
+- `resume_after`: timestamp after which service MAY resume
+  (REQUIRED for `TEMPORARY`, empty for `PERMANENT`)
 
 For temporary termination,
-the user MAY pause the stream until the resume_after time.
+the user MAY pause the stream until the `resume_after` time.
 For permanent termination,
 the user SHOULD close the stream to recover unaccrued funds.
+
+### Protocol Flow
+
+1. The user discovers a provider via the discovery protocol.
+   The provider's advertisement includes
+   accepted eligibility types and service parameters.
+
+2. The user sends the first `ServiceRequest`
+   with `eligibility_proof` containing a `StreamProposal`
+   (`VaultProof` + `StreamParams` + `public_key`)
+   and `request_data`.
+
+3. The provider verifies `VaultProof` on-chain
+   and evaluates `StreamParams`:
+
+   - If parameters are unacceptable:
+     the provider responds with `PARAMS_REJECTED`.
+     The `VaultProof` is not marked as spent.
+     The user MAY retry with adjusted `StreamParams`.
+   - If the proof is invalid:
+     the provider responds with `PROOF_INVALID`.
+   - If accepted:
+     the provider serves the request immediately,
+     responding with `OK` and `response_data`.
+     The provider notes the pending session.
+     The provider SHOULD limit this response
+     to the advertised `VaultProof` response cap.
+
+4. The user creates the stream on-chain
+   within `stream_establishment_timeout`.
+
+5. The user sends subsequent `ServiceRequest`s
+   with `eligibility_proof` containing a `StreamProof`.
+
+6. If no `StreamProof`-backed request arrives
+   within `stream_establishment_timeout`,
+   the provider MAY discard the pending session
+   and release planned capacity.
+
+A user MUST NOT have more than one pending
+`StreamProposal`-backed session per vault-provider pair at a time.
+To open multiple streams to the same provider,
+the user MUST complete each stream establishment
+before initiating the next.
+If the vault is drained between `VaultProof` verification
+and stream creation, this constitutes a protocol violation;
+the provider SHOULD send a `ServiceTermination`
+with `termination_type` `PERMANENT`.
 
 ## Protocol Extensions
 
@@ -318,11 +490,11 @@ This results in minimal payment for actual service usage.
 Activation fee addresses this attack.
 When activation fee is enabled,
 a fixed amount MUST accrue to the provider
-immediately upon the stream becoming ACTIVE.
+immediately upon the stream becoming `ACTIVE`.
 The activation fee SHOULD reflect
 the minimum acceptable payment for a service session.
 The activation fee applies to stream creation, resume, and top-up operations,
-as only user actions transition a stream to ACTIVE state.
+as only user actions transition a stream to `ACTIVE` state.
 If stream allocation is lower than activation fee,
 stream activation MUST fail.
 
@@ -331,21 +503,34 @@ by refusing service to users who pause and resume excessively.
 
 ### Load Cap
 
-The provider MAY advertise a load cap
-(requests per unit time or another service-dependent metric)
-representing the maximum load the provider is willing to serve.
-A separate discovery protocol SHOULD enable providers
-to advertise their load caps (out of scope for this spec).
+A load cap represents
+cumulative resource consumption per stream per time window
+(e.g. total bytes or requests per minute).
+It applies to the entire stream session,
+not to individual responses.
+The provider SHOULD advertise the load cap
+via the discovery protocol.
 
-When responding to StreamRequest with ACCEPTED status,
-the provider MUST include the load cap in StreamResponse.
-The user MUST NOT exceed the load cap.
+For `VaultProof`-backed requests (the first `ServiceRequest`),
+the provider SHOULD advertise a separate `VaultProof` response cap:
+the maximum response size for a single `VaultProof`-backed response.
+This limits provider exposure
+to requests not yet backed by an on-chain stream.
 
-If the user exceeds the load cap during stream operation,
-the provider SHOULD terminate service (see Service Termination).
+The user MUST NOT exceed the applicable cap.
+If the user exceeds it,
+the provider SHOULD terminate service.
 
 A user who requires a higher load cap
 SHOULD open multiple streams to the same provider.
+
+### Multi-round Stream Parameter Negotiation
+
+A future extension MAY allow the provider
+to include counter-proposed parameters
+in a `PARAMS_REJECTED` response,
+enabling iterative negotiation
+before the first request is served.
 
 ## Implementation Considerations
 
@@ -393,6 +578,10 @@ On-chain state of a stream MUST be verifiable by both parties.
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## References
+
+### Normative
+
+- [Incentivization for Waku Light Protocols](https://github.com/logos-messaging/specs/blob/master/standards/core/incentivization.md)
 
 ### Informative
 
