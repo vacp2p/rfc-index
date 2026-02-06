@@ -2,7 +2,9 @@
 
 | Field        | Value                                     |
 | ------------ | ----------------------------------------- |
+| Name         | Merkle Tree                               |
 | Status       | draft                                     |
+| Category     | Standards Track                           |
 | Editor       | Balázs Kőműves <bkomuves@status.im>       |
 | Contributors | Giuliano Mega <giuliano@status.im>, Mohammed Alghazwi <mohalghazwi@status.im> |
 
@@ -23,19 +25,19 @@ A Merkle tree, built on a hash function `H`, produces a Merkle root of type `T` 
 - SHA1: `T` is 160 bits
 - SHA256: `T` is 256 bits
 - Keccak (SHA3): `T` can be one of 224, 256, 384 or 512 bits
-- Poseidon: `T` is one or more finite field element(s) (depending on the field size)
+- Poseidon2: `T` is one or more finite field element(s) (depending on the field size)
 - Monolith: `T` is 4 Goldilocks field elements
 
 The hash function `H` can also have different types `S` ("Source type") of inputs. For example:
 
 - SHA1 / SHA256 / SHA3: `S` is an arbitrary sequence of bits[^1]
 - binary compression function: `S` is a pair of `T`-s
-- Poseidon: `S` is a sequence of finite field elements
-- Poseidon compression function: `S` is at most `t-k` field elements, where `k` field elements should be approximately 256 bits (in our case `t=3`, `k=1` for BN254 field; or `t=12`, `k=4` for the Goldilocks field; or `t=24`, `k=8` for a ~32 bit field)
+- Poseidon2: `S` is a sequence of finite field elements
+- Poseidon2 compression function: `S` is at most `t-k` field elements, where `k` field elements should be approximately 256 bits (in our case `t=3`, `k=1` for BN254 field; or `t=12`, `k=4` for the Goldilocks field; or `t=24`, `k=8` for a ~32 bit field)
 - as an alternative, the "Jive strategy" for binary compression (see [[Bouvier22](#references)]) can eliminate the "minus `k`" requirement (you can compress `t` into `t/2`)
 - A naive Merkle tree implementation could for example accept only a power-of-two sized sequence of `T`
 
-Notation: Let's denote a sequence of `T`-s by `[T]`; and an array of `T`-s of length `l` by `T[l]`.
+Notation: Let's denote a sequence of `T`-s by `[T]`.
 
 ### Keyed Hash Construction
 
