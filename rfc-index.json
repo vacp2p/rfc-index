@@ -833,8 +833,8 @@
     "title": "Codex Merkle Tree",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-22",
-    "path": "storage/raw/codex-merkle-tree.html"
+    "updated": "2026-02-06",
+    "path": "storage/deprecated/codex-merkle-tree.html"
   },
   {
     "component": "storage",
@@ -853,5 +853,14 @@
     "category": "Standards Track",
     "updated": "2026-02-05",
     "path": "storage/raw/datasets.html"
+  },
+  {
+    "component": "storage",
+    "slug": "Merkle Tree",
+    "title": "Merkle Tree",
+    "status": "draft",
+    "category": "Standards Track",
+    "updated": "2026-02-06",
+    "path": "storage/raw/merkle-tree.html"
   }
 ]
