@@ -374,14 +374,7 @@
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
-  function normalizeFilterValue(value) {
-    return (value || "").toString().trim().toLowerCase();
-  }
-
-  const initialStatusChip = document.querySelector("#status-chips .chip.active[data-status]");
-  let statusFilter = normalizeFilterValue(
-    initialStatusChip ? initialStatusChip.dataset.status : "current"
-  ) || "current";
+  let statusFilter = "all";
   let componentFilter = "all";
   let dateFilter = "all";
   let sortKey = "slug";
@@ -439,24 +432,20 @@
     return category;
   }
 
-  function isVisibleInCurrent(status) {
+  function isVisibleByDefault(status) {
     return !hiddenByDefaultStatuses.has(status);
   }
 
-  function currentTotal() {
-    return rfcData.filter((item) => isVisibleInCurrent(normalizeStatus(item.status))).length;
+  function defaultVisibleTotal() {
+    return rfcData.filter((item) => isVisibleByDefault(normalizeStatus(item.status))).length;
   }
 
   function passesStatusFilter(item) {
     const status = normalizeStatus(item.status);
-    const filter = normalizeFilterValue(statusFilter);
-    if (filter === "current") {
-      return isVisibleInCurrent(status);
+    if (statusFilter === "all") {
+      return isVisibleByDefault(status);
     }
-    if (filter === "all" || !filter) {
-      return true;
-    }
-    return status === filter;
+    return status === statusFilter;
   }
 
   function updateHeaderIndicators() {
@@ -491,8 +480,7 @@
 
   function updateChipGroup(containerId, dataAttr, counts, total) {
     document.querySelectorAll(`#${containerId} .chip`).forEach((chip) => {
-      const rawKey = chip.dataset[dataAttr];
-      const key = dataAttr === "status" ? normalizeFilterValue(rawKey) : rawKey;
+      const key = chip.dataset[dataAttr];
       const label = chip.dataset.label || chip.textContent;
       const showCounts = containerId === "status-chips" && chip.dataset.count !== "false";
       if (!showCounts) {
@@ -521,9 +509,7 @@
         }
       }
     });
-    statusCounts.current = currentTotal();
-
-    updateChipGroup("status-chips", "status", statusCounts, rfcData.length);
+    updateChipGroup("status-chips", "status", statusCounts, defaultVisibleTotal());
     updateChipGroup("component-chips", "component", componentCounts, rfcData.length);
     updateChipGroup(
       "date-chips",
@@ -617,7 +603,7 @@
         })
         .slice(0, 20);
     }
-    const totalForCount = statusFilter === "current" ? currentTotal() : rfcData.length;
+    const totalForCount = statusFilter === "all" ? defaultVisibleTotal() : rfcData.length;
     updateResultsCount(sorted.length, totalForCount);
     updateHeaderIndicators();
     tbody.innerHTML = "";
@@ -650,14 +636,10 @@
   const statusChips = document.getElementById("status-chips");
   if (statusChips) {
     statusChips.addEventListener("click", (e) => {
-      const chip = e.target.closest(".chip[data-status]");
-      if (!chip) return;
-      statusFilter = normalizeFilterValue(chip.dataset.status) || "all";
+      if (!e.target.dataset.status) return;
+      statusFilter = e.target.dataset.status;
       document.querySelectorAll("#status-chips .chip").forEach((chip) => {
-        chip.classList.toggle(
-          "active",
-          normalizeFilterValue(chip.dataset.status) === statusFilter
-        );
+        chip.classList.toggle("active", chip.dataset.status === statusFilter);
       });
       render();
     });
