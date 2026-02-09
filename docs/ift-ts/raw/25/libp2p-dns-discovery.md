@@ -5,6 +5,7 @@
 | Name | Libp2p Peer Discovery via DNS |
 | Slug | 25 |
 | Status | deleted |
+| Category | Standards Track |
 | Editor | Hanno Cornelius <hanno@status.im> |
 
 <!-- timeline:start -->

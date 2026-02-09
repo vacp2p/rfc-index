@@ -5,6 +5,7 @@
 | Name | Waku v2 usage of ENR |
 | Slug | 31 |
 | Status | draft |
+| Category | Standards Track |
 | Editor | Franck Royer <franck@status.im> |
 
 <!-- timeline:start -->

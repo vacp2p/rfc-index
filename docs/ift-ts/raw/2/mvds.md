@@ -5,6 +5,7 @@
 | Name | Minimum Viable Data Synchronization |
 | Slug | 2 |
 | Status | stable |
+| Category | Standards Track |
 | Editor | Sanaz Taheri <sanaz@status.im> |
 | Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskarth@titanproxy.com> |
 

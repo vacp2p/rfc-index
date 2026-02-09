@@ -5,6 +5,8 @@
 | Name | Codex Community History |
 | Slug | 76 |
 | Status | raw |
+| Category | Standards Track |
+| Editor | Jimmy Debe <jimmy@status.im> |
 | Contributors | Jimmy Debe <jimmy@status.im> |
 
 <!-- timeline:start -->

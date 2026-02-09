@@ -5,6 +5,7 @@
 | Name | Waku Envelope data field |
 | Slug | 7 |
 | Status | stable |
+| Category | Standards Track |
 | Editor | Oskar Thorén <oskarth@titanproxy.com> |
 | Contributors | Dean Eigenmann <dean@status.im>, Kim De Mey <kimdemey@status.im> |
 
