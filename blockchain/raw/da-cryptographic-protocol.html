@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -224,16 +225,16 @@ in this document are to be interpreted as described in <a href="https://www.ietf
 </div>
 <h3 id="notations"><a class="header" href="#notations">Notations</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Description</th></tr></thead><tbody>
-<tr><td>$f_i(x)$</td><td>Polynomial interpolated from the chunks in row $i$.</td></tr>
-<tr><td>$com_i$</td><td>KZG commitment of the row polynomial $f_i(x)$.</td></tr>
-<tr><td>$f_C(x)$</td><td>Combined polynomial formed as a random linear combination of all row polynomials.</td></tr>
-<tr><td>$com_C$</td><td>KZG commitment of the combined polynomial $f_C(x)$.</td></tr>
-<tr><td>$w$</td><td>Primitive $n$-th root of unity in the finite field. In this protocol, $n = 2k$.</td></tr>
-<tr><td>$h$</td><td>Random scalar generated using the Fiat–Shamir heuristic from row commitments.</td></tr>
-<tr><td>$\pi_j$</td><td>KZG evaluation proof for column $j$ of the combined polynomial.</td></tr>
-<tr><td>$v_j$</td><td>Combined evaluation of column $j$ (i.e., $f_C(w^{j-1})$).</td></tr>
-<tr><td>$k$</td><td>Number of columns in the original data matrix.</td></tr>
-<tr><td>$\ell$</td><td>Number of rows in the data matrix.</td></tr>
+<tr><td><span class="math-inline" data-tex="f_i(x)"></span></td><td>Polynomial interpolated from the chunks in row <span class="math-inline" data-tex="i"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="com_i"></span></td><td>KZG commitment of the row polynomial <span class="math-inline" data-tex="f_i(x)"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="f_C(x)"></span></td><td>Combined polynomial formed as a random linear combination of all row polynomials.</td></tr>
+<tr><td><span class="math-inline" data-tex="com_C"></span></td><td>KZG commitment of the combined polynomial <span class="math-inline" data-tex="f_C(x)"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="w"></span></td><td>Primitive <span class="math-inline" data-tex="n"></span>-th root of unity in the finite field. In this protocol, <span class="math-inline" data-tex="n = 2k"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="h"></span></td><td>Random scalar generated using the Fiat–Shamir heuristic from row commitments.</td></tr>
+<tr><td><span class="math-inline" data-tex="\pi_j"></span></td><td>KZG evaluation proof for column <span class="math-inline" data-tex="j"></span> of the combined polynomial.</td></tr>
+<tr><td><span class="math-inline" data-tex="v_j"></span></td><td>Combined evaluation of column <span class="math-inline" data-tex="j"></span> (i.e., <span class="math-inline" data-tex="f_C(w^{j-1})"></span>).</td></tr>
+<tr><td><span class="math-inline" data-tex="k"></span></td><td>Number of columns in the original data matrix.</td></tr>
+<tr><td><span class="math-inline" data-tex="\ell"></span></td><td>Number of rows in the data matrix.</td></tr>
 </tbody></table>
 </div>
 <h2 id="background"><a class="header" href="#background">Background</a></h2>
@@ -297,12 +298,12 @@ in the scalar finite field used for the BLS12-381 elliptic curve.
 31 bytes are chosen instead of 32 bytes
 because some 32-byte elements will exceed the BLS12-381 modulus,
 making it impossible to recover the data later.</p>
-<p>The matrix representation has $k$ columns which include $\ell$ chunks each.
+<p>The matrix representation has <span class="math-inline" data-tex="k"></span> columns which include <span class="math-inline" data-tex="\ell"></span> chunks each.
 The row and column numbers used in the representation are decided
 based on the size of the block data and the number of DA nodes.</p>
 <p><img src="assets/da-data-matrix.png" alt="Data Matrix Structure" /></p>
 <p><em>Figure 1: Data matrix structure showing chunks and columns.
-Each chunk is a 31-byte element, and each column contains $\ell$ chunks.</em></p>
+Each chunk is a 31-byte element, and each column contains <span class="math-inline" data-tex="\ell"></span> chunks.</em></p>
 <p>The encoding process consists of three steps:</p>
 <ol>
 <li>Calculating row commitments.</li>
@@ -312,34 +313,34 @@ Each chunk is a 31-byte element, and each column contains $\ell$ chunks.</em></p
 <h4 id="row-commitments"><a class="header" href="#row-commitments">Row Commitments</a></h4>
 <p>The original data chunks are considered in the evaluation form,
 and unique polynomials are interpolated for each row.
-For every row $i$, the encoder interpolates a unique degree $k - 1$ polynomial $f_i$
-such that $data^{j}_{i} = f_i(w^{j-1})$ for $i = 1, ..., \ell$ row indices
-and $j = 1, ..., k$ column indices.
-Recall that $w$ is a primitive element of the field.</p>
-<p>Subsequently, 48-byte row commitment values $com_i = com(f_i)$
+For every row <span class="math-inline" data-tex="i"></span>, the encoder interpolates a unique degree <span class="math-inline" data-tex="k - 1"></span> polynomial <span class="math-inline" data-tex="f_i"></span>
+such that <span class="math-inline" data-tex="data^{j}_{i} = f_i(w^{j-1})"></span> for <span class="math-inline" data-tex="i = 1, ..., \ell"></span> row indices
+and <span class="math-inline" data-tex="j = 1, ..., k"></span> column indices.
+Recall that <span class="math-inline" data-tex="w"></span> is a primitive element of the field.</p>
+<p>Subsequently, 48-byte row commitment values <span class="math-inline" data-tex="com_i = com(f_i)"></span>
 for these polynomials are computed by the encoder.
 These commitments ensure the correct ordering of chunks within each row.</p>
 <blockquote>
 <p><strong>Note</strong>: In this protocol, elliptic curves are used as a group,
-thus the entries of $com_i$'s are also elliptic curve points.
-Let the $x$-coordinate of $com_i$ be represented as $com^{x}<em>{i}$
-and the $y$-coordinate of $com_i$ as $com^{y}</em>{j}$.
-If you have just $com^{x}<em>{i}$ and one bit of $com^{y}</em>{i}$,
-then you can construct $com_i$.
-Therefore, there is no need to use both coordinates of $com_i$.
-However, for the sake of simplicity in this document, the value $com_i$ is used.</p>
+thus the entries of <span class="math-inline" data-tex="com_i"></span>'s are also elliptic curve points.
+Let the <span class="math-inline" data-tex="x"></span>-coordinate of <span class="math-inline" data-tex="com_i"></span> be represented as <span class="math-inline" data-tex="com^{x}_{i}"></span>
+and the <span class="math-inline" data-tex="y"></span>-coordinate of <span class="math-inline" data-tex="com_i"></span> as <span class="math-inline" data-tex="com^{y}_{j}"></span>.
+If you have just <span class="math-inline" data-tex="com^{x}_{i}"></span> and one bit of <span class="math-inline" data-tex="com^{y}_{i}"></span>,
+then you can construct <span class="math-inline" data-tex="com_i"></span>.
+Therefore, there is no need to use both coordinates of <span class="math-inline" data-tex="com_i"></span>.
+However, for the sake of simplicity in this document, the value <span class="math-inline" data-tex="com_i"></span> is used.</p>
 </blockquote>
 <h4 id="reed-solomon-expansion"><a class="header" href="#reed-solomon-expansion">Reed-Solomon Expansion</a></h4>
 <p>Using RS coding, the encoder extends the original data row-wise
 to obtain the expanded data matrix.
-The expansion is calculated by evaluating the row polynomials $f_i$
-at the new points $w^{j}$ where $j = k + 1, k + 2, \ldots, 2k$.
+The expansion is calculated by evaluating the row polynomials <span class="math-inline" data-tex="f_i"></span>
+at the new points <span class="math-inline" data-tex="w^{j}"></span> where <span class="math-inline" data-tex="j = k + 1, k + 2, \ldots, 2k"></span>.
 The current design of NomosDA uses an expansion factor of 2,
 but it can also work with different factors.
-This expanded data matrix has rows of length $2k$.</p>
+This expanded data matrix has rows of length <span class="math-inline" data-tex="2k"></span>.</p>
 <p><img src="assets/da-extended-matrix.png" alt="Extended Data Matrix" /></p>
-<p><em>Figure 2: Extended data matrix showing original data ($k$ columns)
-and extended data ($2k$ columns total) after Reed-Solomon expansion.</em></p>
+<p><em>Figure 2: Extended data matrix showing original data (<span class="math-inline" data-tex="k"></span> columns)
+and extended data (<span class="math-inline" data-tex="2k"></span> columns total) after Reed-Solomon expansion.</em></p>
 <p>Due to the homomorphic property of KZG,
 the row commitment values calculated in the previous step
 are also valid for the row polynomials of the extended data.</p>
@@ -353,40 +354,40 @@ while still ensuring the validity of all underlying row data.</p>
 RS-encoding (step 2), and combined row commitment with column data (step 3).</em></p>
 <p>This process consists of the following steps:</p>
 <h5 id="compute-the-random-linear-combination-polynomial"><a class="header" href="#compute-the-random-linear-combination-polynomial">Compute the Random Linear Combination Polynomial</a></h5>
-<p>Let each row $i \in {1, \ldots, \ell}$ have an associated polynomial $f_i(x)$
-and commitment $com_i = com(f_i)$.</p>
-<p>The encoder computes random scalar $h \in \mathbb{F}$ using the Fiat–Shamir heuristic,
+<p>Let each row <span class="math-inline" data-tex="i \in \{1, \ldots, \ell\}"></span> have an associated polynomial <span class="math-inline" data-tex="f_i(x)"></span>
+and commitment <span class="math-inline" data-tex="com_i = com(f_i)"></span>.</p>
+<p>The encoder computes random scalar <span class="math-inline" data-tex="h \in \mathbb{F}"></span> using the Fiat–Shamir heuristic,
 applying the BLAKE2b hash function with a 31-byte output,
 over the row commitments with a domain separation tag <code>DA_V1</code>
 to ensure uniqueness and prevent cross-protocol collisions:</p>
-<p>$$h = \text{Hash}(\text{'DA_V1'} | com_1 | \ldots | com_{\ell})$$</p>
+<div class="math-block" data-tex="h = \text{Hash}(\text{&#x27;DA\_V1&#x27;} \| com_1 \| \ldots \| com_{\ell})"></div>
 <p>The resulting digest is interpreted as a field element
 in the scalar field of BLS12-381.</p>
-<p>Then, the encoder computes the combined polynomial $f_C(x)$, defined as:</p>
-<p>$$f_C(x) = f_1(x) + h \cdot f_2(x) + h^{2} \cdot f_3(x) + \cdots + h^{\ell-1} \cdot f_{\ell}(x)$$</p>
-<p>The corresponding commitment to this polynomial is $com(f_C)$.
+<p>Then, the encoder computes the combined polynomial <span class="math-inline" data-tex="f_C(x)"></span>, defined as:</p>
+<div class="math-block" data-tex="f_C(x) = f_1(x) + h \cdot f_2(x) + h^{2} \cdot f_3(x) + \cdots + h^{\ell-1} \cdot f_{\ell}(x)"></div>
+<p>The corresponding commitment to this polynomial is <span class="math-inline" data-tex="com(f_C)"></span>.
 This value does not need to be computed by the encoder,
 since the verifier can derive it directly from the row commitments
-using the same random scalar $h$.</p>
+using the same random scalar <span class="math-inline" data-tex="h"></span>.</p>
 <h5 id="compute-combined-evaluation-points-per-column"><a class="header" href="#compute-combined-evaluation-points-per-column">Compute Combined Evaluation Points per Column</a></h5>
-<p>For each column $j \in {1, \ldots, 2k}$, the encoder has the set of column values
-${data^{j}<em>{1}, data^{j}</em>{2}, \ldots, data^{j}_{\ell}}$,
-where each value corresponds to $f_i(w^{j-1})$.</p>
-<p>The encoder computes the combined evaluation value at column position $j$ directly:</p>
-<p>$$v_j = f_C(w^{j-1})$$</p>
+<p>For each column <span class="math-inline" data-tex="j \in \{1, \ldots, 2k\}"></span>, the encoder has the set of column values
+<span class="math-inline" data-tex="\{data^{j}_{1}, data^{j}_{2}, \ldots, data^{j}_{\ell}\}"></span>,
+where each value corresponds to <span class="math-inline" data-tex="f_i(w^{j-1})"></span>.</p>
+<p>The encoder computes the combined evaluation value at column position <span class="math-inline" data-tex="j"></span> directly:</p>
+<div class="math-block" data-tex="v_j = f_C(w^{j-1})"></div>
 <h5 id="generate-one-proof-per-column"><a class="header" href="#generate-one-proof-per-column">Generate One Proof per Column</a></h5>
-<p>For each column index $j$, the encoder computes a single KZG evaluation proof
-$\pi_j$ for the combined polynomial $f_C(x)$ at the evaluation point $w^{j-1}$:</p>
-<p>$$eval(f_C, w^{j-1}) \rightarrow (v_j, \pi_j)$$</p>
-<p>The result is a set of $2k$ evaluation proofs,
+<p>For each column index <span class="math-inline" data-tex="j"></span>, the encoder computes a single KZG evaluation proof
+<span class="math-inline" data-tex="\pi_j"></span> for the combined polynomial <span class="math-inline" data-tex="f_C(x)"></span> at the evaluation point <span class="math-inline" data-tex="w^{j-1}"></span>:</p>
+<div class="math-block" data-tex="eval(f_C, w^{j-1}) \rightarrow (v_j, \pi_j)"></div>
+<p>The result is a set of <span class="math-inline" data-tex="2k"></span> evaluation proofs,
 one for each column, derived from the combined row structure.</p>
 <h3 id="dispersal"><a class="header" href="#dispersal">Dispersal</a></h3>
 <p>The encoder sends the following information to a DA node
-in the subnet corresponding to the expanded column number $j$:</p>
+in the subnet corresponding to the expanded column number <span class="math-inline" data-tex="j"></span>:</p>
 <ul>
-<li>The row commitments ${com_1, com_2, \ldots, com_{\ell}}$.</li>
-<li>The column chunks ${data^{j}<em>{1}, data^{j}</em>{2}, \ldots, data^{j}_{\ell}}$.</li>
-<li>The combined proof of the column chunks $\pi_j$.</li>
+<li>The row commitments <span class="math-inline" data-tex="\{com_1, com_2, \ldots, com_{\ell}\}"></span>.</li>
+<li>The column chunks <span class="math-inline" data-tex="\{data^{j}_{1}, data^{j}_{2}, \ldots, data^{j}_{\ell}\}"></span>.</li>
+<li>The combined proof of the column chunks <span class="math-inline" data-tex="\pi_j"></span>.</li>
 </ul>
 <p>This information is also replicated by the receiving node
 to every other node in the subnet.</p>
@@ -396,40 +397,40 @@ performs the following checks:</p>
 <p><img src="assets/da-dispersal-verification.png" alt="Dispersal and Verification" /></p>
 <p><em>Figure 4: Dispersal and verification flow from Encoder to DA Node.
 The DA Node receives row commitments, column data, and combined proof,
-then verifies by calculating $h$, $com_C$, and $v_j$.</em></p>
+then verifies by calculating <span class="math-inline" data-tex="h"></span>, <span class="math-inline" data-tex="com_C"></span>, and <span class="math-inline" data-tex="v_j"></span>.</em></p>
 <ol>
 <li>
-<p>The DA node computes the scalar challenge $h \in \mathbb{F}$
+<p>The DA node computes the scalar challenge <span class="math-inline" data-tex="h \in \mathbb{F}"></span>
 using a Fiat–Shamir hash over the row commitments with a domain separation tag:</p>
-<p>$$h = \text{Hash}(\text{'DA_V1'} | com_1 | com_2 | \ldots | com_{\ell})$$</p>
+<div class="math-block" data-tex="h = \text{Hash}(\text{&#x27;DA\_V1&#x27;} \| com_1 \| com_2 \| \ldots \| com_{\ell})"></div>
 </li>
 <li>
-<p>The DA node computes the combined commitment $com_C$:</p>
-<p>$$com_C = com_1 + h \cdot com_2 + h^{2} \cdot com_3 + \cdots + h^{\ell-1} \cdot com_{\ell}$$</p>
+<p>The DA node computes the combined commitment <span class="math-inline" data-tex="com_C"></span>:</p>
+<div class="math-block" data-tex="com_C = com_1 + h \cdot com_2 + h^{2} \cdot com_3 + \cdots + h^{\ell-1} \cdot com_{\ell}"></div>
 <p>This is the commitment of the following polynomial:</p>
-<p>$$f_C(x) = f_1(x) + h \cdot f_2(x) + h^{2} \cdot f_3(x) + \cdots + h^{\ell-1} \cdot f_{\ell}(x)$$</p>
+<div class="math-block" data-tex="f_C(x) = f_1(x) + h \cdot f_2(x) + h^{2} \cdot f_3(x) + \cdots + h^{\ell-1} \cdot f_{\ell}(x)"></div>
 </li>
 <li>
 <p>The DA node computes:</p>
-<p>$$v_j = data^{j}<em>{1} + h \cdot data^{j}</em>{2} + h^{2} \cdot data^{j}<em>{3} + \cdots + h^{\ell-1} \cdot data^{j}</em>{\ell}$$</p>
-<p>This represents $f_C(w^{j-1})$, the evaluation of the combined polynomial
+<div class="math-block" data-tex="v_j = data^{j}_{1} + h \cdot data^{j}_{2} + h^{2} \cdot data^{j}_{3} + \cdots + h^{\ell-1} \cdot data^{j}_{\ell}"></div>
+<p>This represents <span class="math-inline" data-tex="f_C(w^{j-1})"></span>, the evaluation of the combined polynomial
 at the corresponding column index.</p>
 </li>
 <li>
-<p>The DA node verifies that $\pi_j$ is a valid proof:</p>
-<p>$$\text{Verify}(com_C, w^{j-1}, v_j, \pi_j) \rightarrow \text{true/false}$$</p>
+<p>The DA node verifies that <span class="math-inline" data-tex="\pi_j"></span> is a valid proof:</p>
+<div class="math-block" data-tex="\text{Verify}(com_C, w^{j-1}, v_j, \pi_j) \rightarrow \text{true/false}"></div>
 </li>
 </ol>
 <h3 id="sampling"><a class="header" href="#sampling">Sampling</a></h3>
-<p>A sampling client, such as a light node, selects a random column index $s \in {1, \ldots, 2k}$.
-It sends a request for column $s$ to a DA node hosting that column's data.
-The DA node sends the client the column data $data^{s}_{i}$ and the combined proof $\pi_s$.</p>
+<p>A sampling client, such as a light node, selects a random column index <span class="math-inline" data-tex="s \in \{1, \ldots, 2k\}"></span>.
+It sends a request for column <span class="math-inline" data-tex="s"></span> to a DA node hosting that column's data.
+The DA node sends the client the column data <span class="math-inline" data-tex="data^{s}_{i}"></span> and the combined proof <span class="math-inline" data-tex="\pi_s"></span>.</p>
 <p><img src="assets/da-sampling.png" alt="Sampling" /></p>
 <p><em>Figure 5: Sampling flow between DA Node and Sampling Client.
-The client requests a random column index $s$, receives the column data and proof,
-then verifies by calculating $h$, $com_C$, and $v_s$.</em></p>
+The client requests a random column index <span class="math-inline" data-tex="s"></span>, receives the column data and proof,
+then verifies by calculating <span class="math-inline" data-tex="h"></span>, <span class="math-inline" data-tex="com_C"></span>, and <span class="math-inline" data-tex="v_s"></span>.</em></p>
 <blockquote>
-<p><strong>Note</strong>: The row commitments ${com_1, \ldots, com_{\ell}}$ for a given blob are public
+<p><strong>Note</strong>: The row commitments <span class="math-inline" data-tex="\{com_1, \ldots, com_{\ell}\}"></span> for a given blob are public
 and remain unchanged across multiple queries to that blob.
 If a sampling client has already obtained them,
 it does not need to request them again.</p>
@@ -437,29 +438,29 @@ it does not need to request them again.</p>
 <p>The verification process run by the sampling client proceeds as follows:</p>
 <ol>
 <li>
-<p>Compute the scalar $h \in \mathbb{F}$ using the domain-separated Fiat–Shamir hash:</p>
-<p>$$h = \text{Hash}(\text{'DA_V1'} | com_1 | com_2 | \ldots | com_{\ell})$$</p>
+<p>Compute the scalar <span class="math-inline" data-tex="h \in \mathbb{F}"></span> using the domain-separated Fiat–Shamir hash:</p>
+<div class="math-block" data-tex="h = \text{Hash}(\text{&#x27;DA\_V1&#x27;} \| com_1 \| com_2 \| \ldots \| com_{\ell})"></div>
 </li>
 <li>
-<p>Compute the combined commitment $com_C$:</p>
-<p>$$com_C = com_1 + h \cdot com_2 + h^{2} \cdot com_3 + \cdots + h^{\ell-1} \cdot com_{\ell}$$</p>
+<p>Compute the combined commitment <span class="math-inline" data-tex="com_C"></span>:</p>
+<div class="math-block" data-tex="com_C = com_1 + h \cdot com_2 + h^{2} \cdot com_3 + \cdots + h^{\ell-1} \cdot com_{\ell}"></div>
 </li>
 <li>
-<p>Compute the combined evaluation value $v_s$ using the received column data:</p>
-<p>$$v_s = data^{s}<em>{1} + h \cdot data^{s}</em>{2} + h^{2} \cdot data^{s}<em>{3} + \cdots + h^{\ell-1} \cdot data^{s}</em>{\ell}$$</p>
+<p>Compute the combined evaluation value <span class="math-inline" data-tex="v_s"></span> using the received column data:</p>
+<div class="math-block" data-tex="v_s = data^{s}_{1} + h \cdot data^{s}_{2} + h^{2} \cdot data^{s}_{3} + \cdots + h^{\ell-1} \cdot data^{s}_{\ell}"></div>
 </li>
 <li>
 <p>Verify the evaluation proof:</p>
-<p>$$\text{Verify}(com_C, w^{s-1}, v_s, \pi_s) \rightarrow \text{true/false}$$</p>
+<div class="math-block" data-tex="\text{Verify}(com_C, w^{s-1}, v_s, \pi_s) \rightarrow \text{true/false}"></div>
 </li>
 </ol>
 <p>If these checks succeed, then this proves to the sampling client
-that the column $s$ is correctly encoded and matches the committed data.
+that the column <span class="math-inline" data-tex="s"></span> is correctly encoded and matches the committed data.
 The sampling client can query several columns
 to reach a local opinion on the availability of the entire data.</p>
 <h2 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h2>
 <h3 id="fiatshamir-security"><a class="header" href="#fiatshamir-security">Fiat–Shamir Security</a></h3>
-<p>The random scalar $h$ MUST be computed using the Fiat–Shamir heuristic
+<p>The random scalar <span class="math-inline" data-tex="h"></span> MUST be computed using the Fiat–Shamir heuristic
 with the domain separation tag <code>DA_V1</code> to prevent cross-protocol attacks.
 The hash function MUST be BLAKE2b with a 31-byte output.</p>
 <h3 id="chunk-size"><a class="header" href="#chunk-size">Chunk Size</a></h3>
@@ -493,17 +494,17 @@ In NomosDA, univariate interpolation is used,
 where each polynomial is defined over a single variable.
 There are two main ways to represent polynomials:</p>
 <p><strong>Coefficient form:</strong>
-Given a set of coefficients $a_0, a_1, \ldots, a_k \in \mathbb{F}$,
-a unique polynomial $f(x)$ of degree at most $k$ in coefficient form is:</p>
-<p>$$f(x) = a_0 + a_1 x + a_2 x^{2} + \cdots + a_k x^{k}$$</p>
-<p>If $a_k \neq 0$, then the degree of $f$ is exactly $k$.</p>
+Given a set of coefficients <span class="math-inline" data-tex="a_0, a_1, \ldots, a_k \in \mathbb{F}"></span>,
+a unique polynomial <span class="math-inline" data-tex="f(x)"></span> of degree at most <span class="math-inline" data-tex="k"></span> in coefficient form is:</p>
+<div class="math-block" data-tex="f(x) = a_0 + a_1 x + a_2 x^{2} + \cdots + a_k x^{k}"></div>
+<p>If <span class="math-inline" data-tex="a_k \neq 0"></span>, then the degree of <span class="math-inline" data-tex="f"></span> is exactly <span class="math-inline" data-tex="k"></span>.</p>
 <p><strong>Evaluation form:</strong>
-Let $w \in \mathbb{F}$ be a primitive $k$-th root of unity in the field,
-i.e., $w^{k} = 1$ and $w^{i} \neq 1$ for all $1 \leq i &lt; k$.
-Given a dataset $a_0, a_1, \ldots, a_{k-1}$,
-there exists a unique polynomial $f$ in $\mathbb{F}[X]$ of degree less than $k$ such that:</p>
-<p>$$f(w^{i}) = a_i \quad \text{for all } i = 0, 1, \ldots, k - 1$$</p>
-<p>This representation of a polynomial using its values at $k$ distinct points
+Let <span class="math-inline" data-tex="w \in \mathbb{F}"></span> be a primitive <span class="math-inline" data-tex="k"></span>-th root of unity in the field,
+i.e., <span class="math-inline" data-tex="w^{k} = 1"></span> and <span class="math-inline" data-tex="w^{i} \neq 1"></span> for all <span class="math-inline" data-tex="1 \leq i &lt; k"></span>.
+Given a dataset <span class="math-inline" data-tex="a_0, a_1, \ldots, a_{k-1}"></span>,
+there exists a unique polynomial <span class="math-inline" data-tex="f"></span> in <span class="math-inline" data-tex="\mathbb{F}[X]"></span> of degree less than <span class="math-inline" data-tex="k"></span> such that:</p>
+<div class="math-block" data-tex="f(w^{i}) = a_i \quad \text{for all } i = 0, 1, \ldots, k - 1"></div>
+<p>This representation of a polynomial using its values at <span class="math-inline" data-tex="k"></span> distinct points
 is called the evaluation form.</p>
 <h4 id="kzg-polynomial-commitment"><a class="header" href="#kzg-polynomial-commitment">KZG Polynomial Commitment</a></h4>
 <p>The KZG polynomial commitment scheme provides a way
@@ -516,120 +517,120 @@ while the verifier checks the validity of the proof
 against the commitment and the evaluation point.</p>
 <p><strong>Setup:</strong></p>
 <ol>
-<li>Choose a generator $g$ of a pairing-friendly elliptic curve group $G$.</li>
-<li>Select the maximum degree $d$ of the polynomials to be committed to.</li>
-<li>Choose a secret parameter $\tau$ and compute global parameters
-$gp = (g, g^{\tau}, g^{\tau^{2}}, \ldots, g^{\tau^{d}})$.
-Delete $\tau$ and release the parameters publicly.</li>
+<li>Choose a generator <span class="math-inline" data-tex="g"></span> of a pairing-friendly elliptic curve group <span class="math-inline" data-tex="G"></span>.</li>
+<li>Select the maximum degree <span class="math-inline" data-tex="d"></span> of the polynomials to be committed to.</li>
+<li>Choose a secret parameter <span class="math-inline" data-tex="\tau"></span> and compute global parameters
+<span class="math-inline" data-tex="gp = (g, g^{\tau}, g^{\tau^{2}}, \ldots, g^{\tau^{d}})"></span>.
+Delete <span class="math-inline" data-tex="\tau"></span> and release the parameters publicly.</li>
 </ol>
 <blockquote>
-<p><strong>Note</strong>: The expression $g^{a}$ refers to elliptic curve point addition, i.e.,
-$g^{a} = a * g = g + g + \cdots + g$
-where $g$ is the generator point of the group $G$.
+<p><strong>Note</strong>: The expression <span class="math-inline" data-tex="g^{a}"></span> refers to elliptic curve point addition, i.e.,
+<span class="math-inline" data-tex="g^{a} = a * g = g + g + \cdots + g"></span>
+where <span class="math-inline" data-tex="g"></span> is the generator point of the group <span class="math-inline" data-tex="G"></span>.
 This is known as multiplicative notation.</p>
 </blockquote>
 <p><strong>Polynomial Commitment:</strong>
-Given a polynomial $f(x) = \sum_{i=0}^{d} a_i x^{i}$, compute the commitment of $f$ as follows:</p>
-<p>$$com(f) = g^{f(\tau)} = (g)^{a_0} (g^{\tau})^{a_1} (g^{\tau^{2}})^{a_2} \cdots (g^{\tau^{d}})^{a_d}$$</p>
+Given a polynomial <span class="math-inline" data-tex="f(x) = \sum_{i=0}^{d} a_i x^{i}"></span>, compute the commitment of <span class="math-inline" data-tex="f"></span> as follows:</p>
+<div class="math-block" data-tex="com(f) = g^{f(\tau)} = (g)^{a_0} (g^{\tau})^{a_1} (g^{\tau^{2}})^{a_2} \cdots (g^{\tau^{d}})^{a_d}"></div>
 <p><strong>Proof Evaluation:</strong>
-Given an evaluation $f(u) = v$, compute the proof $\pi = g^{q(\tau)}$,
-where $q(x) = \frac{f(x) - v}{x - u}$ is called the quotient polynomial
-and it is a polynomial if and only if $f(u) = v$.</p>
+Given an evaluation <span class="math-inline" data-tex="f(u) = v"></span>, compute the proof <span class="math-inline" data-tex="\pi = g^{q(\tau)}"></span>,
+where <span class="math-inline" data-tex="q(x) = \frac{f(x) - v}{x - u}"></span> is called the quotient polynomial
+and it is a polynomial if and only if <span class="math-inline" data-tex="f(u) = v"></span>.</p>
 <p><strong>Proof Verification:</strong>
-Given commitment $C = com(f)$, the evaluation point $u$, the evaluation $f(u) = v$,
-and proof $\pi = g^{q(\tau)}$, verify that:</p>
-<p>$$e\left(\frac{C}{g^{v}}, g\right) = e\left(\pi, \frac{g^{\tau}}{g^{u}}\right)$$</p>
-<p>where $e$ is a non-trivial bilinear pairing.</p>
+Given commitment <span class="math-inline" data-tex="C = com(f)"></span>, the evaluation point <span class="math-inline" data-tex="u"></span>, the evaluation <span class="math-inline" data-tex="f(u) = v"></span>,
+and proof <span class="math-inline" data-tex="\pi = g^{q(\tau)}"></span>, verify that:</p>
+<div class="math-block" data-tex="e\left(\frac{C}{g^{v}}, g\right) = e\left(\pi, \frac{g^{\tau}}{g^{u}}\right)"></div>
+<p>where <span class="math-inline" data-tex="e"></span> is a non-trivial bilinear pairing.</p>
 <blockquote>
-<p><strong>Note</strong>: The evaluation of the polynomial commitment to the function $f$
-at the point $u$, yielding the result $v$ and evaluation proof $\pi$,
-is represented as: $eval(f, u) \rightarrow v, \pi$.
-The verification function is defined as: $verify(com(f), u, v, \pi) \rightarrow \text{true/false}$.</p>
+<p><strong>Note</strong>: The evaluation of the polynomial commitment to the function <span class="math-inline" data-tex="f"></span>
+at the point <span class="math-inline" data-tex="u"></span>, yielding the result <span class="math-inline" data-tex="v"></span> and evaluation proof <span class="math-inline" data-tex="\pi"></span>,
+is represented as: <span class="math-inline" data-tex="eval(f, u) \rightarrow v, \pi"></span>.
+The verification function is defined as: <span class="math-inline" data-tex="verify(com(f), u, v, \pi) \rightarrow \text{true/false}"></span>.</p>
 </blockquote>
 <h4 id="random-linear-combination-of-commitments-and-evaluations"><a class="header" href="#random-linear-combination-of-commitments-and-evaluations">Random Linear Combination of Commitments and Evaluations</a></h4>
 <p>When multiple committed polynomials are evaluated at the same point,
 it's possible to verify all evaluations using a single combined proof,
 thanks to the homomorphic properties of KZG commitments.
 This technique improves efficiency by reducing multiple evaluation proofs to just one.</p>
-<p>Suppose there are $\ell$ polynomials $f_1(x), f_2(x), \ldots, f_{\ell}(x)$
-with corresponding commitments $C_i = com(f_i)$,
-and the goal is to verify that each $f_i(u) = v_i$.</p>
-<p>Instead of generating $\ell$ separate proofs and performing $\ell$ pairing checks:</p>
+<p>Suppose there are <span class="math-inline" data-tex="\ell"></span> polynomials <span class="math-inline" data-tex="f_1(x), f_2(x), \ldots, f_{\ell}(x)"></span>
+with corresponding commitments <span class="math-inline" data-tex="C_i = com(f_i)"></span>,
+and the goal is to verify that each <span class="math-inline" data-tex="f_i(u) = v_i"></span>.</p>
+<p>Instead of generating <span class="math-inline" data-tex="\ell"></span> separate proofs and performing <span class="math-inline" data-tex="\ell"></span> pairing checks:</p>
 <ol>
 <li>
 <p>Use the Fiat–Shamir heuristic to derive deterministic random scalars
-$h_1, h_2, \ldots, h_{\ell}$ from the commitments $C_1, \ldots, C_{\ell}$:</p>
-<p>$$(h_1, \ldots, h_{\ell}) = \text{Hash}(C_1 | \ldots | C_{\ell})$$</p>
+<span class="math-inline" data-tex="h_1, h_2, \ldots, h_{\ell}"></span> from the commitments <span class="math-inline" data-tex="C_1, \ldots, C_{\ell}"></span>:</p>
+<div class="math-block" data-tex="(h_1, \ldots, h_{\ell}) = \text{Hash}(C_1 \| \ldots \| C_{\ell})"></div>
 </li>
 <li>
 <p>Form the combined polynomial:</p>
-<p>$$f_C(x) = \sum_{i=1}^{\ell} h_i \cdot f_i(x)$$</p>
+<div class="math-block" data-tex="f_C(x) = \sum_{i=1}^{\ell} h_i \cdot f_i(x)"></div>
 </li>
 <li>
 <p>Compute the combined evaluation:</p>
-<p>$$v = f_C(u) = \sum_{i=1}^{\ell} h_i \cdot v_i$$</p>
+<div class="math-block" data-tex="v = f_C(u) = \sum_{i=1}^{\ell} h_i \cdot v_i"></div>
 </li>
 <li>
-<p>Compute the proof $\pi$ for $f_C(u) = v$ using the standard KZG method:</p>
-<p>$$\pi = g^{q(\tau)} \quad \text{where} \quad q(x) = \frac{f_C(x) - v}{x - u}$$</p>
+<p>Compute the proof <span class="math-inline" data-tex="\pi"></span> for <span class="math-inline" data-tex="f_C(u) = v"></span> using the standard KZG method:</p>
+<div class="math-block" data-tex="\pi = g^{q(\tau)} \quad \text{where} \quad q(x) = \frac{f_C(x) - v}{x - u}"></div>
 </li>
 </ol>
 <p><strong>Verification:</strong>
-Given commitments $C_1, \ldots, C_{\ell}$, evaluation point $u$ and value $v = f_C(u)$,
-and proof $\pi = g^{q(\tau)}$:</p>
-<p>The verifier calculates the combined commitment $C = com(f_C)$
-using random scalars $h_1, h_2, \ldots, h_{\ell}$:</p>
-<p>$$(h_1, \ldots, h_{\ell}) = \text{Hash}(C_1 | \ldots | C_{\ell})$$</p>
-<p>$$C = h_1 \cdot com_1 + h_2 \cdot com_2 + \cdots + h_{\ell} \cdot com_{\ell}$$</p>
+Given commitments <span class="math-inline" data-tex="C_1, \ldots, C_{\ell}"></span>, evaluation point <span class="math-inline" data-tex="u"></span> and value <span class="math-inline" data-tex="v = f_C(u)"></span>,
+and proof <span class="math-inline" data-tex="\pi = g^{q(\tau)}"></span>:</p>
+<p>The verifier calculates the combined commitment <span class="math-inline" data-tex="C = com(f_C)"></span>
+using random scalars <span class="math-inline" data-tex="h_1, h_2, \ldots, h_{\ell}"></span>:</p>
+<div class="math-block" data-tex="(h_1, \ldots, h_{\ell}) = \text{Hash}(C_1 \| \ldots \| C_{\ell})"></div>
+<div class="math-block" data-tex="C = h_1 \cdot com_1 + h_2 \cdot com_2 + \cdots + h_{\ell} \cdot com_{\ell}"></div>
 <p>and checks:</p>
-<p>$$e\left(\frac{C}{g^{v}}, g\right) \stackrel{?}{=} e\left(\pi, \frac{g^{\tau}}{g^{u}}\right)$$</p>
-<p>This ensures that all original evaluations $f_i(u) = v_i$ are correct
+<div class="math-block" data-tex="e\left(\frac{C}{g^{v}}, g\right) \stackrel{?}{=} e\left(\pi, \frac{g^{\tau}}{g^{u}}\right)"></div>
+<p>This ensures that all original evaluations <span class="math-inline" data-tex="f_i(u) = v_i"></span> are correct
 with a single proof and a single pairing check.
-Since the random scalars $h_i$ are generated via Fiat–Shamir,
-any incorrect $v_i$ will almost certainly cause the combined evaluation to fail verification.</p>
+Since the random scalars <span class="math-inline" data-tex="h_i"></span> are generated via Fiat–Shamir,
+any incorrect <span class="math-inline" data-tex="v_i"></span> will almost certainly cause the combined evaluation to fail verification.</p>
 <h4 id="reed-solomon-erasure-coding"><a class="header" href="#reed-solomon-erasure-coding">Reed-Solomon Erasure Coding</a></h4>
 <p>Reed-Solomon coding, also known as RS coding, is an error-correcting code
-based on the fact that any $n$-degree polynomial
-can be uniquely determined by $n + 1$ points satisfying the polynomial equation.
+based on the fact that any <span class="math-inline" data-tex="n"></span>-degree polynomial
+can be uniquely determined by <span class="math-inline" data-tex="n + 1"></span> points satisfying the polynomial equation.
 It uses the interpreted polynomial over the data set
 to produce more points in a process called expansion or encoding.
-Once the data is expanded, any $n$ elements of the total set of points
+Once the data is expanded, any <span class="math-inline" data-tex="n"></span> elements of the total set of points
 can be used to reconstruct the original data.</p>
 <h4 id="pairing-details"><a class="header" href="#pairing-details">Pairing Details</a></h4>
-<p>Let $(G_1, .)$, $(G_2, .)$, and $(G_T, .)$ be three cyclic groups of large prime order.
-A map $e : G_1 \times G_2 \rightarrow G_T$ is a pairing map such that:</p>
-<p>$$e(g^{x}, g^{y}) = e(g, g)^{xy} = e(g, g^{xy})$$</p>
-<p>Given $g^{x}$ and $g^{y}$, a pairing can check that some element $h = g^{xy}$
-without knowing $x$ and $y$.</p>
+<p>Let <span class="math-inline" data-tex="(G_1, .)"></span>, <span class="math-inline" data-tex="(G_2, .)"></span>, and <span class="math-inline" data-tex="(G_T, .)"></span> be three cyclic groups of large prime order.
+A map <span class="math-inline" data-tex="e : G_1 \times G_2 \rightarrow G_T"></span> is a pairing map such that:</p>
+<div class="math-block" data-tex="e(g^{x}, g^{y}) = e(g, g)^{xy} = e(g, g^{xy})"></div>
+<p>Given <span class="math-inline" data-tex="g^{x}"></span> and <span class="math-inline" data-tex="g^{y}"></span>, a pairing can check that some element <span class="math-inline" data-tex="h = g^{xy}"></span>
+without knowing <span class="math-inline" data-tex="x"></span> and <span class="math-inline" data-tex="y"></span>.</p>
 <p>For the KZG commitment scheme to work, a so-called trusted setup is needed,
 consisting of a structured reference string (SRS).
-This is a set of curve points in $G_1$ and $G_2$.
-For a field element $u \in \mathbb{F}<em>q$, define $u * g_i = g^{u}</em>{i}$.
+This is a set of curve points in <span class="math-inline" data-tex="G_1"></span> and <span class="math-inline" data-tex="G_2"></span>.
+For a field element <span class="math-inline" data-tex="u \in \mathbb{F}_q"></span>, define <span class="math-inline" data-tex="u * g_i = g^{u}_{i}"></span>.
 The SRS consists of two sequences of group elements:</p>
-<p>$$g^{0}<em>{1}, g^{\tau}</em>{1}, g^{\tau^{2}}<em>{1}, g^{\tau^{3}}</em>{1}, \ldots, g^{\tau^{D}}_{1} \in G_1$$</p>
-<p>$$g^{0}<em>{2}, g^{\tau}</em>{2}, g^{\tau^{2}}<em>{2}, g^{\tau^{3}}</em>{2}, \ldots, g^{\tau^{K}}_{2} \in G_2$$</p>
-<p>where $\tau \in \mathbb{F}_q$ is a secret field element, not known by either participant.
-$g_1$ is the generator point of $G_1$ and $g_2$ is the generator point of $G_2$.
-$D$ is the upper bound for the degree of the polynomials that can be committed to,
-and $K$ is the maximum number of evaluations to be proven using a batched proof.</p>
+<div class="math-block" data-tex="g^{0}_{1}, g^{\tau}_{1}, g^{\tau^{2}}_{1}, g^{\tau^{3}}_{1}, \ldots, g^{\tau^{D}}_{1} \in G_1"></div>
+<div class="math-block" data-tex="g^{0}_{2}, g^{\tau}_{2}, g^{\tau^{2}}_{2}, g^{\tau^{3}}_{2}, \ldots, g^{\tau^{K}}_{2} \in G_2"></div>
+<p>where <span class="math-inline" data-tex="\tau \in \mathbb{F}_q"></span> is a secret field element, not known by either participant.
+<span class="math-inline" data-tex="g_1"></span> is the generator point of <span class="math-inline" data-tex="G_1"></span> and <span class="math-inline" data-tex="g_2"></span> is the generator point of <span class="math-inline" data-tex="G_2"></span>.
+<span class="math-inline" data-tex="D"></span> is the upper bound for the degree of the polynomials that can be committed to,
+and <span class="math-inline" data-tex="K"></span> is the maximum number of evaluations to be proven using a batched proof.</p>
 <p><strong>Verify Operation:</strong>
 To verify an evaluation proof, the verifier checks the following equation:</p>
-<p>$$q(x)(x - u) = f(x) - f(u) = f(x) - v$$</p>
-<p>As the verifier does not have access to the actual polynomials $f$ and $q$,
+<div class="math-block" data-tex="q(x)(x - u) = f(x) - f(u) = f(x) - v"></div>
+<p>As the verifier does not have access to the actual polynomials <span class="math-inline" data-tex="f"></span> and <span class="math-inline" data-tex="q"></span>,
 the next best thing would be to check that:</p>
-<p>$$com(q) \cdot (x - u) = com(f - v)$$</p>
-<p>Expanding the definition of $com$:</p>
-<p>$$g^{q(\tau)(\tau - u)}<em>{1} = g^{f(\tau) - v}</em>{1}$$</p>
+<div class="math-block" data-tex="com(q) \cdot (x - u) = com(f - v)"></div>
+<p>Expanding the definition of <span class="math-inline" data-tex="com"></span>:</p>
+<div class="math-block" data-tex="g^{q(\tau)(\tau - u)}_{1} = g^{f(\tau) - v}_{1}"></div>
 <p>For elliptic curve additive notation this is equivalent to:</p>
-<p>$$q(\tau)(\tau - u) * g_1 = f(\tau) * g_1 - v * g_1$$</p>
+<div class="math-block" data-tex="q(\tau)(\tau - u) * g_1 = f(\tau) * g_1 - v * g_1"></div>
 <p>Now there is a problem, namely, the multiplication on the left-hand side.
 Pairings allow us to get away with one multiplication.
 So the verifier actually checks:</p>
-<p>$$e(com(q), (\tau * g_2 - u * g_2)) = e(com(f) - v * g_1, g_2)$$</p>
+<div class="math-block" data-tex="e(com(q), (\tau * g_2 - u * g_2)) = e(com(f) - v * g_1, g_2)"></div>
 <p>i.e.,</p>
-<p>$$e(q(\tau) * g_1, (\tau * g_2 - u * g_2)) = e(f(\tau) * g_1 - v * g_1, g_2)$$</p>
+<div class="math-block" data-tex="e(q(\tau) * g_1, (\tau * g_2 - u * g_2)) = e(f(\tau) * g_1 - v * g_1, g_2)"></div>
 <p>This works because of the bilinearity property of elliptic curve pairings:</p>
-<p>$$e(a * g_1, b * g_2) = e(g_1, g_2)^{ab}$$</p>
+<div class="math-block" data-tex="e(a * g_1, b * g_2) = e(g_1, g_2)^{ab}"></div>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
 <ul>
@@ -689,6 +690,9 @@ So the verifier actually checks:</p>
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

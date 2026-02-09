@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -246,28 +247,28 @@ and can significantly improve performance and reliability.</p>
 <p><strong>Fields:</strong></p>
 <ul>
 <li>version=0x01 is version of the protocol.</li>
-<li>public_key is $K^{n}<em>{i}$,
-a public key from the set $\mathbf{K}^{n}</em>{h}$
+<li>public_key is <span class="math-inline" data-tex="K^{n}_{i}"></span>,
+a public key from the set <span class="math-inline" data-tex="\mathbf{K}^{n}_{h}"></span>
 as defined in the Message Encapsulation spec.</li>
-<li>proof_of_quota is $\pi^{K^{n}<em>{i}}</em>{Q}$,
-a corresponding proof of quota for the key $K^{n}<em>{i}$ from the $\mathbf{K}^{n}</em>{h}$;
+<li>proof_of_quota is <span class="math-inline" data-tex="\pi^{K^{n}_{i}}_{Q}"></span>,
+a corresponding proof of quota for the key <span class="math-inline" data-tex="K^{n}_{i}"></span> from the <span class="math-inline" data-tex="\mathbf{K}^{n}_{h}"></span>;
 it also contains the key nullifier.</li>
-<li>signature is $\sigma_{K^{n}<em>{i}}(\mathbf{h|P}</em>{i})$,
-a signature of the concatenation of the $i$-th encapsulation
-of the payload $\mathbf{P}$ and the private header $\mathbf{h}$,
-that can be verified by the public key $K^{n}_{i}$.</li>
+<li>signature is <span class="math-inline" data-tex="\sigma_{K^{n}_{i}}(\mathbf{h|P}_{i})"></span>,
+a signature of the concatenation of the <span class="math-inline" data-tex="i"></span>-th encapsulation
+of the payload <span class="math-inline" data-tex="\mathbf{P}"></span> and the private header <span class="math-inline" data-tex="\mathbf{h}"></span>,
+that can be verified by the public key <span class="math-inline" data-tex="K^{n}_{i}"></span>.</li>
 </ul>
 <h4 id="private-header"><a class="header" href="#private-header">Private Header</a></h4>
 <p>The private_header must be generated as the outcome of
 the Message Encapsulation Mechanism.</p>
 <p>The private header contains a set of encrypted BlendingHeader entries
-$\mathbf{h} = (\mathbf{b}<em>{1},...,\mathbf{b}</em>{h_{max}})$.</p>
+<span class="math-inline" data-tex="\mathbf{h} = (\mathbf{b}_{1},...,\mathbf{b}_{h_{max}})"></span>.</p>
 <pre><code class="language-python">private_header: list[BlendingHeader]
 </code></pre>
-<p>The size of the set is limited to $\beta_{max}=3$ BlendingHeader entries,
+<p>The size of the set is limited to <span class="math-inline" data-tex="\beta_{max}=3"></span> BlendingHeader entries,
 as defined in the Global Parameters.</p>
 <p><strong>Blending Header:</strong></p>
-<p>The BlendingHeader ($\mathbf{b}_{l}$) is defined as follows:</p>
+<p>The BlendingHeader (<span class="math-inline" data-tex="\mathbf{b}_{l}"></span>) is defined as follows:</p>
 <pre><code class="language-python">class BlendingHeader:
     public_key: PublicKey
     proof_of_quota: ProofOfQuota
@@ -277,19 +278,19 @@ as defined in the Global Parameters.</p>
 </code></pre>
 <p><strong>Fields:</strong></p>
 <ul>
-<li>public_key is $K^{n}<em>{l}$,
-a public key from the set $\mathbf{K}^{n}</em>{h}$.</li>
-<li>proof_of_quota is $\pi^{K^{n}<em>{l}}</em>{Q}$,
-a corresponding proof of quota for the key $K^{n}<em>{l}$ from the $\mathbf{K}^{n}</em>{h}$;
+<li>public_key is <span class="math-inline" data-tex="K^{n}_{l}"></span>,
+a public key from the set <span class="math-inline" data-tex="\mathbf{K}^{n}_{h}"></span>.</li>
+<li>proof_of_quota is <span class="math-inline" data-tex="\pi^{K^{n}_{l}}_{Q}"></span>,
+a corresponding proof of quota for the key <span class="math-inline" data-tex="K^{n}_{l}"></span> from the <span class="math-inline" data-tex="\mathbf{K}^{n}_{h}"></span>;
 it also contains the key nullifier.</li>
-<li>signature is $\sigma_{K^{n}<em>{l}}(\mathbf{h|P}</em>{l})$,
-a signature of the concatenation of $l$-th encapsulation
-of the payload $\mathbf{P}$ and the private header $\mathbf{h}$,
-that can be verified by public key $K^{n}_{l}$.</li>
-<li>proof_of_selection is $\pi^{K^{n}<em>{l+1},m</em>{l+1}}<em>{S}$,
-a proof of selection of the node index $m</em>{l+1}$
-assuming valid proof of quota $\pi^{K^{n}<em>{l}}</em>{Q}$.</li>
-<li>is_last is $\Omega$,
+<li>signature is <span class="math-inline" data-tex="\sigma_{K^{n}_{l}}(\mathbf{h|P}_{l})"></span>,
+a signature of the concatenation of <span class="math-inline" data-tex="l"></span>-th encapsulation
+of the payload <span class="math-inline" data-tex="\mathbf{P}"></span> and the private header <span class="math-inline" data-tex="\mathbf{h}"></span>,
+that can be verified by public key <span class="math-inline" data-tex="K^{n}_{l}"></span>.</li>
+<li>proof_of_selection is <span class="math-inline" data-tex="\pi^{K^{n}_{l+1},m_{l+1}}_{S}"></span>,
+a proof of selection of the node index <span class="math-inline" data-tex="m_{l+1}"></span>
+assuming valid proof of quota <span class="math-inline" data-tex="\pi^{K^{n}_{l}}_{Q}"></span>.</li>
+<li>is_last is <span class="math-inline" data-tex="\Omega"></span>,
 a flag that indicates that this is the last encapsulation.</li>
 </ul>
 <h4 id="payload"><a class="header" href="#payload">Payload</a></h4>
@@ -338,7 +339,7 @@ as specified in the Message Encapsulation spec.</li>
 <h3 id="blending-header-limit"><a class="header" href="#blending-header-limit">Blending Header Limit</a></h3>
 <p><strong>Maximum Encapsulation Layers:</strong></p>
 <ul>
-<li>The protocol limits the private header to $\beta_{max}=3$ BlendingHeader entries</li>
+<li>The protocol limits the private header to <span class="math-inline" data-tex="\beta_{max}=3"></span> BlendingHeader entries</li>
 <li>This limit is defined in the Global Parameters</li>
 <li>Each BlendingHeader represents one layer of Message encapsulation</li>
 <li>The limit balances privacy (more layers) with performance and overhead</li>
@@ -349,7 +350,7 @@ as specified in the Message Encapsulation spec.</li>
 <li>Message Encapsulation Mechanism: Generates the public and private headers</li>
 <li>Payload Formatting Specification: Defines how to format the payload content</li>
 <li>Notation: Provides mathematical and cryptographic notation used throughout</li>
-<li>Global Parameters: Defines protocol-wide constants like $\beta_{max}$</li>
+<li>Global Parameters: Defines protocol-wide constants like <span class="math-inline" data-tex="\beta_{max}"></span></li>
 </ul>
 <h3 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h3>
 <p><strong>Traffic Analysis Protection:</strong></p>
@@ -436,6 +437,9 @@ as specified in the Message Encapsulation spec.</li>
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

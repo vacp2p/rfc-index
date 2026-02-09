@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -188,7 +189,15 @@
 <tr><td>Editor</td><td>Prem Prathi <a href="mailto:prem@status.im">prem@status.im</a></td></tr>
 <tr><td>Contributors</td><td></td></tr>
 </tbody></table>
-</div>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-02-09</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/ift-ts/raw/mix-spam-protection-rln.md"><code>afd94c8</code></a> — chore: add math support (#287)</li>
+<li><strong>2026-01-29</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/3cd2d090a4c8aa7a762dd9357d21cd73bb57cd15/docs/ift-ts/raw/mix-spam-protection-rln.md"><code>3cd2d09</code></a> — fix title of doc (#282)</li>
+<li><strong>2026-01-29</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0e53ebb1b0d090d1d2957a0164c85c38d81560f8/docs/ift-ts/raw/mix-spam-protection-rln.md"><code>0e53ebb</code></a> — change header to new format (#279)</li>
+<li><strong>2026-01-24</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/ffca40abfa6b42f239439550cd2fc47fc802f22a/docs/ift-ts/raw/mix-spam-protection-rln.md"><code>ffca40a</code></a> — Mix spam and sybil protection protocol using RLN (#252)</li>
+</ul>
+<!-- timeline:end -->
 <h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
 <p>This document defines a spam and sybil protection protocol for <a href="https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md">libp2p mix</a> based mixnets.
 The protocol specifies how <a href="https://vac.dev/rln">Rate Limiting Nullifiers (RLN)</a> can be integrated into libp2p mix.
@@ -222,8 +231,8 @@ This approach introduces some trade-offs such as additional per-hop latency for 
 <p>The messaging rate is defined as the number of messages that can be sent/forwarded per fixed unit of time, termed an <code>epoch</code>.
 Since we're using this as shorthand for the maximum allowable rate, this is also known as the <em>rate limit</em>.
 The length of each epoch is constant and defined as the <code>period</code>.</p>
-<p>We define an <code>epoch</code> as $\lceil$ <code>unix_time</code> / <code>period</code> $\rceil$.
-For example, if <code>unix_time</code> is <code>1644810116</code> and we set <code>period</code> to <code>30</code>, then <code>epoch</code> is $\lceil$ <code>(unix_time/period)</code> $\rceil$ <code>= 54827004</code>.</p>
+<p>We define an <code>epoch</code> as <span class="math-inline" data-tex="\lceil"></span> <code>unix_time</code> / <code>period</code> <span class="math-inline" data-tex="\rceil"></span>.
+For example, if <code>unix_time</code> is <code>1644810116</code> and we set <code>period</code> to <code>30</code>, then <code>epoch</code> is <span class="math-inline" data-tex="\lceil"></span> <code>(unix_time/period)</code> <span class="math-inline" data-tex="\rceil"></span> <code>= 54827004</code>.</p>
 <blockquote>
 <p><strong>NOTE:</strong> The <code>epoch</code> refers to the epoch in RLN and not Unix epoch.
 This means that no more messages than the registered rate limit can be sent per epoch, where the epoch length (<code>period</code>) is up to the application.</p>
@@ -281,7 +290,7 @@ See <a href="#group-synchronization">Group Synchronization</a> for details on ma
 <p>Intermediary and exit mix nodes SHOULD subscribe to the coordination layer (defined <a href="#coordination-layer">below</a>) in order to detect rate limit violations collaboratively.
 This ensures that mix nodes can detect spam and trigger slashing.</p>
 <h3 id="sending-and-forwarding-messages"><a class="header" href="#sending-and-forwarding-messages">Sending and forwarding messages</a></h3>
-<p>In order to send/forward messages via mixnet, a mix node MUST include the <a href="#ratelimitproof">RateLimitProof</a> in the sphinx packet as <a href="https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs">$\sigma$</a>.</p>
+<p>In order to send/forward messages via mixnet, a mix node MUST include the <a href="#ratelimitproof">RateLimitProof</a> in the sphinx packet as <a href="https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs"><span class="math-inline" data-tex="\sigma"></span></a>.</p>
 <h4 id="proof-generation"><a class="header" href="#proof-generation">Proof Generation</a></h4>
 <p>When generating an RLN proof, the node MUST:</p>
 <ol>
@@ -348,7 +357,7 @@ The node MUST discard the message and MUST NOT forward it.</li>
 The broadcast on the coordination layer MAY be batched atleast once per epoch to reduce constant traffic on coordination layer.</p>
 <h2 id="wire-format-specification--syntax"><a class="header" href="#wire-format-specification--syntax">Wire Format Specification / Syntax</a></h2>
 <h3 id="spam-protection-proof"><a class="header" href="#spam-protection-proof">Spam protection proof</a></h3>
-<p>The following <code>RateLimitProof</code> MUST be added to the sphinx packet as $\sigma$ as explained in <a href="#sending-and-forwarding-messages">sending</a>.</p>
+<p>The following <code>RateLimitProof</code> MUST be added to the sphinx packet as <span class="math-inline" data-tex="\sigma"></span> as explained in <a href="#sending-and-forwarding-messages">sending</a>.</p>
 <pre><code class="language-protobuf">syntax = "proto3";
 
 message RateLimitProof {
@@ -516,6 +525,9 @@ message MessagingMetadata {
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

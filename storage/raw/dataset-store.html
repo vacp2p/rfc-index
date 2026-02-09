@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -182,10 +183,18 @@
                         <h1 id="dataset-store"><a class="header" href="#dataset-store">DATASET-STORE</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Dataset Store</td></tr>
+<tr><td>Slug</td><td>151</td></tr>
 <tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
 <tr><td>Editor</td><td>Giuliano Mega <a href="mailto:giuliano@status.im">giuliano@status.im</a></td></tr>
 </tbody></table>
-</div>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-02-09</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/storage/raw/dataset-store.md"><code>afd94c8</code></a> — chore: add math support (#287)</li>
+<li><strong>2026-02-05</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/4d0ee4929bd2c5037f72e3ca544f116f4c6fe39d/docs/storage/raw/dataset-store.md"><code>4d0ee49</code></a> — feat: Logos Storage dataset store (#278)</li>
+</ul>
+<!-- timeline:end -->
 <h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
 <p>This specification contains the interface for a simple local storage component, named the Dataset Store, which supports Logos Storage nodes in storing and keeping track of partial and complete datasets along with their metadata on-disk, and provides basic support for dataset caching.</p>
 <p><strong>Keywords.</strong> dataset, block, dataset storage, caching, local storage, Logos Storage</p>
@@ -209,7 +218,7 @@
 <p>The <code>DatasetStore</code>/<code>Dataset</code> interfaces rely on a few external pseudotypes:</p>
 <ol>
 <li><code>BytesIO</code> represents a generic read or write byte stream;</li>
-<li><code>Bitset</code> is a fixed-size set - typically represented as a bit array - which encodes an integer set. Bit $i$ in this array is set to $1$ if $i$ is in the set, or $0$ otherwise;</li>
+<li><code>Bitset</code> is a fixed-size set - typically represented as a bit array - which encodes an integer set. Bit <span class="math-inline" data-tex="i"></span> in this array is set to <span class="math-inline" data-tex="1"></span> if <span class="math-inline" data-tex="i"></span> is in the set, or <span class="math-inline" data-tex="0"></span> otherwise;</li>
 <li><code>CID</code> represents a libp2p <a href="https://github.com/multiformats/cid">Content Identifier</a>;</li>
 <li><code>Manifest</code> represents a <a href="./datasets.html">Logos Storage Manifest</a>;</li>
 <li><code>Block</code> represents an arbitrary chunk of data;</li>
@@ -389,6 +398,9 @@
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -209,10 +210,10 @@ bootstrapping, long-range attack, consensus</p>
 in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
 <h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Term</th><th>Description</th></tr></thead><tbody>
-<tr><td>$k$</td><td>Safety parameter, the depth at which a block is considered immutable.</td></tr>
-<tr><td>$s_{gen}$</td><td>Sufficient time measured in slots to measure the density of block production with enough statistical significance. In practice, $s_{gen} = \frac{k}{4f}$, where $f$ is the active slot coefficient from the leader lottery. See <a href="https://eprint.iacr.org/2018/378.pdf">Theorem 2 of Badertscher et al., 2018</a> for more information.</td></tr>
-<tr><td>CommonPrefixDepth</td><td>A function $\textbf{CommonPrefixDepth}(b_1, b_2) \rightarrow (\mathbb{N}, \mathbb{N})$ that returns the minimum block depth at which the two branches converge to a common chain.</td></tr>
-<tr><td>density</td><td>A function $\textbf{density}(b_i, d, s_{gen})$ that returns the number of blocks produced in the $s_{gen}$ slots following block $b_{i-d}$.</td></tr>
+<tr><td><span class="math-inline" data-tex="k"></span></td><td>Safety parameter, the depth at which a block is considered immutable.</td></tr>
+<tr><td><span class="math-inline" data-tex="s_{gen}"></span></td><td>Sufficient time measured in slots to measure the density of block production with enough statistical significance. In practice, <span class="math-inline" data-tex="s_{gen} = \frac{k}{4f}"></span>, where <span class="math-inline" data-tex="f"></span> is the active slot coefficient from the leader lottery. See <a href="https://eprint.iacr.org/2018/378.pdf">Theorem 2 of Badertscher et al., 2018</a> for more information.</td></tr>
+<tr><td>CommonPrefixDepth</td><td>A function <span class="math-inline" data-tex="\textbf{CommonPrefixDepth}(b_1, b_2) \rightarrow (\mathbb{N}, \mathbb{N})"></span> that returns the minimum block depth at which the two branches converge to a common chain.</td></tr>
+<tr><td>density</td><td>A function <span class="math-inline" data-tex="\textbf{density}(b_i, d, s_{gen})"></span> that returns the number of blocks produced in the <span class="math-inline" data-tex="s_{gen}"></span> slots following block <span class="math-inline" data-tex="b_{i-d}"></span>.</td></tr>
 </tbody></table>
 </div>
 <h2 id="background"><a class="header" href="#background">Background</a></h2>
@@ -271,31 +272,31 @@ select the chain with the higher density of blocks.</p>
 <li>A node has successfully bootstrapped and found the honest chain.</li>
 <li>Nodes see honest blocks reasonably quickly.</li>
 </ol>
-<p>Nodes will remain on the honest chain if they reject forks that diverge further back than $k$ blocks,
+<p>Nodes will remain on the honest chain if they reject forks that diverge further back than <span class="math-inline" data-tex="k"></span> blocks,
 without further inspection.
 In order for an adversary to succeed,
-they would need to build a $k$-deep chain faster than the time it takes the honest nodes to grow the honest chain by $k$ blocks.
+they would need to build a <span class="math-inline" data-tex="k"></span>-deep chain faster than the time it takes the honest nodes to grow the honest chain by <span class="math-inline" data-tex="k"></span> blocks.
 The adversary must build this chain live,
 alongside the honest chain.
 They cannot build this chain after-the-fact,
-since online nodes will be rejecting any fork that diverges before their $k$-deep block.</p>
+since online nodes will be rejecting any fork that diverges before their <span class="math-inline" data-tex="k"></span>-deep block.</p>
 <h2 id="protocol-specification"><a class="header" href="#protocol-specification">Protocol Specification</a></h2>
 <h3 id="commonprefixdepth-examples"><a class="header" href="#commonprefixdepth-examples">CommonPrefixDepth Examples</a></h3>
 <ol>
-<li>$\textbf{CommonPrefixDepth}(b_1, b_2) = (0, 4)$
-implies that $b_2$ is ahead of $b_1$ by 4 blocks.</li>
+<li><span class="math-inline" data-tex="\textbf{CommonPrefixDepth}(b_1, b_2) = (0, 4)"></span>
+implies that <span class="math-inline" data-tex="b_2"></span> is ahead of <span class="math-inline" data-tex="b_1"></span> by 4 blocks.</li>
 </ol>
 <p><img src="./images/image1.jpeg" alt="CommonPrefixDepth Example 1" /></p>
 <ol>
-<li>$\textbf{CommonPrefixDepth}(b_2, b_5) = (2, 3)$
+<li><span class="math-inline" data-tex="\textbf{CommonPrefixDepth}(b_2, b_5) = (2, 3)"></span>
 would represent a forking tree like the one illustrated below:</li>
 </ol>
 <p><img src="./images/commonprefix2.jpeg" alt="CommonPrefixDepth Example 2" /></p>
 <ol>
-<li>$\textbf{density}(b_i, d, s_{gen})$
-returns the number of blocks produced in the $s_{gen}$ slots following block $b_{i-d}$.
+<li><span class="math-inline" data-tex="\textbf{density}(b_i, d, s_{gen})"></span>
+returns the number of blocks produced in the <span class="math-inline" data-tex="s_{gen}"></span> slots following block <span class="math-inline" data-tex="b_{i-d}"></span>.
 For example, in the following diagram,
-count the number of blocks produced in the $s_{gen}$ slots of the highlighted area.</li>
+count the number of blocks produced in the <span class="math-inline" data-tex="s_{gen}"></span> slots of the highlighted area.</li>
 </ol>
 <p><img src="./images/density.jpeg" alt="Density Example" /></p>
 <h3 id="bootstrap-fork-choice-rule"><a class="header" href="#bootstrap-fork-choice-rule">Bootstrap Fork Choice Rule</a></h3>
@@ -324,7 +325,7 @@ count the number of blocks produced in the $s_{gen}$ slots of the highlighted ar
 a node SHOULD switch to the <code>online-rule</code>.
 See <a href="./bootstrap.html">CRYPTARCHIA-V1-BOOTSTRAPPING-SYNCHRONIZATION</a> for more information on bootstrapping.
 With the <code>online-rule</code> flag,
-the node SHOULD now reject any forks that diverge further back than $k$ blocks.</p>
+the node SHOULD now reject any forks that diverge further back than <span class="math-inline" data-tex="k"></span> blocks.</p>
 <pre><code class="language-python">def online_fork_choice(c_local, forks, k):
     c_max = c_local
     for c_fork in forks:
@@ -348,10 +349,10 @@ by comparing chain density in the period immediately following divergence.
 Implementations MUST use the Genesis fork choice rule during bootstrapping
 to protect against adversaries who have built alternative chains over extended periods.</p>
 <h3 id="safety-parameter-selection"><a class="header" href="#safety-parameter-selection">Safety Parameter Selection</a></h3>
-<p>The safety parameter $k$ determines the depth at which blocks are considered immutable.
-Implementations SHOULD choose $k$ based on the expected network conditions and
+<p>The safety parameter <span class="math-inline" data-tex="k"></span> determines the depth at which blocks are considered immutable.
+Implementations SHOULD choose <span class="math-inline" data-tex="k"></span> based on the expected network conditions and
 the desired security guarantees.
-A larger $k$ provides stronger security but requires longer confirmation times.</p>
+A larger <span class="math-inline" data-tex="k"></span> provides stronger security but requires longer confirmation times.</p>
 <h3 id="online-rule-assumptions"><a class="header" href="#online-rule-assumptions">Online Rule Assumptions</a></h3>
 <p>The online fork choice rule assumes that nodes have successfully bootstrapped
 and are receiving honest blocks in a timely manner.
@@ -418,6 +419,9 @@ SHOULD fall back to the bootstrap rule.</p>
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -454,10 +455,8 @@ round
 <p>A node selects <code>k</code> nodes randomly from the complete pool of peers in the
 network. This query is can optionally be weighted, so the probability
 of selecting nodes is proportional to their</p>
-<p>Node Weighting
-$$
-P(i) = \frac{w_i}{\sum_{j=0}^{j=N} w_j}
-$$</p>
+<p>Node Weighting</p>
+<div class="math-block" data-tex="P(i) = \frac{w_i}{\sum_{j=0}^{j=N} w_j}"></div>
 <p>where <code>w</code> is evidence.
 The list of nodes is maintained by a separate protocol (the network layer),
 and eventual consistency of this knowledge in the network
@@ -500,25 +499,10 @@ will know in the near future (this being encoded in the look-ahead
 parameter <em><code>l</code></em>.) Evidence accumulated keeps the ratio of total positive
 votes vs the total votes received (positive and negative), whereas the
 evidence per round stores the ratio of the current round only.</p>
-<p>Parameters
-$$
-\begin{array}{lc}
-\text{Look-ahead parameter}      &amp; l = 20 \newline
-\text{First evidence parameter}  &amp; \alpha_1 = 0.8 \newline
-\text{Second evidence parameter} &amp; \alpha_2 = 0.5 \newline
-\end{array}
-$$</p>
-<p>Computation
-$$
-\begin{array}{lc}
-\text{Confidence}                &amp; c_{accum} \impliedby \frac{total\ votes}
-{total\ votes + l} \newline
-\text{Total accumulated evidence}&amp; e_{accum} \impliedby \frac{total\ positive<br />
-votes}{total\ votes} \newline
-\text{Evidence per round}        &amp; e_{round} \impliedby \frac{round\ positive<br />
-votes}{round\ votes} \newline
-\end{array}
-$$</p>
+<p>Parameters</p>
+<div class="math-block" data-tex="\begin{array}{lc}&#10;\text{Look-ahead parameter}      &amp; l = 20 \newline&#10;\text{First evidence parameter}  &amp; \alpha_1 = 0.8 \newline&#10;\text{Second evidence parameter} &amp; \alpha_2 = 0.5 \newline&#10;\end{array}"></div>
+<p>Computation</p>
+<div class="math-block" data-tex="\begin{array}{lc}&#10;\text{Confidence}                &amp; c_{accum} \impliedby \frac{total\ votes}&#10;{total\ votes + l} \newline&#10;\text{Total accumulated evidence}&amp; e_{accum} \impliedby \frac{total\ positive\&#10;votes}{total\ votes} \newline&#10;\text{Evidence per round}        &amp; e_{round} \impliedby \frac{round\ positive\&#10;votes}{round\ votes} \newline&#10;\end{array}"></div>
 <p>The node runs the <code>new_votes</code> and <code>positive_votes</code> parameters received
 in the query round through the following algorithm:</p>
 <pre><code class="language-markdown">
@@ -555,13 +539,8 @@ understood, opening the door to elaborated attacks. The transition
 function proposed is linear with respect to the confidence.</p>
 </li>
 </ol>
-<p>Transition Function
-$$
-\begin{array}{cl}
-evidence &amp; \impliedby e_{round} (1 - c_{accum}) + e_{accum} c_{accum} \newline
-\alpha &amp;  \impliedby \alpha_1 (1 - c_{accum}) + \alpha_2 c_{accum} \newline
-\end{array}
-$$</p>
+<p>Transition Function</p>
+<div class="math-block" data-tex="\begin{array}{cl}&#10;evidence &amp; \impliedby e_{round} (1 - c_{accum}) + e_{accum} c_{accum} \newline&#10;\alpha &amp;  \impliedby \alpha_1 (1 - c_{accum}) + \alpha_2 c_{accum} \newline&#10;\end{array}"></div>
 <p>Since the confidence is modeled as a ratio that depends on the
 constant <em><code>l</code></em>, we can visualize the transition function at
 different values of <em><code>l</code></em>. Recall that this constant encapsulates
@@ -618,14 +597,8 @@ decision, checking both boundaries. The last step is then to <em><code>decide</c
 on the current opinion. For that, a confidence threshold is
 employed. This threshold is derived from the network size, and is
 directly related to the number of total votes received.</p>
-<p>Decision
-$$
-\begin{array}{cl}
-evidence &gt; \alpha &amp; \implies \text{opinion YES} \newline
-evidence &lt; 1 - \alpha &amp; \implies \text{opinion NO} \newline
-if\ \text{confidence} &gt; c_{target} &amp; THEN \ \text{finalize decision} \newline
-\end{array}
-$$</p>
+<p>Decision</p>
+<div class="math-block" data-tex="\begin{array}{cl}&#10;evidence &gt; \alpha &amp; \implies \text{opinion YES} \newline&#10;evidence &lt; 1 - \alpha &amp; \implies \text{opinion NO} \newline&#10;if\ \text{confidence} &gt; c_{target} &amp; THEN \ \text{finalize decision} \newline&#10;\end{array}"></div>
 <p>After the <code>OPINION</code> phase is executed, the current value of <code>confidence</code>
 is considered: if <code>confidence</code> exceeds a threshold derived from the
 network size and directly related to the total votes received, an
@@ -903,6 +876,9 @@ Move: a Language for Writing DAG Abstractions</p>
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

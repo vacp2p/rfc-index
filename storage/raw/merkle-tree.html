@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -182,12 +183,19 @@
                         <h1 id="merkle-tree"><a class="header" href="#merkle-tree">MERKLE-TREE</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Merkle Tree</td></tr>
+<tr><td>Slug</td><td>153</td></tr>
 <tr><td>Status</td><td>draft</td></tr>
 <tr><td>Category</td><td>Standards Track</td></tr>
 <tr><td>Editor</td><td>Balázs Kőműves <a href="mailto:bkomuves@status.im">bkomuves@status.im</a></td></tr>
 <tr><td>Contributors</td><td>Giuliano Mega <a href="mailto:giuliano@status.im">giuliano@status.im</a>, Mohammed Alghazwi <a href="mailto:mohalghazwi@status.im">mohalghazwi@status.im</a></td></tr>
 </tbody></table>
-</div>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-02-09</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/storage/raw/merkle-tree.md"><code>afd94c8</code></a> — chore: add math support (#287)</li>
+<li><strong>2026-02-06</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/af4cd78ffaeb12026c166df80d7c9fec5c2efb86/docs/storage/raw/merkle-tree.md"><code>af4cd78</code></a> — feat: revamped Merkle tree spec (#281)</li>
+</ul>
+<!-- timeline:end -->
 <h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
 <p>This specification describes the Merkle tree construction adopted in Logos Storage. The construction relies on keyed hashing, injective encodings, and a simple padding approach to prevent a variety of collision attacks, and is designed to operate both on conventional hashing functions like SHA-2, and ZK-friendly functions like Poseidon2.</p>
 <h2 id="specification"><a class="header" href="#specification">Specification</a></h2>
@@ -220,9 +228,9 @@
 <li>A hashing function <code>H : S -&gt; T</code>;</li>
 <li>a <em>binary compression function</em> <code>C: T x T -&gt; T</code>.</li>
 </ol>
-<p>In some hashing functions like SHA256, one could express <code>C(a, b)</code> as <code>H(F(a, b))</code>, where <code>F(a, b) = a || b</code> (Fig. 1(a)) and <code>||</code> denotes byte string concatenation. This creates a type of symmetry one can then exploit - since a Merkle tree root does not encode its depth, one could pretend that <code>F(a, b)</code> is actually data, and construct a shorter Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., $T^{\prime}_3$ in the second tree is the same as $T_7$ in the original tree.</p>
+<p>In some hashing functions like SHA256, one could express <code>C(a, b)</code> as <code>H(F(a, b))</code>, where <code>F(a, b) = a || b</code> (Fig. 1(a)) and <code>||</code> denotes byte string concatenation. This creates a type of symmetry one can then exploit - since a Merkle tree root does not encode its depth, one could pretend that <code>F(a, b)</code> is actually data, and construct a shorter Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., <span class="math-inline" data-tex="T^{\prime}_3"></span> in the second tree is the same as <span class="math-inline" data-tex="T_7"></span> in the original tree.</p>
 <p><img src="images/layer-abuse.png" alt="layer abuse attack" /></p>
-<p><strong>Figure 1.</strong> <strong>(a)</strong> original Merkle tree; <strong>(b)</strong> a different Merkle tree with the same Merkle root as the original; i.e., $T^{\prime}_3 = T_7$, constructed from a layer abuse attack.</p>
+<p><strong>Figure 1.</strong> <strong>(a)</strong> original Merkle tree; <strong>(b)</strong> a different Merkle tree with the same Merkle root as the original; i.e., <span class="math-inline" data-tex="T^{\prime}_3 = T_7"></span>, constructed from a layer abuse attack.</p>
 <h4 id="2-padding-attacks"><a class="header" href="#2-padding-attacks">2. Padding attacks</a></h4>
 <p>Merkle trees can be unbalanced as the number of leaves will often not be a power of two. A common technique is then to pad the tree in some way by adding "synthetic" missing children to internal nodes that do not have both of them (Fig. 2(a)). If done carelessly, this can potentially allow an attacker to replace the padding with real data that is equivalent to such padding (Fig. 2(b)), and again generate the same Merkle root from data that is different from what had been intended.</p>
 <p><img src="images/padding.png" alt="padding attack" /></p>
@@ -264,15 +272,15 @@ nodeKey BottomLayer OddNode  = 0x03
 <p>Finally, we proceed from the initial sequence in layers: take the previous sequence, apply the keyed compression function for each consecutive pairs <code>(x,y) : (T,T)</code> with the correct key based on whether this was the initial (bottom) layer, and whether it's a singleton "pair" <code>x : T</code>, in which case it's also padded with a zero to <code>(x,0)</code>.</p>
 <p>Note that if the input is a singleton list <code>[x]</code>, we still apply one layer, so in that case the root will be <code>compress[key=3](x,0)</code>.</p>
 <h3 id="encoding"><a class="header" href="#encoding">Encoding</a></h3>
-<p>Our Merkle trees are created from arbitrary data, and arbitrary data means raw byte strings. Such byte strings are typically first split into equally-sized blocks<sup class="footnote-reference"><a href="#2">2</a></sup> of length $b$, which we refer to as <em>data blocks</em><sup class="footnote-reference"><a href="#3">3</a></sup>. Each data block then undergoes hashing under <code>H</code>, and those become the tree's leaves (Fig. 3(a)). When the source type <code>S</code> for the hashing function is a byte string; e.g. as with SHA256, those strings can be taken to be the $S_i$ in Fig. 1 and hashed directly.</p>
+<p>Our Merkle trees are created from arbitrary data, and arbitrary data means raw byte strings. Such byte strings are typically first split into equally-sized blocks<sup class="footnote-reference"><a href="#2">2</a></sup> of length <span class="math-inline" data-tex="b"></span>, which we refer to as <em>data blocks</em><sup class="footnote-reference"><a href="#3">3</a></sup>. Each data block then undergoes hashing under <code>H</code>, and those become the tree's leaves (Fig. 3(a)). When the source type <code>S</code> for the hashing function is a byte string; e.g. as with SHA256, those strings can be taken to be the <span class="math-inline" data-tex="S_i"></span> in Fig. 1 and hashed directly.</p>
 <p>For hashing functions which do not take byte strings as input - like  Poseidon2, which operates on sequences of finite field elements - we must <em>encode</em> our data blocks into the proper type first (Figure 3(b)).</p>
 <p><img src="images/encoding.png" alt="encoding" /></p>
 <p><strong>Figure 3.</strong> <strong>(a)</strong> A byte string (raw data), split into data blocks which are also byte strings. <strong>(b)</strong> Data blocks after undergoing encoding.</p>
-<p>We define an <em>encoding function</em> <code>E</code> to be a function which can do that for us. Formally speaking, <code>E</code> can encode an arbitrary-valued byte string of length $b$ into a value of the required type <code>S</code>; i.e., <code>E : byte[b] -&gt; S</code>. Such an encoding function MUST always be <em>injective</em>; i.e., distinct byte strings MUST map into distinct values of the type <code>S</code>. To see why, suppose <code>E</code> were not injective. This means there are two byte strings <code>D_1</code> and <code>D_2</code> such that <code>E(D_1) = E(D_2) = S_1 = S_2</code>. We could then take the raw data used to build a Merkle tree $A$, replace all occurrences of <code>D_1</code> with <code>D_2</code>, and build an identical Merkle tree from distinct data - which is what we want to avoid.</p>
+<p>We define an <em>encoding function</em> <code>E</code> to be a function which can do that for us. Formally speaking, <code>E</code> can encode an arbitrary-valued byte string of length <span class="math-inline" data-tex="b"></span> into a value of the required type <code>S</code>; i.e., <code>E : byte[b] -&gt; S</code>. Such an encoding function MUST always be <em>injective</em>; i.e., distinct byte strings MUST map into distinct values of the type <code>S</code>. To see why, suppose <code>E</code> were not injective. This means there are two byte strings <code>D_1</code> and <code>D_2</code> such that <code>E(D_1) = E(D_2) = S_1 = S_2</code>. We could then take the raw data used to build a Merkle tree <span class="math-inline" data-tex="A"></span>, replace all occurrences of <code>D_1</code> with <code>D_2</code>, and build an identical Merkle tree from distinct data - which is what we want to avoid.</p>
 <p>The next section deals with injective encodings for the major types we use - including SHA256, BN254, Goldilocks. We then discuss padding in Sec. <a href="#padding">Padding</a>.</p>
 <h4 id="injective-encodings"><a class="header" href="#injective-encodings">Injective Encodings</a></h4>
 <p>Encoding for SHA256 is trivial in that it already operates on byte strings, so there is no extra work to be done. For most of the other hashing functions we care about, however, <code>S</code> is a sequence of finite field elements, and we therefore need to perform encoding.</p>
-<p>In such situations, it is convenient to construct our injective encoding function <code>E</code> by chunking the input sequence of size $b$ into smaller pieces of size <code>M</code>, and then applying a <em>element encoding function</em> <code>E_s</code> function to each chunk. This function can output either a single or multiple field elements per <code>M</code>-sized chunk (Listing 1).</p>
+<p>In such situations, it is convenient to construct our injective encoding function <code>E</code> by chunking the input sequence of size <span class="math-inline" data-tex="b"></span> into smaller pieces of size <code>M</code>, and then applying a <em>element encoding function</em> <code>E_s</code> function to each chunk. This function can output either a single or multiple field elements per <code>M</code>-sized chunk (Listing 1).</p>
 <pre><code class="language-python=">def E(
   raw: List[byte],
   E_s: List[byte] -&gt; List[FieldElement],
@@ -287,7 +295,7 @@ nodeKey BottomLayer OddNode  = 0x03
   return encoded
 </code></pre>
 <p><strong>Listing 1.</strong> Constructing <code>E</code> from <code>E_s</code>.</p>
-<p>For the BN254 field, we can construct <code>E_s</code> by taking <code>M=31</code>, and having the 31 bytes interpreted as a <em>little-endian</em> integer modulo <code>p</code>. This outputs one single field element per $31$ bytes.</p>
+<p>For the BN254 field, we can construct <code>E_s</code> by taking <code>M=31</code>, and having the 31 bytes interpreted as a <em>little-endian</em> integer modulo <code>p</code>. This outputs one single field element per <span class="math-inline" data-tex="31"></span> bytes.</p>
 <p>Poseidon2 or Monolith (over the Goldilocks field) take multiples of four Goldilocks field elements at a time. We have some choices: We can have <code>M=4*7=28</code>, as a single field element can encode 7 bytes but not 8. Or, if we want to be more efficient, we can still achieve <code>M=31</code> by storing 62 bits in each field element. For this to work, some convention needs to be chosen; our implementation is the following:</p>
 <pre><code class="language-haskell">#define MASK 0x3fffffffffffffffULL
 
@@ -306,8 +314,8 @@ void goldilocks_convert_31_bytes_to_4_field_elements(const uint8_t *ptr, uint64_
 </code></pre>
 <p>This simply chunks the 31 bytes = 248 bits into 62 bits chunks, and interprets them as little endian 62 bit integers.</p>
 <h4 id="padding"><a class="header" href="#padding">Padding</a></h4>
-<p>The element encoding function <code>E_s</code> requires byte strings of length <code>M</code>, but the input's length; i.e., the size $b$ our data blocks, might not be a multiple of <code>M</code>. We might therefore need to <em>pad</em> the blocks, and we need to do it in a way that avoids the usual trap: different input data resulting in the same padded representation.</p>
-<p>We adopt a <code>10*</code> padding strategy to pad raw data blocks to a multiple of <code>M</code> bytes; i.e., we <em>always</em> add a <code>0x01</code> byte, and then as many <code>0x00</code> bytes as required for the length to be divisible by <code>M</code>. Assuming again a data block of length $b$ bytes, then the padded sequence will have <code>M*(floor(b/M)+1)</code> bytes.</p>
+<p>The element encoding function <code>E_s</code> requires byte strings of length <code>M</code>, but the input's length; i.e., the size <span class="math-inline" data-tex="b"></span> our data blocks, might not be a multiple of <code>M</code>. We might therefore need to <em>pad</em> the blocks, and we need to do it in a way that avoids the usual trap: different input data resulting in the same padded representation.</p>
+<p>We adopt a <code>10*</code> padding strategy to pad raw data blocks to a multiple of <code>M</code> bytes; i.e., we <em>always</em> add a <code>0x01</code> byte, and then as many <code>0x00</code> bytes as required for the length to be divisible by <code>M</code>. Assuming again a data block of length <span class="math-inline" data-tex="b"></span> bytes, then the padded sequence will have <code>M*(floor(b/M)+1)</code> bytes.</p>
 <p>Note: The <code>10*</code> padding strategy is an invertible operation, which will ensure that there is no collision between sequences of different lengths; i.e., to unpad scan from the end, drop <code>0x00</code> bytes until the first <code>0x01</code>, drop that too; reject if no <code>0x01</code> found</p>
 <p>Once the data is padded, it can be chunked to pieces of <code>M</code> bytes (so there will be <code>floor(b/M)+1</code> chunks) and encoded by calling the element encoding function for each chunk.</p>
 <p>Remark: We don't pad the sequence of leaf hashes (<code>T</code>-s) when constructing the Merkle tree, as the tree construction ensures that different lengths will result in different root hashes. However, when <strong>using the sponge construction,</strong> we need to further pad the sequence of encoded field elements to be a multiple of the sponge rate; there again we apply the <code>10*</code> strategy, but there the <code>1</code> and <code>0</code> are finite field elements.</p>
@@ -400,10 +408,10 @@ def verify_proof(
 <p>Some less-conforming implementation of these could take a sequence of bytes instead.</p>
 </div>
 <div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
-<p>Data blocks might also need to be padded to a multiple of $b$, but raw data padding is beyond the scope of this document.</p>
+<p>Data blocks might also need to be padded to a multiple of <span class="math-inline" data-tex="b"></span>, but raw data padding is beyond the scope of this document.</p>
 </div>
 <div class="footnote-definition" id="3"><sup class="footnote-definition-label">3</sup>
-<p>The standard block size for Logos storage is $65,536$ bytes for SHA256 trees, and $2,048$ bytes for Poseidon2 trees.</p>
+<p>The standard block size for Logos storage is <span class="math-inline" data-tex="65\,536"></span> bytes for SHA256 trees, and <span class="math-inline" data-tex="2\,048"></span> bytes for Poseidon2 trees.</p>
 </div>
 
                     </main>
@@ -452,6 +460,9 @@ def verify_proof(
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

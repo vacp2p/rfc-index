@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -305,8 +306,8 @@ cryptography, consensus and network engineering.</p>
 <h2 id="protocol"><a class="header" href="#protocol">Protocol</a></h2>
 <h3 id="constants"><a class="header" href="#constants">Constants</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
-<tr><td>$f$</td><td>slot activation coefficient</td><td>The target rate of occupied slots. Not all slots contain blocks, many are empty. (See Block Times &amp; Blend Network Analysis for analysis leading to the choice of value.)</td><td>1/30</td></tr>
-<tr><td>$k$</td><td>security parameter</td><td>Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable.</td><td>2160 blocks</td></tr>
+<tr><td><span class="math-inline" data-tex="f"></span></td><td>slot activation coefficient</td><td>The target rate of occupied slots. Not all slots contain blocks, many are empty. (See Block Times &amp; Blend Network Analysis for analysis leading to the choice of value.)</td><td>1/30</td></tr>
+<tr><td><span class="math-inline" data-tex="k"></span></td><td>security parameter</td><td>Block depth finality. Blocks deeper than <span class="math-inline" data-tex="k"></span> on any given chain are considered immutable.</td><td>2160 blocks</td></tr>
 <tr><td>none</td><td>slot length</td><td>The duration of a single slot.</td><td>1 second</td></tr>
 <tr><td>MAX_BLOCK_SIZE</td><td>max block size</td><td>The maximum size of the block body (not including the header)</td><td>1 MB</td></tr>
 <tr><td>MAX_BLOCK_TXS</td><td>max block transactions</td><td>The maximum number of transactions in a block</td><td>1024</td></tr>
@@ -314,26 +315,26 @@ cryptography, consensus and network engineering.</p>
 </div>
 <h3 id="notation"><a class="header" href="#notation">Notation</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
-<tr><td>$s$</td><td>slot security parameter</td><td>Sufficient slots such that $k$ blocks have been produced with high probability.</td><td>$3\lfloor \frac{k}{f}\rfloor$</td></tr>
-<tr><td>$T$</td><td>the block tree</td><td>This is the block tree observed by a node.</td><td></td></tr>
-<tr><td>$F_T$</td><td>tips of block tree $T$</td><td>The set of concurrent forks of some block tree $T$.</td><td>$F_T={b\in T:\forall c \in T\space \textbf{parent}(c) \neq b }$</td></tr>
-<tr><td>$c_{loc}$</td><td>tip of local chain</td><td>The chain that a node considers to be the honest chain.</td><td>$c_{loc} \in F_{T}$</td></tr>
-<tr><td>$B_\text{imm}$</td><td>the latest immutable block</td><td>The latest block which was committed (finalized) by the chain maintenance.</td><td>$B_\text{imm} \in \textbf{ancestors}(c_{loc})$</td></tr>
-<tr><td>$sl$</td><td>slot number</td><td>Index of slot. $sl=0$ denotes the genesis slot.</td><td>$sl=0,1,2,3,\dots$</td></tr>
-<tr><td>$ep$</td><td>epoch number</td><td>Index of epoch. $ep=0$ denotes the genesis epoch.</td><td>$ep=0,1,2,3,\dots$</td></tr>
+<tr><td><span class="math-inline" data-tex="s"></span></td><td>slot security parameter</td><td>Sufficient slots such that <span class="math-inline" data-tex="k"></span> blocks have been produced with high probability.</td><td><span class="math-inline" data-tex="3\lfloor \frac{k}{f}\rfloor"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="T"></span></td><td>the block tree</td><td>This is the block tree observed by a node.</td><td></td></tr>
+<tr><td><span class="math-inline" data-tex="F_T"></span></td><td>tips of block tree <span class="math-inline" data-tex="T"></span></td><td>The set of concurrent forks of some block tree <span class="math-inline" data-tex="T"></span>.</td><td><span class="math-inline" data-tex="F_T=\{b\in T:\forall c \in T\space \textbf{parent}(c) \neq b \}"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="c_{loc}"></span></td><td>tip of local chain</td><td>The chain that a node considers to be the honest chain.</td><td><span class="math-inline" data-tex="c_{loc} \in F_{T}"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="B_\text{imm}"></span></td><td>the latest immutable block</td><td>The latest block which was committed (finalized) by the chain maintenance.</td><td><span class="math-inline" data-tex="B_\text{imm} \in \textbf{ancestors}(c_{loc})"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="sl"></span></td><td>slot number</td><td>Index of slot. <span class="math-inline" data-tex="sl=0"></span> denotes the genesis slot.</td><td><span class="math-inline" data-tex="sl=0,1,2,3,\dots"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="ep"></span></td><td>epoch number</td><td>Index of epoch. <span class="math-inline" data-tex="ep=0"></span> denotes the genesis epoch.</td><td><span class="math-inline" data-tex="ep=0,1,2,3,\dots"></span></td></tr>
 </tbody></table>
 </div>
 <h3 id="latest-immutable-block"><a class="header" href="#latest-immutable-block">Latest Immutable Block</a></h3>
-<p>The latest immutable block $B_\text{imm}$ is the most recent block
+<p>The latest immutable block <span class="math-inline" data-tex="B_\text{imm}"></span> is the most recent block
 considered permanently finalized.
-The blocks deeper than $B_\text{imm}$ in the local chain $c_{loc}$
+The blocks deeper than <span class="math-inline" data-tex="B_\text{imm}"></span> in the local chain <span class="math-inline" data-tex="c_{loc}"></span>
 are never to be reorganized.</p>
 <p>This is maintained locally by the Chain Maintenance procedure.
 When the Online fork choice rule is in use,
-$B_\text{imm}$ corresponds to the $k$-deep block.
-However, it may be deeper than the $k$-deep block if the fork choice rule
+<span class="math-inline" data-tex="B_\text{imm}"></span> corresponds to the <span class="math-inline" data-tex="k"></span>-deep block.
+However, it may be deeper than the <span class="math-inline" data-tex="k"></span>-deep block if the fork choice rule
 has been switched from Online to Bootstrap.
-Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added
+Unlike the <span class="math-inline" data-tex="k"></span>-deep block, <span class="math-inline" data-tex="B_\text{imm}"></span> does not advance as new blocks are added
 unless the Online fork choice rule is used.</p>
 <p>The details of fork choice rule transitions are defined in the bootstrap spec:
 <a href="https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization">Cryptarchia v1 Bootstrapping &amp; Synchronization</a>.</p>
@@ -359,48 +360,48 @@ and is done w.r.t. the epoch schedule.</p>
 <h4 id="epoch-schedule"><a class="header" href="#epoch-schedule">Epoch Schedule</a></h4>
 <p>An epoch is divided into 3 phases, as outlined below.</p>
 <div class="table-wrapper"><table><thead><tr><th>Epoch Phase</th><th>Phase Length</th><th>Description</th></tr></thead><tbody>
-<tr><td>Stake Distribution Snapshot</td><td>$s$ slots</td><td>A snapshot of note commitments are taken at the beginning of the epoch. The protocol waits for this value to finalize before entering the next phase.</td></tr>
-<tr><td>Buffer phase</td><td>$s$ slots</td><td>After the stake distribution is finalized, the protocol waits another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage.</td></tr>
-<tr><td>Lottery Constants Finalization</td><td>$s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots</td><td>On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. The protocol waits another $4\frac{k}{f}$ slots for these values to finalize.</td></tr>
+<tr><td>Stake Distribution Snapshot</td><td><span class="math-inline" data-tex="s"></span> slots</td><td>A snapshot of note commitments are taken at the beginning of the epoch. The protocol waits for this value to finalize before entering the next phase.</td></tr>
+<tr><td>Buffer phase</td><td><span class="math-inline" data-tex="s"></span> slots</td><td>After the stake distribution is finalized, the protocol waits another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage.</td></tr>
+<tr><td>Lottery Constants Finalization</td><td><span class="math-inline" data-tex="s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor"></span> slots</td><td>On the <span class="math-inline" data-tex="2s^{th}"></span> slot into the epoch, the epoch nonce <span class="math-inline" data-tex="\eta"></span> and the inferred total stake <span class="math-inline" data-tex="D"></span> can be computed. The protocol waits another <span class="math-inline" data-tex="4\frac{k}{f}"></span> slots for these values to finalize.</td></tr>
 </tbody></table>
 </div>
 <p>The <strong>epoch length</strong> is the sum of the individual phases:
-$3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor = 10 \lfloor \frac{k}{f} \rfloor$ slots.</p>
+<span class="math-inline" data-tex="3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor = 10 \lfloor \frac{k}{f} \rfloor"></span> slots.</p>
 <h4 id="epoch-state"><a class="header" href="#epoch-state">Epoch State</a></h4>
 <p>The epoch state holds the variables derived over the course of the epoch schedule.
-It is the 3-tuple $(\mathbb{C}_\text{LEAD}, \eta, D)$ described below.</p>
+It is the 3-tuple <span class="math-inline" data-tex="(\mathbb{C}_\text{LEAD}, \eta, D)"></span> described below.</p>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
-<tr><td>$\mathbb{C}_{\text{LEAD}}$</td><td>Eligible Leader Notes Commitment</td><td>A commitment to the set of notes eligible for leadership.</td><td>See Eligible Leader Notes</td></tr>
-<tr><td>$\eta$</td><td>Epoch Nonce</td><td>Randomness used in the leadership lottery (selected once per epoch)</td><td>See Epoch Nonce</td></tr>
-<tr><td>$D$</td><td>Inferred Total Stake (Lottery Difficulty)</td><td>Total stake inferred from watching the results of the lottery during the course of the epoch. $D$ is used as the stake relativization constant for the following epoch.</td><td>See Total Stake Inference</td></tr>
+<tr><td><span class="math-inline" data-tex="\mathbb{C}_{\text{LEAD}}"></span></td><td>Eligible Leader Notes Commitment</td><td>A commitment to the set of notes eligible for leadership.</td><td>See Eligible Leader Notes</td></tr>
+<tr><td><span class="math-inline" data-tex="\eta"></span></td><td>Epoch Nonce</td><td>Randomness used in the leadership lottery (selected once per epoch)</td><td>See Epoch Nonce</td></tr>
+<tr><td><span class="math-inline" data-tex="D"></span></td><td>Inferred Total Stake (Lottery Difficulty)</td><td>Total stake inferred from watching the results of the lottery during the course of the epoch. <span class="math-inline" data-tex="D"></span> is used as the stake relativization constant for the following epoch.</td><td>See Total Stake Inference</td></tr>
 </tbody></table>
 </div>
 <h3 id="eligible-leader-notes"><a class="header" href="#eligible-leader-notes">Eligible Leader Notes</a></h3>
 <p>A note is eligible to participate in the leadership lottery if it has not been spent
 and was a member of the note set at the beginning of the previous epoch,
-i.e. they are members of $\mathbb{C}_\text{LEAD}$.</p>
+i.e. they are members of <span class="math-inline" data-tex="\mathbb{C}_\text{LEAD}"></span>.</p>
 <h4 id="note-ageing"><a class="header" href="#note-ageing">Note Ageing</a></h4>
-<p>If an adversary knows the epoch nonce $\eta$,
+<p>If an adversary knows the epoch nonce <span class="math-inline" data-tex="\eta"></span>,
 they may grind a note that wins the lottery more frequently
 than should be statistically expected.
 Thus, it's critical that notes participating in the lottery are sufficiently old
-to ensure that they have no predictive power over $\eta$.</p>
+to ensure that they have no predictive power over <span class="math-inline" data-tex="\eta"></span>.</p>
 <h3 id="epoch-nonce"><a class="header" href="#epoch-nonce">Epoch Nonce</a></h3>
-<p>The epoch nonce $\eta$ is evolved after each block.</p>
-<p>Given block $B = (parent, sl, \rho_\text{LEAD}, \dots)$ where:</p>
+<p>The epoch nonce <span class="math-inline" data-tex="\eta"></span> is evolved after each block.</p>
+<p>Given block <span class="math-inline" data-tex="B = (parent, sl, \rho_\text{LEAD}, \dots)"></span> where:</p>
 <ul>
-<li>$parent$ is the parent of block $B$</li>
-<li>$sl$ is the slot that $B$ is occupying.</li>
-<li>$\rho_\text{LEAD}$ is the epoch nonce entropy contribution
+<li><span class="math-inline" data-tex="parent"></span> is the parent of block <span class="math-inline" data-tex="B"></span></li>
+<li><span class="math-inline" data-tex="sl"></span> is the slot that <span class="math-inline" data-tex="B"></span> is occupying.</li>
+<li><span class="math-inline" data-tex="\rho_\text{LEAD}"></span> is the epoch nonce entropy contribution
 from the block's leadership proof</li>
 </ul>
-<p>Then, $\eta_B$ is derived as:</p>
-<p>$$\eta_{B} = \text{zkHASH}(\text{EPOCH_NONCE_V1}||\eta_{\text{parent}}||\rho_\text{LEAD}||\text{Fr}(sl))$$</p>
-<p>where $\text{Fr}(sl)$ maps the slot number to the corresponding scalar
-in Poseidon's scalar field and $\text{zkHASH}(..)$ is Poseidon2
+<p>Then, <span class="math-inline" data-tex="\eta_B"></span> is derived as:</p>
+<div class="math-block" data-tex="\eta_{B} = \text{zkHASH}(\text{EPOCH\_NONCE\_V1}||\eta_{\text{parent}}||\rho_\text{LEAD}||\text{Fr}(sl))"></div>
+<p>where <span class="math-inline" data-tex="\text{Fr}(sl)"></span> maps the slot number to the corresponding scalar
+in Poseidon's scalar field and <span class="math-inline" data-tex="\text{zkHASH}(..)"></span> is Poseidon2
 as specified in Common Cryptographic Components.</p>
-<p>The epoch nonce used in the next epoch is $\eta_{B'}$
-where $B'$ is the last block before the start of the
+<p>The epoch nonce used in the next epoch is <span class="math-inline" data-tex="\eta_{B&#x27;}"></span>
+where <span class="math-inline" data-tex="B&#x27;"></span> is the last block before the start of the
 "Lottery Constants Finalization" phase in the epoch schedule.</p>
 <h3 id="total-stake-inference"><a class="header" href="#total-stake-inference">Total Stake Inference</a></h3>
 <p>Given that stake is private in Cryptarchia,
@@ -473,7 +474,7 @@ this calls for a more expensive fork choice rule that can differentiate
 between malicious long-range attacks and honest chains.</p>
 <p>After bootstrapping, the node commits to the most honest looking chain found
 and switches to a fork choice rule that rejects chains that diverge
-by more than $k$ blocks.</p>
+by more than <span class="math-inline" data-tex="k"></span> blocks.</p>
 <p>The details are specified in Cryptarchia Fork Choice Rule.</p>
 <h3 id="block-id"><a class="header" href="#block-id">Block ID</a></h3>
 <p>Block ID is defined by the hash of the block header,
@@ -510,12 +511,12 @@ class ProofOfLeadership:                         # 224 bytes
 <p>Block construction, validation and execution are specified in
 Block Construction, Validation and Execution Specification.</p>
 <h3 id="block-header-validation"><a class="header" href="#block-header-validation">Block Header Validation</a></h3>
-<p>Given block $B=(header, transactions)$ and the block tree $T$ where:</p>
+<p>Given block <span class="math-inline" data-tex="B=(header, transactions)"></span> and the block tree <span class="math-inline" data-tex="T"></span> where:</p>
 <ul>
-<li>$header$ is the header defined in Header</li>
-<li>$transactions$ is the sequence of transactions in the block</li>
+<li><span class="math-inline" data-tex="header"></span> is the header defined in Header</li>
+<li><span class="math-inline" data-tex="transactions"></span> is the sequence of transactions in the block</li>
 </ul>
-<p>The function $\textbf{valid_header}(B)$ returns True
+<p>The function <span class="math-inline" data-tex="\textbf{valid\_header}(B)"></span> returns True
 if all of the following constraints hold,
 otherwise it returns False.</p>
 <ol>
@@ -552,22 +553,22 @@ Ensure the block's parent has already been accepted into the block tree.</p>
 <li>
 <p><code>height(B) &gt; height(B_imm)</code>
 Ensure the block comes after the latest immutable block.
-Assuming that $T$ prunes all forks diverged deeper than $B_\text{imm}$,
-this step, along with step 5, ensures that $B$ is descendant from $B_\text{imm}$.
+Assuming that <span class="math-inline" data-tex="T"></span> prunes all forks diverged deeper than <span class="math-inline" data-tex="B_\text{imm}"></span>,
+this step, along with step 5, ensures that <span class="math-inline" data-tex="B"></span> is descendant from <span class="math-inline" data-tex="B_\text{imm}"></span>.
 If all forks cannot be pruned completely in the implementation,
 this step must be replaced with <code>is_ancestor(B_imm, B)</code>,
-which checks whether $B_\text{imm}$ is an ancestor of $B$.</p>
+which checks whether <span class="math-inline" data-tex="B_\text{imm}"></span> is an ancestor of <span class="math-inline" data-tex="B"></span>.</p>
 </li>
 <li>
 <p>Verify the leader's right to propose
 and ensure it is the one proposing this block:
-Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL}, P_\text{LEAD}, \sigma)$,
+Given leadership proof <span class="math-inline" data-tex="\pi_\text{LEAD} = (\pi_\text{PoL}, P_\text{LEAD}, \sigma)"></span>,
 where:</p>
 <ul>
-<li>$\pi_\text{PoL}$ is the slot lottery win proof
+<li><span class="math-inline" data-tex="\pi_\text{PoL}"></span> is the slot lottery win proof
 as defined in Proof of Leadership Specification</li>
-<li>$P_\text{LEAD}$ is the public key committed to in $\pi_\text{PoL}$</li>
-<li>$\sigma$ is a signature</li>
+<li><span class="math-inline" data-tex="P_\text{LEAD}"></span> is the public key committed to in <span class="math-inline" data-tex="\pi_\text{PoL}"></span></li>
+<li><span class="math-inline" data-tex="\sigma"></span> is a signature</li>
 </ul>
 </li>
 <li>
@@ -582,7 +583,7 @@ since PoL's are not bound to blocks directly.</li>
 </ol>
 <h3 id="chain-maintenance"><a class="header" href="#chain-maintenance">Chain Maintenance</a></h3>
 <p>The chain maintenance procedure <code>on_block(state, B)</code>
-governs how the block tree $T$ is updated.</p>
+governs how the block tree <span class="math-inline" data-tex="T"></span> is updated.</p>
 <p><strong>Note:</strong> It's assumed that block contents have already been validated
 by the execution layer w.r.t. the parent block's execution state.</p>
 <pre><code class="language-text">define on_block(state, B) → state':
@@ -607,8 +608,8 @@ return (c_loc', B_imm, T')
 </code></pre>
 <h3 id="commit"><a class="header" href="#commit">Commit</a></h3>
 <p>The following procedure commits to the block
-which is $depth$ deep from $c_{loc}$.
-This procedure computes the new latest immutable block $B_\text{imm}$.</p>
+which is <span class="math-inline" data-tex="depth"></span> deep from <span class="math-inline" data-tex="c_{loc}"></span>.
+This procedure computes the new latest immutable block <span class="math-inline" data-tex="B_\text{imm}"></span>.</p>
 <pre><code class="language-text">define commit(T, c_loc, depth) → (T', B_imm):
 
 assert fork_choice_rule = ONLINE
@@ -752,6 +753,9 @@ via Proof-of-Stake.</p>
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

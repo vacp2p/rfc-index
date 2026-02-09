@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../custom.css">
@@ -188,7 +189,8 @@ for new Messaging specifications under discussion.</p>
   <div class="filter-row">
     <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
     <div class="chips" id="status-chips">
-      <span class="chip active" data-status="all" data-label="All">All</span>
+      <span class="chip active" data-status="current" data-label="Current">Current</span>
+      <span class="chip" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>
       <span class="chip" data-status="draft" data-label="Draft">Draft</span>
       <span class="chip" data-status="raw" data-label="Raw">Raw</span>
@@ -259,6 +261,9 @@ for new Messaging specifications under discussion.</p>
         <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/katex/katex.min.js"></script>
+        <script src="../theme/katex/auto-render.min.js"></script>
+        <script src="../scripts/katex-render.js"></script>
         <script src="../scripts/rfc-index.js"></script>
 
 

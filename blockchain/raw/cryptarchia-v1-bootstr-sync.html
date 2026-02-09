@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -217,7 +218,7 @@ that covers all of the following cases:</p>
 <li>From the <strong>Genesis</strong> block</li>
 <li>From the <strong>checkpoint</strong> block obtained from a trusted checkpoint provider</li>
 <li>From the <strong>local block tree</strong>
-(with $B_\text{imm}$ newer than the Genesis and the checkpoint)</li>
+(with <span class="math-inline" data-tex="B_\text{imm}"></span> newer than the Genesis and the checkpoint)</li>
 </ul>
 <p>Additionally, the protocol defines the synchronization mechanism
 that handles orphan blocks while listening for new blocks
@@ -233,7 +234,7 @@ as defined in Setting the Fork Choice Rule.
 If the Bootstrap rule is selected, it is maintained for the Prolonged Bootstrap Period,
 after which the node switches to the Online rule.</p>
 <p>Using the chosen fork choice rule, a node will <strong>download blocks</strong>
-to catch up with the head (also known as the tip) of each peer's local chain $c_{loc}$.</p>
+to catch up with the head (also known as the tip) of each peer's local chain <span class="math-inline" data-tex="c_{loc}"></span>.</p>
 <p>After downloading is done, the node starts <strong>listening for new blocks</strong>.
 Upon receiving a new block, the node validates and adds it to its local block tree.
 If the ancestors of the block are missing from the local block tree,
@@ -241,9 +242,9 @@ the node downloads missing ancestors using the same mechanism as above.</p>
 <h2 id="protocol"><a class="header" href="#protocol">Protocol</a></h2>
 <h3 id="constants"><a class="header" href="#constants">Constants</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Constant</th><th>Name</th><th>Description</th><th>Value</th></tr></thead><tbody>
-<tr><td>$T_\text{offline}$</td><td>Offline Grace Period</td><td>A period during which a node can be restarted without switching to the Bootstrap rule.</td><td>20 minutes</td></tr>
-<tr><td>$T_\text{boot}$</td><td>Prolonged Bootstrap Period</td><td>A period during which Bootstrap fork choice rule must be continuously used after Initial Block Download is completed. This gives nodes additional time to compare their synced chain with a broader set of peers.</td><td>24 hours</td></tr>
-<tr><td>$s_\text{gen}$</td><td>Density Check Slot Window</td><td>A number of slots used by density check of Bootstrap rule. This constant is defined in Cryptarchia Fork Choice Rule - Definitions.</td><td>$\lfloor\frac{k}{4f}\rfloor$ (=4h30m)</td></tr>
+<tr><td><span class="math-inline" data-tex="T_\text{offline}"></span></td><td>Offline Grace Period</td><td>A period during which a node can be restarted without switching to the Bootstrap rule.</td><td>20 minutes</td></tr>
+<tr><td><span class="math-inline" data-tex="T_\text{boot}"></span></td><td>Prolonged Bootstrap Period</td><td>A period during which Bootstrap fork choice rule must be continuously used after Initial Block Download is completed. This gives nodes additional time to compare their synced chain with a broader set of peers.</td><td>24 hours</td></tr>
+<tr><td><span class="math-inline" data-tex="s_\text{gen}"></span></td><td>Density Check Slot Window</td><td>A number of slots used by density check of Bootstrap rule. This constant is defined in Cryptarchia Fork Choice Rule - Definitions.</td><td><span class="math-inline" data-tex="\lfloor\frac{k}{4f}\rfloor"></span> (=4h30m)</td></tr>
 </tbody></table>
 </div>
 <h3 id="setting-the-fork-choice-rule"><a class="header" href="#setting-the-fork-choice-rule">Setting the Fork Choice Rule</a></h3>
@@ -252,31 +253,31 @@ in one of the following cases.
 Otherwise, the node uses the <strong>Online</strong> fork choice rule.</p>
 <ul>
 <li>
-<p><strong>A node is starting with $B_\text{imm}$ set to the Genesis block
+<p><strong>A node is starting with <span class="math-inline" data-tex="B_\text{imm}"></span> set to the Genesis block
 or from a checkpoint block.</strong></p>
-<p>The node is setting its latest immutable block $B_\text{imm}$
+<p>The node is setting its latest immutable block <span class="math-inline" data-tex="B_\text{imm}"></span>
 to the Genesis or a checkpoint,
 which clearly indicates that the node intends to catch up with the subsequent blocks.
 Regardless of how many subsequent blocks remain,
 the node SHOULD use the Bootstrap rule to mitigate long range attacks.</p>
 </li>
 <li>
-<p><strong>A node is restarting after being offline longer than $T_\text{offline}$ (20 minutes).</strong></p>
+<p><strong>A node is restarting after being offline longer than <span class="math-inline" data-tex="T_\text{offline}"></span> (20 minutes).</strong></p>
 <p>Unlike starting from Genesis or checkpoint, in the case where a node is restarted
 while preserving its existing block tree,
 the node MUST choose a fork choice rule depending on how long it has been offline.</p>
 <p>If it is certain that a node has been offline longer than the offline grace period
-$T_\text{offline}$ since it last used the Online rule,
+<span class="math-inline" data-tex="T_\text{offline}"></span> since it last used the Online rule,
 the node uses the Bootstrap rule upon startup.
 Otherwise, it starts with the Online rule.</p>
-<p>Details of $T_\text{offline}$ are described in Offline Grace Period.
+<p>Details of <span class="math-inline" data-tex="T_\text{offline}"></span> are described in Offline Grace Period.
 A recommended way how to measure the offline duration
 is introduced in Offline Duration Measurement.</p>
 </li>
 <li>
 <p><strong>A node operator set the Bootstrap rule explicitly (e.g., by <code>--bootstrap</code> flag).</strong></p>
 <p>In any case where the node operator is clearly aware that the node has fallen behind
-by more than $k$ blocks,
+by more than <span class="math-inline" data-tex="k"></span> blocks,
 they SHOULD be able to start the node with the Bootstrap rule.
 For example, the operator may obtain the latest block height
 from another trusted operator
@@ -286,7 +287,7 @@ and realize that their node has fallen significantly behind due to some issue.</
 <h3 id="initial-block-download"><a class="header" href="#initial-block-download">Initial Block Download</a></h3>
 <p>If peers for Initial Block Download (IBD) are configured,
 a node performs IBD by downloading blocks to catch up with the tip
-of the local chain $c_{loc}$ of each peer
+of the local chain <span class="math-inline" data-tex="c_{loc}"></span> of each peer
 using the fork choice rule chosen in Setting the Fork Choice Rule.</p>
 <p>Blocks are downloaded in parent-to-child order,
 as defined in the Downloading Blocks mechanism.
@@ -312,7 +313,7 @@ allowing the operator to restart the node with other IBD peers.</p>
 the node starts listening for new blocks as described in Listening for New Blocks.</p>
 <h3 id="prolonged-bootstrap-period"><a class="header" href="#prolonged-bootstrap-period">Prolonged Bootstrap Period</a></h3>
 <p>After Initial Block Download is completed,
-a node MUST maintain the Bootstrap fork choice rule during the Bootstrap Period $T_\text{boot}$,
+a node MUST maintain the Bootstrap fork choice rule during the Bootstrap Period <span class="math-inline" data-tex="T_\text{boot}"></span>,
 if the node chose the Bootstrap rule at Setting the Fork Choice Rule.</p>
 <p>The purpose of the Prolonged Bootstrap Period is giving a syncing node
 additional time
@@ -328,18 +329,18 @@ while discovering additional peers,
 allowing it to switch to a better chain if one is found.</p>
 <p>Theoretically, the Bootstrap rule should be prolonged
 until the node has seen a sufficient number of blocks
-beyond the $s_\text{gen}$ slot window,
+beyond the <span class="math-inline" data-tex="s_\text{gen}"></span> slot window,
 which is required for the density check of the Bootstrap rule to be meaningful.
-However, if the node has seen a fork longer than $k$ blocks
+However, if the node has seen a fork longer than <span class="math-inline" data-tex="k"></span> blocks
 from its divergence block during Initial Block Download,
-it means that the node has already seen more slots than $s_\text{gen}$
-with very high probability, considering the small size of $s_\text{gen} = k/(4f)$.
-If the node has never seen any fork longer than $k$ blocks,
+it means that the node has already seen more slots than <span class="math-inline" data-tex="s_\text{gen}"></span>
+with very high probability, considering the small size of <span class="math-inline" data-tex="s_\text{gen} = k/(4f)"></span>.
+If the node has never seen any fork longer than <span class="math-inline" data-tex="k"></span> blocks,
 it means that all forks could have been handled by the longest chain rule,
 which is part of the Bootstrap rule.
-Therefore, this protocol does not explicitly wait $s_\text{gen}$ slots
+Therefore, this protocol does not explicitly wait <span class="math-inline" data-tex="s_\text{gen}"></span> slots
 after Initial Block Download.
-In other words, the protocol does not use $s_\text{gen}$
+In other words, the protocol does not use <span class="math-inline" data-tex="s_\text{gen}"></span>
 to configure the Prolonged Bootstrap Period.</p>
 <p>This protocol configures the Bootstrap Period to 24 hours.</p>
 <p>A timer MUST be started when Listening for New Blocks is started
@@ -477,9 +478,9 @@ The following code shows how the requesting node can be implemented.</p>
 <p>If the node is continuing from a previous <code>DownloadBlocksRequest</code>,
 it is important to include the latest downloaded block
 to the <code>KnownBlocks.additional_blocks</code> to avoid downloading duplicate blocks.</p>
-<p>If the requesting node is downloading blocks up to the peer's tip $c_{loc}$
+<p>If the requesting node is downloading blocks up to the peer's tip <span class="math-inline" data-tex="c_{loc}"></span>
 (e.g. Initial Block Download) by repeating <code>DownloadBlocksRequest</code>s,
-the $c_{loc}$ may switch between requests.
+the <span class="math-inline" data-tex="c_{loc}"></span> may switch between requests.
 The algorithm described above also handles this case
 by specifying the most recent peer's tip each time
 when a <code>DownloadBlocksRequest</code> is constructed.</p>
@@ -497,8 +498,8 @@ allowing nodes to download the checkpoint block and the corresponding ledger sta
 The details are defined in Checkpoint Provider HTTP API.</p>
 <p>The bootstrapping node imports the downloaded checkpoint block and ledger state
 before starting bootstrapping.
-The imported checkpoint block is used as the latest immutable block $B_{imm}$
-and the local chain tip $c_{loc}$.
+The imported checkpoint block is used as the latest immutable block <span class="math-inline" data-tex="B_{imm}"></span>
+and the local chain tip <span class="math-inline" data-tex="c_{loc}"></span>.
 Starting from the checkpoint block,
 the same Initial Block Download is used to download blocks
 up to the tip of the local chain of each peer.
@@ -510,9 +511,9 @@ the node is terminated with an error,
 allowing the node operator to select a new checkpoint.</p>
 <h2 id="details"><a class="header" href="#details">Details</a></h2>
 <h3 id="offline-grace-period"><a class="header" href="#offline-grace-period">Offline Grace Period</a></h3>
-<p>The offline grace period $T_\text{offline}$ is a period during which
+<p>The offline grace period <span class="math-inline" data-tex="T_\text{offline}"></span> is a period during which
 a node can be restarted without switching to the Bootstrap rule.</p>
-<p>This protocol configures $T_\text{offline}$ to 20 minutes.
+<p>This protocol configures <span class="math-inline" data-tex="T_\text{offline}"></span> to 20 minutes.
 Here are the advantages and disadvantages of a short period:</p>
 <p><strong>Advantages:</strong></p>
 <ul>
@@ -525,20 +526,20 @@ beyond the scope of the Online rule.</li>
 <li>Even a short offline duration can too sensitively trigger the Bootstrap rule,
 which then lasts for the long Prolonged Bootstrap Period.</li>
 </ul>
-<p>The following example explains why $T_\text{offline}$ SHOULD NOT be set too long:</p>
+<p>The following example explains why <span class="math-inline" data-tex="T_\text{offline}"></span> SHOULD NOT be set too long:</p>
 <ul>
 <li>A local node stopped in the following situation.
-A malicious peer is building a fork which is now a little shorter ($k - d$)
+A malicious peer is building a fork which is now a little shorter (<span class="math-inline" data-tex="k - d"></span>)
 than the honest chain.</li>
-<li>The local node has been offline shorter than $T_\text{offline}$ and just restarted.
+<li>The local node has been offline shorter than <span class="math-inline" data-tex="T_\text{offline}"></span> and just restarted.
 As defined in this protocol, the Online fork choice rule is used
 because the offline duration is short.</li>
 <li>During the offline duration, the malicious peer made its fork longer
-by adding $k - d$ blocks.
+by adding <span class="math-inline" data-tex="k - d"></span> blocks.
 Now the fork is in the same length as the honest chain.</li>
 <li>If the malicious peer sends the fork to the restarted node
 faster than the honest peer,
-the restarted node will commit to the fork because it has $k$ new blocks.
+the restarted node will commit to the fork because it has <span class="math-inline" data-tex="k"></span> new blocks.
 Even if the node later receives the honest chain from the honest peer,
 it cannot revert blocks that are already immutable.</li>
 </ul>
@@ -643,6 +644,9 @@ paths:
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

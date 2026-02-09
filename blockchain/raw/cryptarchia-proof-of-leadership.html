@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -313,8 +314,8 @@ as a classical transaction modifying the nullifier secret key.</li>
 <li>This solution has good performance:</li>
 </ul>
 <blockquote>
-<p>For a reasonable value of $R = 2^{24}$, this is of little practical concern.
-Public keys are valid for $2^{24}$ slots
+<p>For a reasonable value of <span class="math-inline" data-tex="R = 2^{24}"></span>, this is of little practical concern.
+Public keys are valid for <span class="math-inline" data-tex="2^{24}"></span> slots
 and employing standard space/time trade-offs,
 key updates take under 10,000 hashes, with less than 500kB storage requirement.
 The most expensive part of the process, key generation,
@@ -339,29 +340,29 @@ is only necessary to demonstrate that you are a leader.</p>
 <p><strong>Setup:</strong> When refreshing their notes, potential leaders will:</p>
 <ol>
 <li>
-<p>Uniformly randomly draw a seed $r_1 \xleftarrow{$} \mathbb{F}_p$.</p>
+<p>Uniformly randomly draw a seed <span class="math-inline" data-tex="r_1 \xleftarrow{\$} \mathbb{F}_p"></span>.</p>
 </li>
 <li>
-<p>Construct a Merkle Tree of root $R$ containing $2^{25}$ slot secrets
+<p>Construct a Merkle Tree of root <span class="math-inline" data-tex="R"></span> containing <span class="math-inline" data-tex="2^{25}"></span> slot secrets
 (that are random numbers).
 One way to efficiently construct the tree is to:</p>
 <ul>
 <li>
 <p>Derive the slot secrets using a zkhash chain:
-$\forall i \in [2, 2^{25}], r_i := \text{hash}(r_{i-1})$.</p>
+<span class="math-inline" data-tex="\forall i \in [2, 2^{25}], r_i := \text{hash}(r_{i-1})"></span>.</p>
 <ul>
 <li>More concretely, each leaf is the zkhash of the previous leaf (slot secret).</li>
 </ul>
 </li>
 <li>
 <p>This reduces storage requirements compared to directly randomly drawn
-independently $2^{25}$ slot secrets.</p>
+independently <span class="math-inline" data-tex="2^{25}"></span> slot secrets.</p>
 <ul>
 <li>The first generation of the Merkle tree should be fast enough
 as it only requires hashing data.
 A correct implementation that erases data over time
 could maintain an upper bound in memory usage during the generation
-of the tree to only $\log_2(2^{25}) = 25$ zk hashes which is 800 bytes.</li>
+of the tree to only <span class="math-inline" data-tex="\log_2(2^{25}) = 25"></span> zk hashes which is 800 bytes.</li>
 <li>Leaders are only required to maintain the MMR up to the current slot.
 This means at minimum,
 leaders hold only 25 hashes in memory at any point in time.</li>
@@ -384,11 +385,11 @@ using a fresher one.</li>
 </ul>
 </li>
 <li>
-<p>The user chooses a starting slot $sl_{start}$ from which their note
+<p>The user chooses a starting slot <span class="math-inline" data-tex="sl_{start}"></span> from which their note
 will be eligible for PoS.</p>
-<p>The note MUST be on-chain by the start of epoch $ep - 1$
-to be eligible for PoL in epoch $ep$ because of the age requirement.
-Based on this, we suggest $sl_{start}$ to not be earlier
+<p>The note MUST be on-chain by the start of epoch <span class="math-inline" data-tex="ep - 1"></span>
+to be eligible for PoL in epoch <span class="math-inline" data-tex="ep"></span> because of the age requirement.
+Based on this, we suggest <span class="math-inline" data-tex="sl_{start}"></span> to not be earlier
 than the start of the epoch following the one after the transaction is emitted.
 This prevents the inclusion of unusable slot secrets in the tree
 (because the note would not be aged enough),
@@ -396,7 +397,7 @@ optimizing the PoL lifetime of the note.</p>
 </li>
 <li>
 <p>Finally, they derive their secret key
-$sk := \text{hash}(\text{NOMOS_POL_SK_V1}||sl_{start}||R)$,
+<span class="math-inline" data-tex="sk := \text{hash}(\text{NOMOS\_POL\_SK\_V1}||sl_{start}||R)"></span>,
 binding the starting slot and the Merkle tree of slot secret
 to the note secret key.
 This is verified in Circuit Constraints.</p>
@@ -432,10 +433,10 @@ by proofs or at consensus level and can be adapted by the node
 as long as they are able to derive the merkle proof of their slot secret.</p>
 </blockquote>
 <p><strong>PoL:</strong> When proving the leadership election,
-note owners will prove knowledge of the slot secret corresponding to the slot $sl$.</p>
+note owners will prove knowledge of the slot secret corresponding to the slot <span class="math-inline" data-tex="sl"></span>.</p>
 <ol>
-<li>To do that, they will give a Merkle path from the leaf at index $sl - sl_{start}$.</li>
-<li>The root of the tree hashed with $sl_{start}$ MUST be the secret key $sk$,
+<li>To do that, they will give a Merkle path from the leaf at index <span class="math-inline" data-tex="sl - sl_{start}"></span>.</li>
+<li>The root of the tree hashed with <span class="math-inline" data-tex="sl_{start}"></span> MUST be the secret key <span class="math-inline" data-tex="sk"></span>,
 which will be used for public key derivation.</li>
 </ol>
 <p><strong>Protection against adaptive adversaries:</strong>
@@ -452,7 +453,7 @@ Therefore, an adversary would not be able to generate the PoL for previous slots
 <p>In order to prove that the winning note exists in the ledger
 and existed at the start of the previous epoch,
 every node MUST compute two ledger commitments.
-These commitments $ledger_{AGED}$ and $ledger_{LATEST}$
+These commitments <span class="math-inline" data-tex="ledger_{AGED}"></span> and <span class="math-inline" data-tex="ledger_{LATEST}"></span>
 are Merkle roots constructed over the Note IDs.
 The trees have a depth of 32 and are populated with note IDs.
 The value 0 represents an empty leaf.
@@ -514,19 +515,19 @@ However, note IDs uniqueness guarantees protection against attacks on note aging
 MUST agree on these values:</p>
 <ol>
 <li>
-<p><strong>The slot number:</strong> $sl$.</p>
+<p><strong>The slot number:</strong> <span class="math-inline" data-tex="sl"></span>.</p>
 </li>
 <li>
-<p><strong>The epoch nonce:</strong> $\eta$.</p>
+<p><strong>The epoch nonce:</strong> <span class="math-inline" data-tex="\eta"></span>.</p>
 <ul>
 <li>For details see Cryptarchia v1 Protocol Specification - Epoch Nonce.</li>
 </ul>
 </li>
 <li>
 <p><strong>The lottery function constants:</strong>
-$t_0 = -\frac{\text{VRF_order} \cdot \ln(1-f)}{\text{inferred_total_stake}}$
+<span class="math-inline" data-tex="t_0 = -\frac{\text{VRF\_order} \cdot \ln(1-f)}{\text{inferred\_total\_stake}}"></span>
 and
-$t_1 = -\frac{\text{VRF_order} \cdot \ln^2(1-f)}{2 \cdot \text{inferred_total_stake}^2}$.</p>
+<span class="math-inline" data-tex="t_1 = -\frac{\text{VRF\_order} \cdot \ln^2(1-f)}{2 \cdot \text{inferred\_total\_stake}^2}"></span>.</p>
 <ul>
 <li>For details see Lottery Approximation.</li>
 <li>These numbers MUST be computed with high precision outside the proof.</li>
@@ -534,19 +535,19 @@ $t_1 = -\frac{\text{VRF_order} \cdot \ln^2(1-f)}{2 \cdot \text{inferred_total_st
 </li>
 <li>
 <p><strong>The root of the note Merkle tree when the stake distribution was frozen:</strong>
-$ledger_{AGED}$.</p>
+<span class="math-inline" data-tex="ledger_{AGED}"></span>.</p>
 <ul>
 <li>For details see Cryptarchia v1 Protocol Specification - Epoch State Pseudocode.</li>
 </ul>
 </li>
 <li>
-<p><strong>The latest root of the note Merkle tree:</strong> $ledger_{LATEST}$.</p>
+<p><strong>The latest root of the note Merkle tree:</strong> <span class="math-inline" data-tex="ledger_{LATEST}"></span>.</p>
 <ul>
 <li>Used to ensure the leadership note has not been spent.</li>
 </ul>
 </li>
 <li>
-<p><strong>The leader's one-time public key</strong> $P_{LEAD}$
+<p><strong>The leader's one-time public key</strong> <span class="math-inline" data-tex="P_{LEAD}"></span>
 represented by 2 public inputs, each of 16 bytes in little endian.
 This key is needed to sign the proposed block.</p>
 <ul>
@@ -554,7 +555,7 @@ This key is needed to sign the proposed block.</p>
 </ul>
 </li>
 <li>
-<p><strong>The entropy contribution</strong> $\rho_{LEAD}$ verified to be correctly derived.</p>
+<p><strong>The entropy contribution</strong> <span class="math-inline" data-tex="\rho_{LEAD}"></span> verified to be correctly derived.</p>
 <ul>
 <li>This is the epoch nonce entropy contribution.
 See Cryptarchia v1 Protocol Specification - Epoch Nonce.</li>
@@ -565,33 +566,33 @@ See Cryptarchia v1 Protocol Specification - Epoch Nonce.</li>
 <p>The prover has to provide these values, but they remain secret:</p>
 <ol>
 <li>
-<p><strong>The slot secret and the related information</strong> used for the slot $sl$
+<p><strong>The slot secret and the related information</strong> used for the slot <span class="math-inline" data-tex="sl"></span>
 as described in Protection Against Adaptive Adversaries:</p>
 <ul>
-<li>The slot secret $r_{sl}$.</li>
-<li>The Merkle path $slot_secret_path$ of $r_{sl}$ leading to the root $R$.</li>
-<li>The starting secret slot $sl_{start}$.</li>
+<li>The slot secret <span class="math-inline" data-tex="r_{sl}"></span>.</li>
+<li>The Merkle path <span class="math-inline" data-tex="slot\_secret\_path"></span> of <span class="math-inline" data-tex="r_{sl}"></span> leading to the root <span class="math-inline" data-tex="R"></span>.</li>
+<li>The starting secret slot <span class="math-inline" data-tex="sl_{start}"></span>.</li>
 </ul>
 </li>
 <li>
-<p><strong>The eligible note and its related information</strong> used to derive the $noteID$
+<p><strong>The eligible note and its related information</strong> used to derive the <span class="math-inline" data-tex="noteID"></span>
 (the secret key is derived for the previous step):</p>
 <ul>
-<li>The note value: $v$.</li>
-<li>The note transaction zk hash: $note_tx_hash$.</li>
-<li>The note outputs number: $note_output_number$.</li>
+<li>The note value: <span class="math-inline" data-tex="v"></span>.</li>
+<li>The note transaction zk hash: <span class="math-inline" data-tex="note\_tx\_hash"></span>.</li>
+<li>The note outputs number: <span class="math-inline" data-tex="note\_output\_number"></span>.</li>
 </ul>
 </li>
 <li>
 <p><strong>The proof of membership</strong> of the note identifier in the zone ledgers
-$ledger_{AGED}$ and $ledger_{LATEST}$.
+<span class="math-inline" data-tex="ledger_{AGED}"></span> and <span class="math-inline" data-tex="ledger_{LATEST}"></span>.
 This is done by providing the complementary Merkle nodes
 and indicating whether they are left (0) or right (1) through boolean selectors:</p>
 <ul>
-<li>The aged ledger complementary nodes: $noteid_aged_path$.</li>
-<li>The aged ledger complementary node selectors: $note_id_aged_selectors$.</li>
-<li>The latest ledger complementary nodes: $noteid_latest_path$.</li>
-<li>The latest ledger complementary node selectors: $note_id_latest_selectors$.</li>
+<li>The aged ledger complementary nodes: <span class="math-inline" data-tex="noteid\_aged\_path"></span>.</li>
+<li>The aged ledger complementary node selectors: <span class="math-inline" data-tex="note\_id\_aged\_selectors"></span>.</li>
+<li>The latest ledger complementary nodes: <span class="math-inline" data-tex="noteid\_latest\_path"></span>.</li>
+<li>The latest ledger complementary node selectors: <span class="math-inline" data-tex="note\_id\_latest\_selectors"></span>.</li>
 </ul>
 </li>
 </ol>
@@ -599,46 +600,46 @@ and indicating whether they are left (0) or right (1) through boolean selectors:
 <p>The proof confirms the following relations:</p>
 <ol>
 <li>
-<p>The derivation of the Merkle tree root $R$
-using the slot secret $r_{sl}$ as the $sl - sl_{start}$'s leaf
+<p>The derivation of the Merkle tree root <span class="math-inline" data-tex="R"></span>
+using the slot secret <span class="math-inline" data-tex="r_{sl}"></span> as the <span class="math-inline" data-tex="sl - sl_{start}"></span>'s leaf
 of the Merkle tree using the Merkle path.</p>
-<p>This is a proof of knowledge of the secret slot $r_{sl}$
+<p>This is a proof of knowledge of the secret slot <span class="math-inline" data-tex="r_{sl}"></span>
 guaranteeing protection against adaptive adversaries.</p>
 </li>
 <li>
-<p>The derivation of $sk = \text{hash}(\text{NOMOS_POL_SK_V1}||sl_{start}||R)$,
+<p>The derivation of <span class="math-inline" data-tex="sk = \text{hash}(\text{NOMOS\_POL\_SK\_V1}||sl_{start}||R)"></span>,
 as documented in Protection Against Adaptive Adversaries.</p>
 </li>
 <li>
 <p>The computation of the note identifier.</p>
 </li>
 <li>
-<p>The note identifier is in $ledger_{AGED}$ and $ledger_{LATEST}$.</p>
+<p>The note identifier is in <span class="math-inline" data-tex="ledger_{AGED}"></span> and <span class="math-inline" data-tex="ledger_{LATEST}"></span>.</p>
 </li>
 <li>
 <p>The computation of the lottery ticket:
-$ticket := \text{hash}(\text{LEAD_V1}||\eta||sl||noteID||sk)$ using Poseidon2.</p>
+<span class="math-inline" data-tex="ticket := \text{hash}(\text{LEAD\_V1}||\eta||sl||noteID||sk)"></span> using Poseidon2.</p>
 </li>
 <li>
-<p>The computation of the threshold: $t := v(t_0 + t_1 \cdot v)$.
+<p>The computation of the threshold: <span class="math-inline" data-tex="t := v(t_0 + t_1 \cdot v)"></span>.
 The ticket MUST be lower than this threshold to win the lottery.</p>
 </li>
 <li>
-<p>The check that indeed $ticket &lt; t$.</p>
+<p>The check that indeed <span class="math-inline" data-tex="ticket &lt; t"></span>.</p>
 </li>
 <li>
 <p>Compute and output the entropy contribution
-$\rho_{LEAD} := \text{hash}(\text{NOMOS_NONCE_CONTRIB_V1}||sl||noteID||sk)$.</p>
+<span class="math-inline" data-tex="\rho_{LEAD} := \text{hash}(\text{NOMOS\_NONCE\_CONTRIB\_V1}||sl||noteID||sk)"></span>.</p>
 </li>
 </ol>
 <h3 id="linking-the-proof-of-leadership-to-a-block"><a class="header" href="#linking-the-proof-of-leadership-to-a-block">Linking the Proof of Leadership to a Block</a></h3>
 <p>The PoL is bound to a public key from an asymmetric signature scheme.
-This public key $P_{LEAD}$ is given as two public inputs during the PoL proof generation,
+This public key <span class="math-inline" data-tex="P_{LEAD}"></span> is given as two public inputs during the PoL proof generation,
 binding the proof to the key.</p>
 <ul>
 <li>The public key is represented by two public inputs of 16 bytes
 to guarantee the support of every possible EdDSA25519 public key.</li>
-<li>This public key is later used to verify the signature $\sigma$ of a block
+<li>This public key is later used to verify the signature <span class="math-inline" data-tex="\sigma"></span> of a block
 when it is dispersed.
 This ensures that the PoL is tied to a specific block,
 and only the entity creating the proof can perform this binding.</li>
@@ -650,10 +651,10 @@ by observing the frequency at which it emits a PoL.</li>
 <h2 id="appendix"><a class="header" href="#appendix">Appendix</a></h2>
 <h3 id="lottery-approximation"><a class="header" href="#lottery-approximation">Lottery Approximation</a></h3>
 <ul>
-<li>The $\phi_f(\alpha) = 1 - (1-f)^\alpha$ function of Ouroboros Crypsinous
+<li>The <span class="math-inline" data-tex="\phi_f(\alpha) = 1 - (1-f)^\alpha"></span> function of Ouroboros Crypsinous
 cannot be computed in a hand-written circuit
-as it can only operate on elements of $\mathbb{F}_p$
-for a certain prime number $p$.</li>
+as it can only operate on elements of <span class="math-inline" data-tex="\mathbb{F}_p"></span>
+for a certain prime number <span class="math-inline" data-tex="p"></span>.</li>
 <li>Managing floating point numbers and mathematical functions
 involving floating points like exponentiations or logarithms in circuits
 is very inefficient.</li>
@@ -662,46 +663,46 @@ the Taylor expansion of order 2 method is used
 to approximate the Ouroboros Genesis (and Crypsinous) function
 by the following linear function:
 <ul>
-<li>$\stackrel{0}{\sim}$ means nearly equal in the neighborhood of 0</li>
-<li>$f$ is the probability that at least one leader wins the lottery on each slot</li>
-<li>$x$ is the stake of the proven note</li>
+<li><span class="math-inline" data-tex="\stackrel{0}{\sim}"></span> means nearly equal in the neighborhood of 0</li>
+<li><span class="math-inline" data-tex="f"></span> is the probability that at least one leader wins the lottery on each slot</li>
+<li><span class="math-inline" data-tex="x"></span> is the stake of the proven note</li>
 </ul>
 </li>
 </ul>
-<p>$$1 - (1-f)^x = 1 - e^{x \ln(1-f)}$$</p>
-<p>$$1 - e^{x \ln(1-f)} \stackrel{0}{\sim} x(-\ln(1-f) - 0.5 \ln^2(1-f)x)$$</p>
-<p>Then the threshold is $stake(t_0 + t_1 \cdot stake)$ with
-$t_0 := -\frac{\text{VRF_order} \cdot \ln(1-f)}{\text{inferred_total_stake}}$
+<div class="math-block" data-tex="1 - (1-f)^x = 1 - e^{x \ln(1-f)}"></div>
+<div class="math-block" data-tex="1 - e^{x \ln(1-f)} \stackrel{0}{\sim} x(-\ln(1-f) - 0.5 \ln^2(1-f)x)"></div>
+<p>Then the threshold is <span class="math-inline" data-tex="stake(t_0 + t_1 \cdot stake)"></span> with
+<span class="math-inline" data-tex="t_0 := -\frac{\text{VRF\_order} \cdot \ln(1-f)}{\text{inferred\_total\_stake}}"></span>
 and
-$t_1 := -\frac{\text{VRF_order} \cdot \ln^2(1-f)}{2 \cdot \text{inferred_total_stake}^2}$.</p>
+<span class="math-inline" data-tex="t_1 := -\frac{\text{VRF\_order} \cdot \ln^2(1-f)}{2 \cdot \text{inferred\_total\_stake}^2}"></span>.</p>
 <p>Since everything is known by every node except the value of the staked note,
-we pre-compute $t_0$ and $t_1$ outside of the circuit.</p>
+we pre-compute <span class="math-inline" data-tex="t_0"></span> and <span class="math-inline" data-tex="t_1"></span> outside of the circuit.</p>
 <ul>
 <li>The Hash functions used to derive the lottery ticket is Poseidon2
-so the VRF_order is $p$ the order of the scalar field of the BN254 elliptic curve.</li>
-<li>To compute $t_0$ and $t_1$, we precomputed the constant parts using sagemath
+so the VRF_order is <span class="math-inline" data-tex="p"></span> the order of the scalar field of the BN254 elliptic curve.</li>
+<li>To compute <span class="math-inline" data-tex="t_0"></span> and <span class="math-inline" data-tex="t_1"></span>, we precomputed the constant parts using sagemath
 and real number of 512 bits precision.
-In the implementation, $t_0$ and $t_1$ should then be derived
+In the implementation, <span class="math-inline" data-tex="t_0"></span> and <span class="math-inline" data-tex="t_1"></span> should then be derived
 using 256-bit precision integers following:</li>
 </ul>
 <div class="table-wrapper"><table><thead><tr><th>Variable</th><th>Formula</th></tr></thead><tbody>
-<tr><td>$p$</td><td><code>0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001</code></td></tr>
-<tr><td>$t_0_constant$</td><td><code>0x1a3fb997fd58374772808c13d1c2ddacb5ab3ea77413f86fd6e0d3d978e5438</code></td></tr>
-<tr><td>$t_1_constant$</td><td><code>0x71e790b41991052e30c93934b5612412e7958837bac8b1c524c24d84cc7d0</code></td></tr>
-<tr><td>$t_0$</td><td>$\frac{t_0_constant}{\text{inferred_total_stake}}$</td></tr>
-<tr><td>$t_1$</td><td>$p - \lfloor\frac{t_1_constant}{\text{inferred_total_stake}^2}\rfloor$</td></tr>
+<tr><td><span class="math-inline" data-tex="p"></span></td><td><code>0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001</code></td></tr>
+<tr><td><span class="math-inline" data-tex="t_0\_constant"></span></td><td><code>0x1a3fb997fd58374772808c13d1c2ddacb5ab3ea77413f86fd6e0d3d978e5438</code></td></tr>
+<tr><td><span class="math-inline" data-tex="t_1\_constant"></span></td><td><code>0x71e790b41991052e30c93934b5612412e7958837bac8b1c524c24d84cc7d0</code></td></tr>
+<tr><td><span class="math-inline" data-tex="t_0"></span></td><td><span class="math-inline" data-tex="\frac{t_0\_constant}{\text{inferred\_total\_stake}}"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="t_1"></span></td><td><span class="math-inline" data-tex="p - \lfloor\frac{t_1\_constant}{\text{inferred\_total\_stake}^2}\rfloor"></span></td></tr>
 </tbody></table>
 </div>
 <h3 id="error-analysis"><a class="header" href="#error-analysis">Error Analysis</a></h3>
 <ul>
-<li>For $f = 0.05$.
-The error percentage is computed with $100 \cdot \frac{estimation - real_value}{real_value}$.</li>
+<li>For <span class="math-inline" data-tex="f = 0.05"></span>.
+The error percentage is computed with <span class="math-inline" data-tex="100 \cdot \frac{estimation - real\_value}{real\_value}"></span>.</li>
 <li>This analysis considers inferred_total_stake to be 23.5B as in Cardano.</li>
-<li>Original function: $1 - (1-f)^{\frac{stake}{\text{inferred_total_stake}}}$</li>
+<li>Original function: <span class="math-inline" data-tex="1 - (1-f)^{\frac{stake}{\text{inferred\_total\_stake}}}"></span></li>
 <li>Taylor expansion of order 1:
-$-\frac{stake}{\text{inferred_total_stake}} \ln(1-f) := stake \cdot t_0$</li>
+<span class="math-inline" data-tex="-\frac{stake}{\text{inferred\_total\_stake}} \ln(1-f) := stake \cdot t_0"></span></li>
 <li>Taylor expansion of order 2:
-$\frac{stake}{\text{inferred_total_stake}}(-\ln(1-f) - 0.5 \ln^2(1-f)(\frac{stake}{\text{inferred_total_stake}})) := stake(t_0 + stake \cdot t_1)$</li>
+<span class="math-inline" data-tex="\frac{stake}{\text{inferred\_total\_stake}}(-\ln(1-f) - 0.5 \ln^2(1-f)(\frac{stake}{\text{inferred\_total\_stake}})) := stake(t_0 + stake \cdot t_1)"></span></li>
 </ul>
 <div class="table-wrapper"><table><thead><tr><th>stake (%)</th><th>order 1 error</th><th>order 2 error</th></tr></thead><tbody>
 <tr><td>5%</td><td>0.13%</td><td>-0.0001%</td></tr>
@@ -798,6 +799,9 @@ $\frac{stake}{\text{inferred_total_stake}}(-\ln(1-f) - 0.5 \ln^2(1-f)(\frac{stak
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

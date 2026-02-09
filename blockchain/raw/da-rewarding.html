@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
         <link rel="stylesheet" href="../../theme/fonts/fonts.css">
         <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="../../custom.css">
@@ -211,26 +212,26 @@ activity proof, quality of service, sampling</p>
 in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
 <h3 id="definitions"><a class="header" href="#definitions">Definitions</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Terminology</th><th>Description</th></tr></thead><tbody>
-<tr><td>Block Finality</td><td>A period expressed in number of blocks (2160) after which a block is considered finalized, as defined by parameter $k$ in Cryptarchia.</td></tr>
+<tr><td>Block Finality</td><td>A period expressed in number of blocks (2160) after which a block is considered finalized, as defined by parameter <span class="math-inline" data-tex="k"></span> in Cryptarchia.</td></tr>
 <tr><td>Session</td><td>A time period during which the same set of nodes executes the protocol. Session length is two block finalization periods (4320 blocks).</td></tr>
 <tr><td>Activity Proof</td><td>A data structure containing binary opinion vectors about other nodes' service quality.</td></tr>
 <tr><td>Active Message</td><td>A message registered on the ledger that contains a node's activity proof for a session.</td></tr>
 <tr><td>Opinion Threshold</td><td>The ratio of positive to negative opinions required for a node to be positively opinionated (default: 10).</td></tr>
-<tr><td>Activity Threshold</td><td>The number of positive opinions ($\theta = N_s/2$) a node must collect to be considered active.</td></tr>
+<tr><td>Activity Threshold</td><td>The number of positive opinions (<span class="math-inline" data-tex="\theta = N_s/2"></span>) a node must collect to be considered active.</td></tr>
 <tr><td>DA Node</td><td>A node providing data availability service, identified by a unique <code>ProviderId</code>.</td></tr>
 <tr><td>SDP</td><td>Service Declaration Protocol, used to retrieve the list of active DA nodes.</td></tr>
 </tbody></table>
 </div>
 <h3 id="notations"><a class="header" href="#notations">Notations</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Description</th></tr></thead><tbody>
-<tr><td>$s$</td><td>Current session number.</td></tr>
-<tr><td>$N_s$</td><td>Set of DA nodes (unique <code>ProviderId</code>s) active during session $s$.</td></tr>
-<tr><td>$S$</td><td>Session length in blocks (4320).</td></tr>
-<tr><td>$b$</td><td>Block number.</td></tr>
-<tr><td>$\theta$</td><td>Activity threshold ($N_s/2$).</td></tr>
-<tr><td>$R_s$</td><td>Base reward for session $s$.</td></tr>
-<tr><td>$I_s$</td><td>Total income for DA service during session $s$.</td></tr>
-<tr><td>$R(n)$</td><td>Reward for node $n$.</td></tr>
+<tr><td><span class="math-inline" data-tex="s"></span></td><td>Current session number.</td></tr>
+<tr><td><span class="math-inline" data-tex="N_s"></span></td><td>Set of DA nodes (unique <code>ProviderId</code>s) active during session <span class="math-inline" data-tex="s"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="S"></span></td><td>Session length in blocks (4320).</td></tr>
+<tr><td><span class="math-inline" data-tex="b"></span></td><td>Block number.</td></tr>
+<tr><td><span class="math-inline" data-tex="\theta"></span></td><td>Activity threshold (<span class="math-inline" data-tex="N_s/2"></span>).</td></tr>
+<tr><td><span class="math-inline" data-tex="R_s"></span></td><td>Base reward for session <span class="math-inline" data-tex="s"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="I_s"></span></td><td>Total income for DA service during session <span class="math-inline" data-tex="s"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="R(n)"></span></td><td>Reward for node <span class="math-inline" data-tex="n"></span>.</td></tr>
 </tbody></table>
 </div>
 <h2 id="background"><a class="header" href="#background">Background</a></h2>
@@ -253,26 +254,26 @@ further discouraging manipulation of the opinion system.</p>
 <p>The mechanism operates across three consecutive sessions:</p>
 <ol>
 <li>
-<p><strong>Session $s$</strong>: NomosDA nodes perform sampling of data blobs referenced in blocks.
+<p><strong>Session <span class="math-inline" data-tex="s"></span></strong>: NomosDA nodes perform sampling of data blobs referenced in blocks.
 While sampling, nodes interact with and evaluate the service quality
 of other randomly selected nodes from different subnetworks.
 Nodes sample both new blocks and old blocks.</p>
 </li>
 <li>
-<p><strong>Session $s + 1$</strong>: Nodes formalize their evaluations by submitting Activity Proofs—
+<p><strong>Session <span class="math-inline" data-tex="s + 1"></span></strong>: Nodes formalize their evaluations by submitting Activity Proofs—
 binary vectors where each bit represents their opinion (positive or negative)
 about other nodes' service quality.
 These opinions are tracked separately for new and old blocks.
 The proofs are recorded on the ledger through Active Messages.</p>
 </li>
 <li>
-<p><strong>Session $s + 2$</strong>: Rewards are distributed.
+<p><strong>Session <span class="math-inline" data-tex="s + 2"></span></strong>: Rewards are distributed.
 Nodes that accumulate positive opinions above the activity threshold
 receive a fixed reward calculated as a portion of the session's DA service income.</p>
 </li>
 </ol>
 <h2 id="protocol-specification"><a class="header" href="#protocol-specification">Protocol Specification</a></h2>
-<h3 id="session-s-sampling-phase"><a class="header" href="#session-s-sampling-phase">Session $s$: Sampling Phase</a></h3>
+<h3 id="session--sampling-phase"><a class="header" href="#session--sampling-phase">Session <span class="math-inline" data-tex="s"></span>: Sampling Phase</a></h3>
 <ol>
 <li>
 <p>If the number of DA nodes (unique <code>ProviderId</code>s from declarations)
@@ -280,19 +281,19 @@ retrieved from the SDP is below the minimum,
 then do not perform sampling for <strong>new blocks</strong>.</p>
 </li>
 <li>
-<p>If the number of DA nodes retrieved from the SDP for session $s - 1$
+<p>If the number of DA nodes retrieved from the SDP for session <span class="math-inline" data-tex="s - 1"></span>
 was below the minimum,
 then do not perform sampling for <strong>old blocks</strong>.</p>
 </li>
 <li>
 <p>If the number of DA nodes retrieved from the SDP is below the minimum
-for both session $s$ and $s - 1$,
+for both session <span class="math-inline" data-tex="s"></span> and <span class="math-inline" data-tex="s - 1"></span>,
 then stop and do not execute this protocol.</p>
 </li>
 <li>
-<p>The DA node performs sampling for every new block $b$ it receives,
-and for an old block $b - S$ for every new block received
-(where $S = 4320$ is the session length).</p>
+<p>The DA node performs sampling for every new block <span class="math-inline" data-tex="b"></span> it receives,
+and for an old block <span class="math-inline" data-tex="b - S"></span> for every new block received
+(where <span class="math-inline" data-tex="S = 4320"></span> is the session length).</p>
 <ol>
 <li>
 <p>The node selects at random (without replacement) 20 out of 2048 subnetworks.</p>
@@ -316,7 +317,7 @@ provided by selected nodes as defined in
 <a href="#quality-of-service-measurement">Quality of Service Measurement</a>.</p>
 </li>
 </ol>
-<h3 id="session-s--1-opinion-submission-phase"><a class="header" href="#session-s--1-opinion-submission-phase">Session $s + 1$: Opinion Submission Phase</a></h3>
+<h3 id="session--opinion-submission-phase"><a class="header" href="#session--opinion-submission-phase">Session <span class="math-inline" data-tex="s + 1"></span>: Opinion Submission Phase</a></h3>
 <ol>
 <li>
 <p>The DA node generates an Activity Proof that contains opinion vectors,
@@ -328,10 +329,10 @@ for new and old blocks.</p>
 and contains the node's Activity Proof.</p>
 </li>
 </ol>
-<h3 id="session-s--2-reward-distribution-phase"><a class="header" href="#session-s--2-reward-distribution-phase">Session $s + 2$: Reward Distribution Phase</a></h3>
+<h3 id="session--reward-distribution-phase"><a class="header" href="#session--reward-distribution-phase">Session <span class="math-inline" data-tex="s + 2"></span>: Reward Distribution Phase</a></h3>
 <ol>
 <li>
-<p>Every node that collected above $\theta$ positive opinions
+<p>Every node that collected above <span class="math-inline" data-tex="\theta"></span> positive opinions
 receives a fixed reward as defined in <a href="#reward-calculation">Reward Calculation</a>.</p>
 </li>
 <li>
@@ -350,43 +351,43 @@ to be positively opinionated (at least 90% positive opinions).</p>
 a node MUST:</p>
 <ol>
 <li>
-<p>Retrieve $\mathcal{N}_s$, a list of active DA nodes (unique <code>ProviderId</code>s)
-for session $s$, from the SDP.</p>
+<p>Retrieve <span class="math-inline" data-tex="\mathcal{N}_s"></span>, a list of active DA nodes (unique <code>ProviderId</code>s)
+for session <span class="math-inline" data-tex="s"></span>, from the SDP.</p>
 </li>
 <li>
-<p>Retrieve $\mathcal{N}_{s-1}$, a list of active DA nodes for session $s - 1$,
+<p>Retrieve <span class="math-inline" data-tex="\mathcal{N}_{s-1}"></span>, a list of active DA nodes for session <span class="math-inline" data-tex="s - 1"></span>,
 from the SDP (can be retained from the previous session).</p>
 </li>
 <li>
-<p>Order $\mathcal{N}<em>s$ and $\mathcal{N}</em>{s-1}$ in ascending lexicographical order
+<p>Order <span class="math-inline" data-tex="\mathcal{N}_s"></span> and <span class="math-inline" data-tex="\mathcal{N}_{s-1}"></span> in ascending lexicographical order
 by <code>ProviderId</code> of each node from both lists.</p>
 </li>
 <li>
-<p>Create for each session and independently for old ($\mathcal{N} = \mathcal{N}_{s-1}$)
-and new ($\mathcal{N} = \mathcal{N}_s$) blocks:</p>
+<p>Create for each session and independently for old (<span class="math-inline" data-tex="\mathcal{N} = \mathcal{N}_{s-1}"></span>)
+and new (<span class="math-inline" data-tex="\mathcal{N} = \mathcal{N}_s"></span>) blocks:</p>
 <ol>
 <li>
-<p><code>positive_opinions</code> vector of size $N = \text{length}(\mathcal{N})$
-where the $i$-th element (integer) represents positive opinions
-about the $i$-th node from list $\mathcal{N}$.</p>
+<p><code>positive_opinions</code> vector of size <span class="math-inline" data-tex="N = \text{length}(\mathcal{N})"></span>
+where the <span class="math-inline" data-tex="i"></span>-th element (integer) represents positive opinions
+about the <span class="math-inline" data-tex="i"></span>-th node from list <span class="math-inline" data-tex="\mathcal{N}"></span>.</p>
 </li>
 <li>
-<p><code>negative_opinions</code> vector of size $N = \text{length}(\mathcal{N})$
-where the $i$-th element (integer) represents negative opinions
-about the $i$-th node from list $\mathcal{N}$.</p>
+<p><code>negative_opinions</code> vector of size <span class="math-inline" data-tex="N = \text{length}(\mathcal{N})"></span>
+where the <span class="math-inline" data-tex="i"></span>-th element (integer) represents negative opinions
+about the <span class="math-inline" data-tex="i"></span>-th node from list <span class="math-inline" data-tex="\mathcal{N}"></span>.</p>
 </li>
 <li>
-<p><code>blacklist</code> vector of size $N = \text{length}(\mathcal{N})$
-where the $i$-th element (bool) marks whether the $i$-th node
+<p><code>blacklist</code> vector of size <span class="math-inline" data-tex="N = \text{length}(\mathcal{N})"></span>
+where the <span class="math-inline" data-tex="i"></span>-th element (bool) marks whether the <span class="math-inline" data-tex="i"></span>-th node
 is blacklisted due to providing an invalid response.</p>
 </li>
 </ol>
 </li>
 <li>
-<p>Send a sampling request to a node $n \in \mathcal{N}$ such that <code>blacklist[n]==0</code>:</p>
+<p>Send a sampling request to a node <span class="math-inline" data-tex="n \in \mathcal{N}"></span> such that <code>blacklist[n]==0</code>:</p>
 <ol>
 <li>
-<p>If the node $n$ responds:</p>
+<p>If the node <span class="math-inline" data-tex="n"></span> responds:</p>
 <ol>
 <li>If the response is valid, then <code>positive_opinions[n]++</code></li>
 <li>If the response is not valid, then:
@@ -403,7 +404,7 @@ is blacklisted due to providing an invalid response.</p>
 </ol>
 </li>
 <li>
-<p>When the next session starts, create an opinions binary for every node $i \in \mathcal{N}$:</p>
+<p>When the next session starts, create an opinions binary for every node <span class="math-inline" data-tex="i \in \mathcal{N}"></span>:</p>
 <pre><code class="language-python">previous_session_opinions[i] = opinion(i, old.positive_opinions,
                                        old.negative_opinions,
                                        old.opinions_threshold)
@@ -433,7 +434,7 @@ if the node was taking part in the protocol during the previous session.</p>
     current_session_opinions_length: int
     current_session_opinions: Opinions
 </code></pre>
-<p><code>Opinions</code> is a binary vector of length $N_s$
+<p><code>Opinions</code> is a binary vector of length <span class="math-inline" data-tex="N_s"></span>
 (total number of nodes identified by unique <code>ProviderId</code>s from declarations)
 where each bit represents a node providing DA service for the session.
 A bit is set to 1 only when the node considers the sampling service
@@ -469,7 +470,7 @@ when the DA service was not operational during that session.</p>
 </li>
 <li>
 <p>The byte-length of the <code>previous_session_opinions</code> vector is:</p>
-<p>$$|\text{previous_session_opinions}| = \left\lceil \frac{\log_2(N_{s-1} + 1)}{8} \right\rceil$$</p>
+<div class="math-block" data-tex="|\text{previous\_session\_opinions}| = \left\lceil \frac{\log_2(N_{s-1} + 1)}{8} \right\rceil"></div>
 </li>
 <li>
 <p>The <code>previous_session_opinions</code> vector is not provided
@@ -478,21 +479,21 @@ when the DA service was not operational during that session.</p>
 </li>
 <li>
 <p>The byte-length of the <code>current_session_opinions</code> vector is:</p>
-<p>$$|\text{current_session_opinions}| = \left\lceil \frac{\log_2(N_s + 1)}{8} \right\rceil$$</p>
+<div class="math-block" data-tex="|\text{current\_session\_opinions}| = \left\lceil \frac{\log_2(N_s + 1)}{8} \right\rceil"></div>
 </li>
 <li>
-<p>The $n$-th node (note that $n \in \mathcal{N}<em>s \not\Rightarrow n \in \mathcal{N}</em>{s-1}$)
-is represented by the $n$-th bit of the vector (counting nodes from 0),
+<p>The <span class="math-inline" data-tex="n"></span>-th node (note that <span class="math-inline" data-tex="n \in \mathcal{N}_s \not\Rightarrow n \in \mathcal{N}_{s-1}"></span>)
+is represented by the <span class="math-inline" data-tex="n"></span>-th bit of the vector (counting nodes from 0),
 with the vector encoded as little-endian.
 The rightmost byte of the vector MAY contain bits not mapped to any node;
 these bits are disregarded.</p>
 </li>
 </ul>
 <h3 id="activity-threshold"><a class="header" href="#activity-threshold">Activity Threshold</a></h3>
-<p>The activity threshold $\theta$ defines the number of positive opinions
-a node must collect from peers to be considered active for session $s$.</p>
-<p>$$\theta = N_s / 2$$</p>
-<p>Where $\theta$ controls the number of positive opinions
+<p>The activity threshold <span class="math-inline" data-tex="\theta"></span> defines the number of positive opinions
+a node must collect from peers to be considered active for session <span class="math-inline" data-tex="s"></span>.</p>
+<div class="math-block" data-tex="\theta = N_s / 2"></div>
+<p>Where <span class="math-inline" data-tex="\theta"></span> controls the number of positive opinions
 a node must collect to be considered active.</p>
 <h3 id="active-message"><a class="header" href="#active-message">Active Message</a></h3>
 <p>Each node for every session constructs an <code>active_message</code>
@@ -508,7 +509,7 @@ when the DA service is non-operational for more than a single session.</p>
 <ul>
 <li>An Active Message is stored on the ledger.</li>
 <li>An Active Message is used for calculating the node reward.</li>
-<li>An Active Message for session $s$ MUST only be sent during session $s + 1$;
+<li>An Active Message for session <span class="math-inline" data-tex="s"></span> MUST only be sent during session <span class="math-inline" data-tex="s + 1"></span>;
 otherwise, it MUST be rejected.</li>
 <li>The ledger MUST only accept a single Active Message per node per session;
 any duplicate MUST be rejected.</li>
@@ -516,10 +517,10 @@ any duplicate MUST be rejected.</li>
 <h3 id="reward-calculation"><a class="header" href="#reward-calculation">Reward Calculation</a></h3>
 <p>The reward calculation follows these steps:</p>
 <h4 id="step-1-calculate-base-reward"><a class="header" href="#step-1-calculate-base-reward">Step 1: Calculate Base Reward</a></h4>
-<p>Calculate the base reward for session $s$:</p>
-<p>$$R_s = \frac{I_s}{N_s}$$</p>
-<p>Where $I_s$ is the income for DA service during session $s$,
-and $N_s$ is the number of nodes providing DA service during session $s$.</p>
+<p>Calculate the base reward for session <span class="math-inline" data-tex="s"></span>:</p>
+<div class="math-block" data-tex="R_s = \frac{I_s}{N_s}"></div>
+<p>Where <span class="math-inline" data-tex="I_s"></span> is the income for DA service during session <span class="math-inline" data-tex="s"></span>,
+and <span class="math-inline" data-tex="N_s"></span> is the number of nodes providing DA service during session <span class="math-inline" data-tex="s"></span>.</p>
 <blockquote>
 <p><strong>Note</strong>: The base reward is fixed to the total number of nodes providing the service
 instead of the number of active nodes.
@@ -529,22 +530,22 @@ to increase their own reward.</p>
 <p>The income leftovers MUST be burned or consumed
 in such a way that will not benefit the nodes.</p>
 <h4 id="step-2-count-positive-opinions"><a class="header" href="#step-2-count-positive-opinions">Step 2: Count Positive Opinions</a></h4>
-<p>Count the number of positive opinions for node $n$ in session $s$:</p>
-<p>$$\text{opinions}(n, s) = \sum_{i=1}^{N} \text{valid}(\text{activity_proof}(i, n, s))$$</p>
-<p>Where $\text{valid}()$ returns true only when the <code>activity_proof</code> for node $n$ is valid
-and the opinion about node $n$ is <strong>positive</strong> for session $s$.</p>
+<p>Count the number of positive opinions for node <span class="math-inline" data-tex="n"></span> in session <span class="math-inline" data-tex="s"></span>:</p>
+<div class="math-block" data-tex="\text{opinions}(n, s) = \sum_{i=1}^{N} \text{valid}(\text{activity\_proof}(i, n, s))"></div>
+<p>Where <span class="math-inline" data-tex="\text{valid}()"></span> returns true only when the <code>activity_proof</code> for node <span class="math-inline" data-tex="n"></span> is valid
+and the opinion about node <span class="math-inline" data-tex="n"></span> is <strong>positive</strong> for session <span class="math-inline" data-tex="s"></span>.</p>
 <h4 id="step-3-calculate-node-reward"><a class="header" href="#step-3-calculate-node-reward">Step 3: Calculate Node Reward</a></h4>
-<p>Calculate the reward for node $n$ based on node activity:</p>
-<p>$$R(n) = \frac{R_s}{2} \cdot \text{active}(n, s) + \frac{R_{s-1}}{2} \cdot \text{active}(n, s - 1)$$</p>
-<p>Where $\text{active}(n, s)$ returns true only when $n \in \mathcal{N}_s$
-and the number of positive opinions on node $n$ for session $s$
-is greater than or equal to $\theta$:</p>
-<p>$$\text{opinions}(n, s) \geq \theta$$</p>
+<p>Calculate the reward for node <span class="math-inline" data-tex="n"></span> based on node activity:</p>
+<div class="math-block" data-tex="R(n) = \frac{R_s}{2} \cdot \text{active}(n, s) + \frac{R_{s-1}}{2} \cdot \text{active}(n, s - 1)"></div>
+<p>Where <span class="math-inline" data-tex="\text{active}(n, s)"></span> returns true only when <span class="math-inline" data-tex="n \in \mathcal{N}_s"></span>
+and the number of positive opinions on node <span class="math-inline" data-tex="n"></span> for session <span class="math-inline" data-tex="s"></span>
+is greater than or equal to <span class="math-inline" data-tex="\theta"></span>:</p>
+<div class="math-block" data-tex="\text{opinions}(n, s) \geq \theta"></div>
 <p>The reward is a function of the node's capacity (quality)
 to respond to sampling requests for both new and old blocks.
-Therefore, the reward draws from half of the income from session $s$ (for new blocks)
-and half of the income from session $s - 1$ (for old blocks).</p>
-<p>The base reward $R_s$ is distributed to nodes that both:</p>
+Therefore, the reward draws from half of the income from session <span class="math-inline" data-tex="s"></span> (for new blocks)
+and half of the income from session <span class="math-inline" data-tex="s - 1"></span> (for old blocks).</p>
+<p>The base reward <span class="math-inline" data-tex="R_s"></span> is distributed to nodes that both:</p>
 <ul>
 <li>Submitted a valid Activity Proof</li>
 <li>Received positive opinions exceeding the activity threshold
@@ -573,7 +574,7 @@ discouraging manipulation of the opinion system.</li>
 <li>Income leftovers are burned to prevent benefit from underreporting.</li>
 </ul>
 <h3 id="collusion-resistance"><a class="header" href="#collusion-resistance">Collusion Resistance</a></h3>
-<p>The activity threshold of $N_s/2$ requires a node
+<p>The activity threshold of <span class="math-inline" data-tex="N_s/2"></span> requires a node
 to receive positive opinions from at least half of all nodes.
 This makes collusion attacks expensive,
 as an attacker would need to control a majority of nodes
@@ -637,6 +638,9 @@ to guarantee rewards for malicious nodes.</p>
         <script src="../../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
         <script src="../../scripts/rfc-index.js"></script>
 
 

@@ -22,8 +22,8 @@
     "slug": "136",
     "title": "NomosDA Network",
     "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "blockchain/raw/nomosda-network.html"
   },
   {
@@ -88,6 +88,15 @@
     "category": "Standards Track",
     "updated": "2026-01-30",
     "path": "blockchain/raw/da-rewarding.html"
+  },
+  {
+    "component": "blockchain",
+    "slug": "150",
+    "title": "Nomos Digital Signature",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
+    "path": "blockchain/raw/digital-signature.html"
   },
   {
     "component": "blockchain",
@@ -185,7 +194,7 @@
     "title": "Bedrock v1.1 Block Construction, Validation and Execution Specification",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-22",
+    "updated": "2026-02-09",
     "path": "blockchain/raw/bedrock-v1.1-block-construction.html"
   },
   {
@@ -234,15 +243,6 @@
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {
-    "component": "blockchain",
-    "slug": "Nomos Digital Signature",
-    "title": "Nomos Digital Signature",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-01-30",
-    "path": "blockchain/raw/digital-signature.html"
-  },
-  {
     "component": "ift-ts",
     "slug": "1",
     "title": "Consensus-Oriented Specification System",
@@ -256,8 +256,8 @@
     "slug": "100",
     "title": "Interep as group management for RLN",
     "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/rln-interep-spec.html"
   },
   {
@@ -310,8 +310,8 @@
     "slug": "106",
     "title": "Rate Limit Nullifier V2",
     "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/rln-v2.html"
   },
   {
@@ -383,7 +383,7 @@
     "title": "RLN DoS Protection for Mixnet",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-29",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/mix-spam-protection-rln.html"
   },
   {
@@ -391,8 +391,8 @@
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/2/mvds.html"
   },
   {
@@ -400,8 +400,8 @@
     "slug": "25",
     "title": "Libp2p Peer Discovery via DNS",
     "status": "deleted",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/25/libp2p-dns-discovery.html"
   },
   {
@@ -409,8 +409,8 @@
     "slug": "3",
     "title": "Remote log specification",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/3/remote-log.html"
   },
   {
@@ -418,8 +418,8 @@
     "slug": "32",
     "title": "Rate Limit Nullifier",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/32/rln-v1.html"
   },
   {
@@ -427,8 +427,8 @@
     "slug": "4",
     "title": "MVDS Metadata Field",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/4/mvds-meta.html"
   },
   {
@@ -455,7 +455,7 @@
     "title": "Extensible Peer Records",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-24",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/extensible-peer-records.html"
   },
   {
@@ -464,7 +464,7 @@
     "title": "LIBP2P-MIX",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-01-30",
+    "updated": "2026-02-09",
     "path": "ift-ts/raw/mix.html"
   },
   {
@@ -472,8 +472,8 @@
     "slug": "10",
     "title": "Waku v2",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/10/waku2.html"
   },
   {
@@ -481,8 +481,8 @@
     "slug": "11",
     "title": "Waku v2 Relay",
     "status": "stable",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/11/relay.html"
   },
   {
@@ -490,8 +490,8 @@
     "slug": "12",
     "title": "Waku v2 Filter",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/12/filter.html"
   },
   {
@@ -499,8 +499,8 @@
     "slug": "13",
     "title": "Waku Store Query",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/13/store.html"
   },
   {
@@ -517,8 +517,8 @@
     "slug": "15",
     "title": "Waku Bridge",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/15/bridge.html"
   },
   {
@@ -526,8 +526,8 @@
     "slug": "16",
     "title": "Waku v2 RPC API",
     "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/deprecated/16/rpc.html"
   },
   {
@@ -535,8 +535,8 @@
     "slug": "17",
     "title": "Waku v2 RLN Relay",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/17/rln-relay.html"
   },
   {
@@ -544,8 +544,8 @@
     "slug": "18",
     "title": "Waku SWAP Accounting",
     "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/deprecated/18/swap.html"
   },
   {
@@ -553,8 +553,8 @@
     "slug": "19",
     "title": "Waku v2 Light Push",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/19/lightpush.html"
   },
   {
@@ -562,8 +562,8 @@
     "slug": "20",
     "title": "Toy Ethereum Private Message",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-30",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/application/20/toy-eth-pm.html"
   },
   {
@@ -571,8 +571,8 @@
     "slug": "21",
     "title": "Waku v2 Fault-Tolerant Store",
     "status": "deleted",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/deprecated/fault-tolerant-store.html"
   },
   {
@@ -580,8 +580,8 @@
     "slug": "22",
     "title": "Waku v2 Toy Chat",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Informational",
+    "updated": "2026-02-09",
     "path": "messaging/informational/22/toy-chat.html"
   },
   {
@@ -598,8 +598,8 @@
     "slug": "26",
     "title": "Waku Message Payload Encryption",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-30",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/application/26/payload.html"
   },
   {
@@ -607,8 +607,8 @@
     "slug": "27",
     "title": "Waku v2 Client Peer Management Recommendations",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Informational",
+    "updated": "2026-02-09",
     "path": "messaging/informational/27/peers.html"
   },
   {
@@ -616,8 +616,8 @@
     "slug": "29",
     "title": "Waku v2 Client Parameter Configuration Recommendations",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Informational",
+    "updated": "2026-02-09",
     "path": "messaging/informational/29/config.html"
   },
   {
@@ -625,8 +625,8 @@
     "slug": "30",
     "title": "Adaptive nodes",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Informational",
+    "updated": "2026-02-09",
     "path": "messaging/informational/30/adaptive-nodes.html"
   },
   {
@@ -634,8 +634,8 @@
     "slug": "31",
     "title": "Waku v2 usage of ENR",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/31/enr.html"
   },
   {
@@ -643,8 +643,8 @@
     "slug": "33",
     "title": "Waku v2 Discv5 Ambient Peer Discovery",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/33/discv5.html"
   },
   {
@@ -661,8 +661,8 @@
     "slug": "36",
     "title": "Waku v2 C Bindings API",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/36/bindings-api.html"
   },
   {
@@ -670,8 +670,8 @@
     "slug": "5",
     "title": "Waku v0",
     "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-30",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/deprecated/5/waku0.html"
   },
   {
@@ -697,8 +697,8 @@
     "slug": "6",
     "title": "Waku v1",
     "status": "stable",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/legacy/6/waku1.html"
   },
   {
@@ -715,8 +715,8 @@
     "slug": "66",
     "title": "Waku Metadata Protocol",
     "status": "draft",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/core/66/metadata.html"
   },
   {
@@ -724,8 +724,8 @@
     "slug": "7",
     "title": "Waku Envelope data field",
     "status": "stable",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/legacy/7/data.html"
   },
   {
@@ -733,8 +733,8 @@
     "slug": "8",
     "title": "Waku Mailserver",
     "status": "stable",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/legacy/8/mail.html"
   },
   {
@@ -742,8 +742,8 @@
     "slug": "9",
     "title": "Waku RPC API",
     "status": "stable",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "messaging/standards/legacy/9/rpc.html"
   },
   {
@@ -766,11 +766,38 @@
   },
   {
     "component": "storage",
+    "slug": "151",
+    "title": "Dataset Store",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
+    "path": "storage/raw/dataset-store.html"
+  },
+  {
+    "component": "storage",
+    "slug": "152",
+    "title": "Logos Storage Datasets",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
+    "path": "storage/raw/datasets.html"
+  },
+  {
+    "component": "storage",
+    "slug": "153",
+    "title": "Merkle Tree",
+    "status": "draft",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
+    "path": "storage/raw/merkle-tree.html"
+  },
+  {
+    "component": "storage",
     "slug": "75",
     "title": "Codex Discovery",
     "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-22",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "storage/raw/dht.html"
   },
   {
@@ -778,8 +805,8 @@
     "slug": "76",
     "title": "Codex Community History",
     "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-01-30",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "storage/raw/community-history.html"
   },
   {
@@ -796,8 +823,8 @@
     "slug": "78",
     "title": "Codex Slot Builder",
     "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-30",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "storage/deprecated/slot-buIlder.html"
   },
   {
@@ -805,8 +832,8 @@
     "slug": "79",
     "title": "Codex Erasue Coding",
     "status": "deprecated",
-    "category": "unspecified",
-    "updated": "2026-01-30",
+    "category": "Standards Track",
+    "updated": "2026-02-09",
     "path": "storage/deprecated/erasure-coding.html"
   },
   {
@@ -831,36 +858,9 @@
     "component": "storage",
     "slug": "82",
     "title": "Codex Merkle Tree",
-    "status": "raw",
+    "status": "deprecated",
     "category": "Standards Track",
-    "updated": "2026-02-06",
+    "updated": "2026-02-09",
     "path": "storage/deprecated/codex-merkle-tree.html"
-  },
-  {
-    "component": "storage",
-    "slug": "Dataset Store",
-    "title": "Dataset Store",
-    "status": "raw",
-    "category": "unspecified",
-    "updated": "2026-02-05",
-    "path": "storage/raw/dataset-store.html"
-  },
-  {
-    "component": "storage",
-    "slug": "Logos Storage Datasets",
-    "title": "Logos Storage Datasets",
-    "status": "raw",
-    "category": "Standards Track",
-    "updated": "2026-02-05",
-    "path": "storage/raw/datasets.html"
-  },
-  {
-    "component": "storage",
-    "slug": "Merkle Tree",
-    "title": "Merkle Tree",
-    "status": "draft",
-    "category": "Standards Track",
-    "updated": "2026-02-06",
-    "path": "storage/raw/merkle-tree.html"
   }
 ]
