@@ -16,7 +16,7 @@ additional-js = [
   "theme/katex/katex.min.js",
   "theme/katex/auto-render.min.js",
   "scripts/katex-render.js",
-  "scripts/rfc-index.js"
+  "scripts/rfc-index-v2.js"
 ]
 git-repository-url = "https://github.com/vacp2p/rfc-index"
 
