@@ -884,8 +884,10 @@ the discoverer SHOULD keep track of unique `foundPeers`.
 terminating the procedure once `F_lookup` advertisers have been found,
 or if all buckets have been traversed.
 
-1. For each bucket, the discoverer MUST select up to `K_lookup` random registrar peers to query.
+1. For each bucket, the discoverer MUST select
+up to `K_lookup` random registrar peers to query.
 2. For each selected registrar, the discoverer
+
 - MUST send a [`GET_ADS` message](#get_ads-message) to the registrar
 - on receipt of a `GET_ADS` response,
 SHOULD add the closer peers indicated in the response to `DiscT(service_id_hash)`
@@ -958,19 +960,26 @@ To populate the rest of the response, the registrar MUST:
 
 1. If an identical `ad` already exists in the `ad_cache`,
 reject the request and respond with status `Rejected`.
-2. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`, using the formula in [Waiting Time Calculation](#waiting-time-calculation).
+2. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
+using the formula in [Waiting Time Calculation](#waiting-time-calculation).
 3. If no `ticket` is provided in the `REGISTER` request
 this is the advertiser's first registration attempt for the `ad`.
 Create a new signed `ticket` based on `t_wait`,
 and return the signed `ticket` in a response with status `Wait`.
-3. If a `ticket` is provided in the `REGISTER` request, validate the ticket and respond with the status `Rejected` if any of the following fails:
+3. If a `ticket` is provided in the `REGISTER` request,
+validate the ticket and respond with the status `Rejected` if any of the following fails:
+
     - `ticket.signature` contains a valid signature, issued by this registrar
     - `ticket.ad` matches the current `ad`
-    - calculate the expected time of ticket submission, `t_scheduled`, as `t_scheduled = ticket.t_mod + ticket.t_wait`
-    and verify that the actual submission time, `current_time`, falls within a valid registration window, `δ`,
+    - calculate the expected time of ticket submission,
+    `t_scheduled`, as `t_scheduled = ticket.t_mod + ticket.t_wait`
+    and verify that the actual submission time, `current_time`,
+    falls within a valid registration window, `δ`,
     where `t_scheduled <= current_time <= t_scheduled + δ`.
     The duration of `δ` is up to the application,
-    but SHOULD be just enough to accommodate for the maximum delay between the advertiser and the registrar.
+    but SHOULD be just enough to accommodate for
+    the maximum delay between the advertiser and the registrar.
+
 4. Calculate remaining wait time
 `t_remaining = t_wait - (current_time - ticket.t_init)`.
 This ensures advertisers accumulate waiting time across retries
@@ -1437,7 +1446,7 @@ the body contains only the concise pseudocode and high-level descriptions.
 
 ### Advertiser Algorithms Explanation
 
-Refer to the [Advertisement Algorithm section](#advertisement-algorithm) for the pseudocode.
+Refer to the [Advertisement Algorithm section](#example-advertise-algorithm) for the pseudocode.
 
 #### ADVERTISE() algorithm explanation
 
@@ -1498,7 +1507,7 @@ since we’ve finished trying with it.
 
 #### LOOKUP(service_id_hash) algorithm explanation
 
-Refer to the [Lookup Algorithm section](#lookup-algorithm) for the pseudocode.
+Refer to the [Lookup Algorithm section](#example-lookup-algorithm) for the pseudocode.
 
 1. `DiscT(service_id_hash)` is initialized by
 bootstrapping peers from the discoverer’s `KadDHT(peerID)`
@@ -1565,7 +1574,7 @@ Implementations should consider these trade-offs carefully when selecting approp
 
 #### `REGISTER()` algorithm explanation
 
-Refer to the [Registration Flow section](#registration-flow) for the pseudocode
+Refer to the [Register Algorithm section](#example-register-algorithm) for the pseudocode
 
 1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
 2. Prepare a response ticket `response.ticket` linked to this `ad`.
