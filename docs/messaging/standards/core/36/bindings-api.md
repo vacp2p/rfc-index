@@ -5,6 +5,7 @@
 | Name | Waku v2 C Bindings API |
 | Slug | 36 |
 | Status | draft |
+| Category | Standards Track |
 | Editor | Richard Ramos <richard@status.im> |
 | Contributors | Franck Royer <franck@status.im> |
 

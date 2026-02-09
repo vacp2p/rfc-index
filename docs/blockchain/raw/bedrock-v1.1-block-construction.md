@@ -462,7 +462,7 @@ the node must:
    except the last step, once the verifier has a single commitment C^(i),
    an aggregated element v^(i) at position u^(i) and one proof π^(i) for each sample.
 
-1. The verifier draws a random value for each sample r_i ← $F_p.
+1. The verifier draws a random value for each sample r_i ← $F_p$.
 
 1. The verifier computes:
 
@@ -483,7 +483,7 @@ the node must:
    It includes the proof π^(i), and the public values x_j^(i)
    for each proof of claim.
 
-1. The verifier draws one random value for each proof r_i ← $F_p.
+1. The verifier draws one random value for each proof r_i ← $F_p$.
 
 1. The verifier computes:
 

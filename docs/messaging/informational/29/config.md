@@ -5,6 +5,7 @@
 | Name | Waku v2 Client Parameter Configuration Recommendations |
 | Slug | 29 |
 | Status | draft |
+| Category | Informational |
 | Editor | Hanno Cornelius <hanno@status.im> |
 | Contributors | Filip Dimitrijevic <filip@status.im> |
 

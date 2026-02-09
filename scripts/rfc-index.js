@@ -364,6 +364,7 @@
     codex: "Storage",
     vac: "IFT-TS",
   };
+  const hiddenByDefaultStatuses = new Set(["deprecated", "deleted"]);
   const headers = [
     { key: "slug", label: "RFC", width: showComponentColumn ? "10%" : "12%" },
     { key: "title", label: "Title", width: showComponentColumn ? "34%" : "40%" },
@@ -373,7 +374,7 @@
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
-  let statusFilter = "all";
+  let statusFilter = "current";
   let componentFilter = "all";
   let dateFilter = "all";
   let sortKey = "slug";
@@ -431,6 +432,25 @@
     return category;
   }
 
+  function isVisibleInCurrent(status) {
+    return !hiddenByDefaultStatuses.has(status);
+  }
+
+  function currentTotal() {
+    return rfcData.filter((item) => isVisibleInCurrent(normalizeStatus(item.status))).length;
+  }
+
+  function passesStatusFilter(item) {
+    const status = normalizeStatus(item.status);
+    if (statusFilter === "current") {
+      return isVisibleInCurrent(status);
+    }
+    if (statusFilter === "all") {
+      return true;
+    }
+    return status === statusFilter;
+  }
+
   function updateHeaderIndicators() {
     Object.keys(headerCells).forEach((key) => {
       const th = headerCells[key];
@@ -465,7 +485,8 @@
     document.querySelectorAll(`#${containerId} .chip`).forEach((chip) => {
       const key = chip.dataset[dataAttr];
       const label = chip.dataset.label || chip.textContent;
-      if (chip.dataset.count === "false") {
+      const showCounts = containerId === "status-chips" && chip.dataset.count !== "false";
+      if (!showCounts) {
         chip.textContent = label;
         return;
       }
@@ -491,6 +512,7 @@
         }
       }
     });
+    statusCounts.current = currentTotal();
 
     updateChipGroup("status-chips", "status", statusCounts, rfcData.length);
     updateChipGroup("component-chips", "component", componentCounts, rfcData.length);
@@ -564,7 +586,7 @@
   function render() {
     const query = (searchInput.value || "").toLowerCase();
     let filtered = rfcData.filter((item) => {
-      const statusOk = statusFilter === "all" || normalizeStatus(item.status) === statusFilter;
+      const statusOk = passesStatusFilter(item);
       const componentOk = componentFilter === "all" || item.component === componentFilter;
       const dateOk = passesDateFilter(item);
       const text = `${item.slug} ${item.title} ${item.component} ${item.status} ${item.category}`.toLowerCase();
@@ -586,7 +608,8 @@
         })
         .slice(0, 20);
     }
-    updateResultsCount(sorted.length, rfcData.length);
+    const totalForCount = statusFilter === "current" ? currentTotal() : rfcData.length;
+    updateResultsCount(sorted.length, totalForCount);
     updateHeaderIndicators();
     tbody.innerHTML = "";
 

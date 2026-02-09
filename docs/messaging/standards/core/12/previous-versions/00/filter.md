@@ -5,6 +5,7 @@
 | Name | Waku v2 Filter |
 | Slug | 12 |
 | Status | draft |
+| Category | Standards Track |
 | Editor | Hanno Cornelius <hanno@status.im> |
 | Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskarth@titanproxy.com>, Sanaz Taheri <sanaz@status.im>, Ebube Ud <ebube@status.im> |
 

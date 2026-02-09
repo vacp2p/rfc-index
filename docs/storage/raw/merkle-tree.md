@@ -1,8 +1,9 @@
 # MERKLE-TREE
 
-| Field        | Value                                     |
-| ------------ | ----------------------------------------- |
+| Field | Value |
+| --- | --- |
 | Name         | Merkle Tree                               |
+| Slug | 153 |
 | Status       | draft                                     |
 | Category     | Standards Track                           |
 | Editor       | Balázs Kőműves <bkomuves@status.im>       |

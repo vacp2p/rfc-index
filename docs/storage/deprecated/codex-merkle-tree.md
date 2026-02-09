@@ -4,7 +4,7 @@
 | --- | --- |
 | Name | Codex Merkle Tree |
 | Slug | 82 |
-| Status | raw |
+| Status | deprecated |
 | Category | Standards Track |
 | Editor | Codex Team |
 | Contributors | Filip Dimitrijevic <filip@status.im> |

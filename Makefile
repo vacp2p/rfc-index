@@ -14,5 +14,6 @@ build:
 	mdbook build
 
 lint:
+	python scripts/validate_metadata.py --check
 	npx markdownlint-cli2@0.12.1 "docs/**/*.md" --config .github/workflows/.markdownlint.json
 	npm run lint:remark
