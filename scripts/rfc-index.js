@@ -374,8 +374,14 @@
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
+  function normalizeFilterValue(value) {
+    return (value || "").toString().trim().toLowerCase();
+  }
+
   const initialStatusChip = document.querySelector("#status-chips .chip.active[data-status]");
-  let statusFilter = initialStatusChip ? initialStatusChip.dataset.status : "current";
+  let statusFilter = normalizeFilterValue(
+    initialStatusChip ? initialStatusChip.dataset.status : "current"
+  ) || "current";
   let componentFilter = "all";
   let dateFilter = "all";
   let sortKey = "slug";
@@ -416,7 +422,7 @@
   tableContainer.appendChild(table);
 
   function normalizeStatus(status) {
-    return (status || "unknown").toString().toLowerCase().split("/")[0];
+    return (status || "unknown").toString().trim().toLowerCase().split("/")[0].trim();
   }
 
   function formatStatus(status) {
@@ -443,13 +449,14 @@
 
   function passesStatusFilter(item) {
     const status = normalizeStatus(item.status);
-    if (statusFilter === "current") {
+    const filter = normalizeFilterValue(statusFilter);
+    if (filter === "current") {
       return isVisibleInCurrent(status);
     }
-    if (statusFilter === "all") {
+    if (filter === "all" || !filter) {
       return true;
     }
-    return status === statusFilter;
+    return status === filter;
   }
 
   function updateHeaderIndicators() {
@@ -484,7 +491,8 @@
 
   function updateChipGroup(containerId, dataAttr, counts, total) {
     document.querySelectorAll(`#${containerId} .chip`).forEach((chip) => {
-      const key = chip.dataset[dataAttr];
+      const rawKey = chip.dataset[dataAttr];
+      const key = dataAttr === "status" ? normalizeFilterValue(rawKey) : rawKey;
       const label = chip.dataset.label || chip.textContent;
       const showCounts = containerId === "status-chips" && chip.dataset.count !== "false";
       if (!showCounts) {
@@ -642,10 +650,14 @@
   const statusChips = document.getElementById("status-chips");
   if (statusChips) {
     statusChips.addEventListener("click", (e) => {
-      if (!e.target.dataset.status) return;
-      statusFilter = e.target.dataset.status;
+      const chip = e.target.closest(".chip[data-status]");
+      if (!chip) return;
+      statusFilter = normalizeFilterValue(chip.dataset.status) || "all";
       document.querySelectorAll("#status-chips .chip").forEach((chip) => {
-        chip.classList.toggle("active", chip.dataset.status === statusFilter);
+        chip.classList.toggle(
+          "active",
+          normalizeFilterValue(chip.dataset.status) === statusFilter
+        );
       });
       render();
     });
