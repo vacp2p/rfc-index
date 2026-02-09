@@ -254,8 +254,7 @@ Tickets enable stateless admission control at registrars.
 Advertisers accumulate waiting time across registration attempts
 by presenting tickets from previous attempts.
 
-See the [RPC Messages](#rpc-messages) section for the wire format specification of tickets
-and the [Registration Flow](#registration-flow) section for how tickets are used in the admission protocol.
+See the [RPC Messages](#rpc-messages) section for the wire format specification of tickets.
 
 ## Protocol Specifications
 
@@ -966,7 +965,7 @@ using the formula in [Waiting Time Calculation](#waiting-time-calculation).
 this is the advertiser's first registration attempt for the `ad`.
 Create a new signed `ticket` based on `t_wait`,
 and return the signed `ticket` in a response with status `Wait`.
-3. If a `ticket` is provided in the `REGISTER` request,
+4. If a `ticket` is provided in the `REGISTER` request,
 validate the ticket and respond with the status `Rejected` if any of the following fails:
 
     - `ticket.signature` contains a valid signature, issued by this registrar
@@ -980,13 +979,13 @@ validate the ticket and respond with the status `Rejected` if any of the followi
     but SHOULD be just enough to accommodate for
     the maximum delay between the advertiser and the registrar.
 
-4. Calculate remaining wait time
+5. Calculate remaining wait time
 `t_remaining = t_wait - (current_time - ticket.t_init)`.
 This ensures advertisers accumulate waiting time across retries
-5. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
+6. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
 with an expiry timestamp set to `current_time + E`.
 The registrar SHOULD return a response with status `Confirmed`.
-6. If `t_remaining > 0`, issue a new signed `ticket`
+7. If `t_remaining > 0`, issue a new signed `ticket`
 with `ticket.t_mod` set to `current_time`
 and `ticket.t_wait_for = min(E, t_remaining)`.
 The registrar SHOULD return the signed `ticket` in a response with status `Wait`.
