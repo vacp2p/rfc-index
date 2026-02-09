@@ -374,7 +374,8 @@
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
-  let statusFilter = "current";
+  const initialStatusChip = document.querySelector("#status-chips .chip.active[data-status]");
+  let statusFilter = initialStatusChip ? initialStatusChip.dataset.status : "current";
   let componentFilter = "all";
   let dateFilter = "all";
   let sortKey = "slug";
