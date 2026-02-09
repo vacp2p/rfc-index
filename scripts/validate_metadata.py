@@ -25,6 +25,8 @@ ALLOWED_CATEGORIES = {
     "informational",
     "best current practice",
     "process",
+    "infrastructure",
+    "networking",
 }
 
 SEPARATOR_RE = re.compile(r"^\|\s*:?-{3,}:?\s*\|\s*:?-{3,}:?\s*\|$")
