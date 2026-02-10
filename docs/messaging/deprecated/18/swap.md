@@ -5,6 +5,7 @@
 | Name | Waku SWAP Accounting |
 | Slug | 18 |
 | Status | deprecated |
+| Category | Standards Track |
 | Editor | Oskar Thorén <oskarth@titanproxy.com> |
 
 <!-- timeline:start -->

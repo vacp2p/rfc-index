@@ -1,7 +1,7 @@
 # RLN DoS Protection for Mixnet
 
-| Field        | Value                         |
-| ------------ | ----------------------------- |
+| Field | Value |
+| --- | --- |
 | Name         | RLN DoS Protection for Mixnet |
 | Slug         | 144                           |
 | Status       | raw                           |

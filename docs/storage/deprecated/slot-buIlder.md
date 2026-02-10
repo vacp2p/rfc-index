@@ -5,6 +5,8 @@
 | Name | Codex Slot Builder |
 | Slug | 78 |
 | Status | deprecated |
+| Category | Standards Track |
+| Editor | Jimmy Debe <jimmy@status.im> |
 | Contributors | Jimmy Debe <jimmy@status.im> |
 
 <!-- timeline:start -->

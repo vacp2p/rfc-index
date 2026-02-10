@@ -1,7 +1,7 @@
 # EXTENSIBLE-PEER-RECORDS
 
-| Field        | Value                                     |
-| ------------ | ----------------------------------------- |
+| Field | Value |
+| --- | --- |
 | Name         | Extensible Peer Records                   |
 | Slug         | 74                                        |
 | Status       | raw                                       |

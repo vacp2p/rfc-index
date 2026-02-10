@@ -5,6 +5,8 @@
 | Name | Codex Discovery |
 | Slug | 75 |
 | Status | raw |
+| Category | Standards Track |
+| Editor | Jimmy Debe <jimmy@status.im> |
 | Contributors | Jimmy Debe <jimmy@status.im>, Giuliano Mega <giuliano@status.im> |
 
 <!-- timeline:start -->

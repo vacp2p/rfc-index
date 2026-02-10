@@ -364,6 +364,7 @@
     codex: "Storage",
     vac: "IFT-TS",
   };
+  const hiddenByDefaultStatuses = new Set(["deprecated", "deleted"]);
   const headers = [
     { key: "slug", label: "RFC", width: showComponentColumn ? "10%" : "12%" },
     { key: "title", label: "Title", width: showComponentColumn ? "34%" : "40%" },
@@ -373,7 +374,14 @@
     { key: "updated", label: "Updated", width: "12%" }
   ];
 
-  let statusFilter = "all";
+  function normalizeFilterValue(value) {
+    return (value || "").toString().trim().toLowerCase();
+  }
+
+  const initialStatusChip = document.querySelector("#status-chips .chip.active[data-status]");
+  let statusFilter = normalizeFilterValue(
+    initialStatusChip ? initialStatusChip.dataset.status : "current"
+  ) || "current";
   let componentFilter = "all";
   let dateFilter = "all";
   let sortKey = "slug";
@@ -414,7 +422,7 @@
   tableContainer.appendChild(table);
 
   function normalizeStatus(status) {
-    return (status || "unknown").toString().toLowerCase().split("/")[0];
+    return (status || "unknown").toString().trim().toLowerCase().split("/")[0].trim();
   }
 
   function formatStatus(status) {
@@ -429,6 +437,26 @@
   function formatCategory(category) {
     if (!category) return "unspecified";
     return category;
+  }
+
+  function isVisibleInCurrent(status) {
+    return !hiddenByDefaultStatuses.has(status);
+  }
+
+  function currentTotal() {
+    return rfcData.filter((item) => isVisibleInCurrent(normalizeStatus(item.status))).length;
+  }
+
+  function passesStatusFilter(item) {
+    const status = normalizeStatus(item.status);
+    const filter = normalizeFilterValue(statusFilter);
+    if (filter === "current") {
+      return isVisibleInCurrent(status);
+    }
+    if (filter === "all" || !filter) {
+      return true;
+    }
+    return status === filter;
   }
 
   function updateHeaderIndicators() {
@@ -463,9 +491,11 @@
 
   function updateChipGroup(containerId, dataAttr, counts, total) {
     document.querySelectorAll(`#${containerId} .chip`).forEach((chip) => {
-      const key = chip.dataset[dataAttr];
+      const rawKey = chip.dataset[dataAttr];
+      const key = dataAttr === "status" ? normalizeFilterValue(rawKey) : rawKey;
       const label = chip.dataset.label || chip.textContent;
-      if (chip.dataset.count === "false") {
+      const showCounts = containerId === "status-chips" && chip.dataset.count !== "false";
+      if (!showCounts) {
         chip.textContent = label;
         return;
       }
@@ -491,6 +521,7 @@
         }
       }
     });
+    statusCounts.current = currentTotal();
 
     updateChipGroup("status-chips", "status", statusCounts, rfcData.length);
     updateChipGroup("component-chips", "component", componentCounts, rfcData.length);
@@ -564,7 +595,7 @@
   function render() {
     const query = (searchInput.value || "").toLowerCase();
     let filtered = rfcData.filter((item) => {
-      const statusOk = statusFilter === "all" || normalizeStatus(item.status) === statusFilter;
+      const statusOk = passesStatusFilter(item);
       const componentOk = componentFilter === "all" || item.component === componentFilter;
       const dateOk = passesDateFilter(item);
       const text = `${item.slug} ${item.title} ${item.component} ${item.status} ${item.category}`.toLowerCase();
@@ -586,7 +617,8 @@
         })
         .slice(0, 20);
     }
-    updateResultsCount(sorted.length, rfcData.length);
+    const totalForCount = statusFilter === "current" ? currentTotal() : rfcData.length;
+    updateResultsCount(sorted.length, totalForCount);
     updateHeaderIndicators();
     tbody.innerHTML = "";
 
@@ -618,10 +650,14 @@
   const statusChips = document.getElementById("status-chips");
   if (statusChips) {
     statusChips.addEventListener("click", (e) => {
-      if (!e.target.dataset.status) return;
-      statusFilter = e.target.dataset.status;
+      const chip = e.target.closest(".chip[data-status]");
+      if (!chip) return;
+      statusFilter = normalizeFilterValue(chip.dataset.status) || "all";
       document.querySelectorAll("#status-chips .chip").forEach((chip) => {
-        chip.classList.toggle("active", chip.dataset.status === statusFilter);
+        chip.classList.toggle(
+          "active",
+          normalizeFilterValue(chip.dataset.status) === statusFilter
+        );
       });
       render();
     });
