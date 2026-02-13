@@ -100,6 +100,15 @@
   },
   {
     "component": "blockchain",
+    "slug": "154",
+    "title": "Nomos Wallet Technical Standard",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-02-13",
+    "path": "blockchain/raw/nomos-wallet-technical-standard.html"
+  },
+  {
+    "component": "blockchain",
     "slug": "83",
     "title": "Cryptarchia Proof of Leadership Specification",
     "status": "raw",
