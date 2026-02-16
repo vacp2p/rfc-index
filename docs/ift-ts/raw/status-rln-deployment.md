@@ -227,9 +227,11 @@ RLN proofs are stored in a persistent database (DB) with other informations as f
     
 - table “idx”:
     - there is only 1 key = “COUNT” and value = “Number of Merkle tree”
+
 - table “tx_counter”:
     - key = Serialized (User adress)
     - value = Serialized(EpochCounters structure) = Serialized(~ `Epoch`, `tx_counter`)
+
 - table “tier_limits”:
     - **Key** = Only 2 keys `CURRENT` ‖ `NEXT`
     - **Value** = Serialized `Tier Limit list`
