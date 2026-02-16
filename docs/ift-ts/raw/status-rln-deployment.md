@@ -1,5 +1,3 @@
-# STATUS-RLN-DEPLOYMENT
-
 | Field | Value |
 | --- | --- |
 | Name | RLN deployment to the Status network for gasless L2 |
@@ -7,7 +5,7 @@
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |
-| Contributors | Sylvain [sylvain@status.im ](mailto:sylvain@status.im ) |
+| Contributors | Sylvain [sylvain@status.im ](mailto:sylvain@status.im) |
 
 ## Abstract
 
@@ -93,17 +91,17 @@ To this Karma service has two functionality with querying `Karma contract`,
 
 Karma service query is triggered if the user has no more free TX right,
 in case the user can move to higher tier without user interaction.
-Otherwise, if the  `user` has enough free TX, we don’t update `user`'s tier. 
+Otherwise, if the  `user` has enough free TX, we don’t update `user`'s tier.
 
-Tier proto file for Tier Query info: 
+Tier proto file for Tier Query info:
 
-```protobuf
+```jsx
 message GetUserTierInfoRequest {
 Address user = 1;
 }
 ```
 
-```protobuf
+```jsx
 message GetUserTierInfoReply {
 oneof resp {
 UserTierInfoResult res = 1;
@@ -112,7 +110,7 @@ UserTierInfoError error = 2;
 }
 ```
 
-```protobuf
+```jsx
 message UserTierInfoResult {
 sint64 current_epoch = 1;
 sint64 current_epoch_slice = 2;
@@ -121,14 +119,14 @@ optional Tier tier = 4;
 }
 ```
 
-```protobuf
+```jsx
 message Tier {
 string name = 1;
 uint64 quota = 2;
 }
 ```
 
-```protobuf
+```jsx
 message UserTierInfoError {
 string message = 1;
 }
@@ -153,7 +151,7 @@ Finally, `registeredUsers` consists of as follows:
 
 With the registration, user allows to use free gas transaction within its Tier
 
-```protobuf
+```jsx
 enum RegistrationStatus {
 Success = 0;
 Failure = 1;
@@ -161,7 +159,7 @@ AlreadyRegistered = 2;
 }
 ```
 
-```protobuf
+```jsx
 message RegisterUserReply {
 RegistrationStatus status = 1;
 }
@@ -180,13 +178,13 @@ then streams the proof for a specific epoch.
 - Serializes then streams RLN proofs via gRPC.
 - Outputs `RLNProof` metadata named `proof_value` contains `y` and `internal_nullifier` value see the [RLN specification](https://rfc.vac.dev/vac/raw/rln-v2/) for details.
 
-```protobuf
+```jsx
 message RlnProofFilter {
 optional string address = 1;
 }
 ```
 
-```protobuf
+```jsx
 message RlnProofReply {
 oneof resp {
 RlnProof proof = 1;
@@ -195,7 +193,7 @@ RlnProofError error = 2;
 }
 ```
 
-```protobuf
+```jsx
 message RlnProof {
 bytes sender = 1;
 bytes tx_hash = 2;
@@ -203,7 +201,7 @@ bytes proof = 3;
 }
 ```
 
-```protobuf
+```jsx
 message RlnProofError {
 string error = 2;
 }
@@ -217,11 +215,14 @@ from spam proofs and submitting it to the `RLN contract`.
 
 ### 1.4. Storage
 
-RLN proofs are stored in a persistent database (DB) with other informations as follows: 
+RLN proofs are stored in a persistent database (DB) with other informations as follows:
 
 - **table “user”**: Stores the `RlnUserIdentity` which consists of three field elements: `id-commitment`, `secret-hash` and `rateR`.
     - key = Serialized(`User address`)
     - value = Serialized (`RlnUserIdentity` , `TreeIndex` , `IndexInMerkleTree`)
+
+    Since `RlnUserIdentity` are stored in multiple merkle tree, prover locates them with `TreeIndex` and `IndexInMerkleTree.` 
+
 - table “idx”:
     - there is only 1 key = “COUNT” and value = “Number of Merkle tree”
 - table “tx_counter”:
@@ -311,9 +312,7 @@ as spammer from the local DB. Prover also listening the tier-limits from `karma 
 - `RLN contract`:
     - Stores the RLN membership tree that consists of `id-commitment`
     - Does not store stake since Karma is non-transferable
-    - Contains the slasher function (see Decentralized Slashing section)
-    from 128 whitelisted RPC listener of prover which takes a `secret-hash`
-    and get reward for invoker also spammers `id-commitment` is dropped off from contract and prover.
+    - Contains the slasher function (see Decentralized Slashing section) from 128 whitelisted RPC listener of prover which takes a `secret-hash` and get reward for invoker also spammers `id-commitment` is dropped off from contract and prover.
 
 ## 4. Deny List
 
@@ -324,47 +323,39 @@ The prover module marked as this user as in deny list but still continue to crea
 2. Exceeds the global rate limit `rateR` that results with slashing by mapping user’s Karma to `MinK-1.`
 
 The `user` who is on the deny list MUST NOT be able to submit gasless transactions
-(i.e., the Paymaster MUST reject sponsorship for that account).
-A user can regain access to gasless transactions only after being removed from the deny list.
-Escaping from the deny list is possible under the following conditions
+(i.e., the Paymaster MUST reject sponsorship for that account). A user can regain access to gasless transactions only after being removed from the deny list. Escaping from the deny list is possible under the following conditions
 
-- **TTL expiration:** Deny list entries MAY be configured with an expiration time.
-If a deny list participation is not intended to be permanent,
-the entry is assigned a predefined time window.
-Upon expiration of this period, the user address is automatically considered removed from the deny list.
-The sequencer is responsible for checking expiration timestamps and removing expired user addresses from the deny list accordingly.
-- **Explicit removal:** In this type removel of deny list occurs in two cases:
-**(i)** when a user submits a transaction with a gas price exceeding the configured premium gas threshold,
-in which case the sequencer removes the user from the deny list, and **(ii)** through manual deletion performed by the Layer2 operator.
+- **TTL expiration:** Deny list entries MAY be configured with an expiration time. If a deny list participation is not intended to be permanent, the entry is assigned a predefined time window. Upon expiration of this period, the user address is automatically considered removed from the deny list. The sequencer is responsible for checking expiration timestamps and removing expired user addresses from the deny list accordingly.
+- **Explicit removal:** In this type removel of deny list occurs in two cases: **(i)** when a user submits a transaction with a gas price exceeding the configured premium gas threshold, in which case the sequencer removes the user from the deny list, and **(ii)** through manual deletion performed by the Layer2 operator.
 
 ## 5. Decentralized Slashing
 
-Decentralized slashing is a capability provided by specialized nodes,
-called `slashers`, which operate alongside sequencer-side RLN verifiers to externally detect RLN-based spam.
+Decentralized slashing is a capability provided by specialized nodes, called `slashers`, which operate alongside sequencer-side RLN verifiers to externally detect RLN-based spam.
 
-In `Karma contract`, the user `id-commitment` is stored in a list rather than a Merkle tree.
-At least 128 `slashers` receive all proofs by subscribing gRPC to the prover.
-In the event of spam, any `slasher` can extract the `secret-hash`
-from the proof and submit it to the Karma smart contract.
+In `Karma contract`, the user `id-commitment` is stored in a list rather than a Merkle tree. At most 128 `slashers` receive all proofs by subscribing gRPC to the prover. In the event of spam, any `slasher` can extract the `secret-hash` from the proof and submit it to the Karma smart contract.
 
-`Karma Contract` does as following:
+`Karma Contract` does as following: 
 
 - Receives the `secret-hash` in plaintext
 - Calculates the `id-commitment` by hashing `secret-hash` with Poseidon hash.
 - Look up the list whether it includes the `id-commitment` returns 1 if there is, returns 0 otherwise.
 - If it returns 1, the slasher who is the caller of the contract, is rewarded with Karma tokens.
-- The prover module listens this activity (an event is sent by the smart contract when slashing)
-and drop the particular `id-commitment` from its local DB.
+- The prover module listens this activity (an event is sent by the smart contract when slashing) and drop the particular `id-commitment` from its local DB.
 - The spammer is slashed by the contract by burning its Karma tokens.
 
-Note that the `secret-hash` are derived by a high entropy randomness
-that implies all `id-commitment`  are unique. Plus, the spammers’ `id-commitment` are dropped from the list.
-Under this conditions, double slashing is not feasible.
+Note that the `secret-hash` are derived by a high entropy randomness that implies all `id-commitment`  are unique. Plus, the spammers’ `id-commitment` are dropped from the list. Under this conditions, double slashing is not feasible.
+
+### 5.1. Enforcing the number of slashers
+
+To restrict the number of slashers to 128, with the set being updated weekly, the system MUST implement an authentication and access-control mechanism as follows:
+
+- `Layer2` MUST distribute weekly authentication certificates to exactly 128 decentralized slashers, based on the current authorized slasher set
+- The Prover module MUST enforce a connection limit such that the number of simultaneously authenticated slasher connections MUST NOT exceed 128.
 
 ## References
 
 - [Zerokit](https://github.com/vacp2p/zerokit)
 - [Linea](https://linea.build/)
 - [RLN-Prover](https://github.com/vacp2p/status-rln-prover)
-- [RLN Specification](https://lip.logos.co/ift-ts/raw/rln-v2.html)
-- [Multi-message_id burn RLN](https://lip.logos.co/ift-ts/raw/multi-message_id-burn-rln.html)
+- [RLN Specification](https://rfc.vac.dev/vac/raw/rln-v2/)
+- [Multi-message_id burn RLN](https://github.com/vacp2p/rfc-index/pull/243)
