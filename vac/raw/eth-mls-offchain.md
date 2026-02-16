@@ -424,11 +424,12 @@ that have been finalized through voting and are known to the member.
 Commits that reference non-finalized voting proposals MUST be rejected and
 MUST trigger a peer score penalty for the commit author,
 as this behavior constitutes a protocol violation.
-Commits that omit one or more finalized voting proposals MAY be discarded without penalty,
-as such omissions may arise from benign network delays or partial views of the finalized proposal set.
 
 Among the valid candidate commits, the commit derived from the longest
 deterministic proposal sequence SHOULD be selected as the single valid commit.
+Any other competing commits that do not match the selected commit MUST be
+classified as misbehaviour and penalized with a lower reputation score
+according to the misbehaviour scoring rules defined in this specification.
 The proposal sequence is ordered by the ascending value of each proposal as `SHA256(proposal)`.
 Therefore, commit messages that contain the same set of voting proposals
 are identical in content and can be easily deduplicated.
