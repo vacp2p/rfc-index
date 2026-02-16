@@ -1,7 +1,7 @@
 | Field | Value |
 | --- | --- |
 | Name | RLN deployment to the Status network for gasless L2 |
-| Slug | 104 |
+| Slug | 156 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |
