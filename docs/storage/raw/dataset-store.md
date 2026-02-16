@@ -1,9 +1,11 @@
 # DATASET-STORE
 
-| Field  | Value                                |
-| ------ | ------------------------------------ |
+| Field | Value |
+| --- | --- |
 | Name   | Dataset Store                        |
+| Slug | 151 |
 | Status | raw                                  |
+| Category | Standards Track |
 | Editor | Giuliano Mega <giuliano@status.im>   |
 
 ## Abstract

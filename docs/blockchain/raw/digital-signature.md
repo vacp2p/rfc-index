@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Nomos Digital Signature |
-| Slug | |
+| Slug | 150 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Jimmy Debe <jimmy@status.im> |

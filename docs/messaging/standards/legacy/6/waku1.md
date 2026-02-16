@@ -5,6 +5,7 @@
 | Name | Waku v1 |
 | Slug | 6 |
 | Status | stable |
+| Category | Standards Track |
 | Editor | Oskar Thorén <oskarth@titanproxy.com> |
 | Contributors | Adam Babik <adam@status.im>, Andrea Maria Piana <andreap@status.im>, Dean Eigenmann <dean@status.im>, Kim De Mey <kimdemey@status.im> |
 

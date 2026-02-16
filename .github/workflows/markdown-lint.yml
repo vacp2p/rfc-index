@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Validate Metadata
+        run: python3 scripts/validate_metadata.py --check
       
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15

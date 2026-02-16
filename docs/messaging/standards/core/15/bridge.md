@@ -5,6 +5,7 @@
 | Name | Waku Bridge |
 | Slug | 15 |
 | Status | draft |
+| Category | Standards Track |
 | Editor | Hanno Cornelius <hanno@status.im> |
 
 <!-- timeline:start -->

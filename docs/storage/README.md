@@ -8,7 +8,8 @@ to view the new Storage specifications currently under discussion.
   <div class="filter-row">
     <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
     <div class="chips" id="status-chips">
-      <span class="chip active" data-status="all" data-label="All">All</span>
+      <span class="chip active" data-status="current" data-label="Current">Current</span>
+      <span class="chip" data-status="all" data-label="All">All</span>
       <span class="chip" data-status="stable" data-label="Stable">Stable</span>
       <span class="chip" data-status="draft" data-label="Draft">Draft</span>
       <span class="chip" data-status="raw" data-label="Raw">Raw</span>
