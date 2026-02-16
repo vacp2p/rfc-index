@@ -24,12 +24,16 @@ The document further outlines storage requirements and synchronization mechanism
 between on-chain events and off-chain state, providing a cohesive framework
 for scalable and abuse-resistant transaction processing on Status L2.
 
+The architecture separates cryptographic soundness from operational deployment.
+While operational components may be centralized in this version,
+cryptographic enforcement of rate limits and slashing remains verifiable and non-custodial.
+
 ## Roles
 
 Status L2 RLN deployment consists of five roles: `user`, `Karma contract`,
 `RLN contract`,  `Layer2`, and `Linea ecosystem`, `Slashers`.
 
-- `user`: Uses the Status L2 in a gasless manner who MAY pay premium gas for TX.
+- `user`: Uses the Status L2 in a gasless manner who MAY pay premium gas for the transaction (TX).
 - `Karma contract`: The contract that shows
 - `RLN contract`: The contract that stores the RLN memberships.
 - `Layer2`: Trusted components that are operated by Status L2 team.
