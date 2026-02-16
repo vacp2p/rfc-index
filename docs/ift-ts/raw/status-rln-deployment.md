@@ -309,11 +309,13 @@ Prover is listening slashing event so that update its state by removing the slas
 as spammer from the local DB. Prover also listening the tier-limits from `karma contract` to update local tier limits.
 
 `Karma contract`:
+
 - Modified ERC20 contract without transfer option.
 - Can be queried to get any user’s Karma balance.
 - Stored updatable tier table that shows min and max Karma that prover module fetches this information.
 
 `RLN contract`:
+
 - Stores the RLN membership tree that consists of `id-commitment`
 - Does not store stake since Karma is non-transferable
 - Contains the slasher function (see Decentralized Slashing section) from 128 whitelisted RPC listener
@@ -351,7 +353,7 @@ At most 128 `slashers` receive all proofs by subscribing gRPC to the prover.
 In the event of spam, any `slasher` can extract the `secret-hash`
 from the proof and submit it to the Karma smart contract.
 
-`Karma Contract` does as following: 
+`Karma Contract` does as following:
 
 - Receives the `secret-hash` in plaintext
 - Calculates the `id-commitment` by hashing `secret-hash` with Poseidon hash.
