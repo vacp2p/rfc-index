@@ -229,7 +229,7 @@ based on the outcome of the voting process.
 and present them to the voting in the MLS group as an application message.
 However, unlimited use of `voting proposals` within the group may be misused by
 malicious or overly active members.
-Therefore, an application-level constraint MUST introduced to limit the number
+Therefore, an application-level constraint MUST be introduced to limit the number
 or frequency of proposals initiated by each member to prevent spam or abuse.
 7. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
 that have received affirmative votes from members via application messages.
