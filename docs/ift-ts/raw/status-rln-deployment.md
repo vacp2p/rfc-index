@@ -223,7 +223,7 @@ RLN proofs are stored in a persistent database (DB) with other informations as f
   - key = Serialized(`User address`)
   - value = Serialized (`RlnUserIdentity` , `TreeIndex` , `IndexInMerkleTree`)
 
-    Since `RlnUserIdentity` are stored in multiple merkle tree, prover locates them with `TreeIndex` and `IndexInMerkleTree.` 
+    Since `RlnUserIdentity` are stored in multiple merkle tree, prover locates them with `TreeIndex` and `IndexInMerkleTree.`
 
 - table “idx”:
   - there is only 1 key = “COUNT” and value = “Number of Merkle tree”
@@ -239,7 +239,7 @@ RLN proofs are stored in a persistent database (DB) with other informations as f
 Tiers list are stored on-chain in `Karma contract` and this is a dynamic list
 that is adjusted by Status L2 team according to the inflation of Karma bound.
 This section specifies the changes that initiates by `Karma contract` then affects prover module.
-Each update starts by invoking the tier list in `Karma contract` with some requirements as follows: 
+Each update starts by invoking the tier list in `Karma contract` with some requirements as follows:
 
 - Each updates MUST be contiguous which means no gap or overlap between different tiers.
 Other saying, the intersection of two sequential tiers’ maxKarma and minKarma range should be distinct,
@@ -250,10 +250,10 @@ unlike `minK` is the minimum Karma amount for user can use gasless transaction.
 
 ```solidity
 struct Tier {
-	uint256 minKarma;
-	uint256 maxKarma;
-	string name;
-	uint32 txPerEpoch;
+    uint256 minKarma;
+    uint256 maxKarma;
+    string name;
+    uint32 txPerEpoch;
 }
 ```
 
