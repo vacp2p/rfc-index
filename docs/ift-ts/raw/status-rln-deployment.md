@@ -1,3 +1,5 @@
+# STATUS-RLN-DEPLOYMENT
+
 | Field | Value |
 | --- | --- |
 | Name | RLN deployment to the Status network for gasless L2 |
@@ -218,19 +220,19 @@ from spam proofs and submitting it to the `RLN contract`.
 RLN proofs are stored in a persistent database (DB) with other informations as follows:
 
 - **table “user”**: Stores the `RlnUserIdentity` which consists of three field elements: `id-commitment`, `secret-hash` and `rateR`.
-    - key = Serialized(`User address`)
-    - value = Serialized (`RlnUserIdentity` , `TreeIndex` , `IndexInMerkleTree`)
+  - key = Serialized(`User address`)
+  - value = Serialized (`RlnUserIdentity` , `TreeIndex` , `IndexInMerkleTree`)
 
     Since `RlnUserIdentity` are stored in multiple merkle tree, prover locates them with `TreeIndex` and `IndexInMerkleTree.` 
 
 - table “idx”:
-    - there is only 1 key = “COUNT” and value = “Number of Merkle tree”
+  - there is only 1 key = “COUNT” and value = “Number of Merkle tree”
 - table “tx_counter”:
-    - key = Serialized (User adress)
-    - value = Serialized(EpochCounters structure) = Serialized(~ `Epoch`, `tx_counter`)
+  - key = Serialized (User adress)
+  - value = Serialized(EpochCounters structure) = Serialized(~ `Epoch`, `tx_counter`)
 - table “tier_limits”:
-    - **Key** = Only 2 keys `CURRENT` ‖ `NEXT`
-    - **Value** = Serialized `Tier Limit list`
+  - **Key** = Only 2 keys `CURRENT` ‖ `NEXT`
+  - **Value** = Serialized `Tier Limit list`
 
 ### 1.5. Tier List Management
 
