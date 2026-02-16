@@ -178,7 +178,8 @@ For `RLNproof` generation for the TX done by Prover module as follows:
 - Creates RLN proof on TX by using Zerokit with checking membership information `treeInfo` in `registeredUsers`
 then streams the proof for a specific epoch.
 - Serializes then streams RLN proofs via gRPC.
-- Outputs `RLNProof` metadata named `proof_value` contains `y` and `internal_nullifier` value see the [RLN specification](https://rfc.vac.dev/vac/raw/rln-v2/) for details.
+- Outputs `RLNProof` metadata named `proof_value` contains `y` and `internal_nullifier` value
+see the [RLN specification](https://rfc.vac.dev/vac/raw/rln-v2/) for details.
 
 ```jsx
 message RlnProofFilter {
@@ -307,34 +308,48 @@ the tier management and slashing in case spam and later holds the RLN membership
 Prover is listening slashing event so that update its state by removing the slashed user
 as spammer from the local DB. Prover also listening the tier-limits from `karma contract` to update local tier limits.
 
-- `Karma contract`:
-    - Modified ERC20 contract without transfer option.
-    - Can be queried to get any user’s Karma balance.
-    - Stored updatable tier table that shows min and max Karma that prover module fetches this information.
-- `RLN contract`:
-    - Stores the RLN membership tree that consists of `id-commitment`
-    - Does not store stake since Karma is non-transferable
-    - Contains the slasher function (see Decentralized Slashing section) from 128 whitelisted RPC listener of prover which takes a `secret-hash` and get reward for invoker also spammers `id-commitment` is dropped off from contract and prover.
+`Karma contract`:
+- Modified ERC20 contract without transfer option.
+- Can be queried to get any user’s Karma balance.
+- Stored updatable tier table that shows min and max Karma that prover module fetches this information.
+
+`RLN contract`:
+- Stores the RLN membership tree that consists of `id-commitment`
+- Does not store stake since Karma is non-transferable
+- Contains the slasher function (see Decentralized Slashing section) from 128 whitelisted RPC listener
+of prover which takes a `secret-hash` and get reward
+for invoker also spammers `id-commitment` is dropped off from contract and prover.
 
 ## 4. Deny List
 
-Deny list behaves a black list for a `user` who act maliciously in two ways: 
+Deny list behaves a black list for a `user` who act maliciously in two ways:
 
 1. Exceeds the tier limit and still trying to use gasless TX.
 The prover module marked as this user as in deny list but still continue to create the RLN proof for the TX.
 2. Exceeds the global rate limit `rateR` that results with slashing by mapping user’s Karma to `MinK-1.`
 
 The `user` who is on the deny list MUST NOT be able to submit gasless transactions
-(i.e., the Paymaster MUST reject sponsorship for that account). A user can regain access to gasless transactions only after being removed from the deny list. Escaping from the deny list is possible under the following conditions
+(i.e., the Paymaster MUST reject sponsorship for that account). A user can regain access to gasless transactions
+only after being removed from the deny list. Escaping from the deny list is possible under the following conditions
 
-- **TTL expiration:** Deny list entries MAY be configured with an expiration time. If a deny list participation is not intended to be permanent, the entry is assigned a predefined time window. Upon expiration of this period, the user address is automatically considered removed from the deny list. The sequencer is responsible for checking expiration timestamps and removing expired user addresses from the deny list accordingly.
-- **Explicit removal:** In this type removel of deny list occurs in two cases: **(i)** when a user submits a transaction with a gas price exceeding the configured premium gas threshold, in which case the sequencer removes the user from the deny list, and **(ii)** through manual deletion performed by the Layer2 operator.
+- **TTL expiration:** Deny list entries MAY be configured with an expiration time.
+If a deny list participation is not intended to be permanent, the entry is assigned a predefined time window.
+Upon expiration of this period, the user address is automatically considered removed from the deny list.
+The sequencer is responsible for checking expiration timestamps and removing expired user addresses from the deny list accordingly.
+- **Explicit removal:** In this type removel of deny list occurs in two cases: **(i)** when a user submits a transaction
+with a gas price exceeding the configured premium gas threshold, in which case the sequencer removes the user from the deny list,
+and **(ii)** through manual deletion performed by the Layer2 operator.
 
 ## 5. Decentralized Slashing
 
-Decentralized slashing is a capability provided by specialized nodes, called `slashers`, which operate alongside sequencer-side RLN verifiers to externally detect RLN-based spam.
+Decentralized slashing is a capability provided by specialized nodes,
+called `slashers`, which operate alongside sequencer-side RLN verifiers
+to externally detect RLN-based spam.
 
-In `Karma contract`, the user `id-commitment` is stored in a list rather than a Merkle tree. At most 128 `slashers` receive all proofs by subscribing gRPC to the prover. In the event of spam, any `slasher` can extract the `secret-hash` from the proof and submit it to the Karma smart contract.
+In `Karma contract`, the user `id-commitment` is stored in a list rather than a Merkle tree.
+At most 128 `slashers` receive all proofs by subscribing gRPC to the prover.
+In the event of spam, any `slasher` can extract the `secret-hash`
+from the proof and submit it to the Karma smart contract.
 
 `Karma Contract` does as following: 
 
@@ -345,7 +360,10 @@ In `Karma contract`, the user `id-commitment` is stored in a list rather than a 
 - The prover module listens this activity (an event is sent by the smart contract when slashing) and drop the particular `id-commitment` from its local DB.
 - The spammer is slashed by the contract by burning its Karma tokens.
 
-Note that the `secret-hash` are derived by a high entropy randomness that implies all `id-commitment`  are unique. Plus, the spammers’ `id-commitment` are dropped from the list. Under this conditions, double slashing is not feasible.
+Note that the `secret-hash` are derived by a high entropy randomness
+that implies all `id-commitment`  are unique.
+Plus, the spammers’ `id-commitment` are dropped from the list.
+Under this conditions, double slashing is not feasible.
 
 ### 5.1. Enforcing the number of slashers
 
