@@ -192,7 +192,7 @@ If the voting result is YES, this points out the voting proposal will be convert
 the MLS proposal by the `steward` and following commit message that starts the new epoch.
 
 All `members` including `stewards` MUST maintain a local store of finalized voting proposals
-for at least the duration `threshold_duration` mentioned in [section](#steward-violation-list),
+for at least the duration `threshold_duration` mentioned in [Steward Violation List](#steward-violation-list),
 required to validate incoming commits and perform [commit filtering](#commit-validation-service).
 
 ## Creating welcome message
