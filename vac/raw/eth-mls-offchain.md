@@ -496,7 +496,7 @@ the buffer period mitigates false positives, while commit filtering is required
 to prevent commit flooding during recovery.
 
 This timer-based method is used only for anti-deadlock detection.
-Cases where a commit message includes fewer finalized voting proposals than expected are handled by [section](#steward-violation-list).
+Cases where a commit message includes fewer finalized voting proposals than expected are handled by [Steward Violation List](#steward-violation-list).
 Emergency proposals that return NO, MUST incur a peer score penalty for the creator of the proposal to reduce abuse.
 
 ## Security Considerations
