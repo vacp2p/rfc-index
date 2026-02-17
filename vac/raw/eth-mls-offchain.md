@@ -77,7 +77,7 @@ Authentication service enables group members to authenticate the credentials pre
 The delivery service routes MLS messages among the nodes or
 members in the protocol in the correct order and
 manage the `keyPackage` of the users where the `keyPackage` is the objects
- that provide some public information about a user.
+that provide some public information about a user as specified in [MLS specification](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### MLS Objects
 
@@ -218,9 +218,10 @@ as in section 8.1. Group Context in [MLS RFC 9420](https://datatracker.ietf.org/
 broadcast it to the all network periodically. GA message is visible in network to all `nodes`.
 3. The each `node` who wants to be a `member` needs to obtain this anouncement and create `credential`
 includes `keyPackage` that is specified in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 10.
-4. The `node` send the `KeyPackages` in plaintext with its signature with current `steward` public key which
-anounced in welcome topic. This step is crucial for security, ensuring that malicious nodes/stewards
-cannot use others' `KeyPackages`.
+4. The `node` MUST send the plaintext `KeyPackage`, as defined in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/),
+accompanied by its signature, and publish it to the Welcome topic.
+This ensures that all current group members are aware that a new participant intends to join.
+Upon receipt, the `steward` MUST initiate a voting proposal to decide on admitting the new member.
 It also provides flexibility for liveness in multi-steward settings,
 allowing more than one steward to obtain `KeyPackages` to commit.
 5. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
