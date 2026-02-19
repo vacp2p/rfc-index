@@ -1,6 +1,6 @@
 # MERKLE-TREE
 
-| Field        | Value                                     |
+| Field | Value |
 | ------------ | ----------------------------------------- |
 | Name         | Merkle Tree                               |
 | Slug         | 153                                       |
@@ -614,7 +614,7 @@ Permutation of `[0,1,2,..9,10,11]`:
 
 #### Implementation
 
-- https://github.com/logos-storage/nim-goldilocks-hash (includes the Merkle tree construction)
+- [https://github.com/logos-storage/nim-goldilocks-hash](https://github.com/logos-storage/nim-goldilocks-hash) (includes the Merkle tree construction)
 
 ### Monolith over Goldilocks
 
@@ -646,4 +646,5 @@ Permutation of `[0,1,2,..9,10,11]`:
 
 #### Implementation
 
-- https://github.com/logos-storage/nim-goldilocks-hash (includes the Merkle tree construction)
+- [https://github.com/logos-storage/nim-goldilocks-hash](https://github.com/logos-storage/nim-goldilocks-hash) (includes the Merkle tree construction)
+
