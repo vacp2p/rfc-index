@@ -19,7 +19,7 @@ jobs:
       - name: Markdown Linter
         uses: DavidAnson/markdownlint-cli2-action@v15
         with:
-          config: .github/workflows/.markdownlint.yaml
+          config: .markdownlint.yaml
           globs: 'docs/**/*.md'
 
   remark:
