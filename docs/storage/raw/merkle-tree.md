@@ -3,6 +3,7 @@
 | Field        | Value                                     |
 | ------------ | ----------------------------------------- |
 | Name         | Merkle Tree                               |
+| Slug         | 153                                       |
 | Status       | draft                                     |
 | Category     | Standards Track                           |
 | Editor       | Balázs Kőműves <balazs@status.im>         |
@@ -48,8 +49,8 @@ Some examples of hash functions used in the wild are:
 - SHA256: `T` is 256 bits
 - Keccak / SHA3: `T` can be one of 224, 256, 384 or 512 bits
 - the Poseidon(2) family: `T` is one or more finite field element(s), depending on the field size
-- Monolith-64: `T` is 4 Goldilocks field elements
-- Monolith-31: `T` is 8 Mersenne-31 field elements
+- Monolith-64: `T` is a 4-tuple of Goldilocks field elements
+- Monolith-31: `T` is an 8-tuple of Mersenne-31 field elements
 
 The hash function `H : S -> T` can also have different types `S` ("Source type") of inputs. For example:
 
@@ -60,7 +61,7 @@ The hash function `H : S -> T` can also have different types `S` ("Source type")
 - as an alternative, the "Jive strategy" for binary compression (see [[Bouvier22](#references)]) can eliminate the "minus `k`" requirement (you can compress `t` into `t/2`)
 - A naive Merkle tree implementation could for example accept only a power-of-two sized sequence of `T`-s
 
-As an interesting example from the wild, the ZK proof library [Plonky3](https://github.com/Plonky3/Plonky3), because of performance considerations, uses a binary compression function `T x T -> T` which is _neither collision nor preimage resistant_ to a construct a Merkle tree, which at the end of the day is [still safe to use](https://eprint.iacr.org/2026/089) _in the particular situation they use it_. However, such constructions can be pretty fragile (it would be safer to use Jive strategy mentioned above, with negligible extra cost).
+As an interesting example from the wild, the ZK proof library [Plonky3](https://github.com/Plonky3/Plonky3) (because of performance considerations) uses a binary compression function `T x T -> T` which is _neither collision nor preimage resistant_ (!), to a construct a Merkle tree, which at the end of the day is [still safe to use](https://eprint.iacr.org/2026/089) _in the particular situation they use it_. However, such constructions can be pretty fragile (it would be safer to use the Jive strategy mentioned above, with negligible extra cost).
 
 Notation: Let's denote the type of a sequence of `T`-s by `[T]`.
 
@@ -114,7 +115,9 @@ Again, this is not really an attack on the cryptography itself, but an API abuse
 
 A simple solution would be to disallow the Merkle tree routine taking a sequence of field elements as an input (as opposed to the more usual sequence of bytestrings). Unfortunately, the real world has a say too: In the process of implementing Codex, we wanted to first hash fixed-sized network blocks (with whatever custom construction required), and then build a Merkle tree on the top of these hashes.
 
-In code, these are two separate functions. So internally, we need to use a non-secure functionality, which if naively implemented, can at the end result in _very subtle_ security bugs with potentially serious consequences...
+In code, these are two separate functions. So internally, we need to use a more abuse-prone functionality, which if naively implemented, can at the end result in _very subtle_ security bugs with potentially serious consequences...
+
+Another simple solution would be to always hash the leaves first (and use a dummy padding value with no known hash preimage), even when they already look like hashes themselves. This however doubles the amount of hashing required, in turn doubling the time required to construct the tree. With the below construction, we can avoid this extra cost.
 
 #### Construction
 
@@ -155,22 +158,23 @@ For example, in case of BN254 and `t=3`, the input of the permutation will be `(
 
 This is in practice equivalent to having 4 different compression functions `C_key(x,y) := C(key; x,y)`. 
 
-Remark: Since standard SHA256 already includes mandatory padding (to a multiple of 64 bytes), appending key byte at the end doesn't result in extra computation (it's always two internal hash calls). However, a faster (twice as fast!) alternative would be to choose 4 different random-looking initialization vectors, and not do padding at all. This would be a non-standard SHA256 invocation; but the speed advantage can be critical when proving SHA256 hashes in ZK!. See the Appendix for more details.
+Remark: Since standard SHA256 already includes mandatory padding (to a multiple of 64 bytes), appending key byte at the end doesn't result in extra computation (it's always two internal hash calls). However, a faster (twice as fast!) alternative would be to choose 4 different random-looking initialization vectors, and not do padding at all. This would be a non-standard SHA256 invocation; but the speed advantage can be critical when proving SHA256 hashes in ZK! See the Appendix below for more details.
 
 #### Merkle tree algorithm
 
-Thus a Merkle tree computation is a function `merkleRoot : [D] -> T` taking a sequence of leaf data `[D]`, and producing a Merkle root `T`. In practice, we also need a version which produces the whole tree (eg. to be able to produce inclusion proofs), but that's just keeping the intermediate results.
+Thus a Merkle tree computation is a function `merkleRoot : [D] -> T` taking a sequence of leaf data `[D]`, and producing a Merkle root `T`. In practice, we also need a version which produces the whole tree `Tree<T>` (eg. to be able to produce inclusion proofs), but that's just keeping the intermediate results.
 
-In any case, this is done in two steps:
+Normally, this is done in two or three steps:
 
 1. hash the leaf data: `hash : D -> T`
-2. then build the tree: `root : [T] -> t`
+2. then build the tree: `tree : [T] -> Tree<T>`
+3. finally extract the root: `root : Tree<T> -> T`
 
 The tree building proceeds in layers: Take the previous sequence, apply the keyed compression function for each consecutive pairs `(x,y) : (T,T)` with the correct key based on whether this was the initial (bottom) layer, and whether it's a singleton "pair" `x : T`, in which case it's also padded with a zero to `(x,0)`.
 
 Note that if the input was a singleton list `[x]`, we still apply one layer, so in that case the root will be `compress[key=3](x,0)`. 
 
-Remark: The singleton input is another subtle corner case which can be potentially abused! While in practice it's unlikely to happen, such a bug in fact happened in the history of Codex development! (happily, it was just a rare failure case, not an actual vulnerability).
+Remark: The singleton input is another subtle corner case which can be potentially abused! While in practice it's unlikely to happen, such a bug in fact happened in the history of Codex development (happily, it was just a pathological failure case, not an actual vulnerability).
 
 ### Encoding
 
@@ -179,34 +183,35 @@ Our Merkle trees are created from arbitrary data, and arbitrary data can mean, d
 - a raw bytestring (sequence of bytes), when the Merkle tree is used as a normal hash function;
 - or _a sequence of_ raw bytestrings, when the Merkle tree is used as an actual tree. So in this case the leaves are bytestrings themselves.
 
-The first case can be for example implemented by splitting the input into equally-sized blocks[^2] of length $b$, and passing those to the second version.
+The first case can be for example implemented by splitting the input into equally-sized blocks[^2] of length `b`, and passing those to the second version.
 
-In that context, each such _data block_[^3] (of size $b$) then undergoes hashing under `H' : D -> T`, and the resulting hashes become the tree's leaves (Fig. 3(a)). When `D = S` (eg. with SHA256), this is very straightforward; but maybe it's a better mental model to consider the finite field situation.
+In that context, each such _data block_[^3] (of size `b`) then undergoes hashing under `H' : D -> T`, and the resulting hashes become the tree's leaves (Fig. 3(a)). When `D = S` (eg. with SHA256), this is very straightforward; but maybe it's a better mental model to consider the finite field situation.
 
-For hashing functions which do not take byte strings as input - like  Poseidon2, which operates on sequences of finite field elements - we must _encode_ our data blocks into the proper type first (Figure 3(b)).
+For hashing functions which do not take bytestrings as input - like  Poseidon2, which operates on sequences of finite field elements - we must _encode_ our data blocks into the proper type first (Figure 3(b)).
 
 ![encoding](images/encoding.png)
 
-**Figure 3.** **(a)** A byte string (raw data), split into data blocks which are also byte strings. **(b)** Data blocks after undergoing encoding.
+**Figure 3.** **(a)** A byte string (raw data), split into data blocks which are also bytestrings. **(b)** Data blocks after undergoing encoding.
 
-We define an _encoding function_ `E` to be a function which can do that for us. Formally speaking, `E` can encode an arbitrary-valued byte string of length $b$ into a value of the required type `S`; that is, `E : byte[b] -> S`. Such an encoding function MUST always be _injective_; i.e., distinct byte strings MUST map into distinct values of the type `S`. To see why, suppose `E` were not injective. This means there are two byte strings `D_1` and `D_2` such that `E(D_1) = E(D_2) = S_1 = S_2`. We could then take the raw data used to build a Merkle tree $A$, replace all occurrences of `D_1` with `D_2`, and build an identical Merkle tree from distinct data - which is what we want to avoid.
+We define an _encoding function_ `E` to be a function which can do that for us. Formally speaking, `E` can encode an arbitrary-valued byte string of length `b` into a value of the required type `S`; that is, `E : byte[b] -> S`. Such an encoding function MUST always be _injective_; i.e., distinct bytestrings MUST map into distinct values of the type `S`. To see why, suppose `E` were not injective. This means there are two bytestrings `D_1` and `D_2` such that `E(D_1) = E(D_2) = S_1 = S_2`. We could then take the raw data used to build a Merkle tree `A`, replace all occurrences of `D_1` with `D_2`, and build an identical Merkle tree from distinct data - which is what we want to avoid.
 
 The next section deals with injective encodings for the major types we use - including SHA256, BN254, Goldilocks. We then discuss padding in Sec. [Padding](#padding).
 
 #### Injective Encodings
 
-Encoding for SHA256 is trivial in that it already operates on bytestrings, so there is no extra work to be done. For most of the other hashing functions we care about, however, `S` is a sequence of finite field elements, and we therefore need to perform encoding.
+Encoding for classical hash functions like SHA256 is trivial in that they already operates on bytestrings, so there is no extra work to be done. On the other hand, for arithmetic hash functions like Poseidon(2), `S` is a sequence of finite field elements, and we therefore need to perform encoding.
 
-In such situations, it is convenient to construct our injective encoding function `E` by chunking the input sequence of size $b$ into smaller pieces of size `M`, and then applying a _element encoding function_ `E_s` function to each chunk. This function can output either a single or multiple field elements per `M`-sized chunk (Listing 1).
+In such situations, it is convenient to construct our injective encoding function `E` by chunking the input sequence of size `b` into smaller pieces of size `M`, and then applying an _element encoding function_ `E_s` function to each chunk. This function can output either a single or multiple field elements per `M`-sized chunk (Listing 1).
 
 ```python=
-def E(
-  raw: List[byte],
-  E_s: List[byte] -> List[FieldElement],
-  M: uint,
-) -> List[FieldElement]:
+def E( raw: List[byte],
+       E_s: List[byte] -> List[FieldElement],
+       M:   uint,
+     ) -> List[FieldElement]:
+
   # requires len(raw) to be multiple of M
   chunks = len(raw) / M
+  assert chunks * M == len(raw)
   encoded = []
   for i in range(0, chunks):
     encoded.extend(E_s(raw[i*M:(i+1)*M-1]))
@@ -216,11 +221,11 @@ def E(
 
 **Listing 1.** Constructing `E` from `E_s`.
 
-For the BN254 field, we can construct `E_s` by taking `M=31`, and having the 31 bytes interpreted as a _little-endian_ integer modulo `p` (remember that `31 x 8 < log2(p) < 32 x 8`). This outputs a single field element per $31$ bytes.
+For the BN254 field, we can construct `E_s` by taking `M = 31`, and having the 31 bytes interpreted as a _little-endian_ integer modulo `p` (remember that `31 x 8 < log2(p) < 32 x 8`). This outputs a single field element per 31 bytes.
 
-Poseidon2 or Monolith (over the Goldilocks field) take multiples of four Goldilocks field elements at a time. We have some choices: We can have `M=4*7=28`, as a single field element can encode 7 bytes but not 8. Or, if we want to be more efficient, we can still achieve `M=31` by storing 62 bits in each field element. For this to work, some convention needs to be chosen; our implementation is the following:
+On the other hand, over the Goldilocks field, Poseidon2 or Monolith take multiples of four Goldilocks field elements at a time. We have some choices: We could have `M = 4*7 = 28`, as a single field element can encode 7 bytes but not 8. Or, if we want to be more efficient, we can still achieve `M = 31` by storing 62 bits in each field element. For this to work, some convention needs to be chosen; our implementation is the following:
 
-```haskell
+```C
 #define MASK 0x3fffffffffffffffULL
 
 // NOTE: we assume a little-endian architecture here
@@ -241,9 +246,9 @@ This simply chunks the 31 bytes = 248 bits into 62 bits chunks, and interprets t
 
 #### Padding
 
-The element encoding function `E_s` requires byte strings of length `M`, but the input's length; i.e., the size $b$ our data blocks, might not be a multiple of `M`. We might therefore need to _pad_ the blocks, and we need to do it in a way that avoids the usual trap: different input data resulting in the same padded representation.
+The element encoding function `E_s` requires bytestrings of length `M`, but the input's length; i.e., the size `b` our data blocks, might not be a multiple of `M`. We might therefore need to _pad_ the blocks, and we need to do it in a way that avoids the usual trap: different input data resulting in the same padded representation.
 
-We adopt a `10*` padding strategy to pad raw data blocks to a multiple of `M` bytes; i.e., we _always_ add a `0x01` byte, and then as many `0x00` bytes as required for the length to be divisible by `M`. Assuming again a data block of length $b$ bytes, then the padded sequence will have `M*(floor(b/M)+1)` bytes.
+We adopt a `10*` padding strategy to pad raw data blocks to a multiple of `M` bytes; i.e., we _always_ add a `0x01` byte, and then as many `0x00` bytes as required for the length to be divisible by `M`. Assuming again a data block of length `b` bytes, then the padded sequence will have `M*(floor(b/M)+1)` bytes.
 
 Note: The `10*` padding strategy is an invertible operation, which will ensure that there is no collision between sequences of different lengths; i.e., to unpad scan from the end, drop `0x00` bytes until the first `0x01`, drop that too; reject if no `0x01` found
 
@@ -271,8 +276,9 @@ Remark: we could (de)serialize in the so-called Montgomery representation instea
 The interface for a Merkle tree typically require the following API:
 
 - the Merkle tree construcion function takes a sequence `D`-s (typically bytestrings) of length `n` as input, and produces a Merkle tree of type `T`; that is, `mkTree: [D] -> Tree<T>`
+- if we also want to use the Merkle tree as a normal hash function, then `merkleHashTree : [byte] -> Tree<T>` 
 - further standard functionality are:
-    - extract the tree root
+    - extract the tree root `root : Tree<T> -> T`
     - extract a Merkle inclusion proof
     - check a Merkle inclusion proof against a root
     - update a leaf of the tree
@@ -282,11 +288,9 @@ In practice, we split the tree construction into two parts:
 - leaf encoding: `D -> S`
 - tree construction: `[S] -> Tree<T>`
 
-This split makes the API inherently less safe, but in practice is required. However, our construction is hopefully robust enough that this loss of safety cannot be easily exploited (especially accidentally)
+This split makes the API inherently less safe, but in practice is required. However, our construction is hopefully robust enough that this loss of safety cannot be easily exploited (especially accidentally).
 
-- one which takes a sequence of bytes (or even bits, but in practice we probably only need bytes), and produces a Merkle tree of type `T`.
-
-#### Interface pseudo-code
+### Interface pseudo-code
 
 We also typically want to be able to obtain proofs for existing data blocks, and check blocks along with their proofs against a root. The interface is described in Listing 2. We avoid going into actual algorithms here as those are already specified in the reference implementations.
 
@@ -374,9 +378,9 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 [^1]: Some less-conforming implementation of these could take a sequence of bytes instead.
 
-[^2]: Data blocks might also need to be padded to a multiple of $b$, but raw data padding is beyond the scope of this document.
+[^2]: Data blocks might also need to be padded to a multiple of `b`, but raw data padding is beyond the scope of this document.
 
-[^3]: The standard block size for Logos storage is $65\,536$ bytes for SHA256 trees, and $2\,048$ bytes for Poseidon2 trees.
+[^3]: The standard block size for Logos storage is (currently) `2^16 = 65536` bytes for SHA256 trees. In the "old Codex" design, we used `2^10 = 2048` bytes sized "cells" for probabilistic storage proofs, using a secondary, Poseidon2-based Merkle tree.
 
 --------------------
 
