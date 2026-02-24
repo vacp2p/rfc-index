@@ -5,6 +5,7 @@
 | Name | Interep as group management for RLN |
 | Slug | 100 |
 | Status | raw |
+| Category | Standards Track |
 | Editor | Aaryamann Challani <p1ge0nh8er@proton.me> |
 
 <!-- timeline:start -->

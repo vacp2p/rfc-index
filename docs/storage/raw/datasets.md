@@ -1,8 +1,9 @@
 # DATASETS
 
-| Field    | Value                                |
-| -------- | ------------------------------------ |
+| Field | Value |
+| --- | --- |
 | Name     | Logos Storage Datasets               |
+| Slug | 152 |
 | Category | Standards Track                      |
 | Status   | raw                                  |
 | Editor   | Giuliano Mega <giuliano@status.im>   |

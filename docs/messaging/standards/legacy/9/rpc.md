@@ -5,6 +5,7 @@
 | Name | Waku RPC API |
 | Slug | 9 |
 | Status | stable |
+| Category | Standards Track |
 | Editor | Andrea Maria Piana <andreap@status.im> |
 | Contributors | Dean Eigenmann <dean@status.im>, Oskar Thorén <oskarth@titanproxy.com> |
 

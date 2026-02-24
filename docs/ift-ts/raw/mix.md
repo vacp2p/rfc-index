@@ -619,7 +619,7 @@ The recommended total packet size is $4608$ bytes, chosen to:
 - Allow inclusion of additional data such as SURBs without requiring fragmentation,
 - Maintain reasonable per-hop processing and bandwidth overhead.
 
-This recommended total packet size of \$4608\$ bytes yields:
+This recommended total packet size of $4608$ bytes yields:
 
 $`
 \begin{aligned}
