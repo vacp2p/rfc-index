@@ -129,7 +129,7 @@ the user MUST allocate a portion of vault funds to that stream.
 Each stream MUST belong to exactly one vault.
 Each stream MUST specify an accrual rate (tokens per time unit).
 An allocation is the portion of vault funds committed to a stream.
-The sum of all stream allocations MUST NOT exceed vault balance.
+The sum of all stream allocations MUST NOT exceed the vault balance.
 
 A claim is the operation
 where the provider retrieves accrued funds from a stream.
@@ -226,7 +226,7 @@ On-chain state is the source of truth for fund allocation and accrual.
 Off-chain communication coordinates lifecycle events
 and enables service delivery.
 
-This spec does not re-define the service provision protocol.
+This spec does not redefine the service provision protocol.
 The incentivization spec (see [References](#references))
 defines the generic request-response framework
 with `EligibilityProof` and `EligibilityStatus`.
@@ -500,8 +500,8 @@ by keeping a stream paused
 and resuming briefly only when querying a service.
 This results in minimal payment for actual service usage.
 
-Activation fee addresses this attack.
-When activation fee is enabled,
+The activation fee addresses this attack.
+When the activation fee is enabled,
 a fixed amount MUST accrue to the provider
 immediately upon the stream becoming `ACTIVE`.
 The activation fee SHOULD reflect
@@ -561,7 +561,7 @@ are encoded and enforced through program logic.
 
 Stream state is evaluated lazily.
 On-chain storage holds stream parameters,
-but effective state depends on block timestamp at execution time.
+but the effective state depends on the block timestamp at execution time.
 State transitions (such as auto-pause) are reflected on-chain
 only when an on-chain operation is executed.
 
