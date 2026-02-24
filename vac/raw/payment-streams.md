@@ -289,9 +289,11 @@ where `stream_allocation` is from the accompanying `StreamParams`
 and `buffer` is the provider's required vault buffer percentage
 (RECOMMENDED default: 5%).
 
-The user MAY issue `VaultProof`s to different providers
-only if the sum of their promised allocations
-does not exceed the vault's unallocated balance.
+The user MAY issue `VaultProof`s to multiple providers.
+The user MUST ensure that issuing a new `VaultProof`
+does not cause the total of all promised `VaultProof` allocations
+from this vault
+to exceed the vault's unallocated balance.
 
 #### StreamParams
 
