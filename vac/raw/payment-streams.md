@@ -202,6 +202,9 @@ The following is an informal list of discoverable parameters
 - load cap (cumulative resource limit per stream per time window)
 - `VaultProof` response cap
   (maximum response size for `VaultProof`-backed requests)
+- `max_open_stream_window` (RECOMMENDED default: 300 seconds)
+  (maximum acceptable duration
+  between receiving a `StreamProposal` and stream establishment)
 
 Users SHOULD monitor service delivery
 and take action when providers stop delivering service.
@@ -299,9 +302,14 @@ message StreamParams {
   bytes service_id = 1;              // identifier of the requested service
   uint64 stream_rate = 2;           // proposed accrual rate (tokens per time unit)
   uint64 stream_allocation = 3;     // proposed initial allocation
-  uint32 stream_establishment_timeout = 4;  // seconds; RECOMMENDED default: 300
+  uint64 open_stream_by = 4;   // stream establishment deadline (absolute timestamp)
 }
 ```
+
+The `open_stream_by` field is an absolute timestamp
+by which the user commits to establishing the stream on-chain.
+The user MUST set `open_stream_by` to a future timestamp
+no later than the current time plus `max_open_stream_window`.
 
 #### StreamProof
 
@@ -409,15 +417,18 @@ the user SHOULD close the stream to recover unaccrued funds.
      to the advertised `VaultProof` response cap.
 
 4. The user creates the stream on-chain
-   within `stream_establishment_timeout`.
+   before `open_stream_by`.
 
 5. The user sends subsequent `ServiceRequest`s
    with `eligibility_proof` containing a `StreamProof`.
 
-6. If no `StreamProof`-backed request arrives
-   within `stream_establishment_timeout`,
-   the provider MAY discard the pending session
+6. The provider monitors the chain for a matching stream.
+   If no matching stream appears by `open_stream_by`,
+   the provider SHOULD discard the session
    and release planned capacity.
+   If the stream is established before `open_stream_by`,
+   the first `StreamProof`-backed request
+   MAY arrive after `open_stream_by`.
 
 A user MUST NOT have more than one pending
 `StreamProposal`-backed session per vault-provider pair at a time.
