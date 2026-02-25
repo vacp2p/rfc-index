@@ -458,9 +458,9 @@ two `commit messages` containing the exact same ordered set of `voting proposals
 but produced by different `stewards` will generate different group keys.
 Therefore, proposal equivalence alone does not guarantee state equivalence.
 If multiple valid commits contain the identical deterministic proposal sequence,
-the commit validation service MUST select the commit whose `committer ID`
-is lexicographically smallest (according to canonical ordering) as the single valid output,
-thereby avoiding different state forks.
+the commit validation service MUST select first, if there is `Epoch steward`,
+otherwise the commit whose `committer ID` is lexicographically smallest (according to canonical ordering)
+as the single valid output, thereby avoiding different state forks.
 
 ## Steward violation list
 
