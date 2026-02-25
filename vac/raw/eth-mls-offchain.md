@@ -438,6 +438,12 @@ with different lengths and contents, each containing `voting proposals`.
 The process deterministically selects at most a single valid commit as output.
 In cases where protocol violations are detected, the process MAY additionally trigger peer scoring penalties.
 
+For all candidate commits entering validation, the `creator ID` MUST be identified
+and verified against the local epoch context to ensure that the commit is eligible for the current epoch.
+Commits originating from unauthorized or context-inconsistent creators MUST be rejected.
+The `creator ID` MAY additionally be used for peer scoring purposes, including optional slashing or rewarding mechanisms,
+depending on whether the commit is determined to be valid or invalid.
+
 A commit is considered valid only if it references governance proposals
 that have been finalized through voting and are known to the member.
 Commits that reference non-finalized voting proposals MUST be rejected and
