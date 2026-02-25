@@ -148,12 +148,12 @@ General flow is as follows:
 - Each `member` creates `voting proposals` sends them to from MLS group during `epoch E`.
 - Proposals are voted on during the $\Delta$ time window.
 During this period, the system enters a freezing phase (no new proposals are accepted) to ensure
-that at least 2n/3 members become synchronized, thereby preserving the 
+that at least 2n/3 members become synchronized, thereby preserving the
 health and correctness of the [commit validation service](#commit-validation-service).
 - Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into
 `MLS proposals` then sends them with corresponding `commit messages`
 - Eventually, upon receiving `commit messages`, each member applies the
-[commit validation service](#commit-validation-service) locally. 
+[commit validation service](#commit-validation-service) locally.
 After successful validation, the member transitions to the next `epoch E+1`.
 
 ## Creating Voting Proposal
@@ -242,18 +242,21 @@ However, unlimited use of `voting proposals` within the group may be misused by
 malicious or overly active members.
 Therefore, an application-level constraint MUST be introduced to limit the number
 or frequency of proposals initiated by each member to prevent spam or abuse.
-7. Meanwhile, the `steward` collects finalized `voting proposals` with in epoch `E`,
-that have received affirmative votes from members via application messages.
-Otherwise, the `steward` discards proposals that did not receive a majority of "YES" votes.
-Since voting proposals are transmitted as application messages, omitting them does not affect
-the protocol’s correctness or consistency.
+7. After waiting for the $\Delta$ synchronization window, the `steward` collects
+finalized `voting proposals` within epoch `E` that have received affirmative votes
+from members via application messages.
+The `steward` includes only those proposals that have obtained a majority of "YES" votes.
+Since voting proposals are transmitted as application messages, omitting
+non-finalized proposals does not affect the protocol’s correctness or
+consistency.
 8. The `steward` converts all approved `voting proposals` into
 corresponding `MLS proposals` and `commit message`, and
 transmits both in a single operation as in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 12.4,
 including welcome messages for the new members.
 Therefore, the `commit message` ends the previous epoch and create new ones.
-9. The `members` applied the incoming `commit message` by checking the signatures and `voting proposals`
-and synchronized with the upcoming epoch.
+9. Upon receiving a `commit message`, the `members` first execute the [commit validation service](#commit-validation-service),
+including verification of signatures and associated `voting proposals`.
+If the commit is deemed valid, the `members` apply the commit and synchronize to the upcoming epoch.
 
 ## Multi stewards
 
@@ -265,6 +268,11 @@ operating under the same protocol as the single steward model.
 Thus, the multi steward approach primarily defines how steward roles
 rotate across epochs while preserving the underlying structure and logic of the original protocol.
 Two variants of the multi steward design are introduced to address different system requirements.
+
+In the multi steward setting, multiple stewards MAY issue `commit messages` within the same epoch.
+As a result, members may receive different numbers of commit messages with potentially differing contents.
+For all received commits, the [commit validation service](#commit-validation-service) is executed locally and
+MUST deterministically output at most one valid commit to be applied for the epoch transition.
 
 ### Consensus Types
 
@@ -444,6 +452,15 @@ according to the misbehaviour scoring rules defined in this specification.
 The proposal sequence is ordered by the ascending value of each proposal as `SHA256(proposal)`.
 Therefore, commit messages that contain the same set of voting proposals
 are identical in content and can be easily deduplicated.
+
+Since MLS derives new group secrets from the committer’s contribution,
+two `commit messages` containing the exact same ordered set of `voting proposals`
+but produced by different `stewards` will generate different group keys.
+Therefore, proposal equivalence alone does not guarantee state equivalence.
+If multiple valid commits contain the identical deterministic proposal sequence,
+the commit validation service MUST select the commit whose `committer ID`
+is lexicographically smallest (according to canonical ordering) as the single valid output,
+thereby avoiding different state forks.
 
 ## Steward violation list
 
