@@ -50,6 +50,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 - We MAY have non-reliable (silent) nodes.
 - We MUST have a consensus that is lightweight, scalable and finalized in a specific time.
 - The network MUST enforce a rate-limiting mechanism for all entities in order to mitigate spam.
+- At least $2n/3$ of the members MUST become synchronized within $\Delta$ time, where $n$ is the group size.
 
 ## Roles
 
@@ -85,6 +86,9 @@ Following section presents the MLS objects and components that used in this RFC:
 
 `Epoch`: Time intervals that changes the state that is defined by members,
 section 3.4 in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
+An epoch is represented as a monotonically increasing integer.
+It does not correspond to a fixed wall-clock time interval.
+Instead, the epoch is incremented upon each valid `commit message` that results in a state transition.
 
 `MLS proposal message:` Members MUST receive the proposal message prior to the
 corresponding commit message that initiates a new epoch with key changes,
@@ -130,7 +134,7 @@ it holds the main responsibility for producing the commit.
 However, other stewards MAY also generate a commit within the same epoch to preserve liveness
 in case the epoch steward is inactive or slow.
 Duplicate commits are not re-applied and only the single valid commit for the epoch is accepted by the group,
-as in described in section filtering proposals against the multiple comitting.
+as in described in [commit validation service](#commit-validation-service) against the multiple comitting.
 
 Therefore, if a malicious steward occurred, the `backup steward` will be charged with committing.
 Lastly, the size of the list named as `sn`, which also shows the epoch interval for steward list determination.
@@ -142,9 +146,15 @@ General flow is as follows:
 - A steward initializes a group just once, and then sends out Group Announcements (GA) periodically.
 - Meanwhile, each `node` creates and sends their `credential` includes `keyPackage`.
 - Each `member` creates `voting proposals` sends them to from MLS group during `epoch E`.
+- Proposals are voted on during the $\Delta$ time window.
+During this period, the system enters a freezing phase (no new proposals are accepted) to ensure
+that at least 2n/3 members become synchronized, thereby preserving the 
+health and correctness of the [commit validation service](#commit-validation-service).
 - Meanwhile, the `steward` collects finalized `voting proposals` from MLS group and converts them into
 `MLS proposals` then sends them with corresponding `commit messages`
-- Evantually, with the commit messages, all members starts the next `epoch E+1`.
+- Eventually, upon receiving `commit messages`, each member applies the
+[commit validation service](#commit-validation-service) locally. 
+After successful validation, the member transitions to the next `epoch E+1`.
 
 ## Creating Voting Proposal
 
@@ -193,7 +203,7 @@ the MLS proposal by the `steward` and following commit message that starts the n
 
 All `members` including `stewards` MUST maintain a local store of finalized voting proposals
 for at least the duration `threshold_duration` mentioned in [Steward Violation List](#steward-violation-list),
-required to validate incoming commits and perform [commit filtering](#commit-validation-service).
+required to validate incoming commits and perform [Commit validation service](#commit-validation-service).
 
 ## Creating welcome message
 
