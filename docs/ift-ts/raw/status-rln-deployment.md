@@ -30,11 +30,11 @@ cryptographic enforcement of rate limits and slashing remains verifiable and non
 
 ## Roles
 
-Status L2 RLN deployment consists of five roles: `user`, `Karma contract`,
+Status L2 RLN deployment consists of six roles: `user`, `Karma contract`,
 `RLN contract`,  `Layer2`, and `Linea ecosystem`, `Slashers`.
 
 - `user`: Uses the Status L2 in a gasless manner who MAY pay premium gas for the transaction (TX).
-- `Karma contract`: The contract that shows
+- `Karma contract`: The contract maintains user karma balances, enforces karma slashing, and manages updateable tier limits.
 - `RLN contract`: The contract that stores the RLN memberships.
 - `Layer2`: Trusted components that are operated by Status L2 team.
 - `Linea ecosystem:` : Linea L2 components
