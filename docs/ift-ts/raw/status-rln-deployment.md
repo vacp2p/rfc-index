@@ -383,5 +383,5 @@ To restrict the number of slashers to 128, with the set being updated weekly, th
 - [Zerokit](https://github.com/vacp2p/zerokit)
 - [Linea](https://linea.build/)
 - [RLN-Prover](https://github.com/vacp2p/status-rln-prover)
-- [RLN Specification](https://rfc.vac.dev/vac/raw/rln-v2/)
-- [Multi-message_id burn RLN](https://github.com/vacp2p/rfc-index/pull/243)
+- [RLN Specification](https://lip.logos.co/ift-ts/raw/rln-v2.html)
+- [Multi-message_id burn RLN](https://lip.logos.co/ift-ts/raw/multi-message_id-burn-rln.html)
