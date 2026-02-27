@@ -179,7 +179,7 @@ bool liveness_criteria_yes = 19;  // Shows how managing the silent peers vote
 }
 ```
 
-```bash
+```protobuf
 message Vote {
 int32 vote_id = 20;             // Unique identifier of the vote
 bytes vote_owner = 21;          // Voter's public key
