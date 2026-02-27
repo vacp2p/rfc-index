@@ -31628,6 +31628,7 @@ in different stages of the protocol, violating vote consistency and attempting t
 </div><!-- timeline:start -->
 <h2 id="timeline-88"><a class="header" href="#timeline-88">Timeline</a></h2>
 <ul>
+<li><strong>2026-02-27</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/2ec272e57f6110106297d062098110a3549c5db6/docs/ift-ts/raw/logos-capability-discovery.md"><code>2ec272e</code></a> — docs: refactor and add algo explanation before pseudocode (#280)</li>
 <li><strong>2026-01-27</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/ab9337e58b5947a3b58d205fec7d52fb8d16c2eb/docs/ift-ts/raw/logos-capability-discovery.md"><code>ab9337e</code></a> — Add recipe for algorithms (#232)</li>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/logos-capability-discovery.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/logos-capability-discovery.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
@@ -31684,17 +31685,8 @@ are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.
 <h3 id="advertiser"><a class="header" href="#advertiser">Advertiser</a></h3>
 <p><strong>Advertisers</strong> are nodes that participate in a service
 and want to be discovered by other peers.</p>
-<p>Responsibilities:</p>
-<ul>
-<li>Advertisers SHOULD register advertisements for their service across registrars</li>
-<li>Advertisers SHOULD handle registration responses</li>
-</ul>
 <h3 id="discoverer"><a class="header" href="#discoverer">Discoverer</a></h3>
 <p><strong>Discoverers</strong> are nodes attempting to find peers that provide a specific service.</p>
-<p>Responsibilities:</p>
-<ul>
-<li>Discoverers SHOULD query registrars for advertisements of a service</li>
-</ul>
 <h3 id="registrar"><a class="header" href="#registrar">Registrar</a></h3>
 <p><strong>Registrars</strong> are nodes that store and serve advertisements.</p>
 <p>Responsibilities:</p>
@@ -31727,13 +31719,16 @@ at a particular distance range from a reference ID.</p>
 <li>Buckets enable logarithmic routing by organizing the keyspace into manageable segments</li>
 </ul>
 <p>The number of buckets and their organization is described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance</a> section.
-Implementation considerations for bucket management are detailed in <a href="ift-ts/raw/logos-capability-discovery.html#bucket-management">Bucket Management</a> section.</p>
+Implementation considerations for bucket management
+are detailed in <a href="ift-ts/raw/logos-capability-discovery.html#bucket-management">Bucket Management</a> section.</p>
 <h3 id="service"><a class="header" href="#service">Service</a></h3>
 <p>A service is a logical sub-network within the larger peer-to-peer network.
 It represents a specific capability a node supports
 — for example, a particular protocol or functionality it offers.
 A service MUST be identified by a libp2p protocol ID via the
-<a href="https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/identify">identify protocol</a>.</p>
+<a href="https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/identify">identify protocol</a>.
+This service protocol ID (e.g., <code>/waku/store/1.0.0</code>)
+identifies the capability being discovered.</p>
 <h3 id="service-id"><a class="header" href="#service-id">Service ID</a></h3>
 <p>The service ID <code>service_id_hash</code> MUST be the SHA-256 hash of the protocol ID.</p>
 <p>For example:</p>
@@ -31827,8 +31822,7 @@ to track accumulated waiting time for admission into the advertisement cache.</p
 <p>Tickets enable stateless admission control at registrars.
 Advertisers accumulate waiting time across registration attempts
 by presenting tickets from previous attempts.</p>
-<p>See the <a href="ift-ts/raw/logos-capability-discovery.html#rpc-messages">RPC Messages</a> section for the wire format specification of tickets
-and the <a href="ift-ts/raw/logos-capability-discovery.html#registration-flow">Registration Flow</a> section for how tickets are used in the admission protocol.</p>
+<p>See the <a href="ift-ts/raw/logos-capability-discovery.html#rpc-messages">RPC Messages</a> section for the wire format specification of tickets.</p>
 <h2 id="protocol-specifications"><a class="header" href="#protocol-specifications">Protocol Specifications</a></h2>
 <h3 id="system-parameters-1"><a class="header" href="#system-parameters-1">System Parameters</a></h3>
 <p>The system parameters are derived directly from
@@ -32064,7 +32058,8 @@ to avoid coupling the protocol to specific formats</li>
 <li>Domain: <code>libp2p-routing-state</code></li>
 <li>Payload type: <code>/libp2p/extensible-peer-record/</code></li>
 </ul>
-<p>Alternative encodings MAY be used if they provide equivalent functionality and can be verified by discoverers.</p>
+<p>Alternative encodings MAY be used if they provide equivalent functionality
+and can be verified by discoverers.</p>
 <h3 id="register-message"><a class="header" href="#register-message">REGISTER Message</a></h3>
 <p>Used by advertisers to register their advertisements with registrars.</p>
 <h4 id="register-request"><a class="header" href="#register-request">REGISTER Request</a></h4>
@@ -32210,7 +32205,8 @@ Discoverers MUST verify signatures before accepting.</p>
 <li>Retry within window: <code>ticket.t_mod + ticket.t_wait_for ≤ NOW() ≤ ticket.t_mod + ticket.t_wait_for + δ</code></li>
 </ul>
 </li>
-<li>Advertisement signature is valid (see <a href="ift-ts/raw/logos-capability-discovery.html#advertisement-signature-verification">Advertisement Signature Verification</a>)</li>
+<li>Advertisement signature is valid
+(see <a href="ift-ts/raw/logos-capability-discovery.html#advertisement-signature-verification">Advertisement Signature Verification</a>)</li>
 <li>Advertisement not already in <code>ad_cache</code></li>
 </ol>
 <p>Respond with <code>register.status = REJECTED</code> if validation fails.</p>
@@ -32222,7 +32218,9 @@ Discoverers MUST verify signatures before accepting.</p>
 </ol>
 <p>Return empty <code>getAds.advertisements</code> list or close stream if validation fails.</p>
 <h4 id="advertisement-signature-verification"><a class="header" href="#advertisement-signature-verification">Advertisement Signature Verification</a></h4>
-<p>Both registrars (on REGISTER) and discoverers (on GET_ADS response) MUST verify advertisement signatures. For XPR-encoded advertisements:</p>
+<p>Both registrars (on REGISTER) and discoverers (on GET_ADS response)
+MUST verify advertisement signatures.
+For XPR-encoded advertisements:</p>
 <pre><code class="language-text">VERIFY_ADVERTISEMENT(encoded_ad_bytes, service_id_hash):
     envelope = DECODE_SIGNED_ENVELOPE(encoded_ad_bytes)
     assert(envelope.domain == "libp2p-routing-state")
@@ -32241,7 +32239,10 @@ Discoverers MUST verify signatures before accepting.</p>
 </code></pre>
 <p>Discard advertisements with invalid signatures or that don't advertise the requested service.</p>
 <blockquote>
-<p><strong>Note:</strong> ExtensiblePeerRecord uses protocol strings (e.g., <code>/waku/store/1.0.0</code>) in <code>ServiceInfo.id</code>. Logos discovery uses <code>service_id_hash = SHA256(ServiceInfo.id)</code> for routing. When verifying, implementations MUST hash the protocol string and compare with the <code>key</code> field (<code>service_id_hash</code>).</p>
+<p><strong>Note:</strong> ExtensiblePeerRecord uses protocol strings (e.g., <code>/waku/store/1.0.0</code>) in <code>ServiceInfo.id</code>.
+Logos discovery uses <code>service_id_hash = SHA256(ServiceInfo.id)</code> for routing.
+When verifying, implementations MUST hash the protocol string
+and compare with the <code>key</code> field (<code>service_id_hash</code>).</p>
 </blockquote>
 <h3 id="stream-management"><a class="header" href="#stream-management">Stream Management</a></h3>
 <p>Following standard Kad-DHT behavior:</p>
@@ -32249,7 +32250,8 @@ Discoverers MUST verify signatures before accepting.</p>
 <li>Implementations MAY reuse streams for sequential requests</li>
 <li>Implementations MUST handle multiple requests per stream</li>
 <li>Reset stream on protocol errors or validation failures</li>
-<li>Prefix messages with length as unsigned varint per <a href="https://github.com/multiformats/unsigned-varint">multiformats spec</a></li>
+<li>Prefix messages with length as unsigned varint per
+<a href="https://github.com/multiformats/unsigned-varint">multiformats spec</a></li>
 </ul>
 <h3 id="error-handling-3"><a class="header" href="#error-handling-3">Error Handling</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Error</th><th>Handling</th></tr></thead><tbody>
@@ -32261,40 +32263,34 @@ Discoverers MUST verify signatures before accepting.</p>
 <tr><td>Missing required fields</td><td>Close stream</td></tr>
 </tbody></table>
 </div>
-<p><strong>Protocol identifier:</strong> <code>/logos/capability-discovery/1.0.0</code></p>
-<p>Implementations SHOULD support both standard Kad-DHT operations
-and Logos discovery operations simultaneously.
-Nodes operating in Kad-DHT-only mode will
-simply not respond to <code>REGISTER</code> or <code>GET_ADS</code> requests.</p>
 <h2 id="sequence-diagram"><a class="header" href="#sequence-diagram">Sequence Diagram</a></h2>
 <p><img src="https://github.com/user-attachments/assets/d85fab17-c636-417a-afaf-c609aa53075d" alt="Sequence diagram" /></p>
-<h2 id="advertisement-placement"><a class="header" href="#advertisement-placement">Advertisement Placement</a></h2>
-<h3 id="overview-2"><a class="header" href="#overview-2">Overview</a></h3>
+<h2 id="advertisers"><a class="header" href="#advertisers">Advertisers</a></h2>
+<p>Advertisers distribute advertisements for their service across registrars.</p>
+<h3 id="distributing-ads-across-registrars"><a class="header" href="#distributing-ads-across-registrars">Distributing ads across registrars</a></h3>
 <p>For each service, identified by <code>service_id_hash</code>,
 that an advertiser wants to advertise,
 the advertiser MUST instantiate a
-new <code>AdvT(service_id_hash)</code>,
-centered on that <code>service_id_hash</code>.</p>
-<p>The advertiser MAY bootstrap <code>AdvT(service_id_hash)</code>
-from <code>KadDHT(peerID)</code> using the formula
-described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance section</a>.
-The advertiser SHOULD try to maintain up to <code>K_register</code>
+new advertise table, <code>AdvT(service_id_hash)</code>,
+centered on that <code>service_id_hash</code>.
+The advertiser MAY bootstrap <code>AdvT(service_id_hash)</code>
+from the <code>KadDHT(peerID)</code> routing table using the formula
+described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance section</a>.</p>
+<p>The advertiser SHOULD try to maintain up to <code>K_register</code>
 active registrations per bucket.
 It does so by selecting random registrars
-from each bucket of <code>AdvT(service_id_hash)</code>
-and following the <a href="ift-ts/raw/logos-capability-discovery.html#registration-maintenance-requirements">registration maintenance procedure</a>.
+from each bucket of <code>AdvT(service_id_hash)</code>.
 These ongoing registrations MAY be tracked in a separate data structure.
 Ongoing registrations include those registrars
-which has an active <code>ad</code> or the advertiser is
-trying to register its <code>ad</code> into that registrar.</p>
-<h3 id="registration-maintenance-requirements"><a class="header" href="#registration-maintenance-requirements">Registration Maintenance Requirements</a></h3>
+at which the advertiser has an active registration or
+for which there is an ongoing registration attempt.</p>
 <p>To maintain each registration, the advertiser:</p>
 <ul>
 <li>MUST send a <a href="ift-ts/raw/logos-capability-discovery.html#register-message">REGISTER message</a> to the registrar.
 If there is already a cached <code>ticket</code> from a previous registration attempt
 for the same <code>ad</code> in the same registrar,
 the <code>ticket</code> MUST also be included in the REGISTER message.</li>
-<li>On receipt of a Response,
+<li>on receipt of the <code>REGISTER</code> response:
 SHOULD add the closer peers indicated in the response to <code>AdvT(service_id_hash)</code>
 using the formula described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance</a> section.</li>
 <li>MUST interpret the response <code>status</code> field and schedule actions accordingly:
@@ -32314,12 +32310,9 @@ and SHOULD NOT attempt further registrations with this registrar for this advert
 </ul>
 </li>
 </ul>
-<h3 id="advertisement-algorithm"><a class="header" href="#advertisement-algorithm">Advertisement Algorithm</a></h3>
-<p>Advertisers place advertisements across multiple registrars
-using the <code>ADVERTISE()</code> algorithm.
-The advertisers run <code>ADVERTISE()</code> periodically.
-We RECOMMEND that the following algorithms be used
-to implement the advertisement placement requirements specified above.</p>
+<h3 id="example-advertise-algorithm"><a class="header" href="#example-advertise-algorithm">Example ADVERTISE algorithm</a></h3>
+<p>The following pseudocode block shows one way of implementing the Advertising algorithm.
+Advertisers MAY follow this example.</p>
 <pre><code class="language-text">procedure ADVERTISE(service_id_hash):
     ongoing ← MAP&lt;bucketIndex; LIST&lt;registrars&gt;&gt;
     AdvT(service_id_hash) ← KadDHT(peerID)
@@ -32357,40 +32350,54 @@ procedure ADVERTISE_SINGLE(registrar, ad, i, service_id_hash):
     ongoing[i].remove(registrar)
 end procedure
 </code></pre>
-<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#advertiser-algorithms-explanation">Advertiser Algorithms Explanation section</a> for a detailed explanation.</p>
-<h2 id="service-discovery"><a class="header" href="#service-discovery">Service Discovery</a></h2>
-<h3 id="overview-3"><a class="header" href="#overview-3">Overview</a></h3>
-<p>Discoverers are nodes attempting to find peers that
-provide a specific service identified by <code>service_id_hash</code>.</p>
-<h4 id="discovery-table-disctservice_id_hash-requirements"><a class="header" href="#discovery-table-disctservice_id_hash-requirements">Discovery Table <code>DiscT(service_id_hash)</code> Requirements</a></h4>
-<p>For each service that a discoverer wants to find,
-it MUST instantiate a search table <code>DiscT(service_id_hash)</code>,
-centered on that <code>service_id_hash</code>.</p>
-<h4 id="lookup-requirements"><a class="header" href="#lookup-requirements">Lookup Requirements</a></h4>
-<p>The <code>LOOKUP(service_id_hash)</code> is carried out by discoverer nodes to query registrar nodes
-to get advertisements of a particular <code>service_id_hash</code>.
-The <code>LOOKUP(service_id_hash)</code> procedure MUST work as a gradual search
-on the search table <code>DiscT(service_id_hash)</code> of the service whose advertisements it wants.
-The <code>LOOKUP(service_id_hash)</code> MUST start from far buckets <code>(b_0)</code>
-which has registrar nodes with fewer shared bits with service_id_hash
-and moving to buckets <code>(b_(m-1))</code> containing registrar nodes with
-higher number of shared bits or closer to <code>service_id_hash</code>.
-To perform a lookup, discoverers:</p>
+<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#advertiser-algorithms-explanation">Advertiser Algorithms Explanation section</a>
+for a detailed explanation.</p>
+<h2 id="discoverers"><a class="header" href="#discoverers">Discoverers</a></h2>
+<p>Discoverers look up advertisers for services by querying registrars.</p>
+<h3 id="looking-up-services"><a class="header" href="#looking-up-services">Looking up services</a></h3>
+<p>For each service, identified by <code>service_id_hash</code>,
+that a discoverer wants to find advertisers for,
+the discoverer MUST instantiate a
+new search table, <code>DiscT(service_id_hash)</code>,
+centered on that <code>service_id_hash</code>.
+The discoverer MAY bootstrap <code>DiscT(service_id_hash)</code>
+from the <code>KadDHT(peerID)</code> routing table using the formula
+described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance section</a>.</p>
+<p>The discoverer MUST attempt to find up to <code>F_lookup</code> advertisers
+for this <code>service_id_hash</code>
+by following the lookup procedure below.
+It SHOULD perform the lookup procedure periodically,
+or whenever more peers are requested by the encapsulating application.</p>
+<p>To perform a lookup,
+the discoverer MUST iterate through every bucket of <code>DiscT(service_id_hash)</code>.
+It MUST start from the farthest bucket <code>(b_0)</code>,
+which has the registrar nodes with the fewest shared bits to the <code>service_id_hash</code>,
+gradually moving through buckets <code>(b_(m-1))</code>,
+containing registrar nodes with ever increasing number of shared bits to the <code>service_id_hash</code>.
+During the lookup procedure,
+the discoverer SHOULD keep track of unique <code>foundPeers</code>.
+terminating the procedure once <code>F_lookup</code> advertisers have been found,
+or if all buckets have been traversed.</p>
+<ol>
+<li>For each bucket, the discoverer MUST select
+up to <code>K_lookup</code> random registrar peers to query.</li>
+<li>For each selected registrar, the discoverer</li>
+</ol>
 <ul>
-<li>SHOULD query <code>K_lookup</code> random registrar nodes from every bucket of <code>DiscT(service_id_hash)</code>.</li>
-<li>MUST verify the signature of each advertisement received before accepting it.</li>
-<li>SHOULD add closer peers returned by registrars
-in the response to <code>DiscT(service_id_hash)</code> to improve future lookups.</li>
-<li>SHOULD retrieve at most <code>F_return</code> advertisement peers from a single registrar.</li>
-<li>SHOULD run the lookup process periodically.
-Implementations can choose the interval based on their requirements.</li>
+<li>MUST send a <a href="ift-ts/raw/logos-capability-discovery.html#get_ads-message"><code>GET_ADS</code> message</a> to the registrar</li>
+<li>on receipt of a <code>GET_ADS</code> response,
+SHOULD add the closer peers indicated in the response to <code>DiscT(service_id_hash)</code>
+using the formula described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance</a> section.</li>
+<li>SHOULD validate each <code>advertisement</code> included in the response,
+and add valid advertisers to <code>foundPeers</code>.
+Note that a valid response could also contain <code>0</code> <code>advertisements</code>.</li>
 </ul>
-<h3 id="lookup-algorithm"><a class="header" href="#lookup-algorithm">Lookup Algorithm</a></h3>
-<p>We RECOMMEND that the following algorithm be used
-to implement the service discovery requirements specified above.
-Implementations MAY use alternative algorithms
-as long as they satisfy requirements specified in the previous section.</p>
-<pre><code class="language-protobuf">procedure LOOKUP(service_id_hash):
+<p>This iterative procedure continues until <code>F_lookup</code> advertisers have been found,
+or all buckets have been traversed.</p>
+<h3 id="example-lookup-algorithm"><a class="header" href="#example-lookup-algorithm">Example LOOKUP algorithm</a></h3>
+<p>The following pseudocode block shows one way of implementing the Lookup algorithm.
+Discoverers MAY follow this example.</p>
+<pre><code class="language-text">procedure LOOKUP(service_id_hash):
     DiscT(service_id_hash) ← KadDHT(peerID)
     foundPeers ← SET&lt;Peers&gt;
     for i in 0, 1, ..., m-1:
@@ -32418,62 +32425,75 @@ end procedure
 </code></pre>
 <p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#lookupservice_id_hash-algorithm-explanation">Lookup Algorithm Explanation section</a>
 for the detailed explanation.</p>
-<h2 id="admission-protocol"><a class="header" href="#admission-protocol">Admission Protocol</a></h2>
-<h3 id="overview-4"><a class="header" href="#overview-4">Overview</a></h3>
-<p>Registrars are nodes that store and serve advertisements.
-They play a critical role in the Logos discovery network
-by acting as intermediaries between advertisers and discoverers.</p>
-<h4 id="admission-control-requirements"><a class="header" href="#admission-control-requirements">Admission Control Requirements</a></h4>
-<p>Registrars MUST use a waiting time based admission protocol
-to admit advertisements into their <code>ad_cache</code>.
-The mechanism does not require registrars to maintain
-any state for each ongoing request preventing DoS attacks.</p>
+<h2 id="registrars"><a class="header" href="#registrars">Registrars</a></h2>
+<p>Registrars are nodes that store advertisements,
+by handling <code>REGISTER</code> requests,
+and serve cached advertisements,
+by handling <code>GET_ADS</code> requests.
+Registrars MUST maintain a cache of advertisements, <code>ad_cache</code>,
+that associates each <code>advertisement</code>
+to its <code>service_id</code>,
+and an expiry timestamp based on admission time plus configured expiry time, <code>E</code>.
+Once an <code>ad</code> has expired, it SHOULD be removed from the <code>ad_cache</code></p>
+<h3 id="handling-register-requests"><a class="header" href="#handling-register-requests">Handling REGISTER requests</a></h3>
 <p>When a registrar node receives a <code>REGISTER</code> request from an advertiser node
 to admit its <code>ad</code> for a service into the <code>ad_cache</code>,
-the registrar MUST process the request according to the following requirements:</p>
-<ul>
-<li>The registrar MUST NOT admit an advertisement
-if an identical <code>ad</code> already exists in the <code>ad_cache</code>.</li>
-<li>The Registrar MUST calculate waiting time
-using the formula in <a href="ift-ts/raw/logos-capability-discovery.html#waiting-time-calculation">Waiting Time Calculation</a>.</li>
-<li>If no <code>ticket</code> is provided in the <code>REGISTER</code> request then
+the registrar SHOULD process the request
+and respond with a <code>REGISTER</code> response according to the steps below.
+The registrar SHOULD include a list of closer peers (<code>response.closerPeers</code>) in the response
+using the algorithm described in <a href="ift-ts/raw/logos-capability-discovery.html#peer-table-updates">Peer Table Updates</a> section.</p>
+<p>To populate the rest of the response, the registrar MUST:</p>
+<ol>
+<li>
+<p>If an identical <code>ad</code> already exists in the <code>ad_cache</code>,
+reject the request and respond with status <code>Rejected</code>.</p>
+</li>
+<li>
+<p>Calculate (or recalculate, if this is a resubmission) a waiting time for the <code>ad</code>, <code>t_wait</code>,
+using the formula in <a href="ift-ts/raw/logos-capability-discovery.html#waiting-time-calculation">Waiting Time Calculation</a>.</p>
+</li>
+<li>
+<p>If no <code>ticket</code> is provided in the <code>REGISTER</code> request
 this is the advertiser's first registration attempt for the <code>ad</code>.
-The registrar MUST create a new <code>ticket</code>
-and return the signed <code>ticket</code> to the advertiser with status <code>Wait</code>.</li>
-<li>If a <code>ticket</code> is provided, the registrar MUST verify:
+Create a new signed <code>ticket</code> based on <code>t_wait</code>,
+and return the signed <code>ticket</code> in a response with status <code>Wait</code>.</p>
+</li>
+<li>
+<p>If a <code>ticket</code> is provided in the <code>REGISTER</code> request,
+validate the ticket and respond with the status <code>Rejected</code> if any of the following fails:</p>
 <ul>
-<li>valid signature issued by this registrar</li>
-<li><code>ticket.ad</code> matches current <code>ad</code></li>
-<li><code>ad</code> is not in the <code>ad_cache</code></li>
-<li>retry is within the registration window</li>
-<li>Reject if any verification fails</li>
-<li>The registrar MUST recalculate the waiting time based on current cache state</li>
-<li>The registrar MUST calculate remaining wait time:
-<code>t_remaining = t_wait - (NOW() - ticket.t_init)</code>.
-This ensures advertisers accumulate waiting time across retries</li>
+<li><code>ticket.signature</code> contains a valid signature, issued by this registrar</li>
+<li><code>ticket.ad</code> matches the current <code>ad</code></li>
+<li>calculate the expected time of ticket submission,
+<code>t_scheduled</code>, as <code>t_scheduled = ticket.t_mod + ticket.t_wait</code>
+and verify that the actual submission time, <code>current_time</code>,
+falls within a valid registration window, <code>δ</code>,
+where <code>t_scheduled &lt;= current_time &lt;= t_scheduled + δ</code>.
+The duration of <code>δ</code> is up to the application,
+but SHOULD be just enough to accommodate for
+the maximum delay between the advertiser and the registrar.</li>
 </ul>
 </li>
-<li>If <code>t_remaining ≤ 0</code>, the registrar MUST add the <code>ad</code> to the <code>ad_cache</code>.
-The registrar MUST track the admission time internally for expiry management.
-The registrar SHOULD return response with <code>status = Confirmed</code></li>
-<li>If <code>t_remaining &gt; 0</code>, the advertiser SHOULD continue waiting.
-The registrar MUST issue a new <code>ticket</code> with updated <code>ticket.t_mod</code> and <code>ticket.t_wait_for = MIN(E, t_remaining)</code>.
-The registrar MUST sign the new <code>ticket</code>.
-The registrar SHOULD return response with status <code>Wait</code> and the new signed <code>ticket</code>.</li>
-<li>The registrar SHOULD include a list of closer peers (<code>response.closerPeers</code>)
-using the algorithm described in <a href="ift-ts/raw/logos-capability-discovery.html#peer-table-updates">Peer Table Updates</a> section.</li>
-</ul>
-<p><strong><code>ad_cache</code> Maintenance:</strong></p>
-<ul>
-<li>Size limited by capacity <code>C</code></li>
-<li>Ads expire after time <code>E</code> from admission and are removed</li>
-<li>No duplicate ads allowed</li>
-</ul>
-<h3 id="registration-flow"><a class="header" href="#registration-flow">Registration Flow</a></h3>
-<p>We RECOMMEND that the following algorithm be used by registrars
-to implement the admission control requirements specified above.</p>
-<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#register-message">Register Message section</a>
-for the request and response structure of <code>REGISTER</code>.</p>
+<li>
+<p>Calculate remaining wait time
+<code>t_remaining = t_wait - (current_time - ticket.t_init)</code>.
+This ensures advertisers accumulate waiting time across retries</p>
+</li>
+<li>
+<p>If <code>t_remaining ≤ 0</code>, add the <code>ad</code> to the <code>ad_cache</code>,
+with an expiry timestamp set to <code>current_time + E</code>.
+The registrar SHOULD return a response with status <code>Confirmed</code>.</p>
+</li>
+<li>
+<p>If <code>t_remaining &gt; 0</code>, issue a new signed <code>ticket</code>
+with <code>ticket.t_mod</code> set to <code>current_time</code>
+and <code>ticket.t_wait_for = min(E, t_remaining)</code>.
+The registrar SHOULD return the signed <code>ticket</code> in a response with status <code>Wait</code>.</p>
+</li>
+</ol>
+<h3 id="example-register-algorithm"><a class="header" href="#example-register-algorithm">Example REGISTER algorithm</a></h3>
+<p>The following pseudocode block shows one way of implementing the algorithm to handle register requests.
+Registrars MAY follow this example.</p>
 <pre><code class="language-text">procedure REGISTER(ad, ticket):
     assert(ad not in ad_cache)
     response.ticket.ad ← ad
@@ -32506,21 +32526,19 @@ end procedure
 </code></pre>
 <p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#register-algorithm-explanation">Register Algorithm Explanation section</a>
 for detailed explanation.</p>
-<h2 id="lookup-response-algorithm"><a class="header" href="#lookup-response-algorithm">Lookup Response Algorithm</a></h2>
-<h3 id="overview-5"><a class="header" href="#overview-5">Overview</a></h3>
-<p>Registrars SHOULD respond to <a href="ift-ts/raw/logos-capability-discovery.html#get_ads-message"><code>GET_ADS</code></a> requests from discoverers.
-When responding, registrars:</p>
-<ul>
-<li>SHOULD return up to <code>F_return</code> advertisements
-from their <code>ad_cache</code> for the requested <code>service_id_hash</code>.</li>
-<li>SHOULD include a list of closer peers
+<h3 id="handling-get_ads-requests"><a class="header" href="#handling-get_ads-requests">Handling GET_ADS requests</a></h3>
+<p>Registrars SHOULD respond to <a href="ift-ts/raw/logos-capability-discovery.html#get_ads-message"><code>GET_ADS</code></a> requests from discoverers
+with a <code>GET_ADS</code> response:</p>
+<ol>
+<li>Include up to <code>F_return</code> advertisements
+from the <code>ad_cache</code> for the requested <code>service_id_hash</code>.</li>
+<li>Include a list of closer peers
 to help discoverers populate their search table using the algorithm described in
 <a href="ift-ts/raw/logos-capability-discovery.html#peer-table-updates">Peer Table Updates</a> section.</li>
-</ul>
-<h3 id="recommended-lookup-response-algorithm"><a class="header" href="#recommended-lookup-response-algorithm">Recommended Lookup Response Algorithm</a></h3>
-<p>Registrars respond to <code>GET_ADS</code> requests from discoverers
-using the <code>LOOKUP_RESPONSE()</code> algorithm.
-We RECOMMEND using the following algorithm.</p>
+</ol>
+<h3 id="example-lookup_response-algorithm"><a class="header" href="#example-lookup_response-algorithm">Example LOOKUP_RESPONSE algorithm</a></h3>
+<p>The following pseudocode block shows one way of implementing the algorithm to handle <code>GET_ADS</code> requests.
+Registrars MAY follow this example.</p>
 <pre><code class="language-text">procedure LOOKUP_RESPONSE(service_id_hash):
     response.ads ← ad_cache.getAdvertisements(service_id_hash)[:F_return]
     response.closerPeers ← GETPEERS(service_id_hash)
@@ -32528,7 +32546,7 @@ We RECOMMEND using the following algorithm.</p>
 end procedure
 </code></pre>
 <h2 id="peer-table-updates"><a class="header" href="#peer-table-updates">Peer Table Updates</a></h2>
-<h3 id="overview-6"><a class="header" href="#overview-6">Overview</a></h3>
+<h3 id="overview-2"><a class="header" href="#overview-2">Overview</a></h3>
 <p>While responding to both <code>REGISTER</code> requests by advertisers
 and <code>GET_ADS</code> request by discoverers,
 registrars play an important role in helping nodes discover the network topology.
@@ -32609,8 +32627,10 @@ and the current state of the registrar’s <code>ad_cache</code>.</p>
 <ul>
 <li><code>c</code>: Current cache occupancy</li>
 <li><code>c(ad.service_id_hash)</code>: Number of advertisements for <code>service_id_hash</code> in cache</li>
-<li><code>getIP(ad.addrs)</code> is a function to get the IP address from the multiaddress of the advertisement.</li>
-<li><code>score(getIP(ad.addrs))</code>: IP similarity score (0 to 1). Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#ip-similarity-score">IP Similarity Score section</a></li>
+<li><code>getIP(ad.addrs)</code> is a function to get the IP address
+from the multiaddress of the advertisement.</li>
+<li><code>score(getIP(ad.addrs))</code>: IP similarity score (0 to 1).
+Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#ip-similarity-score">IP Similarity Score section</a></li>
 </ul>
 <p>Section <a href="ift-ts/raw/logos-capability-discovery.html#system-parameters">System Parameters</a> can be referred
 for the definitions of the remaining parameters in the formula.</p>
@@ -32860,7 +32880,7 @@ and helper procedures referenced throughout this RFC.
 To maintain clarity and readability in the main specification,
 the body contains only the concise pseudocode and high-level descriptions.</p>
 <h3 id="advertiser-algorithms-explanation"><a class="header" href="#advertiser-algorithms-explanation">Advertiser Algorithms Explanation</a></h3>
-<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#advertisement-algorithm">Advertisement Algorithm section</a> for the pseudocode.</p>
+<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#example-advertise-algorithm">Advertisement Algorithm section</a> for the pseudocode.</p>
 <h4 id="advertise-algorithm-explanation"><a class="header" href="#advertise-algorithm-explanation">ADVERTISE() algorithm explanation</a></h4>
 <ol>
 <li>Initialize a map <code>ongoing</code> for tracking which registrars are currently being advertised to.</li>
@@ -32926,7 +32946,7 @@ since we’ve finished trying with it.</li>
 </ol>
 <h3 id="discoverer-algorithms"><a class="header" href="#discoverer-algorithms">Discoverer Algorithms</a></h3>
 <h4 id="lookupservice_id_hash-algorithm-explanation"><a class="header" href="#lookupservice_id_hash-algorithm-explanation">LOOKUP(service_id_hash) algorithm explanation</a></h4>
-<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#lookup-algorithm">Lookup Algorithm section</a> for the pseudocode.</p>
+<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#example-lookup-algorithm">Lookup Algorithm section</a> for the pseudocode.</p>
 <ol>
 <li><code>DiscT(service_id_hash)</code> is initialized by
 bootstrapping peers from the discoverer’s <code>KadDHT(peerID)</code>
@@ -32947,7 +32967,8 @@ If there are no peers, it returns <code>None</code>.</li>
 </ol>
 </li>
 <li>A <code>GET_ADS</code> request is sent to the selected registrar peer.
-Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#get_ads-message">GET_ADS Message section</a> to see the request and response structure for <code>GET_ADS</code>.
+Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#get_ads-message">GET_ADS Message section</a>
+to see the request and response structure for <code>GET_ADS</code>.
 The response returned by the registrar node is stored in <code>response</code></li>
 <li>The <code>response</code> contains a list of advertisements <code>response.ads</code>.
 A queried registrar returns at most <code>F_return</code> advertisements.
@@ -32961,15 +32982,17 @@ For each advertisement returned:
 <li>The <code>response</code> also contains a list of peers <code>response.closerPeers</code>
 that is inserted into <code>DiscT(service_id_hash)</code>
 using the formula described in the <a href="ift-ts/raw/logos-capability-discovery.html#distance">Distance section</a>.</li>
-<li>Stop early if enough advertiser peers (<code>F_lookup</code>) have been found — no need to continue searching.
+<li>Stop early if enough advertiser peers (<code>F_lookup</code>) have been found.
 For popular services <code>F_lookup</code> advertisers are generally found in the initial phase
 from the farther buckets and the search terminates.
 But for unpopular ones it might take longer but not more than <code>O(log N)</code>
 where N is number of nodes participating in the network as registrars.</li>
-<li>If early stop doesn’t happen then the search stops when no unqueried registrars remain in any of the buckets.</li>
+<li>If early stop doesn’t happen then the search stops
+when no unqueried registrars remain in any of the buckets.</li>
 </ol>
 </li>
-<li>Return <code>foundPeers</code> which is the final list of discovered advertisers that provide service <code>service_id_hash</code></li>
+<li>Return <code>foundPeers</code> which is the final list of discovered advertisers
+that provide service <code>service_id_hash</code></li>
 </ol>
 <p>Making the advertisers and discoverers walk towards <code>service_id_hash</code> in a similar fashion
 guarantees that the two processes overlap and contact a similar set of registrars that relay the <code>ads</code>.
@@ -32982,17 +33005,20 @@ to impact service discovery process would require considerable resources.
 Subsequent buckets cover smaller fractions of the key space,
 making it easier for the attacker to place Sybils
 but also increasing the chance of advertisers already gathering enough <code>ads</code> in previous buckets.</p>
-<p>Parameters <code>F_return</code> and <code>F_lookup</code> play an important role in setting a compromise between security and efficiency.
-A small value of <code>F_return &lt;&lt; F_lookup</code> increases the diversity of the source of <code>ads</code> received by the discoverer
-but increases search time, and requires reaching buckets covering smaller key ranges where eclipse risks are higher.
+<p>Parameters <code>F_return</code> and <code>F_lookup</code> play an important role
+in setting a compromise between security and efficiency.
+A small value of <code>F_return &lt;&lt; F_lookup</code> increases the diversity of the source of <code>ads</code>
+received by the discoverer but increases search time,
+and requires reaching buckets covering smaller key ranges where eclipse risks are higher.
 On the other hand, similar values for <code>F_lookup</code> and <code>F_return</code> reduce overheads
 but increase the danger of a discoverer receiving <code>ads</code> uniquely from malicious nodes.
 Finally, low values of <code>F_lookup</code> stop the search operation early,
-before reaching registrars close to the service hash, contributing to a more balanced load distribution.
+before reaching registrars close to the service hash,
+contributing to a more balanced load distribution.
 Implementations should consider these trade-offs carefully when selecting appropriate values.</p>
 <h3 id="registrar-algorithms"><a class="header" href="#registrar-algorithms">Registrar Algorithms</a></h3>
 <h4 id="register-algorithm-explanation"><a class="header" href="#register-algorithm-explanation"><code>REGISTER()</code> algorithm explanation</a></h4>
-<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#registration-flow">Registration Flow section</a> for the pseudocode</p>
+<p>Refer to the <a href="ift-ts/raw/logos-capability-discovery.html#example-register-algorithm">Register Algorithm section</a> for the pseudocode</p>
 <ol>
 <li>Make sure this advertisement <code>ad</code> is not already in the registrar’s advertisement cache <code>ad_cache</code>.</li>
 <li>Prepare a response ticket <code>response.ticket</code> linked to this <code>ad</code>.</li>
@@ -33042,22 +33068,27 @@ before trying to register again with the same registrar.</p>
 <p>Tickets can only be used within registration window <code>δ</code>,
 preventing attackers from accumulating and batch-submitting tickets.
 Clock synchronization is not required as advertisers only use <code>t_wait_for</code> values.</p>
-<p>Waiting times are recalculated on each retry based on current cache state, ensuring advertisers accumulate waiting time and are eventually admitted. This stateless design protects registrars from memory exhaustion and DoS attacks.</p>
+<p>Waiting times are recalculated on each retry based on current cache state,
+ensuring advertisers accumulate waiting time and are eventually admitted.
+This stateless design protects registrars from memory exhaustion and DoS attacks.</p>
 <p>The waiting time <code>t_wait</code> is not fixed.
 Each time an advertiser tries to register,
 the registrar recalculates a new waiting time.
 The remaining time <code>t_remaining</code> is then computed as the difference between
 the new waiting time and the time the advertiser has already waited,
 as recorded in the ticket.
-With every retry, the advertiser accumulates waiting time and will eventually be admitted.
-However, if the advertiser misses its registration window or fails to include the last ticket,
+With every retry, the advertiser accumulates waiting time
+and will eventually be admitted.
+However, if the advertiser misses its registration window
+or fails to include the last ticket,
 it loses all accumulated waiting time and
 must restart the registration process from the beginning.
 Implementations must consider these factors
 while deciding the registration window <code>δ</code> time.</p>
 <p>This design lets registrars prioritize advertisers that have waited longer
 without keeping any per-request state before the <code>ad</code> is admitted to the cache.
-Because waiting times are recalculated and tickets are stored only on the advertiser’s side,
+Because waiting times are recalculated
+and tickets are stored only on the advertiser’s side,
 the registrar is protected from memory exhaustion
 and DoS attacks caused by inactive or malicious advertisers.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="mix"><a class="header" href="#mix">MIX</a></h1>
@@ -34992,7 +35023,7 @@ This means that no more messages than the registered rate limit can be sent per 
 </blockquote>
 <p>See section <a href="ift-ts/raw/mix-spam-protection-rln.html#system-parameters">System Parameters</a> for details on the <code>period</code> parameter.</p>
 <h2 id="approach"><a class="header" href="#approach">Approach</a></h2>
-<h3 id="overview-7"><a class="header" href="#overview-7">Overview</a></h3>
+<h3 id="overview-3"><a class="header" href="#overview-3">Overview</a></h3>
 <p>The protocol implements RLN using a <a href="https://github.com/vacp2p/rfc-index/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs">per-hop generated proof approach</a>, where each node in the mix path generates and verifies proofs.
 This enables network-wide spam protection while preserving user privacy.</p>
 <p>Each mix node MUST have an RLN group membership in order to send or forward messages in the mixnet.
@@ -36228,7 +36259,7 @@ applications SHOULD use dedicated worker threads per proof instead.
 The worker thread approach provides significantly higher throughput for
 concurrent proof generation.</p>
 <h2 id="the-api-1"><a class="header" href="#the-api-1">The API</a></h2>
-<h3 id="overview-8"><a class="header" href="#overview-8">Overview</a></h3>
+<h3 id="overview-4"><a class="header" href="#overview-4">Overview</a></h3>
 <p>The API exposes functional interfaces with strongly-typed parameters.
 All three platform bindings share the same function signatures,
 differing only in language-specific conventions.
