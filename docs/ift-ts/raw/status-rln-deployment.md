@@ -44,7 +44,8 @@ and related metadata in order to identify spam and trigger slashing when applica
 ## General Flow
 
 - `User` creates a TX send it to the network
-- RPC node sends to related TX to the mempool at the same time to the Prover.
+- The RPC node submits the TX to the mempool, where it is forwarded to the Prover via gRPC,
+before P2P propagation to the sequencer.
 - `Prover module` bootstraps by querying the `Karma contract` for current user tier limits,
 then listens to events and updates the local tier limit table upon any changes.
 - `Prover module` checks user has enough Karma `minK` (which equals the `minKarma` of the first tier)
