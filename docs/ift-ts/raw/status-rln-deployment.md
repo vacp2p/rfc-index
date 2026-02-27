@@ -356,16 +356,18 @@ to externally detect RLN-based spam.
 In `RLN contract`, the user `id-commitment` is stored as mapping.
 At most 128 `slashers` receive all proofs by subscribing gRPC to the prover.
 In the event of spam, any `slasher` can extract the `secret-hash`
-from the proof and submit it to the Karma smart contract.
+from the proof and submit it to the `RLN contract`.
 
-`Karma Contract` does as following:
+`RLN Contract` does as following:
 
 - Receives the `secret-hash` in plaintext
 - Calculates the `id-commitment` by hashing `secret-hash` with Poseidon hash.
 - Look up the list whether it includes the `id-commitment` returns 1 if there is, returns 0 otherwise.
 - If it returns 1, the slasher who is the caller of the contract, is rewarded with Karma tokens.
-- The prover module listens this activity (an event is sent by the smart contract when slashing) and drop the particular `id-commitment` from its local DB.
-- The spammer is slashed by the contract by burning its Karma tokens.
+- The prover module listens this activity (an event is sent by the smart contract when slashing)
+and drop the particular `id-commitment` from its local DB.
+- Upon detecting spam, the `RLN Contract` invokes the slashing function in the `Karma Contract`,
+which burns the spammer’s Karma tokens. 
 
 Note that the `secret-hash` are derived by a high entropy randomness
 that implies all `id-commitment`  are unique.
