@@ -29,8 +29,8 @@ which introduce risks around privacy, censorship, and unilateral control.
 In restrictive settings, servers can be blocked or surveilled;
 in more open environments, users still face opaque moderation policies,
 data collection, and exclusion from decision-making processes.
-To address this, we propose a decentralized, scalable peer-to-peer
-group messaging system where each participant runs a node, contributes
+To address this, a decentralized, scalable peer-to-peer
+group messaging system is proposed, where each participant runs a node, contributes
 to message propagation, and takes part in governance autonomously.
 Group membership changes are decided collectively through a lightweight
 partially synchronous, fault-tolerant consensus protocol without a centralized identity.
@@ -47,8 +47,8 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 ### Assumptions
 
 - The nodes in the P2P network can discover other nodes or will connect to other nodes when subscribing to same topic in a gossipsub.
-- We MAY have non-reliable (silent) nodes.
-- We MUST have a consensus that is lightweight, scalable and finalized in a specific time.
+- The presence of non-reliable (silent) nodes MAY be assumed.
+- A lightweight, scalable consensus mechanism with deterministic finality within a specific time MUST be employed.
 - The network MUST enforce a rate-limiting mechanism for all entities in order to mitigate spam.
 - At least $2n/3$ of the members MUST become synchronized within $\Delta$ time, where $n$ is the group size.
 
@@ -378,7 +378,7 @@ where `epoch E` is the epoch in which the election proposal is initiated,
 and `group id` for shuffling the list across the different groups.
 Any proposal with a list that does not adhere to this generation method MUST be rejected by all members.
 
-We assume that there are no recurring entries in `SHA256(epoch E || member id || group id)`, since the SHA256 outputs are unique
+It is assumed that that there are no recurring entries in `SHA256(epoch E || member id || group id)`, since the SHA256 outputs are unique
 when there is no repetition in the `member id` values, against the conflicts on sorting issues.
 
 ### Multi steward with big consensuses
