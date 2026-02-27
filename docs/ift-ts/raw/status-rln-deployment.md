@@ -353,7 +353,7 @@ Decentralized slashing is a capability provided by specialized nodes,
 called `slashers`, which operate alongside sequencer-side RLN verifiers
 to externally detect RLN-based spam.
 
-In `Karma contract`, the user `id-commitment` is stored in a list rather than a Merkle tree.
+In `RLN contract`, the user `id-commitment` is stored as mapping.
 At most 128 `slashers` receive all proofs by subscribing gRPC to the prover.
 In the event of spam, any `slasher` can extract the `secret-hash`
 from the proof and submit it to the Karma smart contract.
