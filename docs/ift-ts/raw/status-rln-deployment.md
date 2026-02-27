@@ -335,9 +335,9 @@ Deny list behaves a black list for a `user` who act maliciously in two ways:
 The prover module marked as this user as in deny list but still continue to create the RLN proof for the TX.
 2. Exceeds the global rate limit `rateR` that results with slashing by mapping user’s Karma to `MinK-1.`
 
-The `user` who is on the deny list MUST NOT be able to submit gasless transactions
-(i.e., the Paymaster MUST reject sponsorship for that account). A user can regain access to gasless transactions
-only after being removed from the deny list. Escaping from the deny list is possible under the following conditions
+The `user` who is on the deny list MUST NOT be able to submit gasless transactions.
+A user can regain access to gasless transactions only after being removed from the deny list.
+Escaping from the deny list is possible under the following conditions
 
 - **TTL expiration:** Deny list entries MAY be configured with an expiration time.
 If a deny list participation is not intended to be permanent, the entry is assigned a predefined time window.
