@@ -1,12 +1,13 @@
----
-title: PAYMENT-STREAMS
-name: Payment Streams Protocol for Logos Services
-status: raw
-category: Standards Track
-tags: logos, lez, payment-streams
-editor: Sergei Tikhomirov <sergei@status.im>
-contributors: Akhil Peddireddy <akhil@status.im>
----
+# PAYMENT-STREAMS
+
+| Field | Value |
+| --- | --- |
+| Name | Payment Streams Protocol for Logos Services |
+| Slug | 155 |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Sergei Tikhomirov <sergei@status.im> |
+| Contributors | Akhil Peddireddy <akhil@status.im> |
 
 ## Abstract
 
