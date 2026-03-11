@@ -72,4 +72,4 @@ jobs:
           fi
 
           mapfile -t files < .lint-targets.txt
-          npx remark --frail --rc-path .remarkrc.mjs "${files[@]}"
+          npx remark --frail --no-stdout --rc-path .remarkrc.mjs "${files[@]}"
