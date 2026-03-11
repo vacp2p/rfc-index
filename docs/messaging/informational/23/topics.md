@@ -40,7 +40,6 @@ In [10/WAKU2 spec](/messaging/standards/core/10/waku2.md) there are two types of
 
 ## Pubsub Topics
 
-Pubsub topics are used for routing of messages (see [11/WAKU2-RELAY](/messaging/standards/core/11/relay.md)),
 and can be named implicitly by Waku sharding (see [RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)).
 This document comprises recommendations for explicitly naming pubsub topics
 (e.g. when choosing *named sharding* as specified in [RELAY-SHARDING](https://github.com/waku-org/specs/blob/master/standards/core/relay-sharding.md)).
