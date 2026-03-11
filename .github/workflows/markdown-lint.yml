@@ -7,11 +7,52 @@ on:
       - '**'
 
 jobs:
+  lint-eligibility:
+    runs-on: ubuntu-latest
+    outputs:
+      run_lint: ${{ steps.check.outputs.run_lint }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect Raw LIPs
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+          run_lint="true"
+
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+            [[ ! "$file" =~ ^docs/.+\.md$ ]] && continue
+
+            if [[ "$file" == *"/raw/"* ]]; then
+              run_lint="false"
+              echo "Skipping lint: raw folder file changed: $file"
+              break
+            fi
+
+            if [[ -f "$file" ]] && grep -Eiq '^\|\s*Status\s*\|\s*raw\s*\|$' "$file"; then
+              run_lint="false"
+              echo "Skipping lint: raw status found in: $file"
+              break
+            fi
+          done < <(git diff --name-only "$base_sha" "$head_sha")
+
+          echo "run_lint=$run_lint" >> "$GITHUB_OUTPUT"
+
   lint:
+    needs: lint-eligibility
+    if: needs.lint-eligibility.outputs.run_lint == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Validate Metadata
         run: python3 scripts/validate_metadata.py --check
@@ -23,10 +64,12 @@ jobs:
           globs: 'docs/**/*.md'
 
   remark:
+    needs: lint-eligibility
+    if: needs.lint-eligibility.outputs.run_lint == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
