@@ -22,7 +22,6 @@
 
 This specification defines the Service Declaration Protocol (SDP),
 a mechanism enabling validators to declare their participation
-in specific protocols that require a known and agreed-upon list of participants.
 Examples include Data Availability (DA) and the Blend Network.
 SDP creates a single repository of identifiers
 used to establish secure communication between validators and provide services.
