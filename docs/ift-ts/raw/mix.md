@@ -2,11 +2,11 @@
 
 | Field | Value |
 | --- | --- |
-| Name | LIBP2P-MIX|
+| Name | LIBP2P-MIX |
 | Slug | 99 |
 | Status | raw |
 | Category | Standards Track |
-| Editor | Akshaya Mani <akshaya@status.im>|
+| Editor | Akshaya Mani <akshaya@status.im> |
 | Contributors | Prem Prathi <prem@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius |
 
 <!-- timeline:start -->
@@ -182,7 +182,7 @@ Together with a constant-size header and payload, this provides bounded protecti
 
 It also supports anonymous and indistinguishable reply messages through [Single-Use Reply Blocks (SURBs)](https://cypherpunks.ca/~iang/pubs/Sphinx_Oakland09.pdf), although reply support is not implemented yet.
 
-A complete specification of the Sphinx packet structure and fields is provided in [Section 6].
+A complete specification of the Sphinx packet structure and fields is provided in [Section 8](#8-sphinx-packet-format).
 
 ## 5. Protocol Overview
 
@@ -272,7 +272,7 @@ The destination node does not need to support the Mix Protocol to receive or res
 
 The behavior described above represents the core Mix Protocol.
 In addition, the protocol supports a set of pluggable components that extend its functionality.
-These components cover areas such as node discovery, delay strategy, spam resistance, cover traffic generation, and incentivization.
+These components cover areas such as node discovery, delay strategy, exit abuse prevention, cover traffic generation, incentivization, and DoS protection.
 Some are REQUIRED for interoperability; others are OPTIONAL or deployment-specific.
 The next section describes each component.
 
@@ -313,7 +313,7 @@ To enable this, regardless of the discovery mechanism used, each mix node MUST m
 - Its X25519 public key for Sphinx encryption.
 - One or more routable libp2p multiaddresses that identify the mix node's own network endpoints.
 
-To support sender anonymity at scale, discovery mechanism SHOULD support _unbiased random sampling_ from the set of live mix nodes.
+To support sender anonymity at scale, the discovery mechanism SHOULD support _unbiased random sampling_ from the set of live mix nodes.
 This enables diverse path construction and reduces exposure to adversarial routing bias.
 
 While no existing mechanism provides unbiased sampling by default, [Waku's ambient discovery](https://rfc.vac.dev/waku/standards/core/33/discv5/)&mdash;an extension over [Discv5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)&mdash;demonstrates an approximate solution.
@@ -442,7 +442,7 @@ To perform message initiation, a mix node MUST:
 
 - Select a random mix path.
 - Assign a delay value for each hop and encode it into the Sphinx packet header.
-- Wrap message in a Sphinx packet by applying layered encryption in reverse order of nodes in the selected mix path.
+- Wrap the message in a Sphinx packet by applying layered encryption in reverse order of nodes in the selected mix path.
 - Forward the resulting packet to the first mix node in the mix path using the Mix Protocol.
 
 The Mix Protocol does not interpret message content or origin protocol context.
@@ -530,7 +530,7 @@ This section defines the cryptographic primitives used in Sphinx packet construc
 
   - **Curve**: Curve25519
   - **Notation**: Let $g$ denote the canonical base point (generator) of $\mathbb{G}$.
-  - **Purpose**: Used for deriving Diffie–Hellman-style shared key at each hop using $α$.
+  - **Purpose**: Used for deriving a Diffie–Hellman-style shared key at each hop using $α$.
   - **Representation**: Small 32-byte group elements, efficient for both encryption and key exchange.
   - **Scalar Field**: The curve is defined over the finite field $\mathbb{Z}_q$, where $q = 2^{252} + 27742317777372353535851937790883648493$. Ephemeral exponents used in Sphinx packet construction are selected uniformly at random from $\mathbb{Z}_q^*$, the multiplicative subgroup of $\mathbb{Z}_q$.
 
@@ -600,7 +600,7 @@ Thus, the total header length is:
 $`
 \begin{aligned}
 |Header| &= α + β + γ \\
-  &= 32 + ((t + 1)r + 1)κ + 16
+  &= 32 + (r(t + 1) + 1)κ + 16
 \end{aligned}
 `$
 
@@ -834,7 +834,7 @@ The construction MUST proceed as follows:
 
    - Set the per hop two-byte encoded delay $\mathrm{delay}_i$ as defined in [Section 8.4](#84-address-and-delay-encoding):
 
-     - If final hop (_i.e.,_ $i = L - 1$), encode two byte zero padding.
+     - If final hop (_i.e.,_ $i = L - 1$), encode two-byte zero padding.
      - For all other hop $i$, $i < L - 1$, select the mean forwarding delay for the delay strategy configured by the application, and encode it as a two-byte value. The delay strategy is pluggable, as defined in [Section 6.2](#62-delay-strategy).
 
    - Using the derived keys and encoded forwarding delay, compute the nested encrypted routing information $β_i$:
@@ -1096,7 +1096,7 @@ Once the node determines its role as an intermediary following the steps in [Sec
 
      $`
      \begin{array}{l}
-     β' = B_{[(t + 1)κ\ldots(r(t +1 ) + t + 2)κ - 1]}
+     β' = B_{[(t + 1)κ\ldots(r(t + 1) + t + 2)κ - 1]}
      \end{array}
      `$
 
@@ -1224,7 +1224,7 @@ Finally, it presents an alternative trust model for destinations that support Mi
 The core Mix Protocol&mdash;comprising anonymous routing through a sequence of mix nodes using Sphinx packets&mdash;provides the following security guarantees:
 
 - **Sender anonymity**: Each message is wrapped in layered encryption and routed independently, making it unlinkable to the sender even if multiple mix nodes are colluding.
-- **Metadata protection**: All messages are fixed in size and indistinguishable on the wire. Sphinx packets reveal only the immediate next hop and delay to each mix node. No intermediate node learns its position in the path or the total pathlength.
+- **Metadata protection**: All messages are fixed in size and indistinguishable on the wire. Sphinx packets reveal only the immediate next hop and delay to each mix node. No intermediate node learns its position in the path or the total path length.
 - **Traffic analysis resistance**: Continuous-time mixing with randomized per-hop delays reduces the risk of timing correlation and input-output linkage.
 - **Per-hop confidentiality and integrity**: Each hop decrypts only its assigned layer of the Sphinx packet and verifies header integrity via a per-hop MAC.
 - **No long-term state**: All routing is stateless. Mix nodes do not maintain per-message metadata, reducing the surface for correlation attacks.
@@ -1333,7 +1333,7 @@ For now, deployments MAY improve robustness by sending each packet along multipl
 
 #### 9.4.2 No Built-in Retry or Acknowledgment
 
-The Mix protocol does not support retransmission, delivery acknowledgments, or automated fallback logic.
+The Mix Protocol does not support retransmission, delivery acknowledgments, or automated fallback logic.
 Each message is sent once and routed independently through the mixnet.
 If a message is lost or a node becomes unavailable, recovery is the responsibility of the top-level application.
 
