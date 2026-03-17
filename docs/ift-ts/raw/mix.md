@@ -7,7 +7,7 @@
 | Status | raw |
 | Category | Standards Track |
 | Editor | Akshaya Mani <akshaya@status.im> |
-| Contributors | Prem Prathi <prem@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius |
+| Contributors | Prem Prathi <prem@status.im>, Daniel Kaiser <danielkaiser@status.im>, Hanno Cornelius <hanno@status.im> |
 
 <!-- timeline:start -->
 
