@@ -604,7 +604,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 #### Related Work
 
 - [Off-Chain Payment Protocols: Classification and Architectural Choice](https://forum.vac.dev/t/off-chain-payment-protocols-classification-and-architectural-choice/596)
-- [LSSA](https://github.com/logos-blockchain/lssa) (now called LEZ)
+- [Logos Execution Zone](https://github.com/logos-blockchain/logos-execution-zone)
 
 #### Payment Streaming Protocols
 
