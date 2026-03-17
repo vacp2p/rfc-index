@@ -51,14 +51,16 @@ Logos Messaging, Logos Blockchain, and Logos Storage.
 Logos Messaging comprises a suite of communication protocols
 with both P2P and request-response structures.
 The backbone P2P protocols use tit-for-tat mechanisms.
-We plan to introduce incentivization
+Incentivization is introduced
 for auxiliary request-response protocols
 with well-defined user and provider roles.
 One such protocol is Store,
 which allows users to query historical messages
 from Logos Messaging relay nodes.
 
-We target the following requirements:
+This specification introduces a payment streams protocol
+for Store and other request-response protocols.
+The protocol targets the following requirements:
 
 - Performance: Efficient payments with low latency and fees.
 - Security: Limited loss exposure through spending controls.
@@ -67,7 +69,7 @@ We target the following requirements:
 
 After reviewing prior work on payment channels, streams,
 e-cash, and tickets,
-we selected payment streams as the most suitable mechanism.
+payment streams were selected as the most suitable mechanism.
 
 Payment streams enable unidirectional time-based fund flows
 from payer to payee.
@@ -573,7 +575,7 @@ all protocol operations MAY be performed within shielded execution.
 
 ## Security and Privacy Considerations
 
-Our initial privacy goal is unlinkability
+An initial privacy goal is unlinkability
 between off-chain requests and on-chain funding.
 Vault deposits MUST NOT reveal the depositor's identity.
 Stream creation SHOULD NOT reveal which vault funded the stream.
