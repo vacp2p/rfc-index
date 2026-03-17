@@ -41,7 +41,7 @@ in this document are to be interpreted as described in
 
 ## Change Process
 
-This document is governed by the [1/COSS](../1/coss.md) (COSS).
+This document is governed by the [1/COSS](./1/coss.md) (COSS).
 
 ## Motivation
 
