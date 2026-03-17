@@ -20,11 +20,11 @@ The blockchain determines fund accrual based on elapsed time.
 
 This specification defines stream-backed eligibility proof types
 for the incentivization framework
-defined in the incentivization spec
+defined in the incentivization specification
 (see [References](#references)).
-The incentivization spec is defined
+The incentivization specification is defined
 in the context of Logos Messaging request-response protocols.
-This spec MAY be extended to non-Messaging services.
+This specification MAY be extended to non-Messaging services.
 
 The protocol targets Logos blockchain,
 which includes the Logos Execution Zone (LEZ).
@@ -193,7 +193,7 @@ accepted eligibility proof types and service parameters
 via the discovery protocol.
 
 The following is an informal list of discoverable parameters
-(to be formally defined in the context of the discovery spec):
+(to be formally defined in the context of the discovery specification):
 
 - accepted eligibility proof types
 - accepted tokens
@@ -227,17 +227,17 @@ On-chain state is the source of truth for fund allocation and accrual.
 Off-chain communication coordinates lifecycle events
 and enables service delivery.
 
-This spec does not redefine the service provision protocol.
-The incentivization spec (see [References](#references))
+This specification does not redefine the service provision protocol.
+The incentivization specification (see [References](#references))
 defines the generic request-response framework
 with `EligibilityProof` and `EligibilityStatus`.
-This spec extends `EligibilityProof`
+This specification extends `EligibilityProof`
 with two new types for stream-backed service provision,
 defined in the following subsection.
 
 ### Eligibility Proof Types
 
-The incentivization spec's `EligibilityProof`
+The incentivization specification's `EligibilityProof`
 is extended with two new optional fields:
 `stream_proposal` and `stream_proof`.
 These fields are mutually exclusive.
@@ -250,7 +250,7 @@ All subsequent requests MUST use `stream_proof`.
 
 ```protobuf
 message EligibilityProof {
-  // existing, from incentivization spec
+  // existing, from incentivization specification
   optional bytes proof_of_payment = 1;
   // new, for stream-backed service provision
   optional bytes stream_proposal = 2;
@@ -339,7 +339,7 @@ The off-chain protocol uses three message types:
 #### ServiceRequest
 
 A `ServiceRequest` has two top-level fields,
-consistent with the incentivization spec pattern:
+consistent with the incentivization specification pattern:
 
 - `request_data`: service-specific payload
 - `eligibility_proof`: an `EligibilityProof`
@@ -351,7 +351,7 @@ consistent with the incentivization spec pattern:
 A `ServiceResponse` MUST include:
 
 - `eligibility_status`: an `EligibilityStatus`
-  (from the incentivization spec) with:
+  (from the incentivization specification) with:
   - `status_code`: indicating acceptance,
     parameter rejection, proof invalidity, etc.
   - `status_desc`: human-readable description
@@ -360,7 +360,7 @@ A `ServiceResponse` MUST include:
 - `response_data`: service-specific payload
   (included if and only if the request is served)
 
-Status codes specific to this spec:
+Status codes specific to this specification:
 
 - `OK`: request served
 - `PARAMS_REJECTED`: stream parameters unacceptable;
