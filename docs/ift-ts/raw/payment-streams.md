@@ -24,7 +24,7 @@ defined in the incentivization specification
 (see [References](#references)).
 The incentivization specification is defined
 in the context of Logos Messaging request-response protocols.
-This specification MAY be extended to non-Messaging services.
+This specification can be extended to non-Messaging services.
 
 The protocol targets Logos blockchain,
 which includes the Logos Execution Zone (LEZ).
