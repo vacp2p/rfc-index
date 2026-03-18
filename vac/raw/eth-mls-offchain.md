@@ -237,8 +237,8 @@ based on the outcome of the voting process.
 and present them to the voting in the MLS group as an application message.
 However, unlimited use of `voting proposals` within the group may be misused by
 malicious or overly active members.
-Therefore, an application-level constraint MUST be introduced to limit the number
-or frequency of proposals initiated by each member to prevent spam or abuse.
+Therefore, an application-level constraint MAY be introduced to limit the number
+or frequency of proposals initiated by each member in order to prevent spam or abuse.
 6. After waiting for the $\Delta$ synchronization window, the `steward` collects
 finalized `voting proposals` within epoch `E` that have received affirmative votes
 from members via application messages.
