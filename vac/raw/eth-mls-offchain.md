@@ -509,7 +509,7 @@ In particular, reer score updates MAY be triggered either by direct local observ
 or by the finalized outcome of a governance vote.
 Regardless of the trigger, score updates are applied locally by each peer to its own peer score table.
 
-Stewards MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.
+Members MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.
 A removal operation based on the `threshold_peer_score` MUST be initiated as an `emergency criteria proposal`
 by at least one member and, only after being finalized with a YES outcome, MUST be included in the subsequent commit.
 To prevent abuse, if such a removal emergency criteria proposal is finalized with a NO outcome,
