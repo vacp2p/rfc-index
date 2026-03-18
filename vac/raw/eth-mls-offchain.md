@@ -498,13 +498,22 @@ A peer scoring mechanism allows de-MLS to account for such transient and non-adv
 This enables the system to distinguish persistent and intentional misbehavior from accidental faults.
 Member removal should be triggered only in cases of sustained and intentional malicious activity,
 thereby preserving fairness while maintaining security and liveness.
+
 In this approach, each node maintains a local peer score table mapping `member_id` to a score,
 with new members starting from a configurable default value `default_peer_score`.
+Peer score updates MUST be performed only for stewards that are active in the current epoch context.
 Peer scores may decrease due to violations and increase due to honest behavior;
 such score adjustments are derived from observable protocol events, such as
 successful commits or emergency criteria proposals, and each peer updates its local table accordingly.
-Stewards MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.  
-A removal operation MUST be included in the next commit only if a peer’s score is observed to fall below `threshold_peer_score`.
+In particular, reer score updates MAY be triggered either by direct local observation of protocol violations
+or by the finalized outcome of a governance vote.
+Regardless of the trigger, score updates are applied locally by each peer to its own peer score table.
+
+Stewards MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.
+A removal operation based on the `threshold_peer_score` MUST be initiated as an `emergency criteria proposal`
+by at least one member and, only after being finalized with a YES outcome, MUST be included in the subsequent commit.
+To prevent abuse, if such a removal emergency criteria proposal is finalized with a NO outcome,
+a low score MAY be applied to the proposal owner.
 This mechanism allows accidental or transient failures to be tolerated while still enabling
 decisive action against repeated or harmful behavior.
 The exact scoring rules, recovery mechanisms, and escalation criteria are left for future discussion.
