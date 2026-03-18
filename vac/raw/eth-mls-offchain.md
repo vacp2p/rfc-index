@@ -112,7 +112,7 @@ This section presents the de-MLS objects:
 `Voting proposal`: Similar to MLS proposals, but processed only if approved through a voting process.
 They function as application messages in the MLS group,
 allowing the steward to collect them without halting the protocol.
-There are three types of `voting proposal` according to the type of consensus as in shown Consensus Types section,
+There are three types of `voting proposal` according to the type of consensus as in shown [Consensus Types section](#consensus-types),
 these are, `commit proposal`, `steward election proposal` and `emergency criteria proposal`.
 
 `Epoch steward`: The steward assigned to commit in `epoch E` according to the steward list.
