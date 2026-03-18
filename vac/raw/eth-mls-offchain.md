@@ -143,8 +143,7 @@ Lastly, the size of the list named as `sn`, which also shows the epoch interval 
 
 General flow is as follows:
 
-- A steward initializes a group just once, and then sends out Group Announcements (GA) periodically.
-- Meanwhile, each `node` creates and sends their `credential` includes `keyPackage`.
+- Each `node` creates and sends their `credential` includes `keyPackage`.
 - Each `member` creates `voting proposals` sends them to from MLS group during `epoch E`.
 - Proposals are voted on during the $\Delta$ time window.
 During this period, the system enters a freezing phase (no new proposals are accepted) to ensure
@@ -224,37 +223,35 @@ This is mostly similar with the general flow and specified in voting proposal an
 
 1. Each time a single `steward` initializes a group with group parameters with parameters
 as in section 8.1. Group Context in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
-2. `steward` creates a group anouncement (GA) according to the previous step and
-broadcast it to the all network periodically. GA message is visible in network to all `nodes`.
-3. The each `node` who wants to be a `member` needs to obtain this anouncement and create `credential`
+2. The each `node` who wants to be a `member` needs to obtain this anouncement and create `credential`
 includes `keyPackage` that is specified in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 10.
-4. The `node` MUST send the plaintext `KeyPackage`, as defined in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/),
+3. The `node` MUST send the plaintext `KeyPackage`, as defined in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/),
 accompanied by its signature, and publish it to the Welcome topic.
 This ensures that all current group members are aware that a new participant intends to join.
 Upon receipt, the `steward` MUST initiate a voting proposal to decide on admitting the new member.
 It also provides flexibility for liveness in multi-steward settings,
 allowing more than one steward to obtain `KeyPackages` to commit.
-5. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
+4. The `steward` aggregates all `KeyPackages` utilizes them to provision group additions for new members,
 based on the outcome of the voting process.
-6. Any `member` start to create `voting proposals` for adding or removing users,
+5. Any `member` start to create `voting proposals` for adding or removing users,
 and present them to the voting in the MLS group as an application message.
 However, unlimited use of `voting proposals` within the group may be misused by
 malicious or overly active members.
 Therefore, an application-level constraint MUST be introduced to limit the number
 or frequency of proposals initiated by each member to prevent spam or abuse.
-7. After waiting for the $\Delta$ synchronization window, the `steward` collects
+6. After waiting for the $\Delta$ synchronization window, the `steward` collects
 finalized `voting proposals` within epoch `E` that have received affirmative votes
 from members via application messages.
 The `steward` includes only those proposals that have obtained a majority of "YES" votes.
 Since voting proposals are transmitted as application messages, omitting
 non-finalized proposals does not affect the protocol’s correctness or
 consistency.
-8. The `steward` converts all approved `voting proposals` into
+7. The `steward` converts all approved `voting proposals` into
 corresponding `MLS proposals` and `commit message`, and
 transmits both in a single operation as in [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) section 12.4,
 including welcome messages for the new members.
 Therefore, the `commit message` ends the previous epoch and create new ones.
-9. Upon receiving a `commit message`, the `members` first execute the [commit validation service](#commit-validation-service),
+8. Upon receiving a `commit message`, the `members` first execute the [commit validation service](#commit-validation-service),
 including verification of signatures and associated `voting proposals`.
 If the commit is deemed valid, the `members` apply the commit and synchronize to the upcoming epoch.
 
