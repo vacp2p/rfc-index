@@ -397,6 +397,15 @@
   },
   {
     "component": "ift-ts",
+    "slug": "155",
+    "title": "Payment Streams Protocol for Logos Services",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-03-18",
+    "path": "ift-ts/raw/payment-streams.html"
+  },
+  {
+    "component": "ift-ts",
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
