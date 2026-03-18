@@ -464,6 +464,9 @@ If multiple valid commits contain the identical deterministic proposal sequence,
 the commit validation service MUST select first, if there is `Epoch steward`,
 otherwise the commit whose `committer ID` is lexicographically smallest (according to canonical ordering)
 as the single valid output, thereby avoiding different state forks.
+Competing commits that contain the same deterministic proposal sequence
+but differ only due to steward-generated MLS commit entropy MUST NOT be classified as misbehaviour
+and MAY instead be treated as honest participation for peer scoring purposes.
 
 ## Steward violation list
 
