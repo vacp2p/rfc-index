@@ -693,10 +693,6 @@ that do not match their privacy preferences.
 
 On-chain state of a stream MUST be verifiable by both parties.
 
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
 ## References
 
 ### Normative
@@ -825,3 +821,7 @@ function claim(uint256 streamId) external;
 ///      state updates on next interaction, not at exact depletion time).
 function _accrue(uint256 streamId) internal;
 ```
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
