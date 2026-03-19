@@ -19,7 +19,7 @@
 - **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/vac/raw/logos-capability-discovery.md) — Chore/fix headers (#239)
 - **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/vac/raw/logos-capability-discovery.md) — Chore/mdbook updates (#237)
 - **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/vac/raw/logos-capability-discovery.md) — ci: add mdBook configuration (#233)
-- **2025-12-09** — [`aaf158a`](https://github.com/vacp2p/rfc-index/blob/aaf158aa59edb2ce0841a345725d16355218c196/vac/raw/logos-capability-discovery.md) — VAC/RAW/LOGOS-DISCOVERY-SERVICE RFC  (#212)
+- **2025-12-09** — [`aaf158a`](https://github.com/vacp2p/rfc-index/blob/aaf158aa59edb2ce0841a345725d16355218c196/vac/raw/logos-capability-discovery.md) — VAC/RAW/LOGOS-DISCOVERY-CAPABILITY RFC  (#212)
 
 <!-- timeline:end -->
 
@@ -28,7 +28,7 @@
 ## Abstract
 
 This RFC defines the Logos Service Discovery protocol,
-a discovery mechanism inspired by [DISC-NG capability discovery](https://ieeexplore.ieee.org/document/10629017)
+a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore.ieee.org/document/10629017)
 built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
 
 The protocol enables nodes to:
