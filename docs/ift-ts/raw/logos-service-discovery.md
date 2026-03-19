@@ -1,8 +1,8 @@
-# LOGOS-CAPABILITY-DISCOVERY
+# LOGOS-SERVICE-DISCOVERY
 
 | Field | Value |
 | --- | --- |
-| Name | Logos Capability Discovery Protocol |
+| Name | Logos Service Discovery Protocol |
 | Slug | 107 |
 | Status | raw |
 | Category | Standards Track |
@@ -19,7 +19,7 @@
 - **2025-12-22** — [`0f1855e`](https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/vac/raw/logos-capability-discovery.md) — Chore/fix headers (#239)
 - **2025-12-22** — [`b1a5783`](https://github.com/vacp2p/rfc-index/blob/b1a578393edf8487ccc97a5f25b25af9bf41efb3/docs/vac/raw/logos-capability-discovery.md) — Chore/mdbook updates (#237)
 - **2025-12-18** — [`d03e699`](https://github.com/vacp2p/rfc-index/blob/d03e699084774ebecef9c6d4662498907c5e2080/docs/vac/raw/logos-capability-discovery.md) — ci: add mdBook configuration (#233)
-- **2025-12-09** — [`aaf158a`](https://github.com/vacp2p/rfc-index/blob/aaf158aa59edb2ce0841a345725d16355218c196/vac/raw/logos-capability-discovery.md) — VAC/RAW/LOGOS-DISCOVERY-CAPABILITY RFC  (#212)
+- **2025-12-09** — [`aaf158a`](https://github.com/vacp2p/rfc-index/blob/aaf158aa59edb2ce0841a345725d16355218c196/vac/raw/logos-capability-discovery.md) — VAC/RAW/LOGOS-DISCOVERY-SERVICE RFC  (#212)
 
 <!-- timeline:end -->
 
@@ -27,8 +27,8 @@
 
 ## Abstract
 
-This RFC defines the Logos Capability Discovery protocol,
-a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore.ieee.org/document/10629017)
+This RFC defines the Logos Service Discovery protocol,
+a discovery mechanism inspired by [DISC-NG capability discovery](https://ieeexplore.ieee.org/document/10629017)
 built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
 
 The protocol enables nodes to:
@@ -73,7 +73,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ## Protocol Roles
 
-The Logos capability discovery protocol defines three roles that nodes can perform:
+The Logos service discovery protocol defines three roles that nodes can perform:
 
 ### Advertiser
 
@@ -279,7 +279,7 @@ Implementations SHOULD modify them as needed based on specific requirements.
 
 ### Distance
 
-The distance `d` between any two keys in Logos Capability Discovery
+The distance `d` between any two keys in Logos Service Discovery
 MUST be calculated using the bitwise XOR applied to their 256-bit SHA-256 representations.
 This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
 The keyspace is the entire numerical range of possible `peerID` and `service_id_hash`
@@ -476,7 +476,7 @@ message Message {
 - Advertisements are encoded as generic `bytes` (RECOMMENDED: ExtensiblePeerRecord/XPR)
 to avoid coupling the protocol to specific formats
 - The existing `key` field is reused for `service_id_hash` in Logos operations
-- Nodes without Logos Capability Discovery support will ignore `REGISTER` and `GET_ADS` messages
+- Nodes without Logos Service Discovery support will ignore `REGISTER` and `GET_ADS` messages
 
 ### Advertisement Encoding
 
