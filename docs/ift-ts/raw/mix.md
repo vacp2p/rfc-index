@@ -359,7 +359,8 @@ Common strategies include Proof of Work (PoW), Verifiable Delay Functions (VDFs)
 The sender is responsible for appending the appropriate exit abuse prevention data (_e.g.,_ nonce, timestamp) to the message payload.
 The format and verification logic depend on the selected method.
 
-Note: The exit abuse prevention mechanisms described above are intended to protect the exit from flooding attacks routed through them.
+Note:
+The exit abuse prevention mechanisms described above are intended to protect the exit from flooding attacks routed through them.
 They do not provide protection against denial-of-service (DoS) or resource exhaustion attacks targeting the mixnet itself (_e.g.,_ flooding mix nodes with traffic, inducing processing overhead, or targeting bandwidth).
 
 Protections against attacks targeting the mixnet itself are addressed in [Section 6.6](#66-dos-protection).
@@ -634,6 +635,9 @@ The recommended total packet size is $4608$ bytes, chosen to:
 - Allow inclusion of additional data such as SURBs without requiring fragmentation,
 - Maintain reasonable per-hop processing and bandwidth overhead.
 
+Note:
+When [DoS protection](#66-dos-protection) is enabled, the maximum packet size MUST be increased to accommodate the proof size of the chosen DoS protection mechanism.
+
 This recommended total packet size of $4608$ bytes yields:
 
 $`
@@ -663,8 +667,6 @@ Implementers SHOULD align with widely used defaults to maximize anonymity set si
 Similarly, parameters such as $r$ and $t$ are configurable.
 Changes to these parameters affect header size and therefore impact payload size if the total packet size remains fixed.
 However, if such changes alter the total packet size on the wire, the same anonymity set considerations apply.
-
-When DoS protection is enabled (see [Section 6.6](#66-dos-protection)), the total wire size may increase depending on the integration approach.
 
 The following subsection defines how the next-hop or destination address and forwarding delay are encoded within $β$ to enable correct routing and mixing behavior.
 
