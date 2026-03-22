@@ -159,10 +159,10 @@ After discussion amongst the contributors has reached a rough consensus,
 as described in [RFC7282](https://www.rfc-editor.org/rfc/rfc7282.html),
 the specification MAY begin the process to upgrade it's status.
 
-A specification has five possible states that reflect its maturity and
+A specification has seven possible states that reflect its maturity and
 contractual weight:
 
-![Lifecycle diagram](images/lifecycle.png)
+![Lifecycle diagram](images/lifecycle.svg)
 
 ### Raw Specifications
 
@@ -179,16 +179,33 @@ they become **draft** specifications and are assigned numbers.
 Changes to draft specifications should be done in consultation with users.
 Draft specifications are contracts between the editors and implementers.
 
+### Approved Specifications
+
+When draft specifications have been reviewed and verified by the internal development team,
+they become **approved** specifications.
+Approved specifications are ready to be included in the specification index.
+Changes to approved specifications should be done in consultation with the development team.
+Approved specifications are contracts between the editors, the development team, and implementers.
+
 ### Stable Specifications
 
-When draft specifications are used by third parties, they become **stable** specifications.
+When approved specifications are used by third parties, they become **stable** specifications.
 Changes to stable specifications should be restricted to cosmetic ones,
 errata and clarifications.
 Stable specifications are contracts between editors, implementers, and end-users.
 
+### Verified Specifications
+
+When stable specifications have been implemented by a non-IFT entity,
+they become **verified** specifications.
+Verified status indicates external validation of the specification
+through independent implementation.
+Changes to verified specifications MUST be restricted to errata and clarifications.
+Verified specifications are contracts between editors, implementers, and external parties.
+
 ### Deprecated Specifications
 
-When stable specifications are replaced by newer draft specifications,
+When stable or verified specifications are replaced by newer draft specifications,
 they become **deprecated** specifications.
 Deprecated specifications should not be changed except
 to indicate their replacements, if any.
@@ -271,20 +288,28 @@ and may suspend or ban individuals for behaviour they consider inappropriate.
 
 ### Meta Information
 
-Specifications MUST contain the following metadata.
+Specifications MUST contain certain metadata fields.
 It is RECOMMENDED that specification metadata is specified as a YAML header
 (where possible).
 This will enable programmatic access to specification metadata.
 
-| Key              | Value                | Type   | Example                                                                                                                                                                                                                             |
-|------------------|----------------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **shortname**    | short name           | string | 1/COSS                                                                                                                                                                                                                              |
-| **title**        | full name            | string | Consensus-Oriented Specification System                                                                                                                                                                                             |
-| **status**       | status               | string | draft                                                                                                                                                                                                                               |
-| **category**     | category             | string | Best Current Practice                                                                                                                                                                                                                            |
-| **tags**         | 0 or several tags    | list   | waku-application, waku-core-protocol                                                                                                                                                                                                |
-| **editor**       | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                                      |
-| **contributors** | contributors         | list   | - Pieter Hintjens <ph@imatix.com> - André Rebentisch <andre@openstandards.de> - Alberto Barrionuevo <abarrio@opentia.es> - Chris Puttick <chris.puttick@thehumanjourney.net> - Yurii Rashkovskii <yrashk@gmail.com> |
+Fields marked **required** MUST be present in all specifications at **draft** status or above.
+Fields marked **optional** MAY be omitted,
+particularly in **raw** specifications that are still being developed.
+
+| Key              | Required   | Value                | Type   | Example                                                                                                                                                                                                                             |
+|------------------|------------|----------------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **name**         | required   | full name            | string | Consensus-Oriented Specification System                                                                                                                                                                                             |
+| **slug**         | required   | number               | int    | 1                                                                                                                                                                                                                                   |
+| **status**       | required   | status               | string | draft                                                                                                                                                                                                                               |
+| **category**     | optional   | category             | string | Best Current Practice                                                                                                                                                                                                               |
+| **tags**         | optional   | 0 or several tags    | list   | waku-application, waku-core-protocol                                                                                                                                                                                                |
+| **editor**       | optional   | editor name/email    | string | Oskar Thoren <oskarth@titanproxy.com>                                                                                                                                                                                               |
+| **contributors** | optional   | contributors         | list   | - Pieter Hintjens <ph@imatix.com> - André Rebentisch <andre@openstandards.de> - Alberto Barrionuevo <abarrio@opentia.es> - Chris Puttick <chris.puttick@thehumanjourney.net> - Yurii Rashkovskii <yrashk@gmail.com> |
+
+For **raw** specifications,
+only `name` and `status` are strictly required.
+All other fields SHOULD be added before the specification is promoted to **draft** status.
 
 ### IFT/Logos LIP Process
 
@@ -319,6 +344,22 @@ Standards track specifications MUST be based on the
 [Logos LIP template](../../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
+### Document Types
+
+The IFT specification process recognizes two document types:
+
+**RFC (Request for Comments)**
+is the primary document type for technical specifications.
+RFCs progress through the full COSS lifecycle from raw to stable or beyond.
+All specifications described in this document are RFCs by default.
+
+**CFR (Change for Request)**
+is a document type for proposing changes or amendments to existing specifications.
+A CFR describes a specific, bounded change to an existing RFC.
+CFRs follow the same lifecycle as RFCs but are scoped to a single change proposal.
+A CFR that reaches stable status MAY be merged back into the target RFC,
+after which it transitions to deprecated.
+
 ## Conventions
 
 Where possible editors and contributors are encouraged to:
@@ -335,7 +376,9 @@ Color coded specifications SHOULD use the following color scheme:
 
 - ![raw](https://raw.githubusercontent.com/unprotocols/rfc/master/2/raw.svg)
 - ![draft](https://raw.githubusercontent.com/unprotocols/rfc/master/2/draft.svg)
+- ![approved](images/approved.svg)
 - ![stable](https://raw.githubusercontent.com/unprotocols/rfc/master/2/stable.svg)
+- ![verified](images/verified.svg)
 - ![deprecated](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deprecated.svg)
 - ![retired](https://raw.githubusercontent.com/unprotocols/rfc/master/2/retired.svg)
 - ![deleted](https://raw.githubusercontent.com/unprotocols/rfc/master/2/deleted.svg)
