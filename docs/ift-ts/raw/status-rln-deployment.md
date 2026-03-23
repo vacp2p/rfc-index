@@ -271,7 +271,7 @@ As the second phase, prover module listen for a specific event then fetch
 the new tier list from `Karma contract` and update the local list.
 Note that, updating the contract require a delay till updating the local tier table of prover.
 
-## 1.6 Gas Checking
+### 1.6 Gas Checking
 
 Prover is also responsible for checking that the gas requirements of TXs are at the limit
 since the RLN protects the network in terms of number of TXs not the total gas consumptions.
