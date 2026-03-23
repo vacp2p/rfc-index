@@ -102,13 +102,13 @@ Otherwise, if the  `user` has enough free TX, we don’t update `user`'s tier.
 
 Tier proto file for Tier Query info:
 
-```jsx
+```protobuf
 message GetUserTierInfoRequest {
 Address user = 1;
 }
 ```
 
-```jsx
+```protobuf
 message GetUserTierInfoReply {
 oneof resp {
 UserTierInfoResult res = 1;
@@ -117,7 +117,7 @@ UserTierInfoError error = 2;
 }
 ```
 
-```jsx
+```protobuf
 message UserTierInfoResult {
 sint64 current_epoch = 1;
 sint64 current_epoch_slice = 2;
@@ -126,14 +126,14 @@ optional Tier tier = 4;
 }
 ```
 
-```jsx
+```protobuf
 message Tier {
 string name = 1;
 uint64 quota = 2;
 }
 ```
 
-```jsx
+```protobuf
 message UserTierInfoError {
 string message = 1;
 }
@@ -158,7 +158,7 @@ Finally, `registeredUsers` consists of as follows:
 
 With the registration, user allows to use free gas transaction within its Tier
 
-```jsx
+```protobuf
 enum RegistrationStatus {
 Success = 0;
 Failure = 1;
@@ -166,7 +166,7 @@ AlreadyRegistered = 2;
 }
 ```
 
-```jsx
+```protobuf
 message RegisterUserReply {
 RegistrationStatus status = 1;
 }
@@ -186,13 +186,13 @@ then streams the proof for a specific epoch.
 - Outputs `RLNProof` metadata named `proof_value` contains `y` and `internal_nullifier` value
 see the [RLN specification](https://rfc.vac.dev/vac/raw/rln-v2/) for details.
 
-```jsx
+```protobuf
 message RlnProofFilter {
 optional string address = 1;
 }
 ```
 
-```jsx
+```protobuf
 message RlnProofReply {
 oneof resp {
 RlnProof proof = 1;
@@ -201,7 +201,7 @@ RlnProofError error = 2;
 }
 ```
 
-```jsx
+```protobuf
 message RlnProof {
 bytes sender = 1;
 bytes tx_hash = 2;
@@ -209,7 +209,7 @@ bytes proof = 3;
 }
 ```
 
-```jsx
+```protobuf
 message RlnProofError {
 string error = 2;
 }
