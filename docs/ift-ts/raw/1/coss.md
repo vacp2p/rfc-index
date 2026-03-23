@@ -159,7 +159,7 @@ After discussion amongst the contributors has reached a rough consensus,
 as described in [RFC7282](https://www.rfc-editor.org/rfc/rfc7282.html),
 the specification MAY begin the process to upgrade it's status.
 
-A specification has seven possible states that reflect its maturity and
+A specification has eight possible states that reflect its maturity and
 contractual weight:
 
 ![Lifecycle diagram](images/lifecycle.svg)

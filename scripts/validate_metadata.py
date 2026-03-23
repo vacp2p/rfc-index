@@ -163,8 +163,13 @@ def maybe_assign_slugs(docs: List[DocInfo], check_mode: bool) -> List[DocInfo]:
     for doc in docs:
         if not doc.table:
             continue
-        slug = doc.meta().get("slug", "").strip()
+        meta = doc.meta()
+        slug = meta.get("slug", "").strip()
         if slug:
+            continue
+        # Do not auto-assign slugs to raw specs; slugs are assigned on draft promotion.
+        status = meta.get("status", "").strip().lower()
+        if status == "raw":
             continue
         free_slug = next_free_slug(used)
         assign_missing_slug(doc, free_slug)
