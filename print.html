@@ -26074,6 +26074,7 @@ To learn more about <strong>raw</strong> specifications, take a look at <a href=
 </div><!-- timeline:start -->
 <h2 id="timeline-74"><a class="header" href="#timeline-74">Timeline</a></h2>
 <ul>
+<li><strong>2026-03-23</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/011eea8f069feed3a4feee1c2cc2669f8ed498d9/docs/ift-ts/raw/1/coss.md"><code>011eea8</code></a> — docs(1/coss): add Approved/Verified statuses, CFR doc type, and raw-spec leniency (#301)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/1/coss.md"><code>f01d5b9</code></a> — chore: fix links (#260)</li>
 <li><strong>2026-01-16</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/1/coss.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
 <li><strong>2025-12-22</strong> — <a href="https://github.com/vacp2p/rfc-index/blob/0f1855edcf68ef982c4ce478b67d660809aa9830/docs/vac/1/coss.md"><code>0f1855e</code></a> — Chore/fix headers (#239)</li>
@@ -26195,9 +26196,9 @@ a new specification SHOULD be presented by the team of the sub-domain.
 After discussion amongst the contributors has reached a rough consensus,
 as described in <a href="https://www.rfc-editor.org/rfc/rfc7282.html">RFC7282</a>,
 the specification MAY begin the process to upgrade it's status.</p>
-<p>A specification has five possible states that reflect its maturity and
+<p>A specification has eight possible states that reflect its maturity and
 contractual weight:</p>
-<p><img src="ift-ts/raw/1/images/lifecycle.png" alt="Lifecycle diagram" /></p>
+<p><img src="ift-ts/raw/1/images/lifecycle.svg" alt="Lifecycle diagram" /></p>
 <h3 id="raw-specifications"><a class="header" href="#raw-specifications">Raw Specifications</a></h3>
 <p>All new specifications are <strong>raw</strong> specifications.
 Changes to raw specifications can be unilateral and arbitrary.
@@ -26209,13 +26210,26 @@ Raw specifications have no contractual weight.</p>
 they become <strong>draft</strong> specifications and are assigned numbers.
 Changes to draft specifications should be done in consultation with users.
 Draft specifications are contracts between the editors and implementers.</p>
+<h3 id="approved-specifications"><a class="header" href="#approved-specifications">Approved Specifications</a></h3>
+<p>When draft specifications have been reviewed and verified by the internal development team,
+they become <strong>approved</strong> specifications.
+Approved specifications are ready to be included in the specification index.
+Changes to approved specifications should be done in consultation with the development team.
+Approved specifications are contracts between the editors, the development team, and implementers.</p>
 <h3 id="stable-specifications"><a class="header" href="#stable-specifications">Stable Specifications</a></h3>
-<p>When draft specifications are used by third parties, they become <strong>stable</strong> specifications.
+<p>When approved specifications are used by third parties, they become <strong>stable</strong> specifications.
 Changes to stable specifications should be restricted to cosmetic ones,
 errata and clarifications.
 Stable specifications are contracts between editors, implementers, and end-users.</p>
+<h3 id="verified-specifications"><a class="header" href="#verified-specifications">Verified Specifications</a></h3>
+<p>When stable specifications have been implemented by a non-IFT entity,
+they become <strong>verified</strong> specifications.
+Verified status indicates external validation of the specification
+through independent implementation.
+Changes to verified specifications MUST be restricted to errata and clarifications.
+Verified specifications are contracts between editors, implementers, and external parties.</p>
 <h3 id="deprecated-specifications"><a class="header" href="#deprecated-specifications">Deprecated Specifications</a></h3>
-<p>When stable specifications are replaced by newer draft specifications,
+<p>When stable or verified specifications are replaced by newer draft specifications,
 they become <strong>deprecated</strong> specifications.
 Deprecated specifications should not be changed except
 to indicate their replacements, if any.
@@ -26280,20 +26294,26 @@ may choose to interfere in editorial conflicts,
 and may suspend or ban individuals for behaviour they consider inappropriate.</p>
 <h2 id="specification-structure"><a class="header" href="#specification-structure">Specification Structure</a></h2>
 <h3 id="meta-information"><a class="header" href="#meta-information">Meta Information</a></h3>
-<p>Specifications MUST contain the following metadata.
+<p>Specifications MUST contain certain metadata fields.
 It is RECOMMENDED that specification metadata is specified as a YAML header
 (where possible).
 This will enable programmatic access to specification metadata.</p>
-<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Value</th><th>Type</th><th>Example</th></tr></thead><tbody>
-<tr><td><strong>shortname</strong></td><td>short name</td><td>string</td><td>1/COSS</td></tr>
-<tr><td><strong>title</strong></td><td>full name</td><td>string</td><td>Consensus-Oriented Specification System</td></tr>
-<tr><td><strong>status</strong></td><td>status</td><td>string</td><td>draft</td></tr>
-<tr><td><strong>category</strong></td><td>category</td><td>string</td><td>Best Current Practice</td></tr>
-<tr><td><strong>tags</strong></td><td>0 or several tags</td><td>list</td><td>waku-application, waku-core-protocol</td></tr>
-<tr><td><strong>editor</strong></td><td>editor name/email</td><td>string</td><td>Oskar Thoren <a href="mailto:ift-ts/raw/1/oskarth@titanproxy.com">oskarth@titanproxy.com</a></td></tr>
-<tr><td><strong>contributors</strong></td><td>contributors</td><td>list</td><td>- Pieter Hintjens <a href="mailto:ift-ts/raw/1/ph@imatix.com">ph@imatix.com</a> - André Rebentisch <a href="mailto:ift-ts/raw/1/andre@openstandards.de">andre@openstandards.de</a> - Alberto Barrionuevo <a href="mailto:ift-ts/raw/1/abarrio@opentia.es">abarrio@opentia.es</a> - Chris Puttick <a href="mailto:ift-ts/raw/1/chris.puttick@thehumanjourney.net">chris.puttick@thehumanjourney.net</a> - Yurii Rashkovskii <a href="mailto:ift-ts/raw/1/yrashk@gmail.com">yrashk@gmail.com</a></td></tr>
+<p>Fields marked <strong>required</strong> MUST be present in all specifications at <strong>draft</strong> status or above.
+Fields marked <strong>optional</strong> MAY be omitted,
+particularly in <strong>raw</strong> specifications that are still being developed.</p>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Required</th><th>Value</th><th>Type</th><th>Example</th></tr></thead><tbody>
+<tr><td><strong>name</strong></td><td>required</td><td>full name</td><td>string</td><td>Consensus-Oriented Specification System</td></tr>
+<tr><td><strong>slug</strong></td><td>required</td><td>number</td><td>int</td><td>1</td></tr>
+<tr><td><strong>status</strong></td><td>required</td><td>status</td><td>string</td><td>draft</td></tr>
+<tr><td><strong>category</strong></td><td>optional</td><td>category</td><td>string</td><td>Best Current Practice</td></tr>
+<tr><td><strong>tags</strong></td><td>optional</td><td>0 or several tags</td><td>list</td><td>waku-application, waku-core-protocol</td></tr>
+<tr><td><strong>editor</strong></td><td>optional</td><td>editor name/email</td><td>string</td><td>Oskar Thoren <a href="mailto:ift-ts/raw/1/oskarth@titanproxy.com">oskarth@titanproxy.com</a></td></tr>
+<tr><td><strong>contributors</strong></td><td>optional</td><td>contributors</td><td>list</td><td>- Pieter Hintjens <a href="mailto:ift-ts/raw/1/ph@imatix.com">ph@imatix.com</a> - André Rebentisch <a href="mailto:ift-ts/raw/1/andre@openstandards.de">andre@openstandards.de</a> - Alberto Barrionuevo <a href="mailto:ift-ts/raw/1/abarrio@opentia.es">abarrio@opentia.es</a> - Chris Puttick <a href="mailto:ift-ts/raw/1/chris.puttick@thehumanjourney.net">chris.puttick@thehumanjourney.net</a> - Yurii Rashkovskii <a href="mailto:ift-ts/raw/1/yrashk@gmail.com">yrashk@gmail.com</a></td></tr>
 </tbody></table>
 </div>
+<p>For <strong>raw</strong> specifications,
+only <code>name</code> and <code>status</code> are strictly required.
+All other fields SHOULD be added before the specification is promoted to <strong>draft</strong> status.</p>
 <h3 id="iftlogos-lip-process"><a class="header" href="#iftlogos-lip-process">IFT/Logos LIP Process</a></h3>
 <blockquote>
 <p>[!Note]
@@ -26325,6 +26345,18 @@ or by the <em>sub-domain</em> and the Logos LIP process.
 Standards track specifications MUST be based on the
 <a href="ift-ts/raw/1/../../template.html">Logos LIP template</a> before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.</p>
+<h3 id="document-types"><a class="header" href="#document-types">Document Types</a></h3>
+<p>The IFT specification process recognizes two document types:</p>
+<p><strong>RFC (Request for Comments)</strong>
+is the primary document type for technical specifications.
+RFCs progress through the full COSS lifecycle from raw to stable or beyond.
+All specifications described in this document are RFCs by default.</p>
+<p><strong>CFR (Change for Request)</strong>
+is a document type for proposing changes or amendments to existing specifications.
+A CFR describes a specific, bounded change to an existing RFC.
+CFRs follow the same lifecycle as RFCs but are scoped to a single change proposal.
+A CFR that reaches stable status MAY be merged back into the target RFC,
+after which it transitions to deprecated.</p>
 <h2 id="conventions-1"><a class="header" href="#conventions-1">Conventions</a></h2>
 <p>Where possible editors and contributors are encouraged to:</p>
 <ul>
@@ -26339,7 +26371,9 @@ Color coded specifications SHOULD use the following color scheme:</p>
 <ul>
 <li><img src="https://raw.githubusercontent.com/unprotocols/rfc/master/2/raw.svg" alt="raw" /></li>
 <li><img src="https://raw.githubusercontent.com/unprotocols/rfc/master/2/draft.svg" alt="draft" /></li>
+<li><img src="ift-ts/raw/1/images/approved.svg" alt="approved" /></li>
 <li><img src="https://raw.githubusercontent.com/unprotocols/rfc/master/2/stable.svg" alt="stable" /></li>
+<li><img src="ift-ts/raw/1/images/verified.svg" alt="verified" /></li>
 <li><img src="https://raw.githubusercontent.com/unprotocols/rfc/master/2/deprecated.svg" alt="deprecated" /></li>
 <li><img src="https://raw.githubusercontent.com/unprotocols/rfc/master/2/retired.svg" alt="retired" /></li>
 <li><img src="https://raw.githubusercontent.com/unprotocols/rfc/master/2/deleted.svg" alt="deleted" /></li>
