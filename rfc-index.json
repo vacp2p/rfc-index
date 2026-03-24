@@ -326,11 +326,11 @@
   {
     "component": "ift-ts",
     "slug": "107",
-    "title": "Logos Capability Discovery Protocol",
+    "title": "Logos Service Discovery Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-02-27",
-    "path": "ift-ts/raw/logos-capability-discovery.html"
+    "updated": "2026-03-24",
+    "path": "ift-ts/raw/logos-service-discovery.html"
   },
   {
     "component": "ift-ts",
