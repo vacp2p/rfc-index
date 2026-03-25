@@ -145,7 +145,7 @@ The proof generation, verification, and forwarding proceed as follows:
   Pre-computing proofs offline is not an option, as proofs SHOULD be bound to message contents or an alternative unique signal that cannot be known in advance (see [Section 3](#3-requirements)).
 - When using rate-limiting mechanisms (such as RLN), a node may exhaust its rate limit solely by being selected on multiple independent senders' paths.
   This causes legitimate packets to be dropped, resulting in unpredictable message delivery, even when no individual sender misbehaves.
-  Mix's unlinkability makes it impossible to distinguish a node forwarding messages from one originating them. This makes mitigations such as assigning differential or reputation-based rate limits infeasible.
+  The Mix Protocol's [unlinkability guarantees](./mix.md#91-security-guarantees-of-the-core-mix-protocol) make it impossible to distinguish a node forwarding messages from one originating them. This makes mitigations such as assigning differential or reputation-based rate limits infeasible.
 
 #### 4.2.4 Impact on Packet Size
 
