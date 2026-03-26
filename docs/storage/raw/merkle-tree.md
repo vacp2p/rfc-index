@@ -13,7 +13,7 @@
 
 This specification describes the Merkle tree construction adopted in Logos Storage. The principal consideration driving the design described below is to avoid security issues resulting from _API abuse_. Incorrectly using both low- and high-level cryptography APIs is a known source of never-ending security vulnerabilities (see eg. [arXiv:2306.08869](https://arxiv.org/abs/2306.08869v2)).
 
-This construction relies on keyed compression, domain separation, injective encodings, and standard padding conventions to prevent a variety of possible collision attacks; and is designed to operate with a wide variety of hash functons, including both conventional ones like SHA-2, and arithmetic (ZK-friendly) hashes like the Poseidon family. In the Appendix, we specify some concrete hash function instances covering our use cases.
+This construction relies on keyed compression, domain separation, injective encodings, and standard padding conventions to prevent a variety of possible collision attacks; and is designed to operate with a wide variety of hash functions, including both conventional ones like SHA-2, and arithmetic (ZK-friendly) hashes like the Poseidon family. In the Appendix, we specify some concrete hash function instances covering our use cases.
 
 So while this construction may seem unnecessarily convoluted at first, it exists to avoid possibilities for one to shoot themselves in the foot.
 
@@ -35,7 +35,7 @@ In our setting, allowing arithmetic (finite field based) hash functions allow fo
 
 ### Overview
 
-Merkle trees can be implemented in a variety of ways, and if done naively, can be also attacked in a variety of ways (e.g [BitCoinOps25](#references)). For this reason, this document focuses a _concrete implementation_ of a family of Merkle trees which helps avoiding common pitfalls.
+Merkle trees can be implemented in a variety of ways, and if done naively, can be also attacked in a variety of ways (e.g [BitCoinOps25](#references)). For this reason, this document focuses on a _concrete implementation_ of a family of Merkle trees which helps to avoid common pitfalls.
 
 We start by laying out some basic definitions in the [Definitions](#definitions) section, followed by our [keyed hash construction](#keyed-hash-construction), which guards the Merkle against certain padding and layer abuse attacks. We then discuss injective encodings and their role in the construction of secure Merkle trees that deal with finite field elements in the [Encoding](#encoding) section. Next, we provide some brief guidance on serialization in the [Serialization/Deserialization](#serializing--deserializing) section. Finally, we present an abstract interface for a Merkle tree module in the [Interfaces](#interfaces) section.
 
@@ -61,11 +61,11 @@ The hash function `H : S -> T` can also have different types `S` ("Source type")
 - as an alternative, the "Jive strategy" for binary compression (see [[Bouvier22](#references)]) can eliminate the "minus `k`" requirement (you can compress `t` into `t/2`)
 - A naive Merkle tree implementation could for example accept only a power-of-two sized sequence of `T`-s
 
-As an interesting example from the wild, the ZK proof library [Plonky3](https://github.com/Plonky3/Plonky3) (because of performance considerations) uses a binary compression function `T x T -> T` which is _neither collision nor preimage resistant_ (!), to a construct a Merkle tree, which at the end of the day is [still safe to use](https://eprint.iacr.org/2026/089) _in the particular situation they use it_. However, such constructions can be pretty fragile (it would be safer to use the Jive strategy mentioned above, with negligible extra cost).
+As an interesting example from the wild, the ZK proof library [Plonky3](https://github.com/Plonky3/Plonky3) (because of performance considerations) uses a binary compression function `T x T -> T` which is _neither collision nor preimage resistant_ (!), to construct a Merkle tree, which at the end of the day is [still safe to use](https://eprint.iacr.org/2026/089) _in the particular situation they use it_. However, such constructions can be pretty fragile (it would be safer to use the Jive strategy mentioned above, with negligible extra cost).
 
 Notation: Let's denote the type of a sequence of `T`-s by `[T]`.
 
-A Merkle tree is built on an ordered sequence of leaves. The leaves contain some kind data, whose type we will denote by `D` (for data). In classical implementations, `D` is just a bytestring (a finite sequence of bytes); however, in the ZK setting, sometimes `D` can also be a field element `F`, or a sequence of field elements `[F]`. 
+A Merkle tree is built on an ordered sequence of leaves. The leaves contain some kind of data, whose type we will denote by `D` (for data). In classical implementations, `D` is just a bytestring (a finite sequence of bytes); however, in the ZK setting, sometimes `D` can also be a field element `F`, or a sequence of field elements `[F]`. 
 
 So the input of a Merkle tree is of type `[D]`, a sequence of things with type `D`; and using a hash function `H : S -> T`, we output a Merkle root of type `T`. We can immediately see that we will also need a transformation from `D` to `S`; more about this below.
 
@@ -78,7 +78,7 @@ A (binary) Merkle tree requires, at its minimum, two pieces of building blocks:
 1. A _leaf hashing_ function `H' : D -> T`;
 2. and a _binary compression_ function `C : T x T -> T`.
 
-In the classical situation, like for example SHA2 or SHA3, the leaves are just bytestrings, and the leaf hashing is just normal hashing: `D = S` and `H = H'`. However, in the arithmetic hash (eg. the Poseidon family) context, this is more involved: There `D` can by a bytestring, but `S` a sequence of field elements, and `T` a fixed length array of field elements.
+In the classical situation, like for example SHA2 or SHA3, the leaves are just bytestrings, and the leaf hashing is just normal hashing: `D = S` and `H = H'`. However, in the arithmetic hash (eg. the Poseidon family) context, this is more involved: There `D` can be a bytestring, but `S` a sequence of field elements, and `T` a fixed length array of field elements.
 
 #### 1. Layer abuse attacks
 
@@ -275,8 +275,8 @@ Remark: we could (de)serialize in the so-called Montgomery representation instea
 
 The interface for a Merkle tree typically require the following API:
 
-- the Merkle tree construcion function takes a sequence `D`-s (typically bytestrings) of length `n` as input, and produces a Merkle tree of type `T`; that is, `mkTree: [D] -> Tree<T>`
-- if we also want to use the Merkle tree as a normal hash function, then `merkleHashTree : [byte] -> Tree<T>` 
+- the Merkle tree construction function takes a sequence `D`-s (typically bytestrings) of length `n` as input, and produces a Merkle tree of type `T`; that is, `mkTree: [D] -> Tree<T>`
+- if we also want to use the Merkle tree as a normal hash function, then `merkleHashTree : [byte] -> Tree<T>`
 - further standard functionality are:
     - extract the tree root `root : Tree<T> -> T`
     - extract a Merkle inclusion proof
@@ -319,7 +319,7 @@ class MerkleProof[T]:
 
 def create(data: List[S]) -> MerkleTree[T]:
   """Creates a `MerkleTree` from a sequence
-  of data in the ."""
+  of data, encoded to be compatible with the hash."""
   ...
 
 def create(
