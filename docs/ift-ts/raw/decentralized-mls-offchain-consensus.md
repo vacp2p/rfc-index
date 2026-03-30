@@ -1,8 +1,8 @@
-# ETH-MLS-OFFCHAIN
+# DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS
 
 | Field | Value |
 | --- | --- |
-| Name | Secure channel setup using decentralized MLS and Ethereum accounts |
+| Name | Secure channel setup using decentralized MLS |
 | Slug | 104 |
 | Status | raw |
 | Category | Standards Track |
@@ -25,7 +25,7 @@
 
 ## Abstract
 
-The following document specifies Ethereum authenticated scalable
+The following document specifies scalable
 and decentralized secure group messaging application by
 integrating Message Layer Security (MLS) backend.
 Decentralization refers each user is a node in P2P network and
