@@ -64,7 +64,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 - The presence of non-reliable (silent) nodes MAY be assumed.
 - A lightweight, scalable consensus mechanism with deterministic finality within a specific time MUST be employed.
 - The network MUST enforce a rate-limiting mechanism for all entities in order to mitigate spam.
-- \textbf{$\Delta$ (Delta)} is a protocol parameter denoting a bounded time interval (in seconds)
+- $\Delta$ (Delta) is a protocol parameter denoting a bounded time interval (in seconds)
 that defines the maximum synchronization window of the system.
 - At least $2n/3$ of the members MUST become synchronized within $\Delta$ time, where $n$ is the group size.
 
