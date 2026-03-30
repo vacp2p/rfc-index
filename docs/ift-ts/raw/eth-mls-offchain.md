@@ -525,7 +525,7 @@ Peer score updates MUST be performed only for stewards that are active in the cu
 Peer scores may decrease due to violations and increase due to honest behavior;
 such score adjustments are derived from observable protocol events, such as
 successful commits or emergency criteria proposals, and each peer updates its local table accordingly.
-In particular, reer score updates MAY be triggered either by direct local observation of protocol violations
+In particular, peer score updates MAY be triggered either by direct local observation of protocol violations
 or by the finalized outcome of a governance vote.
 Regardless of the trigger, score updates are applied locally by each peer to its own peer score table.
 
