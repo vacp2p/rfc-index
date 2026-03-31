@@ -290,7 +290,7 @@ for the TX due to the [multi-message_id burn RLN](https://lip.logos.co/ift-ts/ra
 ## 2. Verifier Module
 
 The verifier module is composed of an identity operating
-in the sequencer environment together at least 128 decentralized external slashers.
+in the sequencer environment together the decentralized external slashers.
 Also verifier module manually conducts the slashing by invoking the `Karma contract`
 with authorized callers as owner in case spamming.
 Prover module outputs `RLNproof` with proof metadata named `proof_values`
@@ -323,7 +323,7 @@ as spammer from the local DB. Prover also listening the tier-limits from `karma 
 
 - Stores the RLN membership tree that consists of `id-commitment`
 - Does not store stake since Karma is non-transferable
-- Contains the slasher function (see Decentralized Slashing section) from 128 whitelisted RPC listener
+- Contains the slasher function (see Decentralized Slashing section)
 of prover which takes a `secret-hash` and get reward
 for invoker also spammers `id-commitment` is dropped off from contract and prover.
 
@@ -354,7 +354,7 @@ called `slashers`, which operate alongside sequencer-side RLN verifiers
 to externally detect RLN-based spam.
 
 In `RLN contract`, the user `id-commitment` is stored as mapping.
-At most 128 `slashers` receive all proofs by subscribing gRPC to the prover.
+The `slashers` receive all proofs by subscribing gRPC to the prover.
 In the event of spam, any `slasher` can extract the `secret-hash`
 from the proof and submit it to the `RLN contract`.
 
@@ -374,12 +374,30 @@ that implies all `id-commitment`  are unique.
 Plus, the spammers’ `id-commitment` are dropped from the list.
 Under this conditions, double slashing is not feasible.
 
-### 5.1. Enforcing the number of slashers
+### 5.1. Proof Aggregation Layer
 
-To restrict the number of slashers to 128, with the set being updated weekly, the system MUST implement an authentication and access-control mechanism as follows:
+Instead of having slashers connect directly to the prover,
+an intermediate aggregation layer is introduced between the prover and the slashers.
+An `aggregator` is an entity that subscribes to the prover via gRPC,
+collects RLN proofs and associated metadata, and forwards them to slashers.
 
-- `Layer2` MUST distribute weekly authentication certificates to exactly 128 decentralized slashers, based on the current authorized slasher set
-- The Prover module MUST enforce a connection limit such that the number of simultaneously authenticated slasher connections MUST NOT exceed 128.
+The aggregator MUST:
+
+- Subscribe to the prover module via gRPC to receive all RLN proofs and metadata.
+- Maintain an up-to-date list of active slashers and forward received proofs to each of them.
+- Be stateless with respect to slashing decisions. The aggregator is responsible only
+for proof distribution, not detection or submission.
+
+To avoid a single point of failure, multiple aggregator instances MAY be deployed.
+Each aggregator instance operates independently and subscribes to the prover separately.
+Slashers MAY connect to one or more aggregators to ensure redundant proof delivery.
+
+The prover module MUST NOT impose a connection limit on aggregators.
+Any entity MAY act as a slasher by connecting to an aggregator without restrictions
+under normal operating conditions.
+In cases where slasher capacity limits are exceeded,
+access control MAY be enforced based on the Karma balance of the requesting entity,
+prioritizing slashers with higher Karma amounts.
 
 ## References
 
