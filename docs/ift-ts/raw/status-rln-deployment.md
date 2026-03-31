@@ -323,8 +323,7 @@ as spammer from the local DB. Prover also listening the tier-limits from `karma 
 
 - Stores the RLN membership tree that consists of `id-commitment`
 - Does not store stake since Karma is non-transferable
-- Contains the slasher function (see Decentralized Slashing section)
-of prover which takes a `secret-hash` and get reward
+- Contains the slashing function as mentioned in [Decentralized Slashing](#5-decentralized-slashing) section which takes a `secret-hash` and get reward
 for invoker also spammers `id-commitment` is dropped off from contract and prover.
 
 ## 4. Deny List
