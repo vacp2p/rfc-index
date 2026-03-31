@@ -169,14 +169,19 @@ and advertising this node and its capabilities.
 In the case of Extended Kademlia Discovery,
 `stop()` will cancel the periodic task of [refreshing the propagated `XPR`](#record-propagation).
 
-### `start_advertising(const char* service_id)`
+### `start_advertising(const char* service_id, const byte* add)`
 
 Start advertising this node against any capability
-encoded as an input `service_id` string.
+encoded as an input `service_id` string
+and optionally an advertisement raw bytes.
 
 In the case of Extended Kademlia Discovery,
 `start_advertising()` will include the input `service_id`
 in the [regularly propagated `XPR`](#record-propagation).
+
+In the case of Service Discovery,
+`start_advertising()` CAN include in addition to `service_id`
+an already encoded advertisement in raw bytes form.
 
 ### `stop_advertising(const char* service_id)`
 
@@ -192,15 +197,18 @@ if it was previously included.
 
 Lookup and return records for peers supporting the capability encoded in the input `service_id` string,
 using the underlying discovery protocol.
-`service_id` is an OPTIONAL input argument.
-If unset, it indicates a lookup for peers supporting any (or zero) capabilities.
 
 In the case of Extended Kademlia Discovery,
+`service_id` MAY be included as an input argument.
+If unset, it indicates a lookup for peers supporting any (or zero) capabilities.
 `lookup()` will trigger the random walk [record discovery](#record-discovery),
 filtering discovered records based on `service_id`, if specified.
 If no `service_id` is specified,
 Extended Kademlia Discovery will just return a random selection of peer records,
 matching any capability.
+
+In the case of Service Discovery,
+`lookup()` MUST include a `service_id`.
 
 ## Copyright
 
