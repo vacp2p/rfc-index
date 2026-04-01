@@ -406,6 +406,15 @@
   },
   {
     "component": "ift-ts",
+    "slug": "156",
+    "title": "RLN deployment to the Status network for gasless L2",
+    "status": "raw",
+    "category": "Standards Track",
+    "updated": "2026-04-01",
+    "path": "ift-ts/raw/status-rln-deployment.html"
+  },
+  {
+    "component": "ift-ts",
     "slug": "2",
     "title": "Minimum Viable Data Synchronization",
     "status": "stable",
