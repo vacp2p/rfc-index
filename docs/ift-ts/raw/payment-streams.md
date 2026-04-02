@@ -1,12 +1,13 @@
----
-title: PAYMENT-STREAMS
-name: Payment Streams Protocol for Logos Services
-status: raw
-category: Standards Track
-tags: logos, lez, payment-streams
-editor: Sergei Tikhomirov <sergei@status.im>
-contributors: Akhil Peddireddy <akhil@status.im>
----
+# PAYMENT-STREAMS
+
+| Field | Value |
+| --- | --- |
+| Name | Payment Streams Protocol for Logos Services |
+| Slug | 155 |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Sergei Tikhomirov <sergei@status.im> |
+| Contributors | Akhil Peddireddy <akhil@status.im> |
 
 ## Abstract
 
@@ -19,11 +20,11 @@ The blockchain determines fund accrual based on elapsed time.
 
 This specification defines stream-backed eligibility proof types
 for the incentivization framework
-defined in the incentivization spec
+defined in the incentivization specification
 (see [References](#references)).
-The incentivization spec is defined
+The incentivization specification is defined
 in the context of Logos Messaging request-response protocols.
-This spec MAY be extended to non-Messaging services.
+This specification can be extended to non-Messaging services.
 
 The protocol targets Logos blockchain,
 which includes the Logos Execution Zone (LEZ).
@@ -40,7 +41,7 @@ in this document are to be interpreted as described in
 
 ## Change Process
 
-This document is governed by the [1/COSS](../1/coss.md) (COSS).
+This document is governed by the [1/COSS](./1/coss.md) (COSS).
 
 ## Motivation
 
@@ -50,14 +51,16 @@ Logos Messaging, Logos Blockchain, and Logos Storage.
 Logos Messaging comprises a suite of communication protocols
 with both P2P and request-response structures.
 The backbone P2P protocols use tit-for-tat mechanisms.
-We plan to introduce incentivization
+Incentivization is introduced
 for auxiliary request-response protocols
 with well-defined user and provider roles.
 One such protocol is Store,
 which allows users to query historical messages
 from Logos Messaging relay nodes.
 
-We target the following requirements:
+This specification introduces a payment streams protocol
+for Store and other request-response protocols.
+The protocol targets the following requirements:
 
 - Performance: Efficient payments with low latency and fees.
 - Security: Limited loss exposure through spending controls.
@@ -66,7 +69,7 @@ We target the following requirements:
 
 After reviewing prior work on payment channels, streams,
 e-cash, and tickets,
-we selected payment streams as the most suitable mechanism.
+payment streams were selected as the most suitable mechanism.
 
 Payment streams enable unidirectional time-based fund flows
 from payer to payee.
@@ -192,7 +195,7 @@ accepted eligibility proof types and service parameters
 via the discovery protocol.
 
 The following is an informal list of discoverable parameters
-(to be formally defined in the context of the discovery spec):
+(to be formally defined in the context of the discovery specification):
 
 - accepted eligibility proof types
 - accepted tokens
@@ -226,17 +229,17 @@ On-chain state is the source of truth for fund allocation and accrual.
 Off-chain communication coordinates lifecycle events
 and enables service delivery.
 
-This spec does not redefine the service provision protocol.
-The incentivization spec (see [References](#references))
+This specification does not redefine the service provision protocol.
+The incentivization specification (see [References](#references))
 defines the generic request-response framework
 with `EligibilityProof` and `EligibilityStatus`.
-This spec extends `EligibilityProof`
+This specification extends `EligibilityProof`
 with two new types for stream-backed service provision,
 defined in the following subsection.
 
 ### Eligibility Proof Types
 
-The incentivization spec's `EligibilityProof`
+The incentivization specification's `EligibilityProof`
 is extended with two new optional fields:
 `stream_proposal` and `stream_proof`.
 These fields are mutually exclusive.
@@ -249,7 +252,7 @@ All subsequent requests MUST use `stream_proof`.
 
 ```protobuf
 message EligibilityProof {
-  // existing, from incentivization spec
+  // existing, from incentivization specification
   optional bytes proof_of_payment = 1;
   // new, for stream-backed service provision
   optional bytes stream_proposal = 2;
@@ -338,7 +341,7 @@ The off-chain protocol uses three message types:
 #### ServiceRequest
 
 A `ServiceRequest` has two top-level fields,
-consistent with the incentivization spec pattern:
+consistent with the incentivization specification pattern:
 
 - `request_data`: service-specific payload
 - `eligibility_proof`: an `EligibilityProof`
@@ -350,7 +353,7 @@ consistent with the incentivization spec pattern:
 A `ServiceResponse` MUST include:
 
 - `eligibility_status`: an `EligibilityStatus`
-  (from the incentivization spec) with:
+  (from the incentivization specification) with:
   - `status_code`: indicating acceptance,
     parameter rejection, proof invalidity, etc.
   - `status_desc`: human-readable description
@@ -359,7 +362,7 @@ A `ServiceResponse` MUST include:
 - `response_data`: service-specific payload
   (included if and only if the request is served)
 
-Status codes specific to this spec:
+Status codes specific to this specification:
 
 - `OK`: request served
 - `PARAMS_REJECTED`: stream parameters unacceptable;
@@ -572,7 +575,7 @@ all protocol operations MAY be performed within shielded execution.
 
 ## Security and Privacy Considerations
 
-Our initial privacy goal is unlinkability
+An initial privacy goal is unlinkability
 between off-chain requests and on-chain funding.
 Vault deposits MUST NOT reveal the depositor's identity.
 Stream creation SHOULD NOT reveal which vault funded the stream.
@@ -601,7 +604,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 #### Related Work
 
 - [Off-Chain Payment Protocols: Classification and Architectural Choice](https://forum.vac.dev/t/off-chain-payment-protocols-classification-and-architectural-choice/596)
-- [LSSA](https://github.com/logos-blockchain/lssa) (now called LEZ)
+- [Logos Execution Zone](https://github.com/logos-blockchain/logos-execution-zone)
 
 #### Payment Streaming Protocols
 

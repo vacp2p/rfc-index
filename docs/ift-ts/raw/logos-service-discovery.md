@@ -1,8 +1,8 @@
-# LOGOS-CAPABILITY-DISCOVERY
+# LOGOS-SERVICE-DISCOVERY
 
 | Field | Value |
 | --- | --- |
-| Name | Logos Capability Discovery Protocol |
+| Name | Logos Service Discovery Protocol |
 | Slug | 107 |
 | Status | raw |
 | Category | Standards Track |
@@ -27,7 +27,7 @@
 
 ## Abstract
 
-This RFC defines the Logos Capability Discovery protocol,
+This RFC defines the Logos Service Discovery protocol,
 a discovery mechanism inspired by [DISC-NG service discovery](https://ieeexplore.ieee.org/document/10629017)
 built on top of [Kad-dht](https://github.com/libp2p/specs/tree/7740c076350b6636b868a9e4a411280eea34d335/kad-dht).
 
@@ -73,7 +73,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ## Protocol Roles
 
-The Logos capability discovery protocol defines three roles that nodes can perform:
+The Logos service discovery protocol defines three roles that nodes can perform:
 
 ### Advertiser
 
@@ -279,7 +279,7 @@ Implementations SHOULD modify them as needed based on specific requirements.
 
 ### Distance
 
-The distance `d` between any two keys in Logos Capability Discovery
+The distance `d` between any two keys in Logos Service Discovery
 MUST be calculated using the bitwise XOR applied to their 256-bit SHA-256 representations.
 This provides a deterministic, uniform, and symmetric way to measure proximity in the keyspace.
 The keyspace is the entire numerical range of possible `peerID` and `service_id_hash`
@@ -476,7 +476,7 @@ message Message {
 - Advertisements are encoded as generic `bytes` (RECOMMENDED: ExtensiblePeerRecord/XPR)
 to avoid coupling the protocol to specific formats
 - The existing `key` field is reused for `service_id_hash` in Logos operations
-- Nodes without Logos Capability Discovery support will ignore `REGISTER` and `GET_ADS` messages
+- Nodes without Logos Service Discovery support will ignore `REGISTER` and `GET_ADS` messages
 
 ### Advertisement Encoding
 
