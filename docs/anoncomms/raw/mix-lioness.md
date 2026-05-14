@@ -56,6 +56,7 @@ This section defines the primitives used by this specification. In this specific
 ### 3.1 Stream Cipher
 
 The stream cipher $\mathsf{S}$ used in LIONESS. We denote this as:
+
 $$
 \mathsf{S}(k) \to \mathsf{ks}
 $$
@@ -80,6 +81,7 @@ where $m$ is the plaintext and $c$ is the ciphertext.
 
 In this specification, the keyed hash function used in LIONESS will be denoted as $\mathsf{H}_k$, 
 That is:
+
 $$
 \mathsf{H}_k(m) \to h
 $$
@@ -93,9 +95,10 @@ where:
 The key derivation function $\mathsf{KDF}$ is used to derive the internal LIONESS round keys from:
 - $\mathsf{dom}$: a 16 bytes domain-separation string
 - $\mathsf{seed}$: a 32-byte seed 
-- $\mathsf{len}$: a required output length  in bytes
+- $\mathsf{len}$: a required output length in bytes
 
 the KDF outputs key material $u$ such that $|u| = \mathsf{len}$:
+
 $$
 \mathsf{KDF}(\mathsf{dom}, \mathsf{seed}, \mathsf{len}) \to u
 $$
@@ -113,6 +116,7 @@ $$
 \mathsf{Lioness.Dec}(k,y) \to x 
 \end{array}
 $$
+
 where:
 - $k$ is the seed/master key from which the internal round keys are derived, with size $|k| = 32$ bytes
 - $x$ is the plaintext message with size $|x| \ge 2 |k|$ bytes.
@@ -120,9 +124,11 @@ where:
 
 ### 4.2 Block Structure
 LIONESS is a wide-block cipher, meaning that it can take a large plaintext message and process it as a single large block by applying a small Feistel network over it. Instead of splitting the plaintexts into small blocks and processing these, LIONESS splits the input message block $b$ into two chunks: 
+
 $$
 B = L \parallel R 
 $$
+
 where:
 - $B$ is the plaintext message block of any size $|B| \ge 2 |k|$
 - $L$ is the left chunk with size $|L| = |k|$ bytes
@@ -298,18 +304,25 @@ The size of the payload $|\delta|$ is specified in the Mix protocol, and if the 
 #### Forward Payload
 Once the plaintext is formatted as specified above, it needs to be encrypted in layers such that each hop in the mix path removes exactly one layer using the per-hop session key. This ensures that only the final hop (i.e., the exit node) can fully recover the plaintext message $m$, validate its integrity, and forward it to the destination. To compute the encrypted payload, perform the following steps for each hop $i = L-1$ down to $0$, recursively:
 
-- Derive the payload key $\delta_{\mathrm{key}_i} = \mathsf{KDF}(\texttt{"delta_key"}, s_i, 32)$ where $s_i$ is the per-hop shared secret for hop `i` as defined in the Mix protocol specification.
+- Derive the payload key $\delta_{\mathrm{key}_i} = \mathsf{KDF}(\texttt{"delta-key"}, s_i, 32)$ where $s_i$ is the per-hop shared secret for hop `i` as defined in the Mix protocol specification.
 - Using $\delta_{\mathrm{key}_i}$, compute the encrypted payload $\delta_i$:
-     - If $i = L-1$ (_i.e.,_ exit node):
-       $$
-       \delta_i = \mathsf{Lioness.Enc}\bigl(\delta_{\mathrm{key}_i}, B
-       \bigr)
-       $$
-     - Otherwise (_i.e.,_ intermediary node):
-       $$
-       \delta_i = \mathsf{Lioness.Enc}\bigl(\delta_{\mathrm{key}_i},
-       δ_{i+1} \bigr)
-       $$
+  - If $i = L-1$ (_i.e.,_ exit node):
+       
+    $`
+    \begin{array}{l}
+    \delta_i = \mathsf{Lioness.Enc}\bigl(\delta_{\mathrm{key}_i}, B
+    \bigr)
+    \end{array}
+    `$
+
+  - Otherwise (_i.e.,_ intermediary node):
+
+    $`
+    \begin{array}{l}
+    \delta_i = \mathsf{Lioness.Enc}\bigl(\delta_{\mathrm{key}_i},
+    \delta_{i+1} \bigr)
+    \end{array}
+    `$
 
 The resulting $\delta$ is placed into the final Sphinx packet.
 
@@ -317,18 +330,29 @@ The resulting $\delta$ is placed into the final Sphinx packet.
 For a SURB reply, the reply sender does not know the return-path shared secrets $s_0, \ldots, s_{L-1}$.
 Therefore, the reply sender MUST perform the following steps:
 - constructs the payload plaintext:
-    $$
-    B = 0_\kappa \parallel m
-    $$
+
+  $`
+  \begin{array}{l}
+  B = 0_\kappa \parallel m
+  \end{array}
+  `$
+
 - Then it derives the reply payload encryption key:
-    $$
-    \delta_{key_{\tilde{k}}}
-    = \mathsf{KDF}(\texttt{"delta_key"}, \tilde{k}, 32)
-    $$
+
+  $`
+  \begin{array}{l}
+  \delta_{key_{\tilde{k}}}
+  = \mathsf{KDF}(\texttt{"delta-key"}, \tilde{k}, 32)
+  \end{array}
+  `$
+
 - and computes:
-    $$
-    \delta = \mathsf{Lioness.Enc}(\delta_{key_{\tilde{k}}}, B)
-    $$
+
+  $`
+  \begin{array}{l}
+  \delta = \mathsf{Lioness.Enc}(\delta_{key_{\tilde{k}}}, B)
+  \end{array}
+  `$
 
 The resulting $\delta$ is placed into the SURB reply packet.
 Each hop on return-path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key.
@@ -342,14 +366,22 @@ Once the Sphinx packet is deserialized into ($\alpha,\ \beta,\ \gamma,\ \delta$)
 
 If the node is an intermediary, it MUST:
 - Derive the payload encryption key:
-$$
-\delta_{\mathrm{key_i}} = \mathsf{KDF}(\texttt{"delta_key"}, s, 32)
-$$
+
+  $`
+  \begin{array}{l}
+  \delta_{\mathrm{key_i}} = \mathsf{KDF}(\texttt{"delta-key"}, s, 32)
+  \end{array}
+  `$
+
 - Decrypt one layer of the payload using the payload encryption key $\delta_{\mathrm{key}}$: 
-    $$
-    \delta' = \mathsf{Lioness.Dec}\bigl(\delta_{\mathrm{key}}, \delta
-       \bigr)
-    $$
+
+  $`
+  \begin{array}{l}
+  \delta' = \mathsf{Lioness.Dec}\bigl(\delta_{\mathrm{key}}, \delta
+     \bigr)
+  \end{array}
+  `$
+
 - use $\delta'$ as the outgoing payload,
 - forward the updated packet as defined by the Mix Protocol.
 
@@ -357,14 +389,22 @@ $$
 
 If the node is the exit, and the packet is not a reply (using SURBs), it MUST:
 1. Derive the payload encryption key:
-$$
-\delta_{\mathrm{key_i}} = \mathsf{KDF}(\texttt{"delta_key"}, s, 32)
-$$
-2 Decrypt one layer of the payload using the payload encryption key $\delta_{\mathrm{key}}$: 
-    $$
+
+    $`
+    \begin{array}{l}
+    \delta_{\mathrm{key_i}} = \mathsf{KDF}(\texttt{"delta-key"}, s, 32)
+    \end{array}
+    `$
+
+2. Decrypt one layer of the payload using the payload encryption key $\delta_{\mathrm{key}}$: 
+
+    $`
+    \begin{array}{l}
     \delta' = \mathsf{Lioness.Dec}\bigl(\delta_{\mathrm{key}}, \delta
        \bigr)
-    $$
+    \end{array}
+    `$
+
 3. parse the decrypted payload $\delta'$ as $B = z \parallel m$, where $|z| = \kappa$ bytes.
 4. verify that the first $\kappa$ bytes of $B$ are all zeros.
 5. discard the packet if this integrity check fails.
@@ -372,25 +412,41 @@ $$
 
 **Exit Processing - Reply packet**
 If the node is the exit, and the packet is a reply, it MUST:
-1. reverse the return-path transformations, i.e., since the hops apply LIONESS decryption, the exit must apply LIONESS encryption:
-    For each hop `$i = L-1$` down to `$0$`:
-    - Derive the payload encryption key:
-    $$
+1. reverse the return-path transformations, i.e., since the hops apply LIONESS decryption, the exit must apply LIONESS encryption. For each hop $i = L-1$ down to $0$:
+  - Derive the payload encryption key:
+
+    $`
+    \begin{array}{l}
     \delta_{\mathrm{key}_i}
-    =\mathsf{KDF}(\texttt{"delta_key"}, s_i, 32)
-    $$
-    - and compute:
-    $$
+    =\mathsf{KDF}(\texttt{"delta-key"}, s_i, 32)
+    \end{array}
+    `$
+
+  - and compute:
+
+    $`
+    \begin{array}{l}
     \delta' \leftarrow \mathsf{Lioness.Enc}(\delta_{\mathrm{key}_i}, \delta)
-    $$
-2. After all return-path transformations are reversed, derive the reply payload encryption key from the reply key $\tilde{k}$:
-    $$
-    \delta_{Key_{\tilde{k}}} = \mathsf{KDF}(\texttt{"delta_key"}, \tilde{k}, 32)
-    $$
-    and decrypt the final layer (reversing the effect of the initial encryption):
-    $$
+    \end{array}
+    `$
+
+2. After all return-path transformations are reversed: 
+  - derive the reply payload encryption key from the reply key $\tilde{k}$:
+
+    $`
+    \begin{array}{l}
+    \delta_{Key_{\tilde{k}}} = \mathsf{KDF}(\texttt{"delta-key"}, \tilde{k}, 32)
+    \end{array}
+    `$
+
+  - decrypt the final layer (reversing the effect of the initial encryption):
+
+    $`
+    \begin{array}{l}
     B = \mathsf{Lioness.Dec}(\delta_{Key_{\tilde{k}}}, δ)
-    $$
+    \end{array}
+    `$
+
 3. parse the decrypted payload $B = z \parallel m$, where $|z| = \kappa$ bytes.
 4. verify that the first $\kappa$ bytes of $B$ are all zeros.
 5. discard the packet if this integrity check fails.
@@ -404,6 +460,7 @@ If the node is the exit, and the packet is a reply, it MUST:
 This specification requires the LIONESS input block to be at least 64 bytes. 
 
 LIONESS splits the input block into two parts 
+
 $$
 B = L \parallel R
 $$
