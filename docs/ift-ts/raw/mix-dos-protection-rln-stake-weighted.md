@@ -68,8 +68,8 @@ and [RLN-v2](https://github.com/vacp2p/rfc-index/blob/dabc31786b4a4ca704ebcd1105
   and a rate increment of `T`.
 
 - **`R_min`**: The minimum rate limit a node may be registered with.
-  `R_min` MUST be a multiple of `T`,
-  and `T ≤ R_min ≤ R_base`.
+  `R_min` is the smallest multiple of `T` greater than or equal to `R_base`.
+  `R_min = ⌈R_base / T⌉ × T`.
 
 - **`R_max`**: The maximum rate limit any node may be assigned, regardless of stake,
   expressed as `f × R_base` where `f ≥ 1` is a deployment-defined multiplier.
@@ -215,7 +215,7 @@ All per-hop verification and slashing logic are as defined in [RLN Per-Hop DoS P
 | --- | --- |
 | `S_unit` | Stake required per message per epoch. Deployment-defined. |
 | `T` | Stake tier size, `T ≥ 1`. Granularity at which stakes cluster. |
-| `R_min` | Minimum rate, `T ≤ R_min ≤ R_base`. MUST be a multiple of `T`. Nodes with stake `S < R_min × S_unit` MUST be rejected. |
+| `R_min` | Minimum rate, `R_min = ⌈R_base / T⌉ × T`. Nodes with stake `S < R_min × S_unit` MUST be rejected. |
 | `R_max` | `f × R_base`. Maximum rate regardless of stake. MUST be a multiple of `T`. |
 | `f` | Deployment multiplier `f ≥ 1`. Controls the maximum rate relative to the base rate. |
 
@@ -326,17 +326,27 @@ The following are explicitly out of scope for this specification:
   A mechanism for incrementally increasing stake without full deregistration would improve operational ergonomics.
 
 - **Rate-weighted path selection**:
-  The [Mix Protocol](./mix.md) currently specifies uniform random path selection.
+  The [Mix Protocol](./mix.md) currently specifies uniform random path selection,
+  which distributes forwarding load equally regardless of node capacity.
   Under stake-weighted rate limits,
-  this distributes forwarding load equally regardless of node capacity,
-  causing low-rate nodes to hit their limits and drop forwarding traffic.
-  Adapting the [Mix Protocol](./mix.md) to weight path selection proportional to registered rates &mdash; similar to Tor &mdash; would address this.
+  weighted path selection proportional to registered rates &mdash; similar to Tor &mdash; is an alternative,
+  with an open trade-off between the two.
+  Path-selection rules only constrain honest senders,
+  so attackers can target low-stake nodes under either strategy.
+  Weighted selection biases honest paths toward high-rate nodes,
+  reducing honest-path impact when low-stake nodes are flooded.
+  However, well-funded adversaries can stake more to gain disproportionate path inclusion,
+  enabling traffic surveillance.
+  Uniform random selection avoids this surveillance vector,
+  but every honest path that includes at least one low-stake node is affected by such flooding attacks.
 
-- **Cover traffic under non-uniform rates**:
+- **Cover traffic under stake-weighted rates**:
   The [Mix Cover Traffic](./mix-cover-traffic.md) specification derives per-node cover emission bounds assuming uniform rate limits.
   Under stake-weighted rates,
-  the forwarding load depends on the network's stake distribution,
-  and the cover budget derivation does not directly apply.
+  every node's `user_message_limit` satisfies `user_message_limit ≥ R_min ≥ R_base` by construction,
+  so `R_base` can serve as a common budget parameter across all nodes.
+  Whether stake-weighted capacity in the range `(R_base, R_max]` can be used for emission without breaking uniformity remains open.
+  Resolving this requires either accepting unused capacity above `R_base` or accommodating per-node budgets up to `R_max` without breaking emission uniformity.
 
 ## Copyright
 
