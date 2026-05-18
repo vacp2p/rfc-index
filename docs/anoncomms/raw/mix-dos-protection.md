@@ -268,7 +268,7 @@ All DoS protection mechanisms MUST implement the following procedures.
 
 #### 8.2.1 Proof Generation
 
-`GenerateProof(binding_data) -> encoded_proof_data`
+`GenerateProof(binding_data, hop_pubkey) -> encoded_proof_data`
 
 Generate a DoS protection proof bound to specific packet data.
 
@@ -277,6 +277,10 @@ Generate a DoS protection proof bound to specific packet data.
 - `binding_data`: The packet-specific data to which the proof MAY be cryptographically bound.
   For sender-generated proofs, this is $δ_{i+1}$ (the decrypted payload that hop $i$ will see).
   For per-hop generated proofs, this is the complete outgoing Sphinx packet state $(α', β', γ', δ')$.
+- `hop_pubkey`: The X25519 public key of the hop that will verify the proof.
+  For sender-generated proofs, this is each hop $i$'s public key $y_i$ (obtained during path selection).
+  For per-hop generated proofs, this is the public key of the next hop in the path.
+  This key is used to encrypt proof contents, preventing on-wire exposure of fields that would enable cross-hop correlation (see [Section 3](#3-requirements)).
 
 **Returns**:
 
@@ -340,7 +344,7 @@ The Mix Protocol invokes [DoS protection procedures](#82-interface-procedures) a
 After computing encrypted payloads $δ_i$ for each hop (step 3.d), the initiating node MUST:
 
 1. For each hop $i$ in the path (from $i = 0$ to $L-1$):
-   - Call `GenerateProof(binding_data = δ_{i+1})` to generate `encoded_proof_data` for hop $i$
+   - Call `GenerateProof(binding_data = δ_{i+1}, hop_pubkey = y_i)` to generate `encoded_proof_data` for hop $i$
    - Embed the `encoded_proof_data` in hop $i$'s routing block within $β_i$ during header construction (step 3.c)
 
 **[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
@@ -358,7 +362,7 @@ After decrypting the routing block $β$ and payload $δ'$ (Steps 4-5), the node 
 
 After assembling the final Sphinx packet (step 3.e), the initiating node MUST:
 
-1. Call `GenerateProof(binding_data)` where `binding_data` is the complete Sphinx packet bytes
+1. Call `GenerateProof(binding_data, hop_pubkey)` where `binding_data` is the complete Sphinx packet bytes and `hop_pubkey` is the first hop's X25519 public key
 2. Append `encoded_proof_data` after the Sphinx packet and send to the first hop
 
 **[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
@@ -372,7 +376,7 @@ Before any Sphinx decryption operations, nodes MUST:
 
 **Role-specific processing:**
 - [Intermediary processing](mix.md#863-intermediary-processing)
-  1. Perform standard Sphinx processing, then call `GenerateProof(binding_data)` with the transformed packet as `binding_data`
+  1. Perform standard Sphinx processing, then call `GenerateProof(binding_data, hop_pubkey)` with the transformed packet as `binding_data` and the next hop's X25519 public key as `hop_pubkey`
   2. Append the new `encoded_proof_data` to the transformed Sphinx packet and forward
 - [Exit processing](mix.md#864-exit-processing)
   Perform standard Sphinx processing without generating a new proof.
