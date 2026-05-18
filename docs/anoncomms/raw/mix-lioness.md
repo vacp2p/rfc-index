@@ -11,23 +11,24 @@ Contributors | Balázs Kőműves <balazs@status.im>
 
 ## Abstract
 
-This specification defines the LIONESS wide-block encryption scheme for the Sphinx payload encryption. The purpose of this is to perform layered-encryption and preserve payload integrity in the Sphinx construction used by libp2p mix while keeping the payload fixed-size. The routing header integrity mechanism defined in the Mix Protocol remains unchanged. Only the payload field $\delta$ is affected by this specification.
+This specification defines the LIONESS wide-block encryption scheme for the Sphinx payload encryption. The purpose of this is to perform layered-encryption and preserve payload integrity in the Sphinx construction used by the [Mix Protocol](./mix.md) while keeping the payload fixed-size. The routing header integrity mechanism defined in the [Mix Protocol](./mix.md) remains unchanged. Only the payload field $\delta$ is affected by this specification.
 
+### Scope
 This specification defines:
 - the LIONESS construction to use for payload encryption and decryption,
-- the KDF used to derive LIONESS round keys from the per-hop shared secret,
-- the required payload format and construction.
+- the concrete primitives used to instantiate LIONESS for the [Mix Protocol](./mix.md).
+- the required Sphinx payload format and construction.
 - the hop payload processing and integrity verification.
 
 ## 1. Introduction
 
-The libp2p Mix Protocol uses a Sphinx packet format with four fields ($\alpha,\ \beta,\ \gamma,\ \delta$). The header fields ($\alpha,\ \beta,\ \gamma$) provide per-hop layered-encrypted routing information which includes header integrity. The payload field $\delta$ carries only the application message in layered-encrypted form.
+The [Mix Protocol](./mix.md) uses a Sphinx packet format with four fields ($\alpha,\ \beta,\ \gamma,\ \delta$). The header fields ($\alpha,\ \beta,\ \gamma$) provide per-hop layered-encrypted routing information which includes header integrity. The payload field $\delta$ carries only the application message in layered-encrypted form.
 
 In the current Mix Protocol, AES-CTR is used to encrypt the routing header $\beta$. This is sufficient for $\beta$ because header integrity is separately protected by the per-hop MAC field $\gamma$. However, the integrity of $\delta$ is not covered by $\gamma$, since the Sphinx design intentionally separates header integrity from payload integrity.
 
-This separation is necessary SURB replies require the sender of the SURB to construct the return header before the reply payload is known. As a result, payload integrity MUST be provided independently of header integrity.
+This separation is necessary because SURB replies require the sender of the SURB to construct the return header before the reply payload is known. As a result, payload integrity MUST be provided independently of header integrity.
 
-A malleable encryption scheme such as AES-CTR does not satisfy this requirement. Bit modifications to the ciphertext result in modifications to the decrypted plaintext. This violates the integrity of the Sphinx payload. Therefore, the payload-encryption scheme for libp2p mix MUST satisfy the following:
+A malleable encryption scheme such as AES-CTR does not satisfy this requirement. Bit modifications to the ciphertext result in modifications to the decrypted plaintext. This violates the integrity of the Sphinx payload. Therefore, the payload-encryption scheme MUST satisfy the following:
 1. It MUST preserve the fixed payload size $|\delta|$.
 2. It MUST support layered encryption and per-hop layer removal.
 3. It MUST be compatible with SURBs and therefore MUST NOT require payload-dependent header authentication.
@@ -37,54 +38,66 @@ A malleable encryption scheme such as AES-CTR does not satisfy this requirement.
 To achieve this, this specification uses LIONESS as described in [anderson et al](https://www.cl.cam.ac.uk/archive/rja14/Papers/bear-lion.pdf). LIONESS is a wide-block cipher built from a stream cipher and a keyed hash function. LIONESS acts as a pseudo-random permutation (PRP) over the entire payload block, allowing us to add an integrity prefix (e.g. leading zeros) into the plaintext and verify it after decryption.
 
 ## 2. Terminology
-The following terms are used throughout this specification:
+The following terms are used throughout this specification. Other terms are as defined in the [Mix Protocol](./mix.md).
 
-- **Mix Protocol**: The libp2p-mix protocol defined in [the Mix specification](./mix.md).
-- **Sphinx packet**: The packet format used by the Mix Protocol, consisting of ($\alpha,\ \beta,\ \gamma,\ \delta$).
-- **Payload**: The fixed-size encrypted field $\delta$ in a Sphinx packet.
-- **Payload integrity prefix**: A fixed all-zero prefix added to the plaintext payload before layered encryption and checked after final decryption.
-- **Wide-block cipher**: A block cipher with a large block size compared to conventional fixed-size block ciphers such as AES. LIONESS is a wide-block cipher that supports variable-length input blocks above a lower bound.
-- **Payload encryption key ($\mathbf{\delta_{key}}$)**: A key derived from the per-hop shared secret. It is used to derive the four LIONESS internal round keys.
-- **Round keys**: The four keys $(K_1, K_2, K_3, K_4)$ used by the LIONESS Feistel network.
+- **Sphinx packet**: 
+  The packet format as defined in the [Mix Protocol](./mix.md), consisting of ($\alpha,\ \beta,\ \gamma,\ \delta$).
+- **Sphinx payload ($\mathbf{\delta}$)**
+  The fixed-size encrypted field $\delta$ of a Sphinx packet.
+  It carries the padded application message and any payload extensions such as SURBs.
+- **Payload integrity prefix**
+  A fixed all-zero byte string prepended to the plaintext payload before applying the payload encryption. The final hop verifies this prefix after payload decryption to detect payload tampering.
+- **Payload encryption key ($\mathbf{\delta_{key}}$)**
+  A per-hop key used to encrypt or decrypt one layer of the Sphinx payload field $δ$. 
+  For LIONESS payload encryption, this key is used as the seed for deriving the internal LIONESS round keys.
+- **Round keys**: 
+  The four keys $(K_1, K_2, K_3, K_4)$ used by the LIONESS Feistel network.
+- **Wide-block cipher**: 
+  A block cipher with a large block size compared to conventional fixed-size block ciphers such as AES. LIONESS is a wide-block cipher that supports variable-length input blocks above a lower bound.
+- **Pseudo-random permutation (PRP)**: 
+  A keyed permutation over a fixed-size message block that is computationally indistinguishable from a uniformly random permutation. Changing even one bit of the input is expected to produce unpredictable changes to a large number of output bits.
 
 ## 3. Cryptographic Primitives
 
 This section defines the primitives used by this specification. In this specification, we will assume the following constants:
-- The security parameter $\kappa = 16$ bytes ($128$-bits)
-- The key size $k = 32$ bytes.
+- The security parameter $\kappa = 16$ bytes ($128$-bits) as defined in the [Mix Protocol](./mix.md).
+- The key size $|k| = 32$ bytes.
 
 ### 3.1 Stream Cipher
 
-The stream cipher $\mathsf{S}$ used in LIONESS. We denote this as:
+The stream cipher $\mathsf{S}$ used in LIONESS can be abstracted as the following keyed function that produces an arbitrary-length keystream:
 
-$$
+$`
+\begin{array}{l}
 \mathsf{S}(k) \to \mathsf{ks}
-$$
+\end{array}
+`$
 
 where:
-- $k$ is a 32 byte key
+- $k$ is a 32-byte key
 - $\mathsf{ks}$ is the output arbitrary-length keystream.
 
 Encryption and decryption can then be done by first generating a key stream $\mathsf{ks}$ and then XORing the key stream with the message/ciphertext. Encryption and decryption work in the same way: 
 
-$$
+$`
 \begin{aligned}
 c &= m \oplus \mathsf{ks} \\
 m &= c \oplus \mathsf{ks}
 \end{aligned}
-$$
+`$
 
 where $m$ is the plaintext and $c$ is the ciphertext.
 - $m$ is the arbitrary-length message
 - $c$ is the arbitrary-length ciphertext of the same size as $m$, i.e., $|m| = |c|$
 ### 3.2 Keyed Hash Function
 
-In this specification, the keyed hash function used in LIONESS will be denoted as $\mathsf{H}_k$, 
-That is:
+In this specification, the keyed hash function used in LIONESS is denoted as:
 
-$$
+$`
+\begin{array}{l}
 \mathsf{H}_k(m) \to h
-$$
+\end{array}
+`$
 
 where:
 - $k$ is a 32-byte key
@@ -92,54 +105,124 @@ where:
 - $h$ is the 32-byte digest output
 
 ### 3.3 Key Derivation Function (KDF)
-The key derivation function $\mathsf{KDF}$ is used to derive the internal LIONESS round keys from:
-- $\mathsf{dom}$: a 16 bytes domain-separation string
-- $\mathsf{seed}$: a 32-byte seed 
-- $\mathsf{len}$: a required output length in bytes
+The key derivation function $\mathsf{KDF}$ is used to derive fixed-size keys from a domain-separation string and a seed:
 
-the KDF outputs key material $u$ such that $|u| = \mathsf{len}$:
-
-$$
-\mathsf{KDF}(\mathsf{dom}, \mathsf{seed}, \mathsf{len}) \to u
-$$
-
-LIONESS requires the output key material from the KDF to be of size $|u| = 4\times k$ bytes. In this specification, we have $k = 32$ bytes, resulting in $|u| = 128$ bytes.
-
-## 4. LIONESS Construction
-
-### 4.1 High-level API
-In general the LIONESS wide-block cipher provides the following:
-
-$$
+$`
 \begin{array}{l}
-\mathsf{Lioness.Enc}(k,x) \to y \\
-\mathsf{Lioness.Dec}(k,y) \to x 
+\mathsf{KDF}(\mathsf{dom}, \mathsf{seed}) \to u
 \end{array}
-$$
+`$
+
+where
+
+- $\mathsf{dom}$: is an arbitrary-length domain-separation string.
+- $\mathsf{seed}$: is a 32-byte seed. 
+- $u$ is a 32-byte output key.
+
+## 4. Concrete Primitive Instantiation
+
+This section defines the concrete primitive choices used by this specification.
+
+### 4.1 Stream Cipher Instantiation
+
+The LIONESS stream cipher $\mathsf{S}$ is instantiated using AES-CTR.
+
+Each LIONESS stream-cipher round key $k$ is $32$ bytes. For AES-CTR, this 32-byte value is split as follows:
+
+$`
+\begin{array}{l}
+k = k_{\mathsf{aes}} \parallel IV
+\end{array}
+`$
 
 where:
-- $k$ is the seed/master key from which the internal round keys are derived, with size $|k| = 32$ bytes
+
+- $k_{\mathsf{aes}}$ is the first 16 bytes of $k$.
+- $IV$ is the last 16 bytes of $k$.
+
+### 4.2 Keyed Hash Instantiation
+
+The LIONESS keyed hash function $\mathsf{H}_k$ is instantiated as SHA-256 with the key prepended to the input message:
+
+$`
+\begin{array}{l}
+\mathsf{H}_k(m) = \mathsf{SHA256}(k \parallel m)
+\end{array}
+`$
+
+where:
+
+- $k$ is a 32-byte key.
+- $m$ is the input message.
+- the output is a 32-byte digest.
+
+This construction is used only as the keyed hash function inside the LIONESS Feistel construction. It is not (and must not be used as) a general-purpose MAC.
+
+### 4.3 KDF Instantiation
+
+The KDF is instantiated using SHA-256 with domain-separation:
+
+$`
+\begin{array}{l}
+\mathsf{KDF}(\mathsf{dom}, \mathsf{seed}) =
+\mathsf{SHA256}(\mathsf{dom} \parallel \mathsf{seed})
+\end{array}
+`$
+
+where:
+
+- $\mathsf{dom}$ is a domain-separation string.
+- $\mathsf{seed}$ is a 32-byte seed.
+- the output is a 32-byte key.
+
+The following domain-separation strings are used by this specification:
+
+| Purpose | Domain-separator |
+|---|---|
+| Payload encryption key $\delta_{\mathrm{key}}$ | `payload_enc_key` |
+| LIONESS round key $K_1$ | `lioness_key1` |
+| LIONESS round key $K_2$ | `lioness_key2` |
+| LIONESS round key $K_3$ | `lioness_key3` |
+| LIONESS round key $K_4$ | `lioness_key4` |
+
+## 5. LIONESS Construction
+
+### 5.1 High-level API
+In general, the LIONESS wide-block cipher provides the following:
+
+$`
+\begin{array}{l}
+\mathsf{LIONESS.Enc}(k,x) \to y \\
+\mathsf{LIONESS.Dec}(k,y) \to x 
+\end{array}
+`$
+
+where:
+- $k$ is the seed (master key) from which the internal round keys are derived, with size $|k| = 32$ bytes
 - $x$ is the plaintext message with size $|x| \ge 2 |k|$ bytes.
 - $y$ is the corresponding ciphertext with size $|y| = |x|$
 
-### 4.2 Block Structure
-LIONESS is a wide-block cipher, meaning that it can take a large plaintext message and process it as a single large block by applying a small Feistel network over it. Instead of splitting the plaintexts into small blocks and processing these, LIONESS splits the input message block $b$ into two chunks: 
+### 5.2 Block Structure
+LIONESS is a wide-block cipher, meaning that its block size is large compared to conventional fixed-size block ciphers such as AES. In this specification, LIONESS is applied once to the entire Sphinx payload $\delta$. The whole payload is treated as a single message block, and LIONESS acts as a PRP over that full payload block.
+For both LIONESS encryption and decryption, the input block $B$ is split into two chunks:
 
-$$
+$`
+\begin{array}{l}
 B = L \parallel R 
-$$
+\end{array}
+`$
 
 where:
 - $B$ is the plaintext message block of any size $|B| \ge 2 |k|$
 - $L$ is the left chunk with size $|L| = |k|$ bytes
-- $R$ is the right chunk with size $|R| = |m| - |k|$ bytes. 
+- $R$ is the right chunk with size $|R| = |B| - |k|$ bytes. 
 
-LIONESS scheme requires the size of the message to be at least $|k| + \kappa$, i.e., $|B| \ge |k| + \kappa$ where $\kappa$ is the security parameter.  For simplicity, in this specification, we require the payload size to be strictly greater than 64 bytes (i.e., $\ge 2 |k|$). The Mix protocol payload size satisfies this requirement since the expected payload is much larger than 64 bytes.
+In this specification, we require the size of the message to be at least $2 |k|$, i.e., $|B| \ge 2 |k|$. This requirement ensures that $|L| = |k|$ and $|R| \ge |k|$. The Mix protocol payload size satisfies this requirement since the expected payload is much larger than $2 |k|$.
 
 In summary, we set $|k| = 32$ bytes. Therefore:
 - $|B| \ge 64$ bytes
 - $|L| = |k| = 32$ bytes,
-- $|R|$ is the remaining $|B| - |L|$ bytes.
+- $|R| = |B| - |L|$ bytes.
 
 The choice $|k| = 32$ bytes must match:
 - the stream cipher ($\mathsf{S}$) key size, and
@@ -154,43 +237,48 @@ As a result, we can observe that for large messages, the right chunk is expected
 +----------------+----------------------------------+
 ```
 
-### 4.3 Key Derivation
-LIONESS requires 4 internal round keys, one for each round: $(K_1, K_2, K_3, K_4)$:
+### 5.3 Key Derivation
+LIONESS requires four internal round keys, one for each round: $(K_1, K_2, K_3, K_4)$:
 
 - $K_1$ and $K_3$ are the keys used for the stream cipher.
 - $K_2$ and $K_4$ are the keys used for the keyed hash function.
 
-All internal round keys are $|k| = 32$ bytes in size. Therefore, the required output key material from the $\mathsf{KDF}$ is 128 bytes. 
+All internal round keys are $|k| = 32$ bytes in size. Therefore, we require four calls to the $\mathsf{KDF}$, each with a different domain-separation string:
 
-We expect the seed/master key ($\delta_{key}$) to be of size 32 bytes. This $\delta_{key}$ is derived from the shared key $s_i$ as defined in the [mix specification](./mix.md). Therefore, we use this $\delta_{key}$ to derive all the LIONESS round keys to encrypt the payload. For this we use the KDF as defined in section 3.3:
+$`
+\begin{aligned}
+K_1 &= \mathsf{KDF}(\texttt{"lioness\_key1"}, \delta_{\mathrm{key}}) \\
+K_2 &= \mathsf{KDF}(\texttt{"lioness\_key2"}, \delta_{\mathrm{key}}) \\
+K_3 &= \mathsf{KDF}(\texttt{"lioness\_key3"}, \delta_{\mathrm{key}}) \\
+K_4 &= \mathsf{KDF}(\texttt{"lioness\_key4"}, \delta_{\mathrm{key}})
+\end{aligned}
+`$
 
-$$
-(K_1 \parallel K_2 \parallel K_3 \parallel K_4) = \mathsf{KDF}(\texttt{"lioness-payload-key"}, \delta_{key}, 128)
-$$
+The seed $\delta_{\mathrm{key}}$ is expected to be 32 bytes. It is derived from shared key material between the sender and each hop. The derivation of $\delta_{\mathrm{key}}$ depends on whether the packet is a forward packet or a reply packet. Further details are specified in [Section 6](#6-payload-construction) and [section 7](#7-sphinx-payload-processing).
 
-### 4.4 Encryption
+### 5.4 Encryption
 
 Let:
 - plaintext message $B = L_0 \parallel R_0$
 - round keys $(K_1, K_2, K_3, K_4)$ 
-- $S$ is the stream cipher as defined in section 3.1
-- $H$ is the keyed hash function as defined in section 3.2 
+- $\mathsf{S}$ is the stream cipher as defined in [section 3.1](#31-stream-cipher)
+- $\mathsf{H}_k$ is the keyed hash function as defined in [section 3.2](#32-keyed-hash-function)
 
 LIONESS encryption proceeds with applying a small Feistel network of four rounds:
 
-$$
+$`
 \begin{aligned}
 B &= L_0 \parallel R_0 \\
-R_1 &= R_0 \oplus S(K_1 \oplus L_0, |R_0|) \\
+R_1 &= R_0 \oplus S(K_1 \oplus L_0) \\
 L_1 &= L_0 \oplus H_{K_2}(R_1) \\
-R_2 &= R_1 \oplus S(K_3 \oplus L_1, |R_1|) \\
+R_2 &= R_1 \oplus S(K_3 \oplus L_1) \\
 L_2 &= L_1 \oplus H_{K_4}(R_2) \\
 C   &= L_2 \parallel R_2
 \end{aligned}
-$$
+`$
 
 ```                                                   
-round 1:  R1 = R0 ^ S(L0 ^ K1, |R_0|)                        
+round 1:  R1 = R0 ^ S(L0 ^ K1)                        
                                                       
 +-----------+                           +-----------+ 
 |    L0     |                           |    R0     | 
@@ -226,7 +314,7 @@ round 2:  L1 = L0 ^ H_K2(R1)
 +-----------+                           +-----------+ 
                                                       
                                                       
-round 3:  R2 = R1 ^ S(L1 ^ K3, |R_1|)                        
+round 3:  R2 = R1 ^ S(L1 ^ K3)                        
                                                       
 +-----------+                           +-----------+ 
 |    L1     |                           |    R1     | 
@@ -262,34 +350,36 @@ round 4:  L2 = L1 ^ H_K4(R2)
 +-----------+                           +-----------+ 
 ```                                                   
 
-### 4.5 Decryption
+### 5.5 Decryption
 
 LIONESS decryption is the inverse of the four internal rounds defined in the previous section:
 
-$$
+$`
 \begin{aligned}
 C &= L_2 \parallel R_2 \\
 L_1 &= L_2 \oplus H_{K_4}(R_2) \\
-R_1 &= R_2 \oplus S(K_3 \oplus L_1, |R_2|) \\
+R_1 &= R_2 \oplus S(K_3 \oplus L_1) \\
 L_0 &= L_1 \oplus H_{K_2}(R_1) \\
-R_0 &= R_1 \oplus S(K_1 \oplus L_0, |R_1|) \\
+R_0 &= R_1 \oplus S(K_1 \oplus L_0) \\
 B &= L_0 \parallel R_0
 \end{aligned}
-$$
+`$
 
-## 5. Payload Construction
-This section specifies how the Sphinx payload is constructed using the LIONESS wide-block encryption. Some parts of this section restates the mix specification for clarity. For full specification of how the Sphinx packet is constructed, refer to the [mix specification](./mix.md).
+## 6. Payload Construction
+This section specifies how the Sphinx payload is constructed using the LIONESS wide-block encryption. Some parts of this section restates the Mix specification for clarity. For full specification of how the Sphinx packet is constructed, refer to the [mix protocol specification](./mix.md).
 
-### 5.1 Payload Plaintext Format
+### 6.1 Payload Plaintext Format
 
 Before layered encryption, the sender MUST construct the payload plaintext as the following concatenation:
 
-$$
+$`
+\begin{array}{l}
 B = z \parallel m
-$$
+\end{array}
+`$
 
 where:
-- $z$ is an all-zero integrity prefix of the same length as the security parameter $\kappa$, which equals to 16 bytes (128 bits).
+- $z = 0_\kappa$ is the payload integrity prefix, consisting of $\kappa$ zero bytes.
 - $m$ is the application message padded to fill the remaining payload space.
 
 Thus:
@@ -297,20 +387,29 @@ Thus:
 - $|B| = |\delta|$
 - $|m| = |B| - |z|$
 
-The size of the payload $|\delta|$ is specified in the Mix protocol, and if the application message $|p|$ is small payload padding is added as specified in the [Mix Protocol](./mix.md).
+The size of the payload $|\delta|$ is specified in the Mix protocol, and if the application message $|m|$ is small payload padding is added as specified in the [mix protocol](./mix.md).
 
-### 5.2 Sphinx Payload Construction
+### 6.2 Sphinx Payload Construction
 
-#### Forward Payload
-Once the plaintext is formatted as specified above, it needs to be encrypted in layers such that each hop in the mix path removes exactly one layer using the per-hop session key. This ensures that only the final hop (i.e., the exit node) can fully recover the plaintext message $m$, validate its integrity, and forward it to the destination. To compute the encrypted payload, perform the following steps for each hop $i = L-1$ down to $0$, recursively:
+#### 6.2.1 Forward Payload
+Once the plaintext is formatted as specified in [section 6.1](#61-payload-plaintext-format), it needs to be encrypted in layers such that each hop in the mix path removes exactly one layer using the per-hop session key. This ensures that only the final hop (i.e., the exit node) can fully recover the plaintext message $m$, validate its integrity, and forward it to the destination. To compute the encrypted payload, perform the following steps for each hop $i = L-1$ down to $0$, recursively:
 
-- Derive the payload key $\delta_{\mathrm{key}_i} = \mathsf{KDF}(\texttt{"delta-key"}, s_i, 32)$ where $s_i$ is the per-hop shared secret for hop `i` as defined in the Mix protocol specification.
-- Using $\delta_{\mathrm{key}_i}$, compute the encrypted payload $\delta_i$:
+1. Derive the payload encryption key:
+
+    $`
+    \begin{array}{l}
+    \delta_{\mathrm{key}_i} = \mathsf{KDF}(\texttt{"payload\_enc\_key"}, s_i)
+    \end{array}
+    `$ 
+
+   where $s_i$ is the per-hop shared secret for hop `i` as defined in the Mix protocol specification.
+
+2. Using $\delta_{\mathrm{key}_i}$, compute the encrypted payload $\delta_i$:
   - If $i = L-1$ (_i.e.,_ exit node):
        
     $`
     \begin{array}{l}
-    \delta_i = \mathsf{Lioness.Enc}\bigl(\delta_{\mathrm{key}_i}, B
+    \delta_i = \mathsf{LIONESS.Enc}\bigl(\delta_{\mathrm{key}_i}, B
     \bigr)
     \end{array}
     `$
@@ -319,80 +418,40 @@ Once the plaintext is formatted as specified above, it needs to be encrypted in 
 
     $`
     \begin{array}{l}
-    \delta_i = \mathsf{Lioness.Enc}\bigl(\delta_{\mathrm{key}_i},
+    \delta_i = \mathsf{LIONESS.Enc}\bigl(\delta_{\mathrm{key}_i},
     \delta_{i+1} \bigr)
     \end{array}
     `$
 
-The resulting $\delta$ is placed into the final Sphinx packet.
+   The resulting $\delta$ is placed into the final Sphinx packet.
 
-#### Reply payload (SURB payload)
-For a SURB reply, the reply sender does not know the return-path shared secrets $s_0, \ldots, s_{L-1}$.
-Therefore, the reply sender MUST perform the following steps:
-- constructs the payload plaintext:
+#### 6.2.2 Reply payload (SURB payload)
+For a SURB reply, the reply sender (i.e., the SURB user not the SURB creator) does not know the return-path shared secrets $s_0, \ldots, s_{L-1}$. Instead, it only has the first node in the return path ($\mathrm{hop}_0$), a pre-computed Sphinx header ($\alpha, \beta, \gamma$), and a reply key ($\tilde{k}$).
 
-  $`
-  \begin{array}{l}
-  B = 0_\kappa \parallel m
-  \end{array}
-  `$
+Therefore, the reply sender encrypts the reply payload $B$ only once with using $\tilde{k}$ as the key: 
 
-- Then it derives the reply payload encryption key:
+$`
+\begin{array}{l}
+\delta = \mathsf{LIONESS.Enc}(\tilde{k} \parallel 0_{16}, B)
+\end{array}
+`$
 
-  $`
-  \begin{array}{l}
-  \delta_{key_{\tilde{k}}}
-  = \mathsf{KDF}(\texttt{"delta-key"}, \tilde{k}, 32)
-  \end{array}
-  `$
+Note that the reply key $\tilde{k}$ is $\kappa$ bytes in size and therefore must be padded with zeros to the expected LIONESS key size. In this specification, $\kappa = 16$ bytes and $|k| = 32$ bytes, therefore, $\tilde{k}$ must be padded with $16$ bytes of zeros. 
 
-- and computes:
+The resulting $\delta$ is placed into the SURB reply packet. Then each hop on the return path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key, resulting in one layer of LIONESS encryption and $L$ layers of LIONESS decryptions. These $L + 1$ return path layers are later removed during reply recovery as described in [section 7.3](#73-exit-processing---reply-packet).
 
-  $`
-  \begin{array}{l}
-  \delta = \mathsf{Lioness.Enc}(\delta_{key_{\tilde{k}}}, B)
-  \end{array}
-  `$
+## 7. Sphinx Payload Processing
 
-The resulting $\delta$ is placed into the SURB reply packet.
-Each hop on return-path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key.
-The SURB creator reverses these return-path transformations during reply recovery as described in the next section.
+Once the Sphinx packet is deserialized into ($\alpha,\ \beta,\ \gamma,\ \delta$) and the header is preprocessed as specified in the Mix protocol, the mix node performs the following steps depending on its role (as defined in the [Mix Protocol, Section 8.6.2](./mix/#862-node-role-determination)):
 
-## 6. Sphinx Payload Processing
-
-Once the Sphinx packet is deserialized into ($\alpha,\ \beta,\ \gamma,\ \delta$) and the header is preprocessed as specified in the Mix protocol, the mix node performs the following steps depends on its role (as defined in the [mix specification, Section 8.6.2 Node Role Determination](./mix)):
-
-**Intermediary Processing**
+### 7.1 Intermediary Processing
 
 If the node is an intermediary, it MUST:
-- Derive the payload encryption key:
-
-  $`
-  \begin{array}{l}
-  \delta_{\mathrm{key_i}} = \mathsf{KDF}(\texttt{"delta-key"}, s, 32)
-  \end{array}
-  `$
-
-- Decrypt one layer of the payload using the payload encryption key $\delta_{\mathrm{key}}$: 
-
-  $`
-  \begin{array}{l}
-  \delta' = \mathsf{Lioness.Dec}\bigl(\delta_{\mathrm{key}}, \delta
-     \bigr)
-  \end{array}
-  `$
-
-- use $\delta'$ as the outgoing payload,
-- forward the updated packet as defined by the Mix Protocol.
-
-**Exit Processing - Forward packet**
-
-If the node is the exit, and the packet is not a reply (using SURBs), it MUST:
-1. Derive the payload encryption key:
+1. Derive the payload encryption key using the shared secret $s$:
 
     $`
     \begin{array}{l}
-    \delta_{\mathrm{key_i}} = \mathsf{KDF}(\texttt{"delta-key"}, s, 32)
+    \delta_{\mathrm{key}} = \mathsf{KDF}(\texttt{"payload\_enc\_key"}, s)
     \end{array}
     `$
 
@@ -400,86 +459,69 @@ If the node is the exit, and the packet is not a reply (using SURBs), it MUST:
 
     $`
     \begin{array}{l}
-    \delta' = \mathsf{Lioness.Dec}\bigl(\delta_{\mathrm{key}}, \delta
-       \bigr)
+    \delta' = \mathsf{LIONESS.Dec}\bigl(\delta_{\mathrm{key}}, \delta \bigr)
     \end{array}
     `$
 
-3. parse the decrypted payload $\delta'$ as $B = z \parallel m$, where $|z| = \kappa$ bytes.
-4. verify that the first $\kappa$ bytes of $B$ are all zeros.
-5. discard the packet if this integrity check fails.
-6. otherwise remove the $\kappa$ bytes prefix and pass $m$ to the Mix Exit Layer.
+3. use $\delta'$ as the outgoing payload,
+4. forward the updated packet as defined by the [Mix Protocol](./mix.md).
 
-**Exit Processing - Reply packet**
+### 7.2 Exit Processing - Forward packet
+
+If the node is the exit, and the packet is not a reply (using SURBs), it MUST:
+1. Derive the payload encryption key using the shared secret $s$ in the same way as defined in [section 7.1 step 1](#71-intermediary-processing). 
+2. Decrypt one layer of the payload using the payload encryption key $\delta_{\mathrm{key}}$ in the same way as defined in [section 7.1 step 2](#71-intermediary-processing). 
+3. perform the payload integrity prefix check as follows:
+  - parse the decrypted payload $\delta'$ as $B = z \parallel m$, where $|z| = \kappa$ bytes.
+  - verify that $z = 0_\kappa$
+  - discard the packet if this payload integrity prefix check fails.
+  - otherwise remove $z$ (i.e., the $\kappa$ bytes of payload integrity prefix) and return $m$.
+4. pass $m$ to the Mix Exit Layer.
+
+### 7.3 Exit Processing - Reply packet
 If the node is the exit, and the packet is a reply, it MUST:
-1. reverse the return-path transformations, i.e., since the hops apply LIONESS decryption, the exit must apply LIONESS encryption. For each hop $i = L-1$ down to $0$:
-  - Derive the payload encryption key:
+1. reverse the return-path transformations, i.e., since the hops apply LIONESS decryption, the exit must apply LIONESS encryption. Therefore, the node must perform the same LIONESS layered encryption pattern as defined in [Section 6.2.1](#621-forward-payload), with the reply payload $\delta$ used as the initial input instead of the plaintext payload block $B$.
+
+2. Decrypt the final layer i.e., reversing the effect of the initial encryption in [section 6.2.2](#622-reply-payload-surb-payload):
 
     $`
     \begin{array}{l}
-    \delta_{\mathrm{key}_i}
-    =\mathsf{KDF}(\texttt{"delta-key"}, s_i, 32)
+    B = \mathsf{LIONESS.Dec}(\tilde{k} \parallel 0_{16}, \delta)
     \end{array}
     `$
 
-  - and compute:
+3. perform the payload integrity prefix check as defined in [section 7.2 step 3](#72-exit-processing---forward-packet) and then pass $m$ to the Mix Exit Layer.
 
-    $`
-    \begin{array}{l}
-    \delta' \leftarrow \mathsf{Lioness.Enc}(\delta_{\mathrm{key}_i}, \delta)
-    \end{array}
-    `$
+*Note: We assume here that the exit is the SURB creator, if not then the exit will simply forward $\delta$ to the destination which will process the reply payload as specified above.*
 
-2. After all return-path transformations are reversed: 
-  - derive the reply payload encryption key from the reply key $\tilde{k}$:
+## 8. Security Considerations
 
-    $`
-    \begin{array}{l}
-    \delta_{Key_{\tilde{k}}} = \mathsf{KDF}(\texttt{"delta-key"}, \tilde{k}, 32)
-    \end{array}
-    `$
-
-  - decrypt the final layer (reversing the effect of the initial encryption):
-
-    $`
-    \begin{array}{l}
-    B = \mathsf{Lioness.Dec}(\delta_{Key_{\tilde{k}}}, δ)
-    \end{array}
-    `$
-
-3. parse the decrypted payload $B = z \parallel m$, where $|z| = \kappa$ bytes.
-4. verify that the first $\kappa$ bytes of $B$ are all zeros.
-5. discard the packet if this integrity check fails.
-6. otherwise remove the $\kappa$ bytes prefix and pass $m$ to the Mix Exit Layer.
-
-*Note: We assume here that the exit is the SURB creator, if not then the exit will forward to an exit-layer which will process the reply payload as specified above.*
-
-## 7. Security Considerations
-
-### 7.1 LIONESS Blocks/Messages
-This specification requires the LIONESS input block to be at least 64 bytes. 
+### 8.1 LIONESS Blocks/Messages
+This specification requires the LIONESS input block to be at least $2 |k|$ bytes, i.e., 64 bytes since we assume $|k| = 32$. 
 
 LIONESS splits the input block into two parts 
 
-$$
+$`
+\begin{array}{l}
 B = L \parallel R
-$$
+\end{array}
+`$
 
 where:
 - $|L| = 32$ bytes,
 - $|R| = |B| - 32$ bytes.
 
-Therefore, the 64 byte minimum ensures that both $L$ and $R$ contain at least 32 bytes. The Mix Protocol payload size is expected to be much larger than this minimum, so this requirement is satisfied by normal Mix payload.
+Therefore, the 64-byte minimum ensures that both $L$ and $R$ contain at least 32 bytes. The [Mix Protocol](./mix.md) payload size is expected to be much larger than this minimum, so this requirement is satisfied by normal Mix payloads.
 
-### 7.2 LIONESS Integrity
+### 8.2 LIONESS Integrity
 
 This specification does not use an explicit payload authentication tag. Instead, integrity is obtained by:
-- embedding a fixed all-zero prefix into the plaintext,
-- encrypting the whole payload with a pseudo-random permutation (PRP).
+- embedding a fixed payload integrity prefix, specified as $\kappa$ bytes of zeros, into the plaintext,
+- encrypting the whole payload as a single block with LIONESS.
 
-Because LIONESS acts as a wide-block permutation over the entire message, a modification to the ciphertext will, except with negligible probability, produce a decrypted plaintext whose first $\kappa = 16$ bytes are not all zero. Replacing LIONESS with a malleable stream construction invalidates this property.
+Because the payload is encrypted as a single block, LIONESS acts as a pseudo-random permutation (PRP) over the entire payload, a modification to the ciphertext will, except with negligible probability, produce a decrypted plaintext whose first $\kappa = 16$ bytes are not all zero. Replacing LIONESS with a malleable stream construction invalidates this property.
 
-### 7.3 Primitive Choices
+### 8.3 Primitive Choices
 The security of LIONESS depends on the security of the primitives used to instantiate it:
 - the stream cipher $\mathsf{S}$,
 - the keyed hash function $\mathsf{H}_k$,
@@ -487,25 +529,22 @@ The security of LIONESS depends on the security of the primitives used to instan
 
 Implementations may use any compatible choices. For detailed analysis on the security of LIONESS, refer to the [paper](https://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf). 
 
-## 8. Reference Implementations
+## 9. Reference Implementations
 
-- [Rust reference implementation of LIONESS](https://github.com/mghazwi/lioness_blockcipher)
+- [Rust reference implementation of LIONESS](https://github.com/logos-storage/lioness_blockcipher)
 - [Haskell reference implementation](https://github.com/logos-storage/transport-over-mix).
 
 These reference implementations are generic and can support any compatible $\mathsf{S}$, $\mathsf{H}_k$, and $\mathsf{KDF}$. 
 
-The current Mix protocol already uses primitives that can be used for LIONESS. A recommended instantiation is:
-- AES-CTR as the stream cipher $\mathsf{S}$,
-- HMAC-SHA-256 as the keyed hash $\mathsf{H}_k$,
-- HKDF-SHA256 as the key derivation function $\mathsf{KDF}$.
-
-## 9. Future Work
+## 10. Future Work
 
 The following are under research/consideration:
-- support for faster alternative wide-block ciphers such as AEZ. Research into AEZ is still in progress.
+- support for faster alternative wide-block ciphers: 
+  - [AEZ authenticated encryption scheme](https://www.cs.ucdavis.edu/~rogaway/aez/index.html) 
+  - [Accordion mode based on Hash-Encrypt-Hash](https://csrc.nist.gov/csrc/media/Events/2024/accordion-cipher-mode-workshop-2024/documents/papers/accordion-mode-based-hash-encrypt-hash.pdf)
 
 ## References
 
 - [Sphinx: A Compact and Provably Secure Mix Format](https://eprint.iacr.org/2008/475.pdf)
 - [The Bear and Lion Block Cipher Design](https://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf)
-- [libp2p Mix Protocol](./mix.md)
+- [Mix Protocol](./mix.md)
