@@ -18,16 +18,22 @@ The message types and their CBOR encodings are fully defined by the CDDL
 schemas in section 1. This spec adds only the non-CDDL parts that CDDL
 cannot express:
 
-1. **Framing** — how messages are delimited on a byte stream (section 2)
-2. **Connection state machine** — handshake ordering (section 3)
-3. **Transport binding** — Unix domain socket, TCP (section 9)
+1. **Directional message semantics** — which party may send each message and
+   how replies correlate to requests (section 1.4)
+2. **Stream binding** — how directional messages are carried over a
+   bidirectional byte stream (sections 2 and 3)
+3. **Transport binding** — Unix domain socket and TCP stream bindings
+   (section 9)
 
 Everything else — message types, field names, value types, error codes —
 is defined in CDDL and lives in the schemas below.
 
-This spec is intentionally thin. Length-prefixed dCBOR messages over a
-stream socket with a Hello handshake. Future versions may add streaming,
-multiplexed channels, or compression.
+This spec is intentionally thin.
+The Logos transport protocol is defined as directional dCBOR messages.
+A stream transport is one binding of those messages onto a bidirectional,
+long-lived byte stream; it is not the only possible binding.
+Future versions may add streaming, multiplexed channels, compression, or
+additional bindings.
 
 This spec is ONLY relevant when modules communicate over sockets (inter-
 process or remote). In direct mode (in-process), calls go through C function
@@ -79,7 +85,7 @@ message-kind-cancel      = 7
 
 | Kind | Type        | Direction        | Purpose                            |
 |------|-------------|------------------|------------------------------------|
-| 0    | Hello       | Both             | Connection handshake               |
+| 0    | Hello       | Both             | Peer identification and version/auth metadata |
 | 1    | Request     | Caller -> Callee | Method invocation                  |
 | 2    | Response    | Callee -> Caller | Method result or error             |
 | 3    | Subscribe   | Caller -> Callee | Register for event notifications   |
@@ -106,7 +112,8 @@ in section 10.2.
 
 ```cddl
 ; -- Hello --
-; Sent by caller after opening socket. Callee responds with its own Hello.
+; Peer identification and version/auth metadata.
+; Stream bindings use Hello during connection establishment.
 
 hello = {
     0:        message-kind-hello,
@@ -237,13 +244,54 @@ message = hello
         / cancel
 ```
 
+### 1.4 Directional Message Semantics
+
+The Logos transport protocol is defined as directional dCBOR messages between
+a caller and a callee.
+The caller is the party invoking methods or subscribing to events.
+The callee is the party exposing the module interface.
+
+Caller-to-callee messages:
+
+- `Hello`
+- `Request`
+- `Subscribe`
+- `Unsubscribe`
+- `Cancel`
+- `ProtocolError`
+
+Callee-to-caller messages:
+
+- `Hello`
+- `Response`
+- `Event`
+- `ProtocolError`
+
+`Request` and `Response` messages are correlated by `id`.
+The caller assigns the request `id`; the callee echoes that `id` in exactly
+one `Response`.
+
+`Subscribe`, `Unsubscribe`, and `Event` messages are correlated by
+subscription `id`.
+The caller assigns the subscription `id`; the callee includes that value in
+matching `Event` messages.
+
+These directional semantics are independent of the carrier.
+The stream binding defined in this specification carries both directions over
+one long-lived bidirectional byte stream.
+Other bindings, such as an HTTP-style request-oriented binding, would need a
+separate specification to define how these directional messages are mapped to
+that carrier.
+
 ---
 
-## 2. Framing
+## 2. Stream Binding
 
 ### 2.1 Stream Framing
 
-Messages over a stream socket (Unix domain or TCP) MUST be length-prefixed.
+The stream binding carries directional transport messages over a
+bidirectional byte stream such as a Unix domain socket or TCP connection.
+Messages over a stream binding MUST be length-prefixed.
 Each message is preceded by a 4-byte big-endian unsigned integer indicating
 the byte length of the following CBOR-encoded message:
 
@@ -253,13 +301,24 @@ the byte length of the following CBOR-encoded message:
 +--------+--------+--------+--------+------- ... -------+
 ```
 
-The maximum message size is 4,294,967,295 bytes (4 GB). Implementations
-SHOULD impose a lower configurable limit (default: 16 MB) and reject
-messages exceeding it with error code `INVALID_PARAMS`.
+The 4-byte length prefix can represent frame lengths up to 4,294,967,295
+bytes.
+This is the framing ceiling, not a recommended operational message size.
+
+Implementations MUST enforce a configured maximum accepted frame size for
+resource safety.
+Frames larger than that configured maximum MUST be rejected with error code
+`INVALID_PARAMS` or `TRANSPORT_ERROR`.
+
+A conforming stream implementation MUST support a configured maximum of at
+least 16 MiB.
+Portable module interfaces MUST NOT require single transport messages larger
+than 16 MiB unless a deployment profile, transport binding, or future protocol
+extension specifies a larger supported size.
 
 ### 2.2 Message Ordering
 
-Messages on a single socket connection are processed in order. However,
+Messages on a single stream connection are processed in order. However,
 multiple requests may be in flight simultaneously (multiplexed by `call-id`).
 The callee MAY send responses out of order relative to requests (e.g. a
 fast synchronous call may return before a slow one started earlier).
@@ -281,7 +340,7 @@ layer defined in LOGOS-MODULE-INTERFACE.
 
 ## 3. Connection Lifecycle
 
-### 3.1 Connection Establishment
+### 3.1 Stream Connection Establishment
 
 ```
 Caller                                  Callee
@@ -326,7 +385,8 @@ Caller                                  Callee
    - `version`: the callee's current schema version
    - `token`: echoed or a session token for the connection
 
-5. **Connection is established.** Both parties may now send messages.
+5. **Connection is established.** Both parties may now send directional
+   transport messages allowed for their role.
 
 ### 3.2 Connection Termination
 
@@ -557,7 +617,7 @@ or untrusted peers before any module traffic is accepted.
 
 ## 9. Transport Selection
 
-This protocol is used in two modes:
+This specification defines stream bindings for two modes:
 
 ### 9.1 Unix Domain Sockets (Inter-Process)
 
@@ -576,12 +636,22 @@ where `<runtime-dir>` is:
 For accessing modules on a remote machine. The runtime connects to
 `<host>:<port>` where the module host is listening.
 
-The protocol is identical to Unix domain socket mode, except:
+The stream binding is identical to Unix domain socket mode, except:
 - TLS 1.3 is required (section 8.4)
 
 No additional Hello fields are defined in transport version 1.
 Future transport versions MAY extend the Hello message using the normal
 versioning rules in section 10.
+
+### 9.3 Future Request-Oriented Bindings
+
+HTTP-style or other request-oriented bindings are not defined by this
+specification.
+Such bindings would need a separate interoperability specification that maps
+the directional message semantics from section 1.4 onto the carrier,
+including version/auth metadata, request/response correlation, cancellation,
+subscriptions, event delivery, and error handling without assuming a
+long-lived bidirectional stream session.
 
 ---
 

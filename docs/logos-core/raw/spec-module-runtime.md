@@ -91,6 +91,17 @@ Module names are non-empty UTF-8 strings matching `[a-z][a-z0-9_]*`, with a
 maximum length of 64 bytes. Examples: `storage_module`, `capability_module`,
 `delivery_module`.
 
+This revision intentionally uses flat runtime module names.
+The module name is an operational runtime identifier used for lookup, socket
+naming, and C ABI symbol derivation.
+It is not, by itself, a complete global package identity or cryptographic
+schema identity.
+
+Names beginning with `logos_` are reserved for Logos-defined runtime and
+system modules.
+Exact flat module names assigned by a Logos specification, package catalog, or
+registry are reserved for that assigned module.
+
 The name is used to:
 - Derive socket paths: `<runtime-dir>/logos_<name>.sock`
 - Derive C symbol prefixes: `logos_<name>_*`
@@ -943,20 +954,26 @@ semantics defined by this runtime specification.
 
 ---
 
-## 12. Streaming and Large Data (Future)
+## 12. Large Payload Boundary
 
-This version of the spec does NOT address streaming or chunked transfer of
-large payloads. The default message size limit (16 MB, configurable) is
-sufficient for most RPC calls but not for large file transfers.
+The runtime lifecycle model does not define a generic streaming or
+chunked-transfer facility.
+Ordinary module calls may be routed directly or through a transport binding,
+but the runtime does not make request, response, or event payloads unbounded.
 
-Module authors needing large data transfer in this version should:
+Message framing and message-size limits are transport-binding concerns.
+For stream transports, they are defined by LOGOS-MODULE-TRANSPORT.
 
-- Use filesystem paths (for co-located modules)
-- Use external references (URLs, CIDs) that the caller can fetch separately
-- Use multiple smaller requests if the data can be chunked at the
+Module interfaces that need large data transfer in this version should model
+that explicitly in their schema, for example with:
+
+- filesystem paths for co-located modules
+- external references (URLs, CIDs) that the caller can fetch separately
+- multiple smaller requests if the data can be chunked at the
   application level
 
-Future versions may specify a streaming mechanism at the transport layer.
+Future specifications may define generic streaming or large-object transfer
+profiles.
 That transport extension belongs primarily in LOGOS-MODULE-TRANSPORT, while
 any schema-level conventions for chunked methods or stream references belong
 in LOGOS-MODULE-INTERFACE.

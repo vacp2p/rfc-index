@@ -85,7 +85,8 @@ The schema file defines:
 - Response types (method outputs)
 - Event types (asynchronous notifications)
 
-A module schema MAY import common types from `logos_common.cddl` (section 5).
+A module schema implicitly has access to the Logos prelude and MAY import
+common types from `logos_common.cddl` (section 5).
 
 Note: this spec uses `storage.*` names repeatedly as a convenient running
 example for method, event, codegen, and transport-shape illustrations. Those
@@ -103,10 +104,55 @@ _module = "storage_module"
 _version = [1, 0]            ; [major, minor]
 ```
 
-The `_module` field is the module's unique name. The `_version` field is used
-for compatibility negotiation (see LOGOS-MODULE-TRANSPORT).
+The `_module` field is the module's flat runtime module name.
+It is used for runtime lookup, socket naming, and C ABI symbol derivation.
+It is not, by itself, a complete global package identity or cryptographic
+schema identity.
 
-### 1.3 Methods as Request/Response Pairs
+The `_version` field is used for compatibility negotiation (see
+LOGOS-MODULE-TRANSPORT).
+
+### 1.3 Logos Prelude
+
+Every module schema is interpreted with a small Logos prelude in scope.
+The prelude defines fixed-width integer aliases and reserved Logos common
+types.
+Module schemas MUST NOT redefine prelude names.
+
+```cddl
+uint8  = uint .size 1
+uint16 = uint .size 2
+uint32 = uint .size 4
+uint64 = uint .size 8
+
+int8  = -128..127
+int16 = -32768..32767
+int32 = -2147483648..2147483647
+int64 = -9223372036854775808..9223372036854775807
+```
+
+The unprefixed integer aliases are provided for brevity because module
+schemas are also ABI/codegen inputs.
+They make integer width explicit without requiring every schema to repeat
+CDDL range expressions.
+
+Reserved Logos names:
+
+- CDDL names beginning with `logos.`, `logos-`, or `logos_` are reserved for
+  Logos-defined common-schema, runtime, and ABI surfaces unless this
+  specification explicitly allows their use.
+- `_module` values beginning with `logos_` are reserved for Logos-defined
+  runtime and system modules.
+- Exact flat module names assigned by a Logos specification, package catalog,
+  or registry are reserved for that assigned module.
+  For example, a Logos-defined module named `delivery` owns the flat runtime
+  name `delivery`.
+- The exported C symbol prefix `logos_` is owned by the Logos ABI.
+  Module authors MUST NOT define additional exported `logos_*` symbols as
+  module-specific API outside the symbols derived by this specification or by
+  Logos-defined extension specifications.
+
+### 1.4 Methods as Request/Response Pairs
 
 Methods are declared as pairs of named CDDL maps using the convention:
 
@@ -135,7 +181,7 @@ A method whose only output is success/failure uses an empty response map:
 Map keys MUST be bare CDDL identifiers (not quoted strings). Key names are
 used directly as C parameter names and dCBOR map keys.
 
-### 1.4 Event Declarations
+### 1.5 Event Declarations
 
 Events are asynchronous notifications published by a module. They are declared
 as named maps with the suffix `-event`:
@@ -143,8 +189,8 @@ as named maps with the suffix `-event`:
 ```cddl
 storage.upload-progress-event = {
     session: tstr,
-    bytes-sent: uint,
-    bytes-total: uint,
+    bytes-sent: uint64,
+    bytes-total: uint64,
 }
 
 storage.upload-done-event = {
@@ -166,15 +212,15 @@ events do not return values, do not carry per-call correlation semantics
 beyond subscription, and MUST NOT be used as a general replacement for
 request/response methods.
 
-### 1.5 Custom Types
+### 1.6 Custom Types
 
 Custom types are declared using standard CDDL syntax:
 
 ```cddl
 space-info = {
-    quota: uint,
-    used: uint,
-    available: uint,
+    quota: uint64,
+    used: uint64,
+    available: uint64,
 }
 
 peer-info = {
@@ -184,14 +230,14 @@ peer-info = {
 }
 ```
 
-### 1.6 Type Restrictions
+### 1.7 Type Restrictions
 
 Module schemas MUST only use types from this set:
 
 | Category | Allowed types |
 |----------|--------------|
-| Primitives | `bool`, `uint`, `int`, `float64`, `tstr`, `bstr` |
-| Constrained integers | `uint .size 1`, `uint .size 2`, `uint .size 4`, `int .size 1`, etc. |
+| Primitives | `bool`, `float64`, `tstr`, `bstr` |
+| Fixed-width integers | `uint8`, `uint16`, `uint32`, `uint64`, `int8`, `int16`, `int32`, `int64` |
 | Constrained strings | `tstr .size (min..max)`, `bstr .size n` |
 | Arrays | `[* T]` (variable-length), `[T, T, T]` (fixed-length tuple) |
 | Maps | `{ key: type, ... }` (struct-like maps with known keys) |
@@ -203,13 +249,14 @@ The following are **NOT allowed** in module schemas:
 
 | Disallowed | Rule |
 |-----------|------|
+| Bare `uint`, `int`, `nint` | MUST NOT appear in module schemas except inside the Logos prelude definitions. Use fixed-width integer aliases instead. |
 | `any` | MUST NOT appear in module schemas. Transport envelope uses `any` for generic payload fields; validation against concrete schema happens at the module layer. |
 | `float16`, `float32` | Use `float64`. dCBOR encoding MAY use shorter wire representation if lossless; decoders MUST promote to `double`. |
 | Unkeyed maps (`{ * tstr => any }`) | Reserved for transport envelope. |
 | CBOR tags (beyond the transport envelope) | Reserved for protocol use. |
 | `.regexp`, `.cbor`, `.bits` controls | Reserved for future versions. |
 
-### 1.7 Complete Example
+### 1.8 Complete Example
 
 This complete `storage` schema is illustrative only. It demonstrates the
 module-interface format; it is not the normative specification of the real
@@ -224,9 +271,9 @@ _version = [1, 0]
 
 ; -- types --
 space-info = {
-    quota: uint,
-    used: uint,
-    available: uint,
+    quota: uint64,
+    used: uint64,
+    available: uint64,
 }
 
 ; -- methods --
@@ -252,7 +299,7 @@ storage.destroy-response = {}
 
 storage.upload-url-request = {
     url: tstr,
-    chunk-size: uint,
+    chunk-size: uint64,
 }
 storage.upload-url-response = {
     accepted: bool,
@@ -264,8 +311,8 @@ storage.start-response = {}
 ; -- events --
 storage.upload-progress-event = {
     session: tstr,
-    bytes-sent: uint,
-    bytes-total: uint,
+    bytes-sent: uint64,
+    bytes-total: uint64,
 }
 
 storage.upload-done-event = {
@@ -287,8 +334,13 @@ whitespace and comments).
 ### 2.1 Naming Conventions
 
 **Module prefix.** All C symbols for a module are prefixed with
-`logos_<module>_`. The module name is taken from the `_module` metadata field,
-with hyphens replaced by underscores.
+`logos_<module>_`.
+The module name is taken from the `_module` metadata field.
+Because the current module-name grammar is already underscore-based, no
+escaping is needed for conformant module names in this revision.
+If a later revision introduces dotted or otherwise namespaced module
+identities, it MUST also define deterministic C-symbol escaping before those
+identities can be used as ABI prefixes.
 
 **Method names.** Derived from the request/response pair name by stripping
 the `<module>.` prefix and the `-request`/`-response` suffix. Given
@@ -345,13 +397,25 @@ Pattern: `LOGOS_<MODULE>_EVENT_<NAME_UPPER>` where hyphens become underscores.
 | CDDL type  | CBOR major type           | C type                          | Notes                              |
 |------------|---------------------------|---------------------------------|------------------------------------|
 | `bool`     | 7 (simple true/false)     | `bool`                          | `<stdbool.h>`                      |
-| `uint`     | 0 (unsigned integer)      | `uint64_t`                      | Always 64-bit for ABI stability    |
-| `int`      | 0 or 1 (signed integer)   | `int64_t`                       | Always 64-bit                      |
+| `uint8`    | 0 (unsigned integer)      | `uint8_t`                       | Range 0..255                       |
+| `uint16`   | 0 (unsigned integer)      | `uint16_t`                      | Range 0..65535                     |
+| `uint32`   | 0 (unsigned integer)      | `uint32_t`                      | Range 0..4294967295                |
+| `uint64`   | 0 (unsigned integer)      | `uint64_t`                      | Range 0..2^64-1                    |
+| `int8`     | 0 or 1 (signed integer)   | `int8_t`                        | Range -128..127                    |
+| `int16`    | 0 or 1 (signed integer)   | `int16_t`                       | Range -32768..32767                |
+| `int32`    | 0 or 1 (signed integer)   | `int32_t`                       | Range -2^31..2^31-1                |
+| `int64`    | 0 or 1 (signed integer)   | `int64_t`                       | Range -2^63..2^63-1                |
 | `float64`  | 7 (double-precision)      | `double`                        |                                    |
 | `tstr`     | 3 (text string)           | `const char*`                   | UTF-8, null-terminated             |
 | `bstr`     | 2 (byte string)           | `const uint8_t*` + `size_t`    | Always pointer + length pair       |
 
-**Constrained integers:**
+The generated decoder MUST reject integer values outside the selected alias's
+range.
+The dCBOR wire representation still uses the shortest deterministic CBOR
+integer encoding; fixed-width aliases define the valid value range and C ABI
+type, not a fixed wire width.
+
+**Underlying CDDL definitions:**
 
 | CDDL constraint  | C type      |
 |-------------------|-------------|
@@ -372,9 +436,9 @@ and `const uint8_t*` in function arguments (length is implied by the schema).
 
 ```cddl
 space-info = {
-    quota: uint,
-    used: uint,
-    available: uint,
+    quota: uint64,
+    used: uint64,
+    available: uint64,
 }
 ```
 
@@ -410,7 +474,7 @@ typedef struct {
 | CDDL type       | C type                                 |
 |------------------|----------------------------------------|
 | `[* tstr]`       | `const char* const* items, size_t count` |
-| `[* uint]`       | `const uint64_t* items, size_t count`  |
+| `[* uint64]`     | `const uint64_t* items, size_t count`  |
 | `[* T]` (struct) | `const logos_T_t* items, size_t count` |
 
 Fixed-length tuples `[T, U, V]` expand to individual struct fields or
@@ -420,7 +484,7 @@ context).
 **Choices (tagged unions).** Type choices map to tagged unions:
 
 ```cddl
-value = uint / tstr / bool
+value = uint64 / tstr / bool
 ```
 
 ```c
@@ -444,8 +508,10 @@ The discriminant order matches CDDL declaration order.
 
 **Constraint:** All arms of a choice MUST have distinct CBOR major types so
 the decoder can unambiguously determine which arm was sent. For example,
-`uint / tstr / bool` is valid (major types 0, 3, 7). `uint / int` is NOT
-valid because both use major type 0 for non-negative values. If two arms
+`uint64 / tstr / bool` is valid (major types 0, 3, 7).
+`uint64 / int64` is NOT valid because both can use major type 0 for
+non-negative values.
+If two arms
 would collide, use a wrapping map with a discriminant key instead.
 
 ### 2.4 Method Mapping
@@ -513,7 +579,7 @@ logos_result_t logos_storage_call_space(
 ```cddl
 storage.upload-url-request = {
     url: tstr,
-    chunk-size: uint,
+    chunk-size: uint64,
 }
 storage.upload-url-response = {
     accepted: bool,
@@ -536,8 +602,8 @@ Event types generate a C struct for the event payload:
 ```cddl
 storage.upload-progress-event = {
     session: tstr,
-    bytes-sent: uint,
-    bytes-total: uint,
+    bytes-sent: uint64,
+    bytes-total: uint64,
 }
 ```
 
@@ -745,14 +811,14 @@ Only these C types are permitted in module function signatures:
 | C type | CDDL equivalent |
 |--------|----------------|
 | `bool` | `bool` |
-| `uint8_t` | `uint .size 1` |
-| `uint16_t` | `uint .size 2` |
-| `uint32_t` | `uint .size 4` |
-| `uint64_t` | `uint` |
-| `int8_t` | `int .size 1` |
-| `int16_t` | `int .size 2` |
-| `int32_t` | `int .size 4` |
-| `int64_t` | `int` |
+| `uint8_t` | `uint8` |
+| `uint16_t` | `uint16` |
+| `uint32_t` | `uint32` |
+| `uint64_t` | `uint64` |
+| `int8_t` | `int8` |
+| `int16_t` | `int16` |
+| `int32_t` | `int32` |
+| `int64_t` | `int64` |
 | `double` | `float64` |
 | `const char*` | `tstr` |
 | `const uint8_t*` + `size_t` (pair) | `bstr` |
@@ -806,7 +872,7 @@ Generates:
 ```cddl
 storage.upload-url-request = {
     url: tstr,
-    chunk-size: uint,
+    chunk-size: uint64,
 }
 storage.upload-url-response = {
     accepted: bool,
@@ -829,9 +895,9 @@ Generates:
 
 ```cddl
 space-info = {
-    quota: uint,
-    used: uint,
-    available: uint,
+    quota: uint64,
+    used: uint64,
+    available: uint64,
 }
 ```
 
@@ -855,8 +921,8 @@ Generates:
 ```cddl
 storage.upload-progress-event = {
     session: tstr,
-    bytes-sent: uint,
-    bytes-total: uint,
+    bytes-sent: uint64,
+    bytes-total: uint64,
 }
 ```
 
@@ -900,8 +966,8 @@ encoding is the on-the-wire view.
 | CDDL type  | dCBOR encoding                        |
 |------------|---------------------------------------|
 | `bool`     | Simple value: true (0xf5) / false (0xf4) |
-| `uint`     | Major type 0, shortest encoding       |
-| `int`      | Major type 0 (positive) or 1 (negative), shortest |
+| `uint8`, `uint16`, `uint32`, `uint64` | Major type 0, shortest encoding within the alias range |
+| `int8`, `int16`, `int32`, `int64` | Major type 0 for non-negative values or major type 1 for negative values, shortest encoding within the alias range |
 | `float64`  | Major type 7; dCBOR uses shortest lossless encoding |
 | `tstr`     | Major type 3 (text string)            |
 | `bstr`     | Major type 2 (byte string)            |
@@ -971,6 +1037,12 @@ rules:
    optimisation only. Decoders MUST accept any float width and promote to
    `double` in C.
 
+Note:
+this revision uses dCBOR as the selected Logos deterministic CBOR profile.
+IETF CBOR Common Deterministic Encoding (CDE) is a relevant common baseline
+and may be evaluated as an alternative or underlying reference in a future
+revision.
+
 ### 4.6 Validation
 
 Implementations MUST:
@@ -1031,6 +1103,17 @@ They are defined in `logos_common.cddl` and available to all module schemas.
 ```cddl
 ; logos_common.cddl
 
+; -- Logos prelude integer aliases --
+uint8  = uint .size 1
+uint16 = uint .size 2
+uint32 = uint .size 4
+uint64 = uint .size 8
+
+int8  = -128..127
+int16 = -32768..32767
+int32 = -2147483648..2147483647
+int64 = -9223372036854775808..9223372036854775807
+
 ; -- error codes --
 logos-error-code = &(
     ok:                0,
@@ -1086,7 +1169,7 @@ method-info = {
 
 param-info = {
     name: tstr,
-    type: tstr,                 ; CDDL type name ("int", "tstr", etc.)
+    type: tstr,                 ; CDDL type name ("int64", "tstr", etc.)
 }
 
 ; -- module listing (well-known, provided by runtime) --
@@ -1097,7 +1180,7 @@ logos.modules-response = {
 
 module-info = {
     name:    tstr,
-    version: [uint, uint],
+    version: [uint32, uint32],
     state:   tstr,              ; "ready", "loaded", "error", etc.
 }
 ```
@@ -1270,7 +1353,7 @@ a typed helper that encodes the event payload as dCBOR and calls the
 runtime-provided publish function:
 
 ```c
-/* From: storage.upload-progress-event = { session: tstr, bytes-sent: uint, bytes-total: uint } */
+/* From: storage.upload-progress-event = { session: tstr, bytes-sent: uint64, bytes-total: uint64 } */
 void logos_storage_publish_upload_progress(
     logos_publish_fn  publish,
     void*             publish_user_data,
