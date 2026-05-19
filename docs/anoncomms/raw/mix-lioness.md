@@ -61,7 +61,7 @@ The following terms are used throughout this specification. Other terms are as d
 
 This section defines the primitives used by this specification. In this specification, we will assume the following constants:
 - The security parameter $\kappa = 16$ bytes ($128$-bits) as defined in the [Mix Protocol](./mix.md).
-- The key size $|k| = 32$ bytes.
+- The LIONESS internal parameter $\lambda = 32$ bytes, which defines the size multiple LIONESS components.
 
 ### 3.1 Stream Cipher
 
@@ -74,7 +74,7 @@ $`
 `$
 
 where:
-- $k$ is a 32-byte key
+- $k$ is a $\lambda$-byte key
 - $\mathsf{ks}$ is the output arbitrary-length keystream.
 
 Encryption and decryption can then be done by first generating a key stream $\mathsf{ks}$ and then XORing the key stream with the message/ciphertext. Encryption and decryption work in the same way: 
@@ -100,9 +100,9 @@ $`
 `$
 
 where:
-- $k$ is a 32-byte key
+- $k$ is a $\lambda$-byte key
 - $m$ is an arbitrary-length input message.
-- $h$ is the 32-byte digest output
+- $h$ is the $\lambda$-byte digest output
 
 ### 3.3 Key Derivation Function (KDF)
 The key derivation function $\mathsf{KDF}$ is used to derive fixed-size keys from a domain-separation string and a seed:
@@ -116,8 +116,8 @@ $`
 where
 
 - $\mathsf{dom}$: is an arbitrary-length domain-separation string.
-- $\mathsf{seed}$: is a 32-byte seed. 
-- $u$ is a 32-byte output key.
+- $\mathsf{seed}$: is an arbitrary-length seed at least $\kappa$ bytes in size.
+- $u$ is a $\lambda$-byte output key.
 
 ## 4. Concrete Primitive Instantiation
 
@@ -127,7 +127,7 @@ This section defines the concrete primitive choices used by this specification.
 
 The LIONESS stream cipher $\mathsf{S}$ is instantiated using AES-CTR.
 
-Each LIONESS stream-cipher round key $k$ is $32$ bytes. For AES-CTR, this 32-byte value is split as follows:
+Each LIONESS stream-cipher round key $k$ is $\lambda = 32$ bytes. For AES-CTR, this $32$-byte value is split as follows:
 
 $`
 \begin{array}{l}
@@ -137,8 +137,8 @@ k = k_{\mathsf{aes}} \parallel IV
 
 where:
 
-- $k_{\mathsf{aes}}$ is the first 16 bytes of $k$.
-- $IV$ is the last 16 bytes of $k$.
+- $k_{\mathsf{aes}}$ is the first $16$ bytes of $k$.
+- $IV$ is the last $16$ bytes of $k$.
 
 ### 4.2 Keyed Hash Instantiation
 
@@ -152,9 +152,9 @@ $`
 
 where:
 
-- $k$ is a 32-byte key.
+- $k$ is a $\lambda$-byte key.
 - $m$ is the input message.
-- the output is a 32-byte digest.
+- the output is a $\lambda$-byte digest.
 
 This construction is used only as the keyed hash function inside the LIONESS Feistel construction. It is not (and must not be used as) a general-purpose MAC.
 
@@ -172,8 +172,8 @@ $`
 where:
 
 - $\mathsf{dom}$ is a domain-separation string.
-- $\mathsf{seed}$ is a 32-byte seed.
-- the output is a 32-byte key.
+- $\mathsf{seed}$ is an arbitrary-length seed at least $\kappa$ bytes in size.
+- the output is a $\lambda$-byte key.
 
 The following domain-separation strings are used by this specification:
 
@@ -198,8 +198,8 @@ $`
 `$
 
 where:
-- $k$ is the seed (master key) from which the internal round keys are derived, with size $|k| = 32$ bytes
-- $x$ is the plaintext message with size $|x| \ge 2 |k|$ bytes.
+- $k$ is the arbitrary-length seed (master key) from which the internal round keys are derived, with size at least $\kappa$ bytes
+- $x$ is the plaintext message with size $|x| \ge 2\lambda$ bytes.
 - $y$ is the corresponding ciphertext with size $|y| = |x|$
 
 ### 5.2 Block Structure
@@ -213,18 +213,18 @@ B = L \parallel R
 `$
 
 where:
-- $B$ is the plaintext message block of any size $|B| \ge 2 |k|$
-- $L$ is the left chunk with size $|L| = |k|$ bytes
-- $R$ is the right chunk with size $|R| = |B| - |k|$ bytes. 
+- $B$ is the plaintext message block of any size $|B| \ge 2\lambda$
+- $L$ is the left chunk with size $|L| = \lambda$ bytes
+- $R$ is the right chunk with size $|R| = |B| - \lambda$ bytes.
 
-In this specification, we require the size of the message to be at least $2 |k|$, i.e., $|B| \ge 2 |k|$. This requirement ensures that $|L| = |k|$ and $|R| \ge |k|$. The Mix protocol payload size satisfies this requirement since the expected payload is much larger than $2 |k|$.
+In this specification, we require the size of the message to be at least $2\lambda$, i.e., $|B| \ge 2\lambda$. This requirement ensures that $|L| = \lambda$ and $|R| \ge \lambda$. The Mix protocol payload size satisfies this requirement since the expected payload is much larger than $2\lambda$.
 
-In summary, we set $|k| = 32$ bytes. Therefore:
+In summary, we set $\lambda = 32$ bytes. Therefore:
 - $|B| \ge 64$ bytes
-- $|L| = |k| = 32$ bytes,
+- $|L| = \lambda = 32$ bytes,
 - $|R| = |B| - |L|$ bytes.
 
-The choice $|k| = 32$ bytes must match:
+The choice $\lambda = 32$ bytes must match:
 - the stream cipher ($\mathsf{S}$) key size, and
 - the keyed hash ($H_k$) key size and digest ($h$) size.
 
@@ -233,7 +233,7 @@ As a result, we can observe that for large messages, the right chunk is expected
 ```
 +----------------+----------------------------------+
 |       L        |          R                       |
-|   |k| bytes    |    (|B| - |k|) bytes             |
+|  lambda bytes  |    (|B| - lambda) bytes          |
 +----------------+----------------------------------+
 ```
 
@@ -243,18 +243,18 @@ LIONESS requires four internal round keys, one for each round: $(K_1, K_2, K_3, 
 - $K_1$ and $K_3$ are the keys used for the stream cipher.
 - $K_2$ and $K_4$ are the keys used for the keyed hash function.
 
-All internal round keys are $|k| = 32$ bytes in size. Therefore, we require four calls to the $\mathsf{KDF}$, each with a different domain-separation string:
+All internal round keys are $\lambda = 32$ bytes in size. Given a LIONESS seed $k$, we require four calls to the $\mathsf{KDF}$, each with a different domain-separation string:
 
 $`
 \begin{aligned}
-K_1 &= \mathsf{KDF}(\texttt{"lioness\_key1"}, \delta_{\mathrm{key}}) \\
-K_2 &= \mathsf{KDF}(\texttt{"lioness\_key2"}, \delta_{\mathrm{key}}) \\
-K_3 &= \mathsf{KDF}(\texttt{"lioness\_key3"}, \delta_{\mathrm{key}}) \\
-K_4 &= \mathsf{KDF}(\texttt{"lioness\_key4"}, \delta_{\mathrm{key}})
+K_1 &= \mathsf{KDF}(\texttt{"lioness\_key1"}, k) \\
+K_2 &= \mathsf{KDF}(\texttt{"lioness\_key2"}, k) \\
+K_3 &= \mathsf{KDF}(\texttt{"lioness\_key3"}, k) \\
+K_4 &= \mathsf{KDF}(\texttt{"lioness\_key4"}, k)
 \end{aligned}
 `$
 
-The seed $\delta_{\mathrm{key}}$ is expected to be 32 bytes. It is derived from shared key material between the sender and each hop. The derivation of $\delta_{\mathrm{key}}$ depends on whether the packet is a forward packet or a reply packet. Further details are specified in [Section 6](#6-payload-construction) and [section 7](#7-sphinx-payload-processing).
+The LIONESS seed is arbitrary-length and MUST be at least $\kappa$ bytes. The derivation of the seed depends on whether the packet is a forward packet or a reply packet. Further details are specified in [Section 6](#6-payload-construction) and [section 7](#7-sphinx-payload-processing).
 
 ### 5.4 Encryption
 
@@ -428,17 +428,15 @@ Once the plaintext is formatted as specified in [section 6.1](#61-payload-plaint
 #### 6.2.2 Reply payload (SURB payload)
 For a SURB reply, the reply sender (i.e., the SURB user not the SURB creator) does not know the return-path shared secrets $s_0, \ldots, s_{L-1}$. Instead, it only has the first node in the return path ($\mathrm{hop}_0$), a pre-computed Sphinx header ($\alpha, \beta, \gamma$), and a reply key ($\tilde{k}$).
 
-Therefore, the reply sender encrypts the reply payload $B$ only once with using $\tilde{k}$ as the key: 
+Therefore, the reply sender encrypts the reply payload $B$ only once using $\tilde{k}$ as the LIONESS seed:
 
 $`
 \begin{array}{l}
-\delta = \mathsf{LIONESS.Enc}(\tilde{k} \parallel 0_{16}, B)
+\delta = \mathsf{LIONESS.Enc}(\tilde{k}, B)
 \end{array}
 `$
 
-Note that the reply key $\tilde{k}$ is $\kappa$ bytes in size and therefore must be padded with zeros to the expected LIONESS key size. In this specification, $\kappa = 16$ bytes and $|k| = 32$ bytes, therefore, $\tilde{k}$ must be padded with $16$ bytes of zeros. 
-
-The resulting $\delta$ is placed into the SURB reply packet. Then each hop on the return path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key, resulting in one layer of LIONESS encryption and $L$ layers of LIONESS decryptions. These $L + 1$ return path layers are later removed during reply recovery as described in [section 7.3](#73-exit-processing---reply-packet).
+Note that the reply key $\tilde{k}$ is $\kappa$ bytes in size as defined in the [Mix Protocol](./mix.md), so it satisfies the LIONESS seed requirement. The resulting $\delta$ is placed into the SURB reply packet. Then each hop on the return path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key, resulting in one layer of LIONESS encryption and $L$ layers of LIONESS decryptions. These $L + 1$ return path layers are later removed during reply recovery as described in [section 7.3](#73-exit-processing---reply-packet).
 
 ## 7. Sphinx Payload Processing
 
@@ -486,7 +484,7 @@ If the node is the exit, and the packet is a reply, it MUST:
 
     $`
     \begin{array}{l}
-    B = \mathsf{LIONESS.Dec}(\tilde{k} \parallel 0_{16}, \delta)
+    B = \mathsf{LIONESS.Dec}(\tilde{k}, \delta)
     \end{array}
     `$
 
@@ -497,7 +495,7 @@ If the node is the exit, and the packet is a reply, it MUST:
 ## 8. Security Considerations
 
 ### 8.1 LIONESS Blocks/Messages
-This specification requires the LIONESS input block to be at least $2 |k|$ bytes, i.e., 64 bytes since we assume $|k| = 32$. 
+This specification requires the LIONESS input block to be at least $2\lambda$ bytes, i.e., 64 bytes since we assume $\lambda = 32$.
 
 LIONESS splits the input block into two parts 
 
@@ -508,10 +506,10 @@ B = L \parallel R
 `$
 
 where:
-- $|L| = 32$ bytes,
-- $|R| = |B| - 32$ bytes.
+- $|L| = \lambda = 32$ bytes,
+- $|R| = |B| - \lambda$ bytes.
 
-Therefore, the 64-byte minimum ensures that both $L$ and $R$ contain at least 32 bytes. The [Mix Protocol](./mix.md) payload size is expected to be much larger than this minimum, so this requirement is satisfied by normal Mix payloads.
+Therefore, the 64-byte minimum ensures that both $L$ and $R$ contain at least $\lambda$ bytes. The [Mix Protocol](./mix.md) payload size is expected to be much larger than this minimum, so this requirement is satisfied by normal Mix payloads.
 
 ### 8.2 LIONESS Integrity
 

@@ -566,9 +566,9 @@ This section defines the cryptographic primitives used in Sphinx packet construc
 
 - **Key Derivation Function (KDF)**:
 
-  - **Purpose**: To derive encryption keys, IVs, and MAC key from the shared session key at each hop.
+  - **Purpose**: To derive encryption keys, IVs, and MAC keys from seed material such as the shared session key at each hop or a SURB reply key.
   - **Construction**: SHA-256 hash with output of the size $256$ bits.
-  - **Key Derivation**: The KDF takes two input: a seed and a domain-separation string. The domain-separation strings (_e.g.,_ `"aes_key"`, `"mac_key"`) are fixed and MUST be agreed upon across implementations.
+  - **Key Derivation**: The KDF takes two inputs: an arbitrary-length seed at least $κ$ bytes in size and a domain-separation string. The domain-separation strings (_e.g.,_ `"aes_key"`, `"mac_key"`) are fixed and MUST be agreed upon across implementations.
 
 - **Header Encryption**: AES-128 in Counter Mode (AES-CTR)
 
@@ -1359,16 +1359,15 @@ Once the destination responds with a reply message, the Exit Layer MUST perform 
 
    For a SURB reply, the Exit Layer does not know the return-path shared secrets $s_0, \ldots, s_{L-1}$. Instead, it only has the first node in the return path ($\mathrm{hop}_0$), a pre-computed Sphinx header ($\alpha, \beta, \gamma$), and a reply key ($\tilde{k}$).
 
-   Therefore, the Exit Layer encrypts the reply payload only once using $\tilde{k}$ as the key. 
+   Therefore, the Exit Layer encrypts the reply payload only once using $\tilde{k}$ as the LIONESS seed.
 
    $`
    \begin{array}{l}
-   \delta = \mathsf{LIONESS.Enc}(\tilde{k} \parallel 0_{16}, B)
+   \delta = \mathsf{LIONESS.Enc}(\tilde{k}, 0_{κ} \mid m)
    \end{array}
    `$
    
-   Note that the reply key $\tilde{k}$ is $\kappa$ bytes in size and therefore must be padded with zeros to the expected LIONESS key size. In this specification, $\kappa = 16$ bytes and in the [LIONESS specification](./mix-lioness.md) $|k| = 32$ bytes, therefore, $\tilde{k}$ must be padded with $16$ bytes of zeros. 
-
+   Note that the reply key $\tilde{k}$ is $κ$ bytes in size, which satisfies the LIONESS seed requirement.
    The resulting $\delta$ is placed into the SURB reply packet.
    Then each hop on the return path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key ([Section 8.6.1](#861-shared-preprocessing) Step 5), resulting in one layer of LIONESS encryption and $L$ layers of LIONESS decryptions. These $L + 1$ return path layers are later removed during reply recovery as described in [Section 8.7.5](#875-reply-recovery).
 
@@ -1409,7 +1408,7 @@ When the Exit Layer receives decrypted payload $δ'$ and the SURB identifier $\m
 
    The encrypted payload $δ'$ contains the of the padded reply message $m$ defined in [Section 8.7.3](#873-using-a-surb) Step 1, prepended with the payload integrity prefix of size $κ$-byte.
    It is encrypted in a total of $L+1$ layers: 
-   A first layer of LIONESS encryption using the reply key $\tilde{k}$, and 
+   A first layer of LIONESS encryption using the reply key $\tilde{k}$ as the seed, and
    $L$ layers of LIONESS decryption using per-hop session keys $s_0, \ldots, s_{L-1}$.
    To recover the padded reply message, we must first remove all the decryption layers with a LIONESS encryption, and then remove the initial reply encryption (using $\tilde{k}$) with a decryption. Therefore, the we must perform the following steps: 
 
@@ -1419,7 +1418,7 @@ When the Exit Layer receives decrypted payload $δ'$ and the SURB identifier $\m
    
      $`
      \begin{array}{l}
-     δ = \mathsf{LIONESS.Dec}(\tilde{k} \parallel 0_{16}, δ_0)
+     δ = \mathsf{LIONESS.Dec}(\tilde{k}, δ_0)
      \end{array}
      `$
    
