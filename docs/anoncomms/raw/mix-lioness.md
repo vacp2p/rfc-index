@@ -1,13 +1,13 @@
 # LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX
 
-Field | Value
---- | ---
-Name | LIONESS encryption scheme for LIBP2P-MIX payload encryption
-Slug | TBD
-Status | raw
-Category | Standards Track
-Editor | Mohammed Alghazwi <mohalghazwi@status.im>
-Contributors | Balázs Kőműves <balazs@status.im>
+| Field | Value |
+| --- | --- |
+| Name | LIONESS encryption scheme for LIBP2P-MIX payload encryption |
+| Slug | TBD |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Mohammed Alghazwi <mohalghazwi@status.im> |
+| Contributors | Balázs Kőműves <balazs@status.im> |
 
 ## Abstract
 
