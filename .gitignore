@@ -4,3 +4,4 @@ docs/logos-lips.json
 docs/SUMMARY.md
 .DS_Store
 __pycache__
+*.so
