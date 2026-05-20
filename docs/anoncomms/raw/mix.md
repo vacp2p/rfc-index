@@ -1326,9 +1326,13 @@ To construct each SURB, the initiating node MUST perform the following steps:
 
    The initiating node MUST store the tuple $(\tilde{k}, s_0, \ldots, s_{L-1})$ in a local table indexed by $\mathrm{id}$, for reply recovery defined in [Section 8.7.5](#875-reply-recovery).
 
+   Note: A SURB becomes unusable once any return-path mix node rotates its X25519 key. Implementations SHOULD discard these tuples after a configurable timeout, or at most by the key rotation interval.
+
 #### 8.7.3 Using a SURB
 
 When the Exit Layer receives any SURBs as part of the handoff defined in [Section 8.6.4](#864-exit-processing) Step 4, it MUST retain them for routing the destination's responses back to the sender.
+
+If no response arrives within a configurable timeout, the Exit Layer SHOULD drop the SURBs.
 
 Note: Each retained SURB consists of the hop address of the first node in the return path, a pre-computed Sphinx header, and a reply key, as defined in [Section 8.7.1](#871-surb-component-sizes).
 
