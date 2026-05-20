@@ -7,6 +7,7 @@ This keeps a consistent navigation structure for mdBook without manual edits.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 from pathlib import Path
 import re
 from typing import Iterable, List, Optional
@@ -16,6 +17,7 @@ import blockchain_structure as bc
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 OUTPUT = DOCS / "SUMMARY.md"
+BLOCKCHAIN_TREE_JSON = DOCS / "blockchain-structure.json"
 
 SKIP_FILES = {"README.md", "SUMMARY.md", "template.md"}
 
@@ -266,6 +268,42 @@ def build_blockchain_items() -> List[Item]:
     return [Item(label=bc.BEDROCK_LABEL, path=None, children=topic_items)]
 
 
+def build_blockchain_tree_data() -> dict:
+    """
+    Same topology as `build_blockchain_items`, but emitted as a JSON-friendly
+    dict for the in-page tree view on the Blockchain landing page.
+    Each spec entry carries its `path` (relative to docs/) and `status`.
+    Placeholder entries have `path: null` and `status: null`.
+    """
+    grouped: dict = {topic: {b: [] for b in bc.buckets_for_topic(topic)} for topic in bc.TOPIC_ORDER}
+    for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
+        abs_path = DOCS / rel_path
+        if not abs_path.exists():
+            continue
+        status = read_status(abs_path) or "raw"
+        bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if bucket not in grouped[topic]:
+            grouped[topic][bucket] = []
+        grouped[topic][bucket].append({
+            "label": label,
+            "path": rel_path,
+            "status": status,
+        })
+
+    topics_out = []
+    for topic in bc.TOPIC_ORDER:
+        placeholders = bc.PLACEHOLDERS.get(topic, {})
+        buckets_out = []
+        for bucket in bc.buckets_for_topic(topic):
+            specs = sorted(grouped[topic].get(bucket, []), key=lambda s: s["label"].lower())
+            for placeholder_label in placeholders.get(bucket, []):
+                specs.append({"label": placeholder_label, "path": None, "status": None})
+            buckets_out.append({"name": bucket, "specs": specs})
+        topics_out.append({"name": topic, "buckets": buckets_out})
+
+    return {"label": bc.BEDROCK_LABEL, "topics": topics_out}
+
+
 def main() -> None:
     lines: List[str] = ["# Summary", ""]
 
@@ -291,6 +329,12 @@ def main() -> None:
 
     OUTPUT.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(f"Wrote {OUTPUT}")
+
+    tree_data = build_blockchain_tree_data()
+    BLOCKCHAIN_TREE_JSON.write_text(
+        json.dumps(tree_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(f"Wrote {BLOCKCHAIN_TREE_JSON}")
 
 
 if __name__ == "__main__":

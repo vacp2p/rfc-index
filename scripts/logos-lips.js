@@ -704,4 +704,134 @@
       console.error(err);
       resultsCount.textContent = "Failed to load RFC index.";
     });
+
+  /* ---------- Blockchain topic tree (mirrors the SUMMARY sidebar) ---------- */
+
+  const treeContainer = document.getElementById("blockchain-tree-container");
+  if (treeContainer) {
+    const TREE_STATUS_LABELS = {
+      raw: "Raw",
+      draft: "Draft",
+      approved: "Approved",
+      stable: "Stable",
+      verified: "Verified",
+      deprecated: "Deprecated",
+      retired: "Retired",
+      deleted: "Deleted",
+    };
+
+    const treeSource = `${rootPrefix}blockchain-structure.json`;
+
+    function buildTreeSpec(spec) {
+      const li = document.createElement("li");
+      li.className = spec.path ? "tree-spec" : "tree-spec tree-spec-placeholder";
+
+      if (spec.path) {
+        const a = document.createElement("a");
+        a.href = `${rootPrefix}${spec.path.replace(/\.md(#.*)?$/, ".html$1")}`;
+        a.textContent = spec.label;
+        li.appendChild(a);
+      } else {
+        const span = document.createElement("span");
+        span.className = "tree-spec-label";
+        span.textContent = spec.label;
+        li.appendChild(span);
+        const tbd = document.createElement("span");
+        tbd.className = "tree-badge tree-badge-tbd";
+        tbd.textContent = "TBD";
+        li.appendChild(tbd);
+      }
+
+      if (spec.status && TREE_STATUS_LABELS[spec.status]) {
+        const badge = document.createElement("span");
+        badge.className = `tree-badge tree-badge-${spec.status}`;
+        badge.textContent = TREE_STATUS_LABELS[spec.status];
+        li.appendChild(badge);
+      }
+
+      return li;
+    }
+
+    function buildTreeBucket(bucket) {
+      const realCount = bucket.specs.filter((s) => s.path).length;
+      const totalCount = bucket.specs.length;
+
+      const details = document.createElement("details");
+      details.className = totalCount === 0 ? "tree-bucket tree-bucket-empty" : "tree-bucket";
+
+      const summary = document.createElement("summary");
+      summary.className = "tree-bucket-summary";
+      summary.appendChild(document.createTextNode(bucket.name));
+
+      const count = document.createElement("span");
+      count.className = "tree-bucket-count";
+      if (totalCount === 0) {
+        count.textContent = "empty";
+      } else if (realCount === totalCount) {
+        count.textContent = String(totalCount);
+      } else {
+        count.textContent = `${realCount} of ${totalCount}`;
+      }
+      summary.appendChild(count);
+      details.appendChild(summary);
+
+      if (totalCount > 0) {
+        const ul = document.createElement("ul");
+        ul.className = "tree-specs";
+        bucket.specs.forEach((spec) => ul.appendChild(buildTreeSpec(spec)));
+        details.appendChild(ul);
+      }
+
+      return details;
+    }
+
+    function buildTreeTopic(topic) {
+      const details = document.createElement("details");
+      details.className = "tree-topic";
+
+      const summary = document.createElement("summary");
+      summary.className = "tree-topic-summary";
+      summary.textContent = topic.name;
+      details.appendChild(summary);
+
+      const inner = document.createElement("div");
+      inner.className = "tree-buckets";
+      topic.buckets.forEach((bucket) => inner.appendChild(buildTreeBucket(bucket)));
+      details.appendChild(inner);
+
+      return details;
+    }
+
+    function buildTreeRoot(data) {
+      const root = document.createElement("details");
+      root.className = "tree-root";
+      root.open = true;
+
+      const summary = document.createElement("summary");
+      summary.className = "tree-root-summary";
+      summary.textContent = data.label;
+      root.appendChild(summary);
+
+      const inner = document.createElement("div");
+      inner.className = "tree-topics";
+      data.topics.forEach((topic) => inner.appendChild(buildTreeTopic(topic)));
+      root.appendChild(inner);
+
+      return root;
+    }
+
+    fetch(treeSource)
+      .then((resp) => {
+        if (!resp.ok) throw new Error(resp.statusText);
+        return resp.json();
+      })
+      .then((data) => {
+        treeContainer.innerHTML = "";
+        treeContainer.appendChild(buildTreeRoot(data));
+      })
+      .catch((err) => {
+        console.error("Blockchain tree:", err);
+        treeContainer.innerHTML = '<p class="blockchain-tree-error">Failed to load topic tree.</p>';
+      });
+  }
 })();

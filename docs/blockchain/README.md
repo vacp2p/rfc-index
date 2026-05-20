@@ -5,6 +5,13 @@ scalable infrastructure for developers creating applications for the network sta
 Published Specifications are currently available here,
 [Blockchain Specifications](https://nomos-tech.notion.site/project).
 
+<section class="blockchain-tree-section">
+  <h2 class="blockchain-tree-heading">Browse by topic</h2>
+  <div id="blockchain-tree-container" class="blockchain-tree" data-source="../blockchain-structure.json">
+    <p class="blockchain-tree-loading">Loading topic tree…</p>
+  </div>
+</section>
+
 <div class="landing-hero">
   <div class="filter-row">
     <input id="rfc-search" type="search" placeholder="Search by number, title, status" aria-label="Search LIPs">
