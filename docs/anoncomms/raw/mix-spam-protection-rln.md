@@ -24,23 +24,23 @@
 
 ## Abstract
 
-This document defines a spam and sybil protection protocol for [libp2p mix](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md) based mixnets.
+This document defines a DoS and sybil protection protocol for [libp2p mix](mix.md) based mixnets.
 The protocol specifies how [Rate Limiting Nullifiers (RLN)](https://vac.dev/rln) can be integrated into libp2p mix.
 RLN allows mix nodes to detect and drop spam without identifying legitimate users, addressing spam attacks.
 RLN requires membership for mix nodes to send or forward messages, addressing the sybil attack vector.
-RLN satisfies the spam protection [requirements](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#91-spam-protection-mechanism-requirements) defined in the libp2p mix protocol.
+RLN satisfies the DoS protection [requirements](mix-dos-protection.md#3-requirements) defined for the Mix Protocol.
 
 ## Background / Rationale / Motivation
 
-Mixnets provide strong privacy guarantees by routing messages through multiple mix nodes using layered encryption and per-hop delays to obscure both routing paths and timing correlations. In order to have a production-ready mixnet using the [libp2p mix](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md), two critical vulnerabilities must be addressed:
+Mixnets provide strong privacy guarantees by routing messages through multiple mix nodes using layered encryption and per-hop delays to obscure both routing paths and timing correlations. In order to have a production-ready mixnet using the [libp2p mix](mix.md), two critical vulnerabilities must be addressed:
 
-1. **Spam attacks**: An attacker can generate well-formed sphinx packets targeting mix nodes and can exhaust their resources.
+1. **DoS attacks**: An attacker can generate well-formed sphinx packets targeting mix nodes and exhaust their resources.
    In case of mixnets, it is easy to attack a later hop in the mix path by choosing different first hop nodes.
-   An attacker with minimal resources can launch spam/DoS attacks against individual mix nodes. By targeting all mix nodes in this manner, the attacker can render the entire mixnet unusable.
+   An attacker with minimal resources can launch DoS attacks against individual mix nodes. By targeting all mix nodes in this manner, the attacker can render the entire mixnet unusable.
 2. **Sybil attacks**: Adversaries operating multiple node identities can increase the probability of path compromise, enabling deanonymization through traffic correlation or timing analysis.
 
-The [libp2p mix](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md) protocol provides an extension for integrating spam protection mechanisms.
-This specification proposes to use [Rate Limiting Nullifiers (RLN)](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md) as the spam prevention and sybil protection mechanism.
+The [libp2p mix](mix.md) protocol provides an extension for integrating DoS protection mechanisms (see [Mix DoS Protection](mix-dos-protection.md)).
+This specification proposes to use [Rate Limiting Nullifiers (RLN)](rln-v2.md) as the DoS and sybil protection mechanism.
 This approach introduces some trade-offs such as additional per-hop latency for proof generation which are discussed in the [Tradeoffs](#tradeoffs) section.
 
 ## Terminology
@@ -48,13 +48,7 @@ This approach introduces some trade-offs such as additional per-hop latency for 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”,
 “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-### Node Roles
-
-Mix protocol defines 3 roles for the nodes in the mix network - sender, exit, intermediary.
-
-- A sender node is the originator node of a message, i.e a node that wishes to originate/send messages using the mix network.
-- An exit node is responsible for delivering messages to the destination protocol.
-- An intermediary node is responsible for forwarding a mix packet to the next mix node in the path.
+Other terms used in this document are as defined in the [libp2p Mix Protocol](mix.md) and [Mix DoS Protection](mix-dos-protection.md).
 
 ### Message
 
@@ -78,11 +72,11 @@ See section [System Parameters](#system-parameters) for details on the `period` 
 
 ### Overview
 
-The protocol implements RLN using a [per-hop generated proof approach](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs), where each node in the mix path generates and verifies proofs.
+The protocol implements RLN using a [per-hop generated proof approach](mix-dos-protection.md#42-per-hop-generated-proofs), where each node in the mix path generates and verifies proofs.
 This enables network-wide spam protection while preserving user privacy.
 
 Each mix node MUST have an RLN group membership in order to send or forward messages in the mixnet.
-Each mix node in the path (except the sender) verifies the incoming RLN proof before processing the message.
+Each mix node in the path (except the initiating node) verifies the incoming RLN proof before processing the message.
 After verification, each node generates and attaches a new RLN proof before forwarding the message to the next hop.
 
 To effectively detect spam, mix nodes SHOULD identify when a node exceeds its [messaging rate](#messaging-rate) by reusing the same nullifier across multiple messages within an epoch (known as "double signalling").
@@ -110,10 +104,10 @@ RLN is well-suited for spam and sybil protection in libp2p mix based mixnets due
 
 ### Setup
 
-Each mix node has an RLN key pair consisting of a secret key `sk` and public key `pk` as defined in [RLN](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md).
+Each mix node has an RLN key pair consisting of a secret key `sk` and public key `pk` as defined in [RLN](../draft/32/rln-v1.md).
 The secret key `sk` MUST be persisted securely by the mix node.
 
-A mixnet that is spam-protected requires all mix nodes in it to form an [RLN group](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#flow).
+A mixnet that is DoS-protected requires all mix nodes in it to form an [RLN group](../draft/32/rln-v1.md#flow).
 
 - Mix nodes MUST be registered to the RLN group to be able to send or forward messages.
 - Registration MAY be moderated through a smart contract deployed on a blockchain.
@@ -128,33 +122,73 @@ This ensures that mix nodes can detect spam and trigger slashing.
 
 ### Sending and forwarding messages
 
-In order to send/forward messages via mixnet, a mix node MUST include the [RateLimitProof](#ratelimitproof) in the sphinx packet as [$\sigma$](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#922-per-hop-generated-proofs).
+In order to send/forward messages via mixnet,
+a mix node MUST include the encrypted [RateLimitProof](#ratelimitproof) in the sphinx packet as $\sigma$ (see [Mix DoS Protection spec](mix-dos-protection.md#42-per-hop-generated-proofs)).
 
 #### Proof Generation
 
 When generating an RLN proof, the node MUST:
 
 1. Use its secret key `sk` and the current `epoch`
-2. Obtain the current Merkle root and [`path_elements`](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#obtaining-merkle-proof) from the synchronized membership tree
-3. Generate a keccak256 hash of all components of the **outgoing** sphinx packet [(α', β', γ', δ')](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md#81-packet-structure-overview) and set it as the proof signal. This prevents proof reuse across different messages.
+2. Obtain the current Merkle root and [`path_elements`](../draft/32/rln-v1.md#obtaining-merkle-proof) from the synchronized membership tree
+3. Generate a keccak256 hash of all components of the **outgoing** sphinx packet [(α', β', γ', δ')](mix.md#81-packet-structure-overview) and set it as the proof signal. This prevents proof reuse across different messages.
 
-**Sender nodes**:
+#### Proof Encryption
+
+After generating the proof,
+the node MUST encrypt it to the next hop in the mix path.
+
+The X25519 group, KDF, and AES-CTR construction are as defined in the [Mix Protocol cryptographic primitives](mix.md#82-cryptographic-primitives).
+
+Let $y$ denote the next hop's X25519 public key.
+The node MUST:
+
+1. Choose a random private exponent $e \in_R \mathbb{Z}_q^*$.
+2. Compute:
+
+   $`
+   \begin{aligned}
+   A &= g^e \\
+   z &= y^e
+   \end{aligned}
+   `$
+
+3. Derive the AES key and IV:
+
+   $`
+   \begin{array}{l}
+   \mathrm{proof\_aes\_key} = \mathrm{KDF}(\text{"proof\_aes\_key"} \mid z)\\
+   \mathrm{proof\_iv} = \mathrm{KDF}(\text{"proof\_iv"} \mid z)
+   \end{array}
+   `$
+
+4. Encrypt the serialized `RateLimitProof`:
+
+   $`
+   c = \mathrm{AES\text{-}CTR}(\mathrm{proof\_aes\_key},\ \mathrm{proof\_iv},\ \mathrm{RateLimitProof})
+   `$
+
+5. Encode $A$ and $c$ as $\sigma$ as specified in [Encrypted Proof Wire Format](#encrypted-proof-wire-format).
+
+A fresh $e$ MUST be chosen for every message.
+
+**Initiating node**:
 
 - generate an RLN proof for the initial sphinx packet
-- attach the proof to the packet before sending to the next hop
+- encrypt the proof to the first hop and attach the resulting $\sigma$ to the packet before sending
 
 **Intermediary and Exit nodes**:
 
 MUST do the following for every incoming mix packet:
 
-- verify the incoming packet's RLN proof (see [Message validation](#message-validation))
+- decrypt and verify the incoming packet's RLN proof (see [Message validation](#message-validation))
 - process the sphinx packet according to the mix protocol
 - generate a NEW RLN proof for the outgoing packet
-- attach the new proof before forwarding to the next hop
+- encrypt the new proof to the next hop and attach the resulting $\sigma$ to the packet before forwarding
 
 ### Group Synchronization
 
-Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `path_elements` (the authentication path in the Merkle proof as defined in [RLN](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#obtaining-merkle-proof)) which both require access to the membership Merkle tree.
+Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `path_elements` (the authentication path in the Merkle proof as defined in [RLN](../draft/32/rln-v1.md#obtaining-merkle-proof)) which both require access to the membership Merkle tree.
 Proof verification also requires knowledge of the `merkle_root` to validate that the proof was generated against a valid membership tree state.
 The RLN membership group MUST be synchronized across all mix nodes to ensure the latest Merkle root is used for RLN proof generation and verification.
 Stale roots may cause legitimate proofs to be rejected.
@@ -169,23 +203,48 @@ The coordination layer enables network-wide spam detection by preventing rate li
 The coordination layer SHOULD be used to broadcast [messaging metadata](#messaging-metadata).
 When a node detects spam, it can reconstruct the spammer's secret key using the shared key shares and initiate [slashing](#spam-detection-and-slashing).
 
-Intermediary and exit nodes that participate in the coordination layer MUST both subscribe to receive metadata and broadcast metadata from messages they process.
-Sender-only nodes need not participate in this coordination layer as they only originate messages and do not forward or validate messages from others.
+Mix nodes that participate in the coordination layer MUST both subscribe to receive metadata and broadcast metadata from messages they process.
+Nodes acting only as initiating nodes need not participate in this coordination layer as they only originate messages and do not forward or validate messages from others.
 
 The coordination layer MUST have its own spam and sybil protection mechanism in order to prevent from these attacks.
-We recommend using [WAKU-RLN-RELAY](https://github.com/logos-co/logos-lips/blob/72196d89c1084d625c22b1d5cb775ad7729ad577/waku/standards/core/17/rln-relay.md)
+We recommend using [WAKU-RLN-RELAY](../../messaging/draft/17/rln-relay.md)
 In this case, the Messaging Metadata MUST be encoded as the Waku Message payload.
-We recommend using the [public Waku Network](https://github.com/logos-co/logos-lips/blob/72196d89c1084d625c22b1d5cb775ad7729ad577/waku/standards/core/64/network.md) with a content topic agreed by all mix nodes.
+We recommend using the [public Waku Network](../../messaging/draft/64/network.md) with a content topic agreed by all mix nodes.
 
-### Message validation
+### Processing received messages
 
-A mix node MUST validate a received message using the below checks, discard the message and stop further checks or processing on failure.
+In order to process messages received via mixnet,
+a mix node MUST decrypt the [RateLimitProof](#ratelimitproof), $\sigma$, attached to the sphinx packet and validate it (see [Mix DoS Protection spec](mix-dos-protection.md#42-per-hop-generated-proofs)).
 
-1. If the `epoch` in the received message differs from the mix node's current `epoch` by more than `max_epoch_gap`.
+#### Proof Decryption
+
+Upon receiving a sphinx packet with attached $\sigma$ containing $(A, c)$,
+a mix node MUST decrypt $\sigma$ before validating the proof.
+
+Let $x$ denote the receiving node's X25519 private key.
+The node MUST:
+
+1. Compute the shared secret $z = A^x$.
+2. Derive the AES key and IV:
+
+   $`
+   \begin{array}{l}
+   \mathrm{proof\_aes\_key} = \mathrm{KDF}(\text{"proof\_aes\_key"} \mid z)\\
+   \mathrm{proof\_iv} = \mathrm{KDF}(\text{"proof\_iv"} \mid z)
+   \end{array}
+   `$
+
+3. Decrypt $c$ using AES-CTR with $\mathrm{proof\_aes\_key}$ and $\mathrm{proof\_iv}$ to recover the serialized `RateLimitProof`.
+
+#### Message validation
+
+A mix node MUST validate the recovered `RateLimitProof` using the below checks, discarding the proof and stopping further checks or processing on failure.
+
+1. If the `epoch` in the decrypted proof differs from the mix node's current `epoch` by more than `max_epoch_gap`.
 2. If the `merkle_root` is NOT in the `acceptable_root_window_size` past roots of the mix node.
-3. If the zero-knowledge proof `proof` is valid. It does so by running the zk verification algorithm as explained in [RLN](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#verification-and-slashing).
+3. If the zero-knowledge proof `proof` is valid. It does so by running the zk verification algorithm as explained in [RLN](../draft/32/rln-v1.md#verification-and-slashing).
 
-If all checks pass, the node proceeds to [spam detection](#spam-detection-and-slashing) before processing the message.
+If all checks pass, the node proceeds to [spam detection and slashing](#spam-detection-and-slashing) before processing the message.
 
 #### Spam detection and Slashing
 
@@ -209,9 +268,20 @@ The broadcast on the coordination layer MAY be batched atleast once per epoch to
 
 ## Wire Format Specification / Syntax
 
-### Spam protection proof
+### Encrypted Proof Wire Format
 
-The following `RateLimitProof` MUST be added to the sphinx packet as $\sigma$ as explained in [sending](#sending-and-forwarding-messages).
+$\sigma$ MUST be attached to the sphinx packet as explained in [sending and forwarding messages](#sending-and-forwarding-messages).
+$\sigma$ is the byte concatenation $A \| c$, where:
+
+- $A$ is the 32-byte ephemeral group element
+- $c$ is the AES-CTR ciphertext of the serialized `RateLimitProof`
+
+Both $A$ and $c$ are generated as described in [Proof Encryption](#proof-encryption).
+The size of $\sigma$ MUST be fixed (see [Mix DoS Protection §4.2.4](mix-dos-protection.md#424-impact-on-packet-size)).
+
+#### RateLimitProof
+
+Once $c$ is decrypted (see [Proof Decryption](#proof-decryption)), the result is the serialized `RateLimitProof` protobuf:
 
 ```protobuf
 syntax = "proto3";
@@ -226,21 +296,19 @@ message RateLimitProof {
 }
 ```
 
-#### RateLimitProof
-
-Below is the description of the fields of `RateLimitProof` and their types.
+The following table describes the fields of `RateLimitProof`.
 
 |               Parameter | Type                                     | Description                                                                                                                                                                                                                                                          |
 | ----------------------: | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |                 `proof` | array of 128 bytes compressed            | the zkSNARK proof as explained in the [Sending process](#sending-and-forwarding-messages)                                                                                                                                                                            |
 |           `merkle_root` | array of 32 bytes in little-endian order | the root of membership group Merkle tree at the time of sending the message                                                                                                                                                                                          |
 |                 `epoch` | array of 32 bytes                        | the current epoch at time of sending the message                                                                                                                                                                                                                     |
-| `share_x` and `share_y` | array of 32 bytes each                   | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the hash of the message. `share_y` is calculated using [Shamir secret sharing scheme](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md) |
-|             `nullifier` | array of 32 bytes                        | internal nullifier derived from `epoch` and node's `sk` as explained in [RLN construct](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md)                                                                          |
+| `share_x` and `share_y` | array of 32 bytes each                   | Shamir secret shares of the user's secret identity key `sk` . `share_x` is the hash of the message. `share_y` is calculated using [Shamir secret sharing scheme](../draft/32/rln-v1.md)                                                                              |
+|             `nullifier` | array of 32 bytes                        | internal nullifier derived from `epoch` and node's `sk` as explained in [RLN construct](../draft/32/rln-v1.md)                                                                                                                                                       |
 
 ### Messaging Metadata
 
-[Messaging metadata](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md#notes-from-implementation) is metadata which is broadcasted via coordination layer and cached by mix nodes locally.
+[Messaging metadata](../draft/32/rln-v1.md#notes-from-implementation) is metadata which is broadcasted via coordination layer and cached by mix nodes locally.
 This helps identify duplicate signalling in order to detect spam.
 
 ```protobuf
@@ -281,7 +349,7 @@ The system parameters are summarized in the following table.
 #### Coordination Layer Attacks
 
 - **Attack**: Flood coordination layer with spam metadata to create DoS
-- **Mitigation**: Coordination layer MUST implement its own spam protection (line 156)
+- **Mitigation**: Coordination layer MUST implement its own spam protection (see [Coordination Layer](#coordination-layer))
 
 #### Timing Attacks
 
@@ -296,6 +364,11 @@ The system parameters are summarized in the following table.
 - **Concern**: Nullifiers are broadcast via coordination layer, potentially enabling traffic analysis
 - **Analysis**: Nullifiers are derived from epoch and secret key, changing per epoch
 - **Limitation**: Within an epoch, multiple messages from same node share nullifier metadata structure
+
+#### Wire-Level Privacy
+
+Encrypting the `RateLimitProof` to the next hop prevents on-wire exposure of the proof fields.
+In particular, the `epoch` field is invariant across hops and would otherwise enable cross-hop correlation by passive observers.
 
 ### Out of Scope
 
@@ -353,10 +426,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [libp2p mix protocol](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md/)
+- [libp2p mix protocol](mix.md)
+- [Mix DoS Protection](mix-dos-protection.md)
 - [Rate Limiting Nullifiers (RLN)](https://vac.dev/rln)
-- [Rate Limiting Nullifiers v2](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md)
-- [RLN v1](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md)
+- [Rate Limiting Nullifiers v2](rln-v2.md)
+- [RLN v1](../draft/32/rln-v1.md)
 - [Waku-Relay](https://rfc.vac.dev/spec/11/)
 - [RLN with precomputed proofs](https://forum.vac.dev/t/rln-with-pre-computed-proofs/606)
 - [Poseidon hash implementation](https://eprint.iacr.org/2019/458.pdf)
