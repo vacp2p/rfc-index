@@ -169,16 +169,20 @@ and each mix node in the path generates a fresh proof for the subsequent hop aft
 The proof generation, verification, and forwarding proceed as follows:
 
 1. During [Sphinx packet construction](mix.md#85-packet-construction) of the Mix Protocol, after step 3.e,
-   the initiating node generates an initial DoS protection proof $σ$ for the first hop and appends it after the Sphinx packet,
-   forming the wire format: `SphinxPacket || σ`.
+   the initiating node generates an initial DoS protection proof for the first hop.
    The proof SHOULD be cryptographically bound to the complete outgoing Sphinx packet $(α_0 | β_0 | γ_0 | δ_0)$
    and include any verification metadata required by the DoS protection proof.
-2. The first hop extracts and verifies $σ$ before [processing the Sphinx packet](mix.md#861-shared-preprocessing).
+   The initiating node then encrypts the proof with the first hop's X25519 public key (see [Section 6](#6-anonymity-and-security-considerations)).
+   The resulting encrypted proof $σ$ is appended after the Sphinx packet,
+   forming the wire format: `SphinxPacket || σ`.
+2. The first hop decrypts and verifies $σ$ before [processing the Sphinx packet](mix.md#861-shared-preprocessing).
 3. After successful verification and Sphinx processing,
-   the hop generates a new proof $σ'$ for the next hop bound to the transformed packet.
+   the hop generates a new proof for the next hop bound to the transformed packet.
+   The hop then encrypts the proof with the next hop's X25519 public key.
+   The resulting encrypted proof $σ'$ is appended to the transformed Sphinx packet.
 4. The updated packet is forwarded to the next hop.
 5. This process repeats at each intermediate hop until the packet reaches the final hop.
-   The exit just verifies the proof in the incoming packet without generating a new one.
+   The exit just decrypts and verifies the incoming proof without generating a new one.
 
 #### 4.2.2 Advantages
 
@@ -210,7 +214,7 @@ The proof generation, verification, and forwarding proceed as follows:
 #### 4.2.4 Impact on Packet Size
 
 As mentioned in [Section 4.2.1](#421-details),
-$σ$ consists of the DoS protection proof and all verification metadata.
+$σ$ consists of the encrypted DoS protection proof with all verification metadata.
 Unlike sender-generated proofs,
 appending $σ$ after the Sphinx packet does not affect the internal Sphinx packet structure.
 
@@ -246,7 +250,7 @@ all mix nodes MUST implement the following DoS protection responsibilities for t
 
 ### 5.1 For Sender-Generated Proofs
 
-**[During Sphinx packet construction](mix.md#85-packet-construction):** 
+**[During Sphinx packet construction](mix.md#85-packet-construction):**
 Generate and embed DoS protection proofs for all hops as described in [Section 4.1.1](#411-details).
 The proofs MUST NOT contain any identifying information.
 
@@ -258,18 +262,18 @@ discard the packet and apply any penalties or rate-limiting measures.
 ### 5.2 For Per-Hop Generated Proofs
 
 **[During Sphinx packet construction](mix.md#85-packet-construction):**
-Generate the initial proof $σ$ and append it after the Sphinx packet as described in [Section 4.2.1](#421-details).
+Generate the initial proof, encrypt it, and append the resulting $σ$ after the Sphinx packet as described in [Section 4.2.1](#421-details).
 The proof MUST NOT contain any identifying information.
 
 **[During Sphinx packet preprocessing](mix.md#861-shared-preprocessing):**
-Extract and verify the incoming proof $σ$ before any Sphinx processing as described in [Section 4.2.1](#421-details).
+Decrypt and verify the incoming $σ$ before any Sphinx processing as described in [Section 4.2.1](#421-details).
 If verification fails,
 discard the packet and apply any penalties or rate-limiting measures.
 
 **[After node role determination](mix.md#862-node-role-determination):**
 - If intermediary,
   during [intermediary processing](mix.md#863-intermediary-processing),
-  generate a fresh unlinkable proof $σ'$ and append it to the assembled packet before Step 5.
+  generate a fresh unlinkable proof, encrypt it, and append the resulting $σ'$ to the assembled packet before Step 5.
 - If exit,
   perform [exit processing](mix.md#864-exit-processing) without generating a new proof.
 
@@ -281,6 +285,10 @@ DoS protection mechanisms MUST be carefully designed to avoid introducing correl
 
 - **Proof unlinkability**: Linking incoming and outgoing proofs at intermediary hops MUST be cryptographically hard,
   to preserve the [bitwise unlinkability](mix.md#91-security-guarantees-of-the-core-mix-protocol) guaranteed by the Mix Protocol.
+
+- **Proof confidentiality**: Per-hop generated proofs MUST be encrypted with the verifying hop's X25519 public key,
+  to prevent passive observers from correlating packets across hops via fields invariant on the wire (_e.g.,_ epoch field).
+  Sender-generated proofs are already protected by Sphinx's layered encryption of $β$ (see [Section 4.1.2](#412-advantages)).
 
 - **Verification failure handling**: Nodes MUST silently discard packets that fail proof verification,
   without revealing the reason for failure,
@@ -365,10 +373,10 @@ Generate a DoS protection proof bound to specific packet data.
   For sender-generated proofs, this is $δ_{i+1}$ (the decrypted payload that hop $i$ will see).
   For per-hop generated proofs, this is the complete outgoing Sphinx packet state $(α', β', γ', δ')$.
 - `hop_pubkey`: The X25519 public key of the hop that will verify the proof.
-  For sender-generated proofs, this is each hop $i$'s public key $y_i$ (obtained during path selection).
-  For per-hop generated proofs, this is the public key of the next hop in the path.
-  This key is used to encrypt proof contents,
-  preventing on-wire exposure of fields that would enable cross-hop correlation (see [Section 3](#3-requirements)).
+  For sender-generated proofs, this is each hop $i$'s public key $y_i$ (obtained during path selection);
+  mechanisms MAY ignore it.
+  For per-hop generated proofs, this is the public key of the next hop in the path,
+  used to encrypt proof contents (see [Section 6](#6-anonymity-and-security-considerations)).
 
 **Returns**:
 
@@ -402,6 +410,9 @@ Verify that a DoS protection proof is valid and correctly bound to the provided 
 
 **Requirements**:
 
+- For per-hop generated proofs,
+  the mechanism decrypts `encoded_proof_data` with the verifying node's X25519 private key before verification
+  (see [Section 6](#6-anonymity-and-security-considerations)).
 - Implementations MUST handle malformed or truncated `encoded_proof_data` gracefully
   and return `false`.
 - For mechanisms that maintain global state (_e.g.,_ nullifier sets, rate-limit counters, membership trees),
