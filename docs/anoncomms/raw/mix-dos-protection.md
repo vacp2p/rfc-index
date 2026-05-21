@@ -95,7 +95,8 @@ The proof generation and verification proceed as follows:
    the initiating node first computes the ephemeral secrets (step 3.a) and encrypted payload (step 3.d).
    Note that this deviates from the standard Sphinx construction order.
    Next, it computes the filler strings (step 3.b),
-   where the zero-padding length depends on the size of the DoS protection proof embedded in each hop's routing block (see [Section 4.1.4](#414-impact-on-header-size)).
+   where the zero-padding length depends on the size of the DoS protection proof embedded in each hop's routing block
+   (see [Section 4.1.4](#414-impact-on-header-size)).
    Then, during step 3.c, for each hop $i$ in the path,
    the initiating node:
 
@@ -135,7 +136,8 @@ The proof generation and verification proceed as follows:
   the initiating node must generate $L$ fresh proofs for each path.
 - Proofs can only be verified after expensive Sphinx processing operations (session key derivation, replay checking, header integrity verification, and decryption),
   since they are encrypted within the $β$ field and bound to the decrypted payload state $δ'$.
-  Deployments using this approach SHOULD augment with additional network-level protections (connection rate limiting, localized peer reputation) to defend against attacks that can lead to draining nodes' resources.
+  Deployments using this approach SHOULD augment with additional network-level protections (connection rate limiting, localized peer reputation) to defend against attacks
+  that can lead to draining nodes' resources.
 - This approach does not inherently provide Sybil resistance
   since nodes in the path do not generate any proof using their credentials.
 
@@ -281,7 +283,8 @@ discard the packet and apply any penalties or rate-limiting measures.
 
 DoS protection mechanisms MUST be carefully designed to avoid introducing correlation risks:
 
-- **Timing side channels**: Proof verification and generation SHOULD use constant-time implementations to avoid timing-based side channel attacks that could enable packet fingerprinting.
+- **Timing side channels**: Proof verification and generation SHOULD use constant-time implementations to avoid timing-based side channel attacks
+  that could enable packet fingerprinting.
 
 - **Proof unlinkability**: Linking incoming and outgoing proofs at intermediary hops MUST be cryptographically hard,
   to preserve the [bitwise unlinkability](mix.md#91-security-guarantees-of-the-core-mix-protocol) guaranteed by the Mix Protocol.
