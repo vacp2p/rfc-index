@@ -6,14 +6,18 @@ This keeps a consistent navigation structure for mdBook without manual edits.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import json
 from pathlib import Path
 import re
 from typing import Iterable, List, Optional
 
+import blockchain_structure as bc
+
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 OUTPUT = DOCS / "SUMMARY.md"
+BLOCKCHAIN_TREE_JSON = DOCS / "blockchain-structure.json"
 
 SKIP_FILES = {"README.md", "SUMMARY.md", "template.md"}
 
@@ -80,8 +84,8 @@ ACRONYMS = {
 @dataclass
 class Item:
     label: str
-    path: Path
-    children: List["Item"]
+    path: Optional[Path]  # None -> rendered as a draft (greyed) entry: `[Label]()`
+    children: List["Item"] = field(default_factory=list)
 
 
 def read_h1(path: Path) -> Optional[str]:
@@ -201,13 +205,103 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
     return sections + items
 
 
+def escape_label(label: str) -> str:
+    """Escape `[` and `]` so they survive Markdown link-text parsing."""
+    return label.replace("[", "\\[").replace("]", "\\]")
+
+
 def render_items(items: Iterable[Item], depth: int, lines: List[str]) -> None:
     indent = "  " * depth
     for item in items:
-        rel = item.path.relative_to(DOCS).as_posix()
-        lines.append(f"{indent}- [{item.label}]({rel})")
+        label = escape_label(item.label)
+        if item.path is None:
+            lines.append(f"{indent}- [{label}]()")
+        else:
+            rel = item.path.relative_to(DOCS).as_posix()
+            lines.append(f"{indent}- [{label}]({rel})")
         if item.children:
             render_items(item.children, depth + 1, lines)
+
+
+def read_status(path: Path) -> Optional[str]:
+    """Return the lowercased value of the `Status` row in a spec metadata table."""
+    try:
+        for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+            m = re.match(r"^\|\s*Status\s*\|\s*([^|]+?)\s*\|", line, re.IGNORECASE)
+            if m:
+                return m.group(1).strip().lower()
+    except OSError:
+        pass
+    return None
+
+
+def build_blockchain_items() -> List[Item]:
+    """
+    Build the Blockchain section under the Notion-style topology defined in
+    `blockchain_structure.py`. Each spec lands under its mapped topic; the
+    bucket is derived from its `Status` field. Notion-only entries are emitted
+    as draft links so the full target structure stays visible.
+    """
+    # Group real files by (topic, bucket).
+    grouped: dict = {topic: {b: [] for b in bc.buckets_for_topic(topic)} for topic in bc.TOPIC_ORDER}
+    for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
+        abs_path = DOCS / rel_path
+        if not abs_path.exists():
+            continue
+        status = read_status(abs_path) or "raw"
+        bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if bucket not in grouped[topic]:
+            grouped[topic][bucket] = []
+        grouped[topic][bucket].append(Item(label=label, path=abs_path))
+
+    topic_items: List[Item] = []
+    for topic in bc.TOPIC_ORDER:
+        bucket_items: List[Item] = []
+        placeholders = bc.PLACEHOLDERS.get(topic, {})
+        for bucket in bc.buckets_for_topic(topic):
+            children: List[Item] = sorted(grouped[topic].get(bucket, []), key=lambda i: i.label.lower())
+            for placeholder_label in placeholders.get(bucket, []):
+                children.append(Item(label=placeholder_label, path=None))
+            bucket_items.append(Item(label=bucket, path=None, children=children))
+        topic_items.append(Item(label=topic, path=None, children=bucket_items))
+
+    return [Item(label=bc.BEDROCK_LABEL, path=None, children=topic_items)]
+
+
+def build_blockchain_tree_data() -> dict:
+    """
+    Same topology as `build_blockchain_items`, but emitted as a JSON-friendly
+    dict for the in-page tree view on the Blockchain landing page.
+    Each spec entry carries its `path` (relative to docs/) and `status`.
+    Placeholder entries have `path: null` and `status: null`.
+    """
+    grouped: dict = {topic: {b: [] for b in bc.buckets_for_topic(topic)} for topic in bc.TOPIC_ORDER}
+    for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
+        abs_path = DOCS / rel_path
+        if not abs_path.exists():
+            continue
+        status = read_status(abs_path) or "raw"
+        bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if bucket not in grouped[topic]:
+            grouped[topic][bucket] = []
+        grouped[topic][bucket].append({
+            "label": label,
+            "path": rel_path,
+            "status": status,
+        })
+
+    topics_out = []
+    for topic in bc.TOPIC_ORDER:
+        placeholders = bc.PLACEHOLDERS.get(topic, {})
+        buckets_out = []
+        for bucket in bc.buckets_for_topic(topic):
+            specs = sorted(grouped[topic].get(bucket, []), key=lambda s: s["label"].lower())
+            for placeholder_label in placeholders.get(bucket, []):
+                specs.append({"label": placeholder_label, "path": None, "status": None})
+            buckets_out.append({"name": bucket, "specs": specs})
+        topics_out.append({"name": topic, "buckets": buckets_out})
+
+    return {"label": bc.BEDROCK_LABEL, "topics": topics_out}
 
 
 def main() -> None:
@@ -226,12 +320,21 @@ def main() -> None:
             continue
         label = LABEL_OVERRIDES.get(section, humanize(section))
         lines.append(f"- [{label}]({section}/{readme.name})")
-        children = build_items(section_dir, Path(section))
+        if section == "blockchain":
+            children = build_blockchain_items()
+        else:
+            children = build_items(section_dir, Path(section))
         render_items(children, 1, lines)
         lines.append("")
 
     OUTPUT.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(f"Wrote {OUTPUT}")
+
+    tree_data = build_blockchain_tree_data()
+    BLOCKCHAIN_TREE_JSON.write_text(
+        json.dumps(tree_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(f"Wrote {BLOCKCHAIN_TREE_JSON}")
 
 
 if __name__ == "__main__":
