@@ -26,27 +26,37 @@
 
 This document defines a DoS and sybil protection protocol for [libp2p mix](mix.md) based mixnets.
 The protocol specifies how [Rate Limiting Nullifiers (RLN)](https://vac.dev/rln) can be integrated into libp2p mix.
-RLN allows mix nodes to detect and drop spam without identifying legitimate users, addressing spam attacks.
-RLN requires membership for mix nodes to send or forward messages, addressing the sybil attack vector.
+RLN allows mix nodes to detect and drop spam without identifying legitimate users,
+addressing spam attacks.
+RLN requires membership for mix nodes to send or forward messages,
+addressing the sybil attack vector.
 RLN satisfies the DoS protection [requirements](mix-dos-protection.md#3-requirements) defined for the Mix Protocol.
 
 ## Background / Rationale / Motivation
 
-Mixnets provide strong privacy guarantees by routing messages through multiple mix nodes using layered encryption and per-hop delays to obscure both routing paths and timing correlations. In order to have a production-ready mixnet using the [libp2p mix](mix.md), two critical vulnerabilities must be addressed:
+Mixnets provide strong privacy guarantees by routing messages through multiple mix nodes using layered encryption and per-hop delays to obscure both routing paths and timing correlations.
+In order to have a production-ready mixnet using the [libp2p mix](mix.md),
+two critical vulnerabilities must be addressed:
 
-1. **DoS attacks**: An attacker can generate well-formed sphinx packets targeting mix nodes and exhaust their resources.
-   In case of mixnets, it is easy to attack a later hop in the mix path by choosing different first hop nodes.
-   An attacker with minimal resources can launch DoS attacks against individual mix nodes. By targeting all mix nodes in this manner, the attacker can render the entire mixnet unusable.
-2. **Sybil attacks**: Adversaries operating multiple node identities can increase the probability of path compromise, enabling deanonymization through traffic correlation or timing analysis.
+1. **DoS attacks**: An attacker can generate well-formed sphinx packets targeting mix nodes
+   and exhaust their resources.
+   In case of mixnets,
+   it is easy to attack a later hop in the mix path by choosing different first hop nodes.
+   An attacker with minimal resources can launch DoS attacks against individual mix nodes.
+   By targeting all mix nodes in this manner,
+   the attacker can render the entire mixnet unusable.
+2. **Sybil attacks**: Adversaries operating multiple node identities can increase the probability of path compromise,
+   enabling deanonymization through traffic correlation or timing analysis.
 
 The [libp2p mix](mix.md) protocol provides an extension for integrating DoS protection mechanisms (see [Mix DoS Protection](mix-dos-protection.md)).
 This specification proposes to use [Rate Limiting Nullifiers (RLN)](rln-v2.md) as the DoS and sybil protection mechanism.
-This approach introduces some trade-offs such as additional per-hop latency for proof generation which are discussed in the [Tradeoffs](#tradeoffs) section.
+This approach introduces some trade-offs such as additional per-hop latency for proof generation
+which are discussed in the [Tradeoffs](#tradeoffs) section.
 
 ## Terminology
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”,
-“NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL”
+in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
 Other terms used in this document are as defined in the [libp2p Mix Protocol](mix.md) and [Mix DoS Protection](mix-dos-protection.md).
 
@@ -56,15 +66,20 @@ Message is the actual sphinx packet including headers and encrypted payload that
 
 ### Messaging Rate
 
-The messaging rate is defined as the number of messages that can be sent/forwarded per fixed unit of time, termed an `epoch`.
-Since we're using this as shorthand for the maximum allowable rate, this is also known as the _rate limit_.
+The messaging rate is defined as the number of messages that can be sent/forwarded per fixed unit of time,
+termed an `epoch`.
+Since we're using this as shorthand for the maximum allowable rate,
+this is also known as the _rate limit_.
 The length of each epoch is constant and defined as the `period`.
 
 We define an `epoch` as $\lceil$ `unix_time` / `period` $\rceil$.
-For example, if `unix_time` is `1644810116` and we set `period` to `30`, then `epoch` is $\lceil$ `(unix_time/period)` $\rceil$ `= 54827004`.
+For example,
+if `unix_time` is `1644810116` and we set `period` to `30`,
+then `epoch` is $\lceil$ `(unix_time/period)` $\rceil$ `= 54827004`.
 
 > **NOTE:** The `epoch` refers to the epoch in RLN and not Unix epoch.
-> This means that no more messages than the registered rate limit can be sent per epoch, where the epoch length (`period`) is up to the application.
+> This means that no more messages than the registered rate limit can be sent per epoch,
+> where the epoch length (`period`) is up to the application.
 
 See section [System Parameters](#system-parameters) for details on the `period` parameter.
 
@@ -72,16 +87,22 @@ See section [System Parameters](#system-parameters) for details on the `period` 
 
 ### Overview
 
-The protocol implements RLN using a [per-hop generated proof approach](mix-dos-protection.md#42-per-hop-generated-proofs), where each node in the mix path generates and verifies proofs.
+The protocol implements RLN using a [per-hop generated proof approach](mix-dos-protection.md#42-per-hop-generated-proofs),
+where each node in the mix path generates and verifies proofs.
 This enables network-wide spam protection while preserving user privacy.
 
 Each mix node MUST have an RLN group membership in order to send or forward messages in the mixnet.
 Each mix node in the path (except the initiating node) verifies the incoming RLN proof before processing the message.
-After verification, each node generates and attaches a new RLN proof before forwarding the message to the next hop.
+After verification,
+each node generates and attaches a new RLN proof before forwarding the message to the next hop.
 
-To effectively detect spam, mix nodes SHOULD identify when a node exceeds its [messaging rate](#messaging-rate) by reusing the same nullifier across multiple messages within an epoch (known as "double signalling").
-Since a message does not traverse all the mix nodes in the network, a spammer could exploit different paths to avoid detection by any single mix node.
-To address this, intermediary and exit nodes SHOULD participate in a [coordination layer](#coordination-layer) that indicates already seen [messaging metadata](#messaging-metadata) across the mix nodes.
+To effectively detect spam,
+mix nodes SHOULD identify when a node exceeds its [messaging rate](#messaging-rate) by reusing the same nullifier across multiple messages within an epoch (known as "double signalling").
+Since a message does not traverse all the mix nodes in the network,
+a spammer could exploit different paths to avoid detection by any single mix node.
+To address this,
+intermediary and exit nodes SHOULD participate in a [coordination layer](#coordination-layer)
+that indicates already seen [messaging metadata](#messaging-metadata) across the mix nodes.
 This enables all participating mix nodes to detect double signalling across different paths, derive the spammer's private key, and initiate slashing.
 
 ### Rationale
@@ -90,17 +111,21 @@ RLN is well-suited for spam and sybil protection in libp2p mix based mixnets due
 
 - Sybil Resistance:
   - Requiring membership for each mix node creates friction to participate in the mixnet to send or forward messages
-  - Operating multiple identities becomes costly, mitigating sybil attacks that could compromise mix path selection
+  - Operating multiple identities becomes costly,
+    mitigating sybil attacks that could compromise mix path selection
 
 - Privacy-Preserving Spam Protection:
   - Uses zero-knowledge proofs to enforce rate limits without revealing sender identities
-  - Ties spam protection proof to the message content, making proofs non-reusable across messages
+  - Ties spam protection proof to the message content,
+    making proofs non-reusable across messages
   - Enables economic deterrence through slashing without compromising anonymity
 
 - Network-Level Benefits:
-  - RLN enables setting a deterministic [messaging rate](#messaging-rate) for the mixnet, which translates to predictable bandwidth requirements (messages per epoch × sphinx packet size).
+  - RLN enables setting a deterministic [messaging rate](#messaging-rate) for the mixnet,
+    which translates to predictable bandwidth requirements (messages per epoch × sphinx packet size).
   - This makes it easier to provision and estimate resource usage for nodes participating in the mixnet.
-  - The rate limit creates a baseline traffic level that, when combined with cover traffic, helps maintain k-anonymity even during periods of low organic traffic.
+  - The rate limit creates a baseline traffic level
+    that, when combined with cover traffic, helps maintain k-anonymity even during periods of low organic traffic.
 
 ### Setup
 
@@ -127,11 +152,14 @@ a mix node MUST include the encrypted [RateLimitProof](#ratelimitproof) in the s
 
 #### Proof Generation
 
-When generating an RLN proof, the node MUST:
+When generating an RLN proof,
+the node MUST:
 
 1. Use its secret key `sk` and the current `epoch`
 2. Obtain the current Merkle root and [`path_elements`](../draft/32/rln-v1.md#obtaining-merkle-proof) from the synchronized membership tree
-3. Generate a keccak256 hash of all components of the **outgoing** sphinx packet [(α', β', γ', δ')](mix.md#81-packet-structure-overview) and set it as the proof signal. This prevents proof reuse across different messages.
+3. Generate a keccak256 hash of all components of the **outgoing** sphinx packet [(α', β', γ', δ')](mix.md#81-packet-structure-overview)
+   and set it as the proof signal.
+   This prevents proof reuse across different messages.
 
 #### Proof Encryption
 
@@ -188,33 +216,40 @@ MUST do the following for every incoming mix packet:
 
 ### Group Synchronization
 
-Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `path_elements` (the authentication path in the Merkle proof as defined in [RLN](../draft/32/rln-v1.md#obtaining-merkle-proof)) which both require access to the membership Merkle tree.
+Proof generation relies on the knowledge of Merkle tree root `merkle_root` and `path_elements` (the authentication path in the Merkle proof as defined in [RLN](../draft/32/rln-v1.md#obtaining-merkle-proof))
+which both require access to the membership Merkle tree.
 Proof verification also requires knowledge of the `merkle_root` to validate that the proof was generated against a valid membership tree state.
 The RLN membership group MUST be synchronized across all mix nodes to ensure the latest Merkle root is used for RLN proof generation and verification.
 Stale roots may cause legitimate proofs to be rejected.
-Using an old root can allow inference about the index of the user's `pk` in the membership tree hence compromising user privacy and breaking message unlinkability.
+Using an old root can allow inference about the index of the user's `pk` in the membership tree
+hence compromising user privacy and breaking message unlinkability.
 
-In order to accommodate network delays, nodes MUST maintain a window of recent valid roots (see `acceptable_root_window_size` in [System Parameters](#system-parameters)).
+In order to accommodate network delays,
+nodes MUST maintain a window of recent valid roots (see `acceptable_root_window_size` in [System Parameters](#system-parameters)).
 We recommend `5` for `acceptable_root_window_size`.
 
 ### Coordination Layer
 
 The coordination layer enables network-wide spam detection by preventing rate limit violations through nullifier reuse detection.
 The coordination layer SHOULD be used to broadcast [messaging metadata](#messaging-metadata).
-When a node detects spam, it can reconstruct the spammer's secret key using the shared key shares and initiate [slashing](#spam-detection-and-slashing).
+When a node detects spam,
+it can reconstruct the spammer's secret key using the shared key shares and initiate [slashing](#spam-detection-and-slashing).
 
 Mix nodes that participate in the coordination layer MUST both subscribe to receive metadata and broadcast metadata from messages they process.
-Nodes acting only as initiating nodes need not participate in this coordination layer as they only originate messages and do not forward or validate messages from others.
+Nodes acting only as initiating nodes need not participate in this coordination layer
+as they only originate messages and do not forward or validate messages from others.
 
 The coordination layer MUST have its own spam and sybil protection mechanism in order to prevent from these attacks.
 We recommend using [WAKU-RLN-RELAY](../../messaging/draft/17/rln-relay.md)
-In this case, the Messaging Metadata MUST be encoded as the Waku Message payload.
+In this case,
+the Messaging Metadata MUST be encoded as the Waku Message payload.
 We recommend using the [public Waku Network](../../messaging/draft/64/network.md) with a content topic agreed by all mix nodes.
 
 ### Processing received messages
 
 In order to process messages received via mixnet,
-a mix node MUST decrypt the [RateLimitProof](#ratelimitproof), $\sigma$, attached to the sphinx packet and validate it (see [Mix DoS Protection spec](mix-dos-protection.md#42-per-hop-generated-proofs)).
+a mix node MUST decrypt the [RateLimitProof](#ratelimitproof), $\sigma$, attached to the sphinx packet
+and validate it (see [Mix DoS Protection spec](mix-dos-protection.md#42-per-hop-generated-proofs)).
 
 #### Proof Decryption
 
@@ -238,32 +273,42 @@ The node MUST:
 
 #### Message validation
 
-A mix node MUST validate the recovered `RateLimitProof` using the below checks, discarding the proof and stopping further checks or processing on failure.
+A mix node MUST validate the recovered `RateLimitProof` using the below checks,
+discarding the proof and stopping further checks or processing on failure.
 
 1. If the `epoch` in the decrypted proof differs from the mix node's current `epoch` by more than `max_epoch_gap`.
 2. If the `merkle_root` is NOT in the `acceptable_root_window_size` past roots of the mix node.
-3. If the zero-knowledge proof `proof` is valid. It does so by running the zk verification algorithm as explained in [RLN](../draft/32/rln-v1.md#verification-and-slashing).
+3. If the zero-knowledge proof `proof` is valid.
+   It does so by running the zk verification algorithm as explained in [RLN](../draft/32/rln-v1.md#verification-and-slashing).
 
-If all checks pass, the node proceeds to [spam detection and slashing](#spam-detection-and-slashing) before processing the message.
+If all checks pass,
+the node proceeds to [spam detection and slashing](#spam-detection-and-slashing) before processing the message.
 
 #### Spam detection and Slashing
 
-To enable local spam detection and slashing, mix nodes MUST store the [messaging metadata](#messaging-metadata) in a local cache. This includes metadata from:
+To enable local spam detection and slashing,
+mix nodes MUST store the [messaging metadata](#messaging-metadata) in a local cache.
+This includes metadata from:
 
 - messages processed locally by the mix layer
 - messages received via the coordination layer
 
 The cache SHOULD be cleared for epoch data older than `max_epoch_gap`.
-To identify spam messages, the node checks whether a message with an identical `nullifier` is present in the epoch's cache.
+To identify spam messages,
+the node checks whether a message with an identical `nullifier` is present in the epoch's cache.
 
-1. If no entry exists for this `nullifier`, the node stores the [messaging metadata](#messaging-metadata) in the cache and proceeds to process the message normally.
-2. If an entry exists and its `share_x` and `share_y` components are different from the incoming message, then proceed with slashing.
+1. If no entry exists for this `nullifier`,
+   the node stores the [messaging metadata](#messaging-metadata) in the cache and proceeds to process the message normally.
+2. If an entry exists and its `share_x` and `share_y` components are different from the incoming message,
+   then proceed with slashing.
    The mix node uses the `share_x` and `share_y` of the new message and the shares from the local cache to reconstruct the `sk` of the message owner.
    The `sk` then MUST be used to delete the spammer from the group and withdraw its staked funds.
    The node MUST discard the message and MUST NOT forward it.
-3. If the `share_x` and `share_y` fields in the local cache are identical to the incoming message, then the message is a duplicate and MUST be discarded.
+3. If the `share_x` and `share_y` fields in the local cache are identical to the incoming message,
+   then the message is a duplicate and MUST be discarded.
 
-After successfully validating a message, intermediary and exit nodes SHOULD broadcast the [message's metadata](#messaging-metadata) using the coordination layer to enable network-wide spam detection.
+After successfully validating a message,
+intermediary and exit nodes SHOULD broadcast the [message's metadata](#messaging-metadata) using the coordination layer to enable network-wide spam detection.
 The broadcast on the coordination layer MAY be batched atleast once per epoch to reduce constant traffic on coordination layer.
 
 ## Wire Format Specification / Syntax
@@ -281,7 +326,8 @@ The size of $\sigma$ MUST be fixed (see [Mix DoS Protection §4.2.4](mix-dos-pro
 
 #### RateLimitProof
 
-Once $c$ is decrypted (see [Proof Decryption](#proof-decryption)), the result is the serialized `RateLimitProof` protobuf:
+Once $c$ is decrypted (see [Proof Decryption](#proof-decryption)),
+the result is the serialized `RateLimitProof` protobuf:
 
 ```protobuf
 syntax = "proto3";
@@ -308,7 +354,8 @@ The following table describes the fields of `RateLimitProof`.
 
 ### Messaging Metadata
 
-[Messaging metadata](../draft/32/rln-v1.md#notes-from-implementation) is metadata which is broadcasted via coordination layer and cached by mix nodes locally.
+[Messaging metadata](../draft/32/rln-v1.md#notes-from-implementation) is metadata
+which is broadcasted via coordination layer and cached by mix nodes locally.
 This helps identify duplicate signalling in order to detect spam.
 
 ```protobuf
@@ -403,7 +450,10 @@ The appropriate stake amount MUST balance accessibility against attack economics
 
 ### Cost of ZK Proof Generation
 
-Zero-knowledge proof generation imposes computational costs on mix nodes. Proof generation is CPU-intensive, requiring modern processors. May be prohibitive for mobile or embedded devices.
+Zero-knowledge proof generation imposes computational costs on mix nodes.
+Proof generation is CPU-intensive,
+requiring modern processors.
+May be prohibitive for mobile or embedded devices.
 
 **Mitigation**: See [Future Work](#future-work) for potential research into using alternative proving systems.
 
@@ -413,12 +463,14 @@ These costs must be factored into operational expenses and node requirements.
 
 In order to reduce latency introduced at each hop:
 
-- RLN can be used with pre-computed proofs as explained [here](https://forum.vac.dev/t/rln-with-pre-computed-proofs/606). This approach can be explored further and could potentially replace the current proposed RLN implementation.
+- RLN can be used with pre-computed proofs as explained [here](https://forum.vac.dev/t/rln-with-pre-computed-proofs/606).
+  This approach can be explored further and could potentially replace the current proposed RLN implementation.
 - Research other proving systems that would generate faster ZK proofs.
 
 Additional sybil resistance mechanisms could augment RLN by incorporating reputation-based lists similar to Tor's "directory authorities".
 
-These help clients build circuits that are less likely to be entirely controlled by sybils through a range of techniques that limit nodes' possible influence based on trustworthiness metrics.
+These help clients build circuits that are less likely to be entirely controlled by sybils through a range of techniques
+that limit nodes' possible influence based on trustworthiness metrics.
 
 ## Copyright
 
