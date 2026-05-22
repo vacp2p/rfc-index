@@ -2,12 +2,12 @@
 
 | Field | Value |
 | --- | --- |
-| Name         | RLN DoS Protection for Mixnet |
-| Slug         | 144                           |
-| Status       | raw                           |
-| Category     | Standards Track               |
-| Editor       | Prem Prathi <prem@status.im>  |
-| Contributors |                               |
+| Name | RLN DoS Protection for Mixnet |
+| Slug | 144 |
+| Status | raw |
+| Category | Standards Track |
+| Editor | Prem Prathi <prem@status.im> |
+| Contributors | Akshaya Mani <akshaya@status.im> |
 
 <!-- timeline:start -->
 
