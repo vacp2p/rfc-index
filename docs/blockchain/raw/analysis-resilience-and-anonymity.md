@@ -17,7324 +17,1112 @@
 
 ---
 
-> **Note on this import:** This spec was imported from Notion on 2026-05-22.
-> The body below preserves the source text and needs a formatting pass for COSS conventions
-> (semantic line breaks, code block markers, table formatting, internal cross-references).
-> Treat this commit as the initial migration; subsequent PRs should polish the formatting incrementally.
+> **Note on this import:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) rendered via katex; tables and headings
+> are converted from Notion HTML. A formatting polish (semantic line breaks, code block fences
+> for code samples, internal cross-references) is still recommended.
 
 ---
 
-Authors:  Alexander Mozeika <alexander.mozeika@logos.co>
-Revision History
-Version
-	
-Changes
-	
-Date
+## Revision History
 
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2025-08-25 |
 
-1.0.0
-	
-Initial revision.
-	
-2025-08-25
-Introduction
-In order to guide a design of the Blend Network, this document summarises parameters (and results of analysis) of the leader election process, communication on trees and inference of relative stake. In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network. 
-Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in Cryptarchia. 
-Analysis
-Leader election process
-The leader election process is organised into epochs and each epoch is divided into 
-𝑇
-T time-slots.
-One epoch of the leader election process. Node 
-𝑖
-i participates in the leader election at time-slots 
-𝑡
-1
-,
-…
-,
-𝑡
-𝑇
-t
-1
-	​
+## Introduction
 
-,…,t
-T
-	​
+In order to guide a design of the [Blend Network](/215261aa09df81ae8857d71066a80084?pvs=25), this document summarises parameters (and results of analysis) of the [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25), [communication on trees](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) and [inference of relative stake](/1fd261aa09df8181a428f52251e173c4?pvs=25). In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.
 
-. The (binary) outcome of this lottery, where 0/1 corresponds to lost/won, is either observed (numbers in square brackets) or unobserved. 
-The leader election process has the following parameters 
-Parameter
-	
-Description
-	
-Value/Range
+Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in [Cryptarchia](/1fd261aa09df81618a76e0ac0f7f154f?pvs=25).
 
+## Analysis
 
-𝑁
-N 
-	
-Number of nodes
-	
-10
-2
-…
-10
-4
-10
-2
-…10
-4
-​
+### Leader election process
 
+The [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) is organised into epochs and each epoch is divided into $T$ time-slots.
 
-𝑇
-T​
-	
-Number of time-slots per epoch
-	
-≈
-432
-,
-000
-≈432,000​
+![](/image/attachment%3A29902138-cf0a-4ae7-9cc2-1ee0727f0b51%3AScreenshot_2025-05-02_at_14.23.31.png?table=block&id=1fd261aa-09df-8132-947c-f18dddfbee58&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=770&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
+One epoch of the leader election process. Node $i$ participates in the leader election at time-slots $t\_1,\ldots,t\_T$ . The (binary) outcome of this lottery, where 0/1 corresponds to lost/won, is either observed (numbers in square brackets) or unobserved.
 
-𝑓
-f​
-	
-Fraction of time-slots with at least one winner
-	
-0.05
-0.05​
+ALT
 
-
-Δ
-𝑡
-Δt​
-	
-The duration of a single time-slot
-	
-1
-1 s
-Sampling of Linear Trees 
-Communication on Linear Trees. A message is sent from a root node through 
-𝐾
-K communication paths where each path has 
-𝐿
-L nodes. 
-The number of nodes in linear tree design is 
-1
-+
-𝐾
-𝐿
-1+KL, where 
-𝐾
-K is the number of paths and 
-𝐿
-L is the number of nodes in each path excluding the sender node. In the linear tree design, one node is the sender node and the other 
-𝐾
-𝐿
-KL nodes are mix nodes. 
-We assume that in each epoch of the protocol there are 
-𝑛
-n sender nodes, labelled by the set 
-[
-𝑛
-]
-[n].  Each of the 
-𝑛
-n sender nodes sample 
-𝐾
-×
-𝐿
-K×L nodes from the population of 
-𝑁
-N nodes (labeled by the set 
-[
-𝑁
-]
-[N]). The total number of nodes involved in communication is 
-𝑛
-(
-1
-+
-𝐾
-𝐿
-)
-n(1+KL). 
-We assume that each sender node samples 
-𝐾
-×
-𝐿
-K×L nodes, independently from other nodes, using sampling without replacement. A node among the 
-𝐾
-×
-𝐿
-K×L nodes sampled from 
-[
-𝑁
-]
-[N] just by chance can also appear in other 
-𝑛
-−
-1
-n−1 random subsets of nodes. 
-The result of the sampling process described above can be represented by the following random factor-graph: 
-The random factor-graph generated by sampling of 
-𝑛
-n subsets of 
-𝐾
-×
-𝐿
-K×L nodes, represented by factors (squares), from the set of all nodes 
-[
-𝑁
-]
-[N] represented by (filled) circles. If a node is a member of a subset then this is represented by an edge on this graph. Each node in the subset of 
-[
-𝑁
-]
-[N], 
-[
-𝑛
-]
-[n], is a member of at least 
-1
-1 of these subsets. Here 
-𝐾
-×
-𝐿
-=
-4
-K×L=4. 
-Structure of a factor 
-𝜇
-μ in the random factor graph associated with sampling of linear trees. Here 
-𝐾
-=
-𝐿
-=
-2
-K=L=2. Node 
-𝑖
-i, associated with 
-𝜇
-μ, is a sending a message to nodes 
-𝑖
-2
-i
-2
-	​
-
- and 
-𝑖
-4
-i
-4
-	​
-
- via the mix nodes 
-𝑖
-1
-i
-1
-	​
-
- and 
-𝑖
-3
-i
-3
-	​
-
-.
-Connectivity of a node 
-𝑖
-∈
-[
-𝑁
-]
-i∈[N] is the number of random edges connecting this nodes to factors labelled by the set 
-[
-𝑛
-]
-[n]. The connectivity of a node 
-𝑖
-∈
-[
-𝑁
-]
-i∈[N] is the number of linear trees that 
-𝑖
-i appears in. The connectivity is a random number from the binomial distribution 
-P
-(
-𝑐
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-=
-(
-𝑛
-𝑐
-)
-(
-𝐾
-𝐿
-𝑁
-)
-𝑐
-(
-1
-−
-𝐾
-𝐿
-𝑁
-)
-𝑛
-−
-𝑐
-P(c∣n,
-N
-KL
-	​
-
-)=(
-c
-n
-	​
-
-)(
-N
-KL
-	​
-
-)
-c
-(1−
-N
-KL
-	​
-
-)
-n−c
-with parameters 
-𝑛
-n and 
-𝐾
-𝐿
-𝑁
-N
-KL
-	​
-
-. 
-The probability that a node has more than one random connection 
-P
-(
-𝑐
->
-1
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-P(c>1∣n,
-N
-KL
-	​
-
-), i.e. the prob. that a mix node participates in more than one subset of mix nodes used in linear trees, for 
-𝑛
-≥
-2
-n≥2 is given by the sum 
-P
-(
-𝑐
->
-1
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-=
-∑
-𝑐
-=
-2
-𝑛
-P
-(
-𝑐
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-                        
-=
-1
-−
-∑
-𝑐
-=
-0
-1
-P
-(
-𝑐
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-                 
-=
-1
-−
-(
-1
-−
-𝐾
-𝐿
-𝑁
-)
-𝑛
-                                                             
-−
-𝑛
-(
-𝐾
-𝐿
-𝑁
-)
-(
-1
-−
-𝐾
-𝐿
-𝑁
-)
-𝑛
-−
-1
-                     
-=
-1
-−
-(
-1
-−
-𝐾
-𝐿
-𝑁
-)
-𝛼
-𝑁
-                                             
-−
-𝛼
-𝐾
-𝐿
-(
-1
-−
-𝐾
-𝐿
-𝑁
-)
-𝛼
-𝑁
-−
-1
-                        
-≤
-1
-−
-(
-1
-−
-𝐾
-𝐿
-𝑁
-)
-𝛼
-𝑁
-P(c>1∣n,
-N
-KL
-	​
-
-)=
-c=2
-∑
-n
-	​
-
-P(c∣n,
-N
-KL
-	​
-
-)
-                        =1−
-c=0
-∑
-1
-	​
-
-P(c∣n,
-N
-KL
-	​
-
-)
-                 =1−(1−
-N
-KL
-	​
-
-)
-n
-                                                             −n(
-N
-KL
-	​
-
-)(1−
-N
-KL
-	​
-
-)
-n−1
-                     =1−(1−
-N
-KL
-	​
-
-)
-αN
-                                             −αKL(1−
-N
-KL
-	​
-
-)
-αN−1
-                        ≤1−(1−
-N
-KL
-	​
-
-)
-αN
-where 
-𝛼
-=
-𝑛
-/
-𝑁
-α=n/N with 
-𝑛
-≥
-2
-n≥2.
-We note that 
-P
-(
-𝑐
->
-1
-∣
-2
-,
-𝐾
-𝐿
-𝑁
-)
-=
-(
-𝐾
-𝐿
-𝑁
-)
-2
-P(c>1∣2,
-N
-KL
-	​
-
-)=(
-N
-KL
-	​
-
-)
-2
- and 
-P
-(
-𝑐
->
-1
-∣
-𝑛
-+
-1
-,
-𝐾
-𝐿
-𝑁
-)
->
-P
-(
-𝑐
->
-1
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-P(c>1∣n+1,
-N
-KL
-	​
-
-)>P(c>1∣n,
-N
-KL
-	​
-
-) for 
-𝐾
-𝐿
-<
-𝑁
-KL<N, i.e. the probability 
-P
-(
-𝑐
->
-1
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-P(c>1∣n,
-N
-KL
-	​
-
-) is monotonic increasing function of 
-𝑛
-n for 
-𝐾
-𝐿
-<
-𝑁
-KL<N. Furthermore, the probability 
-P
-(
-𝑐
->
-1
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-P(c>1∣n,
-N
-KL
-	​
-
-) is monotonic increasing function of 
-𝐾
-𝐿
-𝑁
-N
-KL
-	​
-
-, i.e. increasing the number of nodes , 
-𝐾
-𝐿
-KL, in the linear tree sampled by each sender node in 
-[
-𝑛
-]
-[n] increases probability that a node in 
-[
-𝑁
-]
-[N] has more than one random connection. 
-The probability 
-P
-(
-𝑐
->
-1
-∣
-𝑛
-,
-𝐾
-𝐿
-𝑁
-)
-P(c>1∣n,
-N
-KL
-	​
-
-) is computed using the following parameters 
-Parameter 
-	
-Description
-	
-Value/Range
-
-
-𝑁
-N​
-	
-Number of nodes
-	
-10
-2
-…
-10
-4
-10
-2
-…10
-4
-​
-
-
-𝑛
-n​
-	
-Number of sender nodes
-	
-2
-…
-𝑁
-2…N​
-
-
-𝐾
-×
-𝐿
-K×L​
-	
-Number of nodes in a linear tree
-	
-2
-…
-𝑁
-−
-1
-2…N−1​
-Communication on Linear Trees
-We consider the following communication system
-Communication on Linear Trees. A message is sent from a node through 
-𝐾
-K communication paths where each path has 
-𝐿
-L nodes. A node could be faulty (circle with dashed boundary), or adversarial (red circle). The presence of faulty node leads to communication failures. The presence of adversarial nodes could lead to communication and anonymity failures. 
-We assume that 
-𝑀
-𝐹
-M
-F
-	​
-
- nodes in the population are “faulty” (faulty node is unable to relay a message) and the probability that a node is faulty is 
-𝑞
-𝐹
-=
-𝑀
-𝐹
-/
-𝑁
-q
-F
-	​
-
-=M
-F
-	​
-
-/N.
-We assume that 
-𝑀
-𝐴
-M
-A
-	​
-
- nodes in the population are “adversarial” (adversarial nodes are controlled by an adversary which can make nodes faulty, use them for traffic analysis, etc.) and the probability that a node is adversarial is 
-𝑞
-𝐴
-=
-𝑀
-𝐴
-/
-𝑁
-q
-A
-	​
-
-=M
-A
-	​
-
-/N.
-If a path contains at least one faulty node then communication failure occurred.
-If a path does not have any faulty nodes then this path is functioning.
-If all 
-𝐾
-K paths have a communication failure then broadcast failure occurred.
-The probability of broadcast failure is given by 
-P
-𝑏
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-)
-=
-[
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
-]
-𝐾
-P
-b
-	​
-
-(K,L,q
-F
-	​
-
-)=[1−(1−q
-F
-	​
-
-)
-L
-]
-K
-We note that 
-𝑞
-𝐹
-(
-𝐶
-)
-=
-𝐶
-−
-2
-𝐶
-−
-1
-q
-F
-	​
-
-(C)=
-C−1
-C−2
-	​
-
- is the site percolation threshold of random regular graph (RRG) with connectivity C, i.e. for 
-𝑞
-𝐹
->
-𝑞
-𝐹
-(
-𝐶
-)
-q
-F
-	​
-
->q
-F
-	​
-
-(C) the RRG becomes disconnected with high probability as 
-𝑁
-→
-∞
-N→∞. The latter suggests if our model of the network is RRG then for the fraction of faulty nodes 
-𝑞
-𝐹
->
-𝑞
-𝐹
-(
-𝐶
-)
-q
-F
-	​
-
->q
-F
-	​
-
-(C) the communication is not possible with high probability in 
-𝑁
-→
-∞
-N→∞. 
-If all nodes in a communication path are non-faulty then this is a functioning communication path.
-If there is at least one functioning communication paths where all nodes are adversarial, then adversary has opportunity to cause anonymity failure.
-The probability of anonymity failure is given by 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-1
-−
-[
-1
-−
-[
-(
-1
-−
-𝑞
-𝐹
-)
- 
-𝑞
-𝐴
-]
-𝐿
-]
-𝐾
-P
-a
-	​
-
-(K,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=1−[1−[(1−q
-F
-	​
-
-)q
-A
-	​
-
-]
-L
-]
-K
-If there is at least one adversarial node in each functioning communication paths then the adversary has an opportunity to cause broadcast failure. The probability of adversarial broadcast failure is given by 
-P
-𝑎
-𝑏
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-[
-1
-−
-[
-(
-1
-−
-𝑞
-𝐹
-)
-(
-1
-−
-𝑞
-𝐴
-)
-]
-𝐿
-]
-𝐾
-−
-[
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
-]
-𝐾
-P
-ab
-	​
-
-(K,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=[1−[(1−q
-F
-	​
-
-)(1−q
-A
-	​
-
-)]
-L
-]
-K
-−[1−(1−q
-F
-	​
-
-)
-L
-]
-K
-The probabilities 
-P
-𝑎
-P
-a
-	​
-
-, 
-P
-𝑏
-P
-b
-	​
-
- and 
-P
-𝑎
-𝑏
-P
-ab
-	​
-
- are computed the following parameters 
-Parameter 
-	
-Description
-	
-Value/Range
-	
-
-
-𝑞
-𝐹
-q
-F
-	​
-
-​
-	
-Fraction of faulty nodes
-	
-[
-0
-,
-1
-)
-[0,1)​
-	
-
-
-𝑞
-𝐴
-q
-A
-	​
-
-​
-	
-Fraction of adversarial nodes 
-	
-[
-0
-,
-1
-)
-[0,1)​
-	
-
-
-𝐾
-K​
-	
-Number of communication paths
-	
-1
-…
-𝑁
-−
-1
-1…N−1​
-	
-
-
-𝐿
-L​
-	
-Number of nodes in a communication path
-	
-2
-…
-𝑁
-−
-1
-2…N−1​
-	
-The code which computes above probabilities is given below 
-
-def Prob_b(K, L, qF):
- """
- Compute the probability of broadcast failure.
- Formula: (1 - (1 - qF)^L)^K
- """
- return (1 - (1 - qF) ** L) ** K
-
-def Prob_ab(K, L, qF, qA):
- """
- Compute the probability of adversarial broadcast failure.
- Formula: (1 - ((1 - qF)^L * (1 - qA)^L))^K - (1 - (1 - qF)^L)^K
- """
- term1 = (1 - qF) ** L
- term2 = (1 - qA) ** L
- return (1 - (term1 * term2)) ** K - (1 - term1) ** K
-
-def Prob_a(K, L, qF, qA):
- """
- Compute the probability of anonymity failure.
- Formula: 1 - (1 - ((1 - qF)^L * qA^L))^K
- """
- term1 = (1 - qF) ** L
- term2 = qA ** L
- return 1 - (1 - (term1 * term2)) ** K
-
-​
-Inference of relative stake
-The adversary observes the leader election process of a node with the relative stake 
-𝛼
-α. 
-In 
-𝑇
-T time-slots, the adversary is able to observe fraction 
-𝑣
-v of wins in 
-𝑚
-m observations. The probability of observing the election outcome of a node is 
-𝑞
-q. For 
-𝑚
-≥
-1
-m≥1 adversary uses the “naive” estimator 
-𝛼
-^
-=
-log
-⁡
-(
-1
-−
-𝑣
-)
-log
-⁡
-(
-1
-−
-𝑓
-)
-α
-^
-=
-log(1−f)
-log(1−v)
-	​
-
- of the true relative stake 
-𝛼
-α. For large 
-𝑇
-T, the probability that 
-𝛼
-(
-1
-−
-𝛾
-)
-≤
-𝛼
-^
-≤
-𝛼
-(
-1
-+
-𝛾
-)
-α(1−γ)≤
-α
-^
-≤α(1+γ) is given by 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-=
-2
- 
-e
-r
-f
- ⁣
-(
-𝜖
-2
-𝜎
-2
-(
-𝛼
-,
-𝑞
-)
-)
-e
-r
-f
- ⁣
-(
-𝜙
-(
-𝛼
-)
-2
-𝜎
-2
-(
-𝛼
-,
-𝑞
-)
-)
-+
-e
-r
-f
- ⁣
-(
-1
-−
-𝜙
-(
-𝛼
-)
-2
-𝜎
-2
-(
-𝛼
-,
-𝑞
-)
-)
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)=
-erf(
-2σ
-2
-(α,q)
-	​
-
-ϕ(α)
-	​
-
-)+erf(
-2σ
-2
-(α,q)
-	​
-
-1−ϕ(α)
-	​
-
-)
-2erf(
-2σ
-2
-(α,q)
-	​
-
-ϵ
-	​
-
-)
-	​
-
-In the above, 
-𝜙
-(
-𝛼
-)
-=
-1
-−
-(
-1
-−
-𝑓
-)
-𝛼
-ϕ(α)=1−(1−f)
-α
- is the lottery function with parameter 
-𝑓
-f, 
-𝜖
-=
-𝛾
-𝛼
-d
-d
-𝛼
-𝜙
-(
-𝛼
-)
-ϵ=γα
-dα
-d
-	​
-
-ϕ(α) and 
-𝜎
-2
-(
-𝛼
-,
-𝑞
-)
-=
-𝜙
-(
-𝛼
-)
-[
-1
-−
-𝜙
-(
-𝛼
-)
-]
-/
-𝑇
-𝑞
-σ
-2
-(α,q)=ϕ(α)[1−ϕ(α)]/Tq, where 
-𝑞
-q is the fraction of observed time-slots such that 
-𝑇
-𝑞
-Tq slots are observed on average.
-The probability 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT) can be interpreted as adversarial “confidence” and the parameter 
-𝛾
-γ as “accuracy”. An example of the above probability is given below
-The probability that inferred relative stake 
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
-α
-^
-∈[α(1−γ),α(1+γ)], i.e. adversarial “confidence”, as a function of true relative stake 
-𝛼
-α obtained in 
-𝑇
-=
-432000
-T=432000 time-slots (this value is used in Cardano) when the fraction 
-𝑞
-=
-0.657
-q=0.657 of slots is observed. Here the probability that stake of a node with the true stake 
-𝛼
-=
-0.0126
-α=0.0126 (the max. stake in the Bitcoin network), represented by a red vertical line, is inferred with an “accuracy” within the fraction 
-𝛾
-=
-0.1
-γ=0.1 of relative stake 
-𝛼
-α, represented by 
-𝛼
-(
-1
-±
-𝛾
-)
-α(1±γ) red vertical dotted lines, is approx. 
-0.824
-0.824. The red dashed horizontal line corresponds to the threshold 
-𝜃
-=
-0.5
-θ=0.5. The blue vertical line at 
-𝛼
-=
-0.00252
-α=0.00252 is the result of dividing the stake 
-𝛼
-=
-0.0126
-α=0.0126 among the 
-5
-5 nodes. 
-The probability 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT), i.e. adversarial “confidence,” is computed using the following parameters: 
-Parameter 
-	
-Description
-	
-Value/Range
-
-
-𝑇
-T​
-	
-Number of slots per epoch
-	
-≈
-432
-,
-000
-≈432,000​
-
-
-𝑓
-f​
-	
-Fraction of non-empty slots
-	
-0.05
-0.05​
-
-
-𝛼
-α​
-	
-Relative stake of a node 
-	
-(
-0
-,
-1
-)
-(0,1)​
-
-
-𝛾
-γ​
-	
-“Accuracy” parameter
-	
-(
-0
-,
-1
-)
-(0,1)​
-
-
-𝑞
-q​
-	
-Fraction of observed time-slots 
-	
-(
-0
-,
-1
-]
-(0,1]​
-The code which computes adversarial “confidence” is given below
-def phi(alpha, f):
-	return 1 - (1 - f) ** alpha
-
-def dphi(alpha, f):
-	return -((1 - f) ** alpha) * log(1 - f)
-
-def Prob2(alpha, epsilon, T, q):
-	sqrt2 = sqrt(2.0)
- phi_alpha = phi(alpha, f)
- 
- # Denominator term
- denominator = (
- 								erf((phi_alpha - 1) * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
- 									 - erf(phi_alpha * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
-	)
- 
- # Numerator term
- numerator = -2.0 * erf(
- 							sqrt2 * epsilon / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q)))
-	)
- 
- # Final result
- return numerator / denominator
- 
-# Compute epsilon = dphi(alpha) * alpha * gamma
-epsilon = dphi(alpha, f) * alpha * gamma
-
-# Compute Prob2
-Prob2_result = Prob2(alpha, epsilon, T, q)
-
-​
-The probability can also compute the (minimum) number of time-slots, 
-𝑡
-t, such that 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑡
-)
-≥
-𝛿
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qt)≥δ, for some 
-𝛿
-∈
-(
-0
-,
-1
-)
-δ∈(0,1). Here 
-𝑡
-t is the time needed by an adversary to achieve “confidence” greater than 
-𝛿
-δ. The code which computes 
-𝑡
-t is given below 
-T0 = T # One epoch
-T1 = 730 * T # 10 years
-dT = 10**3 # Step size
-
-if Prob2_t < delta:
-	# Increase T until Prob2_result >= delta
-	t = T0
- while t <= T1 and Prob2_t < delta:
-	 Prob2_t = Prob2(alpha, epsilon, t, result3)
- t += dT
- 
-else:
-	# Decrease T until Prob2_result <= delta
- t = T
- while t >= 100 and Prob2_t > delta:
-	 Prob2_t = Prob2(alpha, epsilon, t, result3)
- t -= dT 
-
-​
-Adversarial Confidence as a Measure of Statistical “Noise”
-The probability 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT), where 
-𝑞
- 
-𝑇
-qT is the (average) number of time-slots observed by adversary in one epoch, can be seen as a measure of the magnitude of “noise” which prevents accurate measurements of the relative stake 
-𝛼
-α. One source of this noise is the actual (stochastic) leader election process and the other is the sampling (or “observation”), controlled by parameter 
-𝑞
-q, of the latter by an adversary. For 
-𝑞
-=
-1
-q=1, i.e. all time-slots are observed, and leader election process is the only source of noise. In this regime, for a given accuracy (
-𝛾
-=
-0.1
-γ=0.1), the relative stake can be inferred with high confidence as can be seen in the figure below
-The (relative) stake estimator 
-𝛼
-^
-α
-^
-, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) 
-𝛼
-∈
-{
-0.007482
-,
-…
-,
-0.013476
-}
-α∈{0.007482,…,0.013476}, represented by solid horizontal lines. For a node with the stake 
-𝛼
-=
-0.013476
-α=0.013476 the prob. 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-=
-0.915965
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)=0.915965, where 
-𝛾
-=
-0.1
-γ=0.1, 
-𝑞
-=
-1
-q=1 (fraction of observed time-slots) and 
-𝑇
-=
-432000
-T=432000 (number of time-slots in one epoch). The boundaries of the interval 
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
-[α(1−γ),α(1+γ)] for 
-𝛼
-=
-0.013476
-α=0.013476 are represented by dashed horizontal lines.
-For 
-𝑞
-<
-1
-q<1, sampling becomes an additional source of noise interfering with measurements done by adversary. Here, for a given accuracy, the confidence deteriorates as 
-𝑞
-→
-0
-q→0 (see figures below). 
-The (relative) stake estimator 
-𝛼
-^
-α
-^
-, computed in one epoch of the leader election process, plotted as a function of time-slots for five nodes with true (relative stake) 
-𝛼
-∈
-{
-0.007482
-,
-…
-,
-0.013476
-}
-α∈{0.007482,…,0.013476}, represented by solid horizontal lines. For a node with the stake 
-𝛼
-=
-0.013476
-α=0.013476 the prob. 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-=
-0.778177
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)=0.778177, where 
-𝛾
-=
-0.1
-γ=0.1, 
-𝑞
-=
-0.5
-q=0.5 (fraction of observed time-slots) and 
-𝑇
-=
-432000
-T=432000 (number of time-slots in one epoch). The boundaries of the interval 
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
-[α(1−γ),α(1+γ)] for 
-𝛼
-=
-0.013476
-α=0.013476 are represented by dashed horizontal lines.
-The (relative) stake estimator 
-𝛼
-^
-α
-^
-, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) 
-𝛼
-∈
-{
-0.007482
-,
-…
-,
-0.013476
-}
-α∈{0.007482,…,0.013476}, represented by solid horizontal lines. For a node with the stake 
-𝛼
-=
-0.013476
-α=0.013476 the prob. 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-=
-0.415180
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)=0.415180, where 
-𝛾
-=
-0.1
-γ=0.1, 
-𝑞
-=
-0.1
-q=0.1 (fraction of observed time-slots) and 
-𝑇
-=
-432000
-T=432000 (number of time-slots in one epoch). The boundaries of the interval 
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
-[α(1−γ),α(1+γ)] for 
-𝛼
-=
-0.013476
-α=0.013476 are represented by dashed horizontal lines.
-The (relative) stake estimator 
-𝛼
-^
-α
-^
-, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) 
-𝛼
-∈
-{
-0.007482
-,
-…
-,
-0.013476
-}
-α∈{0.007482,…,0.013476}, represented by solid horizontal lines. For a node with the stake 
-𝛼
-=
-0.013476
-α=0.013476 the prob. 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-=
-0.1431790734
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)=0.1431790734, where 
-𝛾
-=
-0.1
-γ=0.1, 
-𝑞
-=
-0.01
-q=0.01 (fraction of observed time-slots) and 
-𝑇
-=
-432000
-T=432000 (number of time-slots in one epoch). The boundaries of the interval 
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
-[α(1−γ),α(1+γ)] for 
-𝛼
-=
-0.013476
-α=0.013476 are represented by dashed horizontal lines.
-The (relative) stake estimator 
-𝛼
-^
-α
-^
-, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) 
-𝛼
-∈
-{
-0.007482
-,
-…
-,
-0.013476
-}
-α∈{0.007482,…,0.013476}, represented by solid horizontal lines. For a node with the stake 
-𝛼
-=
-0.013476
-α=0.013476 the prob. 
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-=
-0.061572
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)=0.061572, where 
-𝛾
-=
-0.1
-γ=0.1, 
-𝑞
-=
-0.001
-q=0.001 (fraction of observed time-slots) and 
-𝑇
-=
-432000
-T=432000 (number of time-slots in one epoch). The boundaries of the interval 
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
-[α(1−γ),α(1+γ)] for 
-𝛼
-=
-0.013476
-α=0.013476 are represented by dashed horizontal lines.
-Let us define a function which compares properties of inference for 
-𝑞
-=
-1
-q=1 and 
-𝑞
-∈
-(
-0
-,
-1
-)
-q∈(0,1) as follows
-log
-⁡
-(
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑇
-)
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-)
-log(
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣T)
-	​
-
-)
-We note that above is 
-0
-0 when 
-𝑞
-=
-1
-q=1, i.e. no sampling noise, and is growing when 
-𝑞
-→
-0
-q→0 (see figure below). Hence, above can be seen as “amplitude” of the sampling noise. 
-log
-⁡
-(
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑇
-)
-P
-(
-𝛼
-^
-∈
-[
-𝛼
-(
-1
-−
-𝛾
-)
-,
-𝛼
-(
-1
-+
-𝛾
-)
-]
- 
-∣
- 
-𝑞
- 
-𝑇
-)
-)
-log(
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣qT)
-P(
-α
-^
-∈[α(1−γ),α(1+γ)]∣T)
-	​
-
-) plotted as function of 
-𝑞
-q for 
-𝛼
-=
-0.013476
-α=0.013476 and 
-𝛾
-=
-0.1
-γ=0.1.
-The Unlinkability of Block Proposers
-We assume that node 
-S
-S wins the election and broadcasts message 
-m
-m to the network using linear trees. We assume that in the network the sender node 
-S
-S has 
-𝐶
-C neighbouring nodes. Message 
-m
-m is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood 
-∂
-S
-∂S, where 
-∣
-∂
-S
-∣
-=
-𝐶
-∣∂S∣=C, is adversarial with the prob. 
-𝑞
-𝐴
-q
-A
-	​
-
-. The prob. that at least one node in 
-∂
-S
-∂S is adversarial is 
-1
-−
-(
-1
-−
-𝑞
-𝐴
-)
-𝐶
-1−(1−q
-A
-	​
-
-)
-C
-.
-If 
-S
-S has at least one adversarial neighbour and anonymity failure occurred then the message 
-m
-m can linked to the sender node 
-S
-S. We note that just occurrence of the anonymity failure alone is not sufficient to link 
-m
-m to 
-S
-S and at least one compromised node is also needed in 
-∂
-S
-∂S. Furthermore, an adversary may need not one but at least 
-𝑛
-𝐴
-n
-A
-	​
-
- compromised nodes in 
-∂
-S
-∂S. The probability of the latter is given by the binomial 
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
-=
-∑
-𝑛
-=
-𝑛
-𝐴
-𝐶
-(
-𝐶
-𝑛
-)
-[
-1
-−
-𝑞
-𝐴
-]
-𝐶
-−
-𝑛
-𝑞
-𝐴
-𝑛
-P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)=
-n=n
-A
-	​
-
-∑
-C
-	​
-
-(
-n
-C
-	​
-
-)[1−q
-A
-	​
-
-]
-C−n
-q
-A
-n
-	​
-
-We note that the case one adversarial node in 
-∂
-S
-∂S is recovered by setting 
-𝑛
-𝐴
-=
-1
-n
-A
-	​
-
-=1 in the above. The probability of above event, given that 
-S
-S won the election, is the product of two probabilities
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
- 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-0
-,
-𝑞
-𝐴
-)
-P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)P
-a
-	​
-
-(K,L,0,q
-A
-	​
-
-)
-We note that in above we assumed that 
-𝑞
-𝐹
-=
-0
-q
-F
-	​
-
-=0, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since 
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
-<
-1
-P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)<1 for 
-𝑛
-𝐴
-≥
-1
-n
-A
-	​
-
-≥1, the prob. of anonymity failure 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-0
-,
-𝑞
-𝐴
-)
-P
-a
-	​
-
-(K,L,0,q
-A
-	​
-
-) is an upper bound on the above prob. If node 
-S
-S has (relative) stake 
-𝛼
-α then the prob. of node 
-S
-S winning is 
-𝜙
-(
-𝛼
-)
-ϕ(α), where 
-𝜙
-(
-𝛼
-)
-ϕ(α) is the lottery function. Hence, the prob. that the message 
-m
-m, sent by the winning node 
-S
-S, can be linked to 
-S
-S is given by 
-𝜙
-(
-𝛼
-)
- 
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
- 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-0
-,
-𝑞
-𝐴
-)
-ϕ(α)P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)P
-a
-	​
-
-(K,L,0,q
-A
-	​
-
-)
-The prob. that message 
-m
-m can not be linked to the sender 
-S
-S is 
-1
-−
-𝜙
-(
-𝛼
-)
- 
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
- 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-0
-,
-𝑞
-𝐴
-)
-1−ϕ(α)P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)P
-a
-	​
-
-(K,L,0,q
-A
-	​
-
-)
-Hence the prob. that any message sent by node 
-S
-S can be linked to 
-S
-S in 
-𝑡
-t elections is given by 
-1
-−
-[
-1
-−
-𝜙
-(
-𝛼
-)
- 
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
- 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-0
-,
-𝑞
-𝐴
-)
-]
-𝑡
-1−[1−ϕ(α)P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)P
-a
-	​
-
-(K,L,0,q
-A
-	​
-
-)]
-t
-For the above prob. to be greater than some threshold 
-𝜃
-θ (for example 
-𝜃
-=
-1
-/
-2
-θ=1/2) the number of elections 
-𝑡
-t has to satisfy the following inequality
-𝑡
->
-⌈
-log
-⁡
-(
-1
-−
-𝜃
-)
-log
-⁡
-(
-1
-−
-𝜙
-(
-𝛼
-)
- 
-P
-(
-𝑛
-≥
-𝑛
-𝐴
-∣
-𝐶
-,
-𝑞
-𝐴
-)
- 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-0
-,
-𝑞
-𝐴
-)
-)
-⌉
-t>⌈
-log(1−ϕ(α)P(n≥n
-A
-	​
-
-∣C,q
-A
-	​
-
-)P
-a
-	​
-
-(K,L,0,q
-A
-	​
-
-))
-log(1−θ)
-	​
-
-⌉
-The minimum 
-𝑡
-t for which above inequality holds 
-𝑡
-(
-𝜃
-)
-t(θ), which is the RHS of the above, is computed using the following parameters
-Parameter 
-	
-Description
-	
-Value/Range
-
-
-𝜃
-θ​
-	
-Prob. threshold
-	
-(
-0
-,
-1
-)
-(0,1)​
-
-
-𝑓
-f​
-	
-Fraction of non-empty slots
-	
-0.05
-0.05​
-
-
-𝛼
-α​
-	
-Relative stake of a node 
-	
-(
-0
-,
-1
-)
-(0,1)​
-
-
-𝐶
-C​
-	
-Node neighbourhood size
-	
-≥
-4
-≥4​
-
-
-𝑛
-𝐴
-n
-A
-	​
-
-​
-	
-Number of adver. nodes threshold 
-	
-≥
-1
-≥1​
-
-
-𝑞
-𝐴
-q
-A
-	​
-
-​
-	
-Fraction of adversarial nodes 
-	
-[
-0
-,
-1
-)
-[0,1)​
-
-
-𝐾
-K​
-	
-Number of communication paths
-	
-1
-…
-𝑁
-−
-1
-1…N−1​
-
-
-𝐿
-L​
-	
-Number of nodes per communication path
-	
-2
-…
-𝑁
-−
-1
-2…N−1​
-The code which computes 
-𝑡
-(
-𝜃
-)
-t(θ) is given below
-
-def phi(alpha, f):
- return 1 - (1 - f) ** alpha
-
-def calculate_t(qA, L, K, alpha, f, C, nA, theta):
-		#compute prob. Pa
- x = 1 - pow(qA, L)
- Pa = (1 - pow(x, K))
- 
- #compute prob. Pan
- p = 1 - qA
- Pan = 0
- for n in range(nA, C + 1):
- Pan += comb(C, n) * (p ** (C - n)) * (qA ** n)
- 
- #compute prod. of prob.
- Prob = Pan * Pa
- 
- #compute t
- numerator = log(1 - theta)
- denominator = log(1 - phi(alpha, f) * Prob)
- t = ceil(numerator / denominator)
- 
- return t
-
-​
-Design of the “Calculator”
-Here we combine the results for leader election process, sampling of linear trees, broadcasting on linear trees and inference of relative stake to design a calculator which takes parameters of the latter and computes properties of a node related to the resilience and anonymity of communication. The calculator has the following modules:
-N - number of nodes
-T - number of slots per epoch
-f - fraction of non-empty slots
-Δ t=1s
-Leader Elec
-t
-ion Process
-Txf messages
-per epoch
-on average.
-L - number of nodes
-in each path
-Broadcas
-t
-ing on Linear
-Trees
-K - number of paths
-qF - fraction of
-faulty nodes
-Pb - probability
-of broadcast
-failure.
-qA - fraction of
-adversarial nodes
-qF - fraction of
-faulty nodes
-K - number of paths
-Broadcas
-t
-ing on Linear
-Trees
-L - number of nodes
-in each path
-Pa - probability of
-anonymity failure.
-T - number of slots per epoch
-f - fraction of non-epmty slots
-α - relative stake of a node
-γ - "accuracy" of
-adversarial inference
-Inference of Rela
-t
-i
-v
-e S
-t
-ake
-q - fraction of observed slots
-P(s
- 
-∈
- 
-[α(1-γ), α(1+γ)]) is the prob.
-that inferred stake, s, belongs
-to the interval [α(1-γ), α(1+γ)]. 
-Above is adversarial 
-"confidence".
-K - number of paths
-L - number of nodes
-in each path
-Broadcas
-t
-ing on Linear
-Trees
-qA - fraction of
-adversarial nodes
-qF - fraction of
-faulty nodes
- 
-Pab - probability of
-adversarial
-broadcast-failure.
-La
-t
-enc
-y
-"
-Noise
-"
-Sampling of Linear Trees
-N - number of nodes
-n - number of sender nodes
-KxL - number of nodes
-sampled (without repl.)
-by each sender node
-P(c>1|n,KL/N) - is the prob.
-that a node participates
-in more than one
-linear tree.
-nA -number of
-adversarial nodes
-Neigborhood
-C -size of 
-the neighborhood
-qA - fraction of
-adversarial nodes
- 
-Pan - prob. that 
-"the number of
-adver. nodes" >=nA
-f - fraction of non-epmty slots
-α - relative stake of a node
-Pa - probability of
-anonymity failure.
-Linking sending node
- 
-t
-o a
-message
-Pan - prob. that
-"the number of
-adver. nodes" >=nA
-t is the number of time slots needed for the 
-prob. of linking sending node to a message 
-to be greater than θ.
-θ - threshold
-The dependencies between modules can be represented as the following diagram 
-Pa
- 
-is 
-a 
-decreasing
- 
-function of 
-qF
-.
-Broadcast 
-failures can be 
-easily  detected.
-The length of a path, 
-L
-,  is also parameter 
-for  the 
-latency
- 
-of 
-broadcast.  
-The number of paths, 
-K
-,  consumes  
-bandwidth
- 
-of a sending
-node. 
-The "confidence" 
-and "accuracy" are 
-characteristics  of 
-adversary
- 
-and 
-related to "risks" (if 
-any) associated 
-with  "attacks". 
-The fraction of 
-adversarial  nodes, 
-qA
-,
-can not
-  be inferred.
-The fraction of 
-faulty nodes, 
-qF
-, 
-can be
- 
-inferred.
-Stake of a node 
-is changing with 
-epochs. 
-Adversarial 
-"confidence" is 
-monotonic  
-increasing
-  
-function of true 
-stake. 
-We can assume 
-that 
-T
- 
-and 
-f
- 
-are 
-constants
-.
-We assume that 
-q
-=
-Pa*Pan 
-computed
-for 
-qF=0
-.
- 
-The prob. is 0 
-when n=1 and 
-KxL  nodes are 
-sampled 
-without 
-replacement
-.
-Ad
-v
-ersarial
-"
-con
- 
-dence
-":
-P
-(
-s
- 
-∈
- 
-[
-α
-(
-1
--
-γ
-),
- 
-α
-(
-1
-+
-γ
-)]|
-qT
-)
- 
-is
- 
-t
-he
-prob
-.
-t
-ha
-t
- 
-inferred s
-t
-ake
-,
- 
-s
-,
- 
-belongs
-t
-o
- 
-t
-he in
-t
-er
-v
-al
- 
-[
-α
-(
-1
--
-γ
-),
- 
-α
-(
-1
-+
-γ
-)].
-T
-x
-f
- 
-messages
-per epoch
-on a
-v
-erage
-.
-q
- 
--
- 
-frac
-t
-ion of obser
-v
-ed
-slo
-t
-s
-γ
- 
--
- 
-"
-acc
-u
-rac
-y
-"
- 
-of
-ad
-v
-ersarial inference
-α
- 
--
- 
-(
-t
-r
-u
-e
-)
- 
-rela
-t
-i
-v
-e s
-t
-ake
-of
- 
-sender
- 
-node
-Pa
- 
--
- 
-prob
-.
- 
-of
-anon
-y
-m
-.
-fail
-u
-re
-.
-Pab
- 
--
- 
-probabili
-ty
- 
-of
-ad
-v
-ersarial
-broadcas
-t
--
-fail
-u
-re
-.
-P
-(
-c
->
-1
-|
-n
-,
-KL
-/
-N
-)
- 
--
- 
-is
- 
-t
-he
-prob
-.
-t
-ha
-t
- 
-a node pa
- 
-icipa
-t
-es
-in more
- 
-t
-han one
-linear
- 
-t
-ree
-.
-Pb
- 
--
- 
-probabili
-ty
-of broadcas
-t
-fail
-u
-re
-.
-n
- 
--
- 
-n
-u
-mber of sender
-nodes per slo
-t
-.
-f
- 
-=
-0
-.
-05
- 
-(
-frac
-t
-ion of non
--
-emp
-ty
- 
-slo
-t
-s
-)
-Δ
- 
-t
-=
-1
-s
- 
-(
-slo
-t
- 
-d
-u
-ra
-t
-ion
-)
-qA
- 
--
- 
-frac
-t
-ion of
-ad
-v
-ersarial
-nodes
-qF
- 
--
- 
-frac
-t
-ion of
-fa
-u
-l
-ty
- 
-nodes
-K
- 
--
- 
-n
-u
-mber of pa
-t
-hs
-L
- 
--
- 
-n
-u
-mber of nodes
-per pa
-t
-h
-T
-=
-432
-,
-000
- 
-(
-n
-u
-mber of
-slo
-t
-s per epoch
-)
-N
- 
--
- 
-n
-u
-mber of nodes
-Broadcas
-t
-ing on Linear
-Trees
-Broadcas
-t
-ing on Linear
-Trees
-Inference of Rela
-t
-i
-v
-e S
-t
-ake
-Broadcas
-t
-ing on Linear
-Trees
-Sampling of Linear Trees
-Leader Elec
-t
-ion Process
-C
- 
--
- 
-si
-z
-e of
- 
-t
-he
-neighborhood
-Neigborhood
-nA
- 
--
- 
-n
-u
-mber of
-ad
-v
-ersarial
-nodes
-C
- 
-is the size of  the
-neighborhood of a
-node. 
-nA
- is the number of 
-adversarial nodes in 
-the neighborhood of a 
-node. 
-Pan
- 
--
- 
-prob
-.
- 
-t
-ha
-t
-"
-t
-he n
-u
-mber of
-ad
-v
-er
-.
- 
-nodes
-"
- 
->=
- 
-nA
-Linking sending node
- 
-t
-o a
-message
-t
- 
-is
- 
-t
-he n
-u
-mber of
- 
-t
-ime slo
-t
-s needed
-for
- 
-t
-he prob
-.
- 
-of linking sending node
-t
-o a message
- 
-t
-o be grea
-t
-er
- 
-t
-han
- 
-θ
-.
-θ
- 
--
- 
-t
-hreshold
-δ
- 
--
- 
-t
-hreshold
-t
- 
-is
- 
-t
-he n
-u
-mber of
- 
-t
-ime
--
-slo
-t
-s req
-u
-ired
-t
-o infer
- 
-t
-he rela
-t
-i
-v
-e s
-t
-ake
- 
-α
- 
-w
-i
-t
-h
- 
-t
-he
-acc
-u
-rac
-y
- 
-γ
- 
-and con
- 
-dence
- 
-δ
-q
- 
-is used instead of 
-Pa
- 
-for the prob. of 
-anonymity failure.
-Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the repository.
-Strategies to Reduce Anonymity Failure
-Let us assume that a node won at time 
-𝑡
-t of the election process and it broadcasts a message to the network using linear trees. Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-1
-−
-[
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
- 
-𝑞
-𝐴
-𝐿
-]
-𝐾
-P
-a
-	​
-
-(K,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=1−[1−(1−q
-F
-	​
-
-)
-L
-q
-A
-L
-	​
-
-]
-K
-Above corresponds to a scenario when a node at time 
-𝑡
-t sends a message through 
-𝐾
-K paths of length 
-𝐿
-L (see figure) constructed from nodes sampled (with replacement) from the set of network nodes 
-[
-𝑁
-]
-[N]. Here 
-𝑞
-𝐹
-q
-F
-	​
-
- and 
-𝑞
-𝐴
-q
-A
-	​
-
- is, respectively, the fraction of faulty and adversarial nodes in the network. 
-For 
-𝐾
-=
-1
-K=1, i.e. a message is sent through one path, the probability of anonymity failure is given by 
-P
-𝑎
-(
-1
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-1
-−
-[
-1
-−
-[
-(
-1
-−
-𝑞
-𝐹
-)
- 
-𝑞
-𝐴
-]
-𝐿
-]
-        
-=
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
- 
-𝑞
-𝐴
-𝐿
-P
-a
-	​
-
-(1,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=1−[1−[(1−q
-F
-	​
-
-)q
-A
-	​
-
-]
-L
-]
-        =(1−q
-F
-	​
-
-)
-L
-q
-A
-L
-	​
-
-We note that in above 
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
-(1−q
-F
-	​
-
-)
-L
- is the prob. that path is functional and 
-𝑞
-𝐴
-𝐿
-q
-A
-L
-	​
-
- is the prob. that every single node on this path is adversarial. Hence 
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
- 
-𝑞
-𝐴
-𝐿
-1−(1−q
-F
-	​
-
-)
-L
-q
-A
-L
-	​
-
- is the prob. that either the path is not functional or at least one node in the path is not adversarial. 
-Now let us assume that node sends the same message (or different messages) through different paths of length 
-𝐿
-L at times 
-𝑡
-1
-<
-𝑡
-2
-<
-⋯
-<
-𝑡
-𝐾
-t
-1
-	​
-
-<t
-2
-	​
-
-<⋯<t
-K
-	​
-
- (see figure below) 
-Communication on Linear Trees. Node sends a message at times 
-𝑡
-1
-,
-𝑡
-2
-,
-…
-,
-𝑡
-𝐾
-t
-1
-	​
-
-,t
-2
-	​
-
-,…,t
-K
-	​
-
-. Each time a different, sampled randomly (with replacement) from 
-[
-𝑁
-]
-[N], communication path of 
-𝐿
-L nodes is used. 
-After sending the first message at time 
-𝑡
-1
-t
-1
-	​
-
- the prob. of anonymity failure is 
-P
-𝑎
-(
-1
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
- 
-𝑞
-𝐴
-𝐿
-P
-a
-	​
-
-(1,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=(1−q
-F
-	​
-
-)
-L
-q
-A
-L
-	​
-
-, after sending the second message at time 
-𝑡
-2
-t
-2
-	​
-
- the prob. of anonymity failure is 
-P
-𝑎
-(
-2
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-1
-−
-[
-1
-−
-[
-(
-1
-−
-𝑞
-𝐹
-)
- 
-𝑞
-𝐴
-]
-𝐿
-]
-2
-P
-a
-	​
-
-(2,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=1−[1−[(1−q
-F
-	​
-
-)q
-A
-	​
-
-]
-L
-]
-2
-, etc. Thus after sending the last message at time 
-𝑡
-𝐾
-t
-K
-	​
-
- the prob. anonymity failure is 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-P
-a
-	​
-
-(K,L,q
-F
-	​
-
-,q
-A
-	​
-
-), i.e. the same as sending a message through 
-𝐾
-K paths simultaneously. We note that for fixed 
-𝐿
-L the prob. 
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-P
-a
-	​
-
-(K,L,q
-F
-	​
-
-,q
-A
-	​
-
-) is monotonic increasing function of 
-𝐾
-K and hence 
-P
-𝑎
-(
-𝑛
-𝑚
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-P
-a
-	​
-
-(n
-m
-	​
-
-,L,q
-F
-	​
-
-,q
-A
-	​
-
-) is monotonic increasing function of the number of sent messages 
-𝑛
-𝑚
-∈
-{
-1
-,
-…
-,
-𝐾
-}
-n
-m
-	​
-
-∈{1,…,K} as can be seen in the figure below.
-The prob. of anonymity failure as a function of the number of sent messages plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (top to bottom). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1 and the fraction of adversarial nodes is 
-𝑞
-𝐴
-=
-0.1
-q
-A
-	​
-
-=0.1. 
-Furthermore, the probability that no anonymity failure occurred after sending 
-𝑛
-𝑚
-n
-m
-	​
-
- messages is given by 
-1
-−
-P
-𝑎
-(
-𝑛
-𝑚
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-[
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
- 
-𝑞
-𝐴
-𝐿
-]
-𝑛
-𝑚
-1−P
-a
-	​
-
-(n
-m
-	​
-
-,L,q
-F
-	​
-
-,q
-A
-	​
-
-)=[1−(1−q
-F
-	​
-
-)
-L
-q
-A
-L
-	​
-
-]
-n
-m
-	​
-
-From above, it follows that for 
-𝑛
-𝑚
-≤
-𝐾
-n
-m
-	​
-
-≤K we have 
-1
-−
-P
-𝑎
-(
-𝑛
-𝑚
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-1
-−
-P
-𝑎
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-=
-1
-[
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
- 
-𝑞
-𝐴
-𝐿
-]
-𝐾
-−
-𝑛
-𝑚
-≥
-1
-1−P
-a
-	​
-
-(K,L,q
-F
-	​
-
-,q
-A
-	​
-
-)
-1−P
-a
-	​
-
-(n
-m
-	​
-
-,L,q
-F
-	​
-
-,q
-A
-	​
-
-)
-	​
-
-=
-[1−(1−q
-F
-	​
-
-)
-L
-q
-A
-L
-	​
-
-]
-K−n
-m
-	​
-
-1
-	​
-
-≥1
-Hence the probability that no anonymity failure occurred is much larger if the number of messages sent 
-𝑛
-𝑚
-n
-m
-	​
-
- is much less than 
-𝐾
-K. Equivalently, the probability of anonymity failure is much smaller if the number of messages sent 
-𝑛
-𝑚
-n
-m
-	​
-
- is much less than 
-𝐾
-K. 
-We now consider the prob. of broadcast failure 
-P
-𝑏
-(
-𝐾
-,
-𝐿
-,
-𝑞
-𝐹
-)
-=
-[
-1
-−
-(
-1
-−
-𝑞
-𝐹
-)
-𝐿
-]
-𝐾
-P
-b
-	​
-
-(K,L,q
-F
-	​
-
-)=[1−(1−q
-F
-	​
-
-)
-L
-]
-K
-which is a monotonic decreasing function of 
-𝐾
-K when 
-𝐿
-L is fixed. Hence 
-P
-𝑏
-(
-𝑛
-𝑚
-,
-𝐿
-,
-𝑞
-𝐹
-)
-P
-b
-	​
-
-(n
-m
-	​
-
-,L,q
-F
-	​
-
-) is monotonic decreasing function of the number of sent messages 
-𝑛
-𝑚
-∈
-{
-1
-,
-…
-,
-𝐾
-}
-n
-m
-	​
-
-∈{1,…,K} as can be seen in the figure below.
-The prob. of broadcast failure as a function of the number of sent messages plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (bottom to top). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1.
-We note that the probability of adversarial broadcast-failure behaves in a similar way as can be seen in the figure below
-The prob. of adversarial broadcast-failure as a function of the number of sent messages plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (bottom to top). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1 and the fraction of adversarial nodes is 
-𝑞
-𝐴
-=
-0.1
-q
-A
-	​
-
-=0.1. 
-The number of nodes used for broadcasting of 
-𝑛
-𝑚
-n
-m
-	​
-
- messages is 
-𝑛
-𝑚
-𝐿
-n
-m
-	​
-
-L, i.e. grows linearly with the number of messages 
-𝑛
-𝑚
-n
-m
-	​
-
-.
-The number of nodes used in broadcasting as a function of the number of sent messages plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (bottom to top).
-We note that 
-[
-∏
-𝑖
-=
-1
-𝑡
-−
-1
-P
-𝑏
-(
-𝑖
-,
-𝐿
-,
-𝑞
-𝐹
-)
-]
-[
-1
-−
-P
-𝑏
-(
-𝑡
-,
-𝐿
-,
-𝑞
-𝐹
-)
-]
-[
-i=1
-∏
-t−1
-	​
-
-P
-b
-	​
-
-(i,L,q
-F
-	​
-
-)][1−P
-b
-	​
-
-(t,L,q
-F
-	​
-
-)]
-is the probability that the first occurrence of a successful broadcast requires sending 
-𝑡
-t messages. We note that above is generalisation of the Geometric prob. distribution. 
-The probability that the first occurrence of a successful broadcast requires sending number of messages (
-n
-u
-m
-.
- 
-o
-f
- 
-m
-s
-g
-num.ofmsg) plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (black, red, orange,yellow). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1.
-From the above, it follows that 
-1
-−
-∑
-𝑡
-=
-1
-𝑛
-[
-∏
-𝑖
-=
-1
-𝑡
-−
-1
-P
-𝑏
-(
-𝑖
-,
-𝐿
-,
-𝑞
-𝐹
-)
-]
-[
-1
-−
-P
-𝑏
-(
-𝑡
-,
-𝐿
-,
-𝑞
-𝐹
-)
-]
-1−
-t=1
-∑
-n
-	​
-
-[
-i=1
-∏
-t−1
-	​
-
-P
-b
-	​
-
-(i,L,q
-F
-	​
-
-)][1−P
-b
-	​
-
-(t,L,q
-F
-	​
-
-)]
-is the prob. that the first occurrence of a successful broadcast requires sending more than 
-𝑛
-n messages.
-The prob. that the first occurrence of broadcast requires sending more than 
-𝑛
-n messages as a function of 
-𝑛
-n plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (bottom to top). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1.
-In a similar manner, we obtain the probability 
-[
-∏
-𝑖
-=
-1
-𝑡
-−
-1
-[
-1
-−
-P
-𝑎
-(
-𝑖
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-]
-]
-P
-𝑎
-(
-𝑡
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-[
-i=1
-∏
-t−1
-	​
-
-[1−P
-a
-	​
-
-(i,L,q
-F
-	​
-
-,q
-A
-	​
-
-)]]P
-a
-	​
-
-(t,L,q
-F
-	​
-
-,q
-A
-	​
-
-)
-that the first occurrence of anonymity failure requires sending 
-𝑡
-t messages.
-The prob. that the first occurrence of anonymity failure requires sending number of messages (
-n
-u
-m
-.
- 
-o
-f
- 
-m
-s
-g
-num.ofmsg) plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (yellow, orange, red, black). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1 and the fraction of adversarial nodes is 
-𝑞
-𝐴
-=
-0.1
-q
-A
-	​
-
-=0.1.
-From the above, it follows that 
-∑
-𝑡
-=
-1
-𝑛
-−
-1
-[
-∏
-𝑖
-=
-1
-𝑡
-−
-1
-[
-1
-−
-P
-𝑎
-(
-𝑖
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-]
-]
-P
-𝑎
-(
-𝑡
-,
-𝐿
-,
-𝑞
-𝐹
-,
-𝑞
-𝐴
-)
-t=1
-∑
-n−1
-	​
-
-[
-i=1
-∏
-t−1
-	​
-
-[1−P
-a
-	​
-
-(i,L,q
-F
-	​
-
-,q
-A
-	​
-
-)]]P
-a
-	​
-
-(t,L,q
-F
-	​
-
-,q
-A
-	​
-
-)
-is the prob. that the first occurrence of anonymity failure requires sending less than 
-𝑛
-n messages.
-The prob. that the first occurrence of anonymity failure requires sending less than 
-𝑛
-n messages as a function of 
-𝑛
-n plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (top to bottom). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1 and the fraction of adversarial nodes is 
-𝑞
-𝐴
-=
-0.1
-q
-A
-	​
-
-=0.1.
-The prob. that the first occurrence of anonymity failure requires sending less than 
-𝑛
-n messages as a function of 
-𝑛
-n plotted for the number of nodes per path 
-𝐿
-∈
-{
-2
-,
-…
-,
-5
-}
-L∈{2,…,5} (top to bottom). Here the fraction of faulty nodes is 
-𝑞
-𝐹
-=
-0.1
-q
-F
-	​
-
-=0.1 and the fraction of adversarial nodes is 
-𝑞
-𝐴
-=
-0.1
-q
-A
-	​
-
-=0.1.
-Analysis of Latency 
-We consider a network 
-𝑁
-N constructed from 
-𝑁
-=
-∣
-𝑁
-∣
-N=∣N∣ nodes. We assume that a message sent from node 
-0
-∈
-𝑁
-0∈N, via 
-𝐿
-L nodes of 
-𝑁
-N, to the network 
-𝑁
-Nusing the broadcast method of communication. The message is delayed at the node 
-0
-0 by the 
-Δ
-0
-Δ
-0
-	​
-
- amount of time, at the node 
-1
-1 by the 
-Δ
-1
-Δ
-1
-	​
-
- amount of time, etc. Furthermore, a message traveling between the nodes 
-𝑖
-i and 
-𝑖
-+
-1
-i+1 is delayed by 
-𝑑
-𝑖
- 
-𝑖
-+
-1
-d
-ii+1
-	​
-
- due to the latency of broadcast on 
-𝑁
-N used for communication. 
- 
-A message is sent by node 
-0
-0 to the network 
-𝑁
-N via 
-𝐿
-L nodes using the broadcast mode of communication. Here nodes are represented by blue circles and 
-𝑁
-N is represented by large blue circle. 
-Assuming that the message was successfully broadcasted by the last node 
-𝐿
-L to the network 
-𝑁
-N, the total delay is given by 
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-]
-∑
-i=0
-L
-	​
-
-[Δ
-i
-	​
-
-+d
-ii+1
-	​
-
-]. We note that for 
-Δ
-=
-max
-⁡
-𝑖
-Δ
-𝑖
-Δ=max
-i
-	​
-
-Δ
-i
-	​
-
- and 
-𝑑
-=
-max
-⁡
-𝑖
-𝑑
-𝑖
- 
-𝑖
-+
-1
-d=max
-i
-	​
-
-d
-ii+1
-	​
-
- we have a simple upper bound
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-]
-≤
-(
-𝐿
-+
-1
-)
-[
-Δ
-+
-𝑑
-]
-i=0
-∑
-L
-	​
-
-[Δ
-i
-	​
-
-+d
-ii+1
-	​
-
-]≤(L+1)[Δ+d]
-We note that we have equality in the above when 
-Δ
-=
-Δ
-𝑖
-Δ=Δ
-i
-	​
-
- and 
-𝑑
-=
-𝑑
-𝑖
- 
-𝑖
-+
-1
-d=d
-ii+1
-	​
-
-, i.e. all delays are the same. 
-Assuming that sender node monitors, via observation of broadcasts on 
-𝑁
-N, how a message is propagated along the path, the sender node sends first messages and if this message is not broadcasted to 
-𝑁
-N after some time, for example after time 
-∑
-𝑖
-=
-0
-1
-[
-Δ
-𝑖
-(
-1
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-1
-)
-]
-∑
-i=0
-1
-	​
-
-[Δ
-i
-	​
-
-(1)+d
-ii+1
-	​
-
-(1)], it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node 
-𝐿
-L, but is not broadcasted to the network 
-𝑁
-N. Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the 
-𝐾
-K-th message is broadcasted by the last node to 
-𝑁
-N, gives us that the total delay in the sequential scenario is at most 
-∑
-ℓ
-=
-1
-𝐾
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-(
-ℓ
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-]
-ℓ=1
-∑
-K
-	​
-
-i=0
-∑
-L
-	​
-
-[Δ
-i
-	​
-
-(ℓ)+d
-ii+1
-	​
-
-(ℓ)]
-if the delay on each 
-ℓ
-ℓ-th path, i.e. the value of 
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-(
-ℓ
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-]
-∑
-i=0
-L
-	​
-
-[Δ
-i
-	​
-
-(ℓ)+d
-ii+1
-	​
-
-(ℓ)], is known exactly. 
-Furthermore, we have the following inequality 
-∑
-ℓ
-=
-1
-𝐾
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-(
-ℓ
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-]
-≤
-𝐾
-(
-𝐿
-+
-1
-)
-[
-Δ
-+
-𝑑
-]
-ℓ=1
-∑
-K
-	​
-
-i=0
-∑
-L
-	​
-
-[Δ
-i
-	​
-
-(ℓ)+d
-ii+1
-	​
-
-(ℓ)]≤K(L+1)[Δ+d]
-where 
-Δ
-=
-max
-⁡
-𝑖
-,
-ℓ
-Δ
-𝑖
-(
-ℓ
-)
-Δ=max
-i,ℓ
-	​
-
-Δ
-i
-	​
-
-(ℓ) and 
-𝑑
-=
-max
-⁡
-𝑖
-,
-ℓ
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-d=max
-i,ℓ
-	​
-
-d
-ii+1
-	​
-
-(ℓ). We can assume that 
-Δ
-=
-10
-𝑠
-Δ=10s and 
-𝑑
-=
-5
-𝑠
-d=5s.
-We note that when 
-𝐾
-K messages are sent simultaneously and if at least one of them is successfully broadcasted by a last node to the network 
-𝑁
-N, then the total delay is at most 
-max
-⁡
-ℓ
-∈
-[
-𝐾
-]
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-(
-ℓ
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-]
-ℓ∈[K]
-max
-	​
-
-i=0
-∑
-L
-	​
-
-[Δ
-i
-	​
-
-(ℓ)+d
-ii+1
-	​
-
-(ℓ)]
-if the delay on each 
-ℓ
-ℓ-th path, i.e. the value of 
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-(
-ℓ
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-]
-∑
-i=0
-L
-	​
-
-[Δ
-i
-	​
-
-(ℓ)+d
-ii+1
-	​
-
-(ℓ)], is known exactly. Furthermore, for 
-Δ
-=
-max
-⁡
-𝑖
-,
-ℓ
-Δ
-𝑖
-(
-ℓ
-)
-Δ=max
-i,ℓ
-	​
-
-Δ
-i
-	​
-
-(ℓ) and 
-𝑑
-=
-max
-⁡
-𝑖
-,
-ℓ
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-d=max
-i,ℓ
-	​
-
-d
-ii+1
-	​
-
-(ℓ) we have the following inequality 
-max
-⁡
-ℓ
-∈
-[
-𝐾
-]
-∑
-𝑖
-=
-0
-𝐿
-[
-Δ
-𝑖
-(
-ℓ
-)
-+
-𝑑
-𝑖
- 
-𝑖
-+
-1
-(
-ℓ
-)
-]
-≤
-(
-𝐿
-+
-1
-)
-[
-Δ
-+
-𝑑
-]
-ℓ∈[K]
-max
-	​
-
-i=0
-∑
-L
-	​
-
-[Δ
-i
-	​
-
-(ℓ)+d
-ii+1
-	​
-
-(ℓ)]≤(L+1)[Δ+d]
-From the above, it follows that in the worst case the latency of sequential communication is 
-𝐾
-K times the latency of synchronous communication.
-Let us assume that 
-Δ
-=
-10
-𝑠
-Δ=10s, 
-𝑑
-=
-5
-𝑠
-d=5s and sender node is not delaying messages. The latter gives us the upper bound 
-Δ
-𝐿
-+
-𝑑
-(
-𝐿
-+
-1
-)
-=
-15
-×
-𝐿
-+
-5
- 
-𝑠
-ΔL+d(L+1)=15×L+5s on latency in synchronous communication and 
-𝐾
-[
-Δ
-𝐿
-+
-𝑑
-(
-𝐿
-+
-1
-)
-]
-=
-𝐾
-[
-15
-×
-𝐿
-+
-5
-]
- 
-𝑠
-K[ΔL+d(L+1)]=K[15×L+5]s for the upper bound on latency of sequential communication. 
-The Number of Time-Slots Between Two Consecutive Blocks 
-In the leader election process the probability of winning a slot is 
-𝑓
-=
-1
-/
-30
-f=1/30 and the number of time-slots per epoch is 
-𝑇
-=
-648000
-T=648000. Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, 
-𝑛
-0
-n
-0
-	​
-
-, follow the geometric distribution
-P
-(
-𝑛
-0
-)
-=
-(
-1
-−
-𝑓
-)
-𝑛
-0
-𝑓
-P(n
-0
-	​
-
-)=(1−f)
-n
-0
-	​
-
-f
-where 
-𝑛
-0
-∈
-𝑁
-∪
-{
-0
-}
-n
-0
-	​
-
-∈N∪{0}. Follows from above that the average of 
-𝑛
-0
-n
-0
-	​
-
- is 
-⟨
-𝑛
-0
-⟩
-=
-(
-1
-−
-𝑓
-)
-/
-𝑓
-≈
-0.967
-/
-0.033
-=
-29
-⟨n
-0
-	​
-
-⟩=(1−f)/f≈0.967/0.033=29, i.e. on average we expected to see a next block after 
-29
-29 time-slots. The probability that 
-𝑛
-0
-n
-0
-	​
-
- is greater than the average 
-⟨
-𝑛
-0
-⟩
-⟨n
-0
-	​
-
-⟩ is given by 
-P
-(
-𝑛
-0
->
-⟨
-𝑛
-0
-⟩
-)
-=
-(
-1
-−
-𝑓
-)
-⟨
-𝑛
-0
-⟩
-+
-1
-P(n
-0
-	​
-
->⟨n
-0
-	​
-
-⟩)=(1−f)
-⟨n
-0
-	​
-
-⟩+1
-For 
-𝑓
-=
-1
-/
-30
-f=1/30, the above gives us 
-P
-(
-𝑛
-0
->
-29
-)
-=
-(
-1
-−
-1
-/
-30
-)
-30
-≈
-0.362
-P(n
-0
-	​
-
->29)=(1−1/30)
-30
-≈0.362. Furthermore, the maximum of 
-𝑛
-0
-n
-0
-	​
-
- observed in 
-𝑇
-T time-slots (approximately) follows the distribution 
-P
-(
-𝑥
-)
-=
-∫
-−
-∞
-∞
-e
-−
-𝑡
-−
-e
-−
-𝑡
-𝛿
-(
-𝑥
-−
-𝑡
-+
-log
-⁡
-(
-𝑇
-(
-1
-−
-𝑝
-)
-)
-log
-⁡
-(
-1
-/
-𝑝
-)
-)
-d
-𝑡
-           
-=
-∣
-log
-⁡
-(
-𝑝
-)
-∣
- 
-e
-−
-[
-𝑥
-log
-⁡
-(
-𝑝
-)
-+
-log
-⁡
-(
-𝑇
-(
-1
-−
-𝑝
-)
-)
-]
-−
-e
-−
-[
-𝑥
-log
-⁡
-(
-𝑝
-)
-+
-log
-⁡
-(
-𝑇
-(
-1
-−
-𝑝
-)
-)
-]
-P(x)=∫
-−∞
-∞
-	​
-
-e
-−t−e
-−t
-δ(x−
-log(1/p)
-t+log(T(1−p))
-	​
-
-)dt
-           =∣log(p)∣e
-−[xlog(p)+log(T(1−p))]−e
-−[xlog(p)+log(T(1−p))]
-where 
-𝑝
-=
-1
-−
-𝑓
-p=1−f.
-The probability distribution 
-P
-(
-𝑥
-)
-P(x) as a function of 
-𝑥
-x plotted for 
-𝑇
-=
-648000
-T=648000 and 
-𝑓
-=
-1
-/
-30
-f=1/30.
-We note that the mode of 
-P
-(
-𝑥
-)
-P(x) is at 
-𝑥
-=
-log
-⁡
-(
-𝑇
-(
-1
-−
-𝑝
-)
-)
-log
-⁡
-(
-1
-/
-𝑝
-)
-x=
-log(1/p)
-log(T(1−p))
-	​
-
- and hence the typical value of the maximum of 
-𝑛
-0
-n
-0
-	​
-
- observed in 
-𝑇
-=
-648000
-T=648000 time-slots for 
-𝑓
-=
-1
-/
-30
-f=1/30 is 
-≈
-295
-≈295. The prob. that the maximum of 
-𝑛
-0
-n
-0
-	​
-
- observed in 
-𝑇
-=
-648000
-T=648000 time-slots for 
-𝑓
-=
-1
-/
-30
-f=1/30 is greater than 
-295
-295 can be computed with high accuracy from simulations and is 
-≈
-0.62
-≈0.62 as suggested by the simulation data tabulated below.
-Num. of samples
-	
-Prob. 
-𝑛
-0
->
-295
-n
-0
-	​
-
->295​
-
-
-10
-3
-10
-3
-​
-	
-0.612
-0.612​
-
-
-10
-4
-10
-4
-​
-	
-0.617
-0.617​
-
-
-10
-5
-10
-5
-​
-	
-0.62379
-0.62379​
-
-
-10
-6
-10
-6
-​
-	
-0.624018
-0.624018​
-The histogram of the maximum of 
-𝑛
-0
-n
-0
-	​
-
- obtained in one such simulation is presented below
-This histogram of the maximum number of time-slots between two consecutive blocks, 
-𝑛
-0
-n
-0
-	​
-
-, obtained in 
-10
-6
-10
-6
- simulations of one epoch with 
-𝑇
-=
-648000
-T=648000 and 
-𝑓
-=
-1
-/
-30
-f=1/30. The red vertical line corresponds to the typical value of 
-295
-295. Here estimating the prob. that 
-𝑛
-0
->
-295
-n
-0
-	​
-
->295 gives us the value of 
-0.624018
-0.624018.
-Bibliography
-Svante Janson. (2009). On percolation in random graphs with given vertex degrees. Electron. J. Probab. 14: 86 - 118. https://doi.org/10.1214/EJP.v14-603
-Gordon, L., Schilling, M. F. and Waterman, M. S. (1986). An extreme value theory for long head runs.  Probability Theory and Related Fields  72: 279-287. https://doi.org/10.1007/BF00699107
- \mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)=\frac{2 \,\mathrm{erf}\! \left(\frac{ \epsilon}{\sqrt{2\sigma^2(\alpha,q)}}\right)}{\mathrm{erf}\! \left(\frac{\phi(\alpha) }{ \sqrt{2\sigma^2(\alpha,q)}}\right)+\mathrm{erf}\! \left(\frac{ 1-\phi(\alpha)}{ \sqrt{2\sigma^2(\alpha,q)}}\right)}
-
-Sign up or log in
-Report page
-Cookie settings
-Pages
-[1.0.0][Analysis] Resilience and Anonymity
-Current Page
-—
-The Logos Blockchain Project
-/
-Specifications
-The Logos Blockchain Project
-/
-Specifications
-[1.0.0][Analysis] Resilience and Anonymity
-Authors:  Alexander Mozeika <alexander.mozeika@logos.co>
-Revision History
-Table
-Introduction
-In order to guide a design of the Blend Network, this document summarises parameters (and results of analysis) of the leader election process, communication on trees and inference of relative stake. In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.
-Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in Cryptarchia.
-Analysis
-Leader election process
-The leader election process is organised into epochs and each epoch is divided into 
-Σ
-Equation
- time-slots.
 The leader election process has the following parameters
-Table
-Sampling of Linear Trees
-The number of nodes in linear tree design is 
-Σ
-Equation
-, where 
-Σ
-Equation
- is the number of paths and 
-Σ
-Equation
- is the number of nodes in each path excluding the sender node. In the linear tree design, one node is the sender node and the other 
-Σ
-Equation
- nodes are mix nodes.
-We assume that in each epoch of the protocol there are 
-Σ
-Equation
- sender nodes, labelled by the set 
-Σ
-Equation
-. Each of the 
-Σ
-Equation
- sender nodes sample 
-Σ
-Equation
- nodes from the population of 
-Σ
-Equation
- nodes (labeled by the set 
-Σ
-Equation
-). The total number of nodes involved in communication is 
-Σ
-Equation
-.
-We assume that each sender node samples 
-Σ
-Equation
- nodes, independently from other nodes, using sampling without replacement. A node among the 
-Σ
-Equation
- nodes sampled from 
-Σ
-Equation
- just by chance can also appear in other 
-Σ
-Equation
- random subsets of nodes.
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $N$ | Number of nodes | $10^2\ldots10^4$ ​ |
+| $T$ ​ | Number of time-slots per epoch | $\approx 432,000$ ​ |
+| $f$ ​ | Fraction of time-slots with at least one winner | $0.05$ ​ |
+| $\Delta t$ ​ | The duration of a single time-slot | $1$ s |
+
+### Sampling of Linear Trees
+
+![](/image/attachment%3A649de50f-7073-4483-8701-fe98e240d40c%3AScreenshot_2025-02-07_at_12.49.14.png?table=block&id=1fd261aa-09df-81aa-9eaa-f915c3998915&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Communication on Linear Trees. A message is sent from a root node through $K$ communication paths where each path has $L$ nodes.
+
+ALT
+
+The number of nodes in linear tree design is $1+KL$ , where $K$ is the number of paths and $L$ is the number of nodes in each path excluding the sender node. In the linear tree design, one node is the sender node and the other $KL$ nodes are mix nodes.
+
+We assume that in each epoch of the protocol there are $n$ sender nodes, labelled by the set $[n]$ . Each of the $n$ sender nodes sample $K \times L$ nodes from the population of $N$ nodes (labeled by the set $[N]$ ). The total number of nodes involved in communication is $n(1+KL)$ .
+
+We assume that each sender node samples $K\times L$ nodes, independently from other nodes, using sampling without replacement. A node among the $K\times L$ nodes sampled from $[N]$ just by chance can also appear in other $n-1$ random subsets of nodes.
+
 The result of the sampling process described above can be represented by the following random factor-graph:
-Connectivity of a node 
-Σ
-Equation
- is the number of random edges connecting this nodes to factors labelled by the set 
-Σ
-Equation
-. The connectivity of a node 
-Σ
-Equation
- is the number of linear trees that 
-Σ
-Equation
- appears in. The connectivity is a random number from the binomial distribution
-📈
-Equation
-with parameters 
-Σ
-Equation
- and 
-Σ
-Equation
-.
-The probability that a node has more than one random connection 
-Σ
-Equation
-, i.e. the prob. that a mix node participates in more than one subset of mix nodes used in linear trees, for 
-Σ
-Equation
- is given by the sum
-📈
-Equation
-where 
-Σ
-Equation
- with 
-Σ
-Equation
-.
-We note that 
-Σ
-Equation
- and 
-Σ
-Equation
- for 
-Σ
-Equation
-, i.e. the probability 
-Σ
-Equation
- is monotonic increasing function of 
-Σ
-Equation
- for 
-Σ
-Equation
-. Furthermore, the probability 
-Σ
-Equation
- is monotonic increasing function of 
-Σ
-Equation
-, i.e. increasing the number of nodes , 
-Σ
-Equation
-, in the linear tree sampled by each sender node in 
-Σ
-Equation
- increases probability that a node in 
-Σ
-Equation
- has more than one random connection.
-The probability 
-Σ
-Equation
- is computed using the following parameters
-Table
-Communication on Linear Trees
+
+![](/image/attachment%3Ad892cf87-779b-4c75-979f-ebe2dd150dfe%3AScreenshot_2025-02-07_at_16.18.50.png?table=block&id=1fd261aa-09df-8129-b5fb-e05cf6f66bd0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=980&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The random factor-graph generated by sampling of $n$ subsets of $K\times L$ nodes, represented by factors (squares), from the set of all nodes $[N]$ represented by (filled) circles. If a node is a member of a subset then this is represented by an edge on this graph. Each node in the subset of $[N]$ , $[n]$ , is a member of at least $1$ of these subsets. Here $K\times L=4$ .
+
+ALT
+
+![](/image/attachment%3A4756879d-93b3-42bd-9462-726f709f3756%3AScreenshot_2025-02-07_at_16.32.55.png?table=block&id=1fd261aa-09df-81b6-8d35-fabff822c957&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Structure of a factor $\mu$ in the random factor graph associated with sampling of linear trees. Here $K=L=2$ . Node $i$ , associated with $\mu$ , is a sending a message to nodes $i\_2$ and $i\_4$ via the mix nodes $i\_1$ and $i\_3$ .
+
+ALT
+
+Connectivity of a node $i\in[N]$ is the number of random edges connecting this nodes to factors labelled by the set $[n]$ . The connectivity of a node $i \in [N]$ is the number of linear trees that $i$ appears in. The connectivity is a [random number from the binomial distribution](/206261aa09df80509e7dca0605db421b?pvs=25#255261aa09df80028403c5b5e08c1c1f)
+
+$$
+\mathrm{P}\left(c\vert n,\frac{KL}{N}\right)={n\choose c}\left(\frac{KL}{N}\right)^c\left(1-\frac{KL}{N}\right)^{n-c}
+$$
+P(c∣n,NKL​)=(cn​)(NKL​)c(1−NKL​)n−c
+
+with parameters $n$ and $\frac{KL}{N}$ .
+
+The probability that a node has more than one random connection $\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ , i.e. the prob. that a mix node participates in more than one subset of mix nodes used in linear trees, for $n\geq2$ is given by the sum
+
+$$
+\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)=\sum\_{c=2}^n\mathrm{P}\left(c\vert n,\frac{KL}{N}\right)\\~~~~~~~~~~~~~~~~~~~~~~~~=1-\sum\_{c=0}^1\mathrm{P}\left(c\vert n,\frac{KL}{N}\right)\\~~~~~~~~~~~~~~~~~=1-\left(1-\frac{KL}{N}\right)^{n}\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-n\left(\frac{KL}{N}\right)\left(1-\frac{KL}{N}\right)^{n-1}\\~~~~~~~~~~~~~~~~~~~~~=1-\left(1-\frac{KL}{N}\right)^{\alpha N}\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-\alpha KL\left(1-\frac{KL}{N}\right)^{\alpha N-1}\\~~~~~~~~~~~~~~~~~~~~~~~~\leq1-\left(1-\frac{KL}{N}\right)^{\alpha N}
+$$
+P(c>1∣n,NKL​)=c=2∑n​P(c∣n,NKL​)                        =1−c=0∑1​P(c∣n,NKL​)                 =1−(1−NKL​)n                                                             −n(NKL​)(1−NKL​)n−1                     =1−(1−NKL​)αN                                             −αKL(1−NKL​)αN−1                        ≤1−(1−NKL​)αN
+
+where $\alpha=n/N$ with $n\geq2$ .
+
+We note that $\mathrm{P}\left(c>1\vert 2,\frac{KL}{N}\right)=\left(\frac{KL}{N}\right)^2$ and $\mathrm{P}\left(c>1\vert n+1,\frac{KL}{N}\right)>\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ for $KL1\vert n,\frac{KL}{N}\right)$ is monotonic increasing function of $n$ for $KL1\vert n,\frac{KL}{N}\right)$ is monotonic increasing function of $\frac{KL}{N}$ , i.e. increasing the number of nodes , $KL$ , in the linear tree sampled by each sender node in $[n]$ increases probability that a node in $[N]$ has more than one random connection.
+
+The probability $\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ is computed using the following parameters
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $N$ ​ | Number of nodes | $10^2\ldots10^4$ ​ |
+| $n$ ​ | Number of sender nodes | $2\ldots N$ ​ |
+| $K\times L$ ​ | Number of nodes in a linear tree | $2\ldots N-1$ ​ |
+
+### Communication on Linear Trees
+
 We consider the following communication system
-We assume that 
-Σ
-Equation
- nodes in the population are “faulty” (faulty node is unable to relay a message) and the probability that a node is faulty is 
-Σ
-Equation
-.
-We assume that 
-Σ
-Equation
- nodes in the population are “adversarial” (adversarial nodes are controlled by an adversary which can make nodes faulty, use them for traffic analysis, etc.) and the probability that a node is adversarial is 
-Σ
-Equation
-.
+
+![](/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6be5b10e-8533-41e7-a7e3-b4170dcb876e%2FScreenshot_2025-01-02_at_12.37.14.png?table=block&id=1fd261aa-09df-81f8-a9d8-f3bf17954d0a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1200&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Communication on Linear Trees. A message is sent from a node through $K$ communication paths where each path has $L$ nodes. A node could be faulty (circle with dashed boundary), or adversarial (red circle). The presence of faulty node leads to communication failures. The presence of adversarial nodes could lead to communication and anonymity failures.
+
+ALT
+
+We assume that $M\_F$ nodes in the population are “faulty” (faulty node is unable to relay a message) and the probability that a node is faulty is $q\_F=M\_F/N$ .
+
+We assume that $M\_A$ nodes in the population are “adversarial” (adversarial nodes are controlled by an adversary which can make nodes faulty, use them for traffic analysis, etc.) and the probability that a node is adversarial is $q\_A=M\_A/N$ .
+
 If a path contains at least one faulty node then communication failure occurred.
+
 If a path does not have any faulty nodes then this path is functioning.
-If all 
-Σ
-Equation
- paths have a communication failure then broadcast failure occurred.
+
+If all $K$ paths have a communication failure then broadcast failure occurred.
+
 The probability of broadcast failure is given by
-📈
-Equation
-We note that 
-Σ
-Equation
- is the site percolation threshold of random regular graph (RRG) with connectivity C, i.e. for 
-Σ
-Equation
- the RRG becomes disconnected with high probability as 
-Σ
-Equation
-. The latter suggests if our model of the network is RRG then for the fraction of faulty nodes 
-Σ
-Equation
- the communication is not possible with high probability in 
-Σ
-Equation
-.
+
+$$
+\mathrm{P}\_b(K,L,q\_F)=\left[1-(1-q\_F)^L\right]^{K}
+$$
+Pb​(K,L,qF​)=[1−(1−qF​)L]K
+
+We note that $q\_F(C)=\frac{C-2}{C-1}$ is the [site percolation threshold of random regular graph (RRG) with connectivity C](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df811eb66afc94559fa6c4), i.e. for $q\_F>q\_F(C)$ the RRG becomes disconnected with high probability as $N\rightarrow\infty$ . The latter suggests if our model of the network is RRG then for the fraction of faulty nodes $q\_F > q\_F(C)$ the communication is not possible with high probability in $N\rightarrow\infty$ .
+
 If all nodes in a communication path are non-faulty then this is a functioning communication path.
+
 If there is at least one functioning communication paths where all nodes are adversarial, then adversary has opportunity to cause anonymity failure.
+
 The probability of anonymity failure is given by
-📈
-Equation
+
+$$
+\mathrm{P}\_a(K,L,q\_F,q\_A)=1-\left[1-[(1-q\_F)\, q\_A]^L\right]^{K}
+$$
+Pa​(K,L,qF​,qA​)=1−[1−[(1−qF​)qA​]L]K
+
 If there is at least one adversarial node in each functioning communication paths then the adversary has an opportunity to cause broadcast failure. The probability of adversarial broadcast failure is given by
-📈
-Equation
-The probabilities 
-Σ
-Equation
-, 
-Σ
-Equation
- and 
-Σ
-Equation
- are computed the following parameters
-Table
+
+$$
+\mathrm{P}\_{ab}(K,L,q\_F,q\_A)=\left[1-[(1- q\_F)(1- q\_A)]^L\right]^K-\left[1-(1- q\_F)^L\right]^{K}
+$$
+Pab​(K,L,qF​,qA​)=[1−[(1−qF​)(1−qA​)]L]K−[1−(1−qF​)L]K
+
+The probabilities $\mathrm{P}\_a$ , $\mathrm{P}\_b$ and $\mathrm{P}\_{ab}$ are computed the following parameters
+
+| Parameter | Description | Value/Range |  |
+| --- | --- | --- | --- |
+| $q\_F$ ​ | Fraction of faulty nodes | $[0,1)$ ​ |  |
+| $q\_A$ ​ | Fraction of adversarial nodes | $[0,1)$ ​ |  |
+| $K$ ​ | Number of communication paths | $1\ldots N-1$ ​ |  |
+| $L$ ​ | Number of nodes in a communication path | $2\ldots N-1$ ​ |  |
+
 The code which computes above probabilities is given below
 
-def Prob_b(K, L, qF):
- """
- Compute the probability of broadcast failure.
- Formula: (1 - (1 - qF)^L)^K
- """
- return (1 - (1 - qF) ** L) ** K
+def Prob\_b(K, L, qF):
+"""
+Compute the probability of broadcast failure.
+Formula: (1 - (1 - qF)^L)^K
+"""
+return (1 - (1 - qF) \*\* L) \*\* K
+def Prob\_ab(K, L, qF, qA):
+"""
+Compute the probability of adversarial broadcast failure.
+Formula: (1 - ((1 - qF)^L \* (1 - qA)^L))^K - (1 - (1 - qF)^L)^K
+"""
+term1 = (1 - qF) \*\* L
+term2 = (1 - qA) \*\* L
+return (1 - (term1 \* term2)) \*\* K - (1 - term1) \*\* K
+def Prob\_a(K, L, qF, qA):
+"""
+Compute the probability of anonymity failure.
+Formula: 1 - (1 - ((1 - qF)^L \* qA^L))^K
+"""
+term1 = (1 - qF) \*\* L
+term2 = qA \*\* L
+return 1 - (1 - (term1 \* term2)) \*\* K
 
-def Prob_ab(K, L, qF, qA):
- """
- Compute the probability of adversarial broadcast failure.
- Formula: (1 - ((1 - qF)^L * (1 - qA)^L))^K - (1 - (1 - qF)^L)^K
- """
- term1 = (1 - qF) ** L
- term2 = (1 - qA) ** L
- return (1 - (term1 * term2)) ** K - (1 - term1) ** K
+​
 
-def Prob_a(K, L, qF, qA):
- """
- Compute the probability of anonymity failure.
- Formula: 1 - (1 - ((1 - qF)^L * qA^L))^K
- """
- term1 = (1 - qF) ** L
- term2 = qA ** L
- return 1 - (1 - (term1 * term2)) ** K
-Inference of relative stake
-The adversary observes the leader election process of a node with the relative stake 
-Σ
-Equation
-.
-In 
-Σ
-Equation
- time-slots, the adversary is able to observe fraction 
-Σ
-Equation
- of wins in 
-Σ
-Equation
- observations. The probability of observing the election outcome of a node is 
-Σ
-Equation
-. For 
-Σ
-Equation
- adversary uses the “naive” estimator 
-Σ
-Equation
- of the true relative stake 
-Σ
-Equation
-. For large 
-Σ
-Equation
-, the probability that 
-Σ
-Equation
- is given by
-📈
-Equation
-In the above, 
-Σ
-Equation
- is the lottery function with parameter 
-Σ
-Equation
-, 
-Σ
-Equation
- and 
-Σ
-Equation
-, where 
-Σ
-Equation
- is the fraction of observed time-slots such that 
-Σ
-Equation
- slots are observed on average.
-The probability 
-Σ
-Equation
- can be interpreted as adversarial “confidence” and the parameter 
-Σ
-Equation
- as “accuracy”. An example of the above probability is given below
-The probability 
-Σ
-Equation
-, i.e. adversarial “confidence,” is computed using the following parameters:
-Table
+### Inference of relative stake
+
+The [adversary observes the leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) of a node with the relative stake $\alpha$ .
+
+![](/image/attachment%3A4688bad9-2877-4408-9416-bcdee0bc9ef8%3AScreenshot_2025-02-13_at_08.26.49.png?table=block&id=1fd261aa-09df-81f1-9deb-f03fe24a8efa&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+In $T$ time-slots, the adversary is able to observe fraction $v$ of wins in $m$ observations. The probability of observing the election outcome of a node is $q$ . For $m\geq1$ adversary uses the “naive” estimator $\hat{\alpha}=\frac{\log\left(1-v\right)}{\log(1-f)}$ of the true relative stake $\alpha$ . For large $T$ , the probability that $\alpha(1-\gamma)\leq\hat{\alpha}\leq\alpha(1+\gamma)$ is [given by](/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05)
+
+$$
+\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)=\frac{2 \,\mathrm{erf}\! \left(\frac{ \epsilon}{\sqrt{2\sigma^2(\alpha,q)}}\right)}{\mathrm{erf}\! \left(\frac{\phi(\alpha) }{ \sqrt{2\sigma^2(\alpha,q)}}\right)+\mathrm{erf}\! \left(\frac{ 1-\phi(\alpha)}{ \sqrt{2\sigma^2(\alpha,q)}}\right)}
+$$
+P(α^∈[α(1−γ),α(1+γ)]∣qT)=erf(2σ2(α,q)​ϕ(α)​)+erf(2σ2(α,q)​1−ϕ(α)​)2erf(2σ2(α,q)​ϵ​)​
+
+In the above, $\phi(\alpha)=1-(1-f)^\alpha$ is the lottery function with parameter  $f$ , $\epsilon=\gamma\alpha\frac{\mathrm{d}}{\mathrm{d}\alpha}\phi(\alpha)$ and $\sigma^2(\alpha ,q)=\phi(\alpha)[1-\phi(\alpha)]/T q$ , where $q$ is the fraction of observed time-slots such that $Tq$ slots are observed on average.
+
+The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$ can be interpreted as adversarial “confidence” and the parameter $\gamma$ as “accuracy”. An example of the above probability is given below
+
+![](/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F694d7ce0-ede2-44dc-ac13-5ad0bb78b47d%2Fadver_conf.png?table=block&id=1fd261aa-09df-813c-9e95-d6a39857faae&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=590&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The probability that inferred relative stake $\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]$ , i.e. adversarial “confidence”, as a function of true relative stake $\alpha$ obtained in $T=432000$ time-slots (this value is used in Cardano) when the fraction $q=0.657$ of slots is observed. Here the probability that stake of a node with the true stake $\alpha=0.0126$ (the max. stake in the Bitcoin network), represented by a red vertical line, is inferred with an “accuracy” within the fraction $\gamma=0.1$ of relative stake $\alpha$ , represented by $\alpha(1\pm\gamma)$ red vertical dotted lines, is approx. $0.824$ . The red dashed horizontal line corresponds to the threshold $\theta=0.5$ . The blue vertical line at $\alpha=0.00252$ is the result of dividing the stake $\alpha=0.0126$ among the $5$ nodes.
+
+ALT
+
+The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$ , i.e. adversarial “confidence,” is computed using the following parameters:
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $T$ ​ | Number of slots per epoch | $\approx 432,000$ ​ |
+| $f$ ​ | Fraction of non-empty slots | $0.05$ ​ |
+| $\alpha$ ​ | Relative stake of a node | $(0, 1)$ ​ |
+| $\gamma$ ​ | “Accuracy” parameter | $(0, 1)$ ​ |
+| $q$ ​ | Fraction of observed time-slots | $(0, 1]$ ​ |
+
 The code which computes adversarial “confidence” is given below
-def phi(alpha, f):
-	return 1 - (1 - f) ** alpha
 
+def phi(alpha, f):
+return 1 - (1 - f) \*\* alpha
 def dphi(alpha, f):
-	return -((1 - f) ** alpha) * log(1 - f)
-
+return -((1 - f) \*\* alpha) \* log(1 - f)
 def Prob2(alpha, epsilon, T, q):
-	sqrt2 = sqrt(2.0)
- phi_alpha = phi(alpha, f)
- 
- # Denominator term
- denominator = (
- 								erf((phi_alpha - 1) * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
- 									 - erf(phi_alpha * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
-	)
- 
- # Numerator term
- numerator = -2.0 * erf(
- 							sqrt2 * epsilon / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q)))
-	)
- 
- # Final result
- return numerator / denominator
- 
-# Compute epsilon = dphi(alpha) * alpha * gamma
-epsilon = dphi(alpha, f) * alpha * gamma
-
+sqrt2 = sqrt(2.0)
+phi\_alpha = phi(alpha, f)
+# Denominator term
+denominator = (
+erf((phi\_alpha - 1) \* sqrt2 / (2 \* sqrt(phi\_alpha \* (1 - phi\_alpha) / (T \* q))))
+- erf(phi\_alpha \* sqrt2 / (2 \* sqrt(phi\_alpha \* (1 - phi\_alpha) / (T \* q))))
+)
+# Numerator term
+numerator = -2.0 \* erf(
+sqrt2 \* epsilon / (2 \* sqrt(phi\_alpha \* (1 - phi\_alpha) / (T \* q)))
+)
+# Final result
+return numerator / denominator
+# Compute epsilon = dphi(alpha) \* alpha \* gamma
+epsilon = dphi(alpha, f) \* alpha \* gamma
 # Compute Prob2
-Prob2_result = Prob2(alpha, epsilon, T, q)
-The probability can also compute the (minimum) number of time-slots, 
-Σ
-Equation
-, such that 
-Σ
-Equation
-, for some 
-Σ
-Equation
-. Here 
-Σ
-Equation
- is the time needed by an adversary to achieve “confidence” greater than 
-Σ
-Equation
-. The code which computes 
-Σ
-Equation
- is given below
-T0 = T # One epoch
-T1 = 730 * T # 10 years
-dT = 10**3 # Step size
+Prob2\_result = Prob2(alpha, epsilon, T, q)
 
-if Prob2_t < delta:
-	# Increase T until Prob2_result >= delta
-	t = T0
- while t <= T1 and Prob2_t < delta:
-	 Prob2_t = Prob2(alpha, epsilon, t, result3)
- t += dT
- 
+​
+
+The [probability](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8130bc9cc00ece070d4a) can also compute the (minimum) number of time-slots, $t$ , such that $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,t\right)\geq\delta$ , for some $\delta\in (0,1)$ . Here $t$ is the time needed by an adversary to achieve “confidence” greater than $\delta$ . The code which computes $t$ is given below
+
+T0 = T # One epoch
+T1 = 730 \* T # 10 years
+dT = 10\*\*3 # Step size
+if Prob2\_t < delta:
+# Increase T until Prob2\_result >= delta
+t = T0
+while t <= T1 and Prob2\_t < delta:
+Prob2\_t = Prob2(alpha, epsilon, t, result3)
+t += dT
 else:
-	# Decrease T until Prob2_result <= delta
- t = T
- while t >= 100 and Prob2_t > delta:
-	 Prob2_t = Prob2(alpha, epsilon, t, result3)
- t -= dT 
-Adversarial Confidence as a Measure of Statistical “Noise”
-The probability 
-Σ
-Equation
-, where 
-Σ
-Equation
- is the (average) number of time-slots observed by adversary in one epoch, can be seen as a measure of the magnitude of “noise” which prevents accurate measurements of the relative stake 
-Σ
-Equation
-. One source of this noise is the actual (stochastic) leader election process and the other is the sampling (or “observation”), controlled by parameter 
-Σ
-Equation
-, of the latter by an adversary. For 
-Σ
-Equation
-, i.e. all time-slots are observed, and leader election process is the only source of noise. In this regime, for a given accuracy (
-Σ
-Equation
-), the relative stake can be inferred with high confidence as can be seen in the figure below
-For 
-Σ
-Equation
-, sampling becomes an additional source of noise interfering with measurements done by adversary. Here, for a given accuracy, the confidence deteriorates as 
-Σ
-Equation
- (see figures below).
-Let us define a function which compares properties of inference for 
-Σ
-Equation
- and 
-Σ
-Equation
- as follows
-📈
-Equation
-We note that above is 
-Σ
-Equation
- when 
-Σ
-Equation
-, i.e. no sampling noise, and is growing when 
-Σ
-Equation
- (see figure below). Hence, above can be seen as “amplitude” of the sampling noise.
-The Unlinkability of Block Proposers
-We assume that node 
-Σ
-Equation
- wins the election and broadcasts message 
-Σ
-Equation
- to the network using linear trees. We assume that in the network the sender node 
-Σ
-Equation
- has 
-Σ
-Equation
- neighbouring nodes. Message 
-Σ
-Equation
- is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood 
-Σ
-Equation
-, where 
-Σ
-Equation
-, is adversarial with the prob. 
-Σ
-Equation
-. The prob. that at least one node in 
-Σ
-Equation
- is adversarial is 
-Σ
-Equation
-.
-If 
-Σ
-Equation
- has at least one adversarial neighbour and anonymity failure occurred then the message 
-Σ
-Equation
- can linked to the sender node 
-Σ
-Equation
-. We note that just occurrence of the anonymity failure alone is not sufficient to link 
-Σ
-Equation
- to 
-Σ
-Equation
- and at least one compromised node is also needed in 
-Σ
-Equation
-. Furthermore, an adversary may need not one but at least 
-Σ
-Equation
- compromised nodes in 
-Σ
-Equation
-. The probability of the latter is given by the binomial
-📈
-Equation
-We note that the case one adversarial node in 
-Σ
-Equation
- is recovered by setting 
-Σ
-Equation
- in the above. The probability of above event, given that 
-Σ
-Equation
- won the election, is the product of two probabilities
-📈
-Equation
-We note that in above we assumed that 
-Σ
-Equation
-, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since 
-Σ
-Equation
- for 
-Σ
-Equation
-, the prob. of anonymity failure 
-Σ
-Equation
- is an upper bound on the above prob. If node 
-Σ
-Equation
- has (relative) stake 
-Σ
-Equation
- then the prob. of node 
-Σ
-Equation
- winning is 
-Σ
-Equation
-, where 
-Σ
-Equation
- is the lottery function. Hence, the prob. that the message 
-Σ
-Equation
-, sent by the winning node 
-Σ
-Equation
-, can be linked to 
-Σ
-Equation
- is given by
-📈
-Equation
-The prob. that message 
-Σ
-Equation
- can not be linked to the sender 
-Σ
-Equation
- is
-📈
-Equation
-Hence the prob. that any message sent by node 
-Σ
-Equation
- can be linked to 
-Σ
-Equation
- in 
-Σ
-Equation
- elections is given by
-📈
-Equation
-For the above prob. to be greater than some threshold 
-Σ
-Equation
- (for example 
-Σ
-Equation
-) the number of elections 
-Σ
-Equation
- has to satisfy the following inequality
-📈
-Equation
-The minimum 
-Σ
-Equation
- for which above inequality holds 
-Σ
-Equation
-, which is the RHS of the above, is computed using the following parameters
-Table
-The code which computes 
-Σ
-Equation
- is given below
+# Decrease T until Prob2\_result <= delta
+t = T
+while t >= 100 and Prob2\_t > delta:
+Prob2\_t = Prob2(alpha, epsilon, t, result3)
+t -= dT
+
+​
+
+#### Adversarial Confidence as a Measure of Statistical “Noise”
+
+The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$ , where $q\,T$ is the (average) number of time-slots observed by adversary in one epoch, can be seen as a measure of the magnitude of “noise” which prevents accurate measurements of the relative stake $\alpha$ . One source of this noise is the actual (stochastic) leader election process and the other is the sampling (or “observation”), controlled by parameter $q$ , of the latter by an adversary. For $q=1$ , i.e. all time-slots are observed, and leader election process is the only source of noise. In this regime, for a given accuracy ( $\gamma= 0.1$ ), the relative stake can be inferred with high confidence as can be seen in the figure below
+
+![](/image/attachment%3A17d8ecd8-2432-48e8-afff-2ca5ca36c6ae%3AScreenshot_2025-02-26_at_18.55.44.png?table=block&id=1fd261aa-09df-81c5-ad2c-e9d3fc3596b9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The (relative) stake estimator $\hat{\alpha}$ , computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) $\alpha\in\{0.007482,\ldots,0.013476\}$ , represented by solid horizontal lines. For a node with the stake $\alpha=0.013476$ the prob. $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.915965$ , where $\gamma=0.1$ , $q=1$ (fraction of observed time-slots) and $T=432000$ (number of time-slots in one epoch). The boundaries of the interval $[\alpha(1-\gamma), \alpha(1+\gamma)]$ for $\alpha=0.013476$ are represented by dashed horizontal lines.
+
+ALT
+
+For $q<1$ , sampling becomes an additional source of noise interfering with measurements done by adversary. Here, for a given accuracy, the confidence deteriorates as $q\rightarrow0$ (see figures below).
+
+![](/image/attachment%3Af9d351ea-88c6-4042-b160-4e0b3be1b2e1%3AScreenshot_2025-02-27_at_08.42.58.png?table=block&id=1fd261aa-09df-8190-8b30-f301042f7a25&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The (relative) stake estimator $\hat{\alpha}$ , computed in one epoch of the leader election process, plotted as a function of time-slots for five nodes with true (relative stake) $\alpha\in\{0.007482,\ldots,0.013476\}$ , represented by solid horizontal lines. For a node with the stake $\alpha=0.013476$ the prob. $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.778177$ , where $\gamma=0.1$ , $q=0.5$ (fraction of observed time-slots) and $T=432000$ (number of time-slots in one epoch). The boundaries of the interval $[\alpha(1-\gamma), \alpha(1+\gamma)]$ for $\alpha=0.013476$ are represented by dashed horizontal lines.
+
+ALT
+
+![](/image/attachment%3Ac3652184-0c73-41f7-a0b5-9c8acc432944%3AScreenshot_2025-02-26_at_19.02.18.png?table=block&id=1fd261aa-09df-81c3-8aff-c0f8a172694f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The (relative) stake estimator $\hat{\alpha}$ , computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) $\alpha\in\{0.007482,\ldots,0.013476\}$ , represented by solid horizontal lines. For a node with the stake $\alpha=0.013476$ the prob. $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.415180$ , where $\gamma=0.1$ , $q=0.1$ (fraction of observed time-slots) and $T=432000$ (number of time-slots in one epoch). The boundaries of the interval $[\alpha(1-\gamma), \alpha(1+\gamma)]$ for $\alpha=0.013476$ are represented by dashed horizontal lines.
+
+ALT
+
+![](/image/attachment%3A7f99d8cc-7ac6-46b0-b2c6-a0464190d22f%3AScreenshot_2025-02-26_at_19.09.23.png?table=block&id=1fd261aa-09df-81a6-8a72-edc73562fe5d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The (relative) stake estimator $\hat{\alpha}$ , computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) $\alpha\in\{0.007482,\ldots,0.013476\}$ , represented by solid horizontal lines. For a node with the stake $\alpha=0.013476$ the prob. $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.1431790734$ , where $\gamma=0.1$ , $q=0.01$ (fraction of observed time-slots) and $T=432000$ (number of time-slots in one epoch). The boundaries of the interval $[\alpha(1-\gamma), \alpha(1+\gamma)]$ for $\alpha=0.013476$ are represented by dashed horizontal lines.
+
+ALT
+
+![](/image/attachment%3Abaf50abc-7e9e-464c-959d-971dee6f241b%3AScreenshot_2025-02-26_at_19.17.01.png?table=block&id=1fd261aa-09df-81b1-b947-ed8642714222&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The (relative) stake estimator $\hat{\alpha}$ , computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with true (relative stake) $\alpha\in\{0.007482,\ldots,0.013476\}$ , represented by solid horizontal lines. For a node with the stake $\alpha=0.013476$ the prob. $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)= 0.061572$ , where $\gamma=0.1$ , $q=0.001$ (fraction of observed time-slots) and $T=432000$ (number of time-slots in one epoch). The boundaries of the interval $[\alpha(1-\gamma), \alpha(1+\gamma)]$ for $\alpha=0.013476$ are represented by dashed horizontal lines.
+
+ALT
+
+Let us define a function which compares properties of inference for $q=1$ and $q\in(0,1)$ as follows
+
+$$
+\log\left(\frac{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, T\right)}{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)}\right)
+$$
+log(P(α^∈[α(1−γ),α(1+γ)]∣qT)P(α^∈[α(1−γ),α(1+γ)]∣T)​)
+
+We note that above is $0$ when $q=1$ , i.e. no sampling noise, and is growing when $q\rightarrow0$ (see figure below). Hence, above can be seen as “amplitude” of the sampling noise.
+
+![](/image/attachment%3A5d56e8a2-b792-4379-af82-bc879c5c707c%3AScreenshot_2025-03-28_at_17.27.21.png?table=block&id=1fd261aa-09df-815c-85c7-d0813b45f345&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+$\log\left(\frac{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, T\right)}{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)}\right)$ plotted as function of $q$ for $\alpha=0.013476$ and $\gamma=0.1$ .
+
+ALT
+
+### The Unlinkability of Block Proposers
+
+We assume that node $\mathrm{S}$ wins the [election](/1fd261aa09df8181a428f52251e173c4?pvs=25) and broadcasts message $\mathrm{m}$ to the network using [linear trees](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8126abdcf963ec121066). We assume that in the network the sender node $\mathrm{S}$ has $C$ neighbouring nodes. Message $\mathrm{m}$ is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood $\partial\mathrm{S}$ , where $\vert\partial\mathrm{S}\vert=C$ , is adversarial with the prob. $q\_A$ . The prob. that at least one node in $\partial\mathrm{S}$ is adversarial is $1-(1-q\_A)^C$ .
+
+If $\mathrm{S}$ has at least one adversarial neighbour and [anonymity failure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81d18726e5b63a96b432) occurred then the message $\mathrm{m}$ can linked to the sender node $\mathrm{S}$ . We note that just occurrence of the [anonymity failure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81d18726e5b63a96b432) alone is not sufficient to link $\mathrm{m}$ to $\mathrm{S}$ and at least one compromised node is also needed in $\partial\mathrm{S}$ . Furthermore, an adversary may need not one but at least $n\_A$ compromised nodes in $\partial\mathrm{S}$ . The probability of the latter is given by the binomial
+
+$$
+\mathrm{P}(n\geq n\_A\vert C,q\_A)=\sum\_{n=n\_A}^C{C\choose n}[1-q\_A]^{C-n}q\_A^n
+$$
+P(n≥nA​∣C,qA​)=n=nA​∑C​(nC​)[1−qA​]C−nqAn​
+
+We note that the case one adversarial node in $\partial\mathrm{S}$ is recovered by setting $n\_A=1$ in the above. The probability of above event, given that $\mathrm{S}$ won the election, is the product of two probabilities
+
+$$
+\mathrm{P}(n\geq n\_A\vert C,q\_A)\,\mathrm{P}\_a(K,L,0,q\_A)
+$$
+P(n≥nA​∣C,qA​)Pa​(K,L,0,qA​)
+
+We note that in above we assumed that $q\_F=0$ , i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since $\mathrm{P}(n\geq n\_A\vert C,q\_A)<1$ for $n\_A\geq1$ , the prob. of anonymity failure $\mathrm{P}\_a(K,L,0,q\_A)$ is an upper bound on the above prob. If node $\mathrm{S}$ has (relative) stake $\alpha$ then the prob. of node $\mathrm{S}$ winning is $\phi(\alpha)$ , where $\phi(\alpha)$ is the [lottery function](/1fd261aa09df8181a428f52251e173c4?pvs=25). Hence, the prob. that the message $\mathrm{m}$ , sent by the winning node $\mathrm{S}$ , can be linked to $\mathrm{S}$ is given by
+
+$$
+\phi(\alpha)\, \mathrm{P}(n\geq n\_A\vert C,q\_A)\,\mathrm{P}\_a(K,L,0,q\_A)
+$$
+ϕ(α)P(n≥nA​∣C,qA​)Pa​(K,L,0,qA​)
+
+The prob. that message $\mathrm{m}$ can not be linked to the sender $\mathrm{S}$ is
+
+$$
+1-\phi(\alpha)\, \mathrm{P}(n\geq n\_A\vert C,q\_A)\,\mathrm{P}\_a(K,L,0,q\_A)
+$$
+1−ϕ(α)P(n≥nA​∣C,qA​)Pa​(K,L,0,qA​)
+
+Hence the prob. that any message sent by node $\mathrm{S}$ can be linked to $\mathrm{S}$ in $t$ elections is given by
+
+$$
+1-\left[1-\phi(\alpha)\, \mathrm{P}(n\geq n\_A\vert C,q\_A)\,\mathrm{P}\_a(K,L,0,q\_A)\right]^t
+$$
+1−[1−ϕ(α)P(n≥nA​∣C,qA​)Pa​(K,L,0,qA​)]t
+
+For the above prob. to be greater than some threshold $\theta$ (for example $\theta=1/2$ ) the number of elections $t$ has to satisfy the following inequality
+
+$$
+t>\left\lceil\frac{\log(1-\theta)}{\log(1-\phi(\alpha)\, \mathrm{P}(n\geq n\_A\vert C,q\_A)\,\mathrm{P}\_a(K,L,0,q\_A))}\right\rceil
+$$
+t>⌈log(1−ϕ(α)P(n≥nA​∣C,qA​)Pa​(K,L,0,qA​))log(1−θ)​⌉
+
+The minimum $t$ for which above inequality holds $t(\theta)$ , which is the RHS of the above, is computed using the following parameters
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $\theta$ ​ | Prob. threshold | $(0, 1)$ ​ |
+| $f$ ​ | Fraction of non-empty slots | $0.05$ ​ |
+| $\alpha$ ​ | Relative stake of a node | $(0, 1)$ ​ |
+| $C$ ​ | Node neighbourhood size | $\geq 4$ ​ |
+| $n\_A$ ​ | Number of adver. nodes threshold | $\geq 1$ ​ |
+| $q\_A$ ​ | Fraction of adversarial nodes | $[0, 1)$ ​ |
+| $K$ ​ | Number of communication paths | $1\ldots N-1$ ​ |
+| $L$ ​ | Number of nodes per communication path | $2\ldots N-1$ ​ |
+
+The code which computes $t(\theta)$ is given below
 
 def phi(alpha, f):
- return 1 - (1 - f) ** alpha
+return 1 - (1 - f) \*\* alpha
+def calculate\_t(qA, L, K, alpha, f, C, nA, theta):
+#compute prob. Pa
+x = 1 - pow(qA, L)
+Pa = (1 - pow(x, K))
+#compute prob. Pan
+p = 1 - qA
+Pan = 0
+for n in range(nA, C + 1):
+Pan += comb(C, n) \* (p \*\* (C - n)) \* (qA \*\* n)
+#compute prod. of prob.
+Prob = Pan \* Pa
+#compute t
+numerator = log(1 - theta)
+denominator = log(1 - phi(alpha, f) \* Prob)
+t = ceil(numerator / denominator)
+return t
 
-def calculate_t(qA, L, K, alpha, f, C, nA, theta):
-		#compute prob. Pa
- x = 1 - pow(qA, L)
- Pa = (1 - pow(x, K))
- 
- #compute prob. Pan
- p = 1 - qA
- Pan = 0
- for n in range(nA, C + 1):
- Pan += comb(C, n) * (p ** (C - n)) * (qA ** n)
- 
- #compute prod. of prob.
- Prob = Pan * Pa
- 
- #compute t
- numerator = log(1 - theta)
- denominator = log(1 - phi(alpha, f) * Prob)
- t = ceil(numerator / denominator)
- 
- return t
-Design of the “Calculator”
+​
+
+### Design of the “Calculator”
+
 Here we combine the results for leader election process, sampling of linear trees, broadcasting on linear trees and inference of relative stake to design a calculator which takes parameters of the latter and computes properties of a node related to the resilience and anonymity of communication. The calculator has the following modules:
-📄
-PDF
+
+N - number of nodesT - number of slots per epochf - fraction of non-empty slotsΔ t=1sLeader Election ProcessTxf messagesper epochon average.L - number of nodesin each pathBroadcasting on LinearTreesK - number of pathsqF - fraction offaulty nodesPb - probabilityof broadcastfailure.qA - fraction ofadversarial nodesqF - fraction offaulty nodesK - number of pathsBroadcasting on LinearTreesL - number of nodesin each pathPa - probability ofanonymity failure.T - number of slots per epochf - fraction of non-epmty slotsα - relative stake of a nodeγ - "accuracy" ofadversarial inferenceInference of Relative Stakeq - fraction of observed slotsP(s ∈ [α(1-γ), α(1+γ)]) is the prob.that inferred stake, s, belongsto the interval [α(1-γ), α(1+γ)]. Above is adversarial "confidence".K - number of pathsL - number of nodesin each pathBroadcasting on LinearTreesqA - fraction ofadversarial nodesqF - fraction offaulty nodes Pab - probability ofadversarialbroadcast-failure.Latency"Noise"Sampling of Linear TreesN - number of nodesn - number of sender nodesKxL - number of nodessampled (without repl.)by each sender nodeP(c>1|n,KL/N) - is the prob.that a node participatesin more than onelinear tree.nA -number ofadversarial nodesNeigborhoodC -size of the neighborhoodqA - fraction ofadversarial nodes Pan - prob. that "the number ofadver. nodes" >=nAf - fraction of non-epmty slotsα - relative stake of a nodePa - probability ofanonymity failure.Linking sending node to amessagePan - prob. that"the number ofadver. nodes" >=nAt is the number of time slots needed for the prob. of linking sending node to a message to be greater than θ.θ - threshold
+
 The dependencies between modules can be represented as the following diagram
-📄
-PDF
-Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the repository.
-Strategies to Reduce Anonymity Failure
-Let us assume that a node won at time 
-Σ
-Equation
- of the election process and it broadcasts a message to the network using linear trees. Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by
-📈
-Equation
-Above corresponds to a scenario when a node at time 
-Σ
-Equation
- sends a message through 
-Σ
-Equation
- paths of length 
-Σ
-Equation
- (see figure) constructed from nodes sampled (with replacement) from the set of network nodes 
-Σ
-Equation
-. Here 
-Σ
-Equation
- and 
-Σ
-Equation
- is, respectively, the fraction of faulty and adversarial nodes in the network.
-For 
-Σ
-Equation
-, i.e. a message is sent through one path, the probability of anonymity failure is given by
-📈
-Equation
-We note that in above 
-Σ
-Equation
- is the prob. that path is functional and 
-Σ
-Equation
- is the prob. that every single node on this path is adversarial. Hence 
-Σ
-Equation
- is the prob. that either the path is not functional or at least one node in the path is not adversarial.
-Now let us assume that node sends the same message (or different messages) through different paths of length 
-Σ
-Equation
- at times 
-Σ
-Equation
- (see figure below)
-After sending the first message at time 
-Σ
-Equation
- the prob. of anonymity failure is 
-Σ
-Equation
-, after sending the second message at time 
-Σ
-Equation
- the prob. of anonymity failure is 
-Σ
-Equation
-, etc. Thus after sending the last message at time 
-Σ
-Equation
- the prob. anonymity failure is 
-Σ
-Equation
-, i.e. the same as sending a message through 
-Σ
-Equation
- paths simultaneously. We note that for fixed 
-Σ
-Equation
- the prob. 
-Σ
-Equation
- is monotonic increasing function of 
-Σ
-Equation
- and hence 
-Σ
-Equation
- is monotonic increasing function of the number of sent messages 
-Σ
-Equation
- as can be seen in the figure below.
-Furthermore, the probability that no anonymity failure occurred after sending 
-Σ
-Equation
- messages is given by
-📈
-Equation
-From above, it follows that for 
-Σ
-Equation
- we have
-📈
-Equation
-Hence the probability that no anonymity failure occurred is much larger if the number of messages sent 
-Σ
-Equation
- is much less than 
-Σ
-Equation
-. Equivalently, the probability of anonymity failure is much smaller if the number of messages sent 
-Σ
-Equation
- is much less than 
-Σ
-Equation
-.
+
+Pa is a decreasing function of qF.Broadcast failures can be easily  detected.The length of a path, L,  is also parameter for  the latency of broadcast.  The number of paths, K,  consumes  bandwidth of a sendingnode. The "confidence" and "accuracy" are characteristics  of adversary and related to "risks" (if any) associated with  "attacks". The fraction of adversarial  nodes, qA,can not  be inferred.The fraction of faulty nodes, qF, can be inferred.Stake of a node is changing with epochs. Adversarial "confidence" is monotonic  increasing  function of true stake. We can assume that T and f are constants.We assume that q=Pa\*Pan computedfor qF=0. The prob. is 0 when n=1 and KxL  nodes are sampled without replacement.Adversarial"con dence":P(s ∈ [α(1-γ), α(1+γ)]|qT) is theprob.that inferred stake, s, belongsto the interval [α(1-γ), α(1+γ)].Txf messagesper epochon average.q - fraction of observedslotsγ - "accuracy" ofadversarial inferenceα - (true) relative stakeof sender nodePa - prob. ofanonym.failure.Pab - probability ofadversarialbroadcast-failure.P(c>1|n,KL/N) - is theprob.that a node pa icipatesin more than onelinear tree.Pb - probabilityof broadcastfailure.n - number of sendernodes per slot.f =0.05 (fraction of non-empty slots)Δ t=1s (slot duration)qA - fraction ofadversarialnodesqF - fraction offaulty nodesK - number of pathsL - number of nodesper pathT=432,000 (number ofslots per epoch)N - number of nodesBroadcasting on LinearTreesBroadcasting on LinearTreesInference of Relative StakeBroadcasting on LinearTreesSampling of Linear TreesLeader Election ProcessC - size of theneighborhoodNeigborhoodnA - number ofadversarialnodesC is the size of  theneighborhood of anode. nA is the number of adversarial nodes in the neighborhood of a node. Pan - prob. that"the number ofadver. nodes" >= nALinking sending node to amessaget is the number of time slots neededfor the prob. of linking sending nodeto a message to be greater than θ.θ - thresholdδ - thresholdt is the number of time-slots requiredto infer the relative stake α with theaccuracy γ and con dence δq is used instead of Pa for the prob. of anonymity failure.
+
+Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the [repository.](https://github.com/AMozeika/Calculator)
+
+![](/image/attachment%3Aa2d264a0-5a7a-4107-94d7-0db5e5f1e373%3AScreenshot_2025-03-25_at_21.00.02.png?table=block&id=1fd261aa-09df-817b-9867-ff1d5eda6d4d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+### Strategies to Reduce Anonymity Failure
+
+Let us assume that a node won at time $t$ of the [election process](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d) and it broadcasts a message to the network using [linear trees](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8126abdcf963ec121066). Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by
+
+$$
+\mathrm{P}\_a(K,L,q\_F,q\_A)=1-\left[1-(1-q\_F)^L\, q\_A^L\right]^{K}
+$$
+Pa​(K,L,qF​,qA​)=1−[1−(1−qF​)LqAL​]K
+
+Above corresponds to a scenario when a node at time $t$ sends a message through $K$ paths of length $L$ (see [figure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)) constructed from nodes sampled (with replacement) from the set of network nodes $[N]$ . Here $q\_F$ and $q\_A$ is, respectively, the fraction of faulty and adversarial nodes in the network.
+
+For $K=1$ , i.e. a message is sent through one path, the probability of anonymity failure is given by
+
+$$
+\mathrm{P}\_a(1,L,q\_F,q\_A)=1-\left[1-[(1-q\_F)\, q\_A]^L\right]\\~~~~~~~~=(1-q\_F)^L\, q\_A^L
+$$
+Pa​(1,L,qF​,qA​)=1−[1−[(1−qF​)qA​]L]        =(1−qF​)LqAL​
+
+We note that in above $(1-q\_F)^L$ is the prob. that path is functional and $q\_A^L$ is the prob. that every single node on this path is adversarial. Hence $1-(1-q\_F)^L\, q\_A^L$ is the prob. that either the path is not functional or at least one node in the path is not adversarial.
+
+Now let us assume that node sends the same message (or different messages) through different paths of length $L$ at times $t\_1
+
+![](/image/attachment%3A8302fc7c-3058-4960-8722-e20c90e26982%3AScreenshot_2025-04-01_at_18.24.05.png?table=block&id=1fd261aa-09df-8199-b602-e80244ff5dc0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=900&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Communication on Linear Trees. Node sends a message at times $t\_1, t\_2,\ldots,t\_K$ . Each time a different, sampled randomly (with replacement) from $[N]$ , communication path of $L$ nodes is used.
+
+ALT
+
+After sending the first message at time  $t\_1$  the prob. of anonymity failure is  $\mathrm{P}\_a(1,L,q\_F,q\_A)=(1-q\_F)^L\, q\_A^L$ , after sending the second message at time  $t\_2$  the prob. of anonymity failure is  $\mathrm{P}\_a(2,L,q\_F,q\_A)=1-\left[1-[(1-q\_F)\, q\_A]^L\right]^2$ , etc. Thus after sending the last message at time  $t\_K$  the prob. anonymity failure is  $\mathrm{P}\_a(K,L,q\_F,q\_A)$ , i.e. the same as [sending a message through](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)  $K$  paths simultaneously. We note that for fixed  $L$  the prob.  $\mathrm{P}\_a(K,L,q\_F,q\_A)$  is [monotonic increasing function](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of  $K$  and hence  $\mathrm{P}\_a(n\_{m},L,q\_F,q\_A)$  is monotonic increasing function of the number of sent messages  $n\_{m}\in\{1,\ldots,K\}$  as can be seen in the figure below.
+
+![](/image/attachment%3Ab2f25c07-4351-47d0-9b5f-0f2b3fd7bc80%3AScreenshot_2025-04-02_at_15.07.44.png?table=block&id=1fd261aa-09df-8126-8b44-d03a7c40471c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. of anonymity failure as a function of the number of sent messages plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (top to bottom). Here the fraction of faulty nodes is $q\_F=0.1$ and the fraction of adversarial nodes is $q\_A=0.1$ .
+
+ALT
+
+Furthermore, the probability that no anonymity failure occurred after sending $n\_m$ messages is given by
+
+$$
+1-\mathrm{P}\_a(n\_m,L,q\_F,q\_A)=\left[1-(1-q\_F)^L\, q\_A^L\right]^{n\_m}
+$$
+1−Pa​(nm​,L,qF​,qA​)=[1−(1−qF​)LqAL​]nm​
+
+From above, it follows that for $n\_m\leq K$ we have
+
+$$
+\frac{1-\mathrm{P}\_a(n\_m,L,q\_F,q\_A)}{1-\mathrm{P}\_a(K,L,q\_F,q\_A)}=\frac{1}{\left[1-(1-q\_F)^L\, q\_A^L\right]^{K-n\_m}}\geq1
+$$
+1−Pa​(K,L,qF​,qA​)1−Pa​(nm​,L,qF​,qA​)​=[1−(1−qF​)LqAL​]K−nm​1​≥1
+
+Hence the probability that no anonymity failure occurred is much larger if the number of messages sent $n\_m$ is much less than $K$ . Equivalently, the probability of anonymity failure is much smaller if the number of messages sent $n\_m$ is much less than $K$ .
+
 We now consider the prob. of broadcast failure
-📈
-Equation
-which is a monotonic decreasing function of 
-Σ
-Equation
- when 
-Σ
-Equation
- is fixed. Hence 
-Σ
-Equation
- is monotonic decreasing function of the number of sent messages 
-Σ
-Equation
- as can be seen in the figure below.
-We note that the probability of adversarial broadcast-failure behaves in a similar way as can be seen in the figure below
-The number of nodes used for broadcasting of 
-Σ
-Equation
- messages is 
-Σ
-Equation
-, i.e. grows linearly with the number of messages 
-Σ
-Equation
-.
+
+$$
+\mathrm{P}\_b(K,L,q\_F)=\left[1-(1-q\_F)^L\right]^{K}
+$$
+Pb​(K,L,qF​)=[1−(1−qF​)L]K
+
+which is a [monotonic decreasing function](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of  $K$  when  $L$  is fixed. Hence  $\mathrm{P}\_b(n\_{m},L,q\_F)$  is monotonic decreasing function of the number of sent messages  $n\_{m}\in\{1,\ldots,K\}$  as can be seen in the figure below.
+
+![](/image/attachment%3A257fe07a-6ae4-419a-870b-313751b1c4e2%3AScreenshot_2025-04-02_at_15.41.16.png?table=block&id=1fd261aa-09df-81c5-bb23-e9518270b1b0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. of broadcast failure as a function of the number of sent messages plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (bottom to top). Here the fraction of faulty nodes is $q\_F=0.1$ .
+
+ALT
+
+We note that the [probability of adversarial broadcast-failure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f7901bed38662b9882) behaves in a similar way as can be seen in the figure below
+
+![](/image/attachment%3A298bbdcb-04e9-4e22-a6d1-f9116a23a543%3AScreenshot_2025-04-02_at_15.48.32.png?table=block&id=1fd261aa-09df-817d-9a8c-eb0486d2873d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. of adversarial broadcast-failure as a function of the number of sent messages plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (bottom to top). Here the fraction of faulty nodes is $q\_F=0.1$ and the fraction of adversarial nodes is $q\_A=0.1$ .
+
+ALT
+
+The number of nodes used for broadcasting of $n\_m$ messages is $n\_mL$ , i.e. grows linearly with the number of messages $n\_m$ .
+
+![](/image/attachment%3A6fde278c-9e77-49e4-aadc-2c692ce21ed0%3AScreenshot_2025-04-02_at_15.52.04.png?table=block&id=1fd261aa-09df-8103-80d1-d641677cc17e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The number of nodes used in broadcasting as a function of the number of sent messages plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (bottom to top).
+
+ALT
+
 We note that
-📈
-Equation
-is the probability that the first occurrence of a successful broadcast requires sending 
-Σ
-Equation
- messages. We note that above is generalisation of the Geometric prob. distribution.
+
+$$
+\left[\prod\_{i=1}^{t-1}\mathrm{P}\_b(i,L,q\_F)\right]\left[1-\mathrm{P}\_b(t,L,q\_F)\right]
+$$
+[i=1∏t−1​Pb​(i,L,qF​)][1−Pb​(t,L,qF​)]
+
+is the probability that the first occurrence of a successful broadcast requires sending $t$ messages. We note that above is generalisation of the [Geometric prob. distribution](https://en.wikipedia.org/wiki/Geometric_distribution).
+
+![](/image/attachment%3Ad9518838-0a1c-4690-9ff8-47104da89aef%3AScreenshot_2025-04-03_at_18.56.20.png?table=block&id=1fd261aa-09df-8198-a8ff-e319ff4e7b0c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=990&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The probability that the first occurrence of a successful broadcast requires sending number of messages ( $\mathrm{num.\, of\, msg}$ ) plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (black, red, orange,yellow). Here the fraction of faulty nodes is $q\_F=0.1$ .
+
+ALT
+
 From the above, it follows that
-📈
-Equation
-is the prob. that the first occurrence of a successful broadcast requires sending more than 
-Σ
-Equation
- messages.
+
+$$
+1-\sum\_{t=1}^n\left[\prod\_{i=1}^{t-1}\mathrm{P}\_b(i,L,q\_F)\right]\left[1-\mathrm{P}\_b(t,L,q\_F)\right]
+$$
+1−t=1∑n​[i=1∏t−1​Pb​(i,L,qF​)][1−Pb​(t,L,qF​)]
+
+is the prob. that the first occurrence of a successful broadcast requires sending more than $n$ messages.
+
+![](/image/attachment%3A1405ba3a-093c-4517-91ef-372c411f6141%3AScreenshot_2025-04-03_at_18.57.44.png?table=block&id=1fd261aa-09df-81ef-baa7-d67e73eb5bea&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=980&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. that the first occurrence of broadcast requires sending more than $n$ messages as a function of $n$ plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (bottom to top). Here the fraction of faulty nodes is $q\_F=0.1$ .
+
+ALT
+
 In a similar manner, we obtain the probability
-📈
-Equation
-that the first occurrence of anonymity failure requires sending 
-Σ
-Equation
- messages.
+
+$$
+\left[\prod\_{i=1}^{t-1}\left[1-\mathrm{P}\_a(i,L,q\_F,q\_A)\right]\right]\mathrm{P}\_a(t,L,q\_F,q\_A)
+$$
+[i=1∏t−1​[1−Pa​(i,L,qF​,qA​)]]Pa​(t,L,qF​,qA​)
+
+that the first occurrence of anonymity failure requires sending $t$ messages.
+
+![](/image/attachment%3A582d11e9-c134-427b-b64b-906c3a6072ae%3AScreenshot_2025-04-04_at_15.56.26.png?table=block&id=1fd261aa-09df-8144-993d-d4d618b78845&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=970&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. that the first occurrence of anonymity failure requires sending number of messages ( $\mathrm{num.\, of\, msg}$ ) plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (yellow, orange, red, black). Here the fraction of faulty nodes is $q\_F=0.1$ and the fraction of adversarial nodes is $q\_A=0.1$ .
+
+ALT
+
 From the above, it follows that
-📈
-Equation
-is the prob. that the first occurrence of anonymity failure requires sending less than 
-Σ
-Equation
- messages.
-Analysis of Latency
-We consider a network 
-Σ
-Equation
- constructed from 
-Σ
-Equation
- nodes. We assume that a message sent from node 
-Σ
-Equation
-, via 
-Σ
-Equation
- nodes of 
-Σ
-Equation
-, to the network 
-Σ
-Equation
-using the broadcast method of communication. The message is delayed at the node 
-Σ
-Equation
- by the 
-Σ
-Equation
- amount of time, at the node 
-Σ
-Equation
- by the 
-Σ
-Equation
- amount of time, etc. Furthermore, a message traveling between the nodes 
-Σ
-Equation
- and 
-Σ
-Equation
- is delayed by 
-Σ
-Equation
- due to the latency of broadcast on 
-Σ
-Equation
- used for communication.
-Assuming that the message was successfully broadcasted by the last node 
-Σ
-Equation
- to the network 
-Σ
-Equation
-, the total delay is given by 
-Σ
-Equation
-. We note that for 
-Σ
-Equation
- and 
-Σ
-Equation
- we have a simple upper bound
-📈
-Equation
-We note that we have equality in the above when 
-Σ
-Equation
- and 
-Σ
-Equation
-, i.e. all delays are the same.
-Assuming that sender node monitors, via observation of broadcasts on 
-Σ
-Equation
-, how a message is propagated along the path, the sender node sends first messages and if this message is not broadcasted to 
-Σ
-Equation
- after some time, for example after time 
-Σ
-Equation
-, it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node 
-Σ
-Equation
-, but is not broadcasted to the network 
-Σ
-Equation
-. Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the 
-Σ
-Equation
--th message is broadcasted by the last node to 
-Σ
-Equation
-, gives us that the total delay in the sequential scenario is at most
-📈
-Equation
-if the delay on each 
-Σ
-Equation
--th path, i.e. the value of 
-Σ
-Equation
-, is known exactly.
+
+$$
+\sum\_{t=1}^{n-1}\left[\prod\_{i=1}^{t-1}\left[1-\mathrm{P}\_a(i,L,q\_F,q\_A)\right]\right]\mathrm{P}\_a(t,L,q\_F,q\_A)
+$$
+t=1∑n−1​[i=1∏t−1​[1−Pa​(i,L,qF​,qA​)]]Pa​(t,L,qF​,qA​)
+
+is the prob. that the first occurrence of anonymity failure requires sending less than $n$ messages.
+
+![](/image/attachment%3A7d26b0b3-c45a-4f15-8d66-5dda44de6e0b%3AScreenshot_2025-04-04_at_16.10.18.png?table=block&id=1fd261aa-09df-810b-b79d-d351f5519165&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=990&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. that the first occurrence of anonymity failure requires sending less than $n$ messages as a function of $n$ plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (top to bottom). Here the fraction of faulty nodes is $q\_F=0.1$ and the fraction of adversarial nodes is $q\_A=0.1$ .
+
+ALT
+
+![](/image/attachment%3A5f480cac-2c2a-46c4-8b99-46ef5d62c07f%3AScreenshot_2025-04-04_at_16.15.16.png?table=block&id=1fd261aa-09df-81f1-ada1-c48c09e799e7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The prob. that the first occurrence of anonymity failure requires sending less than $n$ messages as a function of $n$ plotted for the number of nodes per path $L\in\{2,\ldots,5\}$ (top to bottom). Here the fraction of faulty nodes is $q\_F=0.1$ and the fraction of adversarial nodes is $q\_A=0.1$ .
+
+ALT
+
+#### Analysis of Latency
+
+We consider a network $\mathcal{N}$ constructed from $N=\vert\mathcal{N} \vert$ nodes. We assume that a message sent from node $0\in \mathcal{N}$ , via $L$ nodes of $\mathcal{N}$ , to the network $\mathcal{N}$ using the broadcast method of communication. The message is delayed at the node $0$ by the $\Delta\_0$ amount of time, at the node $1$ by the $\Delta\_1$ amount of time, etc. Furthermore, a message traveling between the nodes $i$ and $i+1$ is delayed by $d\_{i\,i+1}$ due to the latency of broadcast on $\mathcal{N}$ used for communication.
+
+![](/image/attachment%3Aa169e038-ac36-4237-849a-58042f1762e0%3AScreenshot_2025-04-09_at_18.10.23.png?table=block&id=1fd261aa-09df-8177-83d3-eb0b07a5c71b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+A message is sent by node $0$ to the network $\mathcal{N}$ via $L$ nodes using the broadcast mode of communication. Here nodes are represented by blue circles and $\mathcal{N}$ is represented by large blue circle.
+
+ALT
+
+Assuming that the message was successfully broadcasted by the last node $L$ to the network $\mathcal{N}$ , the total delay is given by $\sum\_{i=0}^L\left[\Delta\_i+ d\_{i\,i+1}\right]$ . We note that for $\Delta=\max\_{i}\Delta\_i$ and $d=\max\_{i}d\_{i\,i+1}$ we have a simple upper bound
+
+$$
+\sum\_{i=0}^L\left[\Delta\_i+ d\_{i\,i+1}\right]\leq (L+1)[\Delta + d]
+$$
+i=0∑L​[Δi​+dii+1​]≤(L+1)[Δ+d]
+
+We note that we have equality in the above when $\Delta=\Delta\_i$ and $d=d\_{i\,i+1}$ , i.e. all delays are the same.
+
+Assuming that sender node monitors, via observation of broadcasts on $\mathcal{N}$ , how a message is propagated along the [path](/1fd261aa09df814a9967efc9aa479eba?pvs=25), the sender node sends first messages and if this message is not broadcasted to $\mathcal{N}$ after some time, for example after time $\sum\_{i=0}^1\left[\Delta\_{i}(1)+ d\_{i\,i+1}(1)\right]$ , it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node $L$ , but is not broadcasted to the network $\mathcal{N}$ . Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the $K$ -th message is broadcasted by the last node to $\mathcal{N}$ , gives us that the total delay in the [sequential scenario](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) is at most
+
+$$
+\sum\_{\ell=1}^K\sum\_{i=0}^L\left[\Delta\_{i}(\ell)+ d\_{i\,i+1}(\ell)\right]
+$$
+ℓ=1∑K​i=0∑L​[Δi​(ℓ)+dii+1​(ℓ)]
+
+if the delay on each $\ell$ -th path, i.e. the value of $\sum\_{i=0}^L\left[\Delta\_{i}(\ell)+ d\_{i\,i+1}(\ell)\right]$ , is known exactly.
+
 Furthermore, we have the following inequality
-📈
-Equation
-where 
-Σ
-Equation
- and 
-Σ
-Equation
-. We can assume that 
-Σ
-Equation
- and 
-Σ
-Equation
-.
-We note that when 
-Σ
-Equation
- messages are sent simultaneously and if at least one of them is successfully broadcasted by a last node to the network 
-Σ
-Equation
-, then the total delay is at most
-📈
-Equation
-if the delay on each 
-Σ
-Equation
--th path, i.e. the value of 
-Σ
-Equation
-, is known exactly. Furthermore, for 
-Σ
-Equation
- and 
-Σ
-Equation
- we have the following inequality
-📈
-Equation
-From the above, it follows that in the worst case the latency of sequential communication is 
-Σ
-Equation
- times the latency of synchronous communication.
-Let us assume that 
-Σ
-Equation
-, 
-Σ
-Equation
- and sender node is not delaying messages. The latter gives us the upper bound 
-Σ
-Equation
- on latency in synchronous communication and 
-Σ
-Equation
- for the upper bound on latency of sequential communication.
+
+$$
+\sum\_{\ell=1}^K\sum\_{i=0}^L\left[\Delta\_{i}(\ell)+ d\_{i\,i+1}(\ell)\right]\leq K(L+1)[\Delta + d]
+$$
+ℓ=1∑K​i=0∑L​[Δi​(ℓ)+dii+1​(ℓ)]≤K(L+1)[Δ+d]
+
+where $\Delta=\max\_{i,\ell}\Delta\_i(\ell)$ and $d=\max\_{i,\ell}d\_{i\,i+1}(\ell)$ . We can assume that $\Delta=10s$ and $d=5s$ .
+
+We note that when $K$ messages are sent [simultaneously](/1fd261aa09df814a9967efc9aa479eba?pvs=25) and if at least one of them is successfully broadcasted by a last node to the network $\mathcal{N}$ , then the total delay is at most
+
+$$
+\max\_{\ell\in[K]}\sum\_{i=0}^L\left[\Delta\_{i}(\ell)+ d\_{i\,i+1}(\ell)\right]
+$$
+ℓ∈[K]max​i=0∑L​[Δi​(ℓ)+dii+1​(ℓ)]
+
+if the delay on each $\ell$ -th path, i.e. the value of $\sum\_{i=0}^L\left[\Delta\_{i}(\ell)+ d\_{i\,i+1}(\ell)\right]$ , is known exactly. Furthermore, for $\Delta=\max\_{i,\ell}\Delta\_i(\ell)$ and $d=\max\_{i,\ell}d\_{i\,i+1}(\ell)$ we have the following inequality
+
+$$
+\max\_{\ell\in[K]}\sum\_{i=0}^L\left[\Delta\_{i}(\ell)+ d\_{i\,i+1}(\ell)\right]\leq (L+1)[\Delta + d]
+$$
+ℓ∈[K]max​i=0∑L​[Δi​(ℓ)+dii+1​(ℓ)]≤(L+1)[Δ+d]
+
+From the above, it follows that in the worst case the latency of [sequential](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) communication is $K$ times the latency of [synchronous](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f8a9d8f3bf17954d0a) communication.
+
+Let us assume that $\Delta=10s$ , $d=5s$ and sender node is not delaying messages. The latter gives us the upper bound $\Delta L+ d(L+1)= 15\times L+5\,s$ on latency in [synchronous](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915) communication and $K[\Delta L+ d(L+1)]= K[15\times L+5]\,s$ for the upper bound on latency of [sequential](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) communication.
+
+### The Number of Time-Slots Between Two Consecutive Blocks
+
+In the [leader election process](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d) the probability of winning a slot is $f=1/30$ and the number of time-slots per epoch is $T=648000$ . Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, $n\_0$ , follow the [geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution)
+
+$$
+\mathrm{P}(n\_0)=(1-f)^{n\_0}f
+$$
+P(n0​)=(1−f)n0​f
+
+where $n\_0\in\mathbb{N}\cup\{0\}$ . Follows from above that the average of $n\_0$ is $\langle n\_0\rangle=(1-f)/f\approx0.967/0.033=29$ , i.e. on average we expected to see a next block after $29$ time-slots. The probability that $n\_0$ is greater than the average $\langle n\_0\rangle$ is given by
+
+$$
+\mathrm{P}(n\_0> \langle n\_0\rangle)=(1-f)^{\langle n\_0\rangle+1}
+$$
+P(n0​>⟨n0​⟩)=(1−f)⟨n0​⟩+1
+
+For $f=1/30$ , the above gives us $\mathrm{P}(n\_0> 29)=(1-1/30)^{30}\approx0.362$ . Furthermore, the maximum of $n\_0$ observed in $T$ time-slots (approximately) follows the [distribution](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199a984c7f1688f60da)
+
+$$
+\mathrm{P}\left(x\right)=\int\_{-\infty}^{\infty} \mathrm{e}^{-t-\mathrm{e}^{-t}}\delta\left(x-\frac{t+\log(T(1-p))}{\log(1/p)}\right)\mathrm{d} t\\~~~~~~~~~~~=\vert\log(p)\vert\, \mathrm{e}^{-\left[x\log(p)+\log(T(1-p))\right]-\mathrm{e}^{-\left[x\log(p)+\log(T(1-p))\right]}}
+$$
+P(x)=∫−∞∞​e−t−e−tδ(x−log(1/p)t+log(T(1−p))​)dt           =∣log(p)∣e−[xlog(p)+log(T(1−p))]−e−[xlog(p)+log(T(1−p))]
+
+where $p=1-f$ .
+
+![](/image/attachment%3Ae5ba9f8f-3deb-4248-9b13-005f4244ec26%3AScreenshot_2025-05-21_at_17.33.30.png?table=block&id=1fd261aa-09df-81c2-9b70-df6e52ab9176&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The probability distribution $\mathrm{P}(x)$ as a function of $x$ plotted for $T= 648000$ and $f=1/30$ .
+
+ALT
+
+We note that the mode of $\mathrm{P}\left(x\right)$ is at $x=\frac{\log(T(1-p))}{\log(1/p)}$ and hence the typical value of the maximum of $n\_0$ observed in $T=648000$ time-slots for $f=1/30$ is $\approx 295$ . The prob. that the maximum of $n\_0$ observed in $T=648000$ time-slots for $f=1/30$ is greater than $295$ can be computed with high accuracy from simulations and is $\approx 0.62$ as suggested by the simulation data tabulated below.
+
+| Num. of samples | Prob. $n\_0>295$ ​ |
+| --- | --- |
+| $10^3$ ​ | $0.612$ ​ |
+| $10^4$ ​ | $0.617$ ​ |
+| $10^5$ ​ | $0.62379$ ​ |
+| $10^6$ ​ | $0.624018$ ​ |
+
+The histogram of the maximum of $n\_0$ obtained in one such simulation is presented below
+
+![](/image/attachment%3A50d3989f-c2aa-4080-8b0d-b1581e254e5b%3AScreenshot_2025-05-22_at_08.28.07.png?table=block&id=1fd261aa-09df-8106-8b30-df0034a2e6d9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+This histogram of the maximum number of time-slots between two consecutive blocks, $n\_0$ , obtained in $10^6$ simulations of one epoch with $T=648000$ and $f=1/30$ . The red vertical line corresponds to the typical value of $295$ . Here estimating the prob. that $n\_0> 295$ gives us the value of $0.624018$ .
+
+ALT
+
+## Bibliography
+
+Svante Janson. (2009). On percolation in random graphs with given vertex degrees. Electron. J. Probab. 14: 86 - 118. <https://doi.org/10.1214/EJP.v14-603>
+
+Gordon, L., Schilling, M. F. and Waterman, M. S. (1986). An extreme value theory for long head runs.  Probability Theory and Related Fields  72: 279-287. <https://doi.org/10.1007/BF00699107>
+
+\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)=\frac{2 \,\mathrm{erf}\! \left(\frac{ \epsilon}{\sqrt{2\sigma^2(\alpha,q)}}\right)}{\mathrm{erf}\! \left(\frac{\phi(\alpha) }{ \sqrt{2\sigma^2(\alpha,q)}}\right)+\mathrm{erf}\! \left(\frac{ 1-\phi(\alpha)}{ \sqrt{2\sigma^2(\alpha,q)}}\right)}
+
+Sign up or log in
+
+Report page
+
+Cookie settings
+
+Pages
+
+Loading...
+
+[🔀
+
+[1.0.0][Analysis] Resilience and Anonymity
+
+Current Page
+
+—
+
+The Logos Blockchain Project
+
+/
+
+Specifications](https://nomos-tech.notion.site/1-0-0-Analysis-Resilience-and-Anonymity-1fd261aa09df814a9967efc9aa479eba?pvs=26&qid=1:7f727854-53e5-4549-b088-e9ce5caacb60:0)
+
+🔀
+
+The Logos Blockchain Project
+
+/
+
+Specifications
+
+[1.0.0][Analysis] Resilience and Anonymity
+
+Revision History
+
+Table
+
+Introduction
+
+In order to guide a design of the Blend Network, this document summarises parameters (and results of analysis) of the leader election process, communication on trees and inference of relative stake. In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.
+
+Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in Cryptarchia.
+
+Analysis
+
+Leader election process
+
+The leader election process is organised into epochs and each epoch is divided into ΣEquation time-slots.
+
+![](/image/attachment%3A29902138-cf0a-4ae7-9cc2-1ee0727f0b51%3AScreenshot_2025-05-02_at_14.23.31.png?table=block&id=1fd261aa-09df-8132-947c-f18dddfbee58&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The leader election process has the following parameters
+
+Table
+
+Sampling of Linear Trees
+
+![](/image/attachment%3A649de50f-7073-4483-8701-fe98e240d40c%3AScreenshot_2025-02-07_at_12.49.14.png?table=block&id=1fd261aa-09df-81aa-9eaa-f915c3998915&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The number of nodes in linear tree design is ΣEquation, where ΣEquation is the number of paths and ΣEquation is the number of nodes in each path excluding the sender node. In the linear tree design, one node is the sender node and the other ΣEquation nodes are mix nodes.
+
+We assume that in each epoch of the protocol there are ΣEquation sender nodes, labelled by the set ΣEquation. Each of the ΣEquation sender nodes sample ΣEquation nodes from the population of ΣEquation nodes (labeled by the set ΣEquation). The total number of nodes involved in communication is ΣEquation.
+
+We assume that each sender node samples ΣEquation nodes, independently from other nodes, using sampling without replacement. A node among the ΣEquation nodes sampled from ΣEquation just by chance can also appear in other ΣEquation random subsets of nodes.
+
+The result of the sampling process described above can be represented by the following random factor-graph:
+
+![](/image/attachment%3Ad892cf87-779b-4c75-979f-ebe2dd150dfe%3AScreenshot_2025-02-07_at_16.18.50.png?table=block&id=1fd261aa-09df-8129-b5fb-e05cf6f66bd0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](/image/attachment%3A4756879d-93b3-42bd-9462-726f709f3756%3AScreenshot_2025-02-07_at_16.32.55.png?table=block&id=1fd261aa-09df-81b6-8d35-fabff822c957&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Connectivity of a node ΣEquation is the number of random edges connecting this nodes to factors labelled by the set ΣEquation. The connectivity of a node ΣEquation is the number of linear trees that ΣEquation appears in. The connectivity is a random number from the binomial distribution
+
+📈Equation
+
+with parameters ΣEquation and ΣEquation.
+
+The probability that a node has more than one random connection ΣEquation, i.e. the prob. that a mix node participates in more than one subset of mix nodes used in linear trees, for ΣEquation is given by the sum
+
+📈Equation
+
+where ΣEquation with ΣEquation.
+
+We note that ΣEquation and ΣEquation for ΣEquation, i.e. the probability ΣEquation is monotonic increasing function of ΣEquation for ΣEquation. Furthermore, the probability ΣEquation is monotonic increasing function of ΣEquation, i.e. increasing the number of nodes , ΣEquation, in the linear tree sampled by each sender node in ΣEquation increases probability that a node in ΣEquation has more than one random connection.
+
+The probability ΣEquation is computed using the following parameters
+
+Table
+
+Communication on Linear Trees
+
+We consider the following communication system
+
+![](/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6be5b10e-8533-41e7-a7e3-b4170dcb876e%2FScreenshot_2025-01-02_at_12.37.14.png?table=block&id=1fd261aa-09df-81f8-a9d8-f3bf17954d0a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+We assume that ΣEquation nodes in the population are “faulty” (faulty node is unable to relay a message) and the probability that a node is faulty is ΣEquation.
+
+We assume that ΣEquation nodes in the population are “adversarial” (adversarial nodes are controlled by an adversary which can make nodes faulty, use them for traffic analysis, etc.) and the probability that a node is adversarial is ΣEquation.
+
+If a path contains at least one faulty node then communication failure occurred.
+
+If a path does not have any faulty nodes then this path is functioning.
+
+If all ΣEquation paths have a communication failure then broadcast failure occurred.
+
+The probability of broadcast failure is given by
+
+📈Equation
+
+We note that ΣEquation is the site percolation threshold of random regular graph (RRG) with connectivity C, i.e. for ΣEquation the RRG becomes disconnected with high probability as ΣEquation. The latter suggests if our model of the network is RRG then for the fraction of faulty nodes ΣEquation the communication is not possible with high probability in ΣEquation.
+
+If all nodes in a communication path are non-faulty then this is a functioning communication path.
+
+If there is at least one functioning communication paths where all nodes are adversarial, then adversary has opportunity to cause anonymity failure.
+
+The probability of anonymity failure is given by
+
+📈Equation
+
+If there is at least one adversarial node in each functioning communication paths then the adversary has an opportunity to cause broadcast failure. The probability of adversarial broadcast failure is given by
+
+📈Equation
+
+The probabilities ΣEquation, ΣEquation and ΣEquation are computed the following parameters
+
+Table
+
+The code which computes above probabilities is given below
+
+def Prob\_b(K, L, qF):
+"""
+Compute the probability of broadcast failure.
+Formula: (1 - (1 - qF)^L)^K
+"""
+return (1 - (1 - qF) \*\* L) \*\* K
+def Prob\_ab(K, L, qF, qA):
+"""
+Compute the probability of adversarial broadcast failure.
+Formula: (1 - ((1 - qF)^L \* (1 - qA)^L))^K - (1 - (1 - qF)^L)^K
+"""
+term1 = (1 - qF) \*\* L
+term2 = (1 - qA) \*\* L
+return (1 - (term1 \* term2)) \*\* K - (1 - term1) \*\* K
+def Prob\_a(K, L, qF, qA):
+"""
+Compute the probability of anonymity failure.
+Formula: 1 - (1 - ((1 - qF)^L \* qA^L))^K
+"""
+term1 = (1 - qF) \*\* L
+term2 = qA \*\* L
+return 1 - (1 - (term1 \* term2)) \*\* K
+
+Inference of relative stake
+
+The adversary observes the leader election process of a node with the relative stake ΣEquation.
+
+![](/image/attachment%3A4688bad9-2877-4408-9416-bcdee0bc9ef8%3AScreenshot_2025-02-13_at_08.26.49.png?table=block&id=1fd261aa-09df-81f1-9deb-f03fe24a8efa&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+In ΣEquation time-slots, the adversary is able to observe fraction ΣEquation of wins in ΣEquation observations. The probability of observing the election outcome of a node is ΣEquation. For ΣEquation adversary uses the “naive” estimator ΣEquation of the true relative stake ΣEquation. For large ΣEquation, the probability that ΣEquation is given by
+
+📈Equation
+
+In the above, ΣEquation is the lottery function with parameter ΣEquation, ΣEquation and ΣEquation, where ΣEquation is the fraction of observed time-slots such that ΣEquation slots are observed on average.
+
+The probability ΣEquation can be interpreted as adversarial “confidence” and the parameter ΣEquation as “accuracy”. An example of the above probability is given below
+
+![](/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F694d7ce0-ede2-44dc-ac13-5ad0bb78b47d%2Fadver_conf.png?table=block&id=1fd261aa-09df-813c-9e95-d6a39857faae&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The probability ΣEquation, i.e. adversarial “confidence,” is computed using the following parameters:
+
+Table
+
+The code which computes adversarial “confidence” is given below
+
+def phi(alpha, f):
+return 1 - (1 - f) \*\* alpha
+def dphi(alpha, f):
+return -((1 - f) \*\* alpha) \* log(1 - f)
+def Prob2(alpha, epsilon, T, q):
+sqrt2 = sqrt(2.0)
+phi\_alpha = phi(alpha, f)
+# Denominator term
+denominator = (
+erf((phi\_alpha - 1) \* sqrt2 / (2 \* sqrt(phi\_alpha \* (1 - phi\_alpha) / (T \* q))))
+- erf(phi\_alpha \* sqrt2 / (2 \* sqrt(phi\_alpha \* (1 - phi\_alpha) / (T \* q))))
+)
+# Numerator term
+numerator = -2.0 \* erf(
+sqrt2 \* epsilon / (2 \* sqrt(phi\_alpha \* (1 - phi\_alpha) / (T \* q)))
+)
+# Final result
+return numerator / denominator
+# Compute epsilon = dphi(alpha) \* alpha \* gamma
+epsilon = dphi(alpha, f) \* alpha \* gamma
+# Compute Prob2
+Prob2\_result = Prob2(alpha, epsilon, T, q)
+
+The probability can also compute the (minimum) number of time-slots, ΣEquation, such that ΣEquation, for some ΣEquation. Here ΣEquation is the time needed by an adversary to achieve “confidence” greater than ΣEquation. The code which computes ΣEquation is given below
+
+T0 = T # One epoch
+T1 = 730 \* T # 10 years
+dT = 10\*\*3 # Step size
+if Prob2\_t < delta:
+# Increase T until Prob2\_result >= delta
+t = T0
+while t <= T1 and Prob2\_t < delta:
+Prob2\_t = Prob2(alpha, epsilon, t, result3)
+t += dT
+else:
+# Decrease T until Prob2\_result <= delta
+t = T
+while t >= 100 and Prob2\_t > delta:
+Prob2\_t = Prob2(alpha, epsilon, t, result3)
+t -= dT
+
+Adversarial Confidence as a Measure of Statistical “Noise”
+
+The probability ΣEquation, where ΣEquation is the (average) number of time-slots observed by adversary in one epoch, can be seen as a measure of the magnitude of “noise” which prevents accurate measurements of the relative stake ΣEquation. One source of this noise is the actual (stochastic) leader election process and the other is the sampling (or “observation”), controlled by parameter ΣEquation, of the latter by an adversary. For ΣEquation, i.e. all time-slots are observed, and leader election process is the only source of noise. In this regime, for a given accuracy (ΣEquation), the relative stake can be inferred with high confidence as can be seen in the figure below
+
+![](/image/attachment%3A17d8ecd8-2432-48e8-afff-2ca5ca36c6ae%3AScreenshot_2025-02-26_at_18.55.44.png?table=block&id=1fd261aa-09df-81c5-ad2c-e9d3fc3596b9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+For ΣEquation, sampling becomes an additional source of noise interfering with measurements done by adversary. Here, for a given accuracy, the confidence deteriorates as ΣEquation (see figures below).
+
+![](/image/attachment%3Af9d351ea-88c6-4042-b160-4e0b3be1b2e1%3AScreenshot_2025-02-27_at_08.42.58.png?table=block&id=1fd261aa-09df-8190-8b30-f301042f7a25&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](/image/attachment%3Ac3652184-0c73-41f7-a0b5-9c8acc432944%3AScreenshot_2025-02-26_at_19.02.18.png?table=block&id=1fd261aa-09df-81c3-8aff-c0f8a172694f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](/image/attachment%3A7f99d8cc-7ac6-46b0-b2c6-a0464190d22f%3AScreenshot_2025-02-26_at_19.09.23.png?table=block&id=1fd261aa-09df-81a6-8a72-edc73562fe5d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](/image/attachment%3Abaf50abc-7e9e-464c-959d-971dee6f241b%3AScreenshot_2025-02-26_at_19.17.01.png?table=block&id=1fd261aa-09df-81b1-b947-ed8642714222&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Let us define a function which compares properties of inference for ΣEquation and ΣEquation as follows
+
+📈Equation
+
+We note that above is ΣEquation when ΣEquation, i.e. no sampling noise, and is growing when ΣEquation (see figure below). Hence, above can be seen as “amplitude” of the sampling noise.
+
+![](/image/attachment%3A5d56e8a2-b792-4379-af82-bc879c5c707c%3AScreenshot_2025-03-28_at_17.27.21.png?table=block&id=1fd261aa-09df-815c-85c7-d0813b45f345&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The Unlinkability of Block Proposers
+
+We assume that node ΣEquation wins the election and broadcasts message ΣEquation to the network using linear trees. We assume that in the network the sender node ΣEquation has ΣEquation neighbouring nodes. Message ΣEquation is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood ΣEquation, where ΣEquation, is adversarial with the prob. ΣEquation. The prob. that at least one node in ΣEquation is adversarial is ΣEquation.
+
+If ΣEquation has at least one adversarial neighbour and anonymity failure occurred then the message ΣEquation can linked to the sender node ΣEquation. We note that just occurrence of the anonymity failure alone is not sufficient to link ΣEquation to ΣEquation and at least one compromised node is also needed in ΣEquation. Furthermore, an adversary may need not one but at least ΣEquation compromised nodes in ΣEquation. The probability of the latter is given by the binomial
+
+📈Equation
+
+We note that the case one adversarial node in ΣEquation is recovered by setting ΣEquation in the above. The probability of above event, given that ΣEquation won the election, is the product of two probabilities
+
+📈Equation
+
+We note that in above we assumed that ΣEquation, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since ΣEquation for ΣEquation, the prob. of anonymity failure ΣEquation is an upper bound on the above prob. If node ΣEquation has (relative) stake ΣEquation then the prob. of node ΣEquation winning is ΣEquation, where ΣEquation is the lottery function. Hence, the prob. that the message ΣEquation, sent by the winning node ΣEquation, can be linked to ΣEquation is given by
+
+📈Equation
+
+The prob. that message ΣEquation can not be linked to the sender ΣEquation is
+
+📈Equation
+
+Hence the prob. that any message sent by node ΣEquation can be linked to ΣEquation in ΣEquation elections is given by
+
+📈Equation
+
+For the above prob. to be greater than some threshold ΣEquation (for example ΣEquation) the number of elections ΣEquation has to satisfy the following inequality
+
+📈Equation
+
+The minimum ΣEquation for which above inequality holds ΣEquation, which is the RHS of the above, is computed using the following parameters
+
+Table
+
+The code which computes ΣEquation is given below
+
+def phi(alpha, f):
+return 1 - (1 - f) \*\* alpha
+def calculate\_t(qA, L, K, alpha, f, C, nA, theta):
+#compute prob. Pa
+x = 1 - pow(qA, L)
+Pa = (1 - pow(x, K))
+#compute prob. Pan
+p = 1 - qA
+Pan = 0
+for n in range(nA, C + 1):
+Pan += comb(C, n) \* (p \*\* (C - n)) \* (qA \*\* n)
+#compute prod. of prob.
+Prob = Pan \* Pa
+#compute t
+numerator = log(1 - theta)
+denominator = log(1 - phi(alpha, f) \* Prob)
+t = ceil(numerator / denominator)
+return t
+
+Design of the “Calculator”
+
+Here we combine the results for leader election process, sampling of linear trees, broadcasting on linear trees and inference of relative stake to design a calculator which takes parameters of the latter and computes properties of a node related to the resilience and anonymity of communication. The calculator has the following modules:
+
+📄PDF
+
+The dependencies between modules can be represented as the following diagram
+
+📄PDF
+
+Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the repository.
+
+![](/image/attachment%3Aa2d264a0-5a7a-4107-94d7-0db5e5f1e373%3AScreenshot_2025-03-25_at_21.00.02.png?table=block&id=1fd261aa-09df-817b-9867-ff1d5eda6d4d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Strategies to Reduce Anonymity Failure
+
+Let us assume that a node won at time ΣEquation of the election process and it broadcasts a message to the network using linear trees. Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by
+
+📈Equation
+
+Above corresponds to a scenario when a node at time ΣEquation sends a message through ΣEquation paths of length ΣEquation (see figure) constructed from nodes sampled (with replacement) from the set of network nodes ΣEquation. Here ΣEquation and ΣEquation is, respectively, the fraction of faulty and adversarial nodes in the network.
+
+For ΣEquation, i.e. a message is sent through one path, the probability of anonymity failure is given by
+
+📈Equation
+
+We note that in above ΣEquation is the prob. that path is functional and ΣEquation is the prob. that every single node on this path is adversarial. Hence ΣEquation is the prob. that either the path is not functional or at least one node in the path is not adversarial.
+
+Now let us assume that node sends the same message (or different messages) through different paths of length ΣEquation at times ΣEquation (see figure below)
+
+![](/image/attachment%3A8302fc7c-3058-4960-8722-e20c90e26982%3AScreenshot_2025-04-01_at_18.24.05.png?table=block&id=1fd261aa-09df-8199-b602-e80244ff5dc0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+After sending the first message at time ΣEquation the prob. of anonymity failure is ΣEquation, after sending the second message at time ΣEquation the prob. of anonymity failure is ΣEquation, etc. Thus after sending the last message at time ΣEquation the prob. anonymity failure is ΣEquation, i.e. the same as sending a message through ΣEquation paths simultaneously. We note that for fixed ΣEquation the prob. ΣEquation is monotonic increasing function of ΣEquation and hence ΣEquation is monotonic increasing function of the number of sent messages ΣEquation as can be seen in the figure below.
+
+![](/image/attachment%3Ab2f25c07-4351-47d0-9b5f-0f2b3fd7bc80%3AScreenshot_2025-04-02_at_15.07.44.png?table=block&id=1fd261aa-09df-8126-8b44-d03a7c40471c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Furthermore, the probability that no anonymity failure occurred after sending ΣEquation messages is given by
+
+📈Equation
+
+From above, it follows that for ΣEquation we have
+
+📈Equation
+
+Hence the probability that no anonymity failure occurred is much larger if the number of messages sent ΣEquation is much less than ΣEquation. Equivalently, the probability of anonymity failure is much smaller if the number of messages sent ΣEquation is much less than ΣEquation.
+
+We now consider the prob. of broadcast failure
+
+📈Equation
+
+which is a monotonic decreasing function of ΣEquation when ΣEquation is fixed. Hence ΣEquation is monotonic decreasing function of the number of sent messages ΣEquation as can be seen in the figure below.
+
+![](/image/attachment%3A257fe07a-6ae4-419a-870b-313751b1c4e2%3AScreenshot_2025-04-02_at_15.41.16.png?table=block&id=1fd261aa-09df-81c5-bb23-e9518270b1b0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+We note that the probability of adversarial broadcast-failure behaves in a similar way as can be seen in the figure below
+
+![](/image/attachment%3A298bbdcb-04e9-4e22-a6d1-f9116a23a543%3AScreenshot_2025-04-02_at_15.48.32.png?table=block&id=1fd261aa-09df-817d-9a8c-eb0486d2873d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The number of nodes used for broadcasting of ΣEquation messages is ΣEquation, i.e. grows linearly with the number of messages ΣEquation.
+
+![](/image/attachment%3A6fde278c-9e77-49e4-aadc-2c692ce21ed0%3AScreenshot_2025-04-02_at_15.52.04.png?table=block&id=1fd261aa-09df-8103-80d1-d641677cc17e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+We note that
+
+📈Equation
+
+is the probability that the first occurrence of a successful broadcast requires sending ΣEquation messages. We note that above is generalisation of the Geometric prob. distribution.
+
+![](/image/attachment%3Ad9518838-0a1c-4690-9ff8-47104da89aef%3AScreenshot_2025-04-03_at_18.56.20.png?table=block&id=1fd261aa-09df-8198-a8ff-e319ff4e7b0c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+From the above, it follows that
+
+📈Equation
+
+is the prob. that the first occurrence of a successful broadcast requires sending more than ΣEquation messages.
+
+![](/image/attachment%3A1405ba3a-093c-4517-91ef-372c411f6141%3AScreenshot_2025-04-03_at_18.57.44.png?table=block&id=1fd261aa-09df-81ef-baa7-d67e73eb5bea&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+In a similar manner, we obtain the probability
+
+📈Equation
+
+that the first occurrence of anonymity failure requires sending ΣEquation messages.
+
+![](/image/attachment%3A582d11e9-c134-427b-b64b-906c3a6072ae%3AScreenshot_2025-04-04_at_15.56.26.png?table=block&id=1fd261aa-09df-8144-993d-d4d618b78845&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+From the above, it follows that
+
+📈Equation
+
+is the prob. that the first occurrence of anonymity failure requires sending less than ΣEquation messages.
+
+![](/image/attachment%3A7d26b0b3-c45a-4f15-8d66-5dda44de6e0b%3AScreenshot_2025-04-04_at_16.10.18.png?table=block&id=1fd261aa-09df-810b-b79d-d351f5519165&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](/image/attachment%3A5f480cac-2c2a-46c4-8b99-46ef5d62c07f%3AScreenshot_2025-04-04_at_16.15.16.png?table=block&id=1fd261aa-09df-81f1-ada1-c48c09e799e7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Analysis of Latency
+
+We consider a network ΣEquation constructed from ΣEquation nodes. We assume that a message sent from node ΣEquation, via ΣEquation nodes of ΣEquation, to the network ΣEquationusing the broadcast method of communication. The message is delayed at the node ΣEquation by the ΣEquation amount of time, at the node ΣEquation by the ΣEquation amount of time, etc. Furthermore, a message traveling between the nodes ΣEquation and ΣEquation is delayed by ΣEquation due to the latency of broadcast on ΣEquation used for communication.
+
+![](/image/attachment%3Aa169e038-ac36-4237-849a-58042f1762e0%3AScreenshot_2025-04-09_at_18.10.23.png?table=block&id=1fd261aa-09df-8177-83d3-eb0b07a5c71b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+Assuming that the message was successfully broadcasted by the last node ΣEquation to the network ΣEquation, the total delay is given by ΣEquation. We note that for ΣEquation and ΣEquation we have a simple upper bound
+
+📈Equation
+
+We note that we have equality in the above when ΣEquation and ΣEquation, i.e. all delays are the same.
+
+Assuming that sender node monitors, via observation of broadcasts on ΣEquation, how a message is propagated along the path, the sender node sends first messages and if this message is not broadcasted to ΣEquation after some time, for example after time ΣEquation, it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node ΣEquation, but is not broadcasted to the network ΣEquation. Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the ΣEquation-th message is broadcasted by the last node to ΣEquation, gives us that the total delay in the sequential scenario is at most
+
+📈Equation
+
+if the delay on each ΣEquation-th path, i.e. the value of ΣEquation, is known exactly.
+
+Furthermore, we have the following inequality
+
+📈Equation
+
+where ΣEquation and ΣEquation. We can assume that ΣEquation and ΣEquation.
+
+We note that when ΣEquation messages are sent simultaneously and if at least one of them is successfully broadcasted by a last node to the network ΣEquation, then the total delay is at most
+
+📈Equation
+
+if the delay on each ΣEquation-th path, i.e. the value of ΣEquation, is known exactly. Furthermore, for ΣEquation and ΣEquation we have the following inequality
+
+📈Equation
+
+From the above, it follows that in the worst case the latency of sequential communication is ΣEquation times the latency of synchronous communication.
+
+Let us assume that ΣEquation, ΣEquation and sender node is not delaying messages. The latter gives us the upper bound ΣEquation on latency in synchronous communication and ΣEquation for the upper bound on latency of sequential communication.
+
 The Number of Time-Slots Between Two Consecutive Blocks
-In the leader election process the probability of winning a slot is 
-Σ
-Equation
- and the number of time-slots per epoch is 
-Σ
-Equation
-. Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, 
-Σ
-Equation
-, follow the geometric distribution
-📈
-Equation
-where 
-Σ
-Equation
-. Follows from above that the average of 
-Σ
-Equation
- is 
-Σ
-Equation
-, i.e. on average we expected to see a next block after 
-Σ
-Equation
- time-slots. The probability that 
-Σ
-Equation
- is greater than the average 
-Σ
-Equation
- is given by
-📈
-Equation
-For 
-Σ
-Equation
-, the above gives us 
-Σ
-Equation
-. Furthermore, the maximum of 
-Σ
-Equation
- observed in 
-Σ
-Equation
- time-slots (approximately) follows the distribution
-📈
-Equation
+
+In the leader election process the probability of winning a slot is ΣEquation and the number of time-slots per epoch is ΣEquation. Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, ΣEquation, follow the geometric distribution
+
+📈Equation
+
+where ΣEquation. Follows from above that the average of ΣEquation is ΣEquation, i.e. on average we expected to see a next block after ΣEquation time-slots. The probability that ΣEquation is greater than the average ΣEquation is given by
+
+📈Equation
+
+For ΣEquation, the above gives us ΣEquation. Furthermore, the maximum of ΣEquation observed in ΣEquation time-slots (approximately) follows the distribution
+
+📈Equation
+
 Open page to view more…
-Open in new tab
+
+- Open in new tab

@@ -17,198 +17,297 @@
 
 ---
 
-> **Note on this import:** This spec was imported from Notion on 2026-05-22.
-> The body below preserves the source text and needs a formatting pass for COSS conventions
-> (semantic line breaks, code block markers, table formatting, internal cross-references).
-> Treat this commit as the initial migration; subsequent PRs should polish the formatting incrementally.
+> **Note on this import:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) rendered via katex; tables and headings
+> are converted from Notion HTML. A formatting polish (semantic line breaks, code block fences
+> for code samples, internal cross-references) is still recommended.
 
 ---
 
-Authors: Thomas Lavaur <thomaslavaur@logos.co>, Marcin Pawlowski <marcin@logos.co>
-Revisions History
-Version
-	
-Changes
-	
-Date
+## Revisions History
 
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2026-04-24 |
 
-1.0.0
-	
-Initial revision.
-	
-2026-04-25
 ❗
+
 Disclamer:
 This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
-
-All information regarding project details, token design, distribution mechanisms, technical parameters, and any forward-looking statements is preliminary and subject to change without notice. No representations or warranties are made as to the completeness or accuracy of the information herein. 
-
+All information regarding project details, token design, distribution mechanisms, technical parameters, and any forward-looking statements is preliminary and subject to change without notice. No representations or warranties are made as to the completeness or accuracy of the information herein.
 Nothing in this material should be relied upon for investment or business decisions. Recipients of this information assume all risks associated with its use and are responsible for seeking independent professional advice regarding any actions based on it.
-Introduction
-This document outlines the cryptoeconomic model for the Logos Blockchain protocol. The network features a balanced set of economic incentives designed to ensure security, optimize resources, and support sustainable growth.
-The Logos Blockchain framework rests on three core mechanisms: a cryptoeconomic model that manages supply and distribution across actors, a fee market system that efficiently allocates network resources and regulates demand, and a rewards structure that incentivizes participation from various network contributors.
-Logos Blockchain implements a three-part fee structure covering execution and  permanent storage, each addressing specific aspects of network resource consumption. The reward system distinguishes between block-proposing leaders and service providers (like Blend), with mechanisms that preserve leaders privacy while maintaining economic efficiency.
-In this document, we detail the mathematical models underlying these systems, explain the rationale for key parameter choices, and describe the participant behaviors these mechanisms are designed to encourage.
-Overview
-In this section we present an overview of the cryptoeconomical aspects of the Logos Blockchain protocol.
-Users (rollup sequencers, node operators, or leaders) acquire tokens through purchase or by earning them as rewards.
-Tokens serve three main purposes:
-Paying for transaction processing resources used: 
-Fee Markets.
-Declaring service participation: node operators lock a 
-Minimum Stake through the Service Declaration Protocol to become Blend Service providers.
-PoS Participation: leaders can propose (build) blocks by participating in a lottery where their chances of winning are proportional to their number of owned and unmoved tokens (aged tokens).
-Transactions may incur up to two types of fees:
-Execution fee: covers the computational resources consumed by the transaction.
-Permanent Storage fee: covers the permanent Ledger storage resources consumed by the transaction.
-All fees are burned for each block.
-Rewards are distributed on an epoch basis for leaders and on a session basis for services:
-Leaders (block proposers) include Mantle Transactions in every block. Each transaction pays Permanent Storage and Execution fees, which are burnt. For each block, a reward is calculated following the 🔀
-[1.0.0] Block Rewards. Additionally, a portion of the Execution fees is minted back for leaders according to the 🔀
-[1.0.0] Execution Market. These two sources determine the total rewards allocated to leaders, as explained in 
-Blend Service and Consensus Leaders, which correspond to tips from the Execution market and 40% of block rewards. For anonymity reasons, block proposers don't receive rewards directly. Instead, leader rewards accumulate in a single pool that increases on an epoch basis rather than per block (see 🔀
-[1.0.0] Anonymous Leaders Reward Protocol). When a new epoch begins, the pool increases by the total leader rewards from all blocks in the previous epoch. Simultaneously, leaders from the previous epoch can start claiming their rewards, with each unclaimed reward (since genesis) representing one equal share of the pool.
-Blend nodes provide Blend service to the network for at least one session. Using the same 🔀
-[1.0.0] Block Rewards, the protocol determines the total rewards allocated to the Blend network, as explained in 
-Blend Service and Consensus Leaders which correspond to 60% of the block rewards.
-When a session s ends, Blend validators have one additional session s+1 to send an active message used by the 
-Reward Distribution Protocols to determine reward distribution among validators. During the first blocks of session s+2, Blend validators from session s receive their portion of 
-Blend Service and Consensus Leaders rewards, with proportions determined by the 
-Reward Distribution Protocols. These rewards are distributed at the start of the next session.
-The 
-Service Rewards Distribution Protocol handles payments of rewards for Blend Services to individual nodes.
-Individual leaders claim their rewards through a Leader Claim Operation (on-chain transaction) that preserves privacy by separating the leader reward from the proposed block.
-Constructions
-Minimum Stake
-To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked through the Service Declaration Protocol and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The 🔀
-[1.0.0][Analysis] Static Minimum Stake Estimation for Service Declaration Protocol defines the methodology on how to calculate the minimum stake value.
-Gas
-Mantle Transactions (see ⚠️
-[1.3.0] Mantle - Mantle Transaction) consume different types of Gas related to the various fee markets. Gas serves as a unit of measurement to quantify the computational or storage effort required to process a Ledger Transaction or an Operation. Gas is a unit of account that was introduced to normalize and facilitate the pricing of resources. Through the gas, the protocol is defining a way to measure computational demand for Operations and Ledge Transactions. The costs for these computational resources are defined by the leaders/nodes.
-The two types of Gas are:
-Execution Gas (corresponding to 1,000 CPU cycles).
-Permanent Storage Gas (corresponding to 1 permanently stored byte).
-In Logos Blockchain, Permanent Storage Gas is determined for an entire encoded Mantle Transaction. Execution Gas, however, is determined differently for each Operation and Ledger Transaction. For more details on how the Gas amounts were determined for each Operation, we invite the reader to read 🔀
-[1.4.1][Analysis] Gas Cost Determination.
-Fee Markets
-Users (rollup sequencers, node operators, or leaders) pay fees in Logos Blockchain for their Mantle Transactions to compensate for service usage. Logos Blockchain operates with two distinct fee markets. The goal of each market is to ensure fair compensation, sustainability, and proper incentives. However each market has its own unique characteristics:
-The Execution fee market covers the validation and execution of Mantle Transactions. The consensus does not directly limit the number of CPU cycles or Execution Gas per block but a fee regulating mechanism is necessary to be compliant with minimum hardware requirements of a node. The fees must regulate the use of CPU cycles for validation and execution of the blockchain.
-The Permanent Storage fee market covers the permanent storage of encoded Mantle Transactions. Blocks are limited to 1MiB with a maximum of 1024 Mantle Transactions per block. However, the fees must reduce the maximum amount of Storage to meet the minimum hardware requirements.
-All fee markets aim to ensure fair compensation, sustainability, proper incentives, and to address specific market needs. Because every Operation (except the Channel Inscribe and the Channel Config Operations), whether it involves computation, or permanent storage, requires some execution to be validated and processed, reaching the execution limit effectively constrains the Permanent Storage market (except for Channel Inscribe and Channel Config). In practice, this means that the Permanent Storage market is limited in the number of transactions it can process per block except for Channel Inscribe and Channel Config Operations.
-Execution Fee Market
-Execution fees cover the validation and execution of Mantle Transactions. The protocol does not directly cap the number of CPU cycles per block, but fees must enforce an Execution Gas limit to ensure compliance with the minimum hardware requirements of a node. The execution limit (
-limit
-Ex
-limit
-Ex
-	​
 
-) represents the maximum acceptable number of Execution Gas per block that a node with the minimum-specification CPU can process to validate and execute the block in a reasonable time.
-We define "reasonable" as limiting the Execution Gas such that a potential leader can verify and execute it in 1 second using 80% (arbitrary) of its CPU (based on minimum CPU specifications in 🟢
-Hardware Requirements - Basic Bedrock Node (Validator)). This corresponds to a maximum of 3,200,000,000 CPU cycles for a leader, which converts to 3,200,000 Execution Gas. We require this 1-second verification for leaders to ensure they can quickly identify the correct chain and extend it with their own produced block in time when they are close to proposing a new block.
-Consensus nodes must validate and execute a block using a small percentage of their CPU but during a longer period than the 1 second period for leaders, as they don't have the strict timing constraints that affect consensus and would increase forking. Using only 20% of their CPU, consensus nodes can validate and execute such blocks in approximately 4 seconds.
-We will also assume that block verification requires an initial and fixed amount of Execution Gas for different ZK proofs. According to 🔀
-[1.1.1] Block Construction, Validation and Execution, we will reduce the Execution Gas limit by 6,540 which is dedicated to initializing batch verification for ZkSignature and Proof of Claim.
-Therefore, 
-limit
-Ex
-:
-=
-3
-,
-193
-,
-460
-limit
-Ex
-	​
+## Introduction
 
-:=3,193,460 Execution Gas. This limit is also important to guarantee a rapid syncing of the chain.
-Node CPU consumption is managed by the per-block Execution Gas limit. The Execution fee market dynamically adjusts fees based on usage relative to this limit: as consumption approaches the limit, fees rise to dampen demand; when consumption drops, fees decrease to encourage additional throughput. Since execution is the bottleneck, these adjustments indirectly bound the Permanent Storage market.
-More details on the execution fee calculations can be found in 🔀
-[1.0.0] Execution Market.
-Permanent Storage Fee Market
-Permanent Storage fees cover the permanent storage of Mantle Transactions. This market is subject to a strict maximum block size limit of 1MiB with a maximum of 1024 Mantle Transactions per block. While stored transactions consume execution resources, certain operations, such as Channel Inscribe or Channel Config, can consume only a limited amount of Execution Gas with no restriction on Permanent Storage consumption. This creates a corner case where a block could, in principle, be filled entirely with such Operations until the limit is reached. To prevent extensive usage of block space and to maintain predictability, Cryptarchia imposes a maximum block size limit of 1 MiB. This cap is a protocol parameter and is chosen such that it remains compatible with the storage limit defined below.
-In the storage context, the minimum hardware requirement is expressed as the amount of data to be stored per year. Assuming ideal operation the network generates roughly 1 Terabyte of data per year, which can be seen as a technical limit.
-The Permanent Storage fee market manages node storage resource consumption through the maximum block size limit. Fees are adjusted based on block space usage: when Permanent Storage Gas consumption rises, fees increase to discourage excessive usage; when Permanent Storage Gas usage drops, fees decrease to encourage more transactions. This dynamic pricing mechanism ensures efficient use of available block space.
-More details on the Permanent Storage fee calculations can be found in 🔀
-[1.0.0] Storage Markets.
-Rewards Determination
-The Logos Blockchain rewards structure is built on key principles that create a balanced and sustainable economic framework while ensuring network security and encouraging participation.
-Our rewards system is guided by three core principles:
-Alignment of incentives: Rewards align all network participants' interests with the protocol's long-term health and success.
-Proportional compensation: Contributors earn rewards proportional to their resource contributions and risks.
-Sustainable economics: The model maintains economic sustainability without excessive inflation or security compromises.
-The following sections explain how these principles apply to different roles in the Logos Blockchain ecosystem.
-Blend Service and Consensus Leaders
-The Blend service and the leaders proposing the blocks share a same block reward that is calculated for each block based on a KPI function. This KPI function takes as input the inferred total stake and the amount of Execution and Permanent Storage fees of the block. How the KPI function calculates each block reward is explained in 🔀
-[1.0.0] Block Rewards.
-Blend rewards are distributed among all active Blend Nodes. Blend rewards are composed of a fraction of the block rewards. These rewards of sessions s are defined when a new Blend session s+1 starts (a defined number of blocks) and are allocated to nodes based on their reported Active Messages and the 
-Reward Distribution Protocols during session s+2. The 🔀
-[1.2.1] Service Reward Distribution Protocol manages the direct payment to nodes.
-Leaders get a voucher for each included block in epoch e. Vouchers represent an equal share of the leader reward pool. At the start of epoch e+1, the leaders rewards of epoch e are added to the pool (represented by a variable) and the voucher of epoch e can start being used. The amount added to the pool is composed of a fraction of the block rewards and a portion of the Execution fees minted back according to the 🔀
-[1.0.0] Execution Market from all blocks of epoch e. Vouchers can be exchanged with a reward through a Leader Claim Operation (on-chain transaction) that preserves privacy by decoupling the leader reward from the proposed block. The reward amount, represented by a share of the pool, is computed when the claim Operation is executed (c.f. 🔀
-[1.0.0] Anonymous Leaders Reward Protocol).
-Each block reward of each block is split as follows between the Blend service and the leader:
-40% for the leader.
-60% for the Blend service.
-The reasons for this split ratio are:
-Blend nodes must stake a minimum amount while leaders have no such requirement, making Blend nodes more exposed to risks.
-Blend nodes, having met the minimum stake requirement, are incentivized to run the validator protocol to earn greater rewards.
-Leaders who can afford the minimum stake are incentivized to lock it and run a Blend node to earn more rewards.
-Leaders who cannot afford the minimum stake can still earn enough to eventually reach it.
-At the start of each Blend session, a Blend reward variable is computed. Its amount equals 60% of the total block rewards of the previous session:
-def get_blend_reward(s: session):  # rewards for the session s
-		blend_rewards = 0
-		for b in s.blocks:    # for each block of the previous session
-				blend_rewards += 0.6 * get_block_rewards(b)  # get 60% of the rewards
-		return blend_rewards
+This document provides the formal specification for the fee collection mechanism of the Permanent Storage market. The primary objective is to define a system that is robust, predictable, and economically sustainable. This mechanism is a critical component of the overall Permanent Storage Market Transaction Fee Mechanism (TFM), which is designed as a self-contained, usage-driven market, economically decoupled from the protocol's core consensus and privacy services.
+
+In what follows, Logos Blockchain Storage refers to the Permanent Storage markets and Logos Blockchain Storage Gas refers to the Permanent Storage Gas respectively.
+
+### Requirements and Rationale
+
+The mechanism is designed with the following core requirements, derived from the project's goals:
+
+Predictability: Consumers of the Logos Blockchain Storage require a high degree of cost predictability for their own operational planning.
+
+Robustness: The mechanism must be able to adapt to significant, medium-term shifts in demand without requiring constant, emergency governance intervention.
+
+Fairness: The fee paid by a user must be directly and transparently proportional to the resources they consume.
+
+Simplicity: The on-chain implementation should be as simple as possible to minimize attack surface and ensure auditability.
+
+Justification. As will be discussed later, the tradeoff between adaptability and predictability of the mechanism is determined by its parameters. In scenarios of high volatility, its core design principle is to act as a shock absorber, deliberately filtering out high-frequency, transient volatility by operating over longer timeframes and using a smoothed moving average (EMA). For the primary consumer, reacting to every momentary spike in demand would create untenable price chaos. This model, therefore, intentionally forgoes instantaneous adaptation in favor of providing crucial timeframe-level price certainty, ensuring that fees reflect meaningful, medium-term trends rather than reacting to volatile, short-term market noise.
+
+## Overview
+
+The proposed fee mechanism operates on a simple but powerful principle: the price for Logos Blockchain Storage is fixed and predictable within a given timeframe (epoch for Permanent Storage), but it adjusts smoothly between timeframes based on observed network usage.
+
+When a user submits data, a fee is calculated based on the Logos Blockchain Storage Gas consumption. This fee is determined by a price per Gas, $P\_{STR}$ , which is known in advance for the entire timeframe.
+
+At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive target—a "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price $P\_{STR}$ for the next timeframe is adjusted slightly up or down.
+
+This flow can be visualized as follows:
+
+timeframes 's' Begins  
+Price P\_STR(s) is Fixed & Known
+
+Data Submission  
+- Logos Blockchain Storage Gas: S\_gas  
+- Fee = S\_gas \* P\_STR(s) + ...
+
+Protocol State:  
+- C\_Usage(s) += S\_gas  
+- Fee → Storage Reward Bucket
+
+timeframes 's' Ends  
+- Total Usage C\_Usage(s) is Final
+
+Price Update Rule Executed:  
+- Calculate Effective Target T\_Effective(s)  
+- Compare C\_Usage(s) to T\_Effective(s)  
+- Calculate and set new price P\_STR(s+1) for next timeframes
+
+Loop for all blocks in timeframes
 
 ​
-At the start of each epoch, the rewards are added to the leader rewards. Its amount is increased by 40% of the total block rewards of the previous epoch. The set of blocks from the previous epoch is denoted by B in the pseudocode below:
-def update_leader_rewards(e: epoch,  # rewards for the epoch e
-	leader_rewards: int):				  # added to the leader reward pool
-		for b in e.blocks:    # for each block of the previous epoch
-				leader_rewards += 0.4 * get_block_rewards(b)  # get 40% of the rewards
-				leader_rewards += get_execution_market_tips(b) # get Execution market tips
-		return leader_rewards
+
+This model provides the best of both worlds: users have perfect price clarity for the duration of a timeframe, while the system as a whole can gracefully adapt to evolving market conditions over time.
+
+## Construction
+
+This section defines the precise algorithm, constants, and state variables for the Logos Blockchain Storage TFM.
+
+#### Core Fee Equation
+
+The fee for a Logos Blockchain Storage transaction, $F\_{\text{STR}}$ , is a linear function of Logos Blockchain Storage Gas' size, $S\_{\text{gas}}$ , and the price-per-gas for the current timeframe, $P\_{\text{STR}}(s)$ .
+
+$$
+F\_{\text{STR}} = S\_{\text{gas}} \cdot P\_{\text{STR}}(s)
+$$
+FSTR​=Sgas​⋅PSTR​(s)
+
+As a remark, the equation above assumes a linear increase of $F\_\text{STR}$ with respect to $S\_\text{gas}$ . For completeness, a more general version can be
+
+$$
+\begin{align\*}
+F\_\text{STR}=f(S\_\text{gas})\cdot P\_\text{STR}
+\end{align\*}
+$$
+FSTR​=f(Sgas​)⋅PSTR​​
+
+with $f:\mathbb{N}\to\mathbb{R}\_+$ a monotonically increasing function. Making f sublinear can be understood as accounting for economies of scale, while making $f$ superlinear can be understood as a penalization for using larger data sizes. We decided to go with the linear form of $f$ as it was the least opinionated. Examples of this could be
+
+$$
+\begin{align\*}
+F\_\text{STR}^\text{exp}&=\exp(\alpha S\_\text{gas})\cdot P\_\text{STR}\quad \alpha >0\\
+F\_\text{poly}^\text{exp}&=S^\beta\_\text{gas}\cdot P\_\text{STR},\quad \beta>1\\
+\end{align\*}
+$$
+FSTRexp​Fpolyexp​​=exp(αSgas​)⋅PSTR​α>0=Sgasβ​⋅PSTR​,β>1​
+
+#### Protocol Constants
+
+To ensure on-chain efficiency, the protocol shall use an Exponential Moving Average (EMA) for its adaptive target calculation. The behavior of the TFM is governed by the following on-chain constants, which are set at genesis.
+
+| Symbol | Name | Description | Initial Value | Justification |
+| --- | --- | --- | --- | --- |
+| $T\_{\text{base}}$ ​ | Baseline Target | A static, policy-driven usage target in Logos Blockchain Storage Gas per timeframe. Acts as a long-term gravitational anchor for the dynamic target. | 0 Permanent Storage Gas per block. | It should represent a conservative initial timeframe capacity. providing a healthy buffer and a clear policy goal. |
+| $w$ ​ | Anchor Weight | A coefficient in $[0, 1]$ determining the influence of $T\_{\text{base}}$ . It's the "gravity knob" for the system. | for Permanent Storage: 0 | Allows the target to be primarily driven by recent demand, ensuring adaptability, while the $w$ % pull from $T\_{\text{base}}$ prevents long-term drift. |
+| $\alpha$ ​ | Max Adjustment Factor | The maximum fractional amount the price can change per timeframe. Acts as "safety brakes" to bound price volatility. | 0.125 for Permanent Storage | A $100\alpha$ % cap provides strong predictability for users planning across timeframes while allowing the price to respond effectively to sustained demand changes. |
+| $\beta$ ​ | EMA Smoothing Factor | A coefficient in $[0, 1]$ controlling the responsiveness of the usage EMA. It governs the speed of adaptation. | 0.5 for Permanent Storage | A value of $\beta$ gives significant weight to the most recent timeframe's usage while incorporating the "memory" of the system with a half-life of 1 timeframe, balancing responsiveness and stability. |
+| $T\_{\text{RA}}(-1)$ ​ | Initial Usage EMA | First value for EMA | 0 (= $T\_{\text{base}}$ ) | Given $T\_{\text{base}} = 0$ , this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset. |
+| $P\_{\text{STR}}(0)$ ​ | Initial Price | The price on the first epoch | 1 LGO/gas | The initial price is set conservatively low at the beginning and let to discover the true market price |
+| $s$ ​ | timeframe | How often things adjust | 1 epoch | Primary users of the Storage market plan operational costs over days or weeks, not block-by-block. |
+
+#### Parameter Justification
+
+For simplicity, we set $T\_\text{base}=0$ as an anchor and $w=0$ as blocks are already constrained by execution. This is to avoid imposing an opinionated choice of parameters, specially at the beginning of the protocol.
+
+The EMA factor ( $\beta=0.5$ ) makes the adaptive target highly sensitive to recent network activity by giving 50% weight to the latest session's usage, creating an effective "memory" of approximately 3 epochs.
+
+The maximum adjustment factor ( $\alpha=0.125$ ) provides a crucial layer of predictability, guaranteeing users that the price cannot change by more than 12.5% between any two epochs, thus fulfilling a core design requirement for stable operational planning.
+
+The seed value for the EMA is set to $T\_{\text{RA}}(-1) = T\_{\text{base}} = 0$ . Given $T\_{\text{base}} = 0$ , this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset.
+
+💡
+
+Why is the index  $-1$ , not  $0$ ? The price update algorithm runs at the end of timeframe $s$ and requires $T\_{\text{RA}}(s-1)$ as its prior EMA value. When $s = 0$ , the algorithm therefore requires $T\_{\text{RA}}(-1)$ as its seed. The value $T\_{\text{RA}}(0)$ is already a
+well-defined computed quantity — the EMA produced after the first epoch's observed usage: $T\_{\text{RA}}(0) = \beta \cdot C\_{\text{usage}}(0) + (1-\beta) \cdot T\_{\text{RA}}(-1)$ . Using index $-1$ for the seed avoids a naming collision with this computed value.
+
+> Implementation note. With $w = 0$ and $T\_{\text{RA}}(-1) = 0$ , the effective target
+> $T\_{\text{effective}}$ will be zero during the first epoch unless $C\_{\text{usage}}(0) > 0$ .
+> The reference implementation handles this correctly via the
+>
+> if effective\_target == 0: return self.price
+>
+> guard, which holds the price at $P\_{\text{STR}}(0)$ until the first non-zero usage
+> epoch provides a meaningful signal. This is the intended behavior at genesis.
+
+The precise value of $P\_{\text{STR}}(0)$ is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price $P^\*$  regardless of the starting point, provided the stability condition  $(\*)$ holds (see [🔀[1.0.0][Analysis] Storage Market - Price Stability Analysis](https://nomos-tech.notion.site/Price-Stability-Analysis-a03261aa09df83f6bcd6815ba73b72e1?pvs=24#fed261aa09df8241b79c01ca67ef6026)). The only hard requirement is for $P\_{\text{STR}}(0)$ to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.
+
+More precisely, since the price can increase by at most $\alpha = 12.5\%$ per epoch, the number
+of epochs required to reach a target price $P^\*$  from an initial price  $P\_{\text{STR}}(0) < P^\*$  is bounded above by:
+
+$$
+N \leq \left\lceil \log\_{1+\alpha}\!\left(\frac{P^\*}{P\_{\text{STR}}(0)}\right) \right\rceil
+= \left\lceil \frac{\ln(P^\*/P\_{\text{STR}}(0))}{\ln(1.125)} \right\rceil
+$$
+N≤⌈log1+α​(PSTR​(0)P∗​)⌉=⌈ln(1.125)ln(P∗/PSTR​(0))​⌉
+
+For example, if $P\_{\text{STR}}(0)$ is set to one tenth of the true equilibrium price, the mechanism reaches $P^\*$ within at most $\lceil \ln(10)/\ln(1.125) \rceil = 20$ epochs. Starting
+one hundredth below requires at most $40$ epochs. Both are negligible relative to the expected lifetime of the network.
+
+We therefore set:
+
+$$
+P\_{\text{STR}}(0) = 1\ \text{LGO per Permanent Storage Gas}
+$$
+PSTR​(0)=1 LGO per Permanent Storage Gas
+
+This corresponds to a cost of 1 LGO per permanently stored byte. Genesis governance may adjust this value based on the LGO price at TGE, but the adjustment has no long-term consequence: the mechanism will converge to the true market price $P^\*$  within  $O(\log P^\*/P\_{\text{STR}}(0))$ epochs regardless.
+
+The timeframe $s$ corresponds to one epoch. The core reason is that the primary users of the Storage market plan operational costs over days or weeks, not block-by-block. An epoch-length timeframe provides price certainty over hundreds of blocks, directly fulfilling the predictability requirement. It also ensures the EMA aggregates a meaningful volume of usage data before influencing the price, rather than reacting to per-block noise.
+
+#### State Variables
+
+The protocol must maintain the following state variables, updated at the end of each timeframe:
+
+| Symbol | Name | Description |
+| --- | --- | --- |
+| $P\_{\text{STR}}(s)$ ​ | Price Per Logos Blockchain Storage Gas | The price per Gas of storage for the current timeframe $s$ . |
+| $T\_{\text{RA}}(s)$ ​ | Usage EMA | The Exponential Moving Average of storage usage, updated with the usage from timeframe $s$ . |
+
+#### Price Update Algorithm
+
+At the conclusion of each timeframe $s$ , the protocol shall execute the following algorithm to determine the price for the next timeframe, $P\_{\text{STR}}(s+1)$ . This is done as follows.
+
+Tally Usage: Aggregate the total Logos Blockchain Storage Gas consumed during timeframe $s$ into a final value, $C\_\text{usage}(s)$ :
+
+$$
+C\_{\text{usage}}(s)=\sum\_{t\in\mathcal{B}\_s}\mathsf{StorageGasUsed}[t]
+$$
+Cusage​(s)=t∈Bs​∑​StorageGasUsed[t]
+
+Where $\mathcal{B}\_s$ corresponds to one block in timeframe $s$ and $\mathsf{StorageGasUsed}[t]$ corresponds to the Logos Blockchain Storage Gas used by transaction $t$ .
+
+Update Usage EMA: Update the Exponential Moving Average of usage.
+
+$$
+T\_{\text{RA}}(s) = \beta \cdot C\_{\text{usage}}(s) + (1-\beta) \cdot T\_{\text{RA}}(s-1)
+$$
+TRA​(s)=β⋅Cusage​(s)+(1−β)⋅TRA​(s−1)
+
+Calculate Effective Target: Calculate the blended, effective target, $T\_{\text{effective}}(s)$ .
+
+$$
+T\_{\text{effective}}(s) = w \cdot T\_{\text{base}} + (1-w) \cdot T\_{\text{RA}}(s)
+$$
+Teffective​(s)=w⋅Tbase​+(1−w)⋅TRA​(s)
+
+Calculate Adjustment Factor: Determine the fractional deviation of usage from the target and clamp the result to the range $[-\alpha, \alpha]$ .
+
+$$
+\text{adjustment}(s) = \frac{C\_{\text{usage}}(s) - T\_{\text{effective}}(s)}{T\_{\text{effective}}(s)}
+$$
+adjustment(s)=Teffective​(s)Cusage​(s)−Teffective​(s)​
+
+$$
+\text{clamped\\_adjustment}(s) = \max \{ -\alpha, \min \{ \alpha, \text{adjustment}(s) \} \}
+$$
+clamped\_adjustment(s)=max{−α,min{α,adjustment(s)}}
+
+Update Price: Calculate the price for the next timeframe, $s+1$ ​
+
+$$
+P\_{\text{STR}}(s+1) = P\_{\text{STR}}(s) \cdot [1 + \text{clamped\\_adjustment}(s)]
+$$
+PSTR​(s+1)=PSTR​(s)⋅[1+clamped\_adjustment(s)]
+
+#### Implementation
+
+Because computation affect consensus state, the implementation must be fully deterministic across all nodes. For that reason, the normative implementation of the reward function should not rely on floating-point arithmetic, machine-dependent rounding behavior, or comparisons against machine epsilon. Earlier sections use real-valued formulas to explain the mechanism and its economic meaning, but the consensus rule itself should be defined only in terms of integer arithmetic.
+
+The goal of this section is not to change the execution mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. To we provide here a reference implementation that uses unsigned integers to have a common reference.
+
+First because we have $w = 0$ , $T\_\text{RA}(s) = T\_\text{effective}(s)$ . Then because $\beta=0.5$ ​
+
+$$
+T\_{\mathrm{RA}}(s)=\frac{C\_{\mathrm{usage}}(s)+T\_{\mathrm{RA}}(s-1)}{2}
+$$
+TRA​(s)=2Cusage​(s)+TRA​(s−1)​
+
+Secondly, we can rewrite $P\_\text{STR}$ equation:
+
+$$
+\begin{align\*}
+P\_{\text{STR}}(s+1) &= P\_{\text{STR}}(s) \cdot [1 + \max \{ -\alpha, \min \{ \alpha, \text{adjustment}(s) \} \}]\\
+&= P\_{\text{STR}}(s) \cdot \max \{ 1-\alpha, \min \{ 1+ \alpha, 1+\text{adjustment}(s) \} \}\\
+&= P\_{\mathrm{STR}}(s)\cdot
+\max\left\{\frac78,\min\left\{\frac98,\,
+\frac{C\_{\mathrm{usage}}(s)}{T\_{\mathrm{RA}}(s)}
+\right\}\right\}
+\end{align\*}
+$$
+PSTR​(s+1)​=PSTR​(s)⋅[1+max{−α,min{α,adjustment(s)}}]=PSTR​(s)⋅max{1−α,min{1+α,1+adjustment(s)}}=PSTR​(s)⋅max{87​,min{89​,TRA​(s)Cusage​(s)​}}​
+
+and so:
+
+$P\_{\mathrm{STR}}(s+1)=\begin{cases}\left\lfloor P\_{\mathrm{STR}}(s)\cdot \frac78 \right\rfloor,& \text{if } 8\,C\_{\mathrm{usage}}(s)\le 7\,T\_{\mathrm{RA}}(s),\\[6pt]\left\lfloor P\_{\mathrm{STR}}(s)\cdot \frac98 \right\rfloor,& \text{if } 8\,C\_{\mathrm{usage}}(s)\ge 9\,T\_{\mathrm{RA}}(s),\\[6pt]\left\lfloor P\_{\mathrm{STR}}(s)\cdot\frac{C\_{\mathrm{usage}}(s)}{T\_{\mathrm{RA}}(s)} \right\rfloor,& \text{otherwise.}\end{cases}$ ​
+
+and so we can derive the following reference code:
+
+EMA\_DENOMINATOR = 2 # 1/beta
+CLAMP\_DENOMINATOR = 8 # denominator of 1+ alpha and 1-alpha
+CLAMP\_DOWN\_NUMERATOR = 7 # numerator of 1-alpha
+CLAMP\_UP\_NUMERATOR = 9 # numerator of 1+alpha
+def update\_usage(total\_gas\_consumed: int, previous\_usage: int) -> int:
+return (total\_gas\_consumed + previous\_usage) // EMA\_DENOMINATOR
+def update\_storage\_price(prev\_price: int, total\_gas\_consumed: int, usage: int) -> int:
+if CLAMP\_DENOMINATOR \* total\_gas\_consumed <= CLAMP\_DOWN\_NUMERATOR \* usage:
+return prev\_price \* CLAMP\_DOWN\_NUMERATOR // CLAMP\_DENOMINATOR
+elif CLAMP\_DENOMINATOR \* total\_gas\_consumed >= CLAMP\_UP\_NUMERATOR \* usage:
+return prev\_price \* CLAMP\_UP\_NUMERATOR // CLAMP\_DENOMINATOR
+else:
+return prev\_price \* total\_gas\_consumed // usage
+def update\_storage\_fee(total\_gas\_consumed: int, prev\_price: int, prev\_usage: int) -> tuple[int, int]:
+usage = update\_usage(total\_gas\_consumed, prev\_usage)
+price = update\_storage\_price(prev\_price, total\_gas\_consumed, usage)
+return price, usage
 
 ​
-Reward Distribution Protocols
-Anonymous Leaders Reward Protocol
-To protect leaders' privacy, we must not link leaders to their blocks and rewards. Therefore, we designed a mechanism for anonymous reward claiming. A key design decision in this mechanism is that the amount of rewards a leader receives cannot be associated with or calculated based on the block they proposed. Without this approach, leaders could be linked back to their proposed blocks based on the value of their claimed rewards. This mechanism creates an anonymity pool where all leaders contribute, turning the leader-to-block assignment into a guessing game.
-The 🔀
-[1.0.0] Anonymous Leaders Reward Protocol defines how leader rewards are maintained in the ledger and how leaders can claim them. Leader rewards follow a two-step procedure: 
-When a new epoch e starts, the unique reward pool variable for leaders is updated, increasing by the reward amount for the previous epoch e-1. This reward amount is calculated as the sum of leader block rewards from epoch e-1. Simultaneously, consensus nodes update the voucher set, adding vouchers of leaders from epoch e-1 to the global voucher set.
-From epoch e onward, leaders can exchange their vouchers for shares of the rewards pool, as their vouchers are now in the set. Each unclaimed voucher represents an equal share of the leader rewards pool.
-Claimable rewards remain stable during an epoch because the reward pool decreases proportionally to the number of unclaimed vouchers, and the pool is neither increased nor are new vouchers added to the set during an epoch.
-Blend Service
-The 🔀
-[1.0.0] Blend Protocol - Rewarding mechanism determines how Blend nodes receive compensation. Only active nodes qualify for rewards, with activity verification conducted through a probabilistic system that works as follows:
-During a session s, nodes collect blending tokens embedded in processed messages.
-When session s+1 begins, the system generates a random target token. Nodes must submit their single blending token closest to this target as proof of activity.
-In session s+2, rewards are distributed to all nodes whose tokens fall sufficiently close to the target, with additional bonuses for those achieving the closest matches.
-The rewards for Blend are given to nodes on the basis of a lottery system where the winning chances are proportional to the work performed by the node. The Blend node receives a base reward for providing the basic service and a bonus reward for an extra work. Both are identical for all qualifying nodes in a session and are calculated by the Blend rewarding logic on the basis of the block rewards. For more details on block reward calculations, see 
-Blend Service and Consensus Leaders.
-Service Rewards Distribution Protocol
-The 🔀
-[1.2.1] Service Reward Distribution Protocol defines how service rewards are minted and inserted in the Ledger and how active service nodes receive their rewards. When a new service session s starts, rewards for the previous session s-1 are calculated and directly inserted in the ledger. The reward amount is calculated as the sum of service block rewards from the previous session s-1.
-Further Details
-In this section we provide references to the core specifications that define the mechanisms introduced throughout this document. Together, these specifications form the foundation of the Logos Blockchain cryptoeconomic model by detailing how fees are collected, how rewards are determined, and how incentives align across different roles in the network. Below is a short overview of each:
-[1.0.0] Block Rewards. Outlines the KPI-based reward emission model that governs leader and Blend rewards. It details how token issuance adapts to network conditions using inferred stake and burn rates, ensuring sustainability, security, and deflationary pressure when demand is high.
-[1.0.0] Execution Market. Describes the fee mechanism for execution resources, including the use of a dynamic base fee and priority tips. It explains how execution demand is smoothed over time, how fees are burned and later reminted as rewards, and how the system mitigates manipulation risks while maintaining predictable costs.
-[1.0.0] Storage Markets. Defines the transaction fee mechanism for the Permanent Storage market. It introduces a timeframe-based model where prices are fixed during a session or epoch and adjusted smoothly between them, ensuring predictability for users while allowing the market to adapt to long-term trends.
-These documents serve as complementary technical references, offering the deeper mathematical and procedural foundations that support the economic model described here.
-On Execution vs Storage Markets
-As a general overview, and to prepare the reader before embarking in the study of these documents, we will highlight here the conceptual differences between the Execution Market and the Storage Market, since they operate under distinct economic logics even though both rely on fee mechanisms:
-Execution Market – Pricing is more reactive and adaptive, with the base fee updated every block using a smoothed demand signal. The system uses a dual-component fee structure: a protocol-defined base_fee and a priority_fee (tip) defined by the user setting the transaction's gas price. It is explicitly anchored to a target utilization (50% of gas limit, similar to EIP-1559) and a hard maximum gas per block, ensuring the network remains operable on minimal hardware. Both base and priority fees are initially burned, but the priority fee is later reminted back as part of leader rewards—providing a clear, strategy-aligned mechanism for transaction inclusion and incentivization.
-Storage Markets – Pricing is designed to be predictable and stable over a timeframe. Fees remain fixed within an epoch and are updated only at the transition to the next timeframe. This creates a single-component fee that is straightforward for users. While the mechanism has an anchoring point 
-𝑇
-base
-T
-base
-	​
 
-, it is not built around strict capacity limits—unlike execution. Instead, it prioritizes robustness and predictability, with parameters (such as the clipping factor) chosen to filter out volatility and keep pricing agnostic to short-term demand spikes.
-Taken together, these distinctions show how the storage market emphasizes stability and medium-term predictability, while the execution market emphasizes responsiveness and short-term allocation efficiency, each addressing the unique constraints of their underlying resources.
+#### Genesis State
+
+The initial state of the TFM at network launch shall be configured as follows:
+
+Initial Price
+
+P\_STR(0)
+
+: Set to a pre-determined value established by genesis governance.
+
+Initial Usage EMA 
+
+T\_RA(-1)
+
+: Set to the value of the baseline target, $T\_{\text{base}}$ . This anchors the mechanism to its long-term policy goal from the outset.

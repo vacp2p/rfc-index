@@ -17,401 +17,341 @@
 
 ---
 
-> **Note on this import:** This spec was imported from Notion on 2026-05-22.
-> The body below preserves the source text and needs a formatting pass for COSS conventions
-> (semantic line breaks, code block markers, table formatting, internal cross-references).
-> Treat this commit as the initial migration; subsequent PRs should polish the formatting incrementally.
+> **Note on this import:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) rendered via katex; tables and headings
+> are converted from Notion HTML. A formatting polish (semantic line breaks, code block fences
+> for code samples, internal cross-references) is still recommended.
 
 ---
 
-Authors: Mehmet Gonen <mehmet@logos.co>
-Revision History
-Version
-	
-Changes
-	
-Date
+## Revision History
 
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2025-09-04 |
+| 1.0.1 | Renamed Nomos to Logos Blockchain. Removed mentions of DA. | 2026-04-23 |
 
-1.0.0
-	
-Initial revision.
-	
-2025-11-18
+## Introduction
 
+The Logos Blockchain utilizes zero-knowledge proof systems not only to ensure strong privacy and security guarantees across its decentralized architecture, but also to reduce the computational burden on validators by compressing execution into succinct proofs. Some of the Logos Blockchain's cryptographic applications specifically use Groth16 (see [🔀[1.0.2] Common Cryptographic Components - Groth16 (zk-SNARK)](https://nomos-tech.notion.site/Groth16-zk-SNARK-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#1fd261aa09df8167bc01e0fc7e6a7c83)), a proof system renowned for its succinctness and efficient verification.
 
-1.0.1
-	
-Renamed Nomos to Logos Blockchain
-	
-2026-04-23
+A critical requirement of Groth16 is the secure generation of a Common Reference String (CRS) through a one-time cryptographic ceremony, commonly known as a Trusted Setup Ceremony. This ceremony ensures that cryptographic parameters are generated in a decentralized manner, such that no individual participant can later compromise the security or privacy guarantees of the system.
 
+The Logos Blockchain adopts a secure, publicly verifiable, and auditable Multi-Party Computation (MPC) protocol known as [Powers-of-Tau](https://eprint.iacr.org/2022/1592.pdf), performed over the BN254 elliptic curve as a first step for Groth16-based zero-knowledge proofs, to generate and extend these trusted setup parameters.
 
-1.0.2
-	
-Clarification of the Poseidon2 function
-Add test values
-	
-2026-05-07
-Introduction
-The Logos Blockchain relies on a variety of cryptographic primitives to ensure security, privacy, and verifiability across its components. This document defines the common cryptographic building blocks used throughout the Logos Blockchain design.
-Its primary purpose is to standardize the selection and usage of these primitives, provide rationale for each choice, and establish consistency across implementations. It also offers guidance for developers and researchers working on different parts of the system so that all components rely on a coherent and interoperable cryptographic foundation.
-Overview
-This document specifies the cryptographic primitives selected for the Logos Blockchain and explains how they interconnect across different layers of the protocol stack. It outlines their technical foundations, rationale, and security considerations to ensure consistent usage across Logos Blockchain components.
-The primitives span multiple domains:
-Hash functions (Poseidon2, BLAKE2b) serve as the base layer for commitments, nullifier derivation, Merkle trees, signature key derivation,  pseudorandom number generator and general purpose hashing.
-Signature schemes (EdDSA, ZkSignature) authenticate messages and participants, with ZkSignature designed specifically for ownership verification within zero-knowledge circuits.
-Proof systems (Groth16) enable succinct and verifiable computation. Groth16 is used in hand-written circuits. 
-Each primitive is chosen for its suitability in a particular context, balancing efficiency, cryptographic strength, and developer usability.
-The table below summarizes the recommended component for each context:
-Context
-	
-Recommended Component
+This document defines the cryptographic foundations and provides detailed instructions for securely performing or extending a trusted setup ceremony, including:
 
+Essential cryptographic definitions and parameters.
 
-ZK Hashing
-	
-Poseidon2
+Step-by-step guidance for participant contributions.
 
+Procedures for extending an existing Powers-of-Tau ceremony.
 
-General Hashing & PRNG
-	
-BLAKE2b
+## Overview
 
+At a high level, the Powers-of-Tau ceremony generates a structured set of elliptic curve points corresponding to powers of a secret scalar $\tau$ . These elements form the Phase 1 CRS that underpins the Groth16 protocol in the Logos Blockchain. For Groth16, the CRS can be extended in a short Phase 2 MPC to derive circuit-specific proving and verification keys, ensuring the underlying secret remains hidden as long as at least one participant discards their randomness. The Logos Blockchain adopts an MPC setup ceremony: the Powers-of-Tau protocol.
 
-General Signatures
-	
-EdDSA
+#### Powers-of-Tau Ceremony Overview
 
+Each participant securely contributes randomness sequentially.
 
-ZK Signatures
-	
-ZkSignature (see 🔀
-[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)) 
+Each participant iterates over the existing CRS parameters to update it.
 
+At least one participant must be honest and destroy their secret input to guarantee the security of ZK schemes using the CRS.
 
-Proof System (SNARK)
-	
-Groth16 
-1. Hash Functions
-The Logos Blockchain utilizes different hash functions depending on the use case context—primarily distinguishing between zero-knowledge circuit contexts and general usage scenarios. The Logos Blockchain selects hash functions based on their performance characteristics: Poseidon2 for arithmetic-oriented handwritten circuits, and Blake2 for bit-oriented operations in ZkVM and general computations. In specifications, we refer to these arithmetic hash function as zkhash and the general purpose hash function as Hash.
-BLAKE2b (General-Purpose Hashing)
-Description: 
-BLAKE2b is a cryptographic hash function providing strong security and high performance. It supports variable-length outputs through parameterization, making it flexible for different cryptographic contexts.
-Technical Details:
-Construction: ARX-based (Addition, Rotation, XOR) design.
-Output Size: Configurable, typically 256-bit or 512-bit.
-Internal State: 64-bit words, utilizing ChaCha-inspired quarter-round operations.
-Performance: Faster than SHA-2/SHA-3 in software implementations.
-Use in the Logos Blockchain:
-BLAKE2b is used for cryptographic hashing outside of zk-circuits in the Logos Blockchain, such as in data integrity checks, identifier generation, and other non-zk cryptographic operations.
-Throughout the Logos Blockchain specifications, BLAKE2b is referred to simply as Hash.
-Domain separation tags (DSTs) are included by treating the DST as a byte string (by convention ASCII-compatible) and prefixing it to the input before hashing.
-Rationale for Use:
-Proven cryptographic strength as a well-studied and mature construction, with BLAKE2b being a finalist in the NIST SHA-3 competition.
-It was selected because of its high software performance and efficiency compared to SHA-2/SHA-3, while providing comparable security guarantees.
-Its adjustable output length and ARX-based design offer flexibility and practical deployment advantages over the SHA family.
-Security Considerations:
-Considered secure under standard cryptanalytic models.
-Resistant to collision, preimage, and second-preimage attacks at intended security levels.
-BLAKE2b-Based PRNG Construction
-The Logos Blockchain also uses BLAKE2b as the basis for a deterministic pseudorandom byte generator, suitable for different purposes.
-Construction:
-Given a 64-byte seed and an integer index i, the PRNG output is derived by:
-> Loading Plain Text code…
-​
-seed: 64-bytes seed (domain-separated if needed).
-encode_u64(i): 8-byte little-endian encoding of the index i.
-out_len: fixed to 64 bytes (maximum output size of BLAKE2b).
-Output:
-For generating n bytes (bigger than 64 bytes), concatenate outputs of PRNG(seed, i) for i = 0, 1, ... until the desired length is reached.
-For generating k bits, compute enough full 64-byte outputs to cover at least k bits, then truncate the last byte to the required bit-length.
-This minimizes the number of BLAKE2b invocations by using the full 64-byte output capacity.
-Notes:
-Seed choice and domain separation must be handled at the protocol level.
-Poseidon2 (ZK Friendly Hash Function)
-Description:
-Poseidon2 is a cryptographic sponge permutation that can be used in different modes. It’s often used as a hash function or compression function designed specifically for arithmetic circuits, frequently used in zero-knowledge proofs. It follows the HADES permutation construction, consisting of multiple rounds of full and partial substitution-box (S-box) applications separated by linear layers.
-Technical Details:
-Structure: HADES permutation (substitution-permutation network).
-Rounds: Clearly defined full and partial round structure, typically around 8 full rounds and ~60 partial rounds, depending on the security parameter.
-S-box: Nonlinear exponentiation-based S-box, typically of the form 
-𝑥
-↦
-𝑥
-𝛼
-x↦x
-α
- over a finite field (often 
-𝛼
-=
-5
-α=5 or 
-𝛼
-=
-3
-α=3).
-Field: Operates over prime fields (
-𝐹
-𝑝
-F
-p
-	​
+All transformations are accompanied by publicly verifiable proofs, ensuring full auditability of the ceremony.
 
-), usually matching the field used in zk-SNARK circuits.
-Use in the Logos Blockchain:
-Used as the hash function and compression function for all hand-written zero-knowledge circuits (e.g., note IDs, membership proofs) in the Logos Blockchain. For these protocols, the Logos Blockchain relies on the BN254 elliptic curve, so the 
-𝐹
-𝑝
-F
-p
-	​
+![](/image/attachment%3A1d418aca-de35-485a-8dac-494b6ab8e191%3Apot.png?table=block&id=229261aa-09df-8031-9983-cc4bea1d36ff&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1500&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
- elements are taken from the prime field corresponding to BN254. The parameters of the Poseidon2 permutation are the following in the Logos Blockchain:
-The rate = 1.
-The capacity = 3.
-8 external rounds and 56 internal rounds.
-The rounds constants are derived following the original Poseidon paper following their implementation referenced in the paper.
-The state of the sponge is initialized with three 0s.
-We provide test values in 
-Poseidon2 Test Values.
-We use the 10* padding rule for the hash mode of Poseidon2. Since our rate is 1, this means a single field element with value 1 is appended to the input before absorption.
-We modified the compression mode compared to the Poseidon2 paper: to compress two elements (with rate=1), we compute zkhash(a,b) instead of zkhash(a,b) + a.
-Throughout the Logos Blockchain specifications, Poseidon2 is referred to as zkhash.
-In the Logos Blockchain, bytes and 
-𝐹
-𝑝
-F
-p
-	​
+In the ceremony, a coordinator manages the sequential flow of contributions. Each contributor downloads the current CRS, applies their secret randomness, and sends the updated CRS back through the coordinator, who relays it to the next participant. At each step, an independent verifier can check that the update was performed correctly. Once all contributions are complete, the final CRS is published.
 
- elements are frequently converted between formats (such as when interpreting DST byte strings as Poseidon2 inputs). To convert from an 
-𝐹
-𝑝
-F
-p
-	​
+#### Security of Powers-of-Tau
 
- element to bytes, we interpret the little-endian unsigned representation of the 
-𝐹
-𝑝
-F
-p
-	​
+Let N denote the total number of contributors participating in the ceremony. The Powers-of-Tau ceremony achieves computational soundness against adversaries that corrupt up to (N-1) participants, under certain number-theoretic assumptions (e.g., the q-Strong Diffie-Hellman (q-SDH) assumption in the underlying elliptic curve groups), provided that at least one honest participant successfully erases their secret randomness.
 
- number as 32 bytes. Conversely, we can interpret 32 bytes as an 
-𝐹
-𝑝
-F
-p
-	​
+Honest Participation: The core trust assumption is that at least one participant in the multi-party computation securely deletes their secret contribution (i.e., the toxic waste). If this holds, then the final CRS remains sound and cannot be used to forge proofs.
 
- element provided the resulting number is smaller than 
-𝑝
-p.
+Computational Assumptions: The protocol relies on several number-theoretic assumptions, most notably the q-SDH assumption over the elliptic curve. These assumptions are fundamental to pairing-based cryptography and are not specific to the ceremony.
+
+Erasure Assumption: Powers-of-Tau is typically analyzed in the secure erasure model, where each participant is assumed to be capable of permanently deleting their internal secret randomness after applying it. This ensures that even if an adversary later compromises a participant, they cannot recover the toxic waste. While not a computational assumption, secure erasure is essential for the soundness of the protocol in this model.
+
+The security of Groth16-based zero-knowledge proofs in the Logos Blockchain critically depends on a sound and verifiable trusted setup. Each participant contributes to the CRS without revealing their secret randomness, and public proofs guarantee the correctness of every transformation. The procedure applies to all required secret scalars, $\tau, \alpha, \beta, \gamma, \delta$ , ensuring that all toxic waste is handled consistently and securely. Furthermore, the Logos Blockchain builds its Powers-of-Tau ceremony on top of an existing, already-audited CRS instead of starting from scratch, providing greater confidence in its security. This trusted setup process forms a foundational cryptographic pillar for ensuring privacy, integrity, and long-term resilience in the Logos architecture.
+
+We have two phases for the ceremony. Phase 1 is circuit-independent and involves generating elliptic curve encodings of powers of a toxic waste scalar $\tau$ . This enables polynomial commitments up to a certain degree and can be reused across any circuit of bounded size. Phase 2 is circuit-specific and requires knowledge of the exact constraint system. It introduces four additional toxic waste scalars $\alpha, \beta, \gamma, \delta$ , which are used to encode the circuit's polynomials and, crucially, compute the $K\_i$ elements in the verification key. These $K\_i$ terms represent compressed combinations of public input polynomials and must be computed for each unique circuit. As a result, while Phase 1 can be performed once and reused broadly, Phase 2 must be securely executed for every new circuit.
+
+### Curve Selection and Parameter Structure
+
+The Logos Blockchain uses the BN254 elliptic curve for Groth16-based zero-knowledge proofs because proving time and proof size are critical in these applications. BN254 offers smaller proofs and faster proving times compared to alternatives like BLS12-381, and is backed by mature, highly optimized libraries such as Circom, SnarkJS, and libsnark.
+
+#### Groth16 Parameters
+
+Groth16 proving systems derive two key components from a structured CRS:
+
+Proving Key ( $pk$ ): This is a set of cryptographic parameters enabling the prover to generate proofs. Includes group elements from the prime-order cyclic subgroups  $\mathbb G\_1$  and  $\mathbb G\_2$  on elliptic curve, where  $\mathbb G\_2$  is defined over a degree-2 extension field.
+
+Verification Key ( $vk$ ): This is a smaller set of parameters allowing efficient verification of proofs. The verification key contains a much smaller set of elliptic curve elements from groups  $\mathbb G\_1$  and  $\mathbb G\_2$ .
+
+## Protocol
+
+### Technical and Cryptographic Steps
+
+This section describes the trusted setup procedure in detail, outlining both the cryptographic computations and the interactive flow of the multi-party Powers-of-Tau protocol. The process begins with a coordinator initializing elliptic curve parameters and generating the initial set of structured CRS elements. Each participant builds on the previous one’s output by applying a secret random transformation and publishing a proof of correctness — so the process is sequential. As long as at least one participant discards their secret input, the entire setup remains secure. These contributions are chained together, and the ceremony concludes with a publicly verifiable aggregation of the final CRS.
+
+The Groth16 protocol requires a CRS with a suite of powers of one random scalar  $\tau \in \mathbb{F}^\*\_p$ . To ensure soundness and zero-knowledge for a given arithmetic circuit, four additional toxic-waste elements must also be sampled independently and uniformly at random. While their values are circuit-independent, the way they are applied in constructing the proving and verification keys depends on the specific circuit.
+
+In addition to $\tau$ , the Groth16 proving system requires, for each circuit, four additional secret scalars, $\alpha,$ $\beta,\gamma$ and $\delta$ all sampled independently and uniformly at random from the field  $\mathbb{F}\_p^\*$ . These values are essential for securely encoding different components of the constraint system and for ensuring zero-knowledge in the final proof. Specifically, $\alpha$ and $\beta$ are used to randomize the circuit polynomials $A(x)$ and $B(x)$ , $\gamma$ is used to compress linear combinations of public inputs, and $\delta$ provides blinding for the quotient polynomial that ensures witness-hiding. Like $\tau$ , each of these values must be treated as toxic waste and securely discarded after use. All five values:  $\tau, \alpha, \beta, \gamma, \delta$  must be generated using the same secure procedure and structure. In Groth16 Phase 2, these scalars are used immediately to derive circuit-specific CRS elements, in particular the $K\_i$ terms in the verification key, before all toxic waste is securely destroyed.
+
+#### Step 1: Initialization (Coordinator)
+
+The coordinator publicly specifies the foundational cryptographic parameters:
+
+Elliptic Curve:
+
+BN254: $(x,y) \in \mathbb{F}\_{p}^{\text{BN254}}$ such that $y^2 = x^3 + 3$ ​
+
+Here $\mathbb{F}\_{p}^{\text{BN254}}$ denotes distinct prime fields of size $p^{\text{BN254}}$ .
+
+Cryptographic Groups:
+
+$\mathbb{G}\_1, \mathbb{G}\_2, \mathbb{G\_T}$ : prime-order subgroups of elliptic curve points over $\mathbb{F}\_p$ and its extensions.
+
+$e: \mathbb{G}\_1 \times \mathbb{G}\_2 \to \mathbb{G}\_T$ : a bilinear, non-degenerate pairing function.
+
+Generators:
+
+$G\_i \in \mathbb{G}\_i : i \in \{1,2,T\}$  are fixed public generators.
+
+Element Notation:
+
+Elements of the group  $\mathbb{G}\_i : i \in \{1,2,T\}$  are written additively by using the following notation:  $[\alpha]\_i := \alpha \cdot G\_i$ .
+
+These values are fixed and published to all ceremony participants.
+
+An initialized CRS:
+
+The initialized CRS contains  $n + 1$  elements in  $G\_1$  and  $m+1$  elements in  $G\_2$ . For the  $\tau$  secret in Groth16, the value of  $n$  defines the maximum degree of polynomials that will be committed and the maximum size of circuits (the number of R1CS constraints must be ≤  $n$ ) and  $m=1$ . In contrast, the parameters  $\alpha, \beta, \gamma, \delta$  of the Groth16 protocol each require only  $n=m=0$ . But, Phase 2 also includes the computation of the  $K\_i$  elements in  $\mathbb G\_1$ , whose number depends on the circuit’s public inputs. These must be generated at the same time, while the toxic waste scalars are still in memory.
+
+The CRS is of the form:  $\left( [1]\_1 \right)\_{j=0}^n \; \left( [1]\_2 \right)\_{k=0}^m$  when initializing from scratch.
+
 💡
-We use Poseidon2 in hash function mode everywhere except in: Merkle proofs, public key derivation, nullifier derivation and reward voucher derivation where we use the modified compression mode.
-Rationale for Use:
-Optimized for SNARK systems (minimizes constraint amount for hand-written circuit).
-Allows significantly fewer constraints compared to SHA or BLAKE, drastically reducing proving time. Reduces the number of constraints by a factor of approximately 100 compared to SHA256 or BLAKE2b, drastically lowering proving time and computational effort in zero-knowledge circuits. 
-Security Considerations:
-Subjected to ongoing cryptanalysis, including differential and algebraic attacks.
-Current research demonstrates security at 100-bit+ levels when using recommended round parameters.
-Resistant to collision, preimage, and second-preimage attacks at intended security levels.
-References
-Poseidon2: https://eprint.iacr.org/2023/323
-Poseidon Cryptanalysis Initiative: https://www.poseidon-initiative.info/
-Algebraic Cryptanalysis of Poseidon: https://eprint.iacr.org/2023/537
-BLAKE2b Specification: https://eprint.iacr.org/2013/322
-2. Digital Signature Schemes
-EdDSA
-Description:
-EdDSA is a digital-signature scheme built on twisted Edwards curves. Ed25519 is a widely used instantiation of EdDSA over the Edwards25519 curve that provides approximately 128 bits of security.
-Technical Details:
-Curve: Twisted Edwards curve Edwards25519 (it is birationally equivalent to Curve25519): 
-(
-𝑥
-,
-𝑦
+
+For performance reasons, especially to leverage Number Theoretic Transforms (NTT) for fast polynomial arithmetic, it is common to choose  $n$  as a power of two. For example, setting  $n = 2^{k}$  allows working with polynomials of degree up to  $2^{k} - 1$ , and proving circuits with up to  $2^{k}$  constraints.
+
+#### Step 2: Participant Contribution
+
+Each participant  $i$  in the sequence performs the following:
+
+Downloads the current CRS:
+
+$([\tau^j]\_1)\_{j=0}^{n}, \; ([\tau^k]\_2)\_{k=0}^{m}$  ( $\tau = 1$  at the initialization phase).
+
+Generates a random secret scalar  $r\_i \overset{{\scriptscriptstyle\$}}{\leftarrow} \mathbb{F}\_p^\*$ .
+
+Updates the CRS by contributing its secret  $r\_i$  into the CRS.
+
+$\forall j\in [0,n]: \; [(\tau')^j]\_1 := [{(r\_i \tau)^j}]\_1 ={r\_i^j}\cdot [\tau^j]\_1$ .
+
+$\forall k \in [0,m] : [(\tau')^k]\_2 = [{(r\_i \tau)^k}]\_2 = {r\_i^k}\cdot [\tau^k]\_2$ .
+
+Creates a proof showing they know  $r\_i$ , and that the CRS is a correct transformation of the old one.
+
+This proof consists of three checks (detailed in Step 4):
+
+Knowledge of exponent  $r\_i$  for the first element.
+
+Non-zero:  $r\_i \neq 0$  ensuring previous contributions are not erased.
+
+Well-formedness of the updated CRS via random linear combination pairing check.
+
+Submits:
+
+Updated parameters  $([(\tau')^j]\_1)\_{j=0}^{n}, \; ([(\tau')^k]\_2)\_{k=0}^{m}$ .
+
+Proof of correct transformation.
+
+In Phase 2 for Groth16, participants also update all circuit-specific elements derived from the toxic waste scalars (including the $K\_i$ terms), ensuring they are transformed consistently with the rest of the CRS.
+
+#### Step 3: Public Verification
+
+Knowledge of Exponent  $r\_i$ ​
+
+This is proven using a Fiat–Shamir transform of a Schnorr-like protocol:
+
+Let:  $\quad [\tau']\_1 = {r\_i \cdot [\tau]\_1}$ .
+
+Prover samples random values uniformly $z \overset{{\scriptscriptstyle\$}}{\leftarrow} \mathbb{F}\_p$ .
+
+Computes:  $[z']\_1 = z\cdot[\tau]\_1$ .
+
+Computes challenge: $h = \text{Hash}([\tau]\_1, [\tau']\_1, [z']\_1)$ .
+
+Computes response: $s = z + h \cdot r\_i \mod p$ .
+
+Publishes proof $\pi = ([z']\_1, s)$ .
+
+Verifier checks: $s\cdot[\tau]\_1 \stackrel{?}{=} [z']\_1 + h\cdot [\tau']\_1$ .
+
+This protocol confirms that the first element of the CRS was exponentiated with a known secret  $r\_i$ .
+
+Well-Formedness of CRS
+
+Verifier samples  $\rho\_1, \rho\_2 \overset{{\scriptscriptstyle\$}}{\leftarrow} \mathbb{F}\_p^\*$ .
+
+The verifier computes the following pairing equation on the new CRS:
+
+$$
+e\left(\sum\_{j=1}^n \rho\_1^{j-1} \cdot [\tau^j]\_1, [1]\_2 + \sum\_{k=1}^{m-1}\rho\_2^k \cdot [\tau^k]\_2 \right) \stackrel{?}{=}
+e\left(
+[1]\_1 + \sum\_{j=1}^{n-1} \rho\_1^j \cdot [\tau^j]\_1, \sum\_{k=1}^m \rho\_2^{k-1}[\tau^k]\_2
+\right)
+$$
+e(j=1∑n​ρ1j−1​⋅[τj]1​,[1]2​+k=1∑m−1​ρ2k​⋅[τk]2​)=?e([1]1​+j=1∑n−1​ρ1j​⋅[τj]1​,k=1∑m​ρ2k−1​[τk]2​)
+
+This pairing check confirms that the CRS has been updated via exponentiation by the same secret scalar  $r\_i$ , preserving the structure of the powers of  $\tau$ .
+
+Non-Erasing Contribution
+
+Checks that  $r\_i \neq 0$ :  $r\_i \cdot [\tau]\_1\ne \mathcal{O} \quad (\text{identity element})$ .
+
+$K\_i$ ’s verification (Phase2 only)
+
+For each public  $i$ , check the pairing equation:
+ $e(K\_i,\; [\gamma]\_2) \;\stackrel{?}{=}\; e\!\left([A\_i(\tau)]\_1,\; [\beta]\_2\right)\;\cdot\; e\!\left([B\_i(\tau)]\_1,\; [\alpha]\_2\right)\;\cdot\; e\!\left([C\_i(\tau)]\_1,\; G\_2\right)$ ​
+
+Left side encodes the division by  $\gamma$  (respectively $\delta$ for private inputs).
+
+Right side encodes the linear combination  $\beta A\_i(\tau) + \alpha B\_i(\tau) + C\_i(\tau)$ .
+
+If it holds for all  $i$ , the  $K\_i$  are correct and consistent with the same  $\alpha,\beta,\gamma,\tau$ for public inputs (respectively $\delta$ for private inputs).
+
+#### Step 4: Toxic Waste Destruction
+
+While each participant is expected to delete their secret scalar  $r\_i$  immediately after contribution, security is guaranteed as long as at least one participant successfully deletes their randomness.
+
+#### Finalized CRS
+
+Once all participants have contributed:
+
+The final CRS  $([\tau^j]\_1)\_{j=0}^{n} = ([\prod\_i r\_i^j]\_1)\_{j=0}^n, \; ([\tau^k]\_2)\_{k=0}^m = ([\prod\_i r\_i^k]\_2)\_{k=0}^m$  is published ( $i$  being the number of participants).
+
+This CRS is used to derive:
+
+Circuit-specific proving keys  $pk$ .
+
+Circuit-specific verification keys  $vk$ .
+
+### Extending an Existing Trusted Setup Ceremony
+
+Logos may choose to leverage an existing, publicly verified Powers-of-Tau ceremony to inherit trust and security. To do this, Logos simply adds additional participants following the above participant contribution steps (Step 2):
+
+Logos participants securely download existing Powers-of-Tau parameters.
+
+Each Logos participant sequentially adds their randomness and generates proofs-of-knowledge, updating the parameters.
+
+After all Logos contributions, a new final set of parameters is derived.
+
+A Logos coordinator aggregates the auditable contributions to compute the new CRS parameters and publish them for Logos.
+
+By following this protocol, Logos ensures robust security guarantees without repeating the entire ceremony from scratch. Most importantly, this process allows Logos to onboard previous contributions from external parties, inheriting their randomness and strengthening the trust assumption. It also preserves the transparency, integrity, and auditability of the original ceremony while enhancing its security by contributing additional entropy from Logos’ own participants, effectively extending a trusted foundation with new safeguards.
+
+### References
+
+[Groth16] [![](https://eprint.iacr.org/img/apple-touch-icon-180x180.png)IACR Cryptology ePrint ArchiveOn the Size of Pairing-based Non-interactive Arguments](https://eprint.iacr.org/2016/260), Jens Groth, Eurocrypt 2016
+
+[WCB25] [![](https://eprint.iacr.org/img/apple-touch-icon-180x180.png)IACR Cryptology ePrint ArchiveSoK: Trusted setups for powers-of-tau strings](https://eprint.iacr.org/2025/064), Faxing Wang, Shaanan Cohney, Joseph Bonneau, FC 2025
+
+## Annex
+
+# Pseudocode for Multi-Party Powers-of-Tau Ceremony
+# Input:
+# - n: Max degree of polynomials to support (e.g., #constraints in Groth16)
+# - m: Usually 1
+# - G1, G2: Elliptic curve generators for groups G1 and G2
+# - p: Prime order of the field F\_p
+# Output:
+# - crs: Common Reference String with structured powers of tau
+# - transcript: List of contributions and public proofs
+# Assume Point is a placeholder for an elliptic curve point class
+Point = object
+Scalar = int
+@dataclass
+class ContributionProof:
+z\_point: Point
+s: Scalar
+def initialize\_crs(n: int, m: int, G1: Point, G2: Point):
+crs\_G1 = [(1 \*\* j) \* G1 for j in range(n)] # [1]\_1, [1]\_1, ..., [1]\_1
+crs\_G2 = [(1 \*\* k) \* G2 for k in range(m)] # [1]\_2, [1]\_2
+return crs\_G1, crs\_G2
+def contribute(
+crs\_G1: list[Point],
+crs\_G2: list[Point],
+G1: Point,
+G2: Point,
+p: int):
+r: Scalar = random\_non\_zero\_scalar(p) # secret toxic waste scalar. 254-bit for BN254 and 255-bit for BLS12-381
+
+# Apply exponentiation to CRS
+crs\_G1\_prime = [(r \*\* j) \* crs\_G1[j] for j in range(len(crs\_G1))]
+crs\_G2\_prime = [(r \*\* k) \* crs\_G2[k] for k in range(len(crs\_G2))]
+# Generate proof of correct exponentiation
+proof = generate\_proof\_of\_knowledge(crs\_G1[1], crs\_G1\_prime[1], r, G1, p)
+# Destroy r securely
+del r
+return crs\_G1\_prime, crs\_G2\_prime, proof
+def generate\_proof\_of\_knowledge(
+old\_point: Point,
+new\_point: Point,
+r: Scalar,
+G: Point,
+p: int):
+z: Scalar = random\_non\_zero\_scalar(p)
+z\_point = z \* G
+# Schnorr-style proof with Fiat–Shamir challenge
+h: Scalar = hash\_to\_scalar(old\_point, new\_point, z\_point)
+s: Scalar = (z + h \* r) % p
+return ContributionProof(z\_point, s)
+def verify\_contribution(
+old\_crs\_G1: list[Point],
+old\_crs\_G2: list[Point],
+new\_crs\_G1: list[Point],
+new\_crs\_G2: list[Point],
+proof: ContributionProof,
+G1: Point,
+G2: Point,
+p: int):
+z\_point, s = proof.z\_point, proof.s
+h = hash\_to\_scalar(old\_crs\_G1[1], new\_crs\_G1[1], z\_point)
+lhs = s \* G1
+rhs = z\_point + h \* new\_crs\_G1[1]
+if lhs != rhs:
+return False
+rho\_one = random\_non\_zero\_scalar(p)
+rho\_two = random\_non\_zero\_scalar(p)
+lhs = pairing(
+sum([(rho\_one \*\* j) \* new\_crs\_G1[j] for j in range(len(new\_crs\_G1))]),
+(1 \* old\_crs\_G2[0]) + sum([(rho\_two \*\* k) \* old\_crs\_G2[k] for k in range(len(old\_crs\_G2))])
 )
-∈
-(
-𝑍
-/
-(
-2
-255
-−
-19
+rhs = pairing(
+(1 \* old\_crs\_G1[0]) + sum([(rho\_one \*\* j) \* old\_crs\_G1[j] for j in range(len(old\_crs\_G1))]),
+sum([(rho\_two \*\* k) \* new\_crs\_G2[k] for k in range(len(new\_crs\_G2))])
 )
-𝑍
-)
-2
-(x,y)∈(Z/(2
-255
-−19)Z)
-2
- such that 
-−
-𝑥
-2
-+
-𝑦
-2
-=
-1
-−
-(
-121665
-/
-121666
-)
-𝑥
-2
-𝑦
-2
-−x
-2
-+y
-2
-=1−(121665/121666)x
-2
-y
-2
-. 
-Signature Size: 64 bytes.
-Public Key Size: 32 bytes.
-Security Level: Approximately 128 bits.
-Operations: Efficient scalar multiplications with Montgomery ladder for constant-time execution.
-Use in the Logos Blockchain:
-General-purpose digital signatures: EdDSA is used for authenticating operations in the Logos Blockchain that require standard digital signatures outside of hand-written ZK circuits.
-Rationale for Use:
-High-performance, constant-time implementations available.
-Well-studied cryptographic primitives, broadly adopted (e.g., TLS, SSH, blockchain ecosystems).
-Security Considerations:
-Standard security assumptions: discrete logarithm hardness on Curve25519.
-Resistant to timing and side-channel attacks due to uniform implementation characteristics.
-ZkSignature (Zero-Knowledge Signature)
-Description:
-The ZkSignature scheme enables a prover to demonstrate cryptographic knowledge of a secret key corresponding to a publicly available key, without revealing the secret key itself. Specifically designed for efficient verification within zero-knowledge circuits, it provides both authentication and privacy, binding proofs securely to particular messages.
-Technical Details:
-Public Parameters:
-Public Key:
-A cryptographic commitment derived from the secret key using a secure collision-resistant hash function. This public key acts as a verifier’s reference to authenticate the prover without disclosing secrets.
-Message Hash:
-A cryptographic hash of the specific message intended to be signed. Binding the proof directly to this hash ensures that the signature is valid only for this exact message, providing protection against replay attacks and unauthorized reuse.
-Private Parameters (Witness):
-Secret Key:
-A securely generated secret scalar value that must remain confidential. The secret key serves as the prover’s private witness input within the zero-knowledge circuit.
-Security Level: 
-The security level of a ZKSignature depends on the concrete instantiations of its underlying primitives—namely the hash function, the zero-knowledge proof system, and the elliptic curve used. Since different instantiations may offer varying security guarantees and may be evaluated under different metrics (e.g., soundness, knowledge extraction, or cryptanalytic resistance), we do not commit to a fixed bit-level security.
-The zk-circuit enforcing the validity of ZkSignature imposes the following conditions through arithmetic constraints:
-Key Ownership Constraint:
-The prover must demonstrate that they possess the secret key corresponding precisely to the provided public key. Within the circuit, this is validated by recomputing the public key using the secret key and the specified cryptographic hash function, then checking equivalence with the given public key.
-Message Binding Constraint:
-The signature is explicitly tied to a particular message by embedding its cryptographic hash into the circuit constraints. As a result, the zk-proof validity inherently ensures the prover’s knowledge of the secret key specifically with respect to this message.
-Use in the Logos Blockchain: 
-ZkSignature is used to sign every object that are linked at some point to a hand-written circuit and if the signature is included in a bigger circuit. 
-Rationale for Use:
-Critically, the proof generation is fast, allowing rapid transaction processing and state updates in the Logos Blockchain without bottlenecks, which is essential for scalable systems.
-Allows anonymous and secure verification of message ownership within zero-knowledge circuits.
-Efficiently verifiable with minimal constraints in zk-SNARK circuits, ensuring performance in cryptographic operations.
-Security Considerations:
-Dependent on the security properties (collision resistance and preimage resistance) of the default hash function for zk-circuits utilized for key derivation and verification.
-Robust against signature forgery, replay attacks, and impersonation, assuming the correct implementation of constraints and binding to the specific message hash.
-References
-IETF RFC for EdDSA: https://datatracker.ietf.org/doc/html/rfc8032  
-EdDSA original paper: High-speed high-security signatures. Daniel J. Bernstein, Niels Duif, Tanja Lange, Peter Schwabe, Bo-Yin Yang.  https://eprint.iacr.org/2011/368
-Curve25519: https://iacr.org/archive/pkc2006/39580209/39580209.pdf
-ZkSignature: 🔀
-[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)​
-3. Proof Systems
-Groth16 (zk-SNARK)
-Description: Groth16 is a succinct zero-knowledge proof system that allows proving arbitrary statements about computations with very short proofs and fast verification.
-Technical Details:
-Proof Size: Approximately 192 bytes per proof (128 bytes if compressed).
-Verification Complexity: Efficient pairing checks (typically ~3 pairing operations).
-Trusted Setup: Required.
-Curve Family: Pairing-friendly elliptic curves (e.g., BN254 or BLS12-381).
-Use in the Logos Blockchain:
-Groth16 is the primary zk-SNARK proving system used in Bedrock.
-Rationale for Use:
-Produces the shortest possible zk-SNARK proofs, a provably optimal size among practical zk-SNARK constructions.
-Minimal verifier cost makes it highly suitable for on-chain verification in resource-constrained environments.
-Extensive adoption and availability of well-supported libraries.
-Security Considerations:
-Groth16 is a zk-SNARK in the Common Reference String (CRS) model. Its knowledge soundness is proved in the generic bilinear group model, under the assumption that the structured CRS was generated honestly and that the trapdoor was destroyed. In practice, producing such a CRS via a one-time multi-party trusted setup ceremony (see 🔀
-[1.0.1] Trusted Setup Ceremony) relies on standard hardness assumptions for the chosen pairing groups and on the at-least-one-honest-participant with secure erasure.
-Groth16’s security has been thoroughly analyzed in the literature, and the protocol is widely used in production zk-blockchain stacks.
-References
-Groth16: https://eprint.iacr.org/2016/260.pdf
-Annex
-Poseidon2 Test Values
-Hash Mode
-Input
-	
-Output
+return lhs == rhs
+def powers\_of\_tau\_ceremony(
+participants: list[object], # Should ideally be a class/interface with contribute()
+n: int,
+m: int,
+G1: Point,
+G2: Point,
+p: int):
+crs\_G1, crs\_G2 = initialize\_crs(n, m, G1, G2)
+transcript: list[ContributionProof] = []
+for participant in participants:
+crs\_G1\_new, crs\_G2\_new, proof = participant.contribute(crs\_G1, crs\_G2, G1, G2, p)
+if not verify\_contribution(crs\_G1, crs\_G2, crs\_G1\_new, crs\_G2\_new, proof, G1, G2, p):
+raise ValueError("Invalid contribution by participant")
+transcript.append(proof)
+crs\_G1, crs\_G2 = crs\_G1\_new, crs\_G2\_new
+return crs\_G1, crs\_G2, transcript
 
-
-[0]
-	
-0x1fed118d9f4466859761f22cad078722b8c4a743b5ebe90443b2dce6bbeb7b23
-
-
-[1]
-	
-0x1eda5b2807bb78c5d061263409295d5115b7793a68c5220e37ea8ab2e94068f8
-
-
-[0,0]
-	
-0x20579a2bf857cd36947250ec60f374c1faf02a40130b5fc867c2bde4da940fd2
-
-
-[1,2]
-	
-0x1f36d032e4a519d0fbe1502fd8e4ad5fad61868c72c03f4294589f506bb52b6b
-
-
-[2,1]
-	
-0x26418d3cada2e7ad9e17b50731f6de916c80fc0ef88ea3ea6520dafbd37f4d7b
-
-
-[1,0,0]
-	
-0x129e88e8d9ae077e2e750222bc131da8b2268ad957cbf83d2b9beed6b9eed7c2
-
-
-[0,0,1]
-	
-0x2a29cf254d2376ef660166c0647bcbed3decee8b3903eadeebecf304cd404dd0
-
-
-[0,1,0,1]
-	
-0x793b1db3204a1bbb8cd7d06dac0b8ef98ae2664aa1ed57fccd37baf01682d3d
-Compression Mode
-Input
-	
-Output
-
-
-[0,0]
-	
-0x2ed1da00b14d635bd35b88ab49390d5c13c90da7e9e3a5f1ea69cd87a0aa3e82
-
-
-[1,0]
-	
-0x63c4e8cac9a858304f0035b069255b069288c2af698ececf362cd8ec8c96665
-
-
-[0,1]
-	
-0x222816f2669279d4c256ed2f196e8b0d54df83d35d61811bac36ea4e858483fc
-
-
-[1,1]
-	
-0x277530b5f2b87dfe4535f43bb1998eda77736b4b05d15d983503566743c88031
+​
