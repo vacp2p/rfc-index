@@ -51,6 +51,7 @@ FILE_ASSIGNMENTS = {
     "blockchain/raw/p2p-nat-solution.md": ("P2P Network", "P2P Nat Solution"),
     "blockchain/raw/p2p-network-bootstrapping.md": ("P2P Network", "P2P Network Bootstrapping"),
     "blockchain/raw/p2p-hardware-requirements.md": ("P2P Network", "Hardware Requirements"),
+    "blockchain/raw/network-wire-format.md": ("P2P Network", "Network Wire Format"),
 
     # Consensus
     "blockchain/raw/nomos-cryptarchia-v1-protocol.md": ("Consensus", "Cryptarchia Protocol"),
@@ -59,6 +60,9 @@ FILE_ASSIGNMENTS = {
     "blockchain/raw/cryptarchia-total-stake-inference.md": ("Consensus", "Total Stake Inference"),
     "blockchain/raw/cryptarchia-proof-of-leadership.md": ("Consensus", "Proof of Leadership"),
     "blockchain/deprecated/claro.md": ("Consensus", "Claro Consensus Protocol"),
+    "blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.md": ("Consensus", "[Analysis] Cryptarchia De-anonymisation of Relative Stake"),
+    "blockchain/raw/analysis-total-stake-inference.md": ("Consensus", "[Analysis] Total Stake Inference"),
+    "blockchain/raw/analysis-block-times-blend-network.md": ("Consensus", "[Analysis] Block Times & Blend Network"),
 
     # Mantle
     "blockchain/raw/bedrock-architecture-overview.md": ("Mantle", "[Overview] Bedrock Architecture"),
@@ -69,6 +73,20 @@ FILE_ASSIGNMENTS = {
     "blockchain/raw/bedrock-service-reward-distribution.md": ("Mantle", "Service Reward Distribution Protocol"),
     "blockchain/raw/nomos-wallet-technical-standard.md": ("Mantle", "Wallet Technical Standard"),
     "blockchain/raw/bedrock-anonymous-leaders-reward.md": ("Mantle", "Anonymous Leaders Reward Protocol"),
+    "blockchain/raw/mantle-transaction-encoding.md": ("Mantle", "Mantle Transaction Encoding"),
+    "blockchain/raw/template-cross-channel-messaging.md": ("Mantle", "[Template] Cross-Channel Messaging"),
+    "blockchain/raw/analysis-gas-cost-determination.md": ("Mantle", "[Analysis] Gas Cost Determination"),
+
+    # Cryptoeconomics
+    "blockchain/raw/overview-cryptoeconomics.md": ("Cryptoeconomics", "[Overview] Cryptoeconomics"),
+    "blockchain/raw/block-rewards.md": ("Cryptoeconomics", "Block Rewards"),
+    "blockchain/raw/execution-market.md": ("Cryptoeconomics", "Execution Market"),
+    "blockchain/raw/storage-markets.md": ("Cryptoeconomics", "Storage Markets"),
+    "blockchain/raw/analysis-block-rewards.md": ("Cryptoeconomics", "[Analysis] Block Rewards"),
+    "blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md": ("Cryptoeconomics", "[Analysis] Static Minimum Stake Estimation for Service Declaration Protocol"),
+    "blockchain/raw/analysis-block-reward-parameter-calibration.md": ("Cryptoeconomics", "[Analysis] Block Reward Parameter Calibration"),
+    "blockchain/raw/analysis-storage-market.md": ("Cryptoeconomics", "[Analysis] Storage Market"),
+    "blockchain/raw/analysis-execution-market.md": ("Cryptoeconomics", "[Analysis] Execution Market"),
 
     # Blend Network
     "blockchain/raw/nomos-blend-protocol.md": ("Blend Network", "Blend Protocol"),
@@ -77,9 +95,18 @@ FILE_ASSIGNMENTS = {
     "blockchain/raw/nomos-message-encapsulation.md": ("Blend Network", "Message Encapsulation Mechanism"),
     "blockchain/raw/nomos-message-formatting.md": ("Blend Network", "Message Formatting"),
     "blockchain/raw/nomos-payload-formatting.md": ("Blend Network", "Payload Formatting"),
+    "blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.md": ("Blend Network", "[Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake"),
+    "blockchain/raw/analysis-queuing-system-in-the-mix-node.md": ("Blend Network", "[Analysis] Queuing System in the Mix Node"),
+    "blockchain/raw/analysis-anonymity.md": ("Blend Network", "[Analysis] Anonymity"),
+    "blockchain/raw/analysis-correlation-functions.md": ("Blend Network", "[Analysis] Correlation Functions"),
+    "blockchain/raw/analysis-communication-on-trees.md": ("Blend Network", "[Analysis] Communication on Trees"),
+    "blockchain/raw/analysis-resilience-and-anonymity.md": ("Blend Network", "[Analysis] Resilience and Anonymity"),
+    "blockchain/raw/analysis-latency.md": ("Blend Network", "[Analysis] Latency"),
 
     # Cryptography
     "blockchain/raw/digital-signature.md": ("Cryptography", "Digital Signature"),
+    "blockchain/raw/common-cryptographic-components.md": ("Cryptography", "Common Cryptographic Components"),
+    "blockchain/raw/trusted-setup-ceremony.md": ("Cryptography", "Trusted Setup Ceremony"),
 
     # Data Availability (not in current Notion outline; confirm placement with team).
     "blockchain/raw/nomosda-network.md": ("Data Availability", "DA Network"),
@@ -89,55 +116,10 @@ FILE_ASSIGNMENTS = {
 
 # Entries that exist in Notion but have not yet been migrated to GitHub.
 # Render as draft (greyed) links so the full target structure stays visible.
-PLACEHOLDERS = {
-    "P2P Network": {
-        "Merged": ["Network Wire Format"],
-    },
-    "Consensus": {
-        "Merged": [
-            "[Analysis] Cryptarchia De-anonymisation of Relative Stake",
-            "[Analysis] Total Stake Inference",
-            "[Analysis] Block Times & Blend Network",
-        ],
-    },
-    "Mantle": {
-        "Merged": [
-            "Mantle Transaction Encoding",
-            "[Template] Cross-Channel Messaging",
-            "[Analysis] Gas Cost Determination",
-        ],
-    },
-    "Cryptoeconomics": {
-        "Merged": [
-            "[Overview] Cryptoeconomics",
-            "Block Rewards",
-            "Execution Market",
-            "Storage Markets",
-            "[Analysis] Block Rewards",
-            "[Analysis] Static Minimum Stake Estimation for Service Declaration Protocol",
-            "[Analysis] Block Reward Parameter Calibration",
-            "[Analysis] Storage Market",
-            "[Analysis] Execution Market",
-        ],
-    },
-    "Blend Network": {
-        "Merged": [
-            "[Analysis] Impact of the Service Declaration Protocol on the Statistical Inference",
-            "[Analysis] Queuing System in the Mix Node",
-            "[Analysis] Anonymity",
-            "[Analysis] Correlation Functions",
-            "[Analysis] Communication on Trees",
-            "[Analysis] Resilience and Anonymity",
-            "[Analysis] Latency",
-        ],
-    },
-    "Cryptography": {
-        "Merged": [
-            "Common Cryptographic Components",
-            "Trusted Setup Ceremony",
-        ],
-    },
-}
+# All Notion-only specs from the initial structure PR (#339) have now been
+# imported as real spec files (see FILE_ASSIGNMENTS); this dict is currently
+# empty but kept for future Notion additions.
+PLACEHOLDERS = {}
 
 # Label for the group containing all topics.
 BEDROCK_LABEL = "Logos Blockchain — The Bedrock"
