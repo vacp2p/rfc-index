@@ -22,172 +22,109 @@
 
 <!-- timeline:end -->
 
+---
+
+> **Note on this content sync:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) via katex; tables and headings
+> are converted from Notion HTML. Formatting polish (semantic line breaks, code block fences,
+> internal cross-references) may still be needed.
+
+---
+
+## Revision History
+
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2025-08-25 |
+| 1.0.1 | Renamed Nomos to Logos Blockchain | 2026-04-17 |
+
 ## Introduction
 
-Nomos network bootstrapping is the process by which a new node discovers peers and synchronizes with the existing decentralized network. It ensures that a node can:
+Logos Blockchain network bootstrapping is the process by which a new node discovers peers and synchronizes with the existing decentralized network. It ensures that a node can:
 
-1. **Discover Peers** – Find other active nodes in the network.
-2. **Establish Connections** – Securely connect to trusted peers.
-3. **Negotiate (libp2p) Protocols** - Ensure that other peers operate in the same protocols as the node needs.
+Discover Peers  Find other active nodes in the network.
+
+Establish Connections  Securely connect to trusted peers.
+
+Negotiate (libp2p) Protocols - Ensure that other peers operate in the same protocols as the node needs.
 
 ## Overview
 
-The Nomos P2P network bootstrapping strategy relies on a designated subset of **bootstrap nodes** to facilitate secure and efficient node onboarding. These nodes serve as the initial entry points for new network participants.
+The Logos Blockchain P2P network bootstrapping strategy relies on a designated subset of bootstrap nodes to facilitate secure and efficient node onboarding. These nodes serve as the initial entry points for new network participants.
 
-### Key Design Principles
+#### Key Design Principles
 
-#### Trusted Bootstrap Nodes
+Trusted Bootstrap Nodes
 
 A curated set of publicly announced and highly available nodes ensures reliability during initial peer discovery. These nodes are configured with elevated connection limits to handle a high volume of incoming bootstrapping requests from new participants.
 
-#### Node Configuration & Onboarding
+Node Configuration & Onboarding
 
 New node operators must explicitly configure their instances with the addresses of bootstrap nodes. This configuration may be preloaded or dynamically fetched from a trusted source to minimize manual setup.
 
-#### Network Integration
+Network Integration
 
-Upon initialization, the node establishes connections with the bootstrap nodes and begins participating in Nomos networking protocols. Through these connections, the node discovers additional peers, synchronizes with the network state, and engages in protocol-specific communication (e.g., consensus, block propagation).
+Upon initialization, the node establishes connections with the bootstrap nodes and begins participating in Logos Blockchain networking protocols. Through these connections, the node discovers additional peers, synchronizes with the network state, and engages in protocol-specific communication (e.g., consensus, block propagation).
 
-### Security & Decentralization Considerations
+#### Security & Decentralization Considerations
 
-**Trust Minimization**: While bootstrap nodes provide initial connectivity, the network rapidly transitions to decentralized peer discovery to prevent over-reliance on any single entity.
+Trust Minimization: While bootstrap nodes provide initial connectivity, the network rapidly transitions to decentralized peer discovery to prevent over-reliance on any single entity.
 
-**Authenticated Announcements**: The identities and addresses of bootstrap nodes are publicly verifiable to mitigate impersonation attacks. From [libp2p documentation](https://docs.libp2p.io/concepts/transports/quic/#quic-in-libp2p):
+Authenticated Announcements: The identities and addresses of bootstrap nodes are publicly verifiable to mitigate impersonation attacks. From the [libp2p documentation](https://docs.libp2p.io/concepts/transports/quic/#quic-in-libp2p):
 
-> To authenticate each others' peer IDs, peers encode their peer ID into a self-signed certificate, which they sign using their host's private key.
+To authenticate each others peer IDs, peers encode their peer ID into a self-signed certificate, which they sign using their hosts private key.
 
-**Dynamic Peer Management**: After bootstrapping, nodes continuously refine their peer lists to maintain a resilient and distributed network topology.
+Dynamic Peer Management: After bootstrapping, nodes continuously refine their peer lists to maintain a resilient and distributed network topology.
 
-This approach ensures **rapid, secure, and scalable** network participation while preserving the decentralized ethos of the Nomos protocol.
+This approach ensures rapid, secure, and scalable network participation while preserving the decentralized ethos of the Logos Blockchain.
 
 ## Protocol
 
-### Protocol Overview
+### Step-by-Step bootstrapping process
 
-The bootstrapping protocol follows libp2p conventions for peer discovery and connection establishment. Implementation details are handled by the underlying libp2p stack with Nomos-specific configuration parameters.
+Node Initial Configuration: New nodes load pre-configured bootstrap node addresses. Addresses may be
 
-### Bootstrapping Process
+IP
 
-#### Step-by-Step bootstrapping process
+or
 
-1. **Node Initial Configuration**: New nodes load pre-configured bootstrap node addresses. Addresses may be `IP` or `DNS` embedded in a compatible [libp2p PeerId multiaddress](https://docs.libp2p.io/concepts/fundamentals/peers/#peer-ids-in-multiaddrs). Node operators may chose to advertise more than one address. This is out of the scope of this protocol. For example:
+DNS
 
-    `/ip4/198.51.100.0/udp/4242/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N` or
+embedded in a compatible [libp2p PeerId multiaddress](https://docs.libp2p.io/concepts/fundamentals/peers/#peer-ids-in-multiaddrs). Node operators may chose to advertise more than one address. This is out of the scope of this protocol. For example:
 
-    `/dns/foo.bar.net/udp/4242/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N`
+/ip4/198.51.100.0/udp/4242/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 
-2. **Secure Connection**: Nodes establish connections to bootstrap nodes announced addresses. Verifies network identity and protocol compatibility.
+or
 
-3. **Peer Discovery**: Requests and receives validated peer lists from bootstrap nodes. Each entry includes connectivity details as per the peer discovery protocol engaging after the initial connection.
+/dns/foo.bar.net/udp/4242/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 
-4. **Network Integration**: Iteratively connects to discovered peers. Gradually build peer connections.
+Secure Connection: Nodes establish connections to bootstrap nodes announced addresses and verify network identity and protocol compatibility.
 
-5. **Protocol Engagement**: Establishes required protocol channels (gossip/consensus/sync). Begins participating in network operations.
+Peer Discovery: Requests and receive validated peer lists from bootstrap nodes. Each entry includes connectivity details as per the [[1.0.1] P2P Network - Peer Discovery](https://nomos-tech.notion.site/Peer-Discovery-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81f19c52d887d833e438) protocol engaging after the initial connection.
 
-6. **Ongoing Maintenance**: Continuously evaluates and refreshes peer connections. Ideally removes the connection to the bootstrap node itself. Bootstrap nodes may chose to remove the connection on their side to keep high availability for other nodes.
+Network Integration: Iteratively connects to discovered peers. Gradually build peer connections.
 
-```mermaid
-sequenceDiagram
-    participant Nomos Network
-    participant Node
-    participant Bootstrap Node
+Protocol Engagement: Establishes required protocol channels (gossip/consensus/sync). Begins participating in network operations.
 
-    Node->>Node: Fetches bootstrapping addresses
+Ongoing Maintenance: Continuously evaluates and refreshes peer connections. Ideally removes the connection to the bootstrap node itself. Bootstrap nodes may chose to remove the connection on their side to keep high availability for other nodes.
 
-    loop Interacts with bootstrap node
-        Node->>+Bootstrap Node: Connects
-        Bootstrap Node->>-Node: Sends discovered peers information
-    end
+Bootstrap NodeNodeLogos Blockchain NetworkBootstrap NodeNodeLogos Blockchain Networkloop[Interacts with bootstrap node]loop[Connects to Networkparticipants]alt[Bootstrap connection no longerneeded][Bootstrap enforces disconnection]loop[Ongoing maintenance]Fetches bootstrapping addressesConnectsSends discovered peers' informationEngages in connectionsNegotiates protocolsEvaluates peer connectionsDisconnectsDisconnects
 
-    loop Connects to Network participants
-        Node->>Nomos Network: Engages in connections
-        Node->>Nomos Network: Negotiates protocols
-    end
+## Details
 
-    loop Ongoing maintenance
-        Node-->>Nomos Network: Evaluates peer connections
-        alt Bootstrap connection no longer needed
-            Node-->>Bootstrap Node: Disconnects
-        else Bootstrap enforces disconnection
-            Bootstrap Node-->>Node: Disconnects
-        end
-    end
-```
+The bootstrapping process for the Logos Blockchain p2p network uses the QUIC transport as specified in the [[1.0.1] P2P Network - Transport](https://nomos-tech.notion.site/Transport-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81a88aa2d18dd0bbe8f3).
 
-## Implementation Details
+Bootstrapping is separated from the networks peer discovery protocol. It assumes that there is one protocol that would engage as soon as the connection with the bootstrapping node triggers. Currently, the Logos Blockchain network uses 
 
-The bootstrapping process for the Nomos p2p network uses the **QUIC** transport as specified in the Nomos network specification.
+kademlia
 
-Bootstrapping is separated from the network's peer discovery protocol. It assumes that there is one protocol that would engage as soon as the connection with the bootstrapping node triggers. Currently Nomos network uses `kademlia` as the current first approach for the Nomos p2p network, this comes granted.
+ as the current first approach for the Logos Blockchain p2p network (see [[1.0.1] P2P Network - Peer Discovery](https://nomos-tech.notion.site/Peer-Discovery-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81f19c52d887d833e438)), which comes built-in.
 
-### Bootstrap Node Requirements
+## Annex
 
-Bootstrap nodes MUST fulfill the following requirements:
+[Ethereum bootnodes](https://ethereum.org/en/developers/docs/nodes-and-clients/bootnodes/)
 
-- **High Availability**: Maintain uptime of 99.5% or higher
-- **Connection Capacity**: Support minimum 1000 concurrent connections
-- **Geographic Distribution**: Deploy across multiple regions
-- **Protocol Compatibility**: Support all required Nomos network protocols
-- **Security**: Implement proper authentication and rate limiting
+[Bitcoin peer discovery](https://developer.bitcoin.org/devguide/p2p_network.html#peer-discovery)
 
-### Network Configuration
-
-Bootstrap node addresses are distributed through:
-
-- **Hardcoded addresses** in node software releases
-- **DNS seeds** for dynamic address resolution
-- **Community-maintained lists** with cryptographic verification
-
-## Security Considerations
-
-### Trust Model
-
-Bootstrap nodes operate under a **minimal trust model**:
-
-- Nodes verify peer identities through cryptographic authentication
-- Bootstrap connections are temporary and replaced by organic peer discovery
-- No single bootstrap node can control network participation
-
-### Attack Mitigation
-
-**Sybil Attack Protection**: Bootstrap nodes implement connection limits and peer verification to prevent malicious flooding.
-
-**Eclipse Attack Prevention**: Nodes connect to multiple bootstrap nodes and rapidly diversify their peer connections.
-
-**Denial of Service Resistance**: Rate limiting and connection throttling protect bootstrap nodes from resource exhaustion attacks.
-
-## Performance Characteristics
-
-### Bootstrapping Metrics
-
-- **Initial Connection Time**: Target < 30 seconds to first bootstrap node
-- **Peer Discovery Duration**: Discover minimum viable peer set within 2 minutes
-- **Network Integration**: Full protocol engagement within 5 minutes
-
-### Resource Requirements
-
-#### Bootstrap Nodes
-
-- Memory: Minimum 4GB RAM
-- Bandwidth: 100 Mbps sustained
-- Storage: 50GB available space
-
-#### Regular Nodes
-
-- Memory: 512MB for bootstrapping process
-- Bandwidth: 10 Mbps during initial sync
-- Storage: Minimal requirements
-
-## References
-
-- P2P Network Specification (internal document)
-- [libp2p QUIC Transport](https://docs.libp2p.io/concepts/transports/quic/)
-- [libp2p Peer IDs and Addressing](https://docs.libp2p.io/concepts/fundamentals/peers/)
-- [Ethereum bootnodes](https://ethereum.org/en/developers/docs/nodes-and-clients/bootnodes/)
-- [Bitcoin peer discovery](https://developer.bitcoin.org/devguide/p2p_network.html#peer-discovery)
-- [Cardano nodes connectivity](https://docs.cardano.org/stake-pool-operators/node-connectivity)
-- [Cardano peer sharing](https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node/part-v-tips/implementing-peer-sharing)
-
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+[Cardano nodes connectivity](https://docs.cardano.org/stake-pool-operators/node-connectivity) & [peer sharing](https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node/part-v-tips/implementing-peer-sharing)

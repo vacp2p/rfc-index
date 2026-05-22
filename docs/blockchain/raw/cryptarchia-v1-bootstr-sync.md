@@ -18,475 +18,292 @@
 
 <!-- timeline:end -->
 
-## Abstract
+---
 
-This document specifies the bootstrapping and synchronization protocol
-for Cryptarchia v1 consensus.
-When a new node joins the network or a previously-bootstrapped node has been offline,
-it must catch up with the most recent honest chain
-by fetching missing blocks from peers before listening for new blocks.
-The protocol defines mechanisms for setting fork choice rules,
-downloading blocks, and handling orphan blocks
-while mitigating long range attacks.
+> **Note on this content sync:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) via katex; tables and headings
+> are converted from Notion HTML. Formatting polish (semantic line breaks, code block fences,
+> internal cross-references) may still be needed.
 
-**Keywords:** bootstrapping, synchronization, fork choice, initial block download,
-orphan blocks, long range attacks, checkpoint
+---
 
-## Semantics
+## Revision History
 
-The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2026-02-17 |
 
-## Background
+## Introduction
 
-This protocol defines the bootstrapping mechanism
-that covers all of the following cases:
+When a new node joins the network or a previously-bootstrapped node has been offline for a while, it cannot follow the most recent honest chain solely by receiving only new blocks because those new blocks cannot be added to the block tree that does not have their parent block. These nodes must first catch up with the most recent honest chain by fetching missing blocks from their peers before they start listening for new blocks.
 
-- From the **Genesis** block
-- From the **checkpoint** block obtained from a trusted checkpoint provider
-- From the **local block tree**
-  (with $B_\text{imm}$ newer than the Genesis and the checkpoint)
+This document specifies a protocol for nodes to bootstrap with the honest chain efficiently while mitigating long range attacks. It also defines how to handle the case which the node falls behind after the bootstrapping is complete.
 
-Additionally, the protocol defines the synchronization mechanism
-that handles orphan blocks while listening for new blocks
-after the bootstrapping is completed.
+This protocol adheres to the key invariant: We never roll back blocks that are deeper than the latest immutable block $B\_\text{imm}$ in the local chain $c\_{loc}$ , as defined in [🔀[1.0.1] Cryptarchia Protocol](/1-0-1-Cryptarchia-Protocol-21c261aa09df810cb85eff1c76e5798c?pvs=24) .
+
+## Overview
+
+This protocol defines the bootstrapping mechanism that covers all of the following cases:
+
+From the Genesis block
+
+From the checkpoint block obtained from a trusted checkpoint provider
+
+From the local block tree (with $B\_\text{imm}$ newer than the Genesis and the checkpoint)
+
+Additionally, the protocol defines the synchronization mechanism that handles orphan blocks while listening for new blocks after the bootstrapping is completed.
 
 The protocol consists of the following key components:
 
-- Determining the fork choice rule (Bootstrap or Online) at startup
-- Switching the fork choice rule from Bootstrap to Online
-- Downloading blocks from peers
+Determining the fork choice rule ([🔀[1.0.0] Cryptarchia Fork Choice Rule - Bootstrap Fork Choice Rule](/Bootstrap-Fork-Choice-Rule-21b261aa09df811584dfd362abb26627?pvs=24#21b261aa09df81e4a352dd365c9ebe8c) or [🔀[1.0.0] Cryptarchia Fork Choice Rule - Online Fork Choice Rule](/Online-Fork-Choice-Rule-21b261aa09df811584dfd362abb26627?pvs=24#21b261aa09df812caa08ce2f637a6278)) at startup
 
-Upon startup, a node **determines the fork choice rule**,
-as defined in Setting the Fork Choice Rule.
-If the Bootstrap rule is selected, it is maintained for the Prolonged Bootstrap Period,
-after which the node switches to the Online rule.
+Switching the fork choice rule from Bootstrap to Online
 
-Using the chosen fork choice rule, a node will **download blocks**
-to catch up with the head (also known as the tip) of each peer's local chain $c_{loc}$.
+Downloading blocks from peers
 
-After downloading is done, the node starts **listening for new blocks**.
-Upon receiving a new block, the node validates and adds it to its local block tree.
-If the ancestors of the block are missing from the local block tree,
-the node downloads missing ancestors using the same mechanism as above.
+The details are described in the [Protocol](/Protocol-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81998017dbb900a84273). This section provides only a high-level overview.
+
+​
+
+Upon startup, a node determines the fork choice rule, as defined in [Setting the Fork Choice Rule](/Setting-the-Fork-Choice-Rule-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81299066c768c56a06f1). If the Bootstrap rule is selected, it is maintained for the [Prolonged Bootstrap Period](/Prolonged-Bootstrap-Period-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8162be49e5aa02199378), after which the node switches to the Online rule.
+
+Using the fork choice rule chosen, the node downloads blocks to catch up with the tip of the local chain $c\_{loc}$ of each peer.
+
+After downloading is done, the node starts listening for new blocks. Upon receiving a new block, the node validates and adds it to its local block tree. If the ancestors of the block are missing from the local block tree, the node downloads missing ancestors using the same mechanism as above.
+
+The node can propose blocks after switching to the Online fork choice rule.
 
 ## Protocol
 
 ### Constants
 
 | Constant | Name | Description | Value |
-| -------- | ---- | ----------- | ----- |
-| $T_\text{offline}$ | Offline Grace Period | A period during which a node can be restarted without switching to the Bootstrap rule. | 20 minutes |
-| $T_\text{boot}$ | Prolonged Bootstrap Period | A period during which Bootstrap fork choice rule must be continuously used after Initial Block Download is completed. This gives nodes additional time to compare their synced chain with a broader set of peers. | 24 hours |
-| $s_\text{gen}$ | Density Check Slot Window | A number of slots used by density check of Bootstrap rule. This constant is defined in Cryptarchia Fork Choice Rule - Definitions. | $\lfloor\frac{k}{4f}\rfloor$ (=4h30m) |
+| --- | --- | --- | --- |
+| $T\_\text{offline}$ ​ | Offline Grace Period | A period during which a node can be restarted without switching to the Bootstrap rule. | 20 minutes |
+| $T\_\text{boot}$ ​ | Prolonged Bootstrap Period | A period during which Bootstrap fork choice rule must be continuously used after Initial Block Download is completed. This gives nodes additional time to compare their synced chain with a broader set of peers. | 24 hours |
+| $s\_\text{gen}$ ​ | Density Check Slot Window | A number of slots used by density check of Bootstrap rule. This constant is defined in [Not found](/21b261aa09df81f1aa58d741e75c1840?pvs=24#21b261aa09df81f1aa58d741e75c1840). | $\lfloor\frac{k}{4f}\rfloor$ (=4h30m) |
 
 ### Setting the Fork Choice Rule
 
-Upon startup, a node sets the fork choice rule to the **Bootstrap** rule
-in one of the following cases.
-Otherwise, the node uses the **Online** fork choice rule.
+Upon startup, a node sets the fork choice rule to the Bootstrap rule in one of the following cases. Otherwise, the node uses the Online fork choice rule.
 
-- **A node is starting with $B_\text{imm}$ set to the Genesis block
-  or from a checkpoint block.**
+A node is starting with  $B\_\text{imm}$ set to the Genesis block or from a checkpoint block.
 
-  The node is setting its latest immutable block $B_\text{imm}$
-  to the Genesis or a checkpoint,
-  which clearly indicates that the node intends to catch up with the subsequent blocks.
-  Regardless of how many subsequent blocks remain,
-  the node SHOULD use the Bootstrap rule to mitigate long range attacks.
+The node is setting its latest immutable block $B\_\text{imm}$ to the Genesis or a checkpoint, which clearly indicates that the node intends to catch up with the subsequent blocks. Regardless of how many subsequent blocks remain, the node should use the Bootstrap rule to mitigate long range attacks.
 
-- **A node is restarting after being offline longer than $T_\text{offline}$ (20 minutes).**
+A node is restarting after being offline longer than  $T\_\text{offline}$  (20 minutes).
 
-  Unlike starting from Genesis or checkpoint, in the case where a node is restarted
-  while preserving its existing block tree,
-  the node MUST choose a fork choice rule depending on how long it has been offline.
+Unlike starting from Genesis or checkpoint, in the case where a node is restarted while preserving its existing block tree, the node must choose a fork choice rule depending on how long it has been offline.
 
-  If it is certain that a node has been offline longer than the offline grace period
-  $T_\text{offline}$ since it last used the Online rule,
-  the node uses the Bootstrap rule upon startup.
-  Otherwise, it starts with the Online rule.
+If it is certain that a node has been offline longer than the offline grace period $T\_\text{offline}$ since it last used the Online rule, the node uses the Bootstrap rule upon startup. Otherwise, it starts with the Online rule.
 
-  Details of $T_\text{offline}$ are described in Offline Grace Period.
-  A recommended way how to measure the offline duration
-  is introduced in Offline Duration Measurement.
+Details of $T\_\text{offline}$ are described in [Offline Grace Period](/Offline-Grace-Period-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8168a95af51c8be83732). A recommended way how to measure the offline duration is introduced in [Offline Duration Measurement](/Offline-Duration-Measurement-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81e89e68d101a284a8e1).
 
-- **A node operator set the Bootstrap rule explicitly (e.g., by `--bootstrap` flag).**
+A node operator set the Bootstrap rule explicitly (e.g., by 
 
-  In any case where the node operator is clearly aware that the node has fallen behind
-  by more than $k$ blocks,
-  they SHOULD be able to start the node with the Bootstrap rule.
-  For example, the operator may obtain the latest block height
-  from another trusted operator
-  and realize that their node has fallen significantly behind due to some issue.
+--bootstrap
+
+ flag).
+
+In any case where the node operator is clearly aware that the node has fallen behind by more than $k$ blocks, they should be able to start the node with the Bootstrap rule. For example, the operator may obtain the latest block height from another trusted operator and realize that their node has fallen significantly behind due to some issue.
 
 ### Initial Block Download
 
-If peers for Initial Block Download (IBD) are configured,
-a node performs IBD by downloading blocks to catch up with the tip
-of the local chain $c_{loc}$ of each peer
-using the fork choice rule chosen in Setting the Fork Choice Rule.
+If peers for Initial Block Download (IBD) are configured, a node performs IBD by downloading blocks to catch up with the tip of the local chain $c\_{loc}$ of each peer using the fork choice rule chosen in [Setting the Fork Choice Rule](/Setting-the-Fork-Choice-Rule-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81299066c768c56a06f1). If no peer is configured, the node skips IBD. For example, genesis nodes will configure no IBD peer because they have to build a chain from scratch.
 
-Blocks are downloaded in parent-to-child order,
-as defined in the Downloading Blocks mechanism.
-This mechanism applies not only when a node starts from the Genesis block,
-but also when it already has the local block tree (or a checkpoint block).
+Blocks are downloaded in parent-to-child order, as defined in the [Downloading Blocks](/Downloading-Blocks-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8157959fd9f30c9f99ea) mechanism. This mechanism applies not only when a node starts from the Genesis block, but also when it already has the local block tree (or a checkpoint block)
 
-```python
-def initial_block_download(peers, local_tree):
-    # In real implementation, these downloadings can be run in parallel.
-    # Also, any optimization can be applied to minimize downloadings,
-    # such as grouping peers by tip.
-    for peer in peers:
-        download_blocks(local_tree, peer, target_block=None)
-```
+> Loading Python code…
 
-The downloaded blocks are validated and added to the local block tree
-using the fork choice rule determined above.
+​
 
-According to Cryptarchia v1 Protocol Specification - Block Header Validation,
-the downloaded blocks are validated and added to the local block tree
-using the fork choice rule determined above.
+![](/image/attachment%3Ac92ab5f8-2d32-4320-876c-635fb3134162%3Aimage.png?table=block&id=1fd261aa-09df-81f6-bb41-fdbd8907329f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-If all IBD peers become unavailable before the node catches up
-with at least one of the IBD peers,
-the node is terminated with an error,
-allowing the operator to restart the node with other IBD peers.
+The downloaded blocks are validated and added to the local block tree using the fork choice rule determined above. Both block headers and block bodies must be validated. The header validation rules are defined in [🔀[1.0.1] Cryptarchia Protocol - Block Header Validation](/Block-Header-Validation-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df810bb539f80ba66dba13).
 
-If downloading is done successfully,
-the node starts listening for new blocks as described in Listening for New Blocks.
+If the node fails to catch up with at least one IBD peer (e.g., network error or invalid blocks), the node is terminated with an error, allowing the operator to restart the node with other IBD peers.
+
+If downloading is done successfully, the node starts listening for new blocks as described in [Listening for New Blocks](/Listening-for-New-Blocks-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df817e97feea688aea50c2).
 
 ### Prolonged Bootstrap Period
 
-After Initial Block Download is completed,
-a node MUST maintain the Bootstrap fork choice rule during the Bootstrap Period $T_\text{boot}$,
-if the node chose the Bootstrap rule at Setting the Fork Choice Rule.
+After [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375) is completed, a node must maintain the Bootstrap fork choice rule during the Bootstrap Period $T\_\text{boot}$ , if the node chose the Bootstrap rule at [Setting the Fork Choice Rule](/Setting-the-Fork-Choice-Rule-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81299066c768c56a06f1).
 
-The purpose of the Prolonged Bootstrap Period is giving a syncing node
-additional time
-to compare its synced chain with a broader set of peers.
-In other words, it provides the node with an opportunity
-to connect to different peers
-and verify whether they are on the same chain.
-If the syncing node has downloaded blocks only from peers within an isolated network,
-the result of Initial Block Download may not reflect the honest chain
-followed by the majority of the entire network.
-To resolve such situations, the node SHOULD continue using the Bootstrap rule
-while discovering additional peers,
-allowing it to switch to a better chain if one is found.
+The purpose of the Prolonged Bootstrap Period is giving a syncing node additional time to compare its synced chain with a broader set of peers. In other words, it provides the node with an opportunity to connect to different peers and verify whether they are on the same chain. If the syncing node has downloaded blocks only from peers within an isolated network, the result of [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375) may not reflect the honest chain followed by the majority of the entire network. To resolve such situations, the node should continue using the Bootstrap rule while discovering additional peers, allowing it to switch to a better chain if one is found.
 
-Theoretically, the Bootstrap rule should be prolonged
-until the node has seen a sufficient number of blocks
-beyond the $s_\text{gen}$ slot window,
-which is required for the density check of the Bootstrap rule to be meaningful.
-However, if the node has seen a fork longer than $k$ blocks
-from its divergence block during Initial Block Download,
-it means that the node has already seen more slots than $s_\text{gen}$
-with very high probability, considering the small size of $s_\text{gen} = k/(4f)$.
-If the node has never seen any fork longer than $k$ blocks,
-it means that all forks could have been handled by the longest chain rule,
-which is part of the Bootstrap rule.
-Therefore, this protocol does not explicitly wait $s_\text{gen}$ slots
-after Initial Block Download.
-In other words, the protocol does not use $s_\text{gen}$
-to configure the Prolonged Bootstrap Period.
+Theoretically, the Bootstrap rule should be prolonged until the node has seen a sufficient number of blocks beyond the $s\_\text{gen}$ slot window, which is required for the density check of the Bootstrap rule to be meaningful. However, if the node has seen a fork longer than $k$ blocks from its divergence block during [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375), it means that the node has already seen more slots than $s\_\text{gen}$ with very high probability, considering the small size of $s\_\text{gen}={k}/{(4f}$ ). If the node has never seen any fork longer than $k$ blocks, it means that all forks could have been handled by the longest chain rule, which is part of the Bootstrap rule. Therefore, this protocol does not explicitly wait $s\_\text{gen}$ slots after [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375). In other words, the protocol does not use $s\_\text{gen}$ to configure the Prolonged Bootstrap Period.
 
 This protocol configures the Bootstrap Period to 24 hours.
 
-A timer MUST be started when Listening for New Blocks is started
-after Initial Block Download is completed.
-Once the timer is completed, the fork choice rule is switched to the Online rule.
+A timer must be started when [Listening for New Blocks](/Listening-for-New-Blocks-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df817e97feea688aea50c2) is started after [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375) is completed. Once the time is completed, the fork choice rule is switched to the Online rule.
 
 ### Listening for New Blocks
 
-Once Initial Block Download is complete and Prolonged Bootstrap Period is started,
-a node starts listening for new blocks relayed by its peers.
+Once [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375) is complete and [Prolonged Bootstrap Period](/Prolonged-Bootstrap-Period-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8162be49e5aa02199378) is started, a node starts listening for new blocks relayed by its peers.
 
-Upon receiving a new block,
-the node tries to validate and add it to its local block tree,
-as defined in Cryptarchia v1 Protocol Specification - Chain Maintenance.
+Upon receiving a new block, the node tries to validate and add it to its local block tree, as defined in [🔀[1.0.1] Cryptarchia Protocol - Chain Maintenance](/Chain-Maintenance-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81de81bac3a3286dc212).
 
-If the parent of the block is missing from the local block tree,
-the block cannot be fully validated and added.
-These blocks are called *orphan blocks*.
-To handle an orphan block,
-the node downloads missing blocks from a randomly selected peer,
-as described in Downloading Blocks.
-If the request fails, the node MAY retry with different peers
-before abandoning the orphan block.
-The retry policy can be configured by implementers.
+If the parent of the block is missing from the local block tree, the block cannot be fully validated and added. These blocks are called orphan blocks. To handle an orphan block, the node downloads missing blocks from a randomly selected peer, as described in [Downloading Blocks](/Downloading-Blocks-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8157959fd9f30c9f99ea). If the request fails, the node may retry with different peers before abandoning the orphan block. The retry policy can be configured by implementers.
 
-Note that downloading missing blocks does not need to be triggered
-if it is clear that the orphan block is in a fork
-diverged before the latest immutable (committed) block,
-as the node MUST never revert immutable blocks.
+Note that downloading missing blocks does not need to be triggered if it is clear that the orphan block is in a fork diverged before the latest immutable (committed) block, as the node should never revert immutable blocks.
 
-```python
-def listen_and_process_new_blocks(fork_choice: ForkChoice,
-                                  local_tree: Tree,
-                                  peers: List[Node]):
-    for block in listen_for_new_blocks():
-        try:
-            # Run the chain maintenance defined in the Cryptarchia spec.
-            local_tree.on_block(block, fork_choice)
-        except InvalidBlock:
-            continue
-        except ParentNotFound:
-            # Ignore the orphan block proactively,
-            # if it's clear that the orphan block is in a fork
-            # behind the latest immutable block
-            # because immutable blocks should never be reverted.
-            # This check doesn't cover all cases, but the uncovered cases
-            # will be handled by the Cryptarchia block validation
-            # during the `download_blocks` below.
-            if block.height <= local_tree.latest_immutable_block().height:
-                continue
-            # In real implementation, downloading can be run in background
-            # with the retry policy.
-            download_blocks(local_tree, random.choice(peers),
-                            target_block=block.id)
-```
+> Loading Python code…
+
+​
 
 ### Downloading Blocks
 
-For performing Initial Block Download and handling orphan blocks
-while Listening for New Blocks,
-a node sends a `DownloadBlocksRequest` to a peer,
-which MUST respond with blocks in parent-to-child order.
-This communication should be implemented based on Libp2p streaming.
+For performing [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375) and handling orphan blocks while [Listening for New Blocks](/Listening-for-New-Blocks-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df817e97feea688aea50c2), a node sends a
 
-#### Libp2p Protocol ID
+DownloadBlocksRequest
 
-- Mainnet: `/nomos/cryptarchia/sync/1.0.0`
-- Testnet: `/nomos-testnet/cryptarchia/sync/1.0.0`
+to a peer, which must respond with blocks in parent-to-child order. This communication should be implemented based on the [Libp2p streaming](https://github.com/libp2p/rust-libp2p/tree/master/protocols/stream).
 
-```python
-class DownloadBlocksRequest:
-    # Ask blocks up to the target block.
-    # The response may not contain the target block
-    # if the responder limits the number of blocks returned.
-    # In that case, the requester must repeat the request.
-    target_block: BlockId
-    # To allow the peer to determine the starting block to return.
-    known_blocks: KnownBlocks
+Libp2p Protocol ID
 
-class KnownBlocks:
-    local_tip: BlockId
-    latest_immutable_block: BlockId
-    # Additional known blocks.
-    # A responder will reject a request if this list contains more than 5.
-    additional_blocks: list[BlockId]
+Mainnet:
 
-class DownloadBlocksResponse:
-    # A stream of blocks in parent-to-child order.
-    # The max number of blocks to be returned can be limited by implementers.
-    # A requester can read the stream until the stream returns "NoMoreBlock".
-    blocks: Stream[Block | "NoMoreBlock"]
-```
+/logos-blockchain/cryptarchia/sync/1.0.0
 
-The responding peer uses `KnownBlocks` to determine the optimal starting block
-for the response stream, aiming to minimize the number of blocks to be returned.
-The requesting node can include any block it believes could assist in this process
-to the `KnownBlocks.additional_blocks`.
-To avoid spamming responders,
-the size of `KnownBlocks.additional_blocks` is limited to 5.
+Testnet:
 
-The responding peer finds the latest common ancestor (i.e. LCA)
-between the `target_block` and each of the known blocks.
-Then, it returns a stream of blocks, starting from the highest LCA.
-To mitigate malicious downloading requests,
-the peer limits the number of blocks to be returned.
-The detailed implementation is up to implementers,
-depending on their internal architecture (e.g. storage design).
+/logos-blockchain-testnet/cryptarchia/sync/1.0.0
 
-The requesting node SHOULD repeat `DownloadBlocksRequest`s
-by updating the `KnownBlocks` in order to download the next batches of blocks.
-The following code shows how the requesting node can be implemented.
+> Loading Python code…
 
-```python
-def download_blocks(local_tree: Tree, peer: Node,
-                    target_block: Optional[BlockId]):
-    latest_downloaded: Optional[Block] = None
-    while True:
-        # Fetch the peer's tip if target is not specified.
-        target_block = target_block if target_block is not None else peer.tip()
-        # Don't start downloading if target is already in local.
-        if local_tree.has(target_block):
-            return
+​
 
-        req = DownloadBlocksRequest(
-            # If target_block is None, specify the current peer's tip
-            # each time when building DownloadBlocksRequest,
-            # so that the node can catch up with the most recent peer's tip.
-            target_block=target_block,
-            known_blocks=KnownBlocks(
-                local_tip=local_tree.tip().id,
-                latest_immutable_block=local_tree.latest_immutable_block().id,
-                # Provide the latest downloaded block as well
-                # to avoid downloading duplicate blocks
-                additional_blocks=[latest_downloaded.id]
-                    if latest_downloaded is not None else [],
-            )
-        )
-        resp = send_request(peer, req)
+The responding peer uses
 
-        for block in resp.blocks():
-            latest_downloaded = block
-            try:
-                # Run the chain maintenance defined in the Cryptarchia spec.
-                local_tree.on_block(block)
-                # Early stop if the target has been reached.
-                if block == req.target_block:
-                    break
-            except:
-                return
-```
+KnownBlocks
 
-If the node is continuing from a previous `DownloadBlocksRequest`,
-it is important to include the latest downloaded block
-to the `KnownBlocks.additional_blocks` to avoid downloading duplicate blocks.
+to determine the optimal starting block for the response stream, aiming to minimize the number of blocks to be returned. The requesting node can include any block it believes could assist in this process to the
 
-If the requesting node is downloading blocks up to the peer's tip $c_{loc}$
-(e.g. Initial Block Download) by repeating `DownloadBlocksRequest`s,
-the $c_{loc}$ may switch between requests.
-The algorithm described above also handles this case
-by specifying the most recent peer's tip each time
-when a `DownloadBlocksRequest` is constructed.
+KnownBlocks.additional\_blocks
+
+. To avoid spamming responders, the size of
+
+KnownBlocks.additional\_blocks
+
+is limited to 5.
+
+The responding peer finds the latest common ancestor (i.e. LCA) between the
+
+target\_block
+
+and each of the known blocks. Then, it returns a stream of blocks, starting from the highest LCA. To mitigate malicious downloading requests, the peer limits the number of blocks to be returned. The detailed implementation is up to implementers, depending on their internal architecture (e.g. storage design).
+
+![](/image/attachment%3A4712e2ca-b5cb-4315-8c2b-9e6e97743c4d%3Aimage.png?table=block&id=1fd261aa-09df-8138-b041-c737c9e0071c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The requesting node should repeat
+
+DownloadBlocksRequest
+
+s by updating the
+
+KnownBlocks
+
+in order to download the next batches of blocks. The following code shows how the requesting node can be implemented.
+
+> Loading Python code…
+
+​
+
+If the node is continuing from a previous
+
+DownloadBlocksRequest
+
+, it is important to include the latest downloaded block to the
+
+KnownBlocks.additional\_blocks
+
+to avoid downloading duplicate blocks.
+
+![](/image/attachment%3A6dae2426-76b3-45e4-822a-bc654c36d490%3Aimage.png?table=block&id=1fd261aa-09df-81c8-b0ff-c858bf97c965&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+If the requesting node is downloading blocks up to the peer’s tip $c\_{loc}$ (e.g. [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375)) by repeating
+
+DownloadBlocksRequest
+
+s, the $c\_{loc}$ may switch between requests. The algorithm described above also handles this case by specifying the most recent peer’s tip each time when a
+
+DownloadBlocksRequest
+
+is constructed.
+
+![](/image/attachment%3A06b0f3f3-f9d6-439f-b11b-1ab9180a1071%3Aimage.png?table=block&id=1fd261aa-09df-8157-b410-e2246d81a3fb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+### Proposing New Blocks
+
+Unlike [Listening for New Blocks](/Listening-for-New-Blocks-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df817e97feea688aea50c2), a node can start proposing blocks after [Prolonged Bootstrap Period](/Prolonged-Bootstrap-Period-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8162be49e5aa02199378) is complete. In other words, the node should not propose blocks before switching to the Online fork choice rule.
 
 ### Bootstrapping from Checkpoint
 
-Instead of bootstrapping from the Genesis block or from the local block tree,
-a node can choose to bootstrap the honest chain
-starting from a checkpoint block obtained from a trusted checkpoint provider.
-A checkpoint provider is a trusted service (which MAY be a Nomos node
-or a dedicated server) that provides recent blockchain snapshots.
-In this case, the node fully trusts the checkpoint provider
-and considers blocks deeper than the checkpoint block as immutable
-(including the checkpoint block itself).
+Instead of bootstrapping from the Genesis block or from the local block tree, a node can choose to bootstrap the honest chain starting from a checkpoint block obtained from a trusted checkpoint provider. In this case, the node fully trusts the checkpoint provider and considers blocks deeper than the checkpoint block as immutable (including the checkpoint block itself).
 
-A trusted checkpoint provider exposes a HTTP endpoint,
-allowing nodes to download the checkpoint block and the corresponding ledger state.
-The details are defined in Checkpoint Provider HTTP API.
+A trusted checkpoint provider exposes a HTTP endpoint, allowing nodes to download the checkpoint block and the corresponding ledger state. The details are defined in [Checkpoint Provider HTTP API](/Checkpoint-Provider-HTTP-API-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8177b6ccd2181d079a81).
 
-The bootstrapping node imports the downloaded checkpoint block and ledger state
-before starting bootstrapping.
-The imported checkpoint block is used as the latest immutable block $B_{imm}$
-and the local chain tip $c_{loc}$.
-Starting from the checkpoint block,
-the same Initial Block Download is used to download blocks
-up to the tip of the local chain of each peer.
-As defined in Setting the Fork Choice Rule,
-the Bootstrap fork choice rule MUST be used upon startup.
+The bootstrapping node imports the downloaded checkpoint block and ledger state before starting bootstrapping. The imported checkpoint block is used as the latest immutable block $B\_{imm}$ and the local chain tip $c\_{loc}$ . Starting from the checkpoint block, the same [Initial Block Download](/Initial-Block-Download-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81bd899ff05e97d66375) is used to downloads blocks up to the tip of the local chain of each peer. As defined in [Setting the Fork Choice Rule](/Setting-the-Fork-Choice-Rule-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81299066c768c56a06f1), the Bootstrap fork choice rule must be used upon startup.
 
-If it turns out that none of the peers' local chains are connected
-to the checkpoint block,
-the node is terminated with an error,
-allowing the node operator to select a new checkpoint.
+![](/image/attachment%3A8e7736d5-e7ae-4058-af18-ba6fd7ced46e%3Aimage.png?table=block&id=1fd261aa-09df-817b-883e-df4c9ca6ae54&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+If it turns out that none of the peers’ local chains are connected to the checkpoint block, the node is terminated with an error, allowing the node operator to select a new checkpoint.
+
+![](/image/attachment%3Aee8ffb1b-e03d-498c-8816-07f6ab3c52d8%3Aimage.png?table=block&id=1fd261aa-09df-8138-99a6-eab12e93aeb6&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Details
 
 ### Offline Grace Period
 
-The offline grace period $T_\text{offline}$ is a period during which
-a node can be restarted without switching to the Bootstrap rule.
+The offline grace period $T\_\text{offline}$ is a period during which a node can be restarted without switching to the Bootstrap rule.
 
-This protocol configures $T_\text{offline}$ to 20 minutes.
-Here are the advantages and disadvantages of a short period:
+This protocol configures $T\_\text{offline}$ to 20 minutes. Here are the advantages and disadvantages of a short period:
 
-**Advantages:**
+Advantages
 
-- Limits chances for malicious peers to build long alternative chains
-  beyond the scope of the Online rule.
-- Conservatively enables the Bootstrap rule to handle long forks.
+Limits chances for malicious peers to build long alternative chains beyond the scope of the Online rule.
 
-**Disadvantages:**
+Conservatively enables the Bootstrap rule to handle long forks.
 
-- Even a short offline duration can too sensitively trigger the Bootstrap rule,
-  which then lasts for the long Prolonged Bootstrap Period.
+Disadvantages
 
-The following example explains why $T_\text{offline}$ SHOULD NOT be set too long:
+Even a short offline duration can too sensitively trigger the Bootstrap rule, which then lasts for the long [Prolonged Bootstrap Period](/Prolonged-Bootstrap-Period-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8162be49e5aa02199378).
 
-- A local node stopped in the following situation.
-  A malicious peer is building a fork which is now a little shorter ($k - d$)
-  than the honest chain.
-- The local node has been offline shorter than $T_\text{offline}$ and just restarted.
-  As defined in this protocol, the Online fork choice rule is used
-  because the offline duration is short.
-- During the offline duration, the malicious peer made its fork longer
-  by adding $k - d$ blocks.
-  Now the fork is in the same length as the honest chain.
-- If the malicious peer sends the fork to the restarted node
-  faster than the honest peer,
-  the restarted node will commit to the fork because it has $k$ new blocks.
-  Even if the node later receives the honest chain from the honest peer,
-  it cannot revert blocks that are already immutable.
+The following example explains why $T\_\text{offline}$ should not be set too long.
+
+A local node stopped in the following situation. A malicious peer is building a fork which is now a little shorter ( $k-d$ ) than the honest chain.
+
+![](/image/attachment%3Ac6f1bce4-8cca-4008-8396-1a8a4fb9f858%3Aimage.png?table=block&id=1fd261aa-09df-81bf-8212-c190c5627c6e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1330&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+The local node has been offline shorter than $T\_\text{offline}$ and just restarted. As defined in this protocol, the Online fork choice rule is used because the offline duration is short.
+
+During the offline duration, the malicious peer made its fork longer by adding $k-d$ blocks. Now the fork is in the same length as the honest chain.
+
+If the malicious peer sends the fork to the restarted node faster than the honest peer, the restarted node will commit to the fork because it has $k$ new blocks. Even if the node later receives the honest chain from the honest peer, it cannot revert blocks that are already immutable.
+
+![](/image/attachment%3A214199c1-8424-4c9f-902c-184a11913d9d%3Aimage.png?table=block&id=1fd261aa-09df-811a-b946-d313dfbdfd4e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1330&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+If $T\_\text{offline}$ is short, the malicious peer would not have enough time to make its fork acceptable by the Online rule. Even if the malicious peer made its fork long enough after $T\_\text{offline}$ , the fork will be rejected by the syncing node because it will use the Bootstrap rule if it has been offline longer after $T\_\text{offline}$ .
+
+A disadvantage is that a syncing node, which has been offline longer than $T\_\text{offline}$ , should maintain the Bootstrap rule during the [Prolonged Bootstrap Period](/Prolonged-Bootstrap-Period-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df8162be49e5aa02199378), which is 24 hours in the current setting. In the future, the team will consider designing a better mechanism to replace the long Bootstrap Period.
 
 ### Offline Duration Measurement
 
-As defined in [Setting the Fork Choice Rule](#setting-the-fork-choice-rule),
-when a node is restarted,
-it should be able to choose a proper fork choice rule
-depending on how long it has been offline since it last used the Online rule.
+As defined in [Setting the Fork Choice Rule](/Setting-the-Fork-Choice-Rule-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24#1fd261aa09df81299066c768c56a06f1), when a node is restarted, it should be able to choose a proper fork choice rule depending on how long it has been offline since it last used the Online rule.
 
-It is considered unsafe to rely on any external information
-(e.g. the slot or height of peer's tip) to check how long the node has been offline,
-since such information could be manipulated as an attack vector.
-Instead, it is recommended to employ a local method to measure the offline duration.
+It is considered unsafe to rely on any external information (e.g. the slot or height of peer’s tip) to check how long the node has been offline, since such information could be manipulated as an attack vector. Instead, it is recommended to employ a local method to measure the offline duration.
 
-While the specific implementation is left to the discretion of implementers,
-one approach is for the node to periodically record the current time to a local file
-while it is running with the **Online** fork choice rule.
-Upon restart, it can use this timestamp to calculate how long it has been offline.
+While the specific implementation is left to the discretion of implementers, one approach is for the node to periodically record the current time to a local file while it is running with the Online fork choice rule. Upon restart, it can use this timestamp to calculate how long it has been offline.
 
 ### Checkpoint Provider HTTP API
 
-A trusted checkpoint provider serves the `GET /checkpoint` API,
-allowing users (which are not connected via p2p)
-to download the latest checkpoint block and its corresponding ledger state.
+A trusted checkpoint provider serves the
 
-```yaml
-openapi: 3.0
+GET /checkpoint
 
-paths:
-  /checkpoint:
-    get:
-      responses:
-        '200':
-          description: OK
-          content:
-            multipart/mixed:
-              schema:
-                type: object
-                properties:
-                  checkpoint_block:
-                    type: string
-                    format: binary
-                  checkpoint_ledger_state:
-                    type: string
-                    format: binary
-```
+API, allowing users (which are not connected via p2p) to download the latest checkpoint block and its corresponding ledger state.
 
-## References
+> Loading YAML code…
 
-### Normative
-
-- [Cryptarchia v1 Protocol Specification][cryptarchia-v1]
-  \- Parent protocol specification
-- [Cryptarchia Fork Choice Rule][fork-choice]
-  \- Fork choice rule specification
-
-### Informative
-
-- [Cryptarchia v1 Bootstrapping & Synchronization][bootstrap-origin]
-  \- Original bootstrapping and synchronization documentation
-- [Libp2p Streaming][libp2p]
-  \- Peer-to-peer networking library
-
-[cryptarchia-v1]: https://nomos-tech.notion.site/Cryptarchia-v1-Protocol-Specification-21c261aa09df810cb85eff1c76e5798c
-[fork-choice]: https://nomos-tech.notion.site/Cryptarchia-Fork-Choice-Rule
-[bootstrap-origin]: https://nomos-tech.notion.site/Cryptarchia-v1-Bootstrapping-Synchronization-1fd261aa09df81ac94b5fb6a4eff32a6
-[libp2p]: https://docs.libp2p.io/
-
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+​

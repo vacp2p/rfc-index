@@ -18,258 +18,168 @@
 
 <!-- timeline:end -->
 
-## Abstract
+---
 
-This specification defines the mechanism for anonymous reward distribution
-based on voucher commitments, nullifiers, and zero-knowledge (ZK) proofs.
-Block leaders can claim their rewards
-without linking them to specific blocks and without revealing their identities.
-The protocol removes any direct link between block production
-and the recipient of the reward, preventing self-censorship behaviors.
+> **Note on this content sync:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) via katex; tables and headings
+> are converted from Notion HTML. Formatting polish (semantic line breaks, code block fences,
+> internal cross-references) may still be needed.
 
-**Keywords:** anonymous rewards, voucher commitment, nullifier, zero-knowledge proof,
-leader reward, Merkle tree, block production, self-censorship
+---
 
-## Semantics
+## Revision History
 
-The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
-in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2026-03-30 |
 
-### Definitions
+## Introduction
 
-<!-- markdownlint-disable MD013 -->
+In many blockchain designs, leaders receive rewards for producing valid blocks. Traditionally, this reward is linked directly to the block or its producer, potentially opening the door to manipulation or self-censorship, where leaders may avoid including certain transactions or messages out of fear of retaliation or reputational harm. As the Logos Blockchain must protect its nodes and ensure that they do not need to engage in self-censorship, we must design a reward mechanism that preserves the anonymity of block leaders while maintaining correctness and preventing double rewards.
 
-| Terminology | Description |
-| ----------- | ----------- |
-| Voucher | A one-time random secret used to claim a block reward anonymously. |
-| Voucher Commitment | A cryptographic commitment (zkhash) to a voucher secret. |
-| Voucher Nullifier | A unique identifier derived from a voucher, prevents double claims. |
-| Leader Claim Operation | A Mantle Operation allowing a leader to claim their reward. |
-| Reward Voucher Set | A Merkle tree containing all voucher commitments. |
-| Voucher Nullifier Set | A searchable database of nullifiers for claimed vouchers. |
-| Anonymity Set | The set of unclaimed vouchers from which a claim could originate. |
+This document specifies the mechanism for anonymous reward distribution based on voucher commitments, nullifiers, and zero-knowledge (ZK) proofs. The goal is to ensure that block leaders can claim their rewards without linking them to specific blocks and without revealing their identities.
 
-<!-- markdownlint-enable MD013 -->
+## Overview
 
-## Background
+The protocol introduces a concept of vouchers to unlink the block reward claim from the block itself. Instead of directly crediting themselves in the block, leaders include a commitment (a zkhash in this protocol) to a secret voucher. These commitments are gathered into a Merkle tree. In the first block of an epoch, we add all vouchers from the previous epoch to the voucher Merkle tree, accumulating the vouchers together in a set and guaranteeing a minimal anonymity set. Leaders may anonymously claim their reward using a ZK proof later, proving the ownership of their voucher. This is summarized in the following diagram:
 
-In many blockchain designs, leaders receive rewards for producing valid blocks.
-Traditionally, this reward is linked directly to the block or its producer,
-potentially opening the door to manipulation or self-censorship,
-where leaders may avoid including certain transactions or messages
-out of fear of retaliation or reputational harm.
-As Nomos protects its nodes
-and ensures that they do not need to engage in self-censorship,
-the reward mechanism preserves the anonymity of block leaders
-while maintaining correctness and preventing double rewards.
+Leader block
 
-### Design Overview
+reward voucher
 
-The protocol introduces a concept of *vouchers*
-to unlink the block reward claim from the block itself.
-Instead of directly crediting themselves in the block,
-leaders include a commitment (a zkhash in this protocol) to a secret voucher.
-These commitments are gathered into a Merkle tree.
-In the first block of an epoch,
-all vouchers from the previous epoch are added to the voucher Merkle tree,
-accumulating the vouchers together in a set
-and guaranteeing a minimal anonymity set.
-Leaders MAY anonymously claim their reward using a ZK proof later,
-proving the ownership of their voucher.
+wait until next epoch
 
-```text
-┌──────────────┐    ┌─────────────────┐    ┌─────────────────────┐
-│ Leader block │───▶│ Reward voucher  │───▶│ Wait until next     │
-└──────────────┘    └─────────────────┘    │ epoch               │
-                                           └──────────┬──────────┘
-                                                      │
-                                                      ▼
-┌──────────────┐    ┌─────────────────┐    ┌─────────────────────┐
-│    Reward    │◀───│ Claim with      │◀───│ Voucher added to    │
-│              │    │ ZK proof        │    │ Merkle tree         │
-└──────────────┘    └─────────────────┘    └─────────────────────┘
-```
+Merkle tree
 
-By anonymizing the identity of block leaders at the time of reward claiming,
-the protocol removes any direct link
-between block production and the recipient of the reward.
-This is essential to prevent self-censorship behaviors.
-With anonymous claiming,
-leaders are free to act honestly according to protocol rules
-without concern for external consequences,
-thus improving the overall neutrality and robustness of the network.
+Claim with ZK proof
+
+Reward
+
+By anonymizing the identity of block leaders at the time of reward claiming, the protocol removes any direct link between block production and the recipient of the reward. This is essential to prevent self-censorship behaviors. With anonymous claiming, leaders are free to act honestly according to protocol rules without concern for external consequences, thus improving the overall neutrality and robustness of the network.
 
 Key properties of the protocol:
 
-- **Anonymity**: Block rewards are unlinkable to the blocks they originate from
-  (avoiding deanonymization).
-- **Soundness**: No reward can be claimed twice.
+Anonymity: Block rewards are unlinkable to the blocks they originate from (avoiding deanonymization).
 
-In parallel, the blockchain maintains the value `leaders_rewards`
-accumulating the rewards for leaders over time.
-Each voucher included in the Merkle tree represents the same share of `leaders_rewards`.
-Just like for voucher inclusion,
-more rewards are added to this variable on an epoch-by-epoch basis,
-which guarantees a stable and equal claimable reward for leaders over an epoch.
+Soundness: No reward can be claimed twice.
 
-## Protocol Specification
+In parallel, the blockchain maintains the value
 
-### Voucher Creation and Inclusion
+leaders\_rewards
+
+accumulating the rewards for leaders over time. Each voucher included in the Merkle tree represents the same share of
+
+leaders\_rewards
+
+. Just like for voucher inclusion, more rewards are added to this variable on an epoch-by-epoch basis, which guarantees a stable and equal claimable reward for leaders over an epoch.
+
+## Protocol
+
+### Voucher creation and inclusion
 
 When producing a block, a leader performs the following:
 
-1. Generate a one-time random secret $voucher \xleftarrow{\$} \mathbb{F}_{p}$.
+Generate a one-time random secret $voucher \overset{{\scriptscriptstyle\$}}{\leftarrow} \mathbb F\_p$ .
 
-1. Compute the commitment: `voucher_cm := zkHash(b"LEAD_VOUCHER_CM_V1", voucher)`.
+Compute the commitment:
 
-1. Include the `voucher_cm` in the block header.
+voucher\_cm := zkHash(b"LEAD\_VOUCHER\_CM\_V1, voucher)
 
-Each `voucher_cm` is added to a Merkle tree of voucher commitments by validators
-during the execution of the first block of the following epoch,
-maintained throughout the entire blockchain history by everyone.
+.
 
-### Claiming the Reward
+Include the
 
-Each leader MAY submit a Leader Claim Operation to claim their reward.
-This Operation includes:
+voucher\_cm
 
-- The Merkle root of the global voucher set
-  when the Mantle Transaction containing the claim is submitted.
-- A Proof of Claim.
+in the block header.
 
-This Operation increases the balance of a Mantle Transaction
-by the leader reward amount,
-letting the leader move the funds as desired
-through the Ledger transaction or another Operation.
+Each 
 
-> **Note**: This means that a leader MAY use their funds directly,
-> getting their reward and using them atomically.
+voucher\_cm
 
-Every leader receives a reward that is independent of the block content
-to avoid de-anonymization.
-This means that the fees of the block cannot be collected by the leader directly,
-or need to be pooled for all the leaders.
+ is added to a Merkle tree of voucher commitments by validators during the execution of the first block of the following epoch, maintained throughout the entire blockchain history by everyone.
 
-### Leaders Reward Calculation
+### Claiming the reward
 
-At the start of epoch N+1,
-validators aggregate the leaders rewards of epoch N into the leader rewards variable.
-The amount of the reward claimable with a voucher
-corresponds to a share of the `leaders_rewards`.
-This share is exactly equal to the total value of rewards
-divided by the size of the anonymity set of leaders, that is:
+#### Protocol
 
-<!-- markdownlint-disable MD013 -->
+Each leader may submit a [[1.3.0] Mantle - LEADER\_CLAIM](https://nomos-tech.notion.site/LEADER_CLAIM-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df81c4a33bddc5ada55f8c) Operation to claim their reward. This Operation includes:
+
+The Merkle root of the global voucher set when the Mantle Transaction containing the claim is submitted.
+
+A [[1.3.0] Mantle - Proof of Claim](https://nomos-tech.notion.site/Proof-of-Claim-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df81d48e26e141e8eed17b).
+
+This Operation increases the balance of a Mantle Transaction by the leader reward amount, letting the leader move the funds as desired through the Ledger transaction or another Operation.
+
+This means that a leader may use their funds directly, getting their reward and using them atomically.
+
+Note that every leader will receive a reward that is independent of the block content to avoid de-anonymization. This means that the fees of the block cannot be collected by the leader directly, or need to be pooled for all the leaders.
+
+#### Leaders Reward
+
+At the start of epoch N+1, validators aggregate the leaders rewards of epoch N into the leader rewards variable. The amount of the reward claimable with a voucher corresponds to a share of the
+
+leaders\_rewards
+
+. This share is exactly equal to the total value of rewards divided by the size of the anonymity set of leaders, that is:
 
 $$
 share = \begin{cases}
-0 & \textbf{if } |voucher\_cm| = |voucher\_nf| \\
-\frac{leader\_rewards}{|voucher\_cm| - |voucher\_nf|} & \textbf{if } |voucher\_cm| \neq |voucher\_nf|
+0 &\textbf{if } |voucher\\_cm|=|voucher\\_nf| \\
+\frac{leader\\_rewards}{|voucher\\_cm| - |voucher\\_nf|} &\textbf{if } |voucher\\_cm| \neq |voucher\\_nf|
 \end{cases}
 $$
+share={0voucher\_cmvoucher\_nfleader\_rewardsif voucher\_cm=voucher\_nfif voucher\_cm=voucher\_nf
 
-<!-- markdownlint-enable MD013 -->
+This amount is stable through an epoch because when a leader withdraws, both the pool value and the number of unclaimed vouchers decrease proportionally, so the price per share remains unchanged. However, the share value will vary across epochs if the leader rewards are variable.
 
-This amount is stable through an epoch
-because when a leader withdraws,
-both the pool value and the number of unclaimed vouchers decrease proportionally,
-so the price per share remains unchanged.
-However, the share value will vary across epochs if the leader rewards are variable.
+### Validation
 
-### LEADER_CLAIM Validation
+Nodes validate a
 
-Nodes validate a `LEADER_CLAIM` Operation by:
+LEADER\_CLAIM
 
-1. Verifying the ZK proof.
+Operation by:
 
-1. Checking that `voucher_nf` is not already in the voucher nullifier set.
+Verifying the ZK proof.
 
-1. Executing the reward logic:
-   - Add the `voucher_nf` to the voucher nullifier set
-     to prevent claiming the same reward more than once.
-   - Increase the balance of the Mantle Transaction by the share amount.
-   - Decrease the value of the `leaders_rewards` by the same amount.
+Checking that
 
-## Design Details
+voucher\_nf
+
+is not already in the voucher nullifier set.
+
+Executing the reward logic:
+
+Add the
+
+voucher\_nf
+
+to the voucher nullifier set to prevent claiming the same reward more than once.
+
+Increase the balance of the Mantle Transaction by the share amount.
+
+Decrease the value of the
+
+leaders\_rewards
+
+by the same amount.
+
+## Details
 
 ### Unlinking Block Rewards from Proposals
 
-Each reward voucher is a cryptographic commitment derived from a voucher secret.
-This commitment, when included in the block header,
-reveals no information about the block producer's identity
-or the actual secret voucher.
-It is computationally infeasible to reverse the commitment
-to retrieve the voucher secret.
+Each reward voucher is a cryptographic commitment derived from a voucher secret. This commitment, when included in the block header, reveals no information about the block producer's identity or the actual secret voucher. It is computationally infeasible to reverse the commitment to retrieve the voucher secret.
 
-Crucially, when the leader reward is claimed and the voucher nullifier revealed,
-a third party cannot link this nullifier to the initial voucher commitment.
-A reward is claimable if its reward voucher is in the reward voucher set
-and its voucher nullifier is not in the voucher nullifier set.
+Crucially, when the leader reward is claimed and the voucher nullifier revealed, a third party cannot link this nullifier to the initial voucher commitment. A reward is claimable if its reward voucher is in the reward voucher set and its voucher nullifier is not in the voucher nullifier set.
 
-The reward voucher set is maintained as a Merkle tree of depth 32,
-and validators are required to hold the frontier of the MMR in memory
-to continue appending to the set.
-The voucher nullifier set is maintained as a searchable database.
+The reward voucher set will be maintained as a Merkle tree of depth 32, and validators will be required to hold the frontier of the MMR in memory to continue appending to the set. The voucher nullifier set will be maintained as a searchable database.
 
 ### ZK Proof of Membership
 
-When claiming a reward, the leader provides a ZK proof
-that they know a leaf in the global Merkle tree of reward vouchers
-and the preimage of that leaf.
-Crucially, the ZK proof does not reveal which leaf is being proven.
-The verifier only learns that *some* valid leaf exists in the tree
-for which the prover knows the secret voucher.
-This property ensures that the claim cannot be linked
-to any specific block header or reward voucher commitment.
+When claiming a reward, the leader provides a ZK proof that they know a leaf in the global Merkle tree of reward vouchers and the preimage of that leaf. Crucially, the ZK proof does not reveal which leaf is being proven. The verifier only learns that some valid leaf exists in the tree for which the prover knows the secret voucher. This property ensures that the claim cannot be linked to any specific block header or reward voucher commitment.
 
 ### Preventing Double Claims Without Breaking Privacy
 
-To prevent double claiming, the leader derives a voucher nullifier.
-This nullifier is unique to the voucher
-but reveals nothing about the original reward voucher or block.
-It acts as a one-way identifier
-that allows nodes to track whether a voucher has already been claimed,
-without compromising the anonymity of the claim.
-
-## Security Considerations
-
-### Anonymity Guarantees
-
-The protocol provides anonymity through the following mechanisms:
-
-- Voucher commitments reveal no information about the block producer's identity.
-- ZK proofs do not reveal which leaf in the Merkle tree is being claimed.
-- Nullifiers cannot be linked back to voucher commitments.
-
-The anonymity set size is determined by the number of unclaimed vouchers.
-Implementations SHOULD ensure a sufficient anonymity set size
-before allowing claims to prevent timing-based deanonymization attacks.
-
-### Double Claim Prevention
-
-The nullifier mechanism ensures that each voucher can only be claimed once.
-Nodes MUST verify that a nullifier is not in the voucher nullifier set
-before accepting a `LEADER_CLAIM` Operation.
-
-### Reward Independence
-
-Leaders receive a reward independent of block content
-to prevent correlation attacks based on block fees or transaction patterns.
-
-## References
-
-### Normative
-
-- [BEDROCK-MANTLE-SPECIFICATION][mantle] - Mantle Transaction and Operation specification
-
-### Informative
-
-- [Anonymous Leaders Reward Protocol][origin-ref] - Original specification document
-
-[mantle]: https://nomos-tech.notion.site/v1-1-Mantle-Specification-269261aa09df80dda501f568697930fd
-[origin-ref]: https://nomos-tech.notion.site/Anonymous-Leaders-Reward-Protocol-206261aa09df8120a49ffa49c71ba70d
-
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+To prevent double claiming, the leader derives a voucher nullifier. This nullifier is unique to the voucher but reveals nothing about the original reward voucher or block. It acts as a one-way identifier that allows nodes to track whether a voucher has already been claimed, without compromising the anonymity of the claim.

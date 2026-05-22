@@ -18,482 +18,339 @@
 
 <!-- timeline:end -->
 
-## Abstract
+---
 
-This document defines an implementation-friendly specification
-of the Proof of Quota (PoQ),
-which ensures that there is a limited number of message encapsulations
-that a node can perform,
-thereby constraining the number of messages a node can introduce
-to the Blend network used in Nomos
-(see [NOMOS-BLEND-PROTOCOL](#references)).
-The mechanism regulating these messages is similar to rate-limiting nullifiers.
+> **Note on this content sync:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) via katex; tables and headings
+> are converted from Notion HTML. Formatting polish (semantic line breaks, code block fences,
+> internal cross-references) may still be needed.
 
-**Keywords:** cryptography, zero-knowledge, Blend, quota, rate-limiting,
-PoQ, nullifier
+---
 
-## Document Structure
+## Revisions History
 
-This specification is organized into two distinct parts
-to serve different audiences and use cases:
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2026-04-09 |
+| 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove the notion of NOMOS in DSTs | 2026-04-09 |
 
-**Protocol Specification** contains the normative requirements necessary
-for implementing an interoperable Blend Protocol node.
-This section defines the cryptographic primitives, message formats,
-network protocols, and behavioral requirements that all implementations
-must follow to ensure compatibility and maintain the protocol's
-privacy guarantees.
-Protocol designers, auditors, and those seeking to understand the core
-mechanisms should focus on this part.
+## Introduction
 
-**Implementation Considerations** provides non-normative guidance
-for implementers.
-This section offers practical recommendations, optimization strategies,
-and detailed examples that help developers build efficient and robust
-implementations.
-While these details are not required for interoperability,
-they represent best practices learned from reference implementations
-and can significantly improve performance and reliability.
+This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which is introduced in [[1.0.0] Blend Protocol - Proof of Quota](https://nomos-tech.notion.site/Proof-of-Quota-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df81edb561ef75a31f65a4).
 
-## Protocol Specification
+## Overview
 
-This section defines the normative cryptographic protocol requirements
-for the Proof of Quota.
+The PoQ ensures that there is a limited number of message encapsulations that a node can perform. This constrains the number of messages a node can introduce to the Blend network. The mechanism regulating these messages is similar to [rate-limiting nullifiers](https://rate-limiting-nullifier.github.io/rln-docs/rln.html).
 
-### Construction
+## Construction
 
-The Proof of Quota (PoQ) can be satisfied by one of two proof types,
-depending on the node's role in the network:
+The Proof of Quota (PoQ) verifies that a node's public key is within a limit for either a core node or a leader node. It consists of two parts:
 
-1. **Proof of Core Quota (PoQ_C)**: Ensures that the core node is declared
-   and hasn't already produced more keys than the core quota Q_C.
+Proof of Core Quota (
 
-2. **Proof of Leadership Quota (PoQ_L)**: Ensures that the leader node
-   would win the proof of stake for current Cryptarchia epoch
-   (see [Cryptarchia Consensus](#references))
-   and hasn't already produced more keys than the leadership quota Q_L.
-   This doesn't guarantee that the node is indeed winning
-   because the PoQ doesn't check if the Proof of Leadership note
-   (representing staked value) is unspent,
-   enabling generation of the proof ahead of time preventing extreme delays.
+PoQ\_C
 
-**Validity**: The final proof PoQ is valid if either PoQ_C or PoQ_L holds.
+): Ensures that the core node is declared and hasnt already produced more keys than the core quota
+
+Q\_C
+
+.
+
+Proof of Leadership Quota (
+
+PoQ\_L
+
+): Ensures that the leader node would win the proof of stake for current Cryptarchia epoch and hasnt already produced more keys than the leadership quota
+
+Q\_L
+
+. That doesnt guarantee that the node is indeed winning because the PoQ doesnt check if the note is unspent enabling generation of the proof ahead of time preventing extreme delays.
+
+The final proof
+
+PoQ
+
+is valid if either
+
+PoQ\_C
+
+or
+
+PoQ\_L
+
+holds.
 
 ### Zero-Knowledge Proof Statement
 
-#### Public Values
+#### Public values
 
-A proof attesting that for the following public values
-derived from blockchain parameters:
+A proof attesting that for the following public values derived from blockchain parameters:
 
-**Type Definition:**
-`zkhash` represents a 256-bit hash value used in zero-knowledge circuits,
-typically a Poseidon hash output compatible with the BN256 scalar field.
-
-```python
 class ProofOfQuotaPublic:
-    session: int              # Session number (uint64)
-    core_quota: int           # Allowed messages per session for core nodes (20 bits)
-    leader_quota: int         # Allowed messages per session for potential leaders (20 bits)
-    core_root: zkhash         # Merkle root of zk_id of the core nodes
-    K_part_one: int           # First part of the signature public key (16 bytes)
-    K_part_two: int           # Second part of the signature public key (16 bytes)
-    pol_epoch_nonce: int      # PoL Epoch nonce
-    pol_t0: int               # PoL constant t0
-    pol_t1: int               # PoL constant t1
-    pol_ledger_aged: zkhash   # Merkle root of the PoL eligible notes
-
-    # Outputs:
-    key_nullifier: zkhash     # Derived from session, private index and private sk
-```
-
-**Field Descriptions:**
-
-- `session`: Unique session identifier for temporal partitioning
-- `core_quota`: Maximum number of message encapsulations allowed per session
-  for core nodes (20-bit value)
-- `leader_quota`: Maximum number of message encapsulations allowed per session
-  for potential leaders (20-bit value)
-- `core_root`: Root of Merkle tree containing zk_id values
-  of all declared core nodes
-- `K_part_one`, `K_part_two`: Split representation of one-time signature
-  public key (32 bytes total)
-- `pol_epoch_nonce`: Proof of Leadership epoch nonce for lottery
-- `pol_t0`, `pol_t1`: Proof of Leadership threshold constants
-- `pol_ledger_aged`: Root of Merkle tree containing eligible
-  Proof of Leadership notes
-- `key_nullifier`: Output nullifier preventing key reuse within a session
+session: int # Session number (uint64)
+core\_quota: int # Allowed messages per session for core nodes (20 bits)
+leader\_quota: int # Allowed messages per session for potential leaders (20 bits)
+core\_root: zkhash # Merkle root of zk\_id of the core nodes
+K\_part\_one: int # First part of the signature public key (16 bytes)
+K\_part\_two: int # Second part of the signature public key (16 bytes)
+pol\_epoch\_nonce: int # PoL Epoch nonce
+pol\_t0: int # PoL constant t0
+pol\_t1: int # PoL constant t1
+pol\_ledger\_aged: zkhash # Merkle root of the PoL eligible notes
+# Outputs:
+key\_nullifier: zkhash # derived from session, private index and private sk
 
 #### Witness
 
 The prover knows a witness:
 
-```python
 class ProofOfQuotaWitness:
-    index: int                              # Index of the generated key (20 bits)
-    selector: bool                          # Indicates if it's a leader (=1) or core node (=0)
+index: int # This is the index of the generated key. Limiting this index limits the maximum number of key generated. (20 bits)
+selector: bool # Indicates if it's a leader (=1) or a core node (=0)
+# This part is filled randomly by potential leaders
+core\_sk: zkhash # sk corresponding to the zk\_id of the core node
+core\_path: list[zkhash] # Merkle path proving zk\_id membership (len = 20)
+core\_path\_selectors: list[bool] # Indicates how to read the core\_path (if Merkle nodes are left or right in the path)
+# This part is filled randomly by core nodes
+pol\_sl: int # PoL slot
+pol\_secret\_key: int # PoL note secret key
+pol\_note\_value: int # PoL note value
+pol\_note\_tx\_hash: zkhash # PoL note transaction 
+pol\_note\_output\_number: int # PoL note transaction output number
+pol\_noteid\_path: list[zkhash] # PoL Merkle path proving noteID membership in ledger aged (len = 32)
+pol\_noteid\_path\_selectors: list[bool] # Indicates how to read the note\_path (if Merkle nodes are left or right in the path)
 
-    # This part is filled randomly by potential leaders
-    core_sk: zkhash                         # sk corresponding to the zk_id of the core node
-    core_path: list[zkhash]                 # Merkle path proving zk_id membership (len = 20)
-    core_path_selectors: list[bool]         # Indicates how to read the core_path
+Note that every inputs and outputs of zero-knowledge proofs are all scalar field elements.
 
-    # This part is filled randomly by core nodes
-    pol_sl: int                             # PoL slot
-    pol_sk_starting_slot: int               # PoL starting slot of the slot secrets
-    pol_note_value: int                     # PoL note value
-    pol_note_tx_hash: zkhash                # PoL note transaction
-    pol_note_output_number: int             # PoL note transaction output number
-    pol_noteid_path: list[zkhash]           # PoL Merkle path proving noteID membership (len = 32)
-    pol_noteid_path_selectors: list[bool]   # Indicates how to read the note_path
-    pol_slot_secret: int                    # PoL slot secret corresponding to sl
-    pol_slot_secret_path: list[zkhash]      # PoL slot secret Merkle path (len = 25)
-```
+#### Constraints
 
-**Witness Field Descriptions:**
+Such that the following constraints hold:
 
-- `index`: The index of the generated key.
-  Limiting this index limits the maximum number of keys generated
-  (20 bits enables up to 2^20 = 1,048,576 messages per node per session)
-- `selector`: Boolean flag indicating node type (1 for leader, 0 for core node)
-- `core_sk`: Secret key corresponding to the core node's zk_id
-- `core_path`: Merkle authentication path for core node membership
-- `core_path_selectors`: Navigation bits for Merkle path (left/right)
-- `pol_*`: Proof of Leadership witness fields (filled randomly by core nodes)
+Step 1: The prover selects an
 
-**Note**: All inputs and outputs of zero-knowledge proofs are scalar field elements.
+index
 
-### Constraints
+for the chosen key. This index must be lower than the allowed quota and not already used. This index is used to derive the key nullifier in step 4. Limiting the possible values of this index also limit the possible nullifier created which produce the desired effect: limiting the generation of keys to a certain quota.
 
-The following constraints MUST hold for a valid proof:
+index
 
-#### Step 1: Index Selection and Quota Limitation
+will be on 20 bits enabling up to $2^{20}$ messages per node per
 
-The prover selects an index for the chosen key.
-This index MUST be lower than the allowed quota and not already used.
-This index is used to derive the key nullifier in
-[Step 4: Key Nullifier Derivation](#step-4-key-nullifier-derivation).
+session
 
-**Purpose**: Limiting the possible values of this index limits the possible
-nullifiers created,
-which produces the desired effect of limiting the generation of keys
-to a certain quota.
+.
 
-**Specification**: `index` is 20 bits,
-enabling up to 2^20 messages per node per session.
+Step 2: If the prover indicated that the node is a core node for the proof, the proof checks that:
 
-#### Step 2: Core Node Verification
+The core node is registered in the set
 
-If the prover indicated that the node is a core node for the proof
-(`selector` is 0), the proof checks that:
+N = SDP(session)
 
-1. **Core Node Registration**: The core node is registered
-   in the set N = SDP(session),
-   where SDP is the Service Declaration Protocol
-   (see [Service Declaration Protocol](#references)).
-   This is proven by demonstrating knowledge of a `core_sk`
-   that corresponds to a declared `zk_id`,
-   which is a valid SDP registry for the current session.
+. This is proven by demonstrating knowledge of a
 
-   - The `zk_id` values are stored in a Merkle tree with a fixed depth of 20
-   - The root is provided as a public input
-   - To build the Merkle tree, `zk_id` values are ordered from smallest
-     to biggest (when seen as natural numbers between 0 and p)
-   - Remaining empty leaves are represented by 0 after the sorting
-     (appended at the end of the vector)
-   - This structure supports up to 1M validators
+core\_sk
 
-2. **Index Validity**: The index MUST satisfy: `index < core_quota`
+that corresponds to a declared
 
-#### Step 3: Leader Node Verification
+zk\_id
 
-If the prover indicated that the node is a potential leader node for the proof
-(`selector` is 1), the proof checks that:
+, which is a valid SDP registry for the current
 
-1. **Leadership Lottery**: The leader node possesses a note
-   that would win a slot in the consensus lottery.
-   Unlike leadership conditions,
-   the proof of quota doesn't verify that the note is unspent.
-   This enables potential provers to generate the PoQ well in advance.
-   All other lottery constraints are the same as in Circuit Constraints.
+session
 
-2. **Index Validity**: The index MUST satisfy: `index < leader_quota`
+. The
 
-#### Step 4: Key Nullifier Derivation
+zk\_id
 
-The prover derives a `key_nullifier` maintained by blend nodes
-during the session for message deduplication purposes:
+values are stored in a Merkle tree with a fixed depth of 20, with the root provided as a public input. To build the Merkle tree,
 
-```python
-selection_randomness = zkhash(b"SELECTION_RANDOMNESS_V1", sk, index, session)
-key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
-```
+zk\_id
 
-Where `sk` is:
+are ordered from the smallest to the biggest (when seen as natural numbers between 0 and $p$ ) and remaining empty leaves are represented by the
 
-- The `core_sk` as defined in the Mantle specification if the node is a core node
-- The secret key of the PoL note if it's a leader node derived from inputs
+0
 
-**Rationale**: Two hashes are used because the selection randomness is used
-in the Proof of Selection to prove the ownership of a valid PoQ.
+after the sorting (appended at the end of the vector). This structure supports up to 1M validators.
 
-#### Step 5: One-Time Signature Key Attachment
+The index is valid:
 
-The prover attaches a one-time signature key used in the blend protocol.
-This public key is split into two 16-byte parts:
-`K_part_one` and `K_part_two`.
+index < core\_quota
 
-**Encoding**: When written in little-endian byte order,
-the complete public key equals the concatenation `K_part_one || K_part_two`.
+.
 
-### Circuit Implementation
+Step 3: If the prover indicated that the node is a potential leader node for the proof, the proof checks that:
 
-```python
+The leader node possesses a note that would win a slot in the consensus lottery. Unlike leadership conditions, the proof of quota doesn't verify that the note is unspent. This enables potential provers to generate the PoQ well in advance. All other lottery constraints are the same as in [[1.1.0] Proof of Leadership - Circuit Constraints](https://nomos-tech.notion.site/Circuit-Constraints-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df8019ad45f5ce872093ea).
+
+The index is valid:
+
+index < leader\_quota
+
+.
+
+Step 4: The prover derives a
+
+key\_nullifier
+
+maintained by blend nodes during the session for message deduplication purpose.
+
+selection\_randomness = zkhash(b"SELECTION\_RANDOMNESS\_V1", sk, index, validity\_period)
+key\_nullifier = zkhash(b"KEY\_NULLIFIER\_V1", selection\_randomness)
+
+Where
+
+sk
+
+is:
+
+The
+
+core\_sk
+
+as defined in the [Mantle specification](https://nomos-tech.notion.site/2ce261aa09df805ea358d80c2046cf95?pvs=25#2ce261aa09df814f8764f3e6d8f543a3) if the node is a core node.
+
+The secret key of the PoL note if its a leader node.
+
+and
+
+validity\_period
+
+is:
+
+The
+
+session
+
+if the node is a core node.
+
+The winning slot of the PoL if its a leader node.
+
+Here we use two hashes because the selection randomness is used in the Proof of Selection in order to prove the ownership of a valid PoQ (see [[1.0.0] Blend Protocol - Proof of Selection](https://nomos-tech.notion.site/Proof-of-Selection-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df81d6bb3febd62b598138)).
+
+Step 5: The prover attaches a one-time signature key used in the blend protocol. This public key is split into two 16-byte parts:
+
+K\_part\_one
+
+and
+
+K\_part\_two
+
+. When written in little-endian byte order, the complete public key equals the concatenation
+
+K\_part\_one||K\_part\_two
+
+.
+
+#### Pseudocode
+
 # Verify selector is a boolean
 # selector = 1 if it's a potential leader and 0 if it's a core node
-selector * (1 - selector) == 0  # Check that selector is indeed a bit
-
-# Verify index is lower than quota
-# Equivalent to: index < leader_quota if selector == 1
-#                or index < core_quota if selector == 0
-index < selector * (leader_quota - core_quota) + core_quota
-
+selector \* (1 - selector) == 0 # to check that selector is indeed a bit.
+# Verify index is lower than quota. It's exactly like saying index < leader\_quota
+# if selector == 1 or index < core\_quota if selector == 0
+index < selector \* (leader\_quota - core\_quota) + core\_quota
 # Check if it's a registered core node
-zk_id = zkhash(b"NOMOS_KDF", core_sk)
-is_registered = merkle_verify(core_root, core_path, core_path_selectors, zk_id)
-
+zk\_id = zkhash(b"KDF", core\_sk)
+is\_registered = merkle\_verify(core\_root, core\_path, core\_path\_selectors, zk\_id)
 # Check if it's a potential leader
-is_leader = would_win_leadership(
-    pol_epoch_nonce,
-    pol_t0,
-    pol_t1,
-    pol_ledger_aged,
-    pol_sl,
-    pol_sk_starting_slot,
-    pol_sk_secrets_root,
-    pol_note_value,
-    pol_note_tx_hash,
-    pol_note_output_number,
-    pol_noteid_path,
-    pol_noteid_path_selectors,
-    pol_slot_secret,
-    pol_slot_secret_path
-)
-
+is\_leader = would\_win\_leadership(pol\_epoch\_nonce,
+pol\_t0,
+pol\_t1,
+pol\_ledger\_aged,
+pol\_sl,
+pol\_secret\_key,
+pol\_sk\_secrets\_root,
+pol\_note\_value,
+pol\_note\_tx\_hash,
+pol\_note\_output\_number,
+pol\_noteid\_path,
+pol\_noteid\_path\_selectors)
 # Verify that it's a core node or a leader
-assert(selector * (is_leader - is_registered) + is_registered == 1)
-
-# Get leader note secret key
-pol_sk_secrets_root = get_merkle_root(pol_sk_starting_slot, sl, pol_slot_secret_path)
-pol_note_sk = zkhash(b"NOMOS_POL_SK_V1", pol_sk_starting_slot, pol_sk_secrets_root)
-
+assert( selector \* (is\_leader - is\_registered) + is\_registered == 1)
 # Derive nullifier
-selection_randomness = zkhash(
-    b"SELECTION_RANDOMNESS_V1",
-    selector * (pol_note_sk - core_sk) + core_sk,
-    index,
-    session
-)
-key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
-```
+selection\_randomness = zkhash(
+b"SELECTION\_RANDOMNESS\_V1",
+selector \* (pol\_secret\_key - core\_sk) + core\_sk,
+index,
+selector \* (pol\_sl - session) + session)
+key\_nullifier = zkhash(b"KEY\_NULLIFIER\_V1", selection\_randomness)
 
 ### Proof Compression
 
-The proof confirming that the PoQ is correct MUST be compressed
-to a size of 128 bytes.
+The proof confirming that the PoQ is correct must be compressed to a size of 128 bytes, where the
 
-**Uncompressed Format**: The UncompressedProof comprises 2 G1 and 1 G2
-BN256 elements:
+UncompressedProof
 
-```python
+is comprising of 2 $\mathbb{G}\_1$ and 1 $\mathbb{G}\_2$ BN256 elements as presented below.
+
 class UncompressedProof:
-    pi_a: G1  # BN256 element
-    pi_b: G2  # BN256 element
-    pi_c: G1  # BN256 element
-```
-
-**Compression Requirements**:
-
-- Compressed size: 128 bytes
-- Curve: BN256 (also known as BN254 or alt_bn128)
-- Compression MUST preserve proof validity
+pi\_a: G1 # BN256 element 
+pi\_b: G2 # BN256 element
+pi\_c: G1 # BN256 element
 
 ### Proof Serialization
 
-The ProofOfQuota structure contains `key_nullifier` and the compressed proof
-transformed into bytes.
+The
 
-```python
+ProofOfQuota
+
+structure contains
+
+key\_nullifier
+
+and the compressed
+
+proof
+
+transformed in bytes according [[1.0.2] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69). The
+
+key\_nullifier
+
+must be transformed into bytes. The bytes of the compressed proof are then concatenated together with the bytes representing the
+
+key\_nullifier
+
+, with the encoded
+
+key\_nullifier
+
+preceding the encoded compressed
+
+proof
+
+. Reconstruction of a serialized
+
+ProofOfQuota
+
+interpreting the bytes as the concatenation of the
+
+key\_nullifier
+
+and of the compressed
+
+proof
+
+following the same rule of conversion.
+
 class ProofOfQuota:
-    key_nullifier: zkhash  # 32 bytes
-    proof: bytes           # 128 bytes
-```
+key\_nullifier: zkhash # 32 bytes
+proof: bytes # 128 bytes
 
-**Serialization Format**:
+## Appendix
 
-1. Transform `key_nullifier` into 32 bytes
-2. Compress proof to 128 bytes
-3. Concatenate: `key_nullifier || proof`
-4. Total size: 160 bytes
+### Benchmarks
 
-**Deserialization**:
+The material used for the benchmarks is the following:
 
-Interpret the 160-byte sequence as:
+CPU: 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
 
-- Bytes 0-31: `key_nullifier`
-- Bytes 32-159: `proof`
+RAM: 32GB - Speed: 5600 MT/s
 
-### Security Considerations
+Motherboard: Micro-Star International Co., Ltd. MS-17S1
 
-#### Quota Enforcement
+OS: Ubuntu 22.04.5 LTS
 
-- Implementations MUST track `key_nullifier` values during each session
-- Duplicate `key_nullifier` values MUST be rejected
-- Session transitions MUST clear the nullifier set
+Kernel: 6.8.0-59-generic
 
-#### Proof Verification
-
-- All Merkle path verifications MUST be performed
-- The `selector` bit MUST be verified as boolean (0 or 1)
-- Index bounds MUST be strictly enforced
-- Implementations MUST reject proofs where neither core nor leader conditions hold
-
-#### Cryptographic Assumptions
-
-- Relies on soundness of the underlying zk-SNARK system
-- Assumes collision resistance of `zkhash` function
-- Assumes computational Diffie-Hellman assumption on BN256 curve
-
-#### Note Unspent Condition
-
-- **Critical**: The PoQ does NOT verify that Proof of Leadership notes are unspent
-- This allows pre-generation of proofs to avoid delays
-- Implementations SHOULD implement additional checks for actual leadership
-
-## Implementation Considerations
-
-This section provides guidance for implementing the Proof of Quota protocol.
-
-### Proof Generation
-
-**Performance Characteristics**:
-
-Implementations SHOULD consider:
-
-- Proof generation is computationally intensive
-- Pre-generation is recommended for leader nodes
-- Witness preparation involves Merkle path computation
-
-### Proof Verification Implementation
-
-**Verification Steps**:
-
-1. Deserialize proof into `key_nullifier` and `proof` components
-2. Verify proof size (160 bytes total)
-3. Check `key_nullifier` against session nullifier set
-4. Verify zk-SNARK proof with public inputs
-5. Add `key_nullifier` to session set if valid
-
-### Merkle Tree Construction
-
-#### Core Nodes Merkle Tree
-
-**Specification**:
-
-- Depth: 20 levels
-- Leaf values: `zk_id` of declared core nodes
-- Ordering: Ascending numerical order (as natural numbers 0 to p)
-- Empty leaves: Represented by 0, appended after sorted values
-- Capacity: 2^20 = 1,048,576 validators
-
-**Construction Algorithm**:
-
-```python
-def build_core_tree(zk_ids: list[int]) -> MerkleTree:
-    # Sort zk_ids in ascending order
-    sorted_ids = sorted(zk_ids)
-
-    # Pad to 2^20 with zeros
-    padded = sorted_ids + [0] * (2**20 - len(sorted_ids))
-
-    # Build Merkle tree
-    return MerkleTree(padded, depth=20)
-```
-
-#### PoL Ledger Merkle Tree
-
-**Specification**:
-
-- Depth: 32 levels
-- Leaf values: Note IDs of eligible PoL notes
-- Purpose: Prove note membership in aged ledger
-
-### Session Management
-
-**Session Lifecycle**:
-
-1. **Session Start**:
-   - Initialize empty nullifier set
-   - Load current session parameters (quotas, roots)
-   - Prepare session number for proofs
-
-2. **During Session**:
-   - Verify incoming proofs
-   - Track nullifiers in set
-   - Reject duplicate nullifiers
-
-3. **Session End**:
-   - Clear nullifier set
-   - Archive session data
-   - Transition to next session
-
-### Best Practices
-
-#### Nullifier Set Management
-
-- Use efficient data structure (hash set or Bloom filter with fallback)
-- Implement atomic operations for nullifier insertion
-- Consider memory constraints for long sessions
-
-#### Pre-Generation Strategy
-
-For leader nodes:
-
-- Generate proofs before slot assignment
-- Cache proofs for multiple indices
-- Monitor note status separately from PoQ
-
-#### Error Handling
-
-Implementations SHOULD handle:
-
-- Invalid proof format
-- Duplicate nullifiers
-- Index out of bounds
-- Merkle path verification failures
-- Invalid selector values
-
-## References
-
-### Normative
-
-- NOMOS-BLEND-PROTOCOL - Blend Protocol specification for Nomos
-- Service Declaration Protocol (SDP) - Protocol for declaring core nodes
-- Mantle Specification
-- Circuit Constraints (Cryptarchia)
-- Proof of Selection
-- [Rate-Limiting Nullifiers](https://rate-limiting-nullifier.github.io/rln-docs/)
-  \- RLN documentation for rate-limiting mechanisms
-
-### Informative
-
-- [Proof of Quota Specification](https://nomos-tech.notion.site/Proof-of-Quota-Specification-215261aa09df81d88118ee22205cbafe)
-  \- Original Proof of Quota documentation
-- BN256 Curve Specification
-- zk-SNARKs (Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge)
-- [Cryptarchia Consensus](https://arxiv.org/abs/2402.06408)
-- Merkle Trees and Authentication Paths
-
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+![](https://nomos-tech.notion.site/image/attachment%3Aa2fcd60c-7778-4aa3-9bcf-0e5299e31e16%3Aoutput_(2).png?table=block&id=2e9261aa-09df-8023-91a7-e7f6c11c4056&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)

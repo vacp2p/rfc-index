@@ -18,245 +18,178 @@
 
 <!-- timeline:end -->
 
-## Abstract
+---
 
-This document specifies the Message Formatting for the Blend Protocol.
-The Message contains a header and a payload,
-where the header informs the protocol about the version and the payload type.
-The Message contains either a drop or a non-drop payload,
-with fixed-length payloads to prevent adversaries from
-distinguishing message types based on length.
-This specification reuses notation from the Notation document
-and integrates with the Message Encapsulation Mechanism.
+> **Note on this content sync:** Body imported from the Notion source on 2026-05-22.
+> Math equations are preserved as LaTeX ($...$ / $$...$$) via katex; tables and headings
+> are converted from Notion HTML. Formatting polish (semantic line breaks, code block fences,
+> internal cross-references) may still be needed.
 
-**Keywords:** Blend, message formatting, header, payload, drop, non-drop
+---
 
-## Semantics
+## Revision History
 
-The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in RFC 2119.
+|  |  |  |
+| --- | --- | --- |
+| Version | Changes | Date |
+| 1.0.0 | Initial revision. | 2026-04-09 |
 
-## Document Structure
+## Introduction
 
-This specification is organized into two distinct parts
-to serve different audiences and use cases:
+This document defines an implementation-friendly specification of the Message Formatting, which is introduced in the [[1.0.0] Blend Protocol - Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df818fb2decabd859c0647) section.
 
-**Protocol Specification** contains the normative requirements
-necessary for implementing an interoperable Blend Protocol node.
-This section defines the cryptographic primitives, message formats, network protocols,
-and behavioral requirements that all implementations MUST follow
-to ensure compatibility and maintain the protocol's privacy guarantees.
-Protocol designers, auditors,
-and those seeking to understand the core mechanisms should focus on this part.
+In this document we are reusing notation from [[1.0.0] Message Encapsulation Mechanism - Notation](https://nomos-tech.notion.site/Notation-215261aa09df81309d7fd7f1c2da086b?pvs=24#215261aa09df81df8604de53e43e134a).
 
-**Implementation Details** provides non-normative guidance for implementers.
-This section offers practical recommendations, optimization strategies,
-and detailed examples that help developers build efficient and robust implementations.
-While these details are not required for interoperability,
-they represent best practices learned from reference implementations
-and can significantly improve performance and reliability.
+## Overview
 
-## Protocol Specification
+The message contains a header and a payload. The header informs the protocol about the version of the protocol and the payload type. The message contains a drop or a non-drop payload. The length of a payload is fixed to prevent adversaries from distinguishing types of messages based on their length.
 
-### Construction
+## Construction
 
-#### Message
+### Message
 
-The Message is a structure that contains a public_header, private_header and a payload.
+The
 
-```python
+Message
+
+is a structure that contains a
+
+public\_header
+
+,
+
+private\_header
+
+and a
+
+payload
+
+.
+
 class Message:
-    public_header: PublicHeader
-    private_header: PrivateHeader
-    payload: bytes
-```
+public\_header: PublicHeader,
+private\_header: Private\_Header,
+payload: bytes
 
 #### Public Header
 
-The public_header must be generated as the outcome of the Message Encapsulation Mechanism.
+The
 
-The public_header is defined as follows:
+public\_header
 
-```python
+must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
+
+The
+
+public\_header
+
+is defined as follows:
+
 class PublicHeader:
-    version: byte
-    public_key: PublicKey
-    proof_of_quota: ProofOfQuota
-    signature: Signature
-```
+version: byte,
+public\_key: PublicKey,
+proof\_of\_quota: ProofOfQuota,
+signature: Signature
 
-**Fields:**
+Where:
 
-- version=0x01 is version of the protocol.
-- public_key is $K^{n}_{i}$,
-  a public key from the set $\mathbf{K}^{n}_{h}$
-  as defined in the Message Encapsulation spec.
-- proof_of_quota is $\pi^{K^{n}_{i}}_{Q}$,
-  a corresponding proof of quota for the key $K^{n}_{i}$ from the $\mathbf{K}^{n}_{h}$;
-  it also contains the key nullifier.
-- signature is $\sigma_{K^{n}_{i}}(\mathbf{h|P}_{i})$,
-  a signature of the concatenation of the $i$-th encapsulation
-  of the payload $\mathbf{P}$ and the private header $\mathbf{h}$,
-  that can be verified by the public key $K^{n}_{i}$.
+version=0x01
+
+is version of the protocol.
+
+public\_key
+
+is $K^{n}\_i$ , a public key from the set  $\mathbf K^n\_h$  as defined in the [Message Encapsulation](https://nomos-tech.notion.site/215261aa09df81309d7fd7f1c2da086b?pvs=25#215261aa09df814f8c13c1389d244c46) spec.
+
+proof\_of\_quota
+
+is $\pi^{K^{n}\_i}\_{Q}$ , a corresponding proof of quota for the key $K^{n}\_i$ from the $\mathbf K^n\_h$ it also contains the key nullifier.
+
+signature
+
+is $\sigma\_{K^{n}\_{i}}(\mathbf {h|P}\_i)$ , a signature of the concatenation of the $i$ -th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$ , that can be verified by the public key $K^{n}\_{i}$ .
 
 #### Private Header
 
-The private_header must be generated as the outcome of
-the Message Encapsulation Mechanism.
+The
 
-The private header contains a set of encrypted BlendingHeader entries
-$\mathbf{h} = (\mathbf{b}_{1},...,\mathbf{b}_{h_{max}})$.
+private\_header
 
-```python
-private_header: list[BlendingHeader]
-```
+must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
-The size of the set is limited to $\beta_{max}=3$ BlendingHeader entries,
-as defined in the Global Parameters.
+The private header contains a set of encrypted blending headers $\mathbf h = (\mathbf b\_1,...,\mathbf b\_{h\_{max}})$ .
 
-**Blending Header:**
+private\_header: list[BlendingHeader]
 
-The BlendingHeader ($\mathbf{b}_{l}$) is defined as follows:
+The size of the set is limited to $\beta\_{max}=3$
 
-```python
+BlendingHeader
+
+entries, as defined in the [[1.0.0] Blend Protocol - Global Parameters](https://nomos-tech.notion.site/Global-Parameters-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8108a3f4e5bdd8f4a4f3).
+
+The
+
+BlendingHeader
+
+( $\mathbf b\_l$ ) is defined as follows:
+
 class BlendingHeader:
-    public_key: PublicKey
-    proof_of_quota: ProofOfQuota
-    signature: Signature
-    proof_of_selection: ProofOfSelection
-    is_last: byte
-```
+public\_key: PublicKey,
+proof\_of\_quota: ProofOfQuota,
+signature: Signature,
+proof\_of\_selection: ProofOfSelection
+is\_last: byte
 
-**Fields:**
+Where:
 
-- public_key is $K^{n}_{l}$,
-  a public key from the set $\mathbf{K}^{n}_{h}$.
-- proof_of_quota is $\pi^{K^{n}_{l}}_{Q}$,
-  a corresponding proof of quota for the key $K^{n}_{l}$ from the $\mathbf{K}^{n}_{h}$;
-  it also contains the key nullifier.
-- signature is $\sigma_{K^{n}_{l}}(\mathbf{h|P}_{l})$,
-  a signature of the concatenation of $l$-th encapsulation
-  of the payload $\mathbf{P}$ and the private header $\mathbf{h}$,
-  that can be verified by public key $K^{n}_{l}$.
-- proof_of_selection is $\pi^{K^{n}_{l+1},m_{l+1}}_{S}$,
-  a proof of selection of the node index $m_{l+1}$
-  assuming valid proof of quota $\pi^{K^{n}_{l}}_{Q}$.
-- is_last is $\Omega$,
-  a flag that indicates that this is the last encapsulation.
+public\_key
+
+is $K^{n}\_{l}$ , a public key from the set $\mathbf K^n\_h$ .
+
+proof\_of\_quota
+
+is $\pi^{K^{n}\_l}\_{Q}$ , a corresponding proof of quota for the key $K^{n}\_l$ from the $\mathbf K^n\_h$ it also contains the key nullifier.
+
+signature
+
+is $\sigma\_{K^{n}\_{l}}(\mathbf {h|P}\_l)$ , a signature of the concatenation of $l$ -th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$ , that can be verified by public key $K^{n}\_{l}$ .
+
+proof\_of\_selection
+
+is $\pi^{K^{n}\_{l+1},m\_{l+1}}\_{S}$ , a proof of selection of the node index $m\_{l+1}$ assuming valid proof of quota $\pi^{K^{n}\_{l}}\_{Q}$ .
+
+is\_last
+
+is $\Omega$ , a flag that indicates that this is the last encapsulation.
 
 #### Payload
 
-The Payload is formatted according to the
-[Payload Formatting Specification][payload-formatting].
-The formatted Payload is generated as the outcome of
-the [Message Encapsulation Mechanism][message-encapsulation].
+The
 
-#### Maximum Payload Length
+payload
 
-The `MAX_PAYLOAD_LENGTH` parameter defines the maximum length of the payload,
-which for version 1 of the Blend Protocol is fixed as `MAX_PAYLOAD_LENGTH=34003`.
-That is, 34kB for the payload body (`MAX_BODY_LENGTH`)
-and 3 bytes for the payload header.
-More information about payload formatting can be found in
-[Payload Formatting Specification][payload-formatting].
+must be formatted according to the [[1.0.0] Payload Formatting](https://nomos-tech.notion.site/1-0-0-Payload-Formatting-215261aa09df8153a456c555b7dcbe1c?pvs=24). The formatted
 
-```python
-MAX_PAYLOAD_LENGTH = 34003
-MAX_BODY_LENGTH = 34000
-PAYLOAD_HEADER_SIZE = 3
-```
+payload
 
-## Implementation Considerations
+must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
-### Message Size Uniformity
+### Maximum Payload Length
 
-**Fixed-Length Design:**
+The
 
-- All messages have a fixed total length to prevent traffic analysis attacks
-- The payload length is constant regardless of actual content size
-- Padding is used to fill unused space in the payload body
-- This design prevents adversaries from distinguishing message types based on size
+Max\_Payload\_Length
 
-### Protocol Version
+parameter defines the maximum length of the
 
-**Version Field:**
+payload
 
-- The current protocol version is 0x01
-- The version field is a single byte in the public header
-- Future protocol versions may introduce breaking changes to the message format
-- Implementations must validate the version field before processing messages
+, which for version 1 of the Blend Protocol is fixed as
 
-### Header Generation
+Max\_Payload\_Length=34003
 
-**Dependency on Encapsulation:**
+. That is, 34kB for the payload body (
 
-- Both public_header and private_header are generated by
-  the Message Encapsulation Mechanism.
-- Implementations must not manually construct headers
-- The encapsulation mechanism ensures proper cryptographic properties
-- Headers include signatures, proofs, and encryption
-  as specified in the Message Encapsulation spec.
+Max\_Body\_Length
 
-### Blending Header Limit
-
-**Maximum Encapsulation Layers:**
-
-- The protocol limits the private header to $\beta_{max}=3$ BlendingHeader entries
-- This limit is defined in the Global Parameters
-- Each BlendingHeader represents one layer of Message encapsulation
-- The limit balances privacy (more layers) with performance and overhead
-
-### Integration Points
-
-**Required Specifications:**
-
-- Message Encapsulation Mechanism: Generates the public and private headers
-- Payload Formatting Specification: Defines how to format the payload content
-- Notation: Provides mathematical and cryptographic notation used throughout
-- Global Parameters: Defines protocol-wide constants like $\beta_{max}$
-
-### Security Considerations
-
-**Traffic Analysis Protection:**
-
-- Fixed message lengths prevent size-based traffic analysis
-- All messages appear identical in size on the network
-- Cover traffic can be indistinguishable from real data messages
-
-**Cryptographic Integrity:**
-
-- Signatures in both public and private headers ensure message authenticity
-- Proof of Quota prevents spam and resource exhaustion
-- Proof of Selection ensures correct node routing
-
-**Message Validation:**
-
-- Implementations must verify all signatures before processing
-- Proof of Quota must be validated to prevent quota violations
-- The is_last flag must be checked to determine final message destination
-
-## References
-
-### Normative
-
-- [Message Encapsulation Mechanism](https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b)
-  \- Cryptographic operations for building and processing messages
-- [Payload Formatting Specification](https://nomos-tech.notion.site/Payload-Formatting-215261aa09df81b2a3e1d913a0df9ad9)
-  \- Defines payload structure and formatting rules
-- [Blend Protocol](https://nomos-tech.notion.site/Blend-Protocol-215261aa09df81ae8857d71066a80084)
-  \- Protocol-wide constants and configuration values
-
-### Informative
-
-- [Message Formatting Specification](https://nomos-tech.notion.site/Message-Formatting-Specification-215261aa09df81c79e3acd9e921bcc30)
-  \- Original Message Formatting documentation
-- [Blend Protocol Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81a3b3ebc1f438209467)
-  \- High-level overview of message formatting in Blend Protocol
-
-[payload-formatting]: https://nomos-tech.notion.site/Payload-Formatting-215261aa09df81b2a3e1d913a0df9ad9
-[message-encapsulation]: https://nomos-tech.notion.site/Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b
-
-## Copyright
-
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+) and 3 bytes for the payload header. More information about payload formatting can be found in [[1.0.0] Payload Formatting](https://nomos-tech.notion.site/1-0-0-Payload-Formatting-215261aa09df8153a456c555b7dcbe1c?pvs=24).
