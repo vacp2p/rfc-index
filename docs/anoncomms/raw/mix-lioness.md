@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | LIONESS encryption scheme for LIBP2P-MIX payload encryption |
-| Slug | TBD |
+| Slug | 183 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Mohammed Alghazwi <mohalghazwi@status.im> |
@@ -35,7 +35,7 @@ A malleable encryption scheme such as AES-CTR does not satisfy this requirement.
 4. It MUST allow the final hop to detect payload tampering.
 5. It MUST avoid adding external authentication material/tags that change the packet or payload size.
 
-To achieve this, this specification uses LIONESS as described in [anderson et al](https://www.cl.cam.ac.uk/archive/rja14/Papers/bear-lion.pdf). LIONESS is a wide-block cipher built from a stream cipher and a keyed hash function. LIONESS acts as a pseudo-random permutation (PRP) over the entire payload block, allowing us to add an integrity prefix (e.g. leading zeros) into the plaintext and verify it after decryption.
+To achieve this, this specification uses LIONESS as described in [anderson et al](https://www.cl.cam.ac.uk/archive/rja14/Papers/bear-lion.pdf). LIONESS is a wide-block cipher built from a stream cipher and a keyed hash function. LIONESS acts as a pseudo-random permutation (PRP) over the entire payload block, allowing us to add the payload integrity prefix into the plaintext and verify it after decryption.
 
 ## 2. Terminology
 The following terms are used throughout this specification. Other terms are as defined in the [Mix Protocol](./mix.md).
@@ -198,7 +198,7 @@ $`
 `$
 
 where:
-- $k$ is the arbitrary-length seed (master key) from which the internal round keys are derived, with size at least $\kappa$ bytes
+- $k$ is the arbitrary-length LIONESS seed from which the internal round keys are derived, with size at least $\kappa$ bytes
 - $x$ is the plaintext message with size $|x| \ge 2\mu$ bytes.
 - $y$ is the corresponding ciphertext with size $|y| = |x|$
 
@@ -525,7 +525,7 @@ The security of LIONESS depends on the security of the primitives used to instan
 - the keyed hash function $\mathsf{H}_k$,
 - the key derivation function $\mathsf{KDF}$.
 
-Implementations may use any compatible choices. For detailed analysis on the security of LIONESS, refer to the [paper](https://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf). 
+For detailed analysis on the security of LIONESS, refer to the [paper](https://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf). 
 
 ## 9. Reference Implementations
 

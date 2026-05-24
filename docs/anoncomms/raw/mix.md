@@ -1406,11 +1406,11 @@ When the Exit Layer receives decrypted payload $δ'$ and the SURB identifier $\m
 
 2. **Recover Padded Reply Message**
 
-   The encrypted payload $δ'$ contains the of the padded reply message $m$ defined in [Section 8.7.3](#873-using-a-surb) Step 1, prepended with the payload integrity prefix of size $κ$-byte.
+   The encrypted payload $δ'$ contains the padded reply message $m$ defined in [Section 8.7.3](#873-using-a-surb) Step 1, prepended with the payload integrity prefix of size $κ$-byte.
    It is encrypted in a total of $L+1$ layers: 
    A first layer of LIONESS encryption using the reply key $\tilde{k}$ as the seed, and
    $L$ layers of LIONESS decryption using per-hop session keys $s_0, \ldots, s_{L-1}$.
-   To recover the padded reply message, we must first remove all the decryption layers with a LIONESS encryption, and then remove the initial reply encryption (using $\tilde{k}$) with a decryption. Therefore, the we must perform the following steps: 
+   To recover the padded reply message, we must first remove all the decryption layers with a LIONESS encryption, and then remove the initial reply encryption (using $\tilde{k}$) with a decryption. Therefore, we must perform the following steps: 
 
    - reverse the return-path layers by performing the same LIONESS layered encryption pattern as defined in [Section 8.5.2](#852-construction-steps), with the reply payload $δ'$ used as the initial input instead of the plaintext payload ($0_{κ} \mid m$). This process removes $L$ layers, resulting in $δ_0$.
 
