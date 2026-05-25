@@ -18,13 +18,11 @@
 
 <!-- timeline:end -->
 
-Authors: Mehmet Gonen <mehmet@status.im>, Marcin Pawlowski <marcin@status.im>, Thomas Lavaur <thomaslavaur@status.im>
-
 # Revisions History
 
 # Introduction
 
-This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which is introduced in [����[1.0.0] Blend Protocol - Proof of Quota](https://nomos-tech.notion.site/Proof-of-Quota-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df81edb561ef75a31f65a4).
+This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which is introduced in [[1.0.0] Blend Protocol - Proof of Quota](https://nomos-tech.notion.site/Proof-of-Quota-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df81edb561ef75a31f65a4).
 
 # Overview
 
@@ -34,8 +32,8 @@ The PoQ ensures that there is a limited number of message encapsulations that a 
 
 The Proof of Quota (PoQ) verifies that a node's public key is within a limit for either a core node or a leader node. It consists of two parts:
 
-1. Proof of Core Quota (PoQ_C): Ensures that the core node is declared and hasn���t already produced more keys than the core quota Q_C.
-1. Proof of Leadership Quota (PoQ_L): Ensures that the leader node would win the proof of stake for current Cryptarchia epoch and hasn���t already produced more keys than the leadership quota Q_L. That doesn���t guarantee that the node is indeed winning because the PoQ doesn���t check if the note is unspent enabling generation of the proof ahead of time preventing extreme delays.
+1. Proof of Core Quota (PoQ_C): Ensures that the core node is declared and hasnt already produced more keys than the core quota Q_C.
+1. Proof of Leadership Quota (PoQ_L): Ensures that the leader node would win the proof of stake for current Cryptarchia epoch and hasnt already produced more keys than the leadership quota Q_L. That doesnt guarantee that the node is indeed winning because the PoQ doesnt check if the note is unspent enabling generation of the proof ahead of time preventing extreme delays.
 
 The final proof PoQ is valid if either PoQ_C or PoQ_L holds.
 
@@ -149,7 +147,7 @@ class UncompressedProof:
 
 ## Proof Serialization
 
-The ProofOfQuota structure contains key_nullifier and the compressed proof transformed in bytes according [����[1.0.2] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69). The key_nullifier must be transformed into bytes. The bytes of the compressed proof are then concatenated together with the bytes representing the key_nullifier, with the encoded key_nullifier preceding the encoded compressed proof. Reconstruction of a serialized ProofOfQuota interpreting the bytes as the concatenation of the key_nullifier and of the compressed proof following the same rule of conversion.
+The ProofOfQuota structure contains key_nullifier and the compressed proof transformed in bytes according [[1.0.2] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69). The key_nullifier must be transformed into bytes. The bytes of the compressed proof are then concatenated together with the bytes representing the key_nullifier, with the encoded key_nullifier preceding the encoded compressed proof. Reconstruction of a serialized ProofOfQuota interpreting the bytes as the concatenation of the key_nullifier and of the compressed proof following the same rule of conversion.
 
 ```
 class ProofOfQuota:

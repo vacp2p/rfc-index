@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Giacomo Pasini <giacomo@status.im>
-
 # Revision History
 
 # Introduction
@@ -28,17 +26,17 @@ The main motivation behind this spec is avoiding being locked into a wallet soft
 
 # Overview
 
-This document mostly follows pre-existing standards in Bitcoin and adapts it to Logos��� needs when necessary. This is also the choice of other Bitcoin-inspired projects like Cardano or Zcash. For this reason, this document will not go over the entire spec itself, and just highlight differences with existing standards.
+This document mostly follows pre-existing standards in Bitcoin and adapts it to Logos needs when necessary. This is also the choice of other Bitcoin-inspired projects like Cardano or Zcash. For this reason, this document will not go over the entire spec itself, and just highlight differences with existing standards.
 
 ## Mnemonic codes for key generation
 
-Mnemonic codes are far easier to interact with as humans than raw binary or hex strings and are the standard for wallets. In this regard we can reuse  entirely, as it���s just operations on strings and bytes.
+Mnemonic codes are far easier to interact with as humans than raw binary or hex strings and are the standard for wallets. In this regard we can reuse  entirely, as its just operations on strings and bytes.
 
 ## Hierarchical Deterministic wallet
 
-Hierarchical Deterministic (HD) wallets are nowadays the standard. Using a single source of entropy (usually obtained through the process above), it���s possible to generate many different addresses and share all or part of it.
+Hierarchical Deterministic (HD) wallets are nowadays the standard. Using a single source of entropy (usually obtained through the process above), its possible to generate many different addresses and share all or part of it.
 
-The industry standard is [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). However, we can���t use it as it is, as we use different keys and cryptographic components. In addition, some of the BIP32 features are only possible thanks to homomorphic properties of ECC, which we don���t have in the Logos Blockchain since we use hash-based sk/pk.
+The industry standard is [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). However, we cant use it as it is, as we use different keys and cryptographic components. In addition, some of the BIP32 features are only possible thanks to homomorphic properties of ECC, which we dont have in the Logos Blockchain since we use hash-based sk/pk.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A76333c8a-46c5-4b16-883f-33fd4b5e04ed%3Aimage.png?table=block&id=216261aa-09df-808f-bbc0-f402be5e66f8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -47,7 +45,7 @@ BIP-32 specifies two kinds of child keys:
 - Normal: you can derive a child public key from the parent public key
 - Hardened: you need the parent private key to derive a child private and public key
 
-Unfortunately, ���normal��� children are possible thanks to specific properties of the keys used in Bitcoin that we don���t have in the Logos Blockchain (namely, homomorphism).
+Unfortunately, normal children are possible thanks to specific properties of the keys used in Bitcoin that we dont have in the Logos Blockchain (namely, homomorphism).
 
 To maintain compatibility, we will still use the same structure but non-hardened children will not be available.
 
@@ -63,7 +61,7 @@ To maintain compatibility, we will still use the same structure but non-hardened
 
 The main novelty with respect to the aforementioned protocols is one last additional step before obtaining a secret key that can be used in the Logos Blockchain network, described in [ZK-Compatible Secret Key Derivation in the Logos Blockchain](https://nomos-tech.notion.site/ZK-Compatible-Secret-Key-Derivation-in-the-Logos-Blockchain-215261aa09df80e9884ad7cf039e2c57?pvs=24#253261aa09df804d884beec790e96826).
 
-For the remaining procedures, we only highlight the differences instead of going over all the details again as they���re already covered extensively elsewhere.
+For the remaining procedures, we only highlight the differences instead of going over all the details again as theyre already covered extensively elsewhere.
 
 ## Notation:
 
@@ -74,20 +72,20 @@ For the remaining procedures, we only highlight the differences instead of going
 
 ## Child Key Derivation
 
-$CDKpriv((k_{par}, c_{par}), i) \rightarrow (k_i, c_i):$���
+$CDKpriv((k_{par}, c_{par}), i) \rightarrow (k_i, c_i):$
 
 ## Master Key Generation
 
 - Generate a seed byte sequence $S$ of a chosen length (e.g. with BIP0039)
-- Calculate $I = Blake2b\_512("Nomos\_MasterKGen", S)$���
+- Calculate $I = Blake2b\_512("Nomos\_MasterKGen", S)$
 - Split $I$ into two 32-byte sequences, $I_L$ and $I_R$.
 - Use $I_L$ as master secret key, and $I_R$ as master chain code.
 
 ## ZK-Compatible Secret Key Derivation in the Logos Blockchain
 
-Since we make extensive use of ZK proofs, we need our secret ��� public derivation to be efficient. For this purpose, we use a ZK-optimized hash function: Poseidon2.
+Since we make extensive use of ZK proofs, we need our secret  public derivation to be efficient. For this purpose, we use a ZK-optimized hash function: Poseidon2.
 
-However, Poseidon2 operates on field elements rather than raw bytes, so we cannot simply input $k_i$ as specified above. Instead, we must encode these bytes into field elements. Using the parameters described in [����[1.0.2] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69), we need two field elements to encode 32 bytes (the size of $k_i$). This creates inefficiency because although a single field element provides adequate security, we must use twice as many, increasing computation costs to accommodate the entire key.
+However, Poseidon2 operates on field elements rather than raw bytes, so we cannot simply input $k_i$ as specified above. Instead, we must encode these bytes into field elements. Using the parameters described in [[1.0.2] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69), we need two field elements to encode 32 bytes (the size of $k_i$). This creates inefficiency because although a single field element provides adequate security, we must use twice as many, increasing computation costs to accommodate the entire key.
 
 To reduce this additional cost inside the proof, we apply one final hash function that compresses these two field elements into a single one, which becomes the actual key used in the Logos Blockchain network:
 
@@ -98,13 +96,13 @@ Let $k_L, k_R$ be 16-byte sequences such that $k_i = k_L || k_R$ and $n_L, n_R$ 
 
 # References
 
-[ZIP 32: Shielded Hierarchical Deterministic Wallets](https://zips.z.cash/zip-0032)���
+[ZIP 32: Shielded Hierarchical Deterministic Wallets](https://zips.z.cash/zip-0032)
 
-[CIP-0003/README.mdcardano-foundation/CIPs](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0003/README.md)���
+[CIP-0003/README.mdcardano-foundation/CIPs](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0003/README.md)
 
-[slip-0023.mdsatoshilabs/slips](https://github.com/satoshilabs/slips/blob/master/slip-0023.md)���
+[slip-0023.mdsatoshilabs/slips](https://github.com/satoshilabs/slips/blob/master/slip-0023.md)
 
-[bip-0039.mediawikibitcoin/bips](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)���
+[bip-0039.mediawikibitcoin/bips](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 
-[bip-0032.mediawikibitcoin/bips](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)���
+[bip-0032.mediawikibitcoin/bips](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
 

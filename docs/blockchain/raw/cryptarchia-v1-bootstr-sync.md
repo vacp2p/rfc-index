@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Youngjoon Lee <youngjoon@status.im>
-
 # Revision History
 
 # Introduction

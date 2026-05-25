@@ -18,13 +18,11 @@
 
 <!-- timeline:end -->
 
-Authors: David Rusu <davidrusu@status.im>, Alexander Mozeika <alexander.mozeika@status.im>, Daniel Kashepava <danielkashepava@status.im>
-
 # Revision History
 
 # Introduction
 
-As with any Proof of Stake (PoS) consensus protocol, the probability that an eligible Cryptarchia participant wins the right to propose a block depends on that participant���s stake relative to the total active stake. Because leader selection in Cryptarchia is private, the total active stake is not directly observable. Instead, nodes must infer it from observable chain growth.
+As with any Proof of Stake (PoS) consensus protocol, the probability that an eligible Cryptarchia participant wins the right to propose a block depends on that participants stake relative to the total active stake. Because leader selection in Cryptarchia is private, the total active stake is not directly observable. Instead, nodes must infer it from observable chain growth.
 
 # Overview
 
@@ -32,7 +30,7 @@ The total active stake can be inferred by observing the slot occupancy rate: a h
 
 The stake inference algorithm adjusts the previous total stake estimate based on the difference between the empirical slot activation rate (measured as the growth rate of the honest chain) and the expected slot activation rate. A large difference serves as an indicator that the total stake estimate is not accurate and must be adjusted.
 
-This algorithm has been analyzed and shown to have good accuracy, precision and convergence speed. A caveat to note is that accuracy decreases with increased network delays. The analysis can be found in [����[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24).
+This algorithm has been analyzed and shown to have good accuracy, precision and convergence speed. A caveat to note is that accuracy decreases with increased network delays. The analysis can be found in [[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24).
 
 # Construction
 
@@ -42,12 +40,12 @@ This algorithm has been analyzed and shown to have good accuracy, precision and 
 
 ### Functions
 
-- $\textbf{density\_over\_slots}(s, p)$���
+- $\textbf{density\_over\_slots}(s, p)$
     Returns the number of blocks produced in the $p$ slots following slot $s$ in the honest chain.
 
 ## Algorithm
 
-For a current epoch���s estimate total_stake_estimate and the epoch���s first slot epoch_slot, the next epoch���s estimate is calculated as shown below:
+For a current epochs estimate total_stake_estimate and the epochs first slot epoch_slot, the next epochs estimate is calculated as shown below:
 
 ```
 const PRECISION: u64 = 1e3
@@ -70,5 +68,5 @@ max(new_total_stake_estimate, 1) as u64
 
 # Annex
 
-[����[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24)
+[[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24)
 

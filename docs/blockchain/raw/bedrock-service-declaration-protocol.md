@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Marcin Pawlowski <marcin@status.im>
-
 # Revision History
 
 # Introduction
@@ -42,7 +40,7 @@ The SDP enables nodes to declare their eligibility to serve a specific service i
 The protocol defines the following actions:
 
 - Declare: A node sends a declaration that confirms its willingness to provide a specific service, which is confirmed by locking a threshold of stake.
-- Active: A node marks that its participation in the protocol is active according to the service-specific activity logic. This action enables the protocol to monitor the node���s activity. We utilize this as a non-intrusive differentiator of node activity. It is crucial to exclude inactive nodes from the set of active nodes, as it enhances the stability of services.
+- Active: A node marks that its participation in the protocol is active according to the service-specific activity logic. This action enables the protocol to monitor the nodes activity. We utilize this as a non-intrusive differentiator of node activity. It is crucial to exclude inactive nodes from the set of active nodes, as it enhances the stability of services.
 - Withdraw: A node withdraws its declaration and stops providing a service.
 
 The logic of the protocol is straightforward.
@@ -53,7 +51,7 @@ The logic of the protocol is straightforward.
 1. The node must confirm its activity with a service-specific minimum frequency; otherwise, its declaration is inactive.
 1. After the service-specific locking period, the node can send a withdrawal message, and its declaration is removed from the Ledger (after necessary retention period), which means that the node will no longer provide the service.
 
-> The protocol messages are subject to a finality that means messages become part of the immutable ledger after a delay. The delay at which it happens is defined by the consensus. Therefore, the protocol���s progress must be tracked from the perspective of the last included (finalized) block, not the tip of the chain. Otherwise, the protocol and services using it would need to handle chain reorganizations, which we must avoid due to their potential to break services.
+> The protocol messages are subject to a finality that means messages become part of the immutable ledger after a delay. The delay at which it happens is defined by the consensus. Therefore, the protocols progress must be tracked from the perspective of the last included (finalized) block, not the tip of the chain. Otherwise, the protocol and services using it would need to handle chain reorganizations, which we must avoid due to their potential to break services.
 
 # Construction
 
@@ -94,7 +92,7 @@ The stake_thresholds is a structure aggregating all defined MinStake values.
 stake_thresholds: list[MinStake]
 ```
 
-For more information on how the minimum stake is calculated, please refer to the [����[1.0.0][Analysis] Static Minimum Stake Estimation for Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Analysis-Static-Minimum-Stake-Estimation-for-Service-Declaration-Protocol-3a2261aa09df83e2a104012e29c21f34?pvs=24).
+For more information on how the minimum stake is calculated, please refer to the [[1.0.0][Analysis] Static Minimum Stake Estimation for Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Analysis-Static-Minimum-Stake-Estimation-for-Service-Declaration-Protocol-3a2261aa09df83e2a104012e29c21f34?pvs=24).
 
 ### Service Parameters
 
@@ -143,7 +141,7 @@ return get_snapshot_at_block(0)
 return get_snapshot_at_block((session_number - 1) * service_parameters.session_length - 1)
 ```
 
-The function get_snapshot_at_block(block_number) returns the state of the SDP registry at block_number, and includes state changes made by that block. This snapshot defines the declaration state for the session���each snapshot updates the common view of the registry. Changes to the declaration registry take effect with a one-session delay: messages sent during session n are included in the next snapshot (for session n+1).
+The function get_snapshot_at_block(block_number) returns the state of the SDP registry at block_number, and includes state changes made by that block. This snapshot defines the declaration state for the sessioneach snapshot updates the common view of the registry. Changes to the declaration registry take effect with a one-session delay: messages sent during session n are included in the next snapshot (for session n+1).
 
 Sessions 0 and 1 read the snapshot at block 0, because the chain has not yet progressed far enough to provide a later finalized block.
 
@@ -152,7 +150,7 @@ Sessions 0 and 1 read the snapshot at block 0, because the chain has not yet pro
 We define the following set of identifiers which are used for service-specific cryptographic operations
 
 - provider_id: used to sign the SDP messages and to establish secure links between validators; it is Ed25519PublicKey.
-- zk_id: used for zero-knowledge operations by the validator that includes rewarding ([����[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)).
+- zk_id: used for zero-knowledge operations by the validator that includes rewarding ([[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)).
 
 ### Locators
 
@@ -298,7 +296,7 @@ If all of the above conditions are fulfilled, then the message is stored on the 
 
 ### Active
 
-The Active action enables marking the provider as actively providing a service. It requires sending a valid ActiveMessage (as defined in [Active Message](https://nomos-tech.notion.site/Active-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81f1a0b5cc8956c70660) ), which is relayed to the service-specific node activity logic (as indicated by the service type in [����[1.5.0] Mantle - Common SDP Structures](https://nomos-tech.notion.site/Common-SDP-Structures-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#b26261aa09df828ea4f1818e1cd3152d)).
+The Active action enables marking the provider as actively providing a service. It requires sending a valid ActiveMessage (as defined in [Active Message](https://nomos-tech.notion.site/Active-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81f1a0b5cc8956c70660) ), which is relayed to the service-specific node activity logic (as indicated by the service type in [[1.5.0] Mantle - Common SDP Structures](https://nomos-tech.notion.site/Common-SDP-Structures-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#b26261aa09df828ea4f1818e1cd3152d)).
 
 The Active action updates the active value of the DeclarationInfo, which means that it also activates inactive (but not expired) providers.
 
@@ -365,7 +363,7 @@ Every query must return information for a finalized state only.
 
 ## Mantle and ZK Proofs
 
-For more information about Mantle and ZK proofs, please refer to [����[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
+For more information about Mantle and ZK proofs, please refer to [[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
 
 # Default Service Parameters
 
@@ -379,5 +377,5 @@ class BlendNetworkServiceParameters:
     retention_period: 1
 ```
 
-The session_length follows the length of an epoch as indicated in [����[1.0.0] Blend Protocol - Session is a time during which the same set of core nodes is���](https://nomos-tech.notion.site/Session-is-a-time-during-which-the-same-set-of-core-nodes-is-executing-the-protocol-When-the-sessio-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8133a0ead533627fbb93)..
+The session_length follows the length of an epoch as indicated in [[1.0.0] Blend Protocol - Session is a time during which the same set of core nodes is](https://nomos-tech.notion.site/Session-is-a-time-during-which-the-same-set-of-core-nodes-is-executing-the-protocol-When-the-sessio-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8133a0ead533627fbb93)..
 

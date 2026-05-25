@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Thomas Lavaur <thomaslavaur@status.im>
-
 # Revisions History
 
 # Introduction

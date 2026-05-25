@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Thomas Lavaur
-
 # Revision History
 
 # Introduction

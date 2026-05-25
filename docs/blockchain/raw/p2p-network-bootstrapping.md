@@ -22,16 +22,14 @@
 
 <!-- timeline:end -->
 
-Authors: Daniel Sanchez Quiros <danielsq@status.im>
-
 # Revision History
 
 # Introduction
 
 Logos Blockchain network bootstrapping is the process by which a new node discovers peers and synchronizes with the existing decentralized network. It ensures that a node can:
 
-1. Discover Peers ��� Find other active nodes in the network.
-1. Establish Connections ��� Securely connect to trusted peers.
+1. Discover Peers  Find other active nodes in the network.
+1. Establish Connections  Securely connect to trusted peers.
 1. Negotiate (libp2p) Protocols - Ensure that other peers operate in the same protocols as the node needs.
 
 # Overview
@@ -52,7 +50,7 @@ Trust Minimization: While bootstrap nodes provide initial connectivity, the netw
 
 Authenticated Announcements: The identities and addresses of bootstrap nodes are publicly verifiable to mitigate impersonation attacks. From the [libp2p documentation](https://docs.libp2p.io/concepts/transports/quic/#quic-in-libp2p):
 
-> To authenticate each others��� peer IDs, peers encode their peer ID into a self-signed certificate, which they sign using their host���s private key.
+> To authenticate each others peer IDs, peers encode their peer ID into a self-signed certificate, which they sign using their hosts private key.
 
 Dynamic Peer Management: After bootstrapping, nodes continuously refine their peer lists to maintain a resilient and distributed network topology.
 
@@ -66,20 +64,20 @@ This approach ensures rapid, secure, and scalable network participation while pr
     /ip4/198.51.100.0/udp/4242/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N or
     /dns/foo.bar.net/udp/4242/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 1. Secure Connection: Nodes establish connections to bootstrap nodes announced addresses and verify network identity and protocol compatibility.
-1. Peer Discovery: Requests and receive validated peer lists from bootstrap nodes. Each entry includes connectivity details as per the [����[1.0.1] P2P Network - Peer Discovery](https://nomos-tech.notion.site/Peer-Discovery-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81f19c52d887d833e438) protocol engaging after the initial connection.
+1. Peer Discovery: Requests and receive validated peer lists from bootstrap nodes. Each entry includes connectivity details as per the [[1.0.1] P2P Network - Peer Discovery](https://nomos-tech.notion.site/Peer-Discovery-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81f19c52d887d833e438) protocol engaging after the initial connection.
 1. Network Integration: Iteratively connects to discovered peers. Gradually build peer connections.
 1. Protocol Engagement: Establishes required protocol channels (gossip/consensus/sync). Begins participating in network operations.
 1. Ongoing Maintenance: Continuously evaluates and refreshes peer connections. Ideally removes the connection to the bootstrap node itself. Bootstrap nodes may chose to remove the connection on their side to keep high availability for other nodes.
 
 ```
-Bootstrap NodeNodeLogos Blockchain NetworkBootstrap NodeNodeLogos Blockchain Networkloop[Interacts with bootstrap node]loop[Connects to Networkparticipants]alt[Bootstrap connection no longerneeded][Bootstrap enforces disconnection]loop[Ongoing maintenance]Fetches bootstrapping addressesConnectsSends discovered peers' informationEngages in connectionsNegotiates protocolsEvaluates peer connectionsDisconnectsDisconnects���
+Bootstrap NodeNodeLogos Blockchain NetworkBootstrap NodeNodeLogos Blockchain Networkloop[Interacts with bootstrap node]loop[Connects to Networkparticipants]alt[Bootstrap connection no longerneeded][Bootstrap enforces disconnection]loop[Ongoing maintenance]Fetches bootstrapping addressesConnectsSends discovered peers' informationEngages in connectionsNegotiates protocolsEvaluates peer connectionsDisconnectsDisconnects
 ```
 
 # Details
 
-The bootstrapping process for the Logos Blockchain p2p network uses the QUIC transport as specified in the [����[1.0.1] P2P Network - Transport](https://nomos-tech.notion.site/Transport-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81a88aa2d18dd0bbe8f3).
+The bootstrapping process for the Logos Blockchain p2p network uses the QUIC transport as specified in the [[1.0.1] P2P Network - Transport](https://nomos-tech.notion.site/Transport-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81a88aa2d18dd0bbe8f3).
 
-Bootstrapping is separated from the network���s peer discovery protocol. It assumes that there is one protocol that would engage as soon as the connection with the bootstrapping node triggers. Currently, the Logos Blockchain network uses kademlia as the current first approach for the Logos Blockchain p2p network (see [����[1.0.1] P2P Network - Peer Discovery](https://nomos-tech.notion.site/Peer-Discovery-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81f19c52d887d833e438)), which comes built-in.
+Bootstrapping is separated from the networks peer discovery protocol. It assumes that there is one protocol that would engage as soon as the connection with the bootstrapping node triggers. Currently, the Logos Blockchain network uses kademlia as the current first approach for the Logos Blockchain p2p network (see [[1.0.1] P2P Network - Peer Discovery](https://nomos-tech.notion.site/Peer-Discovery-206261aa09df81db8100d5f410e39d75?pvs=24#206261aa09df81f19c52d887d833e438)), which comes built-in.
 
 # Annex
 

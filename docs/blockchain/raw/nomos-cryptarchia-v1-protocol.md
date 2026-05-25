@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: David Rusu <davidrusu@status.im>
-
 # Revision History
 
 # Introduction

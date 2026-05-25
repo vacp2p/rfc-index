@@ -18,15 +18,13 @@
 
 <!-- timeline:end -->
 
-Authors: Marcin Pawlowski <marcin@status.im>
-
 # Revision History
 
 # Introduction
 
-This document defines an implementation-friendly specification of the Message Formatting, which is introduced in the [����[1.0.0] Blend Protocol - Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df818fb2decabd859c0647) section.
+This document defines an implementation-friendly specification of the Message Formatting, which is introduced in the [[1.0.0] Blend Protocol - Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df818fb2decabd859c0647) section.
 
-In this document we are reusing notation from [����[1.0.0] Message Encapsulation Mechanism - Notation](https://nomos-tech.notion.site/Notation-215261aa09df81309d7fd7f1c2da086b?pvs=24#215261aa09df81df8604de53e43e134a).
+In this document we are reusing notation from [[1.0.0] Message Encapsulation Mechanism - Notation](https://nomos-tech.notion.site/Notation-215261aa09df81309d7fd7f1c2da086b?pvs=24#215261aa09df81df8604de53e43e134a).
 
 # Overview
 
@@ -47,7 +45,7 @@ class Message:
 
 ### Public Header
 
-The public_header must be generated as the outcome of the [����[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
+The public_header must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
 The public_header is defined as follows:
 
@@ -68,7 +66,7 @@ Where:
 
 ### Private Header
 
-The private_header must be generated as the outcome of the [����[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
+The private_header must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
 The private header contains a set of encrypted blending headers $\mathbf h = (\mathbf b_1,...,\mathbf b_{h_{max}})$.
 
@@ -76,7 +74,7 @@ The private header contains a set of encrypted blending headers $\mathbf h = (\m
 private_header: list[BlendingHeader]
 ```
 
-The size of the set is limited to $\beta_{max}=3$ BlendingHeader entries, as defined in the [����[1.0.0] Blend Protocol - Global Parameters](https://nomos-tech.notion.site/Global-Parameters-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8108a3f4e5bdd8f4a4f3).
+The size of the set is limited to $\beta_{max}=3$ BlendingHeader entries, as defined in the [[1.0.0] Blend Protocol - Global Parameters](https://nomos-tech.notion.site/Global-Parameters-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8108a3f4e5bdd8f4a4f3).
 
 The BlendingHeader ($\mathbf b_l$) is defined as follows:
 
@@ -99,9 +97,9 @@ Where:
 
 ### Payload
 
-The payload must be formatted according to the [����[1.0.0] Payload Formatting](https://nomos-tech.notion.site/1-0-0-Payload-Formatting-215261aa09df8153a456c555b7dcbe1c?pvs=24). The formatted payload must be generated as the outcome of the [����[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
+The payload must be formatted according to the [[1.0.0] Payload Formatting](https://nomos-tech.notion.site/1-0-0-Payload-Formatting-215261aa09df8153a456c555b7dcbe1c?pvs=24). The formatted payload must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
 ## Maximum Payload Length
 
-The Max_Payload_Length parameter defines the maximum length of the payload, which for version 1 of the Blend Protocol is fixed as Max_Payload_Length=34003. That is, 34kB for the payload body (Max_Body_Length) and 3 bytes for the payload header. More information about payload formatting can be found in [����[1.0.0] Payload Formatting](https://nomos-tech.notion.site/1-0-0-Payload-Formatting-215261aa09df8153a456c555b7dcbe1c?pvs=24).
+The Max_Payload_Length parameter defines the maximum length of the payload, which for version 1 of the Blend Protocol is fixed as Max_Payload_Length=34003. That is, 34kB for the payload body (Max_Body_Length) and 3 bytes for the payload header. More information about payload formatting can be found in [[1.0.0] Payload Formatting](https://nomos-tech.notion.site/1-0-0-Payload-Formatting-215261aa09df8153a456c555b7dcbe1c?pvs=24).
 
