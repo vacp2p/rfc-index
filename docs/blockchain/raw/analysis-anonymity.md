@@ -18,80 +18,124 @@
 
 <!-- timeline:end -->
 
-### Summary of “[Are continuous stop-and-go mixnets provably secure](https://eprint.iacr.org/2023/1311)?” article.
+# Revision History
 
-- Adversary: We consider a probabilistic polynomial time (PPT) adversary that can observe (but not alter) all network traffic. The adversary can also perform passive and static corruptions of senders, the recipient R, and a subset of mixnodes. Passive and static corruption means that the adversary chooses the subset of corrupted parties before the protocol starts; the adversary then has access to the internal states of these c mixnodes, including all of their keys and random choices; however, the compromised parties still follow the protocol specifications.
-- User Unlinkability: In our first definition, the adversary does not control the time when the challenge messages are released, and the content of any other messages from the honest users. This more closely captures the surveil- lance scenario where the adversary observes an interesting/disturbing message received by the recipient and then tries to figure out who among Alice and Bob could have sent that message. Informally, the protocol achieves anonymity according to this definition as long as a target message from Alice is ‘mixed’ with at least one message from Bob.
-- Pairwise Unlinkability: Our second definition is stronger; here, we consider that the adversary controls the time when the challenge messages are released to the challenge users, the content of all other messages from the honest users, and then tries to distinguish who among them have sent which of the challenge messages after they are received by the recipient. Such a definition is useful to capture a strong adversarial scenario in the context of whistleblowing where the adversary might release fake/tagged documents and observe the time of its release to identify the whistleblower.
-    - In one of our main results, we prove that in continuous mixnets, by controlling the time of release, the adversary can exploit the fact that whichever message goes into the AC network first, comes out first with good probability - which we formally denote as the FIFO attack.
-- The cascade continuous mixing (CCM) protocol: i) Each message travels through a fixed cascade of k hops before getting delivered to the recipient; ii) The sender then onion encrypts the message (using Sphinx packet structure) for the cascade (including the recipient), and sends it to the first of the mixnode in the cascade after some delay sampled from exponential distribution; iii) Each mixnode delays the messages also following an exponential distribution.
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeEv6p1o-P1Fk8fYjnZCeoZ6mQqUa6RCDzbkDt32QCdgIkd62LjTzFdraWuE5Cnnnl44V0LrQ8h7-lpKjDUUbjrWUDvml1GGG0yeTvYA1HNw6RxTQ5UJyZbykpVCKtjcLZwvJu5gA75vwaDl6yYk_tEj5zw?key=SwbMSSilnhvHe1V0xsYGLQ)
-- The multi-path continuous mixing (MCM) protocol: i) We consider a stratified topology where mixnodes are arranged in a number of layers, such that mixnodes in layer i receives messages from mixnodes in layer i - 1 and sends messages to mixnodes in layer i+1. The path length of message routes is determined by the number of layers, and is denoted by k. Further, we consider that each layer has exactly K mixnodes; ii) The sender of the message picks a path of length k by picking one mixnode uniformly at random from each layer, independent of the choices of other users or other messages; iii) The sender samples k independent delay values from exp. distribution. They then onion-encrypt the message for the path (including the recipient), and embed the values in the onions header such that only i-th mixnode can see its delay value. Then they send it to the first of the mixnodes in the path after a delay sampled from the exp. distr.
-- A trusted third party (TTP) anonymizer receives messages and shuffles them. If there are a sufficient number of messages received by the TTP regularly, then each message will mix with enough number of other messages. However, if a set messages are received by the TTP exactly at the same moment, their output order will not reveal anything to the adversary; and we could say that those messages are “shuffled” with each other.
-    - TTP interacts with the senders in U and the recipient R, and is parameterized by latency k and delay λ. The senders provide TTP with their messages over a secure channel, so that no information about the message content is leaked to the adversary.
-        ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeCFapqD4njwjC32O8hm0rw2WIAS9FrASc2zyqGE_Ur8T7RJHu7hubQJtVHKjCFXD8yQP4ysWpbpvxA-ucGBzeQZgPQ_4rq0R9zSOrEfARVeyZxIKuxwb0iQKliiYT3cm4Vxrnv_JQfFBuVdRvp7_NcME6t?key=SwbMSSilnhvHe1V0xsYGLQ)
-    - TTP acts as a central mixing node that delivers the messages to R after adding a delay (sampled from some prob. distribution related to the protocol).
-    - Assuming that the central mixing node is honest, the power of the adversary is limited to an observer that monitors incoming and outgoing traffic.
-    - As this sets the minimum power for a global passive adversary, the security of TTP serves as an optimistic bound of the security expected by a typical mixing construction.
-- FIFO attack
-    - We consider a simplified setting with (i) two senders u0, u1; (ii) a single recipient R; and (iii) TTP. The system state is as follows: each sender has a single message in her buffer and the queue is empty, i.e. there are no prior pending messages. The senders u0 and u1 send their messages to the recipient R that receives the messages m0 and m1.
-        ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXe-4ImhIeqo9OSTuiArlrWBVmyWrKmfahNejJ4qJ71C8RK1LWRb9DvDe5Vpmik7vtNVa1wTkduhaYkfMkp_3OLHm6cjd3XWc-FXbdcaxAPbVLzSPhqTafHTO8GNYXXZy9Kje5gsto_8LAGRTzXg9CYM0YyV?key=SwbMSSilnhvHe1V0xsYGLQ)
-    - The goal of the mix is to provide sender anonymity against an adversary that controls R and is a global observer, i.e. to hide whether communication occurs in 1) a “direct” manner: i.e. the users u0 and u1 sent, respectively, the messages m0 and m1 to R or 2) a “cross” manner: i.e. the users u0 and u1 sent, respectively, the messages m1 and m0 to R.
-    - The adversary begins observation at some given time when the messages m0 , m1 are in the sender’s queues and are about to be delivered. By the memoryless property (?) and the description of the system state, we may assume that observation begins at time 0. Then adversary executes the following steps:
-        ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXctmeteVHv7igyqjuCORblp83P8p5g5rDASpBffu9WDaBpEQ0sU2rYYTdJyxTNohIbs1HWU0UuoZ9LpSVtM6t9Xj7U-ldWpDx3zW9MYf1AQ8lvurnClmpgQyfn-U8t2hVTC27rcZ2vryIq0EbjVIDu9n252?key=SwbMSSilnhvHe1V0xsYGLQ)
-    - In a nutshell, adversary guesses based on the prediction that messages input earlier to the mixing node are more likely to be delivered earlier to the intended recipient.
-- Analysis of the FIFO attack
-    - Without loss of generality, assume that the users $u_0$ and $u_1$ provide the messages $m_0$ and $m_1$, respectively, in a “direct” manner to $R$ (due to symmetry and independence, the “cross” case can be analysed similarly?).
-    - We denote the following random variables:
-        1. The delay $x_0$ until $m_0$ is sent to TTP by $u_0$.
-        1. The delay $x_1$ until $m_1$ is sent to TTP by $u_1$.
-        1. The delay $y_0$ of TTP until $m_0$ is forwarded to $R$, i.e. the time $m_0$ stays in the TTP.
-        1. The delay $y_1$ of the TTP until $m_1$ is forwarded to $R$, i.e. the time $m_1$ stays in the TTP
-    - We have that $t_{s,0}$,$t_{s,1}$, $t_{r,0}$ and $t_{r,1}$ are the time values of $x_0$, $x_1$, $x_0$+$y_0$, $x_1 + y_1$, that adversary observes, in the direct case.
-    - Thus adversary wins when either one of the following events happen:
-        1. $E_{0<1}: x_0 < x_1$ and $x_0 + y_0 < x_1 + y_1$;
-        1. or $E_{0\geq1}: x_0 \geq x_1$ and $x_0 +y_0 \geq x_1 +y_1$;
-            ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXePQ5mTrLvedWLLwtOHP340bXRJmIavl3xg8AR-xJIu3ylt8jtyG3m9Vn0zUnO4pME_bxnzJyyGacQISwQMWJPOvk4zNy5247Bt04qmRk-g2OQfeh_z5v6wOqWihwpRUU0q0gloeMrkmruBHhhjNO-gBnu3?key=SwbMSSilnhvHe1V0xsYGLQ)
-- User unlinkability definition
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcEAFplYjCMBQ1QKzbqz8KnZaPFsz7UVD35lvtPATWu_6NA5sjWIqMttobV1NPLVeg-nnRzS-1IT8yYOeW7vITLc7qLVIXb5Xy21ty0zS5gaQc6-9C0BpyTAfWPkY57XQwVR0zerbetsqC4Jp92P1jDGQGh?key=SwbMSSilnhvHe1V0xsYGLQ)
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-09-08 |
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F41367a55-f0b6-4bc1-bf86-eba88cb5cc4d%2FScreenshot_2024-08-10_at_19.50.13.png?table=block&id=1fd261aa-09df-81f9-a37e-e564487aa4de&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+# Introduction
 
-- Analysis for User Unlinkability
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfQQWM2scLwXsvofLFmp7pHSm7Qkenmgvubo003trKN_yhPPTGzSxNWIrbmhiv2awynsW7QLFw0YjZ1rzWaLNGx-BHL6zOKL2oqgkq0RRKgk3FE1znREODefKDuBr--Zdcipm8HFqi5pHxz1JcS3pCzg9pZ?key=SwbMSSilnhvHe1V0xsYGLQ)
+In this document we consider anonymity properties of a network constructed from mix nodes. We assume that [queueing systems](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) of nodes in the network delay messages. This delay is a random variable from the Geometric distribution. Furthermore, we assume that an adversary is able to observe communication links, but can not distinguish between message. Also a fraction of nodes can be corrupted by adversary but in a [static and passive manner](https://nomos-tech.notion.site/1fd261aa09df81af9348d645a3c14446?pvs=25#1fd261aa09df81bcb2cccbdd1307008b).
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfHMhmuXc1ruUtJ-he8hs9mABuZvz-mfcmRmEbVG4oEoTHixCmOh8RWGH6Py8K6gIaPyZz8_TCFgMV-OTP4SIJXYcqEwy7PhJG-F4ZexB3jsZ0OxFtdQryH3xa7B-6b2r6syoC3-PpBp-f-uPClrTFCp662?key=SwbMSSilnhvHe1V0xsYGLQ)
+First, we consider a single (uncorrupted) node observed by an adversary. For this scenario we show that the temporal order of two messages which arrived at the node is preserved, with some probability, when they leave the node. We show that the probability $1/2$ is achieved for a large (average) delay per message and a small difference between the arrival times of messages. For prob. $1/2$ the temporal order of outgoing messages is unbiased and random, and hence adversary does not have advantage over the random guessing.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfYPTg2FLQJsiwKuoI18yyAfqCZir6GrSee9Al4oLz3cusZ5eyTjgwNiXd7kXf5WrDlrLbfqco5AvC_XTIsVjPdRUChfVJxUu48cVfxEIr_xcoYfAgDM4zy7IvpUZwtaGjilifzp01elgW976ApWcI4aIgU?key=SwbMSSilnhvHe1V0xsYGLQ)
+Second, we consider two (uncorrupted) nodes sending messages, through the path of (uncorrupted) mix nodes, to the receiver node which is corrupted by adversary. We also assume that the adversary is able to observe only communication links connecting sender nodes to the first mix node. Here in this more complicated set up, we show that the probability of preserving temporal order of messages can be $1/2$, i.e adversary does not have advantage over random guessing.
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcsu4aA_UeFmr7Lo0JiKz_SmeKmQ6T2yKOG_z5u8l_s3VsBoj8oyOq_8SuZwWddRBR7HxQST7v21KKjEZjF6mMjaTX7mCXbkLxcPes-5xQBNQTynXvpesDHtMDNPoQbJrHKuOsPImThvizNcZrYkqVDlQs?key=SwbMSSilnhvHe1V0xsYGLQ)
+# Analysis
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcfvPi-xKaduisFeBeD110O5dR_OSxtTqJ8tjULzl_5CZnKVRtqQzYRGx1zBHbNT_h6aj3iZ08sneoS5IkkCNAL3SF24VSTP2F6GYGQ2bI9MSa86nAnS8YJgx88EMGKGG5Yk9_pdyniaTZ9Q1ZmC6KrEUk?key=SwbMSSilnhvHe1V0xsYGLQ)
+## Single node
 
-![](https://lh7-us.googleusercontent.com/docsz/AD_4nXd521fMQk_pPhrmArfgsYGpt8tQGKkEuxmPAJlm90QvjmSTVnujD1ZX9pSgdMZzBMVQZxQuySa4W5KlK95BHeIIed8O0maXXMAQCwi-v76CKjbs3-p0nkyvOROMXOMVw-_8d97HqliOAJbbu2PrEgJr_za7?key=SwbMSSilnhvHe1V0xsYGLQ)
+- Let us assume that messages $1$ and $2$ arrived, respectively, at a node at the time $t_1^{in}$ and $t_2^{in}$, where $t_2^{in} > t_1^{in}$. Assuming that the message $\mu\in\{1,2\}$ was delayed by $r_\mu\Delta$, where $r_\mu$ is random variable from the Geometric distribution $\mathrm{P}_q(r)$, we have message $\mu$ leaving the node at time $t^{out}_\mu =  t^{in}_\mu +r_\mu\Delta$.
+- We are interested in the probability $\mathrm{P}(t^{out}_2>t^{out}_1\vert t^{in}_2>t^{in}_1)$, i.e. the probability that the order of two messages arrived at the node is preserved. The latter, for the (rescaled) time-difference $\Delta_{12}=\frac{t_2^{in} - t_1^{in}}{\Delta}$, is given by
 
-- Pairwise Unlinkability definition
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXdYYpK5X3OgjdQZ_akxWXzzBcXEEpyyKEL7gnJ4CwNho8rPlR5Jk8MJYTTjLBMeKmsDmReERrMVQFVLUJ-AJksGNthGzSnIfFyXtjcCed85SqxJZV1dB4k31H3Ll0TnD1YX8ApDXLEL4dzPc6okbv-K2aMI?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXe_d78BNGXV9Z04L5kJd8Ux_SM-n3IUh1v4lcsG-90VStZrv1pp8hS7vbfQJaasLaMQmJO506_MbFphDK3S17ccUg5ZgC0fMop3PGUK7DnrL8iLopQ4ZeGOwy6RhAjTL7fcnXr9W30CPGFbFJMb4eCILU3n?key=SwbMSSilnhvHe1V0xsYGLQ)
-- Analysis for Pairwise Unlinkability
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeeB0nCkxi1UJ7Ycgbbm4Ww4sgAHIgGth1ixgsUFwiLEg4NwGi-lvhElDLrizOsQVoY9W2ICpIBcHWeP3YHQa5YEEKZuuYigpbpVlOuVP3z0aTs-NsWO0Ut2e95lfW3BiYGDIWk8kvFSIWlp3NBGe97HBdk?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfzDzbZ5FGrHkXS_kxx0b1v-DnFzLncOwhWH19SHtVOn9GQxXdc1_1EA5jwgq9iX7u2ve9pXKOUFXZsXFGZZ99ItsKufKIbejKVZ3ejakNsvAOzng9q7PLCd0Ee3bKyUKzT7OrY5_iur5RhHKElnvaHaKo?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcwlE4zglXthNZ9VK0S5qCqwogNE9pcqCcnjtvlsVrMCweYJsK5xUKDLStCIuxkBafJuZRm_A9KWu_FAhr3tbF1MwHG44oJiigfqeoVvtdkPy2sUcgKKlO29VTyQ8Drmgins4_yBSQRKX-2qgL-qYUOGFzu?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcerIeAJFaJ0nFHvjOov77uC8IP6MjICFvbNi4bbmT0wjIQKnc_tSROpjL6wPTs4FRaU0qGug7a8d0b7p1c1UOa4sdmoTgMrVhghqHYDHf9IbQ7E5EV0TUfRT5V8VCWrjE3WeRSq9fWd4YNdQY9F0g1R7Df?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeJnupyl4LMFwqb43xOQ3NUUyEUE_7ayU0nJPgJKYBFlmfAh7l4TT_UguxWnTs_tBDvfkU_F8Cj1OMC5CgcwbNxB91YPtbw4-QO_WMqawmU2MA4TY2cwTwJNvkcRBdPrTBqDXLbcIAKGFJkTCcgEI72iLQ?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXeNn3ZCwd_sSEmgcIAJTP7AwneNgEHnOnkxwkxXzeujqSsJ-7613U8I88F9s684CKvKRDDMKXcOCshJEyQEYqbH8BOyAPfeAyx9OyYdsnZWRoI0OEzy53TLAOHYrtaROlGq45Q47rbe9IUE-1toemHjk6E?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcz55oqo7WfYjfqmkFV8ldpxbNBvDPtzEUFCU5fye1-z8K4lShWf_R--M6yBYdQo7YRvuDdrVVYprGdc2McI52haW_HWUoZmuFyQTRIeMcezggqLfDxjx1lpsf1K-Xa55vBqsjg7eBmFw1mrOIpfmV7KJYg?key=SwbMSSilnhvHe1V0xsYGLQ)
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXfflzkZJAS_QJCIW0F2dfWhi2gjW1IJMocvKD0ZpBeSGvlLiGLtrEW0CqwKh3-dKtiDSejuT-tSsQj0xvwrpxoktvAa4syZFDXmFKmT-QQ4TLGjEhFzEalWYrBI67I-GSKnIDzF4WtTsiA307ZE2gSgpALK?key=SwbMSSilnhvHe1V0xsYGLQ)
-- In above we plot the prob. bound from the inequality |prob. -1/2| \leq \delta . For example using Theorem 2 (plot (d) in the above) we obtain the following
-    ![](https://lh7-us.googleusercontent.com/docsz/AD_4nXcyqtzrtcr77pzUvBzVX9rmF9DWhh_eNm45vPW82Zl8Nfnf8Nnu3JtIKhw2B9OMqIl_vnCUIDSmLmFiS0QgxxDFWO6rUuEtkImC4fAjwZ6MO2i1o-F1oOex2fLh5NQmYHywyJzMHHw-IudYek3pYla3GUVA?key=SwbMSSilnhvHe1V0xsYGLQ)
+$$
+\mathrm{P}(t^{out}_2>t^{out}_1\vert t^{in}_2>t^{in}_1)%=\left[1-\frac{q}{1-(1-q)^2}\right]\mathbb{1}\left[\Delta_{12}=0\right]\\
+=\left[1-\frac{q(1-q)^{\Delta_{12}}}{1-(1-q)^2}\right]\mathbb{1}\left[\Delta_{12}>0\right]\mathbb{1}\left[\Delta_{12}\in\mathbb{N}\right]\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+\left[1-\frac{q(1-q)^{\lfloor\Delta_{12}\rfloor+1 }}{1-(1-q)^2}\right]\mathbb{1}\left[\Delta_{12}>0\right]\mathbb{1}\left[\Delta_{12}\in\mathbb{R}^+\setminus\mathbb{N}\right]
+$$
 
-### Summary of “[The Generals' Scuttlebutt: Byzantine-Resilient Gossip Protocols](https://dl.acm.org/doi/abs/10.1145/3548606.3560638)”
+![](https://nomos-tech.notion.site/image/attachment%3A28901364-2710-4201-9d73-3af49be89893%3AScreenshot_2025-02-28_at_16.49.53.png?table=block&id=1fd261aa-09df-8186-a247-f6697c344a03&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-- Abstract
+## Two senders and a single path of mixes scenario: analysis of the FIFO attack
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F2d60f47d-5215-487f-961d-7a68f225637e%2FScreenshot_2024-07-05_at_16.40.07.png?table=block&id=1fd261aa-09df-81c1-acf2-e93f44a10e3b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+- A detailed description of the FIFO attack is provided in the [Appendix](https://nomos-tech.notion.site/1fd261aa09df81d2aedfef8203fa7f49?pvs=25). Here we develop analysis of the FIFO attack for mix nodes with a queuing system.
+- We assume that messages are removed from the out-queue with probability $q$.
+- We assume that nodes $1$ and $2$ send messages via the same path going through $k$ nodes.
+- We assume that each node sends a message to the node $3$ at time $0$. A message in the node $\mu\in\{1,2\}$ is delayed by (at most) $r_\mu\Delta_\mu$, where $r_\mu$ is random variable from the Geometric distribution with parameter $q$, and it is delayed in the link to the node 3 by $d_{\mu 3}$. Hence a message from node $\mu$ arrives to node 3 at the time $t_\mu^{in}=r_\mu\Delta_\mu + d_{\mu3}$.
+- A message from node $\mu\in\{1,2\}$ is delayed by $\sum_{i=3}^{k+2}r^\mu_i\Delta_i+ \sum_{i=3}^{k+1}d_{ii+1}$, where $r^\mu_i$ is random variable from the Geometric distribution with parameter $q$, while travelling through the $k$ nodes. Thus a message from node $\mu$ exits the last node $k+2$ at the time
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F93d3a133-8c05-4646-a9ff-3cfc8bd5453a%2FScreenshot_2024-07-05_at_16.42.26.png?table=block&id=1fd261aa-09df-819e-80c7-e8480028047e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+$$
+t_\mu^{out}=t_\mu^{in} +\sum_{i=3}^{k+2}r^\mu_i\Delta_i+ \sum_{i=3}^{k+1}d_{ii+1}.
+$$
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0c25fc2d-ea05-489c-ba3b-21be3cb295cd%2FScreenshot_2024-07-05_at_16.43.32.png?table=block&id=1fd261aa-09df-8111-9104-c772f683aeb9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F24707ce1-01a5-433c-8bfe-610a705e3b7e%2FFIFO-attack.png?table=block&id=1fd261aa-09df-81e1-9afe-d65bca0d2a68&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- The events $E_{2>1}: (t_2^{out}>t_1^{out}) \land  (t_2^{in}>t_1^{in})$ and $E_{2\leq1}: (t_2^{out}\leq t_1^{out}) \land  (t_2^{in}\leq t_1^{in})$, i.e. the temporal order of two messages is preserved. These events are mutually exclusive, and hence the probability $\mathrm{P}(E_{2>1} \cup E_{2\leq1})$ the at least one of these event will happen is equal to $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$.
+- The probability $\mathrm{P}(E_{2>1} \cup E_{2\leq1})=\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$, i.e. the probability that temporal order of incoming and ougoing messages is preserved, is the probability of success of the FIFO attack.
+- Assuming $\Delta_i=\Delta$ we have $t_\mu^{out}=t_\mu^{in} +b_\mu\Delta+ \sum_{i=3}^{k+1}d_{ii+1}$, where $b_\mu$ is random variable from the [negative binomial distribution](https://en.wikipedia.org/wiki/Negative_binomial_distribution#Waiting_time_in_a_Bernoulli_process) with parameters $k$ and $q$. Furthermore, for $d_{13}=d_1$ and $d_{23}=d_2$ the probability
+
+$$
+\mathrm{P}(E_{2>1})=\sum_{r_1\geq1} \mathrm{P}_q(r_1)\sum_{r_2\geq1} \mathrm{P}_q(r_2) \sum_{b_1\geq k} \mathrm{P}_{k,q}(b_1)\sum_{b_2\geq k} \mathrm{P}_{k,q}(b_2)\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\times\mathbb{1}\left[r_2-r_1+\frac{d_2-d_1}{\Delta}>0\right]\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\times\mathbb{1}\left[r_2-r_1+\frac{d_2-d_1}{\Delta}+b_2-b_1>0\right].
+$$
+
+- We note that in above the random variables $t^{in}_1=r_1\Delta+d_1$ and $t^{in}_2=r_2\Delta+d_2$, where $r_\mu$ is a random variable from the prob. distr. $\mathrm{P}_q(r_\mu)$, models the arrival times of two messages to the first mix node and the first indicator function ensures that only the event $t_2^{in}>t_1^{in}$ contributes to the probability $\mathrm{P}(E_{2>1})$. Furthermore, the random variables $t_1^{out}=t_1^{in} +b_1\Delta+ \sum_{i=3}^{k+1}d_{ii+1}$ and $t_2^{out}=t_2^{in} +b_2\Delta+ \sum_{i=3}^{k+1}d_{ii+1}$, where $b_\mu$ is a random variable from the prob. distr. $\mathrm{P}_{k,q}(b_\mu)$, model arrival times of two messages to the last (receiver) node and the second indicator function ensures that only the event $t_2^{out}>t_1^{out}$ contributes to the probability $\mathrm{P}(E_{2>1})$.
+- In a similar manner, we obtain the probability
+
+$$
+\mathrm{P}(E_{2\leq1})=\sum_{r_1\geq1} \mathrm{P}_q(r_1)\sum_{r_2\geq1} \mathrm{P}_q(r_2) \sum_{b_1\geq k} \mathrm{P}_{k,q}(b_1)\sum_{b_2\geq k} \mathrm{P}_{k,q}(b_2)\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\times\mathbb{1}\left[r_1-r_2+\frac{d_1-d_2}{\Delta}\geq0\right]\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\times\mathbb{1}\left[r_1-r_2+\frac{d_1-d_2}{\Delta}+b_1-b_2\geq0\right].
+$$
+
+- The probability $\mathrm{P}(E_{2>1})$ can be approximated by generating a large population of independent random variables $\{r_2(i), r_1(i),b_2(i), b_1(i):i\in[\mathcal{N}]\}$ sampled from the prob. distributions $\mathrm{P}_q(r_1),  \mathrm{P}_q(r_2), \mathrm{P}_{k,q}(b_1)$ and $\mathrm{P}_{k,q}(b_2)$, and computing the (empirical) probability
+
+$$
+\mathrm{P}_{\mathcal{N}}(E_{2>1})=\frac{1}{\mathcal{N}}\sum_{i=1}^\mathcal{N} \,\mathbb{1}\left[r_2(i)-r_1(i)+\frac{d_2-d_1}{\Delta}>0\right]\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\times\mathbb{1}\left[r_2(i)-r_1(i)+\frac{d_2-d_1}{\Delta}+b_2(i)-b_1(i)>0\right].
+$$
+
+- In a similar manner we define $\mathrm{P}_{\mathcal{N}}(E_{2\leq1})$.
+- We expect that $\lim_{\mathcal{N}\rightarrow\infty}\mathrm{P}_{\mathcal{N}}(E_{2>1})=\mathrm{P}(E_{2>1})$ by the law of large numbers.
+- The (empirical) prob. $\mathrm{P}_{\mathcal{N}}(E_{2>1} \cup E_{2\leq1})=\mathrm{P}_{\mathcal{N}}(E_{2>1})+\mathrm{P}_{\mathcal{N}}(E_{2\leq1})$ allows us to estimate the probability of success of FIFO attack $\mathrm{P}(E_{2>1} \cup E_{2\leq1})$.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F586ff293-f240-48bd-b4a7-d86a79a10cb7%2FScreenshot_2024-07-31_at_22.03.35.png?table=block&id=1fd261aa-09df-8137-a8ff-e205a7301a8d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- We note that the above result, i.e. the probability of success of FIFO attack is a monotonic decreasing function of $k$, is very similar to the result for continuous [mixes](https://nomos-tech.notion.site/1fd261aa09df81d2aedfef8203fa7f49?pvs=25) when $\frac{d_2-d_1}{\Delta}=0$, i.e. the connections 1-3 and 2-3 have the same latency. However, when the latter is not true the prob. $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$ can be much higher as can be seen in the plot below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F90512f08-12f7-447f-8904-84126756ad2b%2FScreenshot_2024-07-31_at_23.00.46.png?table=block&id=1fd261aa-09df-8186-94b6-f21036d2e737&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- Let us assume that in our [setup](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) the random variables $r_1$ and $r_2$ are sampled from the Geometric distribution with parameter $q_S$, and for $i\in\{3,\ldots,k+2\}$ the random variable $r^\mu_i$ is sampled from the Geometric distribution with parameter $q_M$. Thus parameters of delays of the sender and mix nodes are different. The latter can be used to reduce the probability of success, $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$, of the FIFO attack as can be seen in the plot below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0f8faf25-803d-4458-bd7f-442598040e19%2FScreenshot_2024-08-01_at_14.09.28.png?table=block&id=1fd261aa-09df-8117-8cf6-f6f0c6deb318&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- We note that a message is delayed by the sender node by $1/q_S$ (on average) and by the mix node by $1/q_M$ (on average). We note that a similar setup is used in [continuous mixes](https://nomos-tech.notion.site/1fd261aa09df81d2aedfef8203fa7f49?pvs=25) where the ratio $\rho=q_S/q_M$ plays important role.
+- The probability of success of FIFO attack , $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$, is decreasing with increasing $\rho$ as can be seen in the plots below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Fd870a191-cf86-4e82-a45c-6687ae003fcf%2FScreenshot_2024-08-06_at_14.35.36.png?table=block&id=1fd261aa-09df-8121-a6ef-c68e7f9807e4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F7bcbd40a-d6e6-41ff-bec8-50b40ba7ec5d%2FScreenshot_2024-08-06_at_14.21.36.png?table=block&id=1fd261aa-09df-8111-a39f-dfd950099f82&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6e19b545-01ee-4568-88ad-9864a096ed9b%2FScreenshot_2024-08-06_at_13.30.23.png?table=block&id=1fd261aa-09df-8165-819b-ef36865cebc1&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F209567c8-a937-4be3-bf73-159a390a3223%2FScreenshot_2024-08-06_at_14.28.49.png?table=block&id=1fd261aa-09df-8183-9ab9-ceb6e6a4a0da&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- Above plots suggest that the probability of success of FIFO attack, $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$, approaches $1/2$, i.e. an adversary has no advantage over the case of random guessing, as $k\rightarrow\infty$. Furthermore, the speed of convergence (in $k$) to $1/2$ is monotonic increasing function of the ratio $\rho=q_S/q_M$.
+- The probability of success of FIFO attack , $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$, is increasing with increasing $\frac{d_2-d_1}{\Delta}>0$, i.e. [the sender connections 1-3 and 2-3](https://nomos-tech.notion.site/1fd261aa09df81af9348d645a3c14446?pvs=25) have different latency, as can be seen by comparing the [figure](https://nomos-tech.notion.site/1fd261aa09df81af9348d645a3c14446?pvs=25) with the plots below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Fb00b5eeb-27af-495a-9dad-ff3a00201e19%2FScreenshot_2024-08-06_at_21.10.21.png?table=block&id=1fd261aa-09df-814d-bc53-d2e60d9ffcb3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Fa5ecfe1c-f4b8-4c4d-a72c-05b140d56316%2FScreenshot_2024-08-07_at_15.41.50.png?table=block&id=1fd261aa-09df-81f7-9b61-c01c97d74972&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- Furthermore, the probability of success of FIFO attack , $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$, is not dependent on the (rescaled) difference of latencies $\frac{d_2-d_1}{\Delta}$ when $0\leq\frac{d_2-d_1}{\Delta}\leq1$ and is increasing with increasing $\frac{d_2-d_1}{\Delta}$ when $\frac{d_2-d_1}{\Delta}>1$ as can be seen in the figure below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0beca538-4549-48fe-9e71-4c20d6f3f13d%2FScreenshot_2024-08-07_at_20.40.05.png?table=block&id=1fd261aa-09df-8131-81c4-fbd8c7834346&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- For $\frac{d_2-d_1}{\Delta}<0$ the probability $\mathrm{P}(E_{2>1})+\mathrm{P}(E_{2\leq1})$ behaves in a similar way as when $\frac{d_2-d_1}{\Delta}\geq 0$ as can be seen by comparing above figure with the figure below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Fc8a7f493-0a73-471f-ab26-5835d226347a%2FScreenshot_2024-08-08_at_15.54.12.png?table=block&id=1fd261aa-09df-817e-b9cb-f5cf03cbd469&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+- However, the $\frac{d_2-d_1}{\Delta}=-1$ and $\frac{d_2-d_1}{\Delta}=1$ cases are different as can be seen in the figure below.
+
+![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0023ec67-7021-48c9-abf7-6572a94e9dd6%2FScreenshot_2024-08-08_at_21.06.02.png?table=block&id=1fd261aa-09df-81b3-aa59-c7cde78b2563&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+### Summary of FIFO attack analysis
+
+From above analysis, it follows that the probability of success of FIFO attack is reduced by:
+
+- Increasing the number of mix nodes $k$.
+- Increasing the ratio $\rho=q_S/q_M$, where a message is delayed by the sender node by $1/q_S$ (on average) and by the mix node by $1/q_M$ (on average).
+- Decreasing differences between latencies of communication links.
+
+# Bibliography
+
+Das, D., Diaz, C., Kiayias, A., & Zacharias, T. (2024). Are continuous stop-and-go mixnets provably secure?. Proceedings on Privacy Enhancing Technologies. [https://doi.org/10.56553/popets-2024-0136](https://doi.org/10.56553/popets-2024-0136)
+
+# Appendix
 

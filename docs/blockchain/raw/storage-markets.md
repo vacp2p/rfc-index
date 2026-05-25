@@ -54,7 +54,7 @@ The proposed fee mechanism operates on a simple but powerful principle: the pric
 
 When a user submits data, a fee is calculated based on the Logos Blockchain Storage Gas consumption. This fee is determined by a price per Gas, $P_{STR}$, which is known in advance for the entire timeframe.
 
-At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive target—a "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price $P_{STR}$ for the next timeframe is adjusted slightly up or down.
+At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive targeta "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price $P_{STR}$ for the next timeframe is adjusted slightly up or down.
 
 This flow can be visualized as follows:
 
@@ -97,13 +97,13 @@ To ensure on-chain efficiency, the protocol shall use an Exponential Moving Aver
 
 | Symbol | Name | Description | Initial Value | Justification |
 | --- | --- | --- | --- | --- |
-| $T_{\text{base}}$​ | Baseline Target | A static, policy-driven usage target in Logos Blockchain Storage Gas per timeframe. Acts as a long-term gravitational anchor for the dynamic target. | 0 Permanent Storage Gas per block. | It should represent a conservative initial timeframe capacity. providing a healthy buffer and a clear policy goal. |
-| $w$​ | Anchor Weight | A coefficient in $[0, 1]$ determining the influence of $T_{\text{base}}$. It's the "gravity knob" for the system. | for Permanent Storage: 0 | Allows the target to be primarily driven by recent demand, ensuring adaptability, while the $w$% pull from $T_{\text{base}}$ prevents long-term drift. |
-| $\alpha$​ | Max Adjustment Factor | The maximum fractional amount the price can change per timeframe. Acts as "safety brakes" to bound price volatility. | 0.125 for Permanent Storage | A $100\alpha$% cap provides strong predictability for users planning across timeframes while allowing the price to respond effectively to sustained demand changes. |
-| $\beta$​ | EMA Smoothing Factor | A coefficient in $[0, 1]$ controlling the responsiveness of the usage EMA. It governs the speed of adaptation. | 0.5 for Permanent Storage | A value of $\beta$ gives significant weight to the most recent timeframe's usage while incorporating the "memory" of the system with a half-life of 1 timeframe, balancing responsiveness and stability. |
-| $T_{\text{RA}}(-1)$​ | Initial Usage EMA | First value for EMA | 0 (=$T_{\text{base}}$) | Given $T_{\text{base}} = 0$, this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset. |
-| $P_{\text{STR}}(0)$​ | Initial Price | The price on the first epoch | 1 LGO/gas | The initial price is set conservatively low at the beginning and let to discover the true market price |
-| $s$​ | timeframe | How often things adjust | 1 epoch | Primary users of the Storage market plan operational costs over days or weeks, not block-by-block. |
+| $T_{\text{base}}$ | Baseline Target | A static, policy-driven usage target in Logos Blockchain Storage Gas per timeframe. Acts as a long-term gravitational anchor for the dynamic target. | 0 Permanent Storage Gas per block. | It should represent a conservative initial timeframe capacity. providing a healthy buffer and a clear policy goal. |
+| $w$ | Anchor Weight | A coefficient in $[0, 1]$ determining the influence of $T_{\text{base}}$. It's the "gravity knob" for the system. | for Permanent Storage: 0 | Allows the target to be primarily driven by recent demand, ensuring adaptability, while the $w$% pull from $T_{\text{base}}$ prevents long-term drift. |
+| $\alpha$ | Max Adjustment Factor | The maximum fractional amount the price can change per timeframe. Acts as "safety brakes" to bound price volatility. | 0.125 for Permanent Storage | A $100\alpha$% cap provides strong predictability for users planning across timeframes while allowing the price to respond effectively to sustained demand changes. |
+| $\beta$ | EMA Smoothing Factor | A coefficient in $[0, 1]$ controlling the responsiveness of the usage EMA. It governs the speed of adaptation. | 0.5 for Permanent Storage | A value of $\beta$ gives significant weight to the most recent timeframe's usage while incorporating the "memory" of the system with a half-life of 1 timeframe, balancing responsiveness and stability. |
+| $T_{\text{RA}}(-1)$ | Initial Usage EMA | First value for EMA | 0 (=$T_{\text{base}}$) | Given $T_{\text{base}} = 0$, this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset. |
+| $P_{\text{STR}}(0)$ | Initial Price | The price on the first epoch | 1 LGO/gas | The initial price is set conservatively low at the beginning and let to discover the true market price |
+| $s$ | timeframe | How often things adjust | 1 epoch | Primary users of the Storage market plan operational costs over days or weeks, not block-by-block. |
 
 ### Parameter Justification
 
@@ -112,12 +112,12 @@ To ensure on-chain efficiency, the protocol shall use an Exponential Moving Aver
 - The maximum adjustment factor ($\alpha=0.125$) provides a crucial layer of predictability, guaranteeing users that the price cannot change by more than 12.5% between any two epochs, thus fulfilling a core design requirement for stable operational planning.
 - The seed value for the EMA is set to $T_{\text{RA}}(-1) = T_{\text{base}} = 0$.  Given $T_{\text{base}} = 0$, this is the least opinionated choice: with no prior usage data at genesis, a neutral prior of zero makes no assumption about initial market activity and anchors the EMA to the long-term policy goal from the outset.
     > Why is the index $-1$, not $0$? The price update algorithm runs at the end of timeframe $s$ and requires $T_{\text{RA}}(s-1)$ as its prior EMA value. When $s = 0$, the algorithm therefore requires $T_{\text{RA}}(-1)$ as its seed. The value $T_{\text{RA}}(0)$ is already a
-    > well-defined computed quantity — the EMA produced after the first epoch's observed usage: $T_{\text{RA}}(0) = \beta \cdot C_{\text{usage}}(0) + (1-\beta) \cdot T_{\text{RA}}(-1)$. Using index $-1$ for the seed avoids a naming collision with this computed value.
+    > well-defined computed quantity  the EMA produced after the first epoch's observed usage: $T_{\text{RA}}(0) = \beta \cdot C_{\text{usage}}(0) + (1-\beta) \cdot T_{\text{RA}}(-1)$. Using index $-1$ for the seed avoids a naming collision with this computed value.
     > Implementation note. With $w = 0$ and $T_{\text{RA}}(-1) = 0$, the effective target
     > $T_{\text{effective}}$ will be zero during the first epoch unless $C_{\text{usage}}(0) > 0$.
     > The reference implementation handles this correctly via the if effective_target == 0: return self.price guard, which holds the price at $P_{\text{STR}}(0)$ until the first non-zero usage
     > epoch provides a meaningful signal. This is the intended behavior at genesis.
-- The precise value of $P_{\text{STR}}(0)$ is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price $P^*$ regardless of the starting point, provided the stability condition $(*)$ holds (see [🔀[1.0.0][Analysis] Storage Market - Price Stability Analysis](https://nomos-tech.notion.site/Price-Stability-Analysis-a03261aa09df83f6bcd6815ba73b72e1?pvs=24#fed261aa09df8241b79c01ca67ef6026)). The only hard requirement is for $P_{\text{STR}}(0)$ to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.
+- The precise value of $P_{\text{STR}}(0)$ is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price $P^*$ regardless of the starting point, provided the stability condition $(*)$ holds (see [[1.0.0][Analysis] Storage Market - Price Stability Analysis](https://nomos-tech.notion.site/Price-Stability-Analysis-a03261aa09df83f6bcd6815ba73b72e1?pvs=24#fed261aa09df8241b79c01ca67ef6026)). The only hard requirement is for $P_{\text{STR}}(0)$ to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.
     More precisely, since the price can increase by at most $\alpha = 12.5\%$ per epoch, the number
     of epochs required to reach a target price $P^*$ from an initial price $P_{\text{STR}}(0) < P^*$ is bounded above by:
     $$
@@ -141,8 +141,8 @@ The protocol must maintain the following state variables, updated at the end of 
 
 | Symbol | Name | Description |
 | --- | --- | --- |
-| $P_{\text{STR}}(s)$​ | Price Per Logos Blockchain Storage Gas | The price per Gas of storage for the current timeframe $s$. |
-| $T_{\text{RA}}(s)$​ | Usage EMA | The Exponential Moving Average of storage usage, updated with the usage from timeframe $s$. |
+| $P_{\text{STR}}(s)$ | Price Per Logos Blockchain Storage Gas | The price per Gas of storage for the current timeframe $s$. |
+| $T_{\text{RA}}(s)$ | Usage EMA | The Exponential Moving Average of storage usage, updated with the usage from timeframe $s$. |
 
 ### Price Update Algorithm
 
@@ -178,7 +178,7 @@ $$
 \text{clamped\_adjustment}(s) = \max \{ -\alpha, \min \{ \alpha, \text{adjustment}(s) \} \}
 $$
 
-1. Update Price: Calculate the price for the next timeframe, $s+1$​
+1. Update Price: Calculate the price for the next timeframe, $s+1$
 
 $$
 P_{\text{STR}}(s+1) = P_{\text{STR}}(s) \cdot [1 + \text{clamped\_adjustment}(s)]
@@ -190,7 +190,7 @@ Because computation affect consensus state, the implementation must be fully det
 
 The goal of this section is not to change the execution mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. To we provide here a reference implementation that uses unsigned integers to have a common reference.
 
-First because we have $w = 0$, $T_\text{RA}(s) = T_\text{effective}(s)$. Then because $\beta=0.5$​
+First because we have $w = 0$, $T_\text{RA}(s) = T_\text{effective}(s)$. Then because $\beta=0.5$
 
 $$
 T_{\mathrm{RA}}(s)=\frac{C_{\mathrm{usage}}(s)+T_{\mathrm{RA}}(s-1)}{2}
@@ -211,7 +211,7 @@ $$
 
 and so:
 
-$P_{\mathrm{STR}}(s+1)=\begin{cases}\left\lfloor P_{\mathrm{STR}}(s)\cdot \frac78 \right\rfloor,& \text{if } 8\,C_{\mathrm{usage}}(s)\le 7\,T_{\mathrm{RA}}(s),\\[6pt]\left\lfloor P_{\mathrm{STR}}(s)\cdot \frac98 \right\rfloor,& \text{if } 8\,C_{\mathrm{usage}}(s)\ge 9\,T_{\mathrm{RA}}(s),\\[6pt]\left\lfloor P_{\mathrm{STR}}(s)\cdot\frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)} \right\rfloor,& \text{otherwise.}\end{cases}$​
+$P_{\mathrm{STR}}(s+1)=\begin{cases}\left\lfloor P_{\mathrm{STR}}(s)\cdot \frac78 \right\rfloor,& \text{if } 8\,C_{\mathrm{usage}}(s)\le 7\,T_{\mathrm{RA}}(s),\\[6pt]\left\lfloor P_{\mathrm{STR}}(s)\cdot \frac98 \right\rfloor,& \text{if } 8\,C_{\mathrm{usage}}(s)\ge 9\,T_{\mathrm{RA}}(s),\\[6pt]\left\lfloor P_{\mathrm{STR}}(s)\cdot\frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)} \right\rfloor,& \text{otherwise.}\end{cases}$
 
 and so we can derive the following reference code:
 
