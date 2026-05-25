@@ -113,6 +113,7 @@ These values are fixed and published to all ceremony participants.
 \left(
 [1]_2
 \right)_{k=0}^m$ when initializing from scratch.
+    > For performance reasons, especially to leverage Number Theoretic Transforms (NTT) for fast polynomial arithmetic, it is common to choose $n$ as a power of two. For example, setting $n = 2^{k}$ allows working with polynomials of degree up to $2^{k} - 1$, and proving circuits with up to $2^{k}$ constraints.
 
 ### Step 2: Participant Contribution
 

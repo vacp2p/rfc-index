@@ -137,6 +137,11 @@ The protocol for generating the initial randomness nonce can be found below.
     The STAKE_DISTRIBUTION must be finalized before t to ensure a fair Cryptarchia slot lottery.
 1. Randomness Collection:
     We collect the entropy from multiple randomness sources:
+    | Entropy Source | Details |
+    | --- | --- |
+    | Bitcoin block hash immediately after time t, denoted as $r_1$. | Block hash can be found on [blockchain.com](http://blockchain.com/) s bitcoin block explorer, e.g. [https://www.blockchain.com/explorer/blocks/btc/905030](https://www.blockchain.com/explorer/blocks/btc/905030) |
+    | Ethereum block hash immediately after time t, denoted as $r_2$. | Block hash can be found in the more details section of when viewing a block on etherscan, e.g. [https://etherscan.io/block/22894116](https://etherscan.io/block/22894116) |
+    | DRAND beacon value for the round immediately after t, denoted as $r_3$. | Use the default beacon, and find the round number corresponding to t. [https://api.drand.sh/v2/beacons/default/rounds/1234](https://api.drand.sh/v2/beacons/default/rounds/1234) |
 1. Randomness Derivation:
     Once all above entropy contributions, i.e., $r_1,r_2,r_3$ are collected, then we can compute the initial epoch randomness $\eta_{\text{GENESIS}}$ as:
     $$
