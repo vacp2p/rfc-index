@@ -24,9 +24,9 @@
 | --- | --- |
 | 1.0.0 | Initial revision. |
 | 1.2.0 | Removed DA, included Execution Gas determination for channel deposits and withdraws. Updated the Execution Gas of the Channel config. |
-| 1.3.0 | [Not found](/31e261aa09df80bc9e02ea4e9affc082?pvs=24#31e261aa09df80bc9e02ea4e9affc082). Renamed Nomos to Logos Blockchain |
-| 1.4.0 | [Not found](/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db)​ |
-| 1.4.1 | [Not found](/33d261aa09df803d96b0ebcd83013865?pvs=24#33d261aa09df803d96b0ebcd83013865) |
+| 1.3.0 | [Not found](https://nomos-tech.notion.site/31e261aa09df80bc9e02ea4e9affc082?pvs=24#31e261aa09df80bc9e02ea4e9affc082). Renamed Nomos to Logos Blockchain |
+| 1.4.0 | [Not found](https://nomos-tech.notion.site/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db)​ |
+| 1.4.1 | [Not found](https://nomos-tech.notion.site/33d261aa09df803d96b0ebcd83013865?pvs=24#33d261aa09df803d96b0ebcd83013865) |
 
 # Introduction
 
@@ -79,7 +79,7 @@ Comparison, list searching, hashes and operation in small fields are neglected. 
 
 # Transfer
 
-The Execution Gas of the Transfer Operation compensates for the verification of the [ZkSignature](/21c261aa09df810c8820fab1d78b53d9) proof.
+The Execution Gas of the Transfer Operation compensates for the verification of the [ZkSignature](https://nomos-tech.notion.site/21c261aa09df810c8820fab1d78b53d9) proof.
 
 Execution: ~590k CPU cycles.
 
@@ -114,7 +114,7 @@ Execution: ~56k CPU cycles.
 - Update the channel state: negligible
 ## Channel Deposit
 
-The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](/21c261aa09df810c8820fab1d78b53d9) proof and for the check of the inputs.
+The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](https://nomos-tech.notion.site/21c261aa09df810c8820fab1d78b53d9) proof and for the check of the inputs.
 
 Execution: ~590k CPU cycles.
 

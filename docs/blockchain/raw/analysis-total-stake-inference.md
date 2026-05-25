@@ -191,7 +191,7 @@ The plots show the measured normalized error $\left|\frac{\langle D_\ell\rangle 
 
 ![](https://nomos-tech.notion.site/image/attachment%3A038ebd73-d0f3-43b6-9f4f-22ed7676a31b%3Aimage.png?table=block&id=239261aa-09df-8068-94c9-d29043cb2e19&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-Optimal convergence was checked as well showing that with [optimal](/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139)[/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139](/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139)$\beta$, even with massive shocks to total stake, we can converge within 2 epochs.
+Optimal convergence was checked as well showing that with [optimal](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139)[https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139)$\beta$, even with massive shocks to total stake, we can converge within 2 epochs.
 
 Plots show the distribution of normalized error $\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_\text{TRUE}} \right|$ at each epoch $\ell$ for the optimal $\beta$ parameter under different initial conditions. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85,\beta=1$.
 
@@ -213,7 +213,7 @@ $$
 
 where  $h(\ell)>0$ is the learning rate. In the above, we write $s_i(t)\vert D_\ell$ to emphasise that the random variable $s_i(t)$ is conditional on $D_\ell$.
 
-- In the [equation used in inference of total stake](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df8096a67cc0fdc312541a), we take $h(\ell) = \frac{\beta}{f} D_\ell$ but the starting point of our analysis uses a more general learning rate $h(\ell)$.
+- In the [equation used in inference of total stake](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df8096a67cc0fdc312541a), we take $h(\ell) = \frac{\beta}{f} D_\ell$ but the starting point of our analysis uses a more general learning rate $h(\ell)$.
 - We note that $\sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]$ is the number of active slots, i.e. slots with at least one winner, in the $\ell$-th epoch.
 - For the outcome of leader election process $\mathbf{s}(t)=(s_1(t),\ldots,s_N(t))$ at the time-slot $t$, the probability of outcomes $\left(\mathbf{s}(1),\ldots,\mathbf{s}(T)\right)$ at times $t\in[T]$ is given by
 
@@ -254,7 +254,7 @@ D_{\ell+1} &= D_{\ell}-h(\ell)\left[f-\frac{1}{T}\left\{\sum_{t=1}^T \mathbf{1}\
 \end{align*}
 $$
 
-i.e. for the same $D_\ell$, the $D_{\ell+1}$ of the honest node’s [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80c7a5c6f9f0c3cdbd46) is bounded above by the $D_{\ell+1}$ of the idealised [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df8078a24fdd48297f42f7).
+i.e. for the same $D_\ell$, the $D_{\ell+1}$ of the honest node’s [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80c7a5c6f9f0c3cdbd46) is bounded above by the $D_{\ell+1}$ of the idealised [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df8078a24fdd48297f42f7).
 
 - Let us assume that $n(\ell)$ is a random variable from the binomial distribution with the parameters $p(\ell)$ and $\sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]$.
 - Here $p(\ell)$ is the probability that a slot is “wasted” in epoch $\ell$ and hence there are (on average) $p(\ell) \sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]$ number of slots wasted in epoch $\ell$.
@@ -271,7 +271,7 @@ $$
 D_{1}=D_0-h(0)\left[f-\frac{1-p(0)}{T}\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]\right]
 $$
 
-- Now, let us assume that $D_0$ is deterministic and consider the average of $D_1$, $\langle D_1\rangle_0$, with respect to the [distribution](/237261aa09df800285cccbb00b3aeb0a?pvs=25#23a261aa09df803a8185c37e84d12a0e) as follows
+- Now, let us assume that $D_0$ is deterministic and consider the average of $D_1$, $\langle D_1\rangle_0$, with respect to the [distribution](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#23a261aa09df803a8185c37e84d12a0e) as follows
 
 $$
 \langle D_1\rangle_0=D_{0}-h(0)\left[f-\frac{1-p(0)}{T}\sum_{t=1}^T \left\langle \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]\right\rangle_0\right]\\
@@ -283,7 +283,7 @@ $$
 =D_{0}-h(0)\left[f-  [1-p(0)]\left[1-(1-f)^{D^0[\mathbf{w}]/D_0}\right]\right]
 $$
 
-- Thus using in above the [definition](/237261aa09df800285cccbb00b3aeb0a?pvs=25#247261aa09df802a9a0fd2d2facbccb6) we obtain the following equation
+- Thus using in above the [definition](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#247261aa09df802a9a0fd2d2facbccb6) we obtain the following equation
 
 $$
 \langle D_1\rangle_0
@@ -353,7 +353,7 @@ $$
 =\mathrm{Var}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]-2\,\mathrm{Cov}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]+\mathrm{Var}\left[n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]
 $$
 
-by the [identity](/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df807dafbdc3dca7232e13).
+by the [identity](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df807dafbdc3dca7232e13).
 
 - First, we consider
 
@@ -412,7 +412,7 @@ $$
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=p(0)T(1-f)f
 $$
 
-- To obtain above, we used identities described in the [Annex](/237261aa09df800285cccbb00b3aeb0a?pvs=25#23e261aa09df80b4a438d0e3f3b5cab5) and the following results
+- To obtain above, we used identities described in the [Annex](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#23e261aa09df80b4a438d0e3f3b5cab5) and the following results
 
 $$
 \left\langle\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle= Tf\\
@@ -478,7 +478,7 @@ $$
 \frac{h^2q}{T}\left(\frac{\log(1-f)}{\log(1-f/q)}\right)^2(1-f)f\leq \frac{h^2}{T}(1-f)f.
 $$
 
-- Thus assuming that the [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#23b261aa09df80e89e9ae03b1b52a139) is correct, we have shown that
+- Thus assuming that the [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#23b261aa09df80e89e9ae03b1b52a139) is correct, we have shown that
 
 $$
 \boxed{\mathrm{Var}[\overline{D}_{\infty}]\leq \frac{h^2}{T}(1-f)f},
@@ -490,7 +490,7 @@ i.e. the variance for $q\leq1$ is bounded from above by the variance for $q=1$.
 
 The following is a derivation for the property described in [Stability Condition](https://nomos-tech.notion.site/Stability-Condition-237261aa09df800285cccbb00b3aeb0a?pvs=24#237261aa09df80448ca0e8764617da10).
 
-- Let us assume that $\tilde{h}(\ell)=h\langle \overline{D}_{\ell}\rangle$ and consider the [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) for $\langle \overline{D}_{\ell}\rangle=\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)$, where $\vert\epsilon(\ell)\vert\ll1$, as follows
+- Let us assume that $\tilde{h}(\ell)=h\langle \overline{D}_{\ell}\rangle$ and consider the [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) for $\langle \overline{D}_{\ell}\rangle=\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)$, where $\vert\epsilon(\ell)\vert\ll1$, as follows
 
 $$
 \epsilon(\ell+1)
@@ -521,13 +521,13 @@ $$
 \frac{2}{\left(1 -f \right) \log \! \left(\frac{1}{1-f}\right)}   \leq\frac{2}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)},
 $$
 
-i.e. the [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) is stable for larger values of the learning rate $h$ when $q<1$.
+i.e. the [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) is stable for larger values of the learning rate $h$ when $q<1$.
 
 ## Convergence Speed and Optimal Learning Rate Derivation
 
 The following is a derivation for the properties described in [Convergence Speed and Optimal Learning Rate](https://nomos-tech.notion.site/Convergence-Speed-and-Optimal-Learning-Rate-237261aa09df800285cccbb00b3aeb0a?pvs=24#237261aa09df80c5bde0f5a22ff4d09b).
 
-- Applying [Corollary 2.1](/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80c08a50fc273f053a6e) to the [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) with $\tilde{h}(\ell)=h\langle \overline{D}_{\ell}\rangle$ we obtain
+- Applying [Corollary 2.1](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80c08a50fc273f053a6e) to the [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) with $\tilde{h}(\ell)=h\langle \overline{D}_{\ell}\rangle$ we obtain
 
 $$
 \boxed{\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert\leq A\,\vert \overline{D}_0-\langle \overline{D}_{\infty}\rangle\vert\times\left\vert1-h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert^\ell}
@@ -541,10 +541,10 @@ $$
 h_0=\frac{1}{\left(q -f \right)\log \! \left(\frac{1}{1-\frac{f}{q}}\right) }
 $$
 
-the base function $\left\vert1-h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert$ is exactly zero suggesting that $\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert=0$ for any $\ell$  at $h=h_0$.  The latter is not possible and hence the [bound](/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d6861aea3677923a9a), which assumes that the first order derivative of the [map](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) exists, can not be applied when $h=h_0$.
+the base function $\left\vert1-h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert$ is exactly zero suggesting that $\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert=0$ for any $\ell$  at $h=h_0$.  The latter is not possible and hence the [bound](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d6861aea3677923a9a), which assumes that the first order derivative of the [map](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df80b0a0def3ee23950abb) exists, can not be applied when $h=h_0$.
 
-- However, for any $\vert\delta\vert>0$ and learning rate $h=h_0(1+\delta)$ the [bound](/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d6861aea3677923a9a) can be used and the speed of convergence is $\propto   \vert\delta\vert^\ell$.
-- What happens when $h=h_0$? Considering the [equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df802a9381e22a7e4b8b03) for $h=h_0$, the latter gives us
+- However, for any $\vert\delta\vert>0$ and learning rate $h=h_0(1+\delta)$ the [bound](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d6861aea3677923a9a) can be used and the speed of convergence is $\propto   \vert\delta\vert^\ell$.
+- What happens when $h=h_0$? Considering the [equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df802a9381e22a7e4b8b03) for $h=h_0$, the latter gives us
 
 $$
 \epsilon(\ell+1)
@@ -568,7 +568,7 @@ $$
 
 is optimal.
 
-- The [double exponential](/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df80aea575c2d715f96803) form dominates convergence to the fixed point $\langle \overline{D}_{\infty}\rangle$ for small $\epsilon(0)= \overline{D}_{0} -\langle\overline{D}_{\infty}\rangle$ as can be seen in the figures below
+- The [double exponential](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df80aea575c2d715f96803) form dominates convergence to the fixed point $\langle \overline{D}_{\infty}\rangle$ for small $\epsilon(0)= \overline{D}_{0} -\langle\overline{D}_{\infty}\rangle$ as can be seen in the figures below
 
 ![](https://nomos-tech.notion.site/image/attachment%3A6b8f4a6d-227f-4b2a-9410-e7840f9031e0%3Aoptimal1.png?table=block&id=24d261aa-09df-8000-8137-e8418c6b9a10&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=740&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -578,7 +578,7 @@ is optimal.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A838adfb8-bc6d-474e-a4b4-01191fcdce03%3Aoptimal4.png?table=block&id=24d261aa-09df-80c8-aa35-d94ac5a8fa72&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-The difference between average (normalised) stake at epoch $\ell$ and its equilibrium value $\epsilon(\ell)=\langle \overline{D}_{\ell}\rangle-\frac{\log(1-f)}{\log(1-f/q)}$ plotted as a function of $\ell$ for $f=1/30$ and $q=0.85$. The solid (red) line is  the solution of the [difference equation](/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df802a9381e22a7e4b8b03) using [optimal learning rate](/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df8073a860d292de358d09) and the dashed (blue) line is the [double exponential](/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df80aea575c2d715f96803). Here for $\log(1-f)/\log(1-f/q)\approx0.847$ and  $\epsilon(0)\in \{2\times0.847,0.847/2,0.847/10,0.847/100\}$ (top left, top right, bottom left, bottom right) the $\epsilon(1)$ is, respectively, of order $\{10^{-2} , 10^{-3}, 10^{-4} , 10^{-6}\}$.
+The difference between average (normalised) stake at epoch $\ell$ and its equilibrium value $\epsilon(\ell)=\langle \overline{D}_{\ell}\rangle-\frac{\log(1-f)}{\log(1-f/q)}$ plotted as a function of $\ell$ for $f=1/30$ and $q=0.85$. The solid (red) line is  the solution of the [difference equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df802a9381e22a7e4b8b03) using [optimal learning rate](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df8073a860d292de358d09) and the dashed (blue) line is the [double exponential](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df80aea575c2d715f96803). Here for $\log(1-f)/\log(1-f/q)\approx0.847$ and  $\epsilon(0)\in \{2\times0.847,0.847/2,0.847/10,0.847/100\}$ (top left, top right, bottom left, bottom right) the $\epsilon(1)$ is, respectively, of order $\{10^{-2} , 10^{-3}, 10^{-4} , 10^{-6}\}$.
 
 # Annex
 

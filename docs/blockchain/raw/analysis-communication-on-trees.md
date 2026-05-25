@@ -30,7 +30,7 @@ We would like to understand how to reduce probability of a communication failure
 
 First, we assume that a fraction of nodes in the network is adversarial and compute the probability of broadcast and anonymity failures for broadcasting on linear trees. We note that if each communication path has at least one adversarial node then this is considered to be a broadcasting failure and if there is at least one path where all nodes are adversarial then this considered to be anonymity failure. Probabilities are parametrised by the fraction of adversarial nodes, number of paths and number of nodes per path. Second, we compute failure probabilities for broadcasting on branching trees. Assuming the same number of paths, we compare results for linear and branching trees and we find that the linear tree design has better broadcast failure properties than the branching tree design, but worse anonymity failure properties. Finally, we assume that, in addition to adversarial nodes, we also have “faulty” nodes in the network. The latter are unable to relay a messages and their faultiness is a result of some “natural” process. Here we find only quantitative differences with the scenario when only adversarial nodes are considered, but we expect that the model which accounts for “natural” failures to be more realistic.
 
-> Details of mathematical derivations, with references to literature, and additional numerical results are provided in the [Appendix](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8).
+> Details of mathematical derivations, with references to literature, and additional numerical results are provided in the [Appendix](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8).
 
 # Overview
 
@@ -85,7 +85,7 @@ In this document we consider only balanced and complete $b$-ary trees. The numbe
 
 ### Analysis of communication failures
 
-The prob. of broadcast failure $B_{L}$ in the tree with $L$ layers and branching parameter $b$ can be computed recursively (see the [Details of derivations](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) via the following set of equations
+The prob. of broadcast failure $B_{L}$ in the tree with $L$ layers and branching parameter $b$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) via the following set of equations
 
 > **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
 
@@ -99,7 +99,7 @@ Solving above equations gives the following results
 
 ### Analysis of anonymity failure
 
-The prob. of anonymity failure $A_{L}$ in the tree with $L$ layers and branching parameter $b$ can be computed recursively (see the [Details of derivations](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) via the following set of equations
+The prob. of anonymity failure $A_{L}$ in the tree with $L$ layers and branching parameter $b$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) via the following set of equations
 
 > **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
 
@@ -135,7 +135,7 @@ The ratio $\text{num. of nodes}/\text{num. of comm. paths} = L$ in the linear de
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F31d05305-3eb1-4e33-9e52-9967d3d5a8c9%2FScreenshot_2024-12-23_at_10.40.23.png?table=block&id=1fd261aa-09df-81b5-b13f-d9fbe06d6be0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-Given that the number of communication paths is the same in both designs, the bandwidth consumption "pattern" is very different between these two designs. In linear tree design the root node has to send $b^L$ messages to other nodes and other nodes, but leaf nodes, receive a single message and send a single message. In branching tree design the root node sends $b$ number of messages to other nodes and other nodes, but leaf nodes, receive a single message and send $b$ messages. For the branching tree design a node might need to send the same number of messages as in the linear tree design as we might not be able to [encode messages](/215261aa09df81ae8857d71066a80084?pvs=25#215261aa09df816cb2cdcb5dc8eeb991) in a way that it will be able to use topology efficiently.
+Given that the number of communication paths is the same in both designs, the bandwidth consumption "pattern" is very different between these two designs. In linear tree design the root node has to send $b^L$ messages to other nodes and other nodes, but leaf nodes, receive a single message and send a single message. In branching tree design the root node sends $b$ number of messages to other nodes and other nodes, but leaf nodes, receive a single message and send $b$ messages. For the branching tree design a node might need to send the same number of messages as in the linear tree design as we might not be able to [encode messages](https://nomos-tech.notion.site/215261aa09df81ae8857d71066a80084?pvs=25#215261aa09df816cb2cdcb5dc8eeb991) in a way that it will be able to use topology efficiently.
 
 For now bandwidth optimisation is not a priority as it depends on possibility of efficient implementation of a communication design which is not investigated at the moment.  Assuming that branching tree design can be implemented efficiently, the root node in the linear case is more "chatty", where the number of messages sent is equal to the number of comm. paths, than in the branching case, where the number of messages sent is equal to the branching parameter and is independent from the number of comm. paths, which would make "anonymity" properties of the sender (root node) in these designs very different which has to be taken in to consideration when making decision on which design to choose.
 
@@ -315,7 +315,7 @@ Also we define the binary variable $s_i\in\{0,1\}$. A node is “honest/adversar
 
 ### Analysis of broadcast failure
 
-The probability of broadcast failure is give by $\mathrm{P}_b=\left[1-\mathrm{P}_{L-1}\right]^b$, where the prob. $\mathrm{P}_{L-1}$ can be computed recursively (see the [Details of derivations](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) as follows
+The probability of broadcast failure is give by $\mathrm{P}_b=\left[1-\mathrm{P}_{L-1}\right]^b$, where the prob. $\mathrm{P}_{L-1}$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) as follows
 
 > **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
 
@@ -323,7 +323,7 @@ The above equation has only one solution $\mathrm{P}_{\ell}=0$, which correspond
 
 ### Analysis of anonymity failure
 
-The probability of anonymity failure is give by $\mathrm{P}_a=1-\left[1-\mathrm{P}_{L-1}\right]^b$, where $\mathrm{P}_{L-1}$ can be computed recursively (see the [Details of derivations](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) as follows
+The probability of anonymity failure is give by $\mathrm{P}_a=1-\left[1-\mathrm{P}_{L-1}\right]^b$, where $\mathrm{P}_{L-1}$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) as follows
 
 > **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
 
@@ -333,11 +333,11 @@ From above follows that we would like to have $1-q_F>1/b$ and $(1-q_F)\,q_A<1/b$
 
 ### Analysis of adversarial broadcast-failure
 
-We have exploited a recursive property of $\max$ on trees (see equation (48) in the [Details of derivations](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8)) to derive expressions for the prob. of broadcast and anonymity failures, however if such recursive approach is possible in analysis of adversarial broadcast-failure is not clear. In particular we don’t know how to estimate probability of the event
+We have exploited a recursive property of $\max$ on trees (see equation (48) in the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8)) to derive expressions for the prob. of broadcast and anonymity failures, however if such recursive approach is possible in analysis of adversarial broadcast-failure is not clear. In particular we don’t know how to estimate probability of the event
 
 > **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
 
-analytically. However for $q_F=0$, i.e. there are no faulty nodes, we know from our[ earlier analysis](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df8157a67ce3aa45e41aa6) that the probability of adversarial broadcast failure $\mathrm{P}_{ab}$ is strictly less than $1$ as $L\rightarrow\infty$ when $q_A < 1-\frac{1}{b}$.
+analytically. However for $q_F=0$, i.e. there are no faulty nodes, we know from our[ earlier analysis](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df8157a67ce3aa45e41aa6) that the probability of adversarial broadcast failure $\mathrm{P}_{ab}$ is strictly less than $1$ as $L\rightarrow\infty$ when $q_A < 1-\frac{1}{b}$.
 
 ### Simulation results
 
@@ -349,13 +349,13 @@ Above analytic expressions, derived for infinite number of random samples, for f
 
 ### Discussion of results for linear and branching tree designs: two-variable failure model
 
-To compare linear and branching tree designs we assume that both have the same number of paths $b^L$, where $b$ is branching parameter and $L$ is the number of layers (see diagram of [linear trees](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81fdbde2c4cc3eaab976) and diagram of [branching tree](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81c590a3eab6a373ac66)). The differences between designs when above assumption is used were discussed [above](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25).
+To compare linear and branching tree designs we assume that both have the same number of paths $b^L$, where $b$ is branching parameter and $L$ is the number of layers (see diagram of [linear trees](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81fdbde2c4cc3eaab976) and diagram of [branching tree](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81c590a3eab6a373ac66)). The differences between designs when above assumption is used were discussed [above](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25).
 
 First, we consider the prob. of broadcast failure for values of $q_F$ below and above the threshold $q_F(b)$ plotted in the figure below.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A456844fd-2ca7-4413-9612-e6b0f6e49836%3AScreenshot_2025-01-31_at_12.54.49.png?table=block&id=1fd261aa-09df-813e-b721-f7882d2a16b7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=960&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-For the branching parameter $b=2$ the prob. of broadcast failure, $\mathrm{P}_b$, in linear trees is smaller than in the branching trees as can be seen in the figure below. We note that in linear trees the prob. $\mathrm{P}_b\rightarrow0$ as $L\rightarrow\infty$ when $q_F<1/2$ and $\mathrm{P}_b\rightarrow1$ when $q_F>1/2$. The threshold $1/2$ follows from the condition $b(1-q_F)>1$, which ensures $\mathrm{P}_b\rightarrow0$, in the [linear trees analysis](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df8180a435ce3e9f937c9f).
+For the branching parameter $b=2$ the prob. of broadcast failure, $\mathrm{P}_b$, in linear trees is smaller than in the branching trees as can be seen in the figure below. We note that in linear trees the prob. $\mathrm{P}_b\rightarrow0$ as $L\rightarrow\infty$ when $q_F<1/2$ and $\mathrm{P}_b\rightarrow1$ when $q_F>1/2$. The threshold $1/2$ follows from the condition $b(1-q_F)>1$, which ensures $\mathrm{P}_b\rightarrow0$, in the [linear trees analysis](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df8180a435ce3e9f937c9f).
 
 ![](https://nomos-tech.notion.site/image/attachment%3A3a4b667d-6651-4b08-bf2e-cddb5739bfdc%3AScreenshot_2025-01-31_at_12.37.21.png?table=block&id=1fd261aa-09df-819d-956d-e161fbf5ae4e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -367,7 +367,7 @@ As we increase the branching parameter $b$ the probability of broadcast failure 
 
 ![](https://nomos-tech.notion.site/image/attachment%3Af2548243-0410-4b79-a30f-8459f24affab%3AScreenshot_2025-01-31_at_14.31.40.png?table=block&id=1fd261aa-09df-8115-8286-f437cd5d8d73&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-However, the number of nodes involved in communication is growing much faster with the number of layers $L$ for higher values of the branching parameter $b$ (cf. figure below and figure [above](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81e79f61cabed4681a86))
+However, the number of nodes involved in communication is growing much faster with the number of layers $L$ for higher values of the branching parameter $b$ (cf. figure below and figure [above](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81e79f61cabed4681a86))
 
 ![](https://nomos-tech.notion.site/image/attachment%3Add10beca-1fdf-40b7-9e86-ed83f62d1c85%3AScreenshot_2025-01-31_at_14.32.37.png?table=block&id=1fd261aa-09df-8165-ae88-cd3cccf49a8e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -375,7 +375,7 @@ Second, we consider the prob. of anonymity failure for values of $q_A$ below and
 
 ![](https://nomos-tech.notion.site/image/attachment%3A3d9fa2bb-10f5-4397-8a1a-a1a2d806efcb%3AScreenshot_2025-01-31_at_14.58.38.png?table=block&id=1fd261aa-09df-81fa-a9c5-e5b41ffafd97&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-For the branching parameter $b=2$ the prob. of anonymity failure, $\mathrm{P}_a$, in linear trees is higher than in the branching trees as can be seen in the figure below. We note that in linear trees the prob. $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$ when $q_A<1/1.8$ and $\mathrm{P}_a\rightarrow1$ when $q_A>1/1.8$. The threshold $1/1.8$ follows from the condition $b(1-q_F)q_A<1$, which ensures $\mathrm{P}_a\rightarrow0$, in the [linear trees analysis](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81de9a84f2296b8ffa22). For branching trees we have $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$ when $q_A<1/1.8$ but $\mathrm{P}_a<1$ when $q_A>1/1.8$.
+For the branching parameter $b=2$ the prob. of anonymity failure, $\mathrm{P}_a$, in linear trees is higher than in the branching trees as can be seen in the figure below. We note that in linear trees the prob. $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$ when $q_A<1/1.8$ and $\mathrm{P}_a\rightarrow1$ when $q_A>1/1.8$. The threshold $1/1.8$ follows from the condition $b(1-q_F)q_A<1$, which ensures $\mathrm{P}_a\rightarrow0$, in the [linear trees analysis](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81de9a84f2296b8ffa22). For branching trees we have $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$ when $q_A<1/1.8$ but $\mathrm{P}_a<1$ when $q_A>1/1.8$.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A52f69243-adef-4275-a246-383c3c234d2e%3AScreenshot_2025-01-31_at_15.01.18.png?table=block&id=1fd261aa-09df-81f7-8807-f387b1b80248&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -393,7 +393,7 @@ As we increase the branching parameter $b$ the probability of anonymity failure 
 
 ![](https://nomos-tech.notion.site/image/attachment%3Acb9b15ee-452f-489c-8dfa-89c60806654e%3AScreenshot_2025-02-03_at_12.35.32.png?table=block&id=1fd261aa-09df-81b0-aa40-ccfa939902e6&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-Finally, we consider the prob. of adversarial broadcast failure $\mathrm{P}_{ab}$. Here for branching trees we have only simulation results and we compare the latter with analytic results for linear trees. We note that in linear trees the prob. $\mathrm{P}_{ab}\rightarrow0$ as $L\rightarrow\infty$ when $b\,(1-q_F)(1-q_A)>1$ and $\mathrm{P}_{ab}\rightarrow1$ when $b\,(1-q_F)(1-q_A)<1$ and $b\,(1-q_F)>1$ (see the [linear trees analysis](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df813799b4dae2e771b34c)). The latter gives us $q_F<1-1/b$, i.e. the condition for the prob. of broadcast failure $\mathrm{P}_b\rightarrow0$ in linear and branching trees. For the branching parameter $b=2$ the prob. of adversarial broadcast failure, $\mathrm{P}_{ab}$, in linear trees is higher than in the branching trees as can be seen in the figure below.
+Finally, we consider the prob. of adversarial broadcast failure $\mathrm{P}_{ab}$. Here for branching trees we have only simulation results and we compare the latter with analytic results for linear trees. We note that in linear trees the prob. $\mathrm{P}_{ab}\rightarrow0$ as $L\rightarrow\infty$ when $b\,(1-q_F)(1-q_A)>1$ and $\mathrm{P}_{ab}\rightarrow1$ when $b\,(1-q_F)(1-q_A)<1$ and $b\,(1-q_F)>1$ (see the [linear trees analysis](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df813799b4dae2e771b34c)). The latter gives us $q_F<1-1/b$, i.e. the condition for the prob. of broadcast failure $\mathrm{P}_b\rightarrow0$ in linear and branching trees. For the branching parameter $b=2$ the prob. of adversarial broadcast failure, $\mathrm{P}_{ab}$, in linear trees is higher than in the branching trees as can be seen in the figure below.
 
 ![](https://nomos-tech.notion.site/image/attachment%3Ab4f5acb4-aff8-4f6c-b7ef-2efb89a61ec8%3AScreenshot_2025-02-04_at_12.27.34.png?table=block&id=1fd261aa-09df-8146-974c-d514e731b789&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=970&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 

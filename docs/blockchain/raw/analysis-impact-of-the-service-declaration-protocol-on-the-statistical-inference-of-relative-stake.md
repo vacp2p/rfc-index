@@ -63,7 +63,7 @@ In particular:
 
 ## The Model
 
-The relative stake of node $i$, $\alpha_i$, is computed via the formula $\alpha_i=w_i/\sum_{j=1}^Nw_j$, where $w_i$ is the stake of node $i$. We assume that the total stake $\sum_{j=1}^Nw_j$ can be inferred (with high accuracy) by using the [total stake inference](/237261aa09df800285cccbb00b3aeb0a?pvs=25) algorithm.  We note that for the set $\{\alpha_1,\ldots,\alpha_N\}$, i.e. relative stakes of all nodes, it is possible that $\{\alpha_1,\ldots,\alpha_N\} = \{\alpha_i\,\vert\,\alpha_i<\alpha_0\}\cup\{\alpha_i\,\vert\,\alpha_i\geq\alpha_0\}$. It is known, through the declaration of the [Service Declaration Protocol](/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25) (SDP), that the relative stake of a node is at least $\alpha_0$.  For $\alpha_i\in \{\alpha_i\,\vert\,\alpha_i\geq\alpha_0\}$, the relative stake of a node $i$ can be written as $\alpha_i=\beta_i+\alpha_0$, where $\beta_i\geq 0$ is unknown. Intuitively, this suggests that if, relative to the $\alpha_i$, the minimum stake $\alpha_0$ is large, then then there is less “uncertainty” about the relative stake $\alpha_i$.
+The relative stake of node $i$, $\alpha_i$, is computed via the formula $\alpha_i=w_i/\sum_{j=1}^Nw_j$, where $w_i$ is the stake of node $i$. We assume that the total stake $\sum_{j=1}^Nw_j$ can be inferred (with high accuracy) by using the [total stake inference](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25) algorithm.  We note that for the set $\{\alpha_1,\ldots,\alpha_N\}$, i.e. relative stakes of all nodes, it is possible that $\{\alpha_1,\ldots,\alpha_N\} = \{\alpha_i\,\vert\,\alpha_i<\alpha_0\}\cup\{\alpha_i\,\vert\,\alpha_i\geq\alpha_0\}$. It is known, through the declaration of the [Service Declaration Protocol](https://nomos-tech.notion.site/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25) (SDP), that the relative stake of a node is at least $\alpha_0$.  For $\alpha_i\in \{\alpha_i\,\vert\,\alpha_i\geq\alpha_0\}$, the relative stake of a node $i$ can be written as $\alpha_i=\beta_i+\alpha_0$, where $\beta_i\geq 0$ is unknown. Intuitively, this suggests that if, relative to the $\alpha_i$, the minimum stake $\alpha_0$ is large, then then there is less “uncertainty” about the relative stake $\alpha_i$.
 
 Node $i$ participates in the leader election and its probability of winning is given by the “lottery” function
 
@@ -71,11 +71,11 @@ $$
 \phi(\alpha_i)=1-(1-f)^{\alpha_i},
 $$
 
-where $f\in(0,1)$ is the parameter of the [consensus](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d). Since the lottery function $\phi(\alpha_i)$ is a monotonically increasing function of relative stake, for the relative stake $\alpha_i=\beta_i+\alpha_0$ we have $\phi(\beta_i+\alpha_0)\geq \phi(\alpha_0)$, i.e. the prob. of winning for nodes with relative stake greater than $\alpha_0$ is higher.
+where $f\in(0,1)$ is the parameter of the [consensus](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d). Since the lottery function $\phi(\alpha_i)$ is a monotonically increasing function of relative stake, for the relative stake $\alpha_i=\beta_i+\alpha_0$ we have $\phi(\beta_i+\alpha_0)\geq \phi(\alpha_0)$, i.e. the prob. of winning for nodes with relative stake greater than $\alpha_0$ is higher.
 
 ## Inference of relative stake
 
-For the [fraction](/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796)[ of wins](/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796) $\hat{P}_i(1)$ in the $\sum_{t=1}^T\eta_i(t)\geq1$ observations of the leader election process of a node the [(naive) statistical estimator](/1fd261aa09df8181a428f52251e173c4?pvs=25) of $\alpha$, $\hat{\alpha}_i$, is the solution of the equation $\hat{P}_i(1)=\phi(\alpha_i)$ given by
+For the [fraction](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796)[ of wins](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796) $\hat{P}_i(1)$ in the $\sum_{t=1}^T\eta_i(t)\geq1$ observations of the leader election process of a node the [(naive) statistical estimator](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) of $\alpha$, $\hat{\alpha}_i$, is the solution of the equation $\hat{P}_i(1)=\phi(\alpha_i)$ given by
 
 $$
 \hat{\alpha}_i=\frac{\log\left(1-\hat{P}_i(1)\right)}{\log(1-f)}
@@ -87,7 +87,7 @@ $$
 \langle\hat{\alpha}_i\rangle=\left\langle\frac{\log\left(1-\hat{P}_i(1)\right)}{\log(1-f)}\right\rangle\neq\frac{\log\left(1-\phi(\alpha_i)\right)}{\log(1-f)}=\alpha_i
 $$
 
-where the average $\langle\{\cdots\}\rangle$ is defined in the [Appendix](/206261aa09df807bad8afccf8474c6c9?pvs=25#209261aa09df803d9e07f14c76435c45). However, the [average](/206261aa09df807bad8afccf8474c6c9?pvs=25#08422d534bcd4c218558164d6902e6c0) $\langle\hat{P}_i(1)\rangle=\phi(\alpha_i)$ and the [variance](/206261aa09df807bad8afccf8474c6c9?pvs=25#94a001afe6c5456686827b2832ea7ee4) $\mathrm{Var}[\hat{P}_i(1)]\rightarrow0$.  If $\sum_{t=1}^T\eta_i(t)\rightarrow\infty$ when $T\rightarrow\infty$ then in this (”large number of observations”) limit we have
+where the average $\langle\{\cdots\}\rangle$ is defined in the [Appendix](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#209261aa09df803d9e07f14c76435c45). However, the [average](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#08422d534bcd4c218558164d6902e6c0) $\langle\hat{P}_i(1)\rangle=\phi(\alpha_i)$ and the [variance](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#94a001afe6c5456686827b2832ea7ee4) $\mathrm{Var}[\hat{P}_i(1)]\rightarrow0$.  If $\sum_{t=1}^T\eta_i(t)\rightarrow\infty$ when $T\rightarrow\infty$ then in this (”large number of observations”) limit we have
 
 $$
 \hat{\alpha}_i\rightarrow\frac{\log\left(1-\phi(\alpha_i)\right)}{\log(1-f)}=\alpha_i
@@ -95,7 +95,7 @@ $$
 
 i.e. $\hat{\alpha}_i$ is consistent estimator of the relative stake $\alpha_i$.
 
-Similarly [to the estimator of ](/206261aa09df807bad8afccf8474c6c9?pvs=25#d2cc165b22724b03802603cdc9c020df)$\phi(\alpha_i)$, we construct new estimator of relative stake
+Similarly [to the estimator of ](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#d2cc165b22724b03802603cdc9c020df)$\phi(\alpha_i)$, we construct new estimator of relative stake
 
 $$
 \Alpha[\hat{\alpha}_i]=\left\{
@@ -118,7 +118,7 @@ $$
 \left\langle\hat{\alpha}_i\right\rangle\leq\left\langle\Alpha[\hat{\alpha}_i]\right\rangle\leq\left\langle\hat{\alpha}_i\right\rangle+\alpha_0\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle
 $$
 
-but [we showed](/206261aa09df807bad8afccf8474c6c9?pvs=25#a15a45cf4d5848deb204076964b4a79b) that $\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle\rightarrow0$ for a large number of observations, and hence $\left\langle\Alpha[\hat{\alpha}_i]\right\rangle\rightarrow\left\langle\hat{\alpha}_i\right\rangle$ in this limit.
+but [we showed](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#a15a45cf4d5848deb204076964b4a79b) that $\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle\rightarrow0$ for a large number of observations, and hence $\left\langle\Alpha[\hat{\alpha}_i]\right\rangle\rightarrow\left\langle\hat{\alpha}_i\right\rangle$ in this limit.
 
 Let us consider the (squared) distance
 
@@ -160,7 +160,7 @@ Simulations confirm that MSE of the estimator $\hat{\alpha}_i$ is greater than t
 
 ![](https://nomos-tech.notion.site/image/attachment%3Af40e2e20-3706-4b65-a68f-cc4cbac90ab3%3A8c01a4e6-ffe6-40d3-8040-306fee14cc0c.png?table=block&id=14f31751-9f1a-4527-acf1-f59a0d1f412f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-We are interested in the probability $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ which can be seen as [adversarial "confidence"](/1fd261aa09df8181a428f52251e173c4?pvs=25). Here $0<\gamma<1$ prescribes desired “accuracy” of the inference. We note that the probability $\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ can be [estimated analytically](/1fd261aa09df8181a428f52251e173c4?pvs=25) for large $T$. If for a given (accuracy) parameter $\gamma$ we have that $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right) > \mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ then the adversary has an advantage by using the new estimator, i.e. an adversary which knows that $\alpha_i\geq\alpha_0$ has a higher confidence than the adversary which doesn’t know the latter.
+We are interested in the probability $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ which can be seen as [adversarial "confidence"](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25). Here $0<\gamma<1$ prescribes desired “accuracy” of the inference. We note that the probability $\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ can be [estimated analytically](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) for large $T$. If for a given (accuracy) parameter $\gamma$ we have that $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right) > \mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ then the adversary has an advantage by using the new estimator, i.e. an adversary which knows that $\alpha_i\geq\alpha_0$ has a higher confidence than the adversary which doesn’t know the latter.
 
 Recall that $\alpha_0 \leq \alpha_i$. We note that $\alpha_0 \in [\alpha_i(1-\lambda), \alpha_i (1+\lambda)]$, provided $\alpha_i(1-\lambda) \leq \alpha_0$. Let us assume (without loss of generality) that $\alpha_i=n\,\alpha_0$ for some $n\geq1$. Then, from $\alpha_i(1-\gamma)\leq\alpha_0$ follows that $n\leq \frac{1}{1-\gamma}$. Hence, if this inequality is satisfied, an adversary may have advantage. We compute the probabilities $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ and $\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ using simulation and find that the adversary has advantage for the relative stake $\alpha_i\in[\alpha_0,\frac{\alpha_0}{1-\gamma}]$, as can be seen in figures below.
 
@@ -194,7 +194,7 @@ We consider inference only for $5$ nodes with the highest relative stake and for
 
 ## Inference of probability
 
-The [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) is governed by the probability distribution
+The [leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) is governed by the probability distribution
 
 $$
 \mathrm{P}(s_1(t),\ldots,s_N(t))=\prod_{i=1}^N\left[\phi(\alpha_i)\,\delta_{1;s_i(t)}+(1-\phi(\alpha_i))\,\delta_{0;s_i(t)}\right]
@@ -208,7 +208,7 @@ $$
 
 where $\sum_{t=1}^T\eta_i(t)\geq1$, with $\eta_i(t)\in\{0,1\}$, is the total number of observations.
 
-The average with respect to the [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) gives us
+The average with respect to the [leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) gives us
 
 $$
 \langle\hat{P}_i(1)\rangle=\frac{1}{\sum_{t=1}^T\eta_i(t)}\sum_{t=1}^T\eta_i(t)\,\langle\delta_{1;s_i(t)}\rangle=\phi(\alpha_i)
@@ -260,13 +260,13 @@ $$
 \mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))=\mathrm{Prob}\left(\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}\leq\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)\right)\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=\mathrm{Prob}\left(\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\geq\mathrm{e}^{-\lambda\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)}\right)\\~~\leq\frac{\left\langle\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\right\rangle}{\mathrm{e}^{-\lambda\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)}}
 $$
 
-where $\lambda>0$. Using the [definition](/206261aa09df807bad8afccf8474c6c9?pvs=25#209261aa09df803d9e07f14c76435c45), the average on the RHS of the above can be computed as follows
+where $\lambda>0$. Using the [definition](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#209261aa09df803d9e07f14c76435c45), the average on the RHS of the above can be computed as follows
 
 $$
 \left\langle\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\right\rangle=\left\{\prod_{t=1}^T\prod_{j=1}^N \sum_{s_j(t)}\mathrm{P}(s_j(t))\right\}\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\\~~~~~~~~~~=\prod_{t=1}^T\sum_{s_i(t)}\mathrm{P}(s_i(t))\,\mathrm{e}^{-\lambda\eta_i(t)\,\delta_{1;s_i(t)}}\\~~~~~~~~~~~~~~~~~~~=\prod_{t=1}^T\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda\eta_i(t)}+1-\phi(\alpha_i)\right)\\~~~~~~~~~~=\mathrm{e}^{\sum_{t=1}^T\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda\eta_i(t)}+1-\phi(\alpha_i)\right)}\\~~~~~~~~~~~~=\mathrm{e}^{\sum_{t=1}^T\eta_i(t)\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda}+1-\phi(\alpha_i)\right)}
 $$
 
-Using above result in the [inequality](/206261aa09df807bad8afccf8474c6c9?pvs=25#c731d476bd214a4f97d5fcb53a9925ce) we obtain
+Using above result in the [inequality](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#c731d476bd214a4f97d5fcb53a9925ce) we obtain
 
 $$
 \mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))\leq\mathrm{e}^{\sum_{t=1}^T\eta_i(t)\left[\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda}+1-\phi(\alpha_i)\right)+\lambda\phi(\alpha_0)\right]}
@@ -286,7 +286,7 @@ $$
 
 where $-\log \left(\frac{1-\phi(\alpha)}{1-\phi(\alpha_0) }\right)+\log \left(\frac{\phi(\alpha_0)}{\phi(\alpha)}\frac{ 1-\phi(\alpha)}{  1-\phi(\alpha_0) }\right) \phi(\alpha_0)> 0$ when $\phi(\alpha)>\phi(\alpha_0)$.
 
-From above follows that $\mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))\rightarrow0$ in the limit $\sum_{t=1}^T\eta_i(t)\rightarrow\infty$ as $T\rightarrow\infty$, i.e. for a large number of observations. Using the latter in the [upper bound](/206261aa09df807bad8afccf8474c6c9?pvs=25#585561b1774d4c8f9f089c9d47891bca) gives us that $\langle\Phi[\hat{P}_i(1)]\rangle\rightarrow\phi(\alpha_i)$ in this limit. If in the limit of large number of observations we also have that the $\mathrm{Var}[\Phi[\hat{P}_i(1)]]\rightarrow0$ then $\Phi[\hat{P}_i(1)]$ is a consistent estimator of the prob. $\phi(\alpha_i)$.
+From above follows that $\mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))\rightarrow0$ in the limit $\sum_{t=1}^T\eta_i(t)\rightarrow\infty$ as $T\rightarrow\infty$, i.e. for a large number of observations. Using the latter in the [upper bound](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#585561b1774d4c8f9f089c9d47891bca) gives us that $\langle\Phi[\hat{P}_i(1)]\rangle\rightarrow\phi(\alpha_i)$ in this limit. If in the limit of large number of observations we also have that the $\mathrm{Var}[\Phi[\hat{P}_i(1)]]\rightarrow0$ then $\Phi[\hat{P}_i(1)]$ is a consistent estimator of the prob. $\phi(\alpha_i)$.
 
 For $\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\xi_i$, where we defined $\xi_i=\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}$, the $\mathrm{Var}[\Phi[\hat{P}_i(1)]]$ is given by
 
@@ -294,7 +294,7 @@ $$
 \mathrm{Var}[\Phi[\hat{P}_i(1)]]=\mathrm{Var}[\hat{P}_i(1)+\xi_i]=\mathrm{Var}[\hat{P}_i(1)]+2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i].
 $$
 
-In the [Variance section](/206261aa09df807bad8afccf8474c6c9?pvs=25#b91336f816a345cb89a09c1229fecf95) we show that
+In the [Variance section](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#b91336f816a345cb89a09c1229fecf95) we show that
 
 $$
 \mathrm{Var}[\Phi[\hat{P}_i(1)]]\leq\mathrm{Var}[\hat{P}_i(1)].
@@ -382,7 +382,7 @@ $$
 ~~~~~~~~\leq \left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle=-\mathrm{Cov}[\hat{P}_i(1),\xi_i]
 $$
 
-Thus, from the above it follows that $\mathrm{Var}[\xi_i]\leq -\mathrm{Cov}[\hat{P}_i(1),\xi_i]$. The latter with $-\mathrm{Cov}[\hat{P}_i(1), \xi_i] \geq 0$ implies $\mathrm{Cov}[\hat{P}_i(1),\xi_i]\leq-\mathrm{Var}[\xi_i]/2$ which using the [variance equation](/206261aa09df807bad8afccf8474c6c9?pvs=25#878222bbfb1b42169fd4092dc6ea1ed1) gives us that
+Thus, from the above it follows that $\mathrm{Var}[\xi_i]\leq -\mathrm{Cov}[\hat{P}_i(1),\xi_i]$. The latter with $-\mathrm{Cov}[\hat{P}_i(1), \xi_i] \geq 0$ implies $\mathrm{Cov}[\hat{P}_i(1),\xi_i]\leq-\mathrm{Var}[\xi_i]/2$ which using the [variance equation](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#878222bbfb1b42169fd4092dc6ea1ed1) gives us that
 
 $$
 \mathrm{Var}[\Phi[\hat{P}_i(1)]]\leq\mathrm{Var}[\hat{P}_i(1)]

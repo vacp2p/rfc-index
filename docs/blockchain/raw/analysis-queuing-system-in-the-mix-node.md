@@ -26,7 +26,7 @@
 
 # Introduction
 
-We consider queuing system of a mix node where coin-flipping algorithm is used to remove messages. We show that the amount of time message spends in a queue is governed by the [Geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution). The consequence of the latter is [memorylessness](https://en.wikipedia.org/wiki/Memorylessness) property, i.e. the amount of time a message will spend in the queue is independent on how long it is already been in the queue, [which is important for anonymity of communication](/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25#1fd261aa09df8172b2cbe6d970282cb0).
+We consider queuing system of a mix node where coin-flipping algorithm is used to remove messages. We show that the amount of time message spends in a queue is governed by the [Geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution). The consequence of the latter is [memorylessness](https://en.wikipedia.org/wiki/Memorylessness) property, i.e. the amount of time a message will spend in the queue is independent on how long it is already been in the queue, [which is important for anonymity of communication](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25#1fd261aa09df8172b2cbe6d970282cb0).
 
 # Overview
 
@@ -74,7 +74,7 @@ Above operation is repeated by Relayer for all $j\in [c_i]$
 
 Let us consider, without loss of generality, the out-queue $Q_1^{out}$ and assume that the front of $Q_1^{out}$ holds $n$ messages which arrived at times $t_1\leq t_2\leq\cdots\leq t_n$.  Furthermore, we assume that messages which arrive at times after time $t_n$, $t_i > t_n$, are labelled by $i\in \mathbb{N}\setminus [n]$, i.e. we assume that messages are labelled by the set $\mathbb{N}$.
 
-The above $n$ messages are shuffled, which is equivalent to random permutation, then each message is removed from the queue with probability $q$ and sent.  In above removal of a message which arrived at time $t_i$ can be modeled by the binary variable $x_i\in\{0,1\}$, where $0/1$ corresponds to not-removed/removed.  We note that number of removed messages in this process is the random variable from binomial distribution with parameters $n$ and $q$. Hence above process on average (and (approx.) typically) removes $q\, n$ messages from the queue $Q_1^{out}$. The above algorithm can be seen as a variant of the pool mix (see the [article](/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25#1fd261aa09df81609a91c4e9127d06ab))
+The above $n$ messages are shuffled, which is equivalent to random permutation, then each message is removed from the queue with probability $q$ and sent.  In above removal of a message which arrived at time $t_i$ can be modeled by the binary variable $x_i\in\{0,1\}$, where $0/1$ corresponds to not-removed/removed.  We note that number of removed messages in this process is the random variable from binomial distribution with parameters $n$ and $q$. Hence above process on average (and (approx.) typically) removes $q\, n$ messages from the queue $Q_1^{out}$. The above algorithm can be seen as a variant of the pool mix (see the [article](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25#1fd261aa09df81609a91c4e9127d06ab))
 
 ![](https://nomos-tech.notion.site/image/attachment%3Ab32c6736-933e-4137-ac23-e8a70926b742%3AScreenshot_2025-02-17_at_11.54.08.png?table=block&id=1fd261aa-09df-8168-b98c-d281f452fe13&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 

@@ -26,15 +26,15 @@
 
 # Introduction
 
-In order to guide a design of the [Blend Network](/215261aa09df81ae8857d71066a80084?pvs=25), this document summarises parameters (and results of analysis) of the [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25), [communication on trees](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) and [inference of relative stake](/1fd261aa09df8181a428f52251e173c4?pvs=25). In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.
+In order to guide a design of the [Blend Network](https://nomos-tech.notion.site/215261aa09df81ae8857d71066a80084?pvs=25), this document summarises parameters (and results of analysis) of the [leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25), [communication on trees](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) and [inference of relative stake](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25). In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.
 
-Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in [Cryptarchia](/1fd261aa09df81618a76e0ac0f7f154f?pvs=25).
+Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in [Cryptarchia](https://nomos-tech.notion.site/1fd261aa09df81618a76e0ac0f7f154f?pvs=25).
 
 # Analysis
 
 ## Leader election process
 
-The [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) is organised into epochs and each epoch is divided into $T$ time-slots.
+The [leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) is organised into epochs and each epoch is divided into $T$ time-slots.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A29902138-cf0a-4ae7-9cc2-1ee0727f0b51%3AScreenshot_2025-05-02_at_14.23.31.png?table=block&id=1fd261aa-09df-8132-947c-f18dddfbee58&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=770&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -63,7 +63,7 @@ The result of the sampling process described above can be represented by the fol
 
 ![](https://nomos-tech.notion.site/image/attachment%3A4756879d-93b3-42bd-9462-726f709f3756%3AScreenshot_2025-02-07_at_16.32.55.png?table=block&id=1fd261aa-09df-81b6-8d35-fabff822c957&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-Connectivity of a node $i\in[N]$ is the number of random edges connecting this nodes to factors labelled by the set $[n]$. The connectivity of a node $i \in [N]$ is the number of linear trees that $i$ appears in. The connectivity is a [random number from the binomial distribution](/206261aa09df80509e7dca0605db421b?pvs=25#255261aa09df80028403c5b5e08c1c1f)
+Connectivity of a node $i\in[N]$ is the number of random edges connecting this nodes to factors labelled by the set $[n]$. The connectivity of a node $i \in [N]$ is the number of linear trees that $i$ appears in. The connectivity is a [random number from the binomial distribution](https://nomos-tech.notion.site/206261aa09df80509e7dca0605db421b?pvs=25#255261aa09df80028403c5b5e08c1c1f)
 
 $$
 \mathrm{P}\left(c\vert n,\frac{KL}{N}\right)={n\choose c}\left(\frac{KL}{N}\right)^c\left(1-\frac{KL}{N}\right)^{n-c}
@@ -111,7 +111,7 @@ $$
 \mathrm{P}_b(K,L,q_F)=\left[1-(1-q_F)^L\right]^{K}
 $$
 
-We note that $q_F(C)=\frac{C-2}{C-1}$ is the [site percolation threshold of random regular graph (RRG) with connectivity C](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df811eb66afc94559fa6c4), i.e. for $q_F>q_F(C)$ the RRG becomes disconnected with high probability as $N\rightarrow\infty$. The latter suggests if our model of the network is RRG then for the fraction of faulty nodes $q_F > q_F(C)$ the communication is not possible with high probability in $N\rightarrow\infty$.
+We note that $q_F(C)=\frac{C-2}{C-1}$ is the [site percolation threshold of random regular graph (RRG) with connectivity C](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df811eb66afc94559fa6c4), i.e. for $q_F>q_F(C)$ the RRG becomes disconnected with high probability as $N\rightarrow\infty$. The latter suggests if our model of the network is RRG then for the fraction of faulty nodes $q_F > q_F(C)$ the communication is not possible with high probability in $N\rightarrow\infty$.
 
 If all nodes in a communication path are non-faulty then this is a functioning communication path.
 
@@ -169,11 +169,11 @@ def Prob_a(K, L, qF, qA):
 
 ## Inference of relative stake
 
-The [adversary observes the leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) of a node with the relative stake $\alpha$.
+The [adversary observes the leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) of a node with the relative stake $\alpha$.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A4688bad9-2877-4408-9416-bcdee0bc9ef8%3AScreenshot_2025-02-13_at_08.26.49.png?table=block&id=1fd261aa-09df-81f1-9deb-f03fe24a8efa&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-In $T$ time-slots, the adversary is able to observe fraction $v$ of wins in $m$ observations. The probability of observing the election outcome of a node is $q$. For $m\geq1$ adversary uses the “naive” estimator $\hat{\alpha}=\frac{\log\left(1-v\right)}{\log(1-f)}$ of the true relative stake $\alpha$. For large $T$, the probability that $\alpha(1-\gamma)\leq\hat{\alpha}\leq\alpha(1+\gamma)$ is [given by](/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05)
+In $T$ time-slots, the adversary is able to observe fraction $v$ of wins in $m$ observations. The probability of observing the election outcome of a node is $q$. For $m\geq1$ adversary uses the “naive” estimator $\hat{\alpha}=\frac{\log\left(1-v\right)}{\log(1-f)}$ of the true relative stake $\alpha$. For large $T$, the probability that $\alpha(1-\gamma)\leq\hat{\alpha}\leq\alpha(1+\gamma)$ is [given by](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05)
 
 $$
 \mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)=\frac{2 \,\mathrm{erf}\! \left(\frac{ \epsilon}{\sqrt{2\sigma^2(\alpha,q)}}\right)}{\mathrm{erf}\! \left(\frac{\phi(\alpha) }{ \sqrt{2\sigma^2(\alpha,q)}}\right)+\mathrm{erf}\! \left(\frac{ 1-\phi(\alpha)}{ \sqrt{2\sigma^2(\alpha,q)}}\right)}
@@ -225,7 +225,7 @@ epsilon = dphi(alpha, f) * alpha * gamma
 Prob2_result = Prob2(alpha, epsilon, T, q)
 ```
 
-The [probability](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8130bc9cc00ece070d4a) can also compute the (minimum) number of time-slots, $t$, such that $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,t\right)\geq\delta$, for some $\delta\in (0,1)$. Here $t$ is the time needed by an adversary to achieve “confidence” greater than $\delta$. The code which computes $t$ is given below
+The [probability](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8130bc9cc00ece070d4a) can also compute the (minimum) number of time-slots, $t$, such that $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,t\right)\geq\delta$, for some $\delta\in (0,1)$. Here $t$ is the time needed by an adversary to achieve “confidence” greater than $\delta$. The code which computes $t$ is given below
 
 ```
 T0 = T # One epoch
@@ -274,9 +274,9 @@ We note that above is $0$ when $q=1$, i.e. no sampling noise, and is growing whe
 
 ## The Unlinkability of Block Proposers
 
-We assume that node $\mathrm{S}$ wins the [election](/1fd261aa09df8181a428f52251e173c4?pvs=25) and broadcasts message $\mathrm{m}$ to the network using [linear trees](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8126abdcf963ec121066). We assume that in the network the sender node $\mathrm{S}$ has $C$ neighbouring nodes. Message $\mathrm{m}$ is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood $\partial\mathrm{S}$, where $\vert\partial\mathrm{S}\vert=C$, is adversarial with the prob. $q_A$. The prob. that at least one node in $\partial\mathrm{S}$ is adversarial is $1-(1-q_A)^C$.
+We assume that node $\mathrm{S}$ wins the [election](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) and broadcasts message $\mathrm{m}$ to the network using [linear trees](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8126abdcf963ec121066). We assume that in the network the sender node $\mathrm{S}$ has $C$ neighbouring nodes. Message $\mathrm{m}$ is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood $\partial\mathrm{S}$, where $\vert\partial\mathrm{S}\vert=C$, is adversarial with the prob. $q_A$. The prob. that at least one node in $\partial\mathrm{S}$ is adversarial is $1-(1-q_A)^C$.
 
-If $\mathrm{S}$ has at least one adversarial neighbour and [anonymity failure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81d18726e5b63a96b432) occurred then the message $\mathrm{m}$ can linked to the sender node $\mathrm{S}$. We note that just occurrence of the [anonymity failure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81d18726e5b63a96b432) alone is not sufficient to link $\mathrm{m}$ to $\mathrm{S}$ and at least one compromised node is also needed in $\partial\mathrm{S}$. Furthermore, an adversary may need not one but at least $n_A$ compromised nodes in $\partial\mathrm{S}$. The probability of the latter is given by the binomial
+If $\mathrm{S}$ has at least one adversarial neighbour and [anonymity failure](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81d18726e5b63a96b432) occurred then the message $\mathrm{m}$ can linked to the sender node $\mathrm{S}$. We note that just occurrence of the [anonymity failure](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81d18726e5b63a96b432) alone is not sufficient to link $\mathrm{m}$ to $\mathrm{S}$ and at least one compromised node is also needed in $\partial\mathrm{S}$. Furthermore, an adversary may need not one but at least $n_A$ compromised nodes in $\partial\mathrm{S}$. The probability of the latter is given by the binomial
 
 $$
 \mathrm{P}(n\geq n_A\vert C,q_A)=\sum_{n=n_A}^C{C\choose n}[1-q_A]^{C-n}q_A^n
@@ -288,7 +288,7 @@ $$
 \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)
 $$
 
-We note that in above we assumed that $q_F=0$, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since $\mathrm{P}(n\geq n_A\vert C,q_A)<1$ for $n_A\geq1$, the prob. of anonymity failure $\mathrm{P}_a(K,L,0,q_A)$ is an upper bound on the above prob. If node $\mathrm{S}$ has (relative) stake $\alpha$ then the prob. of node $\mathrm{S}$ winning is $\phi(\alpha)$, where $\phi(\alpha)$ is the[ lottery function](/1fd261aa09df8181a428f52251e173c4?pvs=25). Hence, the prob. that the message $\mathrm{m}$, sent by the winning node $\mathrm{S}$, can be linked to $\mathrm{S}$ is given by
+We note that in above we assumed that $q_F=0$, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since $\mathrm{P}(n\geq n_A\vert C,q_A)<1$ for $n_A\geq1$, the prob. of anonymity failure $\mathrm{P}_a(K,L,0,q_A)$ is an upper bound on the above prob. If node $\mathrm{S}$ has (relative) stake $\alpha$ then the prob. of node $\mathrm{S}$ winning is $\phi(\alpha)$, where $\phi(\alpha)$ is the[ lottery function](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25). Hence, the prob. that the message $\mathrm{m}$, sent by the winning node $\mathrm{S}$, can be linked to $\mathrm{S}$ is given by
 
 $$
 \phi(\alpha)\, \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)
@@ -366,13 +366,13 @@ Using above diagram of dependencies a first and later versions of the calculator
 
 ## Strategies to Reduce Anonymity Failure
 
-Let us assume that a node won at time $t$ of the [election process](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d) and it broadcasts a message to the network using [linear trees](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8126abdcf963ec121066). Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by
+Let us assume that a node won at time $t$ of the [election process](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d) and it broadcasts a message to the network using [linear trees](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8126abdcf963ec121066). Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by
 
 $$
 \mathrm{P}_a(K,L,q_F,q_A)=1-\left[1-(1-q_F)^L\, q_A^L\right]^{K}
 $$
 
-Above corresponds to a scenario when a node at time $t$ sends a message through $K$ paths of length $L$ (see [figure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)) constructed from nodes sampled (with replacement) from the set of network nodes $[N]$. Here $q_F$ and $q_A$ is, respectively, the fraction of faulty and adversarial nodes in the network.
+Above corresponds to a scenario when a node at time $t$ sends a message through $K$ paths of length $L$ (see [figure](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)) constructed from nodes sampled (with replacement) from the set of network nodes $[N]$. Here $q_F$ and $q_A$ is, respectively, the fraction of faulty and adversarial nodes in the network.
 
 For $K=1$, i.e. a message is sent through one path, the probability of anonymity failure is given by
 
@@ -386,7 +386,7 @@ Now let us assume that node sends the same message (or different messages) throu
 
 ![](https://nomos-tech.notion.site/image/attachment%3A8302fc7c-3058-4960-8722-e20c90e26982%3AScreenshot_2025-04-01_at_18.24.05.png?table=block&id=1fd261aa-09df-8199-b602-e80244ff5dc0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=900&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-After sending the first message at time $t_1$ the prob. of anonymity failure is $\mathrm{P}_a(1,L,q_F,q_A)=(1-q_F)^L\, q_A^L$, after sending the second message at time $t_2$ the prob. of anonymity failure is $\mathrm{P}_a(2,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]^2$, etc. Thus after sending the last message at time $t_K$ the prob. anonymity failure is $\mathrm{P}_a(K,L,q_F,q_A)$, i.e. the same as [sending a message through ](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)$K$ paths simultaneously. We note that for fixed $L$ the prob. $\mathrm{P}_a(K,L,q_F,q_A)$ is [monotonic increasing function](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ and hence $\mathrm{P}_a(n_{m},L,q_F,q_A)$ is monotonic increasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
+After sending the first message at time $t_1$ the prob. of anonymity failure is $\mathrm{P}_a(1,L,q_F,q_A)=(1-q_F)^L\, q_A^L$, after sending the second message at time $t_2$ the prob. of anonymity failure is $\mathrm{P}_a(2,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]^2$, etc. Thus after sending the last message at time $t_K$ the prob. anonymity failure is $\mathrm{P}_a(K,L,q_F,q_A)$, i.e. the same as [sending a message through ](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)$K$ paths simultaneously. We note that for fixed $L$ the prob. $\mathrm{P}_a(K,L,q_F,q_A)$ is [monotonic increasing function](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ and hence $\mathrm{P}_a(n_{m},L,q_F,q_A)$ is monotonic increasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
 
 ![](https://nomos-tech.notion.site/image/attachment%3Ab2f25c07-4351-47d0-9b5f-0f2b3fd7bc80%3AScreenshot_2025-04-02_at_15.07.44.png?table=block&id=1fd261aa-09df-8126-8b44-d03a7c40471c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -410,11 +410,11 @@ $$
 \mathrm{P}_b(K,L,q_F)=\left[1-(1-q_F)^L\right]^{K}
 $$
 
-which is a [monotonic decreasing function](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ when $L$ is fixed. Hence $\mathrm{P}_b(n_{m},L,q_F)$ is monotonic decreasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
+which is a [monotonic decreasing function](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ when $L$ is fixed. Hence $\mathrm{P}_b(n_{m},L,q_F)$ is monotonic decreasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
 
 ![](https://nomos-tech.notion.site/image/attachment%3A257fe07a-6ae4-419a-870b-313751b1c4e2%3AScreenshot_2025-04-02_at_15.41.16.png?table=block&id=1fd261aa-09df-81c5-bb23-e9518270b1b0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-We note that the [probability of adversarial broadcast-failure](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f7901bed38662b9882) behaves in a similar way as can be seen in the figure below
+We note that the [probability of adversarial broadcast-failure](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f7901bed38662b9882) behaves in a similar way as can be seen in the figure below
 
 ![](https://nomos-tech.notion.site/image/attachment%3A298bbdcb-04e9-4e22-a6d1-f9116a23a543%3AScreenshot_2025-04-02_at_15.48.32.png?table=block&id=1fd261aa-09df-817d-9a8c-eb0486d2873d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -478,7 +478,7 @@ $$
 
 We note that we have equality in the above when $\Delta=\Delta_i$ and $d=d_{i\,i+1}$, i.e. all delays are the same.
 
-Assuming that sender node monitors, via observation of broadcasts on $\mathcal{N}$, how a message is propagated along the [path](/1fd261aa09df814a9967efc9aa479eba?pvs=25), the sender node sends first messages and if this message is not broadcasted to $\mathcal{N}$ after some time, for example after time $\sum_{i=0}^1\left[\Delta_{i}(1)+ d_{i\,i+1}(1)\right]$, it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node $L$, but is not broadcasted to the network $\mathcal{N}$. Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the $K$-th message is broadcasted by the last node to $\mathcal{N}$, gives us that the total delay in the [sequential scenario](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) is at most
+Assuming that sender node monitors, via observation of broadcasts on $\mathcal{N}$, how a message is propagated along the [path](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25), the sender node sends first messages and if this message is not broadcasted to $\mathcal{N}$ after some time, for example after time $\sum_{i=0}^1\left[\Delta_{i}(1)+ d_{i\,i+1}(1)\right]$, it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node $L$, but is not broadcasted to the network $\mathcal{N}$. Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the $K$-th message is broadcasted by the last node to $\mathcal{N}$, gives us that the total delay in the [sequential scenario](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) is at most
 
 $$
 \sum_{\ell=1}^K\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]
@@ -494,7 +494,7 @@ $$
 
 where $\Delta=\max_{i,\ell}\Delta_i(\ell)$ and $d=\max_{i,\ell}d_{i\,i+1}(\ell)$. We can assume that $\Delta=10s$ and $d=5s$.
 
-We note that when $K$ messages are sent [simultaneously](/1fd261aa09df814a9967efc9aa479eba?pvs=25) and if at least one of them is successfully broadcasted by a last node to the network $\mathcal{N}$, then the total delay is at most
+We note that when $K$ messages are sent [simultaneously](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25) and if at least one of them is successfully broadcasted by a last node to the network $\mathcal{N}$, then the total delay is at most
 
 $$
 \max_{\ell\in[K]}\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]
@@ -506,13 +506,13 @@ $$
 \max_{\ell\in[K]}\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]\leq (L+1)[\Delta + d]
 $$
 
-From the above, it follows that in the worst case the latency of [sequential](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) communication is $K$ times the latency of [synchronous](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f8a9d8f3bf17954d0a) communication.
+From the above, it follows that in the worst case the latency of [sequential](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) communication is $K$ times the latency of [synchronous](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f8a9d8f3bf17954d0a) communication.
 
-Let us assume that $\Delta=10s$, $d=5s$ and sender node is not delaying messages. The latter gives us the upper bound $\Delta L+ d(L+1)= 15\times L+5\,s$ on latency in [synchronous](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915) communication and $K[\Delta L+ d(L+1)]= K[15\times L+5]\,s$ for the upper bound on latency of [sequential](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) communication.
+Let us assume that $\Delta=10s$, $d=5s$ and sender node is not delaying messages. The latter gives us the upper bound $\Delta L+ d(L+1)= 15\times L+5\,s$ on latency in [synchronous](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915) communication and $K[\Delta L+ d(L+1)]= K[15\times L+5]\,s$ for the upper bound on latency of [sequential](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199b602e80244ff5dc0) communication.
 
 ## The Number of Time-Slots Between Two Consecutive Blocks
 
-In the [leader election process](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d) the probability of winning a slot is $f=1/30$ and the number of time-slots per epoch is $T=648000$. Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, $n_0$, follow the [geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution)
+In the [leader election process](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8139be03eb565f1e419d) the probability of winning a slot is $f=1/30$ and the number of time-slots per epoch is $T=648000$. Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, $n_0$, follow the [geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution)
 
 $$
 \mathrm{P}(n_0)=(1-f)^{n_0}f
@@ -524,7 +524,7 @@ $$
 \mathrm{P}(n_0> \langle n_0\rangle)=(1-f)^{\langle n_0\rangle+1}
 $$
 
-For $f=1/30$, the above gives us $\mathrm{P}(n_0> 29)=(1-1/30)^{30}\approx0.362$. Furthermore, the maximum of $n_0$ observed in $T$ time-slots (approximately) follows the [distribution](/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199a984c7f1688f60da)
+For $f=1/30$, the above gives us $\mathrm{P}(n_0> 29)=(1-1/30)^{30}\approx0.362$. Furthermore, the maximum of $n_0$ observed in $T$ time-slots (approximately) follows the [distribution](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8199a984c7f1688f60da)
 
 $$
 \mathrm{P}\left(x\right)=\int_{-\infty}^{\infty} \mathrm{e}^{-t-\mathrm{e}^{-t}}\delta\left(x-\frac{t+\log(T(1-p))}{\log(1/p)}\right)\mathrm{d} t\\~~~~~~~~~~~=\vert\log(p)\vert\, \mathrm{e}^{-\left[x\log(p)+\log(T(1-p))\right]-\mathrm{e}^{-\left[x\log(p)+\log(T(1-p))\right]}}

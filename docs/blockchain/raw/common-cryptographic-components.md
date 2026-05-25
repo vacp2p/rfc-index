@@ -48,11 +48,11 @@ The table below summarizes the recommended component for each context:
 
 | Context | Recommended Component |
 | --- | --- |
-| ZK Hashing | [Poseidon2](/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18) |
-| General Hashing & PRNG | [BLAKE2b](/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b3890fcc4f9606ee9e) |
-| General Signatures | [EdDSA](/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b99b7ce8dc0ac2f110) |
-| ZK Signatures | [ZkSignature](/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b7933cc1efca816f72) (see [🔀[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)) |
-| Proof System (SNARK) | [Groth16 ](/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df8167bc01e0fc7e6a7c83) |
+| ZK Hashing | [Poseidon2](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18) |
+| General Hashing & PRNG | [BLAKE2b](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b3890fcc4f9606ee9e) |
+| General Signatures | [EdDSA](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b99b7ce8dc0ac2f110) |
+| ZK Signatures | [ZkSignature](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b7933cc1efca816f72) (see [🔀[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)) |
+| Proof System (SNARK) | [Groth16 ](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df8167bc01e0fc7e6a7c83) |
 
 # 1. Hash Functions
 
@@ -200,7 +200,7 @@ Security Considerations:
 - Standard security assumptions: discrete logarithm hardness on Curve25519.
 - Resistant to timing and side-channel attacks due to uniform implementation characteristics.
 
-## [ZkSignature (Zero-Knowledge Signature)](/33d261aa09df8051b0d0cd4d5ddade85?pvs=25#18a261aa09df83a1a2ee81032493cef4)
+## [ZkSignature (Zero-Knowledge Signature)](https://nomos-tech.notion.site/33d261aa09df8051b0d0cd4d5ddade85?pvs=25#18a261aa09df83a1a2ee81032493cef4)
 
 Description:
 
@@ -243,7 +243,7 @@ Rationale for Use:
 
 Security Considerations:
 
-- Dependent on the security properties (collision resistance and preimage resistance) of the default [hash function](/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18) for zk-circuits utilized for key derivation and verification.
+- Dependent on the security properties (collision resistance and preimage resistance) of the default [hash function](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18) for zk-circuits utilized for key derivation and verification.
 - Robust against signature forgery, replay attacks, and impersonation, assuming the correct implementation of constraints and binding to the specific message hash.
 
 ## References

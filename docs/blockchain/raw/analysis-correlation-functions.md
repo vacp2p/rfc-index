@@ -72,7 +72,7 @@ $$
 
 # Node-centred approach
 
-- We adopt the [CA model](/1fd261aa09df81ff9278e23c51addfa4?pvs=25#1fd261aa09df81a39438fd17c225b730) where state of AC system at time $t$ is described by the vector $\mathbf{S}(t)=(S_1(t),\ldots, S_N(t))$, where the variable $S_i(t)$ is the state of node $i$, such as receiving a message, sending a message, etc., at time $t$. For example $S_i(t)\in\{-1,0,1\}$, where $-1$ corresponds to sending, $0$ corresponds to inactive and $1$ corresponds to receiving.
+- We adopt the [CA model](https://nomos-tech.notion.site/1fd261aa09df81ff9278e23c51addfa4?pvs=25#1fd261aa09df81a39438fd17c225b730) where state of AC system at time $t$ is described by the vector $\mathbf{S}(t)=(S_1(t),\ldots, S_N(t))$, where the variable $S_i(t)$ is the state of node $i$, such as receiving a message, sending a message, etc., at time $t$. For example $S_i(t)\in\{-1,0,1\}$, where $-1$ corresponds to sending, $0$ corresponds to inactive and $1$ corresponds to receiving.
 - We note that a node connected to more than two nodes can be receiving and/or sending multiple messages at the same time. However, to simplify analysis we will assume that at any time a node can receive (or send) at most one message.
 - We assume that we have observed $T$ such vectors at times collected in the (ordered) set $\mathcal{T}=\{t_0,t_1,\ldots\}$, where $\vert\mathcal{T}\vert=T$.
 
