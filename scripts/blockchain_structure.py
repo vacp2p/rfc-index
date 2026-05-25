@@ -59,6 +59,7 @@ FILE_ASSIGNMENTS = {
     "blockchain/raw/fork-choice.md": ("Consensus", "Cryptarchia Fork Choice Rule"),
     "blockchain/raw/cryptarchia-total-stake-inference.md": ("Consensus", "Total Stake Inference"),
     "blockchain/raw/cryptarchia-proof-of-leadership.md": ("Consensus", "Proof of Leadership"),
+    "blockchain/deprecated/cryptarchia-proof-of-leadership.md": ("Consensus", "Proof of Leadership v1.0.0"),
     "blockchain/deprecated/claro.md": ("Consensus", "Claro Consensus Protocol"),
     "blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.md": ("Consensus", "[Analysis] Cryptarchia De-anonymisation of Relative Stake"),
     "blockchain/raw/analysis-total-stake-inference.md": ("Consensus", "[Analysis] Total Stake Inference"),
@@ -66,6 +67,7 @@ FILE_ASSIGNMENTS = {
 
     # Mantle
     "blockchain/raw/bedrock-architecture-overview.md": ("Mantle", "[Overview] Bedrock Architecture"),
+    "blockchain/deprecated/bedrock-architecture-overview.md": ("Mantle", "[Overview] Bedrock Architecture v1.0.0"),
     "blockchain/raw/bedrock-v1.1-mantle-specification.md": ("Mantle", "Mantle"),
     "blockchain/raw/bedrock-v1.1-block-construction.md": ("Mantle", "Block Construction, Validation and Execution"),
     "blockchain/raw/bedrock-genesis-block.md": ("Mantle", "Bedrock Genesis Block"),
