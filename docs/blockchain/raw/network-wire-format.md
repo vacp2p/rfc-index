@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Daniel Sanchez Quiros <danielsq@status.im>
-
 # Revision History
 
 # Introduction
@@ -87,3 +85,4 @@ The complete specification can be found in the [official documentation](https://
 - [Rust ](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)[repr(c)](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)
 - [Bincode serialization specification](https://git.sr.ht/~stygianentity/bincode/tree/trunk/item/docs/spec.md)
 - [Bincode rust crate docs](https://docs.rs/bincode/2.0.1/bincode/)
+

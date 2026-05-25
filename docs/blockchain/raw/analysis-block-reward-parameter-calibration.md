@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Frederico Teixeira <frederico@status.im>
-
 # Revisions History
 
 > Disclamer:
@@ -476,3 +474,4 @@ let leader_reward = (reward_num * 4 / (reward_den * 10)) as u64;
 (blend_reward, leader_reward)
 }
 ```
+

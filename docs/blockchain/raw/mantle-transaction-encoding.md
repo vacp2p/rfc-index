@@ -18,13 +18,11 @@
 
 <!-- timeline:end -->
 
-Authors: David Rusu <davidrusu@status.im>
-
 # Revisions History
 
 # Introduction
 
-This document specifies the canonical encoding of Mantle transactions (see [����[1.5.0] Mantle - Mantle Transaction](https://nomos-tech.notion.site/Mantle-Transaction-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#841261aa09df8322aa8b816bf0e409ce)) and it���s sub-components. Transactions sent through the mempool and included in blocks use this encoding.
+This document specifies the canonical encoding of Mantle transactions (see [[1.5.0] Mantle - Mantle Transaction](https://nomos-tech.notion.site/Mantle-Transaction-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#841261aa09df8322aa8b816bf0e409ce)) and its sub-components. Transactions sent through the mempool and included in blocks use this encoding.
 
 # Overview
 
@@ -172,3 +170,4 @@ UINT32 = 4BYTE ; 32-bit unsigned integer, little-endian
 UINT16 = 2BYTE ; 16-bit unsigned integer, little-endian
 Byte = OCTET
 ```
+

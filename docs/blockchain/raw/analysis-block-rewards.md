@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Frederico Teixeira <frederico@status.im>
-
 # Revisions History
 
 > Disclamer:
@@ -31,7 +29,7 @@ Authors: Frederico Teixeira <frederico@status.im>
 
 # Introduction
 
-This document presents an analysis of Logos Blockchain's block rewards mechanism, with the goal of evaluating its sustainability, security guarantees, and long-term economic effects. Block rewards are a cornerstone of the protocol���s incentive model, ensuring that validators and service providers are compensated while the token supply remains predictable and stable.
+This document presents an analysis of Logos Blockchain's block rewards mechanism, with the goal of evaluating its sustainability, security guarantees, and long-term economic effects. Block rewards are a cornerstone of the protocols incentive model, ensuring that validators and service providers are compensated while the token supply remains predictable and stable.
 
 ### Objectives
 
@@ -58,7 +56,7 @@ Our simulations under baseline parameters indicate:
 
 - The system begins with a maximum issuance of 1% annually, incentivizing early staking participation.
 - As participation and burn rates converge to targets, issuance declines naturally, stabilizing the supply.
-- Under baseline assumptions, total long-term inflation is ~1.33% over 10 years, a level broadly comparable to ���hard money��� benchmarks like gold.
+- Under baseline assumptions, total long-term inflation is ~1.33% over 10 years, a level broadly comparable to hard money benchmarks like gold.
 - The design is robust to short-term volatility due to moving averages and bounded control functions, though delayed convergence of KPIs can temporarily maximize issuance.
 
 # Analysis
@@ -86,20 +84,20 @@ It is assumed here that $S_{t-1}$ already accounts for the burned tokens. This e
 Assume the following parameters for the model:
 
 - $S_{tge}=1$ LGO (this allows us to understand the system behavior in $\%$ terms)
-- $S_{cap} = \infty$���
+- $S_{cap} = \infty$
 - $\Delta_t = 1/365$ (1 day)
 - $f=2880$ (the number of 30 seconds intervals in 1 day)
-- $I_{min} = 0\%$���
-- $I_{max}=1\%$���
-- $\alpha_d = 1$���
-- $\alpha_a = 1$���
+- $I_{min} = 0\%$
+- $I_{max}=1\%$
+- $\alpha_d = 1$
+- $\alpha_a = 1$
 - $T=0$ days (moving average is ignored)
 
 In addition, we assume the following behavior of the system:
 
 - The simulation runs for $10$ years.
 - The volatility of the inferred total stake deviation is $10\%$.
-- The deviation between the inferred total stake and the target takes $2$ years to stabilize within $(\delta_{t} - I_{max}, \delta_{t} + I_{max})$. Note that this differs from the intrinsic convergence property of the inferred total stake algorithm that needs only one epoch to approximate the true value of the stake (see [����[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24) for further details).
+- The deviation between the inferred total stake and the target takes $2$ years to stabilize within $(\delta_{t} - I_{max}, \delta_{t} + I_{max})$. Note that this differs from the intrinsic convergence property of the inferred total stake algorithm that needs only one epoch to approximate the true value of the stake (see [[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24) for further details).
 - The burn rate converges to $0.5\%$ after $2$ years, with volatility $10\%$.
 
 The figure below shows the evolution of the inferred total stake deviation and the burn rate, given the parametrization above.
@@ -145,7 +143,7 @@ The block reward APY starts at $100\%$ when only $1\%$ of the TGE supply partici
 
 This APY dynamics achieves the following: the APY is high enough in the beginning to attract new validators, but quickly decreases to a sustainable level that can be maintained in the long term. If only $15\%$ of the TGE participates in PoS (half of the proposed target), the average $6.67\%$ is well within the value observed in other blockchains (source: [Staking Rewards](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=asc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate)).
 
-The issuance pegged to the inferred total stake incentivizes validators to participate until the rewards APY is small enough to become unattractive for newcomers. This dynamic creates a natural discovery processes, in which the APY is just enough for most validators. Logos Blockchain doesn���t overpay or underpay.
+The issuance pegged to the inferred total stake incentivizes validators to participate until the rewards APY is small enough to become unattractive for newcomers. This dynamic creates a natural discovery processes, in which the APY is just enough for most validators. Logos Blockchain doesnt overpay or underpay.
 
 This token issuance design should not impact stake variability, given that the token issuance rate is inversely proportional to the total stake. The reward per validator is proportional to the size of the validator's stake with respect to the total stake. The aggregation of validators into pools should more likely be a consequence of infrastructure requirements to run the blockchain rather than a consequence of the token issuance design.
 
@@ -153,8 +151,8 @@ This token issuance design should not impact stake variability, given that the t
 
 The KPI-based emission rate depends on the KPI not being manipulated. Two actions can mitigate risks:
 
-- Using a moving average value of the KPI, instead of its spot value ��� this mitigates both true shocks and intentional gamification in the short term.
-- Bounding all functions to prevent runaway inflation/deflation ��� $I_t$ is capped, so that the worst case scenario ($I_t=I_{max}$) is controllable.
+- Using a moving average value of the KPI, instead of its spot value  this mitigates both true shocks and intentional gamification in the short term.
+- Bounding all functions to prevent runaway inflation/deflation  $I_t$ is capped, so that the worst case scenario ($I_t=I_{max}$) is controllable.
 
 # The Expected Outcome of Combining KPIs
 
@@ -189,14 +187,15 @@ If adoption grows and the burning rate exceeds $I_{max}$, then the token supply 
 
 # References
 
-[HackMDMinimum Viable Issuance - HackMD](https://notes.ethereum.org/@anderselowsson/MinimumViableIssuance)���
+[HackMDMinimum Viable Issuance - HackMD](https://notes.ethereum.org/@anderselowsson/MinimumViableIssuance)
 
-[Titania ResearchExploring Minimum Viable Issuance (MVI)](https://titaniaresear.ch/minimum-viable-issuance)���
+[Titania ResearchExploring Minimum Viable Issuance (MVI)](https://titaniaresear.ch/minimum-viable-issuance)
 
-[HackMDProperties of issuance level (part 1) - HackMD](https://notes.ethereum.org/@anderselowsson/HyUIqjo_6)���
+[HackMDProperties of issuance level (part 1) - HackMD](https://notes.ethereum.org/@anderselowsson/HyUIqjo_6)
 
-[Ethereum ResearchProperties of issuance level: consensus incentives and varia���](https://ethresear.ch/t/properties-of-issuance-level-consensus-incentives-and-variability-across-potential-reward-curves/18448)���
+[Ethereum ResearchProperties of issuance level: consensus incentives and varia](https://ethresear.ch/t/properties-of-issuance-level-consensus-incentives-and-variability-across-potential-reward-curves/18448)
 
-[Ethereum ResearchPractical endgame on issuance policy](https://ethresear.ch/t/practical-endgame-on-issuance-policy/20747)���
+[Ethereum ResearchPractical endgame on issuance policy](https://ethresear.ch/t/practical-endgame-on-issuance-policy/20747)
 
-[Staking RewardsTop Proof of Stake Tokens | Staking Rewards](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=asc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate)���
+[Staking RewardsTop Proof of Stake Tokens | Staking Rewards](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=asc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate)
+

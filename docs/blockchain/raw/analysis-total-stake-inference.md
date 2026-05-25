@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: David Rusu <davidrusu@status.im>, Alexander Mozeika <alexander.mozeika@status.im>, Daniel Kashepava <danielkashepava@status.im>
-
 # Revision History
 
 # Introduction
@@ -581,3 +579,4 @@ The difference between average (normalised) stake at epoch $\ell$ and its equili
 # Annex
 
 ## Why Use Total Active Stake instead of Total Supply
+

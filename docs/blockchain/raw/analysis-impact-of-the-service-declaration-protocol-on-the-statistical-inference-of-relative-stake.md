@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 # Introduction
@@ -385,3 +383,4 @@ Thus, from the above it follows that $\mathrm{Var}[\xi_i]\leq -\mathrm{Cov}[\hat
 $$
 \mathrm{Var}[\Phi[\hat{P}_i(1)]]\leq\mathrm{Var}[\hat{P}_i(1)]
 $$
+

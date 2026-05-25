@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Thomas Lavaur <thomaslavaur@status.im>
-
 # Revisions History
 
 # Introduction
@@ -181,3 +179,4 @@ We got the curve $y = 577955 x+2640786$ that we decided to approximate to $y = 5
 To get the numbers, we executed the [test included in the official Rust implementation of the node](https://github.com/logos-blockchain/logos-blockchain/blob/3c249f67d11bcad6ce7cbd92cf8c6b977d35a443/zk/groth16/tests/zk_signature_cpu_cycles.rs#L349).
 
 We found the best linear curve approximating these measures (over 1000 iterations):
+

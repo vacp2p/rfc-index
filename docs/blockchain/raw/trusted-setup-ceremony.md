@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Mehmet Gonen <mehmet@status.im>
-
 # Revision History
 
 # Introduction
@@ -280,3 +278,4 @@ Security Considerations:
 ### Hash Mode
 
 ### Compression Mode
+
