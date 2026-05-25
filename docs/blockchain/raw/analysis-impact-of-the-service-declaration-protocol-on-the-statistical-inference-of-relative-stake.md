@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-22 |
+
 # Introduction
 
 The Service Declaration Protocol (SDP) introduces a piece of a priori information: the knowledge that a node's relative stake cannot be less than a known threshold, $\alpha_0$. Our research investigates the significance of the impact of this information on the statistical inference of relative stake. We propose a new estimator which explicitly utilises $\alpha_0$ by setting any estimated stake below this threshold to $\alpha_0$.

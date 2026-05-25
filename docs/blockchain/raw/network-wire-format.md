@@ -20,6 +20,11 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-20 |
+| 1.0.1 | Renamed Nomos to Logos Blockchain | 2026-04-17 |
+
 # Introduction
 
 The Logos Blockchain consists of multiple networks. Peers within these networks need a common language to exchange information effectively. This document defines the standardized language used for this communication.

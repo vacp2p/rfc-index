@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-01-20 |
+
 # Introduction
 
 As with any Proof of Stake (PoS) consensus protocol, the probability that an eligible Cryptarchia participant wins the right to propose a block depends on that participants stake relative to the total active stake. Because leader selection in Cryptarchia is private, the total active stake is not directly observable. Instead, nodes must infer it from observable chain growth.
@@ -37,6 +41,13 @@ This algorithm has been analyzed and shown to have good accuracy, precision and 
 ## Definitions
 
 ### Parameters and variables
+
+| Symbol | Value | Name | Description |
+| --- | --- | --- | --- |
+| beta | 1.0 | learning rate | Controls how quickly we adjust to new participation levels.  Lower values for beta give a more stable / gradual adjustment, while higher values give faster convergence but at the cost of less stability. |
+| PERIOD | $6\lfloor \frac{k}{f} \rfloor$ | observation period | The length of the observation period in slots. |
+| f | inherited from [[1.0.1] Cryptarchia Protocol - Constants](https://nomos-tech.notion.site/Constants-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81ff90b0e9befd660ed7) | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. |
+| k | inherited from [[1.0.1] Cryptarchia Protocol - Constants](https://nomos-tech.notion.site/Constants-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81ff90b0e9befd660ed7) | security parameter | Block depth finality. Blocks deeper than k on any given chain are considered immutable. |
 
 ### Functions
 

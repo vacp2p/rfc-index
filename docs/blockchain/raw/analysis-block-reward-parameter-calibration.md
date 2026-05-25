@@ -20,6 +20,10 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-04-24 |
+
 > Disclamer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
 >
@@ -29,449 +33,112 @@
 
 # Introduction
 
-This document outlines the specifications for Logos Blockchain's block rewards mechanism, a critical component of the network's economic model. The mechanism is designed to create a sustainable economic framework that incentivizes network participation while maintaining long-term stability.
+This document explains the rationale behind the parameter values proposed in [🔀[1.0.0] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24).
 
-The objective is to develop a block rewards system that addresses key challenges specific to Logos Blockchain's architecture, including the unlinkability between block proposal and reward collection, and the inability to directly allocate transaction fees to specific block proposers. These constraints necessitate a carefully designed economic incentive structure.
+The block reward mechanism adjusts the protocol’s token emission rate based on on-chain signals such as the deviation of the inferred total stake from its target and the moving average of the fee-burning rate. The parameters calibrated here control how strongly the emission rate reacts to those signals, how quickly it transitions between regimes, and the bounds it must respect.
 
-Building on previous work in blockchain economics, this specification proposes a dynamic token emission system that calibrates LGO issuance according to network Key Performance Indicators (KPIs). The system uses two primary metrics: inferred total stake (as a security indicator) and average burning rate (to maintain supply equilibrium).
+The goal of this calibration is to make incentives predictable and robust: provide sufficient security while the chain is below its target staking level, and converge toward a more stable long-run regime in which issuance is primarily constrained by fee burns rather than persistent inflation.
 
-The document references internal mathematical models and simulations that demonstrate how the proposed mechanism would behave under various conditions. Key parameters include maximum annual emission rate ($1\%$), control responsiveness factors, and target metrics for network security.
+# The Parameter $\alpha_d$​
 
-The conclusion of our analysis indicates that this KPI-based emission model should achieve several important outcomes:
+The normalized deviation from target, namely $\delta_t$, is measured in percentage units.
 
-- Initially higher emission rates (capped at $1\%$ annually) to bootstrap network participation.
-- Gradual stabilization of token supply as the system matures, with our baseline simulation showing just $1.33\%$ total inflation after $10$ years.
-- Self-regulating mechanism where token issuance naturally adjusts to compensate for burned transaction fees.
-- Built-in safeguards against manipulation through moving averages and bounded functions.
+The parameter $\alpha_d$, defined [here](/d96261aa09df838ca36601b4b27b49b4?pvs=25), can be described as the “unit of emission rate per unit of target deviation”. This parameter should be defined based on the expected variance of the KPI with respect to the target.
 
-This specification represents a comprehensive approach to creating a robust economic foundation for the Logos Blockchain network that balances security requirements with long-term economic sustainability.
+For the sake of an example, let's set $\alpha_d = 1$, $\alpha_a=0$, $I_{min}=0\%$, and $I_{max}=1\%$.
 
-# Overview
+The figure below shows a KPI whose deviation around the target has a standard deviation $1$.
 
-The Logos Blockchain block rewards mechanism is a KPI-based dynamic token emission system designed to create a sustainable economic framework that incentivizes network participation while maintaining long-term stability. This section provides a high-level understanding of how the system works and its key components.
+![](https://nomos-tech.notion.site/image/attachment%3Ad4a327d9-4476-4082-bc55-3f1851e1b281%3AScreenshot_2025-07-29_at_12.35.22.png?table=block&id=995261aa-09df-83eb-9bd6-8147e7b7403b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-## Key Principles
+As a consequence, the emission rate $I_t$ frequently reaches the maximum value.
 
-The design of the rewards system reflects three architectural constraints unique to Logos Blockchain:
+![](https://nomos-tech.notion.site/image/attachment%3A8525cc9f-0120-4533-8a50-785c8a02d884%3AScreenshot_2025-07-29_at_12.35.48.png?table=block&id=5a7261aa-09df-826e-8a19-814f8697368d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-- Unlinkability: Block proposal and reward collection are intentionally decoupled for privacy, meaning rewards cannot be assigned to a single proposer.
-- Fee burning: All transaction fees (execution base fees and permanent storage fees) are burned, rather than directly given to block proposers.
-- Global metrics over local signals: Rewards are computed from network-wide KPIs at block production time, rather than from easily manipulated per-block data.
+Let's now consider a scenario where the volatility of the KPI deviation decreases to $0.1$. The figure below shows an example (the difference in the signal oscillation with respect to Figure 2 is very subtle).
 
-These principles ensure that the system is censorship-resistant, manipulation-resistant, and aligned with long-term network incentives.
+![](https://nomos-tech.notion.site/image/attachment%3Acc6044a2-6fc4-4923-9d86-d6e26e29b00f%3AScreenshot_2025-07-29_at_12.36.24.png?table=block&id=8d5261aa-09df-8386-9ae9-01565c543c16&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-## Requirements
+As a consequence, all else equal, the annualized token emission rate becomes considerably less volatile.
 
-Building upon the requirements for Logos Blockchain's block rewards system, the implementation will establish that all transaction fees are burned while block rewards are tied to measurable global metrics that reflect network health and security. This mechanism ensures that if network activity surges substantially, the accelerated burning of tokens will be balanced by compensatory emissions over time.
+![](https://nomos-tech.notion.site/image/attachment%3A79138903-054b-44e0-952d-5555eae398ad%3AScreenshot_2025-07-29_at_12.37.15.png?table=block&id=ba2261aa-09df-8226-a76d-815ed44a09c9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-For optimal functionality, block rewards should be anchored to specific observable metrics rather than arbitrary values. Block numbers simply track time passage without indicating chain state. Transaction counts per block are vulnerable to manipulation. On the other hand, tracking the number of Blend nodes or inferring total stake provide more robust information about the chain state, specially when they can be compared with targets that are considered “healthy”.
+The parameter $\alpha_d$ also controls the sensitivity of the normalized deviation from target ($\delta_t$) in the [emission rate factor function](/d96261aa09df838ca36601b4b27b49b4?pvs=25#3f1261aa09df82a38e5181140f0e091c) ($A_t$):
 
-Crucially, any metric-pegged reward system should aim toward a target value or equilibrium point, creating predictability and stability in the token economics.
+- If $\alpha_d$ is too high, for example $\alpha_d>1$, a small value of $\delta_t$ turns $A_t$ to 1, so that the system stays in the maximum inflationary regime driven by $I_{max}$, see equation [(1)](/d96261aa09df838ca36601b4b27b49b4?pvs=25#820261aa09df83949c400177c46b2514).
+- If $\alpha_d$ is too low, for example $\alpha_d = 0.01$, the system needs to be too much off-target to stay in the maximum inflationary regime driven by $I_{max}$.
 
-## High-level System Design
+The parameter $\alpha_d$ therefore allows for a smooth transition from the maximum inflationary regime (driven by $I_{max}$) to the stable regime (driven by the averaged burned fees).
 
-The system dynamically adjusts token emission based on two primary KPIs:
+The value $\alpha_d=1/6$ is chosen so that when the total inferred stake is off target by $16.6\%$ (i.e. $\delta_t=16.6\%$), the system starts moving from the maximum inflationary regime to the regime driven by the burned fees. If $D_{0,target}=30\%$, this means that this happens when the security level reaches $25\%$.
 
-- Inferred Total Stake: Measures network security by tracking the total amount staked against a target threshold (e.g., $30\%$ of TGE supply).
-- Average Burning Rate: Tracks transaction fees (both Execution base fees and Permanent Storage) burned to maintain supply equilibrium.
+## The Parameter $\alpha_a$​
 
-A control function combines these KPIs to determine the emission rate factor, bounded between a minimum and maximum annual issuance. This ensures that:
+The weighted average metric, namely $\gamma_t$, is measured in percentage units.
 
-- When security participation is below target, higher issuance attracts more validators.
-- As usage increases and fees are burned, emissions adjust downward to stabilize supply.
+The parameter $\alpha_a$, defined [here](/d96261aa09df838ca36601b4b27b49b4?pvs=25), can be described as the "unit of emission rate per unit of averaged KPI." This parameter should be defined based on the expected magnitude of the KPI.
 
-```
-​
-```
+For the sake of an example, let's set $\alpha_d = 0$, $\alpha_a=1$, $I_{min}=0\%$, and $I_{max}=1\%$.
 
-The equation that defines the amount of block rewards is given by:
+The figure below shows a KPI whose deviation around the target has a standard deviation of $100\%.$​
 
-$$
-A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block}
-$$
+![](https://nomos-tech.notion.site/image/attachment%3A0bc68e9c-e88e-4609-8816-68ded1107f78%3AScreenshot_2025-07-29_at_12.45.04.png?table=block&id=14d261aa-09df-836c-8f08-015f805d66de&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-where:
+As a consequence of the parametrization, specifically $\alpha_a=1$, the emission rate $I_t$ never reaches the maximum value.
 
-- $A_t$ is the emission rate factor on a per year basis.
-- $I_{max}$ is the maximum emission rate per year.
-- $S_{tge}$ denotes the token supply at Token Generation Event (TGE).
-- $\Delta_t$ denotes the fraction of year in one time step per e.g., epoch, block, or day.
-- $f$ be the average number of block proposal within $\Delta_{t}$ units.
-- $R_\text{block}$ denotes the total amount of Execution base fees and Permanent Storage fees that are burned when the block is proposed.
+![](https://nomos-tech.notion.site/image/attachment%3A0aacf5b4-424e-4c51-8c53-cad4e4a5bdcc%3AScreenshot_2025-07-29_at_12.45.39.png?table=block&id=577261aa-09df-838c-b2f4-01601bb47ec3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-## Lifecycle Phases
+If we set $\alpha_a=2$, then the emission rate $I_t$ reaches the maximum value, but never surpasses it.
 
-The system is designed to evolve through different phases:
+![](https://nomos-tech.notion.site/image/attachment%3Ab40b6e96-ed78-4142-8913-da0e374eca0e%3AScreenshot_2025-07-29_at_12.46.25.png?table=block&id=d82261aa-09df-82cb-a169-81f733cc62ab&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-- Bootstrap Phase: Initially higher emission rates (up to $1\%$ annually) to incentivize network participation when stake is below target. As it is explained below, this is viable even when Logos Blockchain experiences low activity because the level of activity only plays a role when the network participation gets close to the predefined target.
-- Stabilization Phase: As Proof-of-Stake (PoS) participation approaches target levels, emission becomes primarily driven by burning rate.
-- Equilibrium Phase: Supply stabilizes with issuance matching burned fees.
-- High-Adoption Phase: If burning exceeds maximum emission, supply becomes deflationary.
+## The Inferred Total Stake ($D_{0,target}$)
 
-## Benefits
+This section explains the rationale for defining the target $\text{Security Level}$ as $30\%$ of the TGE supply.
 
-This KPI-based approach delivers several advantages:
+The TGE supply of the LGO token has to account for:
 
-- Self-regulating mechanism that automatically adjusts to network conditions.
-- Long-term sustainability with projected total inflation of just $1.33\%$ after $10$ years (assuming constant burning rate of $0.5\%$ per year).
-- Built-in safeguards against manipulation through moving averages and bounded functions.
-- Predictable economic model that balances security incentives with controlled supply.
+- The tokens disbursed as rewards to team, investors, ecosystem, etc. (subject to different vesting schemes),
+- The security of the blockchain.
+- Access to the blockchain utility.
 
-The overall design creates a robust economic foundation for the Logos Blockchain blockchain that effectively balances the need for strong security incentives with long-term token supply stability.
+The first allocation is fixed. The second and third should be balanced to ensure sufficient security while facilitating access to the blockchain utility.
 
-# Construction
+Assuming a constant growth rate of the inferred total stake:
 
-The proposed mechanism implements a dynamic token emission system that precisely calibrates LGO issuance according to network performance metrics (KPIs). This adaptive model adjusts emission rates based on how KPIs perform relative to their predetermined targets, while maintaining strict adherence to supply parameters and economic boundaries.
+- if $\text{Security Level}$ is too high, the inferred total stake will take longer to achieve the predefined target → resulting in more token inflation before the regime stabilizes around the burning rate.
+- if $\text{Security Level}$ is too low, the inferred total stake will take less time to achieve the predefined target → resulting in less token inflation before the regime stabilizes around the burning rate.
 
-## Core Variables
+There is no closed formula for defining the appropriate $\text{Security Level}$. Our rationale was guided by observations from existing blockchains.
 
-The following variables are input to the model:
+This [website](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=asc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate) shows the PoS participation ratio of several blockchains. When examining chains that haven't defined a $\text{Security Level}$ upfront, we observe a negative correlation between utility in the chain and staked amount (at the time of writing). This means that for Logos Blockchain, which aims to become a chain with utility, data suggests that a very high $\text{Security Level}$ (e.g., $> 50\%$) is not recommended.
 
-- $S_{tge}$ denotes the token supply at Token Generation Event (TGE).
-- $S_{cap}$ denotes the maximum allowable token supply (hard cap), if any.
-- $\Delta_t$ denotes the fraction of year in one time step per e.g., epoch, block, or day:
-    - if the time step is 1 day, then $\Delta_t = 1/365$.
-    - if the time step is 1 block every $30$ seconds, then $\Delta_t = 1/(365 \times 2880)$.
-    - if the time step is 1 epoch, which lasts 7.5 days, then $\Delta_t = 1/(365/7.5) = 1/48.667$.
-- $f$ be the average number of block proposal within $\Delta_{t}$ units:
-    - if the time step is 1 day and blocks are proposed every 30 seconds, then $f=2880$ (the number of 30 seconds intervals in 1 day).
-    - if the time step is 1 epoch, which lasts 7.5 days, and blocks are processed every 30 seconds, then $f = 7.5 \times 2880 = 21600$ (the number of 30 seconds intervals in 7.5 day).
-- $I_{min}$ is the minimum emission rate per year (default: $0\%$).
-- $I_{max}$ is the maximum emission rate per year (default: $1\%$).
-- $D_{i,target}$ denotes the target value for the $i$-th KPI.
-- $w_i$ denotes the weight of the $i$-th KPI in the normalized deviation from target or in the normalized average; it satisfies $\sum_i w_i = 1$.
-- $\alpha_d > 0$ denotes the control responsiveness to KPI deviation metrics.
-- $\alpha_a > 0$ denotes the control responsiveness to KPI average metrics.
-- $T$ be the number of periods in the look-back window for the moving average.
-
-Let us define the following variables:
-
-- $S_t$ denotes the token circulating supply at time $t$.
-- $A_t \in [0,1]$ denotes the emission rate factor on a per year basis.
-    - This implies that $A_t \cdot I_{max} \cdot \Delta_t$ denotes the emission within the time-step.
-- $D_{i,t}$ denotes the $i$-th key performance indicator at time $t$ (e.g., TVL, staked amount, active users).
-- $R_\text{block}$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [🔀[1.0.0] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and [🔀[1.0.0] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24) for how to compute $R_{block}$.
-
-## Parametrization
-
-The calibration of these parameters can be found in [🔀[1.0.0][Analysis] Block Reward Parameter Calibration](https://nomos-tech.notion.site/1-0-0-Analysis-Block-Reward-Parameter-Calibration-ff0261aa09df83b1b7cf8199e4707ae7?pvs=24).
-
-## Block Rewards
-
-The amount of tokens to be rewarded in a block depends on the emission rate factor $A_t$. This controls how much is minted from inflation and how much is diverted from transaction fees. The following behavior is expected:
-
-- When the aggregate KPI is far from the target, $A_t \rightarrow 1$, then the emission of new tokens  (inflation) is maximized, and most of the transaction fees aren't minted back. The amount of tokens burned does not impact the block rewards in this situation. This means that the system can burn more tokens than it mints.
-- When the aggregate KPI is close to the target, $A_t \rightarrow 0$, then the emission from inflation is minimized, and most of $R_{block}$ is minted back for leaders and Blend nodes.
-
-That is, what drives the source of minting is the KPI: if far from the target, the system mints new tokens; if close to the target, the system mints exactly what was burned (up to $I_{max}$ of TGE).
-
-The emission from inflation within the time step $\Delta_t$ is given by
-
-$$
-A_t \cdot I_{max} \cdot S_{tge} \cdot \Delta_t.
-$$
-
-The actual amount of tokens minted per block (because of inflation) also depends on how many blocks are expected to be proposed between $\Delta_{t-1}$ and $\Delta_{t}$. This is expressed by the factor $f$, as defined [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#52d261aa09df828e9ced81f25b064b9c).
-
-The equation that implements the behavior above in terms of $A_t$ is given by:
-
-$$
-\begin{equation}
-A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block}
-\end{equation}
-$$
-
-where:
-
-- $A_t$ is the emission rate factor on a per year basis.
-- $I_{max}$ is the maximum emission rate per year.
-- $S_{tge}$ denotes the token supply at Token Generation Event (TGE).
-- $\Delta_t$ denotes the fraction of year in one time step per e.g., epoch, block, or day.
-- $f$ be the average number of block proposal within $\Delta_{t}$ units.
-- $R_\text{block} = D_{1,t}$ denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed.
-
-```
-def block_rewards(
-		S_tge:float,
-    emission_rate_factor:float,
-    I_max:float,
-    Delta_t:float,
-    f:float,
-    D_1_t: float
-) -> float:
-"""
-		    Calculate the rewards per block.
-		    It implements equation (1).
-		"""
-    emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
-    emission_from_rewards = (1. - emission_rate_fator) * R_block_cur
-    return emission_from_inflation + emission_from_rewards
-```
-
-## Emission Rate Factor Function
-
-The emission rate factor $A_t \in [0,1]$ determines the portion of $I_{max}$ that should be emitted based on current values of $\delta_t$ and $\gamma_t$:
-
-$$
-A_t = \min \Bigl\{ 1, \max \Bigl\{ 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \Bigr\} \Bigr\}.
-$$
-
-where
-
-- $\alpha_d$ controls the responsiveness to KPI deviation metrics.
-- $\delta_t$ is measuring the KPI deviation from targets.
-- $\alpha_a$ controls the responsiveness to KPI average metrics.
-- $\gamma_t$ is measuring the KPI average values of over the last $T$ steps.
-- $I_{min}$ is the minimum emission rate per year.
-- $I_{max}$ is the maximum emission rate per year.
-
-All terms are displayed in annualized form to ease comparison.
-
-```
-def calculate_emission_rate_factor(
-		alpha_dev:float,
-    weighted_target_deviation: float,
-    alpha_avg:float
-    weighted_avg: float,
-    i_min: float = 0.0,
-    i_max: float = 0.01
-) -> float:
-"""It calculates the current emission rate factor"""
-    emission_rate:float = alpha_dev * weighted_target_deviation + alpha_avg * weighted_avg + i_min
-    emission_rate_factor:float = emission_rate / i_max
-    emission_rate_factor = min(1.0, max(emission_rate_factor, 0.0))
-return emission_rate_factor
-```
-
-### KPI Deviation from Target
-
-The weighted deviation from target
-
-$$
-\delta_t = \sum_i w_i \times 
-\dfrac{D_{i,target} - D_{i,t}}{D_{i,target}}.
-$$
-
-```
-def weighted_deviation_from_target(
-    kpi_weights: List[float],
-    kpi_deviations: List[float]
-) -> float:
-"""
-    Calculate the normalized deviation (delta_t).
-    Inputs:
-    * kpi_weights: constant list of floats
-    * kpi_deviations: for each KPI, it contains the results of "deviation_from_target"
-    Returns:
-    * a normalized annualized KPI in units of %.
-    """
-assert len(kpi_weights) == len(kpi_deviations)
-    
-    weighted_target_deviation:float = 0.0
-for deviation, weight in zip(kpi_deviations, kpi_weights):
-        weighted_target_deviation += weight * deviation value
+On the other hand, data also shows that many blockchains have their $\text{Security Level}$ in the range of $30\%-50\%$. Given that the proposed token emission mechanism is pegged to the deviation from the $\text{Security Level}$ target, the decision to peg the system behavior to the lower end of this range is meant to stop token inflation sooner.
 
-    return weighted_target_deviation
-```
+## The Burning Rate Average Factor ($D_{1,target}$)
 
-It implies that:
+As already described above, $D_{1,target}$ is taken to be equal to $S_{tge}$ so that $\gamma_t$ evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#a0b261aa09df8315811301dd66c6660c) consistent.
 
-- $\delta_t > 0$ → KPI below target → should increase the token emission by a factor of $\alpha_d \cdot \delta_t$.
-- $\delta_t = 0$ → KPI at target → should not change the token emission.
-- $\delta_t < 0$ → KPI above target → should reduce the token emission by a factor of $\alpha_d \cdot \delta_t$.
+## Maximum Emission Rate ($I_{max}$)
 
-> To measure the deviation, only the total estimated stake KPI is used in this part of the computation
+The maximum emission rate $I_{max}$ caps only the number of tokens that will be minted per year by the block reward protocol. It is unrelated to the tokens that will be burned over the same period. The following information is available:
 
-### KPI Average
-
-The weighted average metric is defined as
+- The net inflation/deflation rate is the difference between the actual emission rate and the actual burning rate. By thinking in terms of $I_{max}$, we consider the worst-case minting scenario.
+- Various sources indicate that gold's inflation rate, defined as the total increase in supply compared to existing stock, ranges from $1\% - 2\%$ per year.
+- $I_{max}$ is the main variable that impacts the nodes' APY, while the inferred total stake is below the target security level.
+- Analysis of other blockchain networks indicates that an $8\%$ emission rate is excessively high.
+- A burning rate between $1\%-2\%$ is feasible for chains with very high demand.
 
-$$
-\gamma_t = \dfrac{1}{\Delta_t} \sum_i w_i \cdot \Bigl(\dfrac{1}{T}  \sum_{\tau=t-T+1}^t \dfrac{ D_{i,\tau}}{D_{i,target}} \Bigr).
-$$
+If Logos Blockchain features similar issuance behavior as gold, when operating under an (net) inflationary regime, then the following conclusions can be reached:
 
-where:
+- $I_{max} < 1\%$ is too conservative. There is insufficient evidence to support such a recommendation.
+- $I_{max} = 1\% - 3\%$ per year is moderate. Although spikes in the burn rate may make the system too deflationary and unpredictable, these are not expected to be common.
+- $I_{max}=3\% - 5\%$ per year is moderate, but risks overpaying for security. Logos Blockchain would need an average $2\%$ burning rate to achieve a reasonable net inflation rate (similar to gold). However, given the target security level of $30\%$, this range would distribute $10\%$ to $16.6\%$ APY to nodes (see [Table 1](/d96261aa09df838ca36601b4b27b49b4?pvs=25) below), which would currently place Logos Blockchain in the top $10\%$ (see Real Reward Rate [here](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=desc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate)).
+- $I_{max}> 5\%$ per year is aggressive. Values above $5\%$ should be justified by very high expected usage of the blockchain, which would cause high burning rates. Given the cyclical behavior of economic activity, this may trigger hyperinflation.
 
-- The value $D_{j,target}$ can be any number with the same units of $D_{j,i}$.
-- The factor $\dfrac{1}{\Delta_t}$ turns $\gamma_t$ into an annualized quantity. This depends on the specific KPI.
+Constraining $I_{max}$ to the range $[1\%, 3\%]$, the decision for $I_{max} = 1\%$ is taken so that the rewards APY stabilizes around $3.34\%$ (see [Table 1](/d96261aa09df838ca36601b4b27b49b4?pvs=25)) as the inferred total stake approaches the target security level.
 
-```
-def weighted_average(
-    kpi_weights: List[float],
-    kpi_average: List[float]
-) -> float:
-"""
-    Calculate the weighted average metric (gamma_t)
-    * kpi_weights: constant list of floats
-    * kpi_average: for each KPI, it contains the results of "average_kpi"
-    """
-assert len(kpi_weights) == len(kpi_deviations)
-    
-    weighted_avg:float = 0.0
-for avg, weight in zip(kpi_average, kpi_weights):
-        weighted_avg += weight * avg
-
-    return weighted_avg
-```
+## Minimum Emission Rate ($I_{min}$)
 
-The weighted average metric features:
-
-- $\gamma_t > 0$ → should increase the token emission by a factor of $\alpha_a \gamma_t$.
-- $\gamma_t = 0$ → should not change the token emission.
-- $\gamma_t < 0$ → should reduce the token emission by a factor of $\alpha_a \gamma_t$.
-
-> To measure the average, only the average burning rate KPI is used in this part of the computation
-
-## Key Performance Indicator(s)
-
-### KPI 1 - The Inferred Total Stake
-
-Given the privacy features of Logos Blockchain and the fact that the token TGE supply is known, the inferred total stake is the most appropriate indicator of the system's security.
-
-Let:
-
-- $D_{0,t}$ denotes the evolution of the inferred total stake.
-- $D_{0,target}$ denotes the total stake that is considered secure. For the blockchain to be secure, we aim for $30\%$ of the TGE supply.
-
-The inferred total stake affects the emission rate through the "normalized deviation from target." The deviation implied by this KPI is characterized by the plot below.
-
-![](https://nomos-tech.notion.site/image/attachment%3Abb31da74-9e18-4881-ab10-b249daceaf03%3AScreenshot_2025-06-15_at_19.44.01.png?table=block&id=cc1261aa-09df-82f0-ace9-81b7dd81a13a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
-
-This happens because, when the blockchain starts, $D_{0,t} \vert_{t=0}$ is very likely a small number compared to the target. Therefore, the equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) tilts towards $1$ (or $100\%$) at that moment. As time passes and more stake participates in the PoS, the difference between the current total stake and the target diminishes. The equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) oscillates around 0 (or $0\%$) when $D_{0,t}$ oscillates around $D_{0,target}$.
-
-Let the Logos Blockchain’s security level be defined by:
-
-$$
-\text{Security Level} = \dfrac{D_{0,target}}{S_{tge}}.
-$$
-
-### KPI 2 - The Average Burning Rate
-
-In the long run, Logos Blockchain should mint only enough tokens to compensate for the burned transaction fees.
-
-Let
-
-- $D_{1,t}$ denote the amount of Storage fees and Execution base fees burned since $t-1$.
-- $D_{1,target}=S_{tge}$ denote the "normalizing factor" (it is the TGE supply, in this case).
-
-This choice of "target" implies that $\gamma_t$ evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#a0b261aa09df8315811301dd66c6660c) consistent.
-
-# Float Precision for Implementation
-
-Because block rewards affect consensus state, the implementation must be fully deterministic across all nodes. For that reason, the normative implementation of the reward function should not rely on floating-point arithmetic, machine-dependent rounding behavior, or comparisons against machine epsilon. Earlier sections use real-valued formulas to explain the mechanism and its economic meaning, but the consensus rule itself should be defined only in terms of integer arithmetic. This is especially important because the current document already notes floating-point concerns in the KPI helper functions and then introduces a final integer rewrite for the reward computation. The issue is therefore not whether integers should be used, but how to present that integer formulation in a way that remains auditable and clearly derived from the protocol parameters.
-
-The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of burned fees over the look-back window. Likewise, the reward still interpolates between inflationary issuance and burned-fee compensation through the emission factor $A_t$.
-
-$$
-A_t = \min \Bigl\{ 1, \max \Bigl\{ 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \Bigr\} \Bigr\}.
-$$
-
-Because we have
-
-$$
-\alpha_d=\frac{1}{4},\quad
-\alpha_a=1,\quad
-I_{\max}=10^{-2},\qquad
-T=120,\quad
-f=1,\quad R_\text{block} = D_{1,t}\\
-D_{0,\mathrm{target}}=3\cdot 10^9,\qquad
-D_{1,\mathrm{target}}=S_{\mathrm{tge}}=10^{10},\qquad
-\Delta_t=\frac{1}{365\cdot 2880},
-$$
-
-$$
-\delta_t = \sum_i w_i \times 
-\dfrac{D_{i,target} - D_{i,t}}{D_{i,target}},
-$$
-
-$$
-\gamma_t = \dfrac{1}{\Delta_t} \sum_i w_i \cdot \Bigl(\dfrac{1}{T}  \sum_{\tau=t-T+1}^t \dfrac{ D_{i,\tau}}{D_{i,target}} \Bigr),
-$$
-
-and $w_i$ denotes the weight of the $i$-th KPI in the normalized deviation from target or in the normalized average; it satisfies $\sum_i w_i = 1$.
-
-Therefore,
-
-$$
-\frac{\alpha_d}{I_{\max}}\delta_t
-=
-\frac{1/4}{10^{-2}}\cdot \frac{D_{0,\mathrm{target}}-D_{0,t}}{D_{0,\mathrm{target}}}
-=
-25\cdot \frac{3\cdot 10^9-D_{0,t}}{3\cdot 10^9}
-=
-\frac{3\cdot 10^9-D_{0,t}}{12\cdot 10^7}.
-$$
-
-and
-
-$$
-\frac{\alpha_a}{I_{\max}}\gamma_t=\frac{1}{10^{-2}}\cdot \frac{1}{\Delta_t}\cdot \frac{1}{T}\sum_{\tau=t-T+1}^{t}\frac{D_{1,\tau}}{D_{1,\mathrm{target}}}=\\\frac{1}{10^{-2}}\cdot \frac{1}{\Delta_t}\cdot \frac{1}{T}\cdot\frac{1}{{D_{1,\mathrm{target}}}}\sum_{\tau=t-T+1}^{t}{D_{1,\tau}}=\\
-\\100\cdot \frac{1}{\frac{1}{365\cdot 2880}}\cdot \frac{1}{120}\cdot\frac{1}{10^{10}}\sum_{\tau=t-120+1}^{t}{D_{1,\tau}}=\\
-100\cdot \frac{365\cdot 2880}{120\cdot 10^{10}}\sum_{\tau=t-120+1}^{t} D_{1,\tau}=\\
-\frac{10512}{12\cdot 10^7}\sum_{\tau=t-120+1}^{t} D_{1,\tau}.
-$$
-
-So we rewrite $A_t$ by
-
-$$
-A_t=\min\!\left\{1,\max\!\left\{0,\quad \frac{3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}}{12\cdot 10^7}\right\}\right\}.
-$$
-
-And by denoting
-
-$$
-A_t'
-=
-\min\!\left\{12\cdot 10^7,\max\!\left\{0,\quad3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\right\}\right\},
-\\
-A_t=\frac{A_t'}{12\cdot 10^7}.
-$$
-
-We can compute the block reward using only integers:
-
-$$
-\text{Rewards}_t= A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block} =\\
-\frac{A_t'}{12\cdot 10^7} \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-\frac{A_t'}{12\cdot 10^7}) \cdot D_{1,t}
-$$
-
-and
-
-$$
-\frac{I_{\max} \cdot S_{\mathrm{tge}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 10^{10}}{365\cdot 2880}=\frac{10^8}{1051200}=\frac{62500}{657}.
-$$
-
-So:
-
-$$
-\text{Rewards}_t=
-\frac{A_t'}{12\cdot 10^7} \cdot \frac{62500}{657} + (1-\frac{A_t'}{12\cdot 10^7})\cdot D_{1,t} =\\
-\frac{62500\cdot A_t' + 657\cdot(12\cdot 10^7-A_t')\cdot D_{1,t}}{657\cdot 12\cdot 10^7}
-.
-$$
-
-So we propose a reference implementation that uses integers:
-
-```
-const A_SCALE: u128 = 120_000_000; // denominator of 1/(I_max * D1_target * Delta_t * T) 
-const INFLATION_NUM: u128 = 62_500; // numerator of I_max * S_TGE * DELTA_t / f
-const INFLATION_DEN: u128 = 657; // denominator of I_max * S_TGE * DELTA_t / f
-const FEE_AVG_NUM: u128 = 10_512; // numerator of 1/(I_max * D1_target * Delta_t * T) 
-const STAKE_TARGET: u128 = 3e9;
-fn block_reward(total_stake: u64, burned_fees_window: [u64; 120]) -> (u64, u64) {
-let sum_fees: u128 = burned_fees_window.iter().map(|x| *x as u128).sum();
-let last_burned_fee: u128 = *burned_fees_window.last().unwrap() as u128;
-let a_num = STAKE_TARGET
-.saturating_add(FEE_AVG_NUM.saturating_mul(sum_fees))
-.saturating_sub(total_stake as u128)
-.min(A_SCALE);
-let reward_num =
-INFLATION_NUM * a_num
-        + INFLATION_DEN * (A_SCALE - a_num) * last_burned_fee;
-let reward_den = INFLATION_DEN * A_SCALE;
-// 60% Blend, 40% leader, with truncation applied only once per share
-let blend_reward = (reward_num * 6 / (reward_den * 10)) as u64;
-let leader_reward = (reward_num * 4 / (reward_den * 10)) as u64;
-(blend_reward, leader_reward)
-}
-```
+The recommendation is $I_{min} = 0$. While $I_{min} > 0$ has a slight inflationary bias and $I_{min} < 0$ a slight deflationary bias, both need a strong argument to be defined. There is currently no evidence for $I_{min} \neq 0$.
 

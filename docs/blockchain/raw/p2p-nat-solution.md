@@ -24,6 +24,11 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-22 |
+| 1.0.1 | Renamed Nomos to Logos Blockchain | 2026-04-17 |
+
 # Introduction
 
 Network Address Translation ([NAT](https://en.wikipedia.org/wiki/Network_address_translation)) is a critical challenge that Logos Blockchain participants must address to the largest extent possible. Nomos is designed to operate on modern laptops for a significant subset of users, many of whom may lack the technical expertise to troubleshoot NAT-related issues. Therefore, the Logos Blockchain aims to resolve these challenges automatically.

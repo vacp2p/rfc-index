@@ -20,6 +20,11 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-02-05 |
+| 1.0.1 | Replaced references to Nomos with Logos Blockchain | 2026-04-17 |
+
 # Introduction
 
 The main motivation behind this spec is avoiding being locked into a wallet software. By specifying the algorithms used to derive keys, we allow users to easily migrate from one implementation to the other.
@@ -74,6 +79,12 @@ For the remaining procedures, we only highlight the differences instead of going
 
 $CDKpriv((k_{par}, c_{par}), i) \rightarrow (k_i, c_i):$
 
+- Check whether $i \geq 2^{31}$ (whether the child is a hardened key).
+    - If so (hardened child): let $I = PRF^{expand}(c_{par}, 0x00 ||k_{par} || ser_{32}(i))$.
+    - If not (normal child): failure.
+- Split $I$ into two 32-byte sequences, $I_L, I_R$.
+- The returned child key $k_i$ is $I_L$.
+- The returned chain code $c_i$ is $I_R$.
 ## Master Key Generation
 
 - Generate a seed byte sequence $S$ of a chosen length (e.g. with BIP0039)

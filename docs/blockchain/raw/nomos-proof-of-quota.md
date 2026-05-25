@@ -20,6 +20,11 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-04-09 |
+| 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove the notion of NOMOS in DSTs | 2026-04-09 |
+
 # Introduction
 
 This document defines an implementation-friendly specification of the Proof of Quota (PoQ), which is introduced in [[1.0.0] Blend Protocol - Proof of Quota](https://nomos-tech.notion.site/Proof-of-Quota-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df81edb561ef75a31f65a4).
@@ -91,9 +96,28 @@ Step 1: The prover selects an index for the chosen key. This index must be lower
 
 Step 2:  If the prover indicated that the node is a core node for the proof, the proof checks that:
 
+1. The core node is registered in the set N = SDP(session). This is proven by demonstrating knowledge of a core_sk that corresponds to a declared zk_id, which is a valid SDP registry for the current session. The zk_id values are stored in a Merkle tree with a fixed depth of 20, with the root provided as a public input. To build the Merkle tree, zk_id are ordered from the smallest to the biggest (when seen as natural numbers between 0 and $p$) and remaining empty leaves are represented by the 0 after the sorting (appended at the end of the vector). This structure supports up to 1M validators.
+1. The index is valid: index < core_quota.
 Step 3: If the prover indicated that the node is a potential leader node for the proof, the proof checks that:
 
+1. The leader node possesses a note that would win a slot in the consensus lottery. Unlike leadership conditions, the proof of quota doesn't verify that the note is unspent. This enables potential provers to generate the PoQ well in advance. All other lottery constraints are the same as in [[1.1.0] Proof of Leadership - Circuit Constraints](https://nomos-tech.notion.site/Circuit-Constraints-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df8019ad45f5ce872093ea).
+1. The index is valid: index < leader_quota.
 Step 4: The prover derives a key_nullifier maintained by blend nodes during the session for message deduplication purpose.
+
+```
+selection_randomness = zkhash(b"SELECTION_RANDOMNESS_V1", sk, index, validity_period)
+key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
+```
+
+Where sk is:
+
+- The core_sk as defined in the [Mantle specification](https://nomos-tech.notion.site/2ce261aa09df805ea358d80c2046cf95?pvs=25#2ce261aa09df814f8764f3e6d8f543a3) if the node is a core node.
+- The secret key of the PoL note if its a leader node.
+and validity_period is:
+
+- The session if the node is a core node.
+- The winning slot of the PoL if its a leader node.
+Here we use two hashes because the selection randomness is used in the Proof of Selection in order to prove the ownership of a valid PoQ (see [[1.0.0] Blend Protocol - Proof of Selection](https://nomos-tech.notion.site/Proof-of-Selection-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df81d6bb3febd62b598138)).
 
 Step 5: The prover attaches a one-time signature key used in the blend protocol. This public key is split into two 16-byte parts: K_part_one and K_part_two. When written in little-endian byte order, the complete public key equals the concatenation K_part_one||K_part_two.
 

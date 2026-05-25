@@ -20,6 +20,12 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial version. | 2026-03-31 |
+| 1.1.0 | [[RFC] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
+| 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24) | 2026-05-06 |
+
 # Introduction
 
 This document outlines the cross-channel messaging framework. A channel is a reserved identifier where only authorized keys can post messages on-chain, while anyone can read them. Cross-channel messaging allows different channels (including channels representing a Zone) to communicate and coordinate actions (such as Zone state transitions), enabling interoperability while maintaining security and decentralization.
@@ -49,6 +55,11 @@ Cross-channel messaging allows different channels to interact and coordinate. Th
 
 - Asynchronous Messaging: Channels send messages to each other without requiring real-time and/or off-chain coordination. The receiving channel waits for the sending channels message to achieve finality on the chain before processing it. This approach minimizes coordination overhead but introduces latency due to finality requirements.
 - Synchronous Messaging: Multiple channels coordinate to include their messages in a single Mantle Transaction. All messages in the transaction either succeed or fail together, providing strong consistency guarantees. This requires off-chain coordination between sequencers but enables use cases like atomic Zone state transitions. Since each Inscription Operation proof is a signature of the entire Mantle Transaction hash, the signature cannot be reused in a different context, for example, posting an Inscription alone after signing it as part of a coordinated transaction.
+
+|  | Pros | Cons |
+| --- | --- | --- |
+| Asynchronous messaging | - Simple coordination model. - Channels operate independently. - Higher decentralization (no trusted coordinator). | - Higher latency due to waiting for finality. - No atomicity across channels (possible partial failures). |
+| Synchronous messaging | - Strong atomicity guarantees across channels (all-or-nothing). - Lower end-to-end latency vs waiting for async finality. - Better suited for cross-channel financial operations (atomic swaps, cross-channel transfers). | - Requires off-chain coordination between sequencers. - Depends on availability of all participating sequencers. - More complex orchestration and implementation. |
 
 > The coordinator typically pays fees and must be trusted for timing of submission. Channel designers should implement mechanisms if they want to share these fees, either by:
 >

@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-04-09 |
+
 # Introduction
 
 This document defines an implementation-friendly specification of the Message Formatting, which is introduced in the [[1.0.0] Blend Protocol - Formatting](https://nomos-tech.notion.site/Formatting-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df818fb2decabd859c0647) section.

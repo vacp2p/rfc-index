@@ -20,6 +20,11 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-01-20 |
+| 1.0.1 | Replaced Nomos name with Logos Blockchain | 2026-04-17 |
+
 # Introduction
 
 Cryptarchia is the consensus protocol of the Logos Blockchain’s Bedrock layer. This document specifies how Bedrock comes to agreement to a single history of blocks.
@@ -50,6 +55,8 @@ These protocols tolerate up to 1/2 of participants becoming faulty. The large fa
 
 The motivation behind the design of Cryptarchia can be boiled down to this statement:
 
+A block proposer should not feel the need to self-censor when proposing a block.
+
 Working to give leaders confidence in this statement has had ripple effects throughout the protocol, including that:
 
 - The block proposals should not be linkable to a leader. An adversary should not be able to connect together the block proposals of a leader in order to build a profile. In particular, one should not be able to infer a proposer's stake from their past on-chain activity.
@@ -77,7 +84,25 @@ Our design starts from the solid foundation provided by [Ouroboros Crypsinous: P
 
 ## Constants
 
+| Symbol | Name | Description | Value |
+| --- | --- | --- | --- |
+| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [Not found](/1fd261aa09df817fa25ef80b964183cc?pvs=24#1fd261aa09df817fa25ef80b964183cc) for analysis leading to the choice of value) | 1/30 |
+| $k$​ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
+| none | slot length | The duration of a single slot. | 1 second |
+| MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
+| MAX_BLOCK_TXS | max block transactions | The maximum number of transactions in a block | 1024 |
+
 ## Notation
+
+| Symbol | Name | Description | Value |
+| --- | --- | --- | --- |
+| $s$​ | slot security parameter | Sufficient slots such that $k$ blocks have been produced with high probability. | $3\lfloor \frac{k}{f}\rfloor$​ |
+| $T$​ | the block tree | This is the block tree observed by a node. |  |
+| $F_T$​ | tips of block tree $T$​ | The set of concurrent forks of some block tree $T$. | $F_T=\{b\in T:\forall c \in T\space \textbf{parent}(c) \neq b \}$​ |
+| $c_{loc}$​ | tip of local chain | The chain that a node considers to be the honest chain. | $c_{loc} \in F_{T}$​ |
+| $B_\text{imm}$​ | the latest immutable block | The latest block which was committed (finalized) by the chain maintenance. | $B_\text{imm} \in \textbf{ancestors}(c_{loc})$​ |
+| $sl$​ | slot number | Index of slot. $sl=0$ denotes the genesis slot. | $sl=0,1,2,3,\dots$​ |
+| $ep$​ | epoch number | Index of epoch. $ep=0$ denotes the genesis epoch. | $ep=0,1,2,3,\dots$​ |
 
 ## Latest Immutable Block
 
@@ -105,11 +130,23 @@ The order in which these variables are calculated is important and is done w.r.t
 
 An epoch is divided into 3 phases, as outlined below.
 
+| Epoch Phase | Phase Length | Description |
+| --- | --- | --- |
+| Stake Distribution Snapshot | $s$ slots | A snapshot of note commitments are taken at the beginning of the epoch. We wait for this value to finalize before entering the next phase. |
+| Buffer phase | $s$ slots | After the stake distribution is finalized, we wait another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage. |
+| Lottery Constants Finalization | $s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots | On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. We wait another $4\frac{k}{f}$ slots for these values to finalize. |
+
 The epoch length is the sum of the individual phases: $3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor =10 \lfloor \frac{k}{f} \rfloor$ slots.
 
 ### Epoch State
 
 The epoch state holds the variables derived over the course of the epoch schedule. It is the 3-tuple $(\mathbb{C}_\text{LEAD}, \eta, D)$ described below.
+
+| Symbol | Name | Description | Value |
+| --- | --- | --- | --- |
+| $\mathbb{C}_{\text{LEAD}}$​ | Eligible Leader Notes Commitment | A commitment to the set of notes eligible for leadership. | See [Eligible Leader Notes](https://nomos-tech.notion.site/Eligible-Leader-Notes-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df8129a312d36488639b41) |
+| $\eta$​ | Epoch Nonce | Randomness used in the leadership lottery (selected once per epoch) | See [Epoch Nonce](https://nomos-tech.notion.site/Epoch-Nonce-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df813b9794d597a383dd05) |
+| $D$​ | Inferred Total Stake (Lottery Difficulty) | Total stake inferred from watching the results of the lottery during the course of the epoch. $D$ is used as the stake relativization constant for the following epoch. | See [Total Stake Inference](https://nomos-tech.notion.site/Total-Stake-Inference-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81cf9096c3897182ad36) |
 
 ### Eligible Leader Notes
 
@@ -131,6 +168,8 @@ Given block $B = (parent,sl, \rho_\text{LEAD},\dots)$ where
 
 Then, $\eta_B$ is derived as
 
+> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+
 where $\text{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\text{zkHASH}(..)$ is Poseidon2 as specified in [🔀[1.0.2] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24) .
 
 The epoch nonce used in the next epoch is $\eta_{B'}$ where $B'$ is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.
@@ -146,6 +185,38 @@ Given that stake is private in Cryptarchia, and that we want to maintain an appr
 At the start of each epoch, each validator must derive the new epoch state variables. This is done through the following protocol:
 
 $\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\rarr(\mathbb{C}_\text{LEAD}^{ep},\eta^{ep},D^{ep})$ :
+
+$\textbf{case}\space ep = 0:$​
+
+> The genesis epoch state is hardcoded upon chain initialization.
+
+$\textbf{return}\space (\mathbb{C}_\text{GENESIS}, \eta_\text{GENESIS}, D_\text{GENESIS})$​
+
+$\textbf{otherwise}:$​
+
+> The epoch state is derived w.r.t. observations in the previous epoch. Here we compute the slot at the start of the previous epoch. We will query observations relative to this slot.
+
+$sl_{ep-1} \coloneqq (ep-1) \cdot \text{EPOCH\_LENGTH}$
+
+> Notes eligible for leadership lottery are those present in the commitment root at the start of the previous epoch.
+
+$\mathbb{C}_\text{LEAD}^{ep} \coloneqq \textbf{commitment\_root\_at\_slot}(sl_{ep-1}, tip)$​
+
+> The epoch nonce for epoch $ep$ is the value of $\eta$ at the beginning of the lottery constants finalization phase in the epoch schedule
+
+$\eta^{ep} \coloneqq \textbf{epoch\_nonce\_at\_slot}(sl_{ep-1} + \lfloor6\frac{k}{f}\rfloor, tip)$​
+
+> Total active stake is inferred from the number of blocks produced in the previous epoch during the stake freezing phase. It is also derived from the previous estimate of total stake, thus we recurse here to retrieve the previous epochs estimate $D^{ep-1}$​
+
+$(\_,\_,D^{ep-1}) \coloneqq \textbf{compute\_epoch\_state}(ep-1,tip)$​
+
+> The number of blocks produced during the first $6\frac{k}{f}$ slots of the previous epoch
+
+$N_\text{BLOCKS}^{ep-1} \coloneqq |\{B \in T | sl_{ep - 1} \le sl_B \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor\}|$
+
+$D^{ep} \coloneqq \textbf{infer\_total\_active\_stake}(D^{ep-1}, N_\text{BLOCKS}^{ep-1})$​
+
+$\textbf{return}\space (\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})$​
 
 ## Leadership Lottery
 
@@ -232,11 +303,46 @@ Note: It’s assumed that block contents have already been validated by the exec
 
 $\text{define } \textbf{on\_block}(state, B)\rarr state'$:
 
+$(c_{loc}, B_\text{imm}, T) \coloneqq state$​
+
+if $B \in T \lor \lnot \textbf{valid\_header}(B)$:
+
+> Either we’ve already seen $B$ or it’s invalid, in both cases we ignore this block
+
+$\textbf{return} \space state$​
+
+$T' \coloneqq T \cup \{B\}$​
+
+$c_{loc}' \coloneqq \begin{cases} 
+ B &\text{if } \textbf{parent}(B) = c_{loc}\\
+\textbf{fork\_choice}(c_{loc}, F_{T'}, k, s) &\text{if } \textbf{parent}(B) \neq c_{loc}
+\end{cases}$
+
+$\text{if } \text{fork\_choice\_rule} = \text{ONLINE}:$​
+
+> Explicitly commit to the $k$-deep block if the [Online Fork Choice Rule](/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) is being used.
+
+$(T', B_\text{imm}) \coloneqq \textbf{commit}(T', c_{loc}', k)$​
+
+$\textbf{return} \space (c_{loc}', B_\text{imm}, T')$​
+
 ### Commit
 
 We define the procedure that commits to the block, which is $depth$ deep from $c_{loc}$. This procedure computes the new latest immutable block $B_\text{imm}$.
 
 $\text{define } \textbf{commit}(T,c_{loc},depth)\rarr (T', B_\text{imm}):$​
+
+$\textbf{assert } \text{fork\_choice\_rule} = \text{ONLINE}$​
+
+> Compute the latest immutable block, which is $depth$ deep from $c_{loc}$.
+
+$B_\text{imm} \coloneqq \textbf{block\_at\_depth}(c_{loc}, depth)$​
+
+> Prune all forks diverged deeper than $B_\text{imm}$, so that future blocks on those forks can be rejected by [Block Header Validation](https://nomos-tech.notion.site/Block-Header-Validation-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df810bb539f80ba66dba13).
+
+$T' \coloneqq \textbf{prune\_forks}(T, B_\text{imm}, c_{loc})$​
+
+$\textbf{return} \space (T', B_\text{imm})$​
 
 ### Fork Pruning
 
@@ -244,7 +350,33 @@ We define the fork pruning procedure that removes all blocks which are part of f
 
 $\text{define } \textbf{prune\_forks}(T, B)\rarr T':$​
 
+$T' \coloneqq T$​
+
+$\text{for each } B_\text{tip} \in F_T:$​
+
+> If $B_\text{tip}$ is a fork diverged deeper than $B$, prune the fork.
+
+$B_{\text{div}} \coloneqq \textbf{common\_ancestor}(B_\text{tip}, B)$​
+
+$\text{if } B_\text{div} \neq B:$​
+
+$T' \coloneqq \textbf{prune\_blocks}(B_\text{tip}, B_\text{div}, T)$​
+
+$\textbf{return } T'$​
+
 $\text{define } \textbf{prune\_blocks}(B_\text{new}, B_\text{old}, T)\rarr T’:$​
+
+> Remove all blocks in the chain within range $(B_\text{old}, B_\text{new}]$ from $T$.
+
+$(B, T') \coloneqq (B_\text{new}, T)$​
+
+$\text{while } B \ne B_\text{old}:$​
+
+$T' \coloneqq T' \setminus \{B\}$​
+
+$B \coloneqq \textbf{parent}(B)$​
+
+$\textbf{return } T'$​
 
 ### Versioning and Protocol Upgrades
 

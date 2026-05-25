@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-09-08 |
+
 # Introduction
 
 One of possible approaches to design a reliable anonymous communication (AC) system is to reduce statistical correlations between communicating nodes. Here we model a network of communicating nodes as a probabilistic discrete-state cellular automata (CA). We consider a node-centred approach where a node has associated with it variable representing its discrete state, such as sending, receiving, etc. Also we suggest a more granular connection-centred approach where discrete states of communication links of a node are considered. We note that message-centred approach is also possible but not pursued here. Finally, we discuss functions which can be used to quantify correlations in empirical analysis of AC systems.
@@ -29,6 +33,13 @@ One of possible approaches to design a reliable anonymous communication (AC) sys
 - The system we consider is a network of communicating nodes where nodes are labelled by the set $[N]=\{1,\ldots,N\}$.
 - We assume that nodes receive and send messages and these messages are indistinguishable, i.e. it is either impossible to observe bitstreams of messages, or incoming and outgoing messages are bitwise uncorrelated.
 - The node $i\in[N]$ at time $t$ can be in the state of either sending (message) or receiving (message) or inactive, i.e. neither sending or receiving. The latter is modelled by the variable $S_i(t)\in\{-1,0,1\}$ as follows
+
+| $S_i(t)$​ | Node $i$ at time $t$ is |
+| --- | --- |
+| -1 | sending a message |
+| 0 | inactive |
+| 1 | receiving a message |
+
 - We note that  a node can be in more states, for example in addition to sending, receiving, and inactive it could have an additional state of simultaneous sending and receiving, i.e. “send-receive” state. Additional states c can be modelled by extending the alphabet from which $S_i(t)$ takes its values, i.e. $S_i(t)\in\{1,2,\ldots,q\}$ for the most general case.
 - The vector $\mathbf{S}(t)=(S_1(t),\ldots, S_N(t))$ is the state of the network at time $t$ and for $t\in\{t_0,t_1,\ldots,t_F\}$, where $t_0<t_1<\ldots<t_F$, the (ordered by time) set of vectors $\mathbf{S}(t_0),  \mathbf{S}(t_1),\ldots,   \mathbf{S}(t_F)$ is the path, through the state-space $\{-1,0,1\}^N$, taken by the system from the time $t_0$ to the time $t_F$. The latter can be represented by a table (or matrix) as in the example below obtained from simulations.
 
@@ -64,6 +75,17 @@ $$
 - We adopt the [CA model](/1fd261aa09df81ff9278e23c51addfa4?pvs=25#1fd261aa09df81a39438fd17c225b730) where state of AC system at time $t$ is described by the vector $\mathbf{S}(t)=(S_1(t),\ldots, S_N(t))$, where the variable $S_i(t)$ is the state of node $i$, such as receiving a message, sending a message, etc., at time $t$. For example $S_i(t)\in\{-1,0,1\}$, where $-1$ corresponds to sending, $0$ corresponds to inactive and $1$ corresponds to receiving.
 - We note that a node connected to more than two nodes can be receiving and/or sending multiple messages at the same time. However, to simplify analysis we will assume that at any time a node can receive (or send) at most one message.
 - We assume that we have observed $T$ such vectors at times collected in the (ordered) set $\mathcal{T}=\{t_0,t_1,\ldots\}$, where $\vert\mathcal{T}\vert=T$.
+
+|  | $t_0$​ | $t_1$​ | $t_2$​ | $\cdots$​ | $t_{T-1}$​ |
+| --- | --- | --- | --- | --- | --- |
+| $S_1$​ | -1 | 0 | 1 | $\vdots$​ | -1 |
+| $S_2$​ | 0 | 1 | 0 | $\vdots$​ | 1 |
+| $\vdots$​ | $\vdots$​ | $\vdots$​ | $\vdots$​ | $\vdots$​ | $\vdots$​ |
+| $S_i$​ | -1 | 0 | -1 | $\vdots$​ | 1 |
+| $S_j$​ | 1 | 0 | -1 | $\vdots$​ | 1 |
+| $\vdots$​ | $\vdots$​ | $\vdots$​ | $\vdots$​ | $\vdots$​ | $\vdots$​ |
+| $S_N$​ | 0 | 0 | 0 | $\cdots$​ | 1 |
+
 - We define the indicator function: $\delta_{S;S_i(t)}=1$ when $S=S_i(t)$ and $0$ otherwise, i.e. this is the Kronecker delta function. The latter allows us to define various “correlation functions” such as the (empirical) frequency $\hat{P}_i(S)=\frac{1}{T}\sum_{t\in\mathcal{T}}\delta_{S;S_i(t)}$ , the joint frequency $\hat{P}_{ij}(S,\tilde{S})=\frac{1}{T}\sum_{t\in\mathcal{T}}\delta_{S;S_i(t)}\delta_{\tilde{S};S_j(t)}$, etc.
 - In general the product $\delta_{S_{i_1};S_{i_1}(t_1)}\times\cdots\times\delta_{S_{i_k};S_{i_k}(t_k)}$ could be used to construct any correlation function.
 

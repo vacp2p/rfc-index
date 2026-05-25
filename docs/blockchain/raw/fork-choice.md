@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-02-17 |
+
 # Introduction
 
 Cryptarchia makes use of two fork choice rules, one during bootstrapping and a second once a node completes bootstrapping and comes online.

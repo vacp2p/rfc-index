@@ -20,6 +20,10 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision | 2026-04-24 |
+
 > Disclamer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
 >
@@ -80,6 +84,23 @@ A critical feature of this design is its resilience to the base fee manipulation
 # Construction
 
 ## Notation
+
+| Symbol | Name | Value | Description |
+| --- | --- | --- | --- |
+| $s$ | Block Number | - | The index of a block in the chain. |
+| $t$ | Transaction | - | A single transaction submitted by a user. |
+| $g_t$ | Execution Gas Consumed | - | The actual amount of Execution Gas consumed by transaction $t$ upon execution. |
+| $c_t$ | Execution Gas Price | - | The user-specified price per unit of execution gas they will pay. |
+| $b_{\mathrm{exec}}[s]$ | Base Fee | - | The protocol-defined Execution Gas price for inclusion in block $s$. This is initialized at 1 for the first block. |
+| $p_t$ | Priority Fee | - | The portion of the Execution Gas price that serves as a tip to the block builder ($p_t = c_t - b_{\mathrm{exec}}[s]$). |
+| $G[s]$ | Total Execution Gas Used | - | The sum of Execution Gas consumed by all transactions in block $s$. |
+| $G_{\mathrm{avg}}[s]$ | Smoothed Average Execution Gas | - | The Exponential Moving Average (EMA) of Execution Gas used up to block $s$. |
+| $G_{\max}$ | Max Execution Gas Per Block | 3,193,460 | A protocol constant defining the hard limit on $G[s]$. |
+| $G_{\mathrm{target}}$ | Target Execution Gas Per Block | 1,596,730 | A protocol constant for the ideal Execution Gas usage. The TFM steers usage towards this target. This is set to half of $G_{max}$ execution gas units. |
+| $\phi$ | Fee Adjustment Rate | 1/8 | A protocol constant controlling how quickly the base fee adjusts to demand. |
+| $q$ | EMA Smoothing Factor | 9/10 | A protocol constant defining the weight of historical average in the EMA update rule. |
+| $F_t$ | Total fee | - | $F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t$ |
+| $\hat{R}_{\mathrm{burned}}[s]$ | Amount of base fees burnt | - | This is used as an input to compute the block rewards |
 
 ### Parameter Justification
 

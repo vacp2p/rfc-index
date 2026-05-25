@@ -20,6 +20,12 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-02-12 |
+| 1.1.0 | [[RFC] Make Ledger Transaction an Operation](https://nomos-tech.notion.site/RFC-Make-Ledger-Transaction-an-Operation-31e261aa09df80bc9e02ea4e9affc082?pvs=24) Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price | 2026-03-27 |
+| 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24) | 2026-05-06 |
+
 # Introduction
 
 The Genesis Block defines the starting state for the Bedrock chain, including the initial bedrock service providers, LGO token distribution and protocol parameters. Its design draws from best practices in the Ouroboros family of protocols (notably Praos and Genesis), as well as privacy and resilience advances from Cryptarchia and related research. The Genesis Block is the root of trust for all subsequent protocol operations and must be constructed in a way that is deterministic, verifiable, and robust against long-range or bootstrap attacks.

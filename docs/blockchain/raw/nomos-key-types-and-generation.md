@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-04-09 |
+
 # Introduction
 
 This document defines the key types used in the Blend protocol and describes the process of generating them.

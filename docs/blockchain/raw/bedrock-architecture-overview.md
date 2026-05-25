@@ -20,6 +20,11 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-22 |
+| 1.1.0 | Remove references to DA Replace Nomos with Logos Blockchain | 2026-01-14 |
+
 # Introduction
 
 Bedrock enables high-performance Sovereign Zones to leverage the security guarantees of Logos. Sovereign Zones build on the Logos Blockchain through Mantle, Bedrocks minimal execution layer which in turn runs on Cryptarchia, Logos' consensus protocol. Taken together, Bedrock provides a private, highly scalable and resilient substrate for high-performance decentralized applications.

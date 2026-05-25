@@ -20,6 +20,10 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-04-24 |
+
 > Disclamer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
 >
@@ -141,6 +145,15 @@ In what follows, this document defines Logos Blockchain valuation based on compa
 ## Logos Blockchain Valuation ($\text{FDV}$)
 
 For a yet-to-be-released L1 blockchain, fundamental valuation is more challenging because there is no on-chain data (users, fees, transactions). Therefore, we will adopt a simple framework that compares Logos Blockchain with similar projects and assumes a valuation based on the mean or median of these comparable valuations.
+
+| Project | Valuation | Last update | Remark |
+| --- | --- | --- | --- |
+| Monero (XMR) | $4.19B | Feb 2025 | Ring signatures, stealth addresses, confidential transactions Fully private transactions by default; resistance to ASIC mining. |
+| Zcash (ZEC) | $534M | Feb 2025 | zk-SNARKs Optional transparency ("shielded" vs. "transparent" addresses). |
+| Dash (DASH) | $309M | Feb 2025 | CoinJoin mixing (PrivateSend) Instant transactions (InstantSend); hybrid consensus (masternodes) |
+| Mina Protocol | $356M | July 2024 | Recursive zk-SNARKs Constant-sized blockchain (22 KB); lightweight node participation. |
+| Oasis Network | $246M | July 2024 | Trusted Execution Environments (TEEs) Privacy-preserving smart contracts; data tokenization for DeFi. |
+| Secret Network | $62M | July 2024 | Encrypted contract states, secure MPC Private NFTs; encrypted data governance for decentralized apps. |
 
 Given that the mean and median of the above valuations of already established projects are $949.5 million and $332.5 million, respectively, we establish Logos Blockchain valuation with a starting point of $\text{FDV}= \$100$ million.
 

@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-02-17 |
+
 # Introduction
 
 When a new node joins the network or a previously-bootstrapped node has been offline for a while, it cannot follow the most recent honest chain solely by receiving only new blocks because those new blocks cannot be added to the block tree that does not have their parent block. These nodes must first catch up with the most recent honest chain by fetching missing blocks from their peers before they start listening for new blocks.
@@ -61,6 +65,12 @@ The node can propose blocks after switching to the Online fork choice rule.
 # Protocol
 
 ## Constants
+
+| Constant | Name | Description | Value |
+| --- | --- | --- | --- |
+| $T_\text{offline}$​ | Offline Grace Period | A period during which a node can be restarted without switching to the Bootstrap rule. | 20 minutes |
+| $T_\text{boot}$​ | Prolonged Bootstrap Period | A period during which Bootstrap fork choice rule must be continuously used after Initial Block Download is completed. This gives nodes additional time to compare their synced chain with a broader set of peers. | 24 hours |
+| $s_\text{gen}$​ | Density Check Slot Window | A number of slots used by density check of Bootstrap rule. This constant is defined in [Not found](/21b261aa09df81f1aa58d741e75c1840?pvs=24#21b261aa09df81f1aa58d741e75c1840). | $\lfloor\frac{k}{4f}\rfloor$ (=4h30m) |
 
 ## Setting the Fork Choice Rule
 

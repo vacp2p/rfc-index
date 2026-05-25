@@ -20,6 +20,12 @@
 
 # Revisions History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial version. | 2025-11-03 |
+| 1.1.0 | Removed references to DA Replaced references to Nomos with Logos Blockchain | 2026-04-17 |
+| 1.2.1 | [Not found](/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db). | 2026-04-24 |
+
 # Introduction
 
 Nomos relies on multiple services, including the Data Availability and Blend Network - each operated by independent validator sets. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [🔀[1.0.0] Service Declaration Protocol](/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24). The Service Reward Distribution Protocol enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
@@ -68,6 +74,8 @@ This generalized mechanism accommodates a wide range of services without requiri
 
 At the end of session N+1, service rewards for the validator n for the session N are computed by the different services taking as input the rewards of the session:
 
+> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+
 Where $Rewards\_Session$ are the total rewards of session N. The $Rewards\_Session$ is determined by the [No access](/269261aa09df80d88d2bfcfa253298ac?pvs=24#269261aa09df80d88d2bfcfa253298ac), which calculates how much each service receives based on fees burnt during session N and the blockchain's state. $Rewards^n$ is stored as an array that maps each validator's zk_id to their allocated reward.
 
 ## Service Reward Distribution
@@ -76,5 +84,9 @@ Starting immediately after session N+1, service rewards are distributed in the f
 
 The reward must:
 
+- Transfer the correct reward amount according to [Service Reward Calculation](/Service-Reward-Calculation-341261aa09df809cbdb6e4a0b0314c4f?pvs=24#341261aa09df805e9f9fcb80f7e7c3c7).2
+- Be sent to the public key zk_id of the validator registered during [declaration of the service](/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df8192949ae1be9950c7e3).
+- Be distributed into a single note if several rewards share the same zk_id.
+- Be executed identically by every node processing the first block of session N+2. This happens by inserting notes in the ledger in ascending order of zk_id.
 Nodes indirectly verify the correct inclusion of rewards because all consensus-validating nodes must maintain the same ledger view to derive the latest ledger root, which serves as input for verifying the [Proof of Leadership](/21c261aa09df819ba5b6d95d0fe3066d).
 

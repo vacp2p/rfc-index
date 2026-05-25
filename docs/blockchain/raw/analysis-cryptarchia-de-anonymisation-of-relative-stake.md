@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-26 |
+
 Details of derivations are in the documents [Statistical inference of relative stake](/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05) and [Analysis of leader election process in PoS](/1fd261aa09df8181a428f52251e173c4?pvs=25#256261aa09df80cfadacdb638f634815).
 
 # Stake Distribution Strategies Based on Adversarial Inference Which Uses a Naive Estimator
@@ -170,11 +174,17 @@ Here we measure the accuracy of estimators. The left plot shows inferred vs true
 
 ## Analysis of leader election process in proof of stake consensus model
 
+> **File attachment** (link not captured by the Notion scrape).
+
 ## Statistical inference of relative stake
+
+> **File attachment** (link not captured by the Notion scrape).
 
 ## Cardano Stake Distribution
 
 Data was pulled from [Cexplorer](https://cexplorer.io/pool) to determine the stake value of every pool in Cardano
+
+> **File attachment** (link not captured by the Notion scrape).
 
 The histogram seems to shows it seems to follow a classic power law
 

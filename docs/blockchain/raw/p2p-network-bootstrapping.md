@@ -24,6 +24,11 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-25 |
+| 1.0.1 | Renamed Nomos to Logos Blockchain | 2026-04-17 |
+
 # Introduction
 
 Logos Blockchain network bootstrapping is the process by which a new node discovers peers and synchronizes with the existing decentralized network. It ensures that a node can:
@@ -40,9 +45,15 @@ The Logos Blockchain P2P network bootstrapping strategy relies on a designated s
 
 Trusted Bootstrap Nodes
 
+A curated set of publicly announced and highly available nodes ensures reliability during initial peer discovery. These nodes are configured with elevated connection limits to handle a high volume of incoming bootstrapping requests from new participants.
+
 Node Configuration & Onboarding
 
+New node operators must explicitly configure their instances with the addresses of bootstrap nodes. This configuration may be preloaded or dynamically fetched from a trusted source to minimize manual setup.
+
 Network Integration
+
+Upon initialization, the node establishes connections with the bootstrap nodes and begins participating in Logos Blockchain networking protocols. Through these connections, the node discovers additional peers, synchronizes with the network state, and engages in protocol-specific communication (e.g., consensus, block propagation).
 
 ### Security & Decentralization Considerations
 

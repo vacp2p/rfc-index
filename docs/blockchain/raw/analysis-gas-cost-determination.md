@@ -20,6 +20,14 @@
 
 # Revisions History
 
+| Version | Changes |
+| --- | --- |
+| 1.0.0 | Initial revision. |
+| 1.2.0 | Removed DA, included Execution Gas determination for channel deposits and withdraws. Updated the Execution Gas of the Channel config. |
+| 1.3.0 | [Not found](/31e261aa09df80bc9e02ea4e9affc082?pvs=24#31e261aa09df80bc9e02ea4e9affc082). Renamed Nomos to Logos Blockchain |
+| 1.4.0 | [Not found](/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db)​ |
+| 1.4.1 | [Not found](/33d261aa09df803d96b0ebcd83013865?pvs=24#33d261aa09df803d96b0ebcd83013865) |
+
 # Introduction
 
 In Mantle, each Mantle Transaction contains one or more Operations. These components consume gas, measured through fixed gas units that reflect their execution or storage impact. Logos Blockchain introduces two independent gas markets:
@@ -61,6 +69,12 @@ The gas derivation of each Operation are:
 
 and come from our implementation observations as described in [Gas determination from measures](https://nomos-tech.notion.site/Gas-determination-from-measures-33e261aa09df80e0933df9f6cd1251a4?pvs=24#33e261aa09df802aa75dcfc4edf2a351).  To get these numbers, we based our calculations on the following measures:
 
+| Operation | Number of CPU cycles |
+| --- | --- |
+| ZkSignature batch verification | 3,900,000 + number_of_proof x 590,000 |
+| Proof of Claim batch verification | 2,640,000 + number_of_proof x 580,000 |
+| Eddsa25519 signature verification | 56,000 |
+
 Comparison, list searching, hashes and operation in small fields are neglected. We also supposed that the initialization cost for batch verification is paid by everyone and deduced from the block directly. The user then pay only for the part that is proportional to the number of proofs.
 
 # Transfer
@@ -69,24 +83,35 @@ The Execution Gas of the Transfer Operation compensates for the verification of 
 
 Execution: ~590k CPU cycles.
 
+- Verification of the ZK signature: 590,000 cycles.
 ## Input Gas
 
 Input gas covers the computational cost of verifying that one Note Id exists in the Ledger and is not locked. Additionally, it compensates for the removal of one Note Id from the Ledger.
 
 Execution: negligible.
 
+- Verification that the note is in the ledger: negligible.
+- Verification that the note is unlocked: negligible.
+- Removing of the note from the ledger: negligible.
 ## Output Gas
 
 Output gas accounts for the computational resources required to verify that one output is well-formed and for its inclusion in the Ledger.
 
 Execution: negligible.
 
+- Verification of the output validity: negligible.
+- Insertion of the note in the ledger: negligible.
+- Derivation of the note identifiers: negligible
 ## Channel Inscription
 
 The validation process includes verifying an Eddsa25519 signature, confirming that the signer is authorized for the specified channel, and checking the chaining sequence of the channel. The execution encompasses creating channel records (if not previously used) and updating the tip of the channel.
 
 Execution: ~56k CPU cycles.
 
+- Verification of the Ed25519 signature: 56,000 cycles.
+- Verification of the signer authorization: negligible.
+- Verification of channel sequencing: negligible
+- Update the channel state: negligible
 ## Channel Deposit
 
 The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](/21c261aa09df810c8820fab1d78b53d9) proof and for the check of the inputs.
@@ -124,12 +149,29 @@ This gas covers multiple verification processes: confirming ownership of the loc
 
 Execution: ~ 646k CPU cycles.
 
+- Verification of the Ed25519 signature: 56,000 cycles.
+- Verification of the ZK signature: 590,000 cycles.
+- Verification that the declaration doesn’t already exist: negligible.
+- Verification of locator length: negligible.
+- Verification of locked note existence: negligible.
+- Verification of locked note value: negligible.
+- Verification that the note isn’t already locked for the service: negligible.
+- Locking the note: negligible.
 ## SDP Withdraw
 
 This gas covers a verification process that includes: confirming ownership of the zk_id through ZkSignature verification, validating the existence of the locked note, verifying that the note has exceeded its lock period, and confirming that the declaration exists and has not been previously withdrawn. The validation process also ensures that the withdrawal message's nonce is greater than any previous nonce, preventing replay attacks. During execution, the system updates the declaration's status to withdrawn, removes the declaration from the locked note's associated declarations, and—if the note has no remaining declarations—removes it from the locked notes dictionary.
 
 Execution: ~ 590k CPU cycles.
 
+- Verification that the note exists, is locked and bound to the declaration: negligible.
+- Verification that the note can be unlocked: negligible.
+- Verification that the declaration exist: negligible.
+- Verification of the ZK signature: 590,000 cycles.
+- Verification that the declaration wasn’t already withdrawn: negligible.
+- Verification of nonce incrementation: negligible.
+- Update declaration: negligible.
+- Remove declaration from locked note: negligible.
+- Unlock the note if not linked to any declaration: negligible.
 ## SDP Activation
 
 This gas funds the verification of the zk_id signature through the ZkSignature verification process, validates the existence of the declaration in the system, and ensures that the activation message's nonce is greater than any previous nonce to prevent replay attacks. The validation includes confirming that the declaration ID is present in the declarations dictionary and that the signature corresponds to the declaration's registered zk_id public key.
@@ -146,6 +188,12 @@ This gas covers the verification of reward voucher ownership through a Proof of 
 
 Execution: ~580k CPU cycles.
 
+- Verification that the voucher nullifier isn’t already in the set: negligible.
+- Verification that the rewards root is one of the root of the reward tree of the last blocks: negligible.
+- Verification of the proof of claim: 580,000 cycles.
+- Insertion of the nullifier in the voucher nullifier set: negligible.
+- Insertion of the note in the ledger: negligible.
+- Derivation of the note identifiers: negligible
 # Annex
 
 ## Gas determination from measures
@@ -170,6 +218,41 @@ To get the numbers, we executed the [test included in the official Rust implemen
 
 We found the best linear curve approximating these measures (over 100 iterations):
 
+| Number of Batches | Number of CPU cycles |
+| --- | --- |
+| 1 | 2,502,356 |
+| 2 | 3,662,746 |
+| 3 | 4,216,022 |
+| 4 | 4,800,445 |
+| 5 | 5,324,304 |
+| 6 | 6,091,442 |
+| 7 | 6,618,446 |
+| 8 | 7,165,629 |
+| 9 | 7,692,432 |
+| 10 | 8,421,783 |
+| 20 | 14,257,450 |
+| 30 | 20,131,137 |
+| 40 | 25,782,519 |
+| 50 | 31,595,523 |
+| 60 | 37,286,419 |
+
+| Number of Batches | Number of CPU cycles |
+| --- | --- |
+| 70 | 42,901,298 |
+| 80 | 48,309,912 |
+| 90 | 54,191,072 |
+| 100 | 61,082,050 |
+| 110 | 66,927,817 |
+| 120 | 73,758,494 |
+| 130 | 78,816,789 |
+| 140 | 84,801,250 |
+| 150 | 91,693,824 |
+| 160 | 94,248,613 |
+| 170 | 99,430,138 |
+| 180 | 105,607,812 |
+| 190 | 112,379,089 |
+| 200 | 116,599,001 |
+
 We got the curve $y = 577955 x+2640786$ that we decided to approximate to $y = 580000x+2640000$:
 
 ![](https://nomos-tech.notion.site/image/attachment%3Af20c18e4-c9a1-4ac3-91e3-298b450954d0%3Aoutput.png?table=block&id=33e261aa-09df-80cb-b9d1-e8801f284a34&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
@@ -179,4 +262,39 @@ We got the curve $y = 577955 x+2640786$ that we decided to approximate to $y = 5
 To get the numbers, we executed the [test included in the official Rust implementation of the node](https://github.com/logos-blockchain/logos-blockchain/blob/3c249f67d11bcad6ce7cbd92cf8c6b977d35a443/zk/groth16/tests/zk_signature_cpu_cycles.rs#L349).
 
 We found the best linear curve approximating these measures (over 1000 iterations):
+
+| Number of Batches | Number of CPU cycles |
+| --- | --- |
+| 1 | 4,126,177 |
+| 2 | 4,904,084 |
+| 3 | 5,538,085 |
+| 4 | 6,061,800 |
+| 5 | 6,957,754 |
+| 6 | 7,421,851 |
+| 7 | 8,237,485 |
+| 8 | 8,621,986 |
+| 9 | 9,115,091 |
+| 10 | 10,186,171 |
+| 20 | 15,777,800 |
+| 30 | 21,456,771 |
+| 40 | 27,441,722 |
+| 50 | 33,430,729 |
+| 60 | 38,986,389 |
+
+| Number of Batches | Number of CPU cycles |
+| --- | --- |
+| 70 | 44,708,450 |
+| 80 | 50,894,373 |
+| 90 | 56,534,430 |
+| 100 | 63,606,624 |
+| 110 | 70,036,347 |
+| 120 | 75,612,096 |
+| 130 | 82,048,010 |
+| 140 | 87,080,407 |
+| 150 | 91,473,391 |
+| 160 | 97,862,623 |
+| 170 | 104,019,852 |
+| 180 | 111,498,103 |
+| 190 | 114,814,226 |
+| 200 | 119,739,702 |
 

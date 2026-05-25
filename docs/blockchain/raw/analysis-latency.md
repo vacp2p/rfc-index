@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2026-03-20 |
+
 # Introduction
 
 We consider latency of a broadcast on the network constructed from mix nodes which use [queues](/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) to store in-coming and out-going messages. A message is removed from the queue with probability $q$ which delays messages by a random amount of time governed by the Geometric distribution with parameter $q$. The other source of message delays are due to the latency in communication links which we assume to be “frozen”, i.e. not changing with time. We show that for a single path constructed from $k$ mix nodes the average message latency is proportional to $k/q$ and we estimate the probability of latency being greater than the average. Furthermore, we consider latency of a broadcast on the network with the topology of a random regular graph with connectivity $c$. Here we find that the latency of broadcast, divided by $\log(N)$, is approaching  $\frac{2(c-1)}{c(c-2)}\frac{1}{\log(1+q)}$ for a small probability of message removal $q$ as the number of nodes in the network $N$ is growing. However, for finite $N$ the distribution of latency can have long tails. We note that the latter result is established semi-analytically and only for trees we managed to develop a complete analytical framework which can be used to compute the latency of a broadcast. Finally, in this document we propose a simple model of communication latency in consensus.
