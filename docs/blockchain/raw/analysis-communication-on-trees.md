@@ -55,13 +55,17 @@ We assume that a node sends a message through $K$ communication paths where each
 
 If nodes in communication paths are sampled with replacement from the $N$ network nodes with $N_F<N$ faulty nodes then the probability that a node is faulty is $q=N_F/N$. The probability of broadcast failure is given by
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_b=\left[1-(1-q)^L\right]^{K}.
+$$
 
 We note that in the limit $L\rightarrow\infty$, such that $K/L\rightarrow0$, the probability of broadcast failure $\mathrm{P}_b\rightarrow1$ and in the limit $K\rightarrow\infty$, such that $L/K\rightarrow0$, the probability $\mathrm{P}_b\rightarrow0$.
 
 Let us now assume that $q$ is the probability that a node is “curious”. Then the event "there is at least one path where all nodes are curious" is the anonymity failure. The probability of anonymity failure is given by
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_a=1-(1-q^L)^{K}.
+$$
 
 We note that in the limit $L\rightarrow\infty$, such that $K/L\rightarrow0$, the probability of anonymity failure $\mathrm{P}_a\rightarrow0$ and in the limit $K\rightarrow\infty$, such that $L/K\rightarrow0$, the probability $\mathrm{P}_a\rightarrow1$.
 
@@ -87,7 +91,11 @@ In this document we consider only balanced and complete $b$-ary trees. The numbe
 
 The prob. of broadcast failure $B_{L}$ in the tree with $L$ layers and branching parameter $b$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) via the following set of equations
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+B_{L}=\mathrm{P}^b_{L-1}\\
+~~~~~~~~~~~~~~~~~~~~~~~~\mathrm{P}_{\ell+1}=1-(1-q)\left[1-\mathrm{P}^b_{\ell}\right]\\
+\mathrm{P}_{0}=q
+$$
 
 Solving above equations gives the following results
 
@@ -101,7 +109,11 @@ Solving above equations gives the following results
 
 The prob. of anonymity failure $A_{L}$ in the tree with $L$ layers and branching parameter $b$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) via the following set of equations
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+A_{L}=1-\left[1-\mathrm{P}_{L-1}\right]^b\\
+\mathrm{P}_{\ell+1}=q\left[1-\left[1-\mathrm{P}_{\ell}\right]^b\right]\nonumber\\
+\mathrm{P}_{0}=q
+$$
 
 Solving above equations gives the following results
 
@@ -173,23 +185,31 @@ We assume that a node sends a message through $K$ communication paths where each
 
 We assume that $M_F$ nodes in the population are “faulty” (faulty node is unable to relay a message).  The probability that a node is faulty is $q_F=M_F/N$. If a path contains at least one faulty node then communication failure occurred. If all nodes in a communication path are non-faulty then this is a functioning communication path. If all $K$ paths have communication failure then broadcast failure occurred. The probability of broadcast failure is given by
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_b=\left[1-(1-q_F)^L\right]^{K}.
+$$
 
 We note that $\mathrm{P}_b$ is (monotonic) decreasing function of $K$ and (monotonic) increasing function of $L$.  Above result is intuitive as increasing number of communications paths (of fixed length) increases chances that at least one of these paths is functional.  Also increasing length of paths (for a fixed number of paths) increases chances that in each path at least one node is faulty.  For $K\rightarrow\infty$, with $L$ fixed, the prob. $\mathrm{P}_b\rightarrow0$ and for $L\rightarrow\infty$, with $K$ fixed, the prob. $\mathrm{P}_b\rightarrow1$.
 
 We note that anonymity properties are improved for larger $L$ (see [Analysis of anonymity failure](https://nomos-tech.notion.site/Analysis-of-anonymity-failure-1fd261aa09df81bbb79ecb2bf3fcf209?pvs=24#1fd261aa09df8160bc7dec266ad5ed6b)) and we would like to find a relation between $K$ and $L$ such that we have both good communication and anonymity properties. Let us assume that $K=f(L)$, where $f(L)\in \mathbb{N}$, and consider the prob. $\mathrm{P}_b$. For the latter we have the following inequality
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_b=\left[1-(1-q_F)^L\right]^{K}=\mathrm{e}^{f(L)\log\left(1-(1-q_F)^L\right)}\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\leq \mathrm{e}^{-f(L)(1-q_F)^L},
+$$
 
 where in above we used $\log(x)\leq x-1$ to obtain inequality.  Hence for $K=f(L)$ we can have $\mathrm{P}_b\rightarrow0$ when $f(L)(1-q_F)^L\rightarrow\infty$ as $L\rightarrow\infty$.
 
 We note that $f(L)(1-q_F)^L=\mathrm{e}^{L[\log(1-q_F)+\frac{1}{L}\log f(L)]}$ and hence for any $\epsilon>0$ the following condition
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\frac{1}{L}\log f(L)= -\log(1-q_F)+\epsilon
+$$
 
 ensures that $\mathrm{P}_b\rightarrow0$ when $L\rightarrow\infty$. Above suggests
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+f(L)= \mathrm{e}^{L[-\log(1-q_F)+\epsilon]}=\left(\frac{\alpha}{1-q_F}\right)^L,
+$$
 
 where $\alpha=\mathrm{e}^\epsilon$, i.e. the number of paths has to grow exponentially with $L$ to ensure that $\mathrm{P}_b\rightarrow0$ when $L\rightarrow\infty$.
 
@@ -197,19 +217,25 @@ where $\alpha=\mathrm{e}^\epsilon$, i.e. the number of paths has to grow exponen
 
 We assume that $M_A$ nodes in the population are “adversarial”;  adversarial nodes are controlled by an adversary which can make nodes faulty, use them for traffic analysis, etc. The probability that a node is adversarial is $q_A=M_A/N$. If there is at least one functioning communication paths where all nodes are adversarial, then adversary has opportunity to cause anonymity failure. The probability of anonymity failure is given by
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_a=1-\left[1-[(1-q_F)\, q_A]^L\right]^{K}.
+$$
 
 We note that $\mathrm{P}_a$ is (monotonic) increasing function of $K$ and (monotonic) decreasing function of $L$.  Also $\mathrm{P}_a$ is monotonic increasing function of $(1-q_F)\, q_A$ and hence monotonic decreasing function of $q_F$. For $K\rightarrow\infty$, with $L$ fixed, the prob. $\mathrm{P}_a\rightarrow1$ and for $L\rightarrow\infty$, with $K$ fixed, the prob. $\mathrm{P}_a\rightarrow0$.
 
 Let us assume that $K=f(L)$, where $f(L)\in \mathbb{N}$, and consider the prob. $\mathrm{P}_a$. For the latter we have the following inequality
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_a=1-\left[1-(1-q_F)^L\, q_A^L\right]^{K}=1-\mathrm{e}^{f(L)\log\left(1-(1-q_F)^L\, q_A^L\right)}\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\leq1-\mathrm{e}^{-f(L)\frac{(1-q_F)^L\, q_A^L}{1-(1-q_F)^L\, q_A^L}}
+$$
 
 Hence for $K=f(L)$ we can have $\mathrm{P}_a\rightarrow0$ when $f(L)\frac{(1-q_F)^L\, q_A^L}{1-(1-q_F)^L\, q_A^L}\rightarrow0$ as $L\rightarrow\infty$. We note that $\frac{(1-q_F)^L\, q_A^L}{1-(1-q_F)^L\, q_A^L}=(1-q_F)^L\, q_A^L+O((1-q_F)^{2L}\, q_A^{2L})$ when $L\rightarrow\infty$ and hence $f(L)(1-q_F)^L\, q_A^L$ is the dominant term in $f(L)\frac{(1-q_F)^L\, q_A^L}{1-(1-q_F)^L\, q_A^L}\rightarrow0$.  Thus $\mathrm{P}_a\rightarrow0$ when $f(L)(1-q_F)^L\, q_A^L\rightarrow0$ as $L\rightarrow\infty$.
 
 Let us assume $f(L)=\left(\frac{\alpha}{1-q_F}\right)^L$ and consider
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+f(L)\frac{(1-q_F)^L\, q_A^L}{1-(1-q_F)^L\, q_A^L}=\left(\frac{\alpha}{1-q_F}\right)^L\frac{(1-q_F)^L\, q_A^L}{1-(1-q_F)^L\, q_A^L}\\~~~~~~~~~~~~~~~~~~=\frac{(\alpha q_A)^L}{1-(1-q_F)^L\, q_A^L}
+$$
 
 From above follows that $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$ when $\alpha\,q_A<1$.  Hence, if $\alpha$ is such that $1<\alpha<1/q_A$ then the number of comm. paths $f(L)=\left(\frac{\alpha}{1-q_F}\right)^L$ ensures that $\mathrm{P}_b\rightarrow0$ and $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$.
 
@@ -217,31 +243,43 @@ From above follows that $\mathrm{P}_a\rightarrow0$ as $L\rightarrow\infty$ when 
 
 If there is at least one adversarial node in each functioning communication paths then adversary has opportunity to cause broadcast failure. The probability of adversarial broadcast failure is given by
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_{ab}=\left[1-[(1- q_F)(1- q_A)]^L\right]^K-\left[1-(1- q_F)^L\right]^{K}.
+$$
 
 We note that $\mathrm{P}_{ab}\leq\left[1-[(1- q_F)(1- q_A)]^L\right]^K$ and hence $\mathrm{P}_{ab}$ is bounded from above by (monotonic) decreasing function of $K$ and (monotonic) increasing function of $L$. For $K\rightarrow\infty$, with $L$ fixed, the prob. $\mathrm{P}_{ab}\rightarrow0$ and for $L\rightarrow\infty$, with $K$ fixed, the prob. $\mathrm{P}_{ab}\rightarrow1$.
 
 Let us assume $K=f(L)$ and consider
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_{ab}\leq\left[1-[(1- q_A)(1- q_F)]^L\right]^{f(L)}\\~~~~~~~~=\mathrm{e}^{f(L)\log\left(1-[(1- q_A)(1-q_F)]^L\right)}\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\leq \mathrm{e}^{-f(L)[(1- q_A)(1-q_F)]^L}
+$$
 
 Hence $\mathrm{P}_{ab}\rightarrow0$ when $f(L)[(1-q_A)(1-q_F)]^L\rightarrow\infty$ as $L\rightarrow\infty$. Furthermore, we can obtain the lower bound on $\mathrm{P}_{ab}$ as follows
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+~~~\mathrm{P}_{ab}=\left[1-[(1- q_A)(1- q_F)]^L\right]^{f(L)}-\left[1-(1- q_F)^L\right]^{K}\\=\mathrm{e}^{f(L)\log\left(1-[(1- q_A)(1-q_F)]^L\right)}-\mathrm{e}^{f(L)\log\left(1-(1-q_F)^L\right)}\\\geq \mathrm{e}^{-f(L)\frac{[(1- q_A)(1-q_F)]^L}{1-[(1- q_A)(1-q_F)]^L}} -\mathrm{e}^{-f(L)(1-q_F)^L}\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=\mathrm{e}^{-f(L)\left[(1- q_A)^L(1-q_F)^L+O((1- q_A)^{2L}(1-q_F)^{2L})\right]} -\mathrm{e}^{-f(L)(1-q_F)^L}
+$$
 
 We note that $(1-q_A)^L(1-q_F)^L \leq (1-q_F)^L$ and hence for $f(L)$ such that $f(L)[(1-q_A)(1-q_F)]^L\rightarrow0$, as $L\rightarrow\infty$, but $f(L)(1-q_F)^L\rightarrow\infty$ we have $\mathrm{P}_{ab}\rightarrow1$.
 
 For $f(L)=\left(\frac{\alpha}{1-q_F}\right)^L$ we have
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+f(L)[(1-q_A)(1-q_F)]^L=\left(\frac{\alpha}{1-q_F}\right)^L(1-q_A)^L(1-q_F)^L\\~~~~~~~~~~=\alpha^L(1-q_A)^L
+$$
 
 From above, it follows that if $\alpha\,(1-q_A)>1$, which is equivalent to $\alpha>1/(1-q_A)$, then $\mathrm{P}_{ab}\rightarrow0$ when $L\rightarrow\infty$.  Thus to have $\mathrm{P}_b\rightarrow0$, $\mathrm{P}_a\rightarrow0$, and $\mathrm{P}_{ab}\rightarrow0$ as $L\rightarrow\infty$ we have to choose
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+f(L)=\left(\frac{\alpha}{1-q_F}\right)^L
+$$
 
 for the number of paths $K$ with
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\frac{1}{1-q_A}<\alpha<\frac{1}{q_A}
+$$
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F226dd7a2-fe6d-417a-9b6f-699f9b141e12%2FScreenshot_2025-01-08_at_10.57.57.png?table=block&id=1fd261aa-09df-81c3-bc80-e74e8a3535bd&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -249,7 +287,9 @@ for the number of paths $K$ with
 
 Using the expression $f(L)=\left(\frac{\alpha}{1-q_F}\right)^L$, where $L$ is the number of nodes in a path and $\alpha$ parameter such that $f(L)\in \mathbb{N}$, for the number of paths in the upper bounds on failure probabilities $\mathrm{P}_b$, $\mathrm{P}_a$, and $\mathrm{P}_{ab}$ we obtain the following inequalities
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\mathrm{P}_b\leq \mathrm{e}^{-\alpha^L}\\ ~~~~~~~~~~~~\mathrm{P}_{ab}\leq \mathrm{e}^{-\alpha^L(1- q_A)^L}\\~~~~~~~~~~~~~~~~~~~~~~\mathrm{P}_a\leq1-\mathrm{e}^{-\alpha^L\frac{ q_A^L}{1-(1-q_F)^L\, q_A^L}}.
+$$
 
 and for any $\alpha\in \left(\frac{1}{1-q_A}, \frac{1}{q_A}\right)$ all of the above are vanishing as $L\rightarrow\infty$.  From above follows that broadcast failure probabilities $\mathrm{P}_b$ and $\mathrm{P}_{ab}$ are tending to $0$ with increasing $L$ at a much higher rate for a larger values of $\alpha$, but the anonymity failure prob. $\mathrm{P}_a$ is tending to $0$ at a much higher rate for a smaller values of $\alpha$.
 
@@ -317,7 +357,9 @@ Also we define the binary variable $s_i\in\{0,1\}$. A node is “honest/adversar
 
 The probability of broadcast failure is give by $\mathrm{P}_b=\left[1-\mathrm{P}_{L-1}\right]^b$, where the prob. $\mathrm{P}_{L-1}$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) as follows
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+~~~~~~~~~~~~~~~~~~~~~~~~~~\mathrm{P}_{\ell+1}=(1-q_F)\left[1-\left[1-\mathrm{P}_{\ell}\right]^b\right]\\\mathrm{P}_0=1-q_F
+$$
 
 The above equation has only one solution $\mathrm{P}_{\ell}=0$, which corresponds to prob. of broadcast failure being $1$, when $1-q_F<1/b$. However, the fixed point $\mathrm{P}_{\ell}=0$ becomes unstable when $1-q_F>1/b$ and a second (stable) solution $\mathrm{P}_{\ell}>0$, which corresponds to prob. of broadcast failure being less than $1$, emerges.
 
@@ -325,7 +367,9 @@ The above equation has only one solution $\mathrm{P}_{\ell}=0$, which correspond
 
 The probability of anonymity failure is give by $\mathrm{P}_a=1-\left[1-\mathrm{P}_{L-1}\right]^b$, where $\mathrm{P}_{L-1}$ can be computed recursively (see the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8) section) as follows
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+~~~~~~~~~~~~~~~~~~~~~~~\mathrm{P}_{\ell+1}=(1-q_F)\,q_A\left[1-\left[1-\mathrm{P}_{\ell}\right]^b\right]\\\mathrm{P}_0=(1-q_F)\,q_A
+$$
 
 The above equation has only one solution $\mathrm{P}_{\ell}=0$, which corresponds to prob. of anonymity failure being $0$, when $(1-q_F)\,q_A<1/b$. However, the fixed point $\mathrm{P}_{\ell}=0$ becomes unstable when $(1-q_F)\,q_A>1/b$ and a second (stable) solution $\mathrm{P}_{\ell}>0$, which corresponds to prob. of anonymity failure being greater than $0$, emerges.
 
@@ -335,7 +379,9 @@ From above follows that we would like to have $1-q_F>1/b$ and $(1-q_F)\,q_A<1/b$
 
 We have exploited a recursive property of $\max$ on trees (see equation (48) in the [Details of derivations](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df81a18261c4d16d5db8d8)) to derive expressions for the prob. of broadcast and anonymity failures, however if such recursive approach is possible in analysis of adversarial broadcast-failure is not clear. In particular we don’t know how to estimate probability of the event
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\sum_{j\in\partial\mathcal{T}_L}\mathrm{1}\left[\sum_{k\in 0\rightarrow j\setminus0}\sigma_k=L\right]\,\mathrm{1}\left[\sum_{k\in 0\rightarrow j\setminus0}s_k\geq1\right]=\sum_{j\in\partial\mathcal{T}_L}\mathrm{1}\left[\sum_{k\in 0\rightarrow j\setminus0}\sigma_k=L\right] \text{ and} \sum_{j\in\partial\mathcal{T}_L}\mathrm{1}\left[\sum_{k\in 0\rightarrow j\setminus0}\sigma_k=L\right]\geq 1
+$$
 
 analytically. However for $q_F=0$, i.e. there are no faulty nodes, we know from our[ earlier analysis](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25#1fd261aa09df8157a67ce3aa45e41aa6) that the probability of adversarial broadcast failure $\mathrm{P}_{ab}$ is strictly less than $1$ as $L\rightarrow\infty$ when $q_A < 1-\frac{1}{b}$.
 
