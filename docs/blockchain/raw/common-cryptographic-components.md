@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Mehmet Gonen <mehmet@status.im>
-
 # Revision History
 
 # Introduction
@@ -299,3 +297,4 @@ raise ValueError("Invalid contribution by participant")
 
     return crs_G1, crs_G2, transcript
 ```
+

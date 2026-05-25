@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors:  Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 # Introduction
@@ -119,3 +117,4 @@ Thus a message is delayed by $r\Delta\geq R\Delta$ with the probability $(1-q)^{
 Das D., Diaz C., Kiayias A., Zacharias T. (2024). Are continuous stop-and-go mixnets provably secure? Proceedings on Privacy Enhancing Technologies. [https://eprint.iacr.org/2023/1311](https://eprint.iacr.org/2023/1311)
 
 Serjantov, A., Danezis, G. (2003). Towards an Information Theoretic Metric for Anonymity. In: Dingledine, R., Syverson, P. (eds) Privacy Enhancing Technologies. PET 2002. Lecture Notes in Computer Science, vol 2482. Springer, Berlin, Heidelberg. [https://doi.org/10.1007/3-540-36467-6_4](https://doi.org/10.1007/3-540-36467-6_4)
+

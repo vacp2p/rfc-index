@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors:  Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 # Introduction
@@ -500,3 +498,4 @@ The histogram of the maximum of $n_0$ obtained in one such simulation is present
 Svante Janson. (2009). On percolation in random graphs with given vertex degrees. Electron. J. Probab. 14: 86 - 118. [https://doi.org/10.1214/EJP.v14-603](https://doi.org/10.1214/EJP.v14-603)
 
 Gordon, L., Schilling, M. F. and Waterman, M. S. (1986). An extreme value theory for long head runs.  Probability Theory and Related Fields  72: 279-287. [https://doi.org/10.1007/BF00699107](https://doi.org/10.1007/BF00699107)
+

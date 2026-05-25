@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: David Rusu <davidrusu@status.im>, Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 Details of derivations are in the documents [Statistical inference of relative stake](/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05) and [Analysis of leader election process in PoS](/1fd261aa09df8181a428f52251e173c4?pvs=25#256261aa09df80cfadacdb638f634815).
@@ -202,3 +200,4 @@ The sharp decline after 70MM ADA is likely explained by this Saturation Paramete
 
 - The IOHK blog post announcing the change to $k=500$ and a plan to increase $k$ to 1000 in 2021 (didn’t seem to happen) [https://iohk.io/en/blog/posts/2020/11/05/parameters-and-decentralization-the-way-ahead/](https://iohk.io/en/blog/posts/2020/11/05/parameters-and-decentralization-the-way-ahead/)
 - Reddit discussion anticipating the change to $k=1000$ [https://www.reddit.com/r/cardano/comments/nfor5t/when_is_a_pools_saturation_too_high/](https://www.reddit.com/r/cardano/comments/nfor5t/when_is_a_pools_saturation_too_high/)
+

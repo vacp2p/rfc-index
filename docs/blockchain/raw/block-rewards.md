@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Frederico Teixeira <frederico@status.im>
-
 # Revisions History
 
 > Disclamer:
@@ -139,3 +137,4 @@ Constraining $I_{max}$ to the range $[1\%, 3\%]$, the decision for $I_{max} = 1\
 ## Minimum Emission Rate ($I_{min}$)
 
 The recommendation is $I_{min} = 0$. While $I_{min} > 0$ has a slight inflationary bias and $I_{min} < 0$ a slight deflationary bias, both need a strong argument to be defined. There is currently no evidence for $I_{min} \neq 0$.
+

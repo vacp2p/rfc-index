@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: David Rusu <davidrusu@status.im>
-
 # Revision History
 
 # Introduction
@@ -474,3 +472,4 @@ So, we have the ratio $\frac{P(\text{violate common prefix in cardano})}{P(\text
 ![](https://nomos-tech.notion.site/image/attachment%3Aed983ead-3ec9-41f5-b834-9bf6d3661cdf%3Aimage.png?table=block&id=210261aa-09df-8099-97a6-e04c50aa92af&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1230&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 My interpretation of this result is that this probability $\exp(\ln(R)+\Delta - \Omega(k))$ is a very loose upper bound. e.g. reducing network delay by 1s leads to a ~2.7x lower probability, and adding 1 second of delay leads again to a 2.7x higher probability, it’s too sensitive to make useful interpretations.
+

@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Juan Pablo Madrigal-Cianci <jp@status.im>, Frederico Teixeira <frederico@status.im>
-
 # Revision History
 
 > Disclamer:
@@ -130,3 +128,4 @@ This begins a "chasing" dynamic across subsequent sessions. As long as the new, 
 The anchor weight ${w}$ is critical here. If $w=0$ (no anchor), the equilibrium condition becomes $C(P^*) = T_{\text{RA}}$, which means the target would simply follow the demand, and the price would not effectively respond to the new normal. The non-zero anchor weight $w$ ensures the system always feels a "pull" back towards the governance-set target $T_{\text{base}}$, forcing the price to adjust until usage realigns with this long-term policy goal.
 
 Conclusion: The mechanism is proven to autonomously guide the market to a new, stable equilibrium price that respects the long-term usage target, even in the face of permanent shifts in market demand. It avoids the failure modes of purely static models (which would see chronic overuse) and purely adaptive models (which would normalize the new, higher usage level instead of controlling it).
+

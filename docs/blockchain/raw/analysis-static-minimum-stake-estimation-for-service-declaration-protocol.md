@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Frederico Teixeira <frederico@status.im>, Juan Pablo Madrigal-Cianci <jp@status.im>
-
 # Revisions History
 
 > Disclamer:
@@ -31,7 +29,7 @@ Authors: Frederico Teixeira <frederico@status.im>, Juan Pablo Madrigal-Cianci <j
 
 # Introduction
 
-The [����[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24) enables nodes to register for specific services in decentralized public registries by committing a predefined stake. Registered nodes may then provide the declared service in exchange for rewards. The protocol uses staking as a mechanism to ensure Sybil resistance and incentivize honest participation.
+The [[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24) enables nodes to register for specific services in decentralized public registries by committing a predefined stake. Registered nodes may then provide the declared service in exchange for rewards. The protocol uses staking as a mechanism to ensure Sybil resistance and incentivize honest participation.
 
 This document aims to define an optimal minimum stake value per node in the context of the SDP. The optimal minimum stake value must strike a careful balance: it should be high enough to discourage sybil attacks while remaining low enough to ensure broad participation, especially in early network stages. Importantly, the protocol mandates a uniform, constant stake value across services and sessions, adding constraints to its determination. We focus on static stake estimation method due to its simplicity.
 
@@ -48,9 +46,9 @@ The SDP is a staking-based registration mechanism designed for decentralized ser
 This protocol is parameterized by a single stake value that is:
 
 - Constant across all services and sessions, to ensure predictability and fairness.
-- Calibrated to balance security and accessibility, based on Logos Blockchain���s economic assumptions.
+- Calibrated to balance security and accessibility, based on Logos Blockchains economic assumptions.
 
-Using the model specified [below](https://www.notion.so/3a2261aa09df83e2a104012e29c21f34#4ab261aa09df8340b44001a8f61cbbf2), the protocol ensures that the stake requirement scales proportionally with Logos Blockchain���s market valuation and design goals, while remaining robust to economic fluctuations.
+Using the model specified [below](https://www.notion.so/3a2261aa09df83e2a104012e29c21f34#4ab261aa09df8340b44001a8f61cbbf2), the protocol ensures that the stake requirement scales proportionally with Logos Blockchains market valuation and design goals, while remaining robust to economic fluctuations.
 
 Under the assumptions explained below, we define the [minimum stake](https://www.notion.so/3a2261aa09df83e2a104012e29c21f34#65b261aa09df83d99dbd01e269c62e01) value in LGO as
 
@@ -106,7 +104,7 @@ The following quantities are derived from the definitions above:
 
 ## Staking Ratio ($r_{\text{stake}}$)
 
-The [����[1.0.0] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24) proposes a 30% of TGE tokens as a target for the security of the PoS participation of [Cryptarchia](https://nomos-tech.notion.site/21c261aa09df810cb85eff1c76e5798c?pvs=25). This implies that it should not be possible for a single entity to acquire $15\%$ of TGE supply. Therefore, we set $r_{\text{stake}}=15\%$.
+The [[1.0.0] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24) proposes a 30% of TGE tokens as a target for the security of the PoS participation of [Cryptarchia](https://nomos-tech.notion.site/21c261aa09df810cb85eff1c76e5798c?pvs=25). This implies that it should not be possible for a single entity to acquire $15\%$ of TGE supply. Therefore, we set $r_{\text{stake}}=15\%$.
 
 ## Number of Service Providers ($N_{\text{stakers}}$)
 
@@ -153,7 +151,7 @@ For the sake of this analysis, suppose that
 - $\text{FDV}= \$100$ million.
 - $S_{\text{max}} = 100,000,000$ LGO.
 - $S_{\text{TGE}} = S_{\text{max}} = 100,000,000$ LGO.
-- $\text{Stake}_{\text{LGO}} = 0.001\% \cdot S_{\text{TGE}}.$���
+- $\text{Stake}_{\text{LGO}} = 0.001\% \cdot S_{\text{TGE}}.$
 - $N_{\text{stakers}}=1000$.
 
 From the Construction section,
@@ -179,3 +177,4 @@ which would be valued at
 $$
 \text{Stake}_{\text{FIAT}} = \$1,000.
 $$
+

@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Juan Pablo Madrigal-Cianci <jp@status.im>, Frederico Teixeira <frederico@status.im>
-
 # Revisions History
 
 > Disclamer:
@@ -221,3 +219,4 @@ The initial state of the TFM at network launch shall be configured as follows:
 
 - Initial Price P_STR(0): Set to a pre-determined value established by genesis governance.
 - Initial Usage EMA T_RA(-1): Set to the value of the baseline target, $T_{\text{base}}$. This anchors the mechanism to its long-term policy goal from the outset.
+

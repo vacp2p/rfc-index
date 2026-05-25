@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 # Introduction
@@ -358,3 +356,4 @@ Finally, we consider the prob. of adversarial broadcast failure $\mathrm{P}_{ab}
 # Appendix
 
 ## Details of derivations
+

@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 # Introduction
@@ -362,3 +360,4 @@ Hamed Amini. Marc Lelarge. "The diameter of weighted random graphs." Ann. Appl. 
 Mézard, M., Parisi, G. “The Bethe lattice spin glass revisited.” Eur. Phys. J. B 20, 217–233 (2001). [https://doi.org/10.1007/PL00011099](https://doi.org/10.1007/PL00011099)
 
 Bollobás, B., Fernandez de la Vega, W. “The diameter of random regular graphs.” Combinatorica 2, 125–134 (1982). [https://doi.org/10.1007/BF02579310](https://doi.org/10.1007/BF02579310)
+

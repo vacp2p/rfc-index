@@ -18,15 +18,13 @@
 
 <!-- timeline:end -->
 
-Authors: Thomas Lavaur <thomaslavaur@status.im>
-
 # Revisions History
 
 # Introduction
 
 This document outlines the cross-channel messaging framework. A channel is a reserved identifier where only authorized keys can post messages on-chain, while anyone can read them. Cross-channel messaging allows different channels (including channels representing a Zone) to communicate and coordinate actions (such as Zone state transitions), enabling interoperability while maintaining security and decentralization.
 
-## Reference: [����[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
+## Reference: [[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
 
 ## Objectives
 
@@ -49,7 +47,7 @@ The cross-channel messaging framework must satisfy the following requirements:
 
 Cross-channel messaging allows different channels to interact and coordinate. The framework supports two distinct messaging modes.
 
-- Asynchronous Messaging: Channels send messages to each other without requiring real-time and/or off-chain coordination. The receiving channel waits for the sending channel���s message to achieve finality on the chain before processing it. This approach minimizes coordination overhead but introduces latency due to finality requirements.
+- Asynchronous Messaging: Channels send messages to each other without requiring real-time and/or off-chain coordination. The receiving channel waits for the sending channels message to achieve finality on the chain before processing it. This approach minimizes coordination overhead but introduces latency due to finality requirements.
 - Synchronous Messaging: Multiple channels coordinate to include their messages in a single Mantle Transaction. All messages in the transaction either succeed or fail together, providing strong consistency guarantees. This requires off-chain coordination between sequencers but enables use cases like atomic Zone state transitions. Since each Inscription Operation proof is a signature of the entire Mantle Transaction hash, the signature cannot be reused in a different context, for example, posting an Inscription alone after signing it as part of a coordinated transaction.
 
 > The coordinator typically pays fees and must be trusted for timing of submission. Channel designers should implement mechanisms if they want to share these fees, either by:
@@ -126,14 +124,14 @@ The structure consists of:
 
 The asynchronous messaging process follows these steps:
 
-1. Message Creation: The source channel���s sequencer creates a message according to the recommended format (or their custom format) and includes it in an Inscription within a Mantle Transaction.
+1. Message Creation: The source channels sequencer creates a message according to the recommended format (or their custom format) and includes it in an Inscription within a Mantle Transaction.
 1. Transaction Submission: The sequencer signs the Operation and submits the Mantle Transaction to the chain independently.
-1. Finality Wait: The transaction propagates through the network and eventually achieves finality on-chain. This guarantee that this transaction won���t be reverted due to a reorganization.
+1. Finality Wait: The transaction propagates through the network and eventually achieves finality on-chain. This guarantee that this transaction wont be reverted due to a reorganization.
 1. Message Observation: Destination channels sequencers monitor the chain for messages addressed to their ChannelId. When a relevant message is detected and has achieved finality, the channel can safely process it.
 1. State Transition: The destination channel checks that the message is valid and publishes a corresponding state transition in its own Inscription.
 
 ```
-Destination SequencerBedrockSource SequencerDestination SequencerBedrockSource SequencerTransaction is propagatedand eventually finalized1. Generate cross-channel message(for one or more destination channels)12. Include message in Mantle Tx(Inscription Operation)24. Submit Mantle Transaction to chain3Destination channel sequencer observesfinalized inscription(s) to its ChannelId4Validate message, applycorresponding state change5���
+Destination SequencerBedrockSource SequencerDestination SequencerBedrockSource SequencerTransaction is propagatedand eventually finalized1. Generate cross-channel message(for one or more destination channels)12. Include message in Mantle Tx(Inscription Operation)24. Submit Mantle Transaction to chain3Destination channel sequencer observesfinalized inscription(s) to its ChannelId4Validate message, applycorresponding state change5
 ```
 
 ### Security Considerations
@@ -217,7 +215,7 @@ mempool.push(signed_tx)
 
 Synchronous messaging requires coordination between sequencers from different channels. The process works as follows:
 
-1. Transaction Construction: One sequencer (the coordinator) constructs a Mantle Transaction containing multiple channel operations for different channels. Each Operation represents an Inscription, withdraw or deposit for a specific channel or a transfer. In order to construct this transaction, the coordinator must gather the different intentions of the affected channels��� sequencers. For example, a Zone sequencer needs to inform another Zone sequencer that a user is transferring tokens so the receiving Zone can mint the token in its state.
+1. Transaction Construction: One sequencer (the coordinator) constructs a Mantle Transaction containing multiple channel operations for different channels. Each Operation represents an Inscription, withdraw or deposit for a specific channel or a transfer. In order to construct this transaction, the coordinator must gather the different intentions of the affected channels sequencers. For example, a Zone sequencer needs to inform another Zone sequencer that a user is transferring tokens so the receiving Zone can mint the token in its state.
 1. Signature Collection: Each participating sequencer receives the complete Mantle Transaction and verifies it. If all checks pass, the sequencer builds a proof for the Operations of its channel which includes the signature of the Mantle Transaction hash. The signature covers the entire transaction, ensuring that all sequencers approve the atomic Operations as a whole and preventing signature replay attacks.
 1. Coordination and Submission: The coordinator collects Operation proofs from all participating sequencers. Once all required proofs are gathered, the coordinator assembles the fully signed transaction and submits it to Bedrock.
 1. Atomic Execution: The chain validates the Mantle Transaction. If any validation check fails, the entire transaction is rejected and no state changes are applied. If all checks pass, all Operations are executed atomically.
@@ -230,7 +228,7 @@ Synchronous messaging requires coordination between sequencers from different ch
 > This coordination requirement is the main trade-off of synchronous messaging: it provides stronger guarantees but requires more complex orchestration and is susceptible to availability issues of the involved sequencers.
 
 ```
-BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)1. Intention gathering2. Transaction construction3. Signature collectionRepeat for all sequencers4. Submission and atomic executionalt[All checks pass][Any check fails]Propose cross-channel operation(e.g., atomic cross-zone transfer burning tokens in A state)1Propose cross-channel operation(e.g., the same atomic cross-zone transfer minting tokens in B state)2Build MantleTx with ops forall involved channels(CHANNEL_INSCRIBE / WITHDRAW / DEPOSIT, etc.)3Send full MantleTx4Verify MantleTx(channel A logic, fees, etc.)5Proofs for A's Operations(sign mantle_txhash(MantleTx))6Send full MantleTx7Verify MantleTx(channel B logic, fees, etc.)8Proofs for B's Operations(sign mantle_txhash(MantleTx))9Submit fully proved MantleTx10Validate tx + all op proofs11Apply all channel ops atomically(all succeed together)12Reject MantleTx(no state changes applied)13���
+BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)1. Intention gathering2. Transaction construction3. Signature collectionRepeat for all sequencers4. Submission and atomic executionalt[All checks pass][Any check fails]Propose cross-channel operation(e.g., atomic cross-zone transfer burning tokens in A state)1Propose cross-channel operation(e.g., the same atomic cross-zone transfer minting tokens in B state)2Build MantleTx with ops forall involved channels(CHANNEL_INSCRIBE / WITHDRAW / DEPOSIT, etc.)3Send full MantleTx4Verify MantleTx(channel A logic, fees, etc.)5Proofs for A's Operations(sign mantle_txhash(MantleTx))6Send full MantleTx7Verify MantleTx(channel B logic, fees, etc.)8Proofs for B's Operations(sign mantle_txhash(MantleTx))9Submit fully proved MantleTx10Validate tx + all op proofs11Apply all channel ops atomically(all succeed together)12Reject MantleTx(no state changes applied)13
 ```
 
 ### Security Considerations
@@ -246,3 +244,4 @@ And trust assumptions:
 - Each participating sequencer is assumed to verify the entire Mantle Transaction and only sign transactions that are valid with respect to its own channel rules.
 - The protocol does not enforce or verify this behavior on-chain.
 - Bedrock does not validate channel-specific Inscription semantics. As a result, correctness of cross-channel operations depends on off-chain verification by sequencers.
+

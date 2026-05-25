@@ -18,8 +18,6 @@
 
 <!-- timeline:end -->
 
-Authors: Alexander Mozeika <alexander.mozeika@status.im>
-
 # Revision History
 
 # Introduction
@@ -118,3 +116,4 @@ for nodes $i$ and $j$.
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F9a7bd2f3-f7ba-4d9b-a9f5-547db8c9ccaa%2Freplica2.png?table=block&id=1fd261aa-09df-8184-9afc-e82127a01d83&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - We note that for $T<t_0$ we have $\overline{D}_H(T)=0$ because states of copies 1 and 2, described by $\mathbf{S}^1(t)$ and $\mathbf{S}^2(t)$, are exactly the same before this event. For times $T\geq t_0$ we can have $\overline{D}_H(T)>0$, i.e. the states of copies $1$ and $2$, described by $\mathbf{S}^1(t)$ and $\mathbf{S}^2(t)$, are different after the event at $t_0$.
+
