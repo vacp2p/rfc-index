@@ -163,7 +163,7 @@ Let us define the following variables:
 | $S_{tge}$​ | Token supply at TGE | 10 billion LGO | N.A. |
 | $T$​ | The number of periods in the look-back window for the moving average. | $120$​ | As the system is expected to mint 1 block every 30 seconds, this look-back window defines that the minting averages the fees burned in the last hour. |
 | $\alpha_a$​ | Denotes the control responsiveness to KPI average metrics. | $1$​ | This parameter drives the token emission from the burn rate. It must be one-to-one. |
-| $\alpha_d$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [No access](/326261aa09df80f79169dff0eb884f78?pvs=24#326261aa09df80f79169dff0eb884f78), for details. |
+| $\alpha_d$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [No access](https://nomos-tech.notion.site/326261aa09df80f79169dff0eb884f78?pvs=24#326261aa09df80f79169dff0eb884f78), for details. |
 | $w_i$​ | Denotes the weight of the $i$-th KPI in the normalized deviation from target | $1$​ | There's only one KPI of this type in our system. |
 | $D_{0,target}$​ | Denotes the target value for the first KPI based on stake. | 3 billion LOGOS | $30\%$ of the token supply. |
 | $D_{1,target}$​ | Denotes the target value for the second KPI based on fees. | $10$ billon LOGOS | In the context of this KPI, this value behaves as a normalizer |
@@ -189,7 +189,7 @@ $$
 A_t \cdot I_{max} \cdot S_{tge} \cdot \Delta_t.
 $$
 
-The actual amount of tokens minted per block (because of inflation) also depends on how many blocks are expected to be proposed between $\Delta_{t-1}$ and $\Delta_{t}$. This is expressed by the factor $f$, as defined [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#52d261aa09df828e9ced81f25b064b9c).
+The actual amount of tokens minted per block (because of inflation) also depends on how many blocks are expected to be proposed between $\Delta_{t-1}$ and $\Delta_{t}$. This is expressed by the factor $f$, as defined [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#52d261aa09df828e9ced81f25b064b9c).
 
 The equation that implements the behavior above in terms of $A_t$ is given by:
 
@@ -355,7 +355,7 @@ The inferred total stake affects the emission rate through the "normalized devia
 
 ![](https://nomos-tech.notion.site/image/attachment%3Abb31da74-9e18-4881-ab10-b249daceaf03%3AScreenshot_2025-06-15_at_19.44.01.png?table=block&id=cc1261aa-09df-82f0-ace9-81b7dd81a13a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-This happens because, when the blockchain starts, $D_{0,t} \vert_{t=0}$ is very likely a small number compared to the target. Therefore, the equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) tilts towards $1$ (or $100\%$) at that moment. As time passes and more stake participates in the PoS, the difference between the current total stake and the target diminishes. The equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) oscillates around 0 (or $0\%$) when $D_{0,t}$ oscillates around $D_{0,target}$.
+This happens because, when the blockchain starts, $D_{0,t} \vert_{t=0}$ is very likely a small number compared to the target. Therefore, the equation [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) tilts towards $1$ (or $100\%$) at that moment. As time passes and more stake participates in the PoS, the difference between the current total stake and the target diminishes. The equation [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) oscillates around 0 (or $0\%$) when $D_{0,t}$ oscillates around $D_{0,target}$.
 
 Let the Logos Blockchain’s security level be defined by:
 
@@ -372,7 +372,7 @@ Let
 - $D_{1,t}$ denote the amount of Storage fees and Execution base fees burned since $t-1$.
 - $D_{1,target}=S_{tge}$ denote the "normalizing factor" (it is the TGE supply, in this case).
 
-This choice of "target" implies that $\gamma_t$ evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#a0b261aa09df8315811301dd66c6660c) consistent.
+This choice of "target" implies that $\gamma_t$ evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#a0b261aa09df8315811301dd66c6660c) consistent.
 
 # Float Precision for Implementation
 

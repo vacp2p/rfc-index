@@ -34,7 +34,7 @@ Once bootstrapping completes, the node commits to the best chain it has seen so 
 
 # Overview
 
-During bootstrapping, we use the [Ouroboros Genesis](/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df81e4a352dd365c9ebe8c) fork choice rule, after bootstrapping, we switch to the [Ouroboros Praos](/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) fork choice rule.
+During bootstrapping, we use the [Ouroboros Genesis](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df81e4a352dd365c9ebe8c) fork choice rule, after bootstrapping, we switch to the [Ouroboros Praos](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) fork choice rule.
 
 To understand why we use the Genesis rule during bootstrapping, it’s useful to consider the long range attack.
 

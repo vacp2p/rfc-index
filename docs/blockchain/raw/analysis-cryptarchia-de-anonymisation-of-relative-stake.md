@@ -24,7 +24,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2025-08-26 |
 
-Details of derivations are in the documents [Statistical inference of relative stake](/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05) and [Analysis of leader election process in PoS](/1fd261aa09df8181a428f52251e173c4?pvs=25#256261aa09df80cfadacdb638f634815).
+Details of derivations are in the documents [Statistical inference of relative stake](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05) and [Analysis of leader election process in PoS](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25#256261aa09df80cfadacdb638f634815).
 
 # Stake Distribution Strategies Based on Adversarial Inference Which Uses a Naive Estimator
 
@@ -99,7 +99,7 @@ print("Final Prob:", delta)
 - The naive estimator of relative stake $\hat{\alpha}_i=\frac{\log\left(1-\hat{P}_i(1)\right)}{\log(1-f)}$ is obtained from the maximum likelihood (ML) estimator by setting $\lambda=0$.
 - The probability that $\alpha_i-\epsilon\leq\hat{\alpha}_i\leq\alpha_i+\epsilon$, where $\alpha_i$ is true relative stake and $\epsilon$ is “accuracy”, is given by   $P\left(\phi_f(\alpha_i-\epsilon)\,m\leq n \leq \phi_f(\alpha_i+\epsilon)\,m\vert m>0\right)=\sum_{m=1}^T\sum_{n=0}^m\frac{P\left(m\vert T \right)P\left(n\vert m \right)}{1-(1-q)^T} 1\left[\phi_f(\alpha_i-\epsilon)\,m\leq n \leq \phi_f(\alpha_i+\epsilon)\,m\right]$, where $P\left(m\vert T \right)$ is the binomial distribution of number of observations $m$, with the parameter $q$ such that $q\,T$ is the average number of observations, and $P\left(n\vert m \right)$ is the binomial distribution of the number of observed wins n, with the parameter $\phi_f(\alpha_i)$ such that $\phi_f(\alpha_i)\, m$ is the average number of observed wins.
 - The probability of $\alpha_i-\epsilon\leq\hat{\alpha}_i\leq\alpha_i+\epsilon$ can be interpreted as “confidence”. The probability that $\alpha_i-\epsilon\leq\hat{\alpha}_i$, given by $P\left(\phi_f(\alpha_i-\epsilon)\,m\leq n\vert m>0\right)$, is also of interest. However, for $\hat{P}_i(1)>f$, which can happen for short observation times  $T$,  the estimator $\hat{\alpha}_i>1$ (and hence the probability of $\alpha_i-\epsilon\leq\hat{\alpha}_i$) can be considered only for long observation times $T$ where the probability of the event $\hat{\alpha}_i>1$ is small.
-- The bounds and (large time T) asymptotic estimates on the probability   $P\left(\phi_f(\alpha_i-\epsilon)\,m\leq n \leq \phi_f(\alpha_i+\epsilon)\,m\vert m>0\right)$, as well as on the probability $P\left(\phi_f(\alpha_i-\epsilon)\,m\leq n\vert m>0\right)$, can be obtained by adopting the results in [Analysis of leader election process in proof of stake consensus model](/1fd261aa09df8181a428f52251e173c4?pvs=25#256261aa09df80cfadacdb638f634815).
+- The bounds and (large time T) asymptotic estimates on the probability   $P\left(\phi_f(\alpha_i-\epsilon)\,m\leq n \leq \phi_f(\alpha_i+\epsilon)\,m\vert m>0\right)$, as well as on the probability $P\left(\phi_f(\alpha_i-\epsilon)\,m\leq n\vert m>0\right)$, can be obtained by adopting the results in [Analysis of leader election process in proof of stake consensus model](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25#256261aa09df80cfadacdb638f634815).
 
 ## Numerical Results
 
@@ -119,7 +119,7 @@ Analysis was also done using Cardano’s real world stake values. Clearly, Carda
 
 The naive estimator above assumed the Lagrange multiplier, which ensures that inferred relative stake is normalized , $\lambda=0$. A more sophisticated estimator can be derived from the ML framework by inferring $\lambda$ for a given sample.
 
-The Lagrange multiplier $\lambda$ is inferred by minimizing the distance between the LHS and RHS of [equation](/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df8004b2a3d68af0ee215b) (18) :
+The Lagrange multiplier $\lambda$ is inferred by minimizing the distance between the LHS and RHS of [equation](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df8004b2a3d68af0ee215b) (18) :
 
 $$
 D(1-f ||  \prod_{i=1}^N\left[1-\hat{\phi}_i(\lambda)\right])

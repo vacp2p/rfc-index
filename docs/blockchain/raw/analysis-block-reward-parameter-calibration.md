@@ -43,7 +43,7 @@ The goal of this calibration is to make incentives predictable and robust: provi
 
 The normalized deviation from target, namely $\delta_t$, is measured in percentage units.
 
-The parameter $\alpha_d$, defined [here](/d96261aa09df838ca36601b4b27b49b4?pvs=25), can be described as the “unit of emission rate per unit of target deviation”. This parameter should be defined based on the expected variance of the KPI with respect to the target.
+The parameter $\alpha_d$, defined [here](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25), can be described as the “unit of emission rate per unit of target deviation”. This parameter should be defined based on the expected variance of the KPI with respect to the target.
 
 For the sake of an example, let's set $\alpha_d = 1$, $\alpha_a=0$, $I_{min}=0\%$, and $I_{max}=1\%$.
 
@@ -63,9 +63,9 @@ As a consequence, all else equal, the annualized token emission rate becomes con
 
 ![](https://nomos-tech.notion.site/image/attachment%3A79138903-054b-44e0-952d-5555eae398ad%3AScreenshot_2025-07-29_at_12.37.15.png?table=block&id=ba2261aa-09df-8226-a76d-815ed44a09c9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-The parameter $\alpha_d$ also controls the sensitivity of the normalized deviation from target ($\delta_t$) in the [emission rate factor function](/d96261aa09df838ca36601b4b27b49b4?pvs=25#3f1261aa09df82a38e5181140f0e091c) ($A_t$):
+The parameter $\alpha_d$ also controls the sensitivity of the normalized deviation from target ($\delta_t$) in the [emission rate factor function](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#3f1261aa09df82a38e5181140f0e091c) ($A_t$):
 
-- If $\alpha_d$ is too high, for example $\alpha_d>1$, a small value of $\delta_t$ turns $A_t$ to 1, so that the system stays in the maximum inflationary regime driven by $I_{max}$, see equation [(1)](/d96261aa09df838ca36601b4b27b49b4?pvs=25#820261aa09df83949c400177c46b2514).
+- If $\alpha_d$ is too high, for example $\alpha_d>1$, a small value of $\delta_t$ turns $A_t$ to 1, so that the system stays in the maximum inflationary regime driven by $I_{max}$, see equation [(1)](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#820261aa09df83949c400177c46b2514).
 - If $\alpha_d$ is too low, for example $\alpha_d = 0.01$, the system needs to be too much off-target to stay in the maximum inflationary regime driven by $I_{max}$.
 
 The parameter $\alpha_d$ therefore allows for a smooth transition from the maximum inflationary regime (driven by $I_{max}$) to the stable regime (driven by the averaged burned fees).
@@ -76,7 +76,7 @@ The value $\alpha_d=1/6$ is chosen so that when the total inferred stake is off 
 
 The weighted average metric, namely $\gamma_t$, is measured in percentage units.
 
-The parameter $\alpha_a$, defined [here](/d96261aa09df838ca36601b4b27b49b4?pvs=25), can be described as the "unit of emission rate per unit of averaged KPI." This parameter should be defined based on the expected magnitude of the KPI.
+The parameter $\alpha_a$, defined [here](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25), can be described as the "unit of emission rate per unit of averaged KPI." This parameter should be defined based on the expected magnitude of the KPI.
 
 For the sake of an example, let's set $\alpha_d = 0$, $\alpha_a=1$, $I_{min}=0\%$, and $I_{max}=1\%$.
 
@@ -117,7 +117,7 @@ On the other hand, data also shows that many blockchains have their $\text{Secur
 
 ## The Burning Rate Average Factor ($D_{1,target}$)
 
-As already described above, $D_{1,target}$ is taken to be equal to $S_{tge}$ so that $\gamma_t$ evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation [above](/d96261aa09df838ca36601b4b27b49b4?pvs=25#a0b261aa09df8315811301dd66c6660c) consistent.
+As already described above, $D_{1,target}$ is taken to be equal to $S_{tge}$ so that $\gamma_t$ evaluates the annualized average burning rate with respect to the TGE supply. This makes the equation [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#a0b261aa09df8315811301dd66c6660c) consistent.
 
 ## Maximum Emission Rate ($I_{max}$)
 
@@ -133,10 +133,10 @@ If Logos Blockchain features similar issuance behavior as gold, when operating u
 
 - $I_{max} < 1\%$ is too conservative. There is insufficient evidence to support such a recommendation.
 - $I_{max} = 1\% - 3\%$ per year is moderate. Although spikes in the burn rate may make the system too deflationary and unpredictable, these are not expected to be common.
-- $I_{max}=3\% - 5\%$ per year is moderate, but risks overpaying for security. Logos Blockchain would need an average $2\%$ burning rate to achieve a reasonable net inflation rate (similar to gold). However, given the target security level of $30\%$, this range would distribute $10\%$ to $16.6\%$ APY to nodes (see [Table 1](/d96261aa09df838ca36601b4b27b49b4?pvs=25) below), which would currently place Logos Blockchain in the top $10\%$ (see Real Reward Rate [here](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=desc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate)).
+- $I_{max}=3\% - 5\%$ per year is moderate, but risks overpaying for security. Logos Blockchain would need an average $2\%$ burning rate to achieve a reasonable net inflation rate (similar to gold). However, given the target security level of $30\%$, this range would distribute $10\%$ to $16.6\%$ APY to nodes (see [Table 1](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25) below), which would currently place Logos Blockchain in the top $10\%$ (see Real Reward Rate [here](https://www.stakingrewards.com/assets/proof-of-stake?sort=real_reward_rate&timeframe=7d&order=desc&byChange=false&columns=staking_ratio%2Creal_reward_rate%2Ctotal_roi_365d%2Cinflation_rate)).
 - $I_{max}> 5\%$ per year is aggressive. Values above $5\%$ should be justified by very high expected usage of the blockchain, which would cause high burning rates. Given the cyclical behavior of economic activity, this may trigger hyperinflation.
 
-Constraining $I_{max}$ to the range $[1\%, 3\%]$, the decision for $I_{max} = 1\%$ is taken so that the rewards APY stabilizes around $3.34\%$ (see [Table 1](/d96261aa09df838ca36601b4b27b49b4?pvs=25)) as the inferred total stake approaches the target security level.
+Constraining $I_{max}$ to the range $[1\%, 3\%]$, the decision for $I_{max} = 1\%$ is taken so that the rewards APY stabilizes around $3.34\%$ (see [Table 1](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25)) as the inferred total stake approaches the target security level.
 
 ## Minimum Emission Rate ($I_{min}$)
 

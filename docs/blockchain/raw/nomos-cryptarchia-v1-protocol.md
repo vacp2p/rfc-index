@@ -86,7 +86,7 @@ Our design starts from the solid foundation provided by [Ouroboros Crypsinous: P
 
 | Symbol | Name | Description | Value |
 | --- | --- | --- | --- |
-| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [Not found](/1fd261aa09df817fa25ef80b964183cc?pvs=24#1fd261aa09df817fa25ef80b964183cc) for analysis leading to the choice of value) | 1/30 |
+| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [Not found](https://nomos-tech.notion.site/1fd261aa09df817fa25ef80b964183cc?pvs=24#1fd261aa09df817fa25ef80b964183cc) for analysis leading to the choice of value) | 1/30 |
 | $k$​ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
 | none | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
@@ -108,7 +108,7 @@ Our design starts from the solid foundation provided by [Ouroboros Crypsinous: P
 
 The latest immutable block $B_\text{imm}$ is the most recent block considered permanently finalized. The blocks deeper than $B_\text{imm}$ in the local chain $c_{loc}$ are never to be reorganized.
 
-This is maintained locally by the [Chain Maintenance](https://nomos-tech.notion.site/Chain-Maintenance-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81de81bac3a3286dc212) procedure. When the [Online fork choice rule](/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) is in use, $B_\text{imm}$ corresponds to the $k$-deep block. However, it may be deeper than the $k$-deep block if the fork choice rule has been switched from Online to [Bootstrap](/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df81e4a352dd365c9ebe8c). Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added unless the Online fork choice rule is used.
+This is maintained locally by the [Chain Maintenance](https://nomos-tech.notion.site/Chain-Maintenance-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81de81bac3a3286dc212) procedure. When the [Online fork choice rule](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) is in use, $B_\text{imm}$ corresponds to the $k$-deep block. However, it may be deeper than the $k$-deep block if the fork choice rule has been switched from Online to [Bootstrap](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df81e4a352dd365c9ebe8c). Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added unless the Online fork choice rule is used.
 
 The details of fork choice rule transitions are defined in the bootstrap spec: [🔀[1.0.0] Cryptarchia Bootstrapping & Synchronization](https://nomos-tech.notion.site/1-0-0-Cryptarchia-Bootstrapping-Synchronization-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24)
 
@@ -320,7 +320,7 @@ $c_{loc}' \coloneqq \begin{cases}
 
 $\text{if } \text{fork\_choice\_rule} = \text{ONLINE}:$​
 
-> Explicitly commit to the $k$-deep block if the [Online Fork Choice Rule](/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) is being used.
+> Explicitly commit to the $k$-deep block if the [Online Fork Choice Rule](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) is being used.
 
 $(T', B_\text{imm}) \coloneqq \textbf{commit}(T', c_{loc}', k)$​
 

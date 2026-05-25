@@ -26,13 +26,13 @@
 
 # Introduction
 
-We consider latency of a broadcast on the network constructed from mix nodes which use [queues](/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) to store in-coming and out-going messages. A message is removed from the queue with probability $q$ which delays messages by a random amount of time governed by the Geometric distribution with parameter $q$. The other source of message delays are due to the latency in communication links which we assume to be “frozen”, i.e. not changing with time. We show that for a single path constructed from $k$ mix nodes the average message latency is proportional to $k/q$ and we estimate the probability of latency being greater than the average. Furthermore, we consider latency of a broadcast on the network with the topology of a random regular graph with connectivity $c$. Here we find that the latency of broadcast, divided by $\log(N)$, is approaching  $\frac{2(c-1)}{c(c-2)}\frac{1}{\log(1+q)}$ for a small probability of message removal $q$ as the number of nodes in the network $N$ is growing. However, for finite $N$ the distribution of latency can have long tails. We note that the latter result is established semi-analytically and only for trees we managed to develop a complete analytical framework which can be used to compute the latency of a broadcast. Finally, in this document we propose a simple model of communication latency in consensus.
+We consider latency of a broadcast on the network constructed from mix nodes which use [queues](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) to store in-coming and out-going messages. A message is removed from the queue with probability $q$ which delays messages by a random amount of time governed by the Geometric distribution with parameter $q$. The other source of message delays are due to the latency in communication links which we assume to be “frozen”, i.e. not changing with time. We show that for a single path constructed from $k$ mix nodes the average message latency is proportional to $k/q$ and we estimate the probability of latency being greater than the average. Furthermore, we consider latency of a broadcast on the network with the topology of a random regular graph with connectivity $c$. Here we find that the latency of broadcast, divided by $\log(N)$, is approaching  $\frac{2(c-1)}{c(c-2)}\frac{1}{\log(1+q)}$ for a small probability of message removal $q$ as the number of nodes in the network $N$ is growing. However, for finite $N$ the distribution of latency can have long tails. We note that the latter result is established semi-analytically and only for trees we managed to develop a complete analytical framework which can be used to compute the latency of a broadcast. Finally, in this document we propose a simple model of communication latency in consensus.
 
 # Analysis
 
 ## Single Node
 
-- Assuming that a message is removed from the queue of a node with probability $q$ (see the [document](/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25)), a message in node $i$ is delayed by (at most) $r_i\Delta_i$, where $r_i$ is a random variable from the Geometric distribution with parameter $q$ and $\Delta_i$ is a “cost” of one attempt of removing a message.
+- Assuming that a message is removed from the queue of a node with probability $q$ (see the [document](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25)), a message in node $i$ is delayed by (at most) $r_i\Delta_i$, where $r_i$ is a random variable from the Geometric distribution with parameter $q$ and $\Delta_i$ is a “cost” of one attempt of removing a message.
 - Assuming that node $i$ has $c$ connections and it puts a message into all out-queues associated with these connections, i.e. the node $i$ is sending a message. The message will be delayed by (at most) $r_i(1)\Delta_i$ in the queue $1$, by $r_i(2)\Delta_i$ in the queue $2$, etc., where $r_i(1),\ldots,r_i(c)$ is sample from the Geometric distr. with parameter $q$.
 - Assuming that node $i$ has $c$ connections and it puts a message into all out-queues but not the queue associated with the connection labelled by $c$, i.e. the node is relaying a message, the message will be delayed by (at most) $r_i(1)\Delta_i$ in the queue $1$, by $r_i(2)\Delta_i$in the queue $2$, etc., where $r_i(1),\ldots,r_i(c-1)$ is sample from the Geometric distr. with parameter $q$.
 
@@ -76,7 +76,7 @@ $$
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F10a16762-a53e-42b2-b207-35f6dd413b6c%2FScreenshot_2024-07-29_at_13.14.07.png?table=block&id=1fd261aa-09df-813d-8d29-db9b3b622edc&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-- We note that the [upper bound](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81578ed2e637fc724d10) can be represented as
+- We note that the [upper bound](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81578ed2e637fc724d10) can be represented as
 
 $$
 \mathrm{P}\left(\sum_{i=1}^kr_i\geq (1+\epsilon)k/q\right)\leq f^k(q,\epsilon)\mathrm{, where}\\ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~f(q,\epsilon)=\left(\frac{q \left(\epsilon -1\right)+1}{1-q}\right) \left(\frac{q \left(\epsilon -1\right)+1}{\left(1-q \right) \left(\epsilon  q +1\right)}\right)^{-\frac{ \left(1+\epsilon \right)}{q}} .
@@ -98,13 +98,13 @@ $$
 
 - We consider the random rooted tree generated as follows. First, we sample $c$ from the distr. $\mathrm{P}(c)$ and connect the root node to $c$ offspring nodes. Second, for each offspring node we sample $c$ from the distr. $\mathrm{Q}(c)$ and connect to $c-1$ nodes. The latter is repeated until the tree $\mathcal{T}(h)$ of height $h$ is generated.
 - We consider the random graph $G_N=(V_N,E_N)$, where $V_N=[N]$ is the set of nodes and $E_N$ is the set of edges, generated by connecting nodes with connectivities sampled from the probability distribution $\mathrm{P}(c)$, i.e. the [“configuration model”.](https://en.wikipedia.org/wiki/Configuration_model)
-- For $N\rightarrow\infty$ we have that $B_i(h)\simeq\mathcal{T}(h)$, where $B_i(h)$ is the subgraph of $G_N$ induced by nodes at a distance (length of shortest path between two nodes) at most $h$ from the node $i\in[N]$, with [high probability](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81eda385ced4c5493781).
+- For $N\rightarrow\infty$ we have that $B_i(h)\simeq\mathcal{T}(h)$, where $B_i(h)$ is the subgraph of $G_N$ induced by nodes at a distance (length of shortest path between two nodes) at most $h$ from the node $i\in[N]$, with [high probability](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81eda385ced4c5493781).
 - A special case $G_N$ is a random regular graph (RRG) of connectivity $c$, i.e. each node in $G_N$ is connected to exactly $c$ nodes.
 
 ### Distance on a graph and latency of a broadcast
 
 - Let us assume, without loss of generality, that node $1$ in this network wants to send a message to the all $N-1$ nodes of network.
-- A node puts a message in to all of its out-queues. Assuming that coin-flipping algorithm is used to remove a message from the queue, we have that a message is delayed by (at most) $r\Delta_1$ (see previous [section](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df812a963bfdb9a383cf43)), where $r$ random variable from the [Geometric distribution](/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) with parameter $q$. A message is delayed further in a communication link and hence, for example, a message sent from the node $1$ to the node $2$ is delayed (at most) by $r_{12}\Delta_1+d_{12}$. We note that copies of the same message, sent to other neighbours of node $1$, are delayed in a similar manner.
+- A node puts a message in to all of its out-queues. Assuming that coin-flipping algorithm is used to remove a message from the queue, we have that a message is delayed by (at most) $r\Delta_1$ (see previous [section](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df812a963bfdb9a383cf43)), where $r$ random variable from the [Geometric distribution](https://nomos-tech.notion.site/1fd261aa09df81dcb90bdad3e6d88b21?pvs=25) with parameter $q$. A message is delayed further in a communication link and hence, for example, a message sent from the node $1$ to the node $2$ is delayed (at most) by $r_{12}\Delta_1+d_{12}$. We note that copies of the same message, sent to other neighbours of node $1$, are delayed in a similar manner.
 - For node $i$ sending a message to its neighbour $j$ the delay is $r_{ij}\Delta_i+d_{ij}$.
 - The total delay of a message sent from the node $1$ to the node $i\in[N]\setminus1$ is the sum of delays
 
@@ -175,27 +175,27 @@ $$
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6cbe78f5-4be8-4a0c-8b7f-fed2279d059f%2FScreenshot_2024-09-09_at_10.28.54.png?table=block&id=1fd261aa-09df-8153-8ba1-c2c82131d99c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - For $q\rightarrow0$ distribution of the random variable $q\,r_{ij}$, where $r_{ij}$ is sampled from the geometric distribution with parameter $q$, is exponential distribution with parameter $1$. The latter follows from the properties of the [Geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution).
-- Furthermore, the [latency of broadcast](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df814ab1e5dfa271da02ef), $\mathcal{L}_1[G_N]$, for delays sampled from the exponential distribution with parameter $1$ and $N\rightarrow\infty$ is
+- Furthermore, the [latency of broadcast](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df814ab1e5dfa271da02ef), $\mathcal{L}_1[G_N]$, for delays sampled from the exponential distribution with parameter $1$ and $N\rightarrow\infty$ is
 
 $$
 \frac{\mathcal{L}_1[G_N]}{\log(N)}\xrightarrow{\text{Prob.}}
 \frac{1}{c-2}+\frac{1}{c},
 $$
 
-i.e. the latency of broadcast is $\frac{2(c-1)}{c(c-2)}\log(N)$ [with ](https://projecteuclid.org/journals/annals-of-applied-probability/volume-25/issue-3/The-diameter-of-weighted-random-graphs/10.1214/14-AAP1034.full)[high probability](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81f3a1f2df61373d6e04) when $N$ is large.
+i.e. the latency of broadcast is $\frac{2(c-1)}{c(c-2)}\log(N)$ [with ](https://projecteuclid.org/journals/annals-of-applied-probability/volume-25/issue-3/The-diameter-of-weighted-random-graphs/10.1214/14-AAP1034.full)[high probability](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81f3a1f2df61373d6e04) when $N$ is large.
 
-- The above two points suggest that for small $q$, the latency of broadcast is approximately $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ when $r_{ij}$ are sampled from the geometric distribution with parameter $q$, i.e. the latency of broadcast is diverging as $q\rightarrow0$. The latter is consistent with latency measured in [simulations](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df811bade7e462828efc7c).
+- The above two points suggest that for small $q$, the latency of broadcast is approximately $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ when $r_{ij}$ are sampled from the geometric distribution with parameter $q$, i.e. the latency of broadcast is diverging as $q\rightarrow0$. The latter is consistent with latency measured in [simulations](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df811bade7e462828efc7c).
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F780b2449-ba5e-48b8-a214-e0b25283642e%2FScreenshot_2024-09-09_at_14.23.13.png?table=block&id=1fd261aa-09df-817e-912f-c5380a0691c2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - For larger values of q, the average latency of broadcast computed numerically deviates from the asymptotic $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ as can be seen in the figure above.
 - We note that the (asymptotic) latency of broadcast $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ is a special case of $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{f(q)}$ for some (unknown) function $f(q)$.
-- Assuming that the latency of broadcast $\mathcal{L}_1[G_N]=\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{f(q)}$, with high prob. as $N\rightarrow\infty$, and inverting this expression gives us $f(q)= \frac{2(c-1)}{c(c-2)}\frac{\log(N)}{ \mathcal{L}_1[G_N]}$. Using the [data](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df817e912fc5380a0691c2) to plot the latter suggests the form $f(q)=\alpha\log(1+q)$ for some parameter $\alpha>0$ as can be seen in the figure below.
+- Assuming that the latency of broadcast $\mathcal{L}_1[G_N]=\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{f(q)}$, with high prob. as $N\rightarrow\infty$, and inverting this expression gives us $f(q)= \frac{2(c-1)}{c(c-2)}\frac{\log(N)}{ \mathcal{L}_1[G_N]}$. Using the [data](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df817e912fc5380a0691c2) to plot the latter suggests the form $f(q)=\alpha\log(1+q)$ for some parameter $\alpha>0$ as can be seen in the figure below.
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F93c1ccd5-8abb-4418-986b-f4de93e8b67e%2FScreenshot_2024-09-10_at_17.02.02.png?table=block&id=1fd261aa-09df-8103-9995-f3f4e442c2f5&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - We note that for $f(q)=\alpha\log(1+q)$ we have $f(q)= \alpha\,(q-q^2/2+O(q^3))$ as $q\rightarrow0$.
-- Furthermore, fitting $\mathcal{L}_1[G_N]=\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{\alpha\log(1+q)}$ to the mean of [data](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df817e912fc5380a0691c2) gives us
+- Furthermore, fitting $\mathcal{L}_1[G_N]=\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{\alpha\log(1+q)}$ to the mean of [data](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df817e912fc5380a0691c2) gives us
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F3dfe8b3f-d35f-4607-beb0-131e552c3161%2FScreenshot_2024-09-10_at_21.38.51.png?table=block&id=1fd261aa-09df-81af-92dc-e769c066daf2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
@@ -207,14 +207,14 @@ i.e. the latency of broadcast is $\frac{2(c-1)}{c(c-2)}\log(N)$ [with ](https://
 
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0f621a59-7dcc-4cb2-8260-c13f13ce57ec%2FScreenshot_2024-09-23_at_13.28.26.png?table=block&id=1fd261aa-09df-81ea-b0f9-fac097fa63c8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-- We note that random regular graph is [locally tree-like](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81eda385ced4c5493781), i.e. when $N$ is large any node is a root of a tree of some height $h$ with high probability.
+- We note that random regular graph is [locally tree-like](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81eda385ced4c5493781), i.e. when $N$ is large any node is a root of a tree of some height $h$ with high probability.
 - For the node connectivity $c>2$ the number of nodes in the tree of height $h$, rooted at node $1$, is given by
 
 $$
 1+c+c(c-1)+c(c-1)^2+\cdots+c(c-1)^{h-1}=1+c\frac{(c-1)^{h}-1}{c-2}.
 $$
 
-- In above we assumed that root node has $c$ children and every internal node has $c-1$ children (see [figure](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81e1932ac0c873f2b808)).
+- In above we assumed that root node has $c$ children and every internal node has $c-1$ children (see [figure](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81e1932ac0c873f2b808)).
 - For $N$ nodes, the minimum $h$ such that $N\leq1+c\frac{(c-1)^{h}-1}{c-2}$ is given by
 
 $$
@@ -244,7 +244,7 @@ $$
 \max\{J_1+J_2,J_1+J_3\}=J_1+\max\{J_2,J_3\},\\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\text{where } J_i>0.
 $$
 
-- To show this we consider the latency of broadcast on a tree of $N$ nodes $\mathcal{T}_N$ rooted at node $1$ (see [figure](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81e1932ac0c873f2b808)) as follows.
+- To show this we consider the latency of broadcast on a tree of $N$ nodes $\mathcal{T}_N$ rooted at node $1$ (see [figure](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81e1932ac0c873f2b808)) as follows.
 - First, we define the latency of communication a message, sent from node $1$ to all nodes in$\mathcal{T}_N$, when it is relayed from the node $i$ to $j$ as $J_{ij}(1)=r_{ij}(1) \Delta_i+d_{ij}$ then the latency of broadcast
 
 $$
@@ -269,8 +269,8 @@ $$
 \max_{k\in \partial\mathcal{T}_N}D_{j\rightarrow k}[\mathcal{T}_N]=\max_{k\in\partial j\setminus i}\{J_{jk}(1)\}
 $$
 
-- For node $j$ not adjacent to leaf nodes the $\max_{k\in \partial\mathcal{T}_N}D_{j\rightarrow k}[\mathcal{T}_N]$ can be computed via equation similar to the [equation](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ab9edbfb2cdd64da4c). The latter suggests that the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ can be computed recursively using above equations and numerical complexity of this computation is $O(N)$. This is better than $O(N\log N)$ when Dijkstra's algorithm is used to compute $\mathcal{L}_1[\mathcal{T}_N]$.
-- The distribution of the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ on a Cayley tree of height $T+2$ can computed by the [population dynamics algorithm ](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81d2b433f31ffb793a74)as follows.
+- For node $j$ not adjacent to leaf nodes the $\max_{k\in \partial\mathcal{T}_N}D_{j\rightarrow k}[\mathcal{T}_N]$ can be computed via equation similar to the [equation](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ab9edbfb2cdd64da4c). The latter suggests that the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ can be computed recursively using above equations and numerical complexity of this computation is $O(N)$. This is better than $O(N\log N)$ when Dijkstra's algorithm is used to compute $\mathcal{L}_1[\mathcal{T}_N]$.
+- The distribution of the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ on a Cayley tree of height $T+2$ can computed by the [population dynamics algorithm ](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81d2b433f31ffb793a74)as follows.
 - First, for each $\ell\in[M]$ compute boundary conditions as follows
 
 $$
@@ -313,8 +313,8 @@ $$
 \mathrm{P}_{T+2}(H)=\sum_{h_1}\cdots\sum_{h_{c}}\prod_{\ell=1}^{c}\mathrm{P}_{T}(h_\ell)\\~~~~~~~~~~~~~~~~~~~\times\sum_{r_1}\cdots\sum_{r_{c}}\prod_{\ell=1}^{c}\mathrm{P}_{q}(r_\ell)\\~~~~~~~~~~~~~~~~~~~~~~~~~\times\delta_{H;\,\max\left\{r_1+h_1,\ldots,r_{c}+h_{c}\right\}}
 $$
 
-- Using that the prob. distribution $\mathrm{P}_q(r)$ is geometric with parameter $q$, one could try to solve above equations analytically. Also one could consider a single loop and see how this will change the [equation](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ab9edbfb2cdd64da4c).
-- For $q=1$ we have $r_{ji}=1$ with prob. $1$ and hence the latency of broadcast is dominated by the diameter $d$ of a random regular graph, i.e. the largest distance between any two nodes. The bounds (using the [Theorems 1 and 3](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81fd84cbeaffe272a77b)) for the latter for (very small) $\epsilon>0$ are given by
+- Using that the prob. distribution $\mathrm{P}_q(r)$ is geometric with parameter $q$, one could try to solve above equations analytically. Also one could consider a single loop and see how this will change the [equation](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ab9edbfb2cdd64da4c).
+- For $q=1$ we have $r_{ji}=1$ with prob. $1$ and hence the latency of broadcast is dominated by the diameter $d$ of a random regular graph, i.e. the largest distance between any two nodes. The bounds (using the [Theorems 1 and 3](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81fd84cbeaffe272a77b)) for the latter for (very small) $\epsilon>0$ are given by
 
 $$
 \lfloor\log_{c-1}(N)\rfloor+\left\lfloor\log_{c-1}\left(\log(N)\frac{c-2}{6c}\right)\right\rfloor+1\leq d \\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\leq \left\lceil\log_{c-1}(N)+\log_{c-1}((2+\epsilon)\,c\log(N))\right\rceil+1.
@@ -326,7 +326,7 @@ $$
 - We assume that given a network of $N$ nodes, a gossiping-like mode of communication is used.
 - Let us assume that the network topology used is a random regular graph $G_N=(V_N,E_N)$, where $V_N=[N]$ is the set of nodes and $E_N$ is the set of edges, with connectivity $c$. The latter is sampled only once and remains fixed for the duration of a consensus protocol.
 - Furthermore, to each edge $\{i,j\}\in E_N$ we assign a random variable $d_{ij}$, sampled from some probability distribution, to model delays in communication links. This gives rise to the weighted graph $G_N[\{d_{ij}\}]$. The probability distribution could be [exponential](https://en.wikipedia.org/wiki/Exponential_distribution), with parameter $\lambda$ such that $1/\lambda$ is the average and $1/\lambda^2$ is the variance, or $d_{ij}=d$ for all $\{i,j\}\in E_N$ (cf. the “300ms” constant delay used in current estimates of latency).
-- To model the mixing delay we assume, without loss of generality, that node $1$ sends (via $k$ mix nodes) a message to node $k+2$, and adopt the [single-path model](/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ccb10cc982e68b58d6) as follows
+- To model the mixing delay we assume, without loss of generality, that node $1$ sends (via $k$ mix nodes) a message to node $k+2$, and adopt the [single-path model](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ccb10cc982e68b58d6) as follows
 
 $$
 \Delta\sum_{\ell=1}^{k+1}r_\ell+ \sum_{\ell=1}^{k+1}D_{\ell\rightarrow \ell+1}%[G_N[\{d^\ell_{ij}\}]]

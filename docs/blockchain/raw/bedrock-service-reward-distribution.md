@@ -24,11 +24,11 @@
 | --- | --- | --- |
 | 1.0.0 | Initial version. | 2025-11-03 |
 | 1.1.0 | Removed references to DA Replaced references to Nomos with Logos Blockchain | 2026-04-17 |
-| 1.2.1 | [Not found](/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db). | 2026-04-24 |
+| 1.2.1 | [Not found](https://nomos-tech.notion.site/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db). | 2026-04-24 |
 
 # Introduction
 
-Nomos relies on multiple services, including the Data Availability and Blend Network - each operated by independent validator sets. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [🔀[1.0.0] Service Declaration Protocol](/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24). The Service Reward Distribution Protocol enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
+Nomos relies on multiple services, including the Data Availability and Blend Network - each operated by independent validator sets. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [🔀[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24). The Service Reward Distribution Protocol enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
 
 Each service defines:
 
@@ -42,7 +42,7 @@ This document describes the protocol's logic for deterministically distributing 
 
 The protocol unfolds over three key phases, aligned with validator sessions:
 
-1. Service Activity Tracking (Session N+1): Service validators submit signed activity messages to attest to their participation of session N through a Mantle Transaction, including an activity message (see [⚠️[1.4.0] Mantle - SDP_ACTIVE](/SDP_ACTIVE-335261aa09df8065a38acff4b25aee82?pvs=24#335261aa09df81f5a839f173760b39f9)).
+1. Service Activity Tracking (Session N+1): Service validators submit signed activity messages to attest to their participation of session N through a Mantle Transaction, including an activity message (see [⚠️[1.4.0] Mantle - SDP_ACTIVE](https://nomos-tech.notion.site/SDP_ACTIVE-335261aa09df8065a38acff4b25aee82?pvs=24#335261aa09df81f5a839f173760b39f9)).
 1. Service Reward Derivation (End of Session N+1): Nodes compute each validator’s reward based on validated activity messages and the different service reward policies.
 1. Service Reward Distribution (First block of session N+2): Rewards are distributed to validators marked as active for the service. This is done by inserting new notes in the ledger corresponding to the reward amount for each active validator.
 
@@ -50,7 +50,7 @@ The protocol unfolds over three key phases, aligned with validator sessions:
 
 Core Properties:
 
-- Service rewards are distributed to the zk_id from validator [SDP declarations](/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25)[.](https://www.notion.so/Service-Declaration-Protocol-Specification-17b8f96fb65c80c69c2ef55e22e29506?d=1b48f96fb65c8011987d001ce8523452#1b38f96fb65c802580d9c334281117a3)
+- Service rewards are distributed to the zk_id from validator [SDP declarations](https://nomos-tech.notion.site/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25)[.](https://www.notion.so/Service-Declaration-Protocol-Specification-17b8f96fb65c80c69c2ef55e22e29506?d=1b48f96fb65c8011987d001ce8523452#1b38f96fb65c802580d9c334281117a3)
 - Minimal Block Overhead: rewards are directly added to the ledger without involving Mantle Transactions.
 
 # Protocol
@@ -64,7 +64,7 @@ Each service defines its own session length (e.g., 10000 blocks), during which:
 
 ## Activity tracking
 
-Throughout session N+1, the block proposers integrate Mantle Transactions containing [SDP_ACTIVE Operations](/335261aa09df8065a38acff4b25aee82?pvs=25#335261aa09df81f5a839f173760b39f9). These transactions originate from service validators and are used to [derive their activity according to the service provided policy](/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df812593c3e167ec7a6efc). The protocol does not prescribe a unique activity rule: each service defines what qualifies as valid participation, enabling flexibility across different services.
+Throughout session N+1, the block proposers integrate Mantle Transactions containing [SDP_ACTIVE Operations](https://nomos-tech.notion.site/335261aa09df8065a38acff4b25aee82?pvs=25#335261aa09df81f5a839f173760b39f9). These transactions originate from service validators and are used to [derive their activity according to the service provided policy](https://nomos-tech.notion.site/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df812593c3e167ec7a6efc). The protocol does not prescribe a unique activity rule: each service defines what qualifies as valid participation, enabling flexibility across different services.
 
 Service validators are economically incentivized to participate actively since only active validators will be rewarded. Moreover, by decoupling activity submission from reward calculation, the system remains robust to network latency.
 
@@ -76,17 +76,17 @@ At the end of session N+1, service rewards for the validator n for the session N
 
 > **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
 
-Where $Rewards\_Session$ are the total rewards of session N. The $Rewards\_Session$ is determined by the [No access](/269261aa09df80d88d2bfcfa253298ac?pvs=24#269261aa09df80d88d2bfcfa253298ac), which calculates how much each service receives based on fees burnt during session N and the blockchain's state. $Rewards^n$ is stored as an array that maps each validator's zk_id to their allocated reward.
+Where $Rewards\_Session$ are the total rewards of session N. The $Rewards\_Session$ is determined by the [No access](https://nomos-tech.notion.site/269261aa09df80d88d2bfcfa253298ac?pvs=24#269261aa09df80d88d2bfcfa253298ac), which calculates how much each service receives based on fees burnt during session N and the blockchain's state. $Rewards^n$ is stored as an array that maps each validator's zk_id to their allocated reward.
 
 ## Service Reward Distribution
 
-Starting immediately after session N+1, service rewards are distributed in the first block of session N+2. The rewards are inserted directly in the ledger without triggering any Mantle validation. The NoteId is computed using the result of hash([ServiceType](/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df81ee87a6fef65cadb4ea) || session_number) as the op_id. The output number corresponds to the position of the zk_id when sorted in ascending order.
+Starting immediately after session N+1, service rewards are distributed in the first block of session N+2. The rewards are inserted directly in the ledger without triggering any Mantle validation. The NoteId is computed using the result of hash([ServiceType](https://nomos-tech.notion.site/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df81ee87a6fef65cadb4ea) || session_number) as the op_id. The output number corresponds to the position of the zk_id when sorted in ascending order.
 
 The reward must:
 
-- Transfer the correct reward amount according to [Service Reward Calculation](/Service-Reward-Calculation-341261aa09df809cbdb6e4a0b0314c4f?pvs=24#341261aa09df805e9f9fcb80f7e7c3c7).2
-- Be sent to the public key zk_id of the validator registered during [declaration of the service](/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df8192949ae1be9950c7e3).
+- Transfer the correct reward amount according to [Service Reward Calculation](https://nomos-tech.notion.site/Service-Reward-Calculation-341261aa09df809cbdb6e4a0b0314c4f?pvs=24#341261aa09df805e9f9fcb80f7e7c3c7).2
+- Be sent to the public key zk_id of the validator registered during [declaration of the service](https://nomos-tech.notion.site/1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=25#1fd261aa09df8192949ae1be9950c7e3).
 - Be distributed into a single note if several rewards share the same zk_id.
 - Be executed identically by every node processing the first block of session N+2. This happens by inserting notes in the ledger in ascending order of zk_id.
-Nodes indirectly verify the correct inclusion of rewards because all consensus-validating nodes must maintain the same ledger view to derive the latest ledger root, which serves as input for verifying the [Proof of Leadership](/21c261aa09df819ba5b6d95d0fe3066d).
+Nodes indirectly verify the correct inclusion of rewards because all consensus-validating nodes must maintain the same ledger view to derive the latest ledger root, which serves as input for verifying the [Proof of Leadership](https://nomos-tech.notion.site/21c261aa09df819ba5b6d95d0fe3066d).
 
