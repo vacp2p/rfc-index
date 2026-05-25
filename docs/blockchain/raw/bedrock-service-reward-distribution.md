@@ -24,7 +24,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial version. | 2025-11-03 |
 | 1.1.0 | Removed references to DA Replaced references to Nomos with Logos Blockchain | 2026-04-17 |
-| 1.2.1 | [Not found](https://nomos-tech.notion.site/335261aa09df807b9fe3c9bb9bd2c6db?pvs=24#335261aa09df807b9fe3c9bb9bd2c6db). | 2026-04-24 |
+| 1.2.1 | [🔀[RFC] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
 
 # Introduction
 
@@ -46,7 +46,7 @@ The protocol unfolds over three key phases, aligned with validator sessions:
 1. Service Reward Derivation (End of Session N+1): Nodes compute each validator’s reward based on validated activity messages and the different service reward policies.
 1. Service Reward Distribution (First block of session N+2): Rewards are distributed to validators marked as active for the service. This is done by inserting new notes in the ledger corresponding to the reward amount for each active validator.
 
-![](https://nomos-tech.notion.site/image/attachment%3A79e20c0f-a8b2-43fd-b6c6-8a49c1fb3d40%3ASans-titre-2024-11-18-1443.excalidraw.png?table=block&id=341261aa-09df-804b-ae7f-cec3cb5d830c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![](https://nomos-tech.notion.site/image/attachment%3A79e20c0f-a8b2-43fd-b6c6-8a49c1fb3d40%3ASans-titre-2024-11-18-1443.excalidraw.png?table=block&id=341261aa-09df-804b-ae7f-cec3cb5d830c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Core Properties:
 
@@ -74,7 +74,9 @@ This generalized mechanism accommodates a wide range of services without requiri
 
 At the end of session N+1, service rewards for the validator n for the session N are computed by the different services taking as input the rewards of the session:
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+Rewards^n := serviceReward(n,Rewards\_Session)
+$$
 
 Where $Rewards\_Session$ are the total rewards of session N. The $Rewards\_Session$ is determined by the [No access](https://nomos-tech.notion.site/269261aa09df80d88d2bfcfa253298ac?pvs=24#269261aa09df80d88d2bfcfa253298ac), which calculates how much each service receives based on fees burnt during session N and the blockchain's state. $Rewards^n$ is stored as an array that maps each validator's zk_id to their allocated reward.
 

@@ -86,7 +86,7 @@ Our design starts from the solid foundation provided by [Ouroboros Crypsinous: P
 
 | Symbol | Name | Description | Value |
 | --- | --- | --- | --- |
-| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [Not found](https://nomos-tech.notion.site/1fd261aa09df817fa25ef80b964183cc?pvs=24#1fd261aa09df817fa25ef80b964183cc) for analysis leading to the choice of value) | 1/30 |
+| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [🔀[1.0.0][Analysis] Block Times & Blend Network](https://nomos-tech.notion.site/1-0-0-Analysis-Block-Times-Blend-Network-1fd261aa09df817fa25ef80b964183cc?pvs=24) for analysis leading to the choice of value) | 1/30 |
 | $k$​ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
 | none | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
@@ -168,7 +168,9 @@ Given block $B = (parent,sl, \rho_\text{LEAD},\dots)$ where
 
 Then, $\eta_B$ is derived as
 
-> **LaTeX equation** (source not captured by the Notion scrape). Please regenerate from the original Notion page.
+$$
+\eta_{B} = \text{zkHASH}(\text{EPOCH\_NONCE\_V1}||\eta_{\text{parent}}||\rho_\text{LEAD}||\text{Fr}(sl)))
+$$
 
 where $\text{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\text{zkHASH}(..)$ is Poseidon2 as specified in [🔀[1.0.2] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24) .
 
@@ -247,13 +249,35 @@ After bootstrapping we commit to the most honest looking chain we found and swit
 Block ID is defined by the hash of the block header [Block Header](https://nomos-tech.notion.site/Block-Header-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df8186bc6cec1fc01e4cf5), where hash is Blake2b as specified in [🔀[1.0.2] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24)
 
 ```
-> Loading Python code…​
+def block_id(header: Header) -> hash
+return hash(
+b"BLOCK_ID_V1",
+        header.bedrock_version,
+        header.parent_block,
+        header.slot.to_bytes(8, byteorder='little'),
+        header.block_root,
+# PoL fields
+        header.proof_of_leadership.leader_voucher,
+        header.proof_of_leadership.entropy_contribution,
+        header.proof_of_leadership.proof.serialize(),
+        header.proof_of_leadership.leader_key.compressed(),
+)
 ```
 
 ### Block Header
 
 ```
-> Loading Python code…​
+class Header: # 297 bytes
+	  bedrock_version: byte                    # 1 bytes
+	  parent_block: hash # 32 bytes
+  	slot: int # 8 bytes
+ block_root: hash # 32 bytes
+	  proof_of_leadership: ProofOfLeadership   # 224 bytes
+class ProofOfLeadership: # 224 bytes
+  	leader_voucher: zkhash                   # 32 bytes
+  	entropy_contribution: zkhash             # 32 bytes
+  	proof: Groth16Proof                      # 128 bytes
+  	leader_key: Ed25519PublicKey             # 32 bytes
 ```
 
 ### Block
