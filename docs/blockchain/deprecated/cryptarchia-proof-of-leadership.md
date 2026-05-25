@@ -122,14 +122,14 @@ We will propose a tree with a depth of $25$, extending the note's eligibility to
         The note must be on-chain by the start of epoch $ep-1$ to be eligible for PoL in epoch $ep$ because of the age requirement. Based on this, we suggest $sl_{start}$ to not be earlier than the start of the epoch following the one after the transaction is emitted. This prevents the inclusion of unusable slot secrets in the tree (because the note would not be aged enough), optimizing the PoL lifetime of the note.
     1. Finally, they derive their secret key $sk := \text{hash}(\text{NOMOS\_POL\_SK\_V1}||sl_{start} || R)$, binding the starting slot and the Merkle tree of slot secret to the note secret key. This is verified in [Circuit Constraints](https://nomos-tech.notion.site/Circuit-Constraints-21c261aa09df819ba5b6d95d0fe3066d?pvs=24#21c261aa09df817c9e99e194ef4983f9).
     These four steps are summarized in the following pseudo-code:
-    ```
+    ```text
     def pol_sk_gen(sl_start, seed):
-    	frontier_nodes = MMR()
+        frontier_nodes = MMR()
       path = MerkleProof()
     # Generate 2^25 slot secrets using a hash chain initialized with `seed`.
       r = zkhash(seed)
     for i in range(2**25):
-    	  frontier_nodes.append(r) # Append the slot secret to the MMR
+          frontier_nodes.append(r) # Append the slot secret to the MMR
         path.update(frontier_nodes) # Update Merkle path of this slot secret
         r = zkhash(r) # Derive the next slot secret
     # Derive the root of the MMR
@@ -154,47 +154,47 @@ We will propose a tree with a depth of $25$, extending the note's eligibility to
 
 In order to prove that the winning note exists in the ledger and existed at the start of the previous epoch, every node must compute two ledger commitments. These commitments $ledger_{AGED}$ and $ledger_{LATEST}$ are Merkle roots constructed over the Note IDs. The trees have a depth of $32$ and are populated with note IDs. The value $0$ represents an empty leaf. When the set is updated, during insertion, the first empty leaf is replaced with the new note ID, and during deletion, the leaf containing the deleted note ID is replaced with $0$. The following pseudo-code shows how the tree is managed:
 
-```
+```text
 def insert_new_note(note_set: list[NoteId], new_note: NoteId):
-		i = 0
+        i = 0
 while i < len(note_set) and note_set[i] != 0:
-				i += 1
+                i += 1
 if i < len(note_set):
-				note_set[i] = new_note
-		else:
-				note_set.append(new_note)
+                note_set[i] = new_note
+        else:
+                note_set.append(new_note)
 return note_set
 
 def delete_note(note_set: list[NodeId], note: NoteId):
-		i = 0
+        i = 0
 while i < len(note_set) and note_set[i] != note:
-				i += 1
+                i += 1
 if i == len(note_set):
 # note not in the set
 return note_set
 
-		note_set[i] = 0
+        note_set[i] = 0
 return note_set
 
 def empty_tree_root(depth: int):
-		root = 0
+        root = 0
 for i in range(depth):
-				h = hasher() # zk hash
-				h.update(root)
-				h.update(root)
-				root = h.digest()
+                h = hasher() # zk hash
+                h.update(root)
+                h.update(root)
+                root = h.digest()
 return root
 
 def get_ledger_root(note_set: list[NoteId]):
 assert(len(note_set) < 2**32)
-		ledger_root = get_merkle_root(note_set) # return the Merkle root of the set
+        ledger_root = get_merkle_root(note_set) # return the Merkle root of the set
 # padded with 0 to next power of 2
-		ledger_root_height = len(note_set).bit_length()
+        ledger_root_height = len(note_set).bit_length()
 for height in range(ledger_root_height, 32):
-				h= Hasher() # zk hash
-				h.update(ledger_root)
-				h.update(empty_tree_root(height))
-				ledger_root = h.digest()
+                h= Hasher() # zk hash
+                h.update(ledger_root)
+                h.update(empty_tree_root(height))
+                ledger_root = h.digest()
 return ledger_root
 ```
 
@@ -202,7 +202,7 @@ return ledger_root
 
 ## Zero-knowledge Proof Statement
 
-![](https://nomos-tech.notion.site/image/attachment%3A74cff9b9-f185-45fa-ab1b-9e56348515b0%3Apol_short.png?table=block&id=21c261aa-09df-81ac-91ec-eeb257b42989&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A74cff9b9-f185-45fa-ab1b-9e56348515b0%3Apol_short.png?table=block&id=21c261aa-09df-81ac-91ec-eeb257b42989&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Circuit Public Inputs
 
@@ -334,4 +334,4 @@ The material used for the benchmarks is the following:
 - OS        : Ubuntu 22.04.5 LTS
 - Kernel    : 6.8.0-59-generic
 
-![](https://nomos-tech.notion.site/image/attachment%3A2804f075-b59b-459e-a04f-c82f8d12b021%3Aoutput.png?table=block&id=240261aa-09df-80a0-ab15-ea46ea2d8bc8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A2804f075-b59b-459e-a04f-c82f8d12b021%3Aoutput.png?table=block&id=240261aa-09df-80a0-ab15-ea46ea2d8bc8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
