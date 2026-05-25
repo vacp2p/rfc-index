@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-25 |
+
 # Introduction
 
 In order to guide a design of the [Blend Network](/215261aa09df81ae8857d71066a80084?pvs=25), this document summarises parameters (and results of analysis) of the [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25), [communication on trees](/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) and [inference of relative stake](/1fd261aa09df8181a428f52251e173c4?pvs=25). In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.
@@ -35,6 +39,13 @@ The [leader election process](/1fd261aa09df8181a428f52251e173c4?pvs=25) is organ
 ![](https://nomos-tech.notion.site/image/attachment%3A29902138-cf0a-4ae7-9cc2-1ee0727f0b51%3AScreenshot_2025-05-02_at_14.23.31.png?table=block&id=1fd261aa-09df-8132-947c-f18dddfbee58&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=770&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The leader election process has the following parameters
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $N$ | Number of nodes | $10^2\ldots10^4$​ |
+| $T$​ | Number of time-slots per epoch | $\approx 432,000$​ |
+| $f$​ | Fraction of time-slots with at least one winner | $0.05$​ |
+| $\Delta t$​ | The duration of a single time-slot | $1$ s |
 
 ## Sampling of Linear Trees
 
@@ -71,6 +82,12 @@ where $\alpha=n/N$ with $n\geq2$.
 We note that $\mathrm{P}\left(c>1\vert 2,\frac{KL}{N}\right)=\left(\frac{KL}{N}\right)^2$ and $\mathrm{P}\left(c>1\vert n+1,\frac{KL}{N}\right)>\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ for $KL<N$, i.e. the probability $\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ is monotonic increasing function of $n$ for $KL<N$. Furthermore, the probability $\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ is monotonic increasing function of $\frac{KL}{N}$, i.e. increasing the number of nodes , $KL$, in the linear tree sampled by each sender node in $[n]$ increases probability that a node in $[N]$ has more than one random connection.
 
 The probability $\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ is computed using the following parameters
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $N$​ | Number of nodes | $10^2\ldots10^4$​ |
+| $n$​ | Number of sender nodes | $2\ldots N$​ |
+| $K\times L$​ | Number of nodes in a linear tree | $2\ldots N-1$​ |
 
 ## Communication on Linear Trees
 
@@ -113,6 +130,13 @@ $$
 $$
 
 The probabilities $\mathrm{P}_a$, $\mathrm{P}_b$ and $\mathrm{P}_{ab}$ are computed the following parameters
+
+| Parameter | Description | Value/Range |  |
+| --- | --- | --- | --- |
+| $q_F$​ | Fraction of faulty nodes | $[0,1)$​ |  |
+| $q_A$​ | Fraction of adversarial nodes | $[0,1)$​ |  |
+| $K$​ | Number of communication paths | $1\ldots N-1$​ |  |
+| $L$​ | Number of nodes in a communication path | $2\ldots N-1$​ |  |
 
 The code which computes above probabilities is given below
 
@@ -162,6 +186,14 @@ The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gam
 ![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F694d7ce0-ede2-44dc-ac13-5ad0bb78b47d%2Fadver_conf.png?table=block&id=1fd261aa-09df-813c-9e95-d6a39857faae&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=590&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$, i.e. adversarial “confidence,” is computed using the following parameters:
+
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $T$​ | Number of slots per epoch | $\approx 432,000$​ |
+| $f$​ | Fraction of non-empty slots | $0.05$​ |
+| $\alpha$​ | Relative stake of a node | $(0, 1)$​ |
+| $\gamma$​ | “Accuracy” parameter | $(0, 1)$​ |
+| $q$​ | Fraction of observed time-slots | $(0, 1]$​ |
 
 The code which computes adversarial “confidence” is given below
 
@@ -282,6 +314,17 @@ $$
 
 The minimum $t$ for which above inequality holds $t(\theta)$, which is the RHS of the above, is computed using the following parameters
 
+| Parameter | Description | Value/Range |
+| --- | --- | --- |
+| $\theta$​ | Prob. threshold | $(0, 1)$​ |
+| $f$​ | Fraction of non-empty slots | $0.05$​ |
+| $\alpha$​ | Relative stake of a node | $(0, 1)$​ |
+| $C$​ | Node neighbourhood size | $\geq 4$​ |
+| $n_A$​ | Number of adver. nodes threshold | $\geq 1$​ |
+| $q_A$​ | Fraction of adversarial nodes | $[0, 1)$​ |
+| $K$​ | Number of communication paths | $1\ldots N-1$​ |
+| $L$​ | Number of nodes per communication path | $2\ldots N-1$​ |
+
 The code which computes $t(\theta)$ is given below
 
 ```
@@ -311,7 +354,11 @@ return t
 
 Here we combine the results for leader election process, sampling of linear trees, broadcasting on linear trees and inference of relative stake to design a calculator which takes parameters of the latter and computes properties of a node related to the resilience and anonymity of communication. The calculator has the following modules:
 
+> **PDF attachment** (link not captured by the Notion scrape).
+
 The dependencies between modules can be represented as the following diagram
+
+> **PDF attachment** (link not captured by the Notion scrape).
 
 Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the [repository.](https://github.com/AMozeika/Calculator)
 
@@ -488,6 +535,13 @@ where $p=1-f$.
 ![](https://nomos-tech.notion.site/image/attachment%3Ae5ba9f8f-3deb-4248-9b13-005f4244ec26%3AScreenshot_2025-05-21_at_17.33.30.png?table=block&id=1fd261aa-09df-81c2-9b70-df6e52ab9176&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We note that the mode of $\mathrm{P}\left(x\right)$ is at $x=\frac{\log(T(1-p))}{\log(1/p)}$ and hence the typical value of the maximum of $n_0$ observed in $T=648000$ time-slots for $f=1/30$ is $\approx 295$. The prob. that the maximum of $n_0$ observed in $T=648000$ time-slots for $f=1/30$ is greater than $295$ can be computed with high accuracy from simulations and is $\approx 0.62$ as suggested by the simulation data tabulated below.
+
+| Num. of samples | Prob. $n_0>295$​ |
+| --- | --- |
+| $10^3$​ | $0.612$​ |
+| $10^4$​ | $0.617$​ |
+| $10^5$​ | $0.62379$​ |
+| $10^6$​ | $0.624018$​ |
 
 The histogram of the maximum of $n_0$ obtained in one such simulation is presented below
 

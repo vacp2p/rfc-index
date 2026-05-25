@@ -20,6 +20,10 @@
 
 # Revision History
 
+| Version | Changes | Date |
+| --- | --- | --- |
+| 1.0.0 | Initial revision. | 2025-08-20 |
+
 # Introduction
 
 We are interested in finalizing the Cryptarchia and Blend Network parameters. There are some competing requirements here: the Blend Network would like to have longer block times in order to provide better privacy, while Cryptarchia wants shorter block times in order to provide faster finality.
@@ -434,6 +438,14 @@ First we must satisfy the condition $\alpha (1-f)^{\Delta + 1} \ge \frac{1+\epsi
 - $\epsilon >0$ is the advantage of the honest network over the adversarial network
 
 We want to understand for a given parameter set, what is the required honest stake $\alpha$ to satisfy the safety condition:
+
+$$
+\begin{align}
+\alpha (1-f)^{\Delta + 1} &\ge \frac{1+\epsilon}{2} \\
+
+\alpha &\ge \frac{1 + \epsilon}{2(1-f)^{\Delta + 1}}
+\end{align}
+$$
 
 We can then look at the minimum $\alpha$ that satisfies this condition for Cardano and Nomos.
 
