@@ -47,23 +47,23 @@ Our methodology involved measuring execution complexity and defining how gas is 
 
 ## Permanent Storage Gas
 
-Permanent Storage is paid directly for the entire signed Mantle Transaction. The Permanent Storage Gas price is derived from [🔀[1.0.0] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24) and is used to determine the Permanent Storage fee. 1 Permanent Storage Gas corresponds to 1 byte.
+Permanent Storage is paid directly for the entire signed Mantle Transaction. The Permanent Storage Gas price is derived from [🔀\[1.0.0\] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24) and is used to determine the Permanent Storage fee. 1 Permanent Storage Gas corresponds to 1 byte.
 
-```
+```text
 ​
 ```
 
 ## Execution Gas
 
-Execution is a second general market that represents how costly an Operation is to execute. This cost can be fixed or variable based on the content of the Operation. The Execution Gas base price is derived from [🔀[1.0.0] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and each Operation defines its execution gas amount. 1 Execution Gas corresponds to 1,000 CPU cycles.
+Execution is a second general market that represents how costly an Operation is to execute. This cost can be fixed or variable based on the content of the Operation. The Execution Gas base price is derived from [🔀\[1.0.0\] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and each Operation defines its execution gas amount. 1 Execution Gas corresponds to 1,000 CPU cycles.
 
-```
+```text
 ​
 ```
 
 The gas derivation of each Operation are:
 
-```
+```text
 ​
 ```
 
@@ -255,7 +255,7 @@ We found the best linear curve approximating these measures (over 100 iterations
 
 We got the curve $y = 577955 x+2640786$ that we decided to approximate to $y = 580000x+2640000$:
 
-![](https://nomos-tech.notion.site/image/attachment%3Af20c18e4-c9a1-4ac3-91e3-298b450954d0%3Aoutput.png?table=block&id=33e261aa-09df-80cb-b9d1-e8801f284a34&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Af20c18e4-c9a1-4ac3-91e3-298b450954d0%3Aoutput.png?table=block&id=33e261aa-09df-80cb-b9d1-e8801f284a34&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### ZkSignature
 

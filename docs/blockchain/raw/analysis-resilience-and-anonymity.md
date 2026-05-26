@@ -36,7 +36,7 @@ Finally, in this document we also analysed strategies which can be used to reduc
 
 The [leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) is organised into epochs and each epoch is divided into $T$ time-slots.
 
-![](https://nomos-tech.notion.site/image/attachment%3A29902138-cf0a-4ae7-9cc2-1ee0727f0b51%3AScreenshot_2025-05-02_at_14.23.31.png?table=block&id=1fd261aa-09df-8132-947c-f18dddfbee58&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=770&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A29902138-cf0a-4ae7-9cc2-1ee0727f0b51%3AScreenshot_2025-05-02_at_14.23.31.png?table=block&id=1fd261aa-09df-8132-947c-f18dddfbee58&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=770&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The leader election process has the following parameters
 
@@ -49,7 +49,7 @@ The leader election process has the following parameters
 
 ## Sampling of Linear Trees
 
-![](https://nomos-tech.notion.site/image/attachment%3A649de50f-7073-4483-8701-fe98e240d40c%3AScreenshot_2025-02-07_at_12.49.14.png?table=block&id=1fd261aa-09df-81aa-9eaa-f915c3998915&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A649de50f-7073-4483-8701-fe98e240d40c%3AScreenshot_2025-02-07_at_12.49.14.png?table=block&id=1fd261aa-09df-81aa-9eaa-f915c3998915&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The number of nodes in linear tree design is $1+KL$, where $K$ is the number of paths and $L$ is the number of nodes in each path excluding the sender node. In the linear tree design, one node is the sender node and the other $KL$ nodes are mix nodes.
 
@@ -59,9 +59,9 @@ We assume that each sender node samples $K\times L$ nodes, independently from ot
 
 The result of the sampling process described above can be represented by the following random factor-graph:
 
-![](https://nomos-tech.notion.site/image/attachment%3Ad892cf87-779b-4c75-979f-ebe2dd150dfe%3AScreenshot_2025-02-07_at_16.18.50.png?table=block&id=1fd261aa-09df-8129-b5fb-e05cf6f66bd0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=980&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ad892cf87-779b-4c75-979f-ebe2dd150dfe%3AScreenshot_2025-02-07_at_16.18.50.png?table=block&id=1fd261aa-09df-8129-b5fb-e05cf6f66bd0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=980&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A4756879d-93b3-42bd-9462-726f709f3756%3AScreenshot_2025-02-07_at_16.32.55.png?table=block&id=1fd261aa-09df-81b6-8d35-fabff822c957&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A4756879d-93b3-42bd-9462-726f709f3756%3AScreenshot_2025-02-07_at_16.32.55.png?table=block&id=1fd261aa-09df-81b6-8d35-fabff822c957&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Connectivity of a node $i\in[N]$ is the number of random edges connecting this nodes to factors labelled by the set $[n]$. The connectivity of a node $i \in [N]$ is the number of linear trees that $i$ appears in. The connectivity is a [random number from the binomial distribution](https://nomos-tech.notion.site/206261aa09df80509e7dca0605db421b?pvs=25#255261aa09df80028403c5b5e08c1c1f)
 
@@ -93,7 +93,7 @@ The probability $\mathrm{P}\left(c>1\vert n,\frac{KL}{N}\right)$ is computed usi
 
 We consider the following communication system
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6be5b10e-8533-41e7-a7e3-b4170dcb876e%2FScreenshot_2025-01-02_at_12.37.14.png?table=block&id=1fd261aa-09df-81f8-a9d8-f3bf17954d0a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1200&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6be5b10e-8533-41e7-a7e3-b4170dcb876e%2FScreenshot_2025-01-02_at_12.37.14.png?table=block&id=1fd261aa-09df-81f8-a9d8-f3bf17954d0a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1200&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We assume that $M_F$ nodes in the population are “faulty” (faulty node is unable to relay a message) and the probability that a node is faulty is $q_F=M_F/N$.
 
@@ -140,7 +140,7 @@ The probabilities $\mathrm{P}_a$, $\mathrm{P}_b$ and $\mathrm{P}_{ab}$ are compu
 
 The code which computes above probabilities is given below
 
-```
+```text
 def Prob_b(K, L, qF):
 """
  Compute the probability of broadcast failure.
@@ -171,7 +171,7 @@ def Prob_a(K, L, qF, qA):
 
 The [adversary observes the leader election process](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) of a node with the relative stake $\alpha$.
 
-![](https://nomos-tech.notion.site/image/attachment%3A4688bad9-2877-4408-9416-bcdee0bc9ef8%3AScreenshot_2025-02-13_at_08.26.49.png?table=block&id=1fd261aa-09df-81f1-9deb-f03fe24a8efa&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A4688bad9-2877-4408-9416-bcdee0bc9ef8%3AScreenshot_2025-02-13_at_08.26.49.png?table=block&id=1fd261aa-09df-81f1-9deb-f03fe24a8efa&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 In $T$ time-slots, the adversary is able to observe fraction $v$ of wins in $m$ observations. The probability of observing the election outcome of a node is $q$. For $m\geq1$ adversary uses the “naive” estimator $\hat{\alpha}=\frac{\log\left(1-v\right)}{\log(1-f)}$ of the true relative stake $\alpha$. For large $T$, the probability that $\alpha(1-\gamma)\leq\hat{\alpha}\leq\alpha(1+\gamma)$ is [given by](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25#255261aa09df802d808dc47be2fdbe05)
 
@@ -183,7 +183,7 @@ In the above, $\phi(\alpha)=1-(1-f)^\alpha$ is the lottery function with paramet
 
 The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$ can be interpreted as adversarial “confidence” and the parameter $\gamma$ as “accuracy”. An example of the above probability is given below
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F694d7ce0-ede2-44dc-ac13-5ad0bb78b47d%2Fadver_conf.png?table=block&id=1fd261aa-09df-813c-9e95-d6a39857faae&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=590&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F694d7ce0-ede2-44dc-ac13-5ad0bb78b47d%2Fadver_conf.png?table=block&id=1fd261aa-09df-813c-9e95-d6a39857faae&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=590&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$, i.e. adversarial “confidence,” is computed using the following parameters:
 
@@ -197,23 +197,23 @@ The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gam
 
 The code which computes adversarial “confidence” is given below
 
-```
+```text
 def phi(alpha, f):
 return 1 - (1 - f) ** alpha
 
 def dphi(alpha, f):
 return -((1 - f) ** alpha) * log(1 - f)
 def Prob2(alpha, epsilon, T, q):
-	sqrt2 = sqrt(2.0)
+    sqrt2 = sqrt(2.0)
  phi_alpha = phi(alpha, f)
 # Denominator term
  denominator = (
- 								erf((phi_alpha - 1) * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
+                                 erf((phi_alpha - 1) * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
 - erf(phi_alpha * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
 )
 # Numerator term
  numerator = -2.0 * erf(
- 							sqrt2 * epsilon / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q)))
+                             sqrt2 * epsilon / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q)))
 )
 # Final result
 return numerator / denominator
@@ -227,22 +227,22 @@ Prob2_result = Prob2(alpha, epsilon, T, q)
 
 The [probability](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df8130bc9cc00ece070d4a) can also compute the (minimum) number of time-slots, $t$, such that $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,t\right)\geq\delta$, for some $\delta\in (0,1)$. Here $t$ is the time needed by an adversary to achieve “confidence” greater than $\delta$. The code which computes $t$ is given below
 
-```
+```text
 T0 = T # One epoch
 T1 = 730 * T # 10 years
 dT = 10**3 # Step size
 if Prob2_t < delta:
 # Increase T until Prob2_result >= delta
-	t = T0
+    t = T0
  while t <= T1 and Prob2_t < delta:
-	 Prob2_t = Prob2(alpha, epsilon, t, result3)
+     Prob2_t = Prob2(alpha, epsilon, t, result3)
  t += dT
  
 else:
 # Decrease T until Prob2_result <= delta
  t = T
  while t >= 100 and Prob2_t > delta:
-	 Prob2_t = Prob2(alpha, epsilon, t, result3)
+     Prob2_t = Prob2(alpha, epsilon, t, result3)
  t -= dT 
 ```
 
@@ -250,17 +250,17 @@ else:
 
 The probability $\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)$, where $q\,T$ is the (average) number of time-slots observed by adversary in one epoch, can be seen as a measure of the magnitude of “noise” which prevents accurate measurements of the relative stake $\alpha$. One source of this noise is the actual (stochastic) leader election process and the other is the sampling (or “observation”), controlled by parameter $q$, of the latter by an adversary. For $q=1$, i.e. all time-slots are observed, and leader election process is the only source of noise. In this regime, for a given accuracy ($\gamma= 0.1$), the relative stake can be inferred with high confidence as can be seen in the figure below
 
-![](https://nomos-tech.notion.site/image/attachment%3A17d8ecd8-2432-48e8-afff-2ca5ca36c6ae%3AScreenshot_2025-02-26_at_18.55.44.png?table=block&id=1fd261aa-09df-81c5-ad2c-e9d3fc3596b9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A17d8ecd8-2432-48e8-afff-2ca5ca36c6ae%3AScreenshot_2025-02-26_at_18.55.44.png?table=block&id=1fd261aa-09df-81c5-ad2c-e9d3fc3596b9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 For $q<1$, sampling becomes an additional source of noise interfering with measurements done by adversary. Here, for a given accuracy, the confidence deteriorates as $q\rightarrow0$ (see figures below).
 
-![](https://nomos-tech.notion.site/image/attachment%3Af9d351ea-88c6-4042-b160-4e0b3be1b2e1%3AScreenshot_2025-02-27_at_08.42.58.png?table=block&id=1fd261aa-09df-8190-8b30-f301042f7a25&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Af9d351ea-88c6-4042-b160-4e0b3be1b2e1%3AScreenshot_2025-02-27_at_08.42.58.png?table=block&id=1fd261aa-09df-8190-8b30-f301042f7a25&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3Ac3652184-0c73-41f7-a0b5-9c8acc432944%3AScreenshot_2025-02-26_at_19.02.18.png?table=block&id=1fd261aa-09df-81c3-8aff-c0f8a172694f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ac3652184-0c73-41f7-a0b5-9c8acc432944%3AScreenshot_2025-02-26_at_19.02.18.png?table=block&id=1fd261aa-09df-81c3-8aff-c0f8a172694f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A7f99d8cc-7ac6-46b0-b2c6-a0464190d22f%3AScreenshot_2025-02-26_at_19.09.23.png?table=block&id=1fd261aa-09df-81a6-8a72-edc73562fe5d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A7f99d8cc-7ac6-46b0-b2c6-a0464190d22f%3AScreenshot_2025-02-26_at_19.09.23.png?table=block&id=1fd261aa-09df-81a6-8a72-edc73562fe5d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3Abaf50abc-7e9e-464c-959d-971dee6f241b%3AScreenshot_2025-02-26_at_19.17.01.png?table=block&id=1fd261aa-09df-81b1-b947-ed8642714222&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Abaf50abc-7e9e-464c-959d-971dee6f241b%3AScreenshot_2025-02-26_at_19.17.01.png?table=block&id=1fd261aa-09df-81b1-b947-ed8642714222&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Let us define a function which compares properties of inference for $q=1$ and $q\in(0,1)$ as follows
 
@@ -270,7 +270,7 @@ $$
 
 We note that above is $0$ when $q=1$, i.e. no sampling noise, and is growing when $q\rightarrow0$ (see figure below). Hence, above can be seen as “amplitude” of the sampling noise.
 
-![](https://nomos-tech.notion.site/image/attachment%3A5d56e8a2-b792-4379-af82-bc879c5c707c%3AScreenshot_2025-03-28_at_17.27.21.png?table=block&id=1fd261aa-09df-815c-85c7-d0813b45f345&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A5d56e8a2-b792-4379-af82-bc879c5c707c%3AScreenshot_2025-03-28_at_17.27.21.png?table=block&id=1fd261aa-09df-815c-85c7-d0813b45f345&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## The Unlinkability of Block Proposers
 
@@ -288,7 +288,7 @@ $$
 \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)
 $$
 
-We note that in above we assumed that $q_F=0$, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since $\mathrm{P}(n\geq n_A\vert C,q_A)<1$ for $n_A\geq1$, the prob. of anonymity failure $\mathrm{P}_a(K,L,0,q_A)$ is an upper bound on the above prob. If node $\mathrm{S}$ has (relative) stake $\alpha$ then the prob. of node $\mathrm{S}$ winning is $\phi(\alpha)$, where $\phi(\alpha)$ is the[ lottery function](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25). Hence, the prob. that the message $\mathrm{m}$, sent by the winning node $\mathrm{S}$, can be linked to $\mathrm{S}$ is given by
+We note that in above we assumed that $q_F=0$, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since $\mathrm{P}(n\geq n_A\vert C,q_A)<1$ for $n_A\geq1$, the prob. of anonymity failure $\mathrm{P}_a(K,L,0,q_A)$ is an upper bound on the above prob. If node $\mathrm{S}$ has (relative) stake $\alpha$ then the prob. of node $\mathrm{S}$ winning is $\phi(\alpha)$, where $\phi(\alpha)$ is the[lottery function](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25). Hence, the prob. that the message $\mathrm{m}$, sent by the winning node $\mathrm{S}$, can be linked to $\mathrm{S}$ is given by
 
 $$
 \phi(\alpha)\, \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)
@@ -327,7 +327,7 @@ The minimum $t$ for which above inequality holds $t(\theta)$, which is the RHS o
 
 The code which computes $t(\theta)$ is given below
 
-```
+```text
 def phi(alpha, f):
 return 1 - (1 - f) ** alpha
 
@@ -362,7 +362,7 @@ The dependencies between modules can be represented as the following diagram
 
 Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the [repository.](https://github.com/AMozeika/Calculator)
 
-![](https://nomos-tech.notion.site/image/attachment%3Aa2d264a0-5a7a-4107-94d7-0db5e5f1e373%3AScreenshot_2025-03-25_at_21.00.02.png?table=block&id=1fd261aa-09df-817b-9867-ff1d5eda6d4d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aa2d264a0-5a7a-4107-94d7-0db5e5f1e373%3AScreenshot_2025-03-25_at_21.00.02.png?table=block&id=1fd261aa-09df-817b-9867-ff1d5eda6d4d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Strategies to Reduce Anonymity Failure
 
@@ -384,11 +384,11 @@ We note that in above $(1-q_F)^L$ is the prob. that path is functional and $q_A^
 
 Now let us assume that node sends the same message (or different messages) through different paths of length $L$ at times $t_1<t_2<\cdots<t_K$ (see figure below)
 
-![](https://nomos-tech.notion.site/image/attachment%3A8302fc7c-3058-4960-8722-e20c90e26982%3AScreenshot_2025-04-01_at_18.24.05.png?table=block&id=1fd261aa-09df-8199-b602-e80244ff5dc0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=900&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A8302fc7c-3058-4960-8722-e20c90e26982%3AScreenshot_2025-04-01_at_18.24.05.png?table=block&id=1fd261aa-09df-8199-b602-e80244ff5dc0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=900&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-After sending the first message at time $t_1$ the prob. of anonymity failure is $\mathrm{P}_a(1,L,q_F,q_A)=(1-q_F)^L\, q_A^L$, after sending the second message at time $t_2$ the prob. of anonymity failure is $\mathrm{P}_a(2,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]^2$, etc. Thus after sending the last message at time $t_K$ the prob. anonymity failure is $\mathrm{P}_a(K,L,q_F,q_A)$, i.e. the same as [sending a message through ](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)$K$ paths simultaneously. We note that for fixed $L$ the prob. $\mathrm{P}_a(K,L,q_F,q_A)$ is [monotonic increasing function](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ and hence $\mathrm{P}_a(n_{m},L,q_F,q_A)$ is monotonic increasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
+After sending the first message at time $t_1$ the prob. of anonymity failure is $\mathrm{P}_a(1,L,q_F,q_A)=(1-q_F)^L\, q_A^L$, after sending the second message at time $t_2$ the prob. of anonymity failure is $\mathrm{P}_a(2,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]^2$, etc. Thus after sending the last message at time $t_K$ the prob. anonymity failure is $\mathrm{P}_a(K,L,q_F,q_A)$, i.e. the same as [sending a message through](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81aa9eaaf915c3998915)$K$ paths simultaneously. We note that for fixed $L$ the prob. $\mathrm{P}_a(K,L,q_F,q_A)$ is [monotonic increasing function](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ and hence $\mathrm{P}_a(n_{m},L,q_F,q_A)$ is monotonic increasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ab2f25c07-4351-47d0-9b5f-0f2b3fd7bc80%3AScreenshot_2025-04-02_at_15.07.44.png?table=block&id=1fd261aa-09df-8126-8b44-d03a7c40471c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ab2f25c07-4351-47d0-9b5f-0f2b3fd7bc80%3AScreenshot_2025-04-02_at_15.07.44.png?table=block&id=1fd261aa-09df-8126-8b44-d03a7c40471c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1040&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Furthermore, the probability that no anonymity failure occurred after sending $n_m$ messages is given by
 
@@ -412,15 +412,15 @@ $$
 
 which is a [monotonic decreasing function](https://nomos-tech.notion.site/1fd261aa09df81bbb79ecb2bf3fcf209?pvs=25) of $K$ when $L$ is fixed. Hence $\mathrm{P}_b(n_{m},L,q_F)$ is monotonic decreasing function of the number of sent messages $n_{m}\in\{1,\ldots,K\}$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/attachment%3A257fe07a-6ae4-419a-870b-313751b1c4e2%3AScreenshot_2025-04-02_at_15.41.16.png?table=block&id=1fd261aa-09df-81c5-bb23-e9518270b1b0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A257fe07a-6ae4-419a-870b-313751b1c4e2%3AScreenshot_2025-04-02_at_15.41.16.png?table=block&id=1fd261aa-09df-81c5-bb23-e9518270b1b0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We note that the [probability of adversarial broadcast-failure](https://nomos-tech.notion.site/1fd261aa09df814a9967efc9aa479eba?pvs=25#1fd261aa09df81f7901bed38662b9882) behaves in a similar way as can be seen in the figure below
 
-![](https://nomos-tech.notion.site/image/attachment%3A298bbdcb-04e9-4e22-a6d1-f9116a23a543%3AScreenshot_2025-04-02_at_15.48.32.png?table=block&id=1fd261aa-09df-817d-9a8c-eb0486d2873d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A298bbdcb-04e9-4e22-a6d1-f9116a23a543%3AScreenshot_2025-04-02_at_15.48.32.png?table=block&id=1fd261aa-09df-817d-9a8c-eb0486d2873d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The number of nodes used for broadcasting of $n_m$ messages is $n_mL$, i.e. grows linearly with the number of messages $n_m$.
 
-![](https://nomos-tech.notion.site/image/attachment%3A6fde278c-9e77-49e4-aadc-2c692ce21ed0%3AScreenshot_2025-04-02_at_15.52.04.png?table=block&id=1fd261aa-09df-8103-80d1-d641677cc17e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A6fde278c-9e77-49e4-aadc-2c692ce21ed0%3AScreenshot_2025-04-02_at_15.52.04.png?table=block&id=1fd261aa-09df-8103-80d1-d641677cc17e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1010&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We note that
 
@@ -430,7 +430,7 @@ $$
 
 is the probability that the first occurrence of a successful broadcast requires sending $t$ messages. We note that above is generalisation of the [Geometric prob. distribution](https://en.wikipedia.org/wiki/Geometric_distribution).
 
-![](https://nomos-tech.notion.site/image/attachment%3Ad9518838-0a1c-4690-9ff8-47104da89aef%3AScreenshot_2025-04-03_at_18.56.20.png?table=block&id=1fd261aa-09df-8198-a8ff-e319ff4e7b0c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=990&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ad9518838-0a1c-4690-9ff8-47104da89aef%3AScreenshot_2025-04-03_at_18.56.20.png?table=block&id=1fd261aa-09df-8198-a8ff-e319ff4e7b0c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=990&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 From the above, it follows that
 
@@ -440,7 +440,7 @@ $$
 
 is the prob. that the first occurrence of a successful broadcast requires sending more than $n$ messages.
 
-![](https://nomos-tech.notion.site/image/attachment%3A1405ba3a-093c-4517-91ef-372c411f6141%3AScreenshot_2025-04-03_at_18.57.44.png?table=block&id=1fd261aa-09df-81ef-baa7-d67e73eb5bea&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=980&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A1405ba3a-093c-4517-91ef-372c411f6141%3AScreenshot_2025-04-03_at_18.57.44.png?table=block&id=1fd261aa-09df-81ef-baa7-d67e73eb5bea&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=980&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 In a similar manner, we obtain the probability
 
@@ -450,7 +450,7 @@ $$
 
 that the first occurrence of anonymity failure requires sending $t$ messages.
 
-![](https://nomos-tech.notion.site/image/attachment%3A582d11e9-c134-427b-b64b-906c3a6072ae%3AScreenshot_2025-04-04_at_15.56.26.png?table=block&id=1fd261aa-09df-8144-993d-d4d618b78845&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=970&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A582d11e9-c134-427b-b64b-906c3a6072ae%3AScreenshot_2025-04-04_at_15.56.26.png?table=block&id=1fd261aa-09df-8144-993d-d4d618b78845&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=970&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 From the above, it follows that
 
@@ -460,15 +460,15 @@ $$
 
 is the prob. that the first occurrence of anonymity failure requires sending less than $n$ messages.
 
-![](https://nomos-tech.notion.site/image/attachment%3A7d26b0b3-c45a-4f15-8d66-5dda44de6e0b%3AScreenshot_2025-04-04_at_16.10.18.png?table=block&id=1fd261aa-09df-810b-b79d-d351f5519165&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=990&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A7d26b0b3-c45a-4f15-8d66-5dda44de6e0b%3AScreenshot_2025-04-04_at_16.10.18.png?table=block&id=1fd261aa-09df-810b-b79d-d351f5519165&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=990&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A5f480cac-2c2a-46c4-8b99-46ef5d62c07f%3AScreenshot_2025-04-04_at_16.15.16.png?table=block&id=1fd261aa-09df-81f1-ada1-c48c09e799e7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A5f480cac-2c2a-46c4-8b99-46ef5d62c07f%3AScreenshot_2025-04-04_at_16.15.16.png?table=block&id=1fd261aa-09df-81f1-ada1-c48c09e799e7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Analysis of Latency
 
 We consider a network $\mathcal{N}$ constructed from $N=\vert\mathcal{N} \vert$ nodes. We assume that a message sent from node $0\in \mathcal{N}$, via $L$ nodes of $\mathcal{N}$, to the network $\mathcal{N}$using the broadcast method of communication. The message is delayed at the node $0$ by the $\Delta_0$ amount of time, at the node $1$ by the $\Delta_1$ amount of time, etc. Furthermore, a message traveling between the nodes $i$ and $i+1$ is delayed by $d_{i\,i+1}$ due to the latency of broadcast on $\mathcal{N}$ used for communication.
 
-![](https://nomos-tech.notion.site/image/attachment%3Aa169e038-ac36-4237-849a-58042f1762e0%3AScreenshot_2025-04-09_at_18.10.23.png?table=block&id=1fd261aa-09df-8177-83d3-eb0b07a5c71b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aa169e038-ac36-4237-849a-58042f1762e0%3AScreenshot_2025-04-09_at_18.10.23.png?table=block&id=1fd261aa-09df-8177-83d3-eb0b07a5c71b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Assuming that the message was successfully broadcasted by the last node $L$ to the network $\mathcal{N}$, the total delay is given by $\sum_{i=0}^L\left[\Delta_i+ d_{i\,i+1}\right]$. We note that for $\Delta=\max_{i}\Delta_i$ and $d=\max_{i}d_{i\,i+1}$ we have a simple upper bound
 
@@ -532,7 +532,7 @@ $$
 
 where $p=1-f$.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ae5ba9f8f-3deb-4248-9b13-005f4244ec26%3AScreenshot_2025-05-21_at_17.33.30.png?table=block&id=1fd261aa-09df-81c2-9b70-df6e52ab9176&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ae5ba9f8f-3deb-4248-9b13-005f4244ec26%3AScreenshot_2025-05-21_at_17.33.30.png?table=block&id=1fd261aa-09df-81c2-9b70-df6e52ab9176&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We note that the mode of $\mathrm{P}\left(x\right)$ is at $x=\frac{\log(T(1-p))}{\log(1/p)}$ and hence the typical value of the maximum of $n_0$ observed in $T=648000$ time-slots for $f=1/30$ is $\approx 295$. The prob. that the maximum of $n_0$ observed in $T=648000$ time-slots for $f=1/30$ is greater than $295$ can be computed with high accuracy from simulations and is $\approx 0.62$ as suggested by the simulation data tabulated below.
 
@@ -545,7 +545,7 @@ We note that the mode of $\mathrm{P}\left(x\right)$ is at $x=\frac{\log(T(1-p))}
 
 The histogram of the maximum of $n_0$ obtained in one such simulation is presented below
 
-![](https://nomos-tech.notion.site/image/attachment%3A50d3989f-c2aa-4080-8b0d-b1581e254e5b%3AScreenshot_2025-05-22_at_08.28.07.png?table=block&id=1fd261aa-09df-8106-8b30-df0034a2e6d9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A50d3989f-c2aa-4080-8b0d-b1581e254e5b%3AScreenshot_2025-05-22_at_08.28.07.png?table=block&id=1fd261aa-09df-8106-8b30-df0034a2e6d9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 # Bibliography
 

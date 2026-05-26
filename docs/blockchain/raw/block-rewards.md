@@ -84,7 +84,7 @@ A control function combines these KPIs to determine the emission rate factor, bo
 - When security participation is below target, higher issuance attracts more validators.
 - As usage increases and fees are burned, emissions adjust downward to stabilize supply.
 
-```
+```text
 ​
 ```
 
@@ -154,7 +154,7 @@ Let us define the following variables:
 - $A_t \in [0,1]$ denotes the emission rate factor on a per year basis.
     - This implies that $A_t \cdot I_{max} \cdot \Delta_t$ denotes the emission within the time-step.
 - $D_{i,t}$ denotes the $i$-th key performance indicator at time $t$ (e.g., TVL, staked amount, active users).
-- $R_\text{block}$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [🔀[1.0.0] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and [🔀[1.0.0] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24) for how to compute $R_{block}$.
+- $R_\text{block}$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [🔀\[1.0.0\] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and [🔀\[1.0.0\] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24) for how to compute $R_{block}$.
 
 ## Parametrization
 
@@ -172,7 +172,7 @@ Let us define the following variables:
 | $f$​ | The average number of block proposal within $\Delta_{t}$ units | $1$​ | The time step $\Delta_t$ was chosen so that $f$ equals to $1$. |
 | $\Delta_t$​ | Time step, the fraction of year in one time step (per e.g., epoch, block, or day) | $1/(365 \times 2880)$​ | The time step is 1 block every $30$ seconds; there are 2880 blocks of 30 seconds in a day. |
 
-The calibration of these parameters can be found in [🔀[1.0.0][Analysis] Block Reward Parameter Calibration](https://nomos-tech.notion.site/1-0-0-Analysis-Block-Reward-Parameter-Calibration-ff0261aa09df83b1b7cf8199e4707ae7?pvs=24).
+The calibration of these parameters can be found in [🔀\[1.0.0\]\[Analysis\] Block Reward Parameter Calibration](https://nomos-tech.notion.site/1-0-0-Analysis-Block-Reward-Parameter-Calibration-ff0261aa09df83b1b7cf8199e4707ae7?pvs=24).
 
 ## Block Rewards
 
@@ -208,9 +208,9 @@ where:
 - $f$ be the average number of block proposal within $\Delta_{t}$ units.
 - $R_\text{block} = D_{1,t}$ denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed.
 
-```
+```text
 def block_rewards(
-		S_tge:float,
+        S_tge:float,
     emission_rate_factor:float,
     I_max:float,
     Delta_t:float,
@@ -218,9 +218,9 @@ def block_rewards(
     D_1_t: float
 ) -> float:
 """
-		    Calculate the rewards per block.
-		    It implements equation (1).
-		"""
+            Calculate the rewards per block.
+            It implements equation (1).
+        """
     emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
     emission_from_rewards = (1. - emission_rate_fator) * R_block_cur
     return emission_from_inflation + emission_from_rewards
@@ -245,9 +245,9 @@ where
 
 All terms are displayed in annualized form to ease comparison.
 
-```
+```text
 def calculate_emission_rate_factor(
-		alpha_dev:float,
+        alpha_dev:float,
     weighted_target_deviation: float,
     alpha_avg:float
     weighted_avg: float,
@@ -270,7 +270,7 @@ $$
 \dfrac{D_{i,target} - D_{i,t}}{D_{i,target}}.
 $$
 
-```
+```text
 def weighted_deviation_from_target(
     kpi_weights: List[float],
     kpi_deviations: List[float]
@@ -313,7 +313,7 @@ where:
 - The value $D_{j,target}$ can be any number with the same units of $D_{j,i}$.
 - The factor $\dfrac{1}{\Delta_t}$ turns $\gamma_t$ into an annualized quantity. This depends on the specific KPI.
 
-```
+```text
 def weighted_average(
     kpi_weights: List[float],
     kpi_average: List[float]
@@ -353,7 +353,7 @@ Let:
 
 The inferred total stake affects the emission rate through the "normalized deviation from target." The deviation implied by this KPI is characterized by the plot below.
 
-![](https://nomos-tech.notion.site/image/attachment%3Abb31da74-9e18-4881-ab10-b249daceaf03%3AScreenshot_2025-06-15_at_19.44.01.png?table=block&id=cc1261aa-09df-82f0-ace9-81b7dd81a13a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Abb31da74-9e18-4881-ab10-b249daceaf03%3AScreenshot_2025-06-15_at_19.44.01.png?table=block&id=cc1261aa-09df-82f0-ace9-81b7dd81a13a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 This happens because, when the blockchain starts, $D_{0,t} \vert_{t=0}$ is very likely a small number compared to the target. Therefore, the equation [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) tilts towards $1$ (or $100\%$) at that moment. As time passes and more stake participates in the PoS, the difference between the current total stake and the target diminishes. The equation [above](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#27b261aa09df82e69b39018bd2083bb7) oscillates around 0 (or $0\%$) when $D_{0,t}$ oscillates around $D_{0,target}$.
 
@@ -469,7 +469,7 @@ $$
 
 So we propose a reference implementation that uses integers:
 
-```
+```text
 const A_SCALE: u128 = 120_000_000; // denominator of 1/(I_max * D1_target * Delta_t * T) 
 const INFLATION_NUM: u128 = 62_500; // numerator of I_max * S_TGE * DELTA_t / f
 const INFLATION_DEN: u128 = 657; // denominator of I_max * S_TGE * DELTA_t / f

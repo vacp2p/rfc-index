@@ -51,30 +51,30 @@ For example:
 
 Python
 
-```
+```text
 @dataclass
 class Foo:
-	data: bytes
-	size: int
+    data: bytes
+    size: int
 ```
 
 Rust
 
-```
+```text
 #[repr(c)]
 struct Foo {
-	data: Vec<u8>,
-	size: usize
+    data: Vec<u8>,
+    size: usize
 }
 ```
 
 C
 
-```
+```text
 struct Foo
 {
-	data: *uint8_t
-	size: size_t
+    data: *uint8_t
+    size: size_t
 }
 ```
 
@@ -87,7 +87,7 @@ The complete specification can be found in the [official documentation](https://
 # Reference
 
 - [C structure layout](https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Structure-Layout.html)
-- [Rust ](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)[repr(c)](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)
+- [Rust](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)[repr(c)](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)
 - [Bincode serialization specification](https://git.sr.ht/~stygianentity/bincode/tree/trunk/item/docs/spec.md)
 - [Bincode rust crate docs](https://docs.rs/bincode/2.0.1/bincode/)
 

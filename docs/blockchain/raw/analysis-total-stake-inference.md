@@ -46,7 +46,7 @@ This document provides an analysis of the Cryptarchia total stake inference algo
 
 ## Total Stake Inference Process
 
-The inference algorithm is described in [🔀[1.0.0] Total Stake Inference - Algorithm](https://nomos-tech.notion.site/Algorithm-22d261aa09df8051a454caa46ec54b34?pvs=24#22d261aa09df8015bf22fb28aa0c0ea1). In order to analyze the properties of this algorithm, we model it analytically as the following sequence $\{D_\ell\}_{\ell=0}^\infty$. We then verify that this model aligns with the algorithm to ensure that the analysis accurately reflects the actual process.
+The inference algorithm is described in [🔀\[1.0.0\] Total Stake Inference - Algorithm](https://nomos-tech.notion.site/Algorithm-22d261aa09df8051a454caa46ec54b34?pvs=24#22d261aa09df8015bf22fb28aa0c0ea1). In order to analyze the properties of this algorithm, we model it analytically as the following sequence $\{D_\ell\}_{\ell=0}^\infty$. We then verify that this model aligns with the algorithm to ensure that the analysis accurately reflects the actual process.
 
 $$
 D_{\ell+1}=D_{\ell}-\frac{\beta}{f}D_\ell\left[f-\frac{\sum_{t=1}^T \mathbf{1}\left[\sum_{i=1}^N s^\ell_i(t)\geq1\right] - n(\ell)}{T}\right]
@@ -63,7 +63,7 @@ where,
 - $s^\ell_i(t)\in \{0,1\}$ is the lottery result of node $i$ at slot $t$, in epoch $\ell$; here, 1 signals a win, and 0 signals a loss;
 - $n(\ell) \in \left\{0,1,...,\sum_{t=1}^T \mathbf{1}\left[\left(\sum_{i=1}^N s^\ell_i(t)\right)\geq1\right] \right\}$ is the number of slots in epoch $\ell$ that could have extended the honest chain but instead were wasted on orphaned blocks.
 
-We note that the form above captures how the protocol updates its estimate of the total active stake based on observed network activity, and the actual inference process is described at: [🔀[1.0.0] Total Stake Inference - Algorithm](https://nomos-tech.notion.site/Algorithm-22d261aa09df8051a454caa46ec54b34?pvs=24#22d261aa09df8015bf22fb28aa0c0ea1). Specifically, at each epoch $\ell$, the estimate $D_\ell$ is adjusted according to the difference between the target slot occupancy rate $f$ and the observed average fraction of slots with at least one block extending the honest chain (after accounting for wasted slots, $n(\ell)$). The learning rate $\beta$ and normalization by $f$ control how aggressively the estimate is updated.
+We note that the form above captures how the protocol updates its estimate of the total active stake based on observed network activity, and the actual inference process is described at: [🔀\[1.0.0\] Total Stake Inference - Algorithm](https://nomos-tech.notion.site/Algorithm-22d261aa09df8051a454caa46ec54b34?pvs=24#22d261aa09df8015bf22fb28aa0c0ea1). Specifically, at each epoch $\ell$, the estimate $D_\ell$ is adjusted according to the difference between the target slot occupancy rate $f$ and the observed average fraction of slots with at least one block extending the honest chain (after accounting for wasted slots, $n(\ell)$). The learning rate $\beta$ and normalization by $f$ control how aggressively the estimate is updated.
 
 # Analysis
 
@@ -95,13 +95,13 @@ $$
 
 Since $q$ varies by epoch and is impacted by the total stake inference process, measurements should be taken after the system converges to a steady state. From simulations, this tends to be after 5 epochs.
 
-![](https://nomos-tech.notion.site/image/attachment%3A40662e98-e80e-451c-a88a-e675f6800415%3Aimage.png?table=block&id=245261aa-09df-80d5-9dcd-c992d62fb912&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=580&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A40662e98-e80e-451c-a88a-e675f6800415%3Aimage.png?table=block&id=245261aa-09df-80d5-9dcd-c992d62fb912&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=580&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Simulation Results
 
 This result predicts that we consistently underestimate true stake by a factor of $\frac{\log(1-f)}{\log(1-f/q)}$. We verified this prediction in simulations and saw a strong correlation between this prediction and the stake we inferred in simulation:
 
-![](https://nomos-tech.notion.site/image/attachment%3A2045459c-797a-46d8-aab0-45ccce995414%3Aimage.png?table=block&id=242261aa-09df-8012-a38f-ee4a8ba95045&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1350&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A2045459c-797a-46d8-aab0-45ccce995414%3Aimage.png?table=block&id=242261aa-09df-8012-a38f-ee4a8ba95045&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1350&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Connecting Simulation to Logos Blockchain
 
@@ -129,7 +129,7 @@ For a derivation of this result, see [Precision Derivation](https://nomos-tech.n
 
 Checking these predictions in simulations shows very good agreement with analysis:
 
-![](https://nomos-tech.notion.site/image/attachment%3A7cda3113-eae3-4ced-b4c7-66a455c6e14c%3Avar_with_converged_q.png?table=block&id=239261aa-09df-8090-9a39-d6d700c2da2f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A7cda3113-eae3-4ced-b4c7-66a455c6e14c%3Avar_with_converged_q.png?table=block&id=239261aa-09df-8090-9a39-d6d700c2da2f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Stability Condition
 
@@ -153,7 +153,7 @@ For a derivation of this result, see [Stability Condition Derivation](https://no
 
 In simulations, we see that when we exceed the condition, the spread in $D_\infty$ values explodes for $\beta \ge \frac{2f}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}$.
 
-![](https://nomos-tech.notion.site/image/attachment%3A21099e55-964b-4689-a48e-22405703d097%3Aconvergence-with-q.png?table=block&id=237261aa-09df-808a-b6bf-e43738f04a39&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A21099e55-964b-4689-a48e-22405703d097%3Aconvergence-with-q.png?table=block&id=237261aa-09df-808a-b6bf-e43738f04a39&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Convergence Speed and Optimal Learning Rate
 
@@ -173,7 +173,7 @@ $$
 
 For reasonable $q$ values, this gives us a $\beta$ slightly higher than 1. Choosing a smaller $\beta$ can only improve the stability of the inference algorithm. This fact, combined with the uncertainty in selecting a $q$ value suggests that we should just select $\beta=1$ as our learning rate.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ab69810b6-9fbd-4e4a-9e34-f40083af4d79%3Aimage.png?table=block&id=23b261aa-09df-808f-9bcb-c97e7b92f606&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=640&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ab69810b6-9fbd-4e4a-9e34-f40083af4d79%3Aimage.png?table=block&id=23b261aa-09df-808f-9bcb-c97e7b92f606&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=640&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 For a derivation of this result, see [Convergence Speed and Optimal Learning Rate Derivation](https://nomos-tech.notion.site/Convergence-Speed-and-Optimal-Learning-Rate-Derivation-237261aa09df800285cccbb00b3aeb0a?pvs=24#239261aa09df80c38aa6dcb253267961).
 
@@ -183,21 +183,21 @@ We verified these results in simulations, showing that the bound holds for varyi
 
 The plots show the measured normalized error $\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_\text{TRUE}} \right|$ decreasing as epoch $\ell$ increases. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85$.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ad0af5a00-2fe0-4463-a38a-761fe421cfed%3Aimage.png?table=block&id=239261aa-09df-8040-8a0e-c23ba6dc18a4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ad0af5a00-2fe0-4463-a38a-761fe421cfed%3Aimage.png?table=block&id=239261aa-09df-8040-8a0e-c23ba6dc18a4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A23eb9a70-a31c-427f-a5f9-d3c326262e34%3Aimage.png?table=block&id=239261aa-09df-80a9-8c4e-c0d30d48cd6e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A23eb9a70-a31c-427f-a5f9-d3c326262e34%3Aimage.png?table=block&id=239261aa-09df-80a9-8c4e-c0d30d48cd6e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A3166a54d-02c9-4136-be93-196640ec9687%3Aimage.png?table=block&id=239261aa-09df-80cd-991b-d4386b6386ca&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A3166a54d-02c9-4136-be93-196640ec9687%3Aimage.png?table=block&id=239261aa-09df-80cd-991b-d4386b6386ca&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A038ebd73-d0f3-43b6-9f4f-22ed7676a31b%3Aimage.png?table=block&id=239261aa-09df-8068-94c9-d29043cb2e19&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A038ebd73-d0f3-43b6-9f4f-22ed7676a31b%3Aimage.png?table=block&id=239261aa-09df-8068-94c9-d29043cb2e19&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=630&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Optimal convergence was checked as well showing that with [optimal](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139)[https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#239261aa09df80d5ae07d87365c93139)$\beta$, even with massive shocks to total stake, we can converge within 2 epochs.
 
 Plots show the distribution of normalized error $\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_\text{TRUE}} \right|$ at each epoch $\ell$ for the optimal $\beta$ parameter under different initial conditions. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85,\beta=1$.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ae412953b-84c0-4061-8190-bc2cb457ce49%3Aimage.png?table=block&id=239261aa-09df-80ed-a464-e7d667f45c9f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=640&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ae412953b-84c0-4061-8190-bc2cb457ce49%3Aimage.png?table=block&id=239261aa-09df-80ed-a464-e7d667f45c9f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=640&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3Ae79a6dc9-2b5b-469c-9fc1-c1d175f32506%3Aimage.png?table=block&id=239261aa-09df-80f7-b62b-c1d4c4d97efb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=640&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ae79a6dc9-2b5b-469c-9fc1-c1d175f32506%3Aimage.png?table=block&id=239261aa-09df-80f7-b62b-c1d4c4d97efb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=640&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 # Details
 
@@ -570,13 +570,13 @@ is optimal.
 
 - The [double exponential](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df80aea575c2d715f96803) form dominates convergence to the fixed point $\langle \overline{D}_{\infty}\rangle$ for small $\epsilon(0)= \overline{D}_{0} -\langle\overline{D}_{\infty}\rangle$ as can be seen in the figures below
 
-![](https://nomos-tech.notion.site/image/attachment%3A6b8f4a6d-227f-4b2a-9410-e7840f9031e0%3Aoptimal1.png?table=block&id=24d261aa-09df-8000-8137-e8418c6b9a10&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=740&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A6b8f4a6d-227f-4b2a-9410-e7840f9031e0%3Aoptimal1.png?table=block&id=24d261aa-09df-8000-8137-e8418c6b9a10&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=740&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A94534def-b1e2-479d-b0ef-cc8f5a854c26%3Aoptimal3.png?table=block&id=24d261aa-09df-8041-9021-e9756d250cfb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A94534def-b1e2-479d-b0ef-cc8f5a854c26%3Aoptimal3.png?table=block&id=24d261aa-09df-8041-9021-e9756d250cfb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A9ab4d4c8-a4b2-4b3f-bc67-904eac18a445%3Aoptimal2.png?table=block&id=24d261aa-09df-8077-aa59-dda1d42b72b5&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A9ab4d4c8-a4b2-4b3f-bc67-904eac18a445%3Aoptimal2.png?table=block&id=24d261aa-09df-8077-aa59-dda1d42b72b5&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A838adfb8-bc6d-474e-a4b4-01191fcdce03%3Aoptimal4.png?table=block&id=24d261aa-09df-80c8-aa35-d94ac5a8fa72&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A838adfb8-bc6d-474e-a4b4-01191fcdce03%3Aoptimal4.png?table=block&id=24d261aa-09df-80c8-aa35-d94ac5a8fa72&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=690&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The difference between average (normalised) stake at epoch $\ell$ and its equilibrium value $\epsilon(\ell)=\langle \overline{D}_{\ell}\rangle-\frac{\log(1-f)}{\log(1-f/q)}$ plotted as a function of $\ell$ for $f=1/30$ and $q=0.85$. The solid (red) line is  the solution of the [difference equation](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#237261aa09df802a9381e22a7e4b8b03) using [optimal learning rate](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df8073a860d292de358d09) and the dashed (blue) line is the [double exponential](https://nomos-tech.notion.site/237261aa09df800285cccbb00b3aeb0a?pvs=25#249261aa09df80aea575c2d715f96803). Here for $\log(1-f)/\log(1-f/q)\approx0.847$ and  $\epsilon(0)\in \{2\times0.847,0.847/2,0.847/10,0.847/100\}$ (top left, top right, bottom left, bottom right) the $\epsilon(1)$ is, respectively, of order $\{10^{-2} , 10^{-3}, 10^{-4} , 10^{-6}\}$.
 

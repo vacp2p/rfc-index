@@ -94,17 +94,17 @@ User Strategy: A rational user has a private valuation for their transaction's i
 - Setting $c_t$ much higher than $b_\text{exec}[s]$ does not guarantee faster inclusion than setting it slightly higher; inclusion speed is determined by the priority fee $p_t = c_t - b_\text{exec}[s]$ relative to other users.
 - The optimal strategy is to set $c_t$ such that it reflects their true marginal valuation per unit of execution gas, $c_t^* = V_t / g_t$. They then pay $b_\text{exec}[s]$ (base fee) plus a competitive tip $p_t$ that they believe is sufficient for inclusion.
 
-block builder Strategy: A rational block builder seeks to maximize their total block reward, $R_{\text{proposer}}$ (cf [[1.0.0] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24)). Maximizing this sum is achieved by a greedy algorithm: sort all valid transactions by their revenue and include them in descending order until the block is full.
+block builder Strategy: A rational block builder seeks to maximize their total block reward, $R_{\text{proposer}}$ (cf [\[1.0.0\] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24)). Maximizing this sum is achieved by a greedy algorithm: sort all valid transactions by their revenue and include them in descending order until the block is full.
 
 Conclusion: The subsidy mechanism, while critical for block builder revenue, does not distort the transaction selection incentive. The dominant strategy remains to prioritize transactions with the highest total tips, which aligns the block builder's interest with that of users who value inclusion the most.
 
 # References
 
-- [[1.0.0] Blend Protocol - Rewarding](https://nomos-tech.notion.site/Rewarding-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df818a8faac94da76ed175)
+- [\[1.0.0\] Blend Protocol - Rewarding](https://nomos-tech.notion.site/Rewarding-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df818a8faac94da76ed175)
 - StableFee [https://pubsonline.informs.org/doi/abs/10.1287/mnsc.2023.4735](https://pubsonline.informs.org/doi/abs/10.1287/mnsc.2023.4735)
 - [Base Fee Manipulation In Ethereums EIP-1559 Transaction Fee Mechanism](https://arxiv.org/pdf/2304.11478)
 - [Transaction fees on a honeymoon](https://arxiv.org/pdf/2110.04753)
-- [[1.0.0] Anonymous Leaders Reward Protocol](https://nomos-tech.notion.site/1-0-0-Anonymous-Leaders-Reward-Protocol-206261aa09df8120a49ffa49c71ba70d?pvs=24)
-- [[1.0.0][Overview] Cryptoeconomics](https://nomos-tech.notion.site/1-0-0-Overview-Cryptoeconomics-4d6261aa09df82b4977c81722de0027f?pvs=24)
+- [\[1.0.0\] Anonymous Leaders Reward Protocol](https://nomos-tech.notion.site/1-0-0-Anonymous-Leaders-Reward-Protocol-206261aa09df8120a49ffa49c71ba70d?pvs=24)
+- [\[1.0.0\]\[Overview\] Cryptoeconomics](https://nomos-tech.notion.site/1-0-0-Overview-Cryptoeconomics-4d6261aa09df82b4977c81722de0027f?pvs=24)
 - [EIP 1559: A transaction fee market proposal](https://ethereum.github.io/abm1559/notebooks/eip1559.html)
 
