@@ -34,7 +34,7 @@ The total active stake can be inferred by observing the slot occupancy rate: a h
 
 The stake inference algorithm adjusts the previous total stake estimate based on the difference between the empirical slot activation rate (measured as the growth rate of the honest chain) and the expected slot activation rate. A large difference serves as an indicator that the total stake estimate is not accurate and must be adjusted.
 
-This algorithm has been analyzed and shown to have good accuracy, precision and convergence speed. A caveat to note is that accuracy decreases with increased network delays. The analysis can be found in [[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24).
+This algorithm has been analyzed and shown to have good accuracy, precision and convergence speed. A caveat to note is that accuracy decreases with increased network delays. The analysis can be found in [\[1.0.0\]\[Analysis\] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24).
 
 # Construction
 
@@ -46,8 +46,8 @@ This algorithm has been analyzed and shown to have good accuracy, precision and 
 | --- | --- | --- | --- |
 | beta | 1.0 | learning rate | Controls how quickly we adjust to new participation levels.  Lower values for beta give a more stable / gradual adjustment, while higher values give faster convergence but at the cost of less stability. |
 | PERIOD | $6\lfloor \frac{k}{f} \rfloor$ | observation period | The length of the observation period in slots. |
-| f | inherited from [[1.0.1] Cryptarchia Protocol - Constants](https://nomos-tech.notion.site/Constants-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81ff90b0e9befd660ed7) | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. |
-| k | inherited from [[1.0.1] Cryptarchia Protocol - Constants](https://nomos-tech.notion.site/Constants-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81ff90b0e9befd660ed7) | security parameter | Block depth finality. Blocks deeper than k on any given chain are considered immutable. |
+| f | inherited from [\[1.0.1\] Cryptarchia Protocol - Constants](https://nomos-tech.notion.site/Constants-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81ff90b0e9befd660ed7) | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. |
+| k | inherited from [\[1.0.1\] Cryptarchia Protocol - Constants](https://nomos-tech.notion.site/Constants-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81ff90b0e9befd660ed7) | security parameter | Block depth finality. Blocks deeper than k on any given chain are considered immutable. |
 
 ### Functions
 
@@ -58,7 +58,7 @@ This algorithm has been analyzed and shown to have good accuracy, precision and 
 
 For a current epochs estimate total_stake_estimate and the epochs first slot epoch_slot, the next epochs estimate is calculated as shown below:
 
-```
+```text
 const PRECISION: u64 = 1e3
 fn total_stake_inference(total_stake_estimate: u64, epoch_slot: u64) -> u64 {
 // f: f64
@@ -79,5 +79,5 @@ max(new_total_stake_estimate, 1) as u64
 
 # Annex
 
-[[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24)
+[\[1.0.0\]\[Analysis\] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24)
 

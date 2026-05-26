@@ -33,7 +33,7 @@
 
 # Introduction
 
-The [[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24) enables nodes to register for specific services in decentralized public registries by committing a predefined stake. Registered nodes may then provide the declared service in exchange for rewards. The protocol uses staking as a mechanism to ensure Sybil resistance and incentivize honest participation.
+The [\[1.0.0\] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24) enables nodes to register for specific services in decentralized public registries by committing a predefined stake. Registered nodes may then provide the declared service in exchange for rewards. The protocol uses staking as a mechanism to ensure Sybil resistance and incentivize honest participation.
 
 This document aims to define an optimal minimum stake value per node in the context of the SDP. The optimal minimum stake value must strike a careful balance: it should be high enough to discourage sybil attacks while remaining low enough to ensure broad participation, especially in early network stages. Importantly, the protocol mandates a uniform, constant stake value across services and sessions, adding constraints to its determination. We focus on static stake estimation method due to its simplicity.
 
@@ -108,7 +108,7 @@ The following quantities are derived from the definitions above:
 
 ## Staking Ratio ($r_{\text{stake}}$)
 
-The [[1.0.0] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24) proposes a 30% of TGE tokens as a target for the security of the PoS participation of [Cryptarchia](https://nomos-tech.notion.site/21c261aa09df810cb85eff1c76e5798c?pvs=25). This implies that it should not be possible for a single entity to acquire $15\%$ of TGE supply. Therefore, we set $r_{\text{stake}}=15\%$.
+The [\[1.0.0\] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24) proposes a 30% of TGE tokens as a target for the security of the PoS participation of [Cryptarchia](https://nomos-tech.notion.site/21c261aa09df810cb85eff1c76e5798c?pvs=25). This implies that it should not be possible for a single entity to acquire $15\%$ of TGE supply. Therefore, we set $r_{\text{stake}}=15\%$.
 
 ## Number of Service Providers ($N_{\text{stakers}}$)
 

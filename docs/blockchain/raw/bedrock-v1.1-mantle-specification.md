@@ -24,10 +24,10 @@
 | --- | --- | --- |
 | 1.1.0 | Initial revision. | 2026-12-01 |
 | 1.2.0 | Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs.   Added bridging and decentralized sequencing for channels. | 2026-01-01 |
-| 1.2.1 | [[RFC] Improve Mantle Transaction hash](https://nomos-tech.notion.site/RFC-Improve-Mantle-Transaction-hash-31e261aa09df80a08146e4978d2da3e0?pvs=24). | 2026-03-25 |
-| 1.3.0 | [[RFC] Make Ledger Transaction an Operation](https://nomos-tech.notion.site/RFC-Make-Ledger-Transaction-an-Operation-31e261aa09df80bc9e02ea4e9affc082?pvs=24). | 2026-04-02 |
-| 1.4.0 | [[RFC] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
-| 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24). | 2026-05-06 |
+| 1.2.1 | [\[RFC\] Improve Mantle Transaction hash](https://nomos-tech.notion.site/RFC-Improve-Mantle-Transaction-hash-31e261aa09df80a08146e4978d2da3e0?pvs=24). | 2026-03-25 |
+| 1.3.0 | [\[RFC\] Make Ledger Transaction an Operation](https://nomos-tech.notion.site/RFC-Make-Ledger-Transaction-an-Operation-31e261aa09df80bc9e02ea4e9affc082?pvs=24). | 2026-04-02 |
+| 1.4.0 | [\[RFC\] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
+| 1.5.0 | [\[RFC\] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24). | 2026-05-06 |
 
 # Introduction
 
@@ -64,12 +64,12 @@ Mantle Transaction fees are derived from a gas model. The Logos Blockchain has t
 
 Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes all Operations atomically, while using the Mantle Transaction's excess balancecalculated as the difference between the consumed and created value as the fee payment.
 
-```
+```text
 class MantleTx:
-	  ops: list[Op]
+      ops: list[Op]
 class Op:
-	  opcode: byte
-	  payload: bytes
+      opcode: byte
+      payload: bytes
 def mantle_txhash(tx: MantleTx) -> Hash:
     tx_bytes = encode(tx)
 
@@ -79,13 +79,13 @@ def mantle_txhash(tx: MantleTx) -> Hash:
 return h.digest()
 ```
 
-The [hash function used](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18), as well as other cryptographic primitives like ZK proofs and signature schemes, are described in [[1.0.2] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24).
+The [hash function used](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18), as well as other cryptographic primitives like ZK proofs and signature schemes, are described in [\[1.0.2\] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24).
 
 ## Mantle Transaction Hash
 
 A Mantle Transaction must include all relevant signatures and proofs for each Operation.
 
-```
+```text
 class SignedMantleTx:
   tx: MantleTx
   op_proofs: list[OpProof | None] # each Op has at most 1 associated proof
@@ -93,7 +93,7 @@ class SignedMantleTx:
 
 Each proof (op proof and signature) must be cryptographically bound to the MantleTx through the mantle_txhash to prevent replay attacks. This binding is achieved by including the MantleTx hash reduced modulo $p$ as a public input in every ZK proof.
 
-```
+```text
 mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 ```
 
@@ -101,22 +101,22 @@ mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 
 ## Mantle Transaction Fee
 
-The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the execution_base_fee, and the total size of the encoded signed Mantle Transaction multiplied by the permanent_storage_gas_price. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[1.0.0] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and [[1.0.0] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24).
+The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the execution_base_fee, and the total size of the encoded signed Mantle Transaction multiplied by the permanent_storage_gas_price. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [\[1.0.0\] Execution Market](https://nomos-tech.notion.site/1-0-0-Execution-Market-d19261aa09df83998ba601723bc29d11?pvs=24) and [\[1.0.0\] Storage Markets](https://nomos-tech.notion.site/1-0-0-Storage-Markets-0fb261aa09df8366916a81cd45d78def?pvs=24).
 
-```
+```text
 def mandatory_fees(signed_tx: SignedMantleTx,
-									 permanent_storage_gas_price: TokenValue, # Given by Storage Market
-									 execution_gas_base_price: TokenValue) -> int: # Given by Execution Market
-		mantle_tx = signed_tx.tx
-		permanent_storage_fees = len(encode(signed_mantle_tx)) * permanent_storage_gas_price
-		tx_execution_gas = 0
+                                     permanent_storage_gas_price: TokenValue, # Given by Storage Market
+                                     execution_gas_base_price: TokenValue) -> int: # Given by Execution Market
+        mantle_tx = signed_tx.tx
+        permanent_storage_fees = len(encode(signed_mantle_tx)) * permanent_storage_gas_price
+        tx_execution_gas = 0
 for op in mantle_tx.ops:
 # Compute how much execution gas of this operation as defined
 # in the gas determination Appendix
-				tx_execution_gas += execution_gas(op)
-		execution_base_fees = tx_execution_gas * execution_gas_base_price
-		
-		return execution_base_fees + permanent_storage_fees
+                tx_execution_gas += execution_gas(op)
+        execution_base_fees = tx_execution_gas * execution_gas_base_price
+        
+        return execution_base_fees + permanent_storage_fees
 ```
 
 If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.
@@ -125,7 +125,7 @@ If the Mantle Transaction is unbalanced (meaning that the Transaction consume mo
 
 Given
 
-```
+```text
 signed_tx = SignedMantleTx(
     tx=MantleTx(ops),
     op_proofs
@@ -135,11 +135,11 @@ signed_tx = SignedMantleTx(
 Mantle validators will ensure the following:
 
 1. We have a proof or a None value for each operation.
-    ```
+    ```text
     assert len(op_proofs) == len(ops)
     ```
 1. Each Operation is valid.
-    ```
+    ```text
     for op, op_proof in zip(ops, op_proofs):
     assert op.opcode in MANTLE_OPCODES
         validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
@@ -150,29 +150,29 @@ Mantle validators will ensure the following:
     #    ...
     ```
 1. The Mantle Transaction excess balance pays least the mandatory fees.
-    ```
+    ```text
     tx_mandatory_fee = mandatory_gas_fees(signed_tx) # Not an unsigned int
     tx_balance = get_transaction_balance(signed_tx)
     assert tx_mandatory_fee <= tx_balance
     tx_execution_tip = tx_balance - tx_mandatory_fee
 
     def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
-    		balance = 0 # It's important to not use unsigned int here to avoid
+            balance = 0 # It's important to not use unsigned int here to avoid
     # overflow vulnerabilities
     for op in signed_tx.tx.ops:
     if op.opcode == TRANSFER:
     for inp in op.inputs:
-    								balance += get_value_from_note_id(inp)
+                                    balance += get_value_from_note_id(inp)
     for out in op.outputs:
-    								balance -= out.value
-    		return balance
+                                    balance -= out.value
+            return balance
     ```
 
 ## Execution
 
 Given
 
-```
+```text
 SignedMantleTx(
     tx=MantleTx(ops),
     op_proofs
@@ -213,7 +213,7 @@ The first time a message is sent to an unclaimed channel, the key that signs the
 
 Validators must maintain the following state to process channel Operations:
 
-```
+```text
 channels: dict[ChannelId, ChannelState] # ChannelId is 32 bytes
 class ChannelState:
 # Channel Configuration
@@ -226,7 +226,7 @@ class ChannelState:
     tip_slot: Slot
     tip_sequencer: u16      # indicating the actual 
 # sequencer position in the list of accredited keys
-		tip_sequencer_starting_slot: Slot
+        tip_sequencer_starting_slot: Slot
     posting_timeframe: u32  # number of slots (0 = infinity)
     posting_timeout: u32    # number of slots (0 = no timeout)
 # Bridging
@@ -237,17 +237,17 @@ class ChannelState:
 def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey])
 -> ChannelState:
 return ChannelState(
-				tip_hash = ZERO,
-				tip_slot = block_slot,
-				accredited_keys = keys,
-				tip_sequencer = 0,
-				tip_sequencer_starting_slot = block_slot,
-				posting_timeframe = 0,
-				posting_timeout = 0,
-				configuration_threshold = 1,
-				balance = 0,
-				withdrawal_nonce = 0,
-				withdraw_threshold = 1)
+                tip_hash = ZERO,
+                tip_slot = block_slot,
+                accredited_keys = keys,
+                tip_sequencer = 0,
+                tip_sequencer_starting_slot = block_slot,
+                posting_timeframe = 0,
+                posting_timeout = 0,
+                configuration_threshold = 1,
+                balance = 0,
+                withdrawal_nonce = 0,
+                withdraw_threshold = 1)
 ```
 
 > Note that the user chooses the ChannelId mapping to the ChannelState (but its restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
@@ -256,7 +256,7 @@ return ChannelState(
 
 To determine which sequencer is currently authorized to send messages, we use a round-robin algorithm. When a message is posted to a channel, the following algorithm is used to determine who the sequencer is:
 
-```
+```text
 # Round Robin algorithm determining the new sequencer index and the
 # new sequencer starting slot
 def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
@@ -289,17 +289,17 @@ Write a message to a channel with the message data being permanently stored on t
 
 Payload
 
-```
+```text
 class Inscribe:
     channel: ChannelId       # 32 bytes Channel being written to
-		inscription : bytes # Message to be written on the blockchain
-		parent: hash # Previous message in the channel
-		signer: Ed25519PublicKey # Identity of message sender
+        inscription : bytes # Message to be written on the blockchain
+        parent: hash # Previous message in the channel
+        signer: Ed25519PublicKey # Identity of message sender
 ```
 
 Proof
 
-```
+```text
 Ed25519Signature
 ```
 
@@ -311,7 +311,7 @@ Validation
 
 Given
 
-```
+```text
 txhash: hash
 msg: Inscribe
 sig: Ed25519Signature
@@ -322,10 +322,10 @@ block_slot: Slot
 
 Validate
 
-```
+```text
 if msg.channel in channels:
-		chan = channels[msg.channel]
-		current_sequencer_index = round_robin(block_slot, chan)[0]
+        chan = channels[msg.channel]
+        current_sequencer_index = round_robin(block_slot, chan)[0]
 # Ensure the signer is the one authorized to write to the channel
 assert msg.signer == chan.accredited_keys[current_sequencer_index]
 # Ensure message is continuing the channel sequence
@@ -334,7 +334,7 @@ else:
 # Channel will be created automatically upon execution
 # Ensure that this message is the genesis message (parent == ZERO)
 assert msg.parent == ZERO
-		
+        
 # Ensure the msg signer signature
 assert Ed25519_verify(txhash, msg.signer, sig)
 ```
@@ -343,7 +343,7 @@ Execution
 
 Given
 
-```
+```text
 msg: Inscribe
 sig: Ed25519Signature
 
@@ -354,29 +354,29 @@ block_slot: Slot
 Execute
 
 1. If the channel does not exist, create it just-in-time.
-    ```
+    ```text
     if msg.channel is not in channels
         channels[msg.channel] = default_channel(block_slot, [msg.signer])
     ```
 1. Update the channel sequencer.
-    ```
+    ```text
     chan = channels[msg.channel]
     (new_sequencer_index, new_sequencer_starting_slot) = round_robin(
-    																					block_slot,
-    																					chan)
+                                                                                        block_slot,
+                                                                                        chan)
 
     chan.tip_sequencer_starting_slot = new_sequencer_starting_slot
     chan.tip_sequencer = new_sequencer_index
     ```
 1. Update the channel tip.
-    ```
+    ```text
     chan = channels[msg.channel]
     chan.tip_hash = hash(encode(msg))
     chan.tip_slot = block_slot
     ```
 Example
 
-```
+```text
 # Build the inscription
 greeting = Inscription(
     channel=CHANNEL_EARTH,
@@ -389,13 +389,13 @@ transfer = Transfer(inputs=[<spocks_note_id>], outputs=[<change_note>])
 # Wrap it in a transaction
 tx = MantleTx(
     ops=[Op(opcode=CHANNEL_INSCRIBE, payload=encode(greeting)),
-		     Op(opcode=TRANSFER, payload=encode(transfer)],
+             Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 # Sign the transaction
 signed_tx = SignedMantleTx(
     tx=tx,
     op_proofs=[Ed25519_sign(mantle_txhash(tx), spock_sk),
-					     transfer.prove(spock_sk)]
+                         transfer.prove(spock_sk)]
 )
 # Send the transaction to the mempool
 mempool.push(signed_tx)
@@ -407,7 +407,7 @@ Overwrite the configuration of a channel.
 
 Payload
 
-```
+```text
 class ChannelConfig:
     channel: ChannelId
     keys: list[Ed25519PublicKey]
@@ -419,10 +419,10 @@ class ChannelConfig:
 
 Proof
 
-```
+```text
 class ChannelConfigOpProof:
-		signatures: list[Ed25519Signature] # signatures from configuration_threshold
-		indexes: list[u16] # signatures of accredited keys with their index. 
+        signatures: list[Ed25519Signature] # signatures from configuration_threshold
+        indexes: list[u16] # signatures of accredited keys with their index. 
 # indexes must be ordered from smallest to
 # biggest without duplication
 ```
@@ -435,7 +435,7 @@ Validation
 
 Given
 
-```
+```text
 txhash: zkhash
 config: ChannelConfig
 proof: ChannelConfigOpProof
@@ -444,17 +444,17 @@ channels: dict[ChannelId, ChannelState]
 
 Validate
 
-```
+```text
 assert len(proof.signatures) == len(proof.indexes)
 assert config.configuration_threshold > 0
 assert config.withdraw_threshold > 0
 assert len(config.keys) > 0
 assert len(config.keys) < 2^16
 if config.channel in channels:
-		chan = channels[config.channel]
+        chan = channels[config.channel]
 # Check there are enough signatures
 assert len(proof.signatures) == chan.configuration_threshold
-		# Check that indexes are ordered to avoid duplication
+        # Check that indexes are ordered to avoid duplication
 for i in range(len(proof.indexes)-1):
 assert proof.indexes[i] < proof.indexes[i+1]
 for sig, idx in zip(proof.signatures, proof.indexes):
@@ -466,7 +466,7 @@ Execution
 
 Given
 
-```
+```text
 config: ChannelConfig
 
 channels: dict[ChannelId, ChannelState]
@@ -476,13 +476,13 @@ block_slot: Slot
 Execute
 
 1. If the channel does not exist, create it just-in-time.
-```
+```text
 if config.channel not in channels:
-		channels[config.channel] = default_channel(block_slot, config.keys)
+        channels[config.channel] = default_channel(block_slot, config.keys)
 ```
 
 1. Update the configuration.
-```
+```text
 chan = channels[config.channel]
 # Update Channel Configuration Parameters
 chan.accredited_keys = config.keys
@@ -499,7 +499,7 @@ chan.withdraw_threshold = config.withdraw_threshold
 ```
 
 1. Update the channel tip.
-```
+```text
 chan = channels[config.channel]
 chan.tip_slot = block_slot
 chan.tip_hash = hash(encode(config))
@@ -509,7 +509,7 @@ Example
 
 Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
 
-```
+```text
 # Given a key to add
 new_sequencer_pk: Ed25519PublicKey
 
@@ -527,13 +527,13 @@ transfer = Transfer(inputs=[old_sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
 ops=[Op(opcode=CHANNEL_CONFIG, payload=encode(config)),
-		     Op(opcode=TRANSFER, payload=encode(transfer)],
+             Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
     tx=tx,
-		op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
-								transfer.prove(old_sequencer_sk)]
+        op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
+                                transfer.prove(old_sequencer_sk)]
 )
 ```
 
@@ -543,18 +543,18 @@ Deposit funds to a channel, reducing the Mantle Transaction balance.
 
 Payload
 
-```
+```text
 class ChannelDeposit:
-		channel: ChannelId
-	  inputs: list[NoteId] # the list of consumed note identifiers
-		metadata: bytes
+        channel: ChannelId
+      inputs: list[NoteId] # the list of consumed note identifiers
+        metadata: bytes
 ```
 
 Proof
 
 A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4).
 
-```
+```text
 ZkSignature
 ```
 
@@ -566,7 +566,7 @@ Validation
 
 Given
 
-```
+```text
 mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
 deposit: ChannelDeposit
 deposit_proof: ZkSignature
@@ -579,15 +579,15 @@ ledger: Ledger
 Validate
 
 1. Verify that the channel exist
-    ```
+    ```text
     assert deposit.channel in channels
     ```
 1. Ensure all inputs are spendable.
-    ```
+    ```text
     ledger.assert_spendable(note_id)
     ```
 1. Validate  ownership over deposited notes.
-    ```
+    ```text
     input_notes = [ledger[input_note_id] for input_note_id in deposit.inputs]
     input_pks = [note.public_key for note in input_notes]
     assert ZkSignature_verify(mantle_txhash, deposit_proof, input_pks)
@@ -596,7 +596,7 @@ Execution
 
 Given
 
-```
+```text
 deposit: ChannelDeposit
 
 channels: dict[ChannelId, ChannelState]
@@ -607,36 +607,36 @@ ledger: Ledger
 Execute
 
 1. Remove inputs from the ledger.
-    ```
+    ```text
     ledger.execute_spending(deposit.inputs)
     ```
 1. Increase the balance of the channel
-    ```
+    ```text
     for inp in deposit.inputs:
-    		channels[deposit.channel].balance += inp.value
+            channels[deposit.channel].balance += inp.value
     ```
 Example
 
 Suppose Alice wants to make a deposit of 50 tokens on Zone A.
 
-```
+```text
 # Alice encodes her deposit
 deposit = ChannelDeposit(
-		channel=ZONE_A,
-		inputs=[alice_deposit_note_id] # This is a note of 50 tokens
-		metadata=b"deposit to address: 0x..."
+        channel=ZONE_A,
+        inputs=[alice_deposit_note_id] # This is a note of 50 tokens
+        metadata=b"deposit to address: 0x..."
 )
 # Build the transfer operation to pay the fees
 transfer = Transfer(inputs=[Alice_funds], outputs=[<change_note>])
 
 tx = MantleTx(
-		ops=[Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
-				 Op(opcode=TRANSFER, payload=encode(transfer)],
+        ops=[Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
+                 Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
-		tx=tx,
-		op_proofs=[transfer.prove(Alice_sk)],
+        tx=tx,
+        op_proofs=[transfer.prove(Alice_sk)],
 )
 ```
 
@@ -648,19 +648,19 @@ Withdraw funds from a channel, increasing the Mantle Transaction balance.
 
 Payload
 
-```
+```text
 class ChannelWithdraw:
-		channel: ChannelId
-		outputs: list[Note]
-		op_id_nonce: u32
+        channel: ChannelId
+        outputs: list[Note]
+        op_id_nonce: u32
 ```
 
 Proof
 
-```
+```text
 class ChannelWithdrawOpProof:
-		signatures: list[Ed25519Signature] # signature from withdraw_threshold keys
-		indexes: list[int] # signatures of accredited keys with their index.
+        signatures: list[Ed25519Signature] # signature from withdraw_threshold keys
+        indexes: list[int] # signatures of accredited keys with their index.
 # indexes must be ordered from smallest to
 # biggest without duplication
 ```
@@ -673,7 +673,7 @@ Validation
 
 Given
 
-```
+```text
 txhash: zkhash
 withdrawal: ChannelWithdraw
 proof: ChannelWithdrawOpProof
@@ -685,44 +685,44 @@ ledger: Ledger
 Validate
 
 1. Check that the outputs are valid
-    ```
+    ```text
     ledger.assert_valid_output(withdrawal.outputs)
     ```
 1. Check that the channel exists
-    ```
+    ```text
     assert withdrawal.channel in channels
     ```
 1. Check that the withdraw nonce is correct
-    ```
+    ```text
     assert channels[withdrawal.channel].withdrawal_nonce == withdrawal.withdrawal_nonce
     ```
 1. Check that the channel has enough funds
-    ```
+    ```text
     withdrawal_amount = sum(output.value for output in withdrawal.outputs)
     assert channels[withdrawal.channel].balance >= withdrawal_amount
     ```
 1. Check that there are enough signatures
-    ```
+    ```text
     assert len(proof.signatures) == len(proof.indexes)
     assert len(proof.signatures) == channels[withdrawal.channel]
     .withdraw_threshold
     ```
 1. Check that every proof index is unique
-    ```
+    ```text
     assert len(proof.indexes) == len(set(proof.indexes))
     ```
 1. Check the signatures
-    ```
+    ```text
     for sig, idx in zip(proof.signatures, proof.indexes):
     assert Ed25519_verify(txhash,
-    						channels[withdrawal.channel].accredited_keys[idx],
-    						sig)
+                            channels[withdrawal.channel].accredited_keys[idx],
+                            sig)
     ```
 Execution
 
 Given
 
-```
+```text
 withdrawal: ChannelWithdraw
 
 channels: dict[ChannelId, ChannelState]
@@ -732,51 +732,51 @@ ledger: Ledger
 Execute
 
 1. Decrease the balance of the Channel
-    ```
+    ```text
     for output in withdrawal.outputs:
-    		channels[withdrawal.channel].balance -= output.value		
+            channels[withdrawal.channel].balance -= output.value        
     ```
 1. Add outputs to the ledger.
-    ```
+    ```text
     withdrawal_id = derive_op_id(withdrawal)
     ledger.execute_adding(withdrawal_id, withdrawal.outputs)
     ```
 1. Increase the channel withraw_nonce
-    ```
+    ```text
     channels[withdrawal.channel].withdrawal_nonce += 1
     ```
 Example
 
 Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.
 
-```
+```text
 # Sequencer encodes his withdrawal
 withdrawal = ChannelWithdraw(
-		channel=ZONE_A,
-		outputs = [Note(pk=alice, value=50)]
+        channel=ZONE_A,
+        outputs = [Note(pk=alice, value=50)]
 )
 # Build the transfer operation to pay the fees
 transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
-		ops=[Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
-				 Op(opcode=TRANSFER, payload=encode(transfer)],
+        ops=[Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
+                 Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
-		tx=tx,
-		op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
-							 transfer.prove(Sequencer_node_sk)],
+        tx=tx,
+        op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
+                             transfer.prove(Sequencer_node_sk)],
 )
 ```
 
 ## Service Declaration Protocol (SDP) Operations
 
-These Operations implement the [[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24).
+These Operations implement the [\[1.0.0\] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24).
 
 Validators must keep the following state when implementing SDP Operations:
 
-```
+```text
 locked_notes: dict[NoteID, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 class LockedNote:
@@ -786,7 +786,7 @@ class LockedNote:
 
 ### Common SDP Structures
 
-```
+```text
 class ServiceType(Enum):
     BN="BN" # Blend Network
 class Locator(str):
@@ -797,7 +797,7 @@ class MinStake:
     stake_threshold: int # stake value
     timestamp: int # block number
 class ServiceParameters:
-	  lock_period: int # number of blocks
+      lock_period: int # number of blocks
     inactivity_period: int # number of blocks
     retention_period: int # number of blocks
     timestamp: int # block number
@@ -816,11 +816,11 @@ class DeclarationInfo:
 
 ### SDP_DECLARE
 
-The service registration follows the definition given in [[1.0.0] Service Declaration Protocol - Declaration Message](https://nomos-tech.notion.site/Declaration-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df8192949ae1be9950c7e3):
+The service registration follows the definition given in [\[1.0.0\] Service Declaration Protocol - Declaration Message](https://nomos-tech.notion.site/Declaration-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df8192949ae1be9950c7e3):
 
 Payload
 
-```
+```text
 class DeclarationMessage:
     service_type: ServiceType
     locators: list[Locator]
@@ -833,7 +833,7 @@ Locked notes are introduced in [Locked notes](https://nomos-tech.notion.site/Loc
 
 Proof
 
-```
+```text
 class DeclarationProof:
 zk_sig: ZkSignature             # signature proving ownership over
 # locked note and zk_id
@@ -850,7 +850,7 @@ Validation
 
 Given
 
-```
+```text
 txhash: zkhash                  # the txhash of the transaction we are validating
 declaration: DeclarationMessage # the declaration we are validating
 proof: DeclarationProof
@@ -863,31 +863,31 @@ declarations: dict[NoteId, DeclarationInfo]
 
 Validate
 
-The declaration is verified according to [[1.0.0] Service Declaration Protocol - Declare](https://nomos-tech.notion.site/Declare-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81dea645ed3567609d12).
+The declaration is verified according to [\[1.0.0\] Service Declaration Protocol - Declare](https://nomos-tech.notion.site/Declare-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81dea645ed3567609d12).
 
 1. Ensure ownership over the locked note, zk_id and provider_id.
-    ```
+    ```text
     assert ZkSignature_verify(
       txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
     )
     assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
     ```
 1. Ensure declaration does not already exist.
-    ```
+    ```text
     assert declaration_id(declaration) not in declarations
     ```
 1. Ensure it has no more than 8 locators.
-    ```
+    ```text
     assert len(declaration.locators) <= 8
     ```
 1. Ensure locked note exists and value of locked note is sufficient for joining the service.
-    ```
+    ```text
     assert ledger.is_unspent(declaration.locked_note_id)
     note = ledger.get_note(declaration.locked_note_id)
     assert note.value >= min_stake.stake_threshold
     ```
 1. Ensure the note has not already been locked for this service.
-    ```
+    ```text
     if declaration.locked_note in locked_notes:
         locked_note = locked_notes[declaration.locked_note]
         services = [declarations[declare_id] for declare_id in locked_note.declarations]
@@ -897,7 +897,7 @@ Execution
 
 Given
 
-```
+```text
 declaration: DeclarationMessage # the declaration we are executing
 service_parameters: dict[ServiceType, ServiceParameters]
 current_block_height: int
@@ -907,7 +907,7 @@ locked_notes : dict[NoteId, LockedNote]
 Execute
 
 1. Create the locked note state if it doesn't already exist.
-    ```
+    ```text
     if declaration.locked_note not in locked_notes:
         locked_notes[declaration.locked_note_id] = \
             LockedNote(declarations=set(), locked_until=0)
@@ -915,18 +915,18 @@ Execute
     locked_note = locked_notes[declaration.locked_note_id]
     ```
 1. Update the locked notes timeout using this services lock period.
-    ```
+    ```text
     lock_period = service_parameters[declaration.service_type].lock_period
     service_lock = current_block_height + lock_period
     locked_note.locked_until = max(service_lock, locked_note.locked_until)
     ```
 1. Add this declaration to the locked note.
-    ```
+    ```text
     declare_id = declaration_id(declaration)
     locked_note.declarations.add(declare_id)
     ```
-1. Store the declaration as explained in [[1.0.0] Service Declaration Protocol - Declaration Storage](https://nomos-tech.notion.site/Declaration-Storage-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81e18abbcbcbaee5d54a).
-    ```
+1. Store the declaration as explained in [\[1.0.0\] Service Declaration Protocol - Declaration Storage](https://nomos-tech.notion.site/Declaration-Storage-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81e18abbcbcbaee5d54a).
+    ```text
     declarations[declare_id] = DeclarationInfo(
         service: declaration.service
         locators: declaration.locators
@@ -942,7 +942,7 @@ Execute
     ```
 Example
 
-```
+```text
 # Assume `alice_note` is in the ledger:
 alice_note = Utxo(
     txhash=0x2948904F2F0F479B8F8197694B30184B0D2ED1C1CD2A1EC0FB85D299A192A447,
@@ -962,7 +962,7 @@ transfer = Transfer(inputs=[fee_note_id], outputs=[])
 
 tx = MantleTx(
     ops=[Op(opcode=SDP_DECLARE, payload=encode(declaration)),
-		     Op(opcode=TRANSFER, payload=encode(transfer)],
+             Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 txhash = mantle_txhash(tx)
 
@@ -981,11 +981,11 @@ SignedMantleTx(
 
 ### SDP_WITHDRAW
 
-The service withdrawal follows the definition given in [[1.0.0] Service Declaration Protocol - Withdraw Message](https://nomos-tech.notion.site/Withdraw-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df817bad97f88bc40ba0c9).
+The service withdrawal follows the definition given in [\[1.0.0\] Service Declaration Protocol - Withdraw Message](https://nomos-tech.notion.site/Withdraw-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df817bad97f88bc40ba0c9).
 
 Payload
 
-```
+```text
 class WithdrawMessage:
     declaration: DeclarationID
     locked_note_id: NoteId
@@ -996,7 +996,7 @@ Proof
 
 A signature from the zk_id and the locked note pk attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)).
 
-```
+```text
 ZkSignature
 ```
 
@@ -1008,7 +1008,7 @@ Validation
 
 Given
 
-```
+```text
 txhash: zkhash # Mantle transaction hash of the tx containing this operation
 withdraw: WithdrawMessage
 signature: ZkSignature
@@ -1022,7 +1022,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
 Validate
 
 1. Ensure that the locked note exists, is locked and bound to this declaration.
-    ```
+    ```text
     assert ledger.is_unspent(withdraw.locked_note_id)
     assert withdraw.locked_note_id in locked_notes
 
@@ -1030,33 +1030,33 @@ Validate
     assert withdraw.declaration in locked_note.declarations
     ```
 1. Ensure that the locked note has expired.
-    ```
+    ```text
     assert locked_note.locked_until <= block_height
     ```
-1. Validate SDP withdrawal according to [[1.0.0] Service Declaration Protocol - Withdraw](https://nomos-tech.notion.site/Withdraw-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df8163980af5f83af4e7d7).
+1. Validate SDP withdrawal according to [\[1.0.0\] Service Declaration Protocol - Withdraw](https://nomos-tech.notion.site/Withdraw-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df8163980af5f83af4e7d7).
     1. Ensure declaration exists.
-        ```
+        ```text
         assert withdraw.declaration in declarations
         declare_info = declarations[withdraw.declaration]
         ```
     1. Ensure locked note pk and zk_id attached to this declaration authorized this Operation.
-        ```
+        ```text
         locked_note = ledger[withdraw.locked_note_id]
         assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
         ```
     1. Ensure the declaration has not already been withdrawn.
-        ```
+        ```text
         assert declare_info.withdrawn == 0
         ```
     1. Ensure that the nonce is greater than the previous one.
-        ```
+        ```text
         assert withdraw.nonce > declare_info.nonce
         ```
 Execution
 
 Given
 
-```
+```text
 withdraw: WithdrawMessage
 signature: ZkSignature
 
@@ -1068,65 +1068,65 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
 Execute
 
-Executes the withdrawal protocol [[1.0.0] Service Declaration Protocol - Withdraw](https://nomos-tech.notion.site/Withdraw-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df8163980af5f83af4e7d7).
+Executes the withdrawal protocol [\[1.0.0\] Service Declaration Protocol - Withdraw](https://nomos-tech.notion.site/Withdraw-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df8163980af5f83af4e7d7).
 
 1. Update declaration info with nonce and withdrawn timestamp.
-    ```
+    ```text
     declare_info = declarations[withdraw.declaration]
     declare_info.nonce = withdraw.nonce
     declare_info.withdrawn = block_height
     ```
 1. Remove this declaration from the locked note.
-    ```
+    ```text
     locked_note = locked_notes[withdraw.locked_note_id]
     locked_note.declarations.remove(withdraw.declaration)
     ```
 1. Remove the locked note if it is no longer bound to any declarations.
-    ```
+    ```text
     if len(locked_note.declarations) == 0:
     del locked_notes[withdraw.locked_note_id)
     ```
 Example
 
-```
+```text
 withdraw=Withdraw(
-		declaration=alice_declaration_id,
-		locked_note_id=alices_locked_note_id
+        declaration=alice_declaration_id,
+        locked_note_id=alices_locked_note_id
     nonce=1579532
 )
 # Build the transfer operation to pay the fees
 transfer = Transfer(inputs=[alices_locked_note_id],
-									  outputs=[Note(100, alice_note_pk)])
+                                      outputs=[Note(100, alice_note_pk)])
 
 tx = MantleTx(
     ops=[Op(opcode=SDP_WITHDRAW, payload=encode(withdraw)),
-		     Op(opcode=TRANSFER, payload=encode(transfer)],
+             Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 SignedMantleTx(
     tx=tx,
 # proof ownership of the withdrawn note and zk id
     op_proofs=[ZkSignature_sign([alice_note_sk, alice_sk], mantle_txhash(tx)),
-					     transfer.prove(alice_sk)]
+                         transfer.prove(alice_sk)]
 )
 ```
 
 ### SDP_ACTIVE
 
-The service active action follows the definition given in [[1.0.0] Service Declaration Protocol - Active Message](https://nomos-tech.notion.site/Active-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81f1a0b5cc8956c70660).
+The service active action follows the definition given in [\[1.0.0\] Service Declaration Protocol - Active Message](https://nomos-tech.notion.site/Active-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81f1a0b5cc8956c70660).
 
 Payload
 
-```
+```text
 class Active:
   declaration: DeclarationID
-	nonce: int
-	metadata: bytes # a service-specific node activeness metadata
+    nonce: int
+    metadata: bytes # a service-specific node activeness metadata
 ```
 
 Proof
 
-```
+```text
 ZkSignature
 ```
 
@@ -1138,7 +1138,7 @@ Validation
 
 Given
 
-```
+```text
 txhash: zkhash # Mantle transaction hash of the tx containing this operation
 active: Active
 signature: ZkSignature
@@ -1148,7 +1148,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
 Validate
 
-```
+```text
 assert active.declaration in declarations
 declaration_info = declarations[active.declaration]
 assert active.nonce > declaration_info.nonce
@@ -1158,13 +1158,13 @@ assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
 
 Execution
 
-Executes the active protocol [[1.0.0] Service Declaration Protocol - Active](https://nomos-tech.notion.site/Active-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df812593c3e167ec7a6efc). The activation, i.e. setting the declaration.active, is handled by the service-specific logic.
+Executes the active protocol [\[1.0.0\] Service Declaration Protocol - Active](https://nomos-tech.notion.site/Active-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df812593c3e167ec7a6efc). The activation, i.e. setting the declaration.active, is handled by the service-specific logic.
 
 Example
 
-```
+```text
 active=Active(
-		declaration=alice_declaration_id,
+        declaration=alice_declaration_id,
     nonce=1579532,
     metadata=b"Look, I am still doing my job"
 )
@@ -1190,7 +1190,7 @@ This Operation claims the leader's block reward anonymously.
 
 Payload
 
-```
+```text
 class ClaimRequest:
     rewards_root: zkhash # Merkle root used in the proof for voucher membership
     voucher_nf: zkhash
@@ -1209,7 +1209,7 @@ Validation
 
 Given
 
-```
+```text
 mantle_txhash: zkhash
 claim : ClaimRequest
 last_voucher_root: zkhash # The last root of the voucher Merkle tree
@@ -1220,7 +1220,7 @@ proof: ProofOfClaim
 
 Validate
 
-```
+```text
 assert claim.voucher_nf not in voucher_nullifier_set
 assert claim.rewards_root == last_voucher_root 
 validate_proof(claim, proof, mantle_txhash)
@@ -1230,7 +1230,7 @@ Execution
 
 Given
 
-```
+```text
 claim: ClaimRequest
 
 ledger: Ledger
@@ -1242,11 +1242,11 @@ leader_reward: TokenValue     # The amount one leader can claim
 Execution
 
 1. Add claim.voucher_nf to the voucher_nullifier_set.
-1. Denoting by leader_reward the amount defined for leader rewards in [[1.0.0] Anonymous Leaders Reward Protocol - Leaders Reward](https://nomos-tech.notion.site/Leaders-Reward-206261aa09df8120a49ffa49c71ba70d?pvs=24#240261aa09df80de83eace3d556eddfc), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
-    ```
+1. Denoting by leader_reward the amount defined for leader rewards in [\[1.0.0\] Anonymous Leaders Reward Protocol - Leaders Reward](https://nomos-tech.notion.site/Leaders-Reward-206261aa09df8120a49ffa49c71ba70d?pvs=24#240261aa09df80de83eace3d556eddfc), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
+    ```text
     output_note=Note(
-    		value = leader_reward
-    		public_key = claim.public_key,
+            value = leader_reward
+            public_key = claim.public_key,
     )
     claim_id = derive_op_id(claim)
     ledger.execute_adding(claim_id, [output_note])
@@ -1254,7 +1254,7 @@ Execution
 1. Reduce the leaders reward leaders_rewards value by the same amount (without ZK proof).
 Example
 
-```
+```text
 secret_voucher = 0xDEADBEAF;
 reward_voucher = leader_claim_voucher(secret_voucher)
 voucher_nullifier = leader_claim_nullifier(secret_voucher)
@@ -1269,7 +1269,7 @@ transfer = Transfer(inputs=[<fee_note>], outputs=[<change_note>])
 
 tx = MantleTx(
     ops=[Op(opcode=LEADER_CLAIM, payload=encode(claim)),
-			   Op(opcode=TRANSFER, payload=encode(transfer)],
+               Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 claim_proof = claim.prove(
@@ -1292,18 +1292,18 @@ Transactions allow complete transaction linkability and the public key spending 
 
 Payload
 
-```
+```text
 class Transfer:
-	  inputs: list[NoteId] # the list of consumed note identifiers
+      inputs: list[NoteId] # the list of consumed note identifiers
 # must be non-empty
-	  outputs: list[Note]
+      outputs: list[Note]
 ```
 
 Proof
 
 A Transfer proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4).
 
-```
+```text
 ZkSignature
 ```
 
@@ -1315,7 +1315,7 @@ Validation
 
 Given
 
-```
+```text
 mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
 transfer: Transfer
 transfer_proof: ZkSignature
@@ -1326,28 +1326,28 @@ ledger: Ledger
 Validate
 
 1. Ensure the Transfer in non-empty
-    ```
+    ```text
     assert len(transfer.inputs) > 0
     ```
 1. Ensure all inputs are spendable.
-    ```
+    ```text
     ledger.assert_spendable(transfer.inputs)
     ```
 1. Validate transfer proof to show ownership over input notes.
-    ```
+    ```text
     input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
     input_pks = [note.public_key for note in input_notes]
     assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
     ```
 1. Ensure outputs are valid.
-    ```
+    ```text
     ledger.assert_valid_output(transfer.output)
     ```
 Execution
 
 Given
 
-```
+```text
 transfer: Transfer
 transfer_proof: ZkSignature
 
@@ -1357,26 +1357,26 @@ ledger: Ledger
 Execution
 
 1. Remove inputs from the ledger.
-    ```
+    ```text
     ledger.execute_spending(transfer.inputs)
     ```
 1. Add outputs to the ledger.
-    ```
+    ```text
     transfer_id = derive_operation_id(transfer)
     ledger.execute_adding(transfer_id, transfer.outputs)
     ```
 Example
 
-```
+```text
 alice_note_id = ... # assume Alice holds a note worth 501 tokens
 bob_note=Note(
-		value=500
-		public_key=bob_pk,
+        value=500
+        public_key=bob_pk,
 )
 
 transfer = Transfer(
-		inputs=[alice_note_id],
-		outputs=[bob_note],
+        inputs=[alice_note_id],
+        outputs=[bob_note],
 )
 ```
 
@@ -1386,7 +1386,7 @@ transfer = Transfer(
 
 Notes are composed of two fields representing their value and their owner:
 
-```
+```text
 class Note:
     value: TokenValue   # u64    
     public_key: ZkPublicKey # 32 bytes
@@ -1396,16 +1396,16 @@ class Note:
 
 A note can be uniquely identified by the Operation that created it and its output number: (op_id, output_number) if each Operation are uniquely identifiable. For this reason, every Operation that output notes have a unique payload that is used to derive the Operation identifier. Because it is often useful to have a commitment to the note fields for use in ZK proofs (e.g., for PoL), we included the note in the note identifier derivation.
 
-```
+```text
 def derive_op_id(operation: Op) -> Hash:
-		op_bytes = encode(op)
+        op_bytes = encode(op)
     h = Hasher() # /!\ This is a classic hash not a zkhash /!\
     h.update(b"OPERATION_ID_V1")
     h.update(op_bytes)
 return h.digest()
 def derive_note_id(op_id: Hash, output_number: int, note: Note) -> NoteId:
 return zkhash(
-			  FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
+              FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
         FiniteField(op_id, byte_order="little", modulus= p),
         FiniteField(output_number, byte_order="little", modulus= p),
         FiniteField(note.value, byte_order="little", modulus= p),
@@ -1423,9 +1423,9 @@ Locked notes are special notes in Mantle that serve as collateral for Service De
 
 ## Ledger
 
-```
+```text
 class Ledger:
-		notes: list[Note]
+        notes: list[Note]
     locked_notes: dict[NoteId, LockedNote]
 ```
 
@@ -1433,10 +1433,10 @@ class Ledger:
 
 A note is spendable if and only if it exists, it is not spent or locked. The following function validates that an input of notes can be consumed:
 
-```
+```text
 class Ledger:
 def assert_spendable(inputs: list[NoteId]):
-## Check there is no duplicate										  
+## Check there is no duplicate                                          
 assert len(inputs) == len(set(inputs))
 # Check that each note is individualy not locked and unspent
 for note_id in inputs:
@@ -1448,7 +1448,7 @@ assert note_id not in locked_notes
 
 Before an output of notes can be inserted into the Ledger, every note field must satisfy the following constraints:
 
-```
+```text
 class Ledger:
 def assert_valid_output(outputs: list[Note]):
 for note in outputs:
@@ -1460,33 +1460,33 @@ assert note.value <= 2**64-1
 
 Consuming a set of notes removes them from the Ledgers Merkle tree and recycles their leaf indices:
 
-```
+```text
 class Ledger:
 def execute_spending(inputs: list[NoteId]):
 for note_id in inputs:
 # updates the merkle tree to zero out the leaf for this entry
 # and adds that leaf index to the list of unused leaves
-				    ledger.remove(note_id)
+                    ledger.remove(note_id)
 ```
 
 ### Creating Output Notes Execution
 
 Creating notes derives their NoteId from the Operations OpId and insert them in the Ledger:
 
-```
+```text
 class Ledger:
 def execute_adding(op_id: Hash,
-											 outputs: list[Note]):
+                                             outputs: list[Note]):
 for (output_index, output_note) in enumerate(outputs):
-						output_note_id = derive_note_id(op_id, output_index, output_note)
-				    ledger.add(output_note_id)
+                        output_note_id = derive_note_id(op_id, output_index, output_note)
+                    ledger.add(output_note_id)
 ```
 
 # Appendix
 
 ## Gas Determination
 
-From the [[1.4.1][Analysis] Gas Cost Determination](https://nomos-tech.notion.site/1-4-1-Analysis-Gas-Cost-Determination-33e261aa09df80e0933df9f6cd1251a4?pvs=24), we get the table below:
+From the [\[1.4.1\]\[Analysis\] Gas Cost Determination](https://nomos-tech.notion.site/1-4-1-Analysis-Gas-Cost-Determination-33e261aa09df80e0933df9f6cd1251a4?pvs=24), we get the table below:
 
 | Constants | Value |
 | --- | --- |
@@ -1504,7 +1504,7 @@ From the [[1.4.1][Analysis] Gas Cost Determination](https://nomos-tech.notion.si
 
 A proof attesting that for the following public values:
 
-```
+```text
 class ZkSignaturePublic:
     public_keys: list[ZkPublicKey] # public keys signing the message (len = 32)
     msg: zkhash # a finite field element uniquely representing the message
@@ -1512,7 +1512,7 @@ class ZkSignaturePublic:
 
 The prover knows a witness:
 
-```
+```text
 class ZkSignatureWitness:
 # The list of secret keys used to signed the message
     secret_keys: list[ZkSecretKey] # (len = 32)
@@ -1521,15 +1521,15 @@ class ZkSignatureWitness:
 Such that the following constraints hold:
 
 - The number of secret keys is equal to the number of public keys.
-    ```
+    ```text
     assert len(secret_keys) == len(public_keys)
     ```
 - Each public key is derived from the corresponding secret key.
-    ```
+    ```text
     assert all(
       notes[i].public_key == zkhash(
-    		  FiniteField(b"KDF", byte_order="little", modulus= p),
-    		  secret_keys[i])
+              FiniteField(b"KDF", byte_order="little", modulus= p),
+              secret_keys[i])
     for i in range(len(public_keys)
     )
     ```
@@ -1547,47 +1547,47 @@ The material used for the benchmarks is the following:
 - OS        : Ubuntu 22.04.5 LTS
 - Kernel    : 6.8.0-59-generic
 
-![](https://nomos-tech.notion.site/image/attachment%3Aad1135c7-6705-47d4-8d11-c7322f1f35f2%3Aoutput.png?table=block&id=477261aa-09df-8268-8845-8145f3f8d670&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aad1135c7-6705-47d4-8d11-c7322f1f35f2%3Aoutput.png?table=block&id=477261aa-09df-8268-8845-8145f3f8d670&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Proof of Claim
 
 A proof attesting that given these public values:
 
-```
+```text
 class ProofOfClaimPublic:
-	voucher_root: zkhash # Merkle root of the reward_voucher maintained by everyone
-	voucher_nullifier: zkhash
-	mantle_tx_hash_fr: zkhash # attached hash reduced modulo p
+    voucher_root: zkhash # Merkle root of the reward_voucher maintained by everyone
+    voucher_nullifier: zkhash
+    mantle_tx_hash_fr: zkhash # attached hash reduced modulo p
 ```
 
 The prover knows the following witness:
 
-```
+```text
 class ProofOfClaimWitness:
-	secret_voucher: zkhash
-	voucher_merkle_path: list[zkhash]
-	voucher_merkle_path_selectors: list[bool]
+    secret_voucher: zkhash
+    voucher_merkle_path: list[zkhash]
+    voucher_merkle_path_selectors: list[bool]
 ```
 
 such that the following constraints hold:
 
 - The reward voucher is derived from the secret voucher.
-    ```
+    ```text
     assert reward_voucher == zkhash(
-    		FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
-    		secret_voucher)
+            FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
+            secret_voucher)
     ```
 - There exists a valid Merkle path from the reward voucher as a leaf to the Merkle root.
-    ```
+    ```text
     assert voucher_root == path_root(leaf=reward_voucher,
-    		path=voucher_merkle_path,
-    		selectors=voucher_merkle_path_selectors)
+            path=voucher_merkle_path,
+            selectors=voucher_merkle_path_selectors)
     ```
 - The voucher nullifier is derived from the secret voucher correctly.
-    ```
+    ```text
     assert voucher_nullifer == zkhash(
-    		FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
-    		secret_voucher)
+            FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
+            secret_voucher)
     ```
 - The proof is bound to the mantle_tx_hash reduced modulo $p$.
 
@@ -1601,5 +1601,5 @@ The material used for the benchmarks is the following:
 - OS        : Ubuntu 22.04.5 LTS
 - Kernel    : 6.8.0-59-generic
 
-![](https://nomos-tech.notion.site/image/attachment%3A6c2a8e67-803d-4a49-8cee-931191d015f8%3Aoutput.png?table=block&id=b23261aa-09df-827c-8565-014a68d98d4c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A6c2a8e67-803d-4a49-8cee-931191d015f8%3Aoutput.png?table=block&id=b23261aa-09df-827c-8565-014a68d98d4c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 

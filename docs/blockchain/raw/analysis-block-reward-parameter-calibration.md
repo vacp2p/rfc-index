@@ -33,7 +33,7 @@
 
 # Introduction
 
-This document explains the rationale behind the parameter values proposed in [🔀[1.0.0] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24).
+This document explains the rationale behind the parameter values proposed in [🔀\[1.0.0\] Block Rewards](https://nomos-tech.notion.site/1-0-0-Block-Rewards-d96261aa09df838ca36601b4b27b49b4?pvs=24).
 
 The block reward mechanism adjusts the protocol’s token emission rate based on on-chain signals such as the deviation of the inferred total stake from its target and the moving average of the fee-burning rate. The parameters calibrated here control how strongly the emission rate reacts to those signals, how quickly it transitions between regimes, and the bounds it must respect.
 
@@ -49,19 +49,19 @@ For the sake of an example, let's set $\alpha_d = 1$, $\alpha_a=0$, $I_{min}=0\%
 
 The figure below shows a KPI whose deviation around the target has a standard deviation $1$.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ad4a327d9-4476-4082-bc55-3f1851e1b281%3AScreenshot_2025-07-29_at_12.35.22.png?table=block&id=995261aa-09df-83eb-9bd6-8147e7b7403b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ad4a327d9-4476-4082-bc55-3f1851e1b281%3AScreenshot_2025-07-29_at_12.35.22.png?table=block&id=995261aa-09df-83eb-9bd6-8147e7b7403b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 As a consequence, the emission rate $I_t$ frequently reaches the maximum value.
 
-![](https://nomos-tech.notion.site/image/attachment%3A8525cc9f-0120-4533-8a50-785c8a02d884%3AScreenshot_2025-07-29_at_12.35.48.png?table=block&id=5a7261aa-09df-826e-8a19-814f8697368d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A8525cc9f-0120-4533-8a50-785c8a02d884%3AScreenshot_2025-07-29_at_12.35.48.png?table=block&id=5a7261aa-09df-826e-8a19-814f8697368d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Let's now consider a scenario where the volatility of the KPI deviation decreases to $0.1$. The figure below shows an example (the difference in the signal oscillation with respect to Figure 2 is very subtle).
 
-![](https://nomos-tech.notion.site/image/attachment%3Acc6044a2-6fc4-4923-9d86-d6e26e29b00f%3AScreenshot_2025-07-29_at_12.36.24.png?table=block&id=8d5261aa-09df-8386-9ae9-01565c543c16&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Acc6044a2-6fc4-4923-9d86-d6e26e29b00f%3AScreenshot_2025-07-29_at_12.36.24.png?table=block&id=8d5261aa-09df-8386-9ae9-01565c543c16&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 As a consequence, all else equal, the annualized token emission rate becomes considerably less volatile.
 
-![](https://nomos-tech.notion.site/image/attachment%3A79138903-054b-44e0-952d-5555eae398ad%3AScreenshot_2025-07-29_at_12.37.15.png?table=block&id=ba2261aa-09df-8226-a76d-815ed44a09c9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A79138903-054b-44e0-952d-5555eae398ad%3AScreenshot_2025-07-29_at_12.37.15.png?table=block&id=ba2261aa-09df-8226-a76d-815ed44a09c9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The parameter $\alpha_d$ also controls the sensitivity of the normalized deviation from target ($\delta_t$) in the [emission rate factor function](https://nomos-tech.notion.site/d96261aa09df838ca36601b4b27b49b4?pvs=25#3f1261aa09df82a38e5181140f0e091c) ($A_t$):
 
@@ -82,15 +82,15 @@ For the sake of an example, let's set $\alpha_d = 0$, $\alpha_a=1$, $I_{min}=0\%
 
 The figure below shows a KPI whose deviation around the target has a standard deviation of $100\%.$​
 
-![](https://nomos-tech.notion.site/image/attachment%3A0bc68e9c-e88e-4609-8816-68ded1107f78%3AScreenshot_2025-07-29_at_12.45.04.png?table=block&id=14d261aa-09df-836c-8f08-015f805d66de&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A0bc68e9c-e88e-4609-8816-68ded1107f78%3AScreenshot_2025-07-29_at_12.45.04.png?table=block&id=14d261aa-09df-836c-8f08-015f805d66de&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 As a consequence of the parametrization, specifically $\alpha_a=1$, the emission rate $I_t$ never reaches the maximum value.
 
-![](https://nomos-tech.notion.site/image/attachment%3A0aacf5b4-424e-4c51-8c53-cad4e4a5bdcc%3AScreenshot_2025-07-29_at_12.45.39.png?table=block&id=577261aa-09df-838c-b2f4-01601bb47ec3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A0aacf5b4-424e-4c51-8c53-cad4e4a5bdcc%3AScreenshot_2025-07-29_at_12.45.39.png?table=block&id=577261aa-09df-838c-b2f4-01601bb47ec3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 If we set $\alpha_a=2$, then the emission rate $I_t$ reaches the maximum value, but never surpasses it.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ab40b6e96-ed78-4142-8913-da0e374eca0e%3AScreenshot_2025-07-29_at_12.46.25.png?table=block&id=d82261aa-09df-82cb-a169-81f733cc62ab&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ab40b6e96-ed78-4142-8913-da0e374eca0e%3AScreenshot_2025-07-29_at_12.46.25.png?table=block&id=d82261aa-09df-82cb-a169-81f733cc62ab&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## The Inferred Total Stake ($D_{0,target}$)
 

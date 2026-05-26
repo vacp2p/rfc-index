@@ -27,7 +27,7 @@
 
 # Introduction
 
-The Logos Blockchain utilizes zero-knowledge proof systems not only to ensure strong privacy and security guarantees across its decentralized architecture, but also to reduce the computational burden on validators by compressing execution into succinct proofs. Some of the Logos Blockchain's cryptographic applications specifically use Groth16 (see [🔀[1.0.2] Common Cryptographic Components - Groth16 (zk-SNARK)](https://nomos-tech.notion.site/Groth16-zk-SNARK-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#1fd261aa09df8167bc01e0fc7e6a7c83)), a proof system renowned for its succinctness and efficient verification.
+The Logos Blockchain utilizes zero-knowledge proof systems not only to ensure strong privacy and security guarantees across its decentralized architecture, but also to reduce the computational burden on validators by compressing execution into succinct proofs. Some of the Logos Blockchain's cryptographic applications specifically use Groth16 (see [🔀\[1.0.2\] Common Cryptographic Components - Groth16 (zk-SNARK)](https://nomos-tech.notion.site/Groth16-zk-SNARK-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#1fd261aa09df8167bc01e0fc7e6a7c83)), a proof system renowned for its succinctness and efficient verification.
 
 A critical requirement of Groth16 is the secure generation of a Common Reference String (CRS) through a one-time cryptographic ceremony, commonly known as a Trusted Setup Ceremony. This ceremony ensures that cryptographic parameters are generated in a decentralized manner, such that no individual participant can later compromise the security or privacy guarantees of the system.
 
@@ -50,7 +50,7 @@ At a high level, the Powers-of-Tau ceremony generates a structured set of ellipt
 - At least one participant must be honest and destroy their secret input to guarantee the security of ZK schemes using the CRS.
 - All transformations are accompanied by publicly verifiable proofs, ensuring full auditability of the ceremony.
 
-![](https://nomos-tech.notion.site/image/attachment%3A1d418aca-de35-485a-8dac-494b6ab8e191%3Apot.png?table=block&id=229261aa-09df-8031-9983-cc4bea1d36ff&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1500&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A1d418aca-de35-485a-8dac-494b6ab8e191%3Apot.png?table=block&id=229261aa-09df-8031-9983-cc4bea1d36ff&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1500&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 In the ceremony, a coordinator manages the sequential flow of contributions. Each contributor downloads the current CRS, applies their secret randomness, and sends the updated CRS back through the coordinator, who relays it to the next participant. At each step, an independent verifier can check that the update was performed correctly. Once all contributions are complete, the final CRS is published.
 
@@ -200,7 +200,7 @@ By following this protocol, Logos ensures robust security guarantees without rep
 
 # Annex
 
-```
+```text
 # Pseudocode for Multi-Party Powers-of-Tau Ceremony
 # Input:
 #   - n: Max degree of polynomials to support (e.g., #constraints in Groth16)

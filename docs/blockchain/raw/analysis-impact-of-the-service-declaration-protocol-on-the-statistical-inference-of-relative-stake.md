@@ -50,7 +50,7 @@ The research provides mathematical proof and numerical simulations to validate t
 
 This document examines the impact of minimum stake threshold, introduced in the SDP, on the statistical inference of relative stake along the following points:
 
-![](https://nomos-tech.notion.site/image/attachment%3Aaf3bbdfb-1a69-4f1e-a947-fc843b63d24e%3AChatGPT_Image_Jul_9_2025_12_26_01_PM.png?table=block&id=22b261aa-09df-80ae-a152-ea44acd86a1d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=350&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aaf3bbdfb-1a69-4f1e-a947-fc843b63d24e%3AChatGPT_Image_Jul_9_2025_12_26_01_PM.png?table=block&id=22b261aa-09df-80ae-a152-ea44acd86a1d&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=350&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 In particular:
 
@@ -75,7 +75,7 @@ where $f\in(0,1)$ is the parameter of the [consensus](https://nomos-tech.notion.
 
 ## Inference of relative stake
 
-For the [fraction](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796)[ of wins](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796) $\hat{P}_i(1)$ in the $\sum_{t=1}^T\eta_i(t)\geq1$ observations of the leader election process of a node the [(naive) statistical estimator](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) of $\alpha$, $\hat{\alpha}_i$, is the solution of the equation $\hat{P}_i(1)=\phi(\alpha_i)$ given by
+For the [fraction](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796)[of wins](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#8b87515ad4d04a17b3ad0d275f7b3796) $\hat{P}_i(1)$ in the $\sum_{t=1}^T\eta_i(t)\geq1$ observations of the leader election process of a node the [(naive) statistical estimator](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) of $\alpha$, $\hat{\alpha}_i$, is the solution of the equation $\hat{P}_i(1)=\phi(\alpha_i)$ given by
 
 $$
 \hat{\alpha}_i=\frac{\log\left(1-\hat{P}_i(1)\right)}{\log(1-f)}
@@ -95,7 +95,7 @@ $$
 
 i.e. $\hat{\alpha}_i$ is consistent estimator of the relative stake $\alpha_i$.
 
-Similarly [to the estimator of ](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#d2cc165b22724b03802603cdc9c020df)$\phi(\alpha_i)$, we construct new estimator of relative stake
+Similarly [to the estimator of](https://nomos-tech.notion.site/206261aa09df807bad8afccf8474c6c9?pvs=25#d2cc165b22724b03802603cdc9c020df)$\phi(\alpha_i)$, we construct new estimator of relative stake
 
 $$
 \Alpha[\hat{\alpha}_i]=\left\{
@@ -154,41 +154,41 @@ Now $\hat{\alpha}_i$ is a consistent estimator of the relative stake $\alpha_i$ 
 
 Simulations confirm that MSE of the estimator $\hat{\alpha}_i$ is greater than the MSE of the new estimator $\Alpha[\hat{\alpha}_i]$, as can be seen in the figures below.
 
-![](https://nomos-tech.notion.site/image/attachment%3A2678cd60-9e32-4836-942c-7b2aaecc4927%3A73cab8dd-4078-4667-9d0c-a9ce90dbcece.png?table=block&id=60c13593-6bd3-4647-b31c-c3fc65955de2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A2678cd60-9e32-4836-942c-7b2aaecc4927%3A73cab8dd-4078-4667-9d0c-a9ce90dbcece.png?table=block&id=60c13593-6bd3-4647-b31c-c3fc65955de2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A6134b659-a19b-4995-8169-6be4dc9dee5c%3A9885ed6e-8178-4467-944f-b2f1ddad5ece.png?table=block&id=0f4a1c28-af9a-41ac-ba19-6a43d154edb9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A6134b659-a19b-4995-8169-6be4dc9dee5c%3A9885ed6e-8178-4467-944f-b2f1ddad5ece.png?table=block&id=0f4a1c28-af9a-41ac-ba19-6a43d154edb9&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3Af40e2e20-3706-4b65-a68f-cc4cbac90ab3%3A8c01a4e6-ffe6-40d3-8040-306fee14cc0c.png?table=block&id=14f31751-9f1a-4527-acf1-f59a0d1f412f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Af40e2e20-3706-4b65-a68f-cc4cbac90ab3%3A8c01a4e6-ffe6-40d3-8040-306fee14cc0c.png?table=block&id=14f31751-9f1a-4527-acf1-f59a0d1f412f&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We are interested in the probability $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ which can be seen as [adversarial "confidence"](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25). Here $0<\gamma<1$ prescribes desired “accuracy” of the inference. We note that the probability $\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ can be [estimated analytically](https://nomos-tech.notion.site/1fd261aa09df8181a428f52251e173c4?pvs=25) for large $T$. If for a given (accuracy) parameter $\gamma$ we have that $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right) > \mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ then the adversary has an advantage by using the new estimator, i.e. an adversary which knows that $\alpha_i\geq\alpha_0$ has a higher confidence than the adversary which doesn’t know the latter.
 
 Recall that $\alpha_0 \leq \alpha_i$. We note that $\alpha_0 \in [\alpha_i(1-\lambda), \alpha_i (1+\lambda)]$, provided $\alpha_i(1-\lambda) \leq \alpha_0$. Let us assume (without loss of generality) that $\alpha_i=n\,\alpha_0$ for some $n\geq1$. Then, from $\alpha_i(1-\gamma)\leq\alpha_0$ follows that $n\leq \frac{1}{1-\gamma}$. Hence, if this inequality is satisfied, an adversary may have advantage. We compute the probabilities $\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ and $\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)$ using simulation and find that the adversary has advantage for the relative stake $\alpha_i\in[\alpha_0,\frac{\alpha_0}{1-\gamma}]$, as can be seen in figures below.
 
-![](https://nomos-tech.notion.site/image/attachment%3A77498bf4-d0c3-4245-8d23-051784c9ad2e%3A85c026e3-c782-42aa-b2fd-85fa25526c7c.png?table=block&id=48c26d1a-420b-43c5-a43a-2e3b26de5036&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A77498bf4-d0c3-4245-8d23-051784c9ad2e%3A85c026e3-c782-42aa-b2fd-85fa25526c7c.png?table=block&id=48c26d1a-420b-43c5-a43a-2e3b26de5036&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A92137e05-cf14-4727-b836-4c1cb595da56%3Ac91bc5ac-9de4-4f84-833f-7fb64ae521b6.png?table=block&id=300d0df8-6895-49f7-8b89-b45f11966ae3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A92137e05-cf14-4727-b836-4c1cb595da56%3Ac91bc5ac-9de4-4f84-833f-7fb64ae521b6.png?table=block&id=300d0df8-6895-49f7-8b89-b45f11966ae3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3Aebcf148c-113f-4aa9-aea4-ed355bf2d258%3Ac63c19d8-0c90-4358-9e26-3c1f6854aea2.png?table=block&id=5cc468cc-8a1d-443e-b4a5-74f7c458695e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aebcf148c-113f-4aa9-aea4-ed355bf2d258%3Ac63c19d8-0c90-4358-9e26-3c1f6854aea2.png?table=block&id=5cc468cc-8a1d-443e-b4a5-74f7c458695e&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Numerical Experiments
 
 In this section, we compare performance of the statistical estimators $\hat{\alpha}_i$ and $\Alpha[\hat{\alpha}_i]$ in a single run of a simulation. This can be seen as a scenario where two adversaries collect the same data from the leader election process, but one of the adversaries knows $\alpha_0$ and uses this in the statistical inference. To simulate the statistical inference of relative stake in one epoch ($T=432000$ time-slots) of the leader election process with parameter $f=0.05$, we sampled $N=2\times10^3$ random (stake) values from the [Pareto distribution](https://en.wikipedia.org/wiki/Pareto_distribution) with shape parameter $2.5$ and scale parameter $2$. The histogram of (relative) stake values is given below
 
-![](https://nomos-tech.notion.site/image/attachment%3Ac80b2c2f-3ab0-4aed-85dd-1106b1f36e6a%3AScreenshot_2025-05-30_at_15.35.36.png?table=block&id=4a2a1aab-0f61-4a0a-92b3-ab151a4c5607&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ac80b2c2f-3ab0-4aed-85dd-1106b1f36e6a%3AScreenshot_2025-05-30_at_15.35.36.png?table=block&id=4a2a1aab-0f61-4a0a-92b3-ab151a4c5607&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 We consider inference only for $5$ nodes with the highest relative stake and for $5$ nodes with relative stake just above the threshold $\alpha_0=1/10^4$.  We consider a scenario where fraction $q\in\{1/100,1/10,1\}$ of time-slots of the leader election process are observed by adversary. Here we find differences between estimators only for nodes with relative stake close to $\alpha_0$ as can be seen in the figures below.
 
-![](https://nomos-tech.notion.site/image/attachment%3Ad0fd7422-7c88-4b0d-a624-9924efef31d4%3A48b85f1a-810d-4fa3-a325-b0aa6eaa9735.png?table=block&id=f9f8159d-2e95-4ba3-a395-a44c97ceb42b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ad0fd7422-7c88-4b0d-a624-9924efef31d4%3A48b85f1a-810d-4fa3-a325-b0aa6eaa9735.png?table=block&id=f9f8159d-2e95-4ba3-a395-a44c97ceb42b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A5603e165-ea7a-4b56-92bf-b32ae06be4a9%3A189eb8a2-1295-450b-b818-81f7f0568090.png?table=block&id=d2daef95-6e55-4cd0-96fb-bfd3e27898d7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A5603e165-ea7a-4b56-92bf-b32ae06be4a9%3A189eb8a2-1295-450b-b818-81f7f0568090.png?table=block&id=d2daef95-6e55-4cd0-96fb-bfd3e27898d7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A5e7e0ed4-0b31-4fd8-9daa-35b4102c953d%3A0c35a1db-e76c-4ead-b7df-31bd371f732b.png?table=block&id=ad2d984c-81fa-4064-81a5-f6fd7fac3cd3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A5e7e0ed4-0b31-4fd8-9daa-35b4102c953d%3A0c35a1db-e76c-4ead-b7df-31bd371f732b.png?table=block&id=ad2d984c-81fa-4064-81a5-f6fd7fac3cd3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A1843e6fa-b779-4c5f-92d3-5640baaec30b%3Ad5f0b6c2-0a29-4395-844c-6f533ba7b2b9.png?table=block&id=2a75024d-d805-4e73-a880-c045055bfc97&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A1843e6fa-b779-4c5f-92d3-5640baaec30b%3Ad5f0b6c2-0a29-4395-844c-6f533ba7b2b9.png?table=block&id=2a75024d-d805-4e73-a880-c045055bfc97&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3A697554e5-f6ac-48e3-8fec-71dedab492e4%3A6066059d-6d60-44e1-8dab-26fbe24cee5a.png?table=block&id=11cd61af-c167-4819-9767-2ccf7579c1d4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A697554e5-f6ac-48e3-8fec-71dedab492e4%3A6066059d-6d60-44e1-8dab-26fbe24cee5a.png?table=block&id=11cd61af-c167-4819-9767-2ccf7579c1d4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/attachment%3Af782ae8a-5d7f-44f5-9441-42d76038b243%3Ab36278f3-c698-4123-8c9f-9d3891d73391.png?table=block&id=e6ca6c54-2e13-4b01-8557-522745e3f4ed&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Af782ae8a-5d7f-44f5-9441-42d76038b243%3Ab36278f3-c698-4123-8c9f-9d3891d73391.png?table=block&id=e6ca6c54-2e13-4b01-8557-522745e3f4ed&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 # Appendix
 

@@ -63,10 +63,10 @@ Each voucher_cm is added to a Merkle tree of voucher commitments by validators d
 
 ### Protocol
 
-Each leader may submit a [[1.3.0] Mantle - LEADER_CLAIM](https://nomos-tech.notion.site/LEADER_CLAIM-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df81c4a33bddc5ada55f8c) Operation to claim their reward. This Operation includes:
+Each leader may submit a [\[1.3.0\] Mantle - LEADER_CLAIM](https://nomos-tech.notion.site/LEADER_CLAIM-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df81c4a33bddc5ada55f8c) Operation to claim their reward. This Operation includes:
 
 - The Merkle root of the global voucher set when the Mantle Transaction containing the claim is submitted.
-- A [[1.3.0] Mantle - Proof of Claim](https://nomos-tech.notion.site/Proof-of-Claim-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df81d48e26e141e8eed17b).
+- A [\[1.3.0\] Mantle - Proof of Claim](https://nomos-tech.notion.site/Proof-of-Claim-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df81d48e26e141e8eed17b).
 
 This Operation increases the balance of a Mantle Transaction by the leader reward amount, letting the leader move the funds as desired through the Ledger transaction or another Operation.
 

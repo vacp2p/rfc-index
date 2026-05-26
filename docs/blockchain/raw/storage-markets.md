@@ -119,7 +119,7 @@ To ensure on-chain efficiency, the protocol shall use an Exponential Moving Aver
     > $T_{\text{effective}}$ will be zero during the first epoch unless $C_{\text{usage}}(0) > 0$.
     > The reference implementation handles this correctly via the if effective_target == 0: return self.price guard, which holds the price at $P_{\text{STR}}(0)$ until the first non-zero usage
     > epoch provides a meaningful signal. This is the intended behavior at genesis.
-- The precise value of $P_{\text{STR}}(0)$ is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price $P^*$ regardless of the starting point, provided the stability condition $(*)$ holds (see [[1.0.0][Analysis] Storage Market - Price Stability Analysis](https://nomos-tech.notion.site/Price-Stability-Analysis-a03261aa09df83f6bcd6815ba73b72e1?pvs=24#fed261aa09df8241b79c01ca67ef6026)). The only hard requirement is for $P_{\text{STR}}(0)$ to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.
+- The precise value of $P_{\text{STR}}(0)$ is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price $P^*$ regardless of the starting point, provided the stability condition $(*)$ holds (see [\[1.0.0\]\[Analysis\] Storage Market - Price Stability Analysis](https://nomos-tech.notion.site/Price-Stability-Analysis-a03261aa09df83f6bcd6815ba73b72e1?pvs=24#fed261aa09df8241b79c01ca67ef6026)). The only hard requirement is for $P_{\text{STR}}(0)$ to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.
     More precisely, since the price can increase by at most $\alpha = 12.5\%$ per epoch, the number
     of epochs required to reach a target price $P^*$ from an initial price $P_{\text{STR}}(0) < P^*$ is bounded above by:
     $$
@@ -217,7 +217,7 @@ $P_{\mathrm{STR}}(s+1)=\begin{cases}\left\lfloor P_{\mathrm{STR}}(s)\cdot \frac7
 
 and so we can derive the following reference code:
 
-```
+```text
 EMA_DENOMINATOR = 2         # 1/beta
 CLAMP_DENOMINATOR = 8       # denominator of 1+ alpha and 1-alpha
 CLAMP_DOWN_NUMERATOR = 7    # numerator of 1-alpha

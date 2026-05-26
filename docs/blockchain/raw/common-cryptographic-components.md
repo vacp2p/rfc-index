@@ -51,14 +51,14 @@ The table below summarizes the recommended component for each context:
 | ZK Hashing | [Poseidon2](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81f48afcd5bbe86c4a18) |
 | General Hashing & PRNG | [BLAKE2b](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b3890fcc4f9606ee9e) |
 | General Signatures | [EdDSA](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b99b7ce8dc0ac2f110) |
-| ZK Signatures | [ZkSignature](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b7933cc1efca816f72) (see [🔀[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)) |
-| Proof System (SNARK) | [Groth16 ](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df8167bc01e0fc7e6a7c83) |
+| ZK Signatures | [ZkSignature](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df81b7933cc1efca816f72) (see [🔀\[1.5.0\] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)) |
+| Proof System (SNARK) | [Groth16](https://nomos-tech.notion.site/1fd261aa09df81ac8ebbe0111e2c2d84?pvs=25#1fd261aa09df8167bc01e0fc7e6a7c83) |
 
 # 1. Hash Functions
 
 The Logos Blockchain utilizes different hash functions depending on the use case context—primarily distinguishing between zero-knowledge circuit contexts and general usage scenarios. The Logos Blockchain selects hash functions based on their performance characteristics: Poseidon2 for arithmetic-oriented handwritten circuits, and Blake2 for bit-oriented operations in ZkVM and general computations. In specifications, we refer to these arithmetic hash function as zkhash and the general purpose hash function as Hash.
 
-## [BLAKE2b](https://www.blake2.net/blake2.pdf)[ (General-Purpose Hashing)](https://eprint.iacr.org/2013/322)
+## [BLAKE2b](https://www.blake2.net/blake2.pdf)[(General-Purpose Hashing)](https://eprint.iacr.org/2013/322)
 
 Description:
 
@@ -98,7 +98,7 @@ Construction:
 
 Given a 64-byte seed and an integer index i, the PRNG output is derived by:
 
-```
+```text
 PRNG(seed, i) = BLAKE2b(seed || encode_u64(i), out_len=64)
 ```
 
@@ -251,7 +251,7 @@ Security Considerations:
 - IETF RFC for EdDSA: [https://datatracker.ietf.org/doc/html/rfc8032](https://datatracker.ietf.org/doc/html/rfc8032)
 - EdDSA original paper: High-speed high-security signatures. Daniel J. Bernstein, Niels Duif, Tanja Lange, Peter Schwabe, Bo-Yin Yang.  [https://eprint.iacr.org/2011/368](https://eprint.iacr.org/2011/368)
 - Curve25519: [https://iacr.org/archive/pkc2006/39580209/39580209.pdf](https://iacr.org/archive/pkc2006/39580209/39580209.pdf)
-- ZkSignature: [🔀[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)​
+- ZkSignature: [🔀\[1.5.0\] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)​
 
 # 3. Proof Systems
 
@@ -278,7 +278,7 @@ Rationale for Use:
 
 Security Considerations:
 
-- Groth16 is a zk-SNARK in the Common Reference String (CRS) model. Its knowledge soundness is proved in the generic bilinear group model, under the assumption that the structured CRS was generated honestly and that the trapdoor was destroyed. In practice, producing such a CRS via a one-time multi-party trusted setup ceremony (see [🔀[1.0.1] Trusted Setup Ceremony](https://nomos-tech.notion.site/1-0-1-Trusted-Setup-Ceremony-202261aa09df8192a9beea11f8e50d02?pvs=24)) relies on standard hardness assumptions for the chosen pairing groups and on the at-least-one-honest-participant with secure erasure.
+- Groth16 is a zk-SNARK in the Common Reference String (CRS) model. Its knowledge soundness is proved in the generic bilinear group model, under the assumption that the structured CRS was generated honestly and that the trapdoor was destroyed. In practice, producing such a CRS via a one-time multi-party trusted setup ceremony (see [🔀\[1.0.1\] Trusted Setup Ceremony](https://nomos-tech.notion.site/1-0-1-Trusted-Setup-Ceremony-202261aa09df8192a9beea11f8e50d02?pvs=24)) relies on standard hardness assumptions for the chosen pairing groups and on the at-least-one-honest-participant with secure erasure.
 - Groth16’s security has been thoroughly analyzed in the literature, and the protocol is widely used in production zk-blockchain stacks.
 
 ## References

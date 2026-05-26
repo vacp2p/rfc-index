@@ -61,7 +61,7 @@ Working to give leaders confidence in this statement has had ripple effects thro
 
 - The block proposals should not be linkable to a leader. An adversary should not be able to connect together the block proposals of a leader in order to build a profile. In particular, one should not be able to infer a proposer's stake from their past on-chain activity.
 - Cryptarchia must not reveal the stake of the leader - that is, it must be a Private Proof of Stake (PPoS) protocol. If the activity of the leader reveals their stake values (e.g. through weighted voting), then this value can be used to reduce the anonymity set for the leader by bucketing the leader as high/low stake and can open him up to targeting.
-- Leaders should be protected against network triangulation attacks. This is outside of the scope of this document, but it suffices to say that in-protocol cryptographic privacy is not sufficient to guarantee a leader's privacy. This topic is dealt with directly in [🔀[1.0.0] Blend Protocol](https://nomos-tech.notion.site/1-0-0-Blend-Protocol-215261aa09df81ae8857d71066a80084?pvs=24).
+- Leaders should be protected against network triangulation attacks. This is outside of the scope of this document, but it suffices to say that in-protocol cryptographic privacy is not sufficient to guarantee a leader's privacy. This topic is dealt with directly in [🔀\[1.0.0\] Blend Protocol](https://nomos-tech.notion.site/1-0-0-Blend-Protocol-215261aa09df81ae8857d71066a80084?pvs=24).
 
 ## Limitations of Cryptarchia V1
 
@@ -86,7 +86,7 @@ Our design starts from the solid foundation provided by [Ouroboros Crypsinous: P
 
 | Symbol | Name | Description | Value |
 | --- | --- | --- | --- |
-| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [🔀[1.0.0][Analysis] Block Times & Blend Network](https://nomos-tech.notion.site/1-0-0-Analysis-Block-Times-Blend-Network-1fd261aa09df817fa25ef80b964183cc?pvs=24) for analysis leading to the choice of value) | 1/30 |
+| $f$​ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [🔀\[1.0.0\]\[Analysis\] Block Times & Blend Network](https://nomos-tech.notion.site/1-0-0-Analysis-Block-Times-Blend-Network-1fd261aa09df817fa25ef80b964183cc?pvs=24) for analysis leading to the choice of value) | 1/30 |
 | $k$​ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
 | none | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
@@ -110,7 +110,7 @@ The latest immutable block $B_\text{imm}$ is the most recent block considered pe
 
 This is maintained locally by the [Chain Maintenance](https://nomos-tech.notion.site/Chain-Maintenance-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81de81bac3a3286dc212) procedure. When the [Online fork choice rule](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df812caa08ce2f637a6278) is in use, $B_\text{imm}$ corresponds to the $k$-deep block. However, it may be deeper than the $k$-deep block if the fork choice rule has been switched from Online to [Bootstrap](https://nomos-tech.notion.site/21b261aa09df811584dfd362abb26627?pvs=25#21b261aa09df81e4a352dd365c9ebe8c). Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added unless the Online fork choice rule is used.
 
-The details of fork choice rule transitions are defined in the bootstrap spec: [🔀[1.0.0] Cryptarchia Bootstrapping & Synchronization](https://nomos-tech.notion.site/1-0-0-Cryptarchia-Bootstrapping-Synchronization-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24)
+The details of fork choice rule transitions are defined in the bootstrap spec: [🔀\[1.0.0\] Cryptarchia Bootstrapping & Synchronization](https://nomos-tech.notion.site/1-0-0-Cryptarchia-Bootstrapping-Synchronization-1fd261aa09df81ac94b5fb6a4eff32a6?pvs=24)
 
 ## Slot
 
@@ -172,7 +172,7 @@ $$
 \eta_{B} = \text{zkHASH}(\text{EPOCH\_NONCE\_V1}||\eta_{\text{parent}}||\rho_\text{LEAD}||\text{Fr}(sl)))
 $$
 
-where $\text{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\text{zkHASH}(..)$ is Poseidon2 as specified in [🔀[1.0.2] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24) .
+where $\text{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\text{zkHASH}(..)$ is Poseidon2 as specified in [🔀\[1.0.2\] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24) .
 
 The epoch nonce used in the next epoch is $\eta_{B'}$ where $B'$ is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.
 
@@ -180,7 +180,7 @@ The epoch nonce used in the next epoch is $\eta_{B'}$ where $B'$ is the last blo
 
 Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The details can be found in the following document:
 
-[🔀[1.0.0] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Total-Stake-Inference-22d261aa09df8051a454caa46ec54b34?pvs=24)
+[🔀\[1.0.0\] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Total-Stake-Inference-22d261aa09df8051a454caa46ec54b34?pvs=24)
 
 ### Epoch State Pseudocode
 
@@ -230,7 +230,7 @@ The specifications of how a leader can prove that they have won the lottery are 
 
 ### Leader Rewards
 
-As an incentive for producing blocks, leaders are rewarded with every block proposal. The rewarding protocol is specified in [🔀[1.0.0] Anonymous Leaders Reward Protocol](https://nomos-tech.notion.site/1-0-0-Anonymous-Leaders-Reward-Protocol-206261aa09df8120a49ffa49c71ba70d?pvs=24).
+As an incentive for producing blocks, leaders are rewarded with every block proposal. The rewarding protocol is specified in [🔀\[1.0.0\] Anonymous Leaders Reward Protocol](https://nomos-tech.notion.site/1-0-0-Anonymous-Leaders-Reward-Protocol-206261aa09df8120a49ffa49c71ba70d?pvs=24).
 
 ## Block Chain
 
@@ -242,13 +242,13 @@ During bootstrapping, we must be resilient to malicious peers feeding us false c
 
 After bootstrapping we commit to the most honest looking chain we found and switch to a fork choice rule that rejects chains that diverge by more than $k$ blocks
 
-[🔀[1.0.0] Cryptarchia Fork Choice Rule](https://nomos-tech.notion.site/1-0-0-Cryptarchia-Fork-Choice-Rule-21b261aa09df811584dfd362abb26627?pvs=24)
+[🔀\[1.0.0\] Cryptarchia Fork Choice Rule](https://nomos-tech.notion.site/1-0-0-Cryptarchia-Fork-Choice-Rule-21b261aa09df811584dfd362abb26627?pvs=24)
 
 ### Block ID
 
-Block ID is defined by the hash of the block header [Block Header](https://nomos-tech.notion.site/Block-Header-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df8186bc6cec1fc01e4cf5), where hash is Blake2b as specified in [🔀[1.0.2] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24)
+Block ID is defined by the hash of the block header [Block Header](https://nomos-tech.notion.site/Block-Header-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df8186bc6cec1fc01e4cf5), where hash is Blake2b as specified in [🔀\[1.0.2\] Common Cryptographic Components](https://nomos-tech.notion.site/1-0-2-Common-Cryptographic-Components-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24)
 
-```
+```text
 def block_id(header: Header) -> hash
 return hash(
 b"BLOCK_ID_V1",
@@ -266,29 +266,29 @@ b"BLOCK_ID_V1",
 
 ### Block Header
 
-```
+```text
 class Header: # 297 bytes
-	  bedrock_version: byte                    # 1 bytes
-	  parent_block: hash # 32 bytes
-  	slot: int # 8 bytes
+      bedrock_version: byte                    # 1 bytes
+      parent_block: hash # 32 bytes
+      slot: int # 8 bytes
  block_root: hash # 32 bytes
-	  proof_of_leadership: ProofOfLeadership   # 224 bytes
+      proof_of_leadership: ProofOfLeadership   # 224 bytes
 class ProofOfLeadership: # 224 bytes
-  	leader_voucher: zkhash                   # 32 bytes
-  	entropy_contribution: zkhash             # 32 bytes
-  	proof: Groth16Proof                      # 128 bytes
-  	leader_key: Ed25519PublicKey             # 32 bytes
+      leader_voucher: zkhash                   # 32 bytes
+      entropy_contribution: zkhash             # 32 bytes
+      proof: Groth16Proof                      # 128 bytes
+      leader_key: Ed25519PublicKey             # 32 bytes
 ```
 
 ### Block
 
-[🔀[1.1.1] Block Construction, Validation and Execution](https://nomos-tech.notion.site/1-1-1-Block-Construction-Validation-and-Execution-33e261aa09df806c8fe3e10ede80918d?pvs=24)​
+[🔀\[1.1.1\] Block Construction, Validation and Execution](https://nomos-tech.notion.site/1-1-1-Block-Construction-Validation-and-Execution-33e261aa09df806c8fe3e10ede80918d?pvs=24)​
 
 ### Block Header Validation
 
 Given block $B=(header, transactions)$ and the block tree $T$ where:
 
-- $header$ is the header defined in [🔀[1.1.1] Block Construction, Validation and Execution - Header](https://nomos-tech.notion.site/Header-33e261aa09df806c8fe3e10ede80918d?pvs=24#39d261aa09df839cba2e0111e1ca9f99)​
+- $header$ is the header defined in [🔀\[1.1.1\] Block Construction, Validation and Execution - Header](https://nomos-tech.notion.site/Header-33e261aa09df806c8fe3e10ede80918d?pvs=24#39d261aa09df839cba2e0111e1ca9f99)​
 - $transactions$ is the sequence of transactions in the block
 
 We say $\textbf{valid\_header}(B)$ returns True if all of the following constraints hold, otherwise it returns False.
@@ -311,7 +311,7 @@ We say $\textbf{valid\_header}(B)$ returns True if all of the following constrai
     Ensure the block comes after the latest immutable block. Assuming that $T$ prunes all forks diverged deeper than $B_\text{imm}$, this step, along with step 5, ensures that $B$ is descendant from $B_\text{imm}$. If all forks cannot be pruned completely in the implementation, this step must be replaced with $\textbf{is\_ancestor}(B_\text{imm}, B)$, which checks whether $B_\text{imm}$ is an ancestor of $B$.
 1. Verify the leader’s right to propose and ensure it is the one proposing this block:
     Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL},P_\text{LEAD},\sigma)$, where
-    - $\pi_\text{PoL}$ is the slot lottery win proof as defined in [🔀[1.1.0] Proof of Leadership](https://nomos-tech.notion.site/1-1-0-Proof-of-Leadership-2e9261aa09df80058244c902defc6da2?pvs=24)
+    - $\pi_\text{PoL}$ is the slot lottery win proof as defined in [🔀\[1.1.0\] Proof of Leadership](https://nomos-tech.notion.site/1-1-0-Proof-of-Leadership-2e9261aa09df80058244c902defc6da2?pvs=24)
     - $P_\text{LEAD}$ is the public key committed to in $\pi_\text{PoL}$.
     - $\sigma$ is a signature.
     A leaders proposal is valid if

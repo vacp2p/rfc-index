@@ -89,7 +89,7 @@ Phase 0: Bootstrapping and identifying Public nodes
 
 If the node is statically configured by the operator to be Public, the procedure is stopped.
 
-The node utilizes bootstrapping (see [[1.0.1] P2P Network Bootstrapping](https://nomos-tech.notion.site/1-0-1-P2P-Network-Bootstrapping-206261aa09df81e9848fe79c32c329c8?pvs=24)) and discovery (see [[1.0.1] P2P Network](https://nomos-tech.notion.site/1-0-1-P2P-Network-206261aa09df81db8100d5f410e39d75?pvs=24)) to find other Public nodes. The [Identify](https://github.com/libp2p/specs/blob/master/identify/README.md) protocol is used to confirm which of the detected Public nodes support [AutoNAT v2](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md).
+The node utilizes bootstrapping (see [\[1.0.1\] P2P Network Bootstrapping](https://nomos-tech.notion.site/1-0-1-P2P-Network-Bootstrapping-206261aa09df81e9848fe79c32c329c8?pvs=24)) and discovery (see [\[1.0.1\] P2P Network](https://nomos-tech.notion.site/1-0-1-P2P-Network-206261aa09df81db8100d5f410e39d75?pvs=24)) to find other Public nodes. The [Identify](https://github.com/libp2p/specs/blob/master/identify/README.md) protocol is used to confirm which of the detected Public nodes support [AutoNAT v2](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md).
 
 The node then moves to the next phase.
 
@@ -101,7 +101,7 @@ Phase 2: Automated Port Mapping
 
 The node attempts to secure a port mapping on the default gateway using one of the following protocols: [PCP](https://datatracker.ietf.org/doc/html/rfc6887), [NAT-PMP](https://datatracker.ietf.org/doc/html/rfc6886), or [UPnP-IGD](https://datatracker.ietf.org/doc/html/rfc6970). PCP is the successor of NAT-PMP and is the most reliable protocol of the three. UPnP-IGD is the most widely deployed protocol, but the least reliable. The port mapping procedure takes this into account and proceeds as follows:
 
-```
+```text
 def try_port_mapping():
 # Step 1: Get the local IPv4 address
     local_ip = get_local_ipv4_address()
@@ -135,7 +135,7 @@ A Public node must ensure that the port mapping is periodically renewed accordin
 
 Finally, the node continues to the next phase.
 
-```
+```text
 NodeRouterPort Mapping ClientNAT State MachineAutoNAT ClientRouterPort Mapping ClientNAT State MachineAutoNAT ClientPhase 2Phase 3Network MonitoringPhase 3Network Monitoringalt[Node asserts Public status][Node asserts Private status]Phase 2Phase 3Network Monitoringalt[Mapping is successful][Mapping fails, node asserts Private status]Requests new mappingConfirms new mappingMapping securedRequests confirmationthat mapped addressis publicly reachableMapped addressis publicly reachableMapped addressis not publicly reachableRequests new mappingRefuses new mapping or TimeoutMapping failed
 ```
 
@@ -148,7 +148,7 @@ A Public node must do this when:
 - AutoNAT client no longer confirms that at least one of the nodes addresses is publicly reachable.
 - A previously successful port mapping has been lost or refreshing of the mapping failed.
 
-```
+```text
 NodeRouterPort Mapping ClientNAT State MachineAutoNAT ClientAutoNAT ServerRouterPort Mapping ClientNAT State MachineAutoNAT ClientAutoNAT ServerPhase 3Network Monitoringloop[periodically refreshes mapping]break[Mapping is lost, the node loses Publicstatus]loop[periodically checks publicreachability]breakpar[Refresh mapping and monitor changes][Monitor public reachability of mapped addresses]Phase 1Requests refreshConfirms mapping refreshRefresh failed or mapping droppedMapping lostRestartRequests dialbackDialback successfulDialback failed or TimeoutPublic reachability lostRestart
 ```
 

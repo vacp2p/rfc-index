@@ -43,7 +43,7 @@ Hierarchical Deterministic (HD) wallets are nowadays the standard. Using a singl
 
 The industry standard is [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki). However, we cant use it as it is, as we use different keys and cryptographic components. In addition, some of the BIP32 features are only possible thanks to homomorphic properties of ECC, which we dont have in the Logos Blockchain since we use hash-based sk/pk.
 
-![](https://nomos-tech.notion.site/image/attachment%3A76333c8a-46c5-4b16-883f-33fd4b5e04ed%3Aimage.png?table=block&id=216261aa-09df-808f-bbc0-f402be5e66f8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A76333c8a-46c5-4b16-883f-33fd4b5e04ed%3Aimage.png?table=block&id=216261aa-09df-808f-bbc0-f402be5e66f8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 BIP-32 specifies two kinds of child keys:
 
@@ -96,7 +96,7 @@ $CDKpriv((k_{par}, c_{par}), i) \rightarrow (k_i, c_i):$
 
 Since we make extensive use of ZK proofs, we need our secret  public derivation to be efficient. For this purpose, we use a ZK-optimized hash function: Poseidon2.
 
-However, Poseidon2 operates on field elements rather than raw bytes, so we cannot simply input $k_i$ as specified above. Instead, we must encode these bytes into field elements. Using the parameters described in [[1.0.2] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69), we need two field elements to encode 32 bytes (the size of $k_i$). This creates inefficiency because although a single field element provides adequate security, we must use twice as many, increasing computation costs to accommodate the entire key.
+However, Poseidon2 operates on field elements rather than raw bytes, so we cannot simply input $k_i$ as specified above. Instead, we must encode these bytes into field elements. Using the parameters described in [\[1.0.2\] Common Cryptographic Components - Use in the Logos Blockchain:](https://nomos-tech.notion.site/Use-in-the-Logos-Blockchain-1fd261aa09df81ac8ebbe0111e2c2d84?pvs=24#209261aa09df80b8aec6cc763573ff69), we need two field elements to encode 32 bytes (the size of $k_i$). This creates inefficiency because although a single field element provides adequate security, we must use twice as many, increasing computation costs to accommodate the entire key.
 
 To reduce this additional cost inside the proof, we apply one final hash function that compresses these two field elements into a single one, which becomes the actual key used in the Logos Blockchain network:
 

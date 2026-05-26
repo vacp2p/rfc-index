@@ -71,7 +71,7 @@ We define the following services which can be used for service declaration:
 
 - BN: for Blend Network service.
 
-```
+```text
 class ServiceType(Enum):
     BN="BN" # Blend Network
 ```
@@ -84,7 +84,7 @@ The minimum stake is a global value that defines the minimum stake a node must h
 
 The MinStake is a structure that holds the value of the stake stake_threshold and the block number it was set at timestamp, which is a BlockHeight at which the threshold was set; its uint64.
 
-```
+```text
 class MinStake:
     stake_threshold: StakeThreshold
     timestamp: BlockHeight
@@ -92,11 +92,11 @@ class MinStake:
 
 The stake_thresholds is a structure aggregating all defined MinStake values.
 
-```
+```text
 stake_thresholds: list[MinStake]
 ```
 
-For more information on how the minimum stake is calculated, please refer to the [[1.0.0][Analysis] Static Minimum Stake Estimation for Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Analysis-Static-Minimum-Stake-Estimation-for-Service-Declaration-Protocol-3a2261aa09df83e2a104012e29c21f34?pvs=24).
+For more information on how the minimum stake is calculated, please refer to the [\[1.0.0\]\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Analysis-Static-Minimum-Stake-Estimation-for-Service-Declaration-Protocol-3a2261aa09df83e2a104012e29c21f34?pvs=24).
 
 ### Service Parameters
 
@@ -108,7 +108,7 @@ The service parameters structure defines the parameters set necessary for correc
 - retention_period defines the time (as a number of sessions) after which the declaration can be safely deleted by the Garbage Collection mechanism; it can be expressed as the number of blocks by multiplying its value by the session_length.
 - timestamp defines the block height at which the parameter was set; its uint64.
 
-```
+```text
 class ServiceParameters:
     session_length: NumberOfBlocks
     lock_period: NumberOfSessions
@@ -119,7 +119,7 @@ class ServiceParameters:
 
 The parameters is a structure aggregating all defined ServiceParameters values.
 
-```
+```text
 parameters: list[ServiceParameters]
 ```
 
@@ -129,14 +129,14 @@ A session is a fixed-length window defined per service via ServiceParameters.ses
 
 Session numbers start at 0 and are computed as follows:
 
-```
+```text
 def get_session_number(current_block_number, service_parameters):
 return current_block_number // service_parameters.session_length
 ```
 
 At the start of session $n$, each node takes a snapshot (get_snapshot_at_block) of the SDP registry at a specified block height from the finalized part of the chain:
 
-```
+```text
 def get_session_snapshot(session_number, service_parameters):
 if session_number < 2:
 # We take the genesis block for the first two sessions
@@ -154,7 +154,7 @@ Sessions 0 and 1 read the snapshot at block 0, because the chain has not yet pro
 We define the following set of identifiers which are used for service-specific cryptographic operations
 
 - provider_id: used to sign the SDP messages and to establish secure links between validators; it is Ed25519PublicKey.
-- zk_id: used for zero-knowledge operations by the validator that includes rewarding ([[1.5.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)).
+- zk_id: used for zero-knowledge operations by the validator that includes rewarding ([\[1.5.0\] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#18a261aa09df83a1a2ee81032493cef4)).
 
 ### Locators
 
@@ -172,7 +172,7 @@ The common formatting of every Locator must be applied to maintain its unambigui
 
 The construction of the declaration message is as follows.
 
-```
+```text
 class DeclarationMessage:
     service_type: ServiceType
     locators: list[Locator]
@@ -193,7 +193,7 @@ The message is also signed by the zk_id key.
 
 Only valid declaration messages can be stored on the ledger. We define the DeclarationInfo as follows:
 
-```
+```text
 class DeclarationInfo:
     service: ServiceType
     provider_id: Ed25519PublicKey
@@ -220,7 +220,7 @@ Where:
 
 We also define the declaration_id (of a DeclarationId type) that is the unique identifier of DeclarationInfo calculated as a hash of the concatenation of service, provider_id,  locators and zk_id. The implementation of the hash function is blake2b using 256 bits of the output.
 
-```
+```text
 declaration_id = Hash(service||provider_id||zk_id||locators)
 ```
 
@@ -228,7 +228,7 @@ The declaration_id is not stored as part of the DeclarationInfo but it is used t
 
 All DeclarationInfo references are stored in the declarations and are indexed by declaration_id.
 
-```
+```text
 declarations: list[declaration_id]
 ```
 
@@ -236,7 +236,7 @@ declarations: list[declaration_id]
 
 The construction of the active message is as follows:
 
-```
+```text
 class ActiveMessage:
     declaration_id: DeclarationId
     nonce: Nonce
@@ -253,7 +253,7 @@ The nonce must increase monotonically by every message sent for the declaration_
 
 The construction of the withdraw message is as follows:
 
-```
+```text
 class WithdrawMessage:
     declaration_id: DeclarationId
     locked_note_id: NoteId
@@ -270,7 +270,7 @@ The nonce must increase monotonically by every message sent for the declaration_
 
 Every event must be correctly indexed to enable lighter synchronization of the changes. Therefore, we index every declaration_id according to EventType, ServiceType, and Timestamp. Where EventType = { "created", "active", "withdrawn" } follows the type of the message.
 
-```
+```text
 events = {
     event_type: {
         service_type: {
@@ -300,7 +300,7 @@ If all of the above conditions are fulfilled, then the message is stored on the 
 
 ### Active
 
-The Active action enables marking the provider as actively providing a service. It requires sending a valid ActiveMessage (as defined in [Active Message](https://nomos-tech.notion.site/Active-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81f1a0b5cc8956c70660) ), which is relayed to the service-specific node activity logic (as indicated by the service type in [[1.5.0] Mantle - Common SDP Structures](https://nomos-tech.notion.site/Common-SDP-Structures-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#b26261aa09df828ea4f1818e1cd3152d)).
+The Active action enables marking the provider as actively providing a service. It requires sending a valid ActiveMessage (as defined in [Active Message](https://nomos-tech.notion.site/Active-Message-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24#1fd261aa09df81f1a0b5cc8956c70660) ), which is relayed to the service-specific node activity logic (as indicated by the service type in [\[1.5.0\] Mantle - Common SDP Structures](https://nomos-tech.notion.site/Common-SDP-Structures-33d261aa09df8051b0d0cd4d5ddade85?pvs=24#b26261aa09df828ea4f1818e1cd3152d)).
 
 The Active action updates the active value of the DeclarationInfo, which means that it also activates inactive (but not expired) providers.
 
@@ -367,13 +367,13 @@ Every query must return information for a finalized state only.
 
 ## Mantle and ZK Proofs
 
-For more information about Mantle and ZK proofs, please refer to [[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
+For more information about Mantle and ZK proofs, please refer to [\[1.5.0\] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
 
 # Default Service Parameters
 
 ## Blend Network
 
-```
+```text
 class BlendNetworkServiceParameters:
     session_length: 21600 # follows the length of an epoch
     lock_period: 1
@@ -381,5 +381,5 @@ class BlendNetworkServiceParameters:
     retention_period: 1
 ```
 
-The session_length follows the length of an epoch as indicated in [[1.0.0] Blend Protocol - Session is a time during which the same set of core nodes is](https://nomos-tech.notion.site/Session-is-a-time-during-which-the-same-set-of-core-nodes-is-executing-the-protocol-When-the-sessio-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8133a0ead533627fbb93)..
+The session_length follows the length of an epoch as indicated in [\[1.0.0\] Blend Protocol - Session is a time during which the same set of core nodes is](https://nomos-tech.notion.site/Session-is-a-time-during-which-the-same-set-of-core-nodes-is-executing-the-protocol-When-the-sessio-215261aa09df81ae8857d71066a80084?pvs=24#215261aa09df8133a0ead533627fbb93)..
 

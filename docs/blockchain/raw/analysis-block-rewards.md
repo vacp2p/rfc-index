@@ -101,20 +101,20 @@ In addition, we assume the following behavior of the system:
 
 - The simulation runs for $10$ years.
 - The volatility of the inferred total stake deviation is $10\%$.
-- The deviation between the inferred total stake and the target takes $2$ years to stabilize within $(\delta_{t} - I_{max}, \delta_{t} + I_{max})$. Note that this differs from the intrinsic convergence property of the inferred total stake algorithm that needs only one epoch to approximate the true value of the stake (see [[1.0.0][Analysis] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24) for further details).
+- The deviation between the inferred total stake and the target takes $2$ years to stabilize within $(\delta_{t} - I_{max}, \delta_{t} + I_{max})$. Note that this differs from the intrinsic convergence property of the inferred total stake algorithm that needs only one epoch to approximate the true value of the stake (see [\[1.0.0\]\[Analysis\] Total Stake Inference](https://nomos-tech.notion.site/1-0-0-Analysis-Total-Stake-Inference-237261aa09df800285cccbb00b3aeb0a?pvs=24) for further details).
 - The burn rate converges to $0.5\%$ after $2$ years, with volatility $10\%$.
 
 The figure below shows the evolution of the inferred total stake deviation and the burn rate, given the parametrization above.
 
-![](https://nomos-tech.notion.site/image/attachment%3A42792418-d181-4cf2-bbf9-5c34b5582f8e%3AScreenshot_2025-07-29_at_13.13.17.png?table=block&id=ac3261aa-09df-8399-ba08-810995576eef&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A42792418-d181-4cf2-bbf9-5c34b5582f8e%3AScreenshot_2025-07-29_at_13.13.17.png?table=block&id=ac3261aa-09df-8399-ba08-810995576eef&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The following figure shows the evolution of the annualized issuance rate:
 
-![](https://nomos-tech.notion.site/image/attachment%3Ac5a723ce-1fc0-4028-a6ee-fdf91f11b5c2%3AScreenshot_2025-07-29_at_13.13.57.png?table=block&id=9e1261aa-09df-8269-9e45-812b660ee805&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Ac5a723ce-1fc0-4028-a6ee-fdf91f11b5c2%3AScreenshot_2025-07-29_at_13.13.57.png?table=block&id=9e1261aa-09df-8269-9e45-812b660ee805&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Finally, the figure below displays the token supply evolution.
 
-![](https://nomos-tech.notion.site/image/attachment%3A26acf3d3-611a-4a77-ac21-1b2be33fdcc6%3AScreenshot_2025-07-29_at_13.15.43.png?table=block&id=b79261aa-09df-83ad-b5bb-8158d05e73db&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A26acf3d3-611a-4a77-ac21-1b2be33fdcc6%3AScreenshot_2025-07-29_at_13.15.43.png?table=block&id=b79261aa-09df-83ad-b5bb-8158d05e73db&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The final normalized token supply yielded by this specific parametrization is $1.0133$, which implies a total inflation of $1.33\%$ after $10$ years.
 
@@ -131,7 +131,7 @@ In Logos Blockchain, the APY depends on the deviation from the inferred total st
 
 The table below shows the average APY per level of total stake for each choice of $I_{max}$ and $D_{0,target}$ (expressed in terms of the $\text{Security Level}$). The proposed parametrization is highlighted in orange.
 
-![](https://nomos-tech.notion.site/image/attachment%3Aefd6576f-6190-4601-93db-b918a928e6ca%3AScreenshot_2025-07-30_at_09.01.50.png?table=block&id=97f261aa-09df-83cd-9699-0114573db40a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aefd6576f-6190-4601-93db-b918a928e6ca%3AScreenshot_2025-07-30_at_09.01.50.png?table=block&id=97f261aa-09df-83cd-9699-0114573db40a&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Each entry of the table above is computed by:
 
@@ -141,7 +141,7 @@ $$
 
 The figure below zooms in on APY evolution of the proposed parametrization, as the inferred total stake approaches the target.
 
-![](https://nomos-tech.notion.site/image/attachment%3Aa8383474-0f13-404f-8470-51b50e1c1023%3AAPY_Evolution.png?table=block&id=bca261aa-09df-8206-aa7a-81d8440afd17&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3Aa8383474-0f13-404f-8470-51b50e1c1023%3AAPY_Evolution.png?table=block&id=bca261aa-09df-8206-aa7a-81d8440afd17&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 The block reward APY starts at $100\%$ when only $1\%$ of the TGE supply participates in PoS. As more validators participate in PoS, the inferred total stake increases and the average APY decreases.
 

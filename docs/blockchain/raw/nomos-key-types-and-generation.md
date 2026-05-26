@@ -42,21 +42,21 @@ This document ensures that the keys are used and generated in a common manner, w
 
 ## Non-ephemeral Quota Key
 
-A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature ([[1.3.0] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df818ba163f9e05495d321)). The NQK is stored on the ledger as the zk_id field in the DeclarationInfo of the nodes outcome of the participation in the Service Declaration Protocol (SDP  [[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24)).
+A node generates a Non-ephemeral Quota Key (NQK) that is a ZkSignature ([\[1.3.0\] Mantle - Zero Knowledge Signature Scheme (ZkSignature)](https://nomos-tech.notion.site/Zero-Knowledge-Signature-Scheme-ZkSignature-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df818ba163f9e05495d321)). The NQK is stored on the ledger as the zk_id field in the DeclarationInfo of the nodes outcome of the participation in the Service Declaration Protocol (SDP  [\[1.0.0\] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24)).
 
 The NQK is used to prove that the node is part of the set of core nodes as indicated through the SDP.
 
 ## Non-ephemeral Signing Key
 
-A node generates a Non-ephemeral Signing Key (NSK) that is a Ed25519 key. The NSK is stored on the ledger as the provider_id field in the DeclarationInfo of the nodes outcome of the participation in the Service Declaration Protocol (SDP  [[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24)).
+A node generates a Non-ephemeral Signing Key (NSK) that is a Ed25519 key. The NSK is stored on the ledger as the provider_id field in the DeclarationInfo of the nodes outcome of the participation in the Service Declaration Protocol (SDP  [\[1.0.0\] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24)).
 
 The NSK is used to authenticate the node on the network level and to derive Non-ephemeral Encryption Key.
 
 ## Ephemeral Signing Key
 
-A node generates Ephemeral Signing Keys (ESK) that are proved to be limited in number by the Proof of Quota (PoQ  [[1.0.1] Proof of Quota](https://nomos-tech.notion.site/1-0-1-Proof-of-Quota-2e9261aa09df8038b95fc94b808ee32f?pvs=24)). The PoQ for core nodes requires a valid NQK for the session for which the PoQ is generated.
+A node generates Ephemeral Signing Keys (ESK) that are proved to be limited in number by the Proof of Quota (PoQ  [\[1.0.1\] Proof of Quota](https://nomos-tech.notion.site/1-0-1-Proof-of-Quota-2e9261aa09df8038b95fc94b808ee32f?pvs=24)). The PoQ for core nodes requires a valid NQK for the session for which the PoQ is generated.
 
-A unique signing key must be generated for every encapsulation as required by the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
+A unique signing key must be generated for every encapsulation as required by the [\[1.0.0\] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
 The key must not be reused. Otherwise, the messages that reuse the same key can be linked together. The node is responsible for not reusing the key.
 
@@ -70,7 +70,7 @@ The NEK key is used for deriving a shared secret (alongside EEK defined below) f
 
 A node derives an Ephemeral Encryption Key (EEK) pair using the X25519 curve from the ESK.
 
-A unique encryption key must be generated for every encapsulation as required by the [[1.0.0] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
+A unique encryption key must be generated for every encapsulation as required by the [\[1.0.0\] Message Encapsulation Mechanism](https://nomos-tech.notion.site/1-0-0-Message-Encapsulation-Mechanism-215261aa09df81309d7fd7f1c2da086b?pvs=24).
 
 The derivation of a shared secret for the encryption of an encapsulated message requires using the EEK of the sender and the derived X25519 key from the NEK of the recipient.
 

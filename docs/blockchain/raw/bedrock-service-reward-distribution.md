@@ -24,11 +24,11 @@
 | --- | --- | --- |
 | 1.0.0 | Initial version. | 2025-11-03 |
 | 1.1.0 | Removed references to DA Replaced references to Nomos with Logos Blockchain | 2026-04-17 |
-| 1.2.1 | [🔀[RFC] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
+| 1.2.1 | [🔀\[RFC\] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
 
 # Introduction
 
-Nomos relies on multiple services, including the Data Availability and Blend Network - each operated by independent validator sets. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [🔀[1.0.0] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24). The Service Reward Distribution Protocol enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
+Nomos relies on multiple services, including the Data Availability and Blend Network - each operated by independent validator sets. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [🔀\[1.0.0\] Service Declaration Protocol](https://nomos-tech.notion.site/1-0-0-Service-Declaration-Protocol-1fd261aa09df819ca9f8eb2bdfd4ec1d?pvs=24). The Service Reward Distribution Protocol enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
 
 Each service defines:
 
@@ -42,11 +42,11 @@ This document describes the protocol's logic for deterministically distributing 
 
 The protocol unfolds over three key phases, aligned with validator sessions:
 
-1. Service Activity Tracking (Session N+1): Service validators submit signed activity messages to attest to their participation of session N through a Mantle Transaction, including an activity message (see [⚠️[1.4.0] Mantle - SDP_ACTIVE](https://nomos-tech.notion.site/SDP_ACTIVE-335261aa09df8065a38acff4b25aee82?pvs=24#335261aa09df81f5a839f173760b39f9)).
+1. Service Activity Tracking (Session N+1): Service validators submit signed activity messages to attest to their participation of session N through a Mantle Transaction, including an activity message (see [⚠️\[1.4.0\] Mantle - SDP_ACTIVE](https://nomos-tech.notion.site/SDP_ACTIVE-335261aa09df8065a38acff4b25aee82?pvs=24#335261aa09df81f5a839f173760b39f9)).
 1. Service Reward Derivation (End of Session N+1): Nodes compute each validator’s reward based on validated activity messages and the different service reward policies.
 1. Service Reward Distribution (First block of session N+2): Rewards are distributed to validators marked as active for the service. This is done by inserting new notes in the ledger corresponding to the reward amount for each active validator.
 
-![](https://nomos-tech.notion.site/image/attachment%3A79e20c0f-a8b2-43fd-b6c6-8a49c1fb3d40%3ASans-titre-2024-11-18-1443.excalidraw.png?table=block&id=341261aa-09df-804b-ae7f-cec3cb5d830c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A79e20c0f-a8b2-43fd-b6c6-8a49c1fb3d40%3ASans-titre-2024-11-18-1443.excalidraw.png?table=block&id=341261aa-09df-804b-ae7f-cec3cb5d830c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 Core Properties:
 

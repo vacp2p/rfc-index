@@ -23,14 +23,14 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial version. | 2026-03-31 |
-| 1.1.0 | [[RFC] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
-| 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24) | 2026-05-06 |
+| 1.1.0 | [\[RFC\] Enforce NoteId uniqueness](https://nomos-tech.notion.site/RFC-Enforce-NoteId-uniqueness-335261aa09df807b9fe3c9bb9bd2c6db?pvs=24). | 2026-04-24 |
+| 1.1.1 | [\[RFC\] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24) | 2026-05-06 |
 
 # Introduction
 
 This document outlines the cross-channel messaging framework. A channel is a reserved identifier where only authorized keys can post messages on-chain, while anyone can read them. Cross-channel messaging allows different channels (including channels representing a Zone) to communicate and coordinate actions (such as Zone state transitions), enabling interoperability while maintaining security and decentralization.
 
-## Reference: [[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
+## Reference: [\[1.5.0\] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24).
 
 ## Objectives
 
@@ -90,7 +90,7 @@ Use Asynchronous Messaging when:
 Cross-channel messaging follows this general flow:
 
 1. The source channel's sequencer generates a message for one or more destination channels.
-1. The message is included in a Mantle Transaction (through an [Inscription](https://nomos-tech.notion.site/335261aa09df8065a38acff4b25aee82?pvs=25#335261aa09df8188b9a1f029a1a10681)[ Operation](https://nomos-tech.notion.site/335261aa09df8065a38acff4b25aee82?pvs=25#335261aa09df8188b9a1f029a1a10681)):
+1. The message is included in a Mantle Transaction (through an [Inscription](https://nomos-tech.notion.site/335261aa09df8065a38acff4b25aee82?pvs=25#335261aa09df8188b9a1f029a1a10681)[Operation](https://nomos-tech.notion.site/335261aa09df8065a38acff4b25aee82?pvs=25#335261aa09df8188b9a1f029a1a10681)):
     1. For asynchronous messaging: the channel's sequencer includes it in a separate transaction.
     1. For synchronous messaging: a coordinator gathers Operations from different channel sequencers and includes them in a common transaction.
 1. Once the Mantle Transaction is built, each channel sequencer signs their Operation using the Mantle Transaction hash as input.
@@ -108,7 +108,7 @@ Asynchronous messaging allows channels to send messages to each other without re
 
 We provide a recommended data structure for formatting messages in Inscriptions. This structure uses compact binary encoding to minimize on-chain storage costs while clearly indicating the message recipient:
 
-```
+```text
 Inscription = MessageCount *Messages
 MessageCount = Byte
 Messages = Destination MessageLength *Message
@@ -141,7 +141,7 @@ The asynchronous messaging process follows these steps:
 1. Message Observation: Destination channels sequencers monitor the chain for messages addressed to their ChannelId. When a relevant message is detected and has achieved finality, the channel can safely process it.
 1. State Transition: The destination channel checks that the message is valid and publishes a corresponding state transition in its own Inscription.
 
-```
+```text
 Destination SequencerBedrockSource SequencerDestination SequencerBedrockSource SequencerTransaction is propagatedand eventually finalized1. Generate cross-channel message(for one or more destination channels)12. Include message in Mantle Tx(Inscription Operation)24. Submit Mantle Transaction to chain3Destination channel sequencer observesfinalized inscription(s) to its ChannelId4Validate message, applycorresponding state change5
 ```
 
@@ -167,7 +167,7 @@ Without atomicity, these operations would be vulnerable to partial failures, lea
 
 ### Example of an atomic transfer
 
-```
+```text
 # Build the inscription that sends a transfer from Zone A to Zone B
 sending = Inscription(
     channel=CHANNEL_ZONE_A,
@@ -184,26 +184,26 @@ receiving = Inscription(
 )
 # Sequencer of Zone A encodes the withdrawal from Zone A
 withdrawal = ChannelWithdraw(
-		channel=CHANNEL_ZONE_A,
-		outputs=[temporary_transfer_note]
+        channel=CHANNEL_ZONE_A,
+        outputs=[temporary_transfer_note]
 )
 # Sequencer of zone B encodes the deposit to Zone B
 deposit = ChannelDeposit(
-		channel=CHANNEL_ZONE_B,
-		inputs=[temporary_transfer_note],
+        channel=CHANNEL_ZONE_B,
+        inputs=[temporary_transfer_note],
 )
 # Transfer
 Trasfer = Transfer(
-		inputs=[<sequencer_zone_a_note_id>],
-		outputs=[<change_note>]
+        inputs=[<sequencer_zone_a_note_id>],
+        outputs=[<change_note>]
 )
 # Wrap it in a transaction
 tx = MantleTx(
     ops=[Op(opcode=CHANNEL_INSCRIBE, payload=encode(sending)),
-			   Op(opcode=CHANNEL_INSCRIBE, payload=encode(receiving)),
-			   Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
-			   Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
-			   Op(opcode=TRANSFER, payload=encode(transfer))],
+               Op(opcode=CHANNEL_INSCRIBE, payload=encode(receiving)),
+               Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
+               Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
+               Op(opcode=TRANSFER, payload=encode(transfer))],
 )
 # Sign the transaction
 signed_tx = SignedMantleTx(
@@ -238,7 +238,7 @@ Synchronous messaging requires coordination between sequencers from different ch
 > - Initiate a new coordination round with modified parameters.
 > This coordination requirement is the main trade-off of synchronous messaging: it provides stronger guarantees but requires more complex orchestration and is susceptible to availability issues of the involved sequencers.
 
-```
+```text
 BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)BedrockCoordinator(one of the sequencers)Sequencer B(Channel B)Sequencer A(Channel A)1. Intention gathering2. Transaction construction3. Signature collectionRepeat for all sequencers4. Submission and atomic executionalt[All checks pass][Any check fails]Propose cross-channel operation(e.g., atomic cross-zone transfer burning tokens in A state)1Propose cross-channel operation(e.g., the same atomic cross-zone transfer minting tokens in B state)2Build MantleTx with ops forall involved channels(CHANNEL_INSCRIBE / WITHDRAW / DEPOSIT, etc.)3Send full MantleTx4Verify MantleTx(channel A logic, fees, etc.)5Proofs for A's Operations(sign mantle_txhash(MantleTx))6Send full MantleTx7Verify MantleTx(channel B logic, fees, etc.)8Proofs for B's Operations(sign mantle_txhash(MantleTx))9Submit fully proved MantleTx10Validate tx + all op proofs11Apply all channel ops atomically(all succeed together)12Reject MantleTx(no state changes applied)13
 ```
 

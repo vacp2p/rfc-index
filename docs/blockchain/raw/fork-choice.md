@@ -77,22 +77,22 @@ Nodes will remain on the honest chain if they reject forks that diverge further 
     Examples:
     1. $\textbf{common\_prefix\_depth}(b_1, b_2) = (0, 4)$ implies that $b_2$ is ahead of $b_1$ by 4 blocks
         i.e. $4^{th}\text{-grandparent}(b_2)=b_1$​
-        ![](https://nomos-tech.notion.site/image/attachment%3Af0819d8a-3b5d-46bf-93e0-01b461f8ffe3%3AScreenshot_2025-08-21_at_3.39.41_AM.png?table=block&id=21b261aa-09df-8127-b31d-e4d33743d675&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=830&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+        ![Diagram](https://nomos-tech.notion.site/image/attachment%3Af0819d8a-3b5d-46bf-93e0-01b461f8ffe3%3AScreenshot_2025-08-21_at_3.39.41_AM.png?table=block&id=21b261aa-09df-8127-b31d-e4d33743d675&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=830&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
     1. $\textbf{common\_prefix\_depth}(b_2, b_5) = (2, 3)$ would represent a forking tree like the one illustrated below
         $$
         2^{nd}\text{-grandparent}(b_2)=3^{rd}\text{-grandparent}(b_5)
         $$
-        ![](https://nomos-tech.notion.site/image/attachment%3A445a5b52-3905-4371-8900-bfda3155cb8e%3AScreenshot_2025-08-21_at_3.42.56_AM.png?table=block&id=21b261aa-09df-8128-a35a-d2f0affc2031&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=830&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+        ![Diagram](https://nomos-tech.notion.site/image/attachment%3A445a5b52-3905-4371-8900-bfda3155cb8e%3AScreenshot_2025-08-21_at_3.42.56_AM.png?table=block&id=21b261aa-09df-8128-a35a-d2f0affc2031&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=830&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 - $\textbf{density}(b_i, d, s_{gen})$​
     Returns the number of blocks produced in the $s$ slots following block $b_{i-d}$.
     For example, in the following diagram, count the number of blocks produced in the $s_{gen}$ slots of the highlighted area.
-    ![](https://nomos-tech.notion.site/image/attachment%3A47e985b3-9ed2-4cef-ae25-97327993c455%3AScreenshot_2025-05-23_at_12.02.42_PM.png?table=block&id=21b261aa-09df-81b3-a43c-d884eae8fce7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1330&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+    ![Diagram](https://nomos-tech.notion.site/image/attachment%3A47e985b3-9ed2-4cef-ae25-97327993c455%3AScreenshot_2025-05-23_at_12.02.42_PM.png?table=block&id=21b261aa-09df-81b3-a43c-d884eae8fce7&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1330&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ## Bootstrap Fork Choice Rule
 
 During bootstrapping, we use the Ouroboros Genesis fork choice rule (maxvalid-bg)
 
-```
+```text
 def bootstrap_fork_choice(c_local, forks, k, s_gen):
     c_max = c_local
     for c_fork in forks:
@@ -116,7 +116,7 @@ if density(c_max, depth_max, s_gen) < density(c_fork, depth_fork, s_gen):
 
 During normal operations, we use the Ouroboros Praos fork choice rule (maxvalid-mc). Here we reject any forks that diverge further back than $k$ blocks.
 
-```
+```text
 def online_fork_choice(c_local, forks, k):
     c_max = c_local
     for c_fork in forks:

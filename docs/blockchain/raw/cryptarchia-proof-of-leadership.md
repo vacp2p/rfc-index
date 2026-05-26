@@ -36,7 +36,7 @@ This document extends the work presented in the [Ouroboros Crypsinous paper](htt
 
 ## References
 
-- [[1.0.1] Cryptarchia Protocol](https://nomos-tech.notion.site/1-0-1-Cryptarchia-Protocol-21c261aa09df810cb85eff1c76e5798c?pvs=24).
+- [\[1.0.1\] Cryptarchia Protocol](https://nomos-tech.notion.site/1-0-1-Cryptarchia-Protocol-21c261aa09df810cb85eff1c76e5798c?pvs=24).
 
 # Overview
 
@@ -73,47 +73,47 @@ Our description differs from the original paper proposition, proving that a note
 
 In order to prove that the winning note exists in the ledger and existed at the start of the previous epoch, every node must compute two ledger commitments. These commitments $ledger_{AGED}$ and $ledger_{LATEST}$ are Merkle roots constructed over the Note IDs. The trees have a depth of $32$ (32 layers without counting the root) and are populated with note IDs, that is, the tree has a maximal capacity of $2^{32}$ note IDs. The value $0$ represents an empty leaf. When the set is updated, during insertion, the first empty leaf is replaced with the new note ID, and during deletion, the leaf containing the deleted note ID is replaced with $0$. The following pseudo-code shows how the tree is managed:
 
-```
+```text
 def insert_new_note(note_set: list[NoteId], new_note: NoteId):
-		i = 0
+        i = 0
 while i < len(note_set) and note_set[i] != 0:
-				i += 1
+                i += 1
 if i < len(note_set):
-				note_set[i] = new_note
-		else:
-				note_set.append(new_note)
+                note_set[i] = new_note
+        else:
+                note_set.append(new_note)
 return note_set
 
 def delete_note(note_set: list[NodeId], note: NoteId):
-		i = 0
+        i = 0
 while i < len(note_set) and note_set[i] != note:
-				i += 1
+                i += 1
 if i == len(note_set):
 # note not in the set
 return note_set
 
-		note_set[i] = 0
+        note_set[i] = 0
 return note_set
 
 def empty_tree_root(depth: int):
-		root = 0
+        root = 0
 for i in range(depth):
-				h = hasher() # zk hash
-				h.update(root)
-				h.update(root)
-				root = h.digest()
+                h = hasher() # zk hash
+                h.update(root)
+                h.update(root)
+                root = h.digest()
 return root
 
 def get_ledger_root(note_set: list[NoteId]):
 assert(len(note_set) < 2**32)
-		ledger_root = get_merkle_root(note_set) # return the Merkle root of the set
+        ledger_root = get_merkle_root(note_set) # return the Merkle root of the set
 # padded with 0 to next power of 2
-		ledger_root_height = len(note_set).bit_length()
+        ledger_root_height = len(note_set).bit_length()
 for height in range(ledger_root_height, 32):
-				h= Hasher() # zk hash
-				h.update(ledger_root)
-				h.update(empty_tree_root(height))
-				ledger_root = h.digest()
+                h= Hasher() # zk hash
+                h.update(ledger_root)
+                h.update(empty_tree_root(height))
+                ledger_root = h.digest()
 return ledger_root
 ```
 
@@ -121,7 +121,7 @@ return ledger_root
 
 ## Zero-knowledge Proof Statement
 
-![](https://nomos-tech.notion.site/image/attachment%3A76a2e1a9-84b5-48b7-8818-2a98337a7c3a%3Apol_short.png?table=block&id=2e9261aa-09df-80d6-b61f-d8881f0b0425&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A76a2e1a9-84b5-48b7-8818-2a98337a7c3a%3Apol_short.png?table=block&id=2e9261aa-09df-80d6-b61f-d8881f0b0425&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Circuit Public Inputs
 
@@ -129,24 +129,24 @@ The prover (the leader) and the verifiers (nodes of the chain) must agree on the
 
 1. The slot number: $sl$.
 1. The epoch nonce: $\eta$.
-    - For details see [[1.0.1] Cryptarchia Protocol - Epoch Nonce](https://nomos-tech.notion.site/Epoch-Nonce-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df813b9794d597a383dd05).
+    - For details see [\[1.0.1\] Cryptarchia Protocol - Epoch Nonce](https://nomos-tech.notion.site/Epoch-Nonce-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df813b9794d597a383dd05).
 1. The lottery function constants: $t_0 = -\frac{\text{VRF}\_order \ln(1-f)}{\text{inferred\_total\_stake}}$ and $t_1=- \frac{\text{VRF}\_order\ln^2(1-f)}{2 \cdot \text{inferred\_total\_stake}^2}$.
     - For details see [Lottery Approximation](https://nomos-tech.notion.site/Lottery-Approximation-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df807abe78c815e7a31809).
     - These numbers must be computed with high precision outside the proof.
 1. The root of the note Merkle tree when the stake distribution was frozen $ledger_\text{AGED}$.
-    - For details see [[1.0.1] Cryptarchia Protocol - Epoch State Pseudocode](https://nomos-tech.notion.site/Epoch-State-Pseudocode-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81b0bffae5fa2fa74508).
+    - For details see [\[1.0.1\] Cryptarchia Protocol - Epoch State Pseudocode](https://nomos-tech.notion.site/Epoch-State-Pseudocode-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df81b0bffae5fa2fa74508).
 1. The latest root of the note Merkle tree: $ledger_\text{LATEST}$.
     - Used to ensure the leadership note has not been spent.
 1. The leader's one-time public key $P_\text{LEAD}$ represented by 2 public inputs, each of 16 bytes in little endian. This key is needed to sign the proposed block.
     - For details see [Linking the Proof of Leadership to a Block](https://nomos-tech.notion.site/Linking-the-Proof-of-Leadership-to-a-Block-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df807caca4d1647f1ef619).
 1. The entropy contribution $\rho_{LEAD}$ verified to be correctly derived.
-    - This is the epoch nonce entropy contribution. See [[1.0.1] Cryptarchia Protocol - Epoch Nonce](https://nomos-tech.notion.site/Epoch-Nonce-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df813b9794d597a383dd05).
+    - This is the epoch nonce entropy contribution. See [\[1.0.1\] Cryptarchia Protocol - Epoch Nonce](https://nomos-tech.notion.site/Epoch-Nonce-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df813b9794d597a383dd05).
 
 ### Circuit Private Inputs
 
 The prover has to provide these values, but they remain secret:
 
-1. The eligible note and its related information used to derive the [[1.3.0] Mantle - Note Id](https://nomos-tech.notion.site/Note-Id-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df812d8e83e8f0db50a2af):
+1. The eligible note and its related information used to derive the [\[1.3.0\] Mantle - Note Id](https://nomos-tech.notion.site/Note-Id-330261aa09df80a899a6efd74f12a7c4?pvs=24#330261aa09df812d8e83e8f0db50a2af):
     - The note secret key: $sk$.
     - The note value: $v$.
     - The note transaction zk hash: $note\_tx\_hash$.
@@ -250,5 +250,5 @@ The material used for the benchmarks is the following:
 - OS        : Ubuntu 22.04.5 LTS
 - Kernel    : 6.8.0-59-generic
 
-![](https://nomos-tech.notion.site/image/attachment%3A3106ad1d-9e48-457c-8abe-7e4672e2164e%3Aoutput_(3).png?table=block&id=2e9261aa-09df-80b0-b368-d153e4199f56&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/attachment%3A3106ad1d-9e48-457c-8abe-7e4672e2164e%3Aoutput_(3).png?table=block&id=2e9261aa-09df-80b0-b368-d153e4199f56&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1420&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 

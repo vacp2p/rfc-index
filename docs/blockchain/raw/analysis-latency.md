@@ -40,7 +40,7 @@ We consider latency of a broadcast on the network constructed from mix nodes whi
 
 - Without loss of generality, we consider a message traveling from node $1$ to node $k$. A message is delayed at the node $1$ by $r_1\Delta_1$, at the node $2$ by $r_2\Delta_2$, etc. For node $i$ we assume that $r_i$ is a random variable from the Geometric distribution with parameter $q$ and that $\Delta_i>0$. The latter is prop. to a max. time elapsed between attempts to “flip a coin”. Furthermore, a message traveling between the nodes $i$ and $j$ is delayed by $d_{ij}$.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F013ef215-15a4-430a-b311-43fd396c6406%2Fk-path-delay.png?table=block&id=1fd261aa-09df-8109-bdc3-ce8b91179527&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F013ef215-15a4-430a-b311-43fd396c6406%2Fk-path-delay.png?table=block&id=1fd261aa-09df-8109-bdc3-ce8b91179527&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Using above the total delay is given by $\sum_{i=1}^kr_i\Delta_i+ \sum_{i=1}^{k-1}d_{ii+1}$. We note that for $\Delta=\max_{i\in[k]}\Delta_i$ and $d=\max_{i\in[k-1]}d_{ii+1}$ we have
 
@@ -56,7 +56,7 @@ $$
 
 - Using that $r_i$ is a random variable from the Geometric distribution with parameter $q$ the average and variance of the total delay $\sum_{i=1}^kr_i\Delta_i+ \sum_{i=1}^{k-1}d_{ii+1}$ is given, respectively, by $\sum_{i=1}^k\Delta_i/q+ \sum_{i=1}^{k-1}d_{ii+1}$ and $\frac{1-q}{q^2}\sum_{i=1}^k\Delta^2_i$. The latter, for $\Delta=\Delta_i$ and $d=d_{ii+1}$ , is simplifies to $k\Delta/q+ (k-1)d$ and $\frac{1-q}{q^2}k\Delta^2$.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F3c2fe8c0-504b-42ed-9664-892feb5f484e%2FScreenshot_2024-07-24_at_17.34.49.png?table=block&id=1fd261aa-09df-81f2-9a1c-e10d0112a61c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F3c2fe8c0-504b-42ed-9664-892feb5f484e%2FScreenshot_2024-07-24_at_17.34.49.png?table=block&id=1fd261aa-09df-81f2-9a1c-e10d0112a61c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - The mean of sum $\sum_{i=1}^kr_i$ is equals to $k/q$. For $\epsilon>0$ the probability $\mathrm{P}\left(\sum_{i=1}^kr_i\geq (1+\epsilon)k/q\right)$ can bounded from above as follows
 
@@ -66,15 +66,15 @@ $$
 
 - To show the above we used $\mathrm{P}\left(\sum_{i=1}^kr_i\geq (1+\epsilon)k/q\right)=\mathrm{P}\left(\mathrm{e}^{\lambda\sum_{i=1}^kr_i}\geq \mathrm{e}^{\lambda(1+\epsilon)k/q}\right)$ for any $\lambda>0$ and Markov’s inequality.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F47c901a7-f83f-4ec2-8b0a-7cf3371b90ee%2FScreenshot_2024-07-29_at_13.15.54.png?table=block&id=1fd261aa-09df-81c5-9635-d2b020ed4146&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F47c901a7-f83f-4ec2-8b0a-7cf3371b90ee%2FScreenshot_2024-07-29_at_13.15.54.png?table=block&id=1fd261aa-09df-81c5-9635-d2b020ed4146&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - The probability $\mathrm{P}\left(\sum_{i=1}^kr_i\geq (1+\epsilon)k/q\right)$ is increasing with decreasing $q$ for $q<1/2$​
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F18a470cb-61f2-45f3-9efb-c3e9f80c3965%2FScreenshot_2024-07-29_at_13.12.19.png?table=block&id=1fd261aa-09df-8111-9f95-de9b603ff42b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F18a470cb-61f2-45f3-9efb-c3e9f80c3965%2FScreenshot_2024-07-29_at_13.12.19.png?table=block&id=1fd261aa-09df-8111-9f95-de9b603ff42b&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - and decreasing with increasing $q$ for $q>1/2$
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F10a16762-a53e-42b2-b207-35f6dd413b6c%2FScreenshot_2024-07-29_at_13.14.07.png?table=block&id=1fd261aa-09df-813d-8d29-db9b3b622edc&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F10a16762-a53e-42b2-b207-35f6dd413b6c%2FScreenshot_2024-07-29_at_13.14.07.png?table=block&id=1fd261aa-09df-813d-8d29-db9b3b622edc&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - We note that the [upper bound](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81578ed2e637fc724d10) can be represented as
 
@@ -82,7 +82,7 @@ $$
 \mathrm{P}\left(\sum_{i=1}^kr_i\geq (1+\epsilon)k/q\right)\leq f^k(q,\epsilon)\mathrm{, where}\\ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~f(q,\epsilon)=\left(\frac{q \left(\epsilon -1\right)+1}{1-q}\right) \left(\frac{q \left(\epsilon -1\right)+1}{\left(1-q \right) \left(\epsilon  q +1\right)}\right)^{-\frac{ \left(1+\epsilon \right)}{q}} .
 $$
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F2a7892f1-e643-4c14-a1f2-62e99e5b2cba%2Ff_q_eps.png?table=block&id=1fd261aa-09df-810f-b0df-fcf9e6fbacb0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=590&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F2a7892f1-e643-4c14-a1f2-62e99e5b2cba%2Ff_q_eps.png?table=block&id=1fd261aa-09df-810f-b0df-fcf9e6fbacb0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=590&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Plotting $f(q,\epsilon)$ suggests that the upper bound is monotonic decreasing function of $k$, $\epsilon$ and $q$.
 
@@ -143,36 +143,36 @@ $$
 \mathcal{D}[G_N]=\max_{i\neq j} D_{i\rightarrow j}[G_N]
 $$
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0a4ec471-d769-49b8-b692-531ce87075e1%2Fbroadcast-channel.png?table=block&id=1fd261aa-09df-81e1-932a-c0c873f2b808&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0a4ec471-d769-49b8-b692-531ce87075e1%2Fbroadcast-channel.png?table=block&id=1fd261aa-09df-81e1-932a-c0c873f2b808&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Results for a High Connectivity Regime
 
 - We consider networks with topology of a random regular graph in the high connectivity regime of $c=\alpha N$, where $\alpha\in (0,1)$, with $\Delta_i=1$ and $d_{ij}=0$.
 - First we consider the case of $c=N-1$, i.e. the network is a complete graph, where the least latency is expected. Measuring the latency of broadcast for $N=\{10,10^2,10^3\}$, we see that it is increasing as $q\rightarrow0$ and decreasing as $q\rightarrow1$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Ffbfc94c8-55b0-47c6-a015-75fe9ca02fe8%2F7552_latency.png?table=block&id=1fd261aa-09df-81f5-9cb3-eb2cb6e173eb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Ffbfc94c8-55b0-47c6-a015-75fe9ca02fe8%2F7552_latency.png?table=block&id=1fd261aa-09df-81f5-9cb3-eb2cb6e173eb&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Furthermore, as $N$ is increased from $N=10$ to $N=10^3$ the latency of broadcast becomes more concentrated on the value of 2 as can be seen in figures below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F831f5e81-13a4-4299-9d60-52b3278996cc%2F4910_latency_hist.png?table=block&id=1fd261aa-09df-81a8-bb3b-d4048c885aa0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F831f5e81-13a4-4299-9d60-52b3278996cc%2F4910_latency_hist.png?table=block&id=1fd261aa-09df-81a8-bb3b-d4048c885aa0&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Finally, we consider random regular graph in the high connectivity regime of $c=\alpha N$, where $\alpha\in (0,1)$.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F1451a5f4-6cda-48cc-bb16-956113e29234%2F9123515c-56f3-49eb-b278-ff3865c0c91a.png?table=block&id=1fd261aa-09df-8186-ad5c-f01297023e24&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F1451a5f4-6cda-48cc-bb16-956113e29234%2F9123515c-56f3-49eb-b278-ff3865c0c91a.png?table=block&id=1fd261aa-09df-8186-ad5c-f01297023e24&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1600&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F193ca3e9-4d42-466a-99d8-302f98845d2e%2F11ed4881-e9f8-433b-a5b0-f618b9135c6e.png?table=block&id=1fd261aa-09df-815b-8d52-d720953cfe09&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1790&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F193ca3e9-4d42-466a-99d8-302f98845d2e%2F11ed4881-e9f8-433b-a5b0-f618b9135c6e.png?table=block&id=1fd261aa-09df-815b-8d52-d720953cfe09&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1790&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 ### Results for a Finite Connectivity Regime
 
 - We consider broadcast on networks with topology of a random regular graph in the finite connectivity regime of $c\ll N$ with $\Delta_i=1$ and $d_{ij}=0$.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0b8a8800-d227-4928-a9d5-98235b2bd183%2FScreenshot_2024-09-03_at_12.25.01.png?table=block&id=1fd261aa-09df-811b-ade7-e462828efc7c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0b8a8800-d227-4928-a9d5-98235b2bd183%2FScreenshot_2024-09-03_at_12.25.01.png?table=block&id=1fd261aa-09df-811b-ade7-e462828efc7c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Ff9b00a6b-2a41-4246-b187-5ff47f5f86fa%2FScreenshot_2024-09-03_at_12.26.49.png?table=block&id=1fd261aa-09df-8134-8947-e8edefe98d63&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Ff9b00a6b-2a41-4246-b187-5ff47f5f86fa%2FScreenshot_2024-09-03_at_12.26.49.png?table=block&id=1fd261aa-09df-8134-8947-e8edefe98d63&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Dividing the latency of broadcast by $\log(N)$ suggests that the latter is converging to some value, dependent on $q$ and connectivity $c$, as $N\rightarrow\infty$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6cbe78f5-4be8-4a0c-8b7f-fed2279d059f%2FScreenshot_2024-09-09_at_10.28.54.png?table=block&id=1fd261aa-09df-8153-8ba1-c2c82131d99c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F6cbe78f5-4be8-4a0c-8b7f-fed2279d059f%2FScreenshot_2024-09-09_at_10.28.54.png?table=block&id=1fd261aa-09df-8153-8ba1-c2c82131d99c&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - For $q\rightarrow0$ distribution of the random variable $q\,r_{ij}$, where $r_{ij}$ is sampled from the geometric distribution with parameter $q$, is exponential distribution with parameter $1$. The latter follows from the properties of the [Geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution).
 - Furthermore, the [latency of broadcast](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df814ab1e5dfa271da02ef), $\mathcal{L}_1[G_N]$, for delays sampled from the exponential distribution with parameter $1$ and $N\rightarrow\infty$ is
@@ -182,30 +182,30 @@ $$
 \frac{1}{c-2}+\frac{1}{c},
 $$
 
-i.e. the latency of broadcast is $\frac{2(c-1)}{c(c-2)}\log(N)$ [with ](https://projecteuclid.org/journals/annals-of-applied-probability/volume-25/issue-3/The-diameter-of-weighted-random-graphs/10.1214/14-AAP1034.full)[high probability](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81f3a1f2df61373d6e04) when $N$ is large.
+i.e. the latency of broadcast is $\frac{2(c-1)}{c(c-2)}\log(N)$ [with](https://projecteuclid.org/journals/annals-of-applied-probability/volume-25/issue-3/The-diameter-of-weighted-random-graphs/10.1214/14-AAP1034.full)[high probability](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81f3a1f2df61373d6e04) when $N$ is large.
 
 - The above two points suggest that for small $q$, the latency of broadcast is approximately $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ when $r_{ij}$ are sampled from the geometric distribution with parameter $q$, i.e. the latency of broadcast is diverging as $q\rightarrow0$. The latter is consistent with latency measured in [simulations](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df811bade7e462828efc7c).
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F780b2449-ba5e-48b8-a214-e0b25283642e%2FScreenshot_2024-09-09_at_14.23.13.png?table=block&id=1fd261aa-09df-817e-912f-c5380a0691c2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F780b2449-ba5e-48b8-a214-e0b25283642e%2FScreenshot_2024-09-09_at_14.23.13.png?table=block&id=1fd261aa-09df-817e-912f-c5380a0691c2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - For larger values of q, the average latency of broadcast computed numerically deviates from the asymptotic $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ as can be seen in the figure above.
 - We note that the (asymptotic) latency of broadcast $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{q}$ is a special case of $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{f(q)}$ for some (unknown) function $f(q)$.
 - Assuming that the latency of broadcast $\mathcal{L}_1[G_N]=\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{f(q)}$, with high prob. as $N\rightarrow\infty$, and inverting this expression gives us $f(q)= \frac{2(c-1)}{c(c-2)}\frac{\log(N)}{ \mathcal{L}_1[G_N]}$. Using the [data](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df817e912fc5380a0691c2) to plot the latter suggests the form $f(q)=\alpha\log(1+q)$ for some parameter $\alpha>0$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F93c1ccd5-8abb-4418-986b-f4de93e8b67e%2FScreenshot_2024-09-10_at_17.02.02.png?table=block&id=1fd261aa-09df-8103-9995-f3f4e442c2f5&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F93c1ccd5-8abb-4418-986b-f4de93e8b67e%2FScreenshot_2024-09-10_at_17.02.02.png?table=block&id=1fd261aa-09df-8103-9995-f3f4e442c2f5&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - We note that for $f(q)=\alpha\log(1+q)$ we have $f(q)= \alpha\,(q-q^2/2+O(q^3))$ as $q\rightarrow0$.
 - Furthermore, fitting $\mathcal{L}_1[G_N]=\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{\alpha\log(1+q)}$ to the mean of [data](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df817e912fc5380a0691c2) gives us
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F3dfe8b3f-d35f-4607-beb0-131e552c3161%2FScreenshot_2024-09-10_at_21.38.51.png?table=block&id=1fd261aa-09df-81af-92dc-e769c066daf2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F3dfe8b3f-d35f-4607-beb0-131e552c3161%2FScreenshot_2024-09-10_at_21.38.51.png?table=block&id=1fd261aa-09df-81af-92dc-e769c066daf2&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Testing the expression $\frac{2(c-1)}{c(c-2)}\frac{\log(N)}{\alpha\log(1+q)}$ for the mean value of broadcast obtained numerically suggests that the latter is accurate when the connectivity $c$ and q are small but significantly diverges from the data when $c$ and $q$ are large as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F4f54e665-3f7d-4bd7-9dee-a085cac78d4f%2FScreenshot_2024-09-16_at_10.00.45.png?table=block&id=1fd261aa-09df-8117-80cd-f85d63fddce3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F4f54e665-3f7d-4bd7-9dee-a085cac78d4f%2FScreenshot_2024-09-16_at_10.00.45.png?table=block&id=1fd261aa-09df-8117-80cd-f85d63fddce3&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - The probability that the latency of broadcast is greater than some threshold $t$ decreases with the connectivity $c$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0f621a59-7dcc-4cb2-8260-c13f13ce57ec%2FScreenshot_2024-09-23_at_13.28.26.png?table=block&id=1fd261aa-09df-81ea-b0f9-fac097fa63c8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0f621a59-7dcc-4cb2-8260-c13f13ce57ec%2FScreenshot_2024-09-23_at_13.28.26.png?table=block&id=1fd261aa-09df-81ea-b0f9-fac097fa63c8&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - We note that random regular graph is [locally tree-like](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81eda385ced4c5493781), i.e. when $N$ is large any node is a root of a tree of some height $h$ with high probability.
 - For the node connectivity $c>2$ the number of nodes in the tree of height $h$, rooted at node $1$, is given by
@@ -224,19 +224,19 @@ $$
 - The latency of broadcast on a tree of $N$ nodes is expected to be higher than on random regular with the same $N$ and the same connectivity $c$. This is due to the presence of loops in the latter.
 - The numerical results for (average) latency of broadcast on a tree of $N$ nodes suggest that this average is an upper bound on the average latency of broadcast on on random regular with the same $N$ and the same connectivity $c$ as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0b27c6ed-ffc2-48a3-b7bb-2216234d96c9%2FScreenshot_2024-09-28_at_09.06.48.png?table=block&id=1fd261aa-09df-81f6-be83-dc48ad28ff08&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F0b27c6ed-ffc2-48a3-b7bb-2216234d96c9%2FScreenshot_2024-09-28_at_09.06.48.png?table=block&id=1fd261aa-09df-81f6-be83-dc48ad28ff08&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - Furthermore, numerical results for latency of broadcast on trees suggest that the latter also can be used to obtain an upper bound on probability as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F9619b896-d06a-4025-875e-41563ddc2666%2FScreenshot_2024-09-23_at_13.54.02.png?table=block&id=1fd261aa-09df-819b-abe1-c72b63e27281&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F9619b896-d06a-4025-875e-41563ddc2666%2FScreenshot_2024-09-23_at_13.54.02.png?table=block&id=1fd261aa-09df-819b-abe1-c72b63e27281&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - We note that the latency of broadcast on a tree of finite size is equivalent to the latency of broadcast in finite neighbourhood of a sender node in large random regular graph. In the latter, as $N\rightarrow\infty$ the finite neighbourhood of a node is (with high prob.) a Cayley tree (see figure below) up to some distance, measured in by number edges between the node and any other node.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Faaf7c477-da06-4466-afd6-2e361f1a46f5%2FScreenshot_2024-09-30_at_11.27.43.png?table=block&id=1fd261aa-09df-81e1-b50e-f57550e2e255&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2Faaf7c477-da06-4466-afd6-2e361f1a46f5%2FScreenshot_2024-09-30_at_11.27.43.png?table=block&id=1fd261aa-09df-81e1-b50e-f57550e2e255&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - The numerical results for latency of broadcast on Cayley trees suggest that the latter also can be used to obtain an upper bound on probability as can be seen in the figure below.
 
-![](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F26f68811-b1c2-4c89-9d1e-2af30e19374c%2FScreenshot_2024-09-30_at_11.42.28.png?table=block&id=1fd261aa-09df-81d9-9901-f16358cafad4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+![Diagram](https://nomos-tech.notion.site/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1518abd9-c08f-4989-93c1-96525e62bce5%2F26f68811-b1c2-4c89-9d1e-2af30e19374c%2FScreenshot_2024-09-30_at_11.42.28.png?table=block&id=1fd261aa-09df-81d9-9901-f16358cafad4&spaceId=8dee56ee-6a26-4946-83e5-607a431da45d&width=1410&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
 - The latency of broadcast on a tree can be computed iteratively. The latter uses the property
 
@@ -270,7 +270,7 @@ $$
 $$
 
 - For node $j$ not adjacent to leaf nodes the $\max_{k\in \partial\mathcal{T}_N}D_{j\rightarrow k}[\mathcal{T}_N]$ can be computed via equation similar to the [equation](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81ab9edbfb2cdd64da4c). The latter suggests that the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ can be computed recursively using above equations and numerical complexity of this computation is $O(N)$. This is better than $O(N\log N)$ when Dijkstra's algorithm is used to compute $\mathcal{L}_1[\mathcal{T}_N]$.
-- The distribution of the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ on a Cayley tree of height $T+2$ can computed by the [population dynamics algorithm ](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81d2b433f31ffb793a74)as follows.
+- The distribution of the latency of broadcast $\mathcal{L}_1[\mathcal{T}_N]$ on a Cayley tree of height $T+2$ can computed by the [population dynamics algorithm](https://nomos-tech.notion.site/1fd261aa09df811b87bafccc589bc724?pvs=25#1fd261aa09df81d2b433f31ffb793a74)as follows.
 - First, for each $\ell\in[M]$ compute boundary conditions as follows
 
 $$

@@ -18,13 +18,12 @@
 
 <!-- timeline:end -->
 
-# Revisions History
+# Revision History
 
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-02-12 |
-| 1.1.0 | [[RFC] Make Ledger Transaction an Operation](https://nomos-tech.notion.site/RFC-Make-Ledger-Transaction-an-Operation-31e261aa09df80bc9e02ea4e9affc082?pvs=24) Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price | 2026-03-27 |
-| 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](https://nomos-tech.notion.site/RFC-Simplify-Mantle-Transaction-and-Refactor-Ledger-Operations-33d261aa09df803d96b0ebcd83013865?pvs=24) | 2026-05-06 |
+| 1.1.0 |  added [\[RFC\] Make Ledger Transaction an Operation](https://nomos-tech.notion.site/RFC-Make-Ledger-Transaction-an-Operation-31e261aa09df80bc9e02ea4e9affc082?pvs=24)    renamed Nomos to Logos Blockchain    remove notions of DA    minor fix in gas price | 2026-03-27 |
 
 # Introduction
 
@@ -34,7 +33,7 @@ The Genesis Block defines the starting state for the Bedrock chain, including th
 
 The Genesis Block establishes the initializing values for the various protocols and services. This includes the initial token distribution, initial nodes participating in Blend Network and the result of running the epoch nonce ceremony.
 
-The block body is a single Mantle Transaction (see [[1.5.0] Mantle](https://nomos-tech.notion.site/1-5-0-Mantle-33d261aa09df8051b0d0cd4d5ddade85?pvs=24)) containing a Transfer Operation distributing the notes to initial token holders. The bedrock services are initialized through SDP_DECLARE Operations embedded in the Mantle Transactions Operations list and protocol initializing constants are encoded through a CHANNEL_INSCRIBE Operation also embedded in the Operations list.
+The block body is a single Mantle Transaction (see [\[1.4.0\] Mantle](https://nomos-tech.notion.site/1-4-0-Mantle-335261aa09df8065a38acff4b25aee82?pvs=24)) containing a Transfer Operation distributing the notes to initial token holders. The bedrock services are initialized through SDP_DECLARE Operations embedded in the Mantle Transactions Operations list and protocol initializing constants are encoded through a CHANNEL_INSCRIBE Operation also embedded in the Operations list.
 
 Not all protocol constants are encoded in the Genesis block. The principle we use to decide whether a value should be in the Genesis block or not is whether it is a value that is derived from blockchain activity or whether it is updated through a protocol update (hard / soft fork). For example, the epoch nonce is updated through normal blockchain Operations and therefore it should be specified in the Genesis block. Gas constants are only changed through protocol updates and hard forks and therefore they will be hardcoded in the node implementation.
 
@@ -46,13 +45,13 @@ The Genesis Block is composed of the Genesis Block Header and the Genesis Mantle
 
 Initial tokens will be distributed through a Transfer Operation containing zero inputs and one output note for each initial stakeholder. Note that since the Ledger is transparent, the initial stake allocation is visible to everyone. Those wishing to hide their initial stake may opt to subdivide their note into a few different notes of equal value.
 
-In order to participate in the Cryptarchia lottery, stakeholders must generate their note keys in accordance with the Proof of Leadership protocol specified at [[1.1.0] Proof of Leadership - Protocol](https://nomos-tech.notion.site/Protocol-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df8034a40fe8405891b855).
+In order to participate in the Cryptarchia lottery, stakeholders must generate their note keys in accordance with the Proof of Leadership protocol specified at [\[1.1.0\] Proof of Leadership - Protocol](https://nomos-tech.notion.site/Protocol-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df8034a40fe8405891b855).
 
 The initial state of the Ledger will be derived through normal execution of this Transfer Operation, that is, each outputs note ID will be added to the unspent notes set.
 
 Example
 
-```
+```text
 STAKE_DISTRIBUTION = Transfer(
   inputs=[],
   outputs=[
@@ -68,17 +67,17 @@ STAKE_DISTRIBUTION = Transfer(
 
 Blend Network MUST initialize its set of providers. This is done through a set of SDP_DECLARE Operations in the Genesis Mantle Transaction.
 
-Blend enforces a minimal network size for the service to be active. Thus, in order to have an active Blend service at Genesis, we MUST have at least as many declarations in the Genesis block to meet Blend services minimal network size [[1.0.0] Blend Protocol - Minimal Network Size](https://nomos-tech.notion.site/Minimal-Network-Size-215261aa09df81ae8857d71066a80084?pvs=24#232261aa09df80b9ba20ec70636e0db6).
+Blend enforces a minimal network size for the service to be active. Thus, in order to have an active Blend service at Genesis, we MUST have at least as many declarations in the Genesis block to meet Blend services minimal network size [\[1.0.0\] Blend Protocol - Minimal Network Size](https://nomos-tech.notion.site/Minimal-Network-Size-215261aa09df81ae8857d71066a80084?pvs=24#232261aa09df80b9ba20ec70636e0db6).
 
 Example
 
-```
+```text
 BLEND_DECLARATIONS = [
-	Declaration(
-	  msg=DeclarationMessage(
-	    ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0
-	  ),
-	  locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+    Declaration(
+      msg=DeclarationMessage(
+        ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0
+      ),
+      locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
 ),
 # ... 32 total declarations
 ]
@@ -95,13 +94,13 @@ Cryptarchia is initialized with the following parameters:
 - chain_id: string.
     It is useful to differentiate testnets from mainnet. To avoid confusion, we place the chain ID in the Genesis block to guarantee that the networks are disjoint.
 - genesis_epoch_nonce: 32 bytes, hex encoded.
-    The initial source of randomness for the Cryptarchia lottery. The process for selecting this value is described in detail at [Epoch Nonce Ceremony](https://nomos-tech.notion.site/Epoch-Nonce-Ceremony-33e261aa09df808ea9a5e2a1edbe8dd0?pvs=24#2fd261aa09df82649b2f813c46159fcf).
+    The initial source of randomness for the Cryptarchia lottery. The process for selecting this value is described in detail at [Epoch Nonce Ceremony](https://nomos-tech.notion.site/Epoch-Nonce-Ceremony-330261aa09df809ab143f87766b8d053?pvs=24#330261aa09df803d9279c8980e4e3b80).
 
 These parameters are encoded in the Genesis block as an inscription sent to the null channel.
 
 Example
 
-```
+```text
 from datetime import datetime
 
 CHAIN_ID = "logos-blockchain-mainnet"
@@ -153,9 +152,11 @@ The protocol for generating the initial randomness nonce can be found below.
 
 The initial stake distribution, service declarations and Cryptarchia inscription are components of the Genesis Mantle Transaction. This is the single transaction that forms the body of the Genesis block.
 
-```
+```text
 GENESIS_MANTLE_TX = MantleTx(
   ops=[STAKE_DISTRIBUTION, CRYPTARCHIA_INSCRIPTION] + SERVICE_DECLARATIONS,
+  permanent_storage_gas_price=0,
+  execution_gas_price=0
 )
 ```
 
@@ -175,17 +176,17 @@ The Genesis Block header fields are set to the following values:
 
 Example
 
-```
+```text
 GENESIS_HEADER = Header(
-	bedrock_version=1,
-	parent_block=0,
-	slot=0,
-	block_root=block_merkle_root([GENESIS_MANTLE_TX]),
-	proof_of_leadership=ProofOfLeadership(
-	  leader_voucher=bytes(32),
-	  entropy_contribution=bytes(32),
-	  proof=Groth16Proof(G1_ZERO, G2_ZERO, G1_ZERO),
-	  leader_key=Ed25519PublicKey_ZERO,
+    bedrock_version=1,
+    parent_block=0,
+    slot=0,
+    block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+    proof_of_leadership=ProofOfLeadership(
+      leader_voucher=bytes(32),
+      entropy_contribution=bytes(32),
+      proof=Groth16Proof(G1_ZERO, G2_ZERO, G1_ZERO),
+      leader_key=Ed25519PublicKey_ZERO,
 )
 )
 ```
@@ -217,9 +218,9 @@ CRYPTARCHIA_INSCRIPTION = Inscribe(
 
 # service declarations
 BLEND_DECLARATIONS = [
-	Declaration(
-	  msg=DeclarationMessage(ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0),
-	  locked_note_id=STAKE_DISTRIBUTION.output_note_id(0)
+    Declaration(
+      msg=DeclarationMessage(ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0),
+      locked_note_id=STAKE_DISTRIBUTION.output_note_id(0)
 ),
 # ... more declarations
 ]
@@ -228,6 +229,8 @@ SERVICE_DECLARATIONS = BLEND_DECLARATIONS
 # build the genesis Mantle Transaction
 GENESIS_MANTLE_TX = MantleTx(
   ops=[STAKE_DISTRIBUTION, CRYPTARCHIA_INSCRIPTION] + SERVICE_DECLARATIONS,
+  permanent_storage_gas_price=0,
+  execution_gas_price=0
 )
 
 GENESIS_HEADER = Header(
@@ -264,12 +267,12 @@ The Cryptarchia slot clock is initialized to genesis_time, LIB is set to the Gen
 
 ### Initial Epoch State
 
-Cryptarchia progresses in epochs where the variables governing the lottery are fixed for the duration of an epoch and the activity during that epoch is used to derive the values of those variables for the next epoch. These variables taken together are called the Epoch State. (see [[1.0.1] Cryptarchia Protocol - Epoch State](https://nomos-tech.notion.site/Epoch-State-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df817aa264c821681a9efb)).
+Cryptarchia progresses in epochs where the variables governing the lottery are fixed for the duration of an epoch and the activity during that epoch is used to derive the values of those variables for the next epoch. These variables taken together are called the Epoch State. (see [\[1.0.2\] Cryptarchia Protocol - Epoch State](https://nomos-tech.notion.site/Epoch-State-21c261aa09df810cb85eff1c76e5798c?pvs=24#21c261aa09df817aa264c821681a9efb)).
 
 To initialize the Epoch State, we derive the epoch variables from the genesis block.
 
 1. $\eta$ : the epoch nonce is taken directly from the genesis_epoch_nonce.
-1. $\mathbb{C}_\text{LEAD}$: Eligible leader commitment is set to the the Ledger Root over all notes from the initial token distribution. The derivation of this root is specified in [[1.1.0] Proof of Leadership - Ledger Root](https://nomos-tech.notion.site/Ledger-Root-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df8062a622d875b5ad43e9).
+1. $\mathbb{C}_\text{LEAD}$: Eligible leader commitment is set to the the Ledger Root over all notes from the initial token distribution. The derivation of this root is specified in [\[1.1.0\] Proof of Leadership - Ledger Root](https://nomos-tech.notion.site/Ledger-Root-2e9261aa09df80058244c902defc6da2?pvs=24#2e9261aa09df8062a622d875b5ad43e9).
 1. $D$: The initial estimate of total stake will be the total tokens distributed at genesis.
 
 ## Bedrock Services Initialization
