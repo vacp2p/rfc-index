@@ -15,7 +15,8 @@ from validate_metadata import DOCS, ROOT, discover_docs, read_doc
 
 SUMMARY = DOCS / "SUMMARY.md"
 INDEX = DOCS / "logos-lips.json"
-EXCLUDE_INDEX_PARTS = {"previous-versions"}
+EXCLUDE_INDEX_PARTS = {"previous-versions", "appendix", "appendices"}
+SUMMARY_AUXILIARY_PARTS = {"appendix", "appendices"}
 SUMMARY_LINK_RE = re.compile(r"\[(?:\\.|[^\]\\])+\]\(([^)]+\.md(?:#[^)]+)?)\)")
 
 
@@ -56,6 +57,7 @@ def validate_summary_coverage() -> List[str]:
         path
         for path in linked_paths - expected_paths
         if path.name not in {"README.md", "about.md"}
+        and not SUMMARY_AUXILIARY_PARTS.intersection(path.relative_to(DOCS).parts)
     )
     if extra:
         joined = ", ".join(str(path.relative_to(ROOT)) for path in extra)

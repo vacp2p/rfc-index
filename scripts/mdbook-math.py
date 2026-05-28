@@ -10,6 +10,7 @@ FENCED_CODE_RE = re.compile(r"```[\s\S]*?```|~~~[\s\S]*?~~~")
 INLINE_CODE_RE = re.compile(r"`+[^`\n]*?`+")
 BLOCK_MATH_RE = re.compile(r"(?<!\\)\$\$(.+?)(?<!\\)\$\$", re.DOTALL)
 INLINE_MATH_RE = re.compile(r"(?<!\\)\$(?!\$)([^\n]*?)(?<!\\)\$")
+GITHUB_INLINE_MATH_RE = re.compile(r"(?<!\\)\$`([^\n]*?)(?<!\\)`\$(?!\$)")
 ALT_BLOCK_MATH_RE = re.compile(
     r"(?<!\\)\$`\s*\n(.+?)\n\s*`\$(?!\$)",
     re.DOTALL,
@@ -53,9 +54,12 @@ def transform(content: str) -> str:
     inline_codes: List[str] = []
 
     content = protect(content, FENCED_CODE_RE, code_blocks, "@@CODEBLOCK")
-    content = protect(content, INLINE_CODE_RE, inline_codes, "@@INLINECODE")
 
     content = ALT_BLOCK_MATH_RE.sub(render_block, content)
+    content = GITHUB_INLINE_MATH_RE.sub(render_inline, content)
+
+    content = protect(content, INLINE_CODE_RE, inline_codes, "@@INLINECODE")
+
     content = BLOCK_MATH_RE.sub(render_block, content)
     content = INLINE_MATH_RE.sub(render_inline, content)
 

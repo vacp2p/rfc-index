@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 
 EXCLUDE_FILES = {"README.md", "SUMMARY.md", "about.md", "template.md"}
+EXCLUDE_PARTS = {"appendix", "appendices"}
 # Fields required for draft and above; raw specs only need name + status.
 REQUIRED_FIELDS_ALL = ("name", "slug", "status", "type", "category", "editor")
 REQUIRED_FIELDS_RAW = ("name", "status")
@@ -81,6 +82,8 @@ def discover_docs() -> List[Path]:
     files = []
     for path in DOCS.rglob("*.md"):
         if path.name in EXCLUDE_FILES:
+            continue
+        if EXCLUDE_PARTS.intersection(path.relative_to(DOCS).parts):
             continue
         files.append(path)
     return sorted(files)

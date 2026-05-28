@@ -3,11 +3,19 @@
 | Field | Value |
 | --- | --- |
 | Name | ConversationTypes |
-| Slug |  |
+| Slug | 236 |
 | Status | raw |
 | Type | RFC |
 | Category | Standards Track |
 | Editor | jazzz <jazz@status.im> |
+
+<!-- timeline:start -->
+
+## Timeline
+
+- **2026-05-14** — [`7a2ff23`](https://github.com/logos-co/logos-lips/blob/7a2ff235ce25f9a50404131f9875f4696b131441/docs/messaging/raw/conversationtypes.md) — Add ConversationTypes Spec (#323)
+
+<!-- timeline:end -->
 
 ## Terminology
 

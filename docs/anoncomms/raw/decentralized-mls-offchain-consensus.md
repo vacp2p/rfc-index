@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/decentralized-mls-offchain-consensus.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/decentralized-mls-offchain-consensus.md) — chore: split ift ts specs (#334)
 - **2026-05-07** — [`a4ef18f`](https://github.com/logos-co/logos-lips/blob/a4ef18f6e0cb77583d8facf57e6056b95e65f5f5/docs/ift-ts/raw/decentralized-mls-offchain-consensus.md) — de-MLS clarifying edge cases (#318)
 - **2026-04-15** — [`5a3e844`](https://github.com/logos-co/logos-lips/blob/5a3e844679a0ac60e6b4e945a64c2f7d8650cba5/docs/ift-ts/raw/decentralized-mls-offchain-consensus.md) — Chore/move repo into logos co (#312)
 - **2026-04-02** — [`155c310`](https://github.com/logos-co/logos-lips/blob/155c310d7bfad6ea3cd9f68e45c68dad731ff629/docs/ift-ts/raw/decentralized-mls-offchain-consensus.md) — de-MLS RFC name change (#303)

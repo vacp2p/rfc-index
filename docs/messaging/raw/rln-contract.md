@@ -14,7 +14,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/messaging/standards/core/rln-contract.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/messaging/raw/rln-contract.md) — chore: split ift ts specs (#334)
 - **2026-05-07** — [`48600b5`](https://github.com/logos-co/logos-lips/blob/48600b5b4fcdcb89f3d556ee0e4d417526f2919a/docs/messaging/standards/core/rln-contract.md) — Migrate logos-messaging/specs into docs/messaging/ (#315)
 
 <!-- timeline:end -->

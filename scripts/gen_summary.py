@@ -20,6 +20,7 @@ OUTPUT = DOCS / "SUMMARY.md"
 BLOCKCHAIN_TREE_JSON = DOCS / "blockchain-structure.json"
 
 SKIP_FILES = {"README.md", "SUMMARY.md", "template.md"}
+AUXILIARY_DIR_NAMES = ("appendices", "appendix")
 
 TOP_LEVEL = ["messaging", "blockchain", "storage", "anoncomms", "research"]
 
@@ -70,7 +71,6 @@ ACRONYMS = {
     "id",
     "mls",
     "mvds",
-    "nomosda",
     "p2p",
     "rfc",
     "rln",
@@ -123,6 +123,23 @@ def label_for_file(path: Path) -> str:
     return title
 
 
+def appendix_items_for_file(path: Path) -> List[Item]:
+    """Return auxiliary appendix pages stored beside a spec file."""
+    items: List[Item] = []
+    base = path.with_suffix("")
+    for dirname in AUXILIARY_DIR_NAMES:
+        appendix_dir = base / dirname
+        if not appendix_dir.is_dir():
+            continue
+        for file in sorted(appendix_dir.rglob("*.md"), key=lambda p: p.as_posix()):
+            if file.name in SKIP_FILES:
+                continue
+            if "previous-versions" in file.parts:
+                continue
+            items.append(Item(label=label_for_file(file), path=file, children=[]))
+    return sorted(items, key=lambda item: item.label.lower())
+
+
 def label_for_dir(rel_dir: Path) -> str:
     key = rel_dir.as_posix()
     return LABEL_OVERRIDES.get(key, humanize(rel_dir.name))
@@ -167,6 +184,10 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
     for subdir in sorted_dirs(base, rel_base):
         if subdir.name == "previous-versions":
             continue
+        if subdir.name in AUXILIARY_DIR_NAMES:
+            continue
+        if (base / f"{subdir.name}.md").exists():
+            continue
         rel_subdir = subdir.relative_to(DOCS)
         readme = subdir / "README.md"
         if readme.exists():
@@ -184,7 +205,7 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
                 if "previous-versions" not in p.parts and p.name not in SKIP_FILES
             ]
         for file in sorted(md_files, key=lambda p: p.name):
-            item = Item(label=label_for_file(file), path=file, children=[])
+            item = Item(label=label_for_file(file), path=file, children=appendix_items_for_file(file))
             prev_dir = subdir / "previous-versions"
             if prev_dir.exists() and prev_dir.is_dir():
                 for version_dir in sorted(prev_dir.iterdir(), key=lambda p: p.name):
@@ -198,7 +219,7 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
     for file in sorted(base.glob("*.md"), key=lambda p: p.name):
         if file.name in SKIP_FILES:
             continue
-        items.append(Item(label=label_for_file(file), path=file, children=[]))
+        items.append(Item(label=label_for_file(file), path=file, children=appendix_items_for_file(file)))
 
     items.sort(key=item_sort_key)
 
@@ -252,7 +273,9 @@ def build_blockchain_items() -> List[Item]:
         bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
         if bucket not in grouped[topic]:
             grouped[topic][bucket] = []
-        grouped[topic][bucket].append(Item(label=label, path=abs_path))
+        grouped[topic][bucket].append(
+            Item(label=label, path=abs_path, children=appendix_items_for_file(abs_path))
+        )
 
     topic_items: List[Item] = []
     for topic in bc.TOPIC_ORDER:
@@ -320,10 +343,7 @@ def main() -> None:
             continue
         label = LABEL_OVERRIDES.get(section, humanize(section))
         lines.append(f"- [{label}]({section}/{readme.name})")
-        if section == "blockchain":
-            children = build_blockchain_items()
-        else:
-            children = build_items(section_dir, Path(section))
+        children = build_items(section_dir, Path(section))
         render_items(children, 1, lines)
         lines.append("")
 

@@ -265,6 +265,30 @@ code, pre, .hljs {
     font-family: "Source Code Pro", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+blockquote:has(> p > sub) {
+    margin: 1rem 0 1.25rem;
+    padding: 0.35rem 0 0.35rem 1rem;
+    border-left: 0.25rem solid var(--quote-border);
+    background: transparent;
+    color: var(--sidebar-fg);
+}
+
+blockquote:has(> p > sub) > p {
+    margin: 0;
+}
+
+blockquote > p > sub:only-child {
+    display: block;
+    color: var(--sidebar-fg);
+    font-size: 1.10rem;
+    line-height: 1.45;
+    vertical-align: baseline;
+}
+
+blockquote > p > sub:only-child .katex {
+    font-size: 1em;
+}
+
 .site-nav {
     display: flex;
     align-items: center;

@@ -14,7 +14,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/messaging/standards/application/reliable-channel-api.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/messaging/raw/reliable-channel-api.md) — chore: split ift ts specs (#334)
 - **2026-05-07** — [`d3ee034`](https://github.com/logos-co/logos-lips/blob/d3ee0346cb0ec0a29030f0c859ca3d104d65b0e4/docs/messaging/standards/application/reliable-channel-api.md) — docs: add Reliable Channel API spec (#325)
 
 <!-- timeline:end -->

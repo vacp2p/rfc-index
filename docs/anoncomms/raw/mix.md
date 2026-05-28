@@ -13,7 +13,9 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/mix.md) — chore: split ift ts specs
+- **2026-05-25** — [`f1017b9`](https://github.com/logos-co/logos-lips/blob/f1017b9f30cfdf8cb4f53d5f3286e4bdf0bdfcd1/docs/anoncomms/raw/mix.md) — Add LIONESS specification for Mix payload encryption (#329)
+- **2026-05-20** — [`1383661`](https://github.com/logos-co/logos-lips/blob/1383661f9d566dde0d1b0de0e3ed01ed602ed34a/docs/anoncomms/raw/mix.md) — Add SURB specification (§8.7) (#335)
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix.md) — chore: split ift ts specs (#334)
 - **2026-05-11** — [`2aa2bcd`](https://github.com/logos-co/logos-lips/blob/2aa2bcd89c58ccc4453207edeb8269e66a631b48/docs/ift-ts/raw/mix.md) — feat: Mix Cover Traffic specification (#311)
 - **2026-04-30** — [`474c7e5`](https://github.com/logos-co/logos-lips/blob/474c7e545ba7db2425f3c5b508f9f2d714ca43c7/docs/ift-ts/raw/mix.md) — Extract Mix DoS protection to a standalone spec (#302)
 - **2026-04-30** — [`ccd5bf4`](https://github.com/logos-co/logos-lips/blob/ccd5bf4a5d28abd4d21722b37b915f02e48833da/docs/ift-ts/raw/mix.md) — Restructure spam protection: Split into Exit Abuse Prevention and DoS Protection sections (#297)

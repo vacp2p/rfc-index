@@ -14,6 +14,7 @@
 
 ## Timeline
 
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/messaging/draft/22/toy-chat.md) — chore: split ift ts specs (#334)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/messaging/informational/22/toy-chat.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/messaging/informational/22/toy-chat.md) — chore: add math support (#287)
 - **2026-01-16** — [`89f2ea8`](https://github.com/logos-co/logos-lips/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/messaging/informational/22/toy-chat.md) — Chore/mdbook updates (#258)

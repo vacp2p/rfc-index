@@ -14,6 +14,8 @@
 
 ## Timeline
 
+- **2026-05-11** — [`cd783d4`](https://github.com/logos-co/logos-lips/blob/cd783d494e935bf9212aae81668f56a3288aba62/docs/messaging/raw/messaging-api.md) — adjust event defs to messaging-api implementation in logos-delivery (#333)
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/messaging/raw/messaging-api.md) — chore: split ift ts specs (#334)
 - **2026-05-07** — [`48600b5`](https://github.com/logos-co/logos-lips/blob/48600b5b4fcdcb89f3d556ee0e4d417526f2919a/docs/messaging/standards/application/messaging-api.md) — Migrate logos-messaging/specs into docs/messaging/ (#315)
 
 <!-- timeline:end -->
