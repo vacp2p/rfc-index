@@ -13,6 +13,7 @@
 
 ## Timeline
 
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/messaging/draft/20/toy-eth-pm.md) — chore: split ift ts specs (#334)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/messaging/standards/application/20/toy-eth-pm.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/messaging/standards/application/20/toy-eth-pm.md) — chore: add math support (#287)
 - **2026-01-30** — [`d5a9240`](https://github.com/logos-co/logos-lips/blob/d5a9240c6c6c859eddd30742b2251f8a13480cf9/docs/messaging/standards/application/20/toy-eth-pm.md) — chore: removed archived (#283)

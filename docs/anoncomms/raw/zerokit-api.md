@@ -12,7 +12,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/zerokit-api.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/zerokit-api.md) — chore: split ift ts specs (#334)
 - **2026-01-21** — [`70f3cfb`](https://github.com/logos-co/logos-lips/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/zerokit-api.md) — chore: mdbook font fix (#266)
 
 <!-- timeline:end -->
@@ -277,7 +277,7 @@ All tree management functions are only available when `stateless` feature is **N
 
 ### Witness Calculation
 
-For **native Rust**** environments, witness calculation is handled internally by the proof generation functions.
+For **native Rust** environments, witness calculation is handled internally by the proof generation functions.
 The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
 
 For **WASM** environments, witness calculation must be performed externally using a JavaScript witness calculator.

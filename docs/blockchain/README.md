@@ -2,11 +2,10 @@
 
 Logos Blockchain is building a secure, flexible, and
 scalable infrastructure for developers creating applications for the network state.
-Published Specifications are currently available here,
-[Blockchain Specifications](https://nomos-tech.notion.site/project).
+Published specifications are available in the topic tree below.
 
 <section class="blockchain-tree-section">
-  <h2 class="blockchain-tree-heading">Browse by topic</h2>
+  <div class="blockchain-tree-heading">Browse by topic</div>
   <div id="blockchain-tree-container" class="blockchain-tree" data-source="../blockchain-structure.json">
     <p class="blockchain-tree-loading">Loading topic tree…</p>
   </div>
