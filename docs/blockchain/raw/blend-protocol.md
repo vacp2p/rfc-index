@@ -1006,7 +1006,7 @@ To better understand the context of the constructions defined in this section re
 The rewarding protocol requires a common and unbiased randomness. We assume that it is provided by the consensus, but at a limited frequency, once per epoch. Therefore, we define the following function:
 
 $$
-R_s=H('\texttt{BLEND\_SESSION\_RANDOMNESS\_V1}' ~||~R_e(s)~||~s)_{512}
+R_s=H(\mathrm{BLEND\_SESSION\_RANDOMNESS\_V1} ~||~R_e(s)~||~s)_{512}
 $$
 
 where:

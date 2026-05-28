@@ -255,10 +255,10 @@ All internal round keys are $`\mu = 32`$ bytes in size. Given a LIONESS seed $`k
 
 $`
 \begin{aligned}
-K_1 &= \mathsf{KDF}(\texttt{"lioness\_key1"}, k) \\
-K_2 &= \mathsf{KDF}(\texttt{"lioness\_key2"}, k) \\
-K_3 &= \mathsf{KDF}(\texttt{"lioness\_key3"}, k) \\
-K_4 &= \mathsf{KDF}(\texttt{"lioness\_key4"}, k)
+K_1 &= \mathsf{KDF}(\mathrm{lioness\_key1}, k) \\
+K_2 &= \mathsf{KDF}(\mathrm{lioness\_key2}, k) \\
+K_3 &= \mathsf{KDF}(\mathrm{lioness\_key3}, k) \\
+K_4 &= \mathsf{KDF}(\mathrm{lioness\_key4}, k)
 \end{aligned}
 `$
 
@@ -406,7 +406,7 @@ Once the plaintext is formatted as specified in [section 6.1](#61-payload-plaint
 
    $`
     \begin{array}{l}
-    \delta_{\mathrm{key}_i} = \mathsf{KDF}(\texttt{"payload\_enc\_key"}, s_i)
+    \delta_{\mathrm{key}_i} = \mathsf{KDF}(\mathrm{payload\_enc\_key}, s_i)
     \end{array}
    `$ 
 
@@ -457,7 +457,7 @@ If the node is an intermediary, it MUST:
 
    $`
     \begin{array}{l}
-    \delta_{\mathrm{key}} = \mathsf{KDF}(\texttt{"payload\_enc\_key"}, s)
+    \delta_{\mathrm{key}} = \mathsf{KDF}(\mathrm{payload\_enc\_key}, s)
     \end{array}
    `$
 
