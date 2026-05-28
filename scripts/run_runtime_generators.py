@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS = [
     "scripts/validate_metadata.py",
+    "scripts/validate_rendering.py",
     "scripts/gen_history.py",
     "scripts/gen_rfc_index.py",
     "scripts/gen_summary.py",

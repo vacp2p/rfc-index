@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/messaging/standards/core/64/network.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/messaging/draft/64/network.md) — chore: split ift ts specs (#334)
 - **2026-05-08** — [`c0ef3b9`](https://github.com/logos-co/logos-lips/blob/c0ef3b965ce844c4ad757832cce9e082b8435b01/docs/messaging/standards/core/64/network.md) — Cleanup: rewrite specs-repo links in pre-existing messaging specs (#316)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/messaging/standards/core/64/network.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-04-15** — [`5a3e844`](https://github.com/logos-co/logos-lips/blob/5a3e844679a0ac60e6b4e945a64c2f7d8650cba5/docs/messaging/standards/core/64/network.md) — Chore/move repo into logos co (#312)

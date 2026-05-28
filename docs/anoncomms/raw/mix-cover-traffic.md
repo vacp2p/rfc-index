@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/mix-cover-traffic.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix-cover-traffic.md) — chore: split ift ts specs (#334)
 - **2026-05-11** — [`2aa2bcd`](https://github.com/logos-co/logos-lips/blob/2aa2bcd89c58ccc4453207edeb8269e66a631b48/docs/ift-ts/raw/mix-cover-traffic.md) — feat: Mix Cover Traffic specification (#311)
 
 <!-- timeline:end -->
@@ -641,7 +641,7 @@ to enable path health monitoring.
 
 ### 11.3 Pre-Scheduled Emission Timing
 
-Inspired by the [Blend Protocol](../../blockchain/raw/nomos-blend-protocol.md), a future enhancement MAY define pre-scheduled emission slots
+Inspired by the [Blend Protocol](../../blockchain/raw/blend-protocol.md), a future enhancement MAY define pre-scheduled emission slots
 where all outgoing packets — cover, locally originated, and forwarded — are assigned to
 fixed time slots determined at epoch start.
 All traffic types would share the same timing grid,
@@ -712,4 +712,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [Mix RLN DoS Protection](mix-spam-protection-rln.md)
 - [Loopix: Providing Anonymity in a Message Passing System](https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/piotrowska)
 - [Nym: Mixnet for Network-Level Privacy](https://nymtech.net/nym-whitepaper.pdf)
-- [Blend Protocol](../../blockchain/raw/nomos-blend-protocol.md)
+- [Blend Protocol](../../blockchain/raw/blend-protocol.md)

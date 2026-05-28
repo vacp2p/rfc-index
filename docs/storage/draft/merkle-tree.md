@@ -14,7 +14,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/storage/draft/merkle-tree.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/storage/draft/merkle-tree.md) — chore: split ift ts specs (#334)
 - **2026-04-28** — [`7c47307`](https://github.com/logos-co/logos-lips/blob/7c47307916f511bd16cfe97890613951cc4ebe6b/docs/storage/raw/merkle-tree.md) — chore: metadata validator improvements (#320)
 - **2026-04-20** — [`5cb91fc`](https://github.com/logos-co/logos-lips/blob/5cb91fc1553230b2ab49fdfe515020ef6d15c608/docs/storage/raw/merkle-tree.md) — improved Merkle tree spec (#293)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/storage/raw/merkle-tree.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)

@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/mix-dos-protection.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix-dos-protection.md) — chore: split ift ts specs (#334)
 - **2026-05-11** — [`2aa2bcd`](https://github.com/logos-co/logos-lips/blob/2aa2bcd89c58ccc4453207edeb8269e66a631b48/docs/ift-ts/raw/mix-dos-protection.md) — feat: Mix Cover Traffic specification (#311)
 - **2026-05-04** — [`0e5882e`](https://github.com/logos-co/logos-lips/blob/0e5882eaa8f952d941e40566241905b285c578e2/docs/ift-ts/raw/mix-dos-protection.md) — Chore/auto assign slugs (#328)
 - **2026-04-30** — [`474c7e5`](https://github.com/logos-co/logos-lips/blob/474c7e545ba7db2425f3c5b508f9f2d714ca43c7/docs/ift-ts/raw/mix-dos-protection.md) — Extract Mix DoS protection to a standalone spec (#302)

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1390 840" role="img" aria-labelledby="title desc">
+  <title id="title">Asynchronous cross-channel messaging flow</title>
+  <desc id="desc">Sequence diagram showing a source sequencer submitting an inscription to Bedrock, finality on Bedrock, and destination sequencer processing.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10.5" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#d7d7d7"/>
+    </marker>
+  </defs>
+  <style>
+    .bg { fill: #1f2020; }
+    .box { fill: transparent; stroke: #d7d7d7; stroke-width: 1.5; rx: 4; }
+    .life { stroke: #d7d7d7; stroke-width: 2.2; }
+    .arrow { stroke: #d7d7d7; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    .dashed { stroke: #d7d7d7; stroke-width: 2.2; stroke-dasharray: 5 5; fill: none; marker-end: url(#arrow); }
+    .loop { stroke: #d7d7d7; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    .note { fill: #4d4f51; stroke: #414345; stroke-width: 1; }
+    .label { fill: #dfdfdf; font-family: Arial, Helvetica, sans-serif; font-size: 21px; }
+    .body { fill: #dfdfdf; font-family: Arial, Helvetica, sans-serif; font-size: 20px; }
+    .small { fill: #dfdfdf; font-family: Arial, Helvetica, sans-serif; font-size: 19px; }
+    .num { fill: #252525; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+    .bubble { fill: #d7d7d7; stroke: #d7d7d7; }
+  </style>
+
+  <rect class="bg" width="1390" height="840" rx="8"/>
+
+  <rect class="box" x="195" y="55" width="190" height="82"/>
+  <text class="label" x="290" y="104" text-anchor="middle">Source Sequencer</text>
+
+  <rect class="box" x="617" y="55" width="188" height="82"/>
+  <text class="label" x="711" y="104" text-anchor="middle">Bedrock</text>
+
+  <rect class="box" x="1042" y="55" width="228" height="82"/>
+  <text class="label" x="1156" y="104" text-anchor="middle">Destination Sequencer</text>
+
+  <line class="life" x1="290" y1="137" x2="290" y2="744"/>
+  <line class="life" x1="711" y1="137" x2="711" y2="744"/>
+  <line class="life" x1="1156" y1="137" x2="1156" y2="744"/>
+
+  <text class="body" x="260" y="180" text-anchor="middle">1. Generate cross-channel message</text>
+  <text class="body" x="260" y="206" text-anchor="middle">(for one or more destination channels)</text>
+  <path class="loop" d="M290 220 C354 214, 365 246, 290 256"/>
+  <circle class="bubble" cx="290" cy="220" r="11"/>
+  <text class="num" x="290" y="220">1</text>
+
+  <text class="body" x="290" y="296" text-anchor="middle">2. Include message in Mantle Tx</text>
+  <text class="body" x="290" y="322" text-anchor="middle">(Inscription Operation)</text>
+  <path class="loop" d="M290 338 C354 332, 365 364, 290 374"/>
+  <circle class="bubble" cx="290" cy="338" r="11"/>
+  <text class="num" x="290" y="338">2</text>
+
+  <text class="body" x="505" y="418" text-anchor="middle">4. Submit Mantle Transaction to chain</text>
+  <line class="arrow" x1="290" y1="432" x2="709" y2="432"/>
+  <circle class="bubble" cx="290" cy="432" r="11"/>
+  <text class="num" x="290" y="432">3</text>
+
+  <rect class="note" x="584" y="454" width="254" height="78"/>
+  <text class="body" x="711" y="486" text-anchor="middle">Transaction is propagated</text>
+  <text class="body" x="711" y="512" text-anchor="middle">and eventually finalized</text>
+
+  <text class="body" x="960" y="575" text-anchor="middle">Destination channel sequencer observes</text>
+  <text class="body" x="960" y="601" text-anchor="middle">finalized inscription(s) to its ChannelId</text>
+  <line class="dashed" x1="711" y1="612" x2="1154" y2="612"/>
+  <circle class="bubble" cx="711" cy="612" r="11"/>
+  <text class="num" x="711" y="612">4</text>
+
+  <text class="body" x="1144" y="654" text-anchor="middle">Validate message, apply</text>
+  <text class="body" x="1144" y="680" text-anchor="middle">corresponding state change</text>
+  <path class="loop" d="M1156 696 C1224 690, 1236 722, 1156 732"/>
+  <circle class="bubble" cx="1156" cy="696" r="11"/>
+  <text class="num" x="1156" y="696">5</text>
+
+  <rect class="box" x="195" y="744" width="190" height="82"/>
+  <text class="label" x="290" y="793" text-anchor="middle">Source Sequencer</text>
+
+  <rect class="box" x="617" y="744" width="188" height="82"/>
+  <text class="label" x="711" y="793" text-anchor="middle">Bedrock</text>
+
+  <rect class="box" x="1042" y="744" width="228" height="82"/>
+  <text class="label" x="1156" y="793" text-anchor="middle">Destination Sequencer</text>
+</svg>
