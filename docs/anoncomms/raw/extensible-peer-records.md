@@ -151,6 +151,8 @@ Extensible Peer Records MUST be wrapped in libp2p [signed envelope](https://gith
 before distributing them to peers.
 The corresponding `ExtensiblePeerRecord` message is serialised into the signed envelope's `payload` field.
 
+> Both domain, payload type and protobuf serialization are compatible with libp2p peer record so that both records can be used interchangeably.
+
 #### Signed Envelope Domain
 
 Extensible Peer Records MUST use `libp2p-peer-record` as domain separator string
@@ -161,8 +163,7 @@ for the envelope signature.
 Extensible Peer Records MUST use the hexadecimal `0x0301`
 as the `payload_type` value.
 
-> **_Note:_** this will make Extensible Peer Records a subtype of the "namespace" [multicodec](https://github.com/multiformats/multicodec/blob/0c6c7d75f1580af329847dbc9900859a445ed980/table.csv).
-> In future we may define a more compact multicodec type for Extensible Peer Records.
+> The payload type is the [multicodec](https://github.com/multiformats/multicodec/blob/0c6c7d75f1580af329847dbc9900859a445ed980/table.csv) `libp2p-peer-record` type
 
 ## Copyright
 
