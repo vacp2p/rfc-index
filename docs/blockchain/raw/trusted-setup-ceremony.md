@@ -105,13 +105,7 @@ These values are fixed and published to all ceremony participants.
 
 - An initialized CRS:
     - The initialized CRS contains $n + 1$ elements in $`G_1`$ and $m+1$ elements in $`G_2`$. For the $\tau$ secret in Groth16, the value of $n$ defines the maximum degree of polynomials that will be committed and the maximum size of circuits (the number of R1CS constraints must be ≤ $n$) and $m=1$. In contrast, the parameters $\alpha, \beta, \gamma, \delta$ of the Groth16 protocol each require only $n=m=0$. But, Phase 2 also includes the computation of the $`K_i`$ elements in $`\mathbb G_1`$, whose number depends on the circuit’s public inputs. These must be generated at the same time, while the toxic waste scalars are still in memory.
-    - The CRS is of the form: $\left(
-[1]_1
-\right)_{j=0}^n
-\;
-\left(
-[1]_2
-\right)_{k=0}^m$ when initializing from scratch.
+    - The CRS is of the form $`\left([1]_1\right)_{j=0}^n \; \left([1]_2\right)_{k=0}^m`$ when initializing from scratch.
     > For performance reasons, especially to leverage Number Theoretic Transforms (NTT) for fast polynomial arithmetic, it is common to choose $n$ as a power of two. For example, setting $`n = 2^{k}`$ allows working with polynomials of degree up to $`2^{k} - 1`$, and proving circuits with up to $`2^{k}`$ constraints.
 
 ### Step 2: Participant Contribution
@@ -120,7 +114,7 @@ Each participant $i$ in the sequence performs the following:
 
 1. Downloads the current CRS:
    $`([\tau^j]_1)_{j=0}^{n}, \; ([\tau^k]_2)_{k=0}^{m}`$ ($\tau = 1$ at the initialization phase).
-1. Generates a random secret scalar $r_i \overset{\$}{\leftarrow} \mathbb{F}_p^*$.
+1. Generates a random secret scalar $`r_i \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p^*`$.
 1. Updates the CRS by contributing its secret $`r_i`$ into the CRS.
     - $`\forall j\in [0,n]: \; [(\tau')^j]_1 := [{(r_i \tau)^j}]_1 ={r_i^j}\cdot [\tau^j]_1`$.
     - $`\forall k \in [0,m] : [(\tau')^k]_2 = [{(r_i \tau)^k}]_2 = {r_i^k}\cdot [\tau^k]_2`$.
@@ -140,7 +134,7 @@ In Phase 2 for Groth16, participants also update all circuit-specific elements d
 1. Knowledge of Exponent $`r_i`$​
     This is proven using a Fiat–Shamir transform of a Schnorr-like protocol:
     - Let: $`\quad [\tau']_1 = {r_i \cdot [\tau]_1}`$.
-    - Prover samples random values uniformly $z \overset{\$}{\leftarrow} \mathbb{F}_p$.
+    - Prover samples random values uniformly $`z \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p`$.
     - Computes: $`[z']_1 = z\cdot[\tau]_1`$.
     - Computes challenge: $`h = \text{Hash}([\tau]_1, [\tau']_1, [z']_1)`$.
     - Computes response: $`s = z + h \cdot r_i \mod p`$.
@@ -148,14 +142,20 @@ In Phase 2 for Groth16, participants also update all circuit-specific elements d
     - Verifier checks: $`s\cdot[\tau]_1 \stackrel{?}{=} [z']_1 + h\cdot [\tau']_1`$.
     This protocol confirms that the first element of the CRS was exponentiated with a known secret $`r_i`$.
 1. Well-Formedness of CRS
-    - Verifier samples $\rho_1, \rho_2 \overset{\$}{\leftarrow} \mathbb{F}_p^*$.
+    - Verifier samples $`\rho_1, \rho_2 \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p^*`$.
     - The verifier computes the following pairing equation on the new CRS:
-        $$
-        e\left(\sum_{j=1}^n \rho_1^{j-1} \cdot [\tau^j]_1, [1]_2 + \sum_{k=1}^{m-1}\rho_2^k \cdot [\tau^k]_2 \right) \stackrel{?}{=} 
-        e\left( 
-        [1]_1 + \sum_{j=1}^{n-1} \rho_1^j \cdot [\tau^j]_1, \sum_{k=1}^m \rho_2^{k-1}[\tau^k]_2
-        \right)
-        $$
+
+$$
+e\!\left(
+\sum_{j=1}^n \rho_1^{j-1} \cdot [\tau^j]_1,\,
+[1]_2 + \sum_{k=1}^{m-1}\rho_2^k \cdot [\tau^k]_2
+\right)
+\stackrel{?}{=}
+e\!\left(
+[1]_1 + \sum_{j=1}^{n-1} \rho_1^j \cdot [\tau^j]_1,\,
+\sum_{k=1}^m \rho_2^{k-1} \cdot [\tau^k]_2
+\right)
+$$
 
 This pairing check confirms that the CRS has been updated via exponentiation by the same secret scalar $`r_i`$, preserving the structure of the powers of $\tau$.
 

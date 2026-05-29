@@ -228,7 +228,7 @@ def block_rewards(
 The emission rate factor $`A_t \in [0,1]`$ determines the portion of $`I_{max}`$ that should be emitted based on current values of $`\delta_t`$ and $`\gamma_t`$:
 
 $$
-A_t = \min \Bigl\{ 1, \max \Bigl\{ 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \Bigr\} \Bigr\}.
+A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace.
 $$
 
 where
@@ -380,7 +380,7 @@ Because block rewards affect consensus state, the implementation must be fully d
 The goal of this section is not to change the reward mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. In particular, the reward logic remains driven by the same two KPI components described previously: the inferred total stake relative to its target, and the moving average of burned fees over the look-back window. Likewise, the reward still interpolates between inflationary issuance and burned-fee compensation through the emission factor $`A_t`$.
 
 $$
-A_t = \min \Bigl\{ 1, \max \Bigl\{ 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \Bigr\} \Bigr\}.
+A_t = \min \lbrace 1, \max \lbrace 0, \dfrac{ \alpha_d \cdot \delta_t + \alpha_a \cdot \gamma_t + I_{min}}{I_{max}} \rbrace \rbrace.
 $$
 
 Because we have
@@ -435,7 +435,7 @@ $$
 So we rewrite $`A_t`$ by
 
 $$
-A_t=\min\!\left\{1,\max\!\left\{0,\quad \frac{3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}}{12\cdot 10^7}\right\}\right\}.
+A_t=\min\!\lbrace1,\max\!\lbrace0,\quad \frac{3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}}{12\cdot 10^7}\rbrace\rbrace.
 $$
 
 And by denoting
@@ -444,7 +444,7 @@ $$
 \begin{aligned}
 A_t'
 &=
-\min\!\left\{12\cdot 10^7,\max\!\left\{0,\quad3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\right\}\right\},
+\min\!\lbrace12\cdot 10^7,\max\!\lbrace0,\quad3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\rbrace\rbrace,
 \\
 A_t&=\frac{A_t'}{12\cdot 10^7}.
 \end{aligned}

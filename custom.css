@@ -265,6 +265,18 @@ code, pre, .hljs {
     font-family: "Source Code Pro", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+pre:has(> code.language-schema) {
+    margin: 1rem 0 1.5rem;
+    padding: 1.35rem 1.5rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #1f2020;
+}
+
+pre > code.language-schema {
+    line-height: 1.55;
+}
+
 blockquote:has(> p > sub) {
     margin: 1rem 0 1.25rem;
     padding: 0.35rem 0 0.35rem 1rem;

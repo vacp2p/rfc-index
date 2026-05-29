@@ -66,8 +66,8 @@ The Logos Blockchain P2P network integrates a combination of libp2p's [Kademlia]
 
 The specific protocols to be negotiated are:
 
-- Kademlia: `/logos-blockchain/kad/{version}` for main network and `/``logos-blockchain``-testnet/kad/{version}` for public testnet.
-- Identify: `/``logos-blockchain``/identify/{version}` and `/``logos-blockchain``-testnet/identify/{version}` for public testnet.
+- Kademlia: `/logos-blockchain/kad/{version}` for main network and `/logos-blockchain-testnet/kad/{version}` for public testnet.
+- Identify: `/logos-blockchain/identify/{version}` and `/logos-blockchain-testnet/identify/{version}` for public testnet.
 
 Current versions are `1.0.0`.
 

@@ -151,18 +151,9 @@ After a block $s$ is executed and its total Execution Gas usage $G[s]$ is known,
 
 The base fee for the next block, $s+1$, is calculated based on the state of block $s$.
 
-1. Total Execution Gas Used: First, sum the actual Execution Gas consumed, $`g_t`$, for all transactions $t$ in the block $`\mathcal{B}_s`$.
-    $$
-    G[s] = \sum_{t \in \mathcal{B}_s} g_t
-    $$
-1. Smoothed Average Update: Update the EMA of Execution Gas usage.
-    $$
-    G_{\mathrm{avg}}[s] = (1 - q) \cdot G[s] + q \cdot G_{\mathrm{avg}}[s-1]
-    $$
-1. Next Base Fee Calculation: Update the base fee for block $s+1$.
-    $$
-    b_{\mathrm{exec}}[s+1] = b_{\mathrm{exec}}[s] \cdot \left(1 + \phi \cdot \frac{G_{\mathrm{avg}}[s] - G_{\mathrm{target}}}{G_{\mathrm{target}}}\right)
-    $$
+1. Total Execution Gas Used: First, sum the actual Execution Gas consumed, $`g_t`$, for all transactions $t$ in the block $`\mathcal{B}_s`$: $`G[s] = \sum_{t \in \mathcal{B}_s} g_t`$.
+1. Smoothed Average Update: Update the EMA of Execution Gas usage: $`G_{\mathrm{avg}}[s] = (1 - q) \cdot G[s] + q \cdot G_{\mathrm{avg}}[s-1]`$.
+1. Next Base Fee Calculation: Update the base fee for block $s+1$: $`b_{\mathrm{exec}}[s+1] = b_{\mathrm{exec}}[s] \cdot \left(1 + \phi \cdot \frac{G_{\mathrm{avg}}[s] - G_{\mathrm{target}}}{G_{\mathrm{target}}}\right)`$.
 
 Pseudocode for Base Fee Update:
 

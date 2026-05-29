@@ -565,12 +565,12 @@ However, this must also be carefully engineered as the number of connections mus
 
 ### Transition Period
 
-When a new session or epoch begins, the set of public information checked against proofs embedded in messages changes, which renders some messages invalid. However, these messages may still contain valid payloads that must reach their destination. Therefore, we implement a Transition Period (TP, $`\Tau`$) during which the network can gracefully react to the change and allow these messages to safely exit the network.
+When a new session or epoch begins, the set of public information checked against proofs embedded in messages changes, which renders some messages invalid. However, these messages may still contain valid payloads that must reach their destination. Therefore, we implement a Transition Period (TP, $`T`$) during which the network can gracefully react to the change and allow these messages to safely exit the network.
 
 The duration of the TP is calculated as follows:
 
 $$
-\Tau = (\Delta_{max} +d)\cdot \beta_{max} +d
+T = (\Delta_{max} +d)\cdot \beta_{max} +d
 $$
 
 where:
@@ -582,12 +582,12 @@ where:
 We assume that $`d=0.5`$ is an average message dissemination delay, then:
 
 $$
-\Tau = (3 + 0.5)\cdot 3 + 0.5= 11
+T = (3 + 0.5)\cdot 3 + 0.5= 11
 $$
 
 That means that after $`11`$ rounds, all messages for the past session or epoch should have been processed and disseminated.
 
-However, to provide an additional safety buffer, we round up the transition period to a single interval: $`\Tau=30`$ rounds. After this period, all old connections can be safely terminated, and messages for the past session or epoch must not be processed anymore.
+However, to provide an additional safety buffer, we round up the transition period to a single interval: $`T=30`$ rounds. After this period, all old connections can be safely terminated, and messages for the past session or epoch must not be processed anymore.
 
 When a new **session** begins:
 
@@ -671,7 +671,7 @@ We define a mechanism that applies the quota to the protocol and makes the messa
 For this to happen, a node creates a pool of keys that can be used for message generation and processing (the pool is session-specific):
 
 $$
-\mathbf K^{n,s}_q = \Bigl\{(K^{n}_{0}, k^{n}_{0}, \pi_{Q}^{K_{0}^{n}}),...,(K^{n}_{q-1}, k^{n}_{q-1}, \pi_{Q}^{K_{q-1}^{n}}) \Bigr\},
+\mathbf K^{n,s}_q = \lbrace(K^{n}_{0}, k^{n}_{0}, \pi_{Q}^{K_{0}^{n}}),...,(K^{n}_{q-1}, k^{n}_{q-1}, \pi_{Q}^{K_{q-1}^{n}}) \rbrace,
 $$
 
 which describes a collection of $`q`$ key pairs for a node $`n`$ with proofs of quota for the session $`s`$, where $`K_{i}^{n}`$ is the $`i`$-th public key, $`k_{i}^{n}`$ is its corresponding private key, and $`\pi_{Q}^{K_{i}^{n}}`$ is its proof of quota. Additionally:
@@ -886,10 +886,14 @@ The relaying logic is defined as follows:
 2. Release the message according to the [Releasing](#releasing) logic.
 3. Concurrently to the above step, add the message to the processing queue, where it is handled by the [Processing](#processing) logic.
 
-  The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single session plus the[](blend-protocol.md)safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that size of the cache must be at least:
+  The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single session plus the safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that size of the cache must be at least:
 
 $$
-(S + \text{safety\_buffer} + \text{STP})\cdot (F_C +F_D) \cdot \beta_{max} \cdot |\nu_i|=\\(648000 + 3000 + 30) \cdot ( 1+\dfrac{1}{30}) \cdot 3 \cdot 32  = 64582176 \approx 65 \text{MB}\\
+\begin{aligned}
+(S + \mathrm{safety\ buffer} + \mathrm{STP})\cdot (F_C +F_D) \cdot \beta_{max} \cdot |\nu_i|
+&=(648000 + 3000 + 30) \cdot \left(1+\dfrac{1}{30}\right) \cdot 3 \cdot 32 \\
+&= 64582176 \approx 65\,\mathrm{MB}
+\end{aligned}
 $$
 
 ### Processing
@@ -902,7 +906,7 @@ When a message $`\mathbf M`$ is received by the node, then it is processed by th
 1. If the proof of selection ($`\pi^{K^{n}_l,l}_{S} \in \mathbf b_1`$) is invalid, then the message is discarded. A valid proof of selection points to the index of the node $`l`$ in the list of nodes returned from the SDP.
 2. Store the blending token which is the collection of the proof of quota from the header ($`\pi^{K^{n}_l}_{Q} \in \mathbf H`$), and the proof of selection from the private header ($`\pi^{K^{n}_l,l}_{S} \in \mathbf b_1 \in \mathbf h`$):
 $$
-\tau = ( \pi^{K^{n}_l}_{Q} \in \mathbf H, \pi^{K^{n}_l,l}_{S} \in \mathbf b_1 \in \mathbf h).
+t = ( \pi^{K^{n}_l}_{Q} \in \mathbf H, \pi^{K^{n}_l,l}_{S} \in \mathbf b_1 \in \mathbf h).
 $$
 
   3. If the last flag is set ($`\Omega == 1`$) then examine the header type of the payload as defined in the [[1.0.0] Payload Formatting](payload-formatting.md), then:
@@ -920,7 +924,7 @@ $$
 
   4. If decapsulation fails, return the appropriate decapsulation failure message.
 
-Blending tokens are stored by the node for rewarding purposes, as they prove that the node processed the message. The blending tokens are stored alongside context information such as the session number. We denote the set of blending tokens from a session $`s`$ stored by a node $`l`$ as $`\Tau^{l,s}`$.
+Blending tokens are stored by the node for rewarding purposes, as they prove that the node processed the message. The blending tokens are stored alongside context information such as the session number. We denote the set of blending tokens from a session $`s`$ stored by a node $`l`$ as $`\mathcal{T}^{l,s}`$.
 
 ### Delaying
 
@@ -1006,12 +1010,13 @@ To better understand the context of the constructions defined in this section re
 The rewarding protocol requires a common and unbiased randomness. We assume that it is provided by the consensus, but at a limited frequency, once per epoch. Therefore, we define the following function:
 
 $$
-R_s=H(\mathrm{BLEND\_SESSION\_RANDOMNESS\_V1} ~||~R_e(s)~||~s)_{512}
+R_{s}=H(D_{\mathrm{blend}}\mathbin{\|}R_e(s)\mathbin{\|}s,512)
 $$
 
 where:
 
 - $`R_s`$ is the session randomness;
+- $`D_{\mathrm{blend}}`$ is the domain separator `BLEND_SESSION_RANDOMNESS_V1`;
 - $`H()_{512}`$ is a the `blake2b` hash function returning $`512`$ bits output;
 - $`||`$ is a binary concatenation operator;
 - $`R_e(s)`$ is the epoch nonce from the consensus epoch state, where the epoch number corresponds to the block beginning session $`s`$;
@@ -1023,18 +1028,18 @@ With this approach, we achieve independence from the epoch randomness and mainta
 
 ### Activity Proof
 
-The node activity proof ($`\pi_{A}^{l,\tau,s}`$) is a construction that attests in a probabilistic manner that a node $`l`$ was active during the session $`s`$, by presenting a blending token $`\tau`$.
+The node activity proof ($`\pi_{A}^{l,t,s}`$) is a construction that attests in a probabilistic manner that a node $`l`$ was active during the session $`s`$, by presenting a blending token $`t`$.
 
 In other words, the activity proof is $`\text{true}`$ when:
 
-- A node $`l`$ has a [blending token](blend-protocol.md#activity-proof) $`\tau \in \Tau^{l,s}`$ collected during session $`s`$, and that:
-  - [Proof of Quota](#proof-of-quota) $`\pi^{K^{n}_l}_{Q} \in \tau`$ is true assuming session $`s`$.
-  - [Proof of Selection](#proof-of-selection) $`\pi^{K^{n}_l,l}_{S} \in \tau`$ is true assuming session $`s`$.
+- A node $`l`$ has a [blending token](blend-protocol.md#activity-proof) $`t \in \mathcal{T}^{l,s}`$ collected during session $`s`$, and that:
+  - [Proof of Quota](#proof-of-quota) $`\pi^{K^{n}_l}_{Q} \in t`$ is true assuming session $`s`$.
+  - [Proof of Selection](#proof-of-selection) $`\pi^{K^{n}_l,l}_{S} \in t`$ is true assuming session $`s`$.
   - $`K^{n}_l`$, a public key from the set $`\mathbf K^n_h`$, that is used to verify the above proofs.
 
-- The Hamming distance ($`\Delta_{\mathcal H}(a,b)`$ — returns the number of different bits between $`a`$ and $`b`$ binary strings) between the blending token $`\tau`$ and the next session randomness $`R_{s+1}`$ is smaller than the node activity threshold $`\mathcal A _{\epsilon}`$. That is:
+- The Hamming distance ($`\Delta_{\mathcal H}(a,b)`$ — returns the number of different bits between $`a`$ and $`b`$ binary strings) between the blending token $`t`$ and the next session randomness $`R_{s+1}`$ is smaller than the node activity threshold $`\mathcal A _{\epsilon}`$. That is:
 $$
-\Delta_{\mathcal H}(H(\tau)_{\epsilon},H(R_{s+1})_{\epsilon}) < {\mathcal A}_{\epsilon}
+\Delta_{\mathcal H}(H(t)_{\epsilon},H(R_{s+1})_{\epsilon}) < {\mathcal A}_{\epsilon}
 $$
 
   Where:
@@ -1085,7 +1090,7 @@ We assume that setting $`\theta = 1`$ is enough to eliminate nodes that have not
 
 ### Active Message
 
-A node $`l`$ for every session must construct an active message $`M_A= \{l, \tau, s, \pi_{A}^{l,\tau,s} \}`$, which must follow the [Active Message](bedrock-service-declaration-protocol.md#active-message).
+A node $`l`$ for every session must construct an active message $`M_A= \{l, t, s, \pi_{A}^{l,t,s} \}`$, which must follow the [Active Message](bedrock-service-declaration-protocol.md#active-message).
 
 The active message `metadata` field must start with a header that contains a one byte `version` field which is fixed to `0x01` value, the rest of the `metadata` is populated by the [Activity Proof](#activity-proof).
 
@@ -1100,7 +1105,7 @@ The active message for session $`s`$ must only be sent during session $`s+1`$; o
 The node $`l`$ selects the activity proof to include in the active message such that the Hamming distance between the proof and the new randomness is minimal.
 
 $$
-\pi_{A}^{l,\tau,s} = \min_{\Delta_{\mathcal H}}(\text{true}(\pi_{A}^{i,\tau,s}))
+\pi_{A}^{l,t,s} = \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,s}))
 $$
 
 The ledger must only accept a single active message per-node per-session. Any duplicate must be rejected.
@@ -1110,33 +1115,21 @@ The ledger must only accept a single active message per-node per-session. Any du
 The node rewards for session $`s`$ are calculated according to the following schema:
 
 1. Rewards are not calculated if the number of nodes (unique `ProviderId`s from declarations) retrieved from the SDP protocol is lower than the [Minimal Network Size](#minimal-network-size).
-2. Count the number of true activity proofs registered on the ledger:
-$$
-B = \sum_{i=1}^{N}\text{true}(\pi_{A}^{i,\tau,s})
-$$
+2. Count the number of true activity proofs registered on the ledger: $`B = \sum_{i=1}^{N}\mathrm{true}(\pi_{A}^{i,t,s})`$
 
-  This value is used for calculating the base reward paid for all active nodes.
+   This value is used for calculating the base reward paid for all active nodes.
 
-3. Count the number of true activity proofs registered on the ledger with the smallest Hamming distance—that is, calculate the number of nodes with the minimal distance among all submitted active messages:
-$$
-P = \sum_{i=1}^{N}\min_{\Delta_{\mathcal H}}(\text{true}(\pi_{A}^{i,\tau,s}))
-$$
+3. Count the number of true activity proofs registered on the ledger with the smallest Hamming distance—that is, calculate the number of nodes with the minimal distance among all submitted active messages: $`P = \sum_{i=1}^{N}\min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,s}))`$
 
-  This value is used for calculating the premium reward, which is paid for all active nodes that have their activity proofs closest to the session randomness.
+   This value is used for calculating the premium reward, which is paid for all active nodes that have their activity proofs closest to the session randomness.
 
-4. Calculate the base reward:
-$$
-R = {I \over B + P}
-$$
+4. Calculate the base reward: $`R = {I \over B + P}`$
 
-  where $`I`$ is the value of income for the Blend Network service for the session $`s`$.  For more details about the income calculation, refer to linked reference.
+   where $`I`$ is the value of income for the Blend Network service for the session $`s`$.  For more details about the income calculation, refer to linked reference.
 
-5. Calculate the reward of the node $`n`$:
-$$
-R(n) = R \cdot [\text{true}(\pi_{A}^{i,\tau,s}) + \min_{\Delta_{\mathcal H}}(\text{true}(\pi_{A}^{i,\tau,s}))]
-$$
+5. Calculate the reward of the node $`n`$: $`R(n) = R \cdot [\mathrm{true}(\pi_{A}^{i,t,s}) + \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,s}))]`$
 
-  That is, a base reward ($`R`$) is paid out to all nodes who have submitted a true activity proof, and the reward is doubled for nodes that submitted a true proof with a minimal Hamming distance.
+   That is, a base reward ($`R`$) is paid out to all nodes who have submitted a true activity proof, and the reward is doubled for nodes that submitted a true proof with a minimal Hamming distance.
 
 ### Rewarding Distribution Logic
 
@@ -1236,16 +1229,11 @@ $$
 Reinjecting in the formula of $`TV`$:
 
 $$
-\begin{align*}
-
-TV&=\frac{1}{2} \left( r \cdot \left( \frac{1}{R} - \frac{r}{NR} \right) + (N-r) \cdot \frac{r}{NR}   \right)\\
-
-&=\frac{1}{2} \left( \frac{r}{R} - \frac{r^2}{NR} + \frac{Nr}{NR} - \frac{r^2}{NR}  \right)\\
-
-& = \frac{r}{R} - \frac{r^2}{NR}\leq \frac{r}{R} \leq \frac{N}{R}
-
-
-\end{align*}
+\begin{aligned}
+TV&=\frac{1}{2} \left( r \cdot \left( \frac{1}{R} - \frac{r}{NR} \right) + (N-r) \cdot \frac{r}{NR} \right)\\
+&=\frac{1}{2} \left( \frac{r}{R} - \frac{r^2}{NR} + \frac{Nr}{NR} - \frac{r^2}{NR} \right)\\
+&= \frac{r}{R} - \frac{r^2}{NR}\leq \frac{r}{R} \leq \frac{N}{R}
+\end{aligned}
 $$
 
 So the distribution deviation is less than $`\frac{N}{R}`$ which is cryptographically negligible when $`\frac{N}{R} \leq 2^{-128}`$. Since $`R=2^{256} \implies N \leq 2^{128}`$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $`N=2^{24}`$) we can safely skip the rejection process necessary to draw random numbers uniformly in $`\{0,1,\ldots,N-1\}`$.

@@ -76,7 +76,7 @@ Nodes will remain on the honest chain if they reject forks that diverge further 
 - $`s_{gen}`$ : sufficient time measured in slots to measure the density of block production with enough statistical significance.
   *In practice, we say* $`s_{gen} = \lfloor\frac{k}{4f}\rfloor`$*, where* $`f`$ *is the active slot coefficient from the leader lottery. (see* [Theorem 2 of Badertscher et al., 2018 “Ouroboros Genesis”](https://eprint.iacr.org/2018/378.pdf)*)*
 
-- $`\textbf{common\_prefix\_depth}(b_1, b_2) \rarr (\mathbb{N},\mathbb{N})`$
+- $`\textbf{common\_prefix\_depth}(b_1, b_2) \to (\mathbb{N},\mathbb{N})`$
   *Returns the minimum block depth at which the two branches converge to a common chain.*
 
   Examples:

@@ -60,7 +60,7 @@ where,
 - $`\mathbf{1}[p]`$ is the indicator function resolving to $1$ if $p$ is true, $0$ otherwise;
 - $N$ is the number of nodes in the system;
 - $`s^\ell_i(t)\in \{0,1\}`$ is the lottery result of node $i$ at slot $t$, in epoch $\ell$; here, 1 signals a win, and 0 signals a loss;
-- $`n(\ell) \in \left\{0,1,...,\sum_{t=1}^T \mathbf{1}\left[\left(\sum_{i=1}^N s^\ell_i(t)\right)\geq1\right] \right\}`$ is the number of slots in epoch $\ell$ that could have extended the honest chain but instead were wasted on orphaned blocks.
+- $`n(\ell) \in \lbrace 0,1,...,\sum_{t=1}^T \mathbf{1}\left[\left(\sum_{i=1}^N s^\ell_i(t)\right)\geq1\right] \rbrace`$ is the number of slots in epoch $\ell$ that could have extended the honest chain but instead were wasted on orphaned blocks.
 
 We note that the form above captures how the protocol updates its estimate of the total active stake based on observed network activity, and the actual inference process is described at: [🔀\[1.0.0\] Total Stake Inference - Algorithm](cryptarchia-total-stake-inference.md). Specifically, at each epoch $\ell$, the estimate $`D_\ell`$ is adjusted according to the difference between the target slot occupancy rate $f$ and the observed average fraction of slots with at least one block extending the honest chain (after accounting for wasted slots, $n(\ell)$). The learning rate $\beta$ and normalization by $f$ control how aggressively the estimate is updated.
 
@@ -71,13 +71,13 @@ We note that the form above captures how the protocol updates its estimate of th
 The process converges to the following value:
 
 $$
-\mathbb{E}\left[ D_{\infty}\right] = \frac{\log(1-f)}{\log(1-f/q)}\cdot D_\text{TRUE}
+\mathbb{E}\left[ D_{\infty}\right] = \frac{\log(1-f)}{\log(1-f/q)}\cdot D_{\mathrm{TRUE}}
 $$
 
 where,
 
 - $`\mathbb{E}\left[D_\infty\right]`$ is the mean fixed point of the inference process;
-- $`D_\text{TRUE}`$ is the true total stake active during the consensus protocol execution;
+- $`D_{\mathrm{TRUE}}`$ is the true total stake active during the consensus protocol execution;
 - $q\in(f,1]$ is the honest slot utilization rate representing the rate of occupied slots contributing to the honest chain growth.
 
 We note that for $q\in(f,1]$, we have that $\log(1-f)/\log(1-f/q)\leq1$. This suggests that increased network delay, which reduces the honest slot utilization rate through wasted blocks results in a systematic underestimate of true total stake.
@@ -91,7 +91,7 @@ For a derivation of this result, please see [Accuracy Derivation](#accuracy-deri
 In simulation, we can derive the value $q$ by measuring how many of the active slots contributed towards the honest chain with this formula:
 
 $$
-\small{q = \frac{\text{total\_honest\_chain\_slots}}{\text{total\_active\_slots}}}
+q = \frac{\text{total honest chain slots}}{\text{total active slots}}
 $$
 
 Since $q$ varies by epoch and is impacted by the total stake inference process, measurements should be taken after the system converges to a steady state. From simulations, this tends to be after 5 epochs.
@@ -117,13 +117,13 @@ With our choice of Blend Network parameters, we measured a $q$ value of 0.85 in 
 The variance at equilibrium is given by
 
 $$
-\mathrm{Var}\left[\frac{D_{\infty}}{D_\text{TRUE}}\right]=\left(\frac{\beta}{f}\right)^2\frac{q}{T}\left(\frac{\log(1-f)}{\log(1-f/q)}\right)^2(1-f)f
+\mathrm{Var}\left[\frac{D_{\infty}}{D_{\mathrm{TRUE}}}\right]=\left(\frac{\beta}{f}\right)^2\frac{q}{T}\left(\frac{\log(1-f)}{\log(1-f/q)}\right)^2(1-f)f
 $$
 
 Furthermore, because of $q\in(f,1]$ and  $\log (1-f) / \log (1-f/q) \leq1$, the variance is bounded above by:
 
 $$
-\mathrm{Var}\left[\frac{D_{\infty}}{D_\text{TRUE}}\right]\leq \frac{(\beta/f)^2}{T}(1-f)f
+\mathrm{Var}\left[\frac{D_{\infty}}{D_{\mathrm{TRUE}}}\right]\leq \frac{(\beta/f)^2}{T}(1-f)f
 $$
 
 The implication is that wasted blocks caused by network delays have a stabilizing effect on the inference process. As the network delay grows, the variance in our estimate decreases.
@@ -143,7 +143,7 @@ Checking these predictions in simulations shows very good agreement with analysi
 The inference process is stable for $\beta$ values that satisfy the following condition
 
 $$
-\beta < \frac{2f}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}
+\beta \lt \frac{2f}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)}
 $$
 
 where $q$ is the honest slot utilization rate as mentioned above.
@@ -151,33 +151,32 @@ where $q$ is the honest slot utilization rate as mentioned above.
 Note that for $q=1$ (perfect network, all active slots are used by the honest chain), we have a lower bound on the stability condition, meaning we can tolerate a higher learning rate $\beta$ and converge faster when the network is inefficient:
 
 $$
-\frac{2f}{\left(1 -f \right) \log \! \left(\frac{1}{1-f}\right)} \le  \frac{2f}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}
+\frac{2f}{\left(1 -f \right) \log \left(\frac{1}{1-f}\right)} \le  \frac{2f}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)}
 $$
 
 For a derivation of this result, see [Stability Condition Derivation](#stability-condition-derivation).
 
 ### Simulation Results
 
-In simulations, we see that when we exceed the condition, the spread in $`D_\infty`$ values explodes for $`\beta \ge \frac{2f}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}`$.
+In simulations, we see that when we exceed the condition, the spread in $`D_\infty`$ values explodes for $`\beta \ge \frac{2f}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)}`$.
 
 ![Diagram](analysis-total-stake-inference/assets/237261aa-09df-808a-b6bf-e43738f04a39.png)
 
-> <sub>The plot shows the spread of values observed over 45 epochs after the process has been given sufficient time to converge. We observe that we have high precision when $`\beta`$ is comfortably within the stability condition range and grows rapidly outside of the range. Red line signals the boundary of the convergence condition ($`\beta = \frac{2f}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}`$).<br>Here, $`f=1/30,T=6k/f,k=2160`$ and $`q`$ is measured as described in [Measuring $`q`$ from simulations](#measuring-q-from-simulations).</sub>
+> <sub>The plot shows the spread of values observed over 45 epochs after the process has been given sufficient time to converge. We observe that we have high precision when $`\beta`$ is comfortably within the stability condition range and grows rapidly outside of the range. Red line signals the boundary of the convergence condition ($`\beta = \frac{2f}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)}`$).<br>Here, $`f=1/30,T=6k/f,k=2160`$ and $`q`$ is measured as described in [Measuring $`q`$ from simulations](#measuring-q-from-simulations).</sub>
 
 ## Convergence Speed and Optimal Learning Rate
 
 The process converges exponentially with the following bound:
 
 $$
-\left| \frac{\mathbb{E}\left[ D_\ell\right] - \mathbb{E}\left[ D_\infty \right]}{D_\text{TRUE}} \right| 
-
-\leq A\, \left|\frac{D_0 - \mathbb{E}\left[ D_\infty \right]}{D_\text{TRUE}} \right| \times \left\vert1-\frac{\beta}{f} \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert^\ell
+\left| \frac{\mathbb{E}\left[ D_\ell\right] - \mathbb{E}\left[ D_\infty \right]}{D_{\mathrm{TRUE}}} \right|
+\leq A\, \left|\frac{D_0 - \mathbb{E}\left[ D_\infty \right]}{D_{\mathrm{TRUE}}} \right| \times \left\vert1-\frac{\beta}{f} \left(q -f \right) \log \left(\frac{1}{1-f/q}\right)\right\vert^\ell
 $$
 
 That is, for some constant $`A \gt 0`$, at epoch $\ell$, the distance between the value for the total stake $`D_\ell`$ and the equilibrium estimate $`D_\infty`$ falls exponentially. Moreover, this result predicts an optimal convergence rate
 
 $$
-\beta=\frac{f}{\left(q -f \right)\log \! \left(\frac{1}{1-\frac{f}{q}}\right) }
+\beta=\frac{f}{\left(q -f \right)\log \left(\frac{1}{1-\frac{f}{q}}\right) }
 $$
 
 For reasonable $q$ values, this gives us a $\beta$ slightly higher than 1. Choosing a smaller $\beta$ can only improve the stability of the inference algorithm. This fact, combined with the uncertainty in selecting a $q$ value suggests that we should just select $\beta=1$ as our learning rate.
@@ -192,7 +191,7 @@ For a derivation of this result, see [Convergence Speed and Optimal Learning Rat
 
 We verified these results in simulations, showing that the bound holds for varying $\beta$’s.
 
-The plots show the measured normalized error $`\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_\text{TRUE}} \right|`$ decreasing as epoch $\ell$ increases. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85$.
+The plots show the measured normalized error $`\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_{\mathrm{TRUE}}} \right|`$ decreasing as epoch $\ell$ increases. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85$.
 
 ![Diagram](analysis-total-stake-inference/assets/239261aa-09df-8040-8a0e-c23ba6dc18a4.png)
 
@@ -204,7 +203,7 @@ The plots show the measured normalized error $`\left|\frac{\langle D_\ell\rangle
 
 Optimal convergence was checked as well showing that with [optimal](#convergence-speed-and-optimal-learning-rate)[#convergence-speed-and-optimal-learning-rate)$\beta$, even with massive shocks to total stake, we can converge within 2 epochs.
 
-Plots show the distribution of normalized error $`\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_\text{TRUE}} \right|`$ at each epoch $\ell$ for the optimal $\beta$ parameter under different initial conditions. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85,\beta=1$.
+Plots show the distribution of normalized error $`\left|\frac{\langle D_\ell\rangle - \langle D_\infty \rangle}{D_{\mathrm{TRUE}}} \right|`$ at each epoch $\ell$ for the optimal $\beta$ parameter under different initial conditions. Cryptarchia parameters for all plots were $f=1/30,T=6k/f,k=2160,q=0.85,\beta=1$.
 
 ![Diagram](analysis-total-stake-inference/assets/239261aa-09df-80ed-a464-e7d667f45c9f.png)
 
@@ -246,7 +245,7 @@ is the probability of winning and $`w_i`$ is the stake of node $i$.
 
 - We note that $`D_\ell`$ is a random variable.
 - Node $i$ uses its (local) copy of the blockchain in the inference of the total stake and the latter can give a different count for the number of active slots  because of a number of slots being “wasted”.
-- To model this scenario, we introduce variable $`n(\ell)\vert \sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]\in\left\{0,1,\ldots,\sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]\right\}`$, i.e. $n(\ell)$ is conditional on $`\sum_{t=1}^T \mathbf{1}\big[\left(\sum_{i=1}^N s_i(t)\vert D_\ell \right)\geq1\big]`$, such that
+- To model this scenario, we introduce variable $`n(\ell)\vert \sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]\in\lbrace 0,1,\ldots,\sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]\rbrace`$, i.e. $n(\ell)$ is conditional on $`\sum_{t=1}^T \mathbf{1}\big[\left(\sum_{i=1}^N s_i(t)\vert D_\ell \right)\geq1\big]`$, such that
 
 $$
 \sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]-n(\ell)\bigg\vert \sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]
@@ -255,7 +254,7 @@ $$
 is the number of blocks on the chain of an honest node, i.e. the number of “honest” slots. The latter will be used for inference by an honest node as follows
 
 $$
-D_{\ell+1}=D_{\ell}-h(\ell)\left[f-\frac{1}{T}\left\{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_\ell\bigg)\geq1\bigg]-n(\ell)\right\}\right],
+D_{\ell+1}=D_{\ell}-h(\ell)\left[f-\frac{1}{T}\lbrace \sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_\ell\bigg)\geq1\bigg]-n(\ell)\rbrace\right],
 $$
 
 where in above $`n(\ell)\equiv n(\ell)\vert \sum_{t=1}^T \mathbf{1}\big[\big(\sum_{i=1}^N s_i(t)\vert D_\ell\big)\geq1\big]`$.
@@ -263,10 +262,10 @@ where in above $`n(\ell)\equiv n(\ell)\vert \sum_{t=1}^T \mathbf{1}\big[\big(\su
 - We note that
 
 $$
-\begin{align*}
-D_{\ell+1} &= D_{\ell}-h(\ell)\left[f-\frac{1}{T}\left\{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_\ell\bigg)\geq1\bigg]-n(\ell)\right\}\right] \\
+\begin{aligned}
+D_{\ell+1} &= D_{\ell}-h(\ell)\left[f-\frac{1}{T}\lbrace \sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_\ell\bigg)\geq1\bigg]-n(\ell)\rbrace\right] \\
   &\leq D_{\ell}-h(\ell)\left[f-\frac{1}{T}\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_\ell\bigg)\geq1\bigg]\right]
-\end{align*}
+\end{aligned}
 $$
 
 i.e. for the same $`D_\ell`$, the $`D_{\ell+1}`$ of the honest node’s [equation](#accuracy-derivation) is bounded above by the $`D_{\ell+1}`$ of the idealised [equation](#accuracy-derivation).
@@ -277,7 +276,7 @@ i.e. for the same $`D_\ell`$, the $`D_{\ell+1}`$ of the honest node’s [equatio
 - We first consider the equation
 
 $$
-D_{1}=D_0-h(0)\left[f-\frac{1}{T}\left\{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]-n(0)\right\}\right]
+D_{1}=D_0-h(0)\left[f-\frac{1}{T}\lbrace \sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]-n(0)\rbrace\right]
 $$
 
 - Averaging above over the random variable $n(0)$ gives us the equation
@@ -290,11 +289,8 @@ $$
 
 $$
 \langle D_1\rangle_0=D_{0}-h(0)\left[f-\frac{1-p(0)}{T}\sum_{t=1}^T \left\langle \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]\right\rangle_0\right]\\
-%
 =D_{0}-h(0)\left[f-\frac{1-p(0)}{T}\sum_{t=1}^T \left\langle \left[1-\mathbf{1}\!\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)=0\bigg]\right]\right\rangle_0\right]\\
-%
-%=D_{0}-h(0)\left[f-\frac{1}{T}\sum_{t=1}^T \eta_i(t)\, \left\{1-\left\langle\mathbf{1}\!\bigg[\sum_{i=1}^N s_i(t)=0\bigg]\right\rangle_0\right\}\right]\\
-%
+%=D_{0}-h(0)\left[f-\frac{1}{T}\sum_{t=1}^T \eta_i(t)\, \lbrace 1-\left\langle\mathbf{1}\!\bigg[\sum_{i=1}^N s_i(t)=0\bigg]\right\rangle_0\rbrace\right]\\
 =D_{0}-h(0)\left[f-  [1-p(0)]\left[1-(1-f)^{D^0[\mathbf{w}]/D_0}\right]\right]
 $$
 
@@ -349,7 +345,7 @@ The following is a derivation for the property described in [Precision](#precisi
 - We consider the equation
 
 $$
-D_{1}=D_{0}-h(0)\left[f-\frac{1}{T}\left\{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]-n(0)\bigg\vert\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]\right\}\right]
+D_{1}=D_{0}-h(0)\left[f-\frac{1}{T}\lbrace \sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]-n(0)\bigg\vert\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]\rbrace\right]
 $$
 
 where $n(0)$ is random variable from the binomial distribution with the parameters $p(0)$ and $`\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]`$.
@@ -363,9 +359,8 @@ $$
 - We note that
 
 $$
-\mathrm{Var}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}-n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
-%
-=\mathrm{Var}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]-2\,\mathrm{Cov}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]+\mathrm{Var}\left[n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]
+\mathrm{Var}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}-n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
+=\mathrm{Var}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]-2\,\mathrm{Cov}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]+\mathrm{Var}\left[n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]
 $$
 
 by the [identity](#covariance-identities).
@@ -373,77 +368,62 @@ by the [identity](#covariance-identities).
 - First, we consider
 
 $$
-\mathrm{Var}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]= T(1-f)f
+\mathrm{Var}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]= T(1-f)f
 $$
 
 - Second, we consider
 
 $$
-\mathrm{Cov}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
-%
-\quad =\left\langle\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\,n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle-\left\langle\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle \left \langle n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle\\
-%
-=p(0)\left\langle\left\{\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\}^2\right\rangle-p(0)(Tf)^2\\=
-%
-p(0)\left[T(1-f)f+(Tf)^2\right]-p(0)(Tf)^2\\
-%
+\mathrm{Cov}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
+\quad =\left\langle{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\,n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle-\left\langle{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle \left\langle n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle\\
+=p(0)\left\langle\lbrace {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\rbrace^2\right\rangle-p(0)(Tf)^2\\
+=p(0)\left[T(1-f)f+(Tf)^2\right]-p(0)(Tf)^2\\
 =p(0)T(1-f)f
 $$
 
 - Hence
 
 $$
-\mathrm{Cov}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
+\mathrm{Cov}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]},n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
 \quad =p(0)T(1-f)f
 $$
 
 - Third, we consider the variance
 
 $$
-\mathrm{Var}\left[n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
-%
-=\left\langle \left\{n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\}^2\right\rangle\\
-%
--\left\langle n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle^2\\
-%
-= (1-p(0))\,p(0) \left\langle\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle+p^2(0) \left\langle\left\{\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\}^2\right\rangle\\
-%
-- p^2(0)(Tf)^2\\
-%
-=(1-p(0))\,p(0) Tf+p^2(0) \left[T(1-f)f+(Tf)^2\right]\\
-%
-- p^2(0)(Tf)^2\\
-%
-=(1-p(0))\,p(0) Tf+p^2(0) T(1-f)f\\
-%
-=p(0) Tf[1-p(0)+p(0) (1-f)]
+\begin{aligned}
+\mathrm{Var}\left[n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]
+&=\left\langle \lbrace n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\rbrace^2\right\rangle \\
+&\quad -\left\langle n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle^2 \\
+&=(1-p(0))\,p(0) \left\langle{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle \\
+&\quad +p^2(0) \left\langle\lbrace {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\rbrace^2\right\rangle \\
+&\quad -p^2(0)(Tf)^2 \\
+&=(1-p(0))\,p(0)Tf+p^2(0)\left[T(1-f)f+(Tf)^2\right]-p^2(0)(Tf)^2 \\
+&=(1-p(0))\,p(0)Tf+p^2(0)T(1-f)f \\
+&=p(0)Tf[1-p(0)+p(0)(1-f)]
+\end{aligned}
 $$
 
 - Hence
 
 $$
-\mathrm{Var}\left[n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
-%
+\mathrm{Var}\left[n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
 \quad =p(0)T(1-f)f
 $$
 
 - To obtain above, we used identities described in the [Annex](analysis-total-stake-inference.md) and the following results
 
 $$
-\left\langle\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle= Tf\\
-%
-\mathrm{Var}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]= T(1-f)f\\
-%
-\left\langle n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle\bigg\vert_{\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}}\\\quad =p(0)\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}
+\left\langle{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle= Tf\\
+\mathrm{Var}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]= T(1-f)f\\
+\left\langle n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right\rangle\bigg\vert_{{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}}\\\quad =p(0){\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}
 $$
 
 - Finally, combining all of the above we obtain the following result
 
 $$
-\mathrm{Var}\left[\small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}-n(0)\bigg\vert \small{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
-%
+\mathrm{Var}\left[{\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}-n(0)\bigg\vert {\sum_{t=1}^T \mathbf{1}\bigg[\bigg(\sum_{i=1}^N s_i(t)\vert D_0\bigg)\geq1\bigg]}\right]\\
 =T(1-f)f\\\quad -2 \,p(0)T(1-f)f\\\quad +p(0)T(1-f)f\\
-%
 \quad \quad =q(0)\,T(1-f)f,
 $$
 
@@ -458,21 +438,13 @@ $$
 - Based on the above, the variance of the normalised total stake $`\overline{D}_1=D_1/D^0[\mathbf{w}]`$ is given by
 
 $$
-\begin{align*}
-\mathrm{Var}[\overline{D}_{1}] 
-
-&=\frac{h^2(0)}{T(D^0[\mathbf{w}])^2}q(0)(1-f)f
-\end{align*}.
+\mathrm{Var}[\overline{D}_{1}]=\frac{h^2(0)}{T(D^0[\mathbf{w}])^2}q(0)(1-f)f.
 $$
 
 - Now, for $`h(0)=h\, D_0`$, where $`h \gt 0`$,  we obtain
 
 $$
-\begin{align*}
-\mathrm{Var}[\overline{D}_{1}] 
-
-&=\frac{h^2\,\overline{D}^2_0}{T}q(0)(1-f)f
-\end{align*}.
+\mathrm{Var}[\overline{D}_{1}]=\frac{h^2\,\overline{D}^2_0}{T}q(0)(1-f)f.
 $$
 
 - Furthermore, if we assume that above is true for all $\ell$, i.e.
@@ -508,32 +480,35 @@ The following is a derivation for the property described in [Stability Condition
 - Let us assume that $`\tilde{h}(\ell)=h\langle \overline{D}_{\ell}\rangle`$ and consider the [equation](#accuracy-derivation) for $`\langle \overline{D}_{\ell}\rangle=\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)`$, where $\vert\epsilon(\ell)\vert\ll1$, as follows
 
 $$
+\begin{aligned}
 \epsilon(\ell+1)
-=\epsilon(\ell)-h\left[\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)\right]\left[f-q \left[1-(1-f)^{\frac{1}{\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)}}\right]\right]\\=\left[1-h \left(f -q \right) \log \! \left(\frac{q -f}{q}\right)\right]\epsilon(\ell)+O(\epsilon^2(\ell)).
+&=\epsilon(\ell)-h\left[\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)\right]\left[f-q \left[1-(1-f)^{\frac{1}{\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)}}\right]\right]\\
+&=\left[1-h \left(f -q \right) \log \left(\frac{q -f}{q}\right)\right]\epsilon(\ell)+O(\epsilon^2(\ell)).
+\end{aligned}
 $$
 
 - The above suggests that the solution $`\langle \overline{D}_{\ell}\rangle =\frac{\log(1-f)}{\log(1-f/q)}`$is stable when
 
 $$
-\left\vert1-h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert<1.
+\left\vert1-h \left(q -f \right) \log \left(\frac{1}{1-f/q}\right)\right\vert<1.
 $$
 
 - We note that above is equivalent to
 
 $$
-0<h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)  <2.
+0<h \left(q -f \right) \log \left(\frac{1}{1-f/q}\right)  <2.
 $$
 
 - Thus the solution $`\langle \overline{D}_{\ell}\rangle =\frac{\log(1-f)}{\log(1-f/q)}`$ is stable for
 
 $$
-\boxed{h   <\frac{2}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}}.
+\boxed{h   <\frac{2}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)}}.
 $$
 
-- Furthermore, $`\frac{2}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)}`$ is a monotonic decreasing function of $q\in(0,1]$ and hence
+- Furthermore, $`\frac{2}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)}`$ is a monotonic decreasing function of $q\in(0,1]$ and hence
 
 $$
-\frac{2}{\left(1 -f \right) \log \! \left(\frac{1}{1-f}\right)}   \leq\frac{2}{\left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)},
+\frac{2}{\left(1 -f \right) \log \left(\frac{1}{1-f}\right)}   \leq\frac{2}{\left(q -f \right) \log \left(\frac{1}{1-f/q}\right)},
 $$
 
 i.e. the [equation](#accuracy-derivation) is stable for larger values of the learning rate $h$ when $`q \lt 1`$.
@@ -545,7 +520,7 @@ The following is a derivation for the properties described in [Convergence Speed
 - Applying [Corollary 2.1](#bibliography) to the [equation](#accuracy-derivation) with $`\tilde{h}(\ell)=h\langle \overline{D}_{\ell}\rangle`$ we obtain
 
 $$
-\boxed{\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert\leq A\,\vert \overline{D}_0-\langle \overline{D}_{\infty}\rangle\vert\times\left\vert1-h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert^\ell}
+\boxed{\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert\leq A\,\vert \overline{D}_0-\langle \overline{D}_{\infty}\rangle\vert\times\left\vert1-h \left(q -f \right) \log \left(\frac{1}{1-f/q}\right)\right\vert^\ell}
 $$
 
 where $`\langle \overline{D}_{\infty}\rangle =\frac{\log(1-f)}{\log(1-f/q)}`$, for some constant $`A \gt 0`$.
@@ -553,21 +528,21 @@ where $`\langle \overline{D}_{\infty}\rangle =\frac{\log(1-f)}{\log(1-f/q)}`$, f
 - We note that for the learning rate  $`h=h_0`$, where
 
 $$
-h_0=\frac{1}{\left(q -f \right)\log \! \left(\frac{1}{1-\frac{f}{q}}\right) }
+h_0=\frac{1}{\left(q -f \right)\log \left(\frac{1}{1-\frac{f}{q}}\right) }
 $$
 
-the base function $`\left\vert1-h \left(q -f \right) \log \! \left(\frac{1}{1-f/q}\right)\right\vert`$ is exactly zero suggesting that $`\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert=0`$ for any $\ell$  at $`h=h_0`$.  The latter is not possible and hence the [bound](#convergence-speed-and-optimal-learning-rate-derivation), which assumes that the first order derivative of the [map](#accuracy-derivation) exists, can not be applied when $`h=h_0`$.
+the base function $`\left\vert1-h \left(q -f \right) \log \left(\frac{1}{1-f/q}\right)\right\vert`$ is exactly zero suggesting that $`\vert \langle \overline{D}_{\ell}\rangle-\langle \overline{D}_{\infty}\rangle\vert=0`$ for any $\ell$  at $`h=h_0`$.  The latter is not possible and hence the [bound](#convergence-speed-and-optimal-learning-rate-derivation), which assumes that the first order derivative of the [map](#accuracy-derivation) exists, can not be applied when $`h=h_0`$.
 
 - However, for any $`\vert\delta\vert \gt 0`$ and learning rate $`h=h_0(1+\delta)`$ the [bound](#convergence-speed-and-optimal-learning-rate-derivation) can be used and the speed of convergence is $`\propto \vert\delta\vert^\ell`$.
 - What happens when $`h=h_0`$? Considering the [equation](#stability-condition-derivation) for $`h=h_0`$, the latter gives us
 
 $$
 \epsilon(\ell+1)
-=\frac{\log \! \left(1-\frac{f}{q}\right)^{2}}{2 \log \! \left(1-f \right)}\epsilon^2(\ell)+O(\epsilon^3(\ell)).
+=\frac{\log \left(1-\frac{f}{q}\right)^{2}}{2 \log \left(1-f \right)}\epsilon^2(\ell)+O(\epsilon^3(\ell)).
 $$
 
 - Ignoring the higher order terms in above and solving $\epsilon(\ell+1)
-=A(q,f)\epsilon^2(\ell)$, where $A(q,f)=\frac{\log \! \left(1-\frac{f}{q}\right)^{2}}{2 \log \! \left(1-f \right)}$, for some initial $\epsilon(0)$  gives us the equation
+=A(q,f)\epsilon^2(\ell)$, where $A(q,f)=\frac{\log \left(1-\frac{f}{q}\right)^{2}}{2 \log \left(1-f \right)}$, for some initial $\epsilon(0)$  gives us the equation
 
 $$
 \boxed{\epsilon(\ell)
@@ -578,7 +553,7 @@ $$
 - Thus locally, i.e. for  $`\langle \overline{D}_{\ell}\rangle=\frac{\log(1-f)}{\log(1-f/q)}+\epsilon(\ell)`$ with $\vert\epsilon(\ell)\vert\ll1$, the speed of convergence to $`\langle\overline{D}_{\infty}\rangle=\frac{\log(1-f)}{\log(1-f/q)}`$ is doubly-exponential. The latter suggests that for $q\in(f,1]$ the learning rate
 
 $$
-\boxed{h=\frac{1}{\left(q -f \right)\log \! \left(\frac{1}{1-\frac{f}{q}}\right) }}
+\boxed{h=\frac{1}{\left(q -f \right)\log \left(\frac{1}{1-\frac{f}{q}}\right) }}
 $$
 
 is optimal.

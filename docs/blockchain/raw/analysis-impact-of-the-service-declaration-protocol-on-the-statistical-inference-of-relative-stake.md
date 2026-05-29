@@ -97,38 +97,47 @@ i.e. $`\hat{\alpha}_i`$ is consistent estimator of the relative stake $`\alpha_i
 Similarly [to the estimator of](#inference-of-probability)$`\phi(\alpha_i)`$, we construct new estimator of relative stake
 
 $$
-\Alpha[\hat{\alpha}_i]=\left\{
-\begin{array}{c}
-\hat{\alpha}_i\text{ if }\hat{\alpha}_i>\alpha_0 \\
-\alpha_0 \text{ if }\hat{\alpha}_i\leq\alpha_0 
-\end{array}
-\right\}
+A[\hat{\alpha}_i]=
+\begin{cases}
+\hat{\alpha}_i, & \hat{\alpha}_i>\alpha_0 \\
+\alpha_0, & \hat{\alpha}_i\leq\alpha_0
+\end{cases}
 $$
 
 The above can be written as follows
 
 $$
-\Alpha[\hat{\alpha}_i]=\hat{\alpha}_i\mathbf{1}[\hat{\alpha}_i>\alpha_0]+\alpha_0\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\\\quad =\hat{\alpha}_i+\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\left\{\alpha_0-\hat{\alpha}_i\right\}\\\quad =\hat{\alpha}_i+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\alpha_0-\hat{\alpha}_i\right\}
+\begin{aligned}
+A[\hat{\alpha}_i]
+&=\hat{\alpha}_i\mathbf{1}[\hat{\alpha}_i>\alpha_0]+\alpha_0\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\\
+&=\hat{\alpha}_i+\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\lbrace\alpha_0-\hat{\alpha}_i\rbrace\\
+&=\hat{\alpha}_i+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\alpha_0-\hat{\alpha}_i\rbrace
+\end{aligned}
 $$
 
-We note that $`\Alpha[\hat{\alpha}_i]\leq\hat{\alpha}_i+\alpha_0\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]`$ from which follows that
+We note that $`A[\hat{\alpha}_i]\leq\hat{\alpha}_i+\alpha_0\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]`$ from which follows that
 
 $$
-\left\langle\hat{\alpha}_i\right\rangle\leq\left\langle\Alpha[\hat{\alpha}_i]\right\rangle\leq\left\langle\hat{\alpha}_i\right\rangle+\alpha_0\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle
+\left\langle\hat{\alpha}_i\right\rangle\leq\left\langle A[\hat{\alpha}_i]\right\rangle\leq\left\langle\hat{\alpha}_i\right\rangle+\alpha_0\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle
 $$
 
-but [we showed](#inference-of-probability) that $`\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle\rightarrow0`$ for a large number of observations, and hence $`\left\langle\Alpha[\hat{\alpha}_i]\right\rangle\rightarrow\left\langle\hat{\alpha}_i\right\rangle`$ in this limit.
+but [we showed](#inference-of-probability) that $`\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle\rightarrow0`$ for a large number of observations, and hence $`\left\langle A[\hat{\alpha}_i]\right\rangle\rightarrow\left\langle\hat{\alpha}_i\right\rangle`$ in this limit.
 
 Let us consider the (squared) distance
 
 $$
-\vert \alpha_i -\Alpha[\hat{\alpha}_i]\vert^2=\left(\alpha_i-\hat{\alpha}_i-\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\alpha_0-\hat{\alpha}_i\right\}\right)^2\\\quad =\left(\alpha_i-\hat{\alpha}_i\right)^2-2\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_i-\hat{\alpha}_i\right)\left(\alpha_0-\hat{\alpha}_i\right)\\\quad +\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_0-\hat{\alpha}_i\right)^2
+\begin{aligned}
+\vert \alpha_i -A[\hat{\alpha}_i]\vert^2
+&=\left(\alpha_i-\hat{\alpha}_i-\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\alpha_0-\hat{\alpha}_i\rbrace\right)^2\\
+&=\left(\alpha_i-\hat{\alpha}_i\right)^2-2\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_i-\hat{\alpha}_i\right)\left(\alpha_0-\hat{\alpha}_i\right)\\
+&\quad+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_0-\hat{\alpha}_i\right)^2
+\end{aligned}
 $$
 
 From the above follows the difference
 
 $$
-\langle\vert \alpha_i -\Alpha[\hat{\alpha}_i]\vert^2\rangle -\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle\quad =-2\,\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_i-\hat{\alpha}_i\right)\left(\alpha_0-\hat{\alpha}_i\right)\right\rangle\\\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_0-\hat{\alpha}_i\right)^2\right\rangle\\\quad =-2\,\left\langle\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\left(\alpha_i-\hat{\alpha}_i\right)\left(\alpha_0-\hat{\alpha}_i\right)\right\rangle\\\quad +\left\langle\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\left(\alpha_0-\hat{\alpha}_i\right)^2\right\rangle
+\langle\vert \alpha_i -A[\hat{\alpha}_i]\vert^2\rangle -\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle\quad =-2\,\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_i-\hat{\alpha}_i\right)\left(\alpha_0-\hat{\alpha}_i\right)\right\rangle\\\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left(\alpha_0-\hat{\alpha}_i\right)^2\right\rangle\\\quad =-2\,\left\langle\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\left(\alpha_i-\hat{\alpha}_i\right)\left(\alpha_0-\hat{\alpha}_i\right)\right\rangle\\\quad +\left\langle\mathbf{1}[\hat{\alpha}_i\leq\alpha_0]\left(\alpha_0-\hat{\alpha}_i\right)^2\right\rangle
 $$
 
 Now, because $`\hat{\alpha}_i \leq \alpha_0 \leq \alpha_i`$, we have the following inequality
@@ -140,50 +149,50 @@ $$
 and hence
 
 $$
-\langle\vert \alpha_i -\Alpha[\hat{\alpha}_i]\vert^2\rangle -\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle\leq0
+\langle\vert \alpha_i -A[\hat{\alpha}_i]\vert^2\rangle -\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle\leq0
 $$
 
-i.e. the [mean squared error](https://en.wikipedia.org/wiki/Mean_squared_error) (MSE) of the estimator $`\hat{\alpha}_i`$ is greater than the MSE of the estimator $`\Alpha[\hat{\alpha}_i]`$. Furthermore, for the MSE of $`\hat{\alpha}_i`$ we have
+i.e. the [mean squared error](https://en.wikipedia.org/wiki/Mean_squared_error) (MSE) of the estimator $`\hat{\alpha}_i`$ is greater than the MSE of the estimator $`A[\hat{\alpha}_i]`$. Furthermore, for the MSE of $`\hat{\alpha}_i`$ we have
 
 $$
 \langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle=\mathrm{Var}[\hat{\alpha}_i]+\vert \alpha_i -\langle\hat{\alpha}_i\rangle\vert^2
 $$
 
-Now $`\hat{\alpha}_i`$ is a consistent estimator of the relative stake $`\alpha_i`$ and hence $`\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle\rightarrow0`$ in the large number of observations limit, but $`\langle\vert \alpha_i -\Alpha[\hat{\alpha}_i]\vert^2\rangle \leq\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle`$, so $`\Alpha[\hat{\alpha}_i]`$ is also a consistent estimator of the relative stake $`\alpha_i`$.
+Now $`\hat{\alpha}_i`$ is a consistent estimator of the relative stake $`\alpha_i`$ and hence $`\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle\rightarrow0`$ in the large number of observations limit, but $`\langle\vert \alpha_i -A[\hat{\alpha}_i]\vert^2\rangle \leq\langle\vert \alpha_i -\hat{\alpha}_i\vert^2\rangle`$, so $`A[\hat{\alpha}_i]`$ is also a consistent estimator of the relative stake $`\alpha_i`$.
 
-Simulations confirm that MSE of the estimator $`\hat{\alpha}_i`$ is greater than the MSE of the new estimator $`\Alpha[\hat{\alpha}_i]`$, as can be seen in the figures below.
+Simulations confirm that MSE of the estimator $`\hat{\alpha}_i`$ is greater than the MSE of the new estimator $`A[\hat{\alpha}_i]`$, as can be seen in the figures below.
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/60c13593-6bd3-4647-b31c-c3fc65955de2.png)
 
-> <sub>The MSE of the estimator $`\hat{\alpha}_i`$ (blue + symbols) and $`\Alpha[\hat{\alpha}_i]`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1`$.</sub>
+> <sub>The MSE of the estimator $`\hat{\alpha}_i`$ (blue + symbols) and $`A[\hat{\alpha}_i]`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/0f4a1c28-af9a-41ac-ba19-6a43d154edb9.png)
 
-> <sub>The MSE of the estimator $`\hat{\alpha}_i`$ (blue + symbols) and $`\Alpha[\hat{\alpha}_i]`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/10`$.</sub>
+> <sub>The MSE of the estimator $`\hat{\alpha}_i`$ (blue + symbols) and $`A[\hat{\alpha}_i]`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/10`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/14f31751-9f1a-4527-acf1-f59a0d1f412f.png)
 
-> <sub>The MSE of the estimator $`\hat{\alpha}_i`$ (blue + symbols) and $`\Alpha[\hat{\alpha}_i]`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/100`$.</sub>
+> <sub>The MSE of the estimator $`\hat{\alpha}_i`$ (blue + symbols) and $`A[\hat{\alpha}_i]`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/100`$.</sub>
 
-We are interested in the probability $`\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ which can be seen as [adversarial "confidence"](analysis-cryptarchia-de-anonymisation-of-relative-stake.md). Here $`0 \lt \gamma \lt 1`$ prescribes desired “accuracy” of the inference. We note that the probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ can be [estimated analytically](analysis-cryptarchia-de-anonymisation-of-relative-stake.md) for large $T$. If for a given (accuracy) parameter $\gamma$ we have that $`\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right) \gt \mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ then the adversary has an advantage by using the new estimator, i.e. an adversary which knows that $`\alpha_i\geq\alpha_0`$ has a higher confidence than the adversary which doesn’t know the latter.
+We are interested in the probability $`\mathrm{P}\left(A[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ which can be seen as [adversarial "confidence"](analysis-cryptarchia-de-anonymisation-of-relative-stake.md). Here $`0 \lt \gamma \lt 1`$ prescribes desired “accuracy” of the inference. We note that the probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ can be [estimated analytically](analysis-cryptarchia-de-anonymisation-of-relative-stake.md) for large $T$. If for a given (accuracy) parameter $\gamma$ we have that $`\mathrm{P}\left(A[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right) \gt \mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ then the adversary has an advantage by using the new estimator, i.e. an adversary which knows that $`\alpha_i\geq\alpha_0`$ has a higher confidence than the adversary which doesn’t know the latter.
 
-Recall that $`\alpha_0 \leq \alpha_i`$. We note that $`\alpha_0 \in [\alpha_i(1-\lambda), \alpha_i (1+\lambda)]`$, provided $`\alpha_i(1-\lambda) \leq \alpha_0`$. Let us assume (without loss of generality) that $`\alpha_i=n\,\alpha_0`$ for some $n\geq1$. Then, from $`\alpha_i(1-\gamma)\leq\alpha_0`$ follows that $`n\leq \frac{1}{1-\gamma}`$. Hence, if this inequality is satisfied, an adversary may have advantage. We compute the probabilities $`\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ and $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ using simulation and find that the adversary has advantage for the relative stake $`\alpha_i\in[\alpha_0,\frac{\alpha_0}{1-\gamma}]`$, as can be seen in figures below.
+Recall that $`\alpha_0 \leq \alpha_i`$. We note that $`\alpha_0 \in [\alpha_i(1-\lambda), \alpha_i (1+\lambda)]`$, provided $`\alpha_i(1-\lambda) \leq \alpha_0`$. Let us assume (without loss of generality) that $`\alpha_i=n\,\alpha_0`$ for some $n\geq1$. Then, from $`\alpha_i(1-\gamma)\leq\alpha_0`$ follows that $`n\leq \frac{1}{1-\gamma}`$. Hence, if this inequality is satisfied, an adversary may have advantage. We compute the probabilities $`\mathrm{P}\left(A[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ and $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ using simulation and find that the adversary has advantage for the relative stake $`\alpha_i\in[\alpha_0,\frac{\alpha_0}{1-\gamma}]`$, as can be seen in figures below.
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/48c26d1a-420b-43c5-a43a-2e3b26de5036.png)
 
-> <sub>The probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (blue + symbols) and $`\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process for $`\gamma=1/10`$, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1`$.</sub>
+> <sub>The probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (blue + symbols) and $`\mathrm{P}\left(A[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process for $`\gamma=1/10`$, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/300d0df8-6895-49f7-8b89-b45f11966ae3.png)
 
-> <sub>The probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (blue + symbols) and $`\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process for $`\gamma=1/10`$, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/10`$.</sub>
+> <sub>The probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (blue + symbols) and $`\mathrm{P}\left(A[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process for $`\gamma=1/10`$, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/10`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/5cc468cc-8a1d-443e-b4a5-74f7c458695e.png)
 
-> <sub>The probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (blue + symbols) and $`\mathrm{P}\left(\Alpha[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process for $`\gamma=1/10`$, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/100`$.</sub>
+> <sub>The probability $`\mathrm{P}\left(\hat{\alpha}_i\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (blue + symbols) and $`\mathrm{P}\left(A[\hat{\alpha}_i]\in[\alpha_i(1-\gamma), \alpha_i(1+\gamma)]\right)`$ (red + symbols), obtained in $`M=10^3`$ simulations of leader election process for $`\gamma=1/10`$, as a function of true relative stake $`\alpha_i=n\alpha_0`$, where $`\alpha_0=1/10^4`$. The leader election process, with parameter$`f=0.05`$, was simulated for $`T=432000`$ time-slots. The fraction of observed slots is $`q=1/100`$.</sub>
 
 ## Numerical Experiments
 
-In this section, we compare performance of the statistical estimators $`\hat{\alpha}_i`$ and $`\Alpha[\hat{\alpha}_i]`$ in a single run of a simulation. This can be seen as a scenario where two adversaries collect the same data from the leader election process, but one of the adversaries knows $`\alpha_0`$ and uses this in the statistical inference. To simulate the statistical inference of relative stake in one epoch ($T=432000$ time-slots) of the leader election process with parameter $f=0.05$, we sampled $`N=2\times10^3`$ random (stake) values from the [Pareto distribution](https://en.wikipedia.org/wiki/Pareto_distribution) with shape parameter $2.5$ and scale parameter $2$. The histogram of (relative) stake values is given below
+In this section, we compare performance of the statistical estimators $`\hat{\alpha}_i`$ and $`A[\hat{\alpha}_i]`$ in a single run of a simulation. This can be seen as a scenario where two adversaries collect the same data from the leader election process, but one of the adversaries knows $`\alpha_0`$ and uses this in the statistical inference. To simulate the statistical inference of relative stake in one epoch ($T=432000$ time-slots) of the leader election process with parameter $f=0.05$, we sampled $`N=2\times10^3`$ random (stake) values from the [Pareto distribution](https://en.wikipedia.org/wiki/Pareto_distribution) with shape parameter $2.5$ and scale parameter $2$. The histogram of (relative) stake values is given below
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/4a2a1aab-0f61-4a0a-92b3-ab151a4c5607.png)
 
@@ -191,27 +200,27 @@ We consider inference only for $5$ nodes with the highest relative stake and for
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/f9f8159d-2e95-4ba3-a395-a44c97ceb42b.png)
 
-> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`\Alpha[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.007482,\ldots,0.013476\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.013476`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1`$.</sub>
+> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`A[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.007482,\ldots,0.013476\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.013476`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/d2daef95-6e55-4cd0-96fb-bfd3e27898d7.png)
 
-> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`\Alpha[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.0001004999,\ldots,0.0001018357\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.0001018357`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1`$.</sub>
+> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`A[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.0001004999,\ldots,0.0001018357\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.0001018357`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/ad2d984c-81fa-4064-81a5-f6fd7fac3cd3.png)
 
-> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`\Alpha[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.007482,\ldots,0.013476\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.013476`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/10`$.</sub>
+> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`A[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.007482,\ldots,0.013476\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.013476`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/10`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/2a75024d-d805-4e73-a880-c045055bfc97.png)
 
-> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`\Alpha[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.0001004999,\ldots,0.0001018357\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.0001018357`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/10`$.</sub>
+> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`A[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.0001004999,\ldots,0.0001018357\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.0001018357`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/10`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/11cd61af-c167-4819-9767-2ccf7579c1d4.png)
 
-> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`\Alpha[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.007482,\ldots,0.013476\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.013476`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/100`$.</sub>
+> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`A[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.007482,\ldots,0.013476\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.013476`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/100`$.</sub>
 
 ![Diagram](analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake/assets/e6ca6c54-2e13-4b01-8557-522745e3f4ed.png)
 
-> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`\Alpha[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.0001004999,\ldots,0.0001018357\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.0001018357`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/100`$.</sub>
+> <sub>The (relative) stake estimator $`\hat{\alpha}`$ (left panel) and $`A[\hat{\alpha}_i]`$ (right panel), computed in one epoch ($`T=432000`$ time-slots) of the leader election process with parameter $`f=0.05`$, plotted as a function of time-slots for five nodes with *true* (relative stake) $`\alpha\in\{0.0001004999,\ldots,0.0001018357\}`$, represented by solid horizontal lines. The boundaries of the interval $`[\alpha(1-\gamma), \alpha(1+\gamma)]`$ for $`\alpha=0.0001018357`$ and $`\gamma=1/10`$ are represented by dashed horizontal lines. The dotted horizontal line corresponds to $`\alpha_0=1/10^4`$. The fraction of observed slots is $`q=1/100`$.</sub>
 
 # Appendix
 
@@ -240,7 +249,7 @@ $$
 i.e. $`\hat{P}_i(1)`$ is unbiased statistical estimator of prob. of winning $`\phi(\alpha_i)`$. In the above $`\langle\{\cdots\}\rangle`$ is the averaging “operator” defines as
 
 $$
-\langle\{\cdots\}\rangle=\left\{\prod_{t=1}^T\prod_{i=1}^N \sum_{s_i(t)}\mathrm{P}(s_i(t))\right\} \{\cdots\}
+\langle\{\cdots\}\rangle=\lbrace\prod_{t=1}^T\prod_{i=1}^N \sum_{s_i(t)}\mathrm{P}(s_i(t))\rbrace \{\cdots\}
 $$
 
 where $`\mathrm{P}(s_i(t))=\phi(\alpha_i)\,\delta_{1;s_i(t)}+(1-\phi(\alpha_i))\,\delta_{0;s_i(t)}`$. Since $`\alpha_i=\beta_i+\alpha_0`$ and $`\phi(\beta_i+\alpha_0)\geq \phi(\alpha_0)`$, from above follows that $`\langle\hat{P}_i(1)\rangle\geq \phi(\alpha_0)`$.
@@ -248,7 +257,7 @@ where $`\mathrm{P}(s_i(t))=\phi(\alpha_i)\,\delta_{1;s_i(t)}+(1-\phi(\alpha_i))\
 The variance of $`\hat{P}_i(1)`$ is given by
 
 $$
-\mathrm{Var}[\hat{P}_i(1)]=\langle\hat{P}^2_i(1)\rangle-\langle\hat{P}_i(1)\rangle^2\\\quad =\frac{1}{\sum_{t=1}^T\eta_i(t)}\phi[\alpha_i](1-\phi(\alpha_i))
+\mathrm{Var}[\hat{P}_i(1)]=\langle\hat{P}^2_i(1)\rangle-\langle\hat{P}_i(1)\rangle^2\\\quad =\frac{1}{\sum_{t=1}^T\eta_i(t)}\phi(\alpha_i)(1-\phi(\alpha_i))
 $$
 
 If $`\sum_{t=1}^T\eta_i(t)\rightarrow\infty`$ as $T\rightarrow\infty$, i.e. for a large number of observations, then $`\mathrm{Var}[\hat{P}_i(1)]\rightarrow0`$, i.e. $`\hat{P}_i(1)`$ is a consistent estimator of the prob. $`\phi(\alpha_i)`$.
@@ -256,19 +265,28 @@ If $`\sum_{t=1}^T\eta_i(t)\rightarrow\infty`$ as $T\rightarrow\infty$, i.e. for 
 Let us define the new estimator of $`\phi(\alpha_i)`$ as follows
 
 $$
-\Phi[\hat{P}_i(1)]=\phi(\alpha_0)\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]+\hat{P}_i(1)\,\mathbf{1}[\hat{P}_i(1)>\phi(\alpha_0)]\\\quad =\phi(\alpha_0)\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]+\hat{P}_i(1)\left\{1-\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\}\\~~=\hat{P}_i(1)+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}
+\begin{aligned}
+\Phi[\hat{P}_i(1)]
+&=\phi(\alpha_0)\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]+\hat{P}_i(1)\,\mathbf{1}[\hat{P}_i(1)>\phi(\alpha_0)]\\
+&=\phi(\alpha_0)\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]+\hat{P}_i(1)\lbrace1-\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\rbrace\\
+&=\hat{P}_i(1)+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace
+\end{aligned}
 $$
 
 The average with respect to leader election process gives us
 
 $$
-\langle\Phi[\hat{P}_i(1)]\rangle=\phi(\alpha_i)+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle
+\langle\Phi[\hat{P}_i(1)]\rangle=\phi(\alpha_i)+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle
 $$
 
 i.e. the estimator $`\Phi[\hat{P}_i(1)]`$ has (positive) bias. We expect that in the limit $`\sum_{t=1}^T\eta_i(t)\rightarrow\infty`$ as $T\rightarrow\infty$, i.e. for a large number of observations, the average $`\langle\Phi[\hat{P}_i(1)]\rangle\rightarrow\phi(\alpha_i)`$. We note that since $`\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\{\phi(\alpha_0)-\hat{P}_i(1)\}\geq0`$, we have that
 
 $$
-\langle\Phi[\hat{P}_i(1)]\rangle=\phi(\alpha_i)+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\\leq \phi(\alpha_i)+\phi(\alpha_0)\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle
+\begin{aligned}
+\langle\Phi[\hat{P}_i(1)]\rangle
+&=\phi(\alpha_i)+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
+&\leq \phi(\alpha_i)+\phi(\alpha_0)\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle
+\end{aligned}
 $$
 
 and
@@ -280,13 +298,25 @@ $$
 Now, for $`\mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))=\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\right\rangle`$ by the Markov’s inequality we have
 
 $$
-\mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))=\mathrm{Prob}\left(\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}\leq\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)\right)\\\quad =\mathrm{Prob}\left(\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\geq\mathrm{e}^{-\lambda\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)}\right)\\~~\leq\frac{\left\langle\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\right\rangle}{\mathrm{e}^{-\lambda\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)}}
+\begin{aligned}
+\mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))
+&=\mathrm{Prob}\left(\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}\leq\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)\right)\\
+&=\mathrm{Prob}\left(\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\geq\mathrm{e}^{-\lambda\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)}\right)\\
+&\leq\frac{\left\langle\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\right\rangle}{\mathrm{e}^{-\lambda\phi(\alpha_0)\sum_{t=1}^T\eta_i(t)}}
+\end{aligned}
 $$
 
 where $`\lambda \gt 0`$. Using the [definition](#inference-of-probability), the average on the RHS of the above can be computed as follows
 
 $$
-\left\langle\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\right\rangle=\left\{\prod_{t=1}^T\prod_{j=1}^N \sum_{s_j(t)}\mathrm{P}(s_j(t))\right\}\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\\\quad =\prod_{t=1}^T\sum_{s_i(t)}\mathrm{P}(s_i(t))\,\mathrm{e}^{-\lambda\eta_i(t)\,\delta_{1;s_i(t)}}\\\quad =\prod_{t=1}^T\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda\eta_i(t)}+1-\phi(\alpha_i)\right)\\\quad =\mathrm{e}^{\sum_{t=1}^T\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda\eta_i(t)}+1-\phi(\alpha_i)\right)}\\\quad =\mathrm{e}^{\sum_{t=1}^T\eta_i(t)\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda}+1-\phi(\alpha_i)\right)}
+\begin{aligned}
+\left\langle\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\right\rangle
+&=\lbrace\prod_{t=1}^T\prod_{j=1}^N \sum_{s_j(t)}\mathrm{P}(s_j(t))\rbrace\mathrm{e}^{-\lambda\sum_{t=1}^T\eta_i(t)\,\delta_{1;s_i(t)}}\\
+&=\prod_{t=1}^T\sum_{s_i(t)}\mathrm{P}(s_i(t))\,\mathrm{e}^{-\lambda\eta_i(t)\,\delta_{1;s_i(t)}}\\
+&=\prod_{t=1}^T\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda\eta_i(t)}+1-\phi(\alpha_i)\right)\\
+&=\mathrm{e}^{\sum_{t=1}^T\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda\eta_i(t)}+1-\phi(\alpha_i)\right)}\\
+&=\mathrm{e}^{\sum_{t=1}^T\eta_i(t)\log\left(\phi(\alpha_i)\,\mathrm{e}^{-\lambda}+1-\phi(\alpha_i)\right)}
+\end{aligned}
 $$
 
 Using above result in the [inequality](#inference-of-probability) we obtain
@@ -311,7 +341,7 @@ where $`-\log \left(\frac{1-\phi(\alpha)}{1-\phi(\alpha_0) }\right)+\log \left(\
 
 From above follows that $`\mathrm{Prob}(\hat{P}_i(1)\leq\phi(\alpha_0))\rightarrow0`$ in the limit $`\sum_{t=1}^T\eta_i(t)\rightarrow\infty`$ as $T\rightarrow\infty$, i.e. for a large number of observations. Using the latter in the [upper bound](#inference-of-probability) gives us that $`\langle\Phi[\hat{P}_i(1)]\rangle\rightarrow\phi(\alpha_i)`$ in this limit. If in the limit of large number of observations we also have that the $`\mathrm{Var}[\Phi[\hat{P}_i(1)]]\rightarrow0`$ then $`\Phi[\hat{P}_i(1)]`$ is a consistent estimator of the prob. $`\phi(\alpha_i)`$.
 
-For $`\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\xi_i`$, where we defined $`\xi_i=\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}`$, the $`\mathrm{Var}[\Phi[\hat{P}_i(1)]]`$ is given by
+For $`\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\xi_i`$, where we defined $`\xi_i=\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace`$, the $`\mathrm{Var}[\Phi[\hat{P}_i(1)]]`$ is given by
 
 $$
 \mathrm{Var}[\Phi[\hat{P}_i(1)]]=\mathrm{Var}[\hat{P}_i(1)+\xi_i]=\mathrm{Var}[\hat{P}_i(1)]+2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i].
@@ -328,7 +358,7 @@ Hence in the limit of large number of observations $`\mathrm{Var}[\Phi[\hat{P}_i
 Thus from above follows that
 
 $$
-\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}
+\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace
 $$
 
 is unbiased and consistent estimator of the prob. $`\phi(\alpha_i)`$ in the limit of large number of observations $`\sum_{t=1}^T\eta_i(t)\rightarrow\infty`$ as $T\rightarrow\infty$.
@@ -336,35 +366,46 @@ is unbiased and consistent estimator of the prob. $`\phi(\alpha_i)`$ in the limi
 For $`\sum_{t=1}^T\eta_i(t)\geq1`$ the [mean squared error](https://en.wikipedia.org/wiki/Mean_squared_error) (MSE) of the estimator $`\hat{P}_i(1)`$ is given by
 
 $$
-\langle\vert \phi(\alpha_i) -\hat{P}_i(1)\vert^2\rangle =\mathrm{Var}[\hat{P}_i(1)]=\frac{1}{\sum_{t=1}^T\eta_i(t)}\phi[\alpha_i](1-\phi(\alpha_i))
+\langle\vert \phi(\alpha_i) -\hat{P}_i(1)\vert^2\rangle =\mathrm{Var}[\hat{P}_i(1)]=\frac{1}{\sum_{t=1}^T\eta_i(t)}\phi(\alpha_i)(1-\phi(\alpha_i))
 $$
 
 Assuming that the $`\eta_i(t)`$ variables are exactly the same as in the above, the MSE of the estimator $`\Phi[\hat{P}_i(1)]`$ is given by
 
 $$
-\langle\vert \phi(\alpha_i) -\Phi[\hat{P}_i(1)]\vert^2\rangle \quad =\mathrm{Var}[\Phi[\hat{P}_i(1)]]+\left\vert\phi(\alpha_i)-\langle\Phi[\hat{P}_i(1)]\rangle\right\vert^2\\=\mathrm{Var}[\Phi[\hat{P}_i(1)]]\\\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle^2
+\begin{aligned}
+\langle\vert \phi(\alpha_i) -\Phi[\hat{P}_i(1)]\vert^2\rangle
+&=\mathrm{Var}[\Phi[\hat{P}_i(1)]]+\left\vert\phi(\alpha_i)-\langle\Phi[\hat{P}_i(1)]\rangle\right\vert^2\\
+&=\mathrm{Var}[\Phi[\hat{P}_i(1)]]\\
+&\quad+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle^2
+\end{aligned}
 $$
 
 Consider the difference$`\langle\vert \phi(\alpha_i) -\Phi[\hat{P}_i(1)]\vert^2\rangle-\langle\vert \phi(\alpha_i) -\hat{P}_i(1)\vert^2\rangle`$ as follows
 
 $$
-\langle\vert \phi(\alpha_i) -\Phi[\hat{P}_i(1)]\vert^2\rangle-\langle\vert \phi(\alpha_i) -\hat{P}_i(1)\vert^2\rangle\\=\\\mathrm{Var}[\hat{P}_i(1)]+2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i]\\\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle^2-\mathrm{Var}[\hat{P}_i(1)]\\\quad =2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i]+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle^2\\\quad =2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}^2\right\rangle
+\begin{aligned}
+&\langle\vert \phi(\alpha_i) -\Phi[\hat{P}_i(1)]\vert^2\rangle-\langle\vert \phi(\alpha_i) -\hat{P}_i(1)\vert^2\rangle\\
+&=\mathrm{Var}[\hat{P}_i(1)]+2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i]\\
+&\quad+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle^2-\mathrm{Var}[\hat{P}_i(1)]\\
+&=2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i]+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle^2\\
+&=2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace^2\right\rangle
+\end{aligned}
 $$
 
 Now the last line in the above can be bounded as follows
 
 $$
-2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}^2\right\rangle\\
+2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace^2\right\rangle\\
 %
-\quad =-2\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\
+\quad =-2\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
 %
-\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}^2\right\rangle\\
+\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace^2\right\rangle\\
 %
-\quad \leq-2\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\
+\quad \leq-2\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
 %
-\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\
+\quad +\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
 %
-\quad =-\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle
+\quad =-\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle
 $$
 
 Hence
@@ -372,7 +413,7 @@ Hence
 $$
 \langle\vert \phi(\alpha_i) -\Phi[\hat{P}_i(1)]\vert^2\rangle-\langle\vert \phi(\alpha_i) -\hat{P}_i(1)\vert^2\rangle\\
 %
-\quad \leq\\\quad -\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle
+\quad \leq -\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle
 $$
 
 Thus, the MSE of the unbiased estimator $`\hat{P}_i(1)`$ is greater that the MSE of the biased, but consistent, estimator $`\Phi[\hat{P}_i(1)]`$.
@@ -381,7 +422,7 @@ Thus, the MSE of the unbiased estimator $`\hat{P}_i(1)`$ is greater that the MSE
 
 ## Variance of $`\Phi[\hat{P}_i(1)]`$​
 
-For $`\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\xi_i`$, where $`\xi_i=\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}`$, we consider the variance
+For $`\Phi[\hat{P}_i(1)]=\hat{P}_i(1)+\xi_i`$, where $`\xi_i=\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace`$, we consider the variance
 
 $$
 \mathrm{Var}[\Phi[\hat{P}_i(1)]]=\mathrm{Var}[\hat{P}_i(1)+\xi_i]\\\quad =\mathrm{Var}[\hat{P}_i(1)]+2\,\mathrm{Cov}[\hat{P}_i(1),\xi_i]+\mathrm{Var}[\xi_i]
@@ -390,7 +431,14 @@ $$
 First, we consider the covariance
 
 $$
-\mathrm{Cov}[\hat{P}_i(1),\xi_i]=\langle\hat{P}_i(1)\,\xi_i\rangle-\langle\hat{P}_i(1)\rangle\langle\xi_i\rangle\\=\langle\hat{P}_i(1)\,\xi_i\rangle-\phi(\alpha_i)\langle\xi_i\rangle\\=\left\langle\hat{P}_i(1)\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle-\phi(\alpha_i)\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\=-\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle
+\begin{aligned}
+\mathrm{Cov}[\hat{P}_i(1),\xi_i]
+&=\langle\hat{P}_i(1)\,\xi_i\rangle-\langle\hat{P}_i(1)\rangle\langle\xi_i\rangle\\
+&=\langle\hat{P}_i(1)\,\xi_i\rangle-\phi(\alpha_i)\langle\xi_i\rangle\\
+&=\left\langle\hat{P}_i(1)\,\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
+&\quad-\phi(\alpha_i)\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
+&=-\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle
+\end{aligned}
 $$
 
 Because of $`\phi(\alpha_0)\leq \phi(\alpha_i)`$, from the above it follows that $`\mathrm{Cov}[\hat{P}_i(1),\xi_i]\leq0`$.
@@ -398,13 +446,13 @@ Because of $`\phi(\alpha_0)\leq \phi(\alpha_i)`$, from the above it follows that
 Second, we consider the variance
 
 $$
-\mathrm{Var}[\xi_i]=\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]^2\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}^2\right\rangle-\left\langle\xi_i\right\rangle^2\\
+\mathrm{Var}[\xi_i]=\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]^2\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace^2\right\rangle-\left\langle\xi_i\right\rangle^2\\
 %
-\quad =\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_0)-\hat{P}_i(1)-\left\langle\xi_i\right\rangle\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\
+\quad =\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_0)-\hat{P}_i(1)-\left\langle\xi_i\right\rangle\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
 %
-~=\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)+\phi(\alpha_0)-\phi(\alpha_i)-\left\langle\xi_i\right\rangle\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle\\
+~=\left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)+\phi(\alpha_0)-\phi(\alpha_i)-\left\langle\xi_i\right\rangle\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle\\
 %
-\quad \leq \left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\left\{\phi(\alpha_i)-\hat{P}_i(1)\right\}\left\{\phi(\alpha_0)-\hat{P}_i(1)\right\}\right\rangle=-\mathrm{Cov}[\hat{P}_i(1),\xi_i]
+\quad \leq \left\langle\mathbf{1}[\hat{P}_i(1)\leq\phi(\alpha_0)]\lbrace\phi(\alpha_i)-\hat{P}_i(1)\rbrace\lbrace\phi(\alpha_0)-\hat{P}_i(1)\rbrace\right\rangle=-\mathrm{Cov}[\hat{P}_i(1),\xi_i]
 $$
 
 Thus, from the above it follows that $`\mathrm{Var}[\xi_i]\leq -\mathrm{Cov}[\hat{P}_i(1),\xi_i]`$. The latter with $`-\mathrm{Cov}[\hat{P}_i(1), \xi_i] \geq 0`$ implies $`\mathrm{Cov}[\hat{P}_i(1),\xi_i]\leq-\mathrm{Var}[\xi_i]/2`$ which using the [variance equation](#variance-of-phihatpi1) gives us that

@@ -145,7 +145,7 @@ $$
 \mathcal{L}_1[G_N]=\max_{i\in[N]\setminus1} D_{1\rightarrow i}[G_N]
 $$
 
-- We note that maximum distance can be computed using [Dijkstra's algorithm](<https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#:~:text=Dijkstra%27s%20algorithm%20(%2F%CB%88da%C9%AA,and%20published%20three%20years%20later>.).
+- We note that maximum distance can be computed using [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm).
 - Finally, for all pairs of distinct nodes we define the diameter of $`G_N`$ as follows
 
 $$
@@ -295,13 +295,13 @@ $$
 - Second, we consider the latency of broadcast
 
 $$
-\mathcal{L}_1[\mathcal{T}_N]=\max_{i\in \partial\mathcal{T}_N}\sum_{(i,j)\in 1\rightarrow i}J_{ij}(1)\\\quad =\max_{i\in\partial1}\left\{J_{1i}(1)+\max_{k\in \partial\mathcal{T}_N}D_{i\rightarrow k}[\mathcal{T}_N]\right\},\\\quad \text{ where } D_{i\rightarrow k}[\mathcal{T}_N] \\\quad \text{ is the distance from } i \text{ to } k
+\mathcal{L}_1[\mathcal{T}_N]=\max_{i\in \partial\mathcal{T}_N}\sum_{(i,j)\in 1\rightarrow i}J_{ij}(1)\\\quad =\max_{i\in\partial1}\lbrace J_{1i}(1)+\max_{k\in \partial\mathcal{T}_N}D_{i\rightarrow k}[\mathcal{T}_N]\rbrace,\\\quad \text{ where } D_{i\rightarrow k}[\mathcal{T}_N] \\\quad \text{ is the distance from } i \text{ to } k
 $$
 
 - Now the maximum distance from node $i$ to a leaf node $k$, $`\max_{k\in \partial\mathcal{T}_N}D_{i\rightarrow k}[\mathcal{T}_N]`$, can be computed as follows
 
 $$
-\max_{k\in \partial\mathcal{T}_N}D_{i\rightarrow k}[\mathcal{T}_N]=\max_{j\in\partial i\setminus1}\left\{J_{ij}(1)+\max_{k\in \partial\mathcal{T}_N}D_{j\rightarrow k}[\mathcal{T}_N]\right\}
+\max_{k\in \partial\mathcal{T}_N}D_{i\rightarrow k}[\mathcal{T}_N]=\max_{j\in\partial i\setminus1}\lbrace J_{ij}(1)+\max_{k\in \partial\mathcal{T}_N}D_{j\rightarrow k}[\mathcal{T}_N]\rbrace
 $$
 
 - Furthermore, if node $j$ is adjacent only to leaf nodes but one then
@@ -315,19 +315,19 @@ $$
 - First, for each $\ell\in[M]$ compute boundary conditions as follows
 
 $$
-r_k\sim\mathrm{Geom}(q)\\ \quad h_\ell(0)=\max\left\{r_1,\ldots,r_{c-1}\right\}
+r_k\sim\mathrm{Geom}(q)\\ \quad h_\ell(0)=\max\lbrace r_1,\ldots,r_{c-1}\rbrace
 $$
 
 - Second, for each $`t\in\{0,1,\ldots,T\}`$ do the following for each $\ell\in[M]$
 
 $$
-r_k\sim\mathrm{Geom}(q)\\\ell_k\sim \mathcal{U}\{[M]\}\\ \quad h_\ell(t+1)=\max\left\{r_1+h_{\ell_1}(t),\ldots,r_{c-1}+h_{ \ell_{c-1}}(t)\right\}
+r_k\sim\mathrm{Geom}(q)\\\ell_k\sim \mathcal{U}([M])\\ \quad h_\ell(t+1)=\max\lbrace r_1+h_{\ell_1}(t),\ldots,r_{c-1}+h_{ \ell_{c-1}}(t)\rbrace
 $$
 
 - Finally, for each $\ell\in[M]$ compute
 
 $$
-r_k\sim\mathrm{Geom}(q)\\\ell_k\sim \mathcal{U}\{[M]\}\\ \quad H_\ell(T)=\max\left\{r_1+h_{\ell_1}(T),\ldots,r_{c}+h_{ \ell_{c}}(T)\right\}
+r_k\sim\mathrm{Geom}(q)\\\ell_k\sim \mathcal{U}([M])\\ \quad H_\ell(T)=\max\lbrace r_1+h_{\ell_1}(T),\ldots,r_{c}+h_{ \ell_{c}}(T)\rbrace
 $$
 
 - The prob. distribution of $`\mathcal{L}_1[\mathcal{T}_N]`$ for a Cayley tree of height $T+2$ can be estimated by the density
@@ -339,19 +339,19 @@ $$
 - The above dynamics can be described by the equation
 
 $$
-\mathrm{P}_{t+1}(h)=\sum_{h_1}\cdots\sum_{h_{c-1}}\prod_{\ell=1}^{c-1}\mathrm{P}_{t}(h_\ell)\\\quad \times\sum_{r_1}\cdots\sum_{r_{c-1}}\prod_{\ell=1}^{c-1}\mathrm{P}_{q}(r_\ell)\\\quad \times\delta_{h;\,\max\left\{r_1+h_1,\ldots,r_{c-1}+h_{c-1}\right\}}
+\mathrm{P}_{t+1}(h)=\sum_{h_1}\cdots\sum_{h_{c-1}}\prod_{\ell=1}^{c-1}\mathrm{P}_{t}(h_\ell)\\\quad \times\sum_{r_1}\cdots\sum_{r_{c-1}}\prod_{\ell=1}^{c-1}\mathrm{P}_{q}(r_\ell)\\\quad \times\delta_{h;\,\max\lbrace r_1+h_1,\ldots,r_{c-1}+h_{c-1}\rbrace}
 $$
 
 - The boundary condition corresponding to the Cayley tree is given by
 
 $$
-\mathrm{P}_{0}(h)=\sum_{r_1}\cdots\sum_{r_{c-1}}\left\{\prod_{\ell-1}^{c-1}\mathrm{P}_{q}(r_\ell)\right\}\,\delta_{h;\,\max\left\{r_1,\ldots,r_{c-1}\right\}}
+\mathrm{P}_{0}(h)=\sum_{r_1}\cdots\sum_{r_{c-1}}\lbrace\prod_{\ell=1}^{c-1}\mathrm{P}_{q}(r_\ell)\rbrace\,\delta_{h;\,\max\lbrace r_1,\ldots,r_{c-1}\rbrace}
 $$
 
 - The prob. distribution of $`\mathcal{L}_1[\mathcal{T}_N]`$ for a Cayley tree of height $T+2$ is given by
 
 $$
-\mathrm{P}_{T+2}(H)=\sum_{h_1}\cdots\sum_{h_{c}}\prod_{\ell=1}^{c}\mathrm{P}_{T}(h_\ell)\\\quad \times\sum_{r_1}\cdots\sum_{r_{c}}\prod_{\ell=1}^{c}\mathrm{P}_{q}(r_\ell)\\\quad \times\delta_{H;\,\max\left\{r_1+h_1,\ldots,r_{c}+h_{c}\right\}}
+\mathrm{P}_{T+2}(H)=\sum_{h_1}\cdots\sum_{h_{c}}\prod_{\ell=1}^{c}\mathrm{P}_{T}(h_\ell)\\\quad \times\sum_{r_1}\cdots\sum_{r_{c}}\prod_{\ell=1}^{c}\mathrm{P}_{q}(r_\ell)\\\quad \times\delta_{H;\,\max\lbrace r_1+h_1,\ldots,r_{c}+h_{c}\rbrace}
 $$
 
 - Using that the prob. distribution $`\mathrm{P}_q(r)`$ is geometric with parameter $q$, one could try to solve above equations analytically. Also one could consider a single loop and see how this will change the [equation](#results-for-a-finite-connectivity-regime).
@@ -383,7 +383,7 @@ $$
 
 - Furthermore, the distance $`D_{\ell\rightarrow \ell+1}\equiv D_{\ell\rightarrow \ell+1}[G_N[\{d^\ell_{ij}\}]]`$, i.e. samples of random variables $`\{d^\ell_{ij}\}`$ are different for different $\ell$ to model the gossiping aspect of communication.
 - The distance $`D_{i_1\rightarrow i_2}`$ can be interpreted as the latency of (communication) path between the sender node $`i_1`$ and the receiver node $`i_2`$ when the gossiping mode of communication is used.
-- We note that in a weighted graph $`G_N[\{d_{ij}\}]`$ the distance $`D_{i_1\rightarrow i_2}`$ can computed by using the [Dijkstra's algorithm](<https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#:~:text=Dijkstra%27s%20algorithm%20(%2F%CB%88da%C9%AA,and%20published%20three%20years%20later>.).
+- We note that in a weighted graph $`G_N[\{d_{ij}\}]`$ the distance $`D_{i_1\rightarrow i_2}`$ can computed by using the [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm).
 - To model the broadcast delay we assume, without loss of generality, that the node $k+2$ broadcasts the message, received from node $1$, to all nodes in the network. Assuming that gossiping is used the delay is $`D_{k+2\rightarrow \ell}[G_N[\{d^\ell_{ij}\}]]`$ for each node $\ell\in [N]\setminus k+2$.
 - To simulate the mixing and broadcast delays in a consensus simulation the following algorithm can be used
     1. Generate a random regular graph $`G_N`$ with connectivity $c$.

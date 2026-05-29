@@ -174,13 +174,17 @@ $$
 $$
 
 $$
-\text{clamped\_adjustment}(s) = \max \{ -\alpha, \min \{ \alpha, \text{adjustment}(s) \} \}
+\mathrm{clampedAdjustment}(s)
+= \max\bigl(-\alpha,\,
+\min\bigl(\alpha,\, \mathrm{adjustment}(s)\bigr)
+\bigr)
 $$
 
 1. Update Price: Calculate the price for the next timeframe, $s+1$
 
 $$
-P_{\text{STR}}(s+1) = P_{\text{STR}}(s) \cdot [1 + \text{clamped\_adjustment}(s)]
+P_{\mathrm{STR}}(s+1)
+= P_{\mathrm{STR}}(s) \cdot [1 + \mathrm{clampedAdjustment}(s)]
 $$
 
 ### Implementation
@@ -199,12 +203,21 @@ Secondly, we can rewrite $`P_\text{STR}`$ equation:
 
 $$
 \begin{align*}
-P_{\text{STR}}(s+1) &= P_{\text{STR}}(s) \cdot [1 + \max \{ -\alpha, \min \{ \alpha, \text{adjustment}(s) \} \}]\\
-&= P_{\text{STR}}(s) \cdot \max \{ 1-\alpha, \min \{ 1+ \alpha, 1+\text{adjustment}(s) \} \}\\
+P_{\mathrm{STR}}(s+1)
+&= P_{\mathrm{STR}}(s) \cdot
+\left[1 + \max\bigl(-\alpha,\,
+\min\bigl(\alpha,\, \mathrm{adjustment}(s)\bigr)
+\bigr)\right]\\
+&= P_{\mathrm{STR}}(s) \cdot
+\max\bigl(1-\alpha,\,
+\min\bigl(1+\alpha,\, 1+\mathrm{adjustment}(s)\bigr)
+\bigr)\\
 &= P_{\mathrm{STR}}(s)\cdot
-\max\left\{\frac78,\min\left\{\frac98,\,
+\max\biggl(\frac78,\,
+\min\biggl(\frac98,\,
 \frac{C_{\mathrm{usage}}(s)}{T_{\mathrm{RA}}(s)}
-\right\}\right\}
+\biggr)
+\biggr)
 \end{align*}
 $$
 

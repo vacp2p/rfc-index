@@ -44,138 +44,147 @@ The transaction encoding is specified in ABNF form to remove any ambiguity and g
 
 ## Signed Mantle Tx
 
-```text
+```schema
 SignedMantleTx = MantleTx OpsProofs
 ```
 
 ## Mantle Tx
 
-```text
+```schema
 MantleTx = OpCount *Op
-OpCount = Byte
+OpCount  = Byte
 ```
 
 ## Operations
 
-```text
-Op = Opcode OpPayload
-Opcode = Byte
+```schema
+Op        = Opcode OpPayload
+Opcode    = Byte
+
 OpPayload = Transfer /
-ChannelInscribe /
-ChannelConfig /
-ChannelDeposit /
-ChannelWithdraw /
-SDPDeclare /
-SDPWithdraw /
-SDPActive /
-LeaderClaim 
+            ChannelInscribe /
+            ChannelConfig /
+            ChannelDeposit /
+            ChannelWithdraw /
+            SDPDeclare /
+            SDPWithdraw /
+            SDPActive /
+            LeaderClaim 
 ```
 
 ### Channel Operations
 
-```text
+```schema
 ChannelInscribe = ChannelId Inscription Parent Signer
-Inscription = UINT32 *BYTE 
-ChannelConfig = ChannelId KeyCount *Signer PostingTimeframe PostingTimeout ConfigThreshold WithdrawThreshold
-KeyCount = UINT16
-PostingTimeframe = UINT32
-PostingTimeout = UINT32
-ConfigThreshold = UINT16
-WithdrawThreshold = UINT16
-ChannelDeposit = ChannelId Inputs Metadata
-Inputs = InputCount *NoteId
-InputCount = Byte
-Metadata = UINT32 *BYTE
+Inscription      = UINT32 *BYTE 
 
-ChannelWithdraw = ChannelId Outputs WithdrawNonce
-Outputs = OutputCount *Note
-OutputCount = Byte
-WithdrawNonce = UINT32
-ChannelId = Hash32
-Parent = Hash32
-Signer = Ed25519PublicKey
+ChannelConfig     = ChannelId KeyCount *Signer PostingTimeframe PostingTimeout ConfigThreshold WithdrawThreshold
+KeyCount          = UINT16
+PostingTimeframe  = UINT32
+PostingTimeout    = UINT32
+ConfigThreshold   = UINT16
+WithdrawThreshold = UINT16
+
+ChannelDeposit    = ChannelId Inputs Metadata
+Inputs            = InputCount *NoteId
+InputCount        = Byte
+Metadata          = UINT32 *BYTE
+
+ChannelWithdraw   = ChannelId Outputs WithdrawNonce
+Outputs           = OutputCount *Note
+OutputCount       = Byte
+WithdrawNonce     = UINT32
+
+ChannelId         = Hash32
+Parent            = Hash32
+Signer            = Ed25519PublicKey
 ```
 
 ### SDP Operations
 
-```text
-SDPDeclare = ServiceType LocatorCount *Locator ProviderId ZkId LockedNoteId
-ServiceType = Byte ; 0 = BN
-LocatorCount = Byte ; Max 8
-Locator = 2Byte *BYTE ; Max 329 bytes, multiaddr format
-ProviderId = Ed25519PublicKey
-ZkId = ZkPublicKey
-LockedNoteId = NoteId
-SDPWithdraw = DeclarationId Nonce LockedNoteId
+```schema
+SDPDeclare    = ServiceType LocatorCount *Locator ProviderId ZkId LockedNoteId
+ServiceType   = Byte          ; 0 = BN
+LocatorCount  = Byte          ; Max 8
+Locator       = 2Byte *BYTE   ; Max 329 bytes, multiaddr format
+ProviderId    = Ed25519PublicKey
+ZkId          = ZkPublicKey
+LockedNoteId  = NoteId
+
+SDPWithdraw   = DeclarationId Nonce LockedNoteId
 DeclarationId = Hash32
-Nonce = UINT64
-SDPActive = DeclarationId Nonce Metadata
-Metadata = UINT32 *BYTE ; Service-specific node activeness metadata
+Nonce         = UINT64
+
+SDPActive     = DeclarationId Nonce Metadata
+Metadata      = UINT32 *BYTE  ; Service-specific node activeness metadata
 ```
 
 ### Leader operations
 
-```text
-LeaderClaim = RewardsRoot VoucherNullifier PublicKey
-RewardsRoot = FieldElement ; Merkle root for voucher membership proof
+```schema
+LeaderClaim      = RewardsRoot VoucherNullifier PublicKey
+RewardsRoot      = FieldElement ; Merkle root for voucher membership proof
 VoucherNullifier = FieldElement
-PublicKey = ZkPublicKey
+PublicKey        = ZkPublicKey
 ```
 
 ### Transfer Operations
 
-```text
-Transfer = Inputs Outputs
-Inputs = InputCount *NoteId
-InputCount = Byte
-Outputs = OutputCount *Note
+```schema
+Transfer    = Inputs Outputs
+Inputs      = InputCount *NoteId
+InputCount  = Byte
+Outputs     = OutputCount *Note
 OutputCount = Byte
 ```
 
 ## Ledger
 
-```text
-Note = Value ZkPublicKey
-Value = UINT64
+```schema
+Note   = Value ZkPublicKey
+Value  = UINT64
 NoteId = FieldElement
 ```
 
 ## Op Proofs
 
-```text
+```schema
 OpsProofs = *OpProof ; 1. Lenth must equal OpCount
-; 2. OpProof variant is derived from the corresponding Op.
-; That is, type(OpProofs[i]) == ProofFor(Op[i])
-OpProof = Ed25519SigProof /
-ZkSigProof /
-ZkAndEd25519SigsProof /
-ChannelWithdrawOpProof /
-ProofOfClaimProof
-Ed25519SigProof = Ed25519Signature
-ZkSigProof = ZkSignature
-ZkAndEd25519SigsProof = ZkSignature Ed25519Signature
-ChannelWithdrawOpProof = SignatureCount *Ed25519Signature
-ProofOfClaimProof = Groth16
+                     ; 2. OpProof variant is derived from the corresponding Op.
+                     ;    That is, type(OpProofs[i]) == ProofFor(Op[i])
+
+OpProof   = Ed25519SigProof /
+            ZkSigProof /
+            ZkAndEd25519SigsProof /
+            ChannelWithdrawOpProof /
+            ProofOfClaimProof
+
+Ed25519SigProof         = Ed25519Signature
+ZkSigProof              = ZkSignature
+ZkAndEd25519SigsProof   = ZkSignature Ed25519Signature
+ChannelWithdrawOpProof  = SignatureCount *Ed25519Signature
+ProofOfClaimProof       = Groth16
+
 SignatureCount = UINT16
 ```
 
 ## Common Structures
 
-```text
+```schema
 ; Zero-knowledge signature
 ZkSignature = Groth16
+
 ; Cryptographic primitives
-Groth16 = 128BYTE      ; pi_a (32) + pi_b (64) + pi_c (32)
-ZkPublicKey = FieldElement
+Groth16          = 128BYTE      ; pi_a (32) + pi_b (64) + pi_c (32)
+ZkPublicKey      = FieldElement
 Ed25519PublicKey = 32BYTE
 Ed25519Signature = 64BYTE
-FieldElement = 32BYTE       ; BN254 field element (little-endian)
-Hash32 = 32BYTE
+FieldElement     = 32BYTE      ; BN254 field element (little-endian)
+Hash32           = 32BYTE
 
 ; Primitive types
 UINT64 = 8BYTE ; 64-bit unsigned integer, little-endian
 UINT32 = 4BYTE ; 32-bit unsigned integer, little-endian
 UINT16 = 2BYTE ; 16-bit unsigned integer, little-endian
-Byte = OCTET
+Byte   = OCTET
 ```
-
