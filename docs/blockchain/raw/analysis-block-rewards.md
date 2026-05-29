@@ -69,7 +69,7 @@ Our simulations under baseline parameters indicate:
 The token supply $`S_t`$ evolves according to:
 
 $$
-S_{t} = \min \Bigl\{ S_{cap},  S_{tge} \times \Bigl( 1 + \sum_{\tau=1}^t A_\tau \cdot I_{max} \cdot \Delta_\tau \Bigr) \Bigr\}.
+S_{t} = \min \lbrace S_{cap},  S_{tge} \times (1 + \sum_{\tau=1}^t A_\tau \cdot I_{max} \cdot \Delta_\tau) \rbrace.
 $$
 
 where:

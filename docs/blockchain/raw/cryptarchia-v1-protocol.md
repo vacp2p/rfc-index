@@ -172,10 +172,10 @@ Given block $`B = (parent,sl, \rho_\text{LEAD},\dots)`$ where
 Then, $`\eta_B`$ is derived as
 
 $$
-\eta_{B} = \text{zkHASH}(\text{EPOCH\_NONCE\_V1}||\eta_{\text{parent}}||\rho_\text{LEAD}||\text{Fr}(sl)))
+\eta_{B} = \mathrm{zkHASH}(D_{\mathrm{epoch}}\mathbin{\|}\eta_{\mathrm{parent}}\mathbin{\|}\rho_{\mathrm{LEAD}}\mathbin{\|}\mathrm{Fr}(sl))
 $$
 
-where $`\text{Fr}(sl)`$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $`\text{zkHASH}(..)`$ is Poseidon2 as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md) .
+where $`D_{\mathrm{epoch}}`$ is the domain separator `EPOCH_NONCE_V1`, $`\mathrm{Fr}(sl)`$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $`\mathrm{zkHASH}(..)`$ is Poseidon2 as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md) .
 
 The epoch nonce used in the next epoch is $`\eta_{B'}`$ where $`B'`$ is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.
 
@@ -189,7 +189,7 @@ Given that stake is private in Cryptarchia, and that we want to maintain an appr
 
 At the start of each epoch, each validator must derive the new epoch state variables. This is done through the following protocol:
 
-$`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\rarr(\mathbb{C}_\text{LEAD}^{ep},\eta^{ep},D^{ep})`$ :
+$`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\text{LEAD}^{ep},\eta^{ep},D^{ep})`$ :
 
   $`\textbf{case}\space ep = 0:`$
 
@@ -340,7 +340,7 @@ We define the chain maintenance procedure $`\textbf{on\_block}(state,B)`$ that g
 
 **Note:** It’s assumed that block contents have already been validated by the execution layer w.r.t. the parent block’s execution state.
 
-$`\text{define } \textbf{on\_block}(state, B)\rarr state'`$:
+$`\text{define } \textbf{on\_block}(state, B)\to state'`$:
 
   $`(c_{loc}, B_\text{imm}, T) \coloneqq state`$
 
@@ -366,7 +366,7 @@ $`\text{define } \textbf{on\_block}(state, B)\rarr state'`$:
 
 We define the procedure that commits to the block, which is $`depth`$ deep from $`c_{loc}`$. This procedure computes the new latest immutable block $`B_\text{imm}`$.
 
-$`\text{define } \textbf{commit}(T,c_{loc},depth)\rarr (T', B_\text{imm}):`$
+$`\text{define } \textbf{commit}(T,c_{loc},depth)\to (T', B_\text{imm}):`$
 
   $`\textbf{assert } \text{fork\_choice\_rule} = \text{ONLINE}`$
 
@@ -384,7 +384,7 @@ $`\text{define } \textbf{commit}(T,c_{loc},depth)\rarr (T', B_\text{imm}):`$
 
 We define the fork pruning procedure that removes all blocks which are part of forks diverged deeper than a certain block.
 
-$`\text{define } \textbf{prune\_forks}(T, B)\rarr T':`$
+$`\text{define } \textbf{prune\_forks}(T, B)\to T':`$
 
   $`T' \coloneqq T`$
 
@@ -400,7 +400,7 @@ $`\text{define } \textbf{prune\_forks}(T, B)\rarr T':`$
 
   $`\textbf{return } T'`$
 
-$`\text{define } \textbf{prune\_blocks}(B_\text{new}, B_\text{old}, T)\rarr T’:`$
+$`\text{define } \textbf{prune\_blocks}(B_\text{new}, B_\text{old}, T)\to T':`$
 
 > Remove all blocks in the chain within range $`(B_\text{old}, B_\text{new}]`$ from $`T`$.
 

@@ -397,10 +397,7 @@ def fill_last_blending_headers(private_header: PrivateHeader, shared_keys: List[
     return private_header
 ```
 
-4. Encrypt the last $`h`$ blend headers in a reconstructable manner: For $`i=\{ 1,...,h \}`$, for $`j=\{1, ..., i \}`$, encrypt blend header:
-$$
-\mathbf{b}_{\beta_{max}-i+1}=E_{H_{\mathbf b}(\kappa^{n,l_j}_{j})}(\mathbf b_{\beta_{max}-i+1})
-$$
+4. Encrypt the last $`h`$ blend headers in a reconstructable manner: For $`i=\{ 1,...,h \}`$, for $`j=\{1, ..., i \}`$, encrypt blend header $`\mathbf{b}_{\beta_{max}-i+1}=E_{H_{\mathbf{b}}(\kappa^{n,l_j}_{j})}(\mathbf{b}_{\beta_{max}-i+1})`$.
 
 ```python
 def encrypt_last_blending_headers(private_header: PrivateHeader, shared_keys: List[SharedKeys]) -> PrivateHeader:
@@ -665,7 +662,7 @@ $`i=1`$:
   2. Calculate the signature of the header and the payload: $`\sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0)`$.
   3. Using shared key $`\kappa^{n,l_1}_{1}`$ encrypt the payload: $`\mathbf P_1 = E_{H_\mathbf{P}(\kappa^{n,l_1}_{1})}(\mathbf P_0)`$.
   4. Shift blending headers by one down: $`\mathbf h_1 = \{`$
-&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_1 = \empty`$,
+&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_1 = \emptyset`$,
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_2 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}`$,
 
@@ -703,7 +700,7 @@ $`i=2`$:
   2. Calculate the signature of the header and the payload: $`\sigma_{K^{n}_1}(\mathbf{h}_{E_1}| \mathbf{P}_1)`$.
   3. Using shared key $`\kappa^{n,l_2}_{2}`$ encrypt the payload: $`\mathbf P_2 = E_{H_\mathbf{P}(\kappa^{n,l_2}_{2})}(\mathbf P_1)`$.
   4. Shift blending headers by one down: $`\mathbf h_2 = \{`$
-&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_1 = \empty`$,
+&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_1 = \emptyset`$,
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S} , \Omega \})`$,
 
@@ -741,7 +738,7 @@ $`i=3`$:
   2. Calculate the signature of the header and the payload: $`\sigma_{K^{n}_2}(\mathbf{h}_{E_2}| \mathbf{P}_2)`$.
   3. Using shared key $`\kappa^{n,l_3}_{3}`$ encrypt the payload: $`\mathbf P_3 = E_{H_\mathbf{P}(\kappa^{n,l_3}_{3})}(\mathbf P_2)`$.
   4. Shift blending headers by one down: $`\mathbf h_3 = \{`$
-&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_1 = \empty`$,
+&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_1 = \emptyset`$,
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S}, \Omega \})`$,
 

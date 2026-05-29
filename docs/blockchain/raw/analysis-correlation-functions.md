@@ -54,10 +54,11 @@ One of possible approaches to design a reliable anonymous communication (AC) sys
 - If node $i$ at time $t$ is in the state $`S_i(t)\in \{-1,0,1\}`$ then  the [Kronecker delta function](https://mathworld.wolfram.com/KroneckerDelta.html) is defined as follows
 
 $$
-\delta_{S;S_i(t)}=\Big\{ \begin{array}{c} 
-1, S=S_i(t) \\ 
-0,  S\neq S_i(t)
-\end{array}
+\delta_{S;S_i(t)}=
+\begin{cases}
+1, & S=S_i(t) \\
+0, & S\neq S_i(t)
+\end{cases}
 $$
 
 - The sum $`\sum_{t\in \mathcal{T}}\delta_{S;S_i(t)}`$ counts how many times node i was in state $s$ on the (ordered) set of times $`\mathcal{T}=\{t_0,t_1,\ldots\}`$, where $`\vert\mathcal{T}\vert=T`$. Additionally, the latter can be used to define the (empirical) frequency $`\hat{P}_i(S)=\frac{1}{T}\sum_{t\in\mathcal{T}}\delta_{S;S_i(t)}`$.
@@ -66,7 +67,7 @@ $$
 - In a similar manner we can define the (spatial) correlation function
 
 $$
-C_{t,t+t_w}(S,\tilde{S})=\frac{2}{N(N-1)}\sum_{i<j}\delta_{S;S_i(t)}\delta_{\tilde{S};S_j(t+t_w)}
+C_{t,t+t_w}(S,\tilde{S})=\frac{2}{N(N-1)}\sum_{i\lt j}\delta_{S;S_i(t)}\delta_{\tilde{S};S_j(t+t_w)}
 $$
 
 - In above the sum $`\sum_{i \lt j}\delta_{S;S_i(t)}\delta_{\tilde{S};S_j(t+t_w)}`$ counts how many pairs of distinct nodes in the network (there are $N(N-1)/2$ such pairs in total ) were in state $s$ and $`\tilde{s}`$ at, respectively, the time $t$ and $`t+t_w`$​
@@ -139,4 +140,3 @@ for nodes $i$ and $j$.
 ![Diagram](analysis-correlation-functions/assets/1fd261aa-09df-8184-9afc-e82127a01d83.png)
 
 - We note that for $`T \lt t_0`$ we have $`\overline{D}_H(T)=0`$ because states of copies 1 and 2, described by $`\mathbf{S}^1(t)`$ and $`\mathbf{S}^2(t)`$, are exactly the same before this event. For times $`T\geq t_0`$ we can have $`\overline{D}_H(T) \gt 0`$, i.e. the states of copies $1$ and $2$, described by $`\mathbf{S}^1(t)`$ and $`\mathbf{S}^2(t)`$, are different after the event at $`t_0`$.
-
