@@ -214,30 +214,69 @@
     const items = root.querySelectorAll("li.chapter-item");
     items.forEach((item) => {
       const sectionInfo = getSectionInfo(item);
-      const link = item.querySelector(":scope > a, :scope > .chapter-link-wrapper > a");
-      if (!sectionInfo || !link) return;
+      const label = item.querySelector(
+        ":scope > a, :scope > .chapter-link-wrapper > a, :scope > div"
+      );
+      if (!sectionInfo || !label) return;
+      const isStructuralLabel = label.matches("div");
 
-      if (!link.querySelector(".section-toggle")) {
+      const setActive = () => {
+        root.querySelectorAll(
+          "li.chapter-item > a.active, " +
+          "li.chapter-item > .chapter-link-wrapper > a.active, " +
+          "li.chapter-item > div.active"
+        ).forEach((active) => active.classList.remove("active"));
+        label.classList.add("active");
+      };
+      const setExpanded = (expanded) => {
+        item.classList.toggle("expanded", expanded);
+        const toggle = label.querySelector(".section-toggle");
+        const control = isStructuralLabel ? label : toggle;
+        if (control) {
+          control.setAttribute("aria-expanded", expanded ? "true" : "false");
+        }
+      };
+      const toggleExpanded = () => {
+        if (isStructuralLabel) {
+          setActive();
+        }
+        setExpanded(!item.classList.contains("expanded"));
+      };
+
+      if (!label.querySelector(".section-toggle")) {
         const toggle = document.createElement("span");
         toggle.className = "section-toggle";
-        toggle.setAttribute("role", "button");
-        toggle.setAttribute("aria-label", "Toggle section");
+        if (isStructuralLabel) {
+          toggle.setAttribute("aria-hidden", "true");
+        } else {
+          toggle.setAttribute("role", "button");
+          toggle.setAttribute("aria-label", "Toggle section");
+        }
         toggle.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
-          item.classList.toggle("expanded");
+          toggleExpanded();
         });
-        link.prepend(toggle);
+        label.prepend(toggle);
+      }
+
+      if (isStructuralLabel && label.dataset.collapsibleLabelInit !== "true") {
+        label.setAttribute("role", "button");
+        label.setAttribute("tabindex", "0");
+        label.addEventListener("click", toggleExpanded);
+        label.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          toggleExpanded();
+        });
+        label.dataset.collapsibleLabelInit = "true";
       }
 
       if (item.dataset.collapsibleInit !== "true") {
-        const hasActive = link.classList.contains("active");
+        const directLink = label.matches("a") ? label : label.querySelector("a");
+        const hasActive = !!directLink && directLink.classList.contains("active");
         const hasActiveInSection = !!sectionInfo.section.querySelector(".active");
-        if (hasActive || hasActiveInSection) {
-          item.classList.add("expanded");
-        } else {
-          item.classList.remove("expanded");
-        }
+        setExpanded(hasActive || hasActiveInSection);
         item.dataset.collapsibleInit = "true";
       }
     });

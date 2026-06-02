@@ -285,8 +285,11 @@ def build_blockchain_items() -> List[Item]:
             children: List[Item] = sorted(grouped[topic].get(bucket, []), key=lambda i: i.label.lower())
             for placeholder_label in placeholders.get(bucket, []):
                 children.append(Item(label=placeholder_label, path=None))
+            if not children:
+                continue
             bucket_items.append(Item(label=bucket, path=None, children=children))
-        topic_items.append(Item(label=topic, path=None, children=bucket_items))
+        if bucket_items:
+            topic_items.append(Item(label=topic, path=None, children=bucket_items))
 
     return [Item(label=bc.BEDROCK_LABEL, path=None, children=topic_items)]
 
@@ -343,7 +346,10 @@ def main() -> None:
             continue
         label = LABEL_OVERRIDES.get(section, humanize(section))
         lines.append(f"- [{label}]({section}/{readme.name})")
-        children = build_items(section_dir, Path(section))
+        if section == "blockchain":
+            children = build_blockchain_items()
+        else:
+            children = build_items(section_dir, Path(section))
         render_items(children, 1, lines)
         lines.append("")
 
