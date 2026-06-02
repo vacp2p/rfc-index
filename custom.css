@@ -434,10 +434,24 @@ blockquote > p > sub:only-child .katex {
 }
 
 .chapter-item > .chapter-link-wrapper > a,
-.chapter-item > a {
+.chapter-item > a,
+.chapter-item > div {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+}
+
+.chapter-item > div[role="button"] {
+    color: var(--sidebar-fg);
+    cursor: pointer;
+}
+
+.chapter-item > div.active {
+    color: var(--sidebar-active);
+}
+
+.chapter-item strong[aria-hidden="true"] {
+    display: none;
 }
 
 .section-toggle::before {
@@ -449,7 +463,8 @@ blockquote > p > sub:only-child .katex {
 }
 
 .chapter-item.expanded > a .section-toggle::before,
-.chapter-item.expanded > .chapter-link-wrapper > a .section-toggle::before {
+.chapter-item.expanded > .chapter-link-wrapper > a .section-toggle::before,
+.chapter-item.expanded > div .section-toggle::before {
     transform: rotate(90deg);
 }
 
@@ -462,7 +477,8 @@ blockquote > p > sub:only-child .katex {
 }
 
 .chapter-item:not(.expanded) > .chapter-link-wrapper > a .section-toggle::before,
-.chapter-item:not(.expanded) > a .section-toggle::before {
+.chapter-item:not(.expanded) > a .section-toggle::before,
+.chapter-item:not(.expanded) > div .section-toggle::before {
     transform: rotate(0deg);
 }
 

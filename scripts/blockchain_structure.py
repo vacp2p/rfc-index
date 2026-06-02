@@ -12,7 +12,7 @@ GitHub are emitted as draft (greyed) links so the full target structure
 stays visible to readers and reviewers.
 """
 
-# Order in which topics appear on the site (under "Logos Blockchain — The Bedrock").
+# Order in which topics appear on the site (under "Bedrock").
 TOPIC_ORDER = [
     "P2P Network",
     "Consensus",
@@ -149,7 +149,7 @@ FILE_ASSIGNMENTS = {
 PLACEHOLDERS = {}
 
 # Label for the group containing all topics.
-BEDROCK_LABEL = "Logos Blockchain — The Bedrock"
+BEDROCK_LABEL = "Bedrock"
 
 
 def buckets_for_topic(topic: str) -> list:
