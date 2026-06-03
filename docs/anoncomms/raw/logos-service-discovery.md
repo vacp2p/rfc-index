@@ -484,34 +484,7 @@ to avoid coupling the protocol to specific formats
 
 ### Advertisement Encoding
 
-Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](https://github.com/logos-co/logos-lips/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md):
-
-```protobuf
-ExtensiblePeerRecord {
-    peer_id: <advertiser_peer_id>
-    seq: <monotonic_sequence>
-    addresses: [
-        AddressInfo { multiaddr: <addr1> },
-        AddressInfo { multiaddr: <addr2> }
-    ]
-    services: [
-        ServiceInfo {
-            id: "/waku/store/1.0.0"  // service protocol identifier
-            data: <optional_metadata>
-        }
-    ]
-}
-```
-
-**Size constraints:**
-
-- Each `ServiceInfo.data` field SHOULD be ≤ 33 bytes
-- Total encoded XPR SHOULD be ≤ 1024 bytes
-
-The XPR MUST be wrapped in a signed envelope with:
-
-- Domain: `libp2p-routing-state`
-- Payload type: `/libp2p/extensible-peer-record/`
+Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](https://github.com/logos-co/logos-lips/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md) encoding.
 
 Alternative encodings MAY be used if they provide equivalent functionality
 and can be verified by discoverers.
