@@ -128,12 +128,7 @@ A conversation protocol defines how messages flow between participants, and subs
 - A Conversation protocol MUST define the payloads it uses and how to handle them.
 - A Conversation protocol SHOULD outline the cryptographic properties provided
 - A Conversation protocol SHOULD describe bidirectional communication.
-- A Conversation protocol ...
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
-## References
-
-A list of references.

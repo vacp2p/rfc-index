@@ -38,7 +38,7 @@ PRIVATE1 provides the following properties:
 
 ## Definitions
 
-This document makes use of the shared terminology defined in the [CHAT-DEFINITIONS](informational/chatdefs.md) specification.
+This document makes use of the shared terminology defined in the [CHAT-DEFINITIONS](./chatdefs.md) specification.
 
 The terms include:
 - Application
@@ -402,17 +402,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 
 ## References
-- **[DOUBLERATCHET]** "The Double Ratchet Algorithm", Signal, 2016.
-  https://signal.org/docs/specifications/doubleratchet/
-
-- **[SDS]** "Scalable Data Sync Specification", vac, 2024.
-  ../../anoncomms/raw/sds.md
-
-- **[SEGMENTATION]** "Message Segmentation Specification", Waku, 2024.
-  ./segmentation.md
-
-- **[CONTENTFRAME]** "ContentFrame Specification", Waku, 2024.
-  ./contentframe.md
-
-- **[CHAT-DEFINITIONS]** "Chat Definitions Specification", Waku, 2024.
-  ./chatdefs.md
+- [DOUBLERATCHET](https://signal.org/docs/specifications/doubleratchet/) "The Double Ratchet Algorithm", Signal, 2016.
+- [SDS](../../anoncomms/raw/sds.md) "Scalable Data Sync Specification", vac, 2024.
+- [SEGMENTATION](./segmentation.md) "Message Segmentation Specification", Waku, 2024.
+- [CONTENTFRAME](./contentframe.md) "ContentFrame Specification", Waku, 2024.
+- [CHAT-DEFINITIONS](./chatdefs.md) "Chat Definitions Specification", Waku, 2024.
