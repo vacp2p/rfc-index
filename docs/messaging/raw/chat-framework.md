@@ -5,7 +5,7 @@
 | Name | A modular framework for defining chat protocols |
 | Status | raw |
 | Type | RFC |
-| Category | Informational |
+| Category | Standards Track |
 | Tags | chat |
 | Editor | Jazz Alyxzander <jazz@status.im> |
 
