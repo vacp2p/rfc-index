@@ -1,11 +1,12 @@
----
-title: PRIVATE1
-name: Private conversation
-category: Standards Track
-tags:
-editor: Jazz Alyxzander (@Jazzz)
-contributors:
----
+# PRIVATE1
+
+| Field | Value |
+| --- | --- |
+| Name | Private conversation |
+| Status | raw |
+| Type | RFC |
+| Category | Standards Track |
+| Editor | Jazz Alyxzander (@Jazzz) |
 
 # Abstract
 
@@ -175,7 +176,7 @@ By segmenting first, the reliability layer can track individual segments and req
 
 **Implementation**
 
-The segmentation strategy used is defined by [!TODO: Flatten link once completed](https://github.com/waku-org/specs/pull/91)
+The segmentation strategy used is defined by the [Segmentation specification](./segmentation.md)
 
 Implementation specifics:
 - Error correction is not used, as reliable delivery is already provided by lower layers. 
@@ -185,7 +186,7 @@ Implementation specifics:
 ### Message Reliability
 
 Scalable Data Sync (SDS) is used to detect missing messages, provide delivery confirmation, and handle retransmission of payloads.
-SDS is implemented according to the [specification](https://github.com/vacp2p/rfc-index/blob/main/vac/raw/sds.md).
+SDS is implemented according to the [specification](../../anoncomms/raw/sds.md).
 
 **SDS Field Mappings**
 
@@ -326,7 +327,7 @@ message Message {
 
 ### Segmentation 
 
-This payload is used without modification from the Segmentation [specification](https://github.com/waku-org/specs/blob/fa2993b427f12796356a232c54be75814fac5d98/standards/application/segmentation.md)
+This payload is used without modification from the Segmentation [specification](./segmentation.md)
 
 ```protobuf
 
@@ -366,7 +367,7 @@ message PrivateV1Frame {
 ### Content Types
 
 Implementers need to be mindful of maintaining interoperability between clients, when deciding how content is encoded prior to transmission.
-In a decentralized context, clients cannot be assumed to be using the same version let alone application. It is recommended that implementers use a self-describing content payload such as [CONTENTFRAME](https://github.com/waku-org/specs/blob/jazzz/content_frame/standards/application/contentframe.md) specification. This provides the ability for clients to determine support for incoming frames, regardless of the software used to receive them. 
+In a decentralized context, clients cannot be assumed to be using the same version let alone application. It is recommended that implementers use a self-describing content payload such as [CONTENTFRAME](./contentframe.md) specification. This provides the ability for clients to determine support for incoming frames, regardless of the software used to receive them. 
 
 ### Initialization
 
@@ -405,13 +406,13 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
   https://signal.org/docs/specifications/doubleratchet/
 
 - **[SDS]** "Scalable Data Sync Specification", vac, 2024.
-  https://github.com/vacp2p/rfc-index/blob/main/vac/raw/sds.md
+  ../../anoncomms/raw/sds.md
 
 - **[SEGMENTATION]** "Message Segmentation Specification", Waku, 2024.
-  https://github.com/waku-org/specs/blob/main/standards/application/segmentation.md
+  ./segmentation.md
 
 - **[CONTENTFRAME]** "ContentFrame Specification", Waku, 2024.
-  https://github.com/waku-org/specs/blob/main/standards/application/contentframe.md
+  ./contentframe.md
 
 - **[CHAT-DEFINITIONS]** "Chat Definitions Specification", Waku, 2024.
-  https://github.com/waku-org/specs/blob/main/informational/chatdefs.md
+  ./chatdefs.md

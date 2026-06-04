@@ -1,13 +1,13 @@
----
-title: Introduction Bundle Encoding
-name: introduction-bundle-encoding
-category: Standards Track
-tags: core, encoding
-editor:
-contributors:
-  - Patryk <patryk@status.im>
-  - Jazzz <jazz@status.im>
----
+# Introduction Bundle Encoding
+
+| Field | Value |
+| --- | --- |
+| Name | introduction-bundle-encoding |
+| Status | raw |
+| Type | RFC |
+| Category | Standards Track |
+| Tags | core, encoding |
+| Editor | Patryk <patryk@status.im>, Jazzz <jazz@status.im> |
 
 ## Abstract
 

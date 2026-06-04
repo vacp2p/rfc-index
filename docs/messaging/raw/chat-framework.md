@@ -1,12 +1,14 @@
----
-title: CHAT-FRAMEWORK
-name: A modular framework for defining chat protocols
-category: Information
-status: raw
-tags: chat
-editor: Jazz Alyxzander<jazz@status.im>
-contributors:
----
+# CHAT-FRAMEWORK
+
+| Field | Value |
+| --- | --- |
+| Name | A modular framework for defining chat protocols |
+| Status | raw |
+| Type | RFC |
+| Category | Informational |
+| Tags | chat |
+| Editor | Jazz Alyxzander <jazz@status.im> |
+
 # Abstract
 
 This specification defines a modular communication protocol framework for describing chat protocols. It introduces abstraction boundaries, and a component model for describing chat protocol functionality.

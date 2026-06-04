@@ -1,11 +1,12 @@
----
-title: CONTENTFRAME
-name: 
-category: Standards Track
-tags: 
-editor: Jazzz
-contributors:
----
+# CONTENTFRAME
+
+| Field | Value |
+| --- | --- |
+| Name | Chat Content Frames |
+| Status | raw |
+| Type | RFC |
+| Category | Standards Track |
+| Editor | Jazzz <jazz@status.im> |
 
 ## Abstract
 
@@ -176,4 +177,4 @@ New domains are added via pull request.
 
 | domain_id | specification repository             |
 |-----------|--------------------------------------|
-| 1         | https://github.com/waku-org/specs    |
+| 1         | https://github.com/logos-co/logos-lips |
