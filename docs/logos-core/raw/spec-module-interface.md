@@ -12,19 +12,21 @@
 ## Abstract
 
 This specification defines how Logos modules declare their interfaces and how
-those interfaces map to both a C calling convention and a dCBOR wire encoding.
+those interfaces map to both a C calling convention and Logos deterministic
+CBOR encoding.
 
 A module interface is defined in a **CDDL schema** (RFC 8610). From that
 single schema, two equivalent representations are derived:
 
 - A **C API** — for direct in-process calls (no serialisation)
-- A **dCBOR encoding** — for inter-process and remote calls (serialised)
+- A **Logos deterministic CBOR encoding** — for inter-process and remote calls
+  (serialised)
 
 The mapping is **bidirectional and canonical**: given the same CDDL input, any
 conformant implementation MUST produce the same C function signatures and the
-same dCBOR byte sequences. Conversely, given a C API that conforms to the
-allowed subset (section 3), any conformant implementation MUST produce the
-same CDDL schema.
+same Logos deterministic CBOR byte sequences.
+Conversely, given a C API that conforms to the allowed subset (section 3), any
+conformant implementation MUST produce the same CDDL schema.
 
 A module author may start from either end:
 
@@ -34,16 +36,16 @@ A module author may start from either end:
 Both paths MUST produce identical artefacts for the same logical interface.
 
 This spec does NOT cover how modules are loaded, discovered, or connected
-(see LOGOS-MODULE-RUNTIME) or how dCBOR messages are transported over sockets
-(see LOGOS-MODULE-TRANSPORT).
+(see LOGOS-MODULE-RUNTIME) or how deterministic CBOR messages are transported
+over sockets (see LOGOS-MODULE-TRANSPORT).
 
 Unless otherwise qualified, references to encoded payloads and wire bytes in
-this specification mean deterministic CBOR using the dCBOR profile defined in
-section 4.5.
+this specification mean Logos deterministic CBOR as defined in section 4.5.
 For brevity, some later sections may still say "CBOR" in explanatory prose.
-In this specification, those references MUST be read as dCBOR unless the text
-is explicitly talking about generic CBOR concepts such as major types,
-RFC terminology, or envelope-level compatibility with CBOR itself.
+In this specification, those references MUST be read as Logos deterministic
+CBOR unless the text is explicitly talking about generic CBOR concepts such as
+major types, RFC terminology, or envelope-level compatibility with CBOR
+itself.
 
 ### Execution-Boundary Invariance
 
@@ -54,7 +56,8 @@ That means the same logical Logos method/event interface MUST remain valid
 across all supported runtime realizations:
 
 - **Direct mode** — in-process C calls using the derived/generated C API
-- **Local IPC mode** — the same contract carried over local dCBOR transport
+- **Local IPC mode** — the same contract carried over local deterministic
+  CBOR transport
 - **Remote mode** — the same contract carried over remote transport
 
 The execution boundary may change how a call is routed, serialised, scheduled,
@@ -85,14 +88,15 @@ The schema file defines:
 - Response types (method outputs)
 - Event types (asynchronous notifications)
 
-A module schema implicitly has access to the Logos prelude and MAY import
-common types from `logos_common.cddl` (section 5).
+A module schema implicitly has access to the Logos prelude fixed-width integer
+aliases and MAY reference common Logos schema definitions from
+`logos_common.cddl` (section 5).
 
 Note: this spec uses `storage.*` names repeatedly as a convenient running
 example for method, event, codegen, and transport-shape illustrations. Those
 snippets are explanatory examples unless they are explicitly being used to
-state a general module-interface rule. They do not, by themselves, define or
-freeze the real Storage module interface.
+state a general module-interface rule. They do not, by themselves, define
+the real Storage module interface.
 
 ### 1.2 Schema Metadata
 
@@ -111,12 +115,16 @@ schema identity.
 
 The `_version` field is used for compatibility negotiation (see
 LOGOS-MODULE-TRANSPORT).
+It is compatibility and release-management metadata, not canonical schema
+identity input.
+LOGOS-MODULE-COMMITMENT-MODEL defines structural schema identity separately.
 
 ### 1.3 Logos Prelude
 
 Every module schema is interpreted with a small Logos prelude in scope.
-The prelude defines fixed-width integer aliases and reserved Logos common
-types.
+The prelude defines fixed-width integer aliases.
+Reusable Logos-defined common types and well-known method surfaces are defined
+separately in `logos_common.cddl` (section 5).
 Module schemas MUST NOT redefine prelude names.
 
 ```cddl
@@ -152,48 +160,82 @@ Reserved Logos names:
   module-specific API outside the symbols derived by this specification or by
   Logos-defined extension specifications.
 
+The reserved Logos namespace is for system, runtime, ABI, and common-schema
+surfaces.
+It is not automatically assigned to every module authored by a Logos project.
+An ordinary domain module, such as a Storage implementation, SHOULD use the
+normal module namespace unless a Logos specification explicitly assigns it a
+system/runtime surface.
+
+Logos module schema identifiers that project to generated C identifiers use
+lowercase `snake_case`.
+This is intentionally less idiomatic CDDL than hyphenated names, but Logos
+module schemas are also ABI and code-generation inputs.
+Using `snake_case` gives a direct, collision-free mapping between schema names
+and generated C identifiers without lossy hyphen-to-underscore conversion or
+escaped C symbol names.
+
+Such identifiers MUST use lowercase ASCII letters, digits, and underscores.
+They MUST begin with a lowercase ASCII letter, MUST end with a lowercase
+ASCII letter or digit, and MUST NOT contain consecutive underscores.
+This rule applies to method names, event names, field names, and named type
+names.
+The metadata names `_module` and `_version`, the underscore-based runtime
+module name carried in `_module`, prelude aliases such as `uint64`, and
+exported C ABI symbols are not Logos module schema identifiers.
+
 ### 1.4 Methods as Request/Response Pairs
 
 Methods are declared as pairs of named CDDL maps using the convention:
 
-- `<module>.<method>-request` — the method input
-- `<module>.<method>-response` — the method output
+- `<module>.<method>_request` — the method input
+- `<module>.<method>_response` — the method output
+
+The `<module>.` prefix is the schema namespace for the module's own
+schema-defined methods, events, and types.
+It SHOULD correspond to the module's logical name, but it is distinct from the
+flat runtime module name carried in `_module`, which is used for loading,
+routing, and C ABI symbol derivation.
+Runtime bindings between `_module`, schema namespace, and schema commitment
+are defined by LOGOS-MODULE-RUNTIME.
+This revision defines one primary schema namespace per module schema.
 
 ```cddl
-storage.exists-request = {
+storage.exists_request = {
     cid: tstr,
 }
 
-storage.exists-response = {
+storage.exists_response = {
     exists: bool,
 }
 ```
 
-The codegen tool recognises `*-request` / `*-response` pairs by naming
-convention and generates the corresponding C function signatures and wire
-protocol dispatch.
+A codegen tool following this specification
+recognises `*_request` / `*_response` pairs by naming
+convention and generates the corresponding C function signatures
+and wire protocol dispatch.
 
-A method with no input uses an empty map: `storage.space-request = {}`.
+A method with no input uses an empty map: `storage.space_request = {}`.
 A method whose only output is success/failure uses an empty response map:
-`storage.destroy-response = {}`. Success is indicated by `logos_result_t.code
+`storage.destroy_response = {}`. Success is indicated by `logos_result_t.code
 == LOGOS_OK`; the empty response means no additional data.
 
 Map keys MUST be bare CDDL identifiers (not quoted strings). Key names are
-used directly as C parameter names and dCBOR map keys.
+used directly as C parameter names and deterministic CBOR map keys.
 
 ### 1.5 Event Declarations
 
 Events are asynchronous notifications published by a module. They are declared
-as named maps with the suffix `-event`:
+as named maps with the suffix `_event`:
 
 ```cddl
-storage.upload-progress-event = {
+storage.upload_progress_event = {
     session: tstr,
-    bytes-sent: uint64,
-    bytes-total: uint64,
+    bytes_sent: uint64,
+    bytes_total: uint64,
 }
 
-storage.upload-done-event = {
+storage.upload_done_event = {
     cid: tstr,
 }
 ```
@@ -217,13 +259,13 @@ request/response methods.
 Custom types are declared using standard CDDL syntax:
 
 ```cddl
-space-info = {
+space_info = {
     quota: uint64,
     used: uint64,
     available: uint64,
 }
 
-peer-info = {
+peer_info = {
     id: tstr,
     addrs: [* tstr],
     ? name: tstr,
@@ -236,7 +278,7 @@ Module schemas MUST only use types from this set:
 
 | Category | Allowed types |
 |----------|--------------|
-| Primitives | `bool`, `float64`, `tstr`, `bstr` |
+| Primitives | `bool`, `tstr`, `bstr` |
 | Fixed-width integers | `uint8`, `uint16`, `uint32`, `uint64`, `int8`, `int16`, `int32`, `int64` |
 | Constrained strings | `tstr .size (min..max)`, `bstr .size n` |
 | Arrays | `[* T]` (variable-length), `[T, T, T]` (fixed-length tuple) |
@@ -251,10 +293,15 @@ The following are **NOT allowed** in module schemas:
 |-----------|------|
 | Bare `uint`, `int`, `nint` | MUST NOT appear in module schemas except inside the Logos prelude definitions. Use fixed-width integer aliases instead. |
 | `any` | MUST NOT appear in module schemas. Transport envelope uses `any` for generic payload fields; validation against concrete schema happens at the module layer. |
-| `float16`, `float32` | Use `float64`. dCBOR encoding MAY use shorter wire representation if lossless; decoders MUST promote to `double`. |
+| `float16`, `float32`, `float64` | Reserved for a future deterministic numeric profile. |
 | Unkeyed maps (`{ * tstr => any }`) | Reserved for transport envelope. |
 | CBOR tags (beyond the transport envelope) | Reserved for protocol use. |
 | `.regexp`, `.cbor`, `.bits` controls | Reserved for future versions. |
+
+Commitment-model note:
+LOGOS-MODULE-COMMITMENT-MODEL does not define schema identity or canonical
+value roots for floating-point values in this revision.
+Floating-point types are reserved for a future deterministic numeric profile.
 
 ### 1.8 Complete Example
 
@@ -263,63 +310,61 @@ module-interface format; it is not the normative specification of the real
 Storage module API.
 
 ```cddl
-; storage_module.cddl
-
 ; -- metadata --
 _module = "storage_module"
 _version = [1, 0]
 
 ; -- types --
-space-info = {
+space_info = {
     quota: uint64,
     used: uint64,
     available: uint64,
 }
 
 ; -- methods --
-storage.init-request = {
-    data-dir: tstr,
+storage.init_request = {
+    data_dir: tstr,
 }
-storage.init-response = {}
+storage.init_response = {}
 
-storage.exists-request = {
+storage.exists_request = {
     cid: tstr,
 }
-storage.exists-response = {
+storage.exists_response = {
     exists: bool,
 }
 
-storage.space-request = {}
-storage.space-response = {
-    info: space-info,
+storage.space_request = {}
+storage.space_response = {
+    info: space_info,
 }
 
-storage.destroy-request = {}
-storage.destroy-response = {}
+storage.destroy_request = {}
+storage.destroy_response = {}
 
-storage.upload-url-request = {
+storage.upload_url_request = {
     url: tstr,
-    chunk-size: uint64,
+    chunk_size: uint64,
 }
-storage.upload-url-response = {
+storage.upload_url_response = {
     accepted: bool,
 }
 
-storage.start-request = {}
-storage.start-response = {}
+storage.start_request = {}
+storage.start_response = {}
 
 ; -- events --
-storage.upload-progress-event = {
+storage.upload_progress_event = {
     session: tstr,
-    bytes-sent: uint64,
-    bytes-total: uint64,
+    bytes_sent: uint64,
+    bytes_total: uint64,
 }
 
-storage.upload-done-event = {
+storage.upload_done_event = {
     cid: tstr,
 }
 
-storage.started-event = {}
+storage.started_event = {}
 ```
 
 ---
@@ -343,22 +388,25 @@ identities, it MUST also define deterministic C-symbol escaping before those
 identities can be used as ABI prefixes.
 
 **Method names.** Derived from the request/response pair name by stripping
-the `<module>.` prefix and the `-request`/`-response` suffix. Given
-`storage.upload-url-request`, the method name is `upload-url`, which maps to
+the `<module>.` prefix and the `_request`/`_response` suffix. Given
+`storage.upload_url_request`, the method name is `upload_url`, which maps to
 C function `logos_storage_call_upload_url`.
 
-The bare method name (e.g. `"upload-url"`) is also the value used in the
-Transport protocol's Request `method` field. The module prefix is NOT
-included in the wire `method` field — the connection already identifies the
-target module via the Hello handshake.
+The bare method name, for example `"upload_url"`, is the module-contract method
+selector used by dispatch and by transport bindings.
+It does not include the schema namespace prefix.
+A transport binding that carries calls to a selected module uses this bare
+method selector after the target module has already been selected by the
+connection, handle, or routing context.
+
 
 | CDDL pair base     | C function                     |
 |---------------------|--------------------------------|
 | `storage.init`      | `logos_storage_call_init`      |
-| `storage.upload-url`| `logos_storage_call_upload_url`|
-| `storage.peer-id`   | `logos_storage_call_peer_id`   |
+| `storage.upload_url`| `logos_storage_call_upload_url`|
+| `storage.peer_id`   | `logos_storage_call_peer_id`   |
 
-Hyphens are replaced by underscores.
+The schema method name is used directly in the generated C function suffix.
 
 **Reserved lifecycle names.** The lifecycle/runtime exports
 `logos_<module>_name`, `_schema`, `_version`, `_init`, `_destroy`, and
@@ -373,24 +421,31 @@ the wire method name remains the bare schema method name (for example
 
 | CDDL type        | C type                              |
 |------------------|-------------------------------------|
-| `space-info`     | `logos_storage_space_info_t`        |
-| `peer-info`      | `logos_storage_peer_info_t`         |
+| `space_info`     | `logos_storage_space_info_t`        |
+| `peer_info`      | `logos_storage_peer_info_t`         |
 
 Types from `logos_common.cddl` are prefixed with `logos_` (no module):
 
 | CDDL type           | C type                      |
 |----------------------|-----------------------------|
-| `logos-result`       | `logos_result_t`            |
-| `logos-error-code`   | `logos_error_code_t`        |
+| `logos_result`       | `logos_result_t`            |
+| `logos_error_code`   | `logos_error_code_t`        |
 
 **Event constants.** Event names map to C `#define` constants:
 
 ```c
-#define LOGOS_STORAGE_EVENT_UPLOAD_PROGRESS  "storage.upload-progress-event"
-#define LOGOS_STORAGE_EVENT_UPLOAD_DONE      "storage.upload-done-event"
+#define LOGOS_STORAGE_UPLOAD_PROGRESS_EVENT  "storage.upload_progress_event"
+#define LOGOS_STORAGE_UPLOAD_DONE_EVENT      "storage.upload_done_event"
 ```
 
-Pattern: `LOGOS_<MODULE>_EVENT_<NAME_UPPER>` where hyphens become underscores.
+Pattern: `LOGOS_<MODULE>_<EVENT_NAME_UPPER>`.
+`<MODULE>` is the `_module` name converted to uppercase.
+`<EVENT_NAME_UPPER>` is the event declaration name after removing the schema
+namespace prefix and converting lowercase ASCII letters to uppercase.
+The generator does not move the `_event` suffix:
+`storage.upload_progress_event` maps to
+`LOGOS_STORAGE_UPLOAD_PROGRESS_EVENT`.
+The literal event name string remains the schema event name.
 
 ### 2.2 Primitive Type Mapping
 
@@ -405,15 +460,14 @@ Pattern: `LOGOS_<MODULE>_EVENT_<NAME_UPPER>` where hyphens become underscores.
 | `int16`    | 0 or 1 (signed integer)   | `int16_t`                       | Range -32768..32767                |
 | `int32`    | 0 or 1 (signed integer)   | `int32_t`                       | Range -2^31..2^31-1                |
 | `int64`    | 0 or 1 (signed integer)   | `int64_t`                       | Range -2^63..2^63-1                |
-| `float64`  | 7 (double-precision)      | `double`                        |                                    |
 | `tstr`     | 3 (text string)           | `const char*`                   | UTF-8, null-terminated             |
 | `bstr`     | 2 (byte string)           | `const uint8_t*` + `size_t`    | Always pointer + length pair       |
 
 The generated decoder MUST reject integer values outside the selected alias's
 range.
-The dCBOR wire representation still uses the shortest deterministic CBOR
-integer encoding; fixed-width aliases define the valid value range and C ABI
-type, not a fixed wire width.
+The deterministic CBOR wire representation still uses the shortest integer
+encoding; fixed-width aliases define the valid value range and C ABI type, not
+a fixed wire width.
 
 **Underlying CDDL definitions:**
 
@@ -435,7 +489,7 @@ and `const uint8_t*` in function arguments (length is implied by the schema).
 **Maps (structs).** A CDDL map with identifier keys maps to a C struct:
 
 ```cddl
-space-info = {
+space_info = {
     quota: uint64,
     used: uint64,
     available: uint64,
@@ -455,7 +509,7 @@ C struct fields appear in CDDL declaration order.
 **Optional fields.** CDDL `? key` adds a `bool has_<field>` presence flag:
 
 ```cddl
-peer-info = {
+peer_info = {
     id: tstr,
     ? name: tstr,
 }
@@ -504,25 +558,32 @@ typedef struct {
 } logos_value_t;
 ```
 
-The discriminant order matches CDDL declaration order.
+Choice arms are first normalized into the canonical choice-arm order defined
+by LOGOS-MODULE-COMMITMENT-MODEL.
+The generated C discriminant order follows that canonical normalized order,
+not the source CDDL declaration order.
+Source order may be retained for diagnostics, but it is not ABI-visible.
 
-**Constraint:** All arms of a choice MUST have distinct CBOR major types so
-the decoder can unambiguously determine which arm was sent. For example,
+**Constraint:** All arms of a choice MUST be distinguishable by the Logos
+decoding rules.
+Source declaration order MUST NOT be used to disambiguate choice arms.
+For this revision, choice arms MUST have distinct CBOR major types so the
+decoder can unambiguously determine which arm was sent.
+For example,
 `uint64 / tstr / bool` is valid (major types 0, 3, 7).
 `uint64 / int64` is NOT valid because both can use major type 0 for
 non-negative values.
-If two arms
-would collide, use a wrapping map with a discriminant key instead.
+If two arms would collide, use a wrapping map with a discriminant key instead.
 
 ### 2.4 Method Mapping
 
 A request/response pair maps to a single C function:
 
 ```cddl
-storage.exists-request = {
+storage.exists_request = {
     cid: tstr,
 }
-storage.exists-response = {
+storage.exists_response = {
     exists: bool,
 }
 ```
@@ -541,7 +602,7 @@ logos_result_t logos_storage_call_exists(
 
 1. First parameter is always `logos_module_handle_t* h`.
 2. Request map fields expand to input parameters, in CDDL declaration order.
-   Names are derived from the CDDL key (hyphens to underscores).
+   Names are derived directly from the CDDL key.
 3. Response map fields expand to output parameters (pointers), appended after
    all input parameters. Prefixed with `out_`.
 4. If the response map is empty (`{}`), there are no output parameters.
@@ -563,9 +624,9 @@ This is an implementation convenience, not a spec concern — the generated code
 **More examples:**
 
 ```cddl
-storage.space-request = {}
-storage.space-response = {
-    info: space-info,
+storage.space_request = {}
+storage.space_response = {
+    info: space_info,
 }
 ```
 
@@ -577,11 +638,11 @@ logos_result_t logos_storage_call_space(
 ```
 
 ```cddl
-storage.upload-url-request = {
+storage.upload_url_request = {
     url: tstr,
-    chunk-size: uint64,
+    chunk_size: uint64,
 }
-storage.upload-url-response = {
+storage.upload_url_response = {
     accepted: bool,
 }
 ```
@@ -600,10 +661,10 @@ logos_result_t logos_storage_call_upload_url(
 Event types generate a C struct for the event payload:
 
 ```cddl
-storage.upload-progress-event = {
+storage.upload_progress_event = {
     session: tstr,
-    bytes-sent: uint64,
-    bytes-total: uint64,
+    bytes_sent: uint64,
+    bytes_total: uint64,
 }
 ```
 
@@ -617,8 +678,8 @@ typedef struct {
 
 Event subscription and delivery are handled by the runtime (see
 LOGOS-MODULE-RUNTIME section 4) via generic subscribe/unsubscribe functions.
-The event struct is used by the codegen'd decode layer to convert dCBOR event
-payloads into typed C structs.
+The event struct is used by the codegen'd decode layer to convert
+deterministic CBOR event payloads into typed C structs.
 
 ### 2.6 Module Lifecycle Symbols
 
@@ -634,17 +695,19 @@ Every module shared library MUST export these C symbols:
   It returns `0` on success or a nonzero Logos error code on failure.
 - `logos_<module>_destroy()` is called once before unloading.
 - `logos_<module>_dispatch()` is the socket-mode entry point.
-  It receives the bare method name plus the dCBOR-encoded request payload.
+  It receives the bare method name plus the deterministic-CBOR-encoded request
+  payload.
   It does not parse the outer transport envelope.
 - `logos_free()` releases typed dynamic outputs and module-kit helper
   allocations returned across this ABI.
 - `logos_<module>_dispatch()` MUST:
   - look up the method in the generated dispatch table,
-  - return `METHOD_NOT_FOUND` for an unknown method,
+  - return `LOGOS_ERR_METHOD_NOT_FOUND` for an unknown method,
   - decode `params_cbor` according to the method request schema,
-  - return `INVALID_PARAMS` if decode fails,
+  - return `LOGOS_ERR_INVALID_PARAMS` if decode fails,
   - call the corresponding per-method C function,
-  - encode a successful response as a dCBOR map matching the method response
+  - encode a successful response as a deterministic CBOR map matching the
+    method response
     schema, and
   - encode a module-level error as the error payload described in section 4.4.
 - The caller frees any non-null `_dispatch()` response buffer with `free()`.
@@ -656,11 +719,15 @@ Every module shared library MUST export these C symbols:
   `logos_free()` as described in section 2.7.
 - `logos_module_name()` is the bootstrap symbol for runtimes that do not know
   the module name in advance.
+  The runtime calls `dlsym("logos_module_name")` to discover the module
+  name, then uses the module-specific prefix for all other symbols.
   Modules SHOULD export this symbol so directory scanners can discover them
   without sidecar metadata.
   Runtimes MUST also support loading modules whose name is already known from
   a manifest, static registration table, command-line argument, or equivalent
   host/deployment metadata.
+
+The following declarations show the required symbol signatures:
 
 ```c
 /* Module name (static string, valid for library lifetime) */
@@ -673,58 +740,39 @@ const char* logos_<module>_schema(void);
 const char* logos_<module>_version(void);
 
 /* Initialise module (called once after loading).
- * Returns LOGOS_OK (0) on success, or a non-zero logos-error-code on failure. */
+ * Returns LOGOS_OK (0) on success, or a non-zero Logos error code on failure. */
 int logos_<module>_init(void);
 
 /* Shut down module (called once before unloading) */
 void logos_<module>_destroy(void);
 
-/* Dispatch a method call (socket-mode entry point).
- *
- * The module host extracts the method name and params from the Transport
- * Request envelope and passes them separately. Dispatch does NOT parse
- * the envelope.
- *
- * Behaviour:
- * 1. Look up `method` in the dispatch table (generated by codegen).
- *    If not found: return LOGOS_ERR_METHOD_NOT_FOUND, *response = NULL.
- * 2. Decode `params_cbor` according to the method's `-request` schema.
- *    If invalid: return LOGOS_ERR_INVALID_PARAMS, *response = NULL.
- * 3. Call the corresponding per-method C function.
- * 4. On success: encode return values as a dCBOR map matching the
- *    method's `-response` schema. Write to *response / *response_len.
- * 5. On module error: encode error-payload {code, message, ?detail}
- *    to *response. The module host wraps this in a Transport Response
- *    with the `error` field.
- *
- * The caller (module host) frees *response with free().
- * This rule applies only to the raw dispatch response buffer.
- * Typed dynamic outputs use logos_free().
- */
+/* Dispatch a method call (socket-mode entry point). */
 int logos_<module>_dispatch(
     const char*     method,         /* bare method name (e.g. "exists") */
-    const uint8_t*  params_cbor,    /* dCBOR-encoded params map */
+    const uint8_t*  params_cbor,    /* deterministic-CBOR-encoded params map */
     size_t          params_len,
     uint8_t**       response,       /* callee allocates with malloc() */
     size_t*         response_len
 );
 
-/* Bootstrap symbol — universal probe for unknown modules.
- * The runtime calls dlsym("logos_module_name") to discover the module
- * name, then uses the module-specific prefix for all other symbols. */
+/* Bootstrap symbol — universal probe for unknown modules. */
 const char* logos_module_name(void);
 
 /* Shared deallocator for typed dynamic outputs and module-kit helpers */
 void logos_free(void* ptr);
 ```
 
-Plus all per-method C functions derived from the CDDL schema (section 2.4).
+In addition to these lifecycle and dispatch symbols, a conforming module exports
+the per-method C functions derived from the CDDL schema as specified in
+section 2.4.
 
 **Note on `_version()`:** The current ABI keeps `logos_<module>_version()`
 as a separate well-known symbol even though the schema text returned by
 `logos_<module>_schema()` also contains version metadata. A future revision
 MAY simplify the ABI by removing `_version()` and treating the schema as the
-sole source of version information.
+sole source of version metadata.
+Version metadata remains separate from the structural schema identity defined
+by LOGOS-MODULE-COMMITMENT-MODEL.
 
 The benefits of keeping `_version()` in v0.1 are pragmatic:
 
@@ -739,8 +787,8 @@ The benefits of keeping `_version()` in v0.1 are pragmatic:
 
 In **direct mode** (in-process), the runtime calls per-method functions
 directly. In **socket mode**, the runtime calls `_dispatch()` which decodes
-the dCBOR request and delegates to the appropriate per-method function. The
-`_dispatch()` implementation is generated by the codegen tool.
+the deterministic CBOR request and delegates to the appropriate per-method
+function. The `_dispatch()` implementation is generated by the codegen tool.
 
 **Important distinction: lifecycle `_init()` vs schema method `init`.**
 
@@ -749,7 +797,7 @@ It is called by the runtime after loading the shared library and before the
 module is exposed for calls. It is for runtime/loader initialisation only.
 
 If a module schema also declares an ordinary method named `init` (for example
-`storage.init-request` / `storage.init-response`), that method is a normal
+`storage.init_request` / `storage.init_response`), that method is a normal
 schema-defined request/response method with C symbol
 `logos_<module>_call_init` and wire method name `"init"`. It is distinct from
 the lifecycle symbol and MAY perform application-level configuration or setup
@@ -819,7 +867,6 @@ Only these C types are permitted in module function signatures:
 | `int16_t` | `int16` |
 | `int32_t` | `int32` |
 | `int64_t` | `int64` |
-| `double` | `float64` |
 | `const char*` | `tstr` |
 | `const uint8_t*` + `size_t` (pair) | `bstr` |
 | `logos_<module>_<type>_t` | Named struct type |
@@ -832,7 +879,7 @@ Only these C types are permitted in module function signatures:
 - `void*` (except in `logos_free`)
 - Raw pointers that are not `const char*` or `const uint8_t* + size_t`
 - Function pointers (no callbacks in module interfaces)
-- `float` (use `double`)
+- `float` and `double` (reserved for a future deterministic numeric profile)
 - Bitfields, bit-packed structs
 - `enum` not declared as `logos_*_t` (use explicit integer types or declared enums)
 
@@ -853,8 +900,8 @@ logos_result_t logos_<module>_<method>(
 - Output parameters (`out_` prefix, pointer types) become response map fields.
 - `logos_result_t` return is stripped (error handling, not in CDDL data).
 
-**Parameter name to CDDL key:** underscores become hyphens.
-`chunk_size` -> `chunk-size`.
+**Parameter name to CDDL key:** parameter names are used directly.
+`chunk_size` -> `chunk_size`.
 
 **Example:**
 
@@ -870,11 +917,11 @@ logos_result_t logos_storage_upload_url(
 Generates:
 
 ```cddl
-storage.upload-url-request = {
+storage.upload_url_request = {
     url: tstr,
-    chunk-size: uint64,
+    chunk_size: uint64,
 }
-storage.upload-url-response = {
+storage.upload_url_response = {
     accepted: bool,
 }
 ```
@@ -894,7 +941,7 @@ typedef struct {
 Generates:
 
 ```cddl
-space-info = {
+space_info = {
     quota: uint64,
     used: uint64,
     available: uint64,
@@ -919,10 +966,10 @@ typedef struct {
 Generates:
 
 ```cddl
-storage.upload-progress-event = {
+storage.upload_progress_event = {
     session: tstr,
-    bytes-sent: uint64,
-    bytes-total: uint64,
+    bytes_sent: uint64,
+    bytes_total: uint64,
 }
 ```
 
@@ -954,59 +1001,74 @@ S -> (CDDL-to-C) -> header.h -> (C-to-CDDL) -> S'
 
 ---
 
-## 4. CDDL-to-dCBOR Canonical Encoding
+## 4. CDDL-to-CBOR Canonical Encoding
 
 When a method call is serialised for socket transport, the mapping from the
-CDDL schema to dCBOR bytes is defined here. This section and section 2 are
-two views of the same schema — the C API is the in-process view, the dCBOR
-encoding is the on-the-wire view.
+CDDL schema to Logos deterministic CBOR bytes is defined here.
+This section and section 2 are two views of the same schema:
+the C API is the in-process view, and Logos deterministic CBOR encoding is the
+on-the-wire value view.
+
+Logos deterministic CBOR is the module-boundary value encoding profile defined
+by this specification.
+It is based on the CBOR data model in RFC 8949, the core deterministic
+encoding requirements in RFC 8949 Section 4.2.1, and the IETF CBOR Common
+Deterministic Encoding (CDE) rules or their successor RFC.
+It is the normative Logos profile for module request, response, event, error,
+transport-envelope, normalized-value, and commitment hash-input bytes unless a
+more specific Logos specification explicitly defines a narrower profile.
 
 ### 4.1 Primitive Encoding
 
-| CDDL type  | dCBOR encoding                        |
+| CDDL type  | Logos deterministic CBOR encoding     |
 |------------|---------------------------------------|
 | `bool`     | Simple value: true (0xf5) / false (0xf4) |
 | `uint8`, `uint16`, `uint32`, `uint64` | Major type 0, shortest encoding within the alias range |
 | `int8`, `int16`, `int32`, `int64` | Major type 0 for non-negative values or major type 1 for negative values, shortest encoding within the alias range |
-| `float64`  | Major type 7; dCBOR uses shortest lossless encoding |
 | `tstr`     | Major type 3 (text string)            |
 | `bstr`     | Major type 2 (byte string)            |
 
 ### 4.2 Composite Encoding
 
-**Maps (structs):** dCBOR map (major type 5) with text string keys. Keys MUST
-be sorted using the length-first ordering defined in section 4.5.
+**Maps (structs):** deterministic CBOR map (major type 5) with text string
+keys.
+Keys MUST be sorted using the CDE deterministic map-order rule defined in
+section 4.5.
 
 ```
-space-info -> {
+space_info -> {
     "available": 1073741824,    ; keys sorted: a < q < u
     "quota": 10737418240,
     "used": 9663676416,
 }
 ```
 
-Note: dCBOR wire order (key-sorted) differs from C struct order (declaration
-order). Encoders sort; decoders match by key name.
+Note: deterministic CBOR wire order differs from C struct order (declaration
+order).
+Encoders sort; decoders match by key name.
 
-**Arrays:** dCBOR array (major type 4), definite length.
+**Arrays:** deterministic CBOR array (major type 4), definite length.
 
-**Optional fields:** Absent keys are simply omitted from the dCBOR map. The
-`has_<field>` flag in the C struct is the decoded representation of key
+**Optional fields:** Absent keys are simply omitted from the deterministic
+CBOR map.
+The `has_<field>` flag in the C struct is the decoded representation of key
 presence.
 
-**Choices:** Encoded as the raw dCBOR value of the selected alternative. The
-decoder determines which alternative was sent by inspecting the dCBOR major
-type.
+**Choices:** Encoded as the raw deterministic CBOR value of the selected
+alternative.
+The decoder determines which alternative was sent by inspecting the CBOR major
+type and validating against the schema-defined alternatives.
 
 ### 4.3 Method Call and Event Encoding
 
-Method params, response results, and event data are each encoded as dCBOR
-maps per §4.1-4.2. The Transport envelope (tags 101, 102, 105) wraps
-these maps — see LOGOS-MODULE-TRANSPORT §1.3 for the full envelope format.
+Method params, response results, and event data are each encoded as
+deterministic CBOR maps per sections 4.1 and 4.2.
+The Transport envelope wraps these maps; see LOGOS-MODULE-TRANSPORT section
+1.3 for the full envelope format.
 
 **Example — `storage.exists` request params:**
 ```
-{"cid": "bafy..."}     ; dCBOR map, keys sorted per §4.5
+{"cid": "bafy..."}     ; deterministic CBOR map, keys sorted per §4.5
 ```
 
 **Example — `storage.exists` response result:**
@@ -1017,39 +1079,32 @@ these maps — see LOGOS-MODULE-TRANSPORT §1.3 for the full envelope format.
 For methods with empty responses, the result is an empty map `{}`.
 For events, the `data` field encodes the event schema map.
 
-### 4.5 dCBOR Requirement
+### 4.5 Logos Deterministic CBOR Requirement
 
-All encoded payloads at the module boundary MUST use dCBOR.
-At minimum, this implies the RFC 8949 Section 4.2.1 deterministic encoding
-rules:
+All encoded payloads at the module boundary MUST use Logos deterministic CBOR.
+This profile is based on RFC 8949 deterministic encoding and CDE.
+It requires:
 
-1. Map keys MUST be sorted using the Length-First Map Key Ordering of
-   RFC 8949 Section 4.2.1:
-   keys are first compared by the length of their encoded forms, with shorter
-   keys preceding longer keys;
-   ties are broken by byte-wise lexicographic comparison of the encoded forms.
+1. Map keys MUST be sorted according to the CDE deterministic map-order rule.
+   For this specification, that means bytewise lexicographic comparison of the
+   complete deterministic CBOR encoding of each map key.
+   Sorting by key length before key byte content MUST NOT be used.
 2. Integers MUST use the shortest possible encoding.
 3. Indefinite-length encodings MUST NOT be used.
 4. Duplicate map keys MUST NOT appear.
-5. Floating-point values MUST use the shortest encoding that preserves the
-   value (float16 if lossless, else float32, else float64). Note: module
-   schemas use `float64` as the type; the shorter encoding is a wire
-   optimisation only. Decoders MUST accept any float width and promote to
-   `double` in C.
+5. Floating-point values are not part of Logos module schemas in this
+   revision.
 
-Note:
-this revision uses dCBOR as the selected Logos deterministic CBOR profile.
-IETF CBOR Common Deterministic Encoding (CDE) is a relevant common baseline
-and may be evaluated as an alternative or underlying reference in a future
-revision.
+The Logos deterministic CBOR profile is a Logos-owned application profile over
+RFC 8949 and CDE.
 
 ### 4.6 Validation
 
 Implementations MUST:
 
-1. Reject any incoming dCBOR that violates the determinism rules in section
-   4.5 with error code `INVALID_PARAMS`.
-2. Validate all outgoing dCBOR in debug builds.
+1. Reject any incoming deterministic CBOR that violates the determinism rules
+   in section 4.5 with error code `INVALID_PARAMS`.
+2. Validate all outgoing deterministic CBOR in debug builds.
 3. Reject unknown method names -> error code `METHOD_NOT_FOUND`.
 4. Reject wrong parameter types or missing required fields ->
    error code `INVALID_PARAMS`.
@@ -1062,13 +1117,15 @@ socket or remote calls.
 
 ### 4.7 Error Propagation
 
-The error path from module to caller spans all three specs:
+In socket or remote transport mode,
+the error path from module to caller spans all three specs:
 
 ```
 Module C function returns logos_result_t with code != LOGOS_OK
     |
     v
-_dispatch() encodes error as dCBOR error-payload: {code, message, ?detail}
+_dispatch() encodes error as deterministic CBOR error-payload:
+{code, message, ?detail}
     |
     v
 Module host wraps in Transport Response: {0: 2, id, error: {code, message, ?detail}}
@@ -1085,18 +1142,23 @@ Per-method C function on caller side returns logos_result_t with the error
 code passes through unchanged.
 
 **Protocol-level errors** are distinct from method errors.
-Protocol errors indicate connection/framing problems, such as malformed dCBOR
-or an unknown transport message kind.
+Protocol errors indicate connection/framing problems, such as malformed
+deterministic CBOR or an unknown transport message kind.
 Method errors are carried in Response messages with the `error` field. A
 module returning `LOGOS_ERR_METHOD_NOT_FOUND` produces a Response error, not
 a protocol error.
 
 ---
 
-## 5. Common Types (`logos_common.cddl`)
+## 5. Logos Common Schema Surface (`logos_common.cddl`)
 
-The following types are shared by all modules and the transport protocol.
-They are defined in `logos_common.cddl` and available to all module schemas.
+`logos_common.cddl` contains the Logos prelude aliases for source-authoring
+convenience and the reusable Logos common schema surface.
+For schema identity, LOGOS-MODULE-COMMITMENT-MODEL treats those two groups
+differently:
+prelude integer aliases normalize to built-in primitive schema leaves, while
+common schema definitions are referenced definitions in the Logos common schema
+surface.
 
 ### 5.1 CDDL Definitions
 
@@ -1115,22 +1177,22 @@ int32 = -2147483648..2147483647
 int64 = -9223372036854775808..9223372036854775807
 
 ; -- error codes --
-logos-error-code = &(
+logos_error_code = &(
     ok:                0,
-    method-not-found:  1,
-    invalid-params:    2,
-    module-error:      3,
-    not-authorised:    4,
-    transport-error:   5,
+    method_not_found:  1,
+    invalid_params:    2,
+    module_error:      3,
+    not_authorised:    4,
+    transport_error:   5,
     timeout:           6,
-    version-mismatch:  7,
-    not-ready:         8,
+    version_mismatch:  7,
+    not_ready:         8,
     cancelled:         9,
 )
 
 ; -- result type --
-logos-result = {
-    code: logos-error-code,
+logos_result = {
+    code: logos_error_code,
     ? message: tstr,
     ? detail: bstr,
 }
@@ -1140,8 +1202,8 @@ logos-result = {
 ; It appears only in C signatures as the first parameter.
 
 ; -- introspection (well-known method, available on all modules) --
-logos.schema-request = {}
-logos.schema-response = {
+logos.schema_request = {}
+logos.schema_response = {
     schema: tstr,
 }
 ```
@@ -1156,29 +1218,29 @@ by the runtime (not individual modules) and returns all known modules.
 
 ```cddl
 ; -- method listing (well-known, on all modules) --
-logos.methods-request = {}
-logos.methods-response = {
-    methods: [* method-info],
+logos.methods_request = {}
+logos.methods_response = {
+    methods: [* method_info],
 }
 
-method-info = {
+method_info = {
     name:    tstr,
-    params:  [* param-info],
-    returns: [* param-info],
+    params:  [* param_info],
+    returns: [* param_info],
 }
 
-param-info = {
+param_info = {
     name: tstr,
     type: tstr,                 ; CDDL type name ("int64", "tstr", etc.)
 }
 
 ; -- module listing (well-known, provided by runtime) --
-logos.modules-request = {}
-logos.modules-response = {
-    modules: [* module-info],
+logos.modules_request = {}
+logos.modules_response = {
+    modules: [* module_info],
 }
 
-module-info = {
+module_info = {
     name:    tstr,
     version: [uint32, uint32],
     state:   tstr,              ; "ready", "loaded", "error", etc.
@@ -1187,13 +1249,17 @@ module-info = {
 
 ### 5.2 C Definitions (`logos_types.h`)
 
-The following C definitions are normative:
+These C definitions are the C-side common ABI surface used by generated and
+hand-written modules.
+For C-first modules, the reverse mapping in section 3 recognizes these shared
+C types and maps them to the corresponding Logos common schema and runtime
+concepts defined above.
 
 - `logos_error_code_t` defines the shared error-code space used at the
   module boundary.
 - `logos_result_t.message` is human-readable text and MAY be `NULL`.
-- `logos_result_t.detail` is an optional dCBOR detail payload and MAY be
-  `NULL`.
+- `logos_result_t.detail` is an optional deterministic CBOR detail payload and
+  MAY be `NULL`.
 - `logos_module_handle_t` is opaque to callers.
 - A handle represents a connection to a specific module instance.
 - The runtime allocates handles and callers obtain them through the runtime
@@ -1234,7 +1300,7 @@ typedef enum {
 typedef struct {
     logos_error_code_t  code;
     const char*         message;      /* human-readable; may be NULL */
-    const uint8_t*      detail;       /* optional dCBOR detail; may be NULL */
+    const uint8_t*      detail;       /* optional deterministic CBOR detail; may be NULL */
     size_t              detail_len;
 } logos_result_t;
 
@@ -1291,139 +1357,21 @@ Methods removed in a new major version MUST go through a deprecation period:
 they must be present (but may return `METHOD_NOT_FOUND`) for at least one
 major version before removal.
 
-Version negotiation happens in the Hello exchange (see LOGOS-MODULE-TRANSPORT).
-
----
-
-## 7. Codegen Tool
-
-A conformant codegen tool (`logos-cddl-gen`) applies the mapping rules from
-sections 2-4 mechanically. Given the same `.cddl` input, any two
-implementations MUST produce equivalent C output (same types, same
-signatures, same dispatch behaviour).
-
-### 7.1 CDDL-to-C (CDDL-first)
-
-```
-logos-cddl-gen --from-cddl <input.cddl> --output-dir <dir>
-```
-
-| Output file               | Contents                                         |
-|--------------------------|--------------------------------------------------|
-| `<module>.h`             | C header: typedefs, per-method function declarations, event publish helper declarations. Module author implements the per-method functions. |
-| `<module>_dispatch.c`    | `_dispatch()`: dCBOR decode → C call → dCBOR encode. Also `_name()`, `_version()`, `_schema()`, `_init()` stub, `_destroy()` stub, `logos_module_name()` bootstrap symbol. |
-| `<module>_events.c`      | Typed event publish helpers (section 7.4). |
-| `<module>_client.h`      | Typed client stub declarations (section 7.5). |
-| `<module>_client.c`      | Client stub implementations. |
-
-### 7.2 C-to-CDDL (C-first)
-
-```
-logos-cddl-gen --from-header <input.h> --output-dir <dir>
-```
-
-Emits `<module>.cddl` (derived from the C header per section 3) plus all
-files from 7.1 above. The C header MUST conform to the allowed subset
-(section 3).
-
-### 7.3 Generated Dispatch
-
-The generated `_dispatch()` function implements the behaviour specified in
-section 2.6. For each method `M` declared in the schema:
-
-```c
-if (strcmp(method, "M") == 0) {
-    /* Decode params_cbor as M-request map (per §4.2) */
-    /* Call logos_<module>_call_M(...) (per §2.4) */
-    /* Encode result as M-response map (per §4.2) */
-    /* Write to *response, *response_len */
-}
-```
-
-The generated dispatch also handles the `logos.schema` well-known method
-(returns `_schema()`) and unknown methods (`LOGOS_ERR_METHOD_NOT_FOUND`).
-
-The generated `_init()` and `_destroy()` stubs are empty — module authors
-override them if they need initialisation/cleanup.
-
-### 7.4 Generated Event Publish Helpers
-
-For each event `<module>.<name>-event` in the schema, the codegen produces
-a typed helper that encodes the event payload as dCBOR and calls the
-runtime-provided publish function:
-
-```c
-/* From: storage.upload-progress-event = { session: tstr, bytes-sent: uint64, bytes-total: uint64 } */
-void logos_storage_publish_upload_progress(
-    logos_publish_fn  publish,
-    void*             publish_user_data,
-    const char*       session,
-    uint64_t          bytes_sent,
-    uint64_t          bytes_total
-);
-```
-
-The implementation dCBOR-encodes `{session, bytes-sent, bytes-total}` per
-section 4.2 and calls
-`publish(publish_user_data, "storage.upload-progress-event", cbor, cbor_len)`.
-
-Module authors call the typed helper instead of encoding dCBOR manually.
-`publish_user_data` is the process-local callback context installed by the
-runtime or module host, as defined by LOGOS-MODULE-RUNTIME.
-
-### 7.5 Generated Client Stubs
-
-For each method, the codegen produces a typed client function that encodes
-a dCBOR request, calls the runtime-provided module call function, and
-decodes the response:
-
-```c
-/* From: storage.exists-request = { cid: tstr }
- *       storage.exists-response = { exists: bool } */
-logos_result_t logos_storage_client_exists(
-    logos_call_module_fn  call,
-    void*                 call_user_data,
-    const char*           cid,
-    bool*                 out_exists
-);
-```
-
-The implementation dCBOR-encodes `{cid}`, calls
-`call(call_user_data, "storage_module", {"method":"exists","params":{cid}}, len,
-&resp, &resp_len)`,
-decodes the response map, and writes `out_exists`. The signature mirrors
-the per-method function (section 2.4) but takes `logos_call_module_fn`
-instead of `logos_module_handle_t*`.
-`call_user_data` follows the same process-local callback context rules as
-the runtime-provided call-module hook.
-
-### 7.6 Framework-Specific UI Bindings
-
-A codegen tool MAY produce UI-framework-facing bindings derived from the same
-CDDL schema.
-Such bindings are derived views over the canonical module contract, not
-parallel interfaces.
-
-The CDDL schema remains the canonical interface definition.
-Framework-specific binding details are out of scope for this specification.
-
-### 7.7 Integration with logos-module-builder
-
-`logos-module-builder` and similar tooling are downstream integrations over
-this specification.
-They are not normative parts of the interface contract.
-
-A builder MAY invoke `logos-cddl-gen` automatically as part of its build
-pipeline so that module authors do not need to run code generation manually.
-That is an implementation convenience, not a protocol requirement.
-
----
+Version metadata applies in all execution modes.
+In direct mode, the runtime MAY query `logos_<module>_version()` during
+loading, registration, or connection setup and apply its compatibility policy
+before routing calls.
+In socket or remote mode, version negotiation is carried in the Transport Hello
+exchange.
+In all modes, `_version` and `logos_<module>_version()` are compatibility
+metadata only; structural schema identity is defined by
+LOGOS-MODULE-COMMITMENT-MODEL.
 
 ## 8. Streaming and Chunked Data (Future)
 
 This version of the spec does NOT address streaming or chunked transfer of
 large payloads. A 100MB file cannot be sent as a single `bstr` within a
-single dCBOR message (given default message size limits).
+single deterministic CBOR message (given default message size limits).
 
 Future versions will specify a streaming mechanism. Options under
 consideration:
@@ -1437,12 +1385,162 @@ or external references (URLs, CIDs) rather than inline byte strings.
 
 ---
 
-## 9. References
+## Appendix A. Generated Artifacts (Informative)
+
+The mapping rules in sections 2 through 4 can be applied mechanically to
+produce C headers, dispatch implementations, event helpers, and client stubs.
+This appendix describes common derived artifacts and implementation patterns.
+The normative requirements are the ABI, mapping, dispatch, and encoding rules
+defined in the main body of this specification.
+
+### A.1 CDDL-to-C Artifacts
+
+| Output file               | Contents                                         |
+|--------------------------|--------------------------------------------------|
+| `<module>.h`             | C header: typedefs, per-method function declarations, event publish helper declarations. Module author implements the per-method functions. |
+| `<module>_dispatch.c`    | `_dispatch()`: deterministic CBOR decode → C call → deterministic CBOR encode. Also `_name()`, `_version()`, `_schema()`, `_init()` stub, `_destroy()` stub, `logos_module_name()` bootstrap symbol. |
+| `<module>_events.c`      | Typed event publish helpers (Appendix A.4). |
+| `<module>_client.h`      | Typed client stub declarations (Appendix A.5). |
+| `<module>_client.c`      | Client stub implementations. |
+
+### A.2 C-to-CDDL Artifacts
+
+A generator may also derive a module CDDL schema from a C header that conforms
+to the allowed subset in section 3.
+After deriving the CDDL schema, it may produce the same artifact family listed
+in Appendix A.1.
+
+### A.3 Generated Dispatch
+
+A generated `_dispatch()` implementation follows the behavior specified in
+section 2.6.
+For each method `M` declared in the schema, it commonly has a branch with this
+shape:
+
+```c
+if (strcmp(method, "M") == 0) {
+    /* Decode params_cbor as M_request map (per §4.2) */
+    /* Call logos_<module>_call_M(...) (per §2.4) */
+    /* Encode result as M_response map (per §4.2) */
+    /* Write to *response, *response_len */
+}
+```
+
+The generated dispatch also handles the `logos.schema` well-known method
+(returns `_schema()`) and unknown methods (`LOGOS_ERR_METHOD_NOT_FOUND`).
+
+The generated `_init()` and `_destroy()` stubs are empty — module authors
+override them if they need initialisation/cleanup.
+
+### A.4 Generated Event Publish Helpers
+
+For each event `<module>.<name>_event` in the schema, a generator may produce a
+typed helper that encodes the event payload as deterministic CBOR and calls the
+runtime-provided publish function:
+
+```c
+/* From: storage.upload_progress_event = { session: tstr, bytes_sent: uint64, bytes_total: uint64 } */
+void logos_storage_publish_upload_progress(
+    logos_publish_fn  publish,
+    void*             publish_user_data,
+    const char*       session,
+    uint64_t          bytes_sent,
+    uint64_t          bytes_total
+);
+```
+
+The implementation deterministic-CBOR-encodes
+`{session, bytes_sent, bytes_total}` per
+section 4.2 and calls
+`publish(publish_user_data, "storage.upload_progress_event", cbor, cbor_len)`.
+
+Module authors call the typed helper instead of encoding deterministic CBOR
+manually.
+`publish_user_data` is the process-local callback context installed by the
+runtime or module host, as defined by LOGOS-MODULE-RUNTIME.
+
+### A.5 Generated Client Stubs
+
+For each method, a generator may produce a typed client function that encodes a
+deterministic CBOR request, calls the runtime-provided module call function, and
+decodes the response:
+
+```c
+/* From: storage.exists_request = { cid: tstr }
+ *       storage.exists_response = { exists: bool } */
+logos_result_t logos_storage_client_exists(
+    logos_call_module_fn  call,
+    void*                 call_user_data,
+    const char*           cid,
+    bool*                 out_exists
+);
+```
+
+The implementation deterministic-CBOR-encodes `{cid}`, calls
+`call(call_user_data, "storage_module", {"method":"exists","params":{cid}}, len,
+&resp, &resp_len)`,
+decodes the response map, and writes `out_exists`. The signature mirrors
+the per-method function (section 2.4) but takes `logos_call_module_fn`
+instead of `logos_module_handle_t*`.
+`call_user_data` follows the same process-local callback context rules as
+the runtime-provided call-module hook.
+
+### A.6 Framework-Specific UI Bindings
+
+Generators may produce UI-framework-facing bindings derived from the same CDDL
+schema.
+Such bindings are derived views over the canonical module contract, not
+parallel interfaces.
+
+The CDDL schema remains the canonical interface definition.
+Framework-specific binding details are out of scope for this specification.
+
+### A.7 Future Floating-Point Support
+
+Floating-point types are not part of Logos module schemas in this revision.
+A future revision may define a deterministic numeric profile that introduces
+floating-point, fixed-point, decimal, or other numeric types.
+Such a profile must define schema identity, deterministic encoding,
+cross-language value semantics, and commitment-model behavior before those
+types can be used in portable Logos module contracts.
+
+One possible future floating-point profile is to expose only `float64` at the
+schema level, map it to C `double`, and reserve `float16` and `float32` as
+wire encodings rather than schema types.
+
+If such a profile is adopted, its type tables could include:
+
+| Surface | Future mapping |
+|---------|----------------|
+| Module schema type | `float64` |
+| CBOR major type | 7, double-precision semantic type |
+| C type | `double` |
+| C-first mapping | `double` maps to `float64` |
+| Reserved schema spellings | `float16`, `float32` |
+
+Its deterministic-CBOR rule could be:
+
+1. Module schemas use `float64` as the type.
+2. Encoders use the shortest floating-point CBOR width that preserves the
+   value exactly:
+   `float16` if lossless, otherwise `float32` if lossless, otherwise
+   `float64`.
+3. The shorter encoding is a wire optimization only.
+4. Decoders accept any CBOR floating-point width and promote the result to
+   `double` in C.
+
+This appendix does not define that profile.
+
+---
+
+## References
 
 ### Normative
 
 - [RFC 8949] -- CBOR: Concise Binary Object Representation.
   https://www.rfc-editor.org/rfc/rfc8949
+- IETF CBOR Common Deterministic Encoding (CDE),
+  draft-ietf-cbor-cde, or its successor RFC if one is published.
 - [RFC 8610] -- CDDL: Concise Data Definition Language.
   https://www.rfc-editor.org/rfc/rfc8610
 - LOGOS-MODULE-TRANSPORT -- Socket protocol specification.
