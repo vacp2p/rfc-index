@@ -256,6 +256,27 @@ def read_status(path: Path) -> Optional[str]:
     return None
 
 
+def blockchain_groups() -> list[tuple[str, list[str]]]:
+    groups = getattr(bc, "GROUPS", None)
+    if not groups:
+        return [(bc.BEDROCK_LABEL, bc.TOPIC_ORDER)]
+    return [(label, list(topics)) for label, topics in groups]
+
+
+def blockchain_topic_order() -> list[str]:
+    topics: list[str] = []
+    for _, group_topics in blockchain_groups():
+        topics.extend(group_topics)
+    return topics
+
+
+def empty_blockchain_grouped() -> dict:
+    return {
+        topic: {bucket: [] for bucket in bc.buckets_for_topic(topic)}
+        for topic in blockchain_topic_order()
+    }
+
+
 def build_blockchain_items() -> List[Item]:
     """
     Build the Blockchain section under the Notion-style topology defined in
@@ -264,34 +285,46 @@ def build_blockchain_items() -> List[Item]:
     as draft links so the full target structure stays visible.
     """
     # Group real files by (topic, bucket).
-    grouped: dict = {topic: {b: [] for b in bc.buckets_for_topic(topic)} for topic in bc.TOPIC_ORDER}
+    grouped: dict = empty_blockchain_grouped()
     for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
         abs_path = DOCS / rel_path
         if not abs_path.exists():
             continue
         status = read_status(abs_path) or "raw"
         bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if topic not in grouped:
+            grouped[topic] = {b: [] for b in bc.buckets_for_topic(topic)}
         if bucket not in grouped[topic]:
             grouped[topic][bucket] = []
         grouped[topic][bucket].append(
             Item(label=label, path=abs_path, children=appendix_items_for_file(abs_path))
         )
 
-    topic_items: List[Item] = []
-    for topic in bc.TOPIC_ORDER:
-        bucket_items: List[Item] = []
-        placeholders = bc.PLACEHOLDERS.get(topic, {})
-        for bucket in bc.buckets_for_topic(topic):
-            children: List[Item] = sorted(grouped[topic].get(bucket, []), key=lambda i: i.label.lower())
-            for placeholder_label in placeholders.get(bucket, []):
-                children.append(Item(label=placeholder_label, path=None))
-            if not children:
-                continue
-            bucket_items.append(Item(label=bucket, path=None, children=children))
-        if bucket_items:
-            topic_items.append(Item(label=topic, path=None, children=bucket_items))
+    group_items: List[Item] = []
+    for group_label, group_topics in blockchain_groups():
+        topic_items: List[Item] = []
+        for topic in group_topics:
+            bucket_items: List[Item] = []
+            placeholders = bc.PLACEHOLDERS.get(topic, {})
+            for bucket in bc.buckets_for_topic(topic):
+                children: List[Item] = sorted(
+                    grouped.get(topic, {}).get(bucket, []),
+                    key=lambda i: i.label.lower(),
+                )
+                for placeholder_label in placeholders.get(bucket, []):
+                    children.append(Item(label=placeholder_label, path=None))
+                if not children:
+                    continue
+                bucket_items.append(Item(label=bucket, path=None, children=children))
+            if bucket_items:
+                if group_topics == [group_label]:
+                    topic_items.extend(bucket_items)
+                else:
+                    topic_items.append(Item(label=topic, path=None, children=bucket_items))
+        if topic_items:
+            group_items.append(Item(label=group_label, path=None, children=topic_items))
 
-    return [Item(label=bc.BEDROCK_LABEL, path=None, children=topic_items)]
+    return group_items
 
 
 def build_blockchain_tree_data() -> dict:
@@ -301,13 +334,15 @@ def build_blockchain_tree_data() -> dict:
     Each spec entry carries its `path` (relative to docs/) and `status`.
     Placeholder entries have `path: null` and `status: null`.
     """
-    grouped: dict = {topic: {b: [] for b in bc.buckets_for_topic(topic)} for topic in bc.TOPIC_ORDER}
+    grouped: dict = empty_blockchain_grouped()
     for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
         abs_path = DOCS / rel_path
         if not abs_path.exists():
             continue
         status = read_status(abs_path) or "raw"
         bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if topic not in grouped:
+            grouped[topic] = {b: [] for b in bc.buckets_for_topic(topic)}
         if bucket not in grouped[topic]:
             grouped[topic][bucket] = []
         grouped[topic][bucket].append({
@@ -316,18 +351,28 @@ def build_blockchain_tree_data() -> dict:
             "status": status,
         })
 
-    topics_out = []
-    for topic in bc.TOPIC_ORDER:
-        placeholders = bc.PLACEHOLDERS.get(topic, {})
-        buckets_out = []
-        for bucket in bc.buckets_for_topic(topic):
-            specs = sorted(grouped[topic].get(bucket, []), key=lambda s: s["label"].lower())
-            for placeholder_label in placeholders.get(bucket, []):
-                specs.append({"label": placeholder_label, "path": None, "status": None})
-            buckets_out.append({"name": bucket, "specs": specs})
-        topics_out.append({"name": topic, "buckets": buckets_out})
+    groups_out = []
+    for group_label, group_topics in blockchain_groups():
+        topics_out = []
+        group_data = {"label": group_label, "topics": topics_out}
+        for topic in group_topics:
+            placeholders = bc.PLACEHOLDERS.get(topic, {})
+            buckets_out = []
+            for bucket in bc.buckets_for_topic(topic):
+                specs = sorted(
+                    grouped.get(topic, {}).get(bucket, []),
+                    key=lambda s: s["label"].lower(),
+                )
+                for placeholder_label in placeholders.get(bucket, []):
+                    specs.append({"label": placeholder_label, "path": None, "status": None})
+                buckets_out.append({"name": bucket, "specs": specs})
+            if group_topics == [group_label]:
+                group_data = {"label": group_label, "buckets": buckets_out}
+            else:
+                topics_out.append({"name": topic, "buckets": buckets_out})
+        groups_out.append(group_data)
 
-    return {"label": bc.BEDROCK_LABEL, "topics": topics_out}
+    return {"groups": groups_out}
 
 
 def main() -> None:
