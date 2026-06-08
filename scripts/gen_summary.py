@@ -352,6 +352,7 @@ def build_blockchain_tree_data() -> dict:
         })
 
     groups_out = []
+    legacy_topics_out = []
     for group_label, group_topics in blockchain_groups():
         topics_out = []
         group_data = {"label": group_label, "topics": topics_out}
@@ -368,11 +369,18 @@ def build_blockchain_tree_data() -> dict:
                 buckets_out.append({"name": bucket, "specs": specs})
             if group_topics == [group_label]:
                 group_data = {"label": group_label, "buckets": buckets_out}
+                legacy_topics_out.append({"name": group_label, "buckets": buckets_out})
             else:
-                topics_out.append({"name": topic, "buckets": buckets_out})
+                topic_data = {"name": topic, "buckets": buckets_out}
+                topics_out.append(topic_data)
+                legacy_topics_out.append(topic_data)
         groups_out.append(group_data)
 
-    return {"groups": groups_out}
+    return {
+        "label": "Blockchain",
+        "topics": legacy_topics_out,
+        "groups": groups_out,
+    }
 
 
 def main() -> None:
