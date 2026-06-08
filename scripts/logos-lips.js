@@ -841,7 +841,7 @@
       return details;
     }
 
-    function buildTreeRoot(data) {
+    function buildTreeGroup(data) {
       const root = document.createElement("details");
       root.className = "tree-root";
       root.open = true;
@@ -853,10 +853,25 @@
 
       const inner = document.createElement("div");
       inner.className = "tree-topics";
-      data.topics.forEach((topic) => inner.appendChild(buildTreeTopic(topic)));
+      if (Array.isArray(data.buckets)) {
+        data.buckets.forEach((bucket) => inner.appendChild(buildTreeBucket(bucket)));
+      } else {
+        data.topics.forEach((topic) => inner.appendChild(buildTreeTopic(topic)));
+      }
       root.appendChild(inner);
 
       return root;
+    }
+
+    function buildTreeRoot(data) {
+      if (!Array.isArray(data.groups)) {
+        return buildTreeGroup(data);
+      }
+
+      const groups = document.createElement("div");
+      groups.className = "tree-groups";
+      data.groups.forEach((group) => groups.appendChild(buildTreeGroup(group)));
+      return groups;
     }
 
     fetch(treeSource)

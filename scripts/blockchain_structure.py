@@ -23,6 +23,12 @@ TOPIC_ORDER = [
     "Data Availability",
 ]
 
+# Top-level topic groups under Blockchain.
+GROUPS = [
+    ("Bedrock", TOPIC_ORDER),
+    ("LEZ", ["LEZ"]),
+]
+
 # Default per-topic bucket order. Override below if a topic uses a different set.
 DEFAULT_BUCKETS = ["Merged", "Stable", "Deprecated", "Retired", "Deleted"]
 
@@ -43,7 +49,7 @@ STATUS_TO_BUCKET = {
     "deleted": "Deleted",
 }
 
-# File path (relative to `docs/`) -> (topic, Notion display label).
+# File path (relative to `docs/`) -> (topic/group key, Notion display label).
 # Bucket is taken from the file's `Status` metadata at generation time.
 FILE_ASSIGNMENTS = {
     # P2P Network
@@ -139,6 +145,9 @@ FILE_ASSIGNMENTS = {
     "blockchain/deprecated/da-network.md": ("Data Availability", "DA Network"),
     "blockchain/deprecated/da-cryptographic-protocol.md": ("Data Availability", "DA Cryptographic Protocol"),
     "blockchain/deprecated/da-rewarding.md": ("Data Availability", "DA Rewarding"),
+
+    # LEZ
+    "blockchain/raw/lez/lee-v0.3-specifications.md": ("LEZ", "LEE v0.3 Specifications"),
 }
 
 # Entries that exist in Notion but have not yet been migrated to GitHub.
