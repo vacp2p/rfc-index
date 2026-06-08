@@ -126,7 +126,7 @@ In both cases the nonce is iteratively produced: each accepted transaction incre
 **Private account nonce initialization:**
 
 $$
-\mathsf{nonce}_{0} = \mathsf{SHA256}(\mathsf{account}\_\mathsf{id} \;||\; [0_{u8}; 32])_{[0..16]}
+\mathsf{nonce}_{0} = \mathsf{SHA256}(\mathsf{accountId} \;||\; [0_{u8}; 32])_{[0..16]}
 $$
 
 where the result is the first 16 bytes of the hash, interpreted as a `u128` little-endian integer. The full preimage is 64 bytes: the 32-byte account ID followed by 32 zero bytes.
@@ -193,7 +193,7 @@ impl NullifierPublicKey {
 **Public account ID:**
 
 $$
-\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PUBLIC}\_\mathsf{ACCOUNT}\_\mathsf{ID}\_\mathsf{PREFIX} \;||\; \mathsf{public}\_\mathsf{key})
+\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PublicAccountIdPrefix} \;||\; \mathsf{publicKey})
 $$
 
 ```rust
@@ -204,7 +204,7 @@ PUBLIC_ACCOUNT_ID_PREFIX: [u8; 32] = b"/LEE/v0.3/AccountId/Public/\x00\x00\x00\x
 **Private account ID:**
 
 $$
-\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PRIVATE}\_\mathsf{ACCOUNT}\_\mathsf{ID}\_\mathsf{PREFIX} \;||\; \mathsf{Npk} \;||\; \mathsf{identifier}\_\mathsf{le})
+\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PrivateAccountIdPrefix} \;||\; \mathsf{Npk} \;||\; \mathsf{identifierLe})
 $$
 
 The hash input is 80 bytes: 32-byte prefix + 32-byte `Npk` + 16-byte little-endian `identifier`. Each `(Npk, identifier)` pair yields a distinct account ID, so the same set of private account keys can be reused across up to $`2^{128}`$ independent private accounts. One per `identifier` value.
@@ -229,7 +229,7 @@ impl AccountId {
 **Public program-derived account ID (public PDA):**
 
 $$
-\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PUBLIC}\_\mathsf{PDA}\_\mathsf{PREFIX} \;||\; \mathsf{program}\_\mathsf{id} \;||\; \mathsf{seed})
+\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PublicPdaPrefix} \;||\; \mathsf{programId} \;||\; \mathsf{seed})
 $$
 
 The hash input is 96 bytes: 32-byte prefix + 32-byte `program_id` (as 8 LE u32 words) + 32-byte `seed`.
@@ -242,7 +242,7 @@ PUBLIC_PDA_PREFIX: [u8; 32] = b"/LEE/v0.3/AccountId/PDA/\x00\x00\x00\x00\x00\x00
 **Private program-derived account ID (private PDA):**
 
 $$
-\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PRIVATE}\_\mathsf{PDA}\_\mathsf{PREFIX} \;||\; \mathsf{program}\_\mathsf{id} \;||\; \mathsf{seed} \;||\; \mathsf{Npk} \;||\; \mathsf{identifier}\_\mathsf{le})
+\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PrivatePdaPrefix} \;||\; \mathsf{programId} \;||\; \mathsf{seed} \;||\; \mathsf{Npk} \;||\; \mathsf{identifierLe})
 $$
 
 The hash input is 144 bytes: 32 + 32 + 32 + 32 + 16. Unlike public PDAs, the private PDA derivation includes `Npk` and `identifier`. This ensures two different users at the same `(program_id, seed)` get different addresses, and a single user at `(program_id, seed, Npk)` controls a family of $`2^{128}`$ private PDA addresses (one per identifier value).
@@ -277,7 +277,7 @@ impl AccountId {
 The commitment of an account is computed as:
 
 $$
-\mathsf{Commitment} = \mathsf{SHA256}(\mathsf{COMMITMENT}\_\mathsf{PREFIX} \;||\; \mathsf{account}\_\mathsf{id} \;||\; \mathsf{ProgramOwner} \;||\; \mathsf{BalanceBytes} \;||\; \mathsf{NonceBytes} \;||\; \mathsf{DataDigest})
+\mathsf{Commitment} = \mathsf{SHA256}(\mathsf{CommitmentPrefix} \;||\; \mathsf{accountId} \;||\; \mathsf{ProgramOwner} \;||\; \mathsf{BalanceBytes} \;||\; \mathsf{NonceBytes} \;||\; \mathsf{DataDigest})
 $$
 
 where
@@ -323,7 +323,7 @@ A private account's commitment is nullified each time the account's state is upd
 - **Initialization nullifier** (used when the private account is created for the first time):
 
 $$
-\mathsf{Nullifier} = \mathsf{SHA256}(\mathsf{INIT}\_\mathsf{PREFIX} \;||\; \mathsf{account}\_\mathsf{id})
+\mathsf{Nullifier} = \mathsf{SHA256}(\mathsf{InitPrefix} \;||\; \mathsf{accountId})
 $$
 
   ```rust
@@ -334,7 +334,7 @@ $$
 - **Update nullifier** (used when an existing private account's state is updated):
 
 $$
-\mathsf{Nullifier} = \mathsf{SHA256}(\mathsf{UPDATE}\_\mathsf{PREFIX} \;||\; \mathsf{commitment} \;||\; \mathsf{nsk})
+\mathsf{Nullifier} = \mathsf{SHA256}(\mathsf{UpdatePrefix} \;||\; \mathsf{commitment} \;||\; \mathsf{nsk})
 $$
 
   ```rust
@@ -393,8 +393,8 @@ After decryption the receiver reconstructs the account ID from the kind:
 
 When creating a private account output, the sender generates an ephemeral secret key `esk` and the corresponding ephemeral public key `Epk = esk * G`. The shared secret is the **x-coordinate** of the ECDH result (32 bytes, not a SEC1-compressed point):
 
-- Sender: $`\mathsf{ss} = x\text{-coordinate of } (\mathsf{esk} \cdot \mathsf{vpk}\_\mathsf{recipient})`$
-- Receiver: $`\mathsf{ss} = x\text{-coordinate of } (\mathsf{vsk} \cdot \mathsf{Epk}\_\mathsf{sender})`$
+- Sender: $`\mathsf{ss} = x\text{-coordinate of } (\mathsf{esk} \cdot \mathsf{vpkRecipient})`$
+- Receiver: $`\mathsf{ss} = x\text{-coordinate of } (\mathsf{vsk} \cdot \mathsf{EpkSender})`$
 
 where `vpk` is the receiver's `ViewingPublicKey` (a 33-byte SEC1-compressed secp256k1 point) and `vsk` is the corresponding viewing secret key (a secp256k1 scalar).
 
@@ -987,7 +987,7 @@ The chain-of-calls logic and `validate_execution` rules are identical to the pub
 Each private account output includes a 1-byte view tag to allow wallets to quickly filter outputs before attempting decryption:
 
 $$
-\mathsf{ViewTag} = \mathsf{first}\_\mathsf{byte}\!\left(\mathsf{SHA256}(\text{"/LEE/v0.3/ViewTag/"} \;||\; \mathsf{Npk} \;||\; \mathsf{vpk})\right)
+\mathsf{ViewTag} = \mathsf{firstByte}\!\left(\mathsf{SHA256}(\text{"/LEE/v0.3/ViewTag/"} \;||\; \mathsf{Npk} \;||\; \mathsf{vpk})\right)
 $$
 
 where `Npk` is the 32-byte nullifier public key and `vpk` is the 33-byte SEC1-compressed `ViewingPublicKey` of the recipient. On average only 1 in 256 outputs will pass this filter for a given account, avoiding expensive ECDH on irrelevant outputs.
