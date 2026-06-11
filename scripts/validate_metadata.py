@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from target_args import add_target_args, load_target_paths
+
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 
@@ -75,17 +77,39 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Read-only mode; do not write missing slugs.",
     )
+    add_target_args(parser)
     return parser.parse_args()
 
 
-def discover_docs() -> List[Path]:
+def is_discoverable_doc(path: Path) -> bool:
+    try:
+        rel = path.relative_to(DOCS)
+    except ValueError:
+        return False
+    if path.suffix.lower() != ".md":
+        return False
+    if path.name in EXCLUDE_FILES:
+        return False
+    if EXCLUDE_PARTS.intersection(rel.parts):
+        return False
+    return True
+
+
+def discover_docs(targets: Optional[List[Path]] = None) -> List[Path]:
+    if targets is not None:
+        files = []
+        for rel_target in targets:
+            path = ROOT / rel_target
+            if not path.exists() or not path.is_file():
+                continue
+            if is_discoverable_doc(path):
+                files.append(path)
+        return sorted(set(files))
+
     files = []
     for path in DOCS.rglob("*.md"):
-        if path.name in EXCLUDE_FILES:
-            continue
-        if EXCLUDE_PARTS.intersection(path.relative_to(DOCS).parts):
-            continue
-        files.append(path)
+        if is_discoverable_doc(path):
+            files.append(path)
     return sorted(files)
 
 
@@ -221,12 +245,16 @@ def slug_needs_assignment(doc: DocInfo, seen: set[int]) -> bool:
     return False
 
 
-def maybe_assign_slugs(docs: List[DocInfo], check_mode: bool) -> List[DocInfo]:
+def maybe_assign_slugs(
+    docs: List[DocInfo],
+    check_mode: bool,
+    all_docs: Optional[List[DocInfo]] = None,
+) -> List[DocInfo]:
     if check_mode:
         return []
 
     changed: List[DocInfo] = []
-    used = collect_used_numeric_slugs(docs)
+    used = collect_used_numeric_slugs(all_docs or docs)
     seen_unique: set[int] = set()
     for doc in docs:
         if not doc.table:
@@ -322,7 +350,10 @@ def validate_doc(doc: DocInfo) -> None:
             )
 
 
-def validate_slug_uniqueness(docs: List[DocInfo]) -> List[str]:
+def validate_slug_uniqueness(
+    docs: List[DocInfo],
+    scoped_to: Optional[set[Path]] = None,
+) -> List[str]:
     # Allow duplicated slugs in archived previous-version snapshots.
     slug_map: Dict[int, List[Path]] = {}
     for doc in docs:
@@ -339,6 +370,8 @@ def validate_slug_uniqueness(docs: List[DocInfo]) -> List[str]:
     for slug, paths in sorted(slug_map.items()):
         if len(paths) <= 1:
             continue
+        if scoped_to is not None and not scoped_to.intersection(paths):
+            continue
         joined = ", ".join(str(p) for p in paths)
         errors.append(f"duplicate slug {slug}: {joined}")
     return errors
@@ -351,13 +384,17 @@ def write_if_changed(doc: DocInfo) -> None:
 
 def main() -> int:
     args = parse_args()
-    docs = [read_doc(path) for path in discover_docs()]
+    targets = load_target_paths(ROOT, args)
+    target_paths = discover_docs(targets)
+    docs = [read_doc(path) for path in target_paths]
+    all_docs = docs if targets is None else [read_doc(path) for path in discover_docs()]
 
-    changed = maybe_assign_slugs(docs, check_mode=args.check)
+    changed = maybe_assign_slugs(docs, check_mode=args.check, all_docs=all_docs)
     for doc in docs:
         validate_doc(doc)
 
-    global_errors = validate_slug_uniqueness(docs)
+    scoped_to = None if targets is None else {doc.rel for doc in docs}
+    global_errors = validate_slug_uniqueness(all_docs, scoped_to=scoped_to)
 
     if changed:
         for doc in changed:

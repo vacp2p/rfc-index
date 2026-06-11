@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Chat Content Frames |
+| Slug | 240 |
 | Status | raw |
 | Type | RFC |
 | Category | Standards Track |
