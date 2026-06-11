@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | introduction-bundle-encoding |
+| Slug | 241 |
 | Status | raw |
 | Type | RFC |
 | Category | Standards Track |

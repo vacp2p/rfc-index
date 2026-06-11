@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Private conversation |
+| Slug | 242 |
 | Status | raw |
 | Type | RFC |
 | Category | Standards Track |

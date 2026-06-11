@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | A modular framework for defining chat protocols |
+| Slug | 239 |
 | Status | raw |
 | Type | RFC |
 | Category | Standards Track |

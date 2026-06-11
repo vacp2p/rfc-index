@@ -3,6 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Message Segmentation and Reconstruction |
+| Slug | 243 |
 | Version | 0.1 |
 | Status | raw |
 | Type | RFC |
