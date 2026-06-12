@@ -52,6 +52,9 @@ python scripts/run_runtime_generators.py
 mdbook build
 ```
 
+History timelines are generated only in CI. Local generator runs skip
+`scripts/gen_history.py` unless `LIPS_GENERATE_HISTORY=1` is set.
+
 To serve locally:
 
 ```bash

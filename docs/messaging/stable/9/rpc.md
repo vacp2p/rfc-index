@@ -473,7 +473,7 @@ an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 
 | Version                                                                                 | Comment          |
 | :--------------------------------------------------------------------------------------:| ---------------- |
-| [1.0.0](https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8)| Initial release. |
+| [1.0.0](https://github.com/vacp2p/specs)| Initial release. |
 
 ## Copyright
 

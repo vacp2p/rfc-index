@@ -81,12 +81,12 @@ struct Foo
 
 Logos Blockchain messages are encoded using bincode - a compact binary serialization format with zero overhead. The format is defined as "a compact encoder/decoder pair that uses a binary zero-fluff encoding scheme." Bincode has been battle-tested in other blockchain protocol implementations, making it production-ready.
 
-The complete specification can be found in the [official documentation](https://git.sr.ht/~stygianentity/bincode/tree/trunk/item/docs/spec.md).
+The complete specification can be found in the [official documentation](https://docs.rs/bincode/latest/bincode/).
 
 # Reference
 
 - [C structure layout](https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Structure-Layout.html)
 - [Rust](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)[repr(c)](https://doc.rust-lang.org/nomicon/other-reprs.html#reprc)
-- [Bincode serialization specification](https://git.sr.ht/~stygianentity/bincode/tree/trunk/item/docs/spec.md)
+- [Bincode serialization specification](https://docs.rs/bincode/latest/bincode/)
 - [Bincode rust crate docs](https://docs.rs/bincode/2.0.1/bincode/)
 

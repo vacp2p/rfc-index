@@ -93,17 +93,17 @@ RPC call to query historical messages.
 this field MAY be filled out to signify the starting point of the queried time window.
 This field holds the Unix epoch time in nanoseconds.  
 The `messages` field of the corresponding
-[`HistoryResponse`](../draft/13/store.md#HistoryResponse)
+[`HistoryResponse`](../draft/13/store.md#store-query-response)
 MUST contain historical waku messages whose
-[`timestamp`](../stable/14/message.md#Payloads)
+[`timestamp`](../stable/14/message.md#message-attributes)
 is larger than or equal to the `start_time`.
 - `end_time`:
 this field MAY be filled out to signify the ending point of the queried time window.
 This field holds the Unix epoch time in nanoseconds.
 The `messages` field of the corresponding
-[`HistoryResponse`](../draft/13/store.md#HistoryResponse)
+[`HistoryResponse`](../draft/13/store.md#store-query-response)
 MUST contain historical waku messages whose
-[`timestamp`](../stable/14/message.md#Payloads) is less than or equal to the `end_time`.
+[`timestamp`](../stable/14/message.md#message-attributes) is less than or equal to the `end_time`.
 
 A time-based query is considered valid if
 its `end_time` is larger than or equal to the `start_time`.
@@ -122,7 +122,7 @@ then the history query SHOULD be made for `[start_time: l - 20s, end_time: r + 2
 
 Note that `HistoryQuery` preserves `AND` operation among the queried attributes.
 As such, the `messages` field of the corresponding
-[`HistoryResponse`](../draft/13/store.md#HistoryResponse)
+[`HistoryResponse`](../draft/13/store.md#store-query-response)
 MUST contain historical waku messages that satisfy the indicated  `pubsubtopic` AND
 `contentFilters` AND the time range [`start_time`, `end_time`].
 
@@ -134,4 +134,4 @@ Copyright and related rights waived via
 ## References
 
 - [13/WAKU2-STORE](../draft/13/store.md)
-- [`timestamp`](../stable/14/message.md#Payloads)
+- [`timestamp`](../stable/14/message.md#message-attributes)

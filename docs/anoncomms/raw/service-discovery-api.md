@@ -116,4 +116,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [logos service discovery](https://github.com/logos-co/logos-lips/blob/155c310d7bfad6ea3cd9f68e45c68dad731ff629/docs/anoncomms/raw/logos-service-discovery.md)
+- [logos service discovery](logos-service-discovery.md)

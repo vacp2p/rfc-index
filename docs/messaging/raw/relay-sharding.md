@@ -65,8 +65,8 @@ but the discovery of these shards is managed by Waku.
 This is the RECOMMENDED default format for shards chosen by an app protocol.
 
 Static shards are managed in shard clusters of 1024 shards per cluster.
-Waku static sharding can manage $2^{16}$ shard clusters.
-Each shard cluster is identified by its index (between $0$ and $2^{16}-1$).
+Waku static sharding can manage $`2^{16}`$ shard clusters.
+Each shard cluster is identified by its index (between $0$ and $`2^{16}-1`$).
 
 It is RECOMMENDED that, for simplification of configuration and various APIs,
 all app-level protocols only interact with `cluster` and `shard`
@@ -77,7 +77,7 @@ A specific shard cluster is either globally available to all apps,
 specific for an app protocol,
 or reserved for automatic sharding (see next section).
 
-> _Note:_ This leads to $2^{16} * 1024 = 2^{26}$ shards for which Waku manages discovery.
+> _Note:_ This leads to $`2^{16} * 1024 = 2^{26}`$ shards for which Waku manages discovery.
 
 App protocols can either choose to use global shards, or app specific shards.
 
@@ -89,7 +89,7 @@ shard clusters are divided into ranges:
 | 0 - 15        | reserved             |
 | 16 - 65535    | app-defined networks |
 
-The informational RFC [WAKU2-RELAY-STATIC-SHARD-ALLOC](../../../informational/relay-static-shard-alloc.md) lists the current index allocations.
+The informational RFC [WAKU2-RELAY-STATIC-SHARD-ALLOC](relay-static-shard-alloc.md) lists the current index allocations.
 
 The global shard with index 0 and the "all app protocols" range are treated in the same way,
 but choosing shards in the global cluster has a higher probability of sharing the shard with other apps.
@@ -121,18 +121,18 @@ for shard 43 of the Status app (which has allocated index 16).
 Waku v2 supports the discovery of peers within static shards,
 so app protocols do not have to implement their own discovery method.
 
-Nodes add information about their shard participation in their [WAKU2-ENR](./enr.md).
+Nodes add information about their shard participation in their [WAKU2-ENR](../draft/31/enr.md).
 Having a static shard participation indication as part of the ENR allows nodes
 to discover peers that are part of shards via [33/WAKU2-DISCV5](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/33/discv5.md) as well as via DNS.
 
 > _Note:_ In the current version of this document,
 > sharding information is directly added to the ENR.
-> (see Ethereum ENR sharding bit vector [here](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/p2p-interface.md#metadata)
+> (see Ethereum ENR sharding bit vector [here](https://github.com/ethereum/consensus-specs/blob/master/specs/altair/p2p-interface.md#metadata)
 > Static relay sharding supports 1024 shards per cluster, leading to a flag field of 128 bytes.
 > This already takes half (including index and key) of the ENR space of 300 bytes.
 > For this reason, the current specification only supports a single shard cluster per node.
 > In future versions, we will add further (hierarchical) discovery methods.
-> We will update [WAKU2-ENR](./enr.md) accordingly, once this RFC moves forward.
+> We will update [WAKU2-ENR](../draft/31/enr.md) accordingly, once this RFC moves forward.
 
 This document specifies two ways of indicating shard cluster participation.
 The index list SHOULD be used for nodes that participante in fewer than 64 shards,
@@ -172,8 +172,8 @@ The ENR key is `rsv`.
 The value is comprised of a two-byte shard cluster index in network byte order concatenated with a 128-byte wide bit vector.
 The bit vector indicates which shards of the respective shard cluster the node is part of.
 The right-most bit in the bit vector represents shard `0`, the left-most bit represents shard `1023`.
-The representation in the ENR is inspired by [Ethereum shard ENRs](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/validator.md#sync-committee-subnet-stability)),
-and [this](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/validator.md#sync-committee-subnet-stability)).
+The representation in the ENR is inspired by [Ethereum shard ENRs](https://github.com/ethereum/consensus-specs/blob/master/specs/altair/validator.md#sync-committee-subnet-stability)),
+and [this](https://github.com/ethereum/consensus-specs/blob/master/specs/altair/validator.md#sync-committee-subnet-stability)).
 
 Example:
 
@@ -300,7 +300,7 @@ The transition to the second method will be seamless and fully backwards compati
 
 ## Security/Privacy Considerations
 
-See [WAKU2-ADVERSARIAL-MODELS](../../../informational/adversarial-models.md), especially the parts on k-anonymity.
+See [WAKU2-ADVERSARIAL-MODELS](adversarial-models.md), especially the parts on k-anonymity.
 We will add more on security considerations in future versions of this document.
 
 ### Receiver Anonymity
@@ -318,11 +318,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [11/WAKU2-RELAY](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/stable/11/relay.md)
 - [Unstructured P2P network](https://en.wikipedia.org/wiki/Peer-to-peer#Unstructured_networks)
 - [33/WAKU2-DISCV5](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/33/discv5.md)
-- [WAKU2-ENR](./enr.md)
+- [WAKU2-ENR](../draft/31/enr.md)
 - [23/WAKU2-TOPICS](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/23/topics.md)
-- [Ethereum ENR sharding bit vector](https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/p2p-interface.md#metadata)
+- [Ethereum ENR sharding bit vector](https://github.com/ethereum/consensus-specs/blob/master/specs/altair/p2p-interface.md#metadata)
 - [Ethereum discv5 specification](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md)
 - [Research log: Waku Discovery](https://vac.dev/wakuv2-apd)
-- [WAKU2-RELAY-STATIC-SHARD-ALLOC](../../../informational/relay-static-shard-alloc.md)
+- [WAKU2-RELAY-STATIC-SHARD-ALLOC](relay-static-shard-alloc.md)
 - [14/WAKU2-MESSAGE](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/stable/14/message.md)
 - [64/WAKU2-NETWORK](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/64/network.md)

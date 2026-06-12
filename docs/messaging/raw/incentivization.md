@@ -212,7 +212,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
-- A high-level [incentivization outline](https://github.com/waku-org/research/blob/master/incentivization.md)
+- A high-level [incentivization outline](https://github.com/logos-messaging/research)
 - [19/WAKU2-LIGHTPUSH](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/19/lightpush.md) (for Lightpush-specific sections)
 
 ### informative

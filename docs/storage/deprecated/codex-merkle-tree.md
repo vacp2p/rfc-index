@@ -25,7 +25,7 @@
 ## Abstract
 
 This specification defines the Merkle tree implementation
-for [Codex](https://github.com/codex-storage/nim-codex).
+for [Codex](https://github.com/logos-storage/logos-storage-nim).
 The purpose of this component is to deal with Merkle trees
 (and Merkle trees only;
 except that certain arithmetic hashes constructed via the sponge construction
@@ -440,7 +440,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
-- **Codex Merkle Tree Implementation**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
+- **Codex Merkle Tree Implementation**: [GitHub - codex-storage/nim-codex](https://github.com/logos-storage/logos-storage-nim)
 
 ### informative
 

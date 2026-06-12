@@ -69,7 +69,7 @@ The approach specified in this document is fully backwards compatible.
 Gossipsub nodes that do not support Tor Push can receive and relay Tor Push messages,
 because Tor Push uses the same Protocol ID as gossipsub.
 
-Messages are sent over Tor via [SOCKS5](https://www.rfc-editor.org/rfc/rfc1928).
+Messages are sent over Tor via [SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928).
 Tor Push uses a dedicated libp2p context to prevent information leakage.
 To significantly increase resilience and mitigate circuit failures,
 Tor Push establishes several connections,
@@ -136,7 +136,7 @@ Control messages of any kind, e.g. gossipsub graft, MUST NOT be sent via Tor Pus
 #### Connection Establishment
 
 Tp-nodes establish a `/meshsub/1.1.0` connection to tp-peers via
-[SOCKS5](https://www.rfc-editor.org/rfc/rfc1928) over [Tor](https://www.torproject.org/).
+[SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928) over [Tor](https://www.torproject.org/).
 
 Establishing connections, which in turn establishes the respective Tor circuits,
 can be done ahead of time.
@@ -237,7 +237,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [libp2p pubsub](https://github.com/libp2p/specs/tree/master/pubsub)
 * [libp2p pubsub message](https://github.com/libp2p/specs/tree/master/pubsub#the-message)
 * [libp2p switch](https://docs.libp2p.io/concepts/multiplex/switch)
-* [SOCKS5](https://www.rfc-editor.org/rfc/rfc1928)
+* [SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928)
 * [Tor](https://www.torproject.org/)
 * [33/WAKU2-DISCV5](../../messaging/draft/33/discv5.md)
 * [Bitcoin over Tor isn't a Good Idea](https://ieeexplore.ieee.org/abstract/document/7163022)

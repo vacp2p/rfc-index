@@ -255,7 +255,7 @@ and the membership set SHOULD be migrated.
 
 ### Membership Set Implementation
 
-The membership set MAY be implemented as a Merkle tree, such as an [Incremental Merkle Tree](https://zkkit.pse.dev/modules/_zk_kit_imt.html) (IMT).
+The membership set MAY be implemented as a Merkle tree, such as an [Incremental Merkle Tree](https://github.com/zk-kit/zk-kit) (IMT).
 
 ### Choosing Which _Expired_ Memberships to Reuse
 

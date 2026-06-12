@@ -267,7 +267,7 @@ TransferPhase:
 ### Messages Nametag Derivation
 
 To reduce metadata leakages and increase devices's anonymity over the p2p network,
-[WAKU2-NOISE](noise.md#session-states) suggests to use some common secrets `mntsInbound, mntsOutbound` (e.g. `mntsInbound, mntsOutbound = HKDF(h)`
+[WAKU2-NOISE](noise-sessions.md#session-states) suggests to use some common secrets `mntsInbound, mntsOutbound` (e.g. `mntsInbound, mntsOutbound = HKDF(h)`
 where `h` is the [handshake hash value](https://noiseprotocol.org/noise.html#overview-of-handshake-state-machine) of the Handshake State at some point of the pairing phase)
 in order to frequently and deterministically change the `messageNametag` of messages exchanged during the pairing and transfer phase -
 ideally, at each message exchanged.
@@ -380,7 +380,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Normative
 
-- [35/WAKU2-NOISE](noise.md#session-states)
+- [35/WAKU2-NOISE](noise-sessions.md#session-states)
 - [WAKU2-NOISE-SESSIONS](noise-sessions.md)
 
 ### Informative

@@ -66,7 +66,7 @@ The example URL from EIP-1459, adapted to the above scheme becomes:
 matree://AM5FCQLWIZX2QFPNJAP7VUERCCRNGRHWZG3YYHIUV7BVDQ5FDPRT2@peers.example.org
 ```
 
-Each entry within the Merkle tree MUST be contained within a [DNS TXT record](https://www.rfc-editor.org/rfc/rfc1035.txt)
+Each entry within the Merkle tree MUST be contained within a [DNS TXT record](https://datatracker.ietf.org/doc/html/rfc1035)
 and stored in a subdomain (except for the base URL `matree` entry).
 The content of any TXT record
 MUST be small enough to fit into the 512-byte limit imposed on UDP DNS packets,

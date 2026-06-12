@@ -238,7 +238,7 @@ Kiayias, A., Russell, A., David, B. and Oliynykov, R. (2016). *Ouroboros: A Prov
 Kohlweiss, M., Madathil, V., Nayak, K. and Scafuro, A. (2021). On the Anonymity Guarantees of Anonymous Proof-of-Stake Protocols. *Edinburgh Research Explorer (University of Edinburgh)*. doi:[https://doi.org/10.1109/sp40001.2021.00107](https://doi.org/10.1109/sp40001.2021.00107).
 Logos.co. (2025). *Logos - A Declaration of Independence in Cyberspace | Logos Network*. [online] Available at: [https://logos.co/](https://logos.co/) [Accessed 21 May 2025].
 Neuder, M. and Drake, J. (2023). *Execution Tickets*. [online] Ethereum Research. Available at: [https://ethresear.ch/t/execution-tickets/17944](https://ethresear.ch/t/execution-tickets/17944) [Accessed 21 May 2025].
-RISC Zero. (2025). *RISC Zero*. [online] Available at: [http://risc0.com](http://risc0.com) [Accessed 21 May 2025].
+RISC Zero. (2025). *RISC Zero*. [online] Available at: [https://www.risc0.com/](https://www.risc0.com/) [Accessed 21 May 2025].
 Sun Yin, A. (2023). *An Introduction to Intents and Intent-centric Architectures | Research - Anoma*. [online] Anoma.net. Available at: [https://anoma.net/blog/an-introduction-to-intents-and-intent-centric-architectures](https://anoma.net/blog/an-introduction-to-intents-and-intent-centric-architectures) [Accessed 21 May 2025].
 Syverson, P. (2009). *Why I’m Not an Entropist*. [online] *<https://gwern.net/doc/cs/security/2009-syverson.pdf>*. Available at: [https://gwern.net/doc/cs/security/2009-syverson.pdf](https://gwern.net/doc/cs/security/2009-syverson.pdf) [Accessed 20 May 2025].
 Waku.org. (2024). *Waku is Uncompromising Web3 Communication at Scale | Waku*. [online] Available at: [https://waku.org/](https://waku.org/) [Accessed 21 May 2025].

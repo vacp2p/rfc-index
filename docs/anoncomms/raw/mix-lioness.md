@@ -448,7 +448,7 @@ Note that the reply key $`\tilde{k}`$ is $`\kappa`$ bytes in size as defined in 
 
 ## 7. Sphinx Payload Processing
 
-Once the Sphinx packet is deserialized into ($`\alpha,\ \beta,\ \gamma,\ \delta`$) and the header is preprocessed as specified in the Mix protocol, the mix node performs the following steps depending on its role (as defined in the [Mix Protocol, Section 8.6.2](./mix/#862-node-role-determination)):
+Once the Sphinx packet is deserialized into ($`\alpha,\ \beta,\ \gamma,\ \delta`$) and the header is preprocessed as specified in the Mix protocol, the mix node performs the following steps depending on its role (as defined in the [Mix Protocol, Section 8.6.2](mix.md#862-node-role-determination)):
 
 ### 7.1 Intermediary Processing
 

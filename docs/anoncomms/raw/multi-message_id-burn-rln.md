@@ -78,7 +78,7 @@ RLN-Diff introduces per-user rate limits. Therefore, **id_commitment** must depe
 0 ≤ `user_message_limit` ≤ `message_limit`.
 
 The user submits the same `identity_secret_hash` as in
-[32/RLN-V1](32/rln-v1.md), i.e.
+[32/RLN-V1](../draft/32/rln-v1.md), i.e.
 `poseidonHash(identity_secret)`, together with `user_message_limit` to a server or
 smart contract.
 
@@ -119,7 +119,7 @@ internal_nullifier = poseidonHash([a_1]);
 
 ### RLNv2 Verification/slashing
 
-Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](32/rln-v1.md).
+Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](../draft/32/rln-v1.md).
 The only difference that may arise is the `message_limit` check in RLN-Same,
 since it is now a public input of the Circuit.
 
@@ -235,5 +235,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### References
 
-* [RLNv1](32/rln-v1.md)
+* [RLNv1](../draft/32/rln-v1.md)
 * [RLNv2](rln-v2.md)

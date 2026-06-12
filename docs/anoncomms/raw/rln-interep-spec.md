@@ -31,8 +31,8 @@
 
 ## Abstract
 
-This spec integrates [Interep](https://interep.link)
-into the [RLN](32/rln-v1.md) spec.
+This spec integrates [Interep](https://github.com/interep-project)
+into the [RLN](../draft/32/rln-v1.md) spec.
 Interep is a group management protocol
 that allows for the creation of groups of users and
 the management of their membership.
@@ -86,7 +86,7 @@ depicted in the [Semaphore documentation](https://semaphore.appliedzkp.org/docs/
 
 ### 2. Verify reputation and join Interep group
 
-Using the Interep app deployed on [Goerli](https://goerli.interep.link/),
+Using the Interep app deployed on Goerli,
 the user can check their reputation tier and join the corresponding group.
 This results in a transaction to the Interep contract, which adds them to the group.
 
@@ -121,11 +121,11 @@ in the RLN contract -
 
 ## Verification of messages
 
-Messages are verified the same way as in the [RLN spec](32/rln-v1.md#verification).
+Messages are verified the same way as in the [RLN spec](../draft/32/rln-v1.md#verification).
 
 ## Slashing
 
-The slashing mechanism is the same as in the [RLN spec](32/rln-v1.md#slashing).
+The slashing mechanism is the same as in the [RLN spec](../draft/32/rln-v1.md#slashing).
 It is important to note that the slashing
 may not have the intended effect on the user,
 since the only consequence is that they cannot send messages.
@@ -143,8 +143,8 @@ which integrates Interep with RLN.
 
 1. As mentioned in [Slashing](#slashing),
 the slashing mechanism may not have the intended effect on the user.
-2. This spec inherits the security considerations of the [RLN spec](32/rln-v1.md#security-considerations).
-3. This spec inherits the security considerations of [Interep](https://docs.interep.link/).
+2. This spec inherits the security considerations of the [RLN spec](../draft/32/rln-v1.md#appendix-a-security-considerations).
+3. This spec inherits the security considerations of [Interep](https://github.com/interep-project/docs).
 4. A user may make multiple registrations using the same Interep proofs but
 different identity commitments.
 The way to mitigate this is to check if the nullifier hash has been detected
@@ -152,10 +152,10 @@ previously in proof verification.
 
 ## References
 
-1. [RLN spec](32/rln-v1.md)
-2. [Interep](https://interep.link)
+1. [RLN spec](../draft/32/rln-v1.md)
+2. [Interep](https://github.com/interep-project)
 3. [Semaphore](https://semaphore.appliedzkp.org/)
 4. [Decentralized cloudflare using Interep](https://ethresear.ch/t/decentralised-cloudflare-using-rln-and-rich-user-identities/10774)
 5. [Interep contracts](https://github.com/interep-project/contracts)
 6. [RLN contract](https://github.com/vacp2p/rln-contract)
-7. [RLNP2P](https://rlnp2p.vac.dev/)
+7. [RLNP2P](https://github.com/vacp2p/rlnp2p.vac.dev)

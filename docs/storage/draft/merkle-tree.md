@@ -96,11 +96,11 @@ In the classical situation, like for example SHA2 or SHA3, the leaves are just b
 
 #### 1. Layer abuse attacks
 
-Using traditional functions like SHA256, one could express the compression `C(a,b)` as `H(f(a,b))`, where `f` is just concatenation: `f(a,b) = a || b` (Fig. 1(a)). This creates a type of symmetry one can then exploit - since a naive Merkle tree root does not encode its depth, one could pretend that `f(a,b)` is actually data, and construct a shorter (that is, less deep) Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., $T^{\prime}_3$ in the second tree is the same as $T_7$ in the original tree.
+Using traditional functions like SHA256, one could express the compression `C(a,b)` as `H(f(a,b))`, where `f` is just concatenation: `f(a,b) = a || b` (Fig. 1(a)). This creates a type of symmetry one can then exploit - since a naive Merkle tree root does not encode its depth, one could pretend that `f(a,b)` is actually data, and construct a shorter (that is, less deep) Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., $`T^{\prime}_3`$ in the second tree is the same as $`T_7`$ in the original tree.
 
-![layer abuse attack](images/layer-abuse.png)
+![layer abuse attack](../raw/images/layer-abuse.png)
 
-**Figure 1.** **(a)** original Merkle tree; **(b)** a different Merkle tree with the same Merkle root as the original; i.e., $T^{\prime}_3 = T_7$, constructed from a layer abuse attack.
+**Figure 1.** **(a)** original Merkle tree; **(b)** a different Merkle tree with the same Merkle root as the original; i.e., $`T^{\prime}_3 = T_7`$, constructed from a layer abuse attack.
 
 #### 2. Padding attacks
 
@@ -108,7 +108,7 @@ A layer of a (binary) Merkle trees can be incomplete, when the number of leaves 
 
 If done carelessly, this can potentially allow an attacker to replace the padding with some fake data below that is equivalent to such padding (Fig. 2(b)), and again generate the same Merkle root from data that is different from what had been intended.
 
-![padding attack](images/padding.png)
+![padding attack](../raw/images/padding.png)
 
 **Figure 2.** **(a)** Original padded Merkle tree, and **(b)** a Merkle tree with the same root as the original built from a padding attack.
 
@@ -203,7 +203,7 @@ In that context, each such _data block_[^3] (of size `b`) then undergoes hashing
 
 For hashing functions which do not take bytestrings as input - like  Poseidon2, which operates on sequences of finite field elements - we must _encode_ our data blocks into the proper type first (Figure 3(b)).
 
-![encoding](images/encoding.png)
+![encoding](../raw/images/encoding.png)
 
 **Figure 3.** **(a)** A byte string (raw data), split into data blocks which are also bytestrings. **(b)** Data blocks after undergoing encoding.
 

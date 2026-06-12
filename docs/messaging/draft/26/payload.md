@@ -39,7 +39,7 @@ This specification describes how Waku provides confidentiality, authenticity, an
 integrity, as well as some form of unlinkability.
 Specifically, it describes how encryption, decryption and
 signing works in [6/WAKU1](../../stable/6/waku1.md) and
-in [10/WAKU2](../10/waku2.md) with [14/WAKU-MESSAGE](../../stable/14/message.md#version1).
+in [10/WAKU2](../10/waku2.md) with [14/WAKU-MESSAGE](../../stable/14/message.md#payload-encryption).
 
 This specification effectively replaces [7/WAKU-DATA](../../stable/7/data.md)
 as well as [6/WAKU1 Payload encryption](../../stable/6/waku1.md#payload-encryption)
@@ -230,11 +230,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 1. [6/WAKU1](../../stable/6/waku1.md)
 2. [10/WAKU2 spec](../10/waku2.md)
-3. [14/WAKU-MESSAGE version 1](../../stable/14/message.md#version1)
+3. [14/WAKU-MESSAGE version 1](../../stable/14/message.md#payload-encryption)
 4. [7/WAKU-DATA](../../stable/7/data.md)
 5. [EIP-627: Whisper spec](https://eips.ethereum.org/EIPS/eip-627)
 6. [RLPx Transport Protocol spec (ECIES encryption)](https://github.com/ethereum/devp2p/blob/master/rlpx.md#ecies-encryption)
-7. [Status 5/SECURE-TRANSPORT](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/secure-transport.md)
+7. [Status 5/SECURE-TRANSPORT](https://github.com/status-im/status-specs)
 8. [Augmented Backus-Naur form (ABNF)](https://tools.ietf.org/html/rfc5234)
 9. [Ethereum "Yellow paper": Appendix F Signing transactions](https://ethereum.github.io/yellowpaper/paper.pdf)
 10. [authenticated encryption](https://en.wikipedia.org/wiki/Authenticated_encryption)

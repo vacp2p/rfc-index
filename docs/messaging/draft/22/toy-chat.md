@@ -37,9 +37,9 @@ This protocol is mainly used to:
 2. Show an example of how to use Waku v2.
 
 Currently, all main Waku v2 implementations support the toy chat protocol:
-[nim-waku](https://github.com/status-im/nim-waku/blob/master/examples/v2/chat2.nim),
-js-waku ([NodeJS](https://github.com/status-im/js-waku/tree/main/examples/cli-chat)
- and [web](https://github.com/status-im/js-waku/tree/main/examples/web-chat))
+[nim-waku](https://github.com/logos-messaging/logos-delivery),
+js-waku ([NodeJS](https://github.com/logos-messaging/logos-delivery-js)
+ and [web](https://github.com/logos-messaging/logos-delivery-js))
 and [go-waku](https://github.com/status-im/go-waku/tree/master/examples/chat2).
 
 Note that this is completely separate from the protocol the Status app

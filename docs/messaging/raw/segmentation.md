@@ -10,6 +10,8 @@
 | Category | Standards Track |
 | Tags | segmentation |
 
+
+
 ## Abstract
 
 This specification defines an application-layer protocol for **segmentation** and **reconstruction** of messages carried over a transport/delivery service with a message-size limitation, when the original payload exceeds said limitation.
@@ -21,7 +23,7 @@ All messages are wrapped in a `SegmentMessageProto`, including those that fit in
 ## Motivation
 
 Many message transport and delivery protocols impose a maximum message size that restricts the size of application payloads.
-For example, Waku Relay typically propagates messages up to **150 KB** as per [64/WAKU2-NETWORK - Message](../core/64/network.md#message-size).
+For example, Waku Relay typically propagates messages up to **150 KB** as per [64/WAKU2-NETWORK - Message](../draft/64/network.md#message-size).
 To support larger application payloads, a segmentation layer is required.
 This specification enables larger messages by partitioning them into multiple envelopes and reconstructing them at the receiver.
 Erasure-coded parity segments provide resilience against partial loss or reordering.
@@ -191,7 +193,7 @@ To mitigate resource exhaustion:
   - When sender identity is available, apply the same two limits per sender
 - Enforce timeouts and size caps
 - Validate segment counts (≤ 256)
-- Consider rate-limiting at the transport layer (for example, via [17/WAKU2-RLN-RELAY](../core/17/rln-relay.md) on Waku)
+- Consider rate-limiting at the transport layer (for example, via [17/WAKU2-RLN-RELAY](../draft/17/rln-relay.md) on Waku)
 
 ---
 
@@ -215,10 +217,10 @@ To mitigate resource exhaustion:
 
 ## References
 
-1. [10/WAKU2 – Waku](../core/10/waku2.md)
-2. [11/WAKU2-RELAY – Relay](../core/11/relay.md)
-3. [14/WAKU2-MESSAGE – Message](../core/14/message.md)
-4. [64/WAKU2-NETWORK](../core/64/network.md#message-size)
+1. [10/WAKU2 – Waku](../draft/10/waku2.md)
+2. [11/WAKU2-RELAY – Relay](../stable/11/relay.md)
+3. [14/WAKU2-MESSAGE – Message](../stable/14/message.md)
+4. [64/WAKU2-NETWORK](../draft/64/network.md#message-size)
 5. [nim-leopard](https://github.com/status-im/nim-leopard) – Nim bindings for Leopard-RS (Reed–Solomon)
 6. [Leopard-RS](https://github.com/catid/leopard) – Fast Reed–Solomon erasure coding library
 7. [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) – Key words for use in RFCs to Indicate Requirement Levels

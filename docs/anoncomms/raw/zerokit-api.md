@@ -40,7 +40,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ### Important Note
 
-All terms and parameters used remain the same as in [RLN-V2](rln-v2.md) and [RLN-V1](32/rln-v1.md#technical-overview).
+All terms and parameters used remain the same as in [RLN-V2](rln-v2.md) and [RLN-V1](../draft/32/rln-v1.md#technical-overview).
 
 ### Architecture Overview
 
@@ -171,7 +171,7 @@ but only one variant is compiled and available at runtime based on the enabled f
 `RLN::new_with_params(zkey_data)` - *Available in WASM | Stateless mode*
 
 - Creates a new stateless RLN instance for WASM with pre-loaded zkey data.
-- Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
+- Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/tree/master/rln-wasm)).
 
 ### Key Generation
 
@@ -501,14 +501,14 @@ implement safeguards to prevent accidental violations.
 
 ### Normative
 
-- [RLN-V1 Specification](32/rln-v1.md) - Rate Limit Nullifier V1 protocol
+- [RLN-V1 Specification](../draft/32/rln-v1.md) - Rate Limit Nullifier V1 protocol
 
 ### Informative
 
 - [Zerokit GitHub Repository](https://github.com/vacp2p/zerokit) - Reference implementation
 - [RLN-V2 Specification](rln-v2.md) - Rate Limit Nullifier V2 protocol
 - [Sled Database](https://sled.rs) - Embedded database for persistent Merkle tree storage
-- [Witness Calculator](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js) - JavaScript witness calculator for WASM environments
+- [Witness Calculator](https://github.com/vacp2p/zerokit/tree/master/rln-wasm) - JavaScript witness calculator for WASM environments
 
 ## Copyright
 

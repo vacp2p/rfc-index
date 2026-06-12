@@ -67,7 +67,7 @@ They MUST have some way of connecting to other nodes.
 Node discovery is largely out of scope for this spec,
 but see the appendix for some suggestions on how to do this.
 
-This protocol needs to advertise the `waku/1` [capability](https://ethereum.gitbooks.io/frontier-guide/devp2p.html).
+This protocol needs to advertise the `waku/1` [capability](https://github.com/ethereum/devp2p/blob/master/rlpx.md#capability-messaging).
 
 ### Gossip based routing
 
@@ -101,7 +101,7 @@ The default values are `1.5mb` for the RLPx Packet and `1mb` for a Waku envelope
 All Waku packets are sent as devp2p RLPx transport protocol, version 5[^1] packets.
 These packets MUST be RLP-encoded arrays of data containing two objects:
 packet code followed by another object (whose type depends on the packet code).
-See [informal RLP spec](https://github.com/ethereum/wiki/wiki/RLP) and
+See [informal RLP spec](https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/) and
 the [Ethereum Yellow Paper, appendix B](https://ethereum.github.io/yellowpaper/paper.pdf)
 for more details on RLP.
 
@@ -545,7 +545,7 @@ settlements and disconnect logic.
 ### General principles and policy
 
 The currently advertised capability is `waku/1`.
-This needs to be advertised in the `hello` `ÐΞVp2p` [packet](https://ethereum.gitbooks.io/frontier-guide/devp2p.html).
+This needs to be advertised in the `hello` `ÐΞVp2p` [packet](https://github.com/ethereum/devp2p/blob/master/rlpx.md#hello-0x00).
 If a node supports multiple versions of `waku`, those needs to be explicitly advertised.
 For example if both `waku/0` and `waku/1` are supported,
 both `waku/0` and `waku/1` MUST be advertised.
@@ -737,8 +737,8 @@ See libp2p and Tor's Pluggable Transport for how this can be improved.
 
 | Client | Spec supported | Details |
 |--------|----------------|---------|
-| **Status-go** | 0.5 | [details](https://github.com/status-im/status-go/blob/develop/WAKU.md) |
-| **Nim-waku** | 1.0 | [details](https://github.com/status-im/nim-waku/blob/master/README.md) |
+| **Status-go** | 0.5 | [details](https://github.com/status-im/status-go) |
+| **Nim-waku** | 1.0 | [details](https://github.com/logos-messaging/logos-delivery/blob/master/README.md) |
 
 ### Recommendations for clients
 
@@ -766,7 +766,7 @@ Known static nodes MAY also be used.
 
 ## Changelog
 
-### [Initial Release](https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8)
+### [Initial Release](https://github.com/vacp2p/specs)
 
 - Add section on P2P Request Complete packet and update packet code table.
 - Correct the header hierarchy for the status-options fields.
@@ -776,13 +776,13 @@ Known static nodes MAY also be used.
 
 ### Version 1.1
 
-Released [June 09, 2020](https://github.com/vacp2p/specs/commit/33b8d7304c9ebece90ea94e601f11080a8ac2c4d)
+Released [June 09, 2020](https://github.com/vacp2p/specs)
 
 - Add rate limit per bytes
 
 ### Version 1.0
 
-Released [April 21,2020](https://github.com/vacp2p/specs/commit/9e650995f24179844857520c68fa3e8f6018b125)
+Released [April 21,2020](https://github.com/vacp2p/specs)
 
 - Removed `version` from handshake
 - Changed `RLP` keys from 48,49.. to 0,1..
@@ -790,13 +790,13 @@ Released [April 21,2020](https://github.com/vacp2p/specs/commit/9e650995f2417984
 
 ### Version 0.6
 
-Released [April 21,2020](https://github.com/vacp2p/specs/commit/9e650995f24179844857520c68fa3e8f6018b125)
+Released [April 21,2020](https://github.com/vacp2p/specs)
 
 - Mark spec as Deprecated mode in terms of its lifecycle.
 
 ### Version 0.5
 
-Released [March 17,2020](https://github.com/vacp2p/specs/commit/7b9dc562bc50c6bb844ac575cb221ec9cda2530a)
+Released [March 17,2020](https://github.com/vacp2p/specs)
 
 - Clarify the preferred way of handling unknown keys
 in the `status-options` association list.
@@ -805,7 +805,7 @@ Change RLP keys to be the their int values in order to reflect production behavi
 
 ### Version 0.4
 
-Released [February 21, 2020](https://github.com/vacp2p/specs/commit/17bd066e317bbe33af07146b721d73f24de47e88).
+Released [February 21, 2020](https://github.com/vacp2p/specs).
 
 - Simplify implementation matrix with latest state
 - Introduces a new required packet code Status Code (`0x22`)
@@ -817,7 +817,7 @@ all superseded by the new Status Code (`0x22`)
 
 ### Version 0.3
 
-Released [February 13, 2020](https://github.com/vacp2p/specs/commit/73138d6ba954ab4c315e1b8d210ac7631b6d1428).
+Released [February 13, 2020](https://github.com/vacp2p/specs).
 
 - Recommend DNS based node discovery over other Discovery methods.
 - Mark spec as Draft mode in terms of its lifecycle.
@@ -830,7 +830,7 @@ specifying options as association list.
 
 ### Version 0.2
 
-Released [December 10, 2019](https://github.com/vacp2p/specs/blob/waku-0.2.0/waku.md).
+Released [December 10, 2019](https://github.com/vacp2p/specs).
 
 - General style improvements.
 - Fix ABNF grammar.
@@ -849,7 +849,7 @@ implementation matrix across various clients with breakdown per capability.
 
 ### Version 0.1
 
-Initial version. Released [November 21, 2019](https://github.com/vacp2p/specs/blob/b59b9247f2ac1bf45c75bd3227a2e5dd87b6d7b0/waku.md).
+Initial version. Released [November 21, 2019](https://github.com/vacp2p/specs).
 
 ### Differences between shh/6 and waku/1
 

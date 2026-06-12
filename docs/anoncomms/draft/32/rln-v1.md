@@ -99,7 +99,7 @@ usually a financial or social stake is introduced.
 An example for financial stake is:
 
 For each registration a certain amount of ETH is required.
-An example for social stake is using [Interep](https://interep.link/) as a registry,
+An example for social stake is using [Interep](https://github.com/interep-project) as a registry,
 users need to prove that they have a highly reputable social media account.
 
 #### Implementation notes
@@ -793,7 +793,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [17/WAKU2-RLN-RELAY RFC](../../../messaging/draft/17/rln-relay.md)
-- [Interep](https://interep.link/)
+- [Interep](https://github.com/interep-project)
 - [incremental Merkle tree algorithm](https://github.com/appliedzkp/incrementalquintree/blob/master/ts/IncrementalQuinTree.ts)
 - [Shamir's Secret sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)
 - [Lagrange polynomials](https://en.wikipedia.org/wiki/Lagrange_polynomial)

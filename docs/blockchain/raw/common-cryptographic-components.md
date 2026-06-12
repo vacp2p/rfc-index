@@ -179,7 +179,7 @@ EdDSA is a digital-signature scheme built on twisted Edwards curves. Ed25519 is 
 Technical Details:
 
 - Curve: Twisted Edwards curve Edwards25519 (it is birationally equivalent to Curve25519):
-    $`(x,y) \in \big(\mathbb{Z}/(2^{255}-19) \mathbb{Z}\big)^2`$ such that $`-x^2 + y^2 = 1 - (121665/121666)x^2y^2`$.
+  $`(x,y) \in \big(\mathbb{Z}/(2^{255}-19) \mathbb{Z}\big)^2`$ such that $`-x^2 + y^2 = 1 - (121665/121666)x^2y^2`$.
 - Signature Size: 64 bytes.
 - Public Key Size: 32 bytes.
 - Security Level: Approximately 128 bits.

@@ -216,7 +216,7 @@ bytes signature = 27;           // Signature of vote_hash
 The voting proposal MAY include adding a `node` or removing a `member`.
 After the `member` creates the voting proposal,
 it is emitted to the network via the MLS `Application message` with a lightweight,
-epoch based voting such as [hashgraphlike consensus.](https://github.com/logos-co/logos-lips/blob/consensus-hashgraph-like/vac/raw/consensus-hashgraphlike.md)
+epoch based voting such as [hashgraphlike consensus.](consensus-hashgraphlike.md)
 This consensus result MUST be finalized within the epoch as YES or NO.
 
 If the voting result is YES, this points out the voting proposal will be converted into
@@ -683,5 +683,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ### References
 
 - [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/)
-- [Hashgraphlike Consensus](https://github.com/logos-co/logos-lips/blob/consensus-hashgraph-like/vac/raw/consensus-hashgraphlike.md)
+- [Hashgraphlike Consensus](consensus-hashgraphlike.md)
 - [vacp2p/de-mls](https://github.com/vacp2p/de-mls)

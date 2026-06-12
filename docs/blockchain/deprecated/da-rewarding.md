@@ -416,8 +416,8 @@ to guarantee rewards for malicious nodes.
 
 [rfc-2119]: https://www.ietf.org/rfc/rfc2119.txt
 [origin-ref]: da-rewarding.md
-[sdp]: bedrock-service-declaration-protocol.md
-[sampling-analysis]: analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.md
+[sdp]: ../raw/bedrock-service-declaration-protocol.md
+[sampling-analysis]: ../raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.md
 
 ## Copyright
 

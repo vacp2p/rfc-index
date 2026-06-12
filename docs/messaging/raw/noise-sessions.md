@@ -59,7 +59,7 @@ A Noise session corresponding to a certain `session-id`:
 
 - is always **active** as long as it is not marked as **stale**.
   For an active `session-id`, new messages are published on the content topic `/{application-name}/{application-version}/wakunoise/1/sessions/{ct-id}/proto`;
-- is marked as **stale** if a [session termination message](noise.md#session-termination-message) containing `Hash(session-id)` is published on the content topic `/{application-name}/{application-version}/wakunoise/1/sessions/{ct-id}/proto`.
+- is marked as **stale** if a [session termination message](#session-states) containing `Hash(session-id)` is published on the content topic `/{application-name}/{application-version}/wakunoise/1/sessions/{ct-id}/proto`.
   Session information relative to stale sessions MAY be deleted from users' device, unless required for later channel binding purposes.
 
 When a Noise session is marked as stale, it means that one party requested its termination while being online,
@@ -99,9 +99,9 @@ messages should be encrypted and decrypted within the Noise session instantiated
 
 This is achieved through two main supported session management mechanisms that we called `N11M` and `NM`, respectively.
 
-### The $N11M$ session management mechanism
+### The `N11M` session management mechanism
 
-In a $N11M$ setting, each party's device shares the same Noise session information used to encrypt and decrypt messages exchanged with the other party.
+In an `N11M` setting, each party's device shares the same Noise session information used to encrypt and decrypt messages exchanged with the other party.
 
 ![N11M session management](images/N11M.png)
 
@@ -132,9 +132,9 @@ where encryption keys are changed every time a new message is exchanged.
 
 This session management mechanism is loosely based on the paper ["Multi-Device for Signal"](https://eprint.iacr.org/2019/1363.pdf).
 
-## The $NM$ session management mechanism
+## The `NM` session management mechanism
 
-In a $NM$ setting, we require all of $N$ Alice's devices to have an active Noise session with each of Bob's $M$ devices,
+In an `NM` setting, we require all of $N$ Alice's devices to have an active Noise session with each of Bob's $M$ devices,
 for a total of $NM$ concurrently active Noise sessions between Alice and Bob.
 
 ![NM session management](images/NM.png)

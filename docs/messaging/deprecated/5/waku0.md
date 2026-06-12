@@ -76,7 +76,7 @@ A node SHOULD relay messages to all connected nodes
 if an envelope matches their PoW and bloom filter settings.
 If a node works in light mode, it MAY choose not to forward envelopes.
 A node MUST NOT send expired envelopes,
-unless the envelopes are sent as a [mailserver](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md) response.
+unless the envelopes are sent as a [mailserver](../../stable/8/mail.md) response.
 A node SHOULD NOT send a message to a peer that it has already sent before.
 
 ## Wire Specification
@@ -87,7 +87,7 @@ All Waku messages are sent as devp2p RLPx transport protocol,
 version 5[^1] packets.
 These packets MUST be RLP-encoded arrays of data containing two objects:
 packet code followed by another object (whose type depends on the packet code).
- See [informal RLP spec](https://github.com/ethereum/wiki/wiki/RLP) and
+ See [informal RLP spec](https://ethereum.org/en/developers/docs/data-structures-and-encoding/rlp/) and
 the [Ethereum Yellow Paper, appendix B](https://ethereum.github.io/yellowpaper/paper.pdf)
 for more details on RLP.
 
@@ -413,7 +413,7 @@ a corresponding confirmation is broadcast by one or more peers.
 #### P2P Request
 
 This packet is used for sending Dapp-level peer-to-peer requests,
-e.g. Waku Mail Client requesting old messages from the [Waku Mail Server](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md).
+e.g. Waku Mail Client requesting old messages from the [Waku Mail Server](../../stable/8/mail.md).
 
 #### P2P Message
 
@@ -453,7 +453,7 @@ Here we list these capabilities, how they are identified,
 what properties they have and what invariants they must maintain.
 
 Additionally there is the capability of a mailserver
-which is documented in its on [specification](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md).
+which is documented in its on [specification](../../stable/8/mail.md).
 
 ### Light node
 
@@ -592,7 +592,7 @@ when receiving `status-options` with unknown option keys.
 There are several security considerations to take into account when running Waku.
 Chief among them are: scalability, DDoS-resistance and privacy.
 These also vary depending on what capabilities are used.
-The security considerations for extra capabilities such as [mailservers](https://github.com/status-im/status-specs/tree/master/specs/status/deprecated/waku-mailserver.md#security-considerations)
+The security considerations for extra capabilities such as [mailservers](../../stable/8/mail.md#security-considerations)
 can be found in their respective specifications.
 
 ### Scalability and UX
@@ -672,8 +672,8 @@ See libp2p and Tor's Pluggable Transport for how this can be improved.
 
 | Client | Spec supported | Details |
 |--------|----------------|---------|
-| **Status-go** | 0.5 | [details](https://github.com/status-im/status-go/blob/develop/WAKU.md) |
-| **Nimbus** | 0.4 | [details](https://github.com/status-im/nimbus/tree/8747fe1ecd36fe778bb92b97634db84d364fede8/waku) |
+| **Status-go** | 0.5 | [details](https://github.com/status-im/status-go) |
+| **Nimbus** | 0.4 | [details](https://github.com/status-im/nimbus-eth1) |
 
 ### Recommendations for clients
 
@@ -702,13 +702,13 @@ Known static nodes MAY also be used.
 
 ### Version 0.6
 
-Released [April 21,2020](https://github.com/vacp2p/specs/commit/9e650995f24179844857520c68fa3e8f6018b125)
+Released [April 21,2020](https://github.com/vacp2p/specs)
 
 - Mark spec as Deprecated mode in terms of its lifecycle.
 
 ### Version 0.5
 
-Released [March 17,2020](https://github.com/vacp2p/specs/commit/7b9dc562bc50c6bb844ac575cb221ec9cda2530a)
+Released [March 17,2020](https://github.com/vacp2p/specs)
 
 - Clarify the preferred way of handling unknown keys
 in the `status-options` association list.
@@ -717,7 +717,7 @@ Change RLP keys to be the their int values in order to reflect production behavi
 
 ### Version 0.4
 
-Released [February 21, 2020](https://github.com/vacp2p/specs/commit/17bd066e317bbe33af07146b721d73f24de47e88).
+Released [February 21, 2020](https://github.com/vacp2p/specs).
 
 - Simplify implementation matrix with latest state
 - Introduces a new required packet code Status Code (`0x22`)
@@ -729,7 +729,7 @@ Topic interest (`0x21`) - all superseded by the new Status Code (`0x22`)
 
 ### Version 0.3
 
-Released [February 13, 2020](https://github.com/vacp2p/specs/commit/73138d6ba954ab4c315e1b8d210ac7631b6d1428).
+Released [February 13, 2020](https://github.com/vacp2p/specs).
 
 - Recommend DNS based node discovery over other Discovery methods.
 - Mark spec as Draft mode in terms of its lifecycle.
@@ -742,7 +742,7 @@ specifying options as association list.
 
 ### Version 0.2
 
-Released [December 10, 2019](https://github.com/vacp2p/specs/blob/waku-0.2.0/waku.md).
+Released [December 10, 2019](https://github.com/vacp2p/specs).
 
 - General style improvements.
 - Fix ABNF grammar.
@@ -761,7 +761,7 @@ implementation matrix across various clients with breakdown per capability.
 
 ### Version 0.1
 
-Initial version. Released [November 21, 2019](https://github.com/vacp2p/specs/blob/b59b9247f2ac1bf45c75bd3227a2e5dd87b6d7b0/waku.md).
+Initial version. Released [November 21, 2019](https://github.com/vacp2p/specs).
 
 ### Differences between shh/6 and waku/0
 
