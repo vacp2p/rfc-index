@@ -23,13 +23,12 @@ pipeline {
   environment {
     GIT_COMMITTER_NAME = 'status-im-auto'
     GIT_COMMITTER_EMAIL = 'auto@status.im'
-    LIPS_GENERATE_HISTORY = '1'
   }
 
   stages {
     stage('Build') {
       steps { script {
-        nix.develop('make build')
+        nix.develop('LIPS_GENERATE_HISTORY=1 make build')
         jenkins.genBuildMetaJSON('book/build.json')
       } }
     }
