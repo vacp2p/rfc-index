@@ -68,10 +68,10 @@ in a hierarchical way as well.
 
 > *Note*: In previous versions of this document, the structure was `/waku/2/{topic-name}/{encoding}`.
 The now deprecated `/{encoding}` was always set to `/proto`,
-which indicated that the [data field](/messaging/stable/11/relay.md#protobuf-definition)
+which indicated that the [data field](../../stable/11/relay.md#protobuf-definitions)
 in pubsub is serialized/encoded as protobuf.
 The inspiration for this format was taken from
-[Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages).
+[Ethereum 2 P2P spec](https://github.com/ethereum/consensus-specs/blob/master/specs/phase0/p2p-interface.md#topics-and-messages).
 However, because the payload of messages transmitted over [11/WAKU2-RELAY](/messaging/stable/11/relay.md)
 must be a [14/WAKU2-MESSAGE](/messaging/stable/14/message.md),
 which specifies the wire format as protobuf,`/proto` is the only valid encoding.
@@ -154,7 +154,7 @@ and depends on the problem domain.
 It can be hierarchical, for instance to separate content, or
 to indicate different bandwidth and privacy guarantees.
 The encoding field indicates the serialization/encoding scheme
-for the [WakuMessage payload](/messaging/stable/14/message.md#payloads) field.
+for the [WakuMessage payload](../../stable/14/message.md#message-attributes) field.
 
 ### Content Topic usage guidelines
 
@@ -224,7 +224,7 @@ Copyright and related rights waived via
 - [10/WAKU2 spec](/messaging/draft/10/waku2.md)
 - [11/WAKU2-RELAY](/messaging/stable/11/relay.md)
 - [RELAY-SHARDING](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/raw/relay-sharding.md)
-- [Ethereum 2 P2P spec](https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#topics-and-messages)
+- [Ethereum 2 P2P spec](https://github.com/ethereum/consensus-specs/blob/master/specs/phase0/p2p-interface.md#topics-and-messages)
 - [14/WAKU2-MESSAGE](/messaging/stable/14/message.md)
 - [12/WAKU2-FILTER](/messaging/draft/12/filter.md)
 - [13/WAKU2-STORE](/messaging/draft/13/store.md)

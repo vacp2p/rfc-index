@@ -138,7 +138,7 @@ The matrix representation has $k$ columns which include $\ell$ chunks each.
 The row and column numbers used in the representation are decided
 based on the size of the block data and the number of DA nodes.
 
-![Data Matrix Structure](da-cryptographic-protocol/assets/da-data-matrix.png)
+![Data Matrix Structure](../raw/da-cryptographic-protocol/assets/da-data-matrix.png)
 
 *Figure 1: Data matrix structure showing chunks and columns.
 Each chunk is a 31-byte element, and each column contains $\ell$ chunks.*
@@ -181,7 +181,7 @@ The current design of DA Network uses an expansion factor of 2,
 but it can also work with different factors.
 This expanded data matrix has rows of length $2k$.
 
-![Extended Data Matrix](da-cryptographic-protocol/assets/da-extended-matrix.png)
+![Extended Data Matrix](../raw/da-cryptographic-protocol/assets/da-extended-matrix.png)
 
 *Figure 2: Extended data matrix showing original data ($k$ columns)
 and extended data ($2k$ columns total) after Reed-Solomon expansion.*
@@ -197,7 +197,7 @@ a more efficient technique using random linear combinations of row polynomials i
 allowing only one proof to be generated per column
 while still ensuring the validity of all underlying row data.
 
-![Encoding Pipeline](da-cryptographic-protocol/assets/da-encoding-pipeline.png)
+![Encoding Pipeline](../raw/da-cryptographic-protocol/assets/da-encoding-pipeline.png)
 
 *Figure 3: Complete encoding pipeline showing row commitments (step 1),
 RS-encoding (step 2), and combined row commitment with column data (step 3).*
@@ -265,7 +265,7 @@ to every other node in the subnet.
 A DA node that receives the column information described above
 performs the following checks:
 
-![Dispersal and Verification](da-cryptographic-protocol/assets/da-dispersal-verification.png)
+![Dispersal and Verification](../raw/da-cryptographic-protocol/assets/da-dispersal-verification.png)
 
 *Figure 4: Dispersal and verification flow from Encoder to DA Node.
 The DA Node receives row commitments, column data, and combined proof,
@@ -301,7 +301,7 @@ A sampling client, such as a light node, selects a random column index $`s \in \
 It sends a request for column $s$ to a DA node hosting that column's data.
 The DA node sends the client the column data $`data^{s}_{i}`$ and the combined proof $`\pi_s`$.
 
-![Sampling](da-cryptographic-protocol/assets/da-sampling.png)
+![Sampling](../raw/da-cryptographic-protocol/assets/da-sampling.png)
 
 *Figure 5: Sampling flow between DA Node and Sampling Client.
 The client requests a random column index $s$, receives the column data and proof,
@@ -582,7 +582,7 @@ $$`e(a * g_1, b * g_2) = e(g_1, g_2)^{ab}`$$
 [rfc-2119]: https://www.ietf.org/rfc/rfc2119.txt
 [origin-ref]: da-cryptographic-protocol.md
 [bls12-381]: https://hackmd.io/@benjaminion/bls12-381
-[ec-pairings]: https://vitalik.ca/general/2017/01/14/exploring_ecp.html
+[ec-pairings]: https://vitalik.eth.limo/general/2017/01/14/exploring_ecp.html
 
 ## Copyright
 

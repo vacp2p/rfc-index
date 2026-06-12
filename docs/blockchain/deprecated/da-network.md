@@ -112,7 +112,7 @@ and replicated data.
 
 ### DA Network Registration
 
-Entities wishing to participate in DA Network must declare their role via [SDP](bedrock-service-declaration-protocol.md) (Service Declaration Protocol).
+Entities wishing to participate in DA Network must declare their role via [SDP](../raw/bedrock-service-declaration-protocol.md) (Service Declaration Protocol).
 Once declared, they're accounted for in the subnetwork construction.
 
 This enables participation in:
@@ -183,7 +183,7 @@ Replication occurs once per blob; subsequent validations of the same blob are di
 2. The node selects `sample_size` random subnetworks
 and queries each for the availability of the corresponding column for the sampled blob. Sampling is deemed successful only if all queried subnetworks respond affirmatively.
 
-- If `num_subnets` is 2048, `sample_size` is [20 as per the sampling research](analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.md)
+- If `num_subnets` is 2048, `sample_size` is [20 as per the sampling research](../raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.md)
 
 ```mermaid
 sequenceDiagram
@@ -258,9 +258,9 @@ ensures the overlay node distribution is scalable for networks of any size.
 - [DA Network Sampling](da-network.md#sampling)
 - [DA Network Reconstruction](da-network.md)
 - [DA Network Indexing](da-network.md)
-- [SDP](bedrock-service-declaration-protocol.md)
+- [SDP](../raw/bedrock-service-declaration-protocol.md)
 - [invoked based on the node's current role](da-network.md#sampling)
-- [20 as per the sampling research](analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.md)
+- [20 as per the sampling research](../raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.md)
 - [multiplexed](https://docs.libp2p.io/concepts/transports/quic/#quic-native-multiplexing)
 - [QUIC](https://docs.libp2p.io/concepts/transports/quic/)
 

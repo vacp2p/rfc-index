@@ -10,6 +10,8 @@
 | Tags | core, encoding |
 | Editor | Patryk <patryk@status.im>, Jazzz <jazz@status.im> |
 
+
+
 ## Abstract
 
 This specification defines the encoding format for Introduction Bundles — the
@@ -146,9 +148,9 @@ Copyright and related rights waived via [CC0].
 ## References
 
 - [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) — Key words for use in RFCs
-- [RFC 4648 §5](https://www.rfc-editor.org/rfc/rfc4648#section-5) — Base 64 Encoding with URL and Filename Safe Alphabet
+- [RFC 4648 §5](https://datatracker.ietf.org/doc/html/rfc4648#section-5) — Base 64 Encoding with URL and Filename Safe Alphabet
 - [CC0](https://creativecommons.org/publicdomain/zero/1.0/) — Creative Commons Zero Public Domain Dedication
 
 [RFC 2119]: https://www.ietf.org/rfc/rfc2119.txt
-[RFC 4648 §5]: https://www.rfc-editor.org/rfc/rfc4648#section-5
+[RFC 4648 §5]: https://datatracker.ietf.org/doc/html/rfc4648#section-5
 [CC0]: https://creativecommons.org/publicdomain/zero/1.0/

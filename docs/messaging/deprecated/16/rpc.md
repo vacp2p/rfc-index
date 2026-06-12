@@ -470,7 +470,7 @@ The following structured types are defined for use on the Filter API:
 ### `post_waku_v2_filter_v1_subscription`
 
 The `post_waku_v2_filter_v1_subscription` method creates a subscription in a
-[light node](../../draft/12/filter.md#rationale) for messages that matches a content filter
+[light node](../../draft/12/filter.md) for messages that matches a content filter
 and, optionally, a [PubSub `topic`](https://github.com/libp2p/specs/blob/master/pubsub/README.md#the-topic-descriptor).
 
 Parameters
@@ -488,7 +488,7 @@ an [error](https://www.jsonrpc.org/specification#error_object) on failure.
 `delete_waku_v2_filter_v1_subscription`
 
 The `delete_waku_v2_filter_v1_subscription` method removes subscriptions
-in a [light node](../../draft/12/filter.md#rationale) matching a content filter and,
+in a [light node](../../draft/12/filter.md) matching a content filter and,
 optionally, a [PubSub `topic`](https://github.com/libp2p/specs/blob/master/pubsub/README.md#the-topic-descriptor).
 
 Parameters

@@ -202,7 +202,7 @@ If adoption grows and the burning rate exceeds $`I_{max}`$, then the token suppl
 
 [HackMDMinimum Viable Issuance - HackMD](https://notes.ethereum.org/@anderselowsson/MinimumViableIssuance)
 
-[Titania ResearchExploring Minimum Viable Issuance (MVI)](https://titaniaresear.ch/minimum-viable-issuance)
+[Titania ResearchExploring Minimum Viable Issuance (MVI)](https://notes.ethereum.org/@anderselowsson/MinimumViableIssuance)
 
 [HackMDProperties of issuance level (part 1) - HackMD](https://notes.ethereum.org/@anderselowsson/HyUIqjo_6)
 

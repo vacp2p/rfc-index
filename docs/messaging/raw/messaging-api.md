@@ -336,7 +336,7 @@ If the `mode` set is `edge`, the initialised `WakuNode` SHOULD use:
 - [STORE](https://lip.logos.co/messaging/draft/13/store.html) as client
 - [METADATA](https://lip.logos.co/messaging/draft/66/metadata.html) as client
 - [PEER-EXCHANGE](https://lip.logos.co/messaging/draft/34/peer-exchange.html) as client
-- [P2P-RELIABILITY](/standards/application/p2p-reliability.md)
+- [P2P-RELIABILITY](p2p-reliability.md)
 
 If the `mode` set is `core`, the initialised `WakuNode` SHOULD use:
 
@@ -345,7 +345,7 @@ If the `mode` set is `core`, the initialised `WakuNode` SHOULD use:
 - [FILTER](https://lip.logos.co/messaging/draft/12/filter.html) as service node
 - [STORE](https://lip.logos.co/messaging/draft/13/store.html) as client
 - [METADATA](https://lip.logos.co/messaging/draft/66/metadata.html) as client and service node
-- [P2P-RELIABILITY](/standards/application/p2p-reliability.md)
+- [P2P-RELIABILITY](p2p-reliability.md)
 - [DISCV5](https://lip.logos.co/messaging/draft/33/discv5.html)
 - [PEER-EXCHANGE](https://lip.logos.co/messaging/draft/34/peer-exchange.html) as client and service node
 - [RENDEZVOUS](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/raw/rendezvous.md) as client and service node
@@ -454,7 +454,7 @@ functions:
 
 A first `message` sent with a certain `contentTopic` SHOULD trigger a subscription for such `contentTopic` as described in the `Subscriptions` section.
 
-The node uses [P2P-RELIABILITY](/standards/application/p2p-reliability.md) strategies to ensure message delivery.
+The node uses [P2P-RELIABILITY](p2p-reliability.md) strategies to ensure message delivery.
 
 ### Subscriptions
 
@@ -503,9 +503,9 @@ functions:
 
 **`mode`**:
 
-If the `mode` set is `edge`, `subscribe` SHOULD trigger set up a subscription using [FILTER](https://lip.logos.co/messaging/draft/12/filter.html) as client and [P2P-RELIABILITY](/standards/application/p2p-reliability.md).
+If the `mode` set is `edge`, `subscribe` SHOULD trigger set up a subscription using [FILTER](https://lip.logos.co/messaging/draft/12/filter.html) as client and [P2P-RELIABILITY](p2p-reliability.md).
 
-If the `mode` set is `core`, `subscribe` SHOULD trigger set up a subscription using [RELAY](https://lip.logos.co/messaging/stable/11/relay.html) and [P2P-RELIABILITY](/standards/application/p2p-reliability.md).
+If the `mode` set is `core`, `subscribe` SHOULD trigger set up a subscription using [RELAY](https://lip.logos.co/messaging/stable/11/relay.html) and [P2P-RELIABILITY](p2p-reliability.md).
 This MAY trigger joining a new shard if not already set.
 
 Only messages on subscribed content topics SHOULD be emitted by a `MessageEvents` event source, meaning messages received via `RELAY` SHOULD be filtered by content topics before emission.
@@ -515,7 +515,7 @@ Only messages on subscribed content topics SHOULD be emitted by a `MessageEvents
 Only irremediable failures should lead to synchronously returning a subscription error for failed subscribe or unsubscribe operations.
 
 Failure to reach nodes can be omitted, and should be handled via the health events;
-[P2P-RELIABILITY](/standards/application/p2p-reliability.md) SHOULD handle automated re-subscriptions and redundancy.
+[P2P-RELIABILITY](p2p-reliability.md) SHOULD handle automated re-subscriptions and redundancy.
 
 Examples of irremediable failures are:
 

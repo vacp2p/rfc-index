@@ -184,7 +184,7 @@ We define a `waku2` field key:
 - A Waku node MAY choose to populate the `waku2` field for enhanced discovery capabilities,
   such as indicating supported protocols.
   Such a node MAY indicate support for any specific protocol by setting the corresponding flag to `true`.
-- Waku nodes that want to participate in [Node Discovery Protocol v5](https://github.com/logos-co/logos-lips/blob/main/waku/standards/core/33/discv5.md) [[4]](#references), however,
+- Waku nodes that want to participate in [Node Discovery Protocol v5](../33/discv5.md) [[4]](#references), however,
   MUST implement the `waku2` key with at least one flag set to `true`.
 - Waku nodes that discovered other participants using Discovery v5,
   MUST filter out participant records that do not implement this field or
@@ -200,7 +200,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ## References
 
 - [1](../10/waku2.md)
-- [2](https://github.com/status-im/nim-waku/pull/690)
+- [2](https://github.com/logos-messaging/logos-delivery/pull/690)
 - [3](https://github.com/vacp2p/rfc/issues/462#issuecomment-943869940)
 - [4](https://eips.ethereum.org/EIPS/eip-778)
 - [5](https://github.com/ethereum/devp2p/blob/master/discv5/discv5.md)

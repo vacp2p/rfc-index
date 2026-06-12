@@ -312,7 +312,7 @@ verifier module MUST extracts the `secret-hash` from two different message with 
 (see [RLN Specification](https://lip.logos.co/anoncomms/raw/rln-v2.html)), and invoke the `Karma contract`
 for slashing which maps user’s Karma to `MinK-1` then adds the `user` to `denylist`.
 
-Note that, Zerokit contains [a function named comput_id_secret](https://github.com/vacp2p/zerokit/blob/master/rln/src/protocol.rs#L526)
+Note that, Zerokit contains [a function named comput_id_secret](https://github.com/vacp2p/zerokit/tree/master/rln/src/protocol)
 for extracting the secret-hash for a given two recurring `internal_nullifier`.
 
 ## 3. Smart Contracts

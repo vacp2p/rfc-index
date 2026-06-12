@@ -402,4 +402,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [14/WAKU2-MESSAGE](../../stable/14/message.md)
 * [gossipsub v1.1 validation](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#extended-validators)
 * [WAKU2-RELAY-SHARDING](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/raw/relay-sharding.md)
-* [The Waku Network Config](https://github.com/waku-org/nwaku/blob/master/waku/factory/networks_config.nim#L31)
+* [The Waku Network Config](https://github.com/logos-messaging/logos-delivery)

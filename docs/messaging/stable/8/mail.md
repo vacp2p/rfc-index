@@ -112,7 +112,7 @@ Historic envelopes MUST be sent to a peer as a packet with a P2P Message code (`
 followed by an array of Waku envelopes.
 A Mailserver MUST limit the amount of messages sent,
 either by the `Limit` specified in the request or
-limited to the maximum [RLPx packet size](../../README.md#maximum-packet-size),
+limited to the maximum RLPx packet size,
 whichever limit comes first.
 
 In order to receive historic envelopes from a mailserver,
@@ -178,9 +178,9 @@ This means a malicious or malfunctioning mailserver can overwhelm an individual 
 
 | Version                                                                                        | Comment |
 | :--------------------------------------------------------------------------------------------: | ------- |
-| [1.0.0](https://github.com/vacp2p/specs/commit/bc7e75ebb2e45d2cbf6ab27352c113e666df37c8)       | marked stable as it is in use.                                                   |
+| [1.0.0](https://github.com/vacp2p/specs)       | marked stable as it is in use.                                                   |
 | 0.2.0                                                                                          | Add topic interest to reduce bandwidth usage |
-| [0.1.0](https://github.com/vacp2p/specs/blob/06d4c736c920526472a507e5d842212843a112ed/wms.md)  | Initial Release |
+| [0.1.0](https://github.com/vacp2p/specs)  | Initial Release |
 
 ### Difference between wms 0.1 and wms 0.2
 

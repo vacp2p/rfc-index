@@ -24,7 +24,7 @@
 This document specifies a deanonymization mitigation technique,
 based on [Dandelion](https://arxiv.org/abs/1701.04439) and [Dandelion++](https://arxiv.org/abs/1805.11060),
 for Waku Relay.
-It mitigates mass deanonymization in the [multi-node (botnet) attacker model](../../../informational/adversarial-models.md/#multi-node),
+It mitigates mass deanonymization in the [multi-node (botnet) attacker model](adversarial-models.md#multi-node),
 even when the number of malicious nodes is linear in the number of total nodes in the network.
 
 Based on the insight that symmetric message propagation makes deanonymization easier,
@@ -118,7 +118,7 @@ This does not include relaying messages originated in $v$, for which $v$ SHOULD 
 
 On startup and when a new epoch starts,
 node $v$ randomly selects a number $r$ between 0 and 1.
-If $r < q$, for $q = 0.2$, the node enters fluff state, otherwise, it enters stem state.
+If $`r \lt q`$, for $q = 0.2$, the node enters fluff state, otherwise, it enters stem state.
 
 New epochs start when `unixtime` (in seconds) $\equiv 0 \mod 600$,
 corresponding to 10 minute epochs.
@@ -153,7 +153,7 @@ because these messages are only handed to gossipsub once they enter fluff phase.
 
 #### Fail Safe
 
-Nodes $v$ in stem state SHOULD store messages attached with a random timer between $t_1 = 5 * 100ms$ and $t_2 = 2 * t_1$.
+Nodes $v$ in stem state SHOULD store messages attached with a random timer between $`t_1 = 5 * 100ms`$ and $`t_2 = 2 * t_1`$.
 This time interval is chosen because
 
 - we assume $100\,ms$ as an average per hop delay, and
@@ -182,7 +182,7 @@ If this is the case, they have to be implemented on the libp2p gossipsub layer.
 
 ### Denial of Service: Black Hole Attack
 
-In a [black hole attack](../../../informational/adversarial-models.md/#black-hole-internal), malicious nodes prevent messages from being spread,
+In a [black hole attack](adversarial-models.md#black-hole-internal), malicious nodes prevent messages from being spread,
 metaphorically not allowing messages to leave once they entered.
 This requires the attacker to control nodes on all dissemination paths.
 Since the number of dissemination paths is significantly reduced in the stem phase,
@@ -195,7 +195,7 @@ The fail-safe mechanism specified in this document (proposed in the Dandelion pa
 #### Attacker Model and Anonymity Goals
 
 WAKU2-DANDELION provides significant mitigation against mass deanonymization in the
-passive [scaling multi node model](../../../informational/adversarial-models.md/#scaling-multi-node).
+passive [scaling multi node model](adversarial-models.md#scaling-multi-node).
 in which the attacker controls a certain percentage of nodes in the network.
 WAKU2-DANDELION provides significant mitigation against mass deanonymization
 even if the attacker knows the network topology, i.e. the anonymity graph and the relay mesh graph.
@@ -298,14 +298,14 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 - [Dandelion](https://arxiv.org/abs/1701.04439)
 - [Dandelion++](https://arxiv.org/abs/1805.11060)
-- [multi-node (botnet) attacker model](../../../informational/adversarial-models.md/#multi-node)
+- [multi-node (botnet) attacker model](adversarial-models.md#multi-node)
 - [Waku Relay](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/stable/11/relay.md)
 - [Waku v2](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/10/waku2.md)
 - [d-regular graph](https://en.wikipedia.org/wiki/Regular_graph)
 - [Anonymity Trilemma](https://freedom.cs.purdue.edu/projects/trilemma.html)
 - [Waku Privacy and Anonymity Analysis](https://vac.dev/wakuv2-relay-anon).
 - [On the Anonymity of Peer-To-Peer Network Anonymity Schemes Used by Cryptocurrencies](https://arxiv.org/pdf/2201.11860.pdf)
-- [Adversarial Models](../../../informational/adversarial-models.md)
+- [Adversarial Models](adversarial-models.md)
 - [14/WAKU2-MESSAGE](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/stable/14/message.md)
 - [29/WAKU-CONFIG](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/29/config.md)
 - [19/WAKU2-LIGHTPUSH](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/draft/19/lightpush.md)

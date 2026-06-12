@@ -114,7 +114,7 @@ This protocol uses the following cryptographic primitives:
   - Elliptic curve Diffie-Hellman key exchange (Curve25519)
   - AES-256-CTR with HMAC-SHA-256 and IV derived alongside an encryption key
 
-    The node achieves key derivation using [HKDF](https://www.rfc-editor.org/rfc/rfc5869).
+    The node achieves key derivation using [HKDF](https://datatracker.ietf.org/doc/html/rfc5869).
 
 ### Pre-keys
 
@@ -332,7 +332,7 @@ Copyright and related rights waived via
 - [Protobuf](https://developers.google.com/protocol-buffers/)
 - [Off-the-Record protocol](https://otr.cypherpunks.ca/Protocol-v3-4.1.1.html)
 - [The Waku v2 protocol](/messaging/draft/10/waku2.md)
-- [HKDF](https://www.rfc-editor.org/rfc/rfc5869)
+- [HKDF](https://datatracker.ietf.org/doc/html/rfc5869)
 - [2/ACCOUNT](https://specs.status.im/spec/2#x3dh-prekey-bundles)
 - [reference wire format](https://github.com/status-im/status-go/blob/a904d9325e76f18f54d59efc099b63293d3dcad3/services/shhext/chat/encryption.proto#L12)
 - [Symmetric key ratchet](https://signal.org/docs/specifications/doubleratchet/#symmetric-key-ratchet)

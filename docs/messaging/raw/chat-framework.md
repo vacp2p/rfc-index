@@ -10,6 +10,8 @@
 | Tags | chat |
 | Editor | Jazz Alyxzander <jazz@status.im> |
 
+
+
 # Abstract
 
 This specification defines a modular communication protocol framework for describing chat protocols. It introduces abstraction boundaries, and a component model for describing chat protocol functionality.

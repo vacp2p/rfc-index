@@ -266,7 +266,7 @@ Applications using [10/WAKU2](/messaging/draft/10/waku2.md) messages’ `timesta
 are RECOMMENDED to use additional methods for more robust message ordering.
 An example of how to deal with message ordering against adversarial message timestamps
 can be found in the Status protocol,
-see [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md#clock-vs-timestamp-and-message-ordering).
+see [62/STATUS-PAYLOADS](../../draft/26/payload.md).
 
 ### Reliability of the `ephemeral` attribute
 
@@ -291,4 +291,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [protocol buffers v3](https://developers.google.com/protocol-buffers/)
 - [26/WAKU-PAYLOAD](/messaging/draft/26/payload.md)
 - [WAKU2-NOISE](https://github.com/logos-co/logos-lips/blob/master/docs/messaging/raw/noise.md)
-- [62/STATUS-PAYLOADS](https://github.com/status-im/status-specs/tree/master/specs/status/62/payloads.md#clock-vs-timestamp-and-message-ordering)
+- [62/STATUS-PAYLOADS](../../draft/26/payload.md)

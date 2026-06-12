@@ -202,7 +202,7 @@ This API considers the types defined by [MESSAGING-API](messaging-api.md) plus t
 ### Channel lifecycle
 
 This point assumes that a WakuNode instance is created beforehand. See `createNode` function
-in [MESSAGING-API](/standards/application/messaging-api.md).
+in [MESSAGING-API](messaging-api.md).
 
 ```yaml
 functions:

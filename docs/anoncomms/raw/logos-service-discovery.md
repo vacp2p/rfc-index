@@ -484,7 +484,7 @@ to avoid coupling the protocol to specific formats
 
 ### Advertisement Encoding
 
-Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](https://github.com/logos-co/logos-lips/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md) encoding.
+Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](extensible-peer-records.md) encoding.
 
 Alternative encodings MAY be used if they provide equivalent functionality
 and can be verified by discoverers.

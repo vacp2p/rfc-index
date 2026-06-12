@@ -353,7 +353,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [libp2p mix protocol](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md/)
+- [libp2p mix protocol](mix.md)
 - [Rate Limiting Nullifiers (RLN)](https://vac.dev/rln)
 - [Rate Limiting Nullifiers v2](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md)
 - [RLN v1](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md)

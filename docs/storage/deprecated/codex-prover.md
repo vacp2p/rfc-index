@@ -25,7 +25,7 @@
 ## Abstract
 
 This specification defines the Proving module for
-[Codex](https://github.com/codex-storage/nim-codex),
+[Codex](https://github.com/logos-storage/logos-storage-nim),
 which provides a succinct, publicly verifiable way to check that storage
 providers still hold the data they committed to.
 The proving module samples cells from stored slots,
@@ -37,7 +37,7 @@ to manage incentives such as payments and slashing.
 ## Background / Rationale / Motivation
 
 In decentralized storage networks such as
-[Codex](https://github.com/codex-storage/nim-codex),
+[Codex](https://github.com/logos-storage/logos-storage-nim),
 one of the main challenges is ensuring durability and availability of data
 stored by storage providers.
 To achieve durability, random sampling combined with erasure coding is used
@@ -529,7 +529,7 @@ Storage providers must submit valid proofs within the proof window deadline. Thi
 
 ## Rationale
 
-This specification is based on the Proving module component specification from the [Codex project](https://github.com/codex-storage/nim-codex).
+This specification is based on the Proving module component specification from the [Codex project](https://github.com/logos-storage/logos-storage-nim).
 
 ### Probabilistic Verification
 
@@ -572,7 +572,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Normative
 
-- **Codex**: [GitHub - codex-storage/nim-codex](https://github.com/codex-storage/nim-codex)
+- **Codex**: [GitHub - codex-storage/nim-codex](https://github.com/logos-storage/logos-storage-nim)
 - **Codex Prover Specification**: [Codex Docs - Component Specification - Prover](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Prover.md)
 - **CODEX-SLOT-BUILDER**: Codex Slot Builder specification (defines `SlotsBuilder`
   and slot commitment construction)

@@ -457,7 +457,7 @@ of their connections and remove peers with a low score.
 
 Confidentiality can be addressed through data encryption whereas integrity and
 authenticity are achievable through digital signatures.
-These features are provided for in [14/WAKU2-MESSAGE (version 1)](/messaging/stable/14/message.md#version-1)`
+These features are provided for in [14/WAKU2-MESSAGE (version 1)](../../stable/14/message.md#payload-encryption)`
 through payload encryption as well as encrypted signatures.
 
 ### Security Considerations
@@ -491,9 +491,9 @@ the security features of each layer-->
 
 There are multiple implementations of Waku and its protocols:
 
-- [nim-waku (Nim)](https://github.com/status-im/nim-waku/)
+- [nim-waku (Nim)](https://github.com/logos-messaging/logos-delivery/)
 - [go-waku (Go)](https://github.com/status-im/go-waku/)
-- [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
+- [js-waku (NodeJS and Browser)](https://github.com/logos-messaging/logos-delivery-js/)
 
 Below you can find an overview of the specifications that they implement
 as they relate to Waku.
@@ -630,11 +630,11 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 27. [GossipSub v1.1](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md)
 
-28. [nim-waku (Nim)](https://github.com/status-im/nim-waku/)
+28. [nim-waku (Nim)](https://github.com/logos-messaging/logos-delivery/)
 
 29. [go-waku (Go)](https://github.com/status-im/go-waku/)
 
-30. [js-waku (NodeJS and Browser)](https://github.com/status-im/js-waku/)
+30. [js-waku (NodeJS and Browser)](https://github.com/logos-messaging/logos-delivery-js/)
 
 31. [8/WAKU-MAIL](/messaging/stable/8/mail.md)
 

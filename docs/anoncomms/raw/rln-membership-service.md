@@ -38,7 +38,7 @@ to determine client eligibility for membership allocation.
 ## Motivation
 
 The Rate Limiting Nullifier (RLN) protocol, as specified in
-[32/RLN-V1](./32/rln-v1.md), requires users to register their
+[32/RLN-V1](../draft/32/rln-v1.md), requires users to register their
 identity commitments in a membership Merkle tree before
 participating in rate-limited anonymous signaling.
 In the standard registration flow, clients submit a transaction
@@ -103,7 +103,7 @@ A client MUST specify the authentication method to use in the
 A client MUST include a payload in the `authentication_payload` field,
 further defined by the authentication method.
 A client MUST include the
-[identity commitment](../32/rln-v1.md#user-identity) to register in the
+[identity commitment](../draft/32/rln-v1.md#user-identity) to register in the
 `identity_commitment` field.
 A client MAY include a `rate_limit` value specifying the requested
 per-epoch message rate limit for the membership; if omitted, the
@@ -219,7 +219,7 @@ message OnchainAuthenticationPayload {
 
 A membership provider MAY advertise that it offers membership allocation
 services by participating in the
-[Logos Capability Discovery protocol](./logos-capability-discovery.md).
+[Logos Capability Discovery protocol](logos-service-discovery.md).
 A membership provider SHOULD include a list of supported authentication
 methods in the metadata field of the `Advertisement` message.
 A membership provider MUST use the protocol ID `/rln/membership/<version>`
@@ -239,6 +239,6 @@ Copyright and related rights waived via
 
 ## References
 
-- [32/RLN-V1](./32/rln-v1.md)
+- [32/RLN-V1](../draft/32/rln-v1.md)
 - [RLN Stealth Commitments](rln-stealth-commitments.md)
-- [Logos Capability Discovery protocol](./logos-capability-discovery.md)
+- [Logos Capability Discovery protocol](logos-service-discovery.md)

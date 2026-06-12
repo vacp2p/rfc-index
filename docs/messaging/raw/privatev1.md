@@ -9,6 +9,8 @@
 | Category | Standards Track |
 | Editor | Jazz Alyxzander (@Jazzz) |
 
+
+
 # Abstract
 
 This specification defines PRIVATE1, a conversation protocol for establishing secure, full-duplex encrypted communication channels between two participants. PRIVATE1 provides end-to-end encryption with forward secrecy and post-compromise security using the Double Ratchet algorithm, combined with reliable message delivery via Scalable Data Sync (SDS) and efficient segmentation for transport-constrained environments.

@@ -9,6 +9,8 @@
 | Category | Standards Track |
 | Editor | Jazzz <jazz@status.im> |
 
+
+
 ## Abstract
 
 This specification defines ContentFrame, a self-describing message format for decentralized chat networks.

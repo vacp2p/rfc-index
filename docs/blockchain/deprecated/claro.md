@@ -553,7 +553,7 @@ The algorithm only requires that nodes have computed the drift of
 observation of the passage of local time, not that that they have
 coordinated an absolute time with their peers.  For an implementation
 of a phase locked-loop feedback to measure local clock drift see
-[NTP](https://www.rfc-editor.org/rfc/rfc5905.html).
+[NTP](https://datatracker.ietf.org/doc/html/rfc5905).
 
 ## Further points
 
@@ -746,7 +746,7 @@ they should be of stable interest no matter if Claro isn't.
 
 ## Normative References
 
-0. [Claro](<https://rdf.logos.co/protocol/Claro/1/0/0/raw>)
+0. [Claro](#consensus-claro)
 
 1. [n3](<https://www.w3.org/DesignIssues/Notation3.html>)
 
