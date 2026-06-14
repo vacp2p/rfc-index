@@ -3,7 +3,7 @@
 | Field        | Value                   |
 |--------------|-------------------------|
 | Name         | Logos Module Transport  |
-| Slug         | 206                     |
+| Slug         | 305                     |
 | Status       | raw                     |
 | Category     | Standards Track         |
 | Editor       | ksr                     |

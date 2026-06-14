@@ -3,7 +3,7 @@
 | Field        | Value                   |
 |--------------|-------------------------|
 | Name         | Logos Module Interface  |
-| Slug         | 202                     |
+| Slug         | 301                     |
 | Status       | raw                     |
 | Category     | Standards Track         |
 | Editor       | ksr                     |

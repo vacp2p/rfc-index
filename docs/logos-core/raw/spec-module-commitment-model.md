@@ -3,7 +3,7 @@
 | Field        | Value                           |
 |--------------|---------------------------------|
 | Name         | Logos Module Commitment Model   |
-| Slug         | 203                             |
+| Slug         | 302                             |
 | Status       | raw                             |
 | Category     | Standards Track                 |
 | Editor       | ksr                             |

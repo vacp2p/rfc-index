@@ -3,7 +3,7 @@
 | Field        | Value                 |
 |--------------|-----------------------|
 | Name         | Logos Module Runtime  |
-| Slug         | 205                   |
+| Slug         | 304                   |
 | Status       | raw                   |
 | Category     | Standards Track       |
 | Editor       | ksr                   |

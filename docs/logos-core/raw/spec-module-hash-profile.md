@@ -3,7 +3,7 @@
 | Field        | Value                       |
 |--------------|-----------------------------|
 | Name         | Logos Module Hash Profile   |
-| Slug         | 204                         |
+| Slug         | 303                         |
 | Status       | raw                         |
 | Category     | Standards Track             |
 | Editor       | ksr                         |
