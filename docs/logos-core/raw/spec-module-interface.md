@@ -1,13 +1,13 @@
 # LOGOS-MODULE-INTERFACE
 
-| Field    | Value                                      |
-|----------|--------------------------------------------|
-| Name     | Logos Module Interface                     |
-| Slug     | LOGOS-MODULE-INTERFACE                     |
-| Status   | raw                                        |
-| Category | Standards Track                            |
-| Editor   | ksr                                        |
-| Contributors | Jarrad, atd                            |
+| Field        | Value                   |
+|--------------|-------------------------|
+| Name         | Logos Module Interface  |
+| Slug         | 202                     |
+| Status       | raw                     |
+| Category     | Standards Track         |
+| Editor       | ksr                     |
+| Contributors | Jarrad, atd             |
 
 ## Abstract
 
@@ -56,8 +56,8 @@ That means the same logical Logos method/event interface MUST remain valid
 across all supported runtime realizations:
 
 - **Direct mode** — in-process C calls using the derived/generated C API
-- **Local IPC mode** — the same contract carried over local deterministic
-  CBOR transport
+- **Socket mode (local IPC)** — the same contract carried over local
+  deterministic CBOR transport
 - **Remote mode** — the same contract carried over remote transport
 
 The execution boundary may change how a call is routed, serialised, scheduled,
@@ -110,6 +110,8 @@ _version = [1, 0]            ; [major, minor]
 
 The `_module` field is the module's flat runtime module name.
 It is used for runtime lookup, socket naming, and C ABI symbol derivation.
+Its syntax is the module-name grammar defined by LOGOS-MODULE-RUNTIME
+section 1.3.
 It is not, by itself, a complete global package identity or cryptographic
 schema identity.
 
@@ -280,11 +282,12 @@ Module schemas MUST only use types from this set:
 |----------|--------------|
 | Primitives | `bool`, `tstr`, `bstr` |
 | Fixed-width integers | `uint8`, `uint16`, `uint32`, `uint64`, `int8`, `int16`, `int32`, `int64` |
+| Literal values | Scalar literals used as exact schema values, especially choice discriminators |
 | Constrained strings | `tstr .size (min..max)`, `bstr .size n` |
 | Arrays | `[* T]` (variable-length), `[T, T, T]` (fixed-length tuple) |
 | Maps | `{ key: type, ... }` (struct-like maps with known keys) |
 | Optional fields | `? key: type` (in maps only) |
-| Choices | `T1 / T2 / T3` (tagged unions; arms MUST have distinct CBOR major types) |
+| Choices | `T1 / T2 / T3` (tagged unions; arms MUST have deterministic, disjoint selection predicates) |
 | Named types | Any type alias defined in the same schema or `logos_common.cddl` |
 
 The following are **NOT allowed** in module schemas:
@@ -410,12 +413,13 @@ The schema method name is used directly in the generated C function suffix.
 
 **Reserved lifecycle names.** The lifecycle/runtime exports
 `logos_<module>_name`, `_schema`, `_version`, `_init`, `_destroy`, and
-`_dispatch` occupy the plain `logos_<module>_*` namespace. Per-method C
-functions therefore use the canonical form `logos_<module>_call_<method>` so
-schema methods such as `init`, `version`, or `destroy` do not collide with the
-required lifecycle symbols. This affects only the generated C symbol names;
-the wire method name remains the bare schema method name (for example
-`"version"`).
+the bootstrap symbol `logos_module_name` occupy reserved ABI namespace.
+Per-method C functions therefore use the canonical form
+`logos_<module>_call_<method>` so schema methods such as `init`, `version`,
+or `destroy` do not collide with required runtime symbols.
+This affects only the generated C symbol names.
+The wire method name remains the bare schema method name, for example
+`"version"`.
 
 **Type names.** CDDL named types map to `logos_<module>_<type_snake>_t`:
 
@@ -567,17 +571,38 @@ Source order may be retained for diagnostics, but it is not ABI-visible.
 **Constraint:** All arms of a choice MUST be distinguishable by the Logos
 decoding rules.
 Source declaration order MUST NOT be used to disambiguate choice arms.
-For this revision, choice arms MUST have distinct CBOR major types so the
-decoder can unambiguously determine which arm was sent.
-For example,
-`uint64 / tstr / bool` is valid (major types 0, 3, 7).
-`uint64 / int64` is NOT valid because both can use major type 0 for
-non-negative values.
-If two arms would collide, use a wrapping map with a discriminant key instead.
+Each choice arm MUST have a deterministic selection predicate as defined by
+LOGOS-MODULE-COMMITMENT-MODEL.
+For a decoded value, exactly one arm predicate MUST match.
+If zero arms or more than one arm predicate match, the value is invalid for
+that choice schema.
+
+Valid choices include arms with disjoint CBOR major types:
+
+```cddl
+value = uint64 / tstr / bool
+```
+
+They also include tagged map unions whose arms are distinguished by a required
+literal discriminator field:
+
+```cddl
+entry =
+  { kind: "file", path: tstr } /
+  { kind: "dir", path: tstr, entries: [* tstr] }
+```
+
+The discriminator field is normal schema data.
+It is encoded as part of the selected map alternative and is not an extra
+transport wrapper.
+Generated bindings MAY represent a required literal discriminator field through
+the generated choice discriminant instead of exposing it as a writable C field.
+Encoders MUST still emit the literal discriminator field in the CBOR map.
+If the selection predicates for two arms overlap, the choice schema is invalid.
 
 ### 2.4 Method Mapping
 
-A request/response pair maps to a single C function:
+A request/response pair maps to a Logos module C function:
 
 ```cddl
 storage.exists_request = {
@@ -592,7 +617,7 @@ maps to:
 
 ```c
 logos_result_t logos_storage_call_exists(
-    logos_module_handle_t* h,
+    logos_call_context_t* ctx,
     const char*            cid,          /* from request map */
     bool*                  out_exists    /* from response map */
 );
@@ -600,7 +625,9 @@ logos_result_t logos_storage_call_exists(
 
 **Rules:**
 
-1. First parameter is always `logos_module_handle_t* h`.
+1. First parameter is always `logos_call_context_t* ctx`.
+   The runtime or module host supplies this opaque call context.
+   Module implementations MAY ignore it.
 2. Request map fields expand to input parameters, in CDDL declaration order.
    Names are derived directly from the CDDL key.
 3. Response map fields expand to output parameters (pointers), appended after
@@ -615,11 +642,13 @@ logos_result_t logos_storage_call_exists(
 7. Struct fields in outputs are passed as a pointer to the struct type.
 8. The function always returns `logos_result_t` for error reporting.
 
-**Note on codegen abstraction:** The C signatures above are the **wire-facing
-API** — what the runtime and transport layer see. Module authors using a
-codegen tool may write simpler signatures with native return types (e.g. `int64_t add(int64_t a, int64_t b)`).
-The codegen wraps these into the canonical `logos_result_t`-returning form.
-This is an implementation convenience, not a spec concern — the generated code MUST conform to the signatures specified here.
+**Note on authoring convenience:** Module authors using a module kit may write
+simpler implementation functions with native return types, existing state
+parameters, or language-specific bindings.
+The module kit wraps these into the canonical `logos_result_t`-returning form.
+This is an implementation convenience:
+the exported Logos module C functions MUST conform to the signatures specified
+here.
 
 **More examples:**
 
@@ -632,8 +661,8 @@ storage.space_response = {
 
 ```c
 logos_result_t logos_storage_call_space(
-    logos_module_handle_t*          h,
-    logos_storage_space_info_t*     out_info
+    logos_call_context_t*       ctx,
+    logos_storage_space_info_t* out_info
 );
 ```
 
@@ -649,7 +678,7 @@ storage.upload_url_response = {
 
 ```c
 logos_result_t logos_storage_call_upload_url(
-    logos_module_handle_t* h,
+    logos_call_context_t* ctx,
     const char*            url,
     uint64_t               chunk_size,
     bool*                  out_accepted
@@ -694,29 +723,8 @@ Every module shared library MUST export these C symbols:
 - `logos_<module>_init()` is called once after loading.
   It returns `0` on success or a nonzero Logos error code on failure.
 - `logos_<module>_destroy()` is called once before unloading.
-- `logos_<module>_dispatch()` is the socket-mode entry point.
-  It receives the bare method name plus the deterministic-CBOR-encoded request
-  payload.
-  It does not parse the outer transport envelope.
-- `logos_free()` releases typed dynamic outputs and module-kit helper
-  allocations returned across this ABI.
-- `logos_<module>_dispatch()` MUST:
-  - look up the method in the generated dispatch table,
-  - return `LOGOS_ERR_METHOD_NOT_FOUND` for an unknown method,
-  - decode `params_cbor` according to the method request schema,
-  - return `LOGOS_ERR_INVALID_PARAMS` if decode fails,
-  - call the corresponding per-method C function,
-  - encode a successful response as a deterministic CBOR map matching the
-    method response
-    schema, and
-  - encode a module-level error as the error payload described in section 4.4.
-- The caller frees any non-null `_dispatch()` response buffer with `free()`.
-  This is a narrow dispatch-buffer rule:
-  `_dispatch()` response buffers are allocated with the C allocator because
-  the dispatch ABI is the lowest common denominator used by independent
-  module hosts.
-  Typed per-method outputs and module-kit helper allocations use
-  `logos_free()` as described in section 2.7.
+- `logos_<module>_free()` releases dynamic memory returned by this module
+  across this ABI.
 - `logos_module_name()` is the bootstrap symbol for runtimes that do not know
   the module name in advance.
   The runtime calls `dlsym("logos_module_name")` to discover the module
@@ -746,23 +754,14 @@ int logos_<module>_init(void);
 /* Shut down module (called once before unloading) */
 void logos_<module>_destroy(void);
 
-/* Dispatch a method call (socket-mode entry point). */
-int logos_<module>_dispatch(
-    const char*     method,         /* bare method name (e.g. "exists") */
-    const uint8_t*  params_cbor,    /* deterministic-CBOR-encoded params map */
-    size_t          params_len,
-    uint8_t**       response,       /* callee allocates with malloc() */
-    size_t*         response_len
-);
-
 /* Bootstrap symbol — universal probe for unknown modules. */
 const char* logos_module_name(void);
 
-/* Shared deallocator for typed dynamic outputs and module-kit helpers */
-void logos_free(void* ptr);
+/* Module deallocator for dynamic memory returned across this ABI */
+void logos_<module>_free(void* ptr);
 ```
 
-In addition to these lifecycle and dispatch symbols, a conforming module exports
+In addition to these lifecycle and helper symbols, a conforming module exports
 the per-method C functions derived from the CDDL schema as specified in
 section 2.4.
 
@@ -786,9 +785,10 @@ The benefits of keeping `_version()` in v0.1 are pragmatic:
   trivially, while still keeping the schema authoritative for interface shape.
 
 In **direct mode** (in-process), the runtime calls per-method functions
-directly. In **socket mode**, the runtime calls `_dispatch()` which decodes
-the deterministic CBOR request and delegates to the appropriate per-method
-function. The `_dispatch()` implementation is generated by the codegen tool.
+directly.
+In **socket mode**, the module host decodes deterministic CBOR requests,
+invokes the corresponding per-method C function, and encodes deterministic
+CBOR responses.
 
 **Important distinction: lifecycle `_init()` vs schema method `init`.**
 
@@ -806,7 +806,8 @@ that remains necessary after lifecycle `_init()` has succeeded.
 Successful lifecycle `_init()` therefore means:
 
 - the module has loaded correctly into the runtime
-- the runtime may call `_dispatch()` or direct per-method entry points
+- the runtime or module host may invoke schema-defined methods through the
+  native per-method C entry points
 
 It does **not** mean every schema-defined method must already succeed.
 Schema-defined methods MAY still return `LOGOS_ERR_NOT_READY` until the
@@ -819,29 +820,43 @@ boundary.
 Without this, independently implemented runtimes and modules cannot safely
 interoperate.
 
-The ABI therefore defines one shared deallocation function for typed dynamic
-outputs and module-kit helper allocations:
+The ABI therefore defines a module-owned deallocation function for dynamic
+memory returned across the module ABI boundary:
 
 ```c
-void logos_free(void* ptr);
+void logos_<module>_free(void* ptr);
 ```
 
 **Lifetime rules:**
 
-- `logos_result_t.message` and `.detail` are valid until the next call to any
-  `logos_*` function on the same handle. Callers MUST copy to retain.
+- For callee-side module C functions, `logos_result_t.message` and `.detail`
+  are valid until the next Logos module call using the same
+  `logos_call_context_t*`, or until the call context is destroyed, whichever
+  comes first.
+  Module hosts MUST copy these fields before that point if they need to encode,
+  retain, or forward them later.
+- For caller-side runtime handles or generated caller helpers,
+  `logos_result_t.message` and `.detail` are valid until the next Logos call on
+  the same handle or helper-owned call state.
+  Callers MUST copy these fields to retain them.
 - Output pointers (`out_*`) for dynamically-sized data (`tstr`, `bstr`,
-  arrays) are allocated by the callee. Callers free with `logos_free()`.
+  arrays) are allocated by the callee. Callers MUST free them with the same
+  module's `logos_<module>_free()`.
 - Output structs are caller-allocated (passed as pointer); the callee fills
   them in. Any dynamic fields within the struct (strings, arrays) are
-  callee-allocated and freed with `logos_free()`.
+  callee-allocated and freed with the same module's
+  `logos_<module>_free()`.
 - All `const` pointer input parameters are borrowed for the duration of the
   call. Modules MUST copy if they need to retain.
 - `_name()` and `_schema()` return static strings. Callers MUST NOT free.
-- Raw `_dispatch()` response buffers are the one exception to the
-  `logos_free()` rule:
-  they are allocated with `malloc()` and freed by the module host with
-  `free()` as specified in section 2.6.
+- `logos_<module>_free(NULL)` MUST be a no-op.
+
+The module that allocates memory owns the corresponding deallocator.
+In direct mode, the runtime or generated caller helper obtains the deallocator
+from the same module binding that produced the output.
+Across process, sandbox, container, or remote boundaries, raw pointers do not
+cross the boundary; the side that decodes serialized data owns and frees its
+own decoded allocations.
 
 ---
 
@@ -872,11 +887,11 @@ Only these C types are permitted in module function signatures:
 | `logos_<module>_<type>_t` | Named struct type |
 | `const T*` + `size_t` (pair) | `[* T]` (array) |
 | `logos_result_t` | (return type only; maps to error handling) |
-| `logos_module_handle_t*` | (first param only; not in CDDL) |
+| `logos_call_context_t*` | (first param only; not in CDDL) |
 
 **Disallowed C constructs in the API surface:**
 
-- `void*` (except in `logos_free`)
+- `void*` (except in `logos_<module>_free`)
 - Raw pointers that are not `const char*` or `const uint8_t* + size_t`
 - Function pointers (no callbacks in module interfaces)
 - `float` and `double` (reserved for a future deterministic numeric profile)
@@ -889,13 +904,13 @@ The codegen tool recognises module functions by pattern:
 
 ```c
 logos_result_t logos_<module>_<method>(
-    logos_module_handle_t* h,
+    logos_call_context_t* ctx,
     <input params...>,
     <output params...>        /* out_ prefix */
 );
 ```
 
-- The `logos_module_handle_t*` first parameter is stripped (not in CDDL).
+- The `logos_call_context_t*` first parameter is stripped (not in CDDL).
 - Input parameters (no `out_` prefix) become request map fields.
 - Output parameters (`out_` prefix, pointer types) become response map fields.
 - `logos_result_t` return is stripped (error handling, not in CDDL data).
@@ -907,7 +922,7 @@ logos_result_t logos_<module>_<method>(
 
 ```c
 logos_result_t logos_storage_upload_url(
-    logos_module_handle_t* h,
+    logos_call_context_t* ctx,
     const char*            url,
     uint64_t               chunk_size,
     bool*                  out_accepted
@@ -975,9 +990,10 @@ storage.upload_progress_event = {
 
 ### 3.5 Lifecycle Symbol Recognition
 
-The lifecycle symbols (`_name`, `_schema`, `_version`, `_init`, `_destroy`,
-`_dispatch`) are recognised by name and excluded from the CDDL schema. They
-are part of the runtime contract, not the module interface.
+The runtime symbols (`_name`, `_schema`, `_version`, `_init`, `_destroy`,
+and `_free`) are recognised by name and excluded from the CDDL schema.
+They are part of the runtime contract, not schema-defined module methods.
+The `_free` suffix refers to the module-prefixed `logos_<module>_free` symbol.
 
 ### 3.6 Roundtrip Guarantee
 
@@ -1056,8 +1072,9 @@ presence.
 
 **Choices:** Encoded as the raw deterministic CBOR value of the selected
 alternative.
-The decoder determines which alternative was sent by inspecting the CBOR major
-type and validating against the schema-defined alternatives.
+The decoder determines which alternative was sent by applying the
+schema-defined deterministic selection predicates.
+Choice selection MUST NOT depend on source declaration order.
 
 ### 4.3 Method Call and Event Encoding
 
@@ -1124,7 +1141,7 @@ the error path from module to caller spans all three specs:
 Module C function returns logos_result_t with code != LOGOS_OK
     |
     v
-_dispatch() encodes error as deterministic CBOR error-payload:
+Module host or generated adapter encodes error as deterministic CBOR error-payload:
 {code, message, ?detail}
     |
     v
@@ -1138,7 +1155,7 @@ Per-method C function on caller side returns logos_result_t with the error
 ```
 
 **Direct mode shortcut:** In direct mode, the per-method function returns
-`logos_result_t` directly. No encoding, no transport, no dispatch. The error
+`logos_result_t` directly. No encoding or transport is involved. The error
 code passes through unchanged.
 
 **Protocol-level errors** are distinct from method errors.
@@ -1199,7 +1216,6 @@ logos_result = {
 
 ; -- module handle (opaque, not on wire) --
 ; logos_module_handle_t is a runtime concept, not serialised.
-; It appears only in C signatures as the first parameter.
 
 ; -- introspection (well-known method, available on all modules) --
 logos.schema_request = {}
@@ -1260,6 +1276,11 @@ concepts defined above.
 - `logos_result_t.message` is human-readable text and MAY be `NULL`.
 - `logos_result_t.detail` is an optional deterministic CBOR detail payload and
   MAY be `NULL`.
+- `logos_call_context_t` is opaque to module implementations.
+- The runtime or module host supplies a call context when invoking a Logos
+  module C function.
+- Module implementations MAY ignore the call context.
+- The call context is not serialized and is not a caller-side routing handle.
 - `logos_module_handle_t` is opaque to callers.
 - A handle represents a connection to a specific module instance.
 - The runtime allocates handles and callers obtain them through the runtime
@@ -1273,7 +1294,8 @@ concepts defined above.
 - Handles are not intrinsically thread-safe.
   A single handle MUST NOT be used concurrently from multiple threads
   without external synchronization.
-- `logos_free()` deallocates memory returned across the module ABI boundary.
+- `logos_<module>_free()` deallocates memory returned by that module across
+  the module ABI boundary.
 
 ```c
 #include <stdint.h>
@@ -1304,6 +1326,14 @@ typedef struct {
     size_t              detail_len;
 } logos_result_t;
 
+/* -- Call context -- */
+
+/*
+ * Opaque inbound-call context supplied by the runtime or module host.
+ * Module implementations may ignore this pointer.
+ */
+typedef struct logos_call_context logos_call_context_t;
+
 /* -- Module handle -- */
 
 /*
@@ -1326,7 +1356,7 @@ typedef struct logos_module_handle {
 
 /* -- Memory management -- */
 
-void logos_free(void* ptr);
+void logos_<module>_free(void* ptr);
 ```
 
 Memory lifetime rules: see section 2.7.
@@ -1388,17 +1418,17 @@ or external references (URLs, CIDs) rather than inline byte strings.
 ## Appendix A. Generated Artifacts (Informative)
 
 The mapping rules in sections 2 through 4 can be applied mechanically to
-produce C headers, dispatch implementations, event helpers, and client stubs.
+produce C headers, adapter implementations, event helpers, and client stubs.
 This appendix describes common derived artifacts and implementation patterns.
-The normative requirements are the ABI, mapping, dispatch, and encoding rules
-defined in the main body of this specification.
+The normative requirements are the ABI, mapping, method-call, and encoding
+rules defined in the main body of this specification.
 
 ### A.1 CDDL-to-C Artifacts
 
 | Output file               | Contents                                         |
 |--------------------------|--------------------------------------------------|
 | `<module>.h`             | C header: typedefs, per-method function declarations, event publish helper declarations. Module author implements the per-method functions. |
-| `<module>_dispatch.c`    | `_dispatch()`: deterministic CBOR decode → C call → deterministic CBOR encode. Also `_name()`, `_version()`, `_schema()`, `_init()` stub, `_destroy()` stub, `logos_module_name()` bootstrap symbol. |
+| `<module>_adapter.c`     | Optional generated adapter support: deterministic CBOR decode -> C call -> deterministic CBOR encode, plus `_name()`, `_version()`, `_schema()`, `_init()` stub, `_destroy()` stub, `logos_module_name()` bootstrap symbol. |
 | `<module>_events.c`      | Typed event publish helpers (Appendix A.4). |
 | `<module>_client.h`      | Typed client stub declarations (Appendix A.5). |
 | `<module>_client.c`      | Client stub implementations. |
@@ -1410,12 +1440,17 @@ to the allowed subset in section 3.
 After deriving the CDDL schema, it may produce the same artifact family listed
 in Appendix A.1.
 
-### A.3 Generated Dispatch
+### A.3 Generated Dispatch Adapter
 
-A generated `_dispatch()` implementation follows the behavior specified in
-section 2.6.
-For each method `M` declared in the schema, it commonly has a branch with this
-shape:
+A module kit or runtime profile MAY generate a dispatch adapter as an
+implementation strategy.
+This adapter is not part of the portable module ABI defined in section 2.6.
+It is an optional generated layer that can support a uniform dispatch table,
+vtable, or internal host-call ABI while preserving the ordinary per-method C
+API as the module contract.
+
+For each method `M` declared in the schema, such an adapter commonly has a
+branch with this shape:
 
 ```c
 if (strcmp(method, "M") == 0) {
@@ -1426,8 +1461,25 @@ if (strcmp(method, "M") == 0) {
 }
 ```
 
-The generated dispatch also handles the `logos.schema` well-known method
-(returns `_schema()`) and unknown methods (`LOGOS_ERR_METHOD_NOT_FOUND`).
+Such an adapter commonly:
+
+- looks up the method in a generated dispatch table,
+- returns `LOGOS_ERR_METHOD_NOT_FOUND` for an unknown method,
+- decodes the deterministic CBOR request payload according to the method
+  request schema,
+- returns `LOGOS_ERR_INVALID_PARAMS` if decode fails,
+- calls the corresponding per-method C function,
+- encodes a successful response as a deterministic CBOR map matching the
+  method response schema, and
+- encodes a module-level error as the error payload described in section 4.4.
+
+The generated adapter may also handle the `logos.schema` well-known method
+by returning `_schema()`, and unknown methods by returning
+`LOGOS_ERR_METHOD_NOT_FOUND`.
+This adapter pattern corresponds to the dispatch-table or vtable strategy
+described in LOGOS-MODULE-RUNTIME Appendix A.
+It is retained here as implementation guidance for this revision and may be
+removed or revised in a future version.
 
 The generated `_init()` and `_destroy()` stubs are empty — module authors
 override them if they need initialisation/cleanup.
@@ -1479,9 +1531,9 @@ logos_result_t logos_storage_client_exists(
 The implementation deterministic-CBOR-encodes `{cid}`, calls
 `call(call_user_data, "storage_module", {"method":"exists","params":{cid}}, len,
 &resp, &resp_len)`,
-decodes the response map, and writes `out_exists`. The signature mirrors
-the per-method function (section 2.4) but takes `logos_call_module_fn`
-instead of `logos_module_handle_t*`.
+decodes the response map, and writes `out_exists`.
+The signature is a client-side helper shape for use with the runtime-provided
+module-call callback.
 `call_user_data` follows the same process-local callback context rules as
 the runtime-provided call-module hook.
 

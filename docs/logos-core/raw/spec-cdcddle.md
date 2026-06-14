@@ -1,13 +1,13 @@
 # cdCDDLe
 
-| Field        | Value                                      |
-|--------------|--------------------------------------------|
-| Name         | cdCDDLe                                    |
-| Slug         | CDCDDLE                                    |
-| Status       | raw                                        |
-| Category     | Standards Track                            |
-| Editor       | ksr                                        |
-| Contributors | atd, Jarrad                                |
+| Field        | Value           |
+|--------------|-----------------|
+| Name         | cdCDDLe         |
+| Slug         | 200             |
+| Status       | raw             |
+| Category     | Standards Track |
+| Editor       | ksr             |
+| Contributors | atd, Jarrad     |
 
 ## Abstract
 
@@ -285,6 +285,23 @@ interpretation, the order should remain represented.
 
 `cdCDDLe` MUST NOT fully inline all references by default.
 Inlining erases the difference between a bound name and an anonymous structure.
+
+The name-preserving canonical model is finite even when the resolved CDDL rule
+graph contains recursive or cyclic references.
+References are represented as reference nodes.
+They are not replaced by the referenced rule body during canonicalization.
+
+The resolved rule/reference relation MAY form a graph.
+That graph MAY contain cycles if the underlying CDDL schema and resolver accept
+them.
+Such cycles do not create cycles in the canonical schema-as-data item because
+the canonical item stores references by name.
+
+Any diagnostic or derived expanded view that follows references recursively
+MUST detect cycles and mark or reject the expansion according to that derived
+view's own rules.
+Such an expanded view is not the canonical model defined by this
+specification.
 
 `cdCDDLe` defines only the name-preserving canonical model.
 A future extension MAY define a derived structural-equivalence view for
@@ -687,10 +704,280 @@ This revision deliberately leaves the following decisions open:
   nodes;
 - whether a future extension should define a structural-equivalence view in
   addition to the required name-preserving canonical model;
-- final conformance-vector publication format and byte examples.
+- final conformance-vector publication format and additional byte examples.
 
 These issues should be resolved before this specification advances beyond
 its current raw maturity level.
+
+## Appendix A. Storage-Like cdCDDLe Vector (Informative)
+
+This appendix gives an informative `cdCDDLe` vector for the Storage-like
+schema used by LOGOS-MODULE-COMMITMENT-MODEL Appendix A.
+It shows the generic `cdCDDLe` canonical CDDL schema model before Logos domain
+interpretation.
+It does not synthesize Logos method declarations, choose a schema namespace, or
+assign Logos schema roots.
+
+Input CDDL:
+
+```cddl
+_module = "storage_module"
+_version = [1, 0]
+
+storage.cid = tstr .size (1..128)
+storage.blob_hash = bstr .size 32
+storage.lookup_key = storage.cid / storage.blob_hash
+
+storage.exists_request = {
+    key: storage.lookup_key,
+}
+
+storage.exists_response = {
+    exists: bool,
+}
+
+storage.changed_event = {
+    cid: storage.cid,
+    digest: storage.blob_hash,
+}
+```
+
+Construction notes:
+
+- `_module` and `_version` are ordinary CDDL type rules at this generic layer.
+- Top-level rules are sorted by canonical rule key.
+- Local references are preserved as reference nodes and are not inlined.
+- The choice alternative order in `storage.lookup_key` is preserved.
+- The `.size` controls are represented as control-application nodes with
+  operator name `"size"`.
+
+The canonical diagnostic notation for the `cdCDDLe` document node is:
+
+```cbor-diag
+{
+  0: 0,
+  1: [
+    {
+      0: 1,
+      1: "_module",
+      3: {
+        0: 6,
+        1: "tstr",
+        2: "storage_module",
+      },
+    },
+    {
+      0: 1,
+      1: "_version",
+      3: {
+        0: 7,
+        1: {
+          0: 9,
+          1: [
+            {
+              0: 10,
+              2: {
+                0: 6,
+                1: "uint",
+                2: 1,
+              },
+            },
+            {
+              0: 10,
+              2: {
+                0: 6,
+                1: "uint",
+                2: 0,
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      0: 1,
+      1: "storage.blob_hash",
+      3: {
+        0: 14,
+        1: "size",
+        2: {
+          0: 5,
+          1: "bstr",
+        },
+        3: {
+          0: 6,
+          1: "uint",
+          2: 32,
+        },
+      },
+    },
+    {
+      0: 1,
+      1: "storage.changed_event",
+      3: {
+        0: 8,
+        1: {
+          0: 9,
+          1: [
+            {
+              0: 10,
+              1: {
+                0: 21,
+                1: {
+                  0: 6,
+                  1: "tstr",
+                  2: "cid",
+                },
+              },
+              2: {
+                0: 3,
+                1: "storage.cid",
+              },
+            },
+            {
+              0: 10,
+              1: {
+                0: 21,
+                1: {
+                  0: 6,
+                  1: "tstr",
+                  2: "digest",
+                },
+              },
+              2: {
+                0: 3,
+                1: "storage.blob_hash",
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      0: 1,
+      1: "storage.cid",
+      3: {
+        0: 14,
+        1: "size",
+        2: {
+          0: 5,
+          1: "tstr",
+        },
+        3: {
+          0: 13,
+          1: {
+            0: 6,
+            1: "uint",
+            2: 1,
+          },
+          2: {
+            0: 6,
+            1: "uint",
+            2: 128,
+          },
+          3: true,
+          4: true,
+        },
+      },
+    },
+    {
+      0: 1,
+      1: "storage.exists_request",
+      3: {
+        0: 8,
+        1: {
+          0: 9,
+          1: [
+            {
+              0: 10,
+              1: {
+                0: 21,
+                1: {
+                  0: 6,
+                  1: "tstr",
+                  2: "key",
+                },
+              },
+              2: {
+                0: 3,
+                1: "storage.lookup_key",
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      0: 1,
+      1: "storage.exists_response",
+      3: {
+        0: 8,
+        1: {
+          0: 9,
+          1: [
+            {
+              0: 10,
+              1: {
+                0: 21,
+                1: {
+                  0: 6,
+                  1: "tstr",
+                  2: "exists",
+                },
+              },
+              2: {
+                0: 5,
+                1: "bool",
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      0: 1,
+      1: "storage.lookup_key",
+      3: {
+        0: 12,
+        1: [
+          {
+            0: 3,
+            1: "storage.cid",
+          },
+          {
+            0: 3,
+            1: "storage.blob_hash",
+          },
+        ],
+      },
+    },
+  ],
+}
+```
+
+The deterministic CBOR byte length is `566` bytes.
+The deterministic CBOR bytes, in hexadecimal, are:
+
+```text
+a200000188a3000101675f6d6f64756c6503a30006016474737472026e73746f
+726167655f6d6f64756c65a3000101685f76657273696f6e03a2000701a20009
+0182a2000a02a30006016475696e740201a2000a02a30006016475696e740200
+a30001017173746f726167652e626c6f625f6861736803a4000e016473697a65
+02a2000501646273747203a30006016475696e74021820a30001017573746f72
+6167652e6368616e6765645f6576656e7403a2000801a200090182a3000a01a2
+001501a30006016474737472026363696402a20003016b73746f726167652e63
+6964a3000a01a2001501a30006016474737472026664696765737402a2000301
+7173746f726167652e626c6f625f68617368a30001016b73746f726167652e63
+696403a4000e016473697a6502a2000501647473747203a5000d01a300060164
+75696e74020102a30006016475696e7402188003f504f5a30001017673746f72
+6167652e6578697374735f7265717565737403a2000801a200090181a3000a01
+a2001501a3000601647473747202636b657902a20003017273746f726167652e
+6c6f6f6b75705f6b6579a30001017773746f726167652e6578697374735f7265
+73706f6e736503a2000801a200090181a3000a01a2001501a300060164747374
+72026665786973747302a200050164626f6f6ca30001017273746f726167652e
+6c6f6f6b75705f6b657903a2000c0182a20003016b73746f726167652e636964
+a20003017173746f726167652e626c6f625f68617368
+```
 
 ---
 

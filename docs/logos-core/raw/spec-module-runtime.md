@@ -1,13 +1,13 @@
 # LOGOS-MODULE-RUNTIME
 
-| Field    | Value                                      |
-|----------|--------------------------------------------|
-| Name     | Logos Module Runtime                       |
-| Slug     | LOGOS-MODULE-RUNTIME                       |
-| Status   | raw                                        |
-| Category | Standards Track                            |
-| Editor   | ksr                                        |
-| Contributors | Jarrad, atd                            |
+| Field        | Value                 |
+|--------------|-----------------------|
+| Name         | Logos Module Runtime  |
+| Slug         | 205                   |
+| Status       | raw                   |
+| Category     | Standards Track       |
+| Editor       | ksr                   |
+| Contributors | Jarrad, atd           |
 
 ## Abstract
 
@@ -20,17 +20,9 @@ connected, and managed at runtime. It covers:
 - Event subscription (how modules publish and receive events)
 - Process isolation models (multi-process vs single-process)
 - Module lifecycle (unloaded -> loaded -> ready -> stopping -> unloaded)
+- Runtime-control interface for privileged runtime-host lifecycle control
 - Threading and concurrency model
-- Packaging (how module code + schema + metadata are bundled)
 - Streaming and large data (acknowledged gap)
-
-An implementor who reads this document and LOGOS-MODULE-INTERFACE
-should be able to write a complete alternative module runtime in any language.
-
-In particular, an implementation in Nim, Rust, or another language MUST
-NOT need Qt in order to satisfy this specification. Qt-based launcher or host
-integration code may exist in a specific application, but that is not part of
-the normative runtime model here.
 
 This spec does NOT define the module interface format (see
 LOGOS-MODULE-INTERFACE) or the socket wire protocol (see
@@ -38,7 +30,7 @@ LOGOS-MODULE-TRANSPORT).
 
 This spec also does NOT define host-application-specific launcher plumbing
 such as package scanning policy, GUI-framework process management, or any
-particular auth-token handoff mechanism between a host shell and a spawned
+particular auth-token handoff mechanism between a runtime host and a spawned
 module process. A concrete host MAY implement such mechanisms, but they are
 deployment concerns rather than part of the reusable module-runtime contract.
 
@@ -57,6 +49,15 @@ In other words, routing mode is a runtime concern.
 Changing execution boundary MUST NOT silently change the interface contract
 observed by callers.
 
+Direct mode has two binding forms:
+
+- **Dynamic direct mode:** the module is loaded from a dynamic library, and the
+  runtime resolves the mandatory C symbols with `dlopen` / `dlsym` or an
+  equivalent platform mechanism.
+- **Static direct mode:** the module is linked into the application or runtime
+  binary, and the runtime obtains addresses for the same mandatory C symbols
+  through build-time or startup integration.
+
 ## 1. Module Structure
 
 ### 1.1 What a Module Is
@@ -71,19 +72,23 @@ executable that:
 
 ### 1.2 Required Exports
 
-Every module shared library MUST export these symbols with C linkage:
+LOGOS-MODULE-INTERFACE is the normative owner of the module shared-library C
+ABI.
+A runtime implementation MUST treat every symbol classified there as mandatory
+as a required load/bind symbol for native shared-library modules.
+If any mandatory symbol is missing, the runtime MUST reject the module with a
+descriptive error.
 
-| Symbol | Purpose |
-|--------|---------|
-| `logos_<module>_name()` | Returns the module's unique name |
-| `logos_<module>_schema()` | Returns the CDDL schema as a string |
-| `logos_<module>_version()` | Returns the schema version string |
-| `logos_<module>_init()` | Initialise the module |
-| `logos_<module>_destroy()` | Shut down the module |
-| `logos_<module>_dispatch()` | Handle a CBOR RPC request |
+In these symbol names, `<module>` is the module's flat runtime module name as
+defined in section 1.3.
 
-Plus all per-method C functions declared in the CDDL schema (see
-LOGOS-MODULE-INTERFACE section 2.4 for the signature mapping).
+Symbols classified as optional or well-known extension symbols are not required
+for every module.
+When present, the runtime MUST bind and use them according to their defining
+Runtime section.
+
+Version metadata is not canonical schema identity;
+structural schema identity is defined by LOGOS-MODULE-COMMITMENT-MODEL.
 
 ### 1.3 Module Naming
 
@@ -130,7 +135,7 @@ void* lib = dlopen("storage_module.so", RTLD_NOW | RTLD_LOCAL);
 typedef const char* (*schema_fn)(void);
 schema_fn get_schema = (schema_fn)dlsym(lib, "logos_storage_module_schema");
 
-/* ... etc for _name, _version, _init, _destroy, _dispatch */
+/* ... etc for _name, _version, _init, _destroy, and per-method C symbols */
 ```
 
 If any required symbol is missing, the module MUST be rejected with a
@@ -161,68 +166,49 @@ remaining prefixed symbols.
 Modules SHOULD export the bootstrap symbol. The runtime MUST support both
 strategies.
 
-### 2.3 Static Linking (Mobile / iOS)
+### 2.3 Static Direct Mode
 
-On platforms where dynamic loading is unavailable (iOS), modules are
-statically linked into the application binary. The runtime discovers them
-via a registration table:
+On platforms where dynamic loading is unavailable or undesirable, modules MAY be
+statically linked into the application or runtime binary.
+This is static direct mode.
 
-- The registration table is a static module vtable whose fields correspond to
-  the lifecycle and dispatch symbols defined in
-  LOGOS-MODULE-INTERFACE section 2.6.
-- For statically linked modules, the runtime uses these function pointers
-  instead of resolving symbols with `dlsym`.
-- The module author owns the vtable object.
-  The runtime copies the pointers it needs during registration, so the caller
-  does not need to preserve the registration struct after the call returns.
-- Applications MUST register statically linked modules before
-  `logos_runtime_start()`.
+Static direct mode MUST bind the same mandatory C symbols defined by
+LOGOS-MODULE-INTERFACE.
+This includes metadata, lifecycle, schema, module deallocation, and
+schema-derived per-method C symbols.
+If a module exposes optional well-known callback setters, static direct mode
+MUST make those setters available through the selected binding mechanism.
 
-```c
-/* Module vtable for static registration.
- *
- * Each field corresponds to a lifecycle symbol from LOGOS-MODULE-INTERFACE
- * section 2.6. For statically linked modules, these are function pointers
- * instead of dlsym'd symbols.
- *
- * The vtable is owned by the module author (typically a static const).
- * The runtime copies the pointers during registration — the vtable
- * struct itself does not need to remain valid after the register call.
- */
-typedef struct {
-    const char*         name;       /* -> logos_<module>_name() */
-    const char*         (*schema)(void);
-    const char*         (*version)(void);
-    int                 (*init)(void);
-    void                (*destroy)(void);
-    int                 (*dispatch)(const char* method,
-                                    const uint8_t* params_cbor, size_t params_len,
-                                    uint8_t** response, size_t* response_len);
-    logos_publish_fn    publish;    /* may be NULL; runtime sets it during init */
-    void*               publish_user_data;
-} logos_module_vtable_t;
+The binding mechanism is implementation-defined and MAY be generated by a module
+kit.
+Common mechanisms include generated registration tables, generated static symbol
+resolvers, linker-section registration, or application startup code that passes
+known function pointers to the runtime.
 
-/* Application registers modules at startup.
- * Must be called before logos_runtime_start(). */
-void logos_runtime_register_module(const logos_module_vtable_t* vtable);
-```
+Static direct mode MUST NOT define a second callee-side module interface.
+It is a binding mechanism for the mandatory C module interface.
 
-### 2.4 Standalone Process Mode
+Applications using static direct mode MUST make the module bindings available
+before `logos_runtime_start()`.
 
-A module MAY run as a standalone executable (rather than a shared library
-loaded by the runtime). In this mode:
+### 2.4 Standalone Transport Module
+
+A module MAY run as a standalone executable that implements
+LOGOS-MODULE-TRANSPORT directly rather than as a shared library loaded by a
+module host process.
+In this mode:
 
 - The module binary starts, binds a Unix domain socket or TCP port, and
-  listens for CBOR RPC requests (per LOGOS-MODULE-TRANSPORT).
+  listens for Logos deterministic CBOR requests per LOGOS-MODULE-TRANSPORT.
 - The runtime connects to the module as a client.
-- The module still exports the dispatch function internally, but calls arrive
-  over the socket rather than via `dlopen`.
+- The module does not need to expose the shared-library C ABI, because it
+  implements the transport endpoint itself.
 
 This mode is useful for modules written in languages that don't produce
 shared libraries (e.g. a Go module, a JVM module).
 
-Security requirements for standalone process mode are the same as for any
-socket-hosted module:
+Security requirements for standalone transport modules are the same as for any
+out-of-process transport module:
 
 - the runtime MUST authenticate the peer according to the active runtime
   security policy,
@@ -254,8 +240,9 @@ by the runtime and codegen tool — module authors do not declare it.
 ### 3.1 Purpose
 
 The service registry maps module names to their locations (socket paths,
-in-process vtables, or remote addresses). It is the runtime's answer to the
-question: "Where is module X?"
+in-process registration records, or remote addresses).
+It is the runtime's answer to the question:
+"Where is module X?"
 
 ### 3.2 Registry Implementation
 
@@ -269,12 +256,62 @@ module_name  ->  {
                  <socket path>        (socket mode)
                  <host:port>          (remote mode)
     schema:      <CDDL string>
+    schema_namespace: <schema namespace>
+    schema_commitment: <schema commitment, when known>
     version:     [major, minor]
     pid:         <process id>         (socket mode only)
 }
 ```
 
-### 3.3 Module States
+### 3.3 Runtime Module Binding
+
+A runtime registry entry is a runtime module binding.
+It binds the operational module name used for loading and routing to the
+schema contract that the runtime expects that module to implement.
+
+The binding contains:
+
+- the flat runtime module name;
+- the execution mode and load or connection location;
+- the compatibility version expectation, when known;
+- the module schema text or another way to obtain it;
+- the primary schema namespace for the module schema;
+- the expected schema commitment, when known.
+
+The flat runtime module name is the operational identifier defined in Section
+1.3.
+The schema namespace and schema commitment are structural contract identifiers
+defined by LOGOS-MODULE-COMMITMENT-MODEL.
+They are distinct identifiers and MUST NOT be treated as interchangeable.
+
+A runtime MUST NOT infer schema compatibility from spelling similarity between
+the runtime module name and the schema namespace.
+For example, `storage_module` and `storage` are related only if the registry
+entry, host record, package metadata, or another trusted configuration source
+binds them to the same module contract.
+
+When a registry entry includes an expected schema commitment, the runtime MUST
+compare the loaded or connected module's declared schema commitment against the
+expected commitment before treating the module as ready.
+For direct modules, the runtime derives or obtains the module's schema
+commitment from the schema returned by `logos_<module>_schema()`.
+For socket or remote modules, the runtime obtains the peer's declared schema
+commitment from the Transport Hello `schema` field.
+
+If the expected schema commitment is present and the loaded or connected
+module declares a different schema commitment, the runtime MUST reject the
+module for that registry entry and MUST NOT route ordinary calls to it.
+If no expected schema commitment is present, the runtime MAY record the
+module's declared schema commitment for diagnostics, later policy decisions,
+or caller-visible introspection.
+
+This specification defines the runtime binding and the checks the runtime
+performs against it.
+It does not define package signatures, artifact digests, catalog trust,
+update policy, or the on-disk manifest schema that may supply the binding.
+Those topics belong to deployment, package, or trust specifications.
+
+### 3.4 Module States
 
 ```
                  load()              init() returns OK
@@ -303,8 +340,9 @@ but this is not a module state.
 
 The lifecycle symbol `logos_<module>_init(void)` is runtime/loader
 initialisation only. It establishes that the shared library has loaded
-correctly and is ready to participate in the runtime contract (dispatch,
-publish hook installation, outbound-call hook installation, etc.).
+correctly and is ready to participate in the runtime contract, including
+method invocation, publish hook installation, and outbound-call hook
+installation.
 
 It does **not** imply that all schema-defined methods will succeed
 immediately. A module MAY still require one or more ordinary schema methods
@@ -321,18 +359,19 @@ Therefore:
 - method-level readiness is part of the module's schema/API semantics, not a
   separate runtime lifecycle state
 
-### 3.4 Discovery Sources
+### 3.5 Discovery Sources
 
 The runtime registry can be populated from several sources:
 
-1. **Resolved host records.** A host shell, package manager, or deployment
+1. **Resolved host records.** A runtime host, package manager, or deployment
    tool may hand the runtime a resolved module name, artifact path, runtime
-   mode, version expectation, and dependency closure.
-2. **Configuration file.** A CBOR or JSON config may list resolved module
-   names, paths, and options for a concrete runtime instance.
+   mode, version expectation, schema namespace expectation, schema commitment
+   expectation, and dependency closure.
+2. **Resolved local records.** A deployment profile or local runtime setup may
+   provide already-resolved module records for a concrete runtime instance.
 3. **Self-describing plugin scan.** A runtime may scan one or more directories
    for `.so`/`.dylib` files and probe each using the bootstrap symbol
-   (see section 3.5).
+   (see section 3.6).
 4. **Runtime registration.** For static linking or test scenarios, modules
    may be registered programmatically via `logos_runtime_register_module()`.
 
@@ -343,7 +382,7 @@ The package-manager catalog output shape also belongs outside this runtime
 specification.
 The runtime consumes resolved records and maintains loaded runtime state.
 
-### 3.5 Plugin Directory Scanning
+### 3.6 Plugin Directory Scanning
 
 When scanning a plugin directory without trusted sidecar metadata, the runtime
 probes each `.so`/`.dylib` file to extract metadata. The probe uses `dlopen`
@@ -363,7 +402,7 @@ for each .so file in plugin_dir:
        if empty or invalid: dlclose, skip
 
     4. Look up optional metadata symbols:
-       - logos_<name>_version()  -> schema version
+       - logos_<name>_version()  -> compatibility version metadata
        - logos_<name>_schema()   -> CDDL schema text
 
     5. Register in service registry:
@@ -388,7 +427,7 @@ static registration table, command-line argument, or equivalent
 host/deployment metadata, it MAY construct the prefixed lifecycle symbol names
 directly as described in section 2.2.
 
-### 3.6 Module Dependencies
+### 3.7 Module Dependencies
 
 Module dependencies are deployment facts, not CDDL interface facts.
 A package manifest or package-manager catalog may declare dependencies on
@@ -440,13 +479,48 @@ The runtime consults the registry to determine the target module's mode:
 - **Remote mode:** Same as socket mode, but over TCP/TLS to a remote host.
 
 The caller does not know or care which mode is active. The handle abstraction
-hides the transport. Per-method C functions (e.g. `logos_storage_exists()`)
-take a `logos_module_handle_t*` as their first argument; the handle
-dispatches to the correct transport internally.
+hides the transport.
+Handle-based typed client helpers are the portable caller-side C API.
+Such helpers take a `logos_module_handle_t*` as their first argument and route
+calls through the handle.
 
 The purpose of the handle abstraction is precisely to preserve the execution-
 boundary equivalence stated above: the runtime may switch routing mode, but
 the module contract observed by the caller remains the same.
+
+For a module method such as `storage.exists`, a generated handle-based client
+helper may have this shape:
+
+```c
+logos_result_t logos_storage_exists(
+    logos_module_handle_t* h,
+    const char*            cid,
+    bool*                  out_exists
+);
+```
+
+This caller-side helper is distinct from the callee-side Logos module C
+function defined by LOGOS-MODULE-INTERFACE.
+
+A runtime MAY also expose a generic dynamic call API for callers that discover
+schemas at runtime or do not have generated typed client helpers:
+
+```c
+logos_result_t logos_runtime_call(
+    logos_module_handle_t* h,
+    const char*            method,
+    const uint8_t*         params_cbor,
+    size_t                 params_len,
+    uint8_t**              response_cbor,
+    size_t*                response_len
+);
+```
+
+The generic call API carries deterministic-CBOR method payloads using the same
+request, response, and error shapes as LOGOS-MODULE-TRANSPORT.
+
+A singleton direct-call profile MAY additionally generate no-handle convenience
+helpers as described in section 5.2.1.
 
 ### 4.2 Routing Table
 
@@ -498,13 +572,15 @@ plane used to achieve it.
 ### 4.3 Capability Validation
 
 Before returning a handle, the runtime MUST verify that the caller is
-authorised to access the callee. This is done via the Capability Module:
+authorised to access the callee according to the active runtime policy.
 
-1. Caller requests access: `logos_capability_request(caller, callee)`
-2. Capability Module returns a token (or denies)
-3. Token is embedded in the handle
-4. For socket mode: token is sent in the Hello handshake
-5. For direct mode: token is validated once at handle creation time
+This specification does not define the capability token format, capability
+issuance flow, or policy language for module-to-module access.
+A future capability or trust specification may define a portable module
+contract for those decisions.
+Until such a profile is selected, the runtime MUST treat authorization as a
+local policy decision and MUST NOT infer permission merely from module names,
+schema names, or successful transport connection.
 
 ### 4.4 Event Subscription via Handle
 
@@ -568,8 +644,8 @@ These are convenience wrappers over the generic subscription API.
 
 ### 5.1 Multi-Process (Desktop Default)
 
-Each module runs in its own OS process. The runtime (`liblogos`) spawns a
-**module host** process for each module:
+Each shared-library module runs in its own OS process by default.
+The runtime (`liblogos`) spawns a **module host** process for each such module:
 
 ```
 logos_host --module <path-to-module.so> --socket <socket-path>
@@ -578,10 +654,17 @@ logos_host --module <path-to-module.so> --socket <socket-path>
 The module host:
 
 1. `dlopen`s the module shared library
-2. Calls lifecycle `_init()` (no typed config is passed in the current ABI)
+2. Calls lifecycle `_init()` (this revision passes no typed configuration)
 3. Binds the Unix domain socket
-4. Enters an event loop, reading CBOR requests from the socket, dispatching
-   to `_dispatch()`, and writing responses
+4. Enters an event loop, reading CBOR requests from the socket, creating an
+   opaque `logos_call_context_t` for each invocation, invoking the corresponding
+   schema-derived C method, and writing responses
+
+In this multi-process shared-library mode, the runtime communicates with the
+module host over LOGOS-MODULE-TRANSPORT, while the module host executes the
+module through the C ABI symbols defined by LOGOS-MODULE-INTERFACE.
+`dlopen`/`dlsym` are used inside the module host process, not across the socket
+connection.
 
 Benefits:
 - Process isolation: a crashing module doesn't bring down others
@@ -596,6 +679,39 @@ pointers. No serialisation, no sockets.
 The runtime still manages the registry, lifecycle, and capability validation.
 The difference is only in the transport: direct calls instead of CBOR-over-
 socket.
+
+### 5.2.1 Singleton Direct-Call Profile
+
+A runtime profile MAY define a singleton direct-call profile for direct mode.
+The profile MAY be used with dynamic direct mode or static direct mode.
+
+In this profile, each module name has at most one live module instance inside
+the runtime instance.
+Generated client helpers MAY omit `logos_module_handle_t*` and route calls
+through the runtime's default binding for that module name.
+
+This profile is intended for mobile, embedded, and simple packaged
+applications where the module set is known at build or packaging time.
+
+The profile MUST NOT change the module contract:
+method names, request and response shapes, event names, error codes, lifecycle
+rules, and authorization semantics remain the same as in the handle-based
+runtime model.
+
+A singleton direct-call profile MUST define:
+
+- how the default runtime instance is selected;
+- how module initialization order is determined;
+- how duplicate module names are rejected;
+- how generated no-handle helpers fail when the default module binding is not
+  ready;
+- whether outbound calls and event publishing use the same runtime callbacks as
+  ordinary direct mode.
+
+This profile is a convenience profile.
+Portable code that needs multiple module instances, multiple runtimes in one
+process, runtime-selected local/remote routing, or explicit test isolation
+SHOULD use handle-based client helpers.
 
 ### 5.3 Hybrid
 
@@ -622,7 +738,8 @@ In socket mode, the module host process runs an event loop that:
 
 - Accepts connections from multiple callers
 - Reads requests from all connections (via `poll`/`epoll`/`kqueue`)
-- Dispatches requests to `_dispatch()` or per-method functions
+- Supplies a `logos_call_context_t*` and invokes the corresponding
+  schema-derived C method for each request
 
 The runtime MUST NOT mark a socket-hosted module as `ready` merely because a
 socket path exists.
@@ -674,10 +791,16 @@ When no host event loop is provided, the runtime provides its own event loop.
 
 Module host processes run their own event loop:
 
+In the pseudocode below, `invoke_schema_method` is illustrative host behavior,
+not a required exported symbol.
+It means that the host decodes the transport request, identifies the requested
+schema method, creates or reuses the call context for the invocation, calls the
+corresponding native C function, and encodes the transport response.
+
 ```
 while running:
     msg = read_framed_cbor(socket)
-    response = logos_<module>_dispatch(msg)
+    response = invoke_schema_method(msg)
     write_framed_cbor(socket, response)
 ```
 
@@ -695,8 +818,8 @@ typedef void (*logos_publish_fn)(
 ```
 
 `event_name` MUST be the exact schema event identifier from the module's
-CDDL, for example `storage.started-event` or
-`storage.upload-progress-event`.
+CDDL, for example `storage.started_event` or
+`storage.upload_progress_event`.
 
 The runtime delivers the event to all subscribers (local or remote). In
 socket mode, the module host translates `logos_publish_fn` calls into Event
@@ -740,10 +863,12 @@ to the canonical schema event name before putting them on the wire. New
 modules and code generators MUST use the canonical schema event name
 directly.
 
-For statically linked modules, the publish function and context are set via
-the `logos_module_vtable_t.publish` and
-`logos_module_vtable_t.publish_user_data` fields (see section 2.3).
-The runtime sets these fields before calling `init`.
+For static direct mode, the selected binding mechanism makes the publish setter
+available to the runtime before `logos_runtime_start()` (see section 2.3).
+The runtime calls the publish setter after `_init()` succeeds and before the
+module is considered ready.
+
+Modules MUST NOT rely on the publish function being installed during `_init()`.
 
 **Lifetime:** The publish function and its `user_data` are valid from the
 time they are set until `_destroy()` returns or until the hook is replaced.
@@ -761,28 +886,54 @@ protocol's client side:
 
 ```c
 /* Provided by the runtime to the module after _init() */
+typedef void (*logos_free_response_fn)(void* user_data, void* ptr);
+
 typedef logos_result_t (*logos_call_module_fn)(
     void*           user_data,
     const char*     target_module,
     const uint8_t*  request_cbor,    /* CBOR: {"method": tstr, "params": {...}} */
     size_t          request_len,
-    uint8_t**       response_cbor,   /* callee allocates; caller frees with logos_free() */
+    uint8_t**       response_cbor,   /* runtime/callback allocates */
     size_t*         response_len
 );
 
 /* Exported by the module. Called by runtime/host after _init() returns OK. */
-void logos_<module>_set_call_module(logos_call_module_fn fn, void* user_data);
+void logos_<module>_set_call_module(
+    logos_call_module_fn   fn,
+    logos_free_response_fn free_response,
+    void*                  user_data
+);
 ```
 
 The module encodes a CBOR request map (`{method, params}`) for the target
-module, calls the function, and receives a CBOR response. The runtime
-handles routing — it determines whether the target is in-process, in
-another process, or remote. The module does not need to know.
+module, calls the function, and receives a CBOR response.
+The callback represents the runtime-owned outbound-call service for the
+module's current placement.
+It hides whether the target is in-process, hosted by another local process, or
+remote.
 
-For socket-hosted modules, this implies that the host process supplying
-`logos_call_module_fn` MUST have access to a routing view consistent with
-section 4.2 and 4.2.1. The callback is a runtime function conceptually, even
-when the concrete function pointer is installed by a per-module host process.
+This specification requires that outbound calls follow the runtime routing
+model from sections 4.2 and 4.2.1.
+It does not require every call to pass through a single central broker process.
+For in-process modules, the callback may dispatch directly through cached
+function pointers, generated stubs, or equivalent local dispatch state.
+For socket-hosted modules, the callback may be installed by the per-module host
+process and may translate the outbound call into transport requests using a
+routing view supplied by, synchronized with, or otherwise authorized by the
+runtime.
+For remote targets, the callback may route through the appropriate remote
+runtime binding.
+
+The callback is runtime-owned in authority and semantics even when the concrete
+function pointer is installed by a per-module host process.
+A module MUST treat the callback as its only portable outbound-call mechanism
+and MUST NOT infer topology from the callback implementation.
+
+If `logos_call_module_fn` returns a non-null `response_cbor`, the module MUST
+free it with the paired `logos_free_response_fn`.
+This deallocator is owned by the runtime or module host that installed the
+callback.
+It is distinct from the callee module's `logos_<module>_free()` function.
 
 If the module does not call other modules, it MAY omit this symbol. The
 runtime MUST NOT fail if the symbol is absent.
@@ -809,108 +960,218 @@ error, the error is encoded in `response_cbor` as an error-payload map
 
 ---
 
-## 8. Packaging
+## 8. Runtime Input Records
 
-Packaging is not part of the core runtime protocol.
-This section is therefore informative.
-It is a placeholder for deployment concerns until a deployment specification
-or package-manager CDDL owns the exact manifest and catalog shapes.
+The runtime does not define a configuration file format.
 
-The runtime requires deployable module artifacts plus enough metadata to
-discover them, identify the entry point, and evaluate compatibility.
-How those artifacts are packaged, signed, installed, or distributed is a
-downstream concern.
+A runtime instance consumes resolved module records supplied by a runtime host,
+package-manager module, deployment profile, static registration API, or test
+harness.
+The producer of those records is outside this specification.
 
-An implementation MAY use LGX packages, unpacked local directories,
-system packages, reproducible local builds, or other deployment formats,
-provided the runtime ultimately receives the module binary and the metadata it
-needs.
+A resolved module record supplies the information needed to create or update a
+runtime registry entry:
 
-### 8.1 Module Package Format
+- the flat runtime module name;
+- the execution mode;
+- the load path, static registration handle, local transport endpoint, or
+  remote transport endpoint;
+- compatibility version expectations, when known;
+- schema namespace expectation, when known;
+- schema commitment expectation, when known;
+- runtime-local options needed by the selected implementation.
 
-One possible distribution format is an **LGX package**
-(the existing `logos-package` format).
-An LGX package may contain:
+The runtime MUST validate resolved module records before routing calls through
+them.
+If a record includes a schema commitment expectation, the runtime MUST apply
+the schema-commitment checks defined in Section 3.3 before marking the module
+ready.
 
-```
-<module>.lgx/
-+-- manifest.json        # Module metadata
-+-- <module>.cddl        # Interface schema
-+-- lib/
-|   +-- <module>.so      # Shared library (Linux)
-|   +-- <module>.dylib   # Shared library (macOS)
-|   +-- <module>.dll     # Shared library (Windows)
-+-- manifest.cose        # (Future) COSE signature for attestation
-```
+This specification does not define package catalogs, install roots,
+dependency-graph queries, trust decisions, action prompts, or persistent
+configuration storage.
+Those belong to package-manager, runtime-host, deployment, or trust
+specifications.
 
-### 8.2 Manifest
+### 8.1 Module Initialization Inputs
 
-A deployment manifest may contain fields like the following.
-This example is informative only and is not a normative manifest schema:
+This revision defines the lifecycle initializer as `_init(void)`.
+It does not define a typed runtime-configuration handoff through the lifecycle
+ABI.
 
-```json
-{
-    "name": "storage_module",
-    "version": [1, 0],
-    "description": "Codex-based decentralised storage",
-    "entry_point": "lib/storage_module.so",
-    "schema": "storage_module.cddl",
-    "dependencies": ["capability_module"],
-    "min_runtime_version": [1, 0]
-}
-```
-
-### 8.3 Package Attestation (Future)
-
-An implementation MAY attach a COSE (RFC 9052) signature or equivalent
-attestation material over the packaged contents.
-For an LGX package, that could be carried in `manifest.cose`.
-This enables:
-
-- **Build reproducibility verification:** Proof that the binary was compiled
-  from specific source code.
-- **TEE attestation:** Proof that the module was built inside a trusted
-  execution environment.
-- **ZK compilation proofs:** Zero-knowledge proof that the binary corresponds
-  to the source, without revealing the source.
-
-This is a future feature.
-The exact attestation format is not specified here.
+If a module needs configuration, the selected deployment or host profile must
+arrange that configuration outside the lifecycle ABI, for example through
+resolved runtime records, environment, local files, or module-specific methods.
+A future specification may define a typed configuration handoff if it becomes
+part of the portable runtime contract.
 
 ---
 
-## 9. Configuration
+## 9. Runtime-Control Interface
 
-### 9.1 Runtime Configuration
+The runtime owns module lifecycle machinery.
+This specification also defines a Logos module interface for privileged
+runtime-host/runtime-control operations.
+The interface exposes runtime-owned lifecycle and observation operations
+through the same CDDL-defined contract model as other Logos modules.
 
-The runtime is configured via a CBOR or JSON file:
+A runtime host is the local authority-bearing environment that creates,
+embeds, launches, or otherwise controls a runtime instance.
+A host shell is one kind of runtime host that provides a general user-facing
+shell.
+A standalone application MAY also be a runtime host for its own runtime
+instance.
+Runtime hosts MAY use the runtime-control interface, subject to active runtime
+policy.
+The runtime host is not required to be a Logos module.
+It MAY expose Logos module interfaces, but its runtime-control authority comes
+from the local host/runtime relationship or an explicitly granted policy, not
+from ordinary module status.
 
-```json
-{
-    "runtime_dir": "/run/user/1000/logos",
-    "plugin_dirs": ["/usr/lib/logos/modules", "~/.logos/modules"],
-    "modules": {
-        "storage_module": {
-            "mode": "socket",
-            "config": { "data_dir": "/var/logos/storage" }
-        },
-        "capability_module": {
-            "mode": "direct"
-        }
-    },
-    "log_level": "info"
+The runtime-control surface operates on runtime-known module records.
+It does not define package catalogs, install roots, dependency graph
+resolution, trust decisions, or UI state.
+Those remain package-manager, deployment, trust, or runtime-host concerns.
+
+Runtime-control methods are privileged operations.
+A runtime MUST authorize a caller according to the active runtime policy
+before executing any runtime-control method.
+A runtime MUST NOT expose this surface to ordinary modules or remote peers by
+default.
+
+This specification does not define a capability token format, token issuance
+flow, policy language, or trust-store format.
+Those mechanisms may be supplied by future capability, trust, deployment, or
+runtime-host specifications.
+Until such profiles are defined, runtime-control access is local privileged
+host/runtime authority.
+
+### 9.1 Runtime-Control Module Contract
+
+The runtime-control interface is a Logos-defined system module surface.
+Its flat runtime module name is `logos_runtime_control`.
+Its schema namespace is `logos.runtime_control`.
+Because both names are Logos-defined, they are allowed uses of the reserved
+`logos_` and `logos.` namespaces.
+
+```cddl
+; -- metadata --
+_module = "logos_runtime_control"
+_version = [1, 0]
+
+logos.runtime_control.module_name = tstr .size (1..64)
+logos.runtime_control.instance_id = tstr .size (1..128)
+logos.runtime_control.schema_namespace = tstr .size (1..128)
+logos.runtime_control.reason = tstr .size (0..512)
+
+logos.runtime_control.state =
+    "unloaded" /
+    "loaded" /
+    "ready" /
+    "stopping" /
+    "error"
+
+logos.runtime_control.mode =
+    "direct" /
+    "socket" /
+    "remote"
+
+logos.runtime_control.schema_commitment = {
+    commitment_model: tstr,
+    schema_root: bstr,
+    hash_profile: tstr,
+    hash_suite: tstr,
+}
+
+logos.runtime_control.module_record = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+    state: logos.runtime_control.state,
+    mode: logos.runtime_control.mode,
+    ? schema_namespace: logos.runtime_control.schema_namespace,
+    ? schema: logos.runtime_control.schema_commitment,
+    ? reason: logos.runtime_control.reason,
+}
+
+logos.runtime_control.list_modules_request = {}
+
+logos.runtime_control.list_modules_response = {
+    modules: [* logos.runtime_control.module_record],
+}
+
+logos.runtime_control.start_module_request = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+}
+
+logos.runtime_control.start_module_response = {
+    module: logos.runtime_control.module_name,
+    instance: logos.runtime_control.instance_id,
+    state: logos.runtime_control.state,
+}
+
+logos.runtime_control.stop_module_request = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+}
+
+logos.runtime_control.stop_module_response = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+    state: logos.runtime_control.state,
+}
+
+logos.runtime_control.get_readiness_request = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+}
+
+logos.runtime_control.get_readiness_response = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+    state: logos.runtime_control.state,
+    ? reason: logos.runtime_control.reason,
+}
+
+logos.runtime_control.module_state_changed_event = {
+    module: logos.runtime_control.module_name,
+    ? instance: logos.runtime_control.instance_id,
+    old_state: logos.runtime_control.state,
+    new_state: logos.runtime_control.state,
+    ? reason: logos.runtime_control.reason,
 }
 ```
 
-### 9.2 Module Configuration
+The `start_module` method starts a module record already known to the runtime.
+If the module record is not known, the runtime returns the ordinary
+schema-defined error result for "module not found" or equivalent runtime
+failure.
+The method does not install packages, resolve package dependencies, or create
+new runtime records by itself.
 
-Per-module runtime configuration is not yet part of the v0.1 module ABI.
-The current ABI uses `_init(void)`.
+If a runtime may have multiple live instances for the same module name, the
+`instance` field disambiguates the target.
+If no ambiguity exists, the caller MAY omit `instance`.
 
-Configuration remains a runtime concern: implementations MAY load per-module
-configuration from manifests, environment variables, or host-specific config
-files before calling `_init()`. A future spec revision MAY add a typed config
-handoff once that ABI is settled.
+The `stop_module` method stops the selected module instance.
+It does not perform package uninstall, dependency cascade confirmation, or
+user prompting.
+A runtime host may perform those workflows before calling `stop_module`.
+
+The `get_readiness` method reports the runtime lifecycle state for the
+selected module instance.
+Method-level application readiness remains part of the module's own schema
+semantics, as described in Section 3.4.
+
+The `module_state_changed_event` event reports runtime lifecycle transitions
+observed through this control surface.
+It is not a replacement for schema-defined events published by ordinary
+modules.
+
+Because the runtime-control interface is an ordinary Logos module contract at
+the schema layer, its schema and values are subject to
+LOGOS-MODULE-COMMITMENT-MODEL and LOGOS-MODULE-HASH-PROFILE in the same way
+as other module contracts.
 
 ---
 
@@ -980,6 +1241,87 @@ in LOGOS-MODULE-INTERFACE.
 
 ---
 
+## Appendix A. Implementation Notes (Informative)
+
+A generic module host that receives LOGOS-MODULE-TRANSPORT requests still has
+to invoke schema-derived per-method C functions whose C signatures vary by
+method.
+Those functions take an opaque `logos_call_context_t*` as their first
+argument, supplied by the runtime or module host.
+
+This specification does not require one implementation strategy.
+
+Known implementation strategies include:
+
+- deriving calls at runtime with a foreign-function interface such as `libffi`
+  from the module schema and LOGOS-MODULE-INTERFACE C mapping, including the
+  call-context pointer;
+- generating per-module host adapter code that decodes transport requests and
+  calls the native C API directly;
+- generating a uniform dispatch table, vtable, or internal host-call ABI
+  alongside the ergonomic per-method C API.
+
+The preferred implementation strategy is the foreign-function-interface model,
+because it lets a generic runtime host call the ordinary native C API at
+runtime without making a generated dispatch function part of the portable
+module ABI.
+The dispatch-table or vtable strategy is allowed in this revision, but it is
+not the preferred strategy because it adds a second invocation surface beside
+the ordinary native C API.
+
+### A.1 Fixed Static Applications
+
+The Logos module architecture also supports fully static application packaging.
+In this packaging style, the module set is curated at build or packaging time,
+and runtime discovery MAY be reduced or omitted by the selected implementation.
+
+Both patterns below still use the same mandatory callee-side C symbols defined
+by LOGOS-MODULE-INTERFACE.
+Neither pattern defines a second module API.
+
+**Generated runtime facade library.**
+A generated runtime facade library is the lowest-friction static packaging form.
+The application driver links one generated library and includes one generated
+facade header.
+
+The facade links the curated modules and MAY include or link the runtime
+components needed by the generated caller-side APIs.
+The application driver does not include individual module headers, perform
+module binding, or manage module lifecycle ordering directly.
+
+A generated runtime facade library differs from ordinary direct C embedding.
+In ordinary direct C embedding, the application includes module headers and
+calls each module API itself.
+The facade instead consolidates the curated module set behind one app-facing API.
+
+If the facade includes the relevant runtime components, it can provide Logos
+runtime behavior such as lifecycle management, callback wiring, event delivery,
+outbound module calls, and policy checks.
+A facade that omits those runtime components is only a generated direct-call
+wrapper and does not provide the omitted runtime behavior.
+
+This pattern is useful when the module set is fixed and the application driver
+should remain small.
+
+**Fixed embedded-runtime app.**
+A fixed embedded-runtime app links the runtime library and the curated modules
+directly.
+The application uses the runtime API explicitly.
+The application or generated startup glue makes static direct-mode bindings
+available to the runtime before `logos_runtime_start()`.
+
+Compared with a generated runtime facade library, this pattern leaves runtime
+setup visible to the application.
+The application can choose the registered module set, initialization order,
+policy configuration, test bindings, and other runtime options exposed by the
+runtime API.
+It still avoids dynamic loading and transport serialization for curated modules.
+
+Build-time or package-time schema checks MAY replace runtime discovery or schema
+negotiation where the module set and versions are fixed.
+
+---
+
 ## References
 
 ### Normative
@@ -989,8 +1331,6 @@ in LOGOS-MODULE-INTERFACE.
 
 ### Informative
 
-- logos-package -- LGX package format implementation.
-  https://github.com/logos-co/logos-package
 - logos-liblogos -- Current runtime implementation (Qt-based).
   https://github.com/logos-co/logos-liblogos
 

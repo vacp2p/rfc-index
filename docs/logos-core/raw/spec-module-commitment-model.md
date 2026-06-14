@@ -3,7 +3,7 @@
 | Field        | Value                           |
 |--------------|---------------------------------|
 | Name         | Logos Module Commitment Model   |
-| Slug         | LOGOS-MODULE-COMMITMENT-MODEL   |
+| Slug         | 203                             |
 | Status       | raw                             |
 | Category     | Standards Track                 |
 | Editor       | ksr                             |
@@ -125,10 +125,10 @@ another layer's canonical object unless this specification explicitly says so.
 |--------------|------|----------------------|---------------|
 | CDDL source text | source text | LOGOS-MODULE-INTERFACE | Authoring input; not a schema identity input by itself |
 | resolved CDDL rule graph | parser/resolver output | CDDL parser/resolver plus `cdCDDLe` input rules | Input to `cdCDDLe`; not serialized identity by itself |
-| `cdCDDLe` canonical CDDL schema model | abstract schema-as-data model | `cdCDDLe` | Generic canonical CDDL object; not a Logos schema root by itself |
+| `cdCDDLe` canonical CDDL schema model | abstract canonical CDDL schema object | `cdCDDLe` | Generic canonical CDDL object; not a Logos schema root by itself |
 | `cdCDDLe` canonical schema bytes | CDE-based deterministic CBOR bytes | `cdCDDLe` | Deterministic encoding of the generic model; not a Logos schema root by itself |
 | Logos domain interpretation | interpretation rules | LOGOS-MODULE-COMMITMENT-MODEL | Maps generic CDDL schema data into Logos module-contract meaning |
-| Logos canonical schema model | Logos schema-as-data object | LOGOS-MODULE-COMMITMENT-MODEL | Input to Logos schema roots and schema subtree roots |
+| Logos canonical schema model | abstract semantic schema object | LOGOS-MODULE-COMMITMENT-MODEL | Input to Logos schema roots and schema subtree roots |
 | Logos module contract | abstract contract object | LOGOS-MODULE-INTERFACE plus LOGOS-MODULE-COMMITMENT-MODEL | Interface, transport, and commitment views of the same method/event/type contract |
 | Logos deterministic CBOR payload bytes | deterministic CBOR bytes | LOGOS-MODULE-INTERFACE | Transport/interchange encoding of concrete module values |
 | normalized Logos value model | semantic typed value object | LOGOS-MODULE-COMMITMENT-MODEL | Input to value commitments and verified-view paths |
@@ -200,7 +200,8 @@ The Logos canonical schema model contains, at minimum:
 - method request declarations;
 - method response declarations;
 - event declarations;
-- map, field, array, list, tuple, choice, primitive, and reference nodes.
+- map, field, array, list, tuple, choice, primitive, literal, and reference
+  nodes.
 
 Section 3.1 defines how the Logos domain interpretation consumes the
 name-preserving `cdCDDLe` canonical CDDL schema model and constructs those
@@ -222,13 +223,24 @@ Event payload values use the same normalized value root, semantic value tree,
 and hash-profile rules as method request and response values;
 see Section 9.3.
 
-The Logos canonical schema model is a semantic tree.
+The Logos canonical schema model is an abstract semantic object.
+Its canonical schema-as-data representation is finite.
 The whole schema has a schema root.
 A named definition or structural subtree inside the schema has a schema subtree
 root.
-A schema leaf hash identifies a leaf node in the schema tree.
-These identify related objects in the same schema tree,
+A schema leaf hash identifies a leaf in the canonical schema representation.
+These identify related views of the same abstract schema model,
 not unrelated identity systems.
+
+Named references are terminal reference nodes in the canonical schema-as-data
+representation.
+The declaration/reference relation in the abstract model is a graph and MAY
+contain recursive or cyclic references through named type declarations.
+Those cycles are valid only through `reference-schema` nodes.
+Implementations MUST NOT construct schema roots, schema subtree roots, schema
+leaf hashes, or schema-node paths by recursively inlining local, imported, or
+common-schema references.
+Schema-node paths and schema leaf hashes stop at reference nodes.
 
 Schema identity tracks the Logos canonical schema model, not authoring style.
 Comments, whitespace, source formatting, source file layout, and source
@@ -252,9 +264,10 @@ Variable-length lists have one element-type child in the schema model;
 the order of concrete list values is a value-model concern.
 
 Ambiguous choices whose arms cannot be distinguished by the Logos decoding
-rules are invalid for this revision.
+rules are invalid.
 Source declaration order MUST NOT be used to disambiguate choices.
-Section 3.1 defines the canonical choice-arm discriminator.
+Section 3.1 defines choice-arm selection predicates and canonical choice-arm
+discriminators.
 
 The Logos prelude and the Logos common schema surface are conceptually
 distinct.
@@ -339,6 +352,7 @@ Primitive schema forms translate as follows:
   aliases translate to `primitive-schema`.
 - A prelude integer alias translates to the corresponding scalar kind and does
   not create an import.
+- Literal scalar values translate to `literal-schema`.
 - `tstr .size (min..max)` translates to a `primitive-schema` with a
   `size-constraint`.
 - `tstr .size n` and `bstr .size n` translate to a `size-constraint` whose
@@ -368,19 +382,91 @@ This preserves schema identity for local named types and prevents two
 different local names with the same structure from collapsing at reference
 sites.
 
-For this revision, choice arms MUST be distinguishable by the Logos decoding
-rules from LOGOS-MODULE-INTERFACE.
-Their CBOR major-type sets MUST be disjoint.
-The Logos canonical choice-arm discriminator is the text
-`cbor-major-set.` followed by the arm's major-type set as ascending decimal
-major-type numbers separated by `+`.
-For example, a `uint64` arm has discriminator `cbor-major-set.0`,
-a `tstr` arm has discriminator `cbor-major-set.3`,
-and an `int64` arm has discriminator `cbor-major-set.0+1`.
-Choice arms are sorted by this canonical choice-arm discriminator.
-If two arms have the same discriminator, or if their major-type sets overlap,
-the choice is invalid for this revision.
-The discriminator is a decoding and ordering field.
+Local named type references MAY be recursive or mutually recursive.
+A local recursive reference is represented by the finite `local-reference`
+node that names the referenced local type declaration.
+It does not inline the referenced declaration body.
+An implementation that provides an expanded diagnostic view over local
+references MUST detect reference cycles.
+That expanded view is not the Logos canonical schema model and MUST NOT be
+used as the schema identity input.
+
+Choice arms MUST be distinguishable by deterministic selection predicates.
+For a decoded value, exactly one arm predicate MUST match.
+If zero arms or more than one arm predicate match, the value is invalid for
+that choice schema.
+A schema containing a choice whose arm predicates cannot be proven mutually
+exclusive by these rules is invalid.
+Source declaration order MUST NOT participate in arm selection.
+
+The supported selection predicates are:
+
+- `major-set`:
+  a finite set of CBOR major types accepted by the arm;
+- `literal`:
+  one exact scalar literal value;
+- `map-field-literal`:
+  a required map field name and exact scalar literal value.
+
+The canonical predicate for an arm is selected as follows:
+
+1. A literal schema node uses a `literal` predicate.
+2. A map schema node with one or more required literal fields uses a
+   `map-field-literal` predicate.
+   If more than one required literal field is present, the canonical predicate
+   uses the first field by canonical field-name order whose predicate makes the
+   surrounding choice valid.
+   If no such field exists, the choice schema is invalid.
+3. Other schema nodes use a `major-set` predicate when a finite major-type set
+   can be computed.
+
+A `major-set` predicate is available when an arm's accepted CBOR major types
+can be computed as a finite set from its schema node.
+Primitive, list, tuple, map, literal, and choice schema nodes have finite
+major-type sets.
+Local references are resolved by following the referenced local named type
+declaration.
+Imported and common-schema references use the selection predicate metadata
+published for the referenced schema subtree.
+Implementations MUST compute referenced predicates with cycle detection.
+A local reference cycle that cannot be reduced to a finite selection predicate
+makes any choice arm depending on that cycle invalid.
+
+A `literal` predicate is available for a literal schema node.
+Two literal predicates are disjoint when their canonical scalar values differ.
+
+A `map-field-literal` predicate is available for a map arm when the arm has a
+required field whose schema is a literal schema node.
+Two `map-field-literal` predicates over the same field name are disjoint when
+their canonical scalar values differ.
+For example, these arms are disjoint:
+
+```cddl
+entry =
+  { kind: "file", path: tstr } /
+  { kind: "dir", path: tstr, entries: [* tstr] }
+```
+
+The canonical choice-arm discriminator identifies the predicate used for arm
+selection:
+
+- `major-set.` followed by ascending decimal CBOR major-type numbers separated
+  by `+`;
+- `literal.` followed by the deterministic diagnostic form of the canonical
+  scalar literal;
+- `map-field-literal.` followed by the deterministic diagnostic form of the
+  field name, `.`, and the deterministic diagnostic form of the canonical
+  scalar literal.
+
+The discriminator string is a canonical label, not a free-form diagnostic
+message.
+Implementations MUST generate it from the selected predicate components using
+the rules above and MUST compare it byte-for-byte.
+
+Choice arms are sorted by canonical choice-arm discriminator.
+If two arms have the same discriminator, or if their selection predicates
+overlap, the choice schema is invalid.
+The discriminator is a decoding, ordering, and path-label field.
 The full choice arm identity is the canonical `choice-arm` object, including
 both the discriminator and the arm schema node.
 
@@ -396,7 +482,7 @@ the root hash of the whole Logos canonical schema tree.
 It commits to the semantic schema surface that a conforming implementation
 needs in order to interpret module values:
 
-- the semantic schema-model revision identifier;
+- the semantic commitment-model revision identifier;
 - the schema namespace;
 - method request and response declarations;
 - event declarations;
@@ -416,7 +502,7 @@ They are not ad-hoc hashes over local text snippets.
 
 Named schema subtree roots commit to:
 
-- the semantic schema-model revision identifier;
+- the semantic commitment-model revision identifier;
 - the node kind;
 - the qualified schema definition name;
 - the Logos canonical definition body.
@@ -440,7 +526,7 @@ identity tree.
 Schema leaf hashes identify leaf schema nodes inside that same hierarchy.
 A schema leaf hash is computed for a leaf schema node under the nearest named
 schema declaration.
-It commits to the semantic schema-model revision identifier, the nearest named
+It commits to the semantic commitment-model revision identifier, the nearest named
 declaration kind and qualified name, the canonical schema path from that
 declaration to the leaf, and the Logos canonical leaf node.
 It is not an independent naming system and MUST NOT be accepted as a whole
@@ -450,7 +536,7 @@ A method identity is the schema subtree root of the `schema-declaration` whose
 kind is `"method"`.
 It commits to the qualified method name, the qualified request declaration
 name, and the qualified response declaration name under the selected semantic
-schema-model revision.
+commitment-model revision.
 Method identity is computed under the existing `logos.schema.node` domain from
 the `schema-node-payload` of the method declaration.
 It is not a separate hash domain.
@@ -513,7 +599,7 @@ By-value expansion is not a canonical import form.
 
 A Logos canonical reference to a named external definition contains:
 
-- the semantic schema-model revision identifier;
+- the semantic commitment-model revision identifier;
 - the referenced schema namespace;
 - the referenced schema root;
 - the referenced qualified definition name;
@@ -521,7 +607,7 @@ A Logos canonical reference to a named external definition contains:
 - the referenced schema subtree root.
 
 A reference to an entire external schema MAY omit the named-definition fields
-and commit only to the semantic schema-model revision identifier, the
+and commit only to the semantic commitment-model revision identifier, the
 referenced schema namespace, and the referenced schema root.
 
 The referenced schema root gives whole-schema context and provenance.
@@ -586,20 +672,20 @@ Import references use schema namespaces and qualified schema definition names.
 They do not use runtime module names, C ABI symbol prefixes, socket names,
 package names, artifact names, or deployment identities.
 
-## 6. Schema-Of-Schema Versioning
+## 6. Commitment Model Versioning
 
 The Logos canonical schema model itself has a schema.
-The semantic schema-model revision identifier is therefore part of canonical
+The semantic commitment-model revision identifier is therefore part of canonical
 schema identity.
 
-This identifier must be explicit because future semantic revisions of this
-specification may add schema constructs, change normalization rules, add import
+This identifier must be explicit because future semantic commitment-model
+revisions may add schema constructs, change normalization rules, add import
 forms, or define new subschema identity rules.
-Without an explicit semantic schema-model revision identifier, old and new
+Without an explicit semantic commitment-model revision identifier, old and new
 schema identities could become ambiguous even when the original CDDL text has
 not changed.
 
-The semantic schema-model revision identifier is not a semantic-versioning
+The semantic commitment-model revision identifier is not a semantic-versioning
 number.
 It does not encode major, minor, or patch compatibility.
 Implementations MUST NOT infer compatibility, ordering, or feature support from
@@ -608,12 +694,12 @@ explicitly defines that meaning.
 Compatibility is a verifier-policy question, not a property inferred from a
 version-number range.
 
-The semantic schema-model revision identifier is an ASCII text token with this
-syntax:
+The semantic commitment-model revision identifier is an ASCII text token with
+this syntax:
 
 ```abnf
-semantic-schema-model-revision = "logos.schema-model." date-label
-                               [ "." revision-label ]
+semantic-commitment-model-revision = "logos.commitment-model." date-label
+                                    [ "." revision-label ]
 date-label = 4DIGIT "-" 2DIGIT
 revision-label = 1*( %x61-7A / DIGIT / "-" )
 ```
@@ -621,39 +707,39 @@ revision-label = 1*( %x61-7A / DIGIT / "-" )
 The initial identifier defined by this specification is:
 
 ```text
-logos.schema-model.2026-06
+logos.commitment-model.2026-06
 ```
 
 The date label is an assignment label.
 It does not imply ordering, recency preference, compatibility, or feature
 support.
 The optional revision label is for a future specification that needs more than
-one assigned semantic model in the same month.
+one assigned semantic commitment model in the same month.
 Implementations MUST encode the identifier as UTF-8 text in canonical schema
 objects and MUST compare identifiers byte-for-byte.
 Unknown identifiers MUST be rejected unless the verifier explicitly supports
 the identifier or has an applicable compatibility profile.
 
-The semantic schema-model revision identifier binds the canonical schema
+The semantic commitment-model revision identifier binds the canonical schema
 foundation consumed by the Logos domain interpretation.
-The initial semantic schema-model revision is defined over the `cdCDDLe`
+The initial semantic commitment-model revision is defined over the `cdCDDLe`
 specification referenced by this document.
 
-A future update to `cdCDDLe` that changes the Logos canonical schema model or
-the canonical schema bytes consumed by Logos MUST either define a new Logos
-semantic schema-model revision identifier or define an explicit compatibility
-profile.
+A future update to `cdCDDLe` that changes the Logos canonical schema model
+or the canonical schema bytes consumed by Logos MUST either define a new Logos
+semantic commitment-model revision identifier or define an explicit
+compatibility profile.
 
-Changing the semantic schema-model revision identifier is a compatibility
+Changing the semantic commitment-model revision identifier is a compatibility
 event for schema identity.
-A future semantic schema-model revision must define whether it can verify old
-schema roots directly, translate old schema models into a newer model, or keep
-old roots in their original domain.
+A future semantic commitment-model revision must define whether it can verify
+old schema roots directly, translate old schema models into a newer model, or
+keep old roots in their original domain.
 
-The semantic schema-model revision identifier is included in schema roots,
+The semantic commitment-model revision identifier is included in schema roots,
 schema subtree roots, schema leaf hashes, and schema references.
 It is not merely metadata on the whole schema root.
-This prevents future schema-model revisions from accidentally sharing hash
+This prevents future commitment-model revisions from accidentally sharing hash
 domains with earlier Logos canonical schema objects.
 
 Every hashed schema object also includes an object-kind domain tag.
@@ -669,42 +755,42 @@ This specification defines these object-kind domain tags:
 | Schema reference | `logos.schema.reference` |
 
 The hash input for each hashed schema object MUST commit to both the
-object-kind domain tag and the semantic schema-model revision identifier before
-committing to the Logos canonical object payload.
+object-kind domain tag and the semantic commitment-model revision identifier
+before committing to the Logos canonical object payload.
 A hash computed for one object kind MUST NOT be accepted as a hash for another
 object kind, even if the normalized payloads are otherwise identical.
 
 Schema roots, schema subtree roots, schema leaf hashes, and schema references
-from different semantic schema-model revision identifiers are distinct and
+from different semantic commitment-model revision identifiers are distinct and
 non-equivalent by default.
 Apparent source-text or structural similarity across revisions does not make
 the resulting roots interchangeable.
 
 Schema references MAY identify schemas or schema subtrees defined under a
-different semantic schema-model revision identifier.
+different semantic commitment-model revision identifier.
 A verifier MUST NOT accept such a reference merely because the referenced hash
 matches.
-The verifier MUST either support the referenced semantic schema-model revision
-directly or support an explicit compatibility profile that defines how objects
-from the referenced revision are verified in relation to objects from the
-referring revision.
+The verifier MUST either support the referenced semantic commitment-model
+revision directly or support an explicit compatibility profile that defines how
+objects from the referenced revision are verified in relation to objects from
+the referring revision.
 
 A compatibility profile is part of the verification policy.
-It must name the semantic schema-model revisions it connects and the exact
+It must name the semantic commitment-model revisions it connects and the exact
 verification or translation rule it permits.
 If no applicable compatibility profile is available, the verifier MUST keep the
 referenced object in its original semantic domain and MUST NOT treat it as an
 object in the referring schema's semantic domain.
 
 Compatibility profiles MUST NOT weaken verifier policy.
-A verifier or trust profile that requires a specific semantic schema-model
+A verifier or trust profile that requires a specific semantic commitment-model
 revision identifier, or a specific set of allowed identifiers, for a schema,
 package, method, value proof, or remote-runtime evidence MUST reject a
 different identifier unless the policy explicitly allows that identifier or an
 explicit compatibility profile for that identifier.
 This prevents an attacker from replacing an expected schema commitment with a
-commitment from another semantic revision whose semantics are weaker, less
-precise, or differently normalized.
+commitment from another semantic commitment-model revision whose semantics are
+weaker, less precise, or differently normalized.
 
 ## 7. Canonical Value Model
 
@@ -722,8 +808,8 @@ decoded and validated under a known Logos schema identity.
 It is the canonical representation of ordinary module values and payloads
 before value hashing and proof construction.
 It is not the schema-as-data representation;
-the schema-as-data representation is the Logos canonical schema model defined
-above.
+the schema-as-data representation is derived from the Logos canonical schema
+model defined above.
 The Logos canonical schema model is analogous to a type definition.
 The normalized Logos value model is analogous to a typed instance of that
 definition.
@@ -803,13 +889,14 @@ Those are defined by LOGOS-MODULE-HASH-PROFILE.
 
 The commitment model separates three concepts:
 
-- the semantic schema tree;
+- the abstract semantic schema model and its canonical schema representation;
 - the semantic value tree;
 - the physical hash layout.
 
-The semantic schema tree is the Logos canonical schema model defined in
-Sections 3 through 6.
-It defines schema roots, schema subtree roots, schema leaf hashes, and schema
+The abstract semantic schema model is the Logos canonical schema model defined
+in Sections 3 through 6.
+Its canonical schema representation is the finite schema-as-data form used to
+define schema roots, schema subtree roots, schema leaf hashes, and schema
 references.
 
 The semantic value tree is the normalized Logos value model from Section 7
@@ -841,7 +928,7 @@ The value root commits to a concrete typed value.
 The schema root commits to the schema under which that value is interpreted.
 A value commitment MUST bind to:
 
-- the semantic schema-model revision identifier;
+- the semantic commitment-model revision identifier;
 - the schema root;
 - the schema definition or schema subtree identity under which the value is
   decoded;
@@ -913,12 +1000,13 @@ Choice nodes commit to the selected schema arm.
 A choice node contains the choice schema identity, the selected arm
 discriminator, the selected arm schema identity, and the selected value.
 The selected arm discriminator and selected arm schema identity MUST be part of
-the semantic value tree even when two choice arms have the same decoded CBOR
-shape.
+the semantic value tree.
 
 Scalar nodes are leaves in the semantic value tree.
 A scalar node contains the scalar schema identity, the scalar kind, and the
 canonical scalar value.
+Values decoded under literal schema nodes are represented as scalar nodes
+whose canonical scalar value equals the required literal value.
 The scalar kind is the Logos schema type, not merely the CBOR major type.
 For example, `uint8` value `5` and `uint64` value `5` are different typed
 scalar values.
@@ -959,7 +1047,7 @@ These shapes are the canonical data inputs consumed by
 LOGOS-MODULE-HASH-PROFILE.
 
 The shapes below use deterministic CBOR maps with unsigned integer keys.
-Unknown keys are invalid unless a later semantic schema-model revision
+Unknown keys are invalid unless a later semantic commitment-model revision
 explicitly defines them.
 Optional fields MUST be omitted when not applicable.
 Arrays whose ordering is semantic MUST preserve that order.
@@ -969,7 +1057,7 @@ canonical order before hashing or comparison.
 The following common aliases are used in this section:
 
 ```cddl
-semantic-schema-model-revision = tstr
+semantic-commitment-model-revision = tstr
 schema-namespace = tstr
 qualified-name = tstr
 field-name = tstr
@@ -1007,7 +1095,7 @@ revision for the canonical data shape:
 ```cddl
 normalized-schema-root = {
     0: "schema-root",
-    1: semantic-schema-model-revision,
+    1: semantic-commitment-model-revision,
     2: schema-namespace,
     3: [* schema-import],
     4: [* schema-declaration],
@@ -1021,7 +1109,7 @@ root, qualified definition name when present, and definition kind when present.
 ```cddl
 schema-import = {
     0: "import",
-    1: semantic-schema-model-revision,
+    1: semantic-commitment-model-revision,
     2: schema-namespace,
     3: schema-root,
     ? 4: qualified-name,
@@ -1055,6 +1143,7 @@ A Logos canonical schema node has this shape:
 ```cddl
 schema-node =
     primitive-schema /
+    literal-schema /
     map-schema /
     list-schema /
     tuple-schema /
@@ -1065,6 +1154,12 @@ primitive-schema = {
     0: "primitive",
     1: scalar-kind,
     ? 2: schema-constraint,
+}
+
+literal-schema = {
+    0: "literal",
+    1: scalar-kind,
+    2: scalar-data,
 }
 
 schema-constraint = size-constraint
@@ -1149,7 +1244,7 @@ schema-root-payload = normalized-schema-root
 
 schema-node-payload = {
     0: "schema-node",
-    1: semantic-schema-model-revision,
+    1: semantic-commitment-model-revision,
     2: qualified-name,
     3: schema-declaration-kind,
     4: schema-declaration-body,
@@ -1157,7 +1252,7 @@ schema-node-payload = {
 
 schema-leaf-payload = {
     0: "schema-leaf",
-    1: semantic-schema-model-revision,
+    1: semantic-commitment-model-revision,
     2: schema-declaration-kind,
     3: qualified-name,       ; nearest named declaration
     4: schema-node-path,
@@ -1196,7 +1291,7 @@ schema-choice-arm-segment = {
 
 A `schema-leaf-payload` is valid only when field `5` contains a leaf schema
 node.
-In this revision, a leaf schema node is a `primitive-schema` or
+A leaf schema node is a `primitive-schema`, `literal-schema`, or
 `reference-schema`.
 Map, list, tuple, and choice schema nodes are not leaf schema nodes.
 The `schema-node-path` MUST resolve from the nearest named declaration body to
@@ -1224,7 +1319,7 @@ which it was decoded:
 ```cddl
 normalized-value-root = {
     0: "value-root",
-    1: semantic-schema-model-revision,
+    1: semantic-commitment-model-revision,
     2: schema-root,
     3: schema-subtree-root,
     4: value-node,
@@ -1394,11 +1489,11 @@ canonical data shapes in Section 9.
 It MUST reject malformed semantic objects whose shape, ordering, references,
 paths, or normalized value semantics violate this specification.
 
-Construction vectors in this specification are semantic conformance/reference
-artifacts.
-An implementation conforms to a published vector set when it produces the same
-canonical semantic objects and rejects every malformed semantic object listed
-by that vector set.
+Construction vectors in this specification define semantic conformance
+requirements for the inputs they cover.
+A conforming implementation MUST produce the same canonical semantic objects
+for each valid construction vector and MUST reject every malformed semantic
+object listed by a vector set.
 
 Hash-input bytes, digest values, roots, and hash-suite-specific vectors are
 defined by LOGOS-MODULE-HASH-PROFILE, not by this specification.
@@ -1429,11 +1524,13 @@ Non-goals:
 - authorization policy;
 - runtime call policy.
 
-## Appendix A. Construction Vector (Informative)
+## Appendix A. Construction Vector
 
-This appendix gives an informative construction vector for the Logos canonical
-schema model.
-It shows the canonical schema object produced by Section 3.1.
+This appendix gives a construction vector for the Logos canonical schema
+model.
+A conforming implementation MUST produce the canonical schema object shown
+below from the input Logos module schema after applying LOGOS-MODULE-INTERFACE,
+`cdCDDLe`, and this specification.
 It is not a hash-suite conformance vector and does not include deterministic
 CBOR bytes or hash outputs.
 
@@ -1475,7 +1572,7 @@ Construction:
 - References to local named types are local reference nodes and are not
   inlined.
 - The choice arms in `storage.lookup_key` use discriminators
-  `cbor-major-set.2` and `cbor-major-set.3`.
+  `major-set.2` and `major-set.3`.
 
 The resulting `normalized-schema-root` object is shown in CBOR diagnostic
 notation:
@@ -1483,7 +1580,7 @@ notation:
 ```cbor-diag
 {
   0: "schema-root",
-  1: "logos.schema-model.2026-06",
+  1: "logos.commitment-model.2026-06",
   2: "storage",
   3: [],
   4: [
@@ -1588,14 +1685,14 @@ notation:
         0: "choice",
         1: [
           {
-            0: "cbor-major-set.2",
+            0: "major-set.2",
             1: {
               0: "local-reference",
               1: "storage.blob_hash",
             },
           },
           {
-            0: "cbor-major-set.3",
+            0: "major-set.3",
             1: {
               0: "local-reference",
               1: "storage.cid",
@@ -1615,11 +1712,13 @@ The declaration array is sorted by qualified declaration name:
 The map fields are sorted by canonical field name.
 The choice arms are sorted by canonical choice-arm discriminator.
 
-## Appendix B. Schema And Value Tree Example (Informative)
+## Appendix B. Schema And Value Tree Vector
 
-This appendix gives a small semantic example that shows the relationship
-between a module schema, the schema tree, one concrete value, and semantic
-paths.
+This appendix gives a small semantic vector that shows the relationship between
+a module schema, the schema tree, one concrete value, and semantic paths.
+A conforming implementation MUST produce the canonical schema object,
+normalized value object, and semantic paths shown below from the input module
+schema and concrete value.
 The object instances shown below use the canonical data shapes defined in
 Section 9:
 schema objects from Section 9.1, schema identity and path payloads from
@@ -1648,7 +1747,7 @@ The schema tree is represented by the resulting Section 9.1
 ```cbor-diag
 {
   0: "schema-root",
-  1: "logos.schema-model.2026-06",
+  1: "logos.commitment-model.2026-06",
   2: "demo",
   3: [],
   4: [
@@ -1733,7 +1832,7 @@ LOGOS-MODULE-HASH-PROFILE:
 ```cbor-diag
 {
   0: "value-root",
-  1: "logos.schema-model.2026-06",
+  1: "logos.commitment-model.2026-06",
   2: h'...schema-root...',
   3: h'...demo.ping_response-subtree-root...',
   4: {

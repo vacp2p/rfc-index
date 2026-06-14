@@ -1,13 +1,13 @@
 # LOGOS-MODULE-TRANSPORT
 
-| Field    | Value                                      |
-|----------|--------------------------------------------|
-| Name     | Logos Module Transport                     |
-| Slug     | LOGOS-MODULE-TRANSPORT                     |
-| Status   | raw                                        |
-| Category | Standards Track                            |
-| Editor   | ksr                                        |
-| Contributors | Jarrad, atd                            |
+| Field        | Value                   |
+|--------------|-------------------------|
+| Name         | Logos Module Transport  |
+| Slug         | 206                     |
+| Status       | raw                     |
+| Category     | Standards Track         |
+| Editor       | ksr                     |
+| Contributors | Jarrad, atd             |
 
 ## Abstract
 
@@ -29,10 +29,11 @@ Everything else — message types, field names, value types, error codes —
 is defined in CDDL and lives in the schemas below.
 
 This spec is intentionally thin.
-The Logos transport protocol is defined as directional dCBOR messages.
+The Logos transport protocol is defined as directional Logos deterministic
+CBOR messages.
 A stream transport is one binding of those messages onto a bidirectional,
 long-lived byte stream; it is not the only possible binding.
-Future versions may add streaming, multiplexed channels, compression, or
+Future revisions may add streaming, multiplexed channels, compression, or
 additional bindings.
 
 This spec is ONLY relevant when modules communicate over sockets (inter-
@@ -59,16 +60,24 @@ This field identifies the transport message type.
 ```cddl
 ; -- primitive types used in the envelope --
 
-protocol-version  = uint                   ; currently 1
+protocol-version  = uint
 module-name       = tstr .size (1..64)
 method-name       = tstr .size (1..128)
 ; Exact schema event identifier from the module's CDDL, e.g.
-; "storage.started-event".
+; "storage.started_event".
 event-name        = tstr .size (1..128)
 call-id           = uint
 subscription-id   = uint
 capability-token  = bstr .size 16
 schema-version    = [uint, uint]           ; [major, minor]
+semantic-commitment-model-revision = tstr
+hash-profile-id   = tstr
+hash-suite-id     = tstr
+schema-root       = bstr
+
+; This block is the owning registry for transport message-kind values in this
+; revision.
+; Other Logos specifications may cite these values but do not allocate them.
 message-kind      = 0..7
 
 message-kind-hello       = 0
@@ -105,8 +114,8 @@ envelope spec, not a module schema. Validation against the concrete module
 schema happens at the module layer after the transport layer delivers the
 message.
 
-The message maps below list the fields defined by transport version 1.
-Future versions may add fields.
+The message maps below list the fields defined by this draft revision.
+Published transport revisions may add fields.
 Implementations MUST ignore unknown fields in known message maps, as specified
 in section 10.2.
 
@@ -114,13 +123,26 @@ in section 10.2.
 ; -- Hello --
 ; Peer identification and version/auth metadata.
 ; Stream bindings use Hello during connection establishment.
+; The version field carries compatibility version metadata.
+; It is not a canonical schema identity or schema root.
+; Structural schema identity is carried separately using the commitment model
+; and hash profile.
+
+schema-commitment = {
+    commitment_model:  semantic-commitment-model-revision,
+    schema_root:       schema-root,
+    hash_profile:      hash-profile-id,
+    hash_suite:        hash-suite-id,
+}
 
 hello = {
-    0:        message-kind-hello,
-    protocol: protocol-version,
-    module:   module-name,
-    version:  schema-version,
-    token:    capability-token,
+    0:              message-kind-hello,
+    protocol:       protocol-version,
+    module:         module-name,
+    version:        schema-version,
+    token:          capability-token,
+    schema:         schema-commitment,
+    ? expect_schema: schema-commitment,
 }
 
 
@@ -219,16 +241,16 @@ cancel = {
 ; error code set.
 
 error-payload = {
-    code:     logos-error-code,        ; from logos_common.cddl
+    code:     logos_error_code,        ; from logos_common.cddl
     message:  tstr,
     ? detail: bstr,
 }
 
 ; Imported from logos_common.cddl:
-; logos-error-code = &(
-;     ok: 0, method-not-found: 1, invalid-params: 2, module-error: 3,
-;     not-authorised: 4, transport-error: 5, timeout: 6,
-;     version-mismatch: 7, not-ready: 8, cancelled: 9,
+; logos_error_code = &(
+;     ok: 0, method_not_found: 1, invalid_params: 2, module_error: 3,
+;     not_authorised: 4, transport_error: 5, timeout: 6,
+;     version_mismatch: 7, not_ready: 8, cancelled: 9,
 ; )
 
 
@@ -246,7 +268,8 @@ message = hello
 
 ### 1.4 Directional Message Semantics
 
-The Logos transport protocol is defined as directional dCBOR messages between
+The Logos transport protocol is defined as directional Logos deterministic
+CBOR messages between
 a caller and a callee.
 The caller is the party invoking methods or subscribing to events.
 The callee is the party exposing the module interface.
@@ -325,16 +348,17 @@ fast synchronous call may return before a slow one started earlier).
 
 ### 2.3 Deterministic CBOR
 
-All messages MUST be encoded using deterministic CBOR (dCBOR) as specified
-in LOGOS-MODULE-INTERFACE section 4.5.
+All messages MUST be encoded using Logos deterministic CBOR as specified in
+LOGOS-MODULE-INTERFACE section 4.5.
 The transport layer MUST validate the message envelope:
 frame length, deterministic CBOR, known message-kind, required envelope fields,
 and envelope field types.
 
 The transport layer treats schema payload fields (`params`, `result`, and
 `data`) as opaque CBOR maps after envelope validation.
-Payload validation against module CDDL schemas is owned by the module dispatch
-layer defined in LOGOS-MODULE-INTERFACE.
+Payload validation against module CDDL schemas is owned by the module host,
+generated adapter, native module method boundary, or generated client helper
+that interprets the concrete module schema.
 
 ---
 
@@ -348,10 +372,10 @@ Caller                                  Callee
   |--- open socket ----------------------->|
   |                                        |
   |--- Hello{protocol, module,       ----->|
-  |         version, token}                |
+  |         version, token, schema}        |
   |                                        |
   |<-- Hello{protocol, module,       ------|
-  |         version, token}                |
+  |         version, token, schema}        |
   |                                        |
   |    (connection established)            |
   |                                        |
@@ -361,31 +385,71 @@ Caller                                  Callee
    (`<runtime-dir>/logos_<name>.sock`) or TCP address.
 
 2. **Caller sends Hello.** Fields:
-   - `protocol`: the transport protocol version (currently `1`)
-   - `module`: the caller's module name
-   - `version`: the schema version the caller expects for the callee
+   - `protocol`: the offered transport protocol revision
+   - `module`: the caller's flat runtime module or endpoint name.
+     In this transport specification, "module" includes ordinary modules,
+     Logos-defined system modules, runtime-control surfaces, and runtime-host
+     endpoints that expose a Logos interface.
+   - `version`: the compatibility version metadata the caller expects for the
+     callee
    - `token`: a capability token authorising this connection
+   - `schema`: structural schema identity of the caller.
+     Every transport endpoint exposes a Logos schema and MUST provide this
+     field.
+   - `expect_schema`: optional structural schema identity the caller expects
+     for the callee
 
 3. **Callee validates the Hello:**
    - `protocol` MUST be compatible with the callee's supported transport
-     versions, using the negotiation rule in section 10.1.
+     revisions, using the negotiation rule in section 10.1.
      If not: Error `VERSION_MISMATCH`.
-   - In transport version 1, the `token` field MUST be present and MAY be
+   - In this draft revision, the `token` field MUST be present and MAY be
      empty.
      If the active runtime security policy enforces capability tokens, the
      token MUST be valid for this caller/callee pair.
      If token validation is enforced and fails: Error `NOT_AUTHORISED`.
    - Schema version MUST be compatible (same major version, caller's minor
      <= callee's minor). If not: Error `VERSION_MISMATCH`.
+   - If `expect_schema` is present, the callee MUST compare it with the
+     callee's structural schema identity.
+     The comparison includes `commitment_model`, `schema_root`,
+     `hash_profile`, and `hash_suite`.
+     If the callee cannot compute structural schema identity for the selected
+     schema, or if any field differs, it MUST send Error `VERSION_MISMATCH`
+     and close.
+   - The caller's `schema` field MUST be present.
+     The callee MUST reject the Hello with Error `VERSION_MISMATCH` and close if
+     the field is missing, malformed, or not acceptable under the active runtime
+     policy.
+   - The callee MAY record the caller's declared `schema` identity for
+     diagnostics, policy, authorization, audit, or later routing decisions.
+     Transport validation does not require the callee to trust the caller's
+     declared `schema` without policy support.
    - On validation failure: callee sends protocol-error and closes.
 
 4. **Callee sends Hello response.** Fields:
-   - `protocol`: the callee's protocol version
+   - `protocol`: the negotiated protocol revision
    - `module`: the callee's module name
-   - `version`: the callee's current schema version
+   - `version`: the callee's current compatibility version metadata
    - `token`: echoed or a session token for the connection
+   - `schema`: structural schema identity of the callee.
+     The callee MUST provide this field.
+   - `expect_schema`: optional structural schema identity the callee expects
+     for the caller, when callee-side policy requires the caller to expose a
+     particular schema identity
 
-5. **Connection is established.** Both parties may now send directional
+5. **Caller validates the Hello response.**
+   The caller MUST validate `protocol`, `module`, `version`, and `token`
+   according to the same negotiated-revision and policy rules used for the
+   initial Hello.
+   The caller MUST verify that the callee response includes a valid `schema`.
+   If the caller sent `expect_schema`, it MUST verify that the callee response
+   includes a matching `schema`.
+   If the callee response includes `expect_schema`, the caller MUST compare it
+   with the caller's own structural schema identity and close the connection if
+   it cannot satisfy that expectation.
+
+6. **Connection is established.** Both parties may now send directional
    transport messages allowed for their role.
 
 ### 3.2 Connection Termination
@@ -400,7 +464,7 @@ Either party may close the socket at any time. On close:
 
 For long-lived connections, either party MAY send a Hello message with the
 same token as a keep-alive / heartbeat.
-The recipient MUST validate it using the same negotiated transport version and
+The recipient MUST validate it using the same negotiated transport revision and
 token policy as the initial Hello, then respond with a Hello.
 If validation fails, the recipient sends protocol-error and closes.
 This can be used to detect dead connections.
@@ -424,12 +488,12 @@ The caller sends a Request and waits for a Response with the matching `id`.
 
 **Request fields:**
 - `id`: unique within this connection (caller-assigned)
-- `method`: the method name (e.g. `"exists"`, `"upload-url"`)
-- `params`: a CBOR map matching the method's `-request` schema
+- `method`: the method name (e.g. `"exists"`, `"upload_url"`)
+- `params`: a CBOR map matching the method's `_request` schema
 
 **Response fields:**
 - `id`: echoed from the Request
-- `result`: a CBOR map matching the method's `-response` schema (on success)
+- `result`: a CBOR map matching the method's `_response` schema (on success)
 - `error`: an error-payload (on failure)
 
 Exactly one of `result` or `error` MUST be present.
@@ -468,7 +532,7 @@ A caller MAY subscribe to the same event multiple times (with different
 IDs). Unsubscribe removes one subscription by ID.
 
 Subscribe and Unsubscribe messages have no separate acknowledgement in
-transport version 1.
+this draft revision.
 On a single connection, normal connection ordering applies:
 a callee processes a Subscribe before any later Request read on that same
 connection.
@@ -486,8 +550,8 @@ For a given published event, the callee sends Event messages to every active
 connection that has matching subscription IDs.
 The `sub` field is scoped to the connection that created the subscription.
 
-The `data` field is a CBOR map matching the event's `-event` schema
-(see LOGOS-MODULE-INTERFACE section 1.4).
+The `data` field is a CBOR map matching the event's `_event` schema
+(see LOGOS-MODULE-INTERFACE section 1.5).
 
 Events are an asynchronous one-way notification mechanism with schema-defined
 payloads, not a second RPC channel.
@@ -553,9 +617,10 @@ Rules:
 
 The Hello `token` field (16-byte `bstr`) is reserved for capability-based
 authentication. The field MUST be present for wire compatibility but MAY be
-empty (`h''`). Token validation is **not enforced** in the current version.
+empty (`h''`). Token validation is **not enforced** in this draft revision.
 
-Future versions will specify token issuance (via Capability Module),
+Future revisions or security profiles will specify token issuance (via
+Capability Module),
 validation, and revocation. See LOGOS-MODULE-RUNTIME section 4.3.
 
 ### 8.2 Socket Path Security
@@ -592,8 +657,9 @@ All incoming CBOR MUST be validated before processing:
 
 The runtime MUST NOT be required to validate `params`, `result`, or `data`
 against the module's CDDL schema when forwarding a socket or remote call.
-Those payload maps are validated by the module dispatch layer and generated
-client/host adapters.
+Those payload maps are validated by the module host, generated adapter, native
+module method boundary, or generated client helper that interprets the concrete
+module schema.
 
 ### 8.4 TLS (Remote Mode)
 
@@ -639,9 +705,11 @@ For accessing modules on a remote machine. The runtime connects to
 The stream binding is identical to Unix domain socket mode, except:
 - TLS 1.3 is required (section 8.4)
 
-No additional Hello fields are defined in transport version 1.
-Future transport versions MAY extend the Hello message using the normal
-versioning rules in section 10.
+This draft defines commitment-aware Hello fields for structural schema
+identity.
+Before publication, those fields should be covered by transport conformance
+vectors and checked against LOGOS-MODULE-COMMITMENT-MODEL and
+LOGOS-MODULE-HASH-PROFILE review feedback.
 
 ### 9.3 Future Request-Oriented Bindings
 
@@ -655,27 +723,47 @@ long-lived bidirectional stream session.
 
 ---
 
-## 10. Protocol Versioning
+## 10. Protocol Revisioning
 
-The transport protocol has a version number, carried in the `protocol` field
-of the Hello message. The current protocol version is **1**.
+The transport protocol has a revision number, carried in the `protocol` field
+of the Hello message.
+This document is still a raw draft and does not assign a final published
+transport revision number.
+Local prototypes MAY use a temporary numeric value while testing, but that
+value is not a published transport revision identifier.
 
-### 10.1 Version Negotiation
+### 10.1 Revision Negotiation
 
-Both parties send their highest supported protocol version in the Hello.
-The connection operates at the **minimum** of the caller's offered version and
-the callee's highest supported version.
-If that negotiated version is below the callee's minimum supported version,
+Both parties send their highest supported protocol revision in the Hello.
+The connection operates at the **minimum** of the caller's offered revision and
+the callee's highest supported revision.
+If that negotiated revision is below the callee's minimum supported revision,
 the callee MUST send Error `VERSION_MISMATCH` and close.
 
-Transport version 1 implementations currently have no lower protocol version
-to negotiate to.
-Therefore a version 1-only callee accepts `protocol = 1` and rejects any
-offered version that cannot negotiate to 1.
+Published revisions must define their own accepted revision numbers and
+minimum-supported revision behavior.
 
-### 10.2 Future Versions
+### 10.2 Commitment Hash-Suite Interoperability
 
-New protocol versions MAY add:
+Commitment-aware Hello validation compares `commitment_model`, `schema_root`,
+`hash_profile`, and `hash_suite`.
+This document does not select a production hash suite.
+
+A commitment-aware deployment MUST define the accepted hash profile and hash
+suite set by local policy, deployment profile, or a future transport profile.
+Implementations MUST reject a Hello schema commitment whose `hash_profile` or
+`hash_suite` is not in that accepted set.
+
+A published interoperable transport profile that requires commitment-aware Hello
+validation MUST select at least one mandatory-to-implement hash suite or define
+a deterministic suite-negotiation rule.
+Until such a profile is selected, commitment-aware Hello interoperability is
+defined only within deployments or conformance vector sets that explicitly
+select the same accepted hash profile and hash suite.
+
+### 10.3 Future Revisions
+
+New protocol revisions MAY add:
 - New message kinds
 - New fields in existing message types (existing fields MUST remain)
 - New error codes
@@ -683,11 +771,11 @@ New protocol versions MAY add:
 Implementations MUST ignore unknown fields in known message maps.
 This is the forward-compatibility mechanism for future envelope extensions.
 
-Message-kind values 0 through 7 are allocated in transport version 1.
-Receiving an unknown or unallocated message-kind value in transport version 1
+Message-kind values 0 through 7 are allocated in this draft revision.
+Receiving an unknown or unallocated message-kind value in this draft revision
 MUST yield a protocol error with code `INVALID_PARAMS`.
 
-New protocol versions MUST NOT:
+New protocol revisions MUST NOT:
 - Remove existing message types
 - Change the meaning of existing fields
 - Change the framing format
