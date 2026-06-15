@@ -253,9 +253,11 @@ def validate_doc(doc: DocInfo) -> None:
             "metadata table must appear at the top of the spec, immediately after the optional H1"
         )
 
-    # Ensure standard header rows remain canonical.
-    if doc.lines[doc.table.start].strip() != CANONICAL_HEADER:
-        doc.errors.append(f"metadata header row must be exactly '{CANONICAL_HEADER}'")
+    # Keep header validation aligned with metadata-table discovery.
+    if not HEADER_RE.match(doc.lines[doc.table.start].strip()):
+        doc.errors.append(
+            f"metadata header row must contain only 'Field' and 'Value' columns"
+        )
     if not SEPARATOR_RE.match(doc.lines[doc.table.separator].strip()):
         doc.errors.append("metadata separator row is malformed")
 
