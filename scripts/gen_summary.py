@@ -19,7 +19,7 @@ DOCS = ROOT / "docs"
 OUTPUT = DOCS / "SUMMARY.md"
 BLOCKCHAIN_TREE_JSON = DOCS / "blockchain-structure.json"
 
-SKIP_FILES = {"README.md", "SUMMARY.md", "template.md"}
+SKIP_FILES = {"README.md", "SUMMARY.md"}
 AUXILIARY_DIR_NAMES = ("appendices", "appendix")
 
 TOP_LEVEL = ["messaging", "blockchain", "storage", "anoncomms", "research"]
@@ -52,6 +52,11 @@ ORDER_OVERRIDES = {
         "deprecated",
         "deleted",
     ],
+    "messaging/raw": ["core", "application", "informational"],
+    "messaging/draft": ["core", "application", "informational"],
+    "messaging/stable": ["core", "application", "informational"],
+    "messaging/deprecated": ["core", "application", "informational"],
+    "messaging/deleted": ["core", "application", "informational"],
     "blockchain": ["raw", "draft", "deprecated"],
     "storage": ["raw", "draft", "deprecated"],
     "anoncomms": ["raw", "draft", "deleted"],

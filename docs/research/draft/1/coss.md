@@ -347,7 +347,7 @@ When a specification is promoted to *draft* status,
 the number that is assigned MAY be incremental
 or by the *sub-domain* and the Logos LIP process.
 Standards track specifications MUST be based on the
-[Logos LIP template](https://github.com/logos-co/logos-lips/blob/master/docs/anoncomms/template.md) before obtaining a new status.
+[Logos LIP template](../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
 ### Document Types

@@ -43,7 +43,7 @@ offering a robust solution to address these challenges.
 
 This document specifies a private messaging service using the
 Ethereum blockchain as authentication service.
-Rooted in the existing [model](../../messaging/draft/20/toy-eth-pm.md),
+Rooted in the existing [model](../../messaging/draft/application/20/toy-eth-pm.md),
 this proposal addresses the deficiencies related
 to forward privacy and authentication inherent
 in the current framework.

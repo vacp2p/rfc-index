@@ -607,7 +607,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### Normative
 
-- [Incentivization for Waku Light Protocols](https://github.com/logos-messaging/specs/blob/master/standards/core/incentivization.md)
+- [Incentivization for Waku Light Protocols](../../messaging/raw/core/incentivization.md)
 
 ### Informative
 
