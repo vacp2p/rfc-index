@@ -34,6 +34,9 @@
     * [Scalable Data Sync (SDS)](#scalable-data-sync-sds)
     * [Rate Limit Manager](#rate-limit-manager)
     * [Encryption Hook](#encryption-hook)
+    * [Wire Format](#wire-format)
+      * [Spec Marker](#spec-marker)
+      * [Versioning](#versioning)
   * [Procedures](#procedures)
     * [Node initialization](#node-initialization)
     * [Outgoing message processing](#outgoing-message-processing)
@@ -149,6 +152,44 @@ The Encryption Hook provides a pluggable interface for upper layers to inject en
 - The `Encryption` interface MUST be implemented by the caller when the hook is provided.
 - The Reliable Channel API MUST NOT impose any specific encryption scheme.
 
+### Wire Format
+
+This section defines the on-the-wire identity of a Reliable Channel segment.
+
+#### Spec Marker
+
+A short, fixed, unencrypted tag that identifies a message on the wire as belonging to
+this layer. The marker value is the ASCII string:
+
+```
+RELIABLE-CHANNEL-API/1
+```
+
+- The marker MUST be attached to every outgoing segment **outside** the encrypted payload,
+  so that receivers can evaluate it without performing decryption.
+- On reception, segments whose marker is absent or does not equal the value above MUST be
+  silently dropped, before any decryption or SDS processing is attempted.
+- The marker is an integrity hint, not an authenticator: it is trivially spoofable and
+  carries no cryptographic guarantees. See [Security/Privacy Considerations](#securityprivacy-considerations).
+
+#### Versioning
+
+The trailing `/N` is the **wire-format version** of this layer. It is intentionally
+decoupled from this spec's slug and from its lifecycle status (`raw`, `draft`,
+`stable`, …), so that editorial changes to the document do not invalidate deployed
+implementations.
+
+- The wire-format version MUST be bumped (`/1` → `/2`) **only** when an editor of this
+  spec declares a change that breaks on-the-wire compatibility — for example, a new
+  marker placement, a change to segment framing, or a non-additive change to required
+  fields.
+- Editorial changes (typos, link fixes, clarifications, timeline regeneration,
+  contributor updates) MUST NOT bump the wire-format version.
+- Implementations MUST pin the exact version they support and reject segments carrying
+  a different version, rather than attempting best-effort compatibility.
+- A bump MUST be recorded in this section together with a one-line rationale, so the
+  history of wire-format changes is readable independently of git.
+
 ## Procedures
 
 ### Node initialization
@@ -172,17 +213,19 @@ When `send` is called, the implementation MUST process `message` in the followin
 1. **Segment**: Split the payload into segments as defined in [SEGMENTATION](./segmentation.md).
 2. **Apply [SDS](https://lip.logos.co/anoncomms/raw/sds.html)**: add each sds message to the SDS outgoing buffer (see [SDS](#scalable-data-sync-sds) for parameter bindings).
 3. **Encrypt**: If an `Encryption` implementation is provided, encrypt each segment before transmission.
-4. **Rate Limit**: If `RateLimitConfig.enabled` is `true`, delay dispatch as needed to comply with [RLN](https://lip.logos.co/messaging/draft/17/rln-relay.html) epoch constraints.
-5. **Dispatch**: Send each segment via the underlying [MESSAGING-API](messaging-api.md).
+4. **Tag with spec marker**: Attach the [Spec Marker](#spec-marker) (`RELIABLE-CHANNEL-API/1`) to the segment, outside the encrypted payload.
+5. **Rate Limit**: If `RateLimitConfig.enabled` is `true`, delay dispatch as needed to comply with [RLN](https://lip.logos.co/messaging/draft/17/rln-relay.html) epoch constraints.
+6. **Dispatch**: Send each segment via the underlying [MESSAGING-API](messaging-api.md).
 
 ### Incoming message processing
 
 When a segment is received from the network, the implementation MUST process it in the following order:
 
-1. **Decrypt**: If an `Encryption` implementation is provided, decrypt the segment.
-2. **Apply [SDS](https://lip.logos.co/anoncomms/raw/sds.html)**: Deliver the segment to the SDS layer, which emits acknowledgements and detects gaps.
+1. **Validate spec marker**: Check that the segment carries the [Spec Marker](#spec-marker) (`RELIABLE-CHANNEL-API/1`). Segments whose marker is missing or does not match MUST be silently dropped, with no further processing.
+2. **Decrypt**: If an `Encryption` implementation is provided, decrypt the segment.
+3. **Apply [SDS](https://lip.logos.co/anoncomms/raw/sds.html)**: Deliver the segment to the SDS layer, which emits acknowledgements and detects gaps.
    - **Detect missing dependencies**: If SDS detects a gap in the causal history, it MUST make a best-effort attempt to retrieve the missing message. The `Retrieval hint` (see [Scalable Data Sync (SDS)](#scalable-data-sync-sds)) carried in each SDS message provides the transport `MessageHash` needed to query the store; without it, store retrieval is not possible. If the message cannot be retrieved, SDS MAY mark it as lost.
-3. **Reassemble**: Once all segments for a message have been received, reassemble and emit a `reliable:message:received` event.
+4. **Reassemble**: Once all segments for a message have been received, reassemble and emit a `reliable:message:received` event.
 
 ### Rate limiting
 
@@ -461,6 +504,7 @@ types:
 - Segment metadata (message ID, segment index, total segments) is visible to network observers unless encrypted by the hook.
 - SDS acknowledgement messages are sent over the same content topic and are subject to the same confidentiality concerns.
 - Rate limiting compliance is required to avoid exclusion from the network by RLN-enforcing relays.
+- The [Spec Marker](#spec-marker) is unencrypted and identifies traffic as belonging to this layer to any on-path observer. It is not authenticated: an attacker can forge the marker on arbitrary payloads, so receivers MUST treat marker presence only as a coarse pre-filter and rely on decryption and SDS to detect malformed or unsolicited messages.
 
 ## Copyright
 
