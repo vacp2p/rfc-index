@@ -19,18 +19,24 @@ DOCS = ROOT / "docs"
 OUTPUT = DOCS / "SUMMARY.md"
 BLOCKCHAIN_TREE_JSON = DOCS / "blockchain-structure.json"
 
-SKIP_FILES = {"README.md", "SUMMARY.md", "template.md"}
+SKIP_FILES = {"README.md", "SUMMARY.md"}
 AUXILIARY_DIR_NAMES = ("appendices", "appendix")
 
 TOP_LEVEL = ["messaging", "blockchain", "storage", "anoncomms", "research"]
 
 LABEL_OVERRIDES = {
     "anoncomms": "AnonComms",
-    "messaging/raw": "Raw",
-    "messaging/draft": "Draft",
-    "messaging/stable": "Stable",
-    "messaging/deprecated": "Deprecated",
-    "messaging/deleted": "Deleted",
+    "messaging/core/raw": "Raw",
+    "messaging/core/draft": "Draft",
+    "messaging/core/stable": "Stable",
+    "messaging/core/deprecated": "Deprecated",
+    "messaging/application/raw": "Raw",
+    "messaging/application/draft": "Draft",
+    "messaging/application/stable": "Stable",
+    "messaging/application/deprecated": "Deprecated",
+    "messaging/application/deleted": "Deleted",
+    "messaging/informational/raw": "Raw",
+    "messaging/informational/draft": "Draft",
     "blockchain/raw": "Raw",
     "blockchain/draft": "Draft",
     "blockchain/deprecated": "Deprecated",
@@ -46,12 +52,13 @@ LABEL_OVERRIDES = {
 
 ORDER_OVERRIDES = {
     "messaging": [
-        "raw",
-        "draft",
-        "stable",
-        "deprecated",
-        "deleted",
+        "core",
+        "application",
+        "informational",
     ],
+    "messaging/core": ["raw", "draft", "stable", "deprecated", "deleted"],
+    "messaging/application": ["raw", "draft", "stable", "deprecated", "deleted"],
+    "messaging/informational": ["raw", "draft", "stable", "deprecated", "deleted"],
     "blockchain": ["raw", "draft", "deprecated"],
     "storage": ["raw", "draft", "deprecated"],
     "anoncomms": ["raw", "draft", "deleted"],

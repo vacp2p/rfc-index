@@ -34,7 +34,7 @@ to add prospective users to a network-governed
 
 ## Motivation
 
-When [32/RLN-V1](../draft/32/rln-v1.md) is enforced in [10/Waku2](../../messaging/draft/10/waku2.md),
+When [32/RLN-V1](../draft/32/rln-v1.md) is enforced in [10/Waku2](../../messaging/core/draft/10/waku2.md),
 all users are required to register to a membership set.
 The membership set will store user identities
 allowing the secure interaction within an application.
@@ -140,6 +140,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [10/Waku2](../../messaging/draft/10/waku2.md)
+- [10/Waku2](../../messaging/core/draft/10/waku2.md)
 - [32/RLN-V1](../draft/32/rln-v1.md)
 - [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564)

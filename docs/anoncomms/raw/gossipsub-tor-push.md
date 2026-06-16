@@ -118,7 +118,7 @@ Tp-peers MUST support `/meshsub/1.1.0`.
 For retrieving Tp-peers,
 Tp-nodes SHOULD use an ambient peer discovery method
 that retrieves a random peer sample (from the set of all peers),
-e.g. [33/WAKU2-DISCV5](../../messaging/draft/33/discv5.md).
+e.g. [33/WAKU2-DISCV5](../../messaging/core/draft/33/discv5.md).
 
 Tp-nodes MUST establish a connection as described in sub-section
 [Tor Push Connection Establishment](#connection-establishment) to at least one Tp-peer.
@@ -191,7 +191,7 @@ which might be critical to certain applications.
 
 #### Targeting the Gossipsub Network
 
-Without sophisticated rate limiting (for example using [17/WAKU2-RLN-RELAY](../../messaging/draft/17/rln-relay.md)),
+Without sophisticated rate limiting (for example using [17/WAKU2-RLN-RELAY](../../messaging/core/draft/17/rln-relay.md)),
 attackers can spam the gossipsub network.
 It is not enough to just block peers that send too many messages,
 because these messages might actually come from a Tor exit node
@@ -239,6 +239,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [libp2p switch](https://docs.libp2p.io/concepts/multiplex/switch)
 * [SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928)
 * [Tor](https://www.torproject.org/)
-* [33/WAKU2-DISCV5](../../messaging/draft/33/discv5.md)
+* [33/WAKU2-DISCV5](../../messaging/core/draft/33/discv5.md)
 * [Bitcoin over Tor isn't a Good Idea](https://ieeexplore.ieee.org/abstract/document/7163022)
-* [17/WAKU2-RLN-RELAY](../../messaging/draft/17/rln-relay.md)
+* [17/WAKU2-RLN-RELAY](../../messaging/core/draft/17/rln-relay.md)

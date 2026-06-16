@@ -19,6 +19,7 @@ SUMMARY = DOCS / "SUMMARY.md"
 INDEX = DOCS / "logos-lips.json"
 EXCLUDE_INDEX_PARTS = {"previous-versions", "appendix", "appendices"}
 SUMMARY_AUXILIARY_PARTS = {"appendix", "appendices"}
+SUMMARY_ALLOWED_NON_SPEC_FILES = {"README.md", "about.md", "template.md"}
 SUMMARY_LINK_RE = re.compile(r"\[(?:\\.|[^\]\\])+\]\(([^)]+\.md(?:#[^)]+)?)\)")
 
 
@@ -95,7 +96,7 @@ def validate_summary_coverage(targets: list[Path] | None = None) -> List[str]:
     extra = sorted(
         path
         for path in linked_paths - expected_paths
-        if path.name not in {"README.md", "about.md"}
+        if path.name not in SUMMARY_ALLOWED_NON_SPEC_FILES
         and not SUMMARY_AUXILIARY_PARTS.intersection(path.relative_to(DOCS).parts)
     )
     if extra:

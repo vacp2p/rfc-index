@@ -29,6 +29,8 @@ STATUS_SCOPED_COMPONENTS = {"messaging", "blockchain", "storage", "anoncomms", "
 ALLOWED_TYPES = {"rfc", "cfr"}
 ALLOWED_CATEGORIES = {
     "standards track",
+    "application",
+    "core",
     "informational",
     "best current practice",
     "process",
