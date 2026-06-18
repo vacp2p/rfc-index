@@ -60,17 +60,17 @@ Our description differs from the original paper proposition, proving that a note
 
 ### Advantages
 
-    1. The ledger isn’t required to be private using shielded notes.
+1. The ledger isn’t required to be private using shielded notes.
       - Validators don’t need to maintain a nullifier list.
       - Leaders keep their privacy unlinking their stake, block and PoL.
 
-    2. There is no leader note evolution mechanism anymore ([see the paper](https://eprint.iacr.org/2018/1132.pdf) for details)
-      - There are no orphan proofs anymore, removing the need to include valid PoL proofs from abandoned forks.
-      - Crypsinous forced us to maintain a parallel note commitment set integrating evolving notes over time. This requirement is removed now
+2. There is no leader note evolution mechanism anymore ([see the paper](https://eprint.iacr.org/2018/1132.pdf) for details)
+     - There are no orphan proofs anymore, removing the need to include valid PoL proofs from abandoned forks.
+     - Crypsinous forced us to maintain a parallel note commitment set integrating evolving notes over time. This requirement is removed now
 
 ### Disadvantages
 
-    1. We cannot compute the PoL far in advance because the leader must know the latest ledger state of Mantle.
+1. We cannot compute the PoL far in advance because the leader must know the latest ledger state of Mantle.
 
 # Protocol
 
@@ -278,6 +278,40 @@ print(f"t_1_constant = {t_1_constant:#x}")
 | 90% | 2.33% | -0.0359% |
 | 95% | 2.46% | -0.0406% |
 | 100% | 2.59% | -0.0444% |
+
+### Corner Case: Note Value Exceeding Inferred Total Stake
+The lottery threshold approximation relies on a second-order Taylor expansion of $\phi_f(α)=1−(1−f)^\alpha$, 
+which is only accurate when $\alpha=v/\text{inferred_total_stake}≪1$.
+Under normal operation this holds trivially, since no single note can hold a significant fraction of the total stake.
+However, a pathological regime exists where this assumption breaks down.
+
+#### Scenario
+
+Suppose the chain halts and only a small fraction of the original stakers come back online to restart it. 
+The `inferred_total_stake` parameter, which is derived from recent epoch snapshots, may lag far behind the actual participating stake. 
+A note with value $v$ could then satisfy $v≫\text{inferred_total_stake}$, placing it well outside the valid domain of the approximation.
+
+#### What happens
+The threshold $t:=v(t0+t1⋅v)t := v(t_0 + t_1 \cdot v)$ is a downward-opening parabola in the reals.
+It peaks near $v \approx 29 \cdot \text{inferred_total_stake}$ and crosses zero again near 
+$ v \approx 58 \cdot \text{inferred_total_stake}$.
+Past the peak, the real-valued threshold becomes negative.
+In $\mathbb{F}_p$ this wraps to a large value close to $p$, meaning the lottery ticket is almost certain to be below the threshold.
+The note wins nearly every slot.
+Past the second zero crossing, the threshold wraps back toward zero and the behavior becomes an oscillation between near-certain win and near-certain loss depending on the exact ratio $v/\text{inferred_total_stake}$
+
+#### Severity
+
+This cannot be triggered by a rational adversary under normal conditions, since it requires `inferred_total_stake` to be severely underestimated relative to individual note values. 
+Several scenarios can produce this regime:
+- Chain halt and partial restart: only a fraction of original stakers come back online, so `inferred_total_stake` lags the actual participating stake by a large factor.
+- Mass unstaking: a large coordinated withdrawal in a short period (confidence crisis, protocol migration) deflates `inferred_total_stake` while large notes remain in circulation.
+- Early bootstrap: at genesis or in the first epochs, total stake has not built up yet but individual notes may already carry significant value.
+- Estimation failure: a bug or manipulation in the `inferred_total_stake` derivation mechanism produces a value far below reality.
+
+In all these cases the effect on liveness is arguably beneficial: large-stake notes winning aggressively helps the chain find leaders and recover from the depressed-stake regime.
+Once epochs progress and `inferred_total_stake` converges back toward reality, the lottery returns to its normal operating range.
+No circuit-level mitigation is strictly necessary given the above.
 
 ## Benchmarks
 
