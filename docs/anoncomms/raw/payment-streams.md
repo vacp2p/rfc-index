@@ -359,11 +359,21 @@ defined in the following subsection.
 Off-chain messages in this section use protobuf for interchange
 between clients, providers, and Delivery.
 
-Cryptographic commitments use a chain-specific canonical form.
-For LEZ, see [LEZ off-chain integration](#lez-off-chain-integration).
-
-Implementations MUST NOT sign protobuf-serialized message bytes unless
+Cryptographic commitments (`VaultProof.owner_signature`,
+`StreamProof.signature`) MUST use a chain-specific canonical form.
+Implementations MUST NOT sign raw protobuf-serialized message bytes unless
 a chain integration explicitly specifies that scheme.
+
+Each chain integration MUST define deterministic signed material for every
+signature field this protocol uses and MUST publish test vectors for those
+payloads.
+Integrations MUST define how signed material covers the fields required by
+[VaultProof](#vaultproof) and [StreamProof](#streamproof).
+
+For LEZ, fixed-width identifier encodings appear under
+[LEZ off-chain integration](#lez-off-chain-integration).
+LEZ preimage byte layouts appear under
+[Implementation Considerations](#implementation-considerations).
 
 ### Eligibility Proof Types
 
@@ -748,11 +758,14 @@ account timestamp used for stream folding.
 
 #### Canonical signing (LEZ)
 
-LEZ canonical preimages are Borsh-encoded structs with a fixed
-32-byte domain prefix and SHA-256 prehash per NSSA practice.
-Field order and types are defined in the payment-streams integration
-plan (Step 4).
+LEZ integrations sign a 32-byte canonical payload digest using NSSA Schnorr.
+Each digest is `SHA-256(domain_prefix ‖ canonical_body_bytes)`,
+where `domain_prefix` is a fixed 32-byte string and `canonical_body_bytes`
+is a deterministic Borsh serialization defined for that signature role.
 Protobuf field numbers are not part of the signed material.
+
+Vault-proof and Store eligibility preimages for the LEZ demo are specified
+under [Implementation Considerations](#implementation-considerations).
 
 #### Eligibility envelope (Store)
 
@@ -763,9 +776,20 @@ The Store `eligibility_proof` field carries a protobuf
 
 ## On-Chain Protocol
 
-This section describes the on-chain components of the protocol:
-the account model, address derivation, balance accounting,
-accrual semantics, authorization, and privacy tiers.
+This section maps payment-stream notions from
+[Theory and Semantics](#theory-and-semantics) onto a concrete on-chain
+execution environment.
+Chain-agnostic lifecycle rules and solvency invariants remain in Theory;
+this chapter states what the chain must provide (notably a time signal for
+[Lazy Accrual](#lazy-accrual)) and how the reference LEZ binding satisfies
+those requirements.
+
+The reference implementation is a single LEZ guest program plus platform
+programs invoked for fund movement.
+This section is not a guest transcript: wire layouts, error codes, and exact
+PDA seed literals live in the reference codebase.
+LEZ-specific clock account identifiers and off-chain signing byte layouts
+live in [Implementation Considerations](#implementation-considerations).
 
 ### Account Types
 
@@ -824,6 +848,26 @@ Two solvency invariants MUST hold after every mutating instruction:
 Instructions maintain the second invariant by applying the same delta to `total_allocated`
 whenever any stream's `allocation` changes.
 
+### Close and claim accounting
+
+Closing and claiming are distinct operations with different effects on
+`VaultHolding`, stream `allocation`, and `total_allocated`.
+
+Close (vault owner or stream provider) folds accrual, transitions the stream
+to `CLOSED`, and returns the unaccrued remainder from stream allocation back
+to the vault's unallocated pool.
+Close MUST reduce stream `allocation` by the released unaccrued amount and MUST
+reduce `total_allocated` by the same amount.
+Accrued funds that were already folded into the stream's accrued balance
+MAY remain on the closed stream until the provider claims them.
+
+Claim (stream provider only) folds accrual, pays the full accrued balance from
+`VaultHolding` to the provider, and MUST reduce stream `allocation` by the
+payout amount.
+Claim MUST reduce `total_allocated` by the same payout amount.
+Claim does not change stream lifecycle state beyond accrual folding.
+Partial claims are not supported.
+
 ### Lazy Accrual
 
 Stream state is a pure function of stored `StreamConfig` fields and the current timestamp.
@@ -881,7 +925,75 @@ Closing an already-closed stream is an error.
   under our wallet.
   The goal is to prevent linking the vault owner's primary public key
   to vault and stream activity on-chain.
-  See Security and Privacy Considerations.
+  See [Security and Privacy Considerations](#security-and-privacy-considerations).
+
+### Programs and interactions (LEZ reference binding)
+
+The reference LEZ demo composes the following participants:
+
+- Payment-streams guest program: owns vault and stream PDAs; enforces
+  allocation accounting, lazy accrual, lifecycle transitions, and
+  authorization predicates described in this section.
+- Platform authenticated-transfer program: moves native balance from the
+  vault owner's account into `VaultHolding` on `deposit`.
+  The guest validates vault ownership and amount, then chains a transfer call
+  to the platform program id supplied in the instruction.
+- System clock accounts: supply monotonic timestamps for stream folding and
+  for comparing against off-chain `create_stream_deadline`
+  (see [Lazy Accrual](#lazy-accrual)).
+- Wallet / submitter: chooses transparent versus shielded execution,
+  constructs account lists, and enforces client-side privacy policy
+  (see [Wallet responsibilities](#wallet-responsibilities)).
+
+Privacy-preserving `deposit` MAY require the payment-streams program to appear
+in a multi-program proof so the chained authenticated transfer and guest
+logic execute under one privacy-preserving transaction.
+The LIP does not normatively specify that proof layout.
+
+Direct transfers into `VaultHolding` without calling `deposit` increase
+`VaultHolding` balance and therefore unallocated funds.
+They do not break solvency invariants; wallets SHOULD account for linkability
+when using that path on `PseudonymousFunder` vaults.
+
+### Operation correspondence (LEZ reference guest)
+
+The table maps Theory-level operations to the reference guest instruction
+names.
+Effects summarize changes to `VaultHolding` balance (B), per-stream
+`allocation`, and vault `total_allocated` after a successful instruction.
+Stream-touching instructions fold accrual to the supplied clock time first.
+
+| Theory operation | Reference instruction | Authorizer | B / allocation / total_allocated effect |
+| --- | --- | --- | --- |
+| Initialize vault | `InitializeVault` | Vault owner | Creates empty vault accounts; no balance change |
+| Deposit | `Deposit` | Vault owner | B increases by deposit amount; `total_allocated` unchanged |
+| Withdraw unallocated | `Withdraw` | Vault owner | B decreases by withdraw amount; `total_allocated` unchanged |
+| Create stream | `CreateStream` | Vault owner | Stream `allocation` set; `total_allocated` increases by same amount |
+| Pause stream | `PauseStream` | Vault owner | Accrual stops; allocation fields unchanged |
+| Resume stream | `ResumeStream` | Vault owner | Accrual resumes; allocation fields unchanged |
+| Top-up stream | `TopUpStream` | Vault owner | Stream `allocation` and `total_allocated` increase by top-up amount; MAY transition to `ACTIVE` |
+| Close stream | `CloseStream` | Vault owner or stream provider | Unaccrued returned to vault (B unchanged); stream `allocation` and `total_allocated` decrease by released unaccrued; accrued MAY remain until claim |
+| Claim accrued | `Claim` | Stream provider | B decreases by payout; provider balance increases; stream `allocation` and `total_allocated` decrease by payout |
+
+Off-chain stream creation deadlines and provider policy checks use the same
+timestamp domain as folding
+(see [StreamProviderPolicy](#streamproviderpolicy) and
+[LEZ off-chain integration](#lez-off-chain-integration)).
+
+### Wallet responsibilities
+
+The guest enforces authorization and accounting given the accounts supplied
+in a transaction.
+It cannot detect whether execution was transparent or shielded.
+
+Wallets that support `PseudonymousFunder` vaults MUST refuse to submit
+transparent transactions that touch those vaults or their streams.
+Wallets SHOULD reject transparent funding paths that link a user's primary
+public key to vault activity when unlinkability is intended.
+
+Detailed privacy limits, pre-shielding guidance, and provider claim
+linkability appear under
+[Security and Privacy Considerations](#security-and-privacy-considerations).
 
 ## Security and Privacy Considerations
 
@@ -1102,6 +1214,112 @@ Per-message receipts allow the user to approve each message individually
 but require signing each receipt, increasing interaction overhead.
 Batched receipts reduce signing overhead
 but require the user to approve multiple messages at once.
+
+
+## Implementation Considerations
+
+This section records LEZ-specific identifiers and canonical signing bytes
+for the reference demo integration.
+It is informative for interoperability with the demo stack.
+LEZ testnet revisions MAY change clock account identifiers or domain prefix
+strings; implementations MUST follow the deployed network genesis and published
+test vectors rather than treating this section as immutable.
+
+On-chain binding narrative and privacy policy appear under
+[On-Chain Protocol](#on-chain-protocol) and
+[Security and Privacy Considerations](#security-and-privacy-considerations).
+Chain-agnostic signing requirements appear under
+[Off-Chain Protocol](#off-chain-protocol).
+
+### System clock accounts (LEZ demo)
+
+Stream folding and deadline checks use timestamps read from a caller-supplied
+system clock account.
+The guest accepts exactly three clock program account identifiers
+(fixed at network genesis):
+
+| Clock account id (UTF-8 prefix string) | Typical update cadence |
+| --- | --- |
+| `/LEZ/ClockProgramAccount/0000001` | Highest frequency (finest folding granularity) |
+| `/LEZ/ClockProgramAccount/0000010` | Medium frequency |
+| `/LEZ/ClockProgramAccount/0000050` | Coarsest frequency |
+
+Each account stores Borsh `ClockAccountData { block_id, timestamp }`.
+The guest rejects unknown clock account ids and malformed payloads.
+
+Demo tooling MAY default to a specific clock account (for example the
+medium-frequency id) for operator convenience.
+Any id in the table is valid when its timestamp is monotonic for the
+transaction.
+
+### Canonical signing bytes (LEZ demo)
+
+Both signature roles use NSSA Schnorr over a 32-byte digest:
+
+```text
+digest = SHA-256(domain_prefix || canonical_body_bytes)
+```
+
+`domain_prefix` is a fixed 32-byte ASCII string padded with NUL bytes.
+`canonical_body_bytes` is defined per role below.
+Implementations MUST match the reference test vectors in the
+`lez-payment-streams` repository (including cross-language Store parity).
+
+#### Vault owner authorization (`VaultProof.owner_signature`)
+
+Domain prefix (32 bytes):
+
+```text
+b"/LEZ/v0.1/VaultOwnerAuth/\x00\x00\x00\x00\x00\x00\x00"
+```
+
+`canonical_body_bytes` is Borsh serialization of the following fields in order:
+
+| Field | Borsh type |
+| --- | --- |
+| `vault_id` | `u64` LE |
+| `provider_id` | 32 raw bytes (LEZ `AccountId`) |
+| `owner_public_key` | 32 raw bytes (NSSA x-only key) |
+| `service_id` | Borsh `string` (4-byte LE length + UTF-8) |
+| `rate` | `u64` LE |
+| `allocation` | `u128` LE |
+| `create_stream_deadline` | `u64` LE |
+| `session_public_key` | 32 raw bytes |
+
+The signed material MUST cover the accepted `StreamParams`, the session
+`StreamProposal.public_key`, and the `VaultProof` identity fields listed above,
+matching the requirements in [VaultProof](#vaultproof).
+
+#### Store eligibility (`StreamProof.signature`)
+
+Domain prefix (32 bytes):
+
+```text
+b"/LEZ/v0.1/StoreEligibility/\x00\x00\x00\x00\x00"
+```
+
+`canonical_body_bytes` is Borsh serialization of `CanonicalStoreRequest`
+with field order and optional-field encoding matching the Store query request
+without eligibility fields (presence-byte optional encoding, Borsh strings,
+message hash array, pagination fields).
+The demo integration uses the same logical Store query fields as
+Logos Delivery `StoreQueryRequest`.
+
+The full wire form logged as `canonicalRequestBytes` in demo tooling is:
+
+```text
+wire = domain_prefix || canonical_body_bytes
+digest = SHA-256(wire)
+```
+
+`StreamProof.signature` signs `digest`.
+Providers recomputing eligibility MUST use the same `wire` bytes, not
+protobuf `request_data`.
+
+Reference fixture length for the pinned cross-language test vector is
+177 bytes for `wire` (32-byte prefix plus Borsh body).
+Byte-level equality between Nim and Rust serializers is required for
+demo conformance.
 
 
 ## References
