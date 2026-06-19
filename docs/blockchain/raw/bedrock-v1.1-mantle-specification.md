@@ -6,7 +6,7 @@
 | Slug | 98 |
 | Status | raw |
 | Category | Informational |
-| Editor | Thomas Lavaur <thomaslavaur@logos.co> |
+| Editor | Thomas Lavaur <thomas@logos.co> |
 | Contributors | David Rusu <davidrusu@logos.co>, Filip Dimitrijevic <filip@logos.co> |
 
 <!-- timeline:start -->
@@ -30,6 +30,7 @@
 | 1.3.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md). | 2026-04-02 |
 | 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
 | 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md). | 2026-05-06 |
+| 1.6.0 | [RFC] Remove Concept of a Session | 2026-06-19 |
 
 # Introduction
 
@@ -228,8 +229,8 @@ channels: dict[ChannelId, ChannelState] # ChannelId is 32 bytes
 class ChannelState:
     # Channel Configuration
     accredited_keys: list[Ed25519PublicKey]  # limited to 65 535 keys
-    configuration_threshold: u16   # indicating how many keys are
-                                                                   # required to update the configuration
+    configuration_threshold: u16  # indicating how many keys are
+                                  # required to update the configuration
 
     # Message Ordering
     tip_hash: hash
@@ -237,19 +238,18 @@ class ChannelState:
     # Decentralized Sequencing
     tip_slot: Slot
     tip_sequencer: u16      # indicating the actual
-                                                    # sequencer position in the list of accredited keys
+                            # sequencer position in the list of accredited keys
         tip_sequencer_starting_slot: Slot
     posting_timeframe: u32  # number of slots (0 = infinity)
     posting_timeout: u32    # number of slots (0 = no timeout)
 
     # Bridging
-    balance: TokenValue            # See the Note section for its precision
-    withdrawal_nonce: u32          # Nonce used to derive a channel OpId
-    withdraw_threshold: u16        # indicating how many keys are
-                                                                     # required to withdraw funds from the channel
+    balance: TokenValue      # See the Note section for its precision
+    withdrawal_nonce: u32    # Nonce used to derive a channel OpId
+    withdraw_threshold: u16  # indicating how many keys are
+                             # required to withdraw funds from the channel
 
-def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey])
-                                                                                                                -> ChannelState:
+def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -> ChannelState:
         return ChannelState(
                 tip_hash = ZERO,
                 tip_slot = block_slot,
@@ -264,37 +264,34 @@ def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey])
                 withdraw_threshold = 1)
 ```
 
-  Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
+Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
 
 ### Decentralized Sequencing
 
 To determine which sequencer is currently authorized to send messages, we use a round-robin algorithm. When a message is posted to a channel, the following algorithm is used to determine who the sequencer is:
 
 ```python
-# Round Robin algorithm determining the new sequencer index and the
+# Round Robin algorithm determining the new sequencer index and the 
 # new sequencer starting slot
-def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
-    elapsed_slots = block_slot - channel.tip_slot
-    if (elapsed_slots >= channel.posting_timeout && channel.posting_timeout != 0):
-        # Get the number of sequencers that get timed out
-        sequencers_timed_out = elapsed_slots // channel.posting_timeout
-        index = (channel.tip_sequencer + sequencers_timed_out) \
-                % len(channel.accredited_keys)
-        starting_slot = channel.tip_slot \
-                      + sequencers_timed_out * channel.posting_timeout
-    elif channel.posting_timeframe != 0:
-        # Get the number of timeframes elapsed to get who is the sequencer
-        tip_sequencer_duration = block_slot - channel.tip_sequencer_starting_slot
-        rotations = tip_sequencer_duration // channel.posting_timeframe
-        index = (channel.tip_sequencer + rotations) \
-                % len(channel.accredited_keys)
-        starting_slot = channel.tip_sequencer_starting_slot \
-                      + rotations * channel.posting_timeframe
-    else:
-        # Infinite turn (posting_timeframe = 0), not timed out
-        index = channel.tip_sequencer
-        starting_slot = channel.tip_sequencer_starting_slot
-    return (index, starting_slot)
+def round_robin(block_slot: Slot, channel: ChannelState) -> (u16,u64):
+		elapsed_slots = block_slot - channel.tip_slot
+		if elapsed_slots >= channel.posting_timeout && channel.posting_timeout != 0:
+				# Get the number of sequencers that get timed out
+				sequencers_timed_out = elapsed_slots // channel.posting_timeout
+				index = (channel.tip_sequencer + sequencers_timed_out) 
+						% len(channel.accredited_keys)
+				starting_slot = channel.tip_slot 
+						+ sequencers_timed_out * channel.posting_timeout
+		else:
+				# Get the number of timeframes elapsed to get who is the sequencer
+				tip_sequencer_duration = block_slot - channel.tip_sequencer_starting_slot
+				index = (channel.tip_sequencer
+						+ (tip_sequencer_duration // channel.posting_timeframe))
+						% len(channel.accredited_keys)
+				starting_slot = channel.tip_sequencer_starting_slot 
+								+ (tip_sequencer_duration // channel.posting_timeframe)
+								* channel.posting_timeframe
+		return (index, starting_slot)
 ```
 
 ### CHANNEL_INSCRIBE
@@ -306,14 +303,14 @@ Write a message to a channel with the message data being permanently stored on t
 ```python
 class Inscribe:
     channel: ChannelId       # 32 bytes Channel being written to
-        inscription : bytes      # Message to be written on the blockchain
-        parent: hash             # Previous message in the channel
-        signer: Ed25519PublicKey # Identity of message sender
+    inscription : bytes      # Message to be written on the blockchain
+    parent: hash             # Previous message in the channel
+    signer: Ed25519PublicKey # Identity of message sender
 ```
 
 **Proof**
 
-```text
+```python
 Ed25519Signature
 ```
 
@@ -333,6 +330,8 @@ sig: Ed25519Signature
 channels: dict[ChannelId, ChannelState]
 block_slot: Slot
 ```
+ 
+  *Validate*
 
 ```python
 if msg.channel in channels:
@@ -374,11 +373,9 @@ if msg.channel is not in channels
 ```
 
   2. Update the channel sequencer.
-```text
+```python
 chan = channels[msg.channel]
-(new_sequencer_index, new_sequencer_starting_slot) = round_robin(
-                                                                                    block_slot,
-                                                                                    chan)
+(new_sequencer_index, new_sequencer_starting_slot) = round_robin(block_slot, chan)
 
 chan.tip_sequencer_starting_slot = new_sequencer_starting_slot
 chan.tip_sequencer = new_sequencer_index
@@ -408,14 +405,14 @@ transfer = Transfer(inputs=[<spocks_note_id>], outputs=[<change_note>])
 # Wrap it in a transaction
 tx = MantleTx(
     ops=[Op(opcode=CHANNEL_INSCRIBE, payload=encode(greeting)),
-             Op(opcode=TRANSFER, payload=encode(transfer)],
+         Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 # Sign the transaction
 signed_tx = SignedMantleTx(
     tx=tx,
     op_proofs=[Ed25519_sign(mantle_txhash(tx), spock_sk),
-                         transfer.prove(spock_sk)]
+               transfer.prove(spock_sk)]
 )
 
 # Send the transaction to the mempool
@@ -443,9 +440,9 @@ class ChannelConfig:
 ```python
 class ChannelConfigOpProof:
         signatures: list[Ed25519Signature] # signatures from configuration_threshold
-        indexes: list[u16]        # signatures of accredited keys with their index.
-                                                    # indexes must be ordered from smallest to
-                                                    # biggest without duplication
+        indexes: list[u16]  # signatures of accredited keys with their index.
+                            # indexes must be ordered from smallest to
+                            # biggest without duplication
 ```
 
 **Execution Gas**
@@ -504,7 +501,7 @@ if config.channel not in channels:
         channels[config.channel] = default_channel(block_slot, config.keys)
 ```
 
-  1. Update the configuration.
+  2. Update the configuration.
 
 ```python
 chan = channels[config.channel]
@@ -523,7 +520,7 @@ chan.posting_timeout = config.posting_timeout
 chan.withdraw_threshold = config.withdraw_threshold
 ```
 
-  1. Update the channel tip.
+  3. Update the channel tip.
 
 ```python
 chan = channels[config.channel]
@@ -554,13 +551,13 @@ transfer = Transfer(inputs=[old_sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
     ops=[Op(opcode=CHANNEL_CONFIG, payload=encode(config)),
-             Op(opcode=TRANSFER, payload=encode(transfer)],
+         Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
     tx=tx,
         op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
-                                transfer.prove(old_sequencer_sk)]
+                   transfer.prove(old_sequencer_sk)]
 )
 ```
 
@@ -572,16 +569,16 @@ Deposit funds to a channel, reducing the Mantle Transaction balance.
 
 ```python
 class ChannelDeposit:
-        channel: ChannelId
+      channel: ChannelId
       inputs: list[NoteId]  # the list of consumed note identifiers
-        metadata: bytes
+      metadata: bytes
 ```
 
 **Proof**
 
   A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
-```text
+```python
 ZkSignature
 ```
 
@@ -637,7 +634,7 @@ ledger: Ledger
   *Execute*
 
   1. Remove inputs from the ledger.
-```text
+```python
 ledger.execute_spending(deposit.inputs)
 ```
 
