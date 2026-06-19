@@ -190,8 +190,8 @@ Where:
 - `zk_id` is used for zero-knowledge operations by the validator that includes rewarding;
 - `locators` is a copy of the `locators` from the `DeclarationMessage`;
 - `created` refers to the epoch number of the block that contained the declaration;
-- `active` refers to the latest epoch number for which the active message was sent (it is set to `created` by default);
-- `withdraw_at` refers to the epoch number for which the service declaration will be withdrawn (it is set to 0 by default);
+- `active` refers to the latest epoch number for which the active message was sent (it is set to `None` by default);
+- `withdraw_at` refers to the epoch number for which the service declaration will be withdrawn (it is set to `None` by default);
 - The `nonce` must be set to 0 for the declaration message and must increase monotonically by every message sent for the `declaration_id`.
 
 We also define the `declaration_id` (of a `DeclarationId` type) that is the unique identifier of `DeclarationInfo` calculated as a hash of the concatenation of `service`, `provider_id`, `zk_id` and `locators`. The implementation of the hash function is `blake2b` using 256 bits of the output.
