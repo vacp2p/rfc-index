@@ -29,10 +29,15 @@ where a payer's deposit releases gradually to a payee.
 The blockchain determines fund accrual based on elapsed time.
 
 This specification defines stream-backed eligibility proof types
-for the incentivization framework.
-The incentivization specification is defined
-in the context of Logos Messaging request-response protocols.
-This specification can be extended to non-Messaging services.
+defined in the [incentivization specification](../../messaging/core/raw/incentivization.md).
+That specification defines the generic request-response framework
+with `EligibilityProof` and `EligibilityStatus`.
+Eligibility is the authorization to receive service.
+This specification uses payment status as the eligibility criterion.
+
+This specification extends that framework for stream-backed service provision.
+The motivating context is Logos Messaging request-response protocols,
+though this specification can also be used with non-Messaging services.
 
 The protocol targets Logos blockchain,
 which includes the Logos Execution Zone (LEZ).
@@ -81,8 +86,8 @@ Payment streams enable unidirectional time-based fund flows
 from payer to payee.
 Streams are simpler than alternatives
 and map well to use cases with distinct roles.
-Parties need not store old states or initiate disputes
-as required in payment channel protocols.
+Parties can avoid storing old states or initiating disputes
+as payment channel protocols require.
 Streams avoid relying on a centralized mint entity,
 typical for e-cash and ticket protocols,
 improving resilience and privacy.
@@ -104,10 +109,34 @@ for the on-chain component of the payment protocol.
 
 ### Architecture Overview
 
+#### Roles
+
 The protocol has two roles:
 
 - User: the party paying for services (payer).
 - Provider: the party delivering services and receiving payment (payee).
+
+In the LEZ realization,
+the user (the party controlling the vault)
+chooses stream parameters,
+signs `VaultProof` and `StreamProof`,
+opens and manages on-chain streams,
+and submits LEZ transactions.
+Client applications and wallets are parts of one user entity.
+
+The provider serves paid requests on a service protocol,
+verifies stream-backed eligibility using this specification inside the
+`EligibilityProof` message structure defined by the incentivization specification,
+and holds service session state.
+Eligibility verification is part of the provider.
+
+A service session is the provider's off-chain record for delivering
+service under one accepted `StreamProposal`.
+The session begins when the provider accepts the proposal.
+`PARAMS_REJECTED` exchanges before acceptance do not start a session.
+`ServiceTermination` or dropped session state ends a session.
+
+#### Vaults and streams
 
 The protocol uses a two-level architecture
 of vaults and streams.
@@ -170,6 +199,10 @@ Stream state transitions:
   Each claim uses the full accrued balance.
   A claim operation does not change stream state.
 
+To fold a stream means to compute elapsed accrual up to the current timestamp
+and to apply any resulting state transition.
+Folding is performed lazily when a stream is touched by an instruction.
+
 ### Stream State Transition Diagram
 
 ```mermaid
@@ -180,34 +213,30 @@ graph LR;
     PAUSED -->|close| CLOSED;
 ```
 
-### Assumptions
+### Balance and accrual semantics
 
-Parties MUST agree on stream parameters before creation.
-A separate discovery protocol SHOULD enable
-providers to advertise services and payment-stream policy.
+Vault balance, allocation, accrued funds,
+and unaccrued funds are the core accounting quantities.
+The stream lifecycle rules above define their abstract behavior.
+The on-chain protocol defines how LEZ stores and enforces them.
 
-The provider SHOULD announce
-accepted eligibility proof types, accepted assets,
-and a `StreamProviderPolicy`
-via the discovery protocol.
-The user MUST read the provider's current discovery advertisement
-immediately before building each `StreamProposal`.
-That advertisement includes `StreamProviderPolicy`,
-accepted eligibility proof types, and accepted assets.
-The provider MUST verify each proposal against its own
-currently published `StreamProviderPolicy`.
-This specification does not require a policy version or hash
-inside `StreamProposal`.
-Until discovery defines such a commitment,
-the provider cannot know which past advertisement the user used.
-If the user built a proposal from a stale advertisement,
-the provider MAY reject it under the current policy.
+Let `balance` be the vault balance
+and `total_allocated` be the sum of all stream allocations
+for that vault.
 
-#### Protocol phases
+```text
+unallocated = balance - total_allocated
+withdraw_amount <= unallocated
+new_stream_allocation <= unallocated
+stream_allocation = accrued + unaccrued
+unaccrued = stream_allocation - accrued
+```
+
+### Protocol phases
 
 Verification is split into proposal, stream creation, and service.
 Parameter negotiation and `PARAMS_REJECTED` retries are part of the
-proposal phase, not stream creation.
+proposal phase rather than stream creation.
 
 - Proposal — A vault-proof-backed `ServiceRequest` carries a
   `StreamProposal`.
@@ -215,22 +244,10 @@ proposal phase, not stream creation.
 - Stream creation — The user submits on-chain `create_stream`.
 - Service — Later `ServiceRequest`s carry `StreamProof`.
 
-#### Service session
+### Service Session Continuation
 
-A service session is the provider's off-chain record for delivering
-service under one accepted `StreamProposal`.
-Session state includes accepted `StreamParams`, `VaultProof` fields
-used for verification (`vault_id`, `provider_id`, `owner_public_key`),
-`StreamProposal.public_key`, and `stream_id` after the first valid
-`StreamProof`.
-Implementations hold this state off-chain only.
-
-The session begins when the provider accepts the proposal.
-`PARAMS_REJECTED` exchanges before acceptance do not start a session.
 The on-chain stream follows the stream lifecycle rules
 from `create_stream`.
-`ServiceTermination` or dropped session state ends provider service
-under that acceptance.
 An on-chain stream MAY stay `ACTIVE` and accrue after service ends.
 If the provider has ended service, the user SHOULD pause or close the
 stream promptly.
@@ -251,10 +268,17 @@ After `TEMPORARY` `ServiceTermination`, the provider MAY resume under
 the same acceptance once `resume_after` has passed.
 
 
-#### StreamProviderPolicy
+### StreamProviderPolicy
 
 `StreamProviderPolicy` is the set of conditions the provider
 advertises for proposing and operating a stream.
+
+| Field | Role |
+| --- | --- |
+| `min_stream_rate` | The provider MUST reject proposals whose `stream_rate` is lower |
+| `min_stream_allocation` | The provider MUST reject proposals whose `stream_allocation` is lower |
+| `max_create_stream_deadline_delay` | Maximum seconds from proposal verification time until `create_stream_deadline` |
+| `vault_proof_max_response_bytes` | The provider SHOULD limit the first vault-proof-backed `response_data` to this size (RECOMMENDED default: 65536) |
 
 Implementations SHOULD expose:
 
@@ -266,12 +290,26 @@ Implementations SHOULD expose:
 The discovery specification defines how policy is advertised.
 This specification defines fields and checks.
 
-| Field | Role |
-| --- | --- |
-| `min_stream_rate` | The provider MUST reject proposals whose `stream_rate` is lower |
-| `min_stream_allocation` | The provider MUST reject proposals whose `stream_allocation` is lower |
-| `max_create_stream_deadline_delay` | Maximum seconds from proposal verification time until `create_stream_deadline` |
-| `vault_proof_max_response_bytes` | The provider SHOULD limit the first vault-proof-backed `response_data` to this size (RECOMMENDED default: 65536) |
+### Discovery Assumptions
+
+Parties MUST agree on stream parameters before creation.
+A separate discovery protocol SHOULD enable
+providers to advertise services and payment-stream policy.
+
+The provider SHOULD announce
+accepted eligibility proof types, accepted assets,
+and a `StreamProviderPolicy`
+via the discovery protocol.
+The user MUST read the provider's current discovery advertisement
+immediately before building each `StreamProposal`.
+The provider MUST verify each proposal against its
+currently published `StreamProviderPolicy`.
+A policy version or hash inside `StreamProposal`
+is outside this specification.
+Until discovery defines such a commitment,
+the provider cannot know which past advertisement the user used.
+If the user built a proposal from a stale advertisement,
+the provider MAY reject it under the current policy.
 
 Create-stream deadline pairing.
 `StreamParams.create_stream_deadline` is an absolute chain timestamp.
@@ -314,66 +352,22 @@ is a reasonable expectation.
 Providers SHOULD monitor the stream on-chain
 and SHOULD stop providing service when a stream is not `ACTIVE`.
 
-## LEZ realization and scope
+### Scope boundaries
 
-LIP-155 includes a chain-agnostic core.
-The remainder of this document describes how that core is realized on the
-Logos Execution Zone (LEZ).
+The following are out of scope:
 
-A LEZ deployment has three components.
-Each aligns with a user, provider, or on-chain execution role.
-
-### User (payer)
-
-The user chooses stream parameters, signs `VaultProof` and `StreamProof`,
-opens and manages on-chain streams, and submits LEZ transactions.
-Client applications and wallets are parts of one user entity, not separate
-protocol roles.
-
-###  Provider (payee)
-
-The provider serves paid requests on a service protocol (the demo uses Store),
-verifies stream-backed eligibility using this specification inside the
-incentivization envelope, and holds service session state.
-Eligibility verification is part of the provider, not a separate component.
-
-### LEZ
-
-LEZ hosts the payment-streams guest program plus platform programs used for
-deposits and stream folding (clock and authenticated transfer).
-Vaults, streams, accrual, and claims live here.
-
-## Integration and implementation
-
-Chain integration (LEZ) is the binding written in this specification:
-abstract vaults, streams, proofs, and operations mapped to LEZ accounts,
-programs, timestamps, and canonical signed bytes.
-Normative LEZ binding material appears throughout the remainder of this document.
-
-Implementation is deployable software for the three components above that
-conforms to that binding.
-Normative MUSTs to implementations apply to user-side and provider-side
-software and to the payment-streams guest on LEZ.
-Where this LIP omits guest wire layout or error codes, the payment-streams
-codebase (guest, core, FFI, Logos modules) is the intended production
-artifact for that detail.
-
-Out of scope.
-This specification does not define the following.
-
-Demo operator harness (scripts, fixtures, local topologies for testing).
-
-Discovery protocol mechanics for advertising `StreamProviderPolicy`.
-This LIP defines policy fields and verification.
-Users SHOULD obtain current policy
-before proposing.
-How that advertisement is published is external.
-
-Service protocol wire formats (for example Store query RPC).
-The incentivization specification defines the eligibility envelope.
-This LIP extends that envelope with `stream_proposal` and `stream_proof`.
-
-The LEZ platform beyond the on-chain binding summarized in this document.
+- Demo operator harnesses,
+  including scripts, fixtures, and local testing topologies.
+- Discovery protocol mechanics for advertising `StreamProviderPolicy`.
+  This specification defines policy fields and verification.
+  Users SHOULD obtain current policy
+  before proposing.
+  How that advertisement is published is external.
+- Service protocol wire formats,
+  for example Store query RPC.
+  The incentivization specification defines the eligibility envelope.
+  This specification extends that envelope with `stream_proposal` and `stream_proof`.
+- The LEZ platform beyond the on-chain binding summarized in this document.
 
 ## Off-Chain Protocol
 
@@ -386,17 +380,17 @@ On-chain state is the source of truth for fund allocation and accrual.
 Off-chain communication coordinates lifecycle events
 and enables service delivery.
 
-This specification does not redefine the service provision protocol.
+The service provision protocol remains defined elsewhere.
 The incentivization specification
 defines the generic request-response framework
 with `EligibilityProof` and `EligibilityStatus`.
 This specification extends `EligibilityProof`
 with two new types for stream-backed service provision.
 
-### Wire encoding and canonical signing
+### Wire encoding and signing requirements
 
 Off-chain messages in this section use protobuf for interchange
-between clients, providers, and Delivery.
+between clients, providers, and Logos Delivery.
 
 Cryptographic commitments (`VaultProof.owner_signature`,
 `StreamProof.signature`) MUST use a chain-specific canonical form.
@@ -433,15 +427,25 @@ message EligibilityProof {
 }
 ```
 
-#### StreamProposal
+#### StreamParams
 
 ```protobuf
-message StreamProposal {
-  VaultProof vault_proof = 1;
-  StreamParams stream_params = 2;
-  bytes public_key = 3;  // session key for signing subsequent service requests
+message StreamParams {
+  bytes service_id = 1; // identifier of the requested service
+  uint64 stream_rate = 2; // proposed accrual rate (tokens per time unit)
+  uint64 stream_allocation = 3; // proposed initial allocation
+  uint64 create_stream_deadline = 4; // latest create_stream time (absolute timestamp)
 }
 ```
+
+`StreamParams` holds the proposed stream fields for one
+`StreamProposal`.
+`VaultProof.owner_signature` covers these fields.
+
+`create_stream_deadline` is the latest chain time for `create_stream`
+in `StreamParams`.
+The user MUST set it within `max_create_stream_deadline_delay`.
+Create-stream deadline pairing is defined alongside `StreamProviderPolicy`.
 
 #### VaultProof
 
@@ -451,23 +455,23 @@ to back the proposed stream.
 
 ```protobuf
 message VaultProof {
-  bytes vault_id = 1;           // on-chain identifier of the vault
-  bytes provider_id = 2;        // target provider (prevents replay)
-  bytes owner_public_key = 3;   // key used to verify owner_signature
-  bytes owner_signature = 4;    // vault-owner signature over the proposal
+  bytes vault_id = 1; // on-chain identifier of the vault
+  bytes provider_id = 2; // target provider (prevents replay)
+  bytes owner_public_key = 3; // key used to verify owner_signature
+  bytes owner_signature = 4; // signature over the proposal
 }
 ```
 
 The `owner_public_key` field identifies the key used to verify
 `owner_signature`.
 Chain-specific integrations MUST define how `owner_public_key`
-maps or binds to the vault owner identifier stored on-chain.
+maps or binds to the user identifier (the vault owner) stored on-chain.
 For example,
 a LEZ integration can derive the public account identifier
 from the owner public key
 and compare it with `VaultConfig.owner`.
 
-The `owner_signature` field proves that the vault owner authorizes
+The `owner_signature` field proves that the user authorizes
 the proposed stream session.
 It MUST cover at least the `VaultProof` fields
 other than `owner_signature`,
@@ -481,13 +485,12 @@ public-key encoding,
 and canonical signed payload are chain-specific integration details.
 They MUST be deterministic and covered by test vectors.
 For LEZ public-vault integrations,
-the expected scheme is the NSSA public-account signature scheme.
+the expected scheme is the Schnorr signature scheme.
 
 The `provider_id` field is the provider identity used by this protocol.
 It prevents replaying a `VaultProof` intended for one provider
 against another provider.
-It does not have to be the same value
-as a chain-specific payee or account identifier.
+It may differ from a chain-specific payee or account identifier.
 
 Chain-specific integrations MUST define how `provider_id`
 maps or binds to the on-chain payee identifier used by that chain.
@@ -496,22 +499,12 @@ to a long-lived service identity,
 and separately bind that service identity
 to the chain account that receives stream claims.
 The binding mechanism is part of the chain-specific integration,
-not this generic off-chain proof format.
+rather than the generic off-chain proof format.
 
 For LEZ integrations, `provider_id` is the 32-byte stream payee
 `AccountId`.
-Predicates compare it to `StreamConfig.provider` with octet equality.
-
-In the proposal phase the provider MUST read on-chain
-`VaultHolding` and `VaultConfig` for `VaultProof.vault_id`.
-Unallocated is `VaultHolding` balance minus
-`VaultConfig.total_allocated`.
-The provider MUST reject the proposal if
-`StreamParams.stream_allocation > unallocated`.
-The provider MUST reject the proposal if
-`StreamParams.stream_allocation < StreamProviderPolicy.min_stream_allocation`.
-The provider SHOULD use `vault_proof_max_response_bytes` to
-limit work on the first vault-proof-backed request.
+The LEZ provider-identity checks compare it to `StreamConfig.provider`
+with octet equality.
 
 The user MAY issue `VaultProof`s to multiple providers.
 The user MUST ensure that issuing a new `VaultProof`
@@ -519,25 +512,15 @@ does not cause the total of all promised `VaultProof` allocations
 from this vault
 to exceed the vault's unallocated balance.
 
-#### StreamParams
-
-`StreamParams` holds the proposed stream fields for one
-`StreamProposal`.
-`VaultProof.owner_signature` covers these fields.
+#### StreamProposal
 
 ```protobuf
-message StreamParams {
-  bytes service_id = 1;              // identifier of the requested service
-  uint64 stream_rate = 2;           // proposed accrual rate (tokens per time unit)
-  uint64 stream_allocation = 3;     // proposed initial allocation
-  uint64 create_stream_deadline = 4;   // latest create_stream time (absolute timestamp)
+message StreamProposal {
+  VaultProof vault_proof = 1;
+  StreamParams stream_params = 2;
+  bytes public_key = 3; // session key for signing subsequent service requests
 }
 ```
-
-`create_stream_deadline` is the latest chain time for `create_stream`
-in `StreamParams`.
-The user MUST set it within `max_create_stream_deadline_delay`.
-Create-stream deadline pairing is defined alongside `StreamProviderPolicy`.
 
 #### StreamProof
 
@@ -547,57 +530,10 @@ the `StreamProposal.public_key` accepted for that stream.
 
 ```protobuf
 message StreamProof {
-  bytes stream_id = 1;    // on-chain identifier of the stream
-  bytes signature = 2;    // signature over request_data using committed public_key
+  bytes stream_id = 1; // on-chain identifier of the stream
+  bytes signature = 2; // signature over request_data using committed public_key
 }
 ```
-
-For each `StreamProof` the provider MUST read the `StreamConfig`
-for `stream_id` on-chain.
-The provider MUST verify the `StreamProof` signature against the
-session `public_key` from the accepted proposal.
-
-On the first `StreamProof` for a service session the provider learns
-`stream_id`.
-The provider MUST run `new_stream_satisfies_proposal` on that
-first request.
-This predicate compares on-chain `StreamConfig` to the accepted
-`StreamParams` after folding to verification time `t`.
-On-chain `rate` and the stored `allocation` field MUST be greater than
-or equal to the accepted `StreamParams`.
-The comparison uses the stored allocation commitment, not unaccrued
-balance (accrual reduces unaccrued without lowering `allocation` until
-a claim).
-If on-chain values are lower than proposed, the provider MUST
-reject the request.
-The provider MAY accept on-chain values higher than proposed.
-The provider identifier stored in `StreamConfig` MUST match this
-session's `VaultProof.provider_id` from the accepted proposal,
-using the chain-specific mapping for `provider_id`.
-
-`stream_satisfies_policy` covers each `StreamProof`, including the
-first.
-The stream MUST be `ACTIVE`.
-On-chain rate MUST be at least `min_stream_rate` from policy.
-The provider identifier in `StreamConfig` MUST correspond to
-`VaultProof.provider_id` for the acceptance.
-
-Later `StreamProof` requests for the same service session need not run
-`new_stream_satisfies_proposal`.
-The provider MAY run it again.
-That is redundant when the first run
-succeeded and does not replace `stream_satisfies_policy` or signature
-verification.
-The provider MUST still run `stream_satisfies_policy` and
-signature verification on each request.
-
-The provider MUST ensure the request is for the service identified by
-`service_id` in the accepted `StreamParams`.
-`service_id` is fixed for that acceptance.
-Changing `service_id` requires a new signed proposal.
-For application protocols that do not carry `service_id` in
-`request_data`, the provider binds via the eligibility handler
-(for example, only Store queries use the paid Store `service_id`).
 
 ### Message Types
 
@@ -659,7 +595,7 @@ the user MAY pause the stream until the `resume_after` time.
 For permanent termination,
 the user SHOULD close the stream to recover unaccrued funds.
 
-#### Termination semantics and response shape
+##### Termination delivery
 
 Semantically, `ServiceTermination` is a provider message indicating service
 will stop.
@@ -676,59 +612,49 @@ All initiative comes from the user via `ServiceRequest`.
 
 ### Protocol Flow
 
-1. The user discovers a provider.
-   The provider's advertisement MUST include `StreamProviderPolicy`.
+#### Proposal
 
-2. The user sends the first `ServiceRequest` with a
-   `StreamProposal` and `request_data`.
+The user discovers a provider.
+The provider's advertisement MUST include `StreamProviderPolicy`.
 
-3. The provider MUST verify `VaultProof` on-chain.
-   The provider MUST run `proposal_satisfies_policy`.
-   The provider MUST verify `VaultProof.owner_signature` with
-   `VaultProof.owner_public_key` over the canonical proposal payload.
-   The provider MUST confirm that `owner_public_key` matches the
-   vault owner for `VaultProof.vault_id` on-chain.
-   If parameters fail policy, the provider MUST respond with
-   `PARAMS_REJECTED`.
-   The provider MUST NOT treat the `VaultProof` as spent.
-   The user MAY send a new proposal with adjusted `StreamParams`.
-   If the proof is invalid, the provider MUST respond with
-   `PROOF_INVALID`.
-   If the provider accepts, it MUST respond with `OK` and
-   `response_data`.
-   The provider MUST record service session state for the accepted
-   proposal.
-   The provider SHOULD keep `response_data` within
-   `vault_proof_max_response_bytes`.
+The user sends the first `ServiceRequest` with a
+`StreamProposal` and `request_data`.
 
-4. The user MUST submit on-chain stream creation before
-   `create_stream_deadline`.
-   On-chain `rate` and `allocation` MUST be at least the signed
-   `StreamParams`.
+The provider MUST verify `VaultProof` on-chain.
+The provider MUST run `proposal_satisfies_policy`.
+The provider MUST verify `VaultProof.owner_signature` with
+`VaultProof.owner_public_key` over the canonical proposal payload.
+The provider MUST confirm that `owner_public_key` matches the
+user (vault owner) for `VaultProof.vault_id` on-chain.
+In the proposal phase the provider MUST read on-chain
+`VaultHolding` and `VaultConfig` for `VaultProof.vault_id`.
+Unallocated is `VaultHolding` balance minus
+`VaultConfig.total_allocated`.
+These LEZ account types and fields are defined in the on-chain protocol.
+The provider MUST reject the proposal if
+`StreamParams.stream_allocation > unallocated`.
+The provider MUST reject the proposal if
+`StreamParams.stream_allocation < StreamProviderPolicy.min_stream_allocation`.
+If parameters fail policy, the provider MUST respond with
+`PARAMS_REJECTED`.
+The provider MUST NOT treat the `VaultProof` as spent.
+The user MAY send a new proposal with adjusted `StreamParams`.
+If the proof is invalid, the provider MUST respond with
+`PROOF_INVALID`.
+If the provider accepts, it MUST respond with `OK` and
+`response_data`.
+The provider SHOULD use `vault_proof_max_response_bytes` to
+limit the first vault-proof-backed `response_data`.
 
-5. The user sends `ServiceRequest`s with `StreamProof`.
-   On the first `StreamProof` for that service session the provider
-   MUST load the stream on-chain using `stream_id` and MUST run
-   `new_stream_satisfies_proposal`.
-   The provider MUST run `stream_satisfies_policy` before serving every
-   service request.
-   The provider MUST verify each `StreamProof.signature` over
-   `request_data` using the session `public_key` from the accepted
-   proposal.
-   Later `StreamProof`s for the same service session need not run
-   `new_stream_satisfies_proposal`.
+#### Proposal acceptance and pending state
 
-6. If the first `StreamProof` arrives after `create_stream_deadline`,
-   the provider MUST reject or stop service.
-   If on-chain parameters are below the accepted proposal,
-   the provider MUST reject.
-   The provider SHOULD use eligibility status codes in
-   `ServiceResponse`.
-   If `create_stream_deadline` passes with no compliant stream,
-   the provider MAY drop session or pending-proposal state.
-   Negotiation for that proposal MUST be treated as failed.
-
-### Pending proposals
+The provider MUST record service session state for the accepted
+proposal.
+Session state includes accepted `StreamParams`,
+`VaultProof` fields used for verification
+(`vault_id`, `provider_id`, `owner_public_key`),
+`StreamProposal.public_key`,
+and `stream_id` after the first valid `StreamProof`.
 
 A pending proposal is a `StreamProposal` awaiting provider acceptance.
 A user MUST NOT send a new `StreamProposal` to the same vault-provider
@@ -754,6 +680,75 @@ If creation fails for insufficient unallocated after acceptance, the
 user has breached that obligation.
 The provider SHOULD send `PERMANENT` `ServiceTermination`.
 
+#### Stream creation
+
+The user MUST submit on-chain stream creation before
+`create_stream_deadline`.
+On-chain `rate` and `allocation` MUST be greater than or equal to
+the signed `StreamParams`.
+
+#### Stream proofs
+
+The user sends `ServiceRequest`s with `StreamProof`.
+For each `StreamProof` the provider MUST read the `StreamConfig`
+for `stream_id` on-chain.
+The provider MUST verify each `StreamProof.signature` over
+`request_data` using the session `public_key` from the accepted
+proposal.
+
+On the first `StreamProof` for a service session,
+the provider learns `stream_id`
+and MUST load the stream on-chain using `stream_id`
+and MUST run `new_stream_satisfies_proposal`.
+This predicate compares on-chain `StreamConfig` to the accepted
+`StreamParams` after folding to the current verification timestamp `t`.
+On-chain `rate` and the stored `allocation` field MUST be greater than
+or equal to the accepted `StreamParams`.
+The comparison uses the stored allocation commitment
+rather than unaccrued balance
+(accrual reduces unaccrued without lowering `allocation` until
+a claim).
+If on-chain values are lower than proposed, the provider MUST
+reject the request.
+The provider MAY accept on-chain values higher than proposed.
+The provider identifier stored in `StreamConfig` MUST match this
+session's `VaultProof.provider_id` from the accepted proposal,
+using the chain-specific mapping for `provider_id`.
+
+The stream MUST be `ACTIVE`.
+On-chain rate MUST be at least `min_stream_rate` from policy.
+The provider identifier in `StreamConfig` MUST correspond to
+`VaultProof.provider_id` for the acceptance.
+The provider MUST run `stream_satisfies_policy` before serving every
+service request.
+The provider MUST ensure the request is for the service identified by
+`service_id` in the accepted `StreamParams`.
+`service_id` is fixed for that acceptance.
+Changing `service_id` requires a new signed proposal.
+For application protocols lacking `service_id` in
+`request_data`, the provider binds via the eligibility handler
+(for example, only Store queries use the paid Store `service_id`).
+
+Later `StreamProof` requests for the same service session need not run
+`new_stream_satisfies_proposal`.
+The provider MAY run it again.
+That is redundant when the first run
+succeeded and does not replace `stream_satisfies_policy` or signature
+verification.
+
+If the first `StreamProof` arrives after `create_stream_deadline`,
+the provider MUST reject.
+If on-chain parameters are below the accepted proposal,
+the provider MUST reject.
+If the stream is not `ACTIVE`,
+the provider MUST respond with `STREAM_NOT_ACTIVE`.
+If `create_stream_deadline` passes with no compliant stream,
+the provider MAY drop session or pending-proposal state.
+The proposal failure semantics from the pending state MUST apply.
+
+The provider SHOULD use eligibility status codes defined in
+`ServiceResponse`.
+
 ### LEZ off-chain integration
 
 This subsection defines the LEZ demo binding for `bytes` fields in the
@@ -766,16 +761,17 @@ off-chain protobuf messages.
 | `VaultProof.vault_id` | Exactly 8 octets, little-endian `VaultId` (`u64`). |
 | `StreamProof.stream_id` | Exactly 8 octets, little-endian `StreamId` (`u64`). |
 | `VaultProof.provider_id` | Exactly 32 octets, LEZ `AccountId` of the stream payee. MUST equal `StreamConfig.provider` (identity mapping). |
-| `VaultProof.owner_public_key` | Exactly 32 octets, NSSA x-only secp256k1 public key. |
-| `VaultProof.owner_signature` | Exactly 64 octets, NSSA Schnorr over the LEZ vault-proof prehash. |
+| `VaultProof.owner_public_key` | Exactly 32 octets, x-only secp256k1 public key. |
+| `VaultProof.owner_signature` | Exactly 64 octets, Schnorr signature over the LEZ vault-proof prehash. |
 | `StreamProposal.public_key` | Exactly 32 octets, session key for `StreamProof.signature`. |
-| `StreamProof.signature` | Exactly 64 octets, NSSA Schnorr over the LEZ Store eligibility prehash. |
+| `StreamProof.signature` | Exactly 64 octets, Schnorr signature over the LEZ Store eligibility prehash. |
 | `StreamParams.service_id` | UTF-8 service identifier, no NUL terminator. Max length 128. Demo: `/vac/waku/store-query/3.0.0`. |
 
 Decoders MUST reject wrong lengths for fixed-width fields.
 
-Vault accounts are resolved by deriving vault PDAs from the vault owner
-(from `owner_public_key`) and `VaultProof.vault_id`.
+Vault accounts are resolved by deriving vault program-derived addresses
+from the user (from `owner_public_key`)
+and `VaultProof.vault_id`.
 
 #### Amounts and time
 
@@ -784,14 +780,14 @@ Vault accounts are resolved by deriving vault PDAs from the vault owner
 on-chain `StreamConfig.rate`, allocation bookkeeping, and the clock
 account timestamp used for stream folding.
 
-#### Canonical signing (LEZ)
+#### LEZ signing scheme
 
-LEZ integrations sign a 32-byte canonical payload digest using NSSA Schnorr.
-Each digest is `SHA-256(domain_prefix ‖ canonical_body_bytes)`,
-where `domain_prefix` is a fixed 32-byte string and `canonical_body_bytes`
-is a deterministic Borsh serialization defined for that signature role.
+LEZ integrations use the Schnorr signature scheme (implemented in NSSA).
+Both `VaultProof.owner_signature` and `StreamProof.signature` sign a 32-byte digest.
 Signed material covers canonical field bytes only.
 Protobuf field numbers stay out of scope for signing.
+The digest construction and byte layouts are defined under
+Implementation Considerations.
 
 #### Eligibility envelope (Store)
 
@@ -802,27 +798,37 @@ The Store `eligibility_proof` field carries a protobuf
 
 ## On-Chain Protocol
 
-This section maps chain-agnostic payment-stream notions onto a concrete on-chain
-execution environment.
-This chapter states what the chain must provide (notably a time signal for
-lazy accrual) and how the LEZ binding satisfies those
-requirements.
+### Scope and LEZ binding
+
+This section maps the chain-agnostic protocol core onto the LEZ.
+LEZ supports two execution modes: transparent (public account visibility)
+and shielded (hidden via zero-knowledge proofs).
+The section states what the chain must provide,
+notably a time signal for lazy accrual,
+and how the LEZ binding satisfies those requirements.
+LEZ hosts the accounts (vaults, streams),
+the payment-streams guest program,
+and platform programs used for
+deposits and stream folding,
+including clock and authenticated transfer.
 
 The LEZ binding centers on one payment-streams guest program plus platform
 programs invoked for fund movement.
 Wire layouts, error codes, and exact PDA seed literals live in the
 payment-streams codebase.
 This section states binding requirements and invariants.
-LEZ-specific clock account identifiers and off-chain signing byte layouts
-are normative for demo interoperability.
+LEZ-specific clock account identifiers and off-chain signing byte layouts are
+recorded under Implementation Considerations.
 
-### Account Types
+### Accounts and identities
+
+#### Account types
 
 The program stores state in three account types:
 `VaultConfig`, `VaultHolding`, and `StreamConfig`.
 
 `VaultConfig` stores vault metadata and the authorization anchor.
-Its `owner` field is the authorization anchor for owner-gated instructions.
+Its `owner` field is the authorization anchor for user-gated instructions.
 For `PseudonymousFunder`-tier vaults,
 `owner` MUST be an identifier derived from a nullifier public key,
 distinct from the user's key associated with their public on-chain activity.
@@ -833,9 +839,9 @@ Its platform-native balance is the vault's total funds.
 
 `StreamConfig` stores per-stream parameters and lazy accrual state.
 
-### PDA Derivation
+#### PDA derivation
 
-Vault and stream accounts are program-derived addresses (PDAs):
+Vault and stream accounts are PDAs:
 their identifiers are derived deterministically from a canonical set of seeds.
 Any party can compute a vault or stream address locally
 without querying the chain,
@@ -852,20 +858,69 @@ Provider identity is stored as a field in `StreamConfig`
 rather than encoded in the PDA seeds,
 so a vault may back multiple streams to the same provider.
 
-### Balance Accounting
+#### Privacy tiers
+
+`VaultPrivacyTier` is stored in `VaultConfig` and is immutable for the vault's lifetime.
+
+- `Public`: the vault may be operated via transparent or shielded transactions.
+  No owner-funding unlinkability guarantee.
+- `PseudonymousFunder`: the vault is intended for shielded-only operation
+  under a conforming wallet.
+  The goal is to prevent linking the user's primary public key
+  to vault and stream activity on-chain.
+
+### Programs and time
+
+#### Programs and interactions
+
+On LEZ, the following programs and roles interact:
+
+- Payment-streams guest program: owns vault and stream PDAs.
+  It enforces allocation accounting, lazy accrual, lifecycle transitions, and
+  authorization predicates described in this section.
+- Platform authenticated-transfer program: moves native balance from the
+  user's account into `VaultHolding` on `deposit`.
+  The guest validates that the user controls the vault and amount,
+  then chains a transfer call to the program id supplied in the instruction.
+- System clock accounts: supply monotonic timestamps for stream folding and
+  for comparing against off-chain `create_stream_deadline`.
+- Wallet / submitter: chooses transparent versus shielded execution,
+  constructs account lists, and enforces client-side privacy policy.
+
+Privacy-preserving `deposit` MAY require the payment-streams program to appear
+in a multi-program proof so the chained authenticated transfer and guest
+logic execute under one privacy-preserving transaction.
+Multi-program proof layout for that case is a chain-implementation detail
+outside this specification.
+
+Direct transfers into `VaultHolding` without calling `deposit` increase
+`VaultHolding` balance and therefore unallocated funds.
+Solvency invariants remain satisfied.
+Wallets SHOULD NOT use direct transfers into `PseudonymousFunder` vaults,
+because that path can link the funding account to vault activity.
+
+#### Clock semantics
+
+The payment-streams guest reads time from a system clock account supplied by the caller.
+Three platform clock accounts exist on LEZ, updated at different frequencies.
+The caller selects which one to use per instruction.
+Finer-granularity clocks give more precise accrual folds.
+Coarser clocks reduce the frequency of visible timestamp changes.
+In shielded execution, coarser clocks also limit timing correlations visible to observers.
+
+Off-chain stream creation deadlines and provider policy verification time
+are interpreted as LEZ clock-account timestamps,
+the same time source used for stream folding.
+
+### Accounting and accrual
+
+#### LEZ accounting invariants
 
 All vault funds reside in `VaultHolding`.
 Let B denote its balance.
-
-Only B and stored account fields exist on-chain.
-The following quantities are derived from them:
-
-- Unallocated: B − total_allocated.
-  Bounds withdrawals and new stream allocations.
-- Allocation (per stream): the vault's current commitment to that stream,
-  equal to accrued + unaccrued.
-  Allocation decreases as the provider claims accrued funds.
-- Unaccrued (per stream): allocation − accrued.
+B is the LEZ representation of the abstract vault `balance`.
+LEZ represents total stream allocation for a vault with
+`VaultConfig.total_allocated`.
 
 Two solvency invariants MUST hold after every mutating instruction:
 
@@ -876,12 +931,25 @@ Two solvency invariants MUST hold after every mutating instruction:
 Instructions maintain the second invariant by applying the same delta to `total_allocated`
 whenever any stream's `allocation` changes.
 
-### Close and claim accounting
+#### Lazy accrual on LEZ
+
+Stream state is a pure function of stored `StreamConfig` fields and the current timestamp.
+Any party can compute the effective stream state
+by reading `StreamConfig` and a clock account locally.
+
+Every instruction that touches a stream folds it first, then applies the transition.
+The time window `[accrued_as_of, t]` over which a fold accumulates accrual is the accrual interval.
+
+Accrual runs only while the stream is `ACTIVE`.
+A depleted stream transitions to `PAUSED` at the computed depletion instant,
+which may precede `t` if depletion occurred within the accrual interval.
+
+#### Close and claim accounting
 
 Closing and claiming are distinct operations with different effects on
 `VaultHolding`, stream `allocation`, and `total_allocated`.
 
-Close (vault owner or stream provider) folds accrual, transitions the stream
+Close (user or provider) folds accrual, transitions the stream
 to `CLOSED`, and returns the unaccrued remainder from stream allocation back
 to the vault's unallocated pool.
 Close MUST reduce stream `allocation` by the released unaccrued amount and MUST
@@ -897,91 +965,29 @@ Claim leaves stream lifecycle state unchanged aside from accrual folding.
 Each claim MUST transfer the full accrued balance.
 The protocol defines no partial payout amount.
 
-### Lazy Accrual
+### Instructions and authorization
 
-Stream state is a pure function of stored `StreamConfig` fields and the current timestamp.
-Any party can compute the effective stream state —
-including whether a stream has auto-paused on depletion —
-by reading `StreamConfig` and a clock account locally,
-without submitting a write transaction.
-
-Computing elapsed accrual up to the current timestamp and applying any resulting state
-transitions is called folding the stream.
-Every instruction that touches a stream folds accrual first, then applies its own transition.
-The time window `[accrued_as_of, t]` over which a fold accumulates accrual is the accrual interval.
-
-Accrual runs only while the stream is `ACTIVE`.
-A paused or closed stream does not accrue over elapsed time.
-When a stream depletes, it transitions to `PAUSED` at the computed depletion instant,
-which may precede `t` if depletion occurred within the accrual interval.
-
-The program reads time from a system clock account supplied by the caller.
-Three platform clock accounts exist, updated at different frequencies.
-The caller selects which to use per instruction.
-The program validates the provided account identifier against the set of system clock accounts.
-Finer-granularity clocks give more precise accrual folds.
-Coarser clocks reduce metadata churn.
-In shielded execution, coarser clocks also limit timing correlations visible to observers.
-
-### Authorization
+#### Authorization
 
 Authorization means a cryptographic signature in transparent transactions
 and proof of account control in shielded transactions.
 
-Most instructions require authorization by the vault owner.
+Most instructions require authorization by the user.
 Two instructions are exceptions.
 
-`CloseStream` accepts authorization by either the vault owner or the stream provider,
-allowing the provider to initiate closure without requiring the owner's cooperation.
+`CloseStream` accepts authorization by either the user or the provider,
+allowing the provider to initiate closure without requiring the user's cooperation.
 `Claim` is authorized by the provider.
 
-Both `CloseStream` and `Claim` include the vault owner
+Both `CloseStream` and `Claim` include the user
 as an explicit non-signing account,
 checked for equality with `VaultConfig.owner`.
 This binding is defense in depth alongside PDA derivation,
-which already ties the vault config to the owner identifier.
+which already ties the vault config to the user identifier.
 
 Closing an already-closed stream is an error.
 
-### Privacy Tiers
-
-`VaultPrivacyTier` is stored in `VaultConfig` and is immutable for the vault's lifetime.
-
-- `Public`: the vault may be operated via transparent or shielded transactions.
-  No owner-funding unlinkability guarantee.
-- `PseudonymousFunder`: the vault is intended for shielded-only operation
-  under our wallet.
-  The goal is to prevent linking the vault owner's primary public key
-  to vault and stream activity on-chain.
-
-### Programs and interactions (LEZ binding)
-
-On LEZ, the following programs and roles interact:
-
-- Payment-streams guest program: owns vault and stream PDAs.
-  It enforces allocation accounting, lazy accrual, lifecycle transitions, and
-  authorization predicates described in this section.
-- Platform authenticated-transfer program: moves native balance from the
-  vault owner's account into `VaultHolding` on `deposit`.
-  The guest validates vault ownership and amount, then chains a transfer call
-  to the platform program id supplied in the instruction.
-- System clock accounts: supply monotonic timestamps for stream folding and
-  for comparing against off-chain `create_stream_deadline`.
-- Wallet / submitter: chooses transparent versus shielded execution,
-  constructs account lists, and enforces client-side privacy policy.
-
-Privacy-preserving `deposit` MAY require the payment-streams program to appear
-in a multi-program proof so the chained authenticated transfer and guest
-logic execute under one privacy-preserving transaction.
-Multi-program proof layout for that case is a chain-implementation detail
-outside this LIP.
-
-Direct transfers into `VaultHolding` without calling `deposit` increase
-`VaultHolding` balance and therefore unallocated funds.
-Solvency invariants remain satisfied.
-Wallets SHOULD account for linkability when using that path on `PseudonymousFunder` vaults.
-
-### Operation correspondence (LEZ reference guest)
+#### Operation correspondence
 
 The table maps Theory-level operations to the reference guest instruction
 names.
@@ -1000,9 +1006,6 @@ Stream-touching instructions fold accrual to the supplied clock time first.
 | Top-up stream | `TopUpStream` | Vault owner | Stream `allocation` and `total_allocated` increase by top-up amount. MAY transition to `ACTIVE`. |
 | Close stream | `CloseStream` | Vault owner or stream provider | Unaccrued returned to vault (B unchanged). Stream `allocation` and `total_allocated` decrease by released unaccrued. Accrued MAY remain until claim. |
 | Claim accrued | `Claim` | Stream provider | B decreases by payout. Provider balance increases. Stream `allocation` and `total_allocated` decrease by payout. |
-
-Off-chain stream creation deadlines and provider policy checks use the same
-timestamp domain as folding.
 
 ### Wallet responsibilities
 
@@ -1023,7 +1026,7 @@ what they provide, and their limits.
 ### Privacy Goals
 
 The primary privacy goal is funder unlinkability:
-preventing an observer from linking the vault owner's primary public key
+preventing an observer from linking the user's primary public key
 to on-chain vault and stream activity.
 
 A secondary goal is provider privacy:
@@ -1046,14 +1049,14 @@ Vault and stream PDAs are public accounts regardless of execution mode.
 An observer can reconstruct the vault-to-stream graph from public account identifiers.
 Shielded execution can hide the identity behind private signing accounts
 and the destinations of private transfers,
-but it does not hide the existence of a stream,
+while the existence of a stream,
 its accrual state,
-or the association between a vault and its streams.
+and the association between a vault and its streams remain visible.
 
 ### Stream Lifetime and Funder Unlinkability
 
 If a stream is created in a transparent transaction,
-it is permanently linked to its vault owner on-chain.
+it is permanently linked to the user on-chain.
 No subsequent shielded execution can undo this linkage.
 To achieve funder unlinkability,
 a stream must be created and operated entirely via shielded transactions.
@@ -1066,8 +1069,6 @@ but does not provide funder unlinkability
 if the vault has ever appeared on a transparent path.
 
 A `PseudonymousFunder`-tier vault is intended to operate entirely via shielded transactions.
-The wallet enforces this
-by refusing to submit transparent transactions that touch these vaults.
 The same program logic runs in both transparent and shielded transactions
 and leaves execution mode outside guest visibility.
 Shielded-only enforcement is therefore wallet responsibility.
@@ -1075,20 +1076,19 @@ A future consensus-level hook could extend this enforcement
 to arbitrary submitters,
 but that is out of scope for this implementation.
 
-For a `PseudonymousFunder`-tier vault to provide meaningful unlinkability,
-the owner's spendable balance SHOULD be pre-shielded before vault funding.
-A transparent transfer from a primary public key into a private persona
-creates a traceable hop on-chain.
-Subsequent shielded operations may not add further edges
-from that public key to the vault,
-but they do not erase the first hop.
-
 `VaultConfig` is a public account even for `PseudonymousFunder`-tier vaults.
 Its `owner` field is a persistent plaintext pseudonym visible to observers.
-For `PseudonymousFunder` vaults it MUST be a nullifier-public-key-derived identifier
-distinct from the user's primary public key linked to public on-chain activity.
-The unlinkability target is separation of the primary public key from that pseudonym,
-not hiding the pseudonym itself.
+For `PseudonymousFunder` vaults,
+that field is the nullifier-public-key-derived identifier described under
+Account types.
+The unlinkability target is separation of the primary public key from that pseudonym
+rather than hiding the pseudonym itself.
+
+### Wallet responsibilities and limits
+
+The guest cannot observe whether execution was transparent or shielded.
+Arbitrary submitters can still construct transparent transactions
+against public vault and stream accounts.
 
 ### Verifiability
 
@@ -1096,7 +1096,7 @@ On-chain state of a stream is verifiable by both parties regardless of privacy t
 `StreamConfig` is a public account.
 A provider who knows the stream identifier can derive the account address locally
 and read its accrual state from the chain at any time,
-without knowing the vault owner's real-world identity.
+without knowing the user's real-world identity.
 
 ### Provider Privacy
 
@@ -1108,21 +1108,34 @@ SHOULD use a long-term public-facing provider identifier
 alongside one or more shielded receiving addresses,
 and claim funds to those addresses via shielded transactions.
 An observer then sees that a provider claimed from a stream
-but not where the funds were transferred.
+without learning where the funds were transferred.
 Each transparent claim permanently links the stream to the receiving address for that claim.
 Shielded claims to different addresses are independently unlinkable,
 regardless of prior transparent claims.
+
+### Service and payment risks
+
+Payment streams bound user exposure through allocation,
+while service quality remains outside the payment proof.
+Users remain responsible for monitoring service delivery
+and pausing or closing streams when providers stop serving.
+
+Providers rely on policy checks and on-chain stream state
+to decide whether each request should be served.
+Providers may stop serving users who resume for only short windows,
+pause and resume excessively,
+or request bursts of service.
 
 ### Achieving Unlinkability
 
 Shielded transactions alone do not guarantee unlinkability.
 To achieve funder unlinkability on a `PseudonymousFunder`-tier vault,
-the vault owner MUST use shielded transactions for all vault and stream operations
+the user MUST use shielded transactions for all vault and stream operations
 and MUST pre-shield funds before depositing,
 so no transparent transaction links the primary public key to the vault.
 To achieve provider-address unlinkability,
 the provider MUST use shielded claims directed to addresses
-not otherwise linked to their primary identity.
+unlinked to their primary identity.
 
 ## Protocol Extensions
 
@@ -1138,7 +1151,7 @@ This extension is not part of `StreamProviderPolicy` in the base protocol.
 
 A load cap is cumulative resource use per stream per time window
 (e.g. total bytes or requests per minute).
-It applies to the whole session, not a single response.
+It applies to the whole session rather than a single response.
 The provider SHOULD advertise a load cap via discovery when using
 this extension.
 
@@ -1151,8 +1164,8 @@ The provider SHOULD reject or bound work and SHOULD tell the user when
 a request cannot be served within the cap.
 A user MAY request work without knowing response size in advance
 (for example history over a time range).
-Oversize outcomes are enforced by the provider, not charged as a user
-protocol breach.
+Oversize outcomes are enforced by the provider rather than charged as a
+user protocol breach.
 
 When sustained load requires a higher cap,
 the user SHOULD open multiple streams to the same provider.
@@ -1241,6 +1254,23 @@ but require the user to approve multiple messages at once.
 This section records LEZ-specific identifiers and canonical signing bytes
 for interoperability with the LEZ payment-streams code and its conformance
 tests.
+
+### Integration and implementation boundary
+
+Chain integration (LEZ) is the binding written in this specification:
+abstract vaults, streams, proofs, and operations mapped to LEZ accounts,
+programs, timestamps, and canonical signed bytes.
+
+Implementation is deployable software for users,
+providers,
+and the payment-streams guest program on LEZ
+that conforms to that binding.
+Normative MUSTs to implementations apply to user-side and provider-side
+software and to the payment-streams guest program on LEZ.
+Where this specification omits guest wire layout or error codes,
+those details are implementation details of the payment-streams
+codebase (guest, core, FFI, Logos modules).
+
 Clock account ids and domain prefix strings in this section are pinned to demo testnet
 fixtures and MAY change when the network genesis changes.
 Implementations MUST follow the deployed network genesis and published
@@ -1269,7 +1299,7 @@ transaction.
 
 ### Canonical signing bytes (LEZ demo)
 
-Both signature roles use NSSA Schnorr over a 32-byte digest:
+Both signature roles use Schnorr over a 32-byte digest:
 
 ```text
 digest = SHA-256(domain_prefix || canonical_body_bytes)
@@ -1294,12 +1324,12 @@ b"/LEZ/v0.1/VaultOwnerAuth/\x00\x00\x00\x00\x00\x00\x00"
 | --- | --- |
 | `vault_id` | `u64` LE |
 | `provider_id` | 32 raw bytes (LEZ `AccountId`) |
-| `owner_public_key` | 32 raw bytes (NSSA x-only key) |
+| `owner_public_key` | 32 raw bytes (x-only secp256k1 public key) |
 | `service_id` | Borsh `string` (4-byte LE length + UTF-8) |
 | `rate` | `u64` LE |
 | `allocation` | `u128` LE |
 | `create_stream_deadline` | `u64` LE |
-| `session_public_key` | 32 raw bytes |
+| `session_public_key` (`StreamProposal.public_key`) | 32 raw bytes |
 
 The signed material MUST cover the accepted `StreamParams`, the session
 `StreamProposal.public_key`, and the `VaultProof` identity fields in the table,
@@ -1334,8 +1364,8 @@ service payload decoding.
 
 Reference fixture length for the pinned cross-language test vector is
 177 bytes for `wire` (32-byte prefix plus Borsh body).
-Byte-level equality between Nim and Rust serializers is required for
-demo conformance.
+Implementations that target the LEZ Store eligibility binding MUST produce
+the same `wire` bytes for the same Store query fields.
 
 
 ## References
