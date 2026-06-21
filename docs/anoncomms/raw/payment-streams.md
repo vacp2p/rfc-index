@@ -775,10 +775,11 @@ and `VaultProof.vault_id`.
 
 #### Amounts and time
 
-`StreamParams.stream_rate`, `stream_allocation`, and
-`create_stream_deadline` use the same integer types and scales as
-on-chain `StreamConfig.rate`, allocation bookkeeping, and the clock
-account timestamp used for stream folding.
+`StreamParams` rate, allocation, and deadline match the scales of
+on-chain `StreamConfig` and the folding clock.
+Protobuf encodes all three as `uint64`.
+LEZ vault-owner signing and on-chain allocation store allocation as
+`u128`, zero-extending the protobuf value.
 
 #### LEZ signing scheme
 
@@ -1363,9 +1364,10 @@ Providers recomputing eligibility MUST derive the digest from the same
 service payload decoding.
 
 Reference fixture length for the pinned cross-language test vector is
-177 bytes for `wire` (32-byte prefix plus Borsh body).
-Implementations that target the LEZ Store eligibility binding MUST produce
-the same `wire` bytes for the same Store query fields.
+138 bytes for `wire` (32-byte prefix plus Borsh body) for the demo Store
+query fields in N8 (`/lez-payment-streams/1/e2e-eligibility/proto`,
+empty `messageHashes`). Other queries produce different wire lengths under
+the same encoding rules.
 
 
 ## References
