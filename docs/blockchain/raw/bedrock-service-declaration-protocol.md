@@ -25,7 +25,7 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
-| 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-19 |
+| 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 
 # Introduction
 
