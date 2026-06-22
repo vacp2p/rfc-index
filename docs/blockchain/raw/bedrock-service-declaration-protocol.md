@@ -99,7 +99,7 @@ The `stake_thresholds` is a structure aggregating all defined `MinStake` values.
 stake_thresholds: list[MinStake]
 ```
 
-For more information on how the minimum stake is calculated, please refer to the [\[1.0.0\]\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md).
+For more information on how the minimum stake is calculated, please refer to the [\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md).
 
 ### **Service Parameters**
 
@@ -333,7 +333,7 @@ Every query must return information for a finalized state only.
 
 ## Mantle and ZK Proofs
 
-For more information about Mantle and ZK proofs, please refer to [[1.5.0] Mantle](bedrock-v1.1-mantle-specification.md).
+For more information about Mantle and ZK proofs, please refer to [[Mantle](bedrock-v1.1-mantle-specification.md).
 
 # Default Service Parameters
 

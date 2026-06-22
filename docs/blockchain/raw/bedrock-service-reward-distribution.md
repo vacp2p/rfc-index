@@ -31,7 +31,7 @@
 
 # Introduction
 
-Logos Blockchain relies on Blend Network services to operate. The service requires an independent sets of known nodes. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [[1.0.0] Service Declaration Protocol](bedrock-service-declaration-protocol.md). The **Service Reward Distribution Protocol** enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
+Logos Blockchain relies on Blend Network services to operate. The service requires an independent sets of known nodes. For sustainability and fairness, these services must compensate service validators based on their participation. Validators first declare their participation through [Service Declaration Protocol](bedrock-service-declaration-protocol.md). The **Service Reward Distribution Protocol** enables deterministic, efficient, and verifiable reward distribution to validators based on their activity within each service.
 
 Each service defines:
 

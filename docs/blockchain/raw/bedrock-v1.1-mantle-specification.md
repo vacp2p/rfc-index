@@ -25,7 +25,7 @@
 | **Version** | **Changes** | Date |
 | --- | --- | --- |
 | 1.1.0 | Initial revision. | 2026-12-01 |
-| 1.2.0 | Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs.   Added bridging and decentralized sequencing for channels. | 2026-01-01 |
+| 1.2.0 | Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs. Added bridging and decentralized sequencing for channels. | 2026-01-01 |
 | 1.2.1 | [RFC] Improve Mantle Transaction hash. | 2026-03-25 |
 | 1.3.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md). | 2026-04-02 |
 | 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
@@ -85,7 +85,7 @@ def mantle_txhash(tx: MantleTx) -> Hash:
     return h.digest()
 ```
 
-The [hash function used](common-cryptographic-components.md), as well as other cryptographic primitives like ZK proofs and signature schemes, are described in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md).
+The [hash function used](common-cryptographic-components.md), as well as other cryptographic primitives like ZK proofs and signature schemes, are described in [Common Cryptographic Components](common-cryptographic-components.md).
 
 ## Mantle Transaction Hash
 
@@ -107,7 +107,7 @@ mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 
 ## Mantle Transaction Fee
 
-The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_base_fee`, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[1.0.0] Execution Market](execution-market.md) and [[1.0.0] Storage Markets](storage-markets.md).
+The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_base_fee`, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[Execution Market](execution-market.md) and [Storage Markets](storage-markets.md).
 
 ```python
 def mandatory_fees(signed_tx: SignedMantleTx,
@@ -1564,7 +1564,7 @@ class Ledger:
 
 ## Gas Determination
 
-From the [\[1.4.1\]\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md), we get the table below:
+From the [[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md), we get the table below:
 
 | Constants | Value |
 | --- | --- |
