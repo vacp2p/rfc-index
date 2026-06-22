@@ -131,6 +131,7 @@ A vault holds a user's deposit and backs multiple streams.
 To start using the protocol,
 the user MUST deposit funds into a vault.
 A user MAY have multiple vaults.
+Vaults are single-asset.
 One vault MAY back streams to different providers.
 
 Let `balance` be the vault balance.
@@ -211,7 +212,7 @@ Closing a `CLOSED` stream is an error.
 
 Stream state is a pure function of stored stream fields and the current timestamp.
 Any party can compute the effective stream state
-by reading on-chain stream state and a time signal locally.
+by reading stream state and a time signal locally.
 However, stream state MAY be outdated on-chain.
 To fold a stream means to update its accrued balance and state on-chain
 based on the current timestamp.
@@ -220,53 +221,52 @@ The blockchain MUST expose a time signal to be able to fold streams.
 
 ## Stream-Backed Eligibility for Request-Response Services
 
-Stream-backed eligibility means a provider verifies service requests against
-an on-chain payment stream and the proofs in this section.
+This section defines how streams back service eligibility
+in the incentivization request-response framework,
+where each request carries an eligibility proof and each response carries
+an eligibility status.
+It extends the generic `ServiceRequest`, `ServiceResponse`,
+`EligibilityProof`, and `EligibilityStatus` envelope from the
+[incentivization specification](../../messaging/core/raw/incentivization.md)
+with stream-backed proof types only (no proof-of-payment or other
+non-stream incentivization arms in stream-backed mode).
 
-This section defines how on-chain streams back service eligibility
-in the incentivization request-response framework.
-It uses protobuf for interchange.
-It avoids Logos Delivery wire formats except where noted under
-[LEZ and Logos Delivery Profile](#lez-and-logos-delivery-profile).
+Off-chain messages coordinate stream lifecycle and service delivery.
+On-chain [Vaults and streams](#vaults-and-streams) and [Stream lifecycle](#stream-lifecycle)
+semantics are the source of truth for fund allocation, accrual, and stream state.
 
-On-chain state is the source of truth for fund allocation and accrual.
-Off-chain communication coordinates lifecycle events
-and enables service delivery.
+This section builds on the user and provider roles and stream accounting from the
+[On-Chain Payment Streams Protocol](#on-chain-payment-streams-protocol).
 
-The service provision protocol remains defined elsewhere.
-The incentivization specification
-defines the generic request-response framework
-with `EligibilityProof` and `EligibilityStatus`.
-This specification extends `EligibilityProof`
-with two new types for stream-backed service provision.
 
-### Roles and service sessions
+### Protocol overview
 
-Stream-backed eligibility involves two roles:
+Verification proceeds in these phases:
 
-- User: chooses stream parameters, signs proofs, opens and manages on-chain streams.
-- Provider: serves paid requests, verifies stream-backed eligibility,
-  and holds service session state.
+1. Discovery.
+   Providers advertise `StreamProviderPolicy`.
+   Discovery mechanics are out of scope for this specification.
+2. Vault-proof-backed proposal.
+   The first request serves two purposes:
+   the user requests service and proposes stream parameters
+   in accordance with the provider's policy.
+3. Acceptance, pending state, and stream creation.
+   If the provider accepts the proposal,
+   the user establishes the stream on-chain
+   within a defined timeframe.
+   Stream creation is defined in the
+   [On-Chain Payment Streams Protocol](#on-chain-payment-streams-protocol).
+4. Stream-proof-backed service delivery.
+   After a compliant stream exists on-chain,
+   service runs as `ServiceRequest` / `ServiceResponse` pairs
+   with a stream proof as eligibility proof in each request.
+   The provider verifies each proof and answers with an appropriate response.
+5. Termination.
+   Termination uses `ServiceTermination` fields,
+   which the provider MAY send in a standalone message
+   or inside `ServiceResponse.eligibility_status`.
 
-A service session is the provider's off-chain record for delivering
-service under one accepted `StreamProposal`.
-The session begins when the provider accepts the proposal.
-`PARAMS_REJECTED` exchanges before acceptance do not start a session.
-`ServiceTermination` or dropped session state ends a session.
-
-### Protocol phases
-
-Verification is split into proposal, stream creation, and service.
-Parameter negotiation and `PARAMS_REJECTED` retries are part of the
-proposal phase rather than stream creation.
-
-- Proposal — A vault-proof-backed `ServiceRequest` carries a
-  `StreamProposal`.
-  No stream exists on-chain yet.
-- Stream creation — The user submits on-chain stream creation.
-- Service — Later `ServiceRequest`s carry `StreamProof`.
-
-### Wire encoding and signing requirements
+### Wire format
 
 Off-chain messages in this section use protobuf for interchange
 between clients and providers.
@@ -275,38 +275,41 @@ Cryptographic commitments (`VaultProof.owner_signature`,
 `StreamProof.signature`) MUST use a chain-specific canonical form.
 Implementations MUST NOT sign raw protobuf-serialized message bytes unless
 a chain integration explicitly specifies that scheme.
-
 Each chain integration MUST define deterministic signed material for every
-signature field this protocol uses and MUST publish test vectors for those
-payloads.
-Integrations MUST define how signed material covers the fields required by
-VaultProof and StreamProof.
-For LEZ, preimage bytes appear under Implementation Considerations.
+signature field this protocol uses, MUST publish test vectors for those
+payloads, and MUST define how signed material covers the fields required by
+`VaultProof` and `StreamProof`.
 
-### Eligibility Proof Types
-
-The incentivization specification's `EligibilityProof`
-is extended with two new optional fields:
-`stream_proposal` and `stream_proof`.
-These fields are mutually exclusive.
-The first `ServiceRequest` MUST use `stream_proposal`.
-Its semantics: "I want to open a stream to you
-with these parameters.
-Here is proof I have a vault to back it.
-Here is my first request."
-All subsequent requests MUST use `stream_proof`.
+`EligibilityProof` in stream-backed mode MUST carry exactly one of
+`stream_proposal` or `stream_proof`.
+The user MUST NOT set `proof_of_payment` or other non-stream incentivization
+fields when using stream-backed eligibility.
 
 ```protobuf
 message EligibilityProof {
-  // existing, from incentivization specification
-  optional bytes proof_of_payment = 1;
-  // new, for stream-backed service provision
+  optional bytes proof_of_payment = 1; // unused in stream-backed mode
   optional bytes stream_proposal = 2;
   optional bytes stream_proof = 3;
 }
 ```
 
-#### StreamParams
+Exactly one of `stream_proposal` or `stream_proof` MUST be present.
+If both are absent, or both are present, the provider MUST treat the proof as
+malformed and respond with `PROOF_INVALID`.
+
+```protobuf
+message StreamProviderPolicy {
+  uint64 min_rate = 1;
+  uint64 min_allocation = 2;
+  uint64 max_create_stream_deadline_delay = 3;
+  uint64 vault_proof_max_response_bytes = 4;
+}
+```
+
+A `ServiceRequest` has two top-level fields:
+
+- `request_data`: service-specific payload
+- `eligibility_proof`: an `EligibilityProof`
 
 ```protobuf
 message StreamParams {
@@ -321,12 +324,12 @@ message StreamParams {
 `StreamProposal`.
 `VaultProof.owner_signature` covers these fields.
 
-`create_stream_deadline` is the latest chain time for on-chain stream creation
+`create_stream_deadline` is the latest chain time for stream creation
 in `StreamParams`.
 The user MUST set it within `max_create_stream_deadline_delay`.
-Create-stream deadline pairing is defined alongside `StreamProviderPolicy`.
-
-#### VaultProof
+See [Discovery and StreamProviderPolicy](#discovery-and-streamproviderpolicy)
+for deadline pairing with
+`StreamProviderPolicy.max_create_stream_deadline_delay`.
 
 A `VaultProof` proves that the user controls a vault
 with sufficient unallocated funds
@@ -373,13 +376,7 @@ and separately bind that service identity
 to the chain account that receives stream claims.
 The binding mechanism is part of the chain-specific integration.
 
-The user MAY issue `VaultProof`s to multiple providers.
-The user MUST ensure that issuing a new `VaultProof`
-does not cause the total of all promised `VaultProof` allocations
-from this vault
-to exceed the vault's unallocated balance.
 
-#### StreamProposal
 
 ```protobuf
 message StreamProposal {
@@ -389,11 +386,12 @@ message StreamProposal {
 }
 ```
 
-#### StreamProof
+A `StreamProposal` bundles `VaultProof`, `StreamParams`, and a session key.
+The user signs each `StreamProof` with the private key for `public_key`.
 
-A `StreamProof` links a request to an active on-chain stream.
-It is signed by the session private key corresponding to
-the `StreamProposal.public_key` accepted for that stream.
+A `StreamProof` links a request to an active stream.
+`StreamProof.signature` follows the same encoding and signing rules as
+`VaultProof.owner_signature`.
 
 ```protobuf
 message StreamProof {
@@ -402,26 +400,27 @@ message StreamProof {
 }
 ```
 
-### Message Types
+The `stream_proposal` and `stream_proof` fields hold serialized
+`StreamProposal` and `StreamProof` messages respectively.
 
-The off-chain protocol uses three message types:
-`ServiceRequest`, `ServiceResponse`, and `ServiceTermination`.
+```protobuf
+message ServiceTermination {
+  enum TerminationType {
+    TEMPORARY = 0;
+    PERMANENT = 1;
+  }
+  TerminationType termination_type = 1;
+  uint64 resume_after = 2;
+}
+```
 
-#### ServiceRequest
-
-A `ServiceRequest` has two top-level fields,
-consistent with the incentivization specification pattern:
-
-- `request_data`: service-specific payload
-- `eligibility_proof`: an `EligibilityProof`
-  containing either a `stream_proposal` or a `stream_proof`
-
-#### ServiceResponse
+For `PERMANENT` termination, `resume_after` MUST be zero.
+For `TEMPORARY` termination, `resume_after` MUST be a chain timestamp
+after which service MAY resume.
 
 A `ServiceResponse` MUST include:
 
-- `eligibility_status`: an `EligibilityStatus`
-  (from the incentivization specification) with:
+- `eligibility_status`: an `EligibilityStatus` with:
   - `status_code`: indicating acceptance,
     parameter rejection, proof invalidity, etc.
   - `status_desc`: human-readable description
@@ -430,314 +429,241 @@ A `ServiceResponse` MUST include:
 - `response_data`: service-specific payload
   (included if and only if the request is served)
 
-Status codes specific to this specification:
+Status codes specific to this specification.
+`status_code` is a `uint32` on the wire.
+The Logos Delivery Store profile uses the following values:
 
-- `OK`: request served
-- `PARAMS_REJECTED`: stream parameters unacceptable.
-  `VaultProof` NOT marked as spent.
-  Spent status is provider session bookkeeping only.
-  It is not an on-chain vault or stream field.
-  User MAY retry with adjusted parameters
-- `PROOF_INVALID`: `VaultProof` or `StreamProof` verification failed
-- `STREAM_NOT_ACTIVE`: referenced stream
-  is no longer active on-chain
+| `status_code` | Name | Meaning |
+| --- | --- | --- |
+| 0 | `OK` | Request served. |
+| 1 | `PARAMS_REJECTED` | Stream or policy parameters unacceptable. User MAY retry with adjusted parameters. |
+| 2 | `PROOF_INVALID` | Malformed proof, failed signature, or failed cryptographic verification. |
+| 3 | `STREAM_NOT_ACTIVE` | Referenced stream is missing, not active on-chain, or otherwise unavailable for service. |
+
+Policy and binding checks (except an inactive stream) map to `PARAMS_REJECTED`.
+An inactive or missing stream maps to `STREAM_NOT_ACTIVE`.
+Wire decode and signature failures map to `PROOF_INVALID`.
+
+
+### Provider verification checks
+
+At proposal time, the provider MUST verify the vault proof signature,
+vault owner binding, and that proposed `StreamParams` satisfy the advertised
+`StreamProviderPolicy` and on-chain vault solvency.
+
+When the provider accepts a proposal, it MUST pin the accepted `StreamParams`,
+session public key, and the `StreamProviderPolicy` snapshot used for that
+acceptance.
+Later verification MUST use the pinned policy, not a newly advertised policy.
+
+On the first service request that carries a stream proof for an acceptance,
+the provider MUST verify that the identified on-chain stream exists,
+that its payee binding matches the accepted proposal,
+and that on-chain rate and stored allocation are at least the accepted
+proposal terms (after folding to the verification time).
+
+On every stream-proof request, the provider MUST verify the stream proof
+signature over `request_data`,
+that the stream is `ACTIVE`,
+that the payee binding still matches the acceptance,
+and that on-chain rate is at least both the policy minimum pinned at
+acceptance and the accepted proposal rate.
+
+
+### Discovery and StreamProviderPolicy
+
+Parties MUST agree on stream parameters before stream creation.
+A separate discovery protocol SHOULD enable providers to advertise their policies.
+Discovery mechanics are out of scope; the advertisement content is not.
+
+When a provider accepts stream-backed eligibility, its advertisement MUST state
+that stream proposals and stream proofs are accepted,
+which assets are accepted,
+and a complete `StreamProviderPolicy` with
+`min_rate`, `min_allocation`, `max_create_stream_deadline_delay`, and
+`vault_proof_max_response_bytes`.
+The provider SHOULD also announce accepted eligibility proof types.
+The user indicates which asset applies by choosing `VaultProof.vault_id`
+in the `StreamProposal` on the first vault-proof-backed `ServiceRequest`.
+If the provider accepts more than one asset,
+the user picks the vault whose asset matches.
+
+A policy (`StreamProviderPolicy`) is the set of conditions the provider
+advertises for proposing and operating a stream.
+New `StreamProviderPolicy` advertisements apply only to new proposals.
+The provider MUST apply the policy as accepted until the session ends.
+
+The provider MUST reject a proposal when proposed `stream_rate` or
+`stream_allocation` is below the advertised minima,
+when `create_stream_deadline` is outside the allowed window,
+or when proposed allocation exceeds vault unallocated balance.
+
+The user SHOULD read the advertised policy before building a `StreamProposal`.
+The provider MUST verify each proposal against its current policy.
+The provider MAY reject a proposal built from an outdated policy.
+
+### Vault-proof-backed proposal and first response
+
+This phase is the first service request and response.
+The request MUST carry a stream proposal with embedded vault proof and
+request payload, not a stream proof.
+It proposes stream terms, proves vault backing, and asks for the first
+service unit.
+
+The provider MUST verify the vault proof, owner signature, and proposal
+parameters against on-chain vault state
+([Vaults and streams](#vaults-and-streams)) and against its policy.
+The provider MUST verify the owner signature with the declared public key over
+the canonical proposal payload.
+The provider MUST confirm that public key matches the vault owner on-chain for
+the vault named in the proof.
+The provider MUST reject the proposal when proposed allocation exceeds
+unallocated funds.
+
+The advertised policy defines a maximum time interval
+from proposal verification until the stream is open on-chain
+(RECOMMENDED default: 300 seconds).
+At proposal verification time `t`,
+the provider MUST require the deadline to lie
+after `t` and no later than `t` plus the policy cap.
+The user MUST set the deadline within that bound in the proposal.
+
+When parameters fail policy, the provider MUST respond with
+`PARAMS_REJECTED`.
+The user MAY send a new proposal with adjusted parameters.
+When the proof is invalid, the provider MUST respond with
+`PROOF_INVALID`.
+When the provider accepts, it MUST respond with `OK` and a response payload.
+The provider SHOULD limit the first vault-proof-backed response to
+`vault_proof_max_response_bytes` from policy
+(RECOMMENDED default: 65536 bytes).
 
 The provider SHOULD limit parameter-rejection retries
 to a RECOMMENDED maximum of 5 per vault
 within a RECOMMENDED time window of 600 seconds.
 
-#### ServiceTermination
+If chain time passes the deadline without acceptance,
+negotiation for that proposal MUST be treated as failed.
+The provider MUST NOT accept that proposal afterward.
+The user MAY withdraw unallocated funds, fund other streams, and
+MAY send a new proposal to any provider.
+
+The user MUST ensure that pending proposals from a vault do not commit more
+allocation than the vault's unallocated balance.
+A user MUST NOT send a new `StreamProposal` to the same vault-provider
+pair while another is pending.
+
+### Acceptance, pending state, and stream creation
+
+A service session is the provider's off-chain record for delivering
+service under one accepted `StreamProposal`.
+The session begins when the provider accepts the proposal.
+`PARAMS_REJECTED` retries before acceptance do not start a session.
+Service ends as described under [Termination](#termination).
+
+The provider MUST record service session state for the accepted
+proposal.
+Session state includes accepted `StreamParams`,
+the `StreamProviderPolicy` snapshot at acceptance,
+`VaultProof` fields used for verification
+(`vault_id`, `provider_id`, `owner_public_key`),
+`StreamProposal.public_key`,
+and `stream_id` after the first valid stream proof.
+
+After acceptance the user MUST open the stream on-chain before the deadline
+from the accepted `StreamParams`.
+On-chain rate and stored allocation commitment MUST be at least the signed
+proposal terms.
+Until the stream exists on-chain or the deadline passes without a compliant
+stream, the user MUST keep unallocated at least the accepted allocation.
+If creation fails for insufficient unallocated after acceptance, the user has
+breached that obligation.
+The provider SHOULD send `PERMANENT` `ServiceTermination`.
+The user MUST complete on-chain stream creation before sending another
+`StreamProposal` to that provider after acceptance.
+
+### Stream-proof-backed service delivery and response
+
+The vault-proof-backed request MAY receive the first service unit before any
+stream exists on-chain.
+The user MUST open a compliant stream on-chain before sending a stream proof.
+
+Until a compliant stream exists on-chain, the user MUST NOT send
+`EligibilityProof.stream_proof`.
+If the provider receives a stream proof before a compliant stream exists,
+it MUST respond with `STREAM_NOT_ACTIVE` or `PROOF_INVALID`.
+
+After a compliant stream exists on-chain, each further `ServiceRequest` MUST
+carry `StreamProof` in `EligibilityProof.stream_proof`.
+
+For each stream-proof request, the provider MUST apply the checks in
+[Provider verification checks](#provider-verification-checks).
+The provider MUST read and fold on-chain stream state for `stream_id`
+before serving.
+
+When on-chain rate or stored allocation is below the accepted proposal terms,
+the provider MUST respond with `PARAMS_REJECTED`.
+When the stream proof signature fails or the proof is malformed,
+the provider MUST respond with `PROOF_INVALID`.
+If the stream is not `ACTIVE`, or the stream account is missing,
+the provider MUST respond with `STREAM_NOT_ACTIVE`.
+
+The provider MUST ensure the request is for the service identified by
+`service_id` in the accepted `StreamParams`.
+`service_id` is fixed for that acceptance.
+Changing `service_id` requires a new signed proposal.
+When `service_id` is absent from `request_data`,
+the provider binds the request via the eligibility handler.
+The Store query binding is in
+[LEZ and Logos Delivery Profile](#lez-and-logos-delivery-profile).
+
+The provider MAY retain session state across user pause.
+After resume, the user MAY send further stream proofs under the same
+acceptance.
+
+If the first stream-proof request arrives after `create_stream_deadline`,
+the provider MUST reject with `PARAMS_REJECTED`.
+If `create_stream_deadline` passes with no compliant stream,
+the provider MAY drop session or pending-proposal state.
+The proposal failure semantics from the pending state MUST apply.
+
+
+### Termination
+
+A service session ends when the provider sends `ServiceTermination` or drops
+session state.
 
 The provider SHOULD send a `ServiceTermination` message
 before stopping service.
 This message MAY be sent at any point,
 including before a stream is established on-chain.
+The user MAY pause, close, or stop sending stream-proof requests.
 
-This message MUST include:
-
-- `termination_type`: `TEMPORARY` or `PERMANENT`
-- `resume_after`: timestamp after which service MAY resume
-  (REQUIRED for `TEMPORARY`, empty for `PERMANENT`)
+`ServiceTermination` MUST use the wire message above, or equivalent fields
+carried inside `EligibilityStatus` on a `ServiceResponse` on transports that
+do not use a standalone termination message.
+Termination fields are separate from the `status_code` values in
+[Wire format](#wire-format); a response MAY include both service outcome
+status and termination metadata.
 
 For temporary termination,
 the user MAY pause the stream until the `resume_after` time.
-For permanent termination,
-the user SHOULD close the stream to recover unaccrued funds.
-
-##### Termination delivery
-
-Semantically, `ServiceTermination` is a provider message indicating service
-will stop.
-On request-response transports, providers MAY carry the same termination
-fields in `EligibilityStatus` within a `ServiceResponse` instead of a
-standalone `ServiceTermination` message.
-
-This suits request-response protocols where the provider cannot push messages.
-
-Future versions MAY define a separate channel for negotiation
-supporting heartbeats, parameter renegotiation, and proactive termination.
-For now, no such channel exists.
-All initiative comes from the user via `ServiceRequest`.
-
-### StreamProviderPolicy
-
-`StreamProviderPolicy` is the set of conditions the provider
-advertises for proposing and operating a stream.
-
-| Field | Role |
-| --- | --- |
-| `min_stream_rate` | The provider MUST reject proposals whose `StreamParams.stream_rate` is lower |
-| `min_stream_allocation` | The provider MUST reject proposals whose `StreamParams.stream_allocation` is lower |
-| `max_create_stream_deadline_delay` | Maximum seconds from proposal verification time until `create_stream_deadline` |
-| `vault_proof_max_response_bytes` | The provider SHOULD limit the first vault-proof-backed `response_data` to this size (RECOMMENDED default: 65536) |
-
-Implementations SHOULD expose:
-
-- `proposal_satisfies_policy` in the proposal phase
-- `stream_satisfies_policy` on every service request
-- `new_stream_satisfies_proposal` on the first `StreamProof` for a
-  service session (required on the first service request only)
-
-The discovery specification defines how policy is advertised.
-This specification defines fields and checks.
-
-### Discovery Assumptions
-
-Parties MUST agree on stream parameters before creation.
-A separate discovery protocol SHOULD enable
-providers to advertise services and payment-stream policy.
-
-The provider SHOULD announce
-accepted eligibility proof types, accepted assets,
-and a `StreamProviderPolicy`
-via the discovery protocol.
-The user MUST read the provider's current discovery advertisement
-immediately before building each `StreamProposal`.
-The provider MUST verify each proposal against its
-currently published `StreamProviderPolicy`.
-A policy version or hash inside `StreamProposal`
-is outside this specification.
-Until discovery defines such a commitment,
-the provider cannot know which past advertisement the user used.
-If the user built a proposal from a stale advertisement,
-the provider MAY reject it under the current policy.
-
-Create-stream deadline pairing.
-`StreamParams.create_stream_deadline` is an absolute chain timestamp.
-It is the latest time the user commits to complete on-chain stream creation.
-`StreamProviderPolicy.max_create_stream_deadline_delay` is the maximum allowed
-delay in seconds from verification time until that deadline.
-At proposal verification time `t`, the provider MUST require
-`t < create_stream_deadline` and
-`create_stream_deadline <= t + max_create_stream_deadline_delay`.
-The user MUST choose `create_stream_deadline` within that bound.
-RECOMMENDED default for `max_create_stream_deadline_delay`: 300 seconds.
-
-Proposal verification time `t` and `create_stream_deadline`
-use the same timestamp domain as stream folding in the on-chain streams protocol.
-
-The provider SHOULD also advertise accepted eligibility proof types
-and accepted assets.
-The user indicates which asset applies by choosing `VaultProof.vault_id`
-in the `StreamProposal` on the first vault-proof-backed `ServiceRequest`.
-Vaults are single-asset.
-If the provider accepts more than one asset,
-the user picks the vault whose asset matches.
-
-New `StreamProviderPolicy` advertisements apply only to new proposals.
-After the provider accepts a proposal,
-it MUST apply the same `StreamProviderPolicy` fields it used at
-acceptance for that service session until the session ends.
-The provider MAY end service with
-`ServiceTermination`.
-A future discovery extension MAY let a `StreamProposal` carry a
-commitment to a specific published policy revision.
-
-Users SHOULD monitor service delivery
-and take action when providers stop delivering service.
-Since users are typically online to receive service,
-monitoring quality and pausing or closing streams
-is a reasonable expectation.
-
-Providers SHOULD monitor the stream on-chain
-and SHOULD stop providing service when a stream is not `ACTIVE`.
-
-### Service session continuation
-
-The on-chain stream follows the stream lifecycle rules
-from on-chain stream creation.
-An on-chain stream MAY stay `ACTIVE` and accrue after service ends.
-If the provider has ended service, the user SHOULD pause or close the
-stream promptly.
-
-Per-request eligibility uses `StreamProof`.
-The provider MAY retain session state across user pause.
-After resume, the user MAY send further `StreamProof`s under the same
-acceptance.
-
-The provider MAY send `ServiceTermination`.
-The provider MAY drop session state.
-The user MAY pause, close, or stop sending `StreamProof` requests.
-After `PERMANENT` `ServiceTermination`, the user SHOULD close the
-stream.
+After `PERMANENT` `ServiceTermination`, the user SHOULD close the stream
+to recover unaccrued funds.
 The provider SHOULD treat that acceptance as closed.
 Further service requires a newly accepted `StreamProposal`.
 After `TEMPORARY` `ServiceTermination`, the provider MAY resume under
 the same acceptance once `resume_after` has passed.
 
-### Protocol flow
+On-chain stream state follows [Stream lifecycle](#stream-lifecycle).
+Ending service does not pause or close the stream.
+If the provider has ended service, the user SHOULD pause or close the
+stream promptly.
 
-#### Proposal
+Future versions MAY define a separate channel for negotiation
+supporting heartbeats, parameter renegotiation, and proactive termination.
+Until then, the user drives every step via `ServiceRequest`.
 
-The user discovers a provider.
-The provider's advertisement MUST include `StreamProviderPolicy`.
-
-The user sends the first `ServiceRequest` with a
-`StreamProposal` and `request_data`.
-
-The provider MUST verify `VaultProof` against on-chain vault state.
-The provider MUST run `proposal_satisfies_policy`.
-The provider MUST verify `VaultProof.owner_signature` with
-`VaultProof.owner_public_key` over the canonical proposal payload.
-The provider MUST confirm that `owner_public_key` matches the
-user (vault owner) for `VaultProof.vault_id` on-chain.
-In the proposal phase the provider MUST read on-chain vault balance
-and `total_allocated` for `VaultProof.vault_id` as defined in the
-[On-Chain Payment Streams Protocol](#on-chain-payment-streams-protocol).
-Unallocated is vault balance minus `total_allocated`.
-
-The provider MUST reject the proposal if
-`StreamParams.stream_allocation > unallocated`.
-The provider MUST reject the proposal if
-`StreamParams.stream_allocation < StreamProviderPolicy.min_stream_allocation`.
-
-If parameters fail policy, the provider MUST respond with
-`PARAMS_REJECTED`.
-The provider MUST NOT treat the `VaultProof` as spent.
-The user MAY send a new proposal with adjusted `StreamParams`.
-If the proof is invalid, the provider MUST respond with
-`PROOF_INVALID`.
-If the provider accepts, it MUST respond with `OK` and
-`response_data`.
-The provider SHOULD use `StreamProviderPolicy.vault_proof_max_response_bytes` to
-limit the first vault-proof-backed `response_data`.
-
-#### Proposal acceptance and pending state
-
-The provider MUST record service session state for the accepted
-proposal.
-Session state includes accepted `StreamParams`,
-`VaultProof` fields used for verification
-(`vault_id`, `provider_id`, `owner_public_key`),
-`StreamProposal.public_key`,
-and `stream_id` after the first valid `StreamProof`.
-
-A user MUST NOT send a new `StreamProposal` to the same vault-provider
-pair while another is pending.
-The user MUST complete on-chain stream creation before sending another
-`StreamProposal` to that provider after acceptance.
-
-The user chooses `StreamParams.create_stream_deadline` in each
-proposal.
-If chain time passes `create_stream_deadline` without acceptance,
-negotiation for that proposal MUST be treated as failed.
-The user MAY then withdraw unallocated funds, fund other streams, and
-MAY send a new `StreamProposal` to any provider.
-The provider MUST NOT accept that proposal after
-`create_stream_deadline`.
-The provider MUST NOT treat its `VaultProof` as spent for that
-proposal.
-
-From acceptance until on-chain stream creation succeeds or
-`create_stream_deadline` passes without a compliant stream,
-the user MUST keep unallocated at least the accepted `stream_allocation`.
-If creation fails for insufficient unallocated after acceptance, the
-user has breached that obligation.
-The provider SHOULD send `PERMANENT` `ServiceTermination`.
-
-#### Stream creation
-
-The user MUST submit on-chain stream creation before
-`create_stream_deadline`.
-On-chain rate and allocation MUST be greater than or equal to
-the signed `StreamParams`.
-
-#### Stream proofs
-
-The user sends `ServiceRequest`s with `StreamProof`.
-For each `StreamProof` the provider MUST read on-chain stream state
-for `stream_id`.
-The provider MUST verify each `StreamProof.signature` over
-`request_data` using the session `public_key` from the accepted
-proposal.
-
-On the first `StreamProof` for a service session,
-the provider learns `stream_id`
-and MUST load the stream on-chain using `stream_id`
-and MUST run `new_stream_satisfies_proposal`.
-This predicate compares on-chain rate and stored allocation commitment
-to the accepted `StreamParams` after folding to the current verification timestamp `t`.
-On-chain rate and the stored allocation field MUST be greater than
-or equal to the accepted `StreamParams`.
-The comparison uses the stored allocation commitment
-rather than unaccrued balance
-(accrual reduces unaccrued without lowering stored allocation until
-a claim).
-If on-chain values are lower than proposed, the provider MUST
-reject the request.
-The provider MAY accept on-chain values higher than proposed.
-The provider identifier stored on-chain for the stream MUST match this
-session's `VaultProof.provider_id` from the accepted proposal,
-using the chain-specific mapping for `provider_id`.
-
-The stream MUST be `ACTIVE`.
-On-chain rate MUST be at least `min_stream_rate` from policy.
-The on-chain provider identifier MUST correspond to
-`VaultProof.provider_id` for the acceptance.
-The provider MUST run `stream_satisfies_policy` before serving every
-service request.
-The provider MUST ensure the request is for the service identified by
-`service_id` in the accepted `StreamParams`.
-`service_id` is fixed for that acceptance.
-Changing `service_id` requires a new signed proposal.
-For application protocols lacking `service_id` in
-`request_data`, the provider binds via the eligibility handler.
-LEZ and Logos Delivery Profile records the Store query binding.
-
-Later `StreamProof` requests for the same service session need not run
-`new_stream_satisfies_proposal`.
-The provider MAY run it again.
-That is redundant when the first run
-succeeded and does not replace `stream_satisfies_policy` or signature
-verification.
-
-If the first `StreamProof` arrives after `create_stream_deadline`,
-the provider MUST reject.
-If on-chain parameters are below the accepted proposal,
-the provider MUST reject.
-If the stream is not `ACTIVE`,
-the provider MUST respond with `STREAM_NOT_ACTIVE`.
-If `create_stream_deadline` passes with no compliant stream,
-the provider MAY drop session or pending-proposal state.
-The proposal failure semantics from the pending state MUST apply.
-
-The provider SHOULD use eligibility status codes defined in
-`ServiceResponse`.
-
-### Scope
-
-This section defines policy fields and verification rules.
-Discovery protocol mechanics for advertising `StreamProviderPolicy`
-remain in the discovery specification.
-Users SHOULD obtain current policy before proposing.
-
-Service protocol wire formats remain in each service specification.
-The incentivization specification defines the eligibility envelope.
-This specification extends that envelope with `stream_proposal` and `stream_proof`.
-
-Demo operator harnesses,
-including scripts, fixtures, and local testing topologies,
-belong in implementation repositories.
 
 ## LEZ and Logos Delivery Profile
 
@@ -761,7 +687,7 @@ including clock and authenticated transfer.
 
 The LEZ binding centers on one payment-streams guest program plus platform
 programs invoked for fund movement.
-This section states binding requirements that realize on-chain streams invariants on LEZ.
+This section states binding requirements that realize streams invariants on LEZ.
 
 ### Mapping abstract accounting to LEZ
 
@@ -788,7 +714,7 @@ whenever any stream's `allocation` changes.
 Stream state is a pure function of stored `StreamConfig` fields and the current timestamp.
 Every instruction that touches a stream folds it first, then applies the transition.
 
-Closing and claiming on LEZ follow close and claim accounting from the on-chain streams protocol,
+Closing and claiming on LEZ follow close and claim accounting from the streams protocol,
 applied to `VaultHolding`, stream `allocation`, and `VaultConfig.total_allocated`.
 
 ### Accounts and identities
@@ -850,7 +776,7 @@ On LEZ, the following programs and roles interact:
 
 - Payment-streams guest program: owns vault and stream PDAs.
   It enforces allocation accounting, lazy accrual, lifecycle transitions, and
-  authorization predicates described in the on-chain streams protocol and this section.
+  authorization predicates described in the streams protocol and this section.
 - Platform authenticated-transfer program: moves native balance from the
   user's account into `VaultHolding` on deposit.
   The guest validates that the user controls the vault and amount,
@@ -909,7 +835,7 @@ Closing an already-closed stream is an error.
 
 #### Operation correspondence
 
-The table maps on-chain streams operations to the reference guest instruction
+The table maps streams operations to the reference guest instruction
 names.
 Effects summarize changes to `VaultHolding` balance (B), per-stream
 `allocation`, and `VaultConfig.total_allocated` after a successful instruction.
@@ -1110,7 +1036,7 @@ while service quality remains outside the payment proof.
 Users remain responsible for monitoring service delivery
 and pausing or closing streams when providers stop serving.
 
-Providers rely on policy checks and on-chain stream state
+Providers rely on policy checks and stream state
 to decide whether each request should be served.
 Providers may stop serving users who resume for only short windows,
 pause and resume excessively,
@@ -1146,7 +1072,7 @@ The provider SHOULD advertise a load cap via discovery when using
 this extension.
 
 `vault_proof_max_response_bytes` stays in base `StreamProviderPolicy`.
-It limits one vault-proof-backed response before an on-chain stream exists.
+It limits one vault-proof-backed response before an stream exists.
 
 The provider MUST meter cumulative load per stream in the window.
 The provider MUST NOT complete service that would exceed the cap.
@@ -1281,6 +1207,10 @@ Any id in the table is valid when its timestamp is monotonic for the
 transaction.
 
 ### Canonical signing bytes (LEZ demo)
+
+Generic signing requirements for all chain integrations appear under
+[Vault-proof-backed proposal and first response](#vault-proof-backed-proposal-and-first-response)
+in Message structures.
 
 Both signature roles use Schnorr over a 32-byte digest:
 
