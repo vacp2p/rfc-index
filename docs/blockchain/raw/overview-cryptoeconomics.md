@@ -24,7 +24,7 @@
 | 1.0.0 | Initial revision. | 2026-04-25 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 
-> **Disclamer**:
+> **Disclaimer**:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
 >
 > All information regarding project details, token design, distribution mechanisms, technical parameters, and any forward-looking statements is preliminary and subject to change without notice. No representations or warranties are made as to the completeness or accuracy of the information herein. 

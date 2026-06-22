@@ -52,7 +52,7 @@ class Ledger:
     ## Check there is no duplicate
     assert len(inputs) == len(set(inputs))
 
-    # Check that each note is individualy not locked and unspent
+    # Check that each note is individually not locked and unspent
     for note_id in inputs:
       assert ledger.is_unspent(note_id)
       assert note_id not in locked_notes
