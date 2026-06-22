@@ -7,7 +7,7 @@
 | Status | raw |
 | Category | Informational |
 | Editor | Frederico Teixeira <frederico@logos.co> |
-| Contributors | Juan Pablo Madrigal-Cianci <jp@logos.co>, Filip Dimitrijevic <filip@logos.co> |
+| Contributors | Juan Pablo Madrigal-Cianci <jp@logos.co>, Filip Dimitrijevic <filip@logos.co>. Marcin Pawlowski <marcin@logos.co> |
 
 <!-- timeline:start -->
 
@@ -22,8 +22,9 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
+| 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 
-> Disclamer:
+> **Disclamer:**
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
 >
 > All information regarding project details, token design, distribution mechanisms, technical parameters, and any forward-looking statements is preliminary and subject to change without notice. No representations or warranties are made as to the completeness or accuracy of the information herein. 
@@ -32,9 +33,9 @@
 
 # Introduction
 
-The [\[1.0.0\] Service Declaration Protocol](bedrock-service-declaration-protocol.md) enables nodes to register for specific services in decentralized public registries by committing a predefined stake. Registered nodes may then provide the declared service in exchange for rewards. The protocol uses staking as a mechanism to ensure Sybil resistance and incentivize honest participation.
+The [Service Declaration Protocol](bedrock-service-declaration-protocol.md) enables nodes to register for specific services in decentralized public registries by committing a predefined stake. Registered nodes may then provide the declared service in exchange for rewards. The protocol uses staking as a mechanism to ensure Sybil resistance and incentivize honest participation.
 
-This document aims to define an optimal minimum stake value per node in the context of the SDP. The optimal minimum stake value must strike a careful balance: it should be high enough to discourage sybil attacks while remaining low enough to ensure broad participation, especially in early network stages. Importantly, the protocol mandates a uniform, constant stake value across services and sessions, adding constraints to its determination. We focus on static stake estimation method due to its simplicity.
+This document aims to define an optimal minimum stake value per node in the context of the SDP. The optimal minimum stake value must strike a careful balance: it should be high enough to discourage sybil attacks while remaining low enough to ensure broad participation, especially in early network stages. Importantly, the protocol mandates a uniform, constant stake value across services and epochs, adding constraints to its determination. We focus on static stake estimation method due to its simplicity.
 
 Given that Logos Blockchain is a pre-launch L1 blockchain with no on-chain economic data, we include an analysis that builds on comparative valuation research of privacy related chains (Monero, Zcash, Dash, Mina Protocol, Oasis Network, and Secret Network). The methodology includes:
 
@@ -48,7 +49,7 @@ The SDP is a staking-based registration mechanism designed for decentralized ser
 
 This protocol is parameterized by a single stake value that is:
 
-- Constant across all services and sessions, to ensure predictability and fairness.
+- Constant across all services and epochs, to ensure predictability and fairness.
 - Calibrated to balance security and accessibility, based on Logos Blockchains economic assumptions.
 
 Using the model specified [below](#generic-model), the protocol ensures that the stake requirement scales proportionally with Logos Blockchains market valuation and design goals, while remaining robust to economic fluctuations.
@@ -107,7 +108,7 @@ The following quantities are derived from the definitions above:
 
 ## Staking Ratio ($`r_{\text{stake}}`$)
 
-The [\[1.0.0\] Block Rewards](block-rewards.md) proposes a 30% of TGE tokens as a target for the security of the PoS participation of [Cryptarchia](cryptarchia-v1-protocol.md). This implies that it should not be possible for a single entity to acquire $15\%$ of TGE supply. Therefore, we set $`r_{\text{stake}}=15\%`$.
+The [Block Rewards](block-rewards.md) proposes a 30% of TGE tokens as a target for the security of the PoS participation of [Cryptarchia](cryptarchia-v1-protocol.md). This implies that it should not be possible for a single entity to acquire $15\%$ of TGE supply. Therefore, we set $`r_{\text{stake}}=15\%`$.
 
 ## Number of Service Providers ($`N_{\text{stakers}}`$)
 
@@ -119,7 +120,7 @@ A network size that is considered small has 1000 nodes. Therefore,  $`N_{\text{s
 
 The stake value for the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) (SDP) must satisfy the following requirements:
 
-- The stake value for all services should be the same and remain constant across sessions.
+- The stake value for all services should be the same and remain constant across epochs.
 - It should be high enough to prevent Sybil attacks, and low enough to ensure maximum participation.
 
 Under the following conditions:
