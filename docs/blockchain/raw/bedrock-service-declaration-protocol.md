@@ -286,7 +286,7 @@ The SDP active action logic is:
 2. The `ActiveMessage` is verified by the SDP logic:
     1. The `declaration_id` returns an existing `DeclarationInfo`.
     2. The transaction containing `ActiveMessage` is signed by the `zk_id`.
-    3. The `withdraw_at` from the `DeclarationInfo` is set to zero or is higher than the current epoch.
+    3. The `withdraw_at` from the `DeclarationInfo` is set to `None` or is higher than the current epoch.
     4. The `nonce` increases monotonically.
 3. If any of these conditions fail, discard the message and stop processing.
 4. The message is processed by the service-specific activity logic alongside the `active` value indicating the period since the last active message was sent. The `active` value comes from the `DeclarationInfo`.
@@ -302,7 +302,7 @@ The logic of the withdraw action is:
 2. The `WithdrawMessage` is verified by the SDP logic.
     1. The `declaration_id` returns an existing `DeclarationInfo`.
     2. The transaction containing `WithdrawMessage` is signed by the `zk_id`.
-    3. The `withdraw_at` from `DeclarationInfo` is set to zero.
+    3. The `withdraw_at` from `DeclarationInfo` is set to `None`.
     4. The `nonce` increases monotonically.
 3. If any of the above is not correct, then discard the message and stop.
 4. Set the `withdraw_at` from the `DeclarationInfo` to the current epoch number + 2.
@@ -333,7 +333,7 @@ Every query must return information for a finalized state only.
 
 ## Mantle and ZK Proofs
 
-For more information about Mantle and ZK proofs, please refer to [[Mantle](bedrock-v1.1-mantle-specification.md).
+For more information about Mantle and ZK proofs, please refer to [Mantle](bedrock-v1.1-mantle-specification.md).
 
 # Default Service Parameters
 
