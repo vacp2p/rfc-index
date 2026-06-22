@@ -87,3 +87,5 @@ The reward must:
   - Be executed identically by every node processing the first block of epoch N+2. This happens by inserting notes in the ledger in ascending order of `zk_id`.
 
 Nodes indirectly verify the correct inclusion of rewards because all consensus-validating nodes must maintain the same ledger view to derive the latest ledger root, which serves as input for verifying the [Proof of Leadership](cryptarchia-proof-of-leadership.md).
+
+After the epoch-**N** rewards are distributed, withdrawn declarations whose last rewardable epoch was **N** are removed by Mantle as part of the same epoch transition (see [SDP Epoch Finalization](bedrock-v1.1-mantle-specification.md#sdp-epoch-finalization)).

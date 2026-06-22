@@ -286,15 +286,14 @@ The SDP active action logic is:
 2. The `ActiveMessage` is verified by the SDP logic:
     1. The `declaration_id` returns an existing `DeclarationInfo`.
     2. The transaction containing `ActiveMessage` is signed by the `zk_id`.
-    3. The `withdraw_at` from the `DeclarationInfo` is set to `None` or is higher than the current epoch.
-    4. The `nonce` increases monotonically.
+    3. The `nonce` increases monotonically.
 3. If any of these conditions fail, discard the message and stop processing.
 4. The message is processed by the service-specific activity logic alongside the `active` value indicating the period since the last active message was sent. The `active` value comes from the `DeclarationInfo`.
 5. If the service-specific activity logic approves the node active message, then the `active` field of the `DeclarationInfo` is set to the epoch number indicated by metadata.
 
 ### **Withdraw**
 
-The withdraw action enables a withdrawal of a service declaration. It requires sending a valid `WithdrawMessage` (as defined in [Withdraw Message](#withdraw-message)). The withdrawal is executed with a delay of up to 2 epochs, due to finalization reasons.
+The withdraw action enables a withdrawal of a service declaration. It requires sending a valid `WithdrawMessage` (as defined in [Withdraw Message](#withdraw-message)). The withdrawal marks the intent to stop providing the service: the node provides the service through the withdrawal epoch `e` and stops afterwards. The `withdraw_at` field records this withdrawal epoch `e`, which is the node's last rewardable epoch. The declaration is removed and the stake unlocked at epoch `e+2`, right after the epoch-`e` reward is paid out, by the Mantle epoch finalization step (see [SDP Epoch Finalization](bedrock-v1.1-mantle-specification.md#sdp-epoch-finalization)). Removing the declaration only after its final reward is paid guarantees it is never removed before the payout.
 
 The logic of the withdraw action is:
 
@@ -305,9 +304,8 @@ The logic of the withdraw action is:
     3. The `withdraw_at` from `DeclarationInfo` is set to `None`.
     4. The `nonce` increases monotonically.
 3. If any of the above is not correct, then discard the message and stop.
-4. Set the `withdraw_at` from the `DeclarationInfo` to the current epoch number + 2.
-5. Unlock the stake at the beginning of the epoch indicated by `withdraw_at` (release the `locked_note_id`).
-6. Remove `DeclarationInfo`.
+4. Set the `withdraw_at` from the `DeclarationInfo` to the current epoch number (the withdrawal epoch `e`).
+5. The `DeclarationInfo` is removed and the stake unlocked (releasing the `locked_note_id`) at epoch `e+2` by the Mantle epoch finalization step, right after the final reward is paid out.
 
 ### Query
 

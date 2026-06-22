@@ -824,7 +824,6 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
 class LockedNote:
     declarations: set[DeclarationID]
-    locked_until: EpochNumber
 ```
 
 ### Common SDP Structures
@@ -950,7 +949,6 @@ declarations: dict[NoteId, DeclarationInfo]
 
 ```python
 declaration: DeclarationMessage # the declaration we are executing
-service_parameters: dict[ServiceType, ServiceParameters]
 current_epoch: EpochNumber
 locked_notes : dict[NoteId, LockedNote]
 ```
@@ -961,25 +959,18 @@ locked_notes : dict[NoteId, LockedNote]
       ```python
       if declaration.locked_note not in locked_notes:
           locked_notes[declaration.locked_note_id] = \
-              LockedNote(declarations=set(), locked_until=0)
+              LockedNote(declarations=set())
 
       locked_note = locked_notes[declaration.locked_note_id]
       ```
 
-  2. Update the locked notes timeout using this services lock period.
-      ```python
-      lock_period = service_parameters[declaration.service_type].lock_period
-      service_lock = current_block_height + lock_period
-      locked_note.locked_until = max(service_lock, locked_note.locked_until)
-      ```
-
-  3. Add this declaration to the locked note.
+  2. Add this declaration to the locked note.
       ```python
       declare_id = declaration_id(declaration)
       locked_note.declarations.add(declare_id)
       ```
 
-  4. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
+  3. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
       ```python
       declarations[declare_id] = DeclarationInfo(
           service: declaration.service
@@ -1071,7 +1062,6 @@ txhash: zkhash # Mantle transaction hash of the tx containing this operation
 withdraw: WithdrawMessage
 signature: ZkSignature
 
-block_height: int  # block height of the current block
 ledger: Ledger
 locked_notes: dict[NoteId, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
@@ -1089,23 +1079,22 @@ declarations: dict[DeclarationID, DeclarationInfo]
       assert withdraw.declaration in locked_note.declarations
       ```
 
-  2. Ensure that the locked note has expired.
-      ```python
-      assert locked_note.locked_until <= current_epoch
-      ```
-
-  3. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
+  2. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
       1. Ensure declaration exists.
           ```python
           assert withdraw.declaration in declarations
           declare_info = declarations[withdraw.declaration]
           ```
-      2. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
+      2. Ensure the declaration is not already scheduled for withdrawal.
+          ```python
+          assert declare_info.withdraw_at is None
+          ```
+      3. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
           ```python
           locked_note = ledger[withdraw.locked_note_id]
           assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
           ```
-      3. Ensure that the nonce is greater than the previous one.
+      4. Ensure that the nonce is greater than the previous one.
           ```python
           assert withdraw.nonce > declare_info.nonce
           ```
@@ -1118,7 +1107,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
 withdraw: WithdrawMessage
 signature: ZkSignature
 
-block_height: int # block height of the current block
+current_epoch: EpochNumber # current epoch
 ledger: Ledger
 locked_notes: dict[NoteId, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
@@ -1128,28 +1117,18 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
   Executes the withdrawal protocol [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
 
-  1. Update the declaration info with the nonce and the withdraw-at epoch.
+  Withdrawal only records the intent: `withdraw_at` is set to the current
+  (withdrawal) epoch `e`, the node's last rewardable epoch. The declaration is
+  removed and its stake unlocked at epoch `e+2` by the
+  [SDP Epoch Finalization](#sdp-epoch-finalization) step, right after the final
+  reward is paid out.
+
+  1. Update the declaration info with the nonce and the withdrawal epoch.
       ```python
       declare_info = declarations[withdraw.declaration]
       declare_info.nonce = withdraw.nonce
-      declare_info.withdraw_at = current_epoch + 2
+      declare_info.withdraw_at = current_epoch
       ```
-
-  2. When `this.withdraw_at==current_epoch`:
-      1. Remove this declaration from the locked note.
-          ```python
-          locked_note = locked_notes[this.locked_note_id]
-          locked_note.declarations.remove(this.declaration)
-          ```
-      2. Remove declaration.
-          ```python
-          declarations.remove(this.declaration)
-          ```
-      2. Remove the locked note if it is no longer bound to any declarations.
-          ```python
-          if len(locked_note.declarations) == 0:
-              del locked_notes[this.locked_note_id)
-          ```
 
 **Example**
 
@@ -1176,6 +1155,50 @@ SignedMantleTx(
                          transfer.prove(alice_sk)]
 )
 ```
+
+### SDP Epoch Finalization
+
+Withdrawn declarations are removed by Mantle as part of the epoch transition,
+not when the `WithdrawMessage` is processed. A node that withdrew in epoch `e`
+has `withdraw_at == e`, and its last rewardable epoch is `e`; the epoch-`e`
+rewards are distributed in the first block of epoch `e+2` (see
+[Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)).
+In that same first block, **after** the rewards have been distributed, every
+declaration whose final reward has been paid out (`withdraw_at <= current_epoch - 2`)
+is removed and its stake unlocked. Performing the removal after the reward
+distribution guarantees a declaration is never removed before its final reward
+is paid. Declarations that withdrew without earning a final reward are removed
+by the same step, so their stake is always released.
+
+  *Given*
+
+```python
+current_epoch: EpochNumber
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+```
+
+  *Execute*
+
+  For every `declare_id`, `declare_info` in `declarations` where
+  `declare_info.withdraw_at is not None and declare_info.withdraw_at <= current_epoch - 2`:
+
+  1. Remove the declaration from its locked note.
+      ```python
+      locked_note = locked_notes[declare_info.locked_note_id]
+      locked_note.declarations.remove(declare_id)
+      ```
+
+  2. Remove the declaration.
+      ```python
+      del declarations[declare_id]
+      ```
+
+  3. Unlock the note once it is no longer bound to any declaration.
+      ```python
+      if len(locked_note.declarations) == 0:
+          del locked_notes[declare_info.locked_note_id]
+      ```
 
 ### SDP_ACTIVE
 
