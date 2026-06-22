@@ -432,3 +432,13 @@ Cryptarchia depends on honest nodes having relatively in-sync clocks. We are cur
 
 1. Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake [eprint.iacr.org](https://eprint.iacr.org/2018/1132.pdf)
 2. Ouroboros Chronos: Permissionless Clock Synchronization via Proof-of-Stake  [eprint.iacr.org](https://eprint.iacr.org/2019/838.pdf)
+
+## Test Vectors
+
+The operations used to derive the `block_root` are the same as those defined in Test Vectors.
+
+| Input | Output |
+| --- | --- |
+| empty block (no transaction) | `block_root`: 0x0000000000000000000000000000000000000000000000000000000000000000 |
+| one transaction per operation kind: <br />- `leaf[0]`: 0x5f3d7fa5b589def6a83f492b18dbb5a98736f80f3b12b2fdda404b8f84e73544 (Transfer)<br />- `leaf[1]`: 0xc25affe7922f01d438273812c5eb80c3eb2871f1023f73c68c4c68708967c97f (ChannelConfig) <br />- `leaf[2]`: 0xc6695f2ad5fb6bd7b36dc90ab3e2ea6bf6644da696031c9635556371607b7aab (ChannelInscribe)<br />- `leaf[3]`: 0x71dabde56ee0c120b784f22a5ceb08be3c3966c2af16c0ef70f981b4621f1cfb (ChannelDeposit)<br />- `leaf[4]`: 0xd47c6ccd464cd21fac36fbf33fd79305369d941acf9e954f14e4bceebf7acfcc (ChannelWithdraw)<br />- `leaf[5]`: 0x0bd42d345c9d1e9b69db7c8e66e5e4acb7dd5d674d053ae871f8be02168cf2f1 (SDPDeclare)<br />- `leaf[6]`: 0xd3d24e81454866f00a38ec38eeb272a149149e01191747e8717c7aafee924368 (SDPWithdraw)<br />- `leaf[7]`: 0x4938d83a18141ff014a7e88fce53582cfe29989fc056df2d9db806a4aec6b02a (SDPActive) <br />- `leaf[8]`: 0x81af95c4c384eff15ba73e4a52d2ff092895a19a69f770d763101e95243b38e7 (LeaderClaim) | `block_root`: 0x5af8cac1570f7194ced83624db655adc7493c27a2804658950222f06c6905a16 |
+| `Header`:<br />- `bedrock_version`: 0x01<br />- `parent_block`: 0x1111111111111111111111111111111111111111111111111111111111111111<br />- `slot`: 0x42<br />- `block_root`: 0x5af8cac1570f7194ced83624db655adc7493c27a2804658950222f06c6905a16<br />- `leader_voucher`: 0x4444000000000000000000000000000000000000000000000000000000000000<br />- `entropy_contribution`: 0x5555000000000000000000000000000000000000000000000000000000000000<br />- `proof`: 0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />- `leader_key`: 0x17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce | `block_id`: 0xca3aef0f1cd0b73a7faf61320ce98e05d7e8d900c8a53187356ff7abd7dfe02c |

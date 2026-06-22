@@ -63,15 +63,17 @@ execution_base_fee = tx.ops.get_summed_gas() * execution_gas_base_price
 The gas derivation of each Operation are:
 
 ```python
-TRANSFER_GAS = 590
-CHANNEL_INSCRIBE_GAS   = 56
-CHANNEL_CONFIG_GAS     = 56 * configuration_threshold
-CHANNEL_DEPOSIT_GAS    = 590
-CHANNEL_WITHDRAW_GAS   = 56 * withdraw_threshold
-SDP_DECLARE_GAS        = 646
-SDP_WITHDRAW_GAS       = 590
-SDP_ACTIVE_GAS         = 590
-LEADER_CLAIM_GAS       = 580
+TRANSFER_GAS                  = 590
+CHANNEL_INSCRIBE_GAS          = 56
+CHANNEL_CONFIG_GAS            = 56 * configuration_threshold
+CHANNEL_DEPOSIT_GAS           = 590
+CHANNEL_STAKE_ASSIGNATION_GAS = 56 * stake_manipulation_threshold
+CHANNEL_STAKE_TRANSFER        = 590
+CHANNEL_WITHDRAW_GAS          = 56 * stake_manipulation_threshold
+SDP_DECLARE_GAS               = 646
+SDP_WITHDRAW_GAS              = 590
+SDP_ACTIVE_GAS                = 590
+LEADER_CLAIM_GAS              = 580
 ```
 
 and come from our implementation observations as described in [Gas determination from measures](#gas-determination-from-measures).  To get these numbers, we based our calculations on the following measures:
@@ -109,6 +111,7 @@ Execution: negligible.
 - Verification of the output validity: negligible.
 - Insertion of the note in the ledger: negligible.
 - Derivation of the note identifiers: negligible
+
 ## Channel Inscription
 
 The validation process includes verifying an Eddsa25519 signature, confirming that the signer is authorized for the specified channel, and checking the chaining sequence of the channel. The execution encompasses creating channel records (if not previously used) and updating the tip of the channel.
@@ -119,25 +122,61 @@ Execution: ~56k CPU cycles.
 - Verification of the signer authorization: negligible.
 - Verification of channel sequencing: negligible
 - Update the channel state: negligible
+
 ## Channel Deposit
 
-The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof and for the check of the inputs.
+The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof and for the check of the inputs and outputs.
 
 Execution: ~590k CPU cycles.
 
 - Verification of the ZK signature: 590,000 cycles.
 - Verification that the notes are in the ledger: negligible.
 - Verification that the notes are unlocked: negligible.
-- Increase of the channel balance: negligible
+- Removing of the note from the ledger: negligible.
+- Verification of the output validity: negligible.
+- Insertion of the note in the ledger: negligible.
+- Derivation of the note identifiers: negligible
+
+## Channel Stake Assignation
+
+The validation process requires verifying multiple Eddsa25519 signatures, and managing the channel notes.
+The execution require deriving note Id and adding notes to the ledger.
+
+Execution: ~56k CPU cycles * stake_manipulation_threshold.
+
+- Verification of `stake_manipulation_threshold` Ed25519Signatures: 56,000 cycles per signature.
+- Verification that the notes are in the ledger: negligible.
+- Verification that the notes are in the channel: negligible.
+- Removing of the note from the ledger: negligible.
+- Verification of the output validity: negligible.
+- Insertion of the note in the ledger: negligible.
+- Derivation of the note identifiers: negligible
+
+## Channel Stake Transfer
+
+The Execution Gas of the Transfer Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof.
+
+Execution: ~590k CPU cycles.
+
+- Verification of the ZK signature: 590,000 cycles.
+- Verification that the notes are in the ledger: negligible.
+- Verification that the notes are in the channel: negligible.
+- Removing of the note from the ledger: negligible.
+- Verification of the output validity: negligible.
+- Insertion of the note in the ledger: negligible.
+- Derivation of the note identifiers: negligible
 
 ## Channel Withdraw
 
-The validation process requires verifying multiple Eddsa25519 signatures, and updating the balance of the channel. The execution require deriving note Id and adding notes to the ledger.
+The validation process requires verifying multiple Eddsa25519 signatures.
+The execution require consuming the channel notes, deriving note Id and adding notes to the ledger.
 
-Execution: ~56k CPU cycles * withdraw_threshold.
+Execution: ~56k CPU cycles * stake_manipulation_threshold.
 
-- Verification of `withdraw_threshold` Ed25519Signatures: 56,000 cycles per signature.
-- Decrease of the channel balance: negligible.
+- Verification of `stake_manipulation_threshold` Ed25519Signatures: 56,000 cycles per signature.
+- Verification that the notes are in the ledger: negligible.
+- Verification that the notes are in the channel: negligible.
+- Removing of the note from the ledger: negligible.
 - Verification of the output validity: negligible.
 - Insertion of the note in the ledger: negligible.
 - Derivation of the note identifiers: negligible
