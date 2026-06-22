@@ -76,63 +76,51 @@ One such protocol is Store,
 which allows users to query historical messages
 from Logos Messaging relay nodes.
 
-This specification introduces payment streams for paid request-response service.
-The on-chain payment streams protocol stands alone for any smart-contract platform with a time signal.
-Stream-backed eligibility applies that protocol to the incentivization envelope.
-The Logos Execution Zone (LEZ) and Logos Delivery profile documents the LEZ and Store reference deployment.
+Logos Blockchain includes the Logos Execution Zone (LEZ),
+which enables both transparent and shielded execution.
 
-The protocol targets the following requirements:
+We target the following requirements:
 
 - Performance: Efficient payments with low latency and fees.
 - Security: Limited loss exposure through spending controls.
 - Privacy: On-chain deposit identity unlinkable to off-chain service requests.
 - Extendability: Simple initial design with room for enhancements.
 
-After reviewing prior work on payment channels, streams,
-e-cash, and tickets,
-payment streams were selected as the most suitable mechanism
-for services with steady usage patterns.
-
-Payment streams enable unidirectional time-based fund flows
+We propose using payment streams
+(referred to simply as streams)
+for paid request-response service.
+Streams enable unidirectional time-based fund flows
 from payer to payee.
 Streams are simpler than alternatives
-and map well to use cases with distinct roles.
-Parties can avoid storing old states or initiating disputes
-as payment channel protocols require.
-Streams avoid relying on a centralized mint entity,
-typical for e-cash and ticket protocols,
-improving resilience and privacy.
+and map well to our use case.
+Unlike alternatives (payment channels, e-cash),
+stream parties avoid storing old states or initiating disputes,
+and to not rely on a centralized mint entity.
+Streams can be implemented on any smart-contract platform with a time signal.
 
-Different service patterns suit different payment mechanisms.
-Ongoing services align well with streams
-that provide time-based automatic fund accrual.
-One-time or on-demand services suit
-payment channels with one-off payments.
-Addressing burst services with one-off payments
-remains future work.
-
-Logos blockchain includes the Logos Execution Zone (LEZ),
-which enables both transparent and shielded execution.
-The LEZ and Logos Delivery profile describes the LEZ on-chain binding.
+This specification includes three main chapters.
+First, we introduce an on-chain payment streams protocol.
+Second, we define how it can be integrated
+in a generic off-chain request-response protocol.
+Third, we describe how the above protocol
+maps onto Logos Execution Zone (LEZ)
+and Logos Delivery Store as reference deployment.
 
 ## On-Chain Payment Streams Protocol
 
-This section defines chain-agnostic on-chain semantics.
-An implementer MAY realize it on the Logos Execution Zone (LEZ), an EVM chain, or any platform
-with smart contracts and a time signal.
-Proofs, service sessions, and provider policy appear under
-[Stream-Backed Eligibility for Request-Response Services](#stream-backed-eligibility-for-request-response-services).
-LEZ account layouts appear under
-[LEZ and Logos Delivery Profile](#lez-and-logos-delivery-profile).
-Privacy analysis appears under
-[Security and Privacy Considerations](#security-and-privacy-considerations).
+This section defines chain-agnostic on-chain semantics
+of a payment streams protocol.
 
 ### Roles
 
-The on-chain protocol has two roles:
+The protocol has two roles:
 
 - User: the party paying for services (payer).
 - Provider: the party delivering services and receiving payment (payee).
+
+The streams protocol does not have to be used in the user-provider context.
+For consistency, throughout this document
+we refer to the payer as the user, and to the payee as the provider.
 
 ### Vaults and streams
 
@@ -140,71 +128,49 @@ The protocol uses a two-level architecture
 of vaults and streams.
 
 A vault holds a user's deposit and backs multiple streams.
-A user MAY have multiple vaults.
-One vault MAY back streams to different providers.
 To start using the protocol,
 the user MUST deposit funds into a vault.
-The user MAY withdraw unallocated funds from the vault at any time.
-Vault withdrawals send funds to addresses,
-which MAY be external addresses or other vaults.
-Stream allocation commits vault funds within the vault accounting.
-Withdrawal applies to unallocated funds that leave the vault.
+A user MAY have multiple vaults.
+One vault MAY back streams to different providers.
 
-A stream is an individual payment flow from a vault to one provider.
+Let `balance` be the vault balance.
+Let `total_allocated` be the sum of stored stream allocations for that vault.
+`unallocated` is the portion of `balance` not committed to streams.
+For each stream, `stream_allocation` is the stored allocation commitment.
+`accrued` and `unaccrued` partition `stream_allocation`.
+
+The following identities hold:
+
+```text
+balance = total_allocated + unallocated
+stream_allocation = accrued + unaccrued
+```
+
+As balances are non-negative,
+it MUST hold that `balance` ≥ `total_allocated` for any vault,
+and that `stream_allocation` ≥ `accrued` for any stream.
+
+Vault operations include:
+
+- Initialize: create an empty vault.
+- Deposit: increase `balance` and `unallocated`.
+- Withdraw: decrease `balance` by at most `unallocated`.
+
+A stream is an on-chain representation
+of an individual payment flow of funds from a vault to one provider.
 When creating a stream,
-the user MUST allocate a portion of vault funds to that stream.
+the user MUST allocate a portion of `unallocated` funds to that stream.
 Each stream MUST belong to exactly one vault.
 Each stream MUST specify an accrual rate (tokens per time unit).
-An allocation is the portion of vault funds committed to a stream.
-The sum of all stream allocations MUST NOT exceed the vault balance.
+The sum of all `stream_allocation` values for a vault MUST NOT exceed `balance`.
 
-A claim is the operation
-where the provider retrieves accrued funds from a stream.
-Accrual increases the provider's accrued balance automatically while the stream is `ACTIVE`.
-Claiming is the explicit on-chain withdrawal of that accrued balance.
+The user MAY withdraw unallocated funds from the vault at any time.
 
 ### Stream lifecycle
 
-Stream states:
+Accrual is the process by which funds of a given stream flow from the user to the provider.
 
-- `ACTIVE`: Funds accrue to the provider at the agreed rate.
-- `PAUSED`: Accrual is stopped.
-  The stream transitions to `PAUSED` by user action
-  or automatically when the stream's allocation is depleted.
-  The user MAY resume the stream.
-- `CLOSED`: Stream is permanently terminated.
-  The stream MUST NOT transition to any other state.
-
-Stream state transitions:
-
-- Create: User creates a stream in ACTIVE state
-  by allocating funds from the vault.
-- Pause: User pauses an ACTIVE stream, stopping accrual.
-  The stream also transitions automatically from ACTIVE to PAUSED
-  when allocated funds are fully accrued.
-- Resume: User resumes a PAUSED stream, restarting accrual.
-  Resume MUST fail if unaccrued balance is zero.
-- Top-Up: User MAY add funds to stream allocation.
-  Top-up MUST transition the stream to ACTIVE state.
-  If the user wants to add funds without resuming,
-  the user MUST pause the stream after top-up.
-- Close: Either user or provider MAY close the stream
-  from any non-CLOSED state.
-  When a stream is closed,
-  unaccrued funds MUST automatically return to the user's vault.
-  Accrued funds remain available for the provider to claim.
-- Claim: Provider MAY claim accrued funds from a stream in any state.
-  A claim MUST transfer the full accrued balance to the provider
-  and MUST reduce the stream's allocation by the payout amount.
-  Each claim uses the full accrued balance.
-  A claim operation leaves stream lifecycle state unchanged
-  aside from accrual folding effects.
-
-To fold a stream means to compute elapsed accrual up to the current timestamp
-and to apply any resulting state transition.
-Folding is performed lazily when a stream is touched by an on-chain operation.
-
-### Stream state transition diagram
+State transition diagram:
 
 ```mermaid
 graph LR;
@@ -214,123 +180,50 @@ graph LR;
     PAUSED -->|close| CLOSED;
 ```
 
-### Balance and accrual semantics
+At any point in time, a stream MUST be in one of the following states:
+`ACTIVE`, `PAUSED`, `CLOSED`.
+Funds MUST accrue only if the stream is `ACTIVE`.
+A `CLOSED` stream is permanently terminated
+and MUST NOT transition to any other state.
+The user creates a stream by setting `stream_allocation` and increasing `total_allocated`.
+The user MAY pause an `ACTIVE` stream.
+Pause stops accrual without changing `stream_allocation`.
+The stream transitions automatically from `ACTIVE` to `PAUSED`
+when allocated funds are fully accrued.
+The user MAY resume a `PAUSED` stream.
+Resume restarts accrual without changing `stream_allocation`.
+Resume MUST fail if unaccrued balance is zero.
+The user MAY top-up a stream.
+Top-up increases `stream_allocation` and `total_allocated`.
+Top-up MUST transition the stream to `ACTIVE` state.
+To add funds and keep the stream `PAUSED`,
+the user MUST pause the stream after top-up.
+Either user or provider MAY close the stream from any non-`CLOSED` state.
+Close releases unaccrued funds from `stream_allocation` back to `unallocated`.
+When a stream is `CLOSED`,
+unaccrued funds MUST automatically be transferred to the vault.
+Accrued funds remain available for the provider to claim.
+The provider MAY claim accrued funds from a stream at any time, in any state.
+A claim MUST transfer the full accrued balance to the provider.
+Closing a `CLOSED` stream is an error.
 
-Vault balance, allocation, accrued funds,
-and unaccrued funds are the core accounting quantities.
-The stream lifecycle rules above define their behavior on chain.
-
-Let `balance` be the vault balance
-and `total_allocated` be the sum of all stream allocations
-for that vault.
-
-The following relationships govern these quantities:
-
-```text
-unallocated = balance - total_allocated
-stream_allocation = accrued + unaccrued
-unaccrued = stream_allocation - accrued
-```
-
-Each chain integration stores and enforces these quantities.
-The [LEZ and Logos Delivery Profile](#lez-and-logos-delivery-profile) section maps them onto LEZ accounts.
-
-### Time signal
-
-The blockchain MUST expose a time signal for lazy accrual
-and for comparing absolute deadlines.
-Lazy accrual computes accrued balances when a stream is touched by an on-chain operation.
-Folding reads a timestamp from this domain.
-The caller or transaction supplies the timestamp to operations that touch streams.
-
-Create-stream deadlines under stream-backed eligibility use the same timestamp domain as folding.
-The [LEZ and Logos Delivery Profile](#lez-and-logos-delivery-profile) section records how LEZ supplies clock timestamps.
-
-### Solvency invariants
-
-Two solvency invariants MUST hold after every mutating on-chain operation:
-
-1. `balance` ≥ `total_allocated`
-2. `total_allocated` equals the sum of each stream's stored allocation
-   for that vault,
-   including closed streams with residual accrued balance.
-
-Instructions MUST apply the same delta to `total_allocated`
-whenever any stream's allocation changes.
-
-### Lazy accrual
+### Lazy accrual and folding
 
 Stream state is a pure function of stored stream fields and the current timestamp.
 Any party can compute the effective stream state
 by reading on-chain stream state and a time signal locally.
-
-Lazy accrual updates accrued balances through folding when a stream is touched.
-Every operation that touches a stream folds it first, then applies the transition.
-
-Accrual runs only while the stream is `ACTIVE`.
-A depleted stream transitions to `PAUSED` at the computed depletion instant,
-which may precede the fold timestamp if depletion occurred before that timestamp.
-
-### Close and claim accounting
-
-Closing and claiming are distinct operations with different effects on
-vault balance, stream allocation, and `total_allocated`.
-
-Close (user or provider) folds accrual, transitions the stream
-to `CLOSED`, and returns the unaccrued remainder from stream allocation back
-to the vault's unallocated pool.
-Close MUST reduce stream allocation by the released unaccrued amount and MUST
-reduce `total_allocated` by the same amount.
-Accrued funds that were already folded into the stream's accrued balance
-MAY remain on the closed stream until the provider claims them.
-
-Claim (stream provider only) folds accrual, pays the full accrued balance from
-the vault treasury to the provider, and MUST reduce stream allocation by the
-payout amount.
-Claim MUST reduce `total_allocated` by the same payout amount.
-Claim leaves stream lifecycle state unchanged aside from accrual folding.
-Each claim MUST transfer the full accrued balance.
-The protocol defines no partial payout amount.
-
-### On-chain operations
-
-On-chain operations include:
-
-- Initialize vault: create empty vault state for a user-chosen vault identifier.
-- Deposit: increase vault `balance`.
-- Withdraw unallocated: decrease vault `balance` by at most `unallocated`.
-- Create stream: set stream allocation and increase `total_allocated`.
-- Pause stream: stop accrual without changing allocation fields.
-- Resume stream: restart accrual without changing allocation fields.
-- Top-up stream: increase stream allocation and `total_allocated`.
-  Top-up MAY transition the stream to `ACTIVE`.
-- Close stream: release unaccrued allocation to the unallocated pool per close accounting above.
-- Claim accrued: pay accrued balance to the provider per claim accounting above.
-
-Stream-touching operations fold accrual to the supplied timestamp first.
-
-### Authorization
-
-Authorization means a cryptographic signature in transparent execution
-and proof of account control in privacy-preserving execution,
-as defined by the chain integration.
-
-Most operations require authorization by the user (vault owner).
-Close stream accepts authorization by either the user or the provider,
-allowing the provider to initiate closure without requiring the user's cooperation.
-Claim accrued is authorized by the provider.
-
-Closing an already-closed stream is an error.
-
-Further binding rules for a chain integration appear under
-[LEZ and Logos Delivery Profile](#lez-and-logos-delivery-profile) for LEZ.
+However, stream state MAY be outdated on-chain.
+To fold a stream means to update its accrued balance and state on-chain
+based on the current timestamp.
+Any on-chain operation that touches a stream MUST fold it before executing its main logic.
+The blockchain MUST expose a time signal to be able to fold streams.
 
 ## Stream-Backed Eligibility for Request-Response Services
 
 Stream-backed eligibility means a provider verifies service requests against
 an on-chain payment stream and the proofs in this section.
 
-This section defines how on-chain payment streams back service eligibility
+This section defines how on-chain streams back service eligibility
 in the incentivization request-response framework.
 It uses protobuf for interchange.
 It avoids Logos Delivery wire formats except where noted under
@@ -346,8 +239,6 @@ defines the generic request-response framework
 with `EligibilityProof` and `EligibilityStatus`.
 This specification extends `EligibilityProof`
 with two new types for stream-backed service provision.
-
-See [Security and Privacy Considerations](#security-and-privacy-considerations) for goals and limits.
 
 ### Roles and service sessions
 
@@ -643,7 +534,7 @@ The user MUST choose `create_stream_deadline` within that bound.
 RECOMMENDED default for `max_create_stream_deadline_delay`: 300 seconds.
 
 Proposal verification time `t` and `create_stream_deadline`
-use the same timestamp domain as stream folding in the on-chain payment streams protocol.
+use the same timestamp domain as stream folding in the on-chain streams protocol.
 
 The provider SHOULD also advertise accepted eligibility proof types
 and accepted assets.
@@ -870,7 +761,7 @@ including clock and authenticated transfer.
 
 The LEZ binding centers on one payment-streams guest program plus platform
 programs invoked for fund movement.
-This section states binding requirements that realize on-chain payment streams invariants on LEZ.
+This section states binding requirements that realize on-chain streams invariants on LEZ.
 
 ### Mapping abstract accounting to LEZ
 
@@ -897,7 +788,7 @@ whenever any stream's `allocation` changes.
 Stream state is a pure function of stored `StreamConfig` fields and the current timestamp.
 Every instruction that touches a stream folds it first, then applies the transition.
 
-Closing and claiming on LEZ follow close and claim accounting from the on-chain payment streams protocol,
+Closing and claiming on LEZ follow close and claim accounting from the on-chain streams protocol,
 applied to `VaultHolding`, stream `allocation`, and `VaultConfig.total_allocated`.
 
 ### Accounts and identities
@@ -959,7 +850,7 @@ On LEZ, the following programs and roles interact:
 
 - Payment-streams guest program: owns vault and stream PDAs.
   It enforces allocation accounting, lazy accrual, lifecycle transitions, and
-  authorization predicates described in the on-chain payment streams protocol and this section.
+  authorization predicates described in the on-chain streams protocol and this section.
 - Platform authenticated-transfer program: moves native balance from the
   user's account into `VaultHolding` on deposit.
   The guest validates that the user controls the vault and amount,
@@ -1018,7 +909,7 @@ Closing an already-closed stream is an error.
 
 #### Operation correspondence
 
-The table maps on-chain payment streams operations to the reference guest instruction
+The table maps on-chain streams operations to the reference guest instruction
 names.
 Effects summarize changes to `VaultHolding` balance (B), per-stream
 `allocation`, and `VaultConfig.total_allocated` after a successful instruction.
@@ -1214,7 +1105,7 @@ regardless of prior transparent claims.
 
 ### Service and payment risks
 
-Payment streams bound user exposure through allocation,
+Streams bound user exposure through allocation,
 while service quality remains outside the payment proof.
 Users remain responsible for monitoring service delivery
 and pausing or closing streams when providers stop serving.
