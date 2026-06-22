@@ -132,7 +132,7 @@ Below we present a simplified diagram of the protocol, which depicts how the pro
 
 > <sub>The sender is an edge node or a core node. The sender sends a data message to its neighbor (a core node). In addition to data message, core nodes send cover messages. The neighbor/relayer relays messages to other core nodes. The blend node relays all received messages immediately, but it also relays messages that it processed once every release window. There is no delay when disseminating/relaying a message due to the processing of messages.</sub>
 
-The current version of the protocol is optimized for the privacy of core nodes. The level of privacy that edge nodes gain is not as high as core nodes. The problem with maintaining a high level of privacy for edge nodes is that it would require increasing the delay of the network significantly (which is bad for the resilience of the consensus) or increasing the number of messages that an edge node emits (which is bad for the core nodes’ bandwidth). This is acceptable as we assume that edge nodes are mobile and do not have any static long-term network identifier. Therefore, they cannot be tracked easily. Moreover, edge nodes should have lower stake than the core nodes so they will connect to the network sporadically. Which makes identifying them even harder.
+The current version of the protocol is optimized for the privacy of core nodes. The level of privacy that edge nodes gain is not as high as core nodes. The problem with maintaining a high level of privacy for edge nodes is that it would require increasing the delay of the network significantly (which is bad for the resilience of the consensus) or increasing the number of messages that an edge node emits (which is bad for the core nodes’ bandwidth). This is acceptable as we assume that edge nodes are mobile and do not have any static long-term network identifier. Therefore, they cannot be tracked easily. Moreover, edge nodes should have lower stake than the core nodes so they will connect to the network sporadically, which makes identifying them even harder.
 
 ## Network
 
@@ -291,7 +291,7 @@ Since the network is built based on two types of nodes, we define two network ty
 
 The bootstrapping defines the process of creating the network, which happens at the beginning of each epoch.
 
-1. A core node at the beginning of a epoch retrieves a set of core nodes’ information from the SDP protocol ([[1.0.0] Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
+1. A core node at the beginning of an epoch retrieves a set of core nodes’ information from the SDP protocol ([[1.0.0] Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 2. If the number of core nodes is below the minimum number of nodes ([Minimal Network Size](#minimal-network-size)), then stop and use regular broadcasting.
 3. It starts opening new connections.
     1. It selects at random (without replacement) a node from the set of core nodes.
@@ -382,7 +382,7 @@ For a complete description of the generation logic, refer to [Generation](#gener
 When a node receives a message from one of its neighbors, it does the following:
 
 1. Checks the public header of the message, that is:
-    1. The version of the message must equal to `0x01`; if not, then discard the message.
+    1. The version of the message must be equal to `0x01`; if not, then discard the message.
     2. The proof of quota nullifier must be unique; if not, then discard the message.
     3. The signature must be valid; if not, then discard the message.
 2. The message is released to the network as defined in the [Releasing](#releasing) section.
@@ -427,11 +427,11 @@ Every active core node receives a reward. The activity of a node is verified in 
 
 1. Generate a proof of its activity for a specific epoch as defined in [Activity Proof](#activity-proof). The proof confirms that the node was processing messages during the epoch. The node activity confirmation is probabilistic, and the odds increase with the number of collected blending tokens.
 2. Use SDP active functionality ([Active](bedrock-service-declaration-protocol.md#active)) to request a reward as described in [Rewarding Distribution Logic](#rewarding-distribution-logic), that is:
-    1. Create a [Active Message](#active-message).
+    1. Create an [Active Message](#active-message).
     2. Send it as a part of the reward message ([Active Message](bedrock-service-declaration-protocol.md#active-message)).
 3. The reward is calculated as defined in [Reward Calculation](#reward-calculation), that is:
     1. The number of correct activity messages is calculated.
-    2. The number of correct and winning messages is calculated. Where winning message is defined by a lottery mechanism.
+    2. The number of correct and winning messages is calculated, where a winning message is defined by a lottery mechanism.
     3. Every node that sends a correct activity message receives a base reward.
     4. Every node that sends a correct and winning message receives a premium reward.
 4. The rewards are distributed by the mechanisms provided by the [**[1.2.1] Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md).
@@ -447,14 +447,14 @@ Every active core node receives a reward. The activity of a node is verified in 
 - $`\Delta_{max}`$ denotes a maximal delay time between two release rounds;
 - $`\beta_{max}`$ denotes a maximum number of processing rounds for a single message;
 - $`\mu`$ denotes the upper bound on the number of messages to be released during a single release round;
-- $`E`$ denotes a number of rounds in a epoch;
+- $`E`$ denotes a number of rounds in an epoch;
 - $`W`$ denote the observation window expressed in the number of rounds;
 - $`F_1^W`$ denote a frequency at which messages are observed during an observation window $`W`$;
 - $`\lceil F_1 \rceil^W`$ denote the maximal frequency at which messages can be generated during an observation window $`W`$;
 - $`\lfloor F_1 \rfloor^W`$ denote the minimal frequency at which messages must be generated during an observation window $`W`$;
 - $`F_C`$ denote a frequency at which cover messages are generated per round;
 - $`F_D`$ denote a frequency at which data messages are generated per round;
-- $`C = S \cdot F_C`$ denote the expected number of cover messages that are generated during a epoch by the core nodes;
+- $`C = S \cdot F_C`$ denote the expected number of cover messages that are generated during an epoch by the core nodes;
 - $`H_C`$ denote the expected number of blending operations for each cover message;
 - $`H_D`$ denote the expected number of blending operations for each data message;
 - $`R_C`$ denote a redundancy parameter for cover messages, defining the number of “replications” of the same message;
@@ -583,7 +583,7 @@ $$
 
 Where:
 
-- $`C = E \cdot F_C`$ denotes an expected number of cover messages that are generated during a epoch by the core nodes;
+- $`C = E \cdot F_C`$ denotes an expected number of cover messages that are generated during an epoch by the core nodes;
 - $`\beta_C`$ denotes the expected number of blending operations for each cover message;
 - $`R_C`$ denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;
 - $`N`$ denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
@@ -811,13 +811,13 @@ The relaying logic is defined as follows:
 1. The node checks the header of the message that was received from its neighbor, according to the [[1.0.0] Message Formatting](message-formatting.md).
     1. If the neighbor is a core node, then update the message counter for the neighbor.
     2. If the neighbor is an edge node, then close the connection with the neighbor.
-    3. If the header of the message is incorrect, then discard the message and mark the neighbor as malicious and close the connection. We assume that adversary cannot inject any spoofed message to the connection.
+    3. If the header of the message is incorrect, then discard the message and mark the neighbor as malicious and close the connection. We assume that an adversary cannot inject any spoofed message to the connection.
     4. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message was already seen, then the message is a duplicate and must be discarded. The PoQ nullifiers are valid during a single epoch, therefore, they need to be stored for the duration of the current epoch and during the  [Transition Period](#transition-period).
     5. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded, and the neighbor must be marked malicious.
 2. Release the message according to the [Releasing](#releasing) logic.
 3. Concurrently to the above step, add the message to the processing queue, where it is handled by the [Processing](#processing) logic.
 
-The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that size of the cache must be at least:
+The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
 $$
 \begin{aligned}
@@ -855,7 +855,7 @@ When a message $`\mathbf M`$ is received by the node, then it is processed by th
 
   4. If decapsulation fails, return the appropriate decapsulation failure message.
 
-Blending tokens are stored by the node for rewarding purposes, as they prove that the node processed the message. The blending tokens are stored alongside context information such as the epoch number. We denote the set of blending tokens from a epoch $`e`$ stored by a node $`l`$ as $`\mathcal{T}^{l,e}`$.
+Blending tokens are stored by the node for rewarding purposes, as they prove that the node processed the message. The blending tokens are stored alongside context information such as the epoch number. We denote the set of blending tokens from an epoch $`e`$ stored by a node $`l`$ as $`\mathcal{T}^{l,e}`$.
 
 ### Delaying
 
@@ -959,7 +959,7 @@ $$
   Where:
 
   - $`H()`$ is a hash function (the implementation of the hash function is `blake2b` returning $`\epsilon`$ bits).
-  - $`\epsilon`$ is a number of bits that can represent an expected number of blending tokens generated during a epoch. The number is rounded up to full bytes as required by the `blake2b` hash algorithm:
+  - $`\epsilon`$ is a number of bits that can represent an expected number of blending tokens generated during an epoch. The number is rounded up to full bytes as required by the `blake2b` hash algorithm:
 
 $$
 \epsilon = \left\lceil \log_2(Q_C^{Total}+1) \over 8\right\rceil\cdot8
@@ -1053,7 +1053,7 @@ The reward is paid out to the node $`n`$ based on the node's activity declaratio
 The rewards are distributed according to [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md). Here we are briefly sketching the main idea of the reward distribution protocol. For more details refer to the above document.
 
 1. To receive a reward, a node must send an Active Message as described in the [Active Message](bedrock-service-declaration-protocol.md#active-message), where the `Metadata` field consists of a node activity proof. The node must point to a single declaration (`declaration_id`) and use a single provider identity (`provider_id`) for constructing the Active Message. Any reuse of the `provider_id` must make the Active Message invalid.
-2. The Active Message must be sent after the end of a epoch ($`e`$), that is, during the next epoch ($`e+1`$), and after the epoch transition period as defined in the [Transition Period](#transition-period) section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.
+2. The Active Message must be sent after the end of an epoch ($`e`$), that is, during the next epoch ($`e+1`$), and after the epoch transition period as defined in the [Transition Period](#transition-period) section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.
 3. When the following epoch begins ($`e+2`$) Mantle distributes rewards ([**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md)). This delay is required to calculate the partition of rewards as defined in the above section.
 4. If a node does not send the Active Message on time, then it will not receive a reward.
 

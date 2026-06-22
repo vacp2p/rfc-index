@@ -923,7 +923,7 @@ declarations: dict[NoteId, DeclarationInfo]
       assert declaration_id(declaration) not in declarations
       ```
 
-  3. Ensure locators list is non-empty and has no more than 8 entries.
+  3. Ensure the locators list is non-empty and has no more than 8 entries.
       ```python
       assert len(declaration.locators) >= 1
       assert len(declaration.locators) <= 8
@@ -1128,7 +1128,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
   Executes the withdrawal protocol [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
 
-  1. Update declaration info with nonce and withdraw at future epoch.
+  1. Update the declaration info with the nonce and the withdraw-at epoch.
       ```python
       declare_info = declarations[withdraw.declaration]
       declare_info.nonce = withdraw.nonce

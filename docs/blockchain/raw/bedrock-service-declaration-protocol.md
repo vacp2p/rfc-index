@@ -58,7 +58,7 @@ The logic of the protocol is straightforward.
 4. The node must confirm its activity with a service-specific minimum frequency; otherwise, its declaration is inactive.
 5. After the service-specific locking period, the node can send a withdrawal message, and its declaration is removed from the Ledger, which means that the node will no longer provide the service.
 
-> The protocol messages are subject to a finality that means messages become part of the immutable ledger after a delay. The delay at which it happens is defined by the consensus. Therefore, the protocol’s progress must be tracked from the perspective of the latest finalized block, not the tip of the chain. Otherwise, the protocol and services using it would need to handle chain reorganizations, which we must avoid due to their potential to break services. Hence, the services must use snapshot from a fully finalized epoch: `finalized_epoch = current_epoch - 2`.
+> The protocol messages are subject to a finality that means messages become part of the immutable ledger after a delay. The delay at which it happens is defined by the consensus. Therefore, the protocol’s progress must be tracked from the perspective of the latest finalized block, not the tip of the chain. Otherwise, the protocol and services using it would need to handle chain reorganizations, which we must avoid due to their potential to break services. Hence, the services must use a snapshot from a fully finalized epoch: `finalized_epoch = current_epoch - 2`.
 
 # Construction
 
@@ -70,7 +70,7 @@ In this section, we discuss and define data types, messages, and their storage.
 
 ### **Service Types**
 
-We define the:
+We define the following service type:
 
 - `BN`: for Blend Network service.
 
@@ -79,7 +79,7 @@ class ServiceType(Enum):
     BN="BN" # Blend Network
 ```
 
-A declaration can be generated for any of the services above. Any declaration that is not the above must be rejected. The number of services might grow in the future.
+A declaration can be generated for any of the services above. Any declaration that is not one of the above must be rejected. The number of services might grow in the future.
 
 ### Minimum Stake
 
@@ -122,10 +122,10 @@ parameters: list[ServiceParameters]
 
 ### Snapshots
 
-At the start of epoch $`n`$, each node takes a snapshot of the SDP registry at a last block from the finalized epoch.
+At the start of epoch $`n`$, each node takes a snapshot of the SDP registry at the last block from the finalized epoch.
 Each snapshot updates the common view of the registry. Changes to the declaration registry take effect with up to a two-epoch delay: messages sent during epoch `n` are included in the next snapshot (for epoch `n+2`).
 
-Epoch 0 and 1 read the snapshot at genesis block, because the chain has not yet progressed far enough to provide a later finalized block. While at epoch 2, the last block of epoch 2 is read, and so forth according to the above logic.
+Epochs 0 and 1 read the snapshot at the genesis block, because the chain has not yet progressed far enough to provide a later finalized block. While at epoch 2, the last block of epoch 2 is read, and so forth according to the above logic.
 
 ### Identifiers
 
@@ -306,7 +306,7 @@ The logic of the withdraw action is:
     4. The `nonce` increases monotonically.
 3. If any of the above is not correct, then discard the message and stop.
 4. Set the `withdraw_at` from the `DeclarationInfo` to the current epoch number + 2.
-5. Unlock the stake at the beginning of epoch indicated by `withdraw_at` (release the `locked_note_id`).
+5. Unlock the stake at the beginning of the epoch indicated by `withdraw_at` (release the `locked_note_id`).
 6. Remove `DeclarationInfo`.
 
 ### Query

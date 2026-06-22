@@ -373,7 +373,7 @@ The second step is to create an empty message $`\mathbf M`$ and fill the private
 
 ## **Message Encapsulation**
 
-The final part of the algorithm is the true encapsulation o f the payload. That is, given the payload $`\mathbf P_0`$ and number of encapsulations $`h \le \beta_{max}`$ we do the following.
+The final part of the algorithm is the true encapsulation of the payload. That is, given the payload $`\mathbf P_0`$ and number of encapsulations $`h \le \beta_{max}`$ we do the following.
 
 For $`i \in \{ 1,…,h \}`$ do the following:
 
@@ -389,7 +389,7 @@ For $`i \in \{ 1,…,h \}`$ do the following:
 
     $`\mathbf{P}_i = E_{H_\mathbf{P}( \kappa^{n,l_i}_i)}(\mathbf P_{i-1})=\mathbf{P}_{i-1} \oplus \text {CSPRBG}(H_\mathbf{P}(\kappa^{n,l_i}_i))`$
     
-    Note that the uniqueness of the key stream is preserved as the encryption is done on a domain separated checksum of the shared key, which is renders a different key stream than the encryption of the header.
+    Note that the uniqueness of the key stream is preserved as the encryption is done on a domain separated checksum of the shared key, which renders a different key stream than the encryption of the header.
 
 4. Shift blending headers by one downward:
 
