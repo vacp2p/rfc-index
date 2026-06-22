@@ -7,7 +7,7 @@
 | Status | raw |
 | Category | Standards Track |
 | Editor | Mehmet Gonen <mehmet@logos.co> |
-| Contributors | Marcin Pawlowski <marcin@logos.co>, Youngjoon Lee <youngjoon@logos.co>, Alexander Mozeika <alexander@logos.co>, Thomas Lavaur <thomaslavaur@logos.co>, Álvaro Castro-Castilla <alvaro@logos.co>, Filip Dimitrijevic <filip@logos.co> |
+| Contributors | Marcin Pawlowski <marcin@logos.co>, Youngjoon Lee <youngjoon@logos.co>, Alexander Mozeika <alexander@logos.co>, Thomas Lavaur <thomas@logos.co>, Álvaro Castro-Castilla <alvaro@logos.co>, Filip Dimitrijevic <filip@logos.co> |
 
 <!-- timeline:start -->
 
@@ -25,6 +25,7 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
+| 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 
 # Introduction
 
@@ -56,7 +57,7 @@ The NSK is used to authenticate the node on the network level and to derive Non-
 
 ## Ephemeral Signing Key
 
-A node generates Ephemeral Signing Keys (ESK) that are proved to be limited in number by the Proof of Quota (PoQ — [[1.0.1] Proof of Quota](proof-of-quota.md)). The PoQ for core nodes requires a valid NQK for the session for which the PoQ is generated.
+A node generates Ephemeral Signing Keys (ESK) that are proved to be limited in number by the Proof of Quota (PoQ — [[1.0.1] Proof of Quota](proof-of-quota.md)). The PoQ for core nodes requires a valid NQK for the epoch for which the PoQ is generated.
 
 A unique signing key must be generated for every encapsulation as required by the [[1.0.0] Message Encapsulation Mechanism](message-encapsulation.md).
 
