@@ -167,15 +167,15 @@ Mantle validators will ensure the following:
     tx_execution_tip = tx_balance - tx_mandatory_fee
 
     def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
-            balance = 0   # It's important to not use unsigned int here to avoid
-                                        # overflow vulnerabilities
-            for op in signed_tx.tx.ops:
-                    if op.opcode == TRANSFER:
-                            for inp in op.inputs:
-                                    balance += get_value_from_note_id(inp)
-                            for out in op.outputs:
-                                    balance -= out.value
-            return balance
+        balance = 0   # It's important to not use unsigned int here to avoid
+                                    # overflow vulnerabilities
+        for op in signed_tx.tx.ops:
+                if op.opcode == TRANSFER:
+                        for inp in op.inputs:
+                                balance += get_value_from_note_id(inp)
+                        for out in op.outputs:
+                                balance -= out.value
+        return balance
     ```
 
 ## Execution
