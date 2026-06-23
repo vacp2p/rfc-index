@@ -610,9 +610,9 @@ ledger: Ledger
 assert deposit.channel in channels
 ```
 
-  2. Ensure all inputs are spendable.
+  2. Ensure all inputs are spendable and not from a channel
 ```python
-ledger.assert_spendable([(note_id, deposit.channel) for note_id in deposit.inputs])
+ledger.assert_spendable([(note_id, None) for note_id in deposit.inputs])
 ```
 
   3. Validate  ownership over deposited notes.
@@ -781,18 +781,10 @@ for input in stake_assignation.inputs:
     ledger.execute_spending([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
 ```
 
-2. Add outputs to the ledger by returning the exceeding balance to `ZkPublicKey = 0`.
+2. Add outputs to the ledger.
 ```python
-input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
-output_amount = sum(output.value for output in withdrawal.outputs)
-returned_amount = input_amount - output_amount
-
 stake_assignation_id = derive_op_id(stake_assignation)
-if returned_amount != 0:
-    channel_note = Note(returned_amount, 0)
-    ledger.execute_adding(stake_assignation_id, [(note_id, stake_assignation.channel) for note_id in stake_assignation.outputs.append(channel_note)])
-else:
-    ledger.execute_adding(stake_assignation_id, [(note_id, stake_assignation.channel) for note_id in stake_assignation.outputs])
+ledger.execute_adding(withdrawal_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
 ```
 
 #### Example
@@ -997,7 +989,7 @@ assert withdrawal.channel in channels
 ledger.assert_spendable([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
 ```
 
-  4. Check that the withdraw is balanced
+  4. Check that the withdraw inputs cover the outputs
 ```python
 input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
 output_amount = sum(output.value for output in withdrawal.outputs)
@@ -1669,7 +1661,7 @@ ledger: Ledger
 assert len(transfer.inputs) > 0
 ```
 
-  2. Ensure all inputs are spendable.
+  2. Ensure all inputs are spendable and not in a channel.
 ```python
 ledger.assert_spendable([(note_id, None) for note_id in transfer.inputs])
 ```
