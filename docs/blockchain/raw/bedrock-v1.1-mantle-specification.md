@@ -958,8 +958,7 @@ locked_notes : dict[NoteId, LockedNote]
   1. Create the locked note state if it doesn't already exist.
       ```python
       if declaration.locked_note not in locked_notes:
-        locked_notes[declaration.locked_note_id] = \
-          LockedNote(declarations=set())
+        locked_notes[declaration.locked_note_id] = LockedNote(declarations=set())
 
       locked_note = locked_notes[declaration.locked_note_id]
       ```
