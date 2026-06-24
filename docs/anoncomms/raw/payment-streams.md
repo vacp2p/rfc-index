@@ -92,8 +92,8 @@ The protocol has two roles:
 - User: the party paying for services.
 - Provider: the party delivering services and receiving payment.
 
-On-chain privacy text uses funder for the user in the vault-funding role
-(see [Security and privacy considerations](#security-and-privacy-considerations)).
+On chain, the user authorized to operate a vault is the vault owner
+(for example `VaultConfig.owner` on LEZ).
 
 ### Vaults and streams
 
@@ -108,9 +108,10 @@ One vault MAY back multiple streams, possibly to different providers.
 A stream represents an individual flow of funds from a vault to one provider.
 Each stream MUST belong to exactly one vault.
 Each stream MUST record a provider identifier (`provider_id`)
-in chain-specific encoding.
+as an opaque byte string in chain-specific encoding.
 That identifier MUST designate the party authorized to claim accrued funds.
-Each chain integration MUST define how `provider_id` binds to the on-chain provider account.
+Each chain integration MUST define how `provider_id` encodes identity
+and binds to the on-chain account or accounts that may claim accrued funds.
 Each stream MUST specify an accrual rate in the vault token per time unit.
 This specification does not fix the time unit.
 Each chain integration MUST define the time unit used by rates and accrual.
@@ -137,6 +138,8 @@ allocation = accrued + unaccrued
 Vault operations include:
 
 - Initialize: create an empty vault.
+  Chain integrations MAY attach privacy or metadata fields at initialization
+  (see [Security and privacy considerations](#security-and-privacy-considerations)).
 - Deposit: increase `balance` and `unallocated`.
 - Withdraw: decrease `balance` by at most `unallocated`.
 
@@ -161,11 +164,11 @@ A stream is depleted when `unaccrued = 0`.
 State transition diagram:
 
 ```mermaid
-graph LR;
-    ACTIVE -->|pause / deplete| PAUSED;
-    PAUSED -->|resume / top-up| ACTIVE;
-    ACTIVE -->|close| CLOSED;
-    PAUSED -->|close| CLOSED;
+graph LR
+    ACTIVE -->|pause / deplete| PAUSED
+    PAUSED -->|resume / top-up| ACTIVE
+    ACTIVE -->|close| CLOSED
+    PAUSED -->|close| CLOSED
 ```
 
 Stream operations include:
@@ -182,6 +185,8 @@ The user MAY create a stream if the vault has `unallocated` funds.
 Stream creation MUST assign a stable `stream_id` in chain-specific encoding.
 A newly created stream MUST be `ACTIVE`.
 Funds MUST accrue only while the stream is `ACTIVE`.
+Each stream MUST store an accrual anchor timestamp
+(see [Lazy accrual and folding](#lazy-accrual-and-folding)).
 
 The user MAY pause a stream while the stream is `ACTIVE`.
 The stream also transitions from `ACTIVE` to `PAUSED` automatically
@@ -220,7 +225,8 @@ but stored on-chain fields can only be updated as a result of a transaction.
 Stored `accrued`, stored `unaccrued`,
 and a depletion-driven transition to `PAUSED` MAY lag behind the effective
 state at the current timestamp.
-To fold a stream means to advance on-chain fields to match a fold timestamp.
+Folding advances stored fields to the effective state at a fold timestamp.
+To fold a stream means to apply accrual and lifecycle updates through that timestamp.
 The fold timestamp is the monotonic chain time up to which accrual is applied in that fold.
 Any stream operation MUST fold the stream before executing its logic.
 
@@ -261,8 +267,11 @@ The auto-pause extension limits offline exposure by time,
 in addition to the funds cap from `allocation`.
 When creating a stream,
 the user MAY specify an auto-pause duration in the chain integration time unit.
-When that duration elapses since stream creation or since the last resume,
-the stream MUST automatically transition to `PAUSED`.
+When that duration elapses in chain time since stream creation
+or since the last resume,
+the stream MUST automatically transition to `PAUSED`
+when the stream is `ACTIVE` at fold time.
+If the stream is already `PAUSED`, that transition has no further effect.
 The user MAY resume the stream.
 Each resume MUST restart the auto-pause duration from the time of that resume.
 
@@ -363,6 +372,7 @@ It extends the generic `ServiceRequest`, `ServiceResponse`,
 `EligibilityProof`, and `EligibilityStatus` envelope from the
 [incentivization specification](../../messaging/core/raw/incentivization.md)
 with stream-backed proof types.
+Normative wire shapes are in [Message structure](#message-structure).
 
 Off-chain messages coordinate stream lifecycle and service delivery.
 On-chain [Vaults and streams](#vaults-and-streams) and [Stream lifecycle](#stream-lifecycle)
@@ -395,44 +405,14 @@ sequenceDiagram
 
   Note over User,Provider: Discovery (mechanics out of scope)
   User->>Provider: ServiceRequest (EligibilityProof.stream_proposal)
-  Provider->>User: ServiceResponse
-  User->>Chain: Open stream on-chain
+  Provider->>User: ServiceResponse (OK, first service unit)
+  User->>Chain: Create stream on-chain (before create_stream_deadline)
   loop Stream-proof-backed request-response
     User->>Provider: ServiceRequest (EligibilityProof.stream_proof)
     Provider->>User: ServiceResponse
   end
   Provider->>User: ServiceTermination (optional standalone or in ServiceResponse)
 ```
-
-### Cryptographic commitments
-
-Cryptographic commitments (`VaultProof.owner_signature`, `StreamProof.signature`)
-MUST use a chain-specific canonical form.
-A chain integration MUST define how signed material covers the required fields.
-
-The `owner_public_key` field identifies the key used to verify `owner_signature`.
-Chain-specific integrations MUST define how `owner_public_key`
-maps or binds to the user identifier (the vault owner) stored on-chain.
-
-The `owner_signature` field proves that the user authorizes
-the proposed stream session.
-It MUST cover at least the `VaultProof` fields
-other than `owner_signature`,
-the accompanying `StreamParams`,
-and the `StreamProposal.public_key`.
-This prevents a valid vault proof from being recombined
-with different stream parameters or a different session key.
-
-The exact owner-signature scheme,
-public-key encoding,
-and canonical signed payload are chain-specific details.
-They MUST be deterministic and covered by test vectors.
-
-Chain-specific integrations MUST define how `provider_id`
-maps or binds to the on-chain provider identifier used by that chain.
-
-`StreamProof.signature` follows the same encoding and signing rules as
-`VaultProof.owner_signature`.
 
 ### Message structure
 
@@ -484,6 +464,8 @@ A `ServiceResponse` MUST include:
 - `response_data`: service-specific payload
   (included if and only if the request is served)
 
+#### Eligibility status codes
+
 Stream-backed eligibility uses the following `EligibilityStatus.status_code` values:
 
 | `status_code` | Name | Meaning |
@@ -497,11 +479,13 @@ Stream-backed eligibility uses the following `EligibilityStatus.status_code` val
 
 ```protobuf
 message EligibilityProof {
-  optional bytes proof_of_payment = 1; // unused in stream-backed mode
+  optional bytes proof_of_payment = 1;
   optional bytes stream_proposal = 2;
   optional bytes stream_proof = 3;
 }
 ```
+
+`proof_of_payment` is unused in stream-backed mode.
 The user MUST NOT set `proof_of_payment` or other non-stream incentivization
 fields when using stream-backed eligibility.
 Exactly one of `stream_proposal` or `stream_proof` MUST be present.
@@ -514,9 +498,11 @@ malformed and respond with `PROOF_INVALID`.
 message StreamProposal {
   VaultProof vault_proof = 1;
   StreamParams stream_params = 2;
-  bytes public_key = 3; // session key for StreamProof signatures
+  bytes public_key = 3;
 }
 ```
+
+`public_key` is the session key for `StreamProof` signatures.
 
 The session key is the key pair committed in `public_key`.
 The user signs each `StreamProof` with the session key private key.
@@ -527,10 +513,16 @@ A `StreamProof` links a request to an active stream.
 
 ```protobuf
 message StreamProof {
-  bytes stream_id = 1; // on-chain identifier of the stream
-  bytes signature = 2; // signature over request_data using committed public_key
+  bytes stream_id = 1;
+  bytes signature = 2;
 }
 ```
+
+`stream_id` is the on-chain identifier of the stream.
+`signature` is over `request_data` using the committed session key.
+`request_data` is the service-specific payload in the enclosing `ServiceRequest`,
+as defined by the service integration building on the
+[incentivization specification](../../messaging/core/raw/incentivization.md).
 
 #### `VaultProof`
 
@@ -540,12 +532,17 @@ to back the proposed stream.
 
 ```protobuf
 message VaultProof {
-  bytes vault_id = 1; // on-chain identifier of the vault
-  bytes provider_id = 2; // target provider (prevents replay)
-  bytes owner_public_key = 3; // key used to verify owner_signature
-  bytes owner_signature = 4; // signature over the proposal
+  bytes vault_id = 1;
+  bytes provider_id = 2;
+  bytes owner_public_key = 3;
+  bytes owner_signature = 4;
 }
 ```
+
+`vault_id` is the on-chain identifier of the vault.
+`provider_id` is the target provider and prevents replay across providers.
+`owner_public_key` is the key used to verify `owner_signature`.
+`owner_signature` is the vault-owner authorization signature over the proposal.
 
 The `provider_id` field is the provider identity used by this protocol.
 It prevents replaying a `VaultProof` between providers.
@@ -558,15 +555,17 @@ to the chain account that receives stream claims.
 
 ```protobuf
 message StreamParams {
-  bytes service_id = 1; // identifier of the requested service
-  uint64 stream_rate = 2; // proposed accrual rate (tokens per time unit)
-  uint64 allocation = 3; // proposed initial allocation
-  uint64 create_stream_deadline = 4; // latest create_stream time (absolute timestamp)
+  bytes service_id = 1;
+  uint64 stream_rate = 2;
+  uint64 allocation = 3;
+  uint64 create_stream_deadline = 4;
 }
 ```
 
+`create_stream_deadline` is the latest chain time by which the stream MUST exist on-chain.
+
 `StreamParams` holds the proposed stream fields for one `StreamProposal`.
-`service_id` identifies the request-response service for the stream session.
+`service_id` is is an opaque byte string that identifies the request-response service for the stream session.
 The provider assigns or advertises acceptable `service_id` values via discovery.
 The user MUST set `service_id` to a value the provider accepts for that session.
 
@@ -603,11 +602,51 @@ For `PERMANENT` termination, `resume_after` MUST be zero.
 For `TEMPORARY` termination, `resume_after` MUST be a chain timestamp
 after which service MAY resume.
 
+### Cryptographic commitments
+
+Cryptographic commitments (`VaultProof.owner_signature`, `StreamProof.signature`)
+MUST use a chain-specific canonical form.
+A chain integration MUST define how signed material covers the required fields.
+Each signature role MUST use its own domain separation prefix
+(for example vault-owner authorization versus per-request service eligibility).
+
+The `owner_public_key` field identifies the key used to verify `owner_signature`.
+Chain-specific integrations MUST define how `owner_public_key`
+maps or binds to the vault owner stored on-chain.
+
+The `owner_signature` field proves that the user authorizes
+the proposed stream session.
+It MUST cover at least the `VaultProof` fields
+other than `owner_signature`,
+the accompanying `StreamParams`,
+and the `StreamProposal.public_key`.
+This prevents a valid vault proof from being recombined
+with different stream parameters or a different session key.
+Chain integrations MUST document the canonical signed payload.
+The LEZ binding is in [Vault owner authorization](#vault-owner-authorization-vaultproofowner_signature).
+
+The exact owner-signature scheme,
+public-key encoding,
+and canonical signed payload are chain-specific details.
+They MUST be deterministic and covered by test vectors.
+
+At the protocol level, `VaultProof.provider_id` is the provider identity
+used for replay prevention and session pinning.
+Chain integrations MUST define how that value binds to on-chain claim authorization
+(for example octet equality with `StreamConfig.provider` on LEZ).
+
+`StreamProof.signature` MUST use the same signature scheme and encoding
+as `VaultProof.owner_signature` for the integration,
+with a domain prefix and `canonical_body_bytes` defined for the service request
+(for example [Store eligibility signature](#store-eligibility-signature) on LEZ).
+
 ### Protocol Flow
 
 #### Discovery
 
-Parties MUST agree on stream parameters before stream creation.
+Discovery mechanics are out of scope for this specification.
+Where providers advertise policies,
+parties MUST agree on stream parameters before stream creation.
 A separate discovery protocol SHOULD enable providers to advertise their policies.
 
 The provider SHOULD also announce accepted eligibility proof types.
@@ -642,9 +681,11 @@ until the stream MUST be open on-chain
 (RECOMMENDED default: 300 seconds).
 At proposal verification time `t`,
 the provider MUST verify that the deadline is
-between `t` and `t` plus the policy-defined interval.
+between `t` and `t` plus the policy-defined interval
+(`max_create_stream_deadline_delay` in [`StreamProviderPolicy`](#streamproviderpolicy)).
 The user MUST set the deadline within these bounds in the stream proposal.
-If chain time passes the deadline without acceptance,
+If chain time passes `create_stream_deadline`
+without a compliant stream on-chain,
 negotiation for that proposal MUST be treated as failed.
 The provider MUST NOT accept that proposal afterward.
 The user MAY withdraw unallocated funds, fund other streams, and
@@ -661,6 +702,8 @@ within a RECOMMENDED time window of 600 seconds.
 
 A service session is the provider's off-chain record for delivering
 service under one accepted `StreamProposal`.
+It pins accepted `StreamParams`, policy, and verification keys
+until termination, deadline failure, or explicit session drop.
 When the provider accepts a proposal,
 it MUST respond with `OK` and a response payload.
 The provider MUST record service session state for the accepted
@@ -918,7 +961,11 @@ digest = SHA-256(domain_prefix || canonical_body_bytes)
 
 `domain_prefix` is a fixed 32-byte ASCII string padded with NUL bytes.
 `canonical_body_bytes` is defined per signature role below.
-Implementations MUST match the reference test vectors in the
+On LEZ, vault-owner authorization and Store eligibility are separate roles:
+[`VaultProof.owner_signature`](#vault-owner-authorization-vaultproofowner_signature)
+and [`StreamProof.signature`](#store-eligibility-signature)
+each have their own normative `domain_prefix` and body layout in the subsections below.
+Implementations MUST use those prefixes and MUST match the reference test vectors in the
 `lez-payment-streams` repository (including cross-language Store parity).
 
 `VaultProof.owner_public_key` binds to `VaultConfig.owner`
@@ -977,10 +1024,9 @@ and wallet and provider obligations follow.
 
 ### Privacy goals
 
-In this section, funder means the user in the role of funding a vault on chain.
-
 The primary goal is funder unlinkability:
-separating the user's primary public key from on-chain vault and stream activity.
+separating the user's primary public key from on-chain vault and stream activity
+carried out under the vault owner identity.
 
 The secondary goal is provider receiving privacy:
 limiting linkage between on-chain claims and the provider's real receiving addresses.
@@ -988,12 +1034,12 @@ limiting linkage between on-chain claims and the provider's real receiving addre
 ### On-chain visibility
 
 Vault and stream accounts are public.
-An observer can read each stream's terms and accrual state in `StreamConfig`
+Observers can read each stream's terms and accrual state in `StreamConfig`
 and reconstruct the vault-to-stream graph from account identifiers.
 
 Transparent and shielded transactions run the same guest logic;
 they differ in which signing identities and transfer endpoints appear on chain.
-Shielded execution can hide the funder behind private signing accounts
+Shielded execution can hide the vault owner behind private signing accounts
 and hide claim destinations,
 but it does not hide the vault-to-stream relationship or how streams accrue.
 Coarser [system clock accounts](#system-clock-accounts) reduce how often
@@ -1001,22 +1047,15 @@ folding updates visible timestamps on stream accounts.
 
 ### Funder unlinkability
 
-A transparent stream creation permanently links the funder on chain;
-later shielded operations cannot remove that linkage.
+A transparent stream creation permanently links the vault owner on chain.
+Later shielded operations cannot remove that linkage.
 
-Privacy tiers (see [Account types](#account-types)) express intent at vault creation:
-
-- `Public`: transparent or shielded use is allowed;
-  shielded operations alone do not yield funder unlinkability
-  after any transparent vault or stream activity.
-- `PseudonymousFunder`: intended for shielded-only use;
-  the guest does not enforce execution mode,
-  and `VaultConfig.owner` remains a visible pseudonym
-  (not the user's primary public key).
+Privacy tiers (see [Account types](#account-types)) express intent at vault creation.
+The guest records `Public` or `PseudonymousFunder` on LEZ and does not enforce execution mode.
 
 To obtain funder unlinkability on a `PseudonymousFunder` vault,
-the user MUST run all vault and stream operations through shielded transactions
-and MUST pre-shield funds before deposit so no transparent path
+the vault owner MUST run all vault and stream operations through shielded transactions.
+The user MUST pre-shield funds before deposit so no transparent path
 links the primary public key to the vault.
 
 ### Wallet obligations
@@ -1025,9 +1064,9 @@ Because execution mode is outside guest visibility,
 any submitter can still post transparent transactions against public accounts.
 Wallets MUST NOT transfer directly into a `VaultHolding` for
 `PseudonymousFunder` vaults,
-because that links a funder address to the vault on chain.
+because that links a transparent address to the vault on chain.
 Wallets SHOULD avoid transparent paths that link the user's primary public key
-to vault activity when unlinkability is intended.
+to vault activity when funder unlinkability is intended.
 
 ### Provider receiving privacy
 
