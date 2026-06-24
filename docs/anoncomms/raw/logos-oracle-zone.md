@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Logos Oracle Network (LON) Oracle Zone |
-| Slug | 162 |
+| Slug | 244 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Ugur Sen [ugur@status.im](mailto:ugur@status.im) |
