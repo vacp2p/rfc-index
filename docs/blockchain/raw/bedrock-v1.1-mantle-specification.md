@@ -69,20 +69,20 @@ Mantle Transactions form the core of Mantle, enabling users to combine multiple 
 
 ```python
 class MantleTx:
-      ops: list[Op]
+  ops: list[Op]
 
 class Op:
-      opcode: byte
-      payload: bytes
+  opcode: byte
+  payload: bytes
 
 def mantle_txhash(tx: MantleTx) -> Hash:
-    tx_bytes = encode(tx)
+  tx_bytes = encode(tx)
 
-    h = Hasher()
-    h.update(b"MANTLE_TXHASH_V1")
-    h.update(tx_bytes)
+  h = Hasher()
+  h.update(b"MANTLE_TXHASH_V1")
+  h.update(tx_bytes)
 
-    return h.digest()
+  return h.digest()
 ```
 
 The [hash function used](common-cryptographic-components.md), as well as other cryptographic primitives like ZK proofs and signature schemes, are described in [Common Cryptographic Components](common-cryptographic-components.md).
@@ -113,17 +113,17 @@ The transaction mandatory fee is a sum of two components: the multiplication of 
 def mandatory_fees(signed_tx: SignedMantleTx,
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
                    execution_gas_base_price: TokenValue) -> int:  # Given by Execution Market
-        mantle_tx = signed_tx.tx
-        permanent_storage_fees = len(encode(signed_mantle_tx)) * permanent_storage_gas_price
-        tx_execution_gas = 0
+  mantle_tx = signed_tx.tx
+  permanent_storage_fees = len(encode(signed_mantle_tx)) * permanent_storage_gas_price
+  tx_execution_gas = 0
 
-        for op in mantle_tx.ops:
-            # Compute how much execution gas of this operation as defined
-            # in the gas determination Appendix
-            tx_execution_gas += execution_gas(op)
-        execution_base_fees = tx_execution_gas * execution_gas_base_price
+  for op in mantle_tx.ops:
+    # Compute how much execution gas of this operation as defined
+    # in the gas determination Appendix
+    tx_execution_gas += execution_gas(op)
+  execution_base_fees = tx_execution_gas * execution_gas_base_price
 
-        return execution_base_fees + permanent_storage_fees
+  return execution_base_fees + permanent_storage_fees
 ```
 
 If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.
@@ -134,8 +134,8 @@ If the Mantle Transaction is unbalanced (meaning that the Transaction consume mo
 
 ```python
 signed_tx = SignedMantleTx(
-    tx=MantleTx(ops),
-    op_proofs
+  tx=MantleTx(ops),
+  op_proofs
 )
 ```
 
@@ -149,14 +149,14 @@ Mantle validators will ensure the following:
 2. Each Operation is valid.
     ```python
     for op, op_proof in zip(ops, op_proofs):
-        assert op.opcode in MANTLE_OPCODES
-        validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+      assert op.opcode in MANTLE_OPCODES
+      validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
 
     def validate_mantle_op(txhash, opcode, payload, op_proof):
-        if opcode == CHANNEL_INSCRIBE:
-            validate_channel_inscribe(txhash, payload, op_proof)
-        # elif opcode == ...
-        #    ...
+      if opcode == CHANNEL_INSCRIBE:
+        validate_channel_inscribe(txhash, payload, op_proof)
+      # elif opcode == ...
+      #    ...
     ```
 
 3. The Mantle Transaction excess balance pays least the mandatory fees.
@@ -167,15 +167,15 @@ Mantle validators will ensure the following:
     tx_execution_tip = tx_balance - tx_mandatory_fee
 
     def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
-        balance = 0   # It's important to not use unsigned int here to avoid
-                                    # overflow vulnerabilities
-        for op in signed_tx.tx.ops:
-                if op.opcode == TRANSFER:
-                        for inp in op.inputs:
-                                balance += get_value_from_note_id(inp)
-                        for out in op.outputs:
-                                balance -= out.value
-        return balance
+      balance = 0   # It's important to not use unsigned int here to avoid
+                    # overflow vulnerabilities
+      for op in signed_tx.tx.ops:
+        if op.opcode == TRANSFER:
+          for inp in op.inputs:
+            balance += get_value_from_note_id(inp)
+          for out in op.outputs:
+            balance -= out.value
+      return balance
     ```
 
 ## Execution
@@ -184,8 +184,8 @@ Mantle validators will ensure the following:
 
 ```python
 SignedMantleTx(
-    tx=MantleTx(ops),
-    op_proofs
+  tx=MantleTx(ops),
+  op_proofs
 )
 ```
 
@@ -227,41 +227,41 @@ Validators must maintain the following state to process channel Operations:
 channels: dict[ChannelId, ChannelState] # ChannelId is 32 bytes
 
 class ChannelState:
-    # Channel Configuration
-    accredited_keys: list[Ed25519PublicKey]  # limited to 65 535 keys
-    configuration_threshold: u16  # indicating how many keys are
-                                  # required to update the configuration
+  # Channel Configuration
+  accredited_keys: list[Ed25519PublicKey]  # limited to 65 535 keys
+  configuration_threshold: u16  # indicating how many keys are
+                                # required to update the configuration
 
-    # Message Ordering
-    tip_hash: hash
+  # Message Ordering
+  tip_hash: hash
 
-    # Decentralized Sequencing
-    tip_slot: Slot
-    tip_sequencer: u16      # indicating the actual
-                            # sequencer position in the list of accredited keys
-    tip_sequencer_starting_slot: Slot
-    posting_timeframe: u32  # number of slots (0 = infinity)
-    posting_timeout: u32    # number of slots (0 = no timeout)
+  # Decentralized Sequencing
+  tip_slot: Slot
+  tip_sequencer: u16      # indicating the actual
+                          # sequencer position in the list of accredited keys
+  tip_sequencer_starting_slot: Slot
+  posting_timeframe: u32  # number of slots (0 = infinity)
+  posting_timeout: u32    # number of slots (0 = no timeout)
 
-    # Bridging
-    balance: TokenValue      # See the Note section for its precision
-    withdrawal_nonce: u32    # Nonce used to derive a channel OpId
-    withdraw_threshold: u16  # indicating how many keys are
-                             # required to withdraw funds from the channel
+  # Bridging
+  balance: TokenValue      # See the Note section for its precision
+  withdrawal_nonce: u32    # Nonce used to derive a channel OpId
+  withdraw_threshold: u16  # indicating how many keys are
+                           # required to withdraw funds from the channel
 
 def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -> ChannelState:
-    return ChannelState(
-        tip_hash = ZERO,
-        tip_slot = block_slot,
-        accredited_keys = keys,
-        tip_sequencer = 0,
-        tip_sequencer_starting_slot = block_slot,
-        posting_timeframe = 0,
-        posting_timeout = 0,
-        configuration_threshold = 1,
-        balance = 0,
-        withdrawal_nonce = 0,
-        withdraw_threshold = 1)
+  return ChannelState(
+    tip_hash = ZERO,
+    tip_slot = block_slot,
+    accredited_keys = keys,
+    tip_sequencer = 0,
+    tip_sequencer_starting_slot = block_slot,
+    posting_timeframe = 0,
+    posting_timeout = 0,
+    configuration_threshold = 1,
+    balance = 0,
+    withdrawal_nonce = 0,
+    withdraw_threshold = 1)
 ```
 
 Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
@@ -274,24 +274,24 @@ To determine which sequencer is currently authorized to send messages, we use a 
 # Round Robin algorithm determining the new sequencer index and the 
 # new sequencer starting slot
 def round_robin(block_slot: Slot, channel: ChannelState) -> (u16,u64):
-		elapsed_slots = block_slot - channel.tip_slot
-		if elapsed_slots >= channel.posting_timeout && channel.posting_timeout != 0:
-				# Get the number of sequencers that get timed out
-				sequencers_timed_out = elapsed_slots // channel.posting_timeout
-				index = (channel.tip_sequencer + sequencers_timed_out) 
-						% len(channel.accredited_keys)
-				starting_slot = channel.tip_slot 
-						+ sequencers_timed_out * channel.posting_timeout
-		else:
-				# Get the number of timeframes elapsed to get who is the sequencer
-				tip_sequencer_duration = block_slot - channel.tip_sequencer_starting_slot
-				index = (channel.tip_sequencer
-						+ (tip_sequencer_duration // channel.posting_timeframe))
-						% len(channel.accredited_keys)
-				starting_slot = channel.tip_sequencer_starting_slot 
-								+ (tip_sequencer_duration // channel.posting_timeframe)
-								* channel.posting_timeframe
-		return (index, starting_slot)
+  elapsed_slots = block_slot - channel.tip_slot
+  if elapsed_slots >= channel.posting_timeout && channel.posting_timeout != 0:
+    # Get the number of sequencers that get timed out
+    sequencers_timed_out = elapsed_slots // channel.posting_timeout
+    index = (channel.tip_sequencer + sequencers_timed_out)
+      % len(channel.accredited_keys)
+    starting_slot = channel.tip_slot
+      + sequencers_timed_out * channel.posting_timeout
+  else:
+    # Get the number of timeframes elapsed to get who is the sequencer
+    tip_sequencer_duration = block_slot - channel.tip_sequencer_starting_slot
+    index = (channel.tip_sequencer
+      + (tip_sequencer_duration // channel.posting_timeframe))
+      % len(channel.accredited_keys)
+    starting_slot = channel.tip_sequencer_starting_slot
+      + (tip_sequencer_duration // channel.posting_timeframe)
+      * channel.posting_timeframe
+  return (index, starting_slot)
 ```
 
 ### CHANNEL_INSCRIBE
@@ -302,10 +302,10 @@ Write a message to a channel with the message data being permanently stored on t
 
 ```python
 class Inscribe:
-    channel: ChannelId       # 32 bytes Channel being written to
-    inscription : bytes      # Message to be written on the blockchain
-    parent: hash             # Previous message in the channel
-    signer: Ed25519PublicKey # Identity of message sender
+  channel: ChannelId       # 32 bytes Channel being written to
+  inscription : bytes      # Message to be written on the blockchain
+  parent: hash             # Previous message in the channel
+  signer: Ed25519PublicKey # Identity of message sender
 ```
 
 **Proof**
@@ -335,18 +335,18 @@ block_slot: Slot
 
 ```python
 if msg.channel in channels:
-        chan = channels[msg.channel]
-        current_sequencer_index = round_robin(block_slot, chan)[0]
+  chan = channels[msg.channel]
+  current_sequencer_index = round_robin(block_slot, chan)[0]
 
-        # Ensure the signer is the one authorized to write to the channel
-        assert msg.signer == chan.accredited_keys[current_sequencer_index]
+  # Ensure the signer is the one authorized to write to the channel
+  assert msg.signer == chan.accredited_keys[current_sequencer_index]
 
-        # Ensure message is continuing the channel sequence
-        assert msg.parent == chan.tip_hash
+  # Ensure message is continuing the channel sequence
+  assert msg.parent == chan.tip_hash
 else:
-        # Channel will be created automatically upon execution
-        # Ensure that this message is the genesis message (parent == ZERO)
-        assert msg.parent == ZERO
+  # Channel will be created automatically upon execution
+  # Ensure that this message is the genesis message (parent == ZERO)
+  assert msg.parent == ZERO
 
 # Ensure the msg signer signature
 assert Ed25519_verify(txhash, msg.signer, sig)
@@ -369,7 +369,7 @@ block_slot: Slot
   1. If the channel does not exist, create it just-in-time.
       ```python
       if msg.channel is not in channels
-          channels[msg.channel] = default_channel(block_slot, [msg.signer])
+        channels[msg.channel] = default_channel(block_slot, [msg.signer])
       ```
 
   2. Update the channel sequencer.
@@ -393,10 +393,10 @@ block_slot: Slot
 ```python
 # Build the inscription
 greeting = Inscription(
-    channel=CHANNEL_EARTH,
-    inscription=b"Live long and prosper",
-    parent=ZERO
-    signer=spock_pk
+  channel=CHANNEL_EARTH,
+  inscription=b"Live long and prosper",
+  parent=ZERO
+  signer=spock_pk
 )
 
 # Build the transfer operation to pay the fees
@@ -404,15 +404,15 @@ transfer = Transfer(inputs=[<spocks_note_id>], outputs=[<change_note>])
 
 # Wrap it in a transaction
 tx = MantleTx(
-    ops=[Op(opcode=CHANNEL_INSCRIBE, payload=encode(greeting)),
-         Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=CHANNEL_INSCRIBE, payload=encode(greeting)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 # Sign the transaction
 signed_tx = SignedMantleTx(
-    tx=tx,
-    op_proofs=[Ed25519_sign(mantle_txhash(tx), spock_sk),
-               transfer.prove(spock_sk)]
+  tx=tx,
+  op_proofs=[Ed25519_sign(mantle_txhash(tx), spock_sk),
+             transfer.prove(spock_sk)]
 )
 
 # Send the transaction to the mempool
@@ -427,22 +427,22 @@ Overwrite the configuration of a channel.
 
 ```python
 class ChannelConfig:
-    channel: ChannelId
-    keys: list[Ed25519PublicKey]
-    posting_timeframe: u32
-    posting_timeout: u32
-    configuration_threshold: u16
-    withdraw_threshold: u16
+  channel: ChannelId
+  keys: list[Ed25519PublicKey]
+  posting_timeframe: u32
+  posting_timeout: u32
+  configuration_threshold: u16
+  withdraw_threshold: u16
 ```
 
 **Proof**
 
 ```python
 class ChannelConfigOpProof:
-        signatures: list[Ed25519Signature] # signatures from configuration_threshold
-        indexes: list[u16]  # signatures of accredited keys with their index.
-                            # indexes must be ordered from smallest to
-                            # biggest without duplication
+  signatures: list[Ed25519Signature] # signatures from configuration_threshold
+  indexes: list[u16]  # signatures of accredited keys with their index.
+                      # indexes must be ordered from smallest to
+                      # biggest without duplication
 ```
 
 **Execution Gas**
@@ -470,15 +470,15 @@ assert len(config.keys) > 0
 assert len(config.keys) < 2^16
 
 if config.channel in channels:
-        chan = channels[config.channel]
-        # Check there are enough signatures
-        assert len(proof.signatures) == chan.configuration_threshold
-        # Check that indexes are ordered to avoid duplication
-        for i in range(len(proof.indexes)-1):
-                assert proof.indexes[i] < proof.indexes[i+1]
-        for sig, idx in zip(proof.signatures, proof.indexes):
-                # and at the same time that chan.accredited_keys[idx] isn't out of bound
-                assert Ed25519_verify(txhash, chan.accredited_keys[idx], sig)
+  chan = channels[config.channel]
+  # Check there are enough signatures
+  assert len(proof.signatures) == chan.configuration_threshold
+  # Check that indexes are ordered to avoid duplication
+  for i in range(len(proof.indexes)-1):
+    assert proof.indexes[i] < proof.indexes[i+1]
+  for sig, idx in zip(proof.signatures, proof.indexes):
+    # and at the same time that chan.accredited_keys[idx] isn't out of bound
+    assert Ed25519_verify(txhash, chan.accredited_keys[idx], sig)
 ```
 
 **Execution**
@@ -498,7 +498,7 @@ block_slot: Slot
 
       ```python
       if config.channel not in channels:
-              channels[config.channel] = default_channel(block_slot, config.keys)
+        channels[config.channel] = default_channel(block_slot, config.keys)
       ```
 
   2. Update the configuration.
@@ -550,14 +550,14 @@ config = ChannelConfig(
 transfer = Transfer(inputs=[old_sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
-    ops=[Op(opcode=CHANNEL_CONFIG, payload=encode(config)),
-         Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=CHANNEL_CONFIG, payload=encode(config)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
-    tx=tx,
-    op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
-               transfer.prove(old_sequencer_sk)]
+  tx=tx,
+  op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
+             transfer.prove(old_sequencer_sk)]
 )
 ```
 
@@ -569,9 +569,9 @@ Deposit funds to a channel, reducing the Mantle Transaction balance.
 
 ```python
 class ChannelDeposit:
-      channel: ChannelId
-      inputs: list[NoteId]  # the list of consumed note identifiers
-      metadata: bytes
+  channel: ChannelId
+  inputs: list[NoteId]  # the list of consumed note identifiers
+  metadata: bytes
 ```
 
 **Proof**
@@ -641,7 +641,7 @@ ledger: Ledger
   2. Increase the balance of the channel
       ```python
       for inp in deposit.inputs:
-              channels[deposit.channel].balance += inp.value
+        channels[deposit.channel].balance += inp.value
       ```
 
 **Example**
@@ -651,9 +651,9 @@ ledger: Ledger
 ```python
 # Alice encodes her deposit
 deposit = ChannelDeposit(
-        channel=ZONE_A,
-        inputs=[alice_deposit_note_id]    # This is a note of 50 tokens
-        metadata=b"deposit to address: 0x..."
+  channel=ZONE_A,
+  inputs=[alice_deposit_note_id]    # This is a note of 50 tokens
+  metadata=b"deposit to address: 0x..."
 )
 
 # Build the transfer operation to pay the fees
@@ -661,13 +661,13 @@ transfer = Transfer(inputs=[Alice_funds], outputs=[<change_note>])
 
 
 tx = MantleTx(
-        ops=[Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
-             Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
-        tx=tx,
-        op_proofs=[transfer.prove(Alice_sk)],
+  tx=tx,
+  op_proofs=[transfer.prove(Alice_sk)],
 )
 ```
 
@@ -681,19 +681,19 @@ Withdraw funds from a channel, increasing the Mantle Transaction balance.
 
 ```python
 class ChannelWithdraw:
-      channel: ChannelId
-      outputs: list[Note]
-      op_id_nonce: u32
+  channel: ChannelId
+  outputs: list[Note]
+  op_id_nonce: u32
 ```
 
 **Proof**
 
 ```python
 class ChannelWithdrawOpProof:
-      signatures: list[Ed25519Signature] # signature from withdraw_threshold keys
-      indexes: list[int]    # signatures of accredited keys with their index
-                            # indexes must be ordered from smallest to
-                            # biggest without duplication
+  signatures: list[Ed25519Signature] # signature from withdraw_threshold keys
+  indexes: list[int]    # signatures of accredited keys with their index
+                        # indexes must be ordered from smallest to
+                        # biggest without duplication
 ```
 
 **Execution Gas**
@@ -750,10 +750,10 @@ ledger: Ledger
   7. Check the signatures
       ```python
       for sig, idx in zip(proof.signatures, proof.indexes):
-          assert Ed25519_verify(
-            txhash,
-            channels[withdrawal.channel].accredited_keys[idx],
-            sig)
+        assert Ed25519_verify(
+          txhash,
+          channels[withdrawal.channel].accredited_keys[idx],
+          sig)
       ```
 
 **Execution**
@@ -772,7 +772,7 @@ ledger: Ledger
   1. Decrease the balance of the Channel
       ```python
       for output in withdrawal.outputs:
-              channels[withdrawal.channel].balance -= output.value
+        channels[withdrawal.channel].balance -= output.value
       ```
 
   2. Add outputs to the ledger.
@@ -793,22 +793,22 @@ ledger: Ledger
 ```python
 # Sequencer encodes his withdrawal
 withdrawal = ChannelWithdraw(
-        channel=ZONE_A,
-        outputs = [Note(pk=alice, value=50)]
+  channel=ZONE_A,
+  outputs = [Note(pk=alice, value=50)]
 )
 
 # Build the transfer operation to pay the fees
 transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
-        ops=[Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
-             Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 signed_tx = SignedMantleTx(
-        tx=tx,
-        op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
-                             transfer.prove(Sequencer_node_sk)],
+  tx=tx,
+  op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
+             transfer.prove(Sequencer_node_sk)],
 )
 ```
 
@@ -823,39 +823,39 @@ locked_notes: dict[NoteID, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 
 class LockedNote:
-    declarations: set[DeclarationID]
+  declarations: set[DeclarationID]
 ```
 
 ### Common SDP Structures
 
 ```python
 class ServiceType(Enum):
-    BN="BN" # Blend Network
+  BN="BN" # Blend Network
 
 class Locator(str):
-    def validate(self):
-        assert len(self) <= 329
-        assert validate_multiaddr(self)
+  def validate(self):
+    assert len(self) <= 329
+    assert validate_multiaddr(self)
 
 class MinStake:
-    stake_threshold: int # stake value
-    epoch: EpochNumber # epoch number
+  stake_threshold: int # stake value
+  epoch: EpochNumber # epoch number
 
 class ServiceParameters:
-    inactivity_period: NumberOfEpochs # number of epochs
-    epoch: EpochNumber                # epoch number at which the Service Parameters were set
+  inactivity_period: NumberOfEpochs # number of epochs
+  epoch: EpochNumber                # epoch number at which the Service Parameters were set
 
 class DeclarationInfo:
-    service: ServiceType
-    locators: list[Locator]
-    provider_id: Ed25519PublicKey
-    zk_id: ZkPublicKey
-    locked_note_id: NoteId
-    created: EpochNumber
-    active: EpochNumber
-    withdraw_at: EpochNumber
-    # SDP ops updating a declaration must use monotonically increasing nonces
-    nonce: int
+  service: ServiceType
+  locators: list[Locator]
+  provider_id: Ed25519PublicKey
+  zk_id: ZkPublicKey
+  locked_note_id: NoteId
+  created: EpochNumber
+  active: EpochNumber
+  withdraw_at: EpochNumber
+  # SDP ops updating a declaration must use monotonically increasing nonces
+  nonce: int
 ```
 
 ### SDP_DECLARE
@@ -866,11 +866,11 @@ The service registration follows the definition given in [**Declaration Message*
 
 ```python
 class DeclarationMessage:
-    service_type: ServiceType
-    locators: list[Locator]
-    provider_id: Ed25519PublicKey
-    zk_id: ZkPublicKey
-    locked_note_id: NoteId
+  service_type: ServiceType
+  locators: list[Locator]
+  provider_id: Ed25519PublicKey
+  zk_id: ZkPublicKey
+  locked_note_id: NoteId
 ```
 
 Locked notes are introduced in [Locked notes](#locked-notes) and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).
@@ -879,9 +879,9 @@ Locked notes are introduced in [Locked notes](#locked-notes) and serve as Servic
 
 ```python
 class DeclarationProof:
-      zk_sig: ZkSignature             # signature proving ownership over
-                                      # locked note and zk_id
-      provider_sig: Ed25519Signature  # signature proving ownership of provider key
+  zk_sig: ZkSignature             # signature proving ownership over
+                                  # locked note and zk_id
+  provider_sig: Ed25519Signature  # signature proving ownership of provider key
 ```
 
   see: [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
@@ -938,9 +938,9 @@ declarations: dict[NoteId, DeclarationInfo]
   5. Ensure the note has not already been locked for this service.
       ```python
       if declaration.locked_note in locked_notes:
-          locked_note = locked_notes[declaration.locked_note]
-          services = [declarations[declare_id] for declare_id in locked_note.declarations]
-          assert declaration.service_type not in services
+        locked_note = locked_notes[declaration.locked_note]
+        services = [declarations[declare_id] for declare_id in locked_note.declarations]
+        assert declaration.service_type not in services
       ```
 
 **Execution**
@@ -958,8 +958,8 @@ locked_notes : dict[NoteId, LockedNote]
   1. Create the locked note state if it doesn't already exist.
       ```python
       if declaration.locked_note not in locked_notes:
-          locked_notes[declaration.locked_note_id] = \
-              LockedNote(declarations=set())
+        locked_notes[declaration.locked_note_id] = \
+          LockedNote(declarations=set())
 
       locked_note = locked_notes[declaration.locked_note_id]
       ```
@@ -973,16 +973,16 @@ locked_notes : dict[NoteId, LockedNote]
   3. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
       ```python
       declarations[declare_id] = DeclarationInfo(
-          service: declaration.service
-          locators: declaration.locators
-          provider_id: declaration.provider_id
-          zk_id: declaration.zk_id
-          locked_note_id: declaration.locked_note_id
-          declaration,
-          created=current_epoch,
-          active=None,
-          withdraw_at=None
-          nonce=0
+        service: declaration.service
+        locators: declaration.locators
+        provider_id: declaration.provider_id
+        zk_id: declaration.zk_id
+        locked_note_id: declaration.locked_note_id
+        declaration,
+        created=current_epoch,
+        active=None,
+        withdraw_at=None
+        nonce=0
       )
       ```
 
@@ -991,18 +991,18 @@ locked_notes : dict[NoteId, LockedNote]
 ```python
 # Assume `alice_note` is in the ledger:
 alice_note = Utxo(
-    txhash=0x2948904F2F0F479B8F8197694B30184B0D2ED1C1CD2A1EC0FB85D299A192A447,
-    output_number=3,
-    note=Note(value=500, public_key=alice_pk_1),
+  txhash=0x2948904F2F0F479B8F8197694B30184B0D2ED1C1CD2A1EC0FB85D299A192A447,
+  output_number=3,
+  note=Note(value=500, public_key=alice_pk_1),
 )
 
 # Alice wishes to lock it to join the Blend network
 declaration=DeclarationMessage(
-    service_type=ServiceType.BN,
-    locators=["/ip4/203.0.113.10/tcp/4001/p2p"],
-    provider_id=alice_provider_pk,
-    zk_id=alice_pk_2,
-    locked_note_id=alice_note.id()
+  service_type=ServiceType.BN,
+  locators=["/ip4/203.0.113.10/tcp/4001/p2p"],
+  provider_id=alice_provider_pk,
+  zk_id=alice_pk_2,
+  locked_note_id=alice_note.id()
 )
 
 # Build the transfer operation to pay the fees
@@ -1010,21 +1010,21 @@ transfer = Transfer(inputs=[fee_note_id], outputs=[])
 
 
 tx = MantleTx(
-    ops=[Op(opcode=SDP_DECLARE, payload=encode(declaration)),
-         Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=SDP_DECLARE, payload=encode(declaration)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 txhash = mantle_txhash(tx)
 
 declaration_proof = DeclarationProof(
-    # proof of ownership of the staked note and zk_id
-    zk_sig=ZkSignature([alice_sk_1, alice_sk_2], txhash),
-    # proof of ownership of the provider id
-    provider_sig=Ed25519Signature(alice_provider_sk, txhash),
+  # proof of ownership of the staked note and zk_id
+  zk_sig=ZkSignature([alice_sk_1, alice_sk_2], txhash),
+  # proof of ownership of the provider id
+  provider_sig=Ed25519Signature(alice_provider_sk, txhash),
 )
 
 SignedMantleTx(
-    tx=tx,
-    op_proofs=[declaration_proof, transfer.prove(alice_sk_1)],
+  tx=tx,
+  op_proofs=[declaration_proof, transfer.prove(alice_sk_1)],
 )
 ```
 
@@ -1036,9 +1036,9 @@ The service withdrawal follows the definition given in [Withdraw Message](bedroc
 
 ```python
 class WithdrawMessage:
-    declaration: DeclarationID
-    locked_note_id: NoteId
-    nonce: int
+  declaration: DeclarationID
+  locked_note_id: NoteId
+  nonce: int
 ```
 
 **Proof**
@@ -1134,9 +1134,9 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
 ```python
 withdraw=Withdraw(
-    declaration=alice_declaration_id,
-    locked_note_id=alices_locked_note_id
-    nonce=1579532
+  declaration=alice_declaration_id,
+  locked_note_id=alices_locked_note_id
+  nonce=1579532
 )
 
 # Build the transfer operation to pay the fees
@@ -1144,15 +1144,15 @@ transfer = Transfer(inputs=[alices_locked_note_id],
                     outputs=[Note(100, alice_note_pk)])
 
 tx = MantleTx(
-    ops=[Op(opcode=SDP_WITHDRAW, payload=encode(withdraw)),
-         Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=SDP_WITHDRAW, payload=encode(withdraw)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 SignedMantleTx(
-    tx=tx,
-    # proof ownership of the withdrawn note and zk id
-    op_proofs=[ZkSignature_sign([alice_note_sk, alice_sk], mantle_txhash(tx)),
-                         transfer.prove(alice_sk)]
+  tx=tx,
+  # proof ownership of the withdrawn note and zk id
+  op_proofs=[ZkSignature_sign([alice_note_sk, alice_sk], mantle_txhash(tx)),
+             transfer.prove(alice_sk)]
 )
 ```
 
@@ -1197,7 +1197,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
   3. Unlock the note once it is no longer bound to any declaration.
       ```python
       if len(locked_note.declarations) == 0:
-          del locked_notes[declare_info.locked_note_id]
+        del locked_notes[declare_info.locked_note_id]
       ```
 
 ### SDP_ACTIVE
@@ -1209,8 +1209,8 @@ The service active action follows the definition given in [Active Message](bedro
 ```python
 class Active:
   declaration: DeclarationID
-    nonce: int
-    metadata: bytes # a service-specific node activeness metadata
+  nonce: int
+  metadata: bytes # a service-specific node activeness metadata
 ```
 
 **Proof**
@@ -1254,22 +1254,22 @@ assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
 
 ```python
 active=Active(
-        declaration=alice_declaration_id,
-    nonce=1579532,
-    metadata=b"Look, I am still doing my job"
+  declaration=alice_declaration_id,
+  nonce=1579532,
+  metadata=b"Look, I am still doing my job"
 )
 
 # Build the transfer operation to pay the fees
 transfer = Transfer(inputs=[fee_note_id], outputs=[])
 
 tx = MantleTx(
-    ops=[Op(opcode=SDP_ACTIVE, payload=encode(active))],
+  ops=[Op(opcode=SDP_ACTIVE, payload=encode(active))],
 )
 txhash = mantle_txhash(tx)
 
 SignedMantleTx(
-    tx=tx,
-    op_proofs=[Ed25519_sign(txhash, validator_sk), transfer.prove(fee_note_sk)]
+  tx=tx,
+  op_proofs=[Ed25519_sign(txhash, validator_sk), transfer.prove(fee_note_sk)]
 )
 ```
 
@@ -1283,9 +1283,9 @@ This Operation claims the leader's block reward anonymously.
 
 ```python
 class ClaimRequest:
-    rewards_root: zkhash # Merkle root used in the proof for voucher membership
-    voucher_nf: zkhash
-    public_key: ZkPublicKey
+  rewards_root: zkhash # Merkle root used in the proof for voucher membership
+  voucher_nf: zkhash
+  public_key: ZkPublicKey
 ```
 
 **Proof**
@@ -1336,8 +1336,8 @@ leader_reward: TokenValue     # The amount one leader can claim
   2. Denoting by `leader_reward` the amount defined for leader rewards in [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
       ```python
       output_note=Note(
-              value = leader_reward
-              public_key = claim.public_key,
+        value = leader_reward
+        public_key = claim.public_key,
       )
       claim_id = derive_op_id(claim)
       ledger.execute_adding(claim_id, [output_note])
@@ -1353,28 +1353,28 @@ reward_voucher = leader_claim_voucher(secret_voucher)
 voucher_nullifier = leader_claim_nullifier(secret_voucher)
 
 claim=ClaimRequest(
-    rewards_root=REWARDS_MERKLE_TREE.root(),
-    voucher_nf=voucher_nullifier,
-    public_key=leader_one_time_key
+  rewards_root=REWARDS_MERKLE_TREE.root(),
+  voucher_nf=voucher_nullifier,
+  public_key=leader_one_time_key
 )
 
 # Build the transfer operation to pay the fees
 transfer = Transfer(inputs=[<fee_note>], outputs=[<change_note>])
 
 tx = MantleTx(
-    ops=[Op(opcode=LEADER_CLAIM, payload=encode(claim)),
-               Op(opcode=TRANSFER, payload=encode(transfer)],
+  ops=[Op(opcode=LEADER_CLAIM, payload=encode(claim)),
+       Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
 claim_proof = claim.prove(
-    secret_voucher,
-    REWARDS_MERKLE_TREE.path(leaf=reward_voucher),
-    mantle_txhash(tx)
+  secret_voucher,
+  REWARDS_MERKLE_TREE.path(leaf=reward_voucher),
+  mantle_txhash(tx)
 )
 
 SignedMantleTx(
-    tx=tx,
-    op_proofs=[claim_proof, transfer.prove(fee_note_sk)]
+  tx=tx,
+  op_proofs=[claim_proof, transfer.prove(fee_note_sk)]
 )
 ```
 
@@ -1388,9 +1388,9 @@ Transactions allow complete transaction linkability and the public key spending 
 
 ```python
 class Transfer:
-      inputs: list[NoteId]  # the list of consumed note identifiers
-                            # must be non-empty
-      outputs: list[Note]
+  inputs: list[NoteId]  # the list of consumed note identifiers
+                        # must be non-empty
+  outputs: list[Note]
 ```
 
 **Proof**
@@ -1470,13 +1470,13 @@ ledger: Ledger
 ```python
 alice_note_id = ... # assume Alice holds a note worth 501 tokens
 bob_note=Note(
-        value=500
-        public_key=bob_pk,
+  value=500
+  public_key=bob_pk,
 )
 
 transfer = Transfer(
-        inputs=[alice_note_id],
-        outputs=[bob_note],
+  inputs=[alice_note_id],
+  outputs=[bob_note],
 )
 ```
 
@@ -1488,8 +1488,8 @@ Notes are composed of two fields representing their value and their owner:
 
 ```python
 class Note:
-    value: TokenValue   # u64
-    public_key: ZkPublicKey # 32 bytes
+  value: TokenValue   # u64
+  public_key: ZkPublicKey # 32 bytes
 ```
 
 ### Note Id
@@ -1498,20 +1498,20 @@ A note can be uniquely identified by the Operation that created it and its outpu
 
 ```python
 def derive_op_id(operation: Op) -> Hash:
-    op_bytes = encode(op)
-    h = Hasher() # /!\ This is a classic hash not a zkhash /!\
-    h.update(b"OPERATION_ID_V1")
-    h.update(op_bytes)
-    return h.digest()
+  op_bytes = encode(op)
+  h = Hasher() # /!\ This is a classic hash not a zkhash /!\
+  h.update(b"OPERATION_ID_V1")
+  h.update(op_bytes)
+  return h.digest()
 
 def derive_note_id(op_id: Hash, output_number: int, note: Note) -> NoteId:
-      return zkhash(
-          FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
-          FiniteField(op_id, byte_order="little", modulus= p),
-          FiniteField(output_number, byte_order="little", modulus= p),
-          FiniteField(note.value, byte_order="little", modulus= p),
-          note.public_key
-      )
+  return zkhash(
+    FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
+    FiniteField(op_id, byte_order="little", modulus= p),
+    FiniteField(output_number, byte_order="little", modulus= p),
+    FiniteField(note.value, byte_order="little", modulus= p),
+    note.public_key
+  )
 ```
 
 `op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $`p \approx2^{-254}`$, the reduction is slightly non-uniform, values in $`[0, 2^{256} \mod p)`$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $`2^{-254}`$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $`𝔽_p`$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
@@ -1526,8 +1526,8 @@ Locked notes are special notes in Mantle that serve as collateral for Service De
 
 ```python
 class Ledger:
-      notes: list[Note]
-      locked_notes: dict[NoteId, LockedNote]
+  notes: list[Note]
+  locked_notes: dict[NoteId, LockedNote]
 ```
 
 ### Input Notes Spendability Validation
@@ -1536,14 +1536,14 @@ A note is spendable if and only if it exists, it is not spent or locked. The fol
 
 ```python
 class Ledger:
-    def assert_spendable(inputs: list[NoteId]):
-        ## Check there is no duplicate
-        assert len(inputs) == len(set(inputs))
+  def assert_spendable(inputs: list[NoteId]):
+    ## Check there is no duplicate
+    assert len(inputs) == len(set(inputs))
 
-        # Check that each note is individually not locked and unspent
-        for note_id in inputs:
-            assert ledger.is_unspent(note_id)
-            assert note_id not in locked_notes
+    # Check that each note is individually not locked and unspent
+    for note_id in inputs:
+      assert ledger.is_unspent(note_id)
+      assert note_id not in locked_notes
 ```
 
 ### Output Notes Validation
@@ -1552,10 +1552,10 @@ Before an output of notes can be inserted into the Ledger, every note field must
 
 ```python
 class Ledger:
-      def assert_valid_output(outputs: list[Note]):
-          for note in outputs:
-              assert note.value > 0
-              assert note.value <= 2**64-1
+  def assert_valid_output(outputs: list[Note]):
+    for note in outputs:
+      assert note.value > 0
+      assert note.value <= 2**64-1
 ```
 
 ### Consuming Input Notes Execution
@@ -1564,11 +1564,11 @@ Consuming a set of notes removes them from the Ledger’s Merkle tree and recycl
 
 ```python
 class Ledger:
-      def execute_spending(inputs: list[NoteId]):
-          for note_id in inputs:
-              # updates the merkle tree to zero out the leaf for this entry
-              # and adds that leaf index to the list of unused leaves
-              ledger.remove(note_id)
+  def execute_spending(inputs: list[NoteId]):
+    for note_id in inputs:
+      # updates the merkle tree to zero out the leaf for this entry
+      # and adds that leaf index to the list of unused leaves
+      ledger.remove(note_id)
 ```
 
 ### Creating Output Notes Execution
@@ -1577,10 +1577,10 @@ Creating notes derives their `NoteId` from the Operation’s `OpId` and insert t
 
 ```python
 class Ledger:
-      def execute_adding(op_id: Hash, outputs: list[Note]):
-          for (output_index, output_note) in enumerate(outputs):
-              output_note_id = derive_note_id(op_id, output_index, output_note)
-              ledger.add(output_note_id)
+  def execute_adding(op_id: Hash, outputs: list[Note]):
+    for (output_index, output_note) in enumerate(outputs):
+      output_note_id = derive_note_id(op_id, output_index, output_note)
+      ledger.add(output_note_id)
 ```
 
 # Appendix
@@ -1607,16 +1607,16 @@ A proof attesting that for the following public values:
 
 ```python
 class ZkSignaturePublic:
-    public_keys: list[ZkPublicKey] # public keys signing the message (len = 32)
-    msg: zkhash # a finite field element uniquely representing the message
+  public_keys: list[ZkPublicKey] # public keys signing the message (len = 32)
+  msg: zkhash # a finite field element uniquely representing the message
 ```
 
 The prover knows a witness:
 
 ```python
 class ZkSignatureWitness:
-    # The list of secret keys used to signed the message
-    secret_keys: list[ZkSecretKey] # (len = 32)
+  # The list of secret keys used to signed the message
+  secret_keys: list[ZkSecretKey] # (len = 32)
 ```
 
 Such that the following constraints hold:
@@ -1656,18 +1656,18 @@ A proof attesting that given these public values:
 
 ```python
 class ProofOfClaimPublic:
-    voucher_root: zkhash # Merkle root of the reward_voucher maintained by everyone
-    voucher_nullifier: zkhash
-    mantle_tx_hash_fr: zkhash # attached hash reduced modulo p
+  voucher_root: zkhash # Merkle root of the reward_voucher maintained by everyone
+  voucher_nullifier: zkhash
+  mantle_tx_hash_fr: zkhash # attached hash reduced modulo p
 ```
 
 The prover knows the following witness:
 
 ```python
 class ProofOfClaimWitness:
-    secret_voucher: zkhash
-    voucher_merkle_path: list[zkhash]
-    voucher_merkle_path_selectors: list[bool]
+  secret_voucher: zkhash
+  voucher_merkle_path: list[zkhash]
+  voucher_merkle_path_selectors: list[bool]
 ```
 
 such that the following constraints hold:
@@ -1675,22 +1675,22 @@ such that the following constraints hold:
 - The reward voucher is derived from the secret voucher.
 ```python
 assert reward_voucher == zkhash(
-        FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
-        secret_voucher)
+  FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
+  secret_voucher)
 ```
 
 - There exists a valid Merkle path from the reward voucher as a leaf to the Merkle root.
 ```python
 assert voucher_root == path_root(leaf=reward_voucher,
-        path=voucher_merkle_path,
-        selectors=voucher_merkle_path_selectors)
+  path=voucher_merkle_path,
+  selectors=voucher_merkle_path_selectors)
 ```
 
 - The voucher nullifier is derived from the secret voucher correctly.
 ```python
 assert voucher_nullifer == zkhash(
-        FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
-        secret_voucher)
+  FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
+  secret_voucher)
 ```
 
 - The proof is bound to the `mantle_tx_hash` reduced modulo $`p`$.
