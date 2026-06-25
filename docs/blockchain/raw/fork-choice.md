@@ -66,41 +66,41 @@ Under two assumptions:
 1. A node has successfully bootstrapped and found the honest chain.
 2. Nodes see honest blocks reasonably quickly.
 
-Nodes will remain on the honest chain if they reject forks that diverge further back than $k$ blocks without further inspection. In order for an adversary to succeed, they would need to build a $k$-deep chain faster than the time it takes the honest nodes to grow the honest chain by $k$ blocks. The adversary must build this chain live, alongside the honest chain. They cannot build this chain after-the-fact since online nodes will be rejecting any fork that diverges before their $k$-deep block.
+Nodes will remain on the honest chain if they reject forks that diverge further back than $`k`$ blocks without further inspection. In order for an adversary to succeed, they would need to build a $`k`$-deep chain faster than the time it takes the honest nodes to grow the honest chain by $`k`$ blocks. The adversary must build this chain live, alongside the honest chain. They cannot build this chain after-the-fact since online nodes will be rejecting any fork that diverges before their $`k`$-deep block.
 
 # Protocol
 
 ## Definitions
 
-- $k$ : safety parameter, i.e. the depth at which a block is considered immutable
-- $s_{gen}$ : sufficient time measured in slots to measure the density of block production with enough statistical significance.
-  *In practice, we say* $s_{gen} = \lfloor\frac{k}{4f}\rfloor$*, where* $f$ *is the active slot coefficient from the leader lottery. (see* [Theorem 2 of Badertscher et al., 2018 “Ouroboros Genesis”](https://eprint.iacr.org/2018/378.pdf)*)*
+- $`k`$ : safety parameter, i.e. the depth at which a block is considered immutable
+- $`s_{gen}`$ : sufficient time measured in slots to measure the density of block production with enough statistical significance.
+  *In practice, we say* $`s_{gen} = \lfloor\frac{k}{4f}\rfloor`$*, where* $`f`$ *is the active slot coefficient from the leader lottery. (see* [Theorem 2 of Badertscher et al., 2018 “Ouroboros Genesis”](https://eprint.iacr.org/2018/378.pdf)*)*
 
-- $\textbf{common\_prefix\_depth}(b_1, b_2) \to (\mathbb{N},\mathbb{N})$
+- $`\textbf{common\_prefix\_depth}(b_1, b_2) \to (\mathbb{N},\mathbb{N})`$
   *Returns the minimum block depth at which the two branches converge to a common chain.*
 
   Examples:
 
-    1. $\textbf{common\_prefix\_depth}(b_1, b_2) = (0, 4)$ implies that $b_2$ is ahead of $b_1$ by 4 blocks
-      i.e. $4^{th}\text{-grandparent}(b_2)=b_1$
+    1. $`\textbf{common\_prefix\_depth}(b_1, b_2) = (0, 4)`$ implies that $`b_2`$ is ahead of $`b_1`$ by 4 blocks
+      i.e. $`4^{th}\text{-grandparent}(b_2)=b_1`$
 
   ![Diagram](fork-choice/assets/21b261aa-09df-8127-b31d-e4d33743d675.png)
     
-    2. $\textbf{common\_prefix\_depth}(b_2, b_5) = (2, 3)$ would represent a forking tree like the one illustrated below
+    2. $`\textbf{common\_prefix\_depth}(b_2, b_5) = (2, 3)`$ would represent a forking tree like the one illustrated below
   $$
   2^{nd}\text{-grandparent}(b_2)=3^{rd}\text{-grandparent}(b_5)
   $$
 
   ![Diagram](fork-choice/assets/21b261aa-09df-8128-a35a-d2f0affc2031.png)
 
-- $\textbf{density}(b_i, d, s_{gen})$
-  *Returns the number of blocks produced in the* $s$ slots following block $b_{i-d}$.
+- $`\textbf{density}(b_i, d, s_{gen})`$
+  *Returns the number of blocks produced in the* $`s`$ slots following block $`b_{i-d}`$.
 
-  For example, in the following diagram, count the number of blocks produced in the $s_{gen}$ slots of the highlighted area.
+  For example, in the following diagram, count the number of blocks produced in the $`s_{gen}`$ slots of the highlighted area.
 
 ![Diagram](fork-choice/assets/21b261aa-09df-81b3-a43c-d884eae8fce7.png)
 
-> <sub>We look backwards starting from $b_i$, looking at the $d^{th}$ grandparent of $b_i$. We denote this block $b_{i-d}^{sl_t}$ and note that it was created in slot $sl_t$. The density calculation considers the number of blocks created in the next $s_{gen}$ slots. The last block in this interval is $b_{i-d+j}^{sl\le t+s_{gen}}$, that is, its the last block who’s slot number is less than or equal to $s$ slots after $sl_t$.</sub>
+> <sub>We look backwards starting from $`b_i`$, looking at the $`d^{th}`$ grandparent of $`b_i`$. We denote this block $`b_{i-d}^{sl_t}`$ and note that it was created in slot $`sl_t`$. The density calculation considers the number of blocks created in the next $`s_{gen}`$ slots. The last block in this interval is $`b_{i-d+j}^{sl\le t+s_{gen}}`$, that is, its the last block who’s slot number is less than or equal to $`s`$ slots after $`sl_t`$.</sub>
 
 ## Bootstrap Fork Choice Rule
 
@@ -128,7 +128,7 @@ def bootstrap_fork_choice(c_local, forks, k, s_gen):
 
 ## Online Fork Choice Rule
 
-During normal operations, we use the Ouroboros Praos fork choice rule (`maxvalid-mc`). Here we reject any forks that diverge further back than $k$ blocks.
+During normal operations, we use the Ouroboros Praos fork choice rule (`maxvalid-mc`). Here we reject any forks that diverge further back than $`k`$ blocks.
 
 ```python
 def online_fork_choice(c_local, forks, k):

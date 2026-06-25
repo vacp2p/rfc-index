@@ -109,7 +109,7 @@ The identification number of the program that can operate on this account's data
 
 ### Balance field
 
-The number of native tokens held by the account. It's represented as a 128-bit number. That means, the total supply of the system should never exceed $2^{128} - 1$. As long as that is guaranteed, transfer operations on the balance will not overflow. This is because under normal transfer operations, no account can end up with a balance greater than the total supply of the system. LEE prevents overflow exploits on the balance field by upcasting each term to u256 when computing the total balances before and after an execution.
+The number of native tokens held by the account. It's represented as a 128-bit number. That means, the total supply of the system should never exceed $`2^{128} - 1`$. As long as that is guaranteed, transfer operations on the balance will not overflow. This is because under normal transfer operations, no account can end up with a balance greater than the total supply of the system. LEE prevents overflow exploits on the balance field by upcasting each term to u256 when computing the total balances before and after an execution.
 
 ### Data field
 
@@ -208,7 +208,7 @@ $$
 \mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PrivateAccountIdPrefix} \;||\; \mathsf{Npk} \;||\; \mathsf{identifierLe})
 $$
 
-The hash input is 80 bytes: 32-byte prefix + 32-byte `Npk` + 16-byte little-endian `identifier`. Each `(Npk, identifier)` pair yields a distinct account ID, so the same set of private account keys can be reused across up to $2^{128}$ independent private accounts. One per `identifier` value.
+The hash input is 80 bytes: 32-byte prefix + 32-byte `Npk` + 16-byte little-endian `identifier`. Each `(Npk, identifier)` pair yields a distinct account ID, so the same set of private account keys can be reused across up to $`2^{128}`$ independent private accounts. One per `identifier` value.
 
 ```rust
 /// ASCII "/LEE/v0.3/AccountId/Private/" zero-padded to 32 bytes
@@ -246,7 +246,7 @@ $$
 \mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PrivatePdaPrefix} \;||\; \mathsf{programId} \;||\; \mathsf{seed} \;||\; \mathsf{Npk} \;||\; \mathsf{identifierLe})
 $$
 
-The hash input is 144 bytes: 32 + 32 + 32 + 32 + 16. Unlike public PDAs, the private PDA derivation includes `Npk` and `identifier`. This ensures two different users at the same `(program_id, seed)` get different addresses, and a single user at `(program_id, seed, Npk)` controls a family of $2^{128}$ private PDA addresses (one per identifier value).
+The hash input is 144 bytes: 32 + 32 + 32 + 32 + 16. Unlike public PDAs, the private PDA derivation includes `Npk` and `identifier`. This ensures two different users at the same `(program_id, seed)` get different addresses, and a single user at `(program_id, seed, Npk)` controls a family of $`2^{128}`$ private PDA addresses (one per identifier value).
 
 ```rust
 /// ASCII "/LEE/v0.3/AccountId/PrivatePDA/" zero-padded to 32 bytes
@@ -394,8 +394,8 @@ After decryption the receiver reconstructs the account ID from the kind:
 
 When creating a private account output, the sender generates an ephemeral secret key `esk` and the corresponding ephemeral public key `Epk = esk * G`. The shared secret is the **x-coordinate** of the ECDH result (32 bytes, not a SEC1-compressed point):
 
-- Sender: $\mathsf{ss} = x\text{-coordinate of } (\mathsf{esk} \cdot \mathsf{vpkRecipient})$
-- Receiver: $\mathsf{ss} = x\text{-coordinate of } (\mathsf{vsk} \cdot \mathsf{EpkSender})$
+- Sender: $`\mathsf{ss} = x\text{-coordinate of } (\mathsf{esk} \cdot \mathsf{vpkRecipient})`$
+- Receiver: $`\mathsf{ss} = x\text{-coordinate of } (\mathsf{vsk} \cdot \mathsf{EpkSender})`$
 
 where `vpk` is the receiver's `ViewingPublicKey` (a 33-byte SEC1-compressed secp256k1 point) and `vsk` is the corresponding viewing secret key (a secp256k1 scalar).
 

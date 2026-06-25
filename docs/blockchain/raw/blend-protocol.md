@@ -36,7 +36,7 @@ The privacy of a Proof-of-Stake (PoS) system is defined by the inability of an a
 
 While a node can be de-anonymized based on the content of its block proposals, this angle of attack is mitigated by Private Proof of Stake systems. However, a node can also be de-anonymized based on its network activity. An adversary can observe the node’s network behavior and link the node to the proposal it sends. Because a node’s relative stake correlates with its network activity in all PoS systems, observing a node’s behavior for some time enables the adversary to estimate the node’s stake. It is this network-based de-anonymization that is addressed by the Blend Protocol, allowing Logos Blockchain to achieve a truly Private PoS system.
 
-The Blend Protocol is designed as **a way to allow nodes to send block proposals that cannot be linked back to them**. The idea is to make it very difficult and costly for someone trying to figure out who sent a proposal and what stake they hold. Because the protocol spreads messages out over many nodes, it becomes even harder to attack, which enhances network privacy. The Blend Protocol increases the time to link the sender to the proposal by at least $300$ times, which **makes the stake inference highly impractical** ([Impact of the Blend Protocol on the Time to Link and Time to Infer the Stake](#impact-of-the-blend-protocol-on-the-time-to-link-and-time-to-infer-the-stake)).
+The Blend Protocol is designed as **a way to allow nodes to send block proposals that cannot be linked back to them**. The idea is to make it very difficult and costly for someone trying to figure out who sent a proposal and what stake they hold. Because the protocol spreads messages out over many nodes, it becomes even harder to attack, which enhances network privacy. The Blend Protocol increases the time to link the sender to the proposal by at least $`300`$ times, which **makes the stake inference highly impractical** ([Impact of the Blend Protocol on the Time to Link and Time to Infer the Stake](#impact-of-the-blend-protocol-on-the-time-to-link-and-time-to-infer-the-stake)).
 
 The Blend Protocol targets a specific set of requirements that differentiate it from mixnets and other general-purpose anonymous communication systems. It achieves probabilistic unlinkability in a highly decentralized environment with low bandwidth cost but high latency. It hides the sender of a block proposal, making it costly for an adversary to learn its origin with high confidence. The cost of attacking the network is high due to decentralization and the economic value of stake needed to add a single node. The protocol works well even when many nodes are involved and not much data is being sent, but it may take longer for proposals to be delivered.
 
@@ -99,7 +99,7 @@ To have a **truly privacy-preserving system, we need to apply both techniques si
 
 ## Time
 
-- *Epoch* is a period that is defined by the consensus. It lasts for $648,000$ slots, each slot lasting 1 second. A new block is proposed for each slot with a probability of $1/30$, which translates to $21,600$ blocks, as on average, every $30$ slots a single block is proposed.
+- *Epoch* is a period that is defined by the consensus. It lasts for $`648,000`$ slots, each slot lasting 1 second. A new block is proposed for each slot with a probability of $`1/30`$, which translates to $`21,600`$ blocks, as on average, every $`30`$ slots a single block is proposed.
 - *Round* is the primitive measure of time in the protocol. It defines a period during which a node can emit a new message. The definition of a round is also important for defining the message releasing logic, which handles the randomized emission delay for processed messages. In this version of the protocol, the length of the round is 1 second (an equivalent of a single slot).
 
 # Overview
@@ -146,11 +146,11 @@ At the beginning of an epoch, all core nodes retrieve a fresh set of core nodes�
 
 ### Minimal Network Size
 
-The minimal network size is $32$. This is the minimum number of nodes (unique `ProviderId`s from declarations) that must be retrieved from the SDP to consider the Blend protocol safe to use.
+The minimal network size is $`32`$. This is the minimum number of nodes (unique `ProviderId`s from declarations) that must be retrieved from the SDP to consider the Blend protocol safe to use.
 
-This minimal size of $32$ nodes allows the network to release, on average, a single message per round under the assumption of $50\%$ unresponsive nodes. With fewer nodes, the network would need to either release more messages per round or queue them. This would increase the time messages take to traverse the network, potentially compromising the safety of the consensus.
+This minimal size of $`32`$ nodes allows the network to release, on average, a single message per round under the assumption of $`50\%`$ unresponsive nodes. With fewer nodes, the network would need to either release more messages per round or queue them. This would increase the time messages take to traverse the network, potentially compromising the safety of the consensus.
 
-The calculations supporting this requirement are provided in the [Releasing](#releasing) section, where the number of $16$ nodes has been estimated without assuming any unresponsive nodes. Therefore, we have doubled that value to accommodate the potential $50\%$ unresponsive nodes.
+The calculations supporting this requirement are provided in the [Releasing](#releasing) section, where the number of $`16`$ nodes has been estimated without assuming any unresponsive nodes. Therefore, we have doubled that value to accommodate the potential $`50\%`$ unresponsive nodes.
 
 ### Fallback
 
@@ -183,17 +183,17 @@ The protocol defines two types of messages: data, and cover.
 
 A message is generated according to the following logic:
 
-1. The node generates a message payload $p$:
+1. The node generates a message payload $`p`$:
 1. The payload is a block proposal, then a data message is generated.
 2. The payload is a random number, then a cover message is generated.
 
   Both types of messages are created at random by independent processes.
 
-2. The payload $p$ is cryptographically processed as follows:
-1. $k$ core nodes are selected at random from the set retrieved by SDP,
-2. The message $m^k = E_k(...(E_2(E_1(p)))...)$ is generated, which encapsulates the payload $p$ in $k$ layers of encryption. Each $i$’th layer can be decrypted by the $i$’th node from the selected set.
+2. The payload $`p`$ is cryptographically processed as follows:
+1. $`k`$ core nodes are selected at random from the set retrieved by SDP,
+2. The message $`m^k = E_k(...(E_2(E_1(p)))...)`$ is generated, which encapsulates the payload $`p`$ in $`k`$ layers of encryption. Each $`i`$’th layer can be decrypted by the $`i`$’th node from the selected set.
 
-3. The message $m^k$ is relayed.
+3. The message $`m^k`$ is relayed.
 
 ### Relaying
 
@@ -211,13 +211,13 @@ A message is relayed according to the following logic.
 
 ### Processing
 
-1. A message $m^k$ is received by a node.
-2. **If** the node is the $k$’th node, **then**:
-1. The $m^{k-1}$ message is decapsulated from the $m^k$ message;
-2. The $m^{k-1}$ message is relayed.
+1. A message $`m^k`$ is received by a node.
+2. **If** the node is the $`k`$’th node, **then**:
+1. The $`m^{k-1}`$ message is decapsulated from the $`m^k`$ message;
+2. The $`m^{k-1}`$ message is relayed.
 
 3. **Else,** the message is discarded as the node cannot process the message. Note that the message was previously relayed according to the [Relaying](#relaying) logic.
-4. After $k-1$ decryptions, the last node can determine the type of the message by examining the payload $p$:
+4. After $`k-1`$ decryptions, the last node can determine the type of the message by examining the payload $`p`$:
 1. If the payload contains a block proposal, then it is broadcast to the entire Logos Blockchain network;
 2. Otherwise, the message is discarded.
 
@@ -256,9 +256,9 @@ We address the above motivations in the following manner:
 
   There is a subtle distinction between the broadcasting and relaying motivation logic:
 
-  - The broadcasting action is motivated by the fact that each broadcast block is contributing to the service income pool $\mathbf I$.
-  - The relaying action is motivated by a fear of losing a reward, which impacts the chances for winning a reward (node’s activity $\mathcal A$).
-  - The reward is calculated as a multiplication of both $\mathcal R=\mathcal A⋅\mathbf I$.
+  - The broadcasting action is motivated by the fact that each broadcast block is contributing to the service income pool $`\mathbf I`$.
+  - The relaying action is motivated by a fear of losing a reward, which impacts the chances for winning a reward (node’s activity $`\mathcal A`$).
+  - The reward is calculated as a multiplication of both $`\mathcal R=\mathcal A⋅\mathbf I`$.
 
   Therefore, the nuance between such a distinction is with the “direction” of the motivation. For broadcasting, it is positive (earning), and for relaying, it is negative (losing).
 
@@ -300,12 +300,12 @@ The bootstrapping defines the process of creating the network, which happens at 
         2. It identifies its neighbor using the [Neighbor Distinction Process](#neighbor-distinction-process) (NDP).
             1. The node learns that the neighbor is a core or an edge node.
             2. The neighbor learns that the node is a core node.
-            3. The node stops connecting to selected peer after reaching the maximum number of tries ($\Omega_C$ parameter: [Core Node Parameters](#core-node-parameters)). Then a new random peer is selected.
+            3. The node stops connecting to selected peer after reaching the maximum number of tries ($`\Omega_C`$ parameter: [Core Node Parameters](#core-node-parameters)). Then a new random peer is selected.
 
-    3. It repeats the above steps until it connects to the minimal core peering degree of nodes. That is, 4 according to the $\Phi_{CC}^{Min}$ parameter: [Core Node Parameters](#core-node-parameters). Both incoming and outgoing connections count toward this minimal degree.
+    3. It repeats the above steps until it connects to the minimal core peering degree of nodes. That is, 4 according to the $`\Phi_{CC}^{Min}`$ parameter: [Core Node Parameters](#core-node-parameters). Both incoming and outgoing connections count toward this minimal degree.
 4. It starts accepting incoming connections and maintaining all connections as defined in **Maintenance**.
-    1. It can maintain up to the maximum number of connections with core nodes ($\Phi_{CC}^{Max}$ parameter: [Core Node Parameters](#core-node-parameters)).  For example, a node initiates $\Phi_{CC}^{Min}=4$ connections and $\Phi_{CC}^{Max}=8$ , then it can still accept $\Phi_{CC}^{Max} - \Phi_{CC}^{Min} = 4$ connections from core nodes.
-    2. It can receive up to the maximum number of connections with edge nodes. For example, 300 or according to the $\Phi_{CE}^{Max}$ parameter: [Core Node Parameters](#core-node-parameters).
+    1. It can maintain up to the maximum number of connections with core nodes ($`\Phi_{CC}^{Max}`$ parameter: [Core Node Parameters](#core-node-parameters)).  For example, a node initiates $`\Phi_{CC}^{Min}=4`$ connections and $`\Phi_{CC}^{Max}=8`$ , then it can still accept $`\Phi_{CC}^{Max} - \Phi_{CC}^{Min} = 4`$ connections from core nodes.
+    2. It can receive up to the maximum number of connections with edge nodes. For example, 300 or according to the $`\Phi_{CE}^{Max}`$ parameter: [Core Node Parameters](#core-node-parameters).
 5. If two nodes open two connections with each other, so that both have incoming and outgoing connections to the same neighbor (core node), then:
     1. The node with the lower public key value (`provider_id` from SDP) must close the outgoing connection to the node with the higher public key value.
     2. The node with the higher public key value (`provider_id` from SDP) must close the incoming connection from the node with the lower public key value.
@@ -440,48 +440,48 @@ Every active core node receives a reward. The activity of a node is verified in 
 
 ## Notation
 
-- $\Phi_{CC}$ denotes the actual number of established connections of the core node with other core nodes;
-- $\Phi_{CE}$ denotes the actual number of connections of the core node with edge nodes;
-- $\Phi_{EC}$ denotes the actual number of connections of the edge node with core nodes;
-- $h(x)$ denotes a function that returns the number of healthy connections of a given type, where type is: $x \in \{ \Phi_{CC}, \Phi_{CE}, \Phi_{EC} \}$;
-- $\Delta_{max}$ denotes a maximal delay time between two release rounds;
-- $\beta_{max}$ denotes a maximum number of processing rounds for a single message;
-- $\mu$ denotes the upper bound on the number of messages to be released during a single release round;
-- $E$ denotes a number of rounds in an epoch;
-- $W$ denote the observation window expressed in the number of rounds;
-- $F_1^W$ denote a frequency at which messages are observed during an observation window $W$;
-- $\lceil F_1 \rceil^W$ denote the maximal frequency at which messages can be generated during an observation window $W$;
-- $\lfloor F_1 \rfloor^W$ denote the minimal frequency at which messages must be generated during an observation window $W$;
-- $F_C$ denote a frequency at which cover messages are generated per round;
-- $F_D$ denote a frequency at which data messages are generated per round;
-- $C = S \cdot F_C$ denote the expected number of cover messages that are generated during an epoch by the core nodes;
-- $H_C$ denote the expected number of blending operations for each cover message;
-- $H_D$ denote the expected number of blending operations for each data message;
-- $R_C$ denote a redundancy parameter for cover messages, defining the number of “replications” of the same message;
-- $R_D$ denote a redundancy parameter for data messages, defining the number of “replications” of the same message;
-- $\mathcal{N} = \text{SDP}(s)$ denote a set of core nodes providing the Blend service for the epoch $e$ returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md));
-- $N = |\mathcal N|$ denote a number of core nodes providing the Blend service;
-- $\text {CSPRNG}()$ is a cryptographically secure pseudo-random number generator, implemented as a [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction);
+- $`\Phi_{CC}`$ denotes the actual number of established connections of the core node with other core nodes;
+- $`\Phi_{CE}`$ denotes the actual number of connections of the core node with edge nodes;
+- $`\Phi_{EC}`$ denotes the actual number of connections of the edge node with core nodes;
+- $`h(x)`$ denotes a function that returns the number of healthy connections of a given type, where type is: $`x \in \{ \Phi_{CC}, \Phi_{CE}, \Phi_{EC} \}`$;
+- $`\Delta_{max}`$ denotes a maximal delay time between two release rounds;
+- $`\beta_{max}`$ denotes a maximum number of processing rounds for a single message;
+- $`\mu`$ denotes the upper bound on the number of messages to be released during a single release round;
+- $`E`$ denotes a number of rounds in an epoch;
+- $`W`$ denote the observation window expressed in the number of rounds;
+- $`F_1^W`$ denote a frequency at which messages are observed during an observation window $`W`$;
+- $`\lceil F_1 \rceil^W`$ denote the maximal frequency at which messages can be generated during an observation window $`W`$;
+- $`\lfloor F_1 \rfloor^W`$ denote the minimal frequency at which messages must be generated during an observation window $`W`$;
+- $`F_C`$ denote a frequency at which cover messages are generated per round;
+- $`F_D`$ denote a frequency at which data messages are generated per round;
+- $`C = S \cdot F_C`$ denote the expected number of cover messages that are generated during an epoch by the core nodes;
+- $`H_C`$ denote the expected number of blending operations for each cover message;
+- $`H_D`$ denote the expected number of blending operations for each data message;
+- $`R_C`$ denote a redundancy parameter for cover messages, defining the number of “replications” of the same message;
+- $`R_D`$ denote a redundancy parameter for data messages, defining the number of “replications” of the same message;
+- $`\mathcal{N} = \text{SDP}(s)`$ denote a set of core nodes providing the Blend service for the epoch $`e`$ returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md));
+- $`N = |\mathcal N|`$ denote a number of core nodes providing the Blend service;
+- $`\text {CSPRNG}()`$ is a cryptographically secure pseudo-random number generator, implemented as a [BLAKE2b-Based PRNG Construction](common-cryptographic-components.md#blake2b-based-prng-construction);
 
 ## Global Parameters
 
-- $\Delta_{max}=3$, as defined in the [Delaying](#delaying) section below.
+- $`\Delta_{max}=3`$, as defined in the [Delaying](#delaying) section below.
 - $E=648000$, the number of rounds per epoch.
-- $\beta_{max} = 3$, the maximum number of blending operations of a single message.
-- $\beta_C=3$, the expected number of blending operations for each cover message;
-- $\beta_D=3$, the expected number of blending operations for each data message;
-- $W=10 \cdot \Delta_{max}=30$, the observation window is $30$ rounds.
-- $\lceil F_1 \rceil^W = W \cdot \mu=30 \cdot \mu$, the maximum number of messages per-connection during the observation window is a function of the $\mu$, which is defined in the [Releasing](#releasing)  section.
-- $\lfloor F_1 \rfloor^W = 3 \cdot \mu$, the minimum number of messages per-connection during observation is a function of the $\mu$, which is defined in the [Releasing](#releasing) section.
+- $`\beta_{max} = 3`$, the maximum number of blending operations of a single message.
+- $`\beta_C=3`$, the expected number of blending operations for each cover message;
+- $`\beta_D=3`$, the expected number of blending operations for each data message;
+- $`W=10 \cdot \Delta_{max}=30`$, the observation window is $`30`$ rounds.
+- $`\lceil F_1 \rceil^W = W \cdot \mu=30 \cdot \mu`$, the maximum number of messages per-connection during the observation window is a function of the $`\mu`$, which is defined in the [Releasing](#releasing)  section.
+- $`\lfloor F_1 \rfloor^W = 3 \cdot \mu`$, the minimum number of messages per-connection during observation is a function of the $`\mu`$, which is defined in the [Releasing](#releasing) section.
 
 ### Core Node Parameters
 
 A core node maintains the following set of parameters:
 
-- $\Phi_{CC}^{Max}$ denotes the maximal peering degree a core node can maintain with other core nodes. It is set by a core node individually.
-- $\Phi_{CC}^{Min}$ denotes the minimal peering degree a core node must maintain with other core nodes. It is set by a core node individually.
-- $\Phi_{CE}^{Max}$ denotes the maximum number of connections with edge nodes. It is set by the core node individually.
-- $\Omega_C$ denotes the maximum number of retries a core node will do to connect with another core node.
+- $`\Phi_{CC}^{Max}`$ denotes the maximal peering degree a core node can maintain with other core nodes. It is set by a core node individually.
+- $`\Phi_{CC}^{Min}`$ denotes the minimal peering degree a core node must maintain with other core nodes. It is set by a core node individually.
+- $`\Phi_{CE}^{Max}`$ denotes the maximum number of connections with edge nodes. It is set by the core node individually.
+- $`\Omega_C`$ denotes the maximum number of retries a core node will do to connect with another core node.
 
 Implementations should choose a default based on the deployment they operate in, and users can override these defaults before joining.
 
@@ -489,8 +489,8 @@ Implementations should choose a default based on the deployment they operate in,
 
 An edge node maintains the following parameters:
 
-- $\Phi_{EC}$ denotes the connection redundancy number for the edge node. A node must send a single message that needs to be blended to this number of core nodes.
-- $\Omega_E$ denotes the maximum number of retries an edge node will do to establish a connection with a core node.
+- $`\Phi_{EC}`$ denotes the connection redundancy number for the edge node. A node must send a single message that needs to be blended to this number of core nodes.
+- $`\Omega_E`$ denotes the maximum number of retries an edge node will do to establish a connection with a core node.
 
 Implementations should choose a default based on the deployment they operate in, and users can override these defaults before joining.
 
@@ -514,15 +514,15 @@ The core node is responsible for maintaining the level of connectivity and monit
 The monitoring logic is defined as follows:
 
 1. The messages are counted after successful connection-level decryption of the message for each neighbor.
-2. The node counts the number of messages during a window of observation $W$. The frequency of observed messages $F_1^W$is calculated as the number of messages recorded during the observation time divided by the length of the observation window (denoted in rounds).
-3. If the measured message frequency is higher than maximal ($F_1^W \gt \lceil F_1 \rceil^W$), then the node marks the neighbor as *spammy,* and the connection with that node must be closed.
+2. The node counts the number of messages during a window of observation $`W`$. The frequency of observed messages $`F_1^W`$is calculated as the number of messages recorded during the observation time divided by the length of the observation window (denoted in rounds).
+3. If the measured message frequency is higher than maximal ($`F_1^W \gt \lceil F_1 \rceil^W`$), then the node marks the neighbor as *spammy,* and the connection with that node must be closed.
     1. The node can mark the neighbor as spammy with high confidence, as the neighbor is the true source of messages due to the usage of the TLS protocol, which eliminates the possibility of executing replay attacks by the adversary.
     2. To maintain the minimal number of connections, a new one must be established when a connection with an abusive node is closed.
     3. The neighbor is added to a black list, and its selection must be avoided.
-4. If the measured frequency is lower than the minimum ($F_1^W \lt \lfloor F_1 \rfloor^W$), then the connection is marked *unhealthy*.
-5. If the number of healthy connections is below the minimum number of connections ($h(\Phi_{CC}) \lt \Phi_{CC}^{Min}$ for core-to-core connections), then another connection must be opened with a new randomly selected core node. We cannot assume that the neighbor is spammy, as it might be under a denial-of-service attack or other censoring attack.
+4. If the measured frequency is lower than the minimum ($`F_1^W \lt \lfloor F_1 \rfloor^W`$), then the connection is marked *unhealthy*.
+5. If the number of healthy connections is below the minimum number of connections ($`h(\Phi_{CC}) \lt \Phi_{CC}^{Min}`$ for core-to-core connections), then another connection must be opened with a new randomly selected core node. We cannot assume that the neighbor is spammy, as it might be under a denial-of-service attack or other censoring attack.
 6. An unhealthy connection is monitored continuously. If the message frequency goes above the minimal value during the next observation window, then the connection must be treated as healthy, and the node must remove the unhealthy marking for that connection.
-7. If the number of open connections is above the maximum ($\Phi_{CC} \ge \Phi_{CC}^{Max}$) then:
+7. If the number of open connections is above the maximum ($`\Phi_{CC} \ge \Phi_{CC}^{Max}`$) then:
     1. Add an entry to the log that the maximum number of connections has been reached*.*
     2. Pause the ability to establish new connections until the number of open connections drops below the maximum.
 8. If the neighbor is an edge node, then the edge node must send a message immediately after establishing the connection with the core node and then close the connection. Otherwise, the connection must be closed by the core node.
@@ -539,7 +539,7 @@ However, this must also be carefully engineered as the number of connections mus
 
 ### Transition Period
 
-When a new epoch begins, the set of public information checked against proofs embedded in messages changes, which renders some messages invalid. However, these messages may still contain valid payloads that must reach their destination. Therefore, we implement a Transition Period (TP, $T$) during which the network can gracefully react to the change and allow these messages to safely exit the network.
+When a new epoch begins, the set of public information checked against proofs embedded in messages changes, which renders some messages invalid. However, these messages may still contain valid payloads that must reach their destination. Therefore, we implement a Transition Period (TP, $`T`$) during which the network can gracefully react to the change and allow these messages to safely exit the network.
 
 The duration of the TP is calculated as follows:
 
@@ -549,19 +549,19 @@ $$
 
 where:
 
-- $\Delta_{max} = 3$ defines the maximal blending delay;
-- $d$ defines the network dissemination delay;
-- $\beta_{max}=3$ defines maximum number of blending operations of a single message.
+- $`\Delta_{max} = 3`$ defines the maximal blending delay;
+- $`d`$ defines the network dissemination delay;
+- $`\beta_{max}=3`$ defines maximum number of blending operations of a single message.
 
-We assume that $d=0.5$ is an average message dissemination delay, then:
+We assume that $`d=0.5`$ is an average message dissemination delay, then:
 
 $$
 T = (3 + 0.5)\cdot 3 + 0.5= 11
 $$
 
-That means that after $11$ rounds, all messages for the past epoch should have been processed and disseminated.
+That means that after $`11`$ rounds, all messages for the past epoch should have been processed and disseminated.
 
-However, to provide an additional safety buffer, we round up the transition period to $T=30$ rounds. After this period, all old connections can be safely terminated, and messages for the past epoch must not be processed anymore.
+However, to provide an additional safety buffer, we round up the transition period to $`T=30`$ rounds. After this period, all old connections can be safely terminated, and messages for the past epoch must not be processed anymore.
 
 When a new **epoch** begins:
 
@@ -575,7 +575,7 @@ The quota limits the number of messages that can be generated during an epoch. T
 
 ### Core Quota
 
-The core quota ($Q_C$) defines the messaging allowance that can be used by a core node during a single epoch. **The purpose of** $Q_C$ **is to limit the number of cover messages and the number of blending operations that can be used for a single message.** We assume that the core quota is used for generating cover messages, but the core node is not limited by this assumption. We define it as follows:
+The core quota ($`Q_C`$) defines the messaging allowance that can be used by a core node during a single epoch. **The purpose of** $`Q_C`$ **is to limit the number of cover messages and the number of blending operations that can be used for a single message.** We assume that the core quota is used for generating cover messages, but the core node is not limited by this assumption. We define it as follows:
 
 $$
 Q_C = \left\lfloor \dfrac{C \cdot (\beta_C+R_C \cdot \beta_C)}{N} \right\rfloor
@@ -583,10 +583,10 @@ $$
 
 Where:
 
-- $C = E \cdot F_C$ denotes an expected number of cover messages that are generated during an epoch by the core nodes;
-- $\beta_C$ denotes the expected number of blending operations for each cover message;
-- $R_C$ denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;
-- $N$ denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
+- $`C = E \cdot F_C`$ denotes an expected number of cover messages that are generated during an epoch by the core nodes;
+- $`\beta_C`$ denotes the expected number of blending operations for each cover message;
+- $`R_C`$ denotes a redundancy parameter for cover messages, increasing the number of core node messages a node can send;
+- $`N`$ denote a number of core nodes providing the Blend service for the epoch returned by the SDP protocol ([Service Declaration Protocol](bedrock-service-declaration-protocol.md)).
 
 Additionally, we introduce the total core quota, which defines the total number of generated cover messages that the whole network can emit (independently of the number of nodes):
 
@@ -596,7 +596,7 @@ $$
 
 ### Leadership Quota
 
-**The leadership quota (**$Q_L$**) defines the number of blending operations a block proposer (consensus leader) node can perform within the network.** A single quota is used per single proof of leadership. Therefore, a single node can use multiple leadership quotas during a single epoch. We assume that the leader is interested in using most of its quota to generate data messages; however, the leader is not limited by this assumption. We define the leadership quota as follows:
+**The leadership quota (**$`Q_L`$**) defines the number of blending operations a block proposer (consensus leader) node can perform within the network.** A single quota is used per single proof of leadership. Therefore, a single node can use multiple leadership quotas during a single epoch. We assume that the leader is interested in using most of its quota to generate data messages; however, the leader is not limited by this assumption. We define the leadership quota as follows:
 
 $$
 Q_L = \beta_D + \beta_D \cdot R_D
@@ -604,32 +604,32 @@ $$
 
 where:
 
-- $\beta_D$ denotes the expected number of blending operations for each data message;
-- $R_D$ denotes a redundancy parameter for data messages, defining the number of “replications” of the same message.
+- $`\beta_D`$ denotes the expected number of blending operations for each data message;
+- $`R_D`$ denotes a redundancy parameter for data messages, defining the number of “replications” of the same message.
 
-We can calculate an average data message number ($D_{Avg}$) which informs us about the average number of data messages generated per epoch:
+We can calculate an average data message number ($`D_{Avg}`$) which informs us about the average number of data messages generated per epoch:
 
 $$
 D_{Avg} = L_{Avg} \cdot Q_L
 $$
 
-where $L_{Avg}$ is the average number of leaders per epoch.
+where $`L_{Avg}`$ is the average number of leaders per epoch.
 
-The $L_{Avg}$ depends on the consensus leader election algorithm, which at the time of writing can be estimated as follows:
+The $`L_{Avg}`$ depends on the consensus leader election algorithm, which at the time of writing can be estimated as follows:
 
 $$
 L_{Avg} = E \cdot F_D = \dfrac{648000}{30} = 21600,
 $$
 
-where $E=648000$ and $F_D=1/30$ are taken from the [Cryptarchia Protocol](cryptarchia-v1-protocol.md). This is equivalent to the average rate of a slot having an elected leader.
+where $`E=648000`$ and $`F_D=1/30`$ are taken from the [Cryptarchia Protocol](cryptarchia-v1-protocol.md). This is equivalent to the average rate of a slot having an elected leader.
 
-Finally, let us define the leadership quota for node $n$ ($Q^{n}_L$), which can **only** be calculated by the node $n$:
+Finally, let us define the leadership quota for node $`n`$ ($`Q^{n}_L`$), which can **only** be calculated by the node $`n`$:
 
 $$
 Q^{n}_L = x \cdot (\beta_D + \beta_D \cdot R_D)
 $$
 
-where $x$ is the exact number of leader elections won by the node $n$ in an epoch. The value of $x$ is known only to the node because its value is a function of the stake of a node $n$, which is kept private.
+where $`x`$ is the exact number of leader elections won by the node $`n`$ in an epoch. The value of $`x`$ is known only to the node because its value is a function of the stake of a node $`n`$, which is kept private.
 
 ### Quota Application
 
@@ -644,10 +644,10 @@ $$
 \mathbf K^{n,e}_q = \lbrace(K^{n}_{0}, k^{n}_{0}, \pi_{Q}^{K_{0}^{n}}),...,(K^{n}_{q-1}, k^{n}_{q-1}, \pi_{Q}^{K_{q-1}^{n}}) \rbrace,
 $$
 
-which describes a collection of $q$ key pairs for a node $n$ with proofs of quota for the epoch $e$, where $K_{i}^{n}$ is the $i$-th public key, $k_{i}^{n}$ is its corresponding private key, and $\pi_{Q}^{K_{i}^{n}}$ is its proof of quota. Additionally:
+which describes a collection of $`q`$ key pairs for a node $`n`$ with proofs of quota for the epoch $`e`$, where $`K_{i}^{n}`$ is the $`i`$-th public key, $`k_{i}^{n}`$ is its corresponding private key, and $`\pi_{Q}^{K_{i}^{n}}`$ is its proof of quota. Additionally:
 
-- $q=Q_C + Q_L^n$ is the sum of core quota and leadership quota for the node $n$.
-- $\pi_{Q}^{K_{i}^{n}}$ is a proof of quota which confirms that $i \lt h$ for every key $K^{n}_{i}$ from the key pool $\mathbf K^{n,e}_h$ of a node, without disclosing the identity of the node $n$.
+- $`q=Q_C + Q_L^n`$ is the sum of core quota and leadership quota for the node $`n`$.
+- $`\pi_{Q}^{K_{i}^{n}}`$ is a proof of quota which confirms that $`i \lt h`$ for every key $`K^{n}_{i}`$ from the key pool $`\mathbf K^{n,e}_h`$ of a node, without disclosing the identity of the node $`n`$.
 
 ### Keys Generation
 
@@ -663,40 +663,40 @@ This might lead to a situation where part of the network will see the first mess
 
 The PoQ is constructed from two parts.
 
-The first part of the PoQ is dedicated to the core quota. We define the proof of core quota ($\pi^{K_{a}^{n}}_{Q_C}$) as true when all of the following conditions are met:
+The first part of the PoQ is dedicated to the core quota. We define the proof of core quota ($`\pi^{K_{a}^{n}}_{Q_C}`$) as true when all of the following conditions are met:
 
-- $n \in \mathcal{N} = \text{SDP}(e)$: there exists a node $n$ that is part of the set of registered nodes $\mathcal{N}$, which is retrieved from the SDP protocol for the epoch $e$. The value identifying the node $n$ must be hidden.
-- $K_{a}^{n} \in \mathbf K^{n,e}_h$: the public key $K_{a}^{n}$ is generated by the node $n$ for the epoch $e$.
-- $a \lt Q_C$: the number (index) $a$ of proof nullifiers that limits the number of proof of quotas a core node can generate in one epoch.
+- $`n \in \mathcal{N} = \text{SDP}(e)`$: there exists a node $`n`$ that is part of the set of registered nodes $`\mathcal{N}`$, which is retrieved from the SDP protocol for the epoch $`e`$. The value identifying the node $`n`$ must be hidden.
+- $`K_{a}^{n} \in \mathbf K^{n,e}_h`$: the public key $`K_{a}^{n}`$ is generated by the node $`n`$ for the epoch $`e`$.
+- $`a \lt Q_C`$: the number (index) $`a`$ of proof nullifiers that limits the number of proof of quotas a core node can generate in one epoch.
 
 The proof of the core quota assumes:
 
-- Public input: $e$, $K_{a}^{n}$, $Q_C$.
-- Private input: $n$, $a$.
-- Public output: $\nu_e$.
+- Public input: $`e`$, $`K_{a}^{n}`$, $`Q_C`$.
+- Private input: $`n`$, $`a`$.
+- Public output: $`\nu_e`$.
 
-Where $\nu_e$ is a PoQ nullifier and uniquely identifies the PoQ.
+Where $`\nu_e`$ is a PoQ nullifier and uniquely identifies the PoQ.
 
-The second part of the PoQ is dedicated to the leadership quota. The proof of the leadership quota ($\pi^{K_{b}^{n}}_{Q_L}$) is true when all of the following conditions are met:
+The second part of the PoQ is dedicated to the leadership quota. The proof of the leadership quota ($`\pi^{K_{b}^{n}}_{Q_L}`$) is true when all of the following conditions are met:
 
-- $\exists~\pi^{n,e}_{L}$: there exists a valid proof of leadership for node $n$ valid for epoch $e$.
-- $K_{b}^{n} \in \mathbf K^{n,s}_h$: the key $K_{b}^{n}$ is generated by the node $n$ for the epoch $e$.
-- $b \lt Q_L^n$: the number $b$ of key nullifiers that limits the number of proof of quotas a leader can generate per won slot.
+- $`\exists~\pi^{n,e}_{L}`$: there exists a valid proof of leadership for node $`n`$ valid for epoch $`e`$.
+- $`K_{b}^{n} \in \mathbf K^{n,s}_h`$: the key $`K_{b}^{n}`$ is generated by the node $`n`$ for the epoch $`e`$.
+- $`b \lt Q_L^n`$: the number $`b`$ of key nullifiers that limits the number of proof of quotas a leader can generate per won slot.
 
 The proof of the leadership quota assumes:
 
-- Public input: $e$, $K_{b}^{n}$, $Q_L^n$.
-- Private input: $\pi^{n,e}_{L}$, $n$, $b$.
-- Public output: $\nu_e$.
+- Public input: $`e`$, $`K_{b}^{n}`$, $`Q_L^n`$.
+- Private input: $`\pi^{n,e}_{L}`$, $`n`$, $`b`$.
+- Public output: $`\nu_e`$.
 
-Where $\nu_e$ is a PoQ nullifier and uniquely identifies the PoQ.
+Where $`\nu_e`$ is a PoQ nullifier and uniquely identifies the PoQ.
 
-Finally, we use both constrains and create a single proof of quota ($\pi^{K_{i}^{n}}_{Q}$). That is, the proof is true when ***any*** of the following conditions are met:
+Finally, we use both constrains and create a single proof of quota ($`\pi^{K_{i}^{n}}_{Q}`$). That is, the proof is true when ***any*** of the following conditions are met:
 
-- $\pi^{K_{i}^{n}}_{Q_C}$ constraints are true.
-- $\pi^{K_{i}^{n}}_{Q_L^{n}}$ constraints are true.
+- $`\pi^{K_{i}^{n}}_{Q_C}`$ constraints are true.
+- $`\pi^{K_{i}^{n}}_{Q_L^{n}}`$ constraints are true.
 
-This means that the proof of quota is a logical sum of the proof of core quota and the proof of leadership quota, $\pi_{Q}^{K_{i}^{n}} = \pi_{Q_C}^{K_{i}^{n}} \lor \pi_{Q_L^{n}}^{K_{i}^{n}}$.
+This means that the proof of quota is a logical sum of the proof of core quota and the proof of leadership quota, $`\pi_{Q}^{K_{i}^{n}} = \pi_{Q_C}^{K_{i}^{n}} \lor \pi_{Q_L^{n}}^{K_{i}^{n}}`$.
 
 Please refer to the document below for more details.
 
@@ -708,7 +708,7 @@ For more details see [Proof of Quota](proof-of-quota.md).
 
 ### Proof of Selection
 
-The proof of selection (PoSel, $\pi^{K^{n}_{i},m_{i}}_{S}$) is a construction that makes the selection of nodes for message processing a random and verifiable process. The reasons behind such restrictions are:
+The proof of selection (PoSel, $`\pi^{K^{n}_{i},m_{i}}_{S}`$) is a construction that makes the selection of nodes for message processing a random and verifiable process. The reasons behind such restrictions are:
 
 - Due to random (unbiased) sampling of blend nodes, messages are distributed uniformly across the whole set of nodes. Therefore, we avoid creating communication hotspots, and through this, we make the rewarding process fair.
 - The restriction on the selection of the blend node limits the possibility of targeting a specific node by an adversary. **The adversary is limited only to a subset of keys that can be used to generate a message to a particular node.**
@@ -718,24 +718,24 @@ Note that the Proof of Selection alongside the Proof of Quota restricts the set 
 
 The PoSel assumes:
 
-- Public input: $\pi_{Q}^{K_{i}^{n}}$.
-- Shared secret: $\rho$.
-- Public output: $m_i$.
+- Public input: $`\pi_{Q}^{K_{i}^{n}}`$.
+- Shared secret: $`\rho`$.
+- Public output: $`m_i`$.
 
-Where $\rho$ is the secret selection randomness generated by the $\pi_{Q}^{K_{i}^{n}}$ and shared only with the recipient (node $i$), and $m_i$ is an index of the node $i$ on the list of core nodes.
+Where $`\rho`$ is the secret selection randomness generated by the $`\pi_{Q}^{K_{i}^{n}}`$ and shared only with the recipient (node $`i`$), and $`m_i`$ is an index of the node $`i`$ on the list of core nodes.
 
-The PoSel ($\pi^{K^{n}_{i},m_{i}}_{S}$) is true when all of the following conditions are met:
+The PoSel ($`\pi^{K^{n}_{i},m_{i}}_{S}`$) is true when all of the following conditions are met:
 
-- $m_i = \text{CSPBRG(}H_{\mathbf N}(\rho))_{8} \mod N$, where:
-  - $\rho$ is secret selection randomness that is encoded using little-endian,
-  - $m_i$ is the index of the recipient node (from the SDP list of core nodes) encoded as little-endian,
-  - $\text {CSPRBG}()_{8}$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $8$ bytes which is encoded using little-endian,
-  - $H_{\mathbf N}()$ is a domain separated `blake2b` hash function,
-  - and $N$ is the number of core nodes.
+- $`m_i = \text{CSPBRG(}H_{\mathbf N}(\rho))_{8} \mod N`$, where:
+  - $`\rho`$ is secret selection randomness that is encoded using little-endian,
+  - $`m_i`$ is the index of the recipient node (from the SDP list of core nodes) encoded as little-endian,
+  - $`\text {CSPRBG}()_{8}`$ is a cryptographically secure pseudo-random bytes generator whose output is restricted to $`8`$ bytes which is encoded using little-endian,
+  - $`H_{\mathbf N}()`$ is a domain separated `blake2b` hash function,
+  - and $`N`$ is the number of core nodes.
 
-  This operation is statistically secure for relatively small $N$ that we assume to have in our system as analyzed in [Statistical Analysis of Selection Bias of Modulo Operation](#statistical-analysis-of-selection-bias-of-modulo-operation).
+  This operation is statistically secure for relatively small $`N`$ that we assume to have in our system as analyzed in [Statistical Analysis of Selection Bias of Modulo Operation](#statistical-analysis-of-selection-bias-of-modulo-operation).
 
-- $v==v'$, where $v$ is the PoQ nullifier of the $\pi_{Q}^{K_{i}^{n}}$ and  $v'=H_{\Psi}(b\text{"KEY\_NULLIFIER\_V1"}, \rho)$ is the PoQ nullifier derived from the secret $\rho$ and $H_{\Psi}()$ is the Posiedon2 hash function.
+- $`v==v'`$, where $`v`$ is the PoQ nullifier of the $`\pi_{Q}^{K_{i}^{n}}`$ and  $`v'=H_{\Psi}(b\text{"KEY\_NULLIFIER\_V1"}, \rho)`$ is the PoQ nullifier derived from the secret $`\rho`$ and $`H_{\Psi}()`$ is the Posiedon2 hash function.
 
 The PoSel must be used alongside the PoQ, as the PoSel is tightly coupled with the PoQ.
 
@@ -749,7 +749,7 @@ def modular_bytes(data: bytes, modulus: int) -> int:
 
 ### Cover Message Schedule
 
-Generation of cover messages is handled by each core node individually. The only protocol-enforced limitation is through the [Core Quota](#core-quota) ($Q_C$), which limits the number of messages a node can generate.
+Generation of cover messages is handled by each core node individually. The only protocol-enforced limitation is through the [Core Quota](#core-quota) ($`Q_C`$), which limits the number of messages a node can generate.
 
 To protect its own privacy, a core node should emit cover messages in a fully random manner to ensure that the cover messages are evenly distributed across the duration of an epoch.
 
@@ -757,25 +757,25 @@ To protect its own privacy, a core node should emit cover messages in a fully ra
 
 For this document, we present a definition of the message structure as defined in the [Message Encapsulation Mechanism](message-encapsulation.md). For simplicity, we omit the versioning of the message as defined in [Message Formatting](message-formatting.md).
 
-A node $n$ constructs a message $\mathbf M = (\mathbf H, \mathbf h, \mathbf P)$ according to the format presented below.
+A node $`n`$ constructs a message $`\mathbf M = (\mathbf H, \mathbf h, \mathbf P)`$ according to the format presented below.
 
 ![Diagram](blend-protocol/assets/215261aa-09df-817f-bf34-d640e8cbcd5e.jpg)
 
-1. $\mathbf H$ is a public header:
-    1. $K^{n}_i$, a public key from the set $\mathbf K^n_h$.
-    2. $\pi^{K^{n}_i}_{Q}$, a corresponding proof of quota for the key $K^{n}_i$ from the $\mathbf K^n_h$ and contains its PoQ nullifier $\nu_i$.
-    3. $\sigma_{K^{n}_{i}}(\mathbf P_i)$, a signature of the $i$-th encapsulation of the payload $\mathbf P$, that can be verified by the public key $K^{n}_{i}$.
+1. $`\mathbf H`$ is a public header:
+    1. $`K^{n}_i`$, a public key from the set $`\mathbf K^n_h`$.
+    2. $`\pi^{K^{n}_i}_{Q}`$, a corresponding proof of quota for the key $`K^{n}_i`$ from the $`\mathbf K^n_h`$ and contains its PoQ nullifier $`\nu_i`$.
+    3. $`\sigma_{K^{n}_{i}}(\mathbf P_i)`$, a signature of the $`i`$-th encapsulation of the payload $`\mathbf P`$, that can be verified by the public key $`K^{n}_{i}`$.
 
-2. $\mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})$ is an encrypted private header $\mathbf b_l$, which contains:
-    1. $K^{n}_{l}$, a public key from the set $\mathbf K^n_h$.
-    2. $\pi^{K^{n}_{l}}_{Q}$, a corresponding proof of quota for the key $K^{n}_l$ from the $\mathbf K^n_h$ and contains its PoQ nullifier $\nu_l$.
-    3. $\sigma_{K^{n}_{l}}(\mathbf P_l)$, a signature of the $l$-th encapsulation of the payload $\mathbf P$, that can be verified by the public key $K^{n}_{l}$.
-    4. $\pi^{K^{n}_{l+1},m_{l+1}}_{S}$, a proof of selection of the node index $m_{l+1}$ assuming a public key $K^{n}_{l+1}$.
-    5. $\Omega$, a flag that indicates that this is the last blending header.
+2. $`\mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})`$ is an encrypted private header $`\mathbf b_l`$, which contains:
+    1. $`K^{n}_{l}`$, a public key from the set $`\mathbf K^n_h`$.
+    2. $`\pi^{K^{n}_{l}}_{Q}`$, a corresponding proof of quota for the key $`K^{n}_l`$ from the $`\mathbf K^n_h`$ and contains its PoQ nullifier $`\nu_l`$.
+    3. $`\sigma_{K^{n}_{l}}(\mathbf P_l)`$, a signature of the $`l`$-th encapsulation of the payload $`\mathbf P`$, that can be verified by the public key $`K^{n}_{l}`$.
+    4. $`\pi^{K^{n}_{l+1},m_{l+1}}_{S}`$, a proof of selection of the node index $`m_{l+1}`$ assuming a public key $`K^{n}_{l+1}`$.
+    5. $`\Omega`$, a flag that indicates that this is the last blending header.
 
-3. $\mathbf P$ is a payload.
+3. $`\mathbf P`$ is a payload.
 
->**Encapsulation Overhead Calculation:** Assuming that we use Groth16 SNARKs as a proving system, we need $160$ bytes per PoQ ($128$ for proof and $32$ for nullifier) quota. Which gives us $289$ bytes per hop (proof of quota $160$ bytes + proof of selection $32$ bytes + public key $32$ bytes + signature $64$ bytes + last flag $1$ byte) plus $256$ bytes for the public header. Which for $3$ hops gives us $1123$ bytes in total. That increases the block proposal message defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md), of $33129$ bytes by $\approx 3\%$.
+>**Encapsulation Overhead Calculation:** Assuming that we use Groth16 SNARKs as a proving system, we need $`160`$ bytes per PoQ ($`128`$ for proof and $`32`$ for nullifier) quota. Which gives us $`289`$ bytes per hop (proof of quota $`160`$ bytes + proof of selection $`32`$ bytes + public key $`32`$ bytes + signature $`64`$ bytes + last flag $`1`$ byte) plus $`256`$ bytes for the public header. Which for $`3`$ hops gives us $`1123`$ bytes in total. That increases the block proposal message defined in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md), of $`33129`$ bytes by $`\approx 3\%`$.
 
 ### Formatting
 
@@ -812,12 +812,12 @@ The relaying logic is defined as follows:
     1. If the neighbor is a core node, then update the message counter for the neighbor.
     2. If the neighbor is an edge node, then close the connection with the neighbor.
     3. If the header of the message is incorrect, then discard the message and mark the neighbor as malicious and close the connection. We assume that an adversary cannot inject any spoofed message to the connection.
-    4. If the PoQ nullifier $\nu_i \in \mathbf H$ from the public header of the message was already seen, then the message is a duplicate and must be discarded. The PoQ nullifiers are valid during a single epoch, therefore, they need to be stored for the duration of the current epoch and during the  [Transition Period](#transition-period).
-    5. If the signature $\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H$ from the public header of the message is invalid, then the message must be discarded, and the neighbor must be marked malicious.
+    4. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message was already seen, then the message is a duplicate and must be discarded. The PoQ nullifiers are valid during a single epoch, therefore, they need to be stored for the duration of the current epoch and during the  [Transition Period](#transition-period).
+    5. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded, and the neighbor must be marked malicious.
 2. Release the message according to the [Releasing](#releasing) logic.
 3. Concurrently to the above step, add the message to the processing queue, where it is handled by the [Processing](#processing) logic.
 
-The node must cache the PoQ nullifiers ($\nu_i$) for every message it relays for a duration of a single epoch plus the safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
+The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
 $$
 \begin{aligned}
@@ -829,33 +829,33 @@ $$
 
 ### Processing
 
-When a message $\mathbf M$ is received by the node, then it is processed by this logic:
+When a message $`\mathbf M`$ is received by the node, then it is processed by this logic:
 
-1. If the proof $\pi^{K^{n}_i}_{Q} \in \mathbf H$ from the public header of the message is not correct, then the message must be discarded.
+1. If the proof $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header of the message is not correct, then the message must be discarded.
 2. Decapsulate the message as defined in the decapsulation section of the [Message Encapsulation Mechanism](message-encapsulation.md).
 3. If the decapsulation is successful, then:
-    1. If the proof of selection ($\pi^{K^{n}_l,l}_{S} \in \mathbf b_1$) is invalid, then the message is discarded. A valid proof of selection points to the index of the node $l$ in the list of nodes returned from the SDP.
-    2. Store the blending token which is the collection of the proof of quota from the header ($\pi^{K^{n}_l}_{Q} \in \mathbf H$), and the proof of selection from the private header ($\pi^{K^{n}_l,l}_{S} \in \mathbf b_1 \in \mathbf h$):
+    1. If the proof of selection ($`\pi^{K^{n}_l,l}_{S} \in \mathbf b_1`$) is invalid, then the message is discarded. A valid proof of selection points to the index of the node $`l`$ in the list of nodes returned from the SDP.
+    2. Store the blending token which is the collection of the proof of quota from the header ($`\pi^{K^{n}_l}_{Q} \in \mathbf H`$), and the proof of selection from the private header ($`\pi^{K^{n}_l,l}_{S} \in \mathbf b_1 \in \mathbf h`$):
     $$
     t = ( \pi^{K^{n}_l}_{Q} \in \mathbf H, \pi^{K^{n}_l,l}_{S} \in \mathbf b_1 \in \mathbf h).
     $$
 
-    3. If the last flag is set ($\Omega == 1$) then examine the header type of the payload as defined in the [Payload Formatting](payload-formatting.md), then:
+    3. If the last flag is set ($`\Omega == 1`$) then examine the header type of the payload as defined in the [Payload Formatting](payload-formatting.md), then:
         1. If the payload is a block proposal, then the payload structure is verified and broadcast, as defined in the [Broadcasting](#broadcasting) section.
         2. If the payload is a cover message, then the payload is discarded.
 
     4. Else:
         1. Examine the decapsulated public header:
-            1. If the PoQ nullifier $\nu_i \in \mathbf H$ from the public header of the message was already seen, then the node was not allowed to use the same PoQ nullifier and the message must be discarded. The PoQ nullifiers are valid during a single epoch, so they do not need to be stored for more than a single epoch.
-            2. If the signature $\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H$ from the public header of the message is invalid, then the message must be discarded.
-            3. If the proof of quota $\pi^{K^{n}_i}_{Q} \in \mathbf H$ from the public header of the message is not correct, then the message must be discarded.
+            1. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message was already seen, then the node was not allowed to use the same PoQ nullifier and the message must be discarded. The PoQ nullifiers are valid during a single epoch, so they do not need to be stored for more than a single epoch.
+            2. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded.
+            3. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header of the message is not correct, then the message must be discarded.
         2. Format the message according to the [Message Formatting](message-formatting.md).
         3. Attempt a subsequent decapsulation to validate whether the node is the recipient (return to step 1). This must be done recursively to remove all consecutive encapsulation layers where the node is the intended recipient.
         4. If the decapsulation fails (meaning no more layers remain), randomly delay the message and release the formatted message according to the [Releasing](#releasing) logic.
 
   4. If decapsulation fails, return the appropriate decapsulation failure message.
 
-Blending tokens are stored by the node for rewarding purposes, as they prove that the node processed the message. The blending tokens are stored alongside context information such as the epoch number. We denote the set of blending tokens from an epoch $e$ stored by a node $l$ as $\mathcal{T}^{l,e}$.
+Blending tokens are stored by the node for rewarding purposes, as they prove that the node processed the message. The blending tokens are stored alongside context information such as the epoch number. We denote the set of blending tokens from an epoch $`e`$ stored by a node $`l`$ as $`\mathcal{T}^{l,e}`$.
 
 ### Delaying
 
@@ -863,20 +863,20 @@ The purpose of message delaying is to hide timing correlations between incoming 
 
 The message anonymity pool is the total number of messages that have been seen by the node between two subsequent message release events. The set of seen messages does not necessarily include a message that the node is the recipient of.
 
-**The key design objective is to release messages with an upper bound on the delay.** Therefore, the design assumes that there is a $\Delta_{max}$ maximum delay between two subsequent message release attempts that define the longest waiting time for message release. This also defines the maximal message anonymity pool (assuming a single message is released in a round by the network).
+**The key design objective is to release messages with an upper bound on the delay.** Therefore, the design assumes that there is a $`\Delta_{max}`$ maximum delay between two subsequent message release attempts that define the longest waiting time for message release. This also defines the maximal message anonymity pool (assuming a single message is released in a round by the network).
 
 Now we can define the delaying logic:
 
-1. Select at random a delay: $\delta \in (1, \Delta_{max})$.
-2. Start counting rounds: $s$ is the starting round.
-3. Every round check if the current round ($c$) is the delayed one $c == s+\delta$, then:
+1. Select at random a delay: $`\delta \in (1, \Delta_{max})`$.
+2. Start counting rounds: $`s`$ is the starting round.
+3. Every round check if the current round ($`c`$) is the delayed one $`c == s+\delta`$, then:
     1. Release messages from the queue according to the [Releasing](#releasing) logic.
-    2. Select at random a delay: $\delta \in (1, \Delta_{max})$.
-    3. Start counting rounds: $s$ is the starting round.
+    2. Select at random a delay: $`\delta \in (1, \Delta_{max})`$.
+    3. Start counting rounds: $`s`$ is the starting round.
 
 If the queue is empty, then we do not release any message.
 
-However, the release round selection must work independently of the queue state. Otherwise, the maximal anonymity set is going to be $\Delta_{max} \over 2$, which must be scaled by the number of messages that are released in a single round.
+However, the release round selection must work independently of the queue state. Otherwise, the maximal anonymity set is going to be $`\Delta_{max} \over 2`$, which must be scaled by the number of messages that are released in a single round.
 
 ### Releasing
 
@@ -890,11 +890,11 @@ The process of releasing messages involves the following steps:
 
 The cover and data message generation processes are **independent**, and there is a non-zero probability that more than one message will be scheduled for the same round. Therefore, the number of messages that can be released during a single round is **not restricted**.
 
-However, a node can calculate the expected number of messages to be released per release round. This depends on the value of $\Delta_{max}$, the network size (number of core nodes), and the generation quota. This number can be used to detect spammy nodes as part of the [Connectivity Maintenance](#connectivity-maintenance) logic.
+However, a node can calculate the expected number of messages to be released per release round. This depends on the value of $`\Delta_{max}`$, the network size (number of core nodes), and the generation quota. This number can be used to detect spammy nodes as part of the [Connectivity Maintenance](#connectivity-maintenance) logic.
 
-For sufficiently large networks, the number of processed messages queued in a node will be smaller than $1$ on average.
+For sufficiently large networks, the number of processed messages queued in a node will be smaller than $`1`$ on average.
 
-However, in **smaller networks**, the number of messages queued in a node will be **larger than** $1$. **We must avoid this property because the additional delay negatively impacts the consensus protocol's safety. Therefore, we need to determine the network size threshold where the number of messages to be released exceeds** $1$**.**
+However, in **smaller networks**, the number of messages queued in a node will be **larger than** $`1`$. **We must avoid this property because the additional delay negatively impacts the consensus protocol's safety. Therefore, we need to determine the network size threshold where the number of messages to be released exceeds** $`1`$**.**
 
 The expected number of messages to be released during a single release round for a single node is:
 
@@ -904,24 +904,24 @@ $$
 
 Where:
 
-- $\Delta_{max}$ is the maximal delay time between two release rounds;
-- $\beta_C$ denotes an expected number of blending operations for each cover message;
-- $\alpha$ is a message number normalization constant;
-- $N$ is the number of core nodes in the network.
+- $`\Delta_{max}`$ is the maximal delay time between two release rounds;
+- $`\beta_C`$ denotes an expected number of blending operations for each cover message;
+- $`\alpha`$ is a message number normalization constant;
+- $`N`$ is the number of core nodes in the network.
 
 Let us assume:
 
-- $\Delta_{max}=3$ is our target value, as defined in the [Delaying](#delaying) section above;
-- $\beta_C=3$, which means that every round, $3$ nodes are going to be processing messages generated by the network, which is a reasonable assumption as it defines the maximum number that the protocol can tolerate due to the quota limitations;
-- $\alpha \approx 1.03$, corrects the number of new messages emitted by the network per round to include data messages, where $1$ is the number of cover messages, and $0.03$ is the number of data messages per round.
+- $`\Delta_{max}=3`$ is our target value, as defined in the [Delaying](#delaying) section above;
+- $`\beta_C=3`$, which means that every round, $`3`$ nodes are going to be processing messages generated by the network, which is a reasonable assumption as it defines the maximum number that the protocol can tolerate due to the quota limitations;
+- $`\alpha \approx 1.03`$, corrects the number of new messages emitted by the network per round to include data messages, where $1$ is the number of cover messages, and $0.03$ is the number of data messages per round.
 
 This gives us:
 
-- For $N=16$ core nodes; $\mu=1$ message per release round on average.
-- For $N=8$ core nodes;  $\mu=2$ messages per release round on average.
-- For $N=4$ core nodes; $\mu=3$ messages per release round on average.
+- For $`N=16`$ core nodes; $`\mu=1`$ message per release round on average.
+- For $`N=8`$ core nodes;  $`\mu=2`$ messages per release round on average.
+- For $`N=4`$ core nodes; $`\mu=3`$ messages per release round on average.
 
-We use the $\mu$ estimator for calculating the maximum and minimum number of messages that can be received by a node, as listed in the [Global Parameters](#global-parameters) section.
+We use the $`\mu`$ estimator for calculating the maximum and minimum number of messages that can be received by a node, as listed in the [Global Parameters](#global-parameters) section.
 
 ### Broadcasting
 
@@ -942,24 +942,24 @@ The rewarding protocol requires a common and unbiased randomness. We assume that
 
 ### Activity Proof
 
-The node activity proof ($\pi_{A}^{l,t,e}$) is a construction that attests in a probabilistic manner that a node $l$ was active during the epoch $e$, by presenting a blending token $t$.
+The node activity proof ($`\pi_{A}^{l,t,e}`$) is a construction that attests in a probabilistic manner that a node $`l`$ was active during the epoch $`e`$, by presenting a blending token $`t`$.
 
-In other words, the activity proof is $\text{true}$ when:
+In other words, the activity proof is $`\text{true}`$ when:
 
-- A node $l$ has a [blending token](blend-protocol.md#activity-proof) $t \in \mathcal{T}^{l,s}$ collected during epoch $e$, and that:
-  - [Proof of Quota](#proof-of-quota) $\pi^{K^{n}_l}_{Q} \in t$ is true assuming epoch $e$.
-  - [Proof of Selection](#proof-of-selection) $\pi^{K^{n}_l,l}_{S} \in t$ is true assuming epoch $e$.
-  - $K^{n}_l$, a public key from the set $\mathbf K^n_h$, that is used to verify the above proofs.
+- A node $`l`$ has a [blending token](blend-protocol.md#activity-proof) $`t \in \mathcal{T}^{l,s}`$ collected during epoch $`e`$, and that:
+  - [Proof of Quota](#proof-of-quota) $`\pi^{K^{n}_l}_{Q} \in t`$ is true assuming epoch $`e`$.
+  - [Proof of Selection](#proof-of-selection) $`\pi^{K^{n}_l,l}_{S} \in t`$ is true assuming epoch $`e`$.
+  - $`K^{n}_l`$, a public key from the set $`\mathbf K^n_h`$, that is used to verify the above proofs.
 
-- The Hamming distance ($\Delta_{\mathcal H}(a,b)$ — returns the number of different bits between $a$ and $b$ binary strings) between the blending token $t$ and the next epoch randomness $R_{e+1}$ is smaller than the node activity threshold $\mathcal A _{\epsilon}$. That is:
+- The Hamming distance ($`\Delta_{\mathcal H}(a,b)`$ — returns the number of different bits between $`a`$ and $`b`$ binary strings) between the blending token $`t`$ and the next epoch randomness $`R_{e+1}`$ is smaller than the node activity threshold $`\mathcal A _{\epsilon}`$. That is:
 $$
 \Delta_{\mathcal H}(H(t)_{\epsilon},H(R_{e+1})_{\epsilon}) < {\mathcal A}_{\epsilon}
 $$
 
   Where:
 
-  - $H()$ is a hash function (the implementation of the hash function is `blake2b` returning $\epsilon$ bits).
-  - $\epsilon$ is a number of bits that can represent an expected number of blending tokens generated during an epoch. The number is rounded up to full bytes as required by the `blake2b` hash algorithm:
+  - $`H()`$ is a hash function (the implementation of the hash function is `blake2b` returning $`\epsilon`$ bits).
+  - $`\epsilon`$ is a number of bits that can represent an expected number of blending tokens generated during an epoch. The number is rounded up to full bytes as required by the `blake2b` hash algorithm:
 
 $$
 \epsilon = \left\lceil \log_2(Q_C^{Total}+1) \over 8\right\rceil\cdot8
@@ -986,7 +986,7 @@ Where:
 
 ### Activity Threshold
 
-The activity threshold ${\mathcal A}_{\epsilon}$ defines the expected maximal Hamming distance from the epoch randomness to the blending token expressed as an integer smaller or equal $\epsilon$.
+The activity threshold $`{\mathcal A}_{\epsilon}`$ defines the expected maximal Hamming distance from the epoch randomness to the blending token expressed as an integer smaller or equal $`\epsilon`$.
 
 We define the activity threshold as follows:
 
@@ -996,15 +996,15 @@ $$
 
 Where:
 
-- $\nu=\left\lceil \log_2(N + 1) \right\rceil$ represents the number of bits that are needed to express the number of nodes in the network $N$, it makes the lottery difficulty a function of the network size;
-- $\chi=\left\lceil\log_2(Q_C^{Total}+1)\right\rceil$ represents the number of bits needed to express all blending tokens generated during an epoch, where $Q_C^{Total}$ is the total number of cover messages generated by the network during an epoch (as defined [here](blend-protocol.md));
-- $\theta=1$ represents a sensitivity parameter that controls the winning conditions of the lottery.
+- $`\nu=\left\lceil \log_2(N + 1) \right\rceil`$ represents the number of bits that are needed to express the number of nodes in the network $`N`$, it makes the lottery difficulty a function of the network size;
+- $`\chi=\left\lceil\log_2(Q_C^{Total}+1)\right\rceil`$ represents the number of bits needed to express all blending tokens generated during an epoch, where $`Q_C^{Total}`$ is the total number of cover messages generated by the network during an epoch (as defined [here](blend-protocol.md));
+- $`\theta=1`$ represents a sensitivity parameter that controls the winning conditions of the lottery.
 
-We assume that setting $\theta = 1$ is enough to eliminate nodes that have not been active enough without too aggressively eliminating nodes that worked but had less luck with the lottery. However, we are going to revise this parameter in the future version of the protocol.
+We assume that setting $`\theta = 1`$ is enough to eliminate nodes that have not been active enough without too aggressively eliminating nodes that worked but had less luck with the lottery. However, we are going to revise this parameter in the future version of the protocol.
 
 ### Active Message
 
-A node $l$ for every epoch must construct an active message $M_A= \{l, t, e, \pi_{A}^{l,t,e} \}$, which must follow the [Active Message](bedrock-service-declaration-protocol.md#active-message).
+A node $`l`$ for every epoch must construct an active message $`M_A= \{l, t, e, \pi_{A}^{l,t,e} \}`$, which must follow the [Active Message](bedrock-service-declaration-protocol.md#active-message).
 
 The active message `metadata` field must start with a header that contains a one byte `version` field which is fixed to `0x01` value, the rest of the `metadata` is populated by the [Activity Proof](#activity-proof).
 
@@ -1014,9 +1014,9 @@ The active message is used for calculating the node reward.
 
 The active message is constructed after the current epoch, when the next epoch randomness is known.
 
-The active message for epoch $e$ must only be sent during epoch $e+1$; otherwise, it must be rejected.
+The active message for epoch $`e`$ must only be sent during epoch $`e+1`$; otherwise, it must be rejected.
 
-The node $l$ selects the activity proof to include in the active message such that the Hamming distance between the proof and the new randomness is minimal.
+The node $`l`$ selects the activity proof to include in the active message such that the Hamming distance between the proof and the new randomness is minimal.
 
 $$
 \pi_{A}^{l,t,e} = \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,e}))
@@ -1026,7 +1026,7 @@ The ledger must only accept a single active message per-node per-epoch. Any dupl
 
 ### Reward Calculation
 
-The node rewards for epoch $s$ are calculated according to the following schema:
+The node rewards for epoch $`s`$ are calculated according to the following schema:
 
 1. Rewards are not calculated if the number of nodes (unique `ProviderId`s from declarations) retrieved from the SDP protocol is lower than the [Minimal Network Size](#minimal-network-size).
 
@@ -1040,21 +1040,21 @@ The node rewards for epoch $s$ are calculated according to the following schema:
 
 4. Calculate the base reward:
     $$R = {I \over B + P}$$
-    where $I$ is the value of income for the Blend Network service for the epoch $s$.  For more details about the income calculation, refer to linked reference.
+    where $`I`$ is the value of income for the Blend Network service for the epoch $`s`$.  For more details about the income calculation, refer to linked reference.
 
-5. Calculate the reward of the node $n$:
+5. Calculate the reward of the node $`n`$:
     $$R(n) = R \cdot [\mathrm{true}(\pi_{A}^{i,t,e}) + \min_{\Delta_{\mathcal H}}(\mathrm{true}(\pi_{A}^{i,t,e}))]$$
-    That is, a base reward ($R$) is paid out to all nodes who have submitted a true activity proof, and the reward is doubled for nodes that submitted a true proof with a minimal Hamming distance.
+    That is, a base reward ($`R`$) is paid out to all nodes who have submitted a true activity proof, and the reward is doubled for nodes that submitted a true proof with a minimal Hamming distance.
 
 ### Rewarding Distribution Logic
 
-The reward is paid out to the node $n$ based on the node's activity declaration and the above reward calculation.
+The reward is paid out to the node $`n`$ based on the node's activity declaration and the above reward calculation.
 
 The rewards are distributed according to [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md). Here we are briefly sketching the main idea of the reward distribution protocol. For more details refer to the above document.
 
 1. To receive a reward, a node must send an Active Message as described in the [Active Message](bedrock-service-declaration-protocol.md#active-message), where the `Metadata` field consists of a node activity proof. The node must point to a single declaration (`declaration_id`) and use a single provider identity (`provider_id`) for constructing the Active Message. Any reuse of the `provider_id` must make the Active Message invalid.
-2. The Active Message must be sent after the end of an epoch ($e$), that is, during the next epoch ($e+1$), and after the epoch transition period as defined in the [Transition Period](#transition-period) section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.
-3. When the following epoch begins ($e+2$) Mantle distributes rewards ([Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)). This delay is required to calculate the partition of rewards as defined in the above section.
+2. The Active Message must be sent after the end of an epoch ($`e`$), that is, during the next epoch ($`e+1`$), and after the epoch transition period as defined in the [Transition Period](#transition-period) section. The delay allows nodes to include blending tokens collected during the epoch transition period for rewarding purposes.
+3. When the following epoch begins ($`e+2`$) Mantle distributes rewards ([Service Reward Distribution Protocol](bedrock-service-reward-distribution.md)). This delay is required to calculate the partition of rewards as defined in the above section.
 4. If a node does not send the Active Message on time, then it will not receive a reward.
 
 # Analysis
@@ -1065,13 +1065,13 @@ The main objective of the Blend protocol is to reduce the probability of linking
 
 The average latency penalty does not include the network delay.
 
-The Blend Protocol increases the Time to Infer (TTI — [Inference of relative stake](analysis-resilience-and-anonymity.md#inference-of-relative-stake)) the stake $300$ times (assuming a network of a peering degree 4) in comparison to not using the Blend Protocol. This TTI increases $10$ times for every additional Blend node used, reaching more than $10$ years ($487$ epochs) to infer a node stake.
+The Blend Protocol increases the Time to Infer (TTI — [Inference of relative stake](analysis-resilience-and-anonymity.md#inference-of-relative-stake)) the stake $`300`$ times (assuming a network of a peering degree 4) in comparison to not using the Blend Protocol. This TTI increases $`10`$ times for every additional Blend node used, reaching more than $`10`$ years ($`487`$ epochs) to infer a node stake.
 
-When the peering degree is increased to 6 the time to infer the stake increases $200$ times that means that higher peering degree decreases the time as an adversary has more chances to observe traffic.
+When the peering degree is increased to 6 the time to infer the stake increases $`200`$ times that means that higher peering degree decreases the time as an adversary has more chances to observe traffic.
 
-(*) Our TTI calculations are capped at *more than* $487$ *epochs*, which can be interpreted as more than $10$ years — a relatively safe threshold.
+(*) Our TTI calculations are capped at *more than* $`487`$ *epochs*, which can be interpreted as more than $`10`$ years — a relatively safe threshold.
 
-The time to infer the node stake depends on the confidence of the adversary. The confidence increases as the network observation time increases. Assuming $10\%$ node adversaries in the network and stake inference confidence of $60\%$ (which tells us about the confidence of the adversary when learning the node stake), we obtain the following values.
+The time to infer the node stake depends on the confidence of the adversary. The confidence increases as the network observation time increases. Assuming $`10\%`$ node adversaries in the network and stake inference confidence of $`60\%`$ (which tells us about the confidence of the adversary when learning the node stake), we obtain the following values.
 
 TTI — peering degree 4:
 
@@ -1091,9 +1091,9 @@ TTI — peering degree 6:
 | 2-hop Blend | more than 487 epochs (*) | more than 487 epochs (*) | more than 487 epochs (*) | 3s |
 | 3-hop Blend | more than 487 epochs (*) | more than 487 epochs (*) | more than 487 epochs (*) | 4.5s |
 
-When the Blend protocol is applied, then the the Time to Link (TTL — [The Unlinkability of Block Proposers](analysis-resilience-and-anonymity.md#the-unlinkability-of-block-proposers)) is non-instant, and it increases with the number of blend nodes used. For each additional blend used, the time increases $10$ times and the cost is of additional $1.5$ seconds of average latency.
+When the Blend protocol is applied, then the the Time to Link (TTL — [The Unlinkability of Block Proposers](analysis-resilience-and-anonymity.md#the-unlinkability-of-block-proposers)) is non-instant, and it increases with the number of blend nodes used. For each additional blend used, the time increases $`10`$ times and the cost is of additional $`1.5`$ seconds of average latency.
 
-Without the Blend protocol, the TTL is instant as the proposal is directly broadcast by the sender. Below we present a table where we show how long it takes to link a node to a single message with more than $50\%$ probability.
+Without the Blend protocol, the TTL is instant as the proposal is directly broadcast by the sender. Below we present a table where we show how long it takes to link a node to a single message with more than $`50\%`$ probability.
 
 TTL — peering degree 4:
 
@@ -1115,15 +1115,15 @@ TTL — peering degree 6:
 
 ## Statistical Analysis of Selection Bias of Modulo Operation
 
-Applying a modulo $N$ operation to the output of a pseudorandom number generator (here the Blake2b hash function) with a large range (here from $0$ to $2^{256}-1$), introduces a statistical bias when mapping to the smaller domain $\{0,1,\ldots,N-1\}$. This bias arises because $2^{256}$ is typically not divisible by $N$, meaning that some residues modulo $N$ will occur slightly more often than others. Specifically, let $R:=2^{256}$, then $R=q\cdot N+r$ with $0 \leq r \lt N$. The first $r$ values modulo $N$ will appear $q+1$ times, while the remaining $N-r$ values will appear $q$ times. Thus, the maximum bias between two values $a\leq r$ and $b \gt r$ in $\{0,1,\ldots,N-1\}$ is:
+Applying a modulo $`N`$ operation to the output of a pseudorandom number generator (here the Blake2b hash function) with a large range (here from $`0`$ to $`2^{256}-1`$), introduces a statistical bias when mapping to the smaller domain $`\{0,1,\ldots,N-1\}`$. This bias arises because $`2^{256}`$ is typically not divisible by $`N`$, meaning that some residues modulo $`N`$ will occur slightly more often than others. Specifically, let $`R:=2^{256}`$, then $`R=q\cdot N+r`$ with $`0 \leq r \lt N`$. The first $`r`$ values modulo $`N`$ will appear $`q+1`$ times, while the remaining $`N-r`$ values will appear $`q`$ times. Thus, the maximum bias between two values $`a\leq r`$ and $`b \gt r`$ in $`\{0,1,\ldots,N-1\}`$ is:
 
 $$
 |Pr[a]-Pr[b]| \leq \left| \frac{q+1}{R} - \frac{q}{R} \right| = \frac{1}{R}
 $$
 
-Where $Pr[a]$ is the probability that $a$ is the result of the modulo $N$ operation and $Pr[b]$ the probability that $b$ is the result of the modulo $N$ operation.
+Where $`Pr[a]`$ is the probability that $`a`$ is the result of the modulo $`N`$ operation and $`Pr[b]`$ the probability that $`b`$ is the result of the modulo $`N`$ operation.
 
-The maximum per-value bias is exactly $\frac{1}{R}$, regardless of $N$, as long as $N \lt R$. That means no single output differs from uniform by more than $2^{-256}$.
+The maximum per-value bias is exactly $`\frac{1}{R}`$, regardless of $`N`$, as long as $`N \lt R`$. That means no single output differs from uniform by more than $`2^{-256}`$.
 
 But now we consider total variation distance, a better global metric of distinguishability between the true distribution and uniform. This is:
 
@@ -1141,7 +1141,7 @@ $$
 \end{align}
 $$
 
-Reinjecting in the formula of $TV$:
+Reinjecting in the formula of $`TV`$:
 
 $$
 \begin{aligned}
@@ -1151,4 +1151,4 @@ TV&=\frac{1}{2} \left( r \cdot \left( \frac{1}{R} - \frac{r}{NR} \right) + (N-r)
 \end{aligned}
 $$
 
-So the distribution deviation is less than $\frac{N}{R}$ which is cryptographically negligible when $\frac{N}{R} \leq 2^{-128}$. Since $R=2^{256} \implies N \leq 2^{128}$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $N=2^{24}$) we can safely skip the rejection process necessary to draw random numbers uniformly in $\{0,1,\ldots,N-1\}$.
+So the distribution deviation is less than $`\frac{N}{R}`$ which is cryptographically negligible when $`\frac{N}{R} \leq 2^{-128}`$. Since $`R=2^{256} \implies N \leq 2^{128}`$. Since the number of nodes participating in Blend is expected to be less than 10 million (less than $`N=2^{24}`$) we can safely skip the rejection process necessary to draw random numbers uniformly in $`\{0,1,\ldots,N-1\}`$.

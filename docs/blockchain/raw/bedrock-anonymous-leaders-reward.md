@@ -59,7 +59,7 @@ In parallel, the blockchain maintains the value `leaders_rewards` accumulating t
 
 When producing a block, a leader performs the following:
 
-1. Generate a one-time random secret $voucher \overset{\$}{\leftarrow} \mathbb F_p$.
+1. Generate a one-time random secret $`voucher \overset{\$}{\leftarrow} \mathbb F_p`$.
 2. Compute the commitment: `voucher_cm := zkHash(b"LEAD_VOUCHER_CM_V1, voucher)`.
 3. Include the `voucher_cm` in the block header.
 

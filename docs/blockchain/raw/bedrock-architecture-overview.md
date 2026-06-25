@@ -53,7 +53,7 @@ Bedrock is composed of Cryptarchia and Bedrock Mantle. Bedrock is in turn suppor
 
 ![Diagram](bedrock-architecture-overview/assets/2e0261aa-09df-80e0-92a3-dc2820adbb7e.png)
 
-> <sub>Channels A and B form virtual chains on top of the Logos Blockchain. Channel messages are included in blocks on the Logos Blockchain in such a way that they respect the ordering of channel messages e.g. $B_4$ must come after $B_3$ in the Logos Blockchain.</sub>
+> <sub>Channels A and B form virtual chains on top of the Logos Blockchain. Channel messages are included in blocks on the Logos Blockchain in such a way that they respect the ordering of channel messages e.g. $`B_4`$ must come after $`B_3`$ in the Logos Blockchain.</sub>
 
 Channel messages can be used by Sovereign Zone sequencers to asynchronously communicate and coordinate actions amongst themselves. This could include planning cross-Zone transactions that affect the state of several Zones, or agreeing to modify a channel's properties.
 

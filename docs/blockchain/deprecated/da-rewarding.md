@@ -49,7 +49,7 @@ in this document are to be interpreted as described in [RFC 2119][rfc-2119].
 | Activity Proof | A data structure containing binary opinion vectors about other nodes' service quality. |
 | Active Message | A message registered on the ledger that contains a node's activity proof for a session. |
 | Opinion Threshold | The ratio of positive to negative opinions required for a node to be positively opinionated (default: 10). |
-| Activity Threshold | The number of positive opinions ($\theta = N_s/2$) a node must collect to be considered active. |
+| Activity Threshold | The number of positive opinions ($`\theta = N_s/2`$) a node must collect to be considered active. |
 | DA Node | A node providing data availability service, identified by a unique `ProviderId`. |
 | SDP | Service Declaration Protocol, used to retrieve the list of active DA nodes. |
 
@@ -58,12 +58,12 @@ in this document are to be interpreted as described in [RFC 2119][rfc-2119].
 | Symbol | Description |
 | ------ | ----------- |
 | $s$ | Current session number. |
-| $N_s$ | Set of DA nodes (unique `ProviderId`s) active during session $s$. |
+| $`N_s`$ | Set of DA nodes (unique `ProviderId`s) active during session $s$. |
 | $S$ | Session length in blocks (4320). |
 | $b$ | Block number. |
-| $\theta$ | Activity threshold ($N_s/2$). |
-| $R_s$ | Base reward for session $s$. |
-| $I_s$ | Total income for DA service during session $s$. |
+| $\theta$ | Activity threshold ($`N_s/2`$). |
+| $`R_s`$ | Base reward for session $s$. |
+| $`I_s`$ | Total income for DA service during session $s$. |
 | $R(n)$ | Reward for node $n$. |
 
 ## Background
@@ -171,31 +171,31 @@ to be positively opinionated (at least 90% positive opinions).
 To build an opinions vector describing the quality of data availability sampling,
 a node MUST:
 
-1. Retrieve $\mathcal{N}_s$, a list of active DA nodes (unique `ProviderId`s)
+1. Retrieve $`\mathcal{N}_s`$, a list of active DA nodes (unique `ProviderId`s)
    for session $s$, from the SDP.
 
-1. Retrieve $\mathcal{N}_{s-1}$, a list of active DA nodes for session $s - 1$,
+1. Retrieve $`\mathcal{N}_{s-1}`$, a list of active DA nodes for session $s - 1$,
    from the SDP (can be retained from the previous session).
 
-1. Order $\mathcal{N}_s$ and $\mathcal{N}_{s-1}$ in ascending lexicographical order
+1. Order $`\mathcal{N}_s`$ and $`\mathcal{N}_{s-1}`$ in ascending lexicographical order
    by `ProviderId` of each node from both lists.
 
-1. Create for each session and independently for old ($\mathcal{N} = \mathcal{N}_{s-1}$)
-   and new ($\mathcal{N} = \mathcal{N}_s$) blocks:
+1. Create for each session and independently for old ($`\mathcal{N} = \mathcal{N}_{s-1}`$)
+   and new ($`\mathcal{N} = \mathcal{N}_s`$) blocks:
 
-   1. `positive_opinions` vector of size $N = \text{length}(\mathcal{N})$
+   1. `positive_opinions` vector of size $`N = \text{length}(\mathcal{N})`$
       where the $i$-th element (integer) represents positive opinions
-      about the $i$-th node from list $\mathcal{N}$.
+      about the $i$-th node from list $`\mathcal{N}`$.
 
-   1. `negative_opinions` vector of size $N = \text{length}(\mathcal{N})$
+   1. `negative_opinions` vector of size $`N = \text{length}(\mathcal{N})`$
       where the $i$-th element (integer) represents negative opinions
-      about the $i$-th node from list $\mathcal{N}$.
+      about the $i$-th node from list $`\mathcal{N}`$.
 
-   1. `blacklist` vector of size $N = \text{length}(\mathcal{N})$
+   1. `blacklist` vector of size $`N = \text{length}(\mathcal{N})`$
       where the $i$-th element (bool) marks whether the $i$-th node
       is blacklisted due to providing an invalid response.
 
-1. Send a sampling request to a node $n \in \mathcal{N}$ such that `blacklist[n]==0`:
+1. Send a sampling request to a node $`n \in \mathcal{N}`$ such that `blacklist[n]==0`:
 
    1. If the node $n$ responds:
       1. If the response is valid, then `positive_opinions[n]++`
@@ -205,7 +205,7 @@ a node MUST:
 
    1. If the node does not respond, then `negative_opinions[n]++`
 
-1. When the next session starts, create an opinions binary for every node $i \in \mathcal{N}$:
+1. When the next session starts, create an opinions binary for every node $`i \in \mathcal{N}`$:
 
    ```python
    previous_session_opinions[i] = opinion(i, old.positive_opinions,
@@ -238,7 +238,7 @@ class ActivityProof:
     current_session_opinions: Opinions
 ```
 
-`Opinions` is a binary vector of length $N_s$
+`Opinions` is a binary vector of length $`N_s`$
 (total number of nodes identified by unique `ProviderId`s from declarations)
 where each bit represents a node providing DA service for the session.
 A bit is set to 1 only when the node considers the sampling service
@@ -269,7 +269,7 @@ The Activity Proof is **valid** when:
 
 - The byte-length of the `previous_session_opinions` vector is:
 
-  $$|\text{previous\_session\_opinions}| = \left\lceil \frac{\log_2(N_{s-1} + 1)}{8} \right\rceil$$
+  $$`|\text{previous\_session\_opinions}| = \left\lceil \frac{\log_2(N_{s-1} + 1)}{8} \right\rceil`$$
 
 - The `previous_session_opinions` vector is not provided
   (and `previous_session_opinions_length==0`)
@@ -277,9 +277,9 @@ The Activity Proof is **valid** when:
 
 - The byte-length of the `current_session_opinions` vector is:
 
-  $$|\text{current\_session\_opinions}| = \left\lceil \frac{\log_2(N_s + 1)}{8} \right\rceil$$
+  $$`|\text{current\_session\_opinions}| = \left\lceil \frac{\log_2(N_s + 1)}{8} \right\rceil`$$
 
-- The $n$-th node (note that $n \in \mathcal{N}_s \not\Rightarrow n \in \mathcal{N}_{s-1}$)
+- The $n$-th node (note that $`n \in \mathcal{N}_s \not\Rightarrow n \in \mathcal{N}_{s-1}`$)
   is represented by the $n$-th bit of the vector (counting nodes from 0),
   with the vector encoded as little-endian.
   The rightmost byte of the vector MAY contain bits not mapped to any node;
@@ -290,7 +290,7 @@ The Activity Proof is **valid** when:
 The activity threshold $\theta$ defines the number of positive opinions
 a node must collect from peers to be considered active for session $s$.
 
-$$\theta = N_s / 2$$
+$$`\theta = N_s / 2`$$
 
 Where $\theta$ controls the number of positive opinions
 a node must collect to be considered active.
@@ -325,10 +325,10 @@ The reward calculation follows these steps:
 
 Calculate the base reward for session $s$:
 
-$$R_s = \frac{I_s}{N_s}$$
+$$`R_s = \frac{I_s}{N_s}`$$
 
-Where $I_s$ is the income for DA service during session $s$,
-and $N_s$ is the number of nodes providing DA service during session $s$.
+Where $`I_s`$ is the income for DA service during session $s$,
+and $`N_s`$ is the number of nodes providing DA service during session $s$.
 
 > **Note**: The base reward is fixed to the total number of nodes providing the service
 > instead of the number of active nodes.
@@ -342,29 +342,29 @@ in such a way that will not benefit the nodes.
 
 Count the number of positive opinions for node $n$ in session $s$:
 
-$$\text{opinions}(n, s) = \sum_{i=1}^{N} \text{valid}(\text{activity\_proof}(i, n, s))$$
+$$`\text{opinions}(n, s) = \sum_{i=1}^{N} \text{valid}(\text{activity\_proof}(i, n, s))`$$
 
-Where $\text{valid}()$ returns true only when the `activity_proof` for node $n$ is valid
+Where $`\text{valid}()`$ returns true only when the `activity_proof` for node $n$ is valid
 and the opinion about node $n$ is **positive** for session $s$.
 
 #### Step 3: Calculate Node Reward
 
 Calculate the reward for node $n$ based on node activity:
 
-$$R(n) = \frac{R_s}{2} \cdot \text{active}(n, s) + \frac{R_{s-1}}{2} \cdot \text{active}(n, s - 1)$$
+$$`R(n) = \frac{R_s}{2} \cdot \text{active}(n, s) + \frac{R_{s-1}}{2} \cdot \text{active}(n, s - 1)`$$
 
-Where $\text{active}(n, s)$ returns true only when $n \in \mathcal{N}_s$
+Where $`\text{active}(n, s)`$ returns true only when $`n \in \mathcal{N}_s`$
 and the number of positive opinions on node $n$ for session $s$
 is greater than or equal to $\theta$:
 
-$$\text{opinions}(n, s) \geq \theta$$
+$$`\text{opinions}(n, s) \geq \theta`$$
 
 The reward is a function of the node's capacity (quality)
 to respond to sampling requests for both new and old blocks.
 Therefore, the reward draws from half of the income from session $s$ (for new blocks)
 and half of the income from session $s - 1$ (for old blocks).
 
-The base reward $R_s$ is distributed to nodes that both:
+The base reward $`R_s`$ is distributed to nodes that both:
 
 - Submitted a valid Activity Proof
 - Received positive opinions exceeding the activity threshold
@@ -397,7 +397,7 @@ for dishonest behaviour and collusion:
 
 ### Collusion Resistance
 
-The activity threshold of $N_s/2$ requires a node
+The activity threshold of $`N_s/2`$ requires a node
 to receive positive opinions from at least half of all nodes.
 This makes collusion attacks expensive,
 as an attacker would need to control a majority of nodes

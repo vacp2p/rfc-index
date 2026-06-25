@@ -47,14 +47,14 @@ This algorithm has been analyzed and shown to have good accuracy, precision and 
 | Symbol | Value | Name | Description |
 | --- | --- | --- | --- |
 | `beta` | 1.0 | learning rate | Controls how quickly we adjust to new participation levels.  Lower values for `beta` give a more stable / gradual adjustment, while higher values give faster convergence but at the cost of less stability. |
-| `PERIOD` | $6\lfloor \frac{k}{f} \rfloor$ | observation period | The length of the observation period in slots. |
+| `PERIOD` | $`6\lfloor \frac{k}{f} \rfloor`$ | observation period | The length of the observation period in slots. |
 | `f` | *inherited from* [Constants](cryptarchia-v1-protocol.md#constants) | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty. |
 | `k` | *inherited from* [Constants](cryptarchia-v1-protocol.md#constants) | security parameter | Block depth finality. Blocks deeper than `k` on any given chain are considered immutable. |
 
 ### Functions
 
-- $\textbf{density\_over\_slots}(s, p)$
-  *Returns the number of blocks produced in the* $p$ *slots following slot* $s$ *in the honest chain.*
+- $`\textbf{density\_over\_slots}(s, p)`$
+  *Returns the number of blocks produced in the* $`p`$ *slots following slot* $`s`$ *in the honest chain.*
 
 ## Algorithm
 

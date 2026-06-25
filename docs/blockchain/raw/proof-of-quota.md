@@ -95,11 +95,11 @@ Note that every inputs and outputs of zero-knowledge proofs are all scalar field
 
 Such that the following constraints hold:
 
-**Step 1**: The prover selects an `index` for the chosen key. This index must be lower than the allowed quota and not already used. This index is used to derive the key nullifier in step 4. Limiting the possible values of this index also limit the possible nullifier created which produce the desired effect: limiting the generation of keys to a certain quota. `index` will be on 20 bits enabling up to $2^{20}$ messages per node per `epoch`.
+**Step 1**: The prover selects an `index` for the chosen key. This index must be lower than the allowed quota and not already used. This index is used to derive the key nullifier in step 4. Limiting the possible values of this index also limit the possible nullifier created which produce the desired effect: limiting the generation of keys to a certain quota. `index` will be on 20 bits enabling up to $`2^{20}`$ messages per node per `epoch`.
 
 **Step 2:**  If the prover indicated that the node is a core node for the proof, the proof checks that:
 
-  1. The core node is registered in the set `N = SDP(epoch)`. This is proven by demonstrating knowledge of a `core_sk` that corresponds to a declared `zk_id`, which is a valid SDP registry for the current `epoch`. The `zk_id` values are stored in a Merkle tree with a fixed depth of 20, with the root provided as a public input. To build the Merkle tree, `zk_id` are ordered from the smallest to the biggest (when seen as natural numbers between 0 and $p$) and remaining empty leaves are represented by the `0` after the sorting (appended at the end of the vector). This structure supports up to 1M validators.
+  1. The core node is registered in the set `N = SDP(epoch)`. This is proven by demonstrating knowledge of a `core_sk` that corresponds to a declared `zk_id`, which is a valid SDP registry for the current `epoch`. The `zk_id` values are stored in a Merkle tree with a fixed depth of 20, with the root provided as a public input. To build the Merkle tree, `zk_id` are ordered from the smallest to the biggest (when seen as natural numbers between 0 and $`p`$) and remaining empty leaves are represented by the `0` after the sorting (appended at the end of the vector). This structure supports up to 1M validators.
   2. The index is valid: `index < core_quota`.
 
 **Step 3:** If the prover indicated that the node is a potential leader node for the proof, the proof checks that:
@@ -171,7 +171,7 @@ key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 
 ## Proof Compression
 
-The proof confirming that the PoQ is correct must be compressed to a size of 128 bytes, where the `UncompressedProof` is comprising of 2  $\mathbb{G}_1$ and 1  $\mathbb{G}_2$ BN256 elements as presented below.
+The proof confirming that the PoQ is correct must be compressed to a size of 128 bytes, where the `UncompressedProof` is comprising of 2  $`\mathbb{G}_1`$ and 1  $`\mathbb{G}_2`$ BN256 elements as presented below.
 
 ```python
 class UncompressedProof:

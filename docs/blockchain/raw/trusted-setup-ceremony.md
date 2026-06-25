@@ -63,7 +63,7 @@ Let N denote the total number of contributors participating in the ceremony. The
 
 The security of Groth16-based zero-knowledge proofs in the Logos Blockchain critically depends on a sound and verifiable trusted setup. Each participant contributes to the CRS without revealing their secret randomness, and public proofs guarantee the correctness of every transformation. The procedure applies to all required secret scalars, $\tau, \alpha, \beta, \gamma, \delta$, ensuring that all toxic waste is handled consistently and securely. Furthermore, the Logos Blockchain builds its Powers-of-Tau ceremony on top of an existing, already-audited CRS instead of starting from scratch, providing greater confidence in its security. This trusted setup process forms a foundational cryptographic pillar for ensuring privacy, integrity, and long-term resilience in the Logos architecture.
 
-We have two phases for the ceremony. Phase 1 is circuit-independent and involves generating elliptic curve encodings of powers of a toxic waste scalar $\tau$. This enables polynomial commitments up to a certain degree and can be reused across any circuit of bounded size. Phase 2 is circuit-specific and requires knowledge of the exact constraint system. It introduces four additional toxic waste scalars $\alpha, \beta, \gamma, \delta$, which are used to encode the circuit's polynomials and, crucially, compute the $K_i$ elements in the verification key. These $K_i$ terms represent compressed combinations of public input polynomials and must be computed for each unique circuit. As a result, while Phase 1 can be performed once and reused broadly, Phase 2 must be securely executed for every new circuit.
+We have two phases for the ceremony. Phase 1 is circuit-independent and involves generating elliptic curve encodings of powers of a toxic waste scalar $\tau$. This enables polynomial commitments up to a certain degree and can be reused across any circuit of bounded size. Phase 2 is circuit-specific and requires knowledge of the exact constraint system. It introduces four additional toxic waste scalars $\alpha, \beta, \gamma, \delta$, which are used to encode the circuit's polynomials and, crucially, compute the $`K_i`$ elements in the verification key. These $`K_i`$ terms represent compressed combinations of public input polynomials and must be computed for each unique circuit. As a result, while Phase 1 can be performed once and reused broadly, Phase 2 must be securely executed for every new circuit.
 
 ## Curve Selection and Parameter Structure
 
@@ -73,8 +73,8 @@ The Logos Blockchain uses the BN254 elliptic curve for Groth16-based zero-knowle
 
 Groth16 proving systems derive two key components from a structured CRS:
 
-- Proving Key ($pk$): This is a set of cryptographic parameters enabling the prover to generate proofs. Includes group elements from the prime-order cyclic subgroups $\mathbb G_1$ and $\mathbb G_2$ on elliptic curve, where $\mathbb G_2$ is defined over a degree-2 extension field.
-- Verification Key ($vk$): This is a smaller set of parameters allowing efficient verification of proofs. The verification key contains a much smaller set of elliptic curve elements from groups $\mathbb G_1$ and $\mathbb G_2$.
+- Proving Key ($pk$): This is a set of cryptographic parameters enabling the prover to generate proofs. Includes group elements from the prime-order cyclic subgroups $`\mathbb G_1`$ and $`\mathbb G_2`$ on elliptic curve, where $`\mathbb G_2`$ is defined over a degree-2 extension field.
+- Verification Key ($vk$): This is a smaller set of parameters allowing efficient verification of proofs. The verification key contains a much smaller set of elliptic curve elements from groups $`\mathbb G_1`$ and $`\mathbb G_2`$.
 
 # Protocol
 
@@ -82,67 +82,67 @@ Groth16 proving systems derive two key components from a structured CRS:
 
 This section describes the trusted setup procedure in detail, outlining both the cryptographic computations and the interactive flow of the multi-party Powers-of-Tau protocol. The process begins with a coordinator initializing elliptic curve parameters and generating the initial set of structured CRS elements. Each participant builds on the previous one’s output by applying a secret random transformation and publishing a proof of correctness — so the process is sequential. As long as at least one participant discards their secret input, the entire setup remains secure. These contributions are chained together, and the ceremony concludes with a publicly verifiable aggregation of the final CRS.
 
-The Groth16 protocol requires a CRS with a suite of powers of one random scalar $\tau \in \mathbb{F}^*_p$. To ensure soundness and zero-knowledge for a given arithmetic circuit, four additional toxic-waste elements must also be sampled independently and uniformly at random. While their values are circuit-independent, the way they are applied in constructing the proving and verification keys depends on the specific circuit.
+The Groth16 protocol requires a CRS with a suite of powers of one random scalar $`\tau \in \mathbb{F}^*_p`$. To ensure soundness and zero-knowledge for a given arithmetic circuit, four additional toxic-waste elements must also be sampled independently and uniformly at random. While their values are circuit-independent, the way they are applied in constructing the proving and verification keys depends on the specific circuit.
 
-In addition to $\tau$, the Groth16 proving system requires, for each circuit, four additional secret scalars, $\alpha,$ $\beta,\gamma$ and $\delta$ all sampled independently and uniformly at random from the field $\mathbb{F}_p^*$. These values are essential for securely encoding different components of the constraint system and for ensuring zero-knowledge in the final proof. Specifically, $\alpha$ and $\beta$ are used to randomize the circuit polynomials $A(x)$ and $B(x)$, $\gamma$ is used to compress linear combinations of public inputs, and $\delta$ provides blinding for the quotient polynomial that ensures witness-hiding. Like $\tau$, each of these values must be treated as toxic waste and securely discarded after use. All five values: $\tau, \alpha, \beta, \gamma, \delta$ must be generated using the same secure procedure and structure. In Groth16 Phase 2, these scalars are used immediately to derive circuit-specific CRS elements, in particular the $K_i$ terms in the verification key, before all toxic waste is securely destroyed.
+In addition to $\tau$, the Groth16 proving system requires, for each circuit, four additional secret scalars, $\alpha,$ $\beta,\gamma$ and $\delta$ all sampled independently and uniformly at random from the field $`\mathbb{F}_p^*`$. These values are essential for securely encoding different components of the constraint system and for ensuring zero-knowledge in the final proof. Specifically, $\alpha$ and $\beta$ are used to randomize the circuit polynomials $A(x)$ and $B(x)$, $\gamma$ is used to compress linear combinations of public inputs, and $\delta$ provides blinding for the quotient polynomial that ensures witness-hiding. Like $\tau$, each of these values must be treated as toxic waste and securely discarded after use. All five values: $\tau, \alpha, \beta, \gamma, \delta$ must be generated using the same secure procedure and structure. In Groth16 Phase 2, these scalars are used immediately to derive circuit-specific CRS elements, in particular the $`K_i`$ terms in the verification key, before all toxic waste is securely destroyed.
 
 ### Step 1: Initialization (Coordinator)
 
 The coordinator publicly specifies the foundational cryptographic parameters:
 
 - Elliptic Curve:
-    BN254: $(x,y) \in \mathbb{F}_{p}^{\text{BN254}}$ such that $y^2 = x^3 + 3$​
-    Here $\mathbb{F}_{p}^{\text{BN254}}$ denotes distinct prime fields of size $p^{\text{BN254}}$.
+    BN254: $`(x,y) \in \mathbb{F}_{p}^{\text{BN254}}`$ such that $`y^2 = x^3 + 3`$​
+    Here $`\mathbb{F}_{p}^{\text{BN254}}`$ denotes distinct prime fields of size $`p^{\text{BN254}}`$.
 - Cryptographic Groups:
-    - $\mathbb{G}_1, \mathbb{G}_2, \mathbb{G_T}$: prime-order subgroups of elliptic curve points over $\mathbb{F}_p$ and its extensions.
-    - $e: \mathbb{G}_1 \times \mathbb{G}_2 \to \mathbb{G}_T$: a bilinear, non-degenerate pairing function.
+    - $`\mathbb{G}_1, \mathbb{G}_2, \mathbb{G_T}`$: prime-order subgroups of elliptic curve points over $`\mathbb{F}_p`$ and its extensions.
+    - $`e: \mathbb{G}_1 \times \mathbb{G}_2 \to \mathbb{G}_T`$: a bilinear, non-degenerate pairing function.
 - Generators:
-    - $G_i \in \mathbb{G}_i : i \in \{1,2,T\}$ are fixed public generators.
+    - $`G_i \in \mathbb{G}_i : i \in \{1,2,T\}`$ are fixed public generators.
 - Element Notation:
-    - Elements of the group $\mathbb{G}_i : i \in \{1,2,T\}$ are written additively by using the following notation: $[\alpha]_i := \alpha \cdot G_i$.
+    - Elements of the group $`\mathbb{G}_i : i \in \{1,2,T\}`$ are written additively by using the following notation: $`[\alpha]_i := \alpha \cdot G_i`$.
 
 These values are fixed and published to all ceremony participants.
 
 - An initialized CRS:
-    - The initialized CRS contains $n + 1$ elements in $G_1$ and $m+1$ elements in $G_2$. For the $\tau$ secret in Groth16, the value of $n$ defines the maximum degree of polynomials that will be committed and the maximum size of circuits (the number of R1CS constraints must be ≤ $n$) and $m=1$. In contrast, the parameters $\alpha, \beta, \gamma, \delta$ of the Groth16 protocol each require only $n=m=0$. But, Phase 2 also includes the computation of the $K_i$ elements in $\mathbb G_1$, whose number depends on the circuit’s public inputs. These must be generated at the same time, while the toxic waste scalars are still in memory.
-    - The CRS is of the form $\left([1]_1\right)_{j=0}^n \; \left([1]_2\right)_{k=0}^m$ when initializing from scratch.
-    > For performance reasons, especially to leverage Number Theoretic Transforms (NTT) for fast polynomial arithmetic, it is common to choose $n$ as a power of two. For example, setting $n = 2^{k}$ allows working with polynomials of degree up to $2^{k} - 1$, and proving circuits with up to $2^{k}$ constraints.
+    - The initialized CRS contains $n + 1$ elements in $`G_1`$ and $m+1$ elements in $`G_2`$. For the $\tau$ secret in Groth16, the value of $n$ defines the maximum degree of polynomials that will be committed and the maximum size of circuits (the number of R1CS constraints must be ≤ $n$) and $m=1$. In contrast, the parameters $\alpha, \beta, \gamma, \delta$ of the Groth16 protocol each require only $n=m=0$. But, Phase 2 also includes the computation of the $`K_i`$ elements in $`\mathbb G_1`$, whose number depends on the circuit’s public inputs. These must be generated at the same time, while the toxic waste scalars are still in memory.
+    - The CRS is of the form $`\left([1]_1\right)_{j=0}^n \; \left([1]_2\right)_{k=0}^m`$ when initializing from scratch.
+    > For performance reasons, especially to leverage Number Theoretic Transforms (NTT) for fast polynomial arithmetic, it is common to choose $n$ as a power of two. For example, setting $`n = 2^{k}`$ allows working with polynomials of degree up to $`2^{k} - 1`$, and proving circuits with up to $`2^{k}`$ constraints.
 
 ### Step 2: Participant Contribution
 
 Each participant $i$ in the sequence performs the following:
 
 1. Downloads the current CRS:
-   $([\tau^j]_1)_{j=0}^{n}, \; ([\tau^k]_2)_{k=0}^{m}$ ($\tau = 1$ at the initialization phase).
-1. Generates a random secret scalar $r_i \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p^*$.
-1. Updates the CRS by contributing its secret $r_i$ into the CRS.
-    - $\forall j\in [0,n]: \; [(\tau')^j]_1 := [{(r_i \tau)^j}]_1 ={r_i^j}\cdot [\tau^j]_1$.
-    - $\forall k \in [0,m] : [(\tau')^k]_2 = [{(r_i \tau)^k}]_2 = {r_i^k}\cdot [\tau^k]_2$.
-1. Creates a proof showing they know $r_i$, and that the CRS is a correct transformation of the old one.
+   $`([\tau^j]_1)_{j=0}^{n}, \; ([\tau^k]_2)_{k=0}^{m}`$ ($\tau = 1$ at the initialization phase).
+1. Generates a random secret scalar $`r_i \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p^*`$.
+1. Updates the CRS by contributing its secret $`r_i`$ into the CRS.
+    - $`\forall j\in [0,n]: \; [(\tau')^j]_1 := [{(r_i \tau)^j}]_1 ={r_i^j}\cdot [\tau^j]_1`$.
+    - $`\forall k \in [0,m] : [(\tau')^k]_2 = [{(r_i \tau)^k}]_2 = {r_i^k}\cdot [\tau^k]_2`$.
+1. Creates a proof showing they know $`r_i`$, and that the CRS is a correct transformation of the old one.
     - This proof consists of three checks (detailed in Step 4):
-        - Knowledge of exponent $r_i$ for the first element.
-        - Non-zero: $r_i \neq 0$ ensuring previous contributions are not erased.
+        - Knowledge of exponent $`r_i`$ for the first element.
+        - Non-zero: $`r_i \neq 0`$ ensuring previous contributions are not erased.
         - Well-formedness of the updated CRS via random linear combination pairing check.
 1. Submits:
-    - Updated parameters $([(\tau')^j]_1)_{j=0}^{n}, \; ([(\tau')^k]_2)_{k=0}^{m}$.
+    - Updated parameters $`([(\tau')^j]_1)_{j=0}^{n}, \; ([(\tau')^k]_2)_{k=0}^{m}`$.
     - Proof of correct transformation.
 
-In Phase 2 for Groth16, participants also update all circuit-specific elements derived from the toxic waste scalars (including the $K_i$ terms), ensuring they are transformed consistently with the rest of the CRS.
+In Phase 2 for Groth16, participants also update all circuit-specific elements derived from the toxic waste scalars (including the $`K_i`$ terms), ensuring they are transformed consistently with the rest of the CRS.
 
 ### Step 3: Public Verification
 
-1. Knowledge of Exponent $r_i$​
+1. Knowledge of Exponent $`r_i`$​
     This is proven using a Fiat–Shamir transform of a Schnorr-like protocol:
-    - Let: $\quad [\tau']_1 = {r_i \cdot [\tau]_1}$.
-    - Prover samples random values uniformly $z \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p$.
-    - Computes: $[z']_1 = z\cdot[\tau]_1$.
-    - Computes challenge: $h = \text{Hash}([\tau]_1, [\tau']_1, [z']_1)$.
-    - Computes response: $s = z + h \cdot r_i \mod p$.
-    - Publishes proof $\pi = ([z']_1, s)$.
-    - Verifier checks: $s\cdot[\tau]_1 \stackrel{?}{=} [z']_1 + h\cdot [\tau']_1$.
-    This protocol confirms that the first element of the CRS was exponentiated with a known secret $r_i$.
+    - Let: $`\quad [\tau']_1 = {r_i \cdot [\tau]_1}`$.
+    - Prover samples random values uniformly $`z \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p`$.
+    - Computes: $`[z']_1 = z\cdot[\tau]_1`$.
+    - Computes challenge: $`h = \text{Hash}([\tau]_1, [\tau']_1, [z']_1)`$.
+    - Computes response: $`s = z + h \cdot r_i \mod p`$.
+    - Publishes proof $`\pi = ([z']_1, s)`$.
+    - Verifier checks: $`s\cdot[\tau]_1 \stackrel{?}{=} [z']_1 + h\cdot [\tau']_1`$.
+    This protocol confirms that the first element of the CRS was exponentiated with a known secret $`r_i`$.
 1. Well-Formedness of CRS
-    - Verifier samples $\rho_1, \rho_2 \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p^*$.
+    - Verifier samples $`\rho_1, \rho_2 \stackrel{\mathrm{R}}{\leftarrow} \mathbb{F}_p^*`$.
     - The verifier computes the following pairing equation on the new CRS:
 
 $$
@@ -157,26 +157,26 @@ e\!\left(
 \right)
 $$
 
-This pairing check confirms that the CRS has been updated via exponentiation by the same secret scalar $r_i$, preserving the structure of the powers of $\tau$.
+This pairing check confirms that the CRS has been updated via exponentiation by the same secret scalar $`r_i`$, preserving the structure of the powers of $\tau$.
 
 1. Non-Erasing Contribution
-    - Checks that $r_i \neq 0$:  $r_i \cdot [\tau]_1\ne \mathcal{O} \quad (\text{identity element})$.
-1. $K_i$’s verification (Phase2 only)
+    - Checks that $`r_i \neq 0`$:  $`r_i \cdot [\tau]_1\ne \mathcal{O} \quad (\text{identity element})`$.
+1. $`K_i`$’s verification (Phase2 only)
     For each public $i$, check the pairing equation:
-   $e(K_i,\; [\gamma]_2) \;\stackrel{?}{=}\; e\!\left([A_i(\tau)]_1,\; [\beta]_2\right)\;\cdot\; e\!\left([B_i(\tau)]_1,\; [\alpha]_2\right)\;\cdot\; e\!\left([C_i(\tau)]_1,\; G_2\right)$​
+   $`e(K_i,\; [\gamma]_2) \;\stackrel{?}{=}\; e\!\left([A_i(\tau)]_1,\; [\beta]_2\right)\;\cdot\; e\!\left([B_i(\tau)]_1,\; [\alpha]_2\right)\;\cdot\; e\!\left([C_i(\tau)]_1,\; G_2\right)`$​
     - Left side encodes the division by $\gamma$ (respectively $\delta$ for private inputs).
-    - Right side encodes the linear combination $\beta A_i(\tau) + \alpha B_i(\tau) + C_i(\tau)$.
-    - If it holds for all $i$, the $K_i$ are correct and consistent with the same $\alpha,\beta,\gamma,\tau$ for public inputs (respectively $\delta$ for private inputs).
+    - Right side encodes the linear combination $`\beta A_i(\tau) + \alpha B_i(\tau) + C_i(\tau)`$.
+    - If it holds for all $i$, the $`K_i`$ are correct and consistent with the same $\alpha,\beta,\gamma,\tau$ for public inputs (respectively $\delta$ for private inputs).
 
 ### Step 4: Toxic Waste Destruction
 
-While each participant is expected to delete their secret scalar $r_i$ immediately after contribution, security is guaranteed as long as at least one participant successfully deletes their randomness.
+While each participant is expected to delete their secret scalar $`r_i`$ immediately after contribution, security is guaranteed as long as at least one participant successfully deletes their randomness.
 
 ### Finalized CRS
 
 Once all participants have contributed:
 
-- The final CRS $([\tau^j]_1)_{j=0}^{n} = ([\prod_i r_i^j]_1)_{j=0}^n, \; ([\tau^k]_2)_{k=0}^m = ([\prod_i r_i^k]_2)_{k=0}^m$ is published ($i$ being the number of participants).
+- The final CRS $`([\tau^j]_1)_{j=0}^{n} = ([\prod_i r_i^j]_1)_{j=0}^n, \; ([\tau^k]_2)_{k=0}^m = ([\prod_i r_i^k]_2)_{k=0}^m`$ is published ($i$ being the number of participants).
 - This CRS is used to derive:
     - Circuit-specific proving keys $pk$.
     - Circuit-specific verification keys $vk$.

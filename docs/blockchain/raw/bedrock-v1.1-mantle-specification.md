@@ -97,13 +97,13 @@ class SignedMantleTx:
     op_proofs: list[OpProof | None] # each Op has at most 1 associated proof
 ```
 
-Each proof (op proof and signature) must be cryptographically bound to the `MantleTx` through the `mantle_txhash` to prevent replay attacks. This binding is achieved by including the `MantleTx` hash reduced modulo $p$ as a public input in every ZK proof.
+Each proof (op proof and signature) must be cryptographically bound to the `MantleTx` through the `mantle_txhash` to prevent replay attacks. This binding is achieved by including the `MantleTx` hash reduced modulo $`p`$ as a public input in every ZK proof.
 
 ```python
 mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 ```
 
-  `mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $p$ (via `FiniteField(..., modulus=p)`). Since $p \approx 2^{254}$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $2^{-254}$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $F_p$.
+  `mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
 
 ## Mantle Transaction Fee
 
@@ -1519,7 +1519,7 @@ def derive_note_id(op_id: Hash, output_number: int, note: Note) -> NoteId:
     )
 ```
 
-`op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $p \approx2^{-254}$, the reduction is slightly non-uniform, values in $[0, 2^{256} \mod p)$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $2^{-254}$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $𝔽_p$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
+`op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $`p \approx2^{-254}`$, the reduction is slightly non-uniform, values in $`[0, 2^{256} \mod p)`$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $`2^{-254}`$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $`𝔽_p`$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
 
 These note identifiers uniquely define notes in the system and cannot be chosen by the user. Nodes maintain the set of notes through a dictionary mapping the NoteId to the note.
 
@@ -1639,7 +1639,7 @@ Such that the following constraints hold:
   )
   ```
 
-- The proof is bound to `msg` (it’s the `mantle_tx_hash` reduced modulo $p$ in case of transactions).
+- The proof is bound to `msg` (it’s the `mantle_tx_hash` reduced modulo $`p`$ in case of transactions).
 
   For implementation, the ZkSignature circuit will take a maximum of 32 public keys as inputs. To prove ownership of fewer keys, the remaining inputs will be padded with the public key corresponding to the secret key `0` and ignored during execution. The outputs have no size limit since they are included in the hashed message.
 
@@ -1698,7 +1698,7 @@ assert voucher_nullifier == zkhash(
     secret_voucher)
 ```
 
-- The proof is bound to the `mantle_tx_hash` reduced modulo $p$.
+- The proof is bound to the `mantle_tx_hash` reduced modulo $`p`$.
 
 ### Benchmark
 
