@@ -510,7 +510,7 @@ The NoteId Section also needs an update to include the new `OpId` derivation. We
     )
 ```
 
-> `op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $`p \approx2^{-254}`$, the reduction is slightly non-uniform, values in $`[0, 2^{256} \mod p)`$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $`2^{-254}`$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $`𝔽_p`$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
+> `op_id` is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod `p` (via `FiniteField(..., modulus=p)`). Since $p \approx2^{-254}$, the reduction is slightly non-uniform, values in $[0, 2^{256} \mod p)$ appear one extra time, but this is inconsequential in practice: the collision probability remains around $2^{-254}$, and `NoteId` uniqueness is not derived from uniformity of `op_id` over $𝔽_p$ but from the collision-resistance of the underlying hash and per-operation payload uniqueness.
 
 #### Gas Determination
 

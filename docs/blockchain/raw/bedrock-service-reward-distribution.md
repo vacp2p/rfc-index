@@ -73,7 +73,7 @@ $$
 Rewards^n := serviceReward(n,Rewards\_Epoch)
 $$
 
-Where $`Rewards\_Epoch`$ are the total rewards of epoch **N**. The $`Rewards\_Epoch`$ is determined by the linked reference, which calculates how much each service receives based on fees burnt during epoch N and the blockchain's state. $`Rewards^n`$ is stored as an array that maps each validator's `zk_id` to their allocated reward.
+Where $Rewards\_Epoch$ are the total rewards of epoch **N**. The $Rewards\_Epoch$ is determined by the linked reference, which calculates how much each service receives based on fees burnt during epoch N and the blockchain's state. $Rewards^n$ is stored as an array that maps each validator's `zk_id` to their allocated reward.
 
 ## Service Reward Distribution
 

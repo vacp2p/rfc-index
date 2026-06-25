@@ -66,23 +66,23 @@ class PublicHeader:
 Where:
 
 - `version=0x01` is version of the protocol.
-- `public_key` is $`K^{n}_i`$, a public key from the set $`\mathbf K^n_h`$ as defined in the [Message Encapsulation](message-encapsulation.md) spec.
-- `proof_of_quota` is $`\pi^{K^{n}_i}_{Q}`$, a corresponding proof of quota for the key $`K^{n}_i`$ from the $`\mathbf K^n_h`$ it also contains the key nullifier.
-- `signature` is $`\sigma_{K^{n}_{i}}(\mathbf {h|P}_i)`$, a signature of the concatenation of the $`i`$-th encapsulation of the payload $`\mathbf P`$ and the private header $`\mathbf h`$, that can be verified by the public key $`K^{n}_{i}`$.
+- `public_key` is $K^{n}_i$, a public key from the set $\mathbf K^n_h$ as defined in the [Message Encapsulation](message-encapsulation.md) spec.
+- `proof_of_quota` is $\pi^{K^{n}_i}_{Q}$, a corresponding proof of quota for the key $K^{n}_i$ from the $\mathbf K^n_h$ it also contains the key nullifier.
+- `signature` is $\sigma_{K^{n}_{i}}(\mathbf {h|P}_i)$, a signature of the concatenation of the $i$-th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$, that can be verified by the public key $K^{n}_{i}$.
 
 ### Private Header
 
 The `private_header` must be generated as the outcome of the [[1.0.0] Message Encapsulation Mechanism](message-encapsulation.md).
 
-The private header contains a set of encrypted blending headers $`\mathbf h = (\mathbf b_1,...,\mathbf b_{h_{max}})`$.
+The private header contains a set of encrypted blending headers $\mathbf h = (\mathbf b_1,...,\mathbf b_{h_{max}})$.
 
 ```python
 private_header: list[BlendingHeader]
 ```
 
-The size of the set is limited to $`\beta_{max}=3`$ `BlendingHeader` entries, as defined in the [Global Parameters](blend-protocol.md#global-parameters).
+The size of the set is limited to $\beta_{max}=3$ `BlendingHeader` entries, as defined in the [Global Parameters](blend-protocol.md#global-parameters).
 
-The `BlendingHeader` ($`\mathbf b_l`$) is defined as follows:
+The `BlendingHeader` ($\mathbf b_l$) is defined as follows:
 
 ```python
 class BlendingHeader:
@@ -95,11 +95,11 @@ class BlendingHeader:
 
 Where:
 
-- `public_key` is $`K^{n}_{l}`$, a public key from the set $`\mathbf K^n_h`$.
-- `proof_of_quota` is $`\pi^{K^{n}_l}_{Q}`$, a corresponding proof of quota for the key $`K^{n}_l`$ from the $`\mathbf K^n_h`$ it also contains the key nullifier.
-- `signature` is $`\sigma_{K^{n}_{l}}(\mathbf {h|P}_l)`$, a signature of the concatenation of $`l`$-th encapsulation of the payload $`\mathbf P`$ and the private header $`\mathbf h`$, that can be verified by public key $`K^{n}_{l}`$.
-- `proof_of_selection` is $`\pi^{K^{n}_{l+1},m_{l+1}}_{S}`$, a proof of selection of the node index $`m_{l+1}`$ assuming valid proof of quota $`\pi^{K^{n}_{l}}_{Q}`$.
-- `is_last` is $`\Omega`$, a flag that indicates that this is the last encapsulation.
+- `public_key` is $K^{n}_{l}$, a public key from the set $\mathbf K^n_h$.
+- `proof_of_quota` is $\pi^{K^{n}_l}_{Q}$, a corresponding proof of quota for the key $K^{n}_l$ from the $\mathbf K^n_h$ it also contains the key nullifier.
+- `signature` is $\sigma_{K^{n}_{l}}(\mathbf {h|P}_l)$, a signature of the concatenation of $l$-th encapsulation of the payload $\mathbf P$ and the private header $\mathbf h$, that can be verified by public key $K^{n}_{l}$.
+- `proof_of_selection` is $\pi^{K^{n}_{l+1},m_{l+1}}_{S}$, a proof of selection of the node index $m_{l+1}$ assuming valid proof of quota $\pi^{K^{n}_{l}}_{Q}$.
+- `is_last` is $\Omega$, a flag that indicates that this is the last encapsulation.
 
 ### Payload
 

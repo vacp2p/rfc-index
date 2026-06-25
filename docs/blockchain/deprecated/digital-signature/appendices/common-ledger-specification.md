@@ -53,7 +53,7 @@ To resolve this, we divide commitment membership proofing into two stages:
 The intuition behind why this works is that since the commitment set MMR is append-only, an old state of an MMR will always be a subset of the latest MMR:
 ![Diagram](../assets/1fd261aa-09df-8182-8226-da04fae6e147.png)
 
-> <sub>The MMR when $`cm_5`$ was added is a subset of the latest MMR, we can prove that the frontier nodes of the old MMR $`\{r_3, cm_5\}`$ are members of the latest MMR by providing paths up to $`r_7`$</sub>
+> <sub>The MMR when $cm_5$ was added is a subset of the latest MMR, we can prove that the frontier nodes of the old MMR $\{r_3, cm_5\}$ are members of the latest MMR by providing paths up to $r_7$</sub>
 
 This works insofar as executors maintain a far enough history of MMR states. If a wallet membership proof is too old, an executor may not have kept MMR states so far back and so he won’t be able to extend the membership proof to the latest root. In this case, the wallet must sync with the zone to update its membership proof to proceed (see Membership Proof Updates).
 #### Compression of the Commitment Set
@@ -71,15 +71,15 @@ When a wallet wants to store a new note, because it's waiting to receive a note 
   For the detection of new notes by wallets, see
   - Wallet scanning the network for the notes
 
-The wallet can build this proof of membership w.r.t. some frontier nodes $`F`$ by providing the witness $`(cm,path)`$ where
-- $`cm`$ is the commitment we are proving membership for.
-- $`path`$ is the Merkle path provided by the note owner.
+The wallet can build this proof of membership w.r.t. some frontier nodes $F$ by providing the witness $(cm,path)$ where
+- $cm$ is the commitment we are proving membership for.
+- $path$ is the Merkle path provided by the note owner.
 The membership proof attests to the statement:
-- $`\textbf{merkle\_path\_root}(cm, path) \in F`$.
+- $\textbf{merkle\_path\_root}(cm, path) \in F$.
 By proving membership against the frontier nodes, we do not leak temporal information about which mountain a commitment is part of in the MMR.
 **Membership Proof Updates**
 To ensure transaction unlinkability, it is essential that an observer cannot determine which commitment is used in the proof of membership.
-- Ideally, when there are $`n`$ commitments in the set, the probability $`p`$ that an observer can identify whether a particular commitment is being used should satisfy $`|p-\frac{1}{n}|\leq 2^{-128}`$ for 128 bits of security.
+- Ideally, when there are $n$ commitments in the set, the probability $p$ that an observer can identify whether a particular commitment is being used should satisfy $|p-\frac{1}{n}|\leq 2^{-128}$ for 128 bits of security.
 - This means that a wallet cannot simply use the frontier nodes of the commitment set from when it was initially created. Doing so would allow an observer to infer that the proven commitment is more likely to be one of the recently added ones
 Therefore, it is essential for wallets to update this list of frontier nodes representing the commitment set regularly.
 1. The wallets main maintenance task is centred around maintaining the one frontier node in which his note is a member of.
@@ -87,7 +87,7 @@ Therefore, it is essential for wallets to update this list of frontier nodes rep
     - When two frontier nodes have the same height, they are merged according to Merkle Mountain Ranges (MMR).
 
   - The merging process of two frontier nodes can be anticipated.
-    - If a commitment is the $`i^{th}`$ commitment added to the set (starting from 0), the folding happens every time a new commitment added is the $`j^{th}`$ commitment and $`j`$ has a binary representation that changes a 0 to a 1 in $`i`$’s binary representation from right to left.
+    - If a commitment is the $i^{th}$ commitment added to the set (starting from 0), the folding happens every time a new commitment added is the $j^{th}$ commitment and $j$ has a binary representation that changes a 0 to a 1 in $i$’s binary representation from right to left.
     - For example, if a commitment is the n°54 (counting the first commitment as commitment 0), 54 in binary is 110110.
     - Its tree will be merged after the inclusion of the 110111, 111111, 1111111, etc. commitment, or whenever another leading 1 is added to the binary representation.
     - In other words, the Merkle path should be updated when commitments 55, 63, 127, 255, and so on are added.
@@ -136,7 +136,7 @@ As already presented in 2. Executors, zones are responsible for the verification
 
 In this section, there are some components that are described in detail in Execution Model Specification and Preliminary Research: Bedrock Mantle Specification (Native Zones). Here we will just provide a brief intuition of what they do, and kindly refer the reader to the original documents for further detail:
 - **Bundle**: A bundle is an aggregation of one or several valid transactions that are balancing each other.
-- Zone **Sync Logs**: This is a list of the form $`(bundle\_root, Zone1,Zone2,\dots)`$ used to verify the correct coordination between zones.
+- Zone **Sync Logs**: This is a list of the form $(bundle\_root, Zone1,Zone2,\dots)$ used to verify the correct coordination between zones.
 - Zone **Update** is what will land on the Bedrock Mantle for posting about a zone update, which  includes the update of its ledger. This update processes several valid bundles and updates the ledger of a zone accordingly.
 ### **Proof overview**
 
@@ -152,27 +152,27 @@ In order to prove the correct update of the ledger to the Bedrock, zones will pr
 
 ![Diagram](../assets/1fd261aa-09df-813f-bee7-cb83fa51c14d.png)
 
-1. The executor will bring $`i`$ bundles, of input $`Inputs^{(i)}`$, $`Outputs^{(i)}`$ and of root $`bundle\_root`$, to apply an update on the ledger of its zone. The ledger proof checks that each bundle has a valid bundle proof:
+1. The executor will bring $i$ bundles, of input $Inputs^{(i)}$, $Outputs^{(i)}$ and of root $bundle\_root$, to apply an update on the ledger of its zone. The ledger proof checks that each bundle has a valid bundle proof:
   - Proving that each of them is balanced.
   - Proving that inputs and outputs are valid notes that can be included in the zone ledger on the condition that the frontier nodes used for proof of membership are nodes included in the ledger state of the zone.
 
-2. For each different bundle $`i`$, $`\forall (nf,ZoneID,Roots) \in Inputs^{(i)}`$, If $`ZoneID`$ is the executor’s zone, the ledger proof guarantees that nullifiers are not already in the set and include them afterward.
-1. To finalize the proof of membership, the executor must prove that there exists a Merkle path from each node in $`Roots`$ to one of the latest frontier nodes.
+2. For each different bundle $i$, $\forall (nf,ZoneID,Roots) \in Inputs^{(i)}$, If $ZoneID$ is the executor’s zone, the ledger proof guarantees that nullifiers are not already in the set and include them afterward.
+1. To finalize the proof of membership, the executor must prove that there exists a Merkle path from each node in $Roots$ to one of the latest frontier nodes.
 2. The nullifier is checked to be indeed not present in the last known nullifier set of the zone.
-    - For that, the executor is providing a Merkle path demonstrating that there is a different nullifier $`nf_{inf}`$ in the nullifier set Merkle tree.
-    - That $`nf_{inf}`$ is strictly lower than $`nf`$
-    - That the leaf of $`nf_{inf}`$ is pointing to another nullifier $`nf_{supp}`$.
-    - That $`nf_{supp}`$ is strictly greater than $`nf`$.
+    - For that, the executor is providing a Merkle path demonstrating that there is a different nullifier $nf_{inf}$ in the nullifier set Merkle tree.
+    - That $nf_{inf}$ is strictly lower than $nf$
+    - That the leaf of $nf_{inf}$ is pointing to another nullifier $nf_{supp}$.
+    - That $nf_{supp}$ is strictly greater than $nf$.
 
-3. Integrate $`nf`$ in the nullifier set of the zone:
-    - Integrate a new leaf which includes the new nullifier $`nf`$ pointing to the greater nullifier $`nf_{supp}`$.
-    - Change the pointer of $`nf_{inf}`$ to $`nf`$ using the Merkle path of $`nf_{inf}`$.
+3. Integrate $nf$ in the nullifier set of the zone:
+    - Integrate a new leaf which includes the new nullifier $nf$ pointing to the greater nullifier $nf_{supp}$.
+    - Change the pointer of $nf_{inf}$ to $nf$ using the Merkle path of $nf_{inf}$.
     - This ensures that each leaf is still pointing to the next nullifier, conserving the ordered property of the list.
 
-3. For each different bundle $`i`$,  $`\forall (cm,ZoneID) \in Outputs^{(i)}`$, if $`ZoneID`$ is the executor’s zone, the ledger proof appends the commitment in the commitment set MMR of the zone.
-4. The ledger proof then constructs the Merkle root of the bundle $`bundle\_root`$, representing uniquely the bundle. This is achieved by constructing a Merkle tree over the transaction roots.
-5. The ledger proof constructs the zone $`sync\_logs`$ that is used by validators to ensure correct coordination between zones for cross-zone bundles. This takes the form of one tuple per cross-zone bundle (with the $`bundle\_root`$ followed by every zone involved in the bundle).
-6. Output updated ledger state $`ledger_{new}`$, the hash of cross-zone $`sync\_logs`$ and **the hash of the nullifiers and commitments included in the ledger in correct order**.
+3. For each different bundle $i$,  $\forall (cm,ZoneID) \in Outputs^{(i)}$, if $ZoneID$ is the executor’s zone, the ledger proof appends the commitment in the commitment set MMR of the zone.
+4. The ledger proof then constructs the Merkle root of the bundle $bundle\_root$, representing uniquely the bundle. This is achieved by constructing a Merkle tree over the transaction roots.
+5. The ledger proof constructs the zone $sync\_logs$ that is used by validators to ensure correct coordination between zones for cross-zone bundles. This takes the form of one tuple per cross-zone bundle (with the $bundle\_root$ followed by every zone involved in the bundle).
+6. Output updated ledger state $ledger_{new}$, the hash of cross-zone $sync\_logs$ and **the hash of the nullifiers and commitments included in the ledger in correct order**.
 The following diagram summarizes the executor’s ledger proof:
 ![Diagram](../assets/1fd261aa-09df-816b-a7c8-e4d9f7dbbc9d.png)
 
@@ -181,7 +181,7 @@ The following diagram summarizes the executor’s ledger proof:
 ### Merkle Mountain Ranges (MMR)
 
 From the [original presentation of MMR on github:](https://github.com/opentimestamps/opentimestamps-server/blob/master/doc/merkle-mountain-range.md)
-As digests are accumulated we hash them into trees, building up the largest perfect binary trees possible as we go. At least one tree will always exist, with $`2^k`$ digests at the base, and $`2^{k+1}-1`$ total elements. If the total number of digests doesn't divide up into one perfect tree, more than one tree will exist. This data structure we call a Merkle Mountain Range, for obvious reasons:
+As digests are accumulated we hash them into trees, building up the largest perfect binary trees possible as we go. At least one tree will always exist, with $2^k$ digests at the base, and $2^{k+1}-1$ total elements. If the total number of digests doesn't divide up into one perfect tree, more than one tree will exist. This data structure we call a Merkle Mountain Range, for obvious reasons:
 ```text
 graph BT
     %% Leaves (elements)
@@ -202,7 +202,7 @@ graph BT
     Hash23 --> Hash0-3
 ```
 
-Since the trees are strictly append only, we can easily build, and store them, on disk in the standard breadth first tree storage. In this array we can define a height for each digest, and that height is equal to $`log_2(n)`$ where n is the number of digests in the base of the tree. The following shows the contents of that array as it is progressively extended with new digests:
+Since the trees are strictly append only, we can easily build, and store them, on disk in the standard breadth first tree storage. In this array we can define a height for each digest, and that height is equal to $log_2(n)$ where n is the number of digests in the base of the tree. The following shows the contents of that array as it is progressively extended with new digests:
 ```text
 0
 00
@@ -260,5 +260,5 @@ graph BT
     N4-7 --> root
 ```
 
-The process can be completely deterministic, producing the exact same digest every time provided you have every base digest and their order. By knowing the number of digests in a given mountain range you can always efficiently reproduce the peak enclosing the mountain whole range at that point in time. The storage cost for all the intermediate hashes is $`n-1`$.
+The process can be completely deterministic, producing the exact same digest every time provided you have every base digest and their order. By knowing the number of digests in a given mountain range you can always efficiently reproduce the peak enclosing the mountain whole range at that point in time. The storage cost for all the intermediate hashes is $n-1$.
 Moreover, knowing Merkle roots of different depth Merkle tree filled with empty leaves able the computation of the Merkle root logarithmically without needing to really pad the tree.

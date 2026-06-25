@@ -65,12 +65,12 @@ The entire lifecycle can be visualized in the following flow:
 
 ## Incentive Analysis
 
-- User Strategy: The mechanism promotes a straightforward bidding strategy. A rational user should set their execution_gas_price ($`c_t`$) to their true maximum willingness to pay. Setting it higher provides no advantage and risks overpayment, while setting it lower risks the transaction being delayed if the base_fee rises. The priority_fee acts as a simple tip to gauge the market rate for priority inclusion during congestion.
+- User Strategy: The mechanism promotes a straightforward bidding strategy. A rational user should set their execution_gas_price ($c_t$) to their true maximum willingness to pay. Setting it higher provides no advantage and risks overpayment, while setting it lower risks the transaction being delayed if the base_fee rises. The priority_fee acts as a simple tip to gauge the market rate for priority inclusion during congestion.
 - Block Builder Strategy: The dominant strategy for a rational, profit-maximizing block builder is to follow the prescribed block construction algorithm honestly. The block builder's revenue is derived from (a) priority fees and (b) block rewards in accordance with network Key Performance Indicators (KPIs) as described in [\[1.0.0\] Block Rewards](block-rewards.md), which incentivize them to include the transactions that maximize their revenue. Because the base_fee is determined algorithmically based on historical data, a block builder cannot manipulate it for their own immediate gain.
 
 ## Economic Properties
 
-- Sustainable Resource Management: The TFM automatically steers network usage toward the target ($`G_\text{target}`$). By increasing the cost of Execution Gas during high demand, the protocol prevents network overload. This protects the ability of nodes with modest hardware to participate, safeguarding decentralization.
+- Sustainable Resource Management: The TFM automatically steers network usage toward the target ($G_\text{target}$). By increasing the cost of Execution Gas during high demand, the protocol prevents network overload. This protects the ability of nodes with modest hardware to participate, safeguarding decentralization.
 - Deflationary Pressure: Burning the base_fee (and minting later a proportion of it back as rewards, cf [\[1.0.0\] Block Rewards](block-rewards.md)) establishes a direct link between network activity and the intrinsic economic utility of the Logos Blockchain token. As usage grows, the rate of token burn increases, applying deflationary pressure on the total supply and creating a sustainable economic flywheel.
 
 ## Security Properties: Mitigation of Base Fee Manipulation
@@ -88,18 +88,18 @@ A critical feature of this design is its resilience to the base fee manipulation
 | --- | --- | --- | --- |
 | $s$ | Block Number | - | The index of a block in the chain. |
 | $t$ | Transaction | - | A single transaction submitted by a user. |
-| $`g_t`$ | Execution Gas Consumed | - | The actual amount of Execution Gas consumed by transaction $t$ upon execution. |
-| $`c_t`$ | Execution Gas Price | - | The user-specified price per unit of execution gas they will pay. |
-| $`b_{\mathrm{exec}}[s]`$ | Base Fee | - | The protocol-defined Execution Gas price for inclusion in block $s$. This is initialized at 1 for the first block. |
-| $`p_t`$ | Priority Fee | - | The portion of the Execution Gas price that serves as a tip to the block builder ($`p_t = c_t - b_{\mathrm{exec}}[s]`$). |
+| $g_t$ | Execution Gas Consumed | - | The actual amount of Execution Gas consumed by transaction $t$ upon execution. |
+| $c_t$ | Execution Gas Price | - | The user-specified price per unit of execution gas they will pay. |
+| $b_{\mathrm{exec}}[s]$ | Base Fee | - | The protocol-defined Execution Gas price for inclusion in block $s$. This is initialized at 1 for the first block. |
+| $p_t$ | Priority Fee | - | The portion of the Execution Gas price that serves as a tip to the block builder ($p_t = c_t - b_{\mathrm{exec}}[s]$). |
 | $G[s]$ | Total Execution Gas Used | - | The sum of Execution Gas consumed by all transactions in block $s$. |
-| $`G_{\mathrm{avg}}[s]`$ | Smoothed Average Execution Gas | - | The Exponential Moving Average (EMA) of Execution Gas used up to block $s$. |
-| $`G_{\max}`$ | Max Execution Gas Per Block | 3,193,460 | A protocol constant defining the hard limit on $G[s]$. |
-| $`G_{\mathrm{target}}`$ | Target Execution Gas Per Block | 1,596,730 | A protocol constant for the ideal Execution Gas usage. The TFM steers usage towards this target. This is set to half of $`G_{max}`$ execution gas units. |
+| $G_{\mathrm{avg}}[s]$ | Smoothed Average Execution Gas | - | The Exponential Moving Average (EMA) of Execution Gas used up to block $s$. |
+| $G_{\max}$ | Max Execution Gas Per Block | 3,193,460 | A protocol constant defining the hard limit on $G[s]$. |
+| $G_{\mathrm{target}}$ | Target Execution Gas Per Block | 1,596,730 | A protocol constant for the ideal Execution Gas usage. The TFM steers usage towards this target. This is set to half of $G_{max}$ execution gas units. |
 | $\phi$ | Fee Adjustment Rate | 1/8 | A protocol constant controlling how quickly the base fee adjusts to demand. |
 | $q$ | EMA Smoothing Factor | 9/10 | A protocol constant defining the weight of historical average in the EMA update rule. |
-| $`F_t`$ | Total fee | - | $`F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t`$ |
-| $`\hat{R}_{\mathrm{burned}}[s]`$ | Amount of base fees burnt | - | This is used as an input to compute the block rewards |
+| $F_t$ | Total fee | - | $F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t$ |
+| $\hat{R}_{\mathrm{burned}}[s]$ | Amount of base fees burnt | - | This is used as an input to compute the block rewards |
 
 ### Parameter Justification
 
@@ -107,7 +107,7 @@ We set $\phi=1/8$, which results in up to a $\pm$12.5% increase or decrease in t
 
 We set a value of $q=0.9$ as it robustly achieves the primary security goal of mitigating base fee manipulation while retaining sufficient market responsiveness. This setting heavily dampens the influence of any single block's gas usage on the new smoothed average to a mere 10%, making manipulation attacks prohibitively expensive for their limited impact. This is economically equivalent to a lookback period of approximately 19 blocks.
 
-Furthermore, we set $`G_\text{max} = 3,193,460`$ Execution Gas units (cf as explained in [\[1.0.0\]\[Overview\] Cryptoeconomics](overview-cryptoeconomics.md)), and $`G_\text{target} = 1,596,730`$ Execution Gas units. The 50% target creates a perfectly symmetrical buffer, giving the network equal capacity to elastically expand block sizes to absorb demand spikes or contract them during lulls. Any other value would create an asymmetric system, making it either too volatile and over-reactive to demand increases (e.g., a 75% target) or too sluggish to respond to periods of low activity. This rationale is also borrowed from Ethereums EIP-1559 (cf [EIP 1559: A transaction fee market proposal](https://ethereum.github.io/abm1559/notebooks/eip1559.html)) and is also used in ([Base Fee Manipulation In Ethereums EIP-1559 Transaction Fee Mechanism](https://arxiv.org/pdf/2304.11478)).
+Furthermore, we set $G_\text{max} = 3,193,460$ Execution Gas units (cf as explained in [\[1.0.0\]\[Overview\] Cryptoeconomics](overview-cryptoeconomics.md)), and $G_\text{target} = 1,596,730$ Execution Gas units. The 50% target creates a perfectly symmetrical buffer, giving the network equal capacity to elastically expand block sizes to absorb demand spikes or contract them during lulls. Any other value would create an asymmetric system, making it either too volatile and over-reactive to demand increases (e.g., a 75% target) or too sluggish to respond to periods of low activity. This rationale is also borrowed from Ethereums EIP-1559 (cf [EIP 1559: A transaction fee market proposal](https://ethereum.github.io/abm1559/notebooks/eip1559.html)) and is also used in ([Base Fee Manipulation In Ethereums EIP-1559 Transaction Fee Mechanism](https://arxiv.org/pdf/2304.11478)).
 
 ## Block Builder Mechanism: Block Construction
 
@@ -115,15 +115,15 @@ A rational, profit-maximizing block builder must follow this algorithm to constr
 
 Algorithm Steps:
 
-1. Fetch State: Retrieve the current base fee for the block to be built, $`b_{\mathrm{exec}}[s]`$.
-1. Filter Mempool: From the set of all available transactions $`\mathcal{M}`$, create a candidate set $`\mathcal{M}'`$ containing only valid transactions where the user's Execution Gas price cap is sufficient to pay the base fee.
+1. Fetch State: Retrieve the current base fee for the block to be built, $b_{\mathrm{exec}}[s]$.
+1. Filter Mempool: From the set of all available transactions $\mathcal{M}$, create a candidate set $\mathcal{M}'$ containing only valid transactions where the user's Execution Gas price cap is sufficient to pay the base fee.
 
 $$
 \mathcal{M}' = \{\,t \in \mathcal{M} \mid c_t \ge b_{\mathrm{exec}}[s] \,\}
 $$
 
-1. Sort Candidates: Sort the valid transactions in $`\mathcal{M}'`$ in descending order of revenue
-1. Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the $`G_{\max}`$ limit.
+1. Sort Candidates: Sort the valid transactions in $\mathcal{M}'$ in descending order of revenue
+1. Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the $G_{\max}$ limit.
 
 Pseudocode for Block Construction:
 
@@ -151,9 +151,9 @@ After a block $s$ is executed and its total Execution Gas usage $G[s]$ is known,
 
 The base fee for the next block, $s+1$, is calculated based on the state of block $s$.
 
-1. Total Execution Gas Used: First, sum the actual Execution Gas consumed, $`g_t`$, for all transactions $t$ in the block $`\mathcal{B}_s`$: $`G[s] = \sum_{t \in \mathcal{B}_s} g_t`$.
-1. Smoothed Average Update: Update the EMA of Execution Gas usage: $`G_{\mathrm{avg}}[s] = (1 - q) \cdot G[s] + q \cdot G_{\mathrm{avg}}[s-1]`$.
-1. Next Base Fee Calculation: Update the base fee for block $s+1$: $`b_{\mathrm{exec}}[s+1] = b_{\mathrm{exec}}[s] \cdot \left(1 + \phi \cdot \frac{G_{\mathrm{avg}}[s] - G_{\mathrm{target}}}{G_{\mathrm{target}}}\right)`$.
+1. Total Execution Gas Used: First, sum the actual Execution Gas consumed, $g_t$, for all transactions $t$ in the block $\mathcal{B}_s$: $G[s] = \sum_{t \in \mathcal{B}_s} g_t$.
+1. Smoothed Average Update: Update the EMA of Execution Gas usage: $G_{\mathrm{avg}}[s] = (1 - q) \cdot G[s] + q \cdot G_{\mathrm{avg}}[s-1]$.
+1. Next Base Fee Calculation: Update the base fee for block $s+1$: $b_{\mathrm{exec}}[s+1] = b_{\mathrm{exec}}[s] \cdot \left(1 + \phi \cdot \frac{G_{\mathrm{avg}}[s] - G_{\mathrm{target}}}{G_{\mathrm{target}}}\right)$.
 
 Pseudocode for Base Fee Update:
 
@@ -200,7 +200,7 @@ $$
 p_t = c_t - b_{\mathrm{exec}}[s].
 $$
 
-The final fee $`F_t`$ paid by the transaction $t$ is:
+The final fee $F_t$ paid by the transaction $t$ is:
 
 $$
 F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t

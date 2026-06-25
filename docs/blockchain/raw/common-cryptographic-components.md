@@ -125,12 +125,12 @@ Technical Details:
 
 - Structure: HADES permutation (substitution-permutation network).
 - Rounds: Clearly defined full and partial round structure, typically around 8 full rounds and ~60 partial rounds, depending on the security parameter.
-- S-box: Nonlinear exponentiation-based S-box, typically of the form $`x \mapsto x^\alpha`$ over a finite field (often $\alpha = 5$ or $\alpha = 3$).
-- Field: Operates over prime fields ($`\mathbb{F}_p`$), usually matching the field used in zk-SNARK circuits.
+- S-box: Nonlinear exponentiation-based S-box, typically of the form $x \mapsto x^\alpha$ over a finite field (often $\alpha = 5$ or $\alpha = 3$).
+- Field: Operates over prime fields ($\mathbb{F}_p$), usually matching the field used in zk-SNARK circuits.
 
 Use in the Logos Blockchain:
 
-Used as the hash function and compression function for all hand-written zero-knowledge circuits (e.g., note IDs, membership proofs) in the Logos Blockchain. For these protocols, the Logos Blockchain relies on the BN254 elliptic curve, so the $`\mathbb{F}_p`$ elements are taken from the prime field corresponding to BN254. The parameters of the Poseidon2 permutation are the following in the Logos Blockchain:
+Used as the hash function and compression function for all hand-written zero-knowledge circuits (e.g., note IDs, membership proofs) in the Logos Blockchain. For these protocols, the Logos Blockchain relies on the BN254 elliptic curve, so the $\mathbb{F}_p$ elements are taken from the prime field corresponding to BN254. The parameters of the Poseidon2 permutation are the following in the Logos Blockchain:
 
 - The rate = 1.
 - The capacity = 3.
@@ -146,7 +146,7 @@ We modified the compression mode compared to the Poseidon2 paper: to compress tw
 
 Throughout the Logos Blockchain specifications, Poseidon2 is referred to as zkhash.
 
-In the Logos Blockchain, bytes and $`\mathbb{F}_p`$ elements are frequently converted between formats (such as when interpreting DST byte strings as Poseidon2 inputs). To convert from an $`\mathbb{F}_p`$ element to bytes, we interpret the little-endian unsigned representation of the $`\mathbb{F}_p`$ number as 32 bytes. Conversely, we can interpret 32 bytes as an $`\mathbb{F}_p`$ element provided the resulting number is smaller than $p$.
+In the Logos Blockchain, bytes and $\mathbb{F}_p$ elements are frequently converted between formats (such as when interpreting DST byte strings as Poseidon2 inputs). To convert from an $\mathbb{F}_p$ element to bytes, we interpret the little-endian unsigned representation of the $\mathbb{F}_p$ number as 32 bytes. Conversely, we can interpret 32 bytes as an $\mathbb{F}_p$ element provided the resulting number is smaller than $p$.
 
 > We use Poseidon2 in hash function mode everywhere except in: Merkle proofs, public key derivation, nullifier derivation and reward voucher derivation where we use the modified compression mode.
 
@@ -179,7 +179,7 @@ EdDSA is a digital-signature scheme built on twisted Edwards curves. Ed25519 is 
 Technical Details:
 
 - Curve: Twisted Edwards curve Edwards25519 (it is birationally equivalent to Curve25519):
-  $`(x,y) \in \big(\mathbb{Z}/(2^{255}-19) \mathbb{Z}\big)^2`$ such that $`-x^2 + y^2 = 1 - (121665/121666)x^2y^2`$.
+  $(x,y) \in \big(\mathbb{Z}/(2^{255}-19) \mathbb{Z}\big)^2$ such that $-x^2 + y^2 = 1 - (121665/121666)x^2y^2$.
 - Signature Size: 64 bytes.
 - Public Key Size: 32 bytes.
 - Security Level: Approximately 128 bits.

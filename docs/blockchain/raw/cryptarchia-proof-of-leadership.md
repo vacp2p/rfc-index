@@ -76,7 +76,7 @@ Our description differs from the original paper proposition, proving that a note
 
 ## Ledger Root
 
-In order to prove that the winning note exists in the ledger and existed at the start of the previous epoch, every node must compute two ledger commitments. These commitments $`ledger_{AGED}`$ and $`ledger_{LATEST}`$ are Merkle roots constructed over the Note IDs. The trees have a depth of $`32`$ (32 layers without counting the root) and are populated with note IDs, that is, the tree has a maximal capacity of $`2^{32}`$ note IDs. The value $`0`$ represents an empty leaf. When the set is updated, during insertion, the first empty leaf is replaced with the new note ID, and during deletion, the leaf containing the deleted note ID is replaced with $`0`$. The following pseudo-code shows how the tree is managed:
+In order to prove that the winning note exists in the ledger and existed at the start of the previous epoch, every node must compute two ledger commitments. These commitments $ledger_{AGED}$ and $ledger_{LATEST}$ are Merkle roots constructed over the Note IDs. The trees have a depth of $32$ (32 layers without counting the root) and are populated with note IDs, that is, the tree has a maximal capacity of $2^{32}$ note IDs. The value $0$ represents an empty leaf. When the set is updated, during insertion, the first empty leaf is replaced with the new note ID, and during deletion, the leaf containing the deleted note ID is replaced with $0$. The following pseudo-code shows how the tree is managed:
 
 ```python
 def insert_new_note(note_set: list[NoteId], new_note: NoteId):
@@ -133,24 +133,24 @@ def get_ledger_root(note_set: list[NoteId]):
 
 The prover (the leader) and the verifiers (nodes of the chain) must agree on these values:
 
-1. The slot number: $`sl`$.
-2. The epoch nonce: $`\eta`$.
+1. The slot number: $sl$.
+2. The epoch nonce: $\eta$.
   - For details see [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce).
 
-3. The lottery function constants: $`t_0 = -\frac{\text{VRF}\_order \ln(1-f)}{\text{inferred\_total\_stake}}`$ and $`t_1=- \frac{\text{VRF}\_order\ln^2(1-f)}{2 \cdot \text{inferred\_total\_stake}^2}`$.
+3. The lottery function constants: $t_0 = -\frac{\text{VRF}\_order \ln(1-f)}{\text{inferred\_total\_stake}}$ and $t_1=- \frac{\text{VRF}\_order\ln^2(1-f)}{2 \cdot \text{inferred\_total\_stake}^2}$.
   - For details see [Lottery Approximation](#lottery-approximation).
   - These numbers must be computed with high precision outside the proof.
 
-4. The root of the note Merkle tree when the stake distribution was frozen $`ledger_\text{AGED}`$.
+4. The root of the note Merkle tree when the stake distribution was frozen $ledger_\text{AGED}$.
   - For details see [Epoch State Pseudocode](cryptarchia-v1-protocol.md#epoch-state-pseudocode).
 
-5. The latest root of the note Merkle tree: $`ledger_\text{LATEST}`$.
+5. The latest root of the note Merkle tree: $ledger_\text{LATEST}$.
   - Used to ensure the leadership note has not been spent.
 
-6. The leader's one-time public key $`P_\text{LEAD}`$ represented by 2 public inputs, each of 16 bytes in little endian. This key is needed to sign the proposed block.
+6. The leader's one-time public key $P_\text{LEAD}$ represented by 2 public inputs, each of 16 bytes in little endian. This key is needed to sign the proposed block.
   - For details see [Linking the Proof of Leadership to a Block](#linking-the-proof-of-leadership-to-a-block).
 
-7. The entropy contribution $`\rho_{LEAD}`$ verified to be correctly derived.
+7. The entropy contribution $\rho_{LEAD}$ verified to be correctly derived.
   - This is the epoch nonce entropy contribution. See [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce).
 
 ### Circuit Private Inputs
@@ -158,16 +158,16 @@ The prover (the leader) and the verifiers (nodes of the chain) must agree on the
 The prover has to provide these values, but they remain secret:
 
 1. The eligible note and its related information used to derive the [Note Id](bedrock-v1.1-mantle-specification.md#note-id):
-  - The note secret key: $`sk`$.
-  - The note value: $`v`$.
-  - The note transaction zk hash: $`note\_tx\_hash`$.
-  - The note outputs number: $`note\_output\_number`$.
+  - The note secret key: $sk$.
+  - The note value: $v$.
+  - The note transaction zk hash: $note\_tx\_hash$.
+  - The note outputs number: $note\_output\_number$.
 
-2. The proof of membership of the note identifier in the zone ledgers $`ledger_{AGED}`$ and $`ledger_{LATEST}`$. This is done by providing the complementary Merkle nodes and indicating whether they are left (0) or right (1) through boolean selectors:
-  - The aged ledger complementary nodes: $`noteid\_aged\_path`$.
-  - The aged ledger complementary node selectors: $`note\_id\_aged\_selectors`$.
-  - The latest ledger complementary nodes: $`noteid\_latest\_path`$.
-  - The latest ledger complementary node selectors: $`note\_id\_latest\_selectors`$.
+2. The proof of membership of the note identifier in the zone ledgers $ledger_{AGED}$ and $ledger_{LATEST}$. This is done by providing the complementary Merkle nodes and indicating whether they are left (0) or right (1) through boolean selectors:
+  - The aged ledger complementary nodes: $noteid\_aged\_path$.
+  - The aged ledger complementary node selectors: $note\_id\_aged\_selectors$.
+  - The latest ledger complementary nodes: $noteid\_latest\_path$.
+  - The latest ledger complementary node selectors: $note\_id\_latest\_selectors$.
 
 ### Circuit Constraints
 
@@ -175,51 +175,51 @@ The proof confirms the following relations:
 
 1. The derivation of the public key.
 2. The computation of the note identifier.
-3. The note identifier is in $`ledger_{AGED}`$ and $`ledger_{LATEST}`$.
-4. The computation of the lottery ticket: $`ticket := \text{hash}(\text{LEAD\_V1}||\eta||sl||noteID||sk)`$ using [Poseidon2](common-cryptographic-components.md).
-5. The computation of the threshold: $`t:= v(t_0+t_1\cdot v)`$.
+3. The note identifier is in $ledger_{AGED}$ and $ledger_{LATEST}$.
+4. The computation of the lottery ticket: $ticket := \text{hash}(\text{LEAD\_V1}||\eta||sl||noteID||sk)$ using [Poseidon2](common-cryptographic-components.md).
+5. The computation of the threshold: $t:= v(t_0+t_1\cdot v)$.
   The ticket must be lower than this threshold to win the lottery.
 
-6. The check that indeed $`ticket \lt t`$.
-7. Compute and output the entropy contribution $`\rho_{LEAD} := \text{hash}(\text{NONCE\_CONTRIB\_V1} || sl||noteID||sk)`$
+6. The check that indeed $ticket \lt t$.
+7. Compute and output the entropy contribution $\rho_{LEAD} := \text{hash}(\text{NONCE\_CONTRIB\_V1} || sl||noteID||sk)$
 
 # Linking the Proof of Leadership to a Block
 
-The PoL is bound to a public key from an asymmetric signature scheme. This public key $`P_\text{LEAD}`$ is given as two public inputs during the PoL proof generation, binding the proof to the key.
+The PoL is bound to a public key from an asymmetric signature scheme. This public key $P_\text{LEAD}$ is given as two public inputs during the PoL proof generation, binding the proof to the key.
 
 - The public key is represented by two public inputs of 16 bytes to guarantee the support of every possible Eddsa25519 public key.
-- This public key is later used to verify the signature $`\sigma`$ of a block when it is dispersed. This ensures that the PoL is tied to a specific block, and only the entity creating the proof can perform this binding.
+- This public key is later used to verify the signature $\sigma$ of a block when it is dispersed. This ensures that the PoL is tied to a specific block, and only the entity creating the proof can perform this binding.
 - The key is single-use, as reusing the same one could allow multiple PoLs to be linked to the same identity. An observer could then infer the stake of that identity by observing the frequency at which it emits a PoL.
 
 # Appendix
 
 ## Lottery Approximation
 
-- The $`\phi_f(\alpha)=1 - (1-f)^\alpha`$ function of [Ouroboros Crypsinous](https://eprint.iacr.org/2018/1132.pdf) cannot be computed in a hand-written circuit as it can only operates on elements of $`\mathbb{F}_p`$ for a certain prime number $`p`$.
+- The $\phi_f(\alpha)=1 - (1-f)^\alpha$ function of [Ouroboros Crypsinous](https://eprint.iacr.org/2018/1132.pdf) cannot be computed in a hand-written circuit as it can only operates on elements of $\mathbb{F}_p$ for a certain prime number $p$.
 - Managing floating point numbers and mathematical functions involving floating points like exponentiations or logarithms in circuits is very inefficient.
 - We compared the Taylor expansion of order 1 and 2 and used the Taylor expansion of order 2 method to approximate the Ouroboros Genesis (and Crypsinous) function by the following linear function
-  - $`\underset{0}{\sim}`$ means nearly equal in the neighborhood of 0
-  - $`f`$ is the probability that at least one leader wins the lottery on each slot
-  - $`x`$ is the stake of the proven note
+  - $\underset{0}{\sim}$ means nearly equal in the neighborhood of 0
+  - $f$ is the probability that at least one leader wins the lottery on each slot
+  - $x$ is the stake of the proven note
 
 $$
 \begin{align*}1-(1-f)^x &= 1-e^{x\ln(1-f)} \\ 1-e^{x\ln(1-f)} &\underset{0}{\sim}x(-\ln(1-f)-0.5\ln²(1-f)x)\end{align*}
 $$
 
-Then the threshold is $`stake(t_0+t_1\cdot stake)`$ with $`t_0 := -\frac{\text{VRF}\_order \ln(1-f)}{\text{inferred\_total\_stake}}`$ and
+Then the threshold is $stake(t_0+t_1\cdot stake)$ with $t_0 := -\frac{\text{VRF}\_order \ln(1-f)}{\text{inferred\_total\_stake}}$ and
 
-$`t_1:=- \frac{\text{VRF}\_order\ln^2(1-f)}{2\cdot \text{inferred\_total\_stake}^2}`$. Since everything is known by every node except the value of the staked note, we pre-compute $`t_0`$ and $`t_1`$ outside of the circuit.
+$t_1:=- \frac{\text{VRF}\_order\ln^2(1-f)}{2\cdot \text{inferred\_total\_stake}^2}$. Since everything is known by every node except the value of the staked note, we pre-compute $t_0$ and $t_1$ outside of the circuit.
 
-- The Hash functions used to derive the lottery ticket is Poseidon2 so the $`\text{VRF}\_order`$ is $`p`$ the order of the scalar field of the BN254 elliptic curve.
-- To compute $`t_0`$ and $`t_1`$, we precomputed the constant parts using sagemath and real number of 512 bits precision. In the implementation, $`t_0`$ and $`t_1`$ should then be derived using 256-bit precision integers following:
+- The Hash functions used to derive the lottery ticket is Poseidon2 so the $\text{VRF}\_order$ is $p$ the order of the scalar field of the BN254 elliptic curve.
+- To compute $t_0$ and $t_1$, we precomputed the constant parts using sagemath and real number of 512 bits precision. In the implementation, $t_0$ and $t_1$ should then be derived using 256-bit precision integers following:
 
 | Variable | Formula |
 | --- | --- |
-| $`p`$ | 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001 |
-| $`t_0\_constant`$ | 0x1a3fb997fd5838f2a1585ee090a95c88129ab25cc4d2e2d28f1a95f81d85465 |
-| $`t_1\_constant`$ | 0x71e790b4199113a9a00298d823c5716ddac764a110a45fe3b770bbb3e8a57 |
-| $`t_0`$ | $`\frac{t_0\_constant}{inferred\_total\_stake}`$ |
-| $`t_1`$ | $`p-\left\lfloor\frac{t_1\_constant}{inferred\_total\_stake^2}\right\rfloor`$ |
+| $p$ | 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001 |
+| $t_0\_constant$ | 0x1a3fb997fd5838f2a1585ee090a95c88129ab25cc4d2e2d28f1a95f81d85465 |
+| $t_1\_constant$ | 0x71e790b4199113a9a00298d823c5716ddac764a110a45fe3b770bbb3e8a57 |
+| $t_0$ | $\frac{t_0\_constant}{inferred\_total\_stake}$ |
+| $t_1$ | $p-\left\lfloor\frac{t_1\_constant}{inferred\_total\_stake^2}\right\rfloor$ |
 
 <details><summary>**Python code to derive constants**</summary>
 
@@ -250,11 +250,11 @@ print(f"t_1_constant = {t_1_constant:#x}")
 
 ### Error Analysis
 
-- For $`f = \frac{1}{30}`$. The error percentage is computed with $`100 \cdot \frac{estimation - real\_value}{real\_value}`$
-- We will consider that $`inferred\_total\_stake`$ is 23.5B as in Cardano
-- Original function: $`1-(1-f)^\frac{stake}{inferred\_total\_stake}`$
-- Taylor expansion of order 1: $`- \frac{stake}{inferred\_total\_stake}\ln(1-f) := stake \cdot t_0`$
-- Taylor expansion of order 2: $`\frac{stake}{inferred\_total\_stake}(-\ln(1-f)-0.5\ln^2(1-f)(\frac{stake}{inferred\_total\_stake})) := stake(t_0+stake \cdot t_1)`$
+- For $f = \frac{1}{30}$. The error percentage is computed with $100 \cdot \frac{estimation - real\_value}{real\_value}$
+- We will consider that $inferred\_total\_stake$ is 23.5B as in Cardano
+- Original function: $1-(1-f)^\frac{stake}{inferred\_total\_stake}$
+- Taylor expansion of order 1: $- \frac{stake}{inferred\_total\_stake}\ln(1-f) := stake \cdot t_0$
+- Taylor expansion of order 2: $\frac{stake}{inferred\_total\_stake}(-\ln(1-f)-0.5\ln^2(1-f)(\frac{stake}{inferred\_total\_stake})) := stake(t_0+stake \cdot t_1)$
 
 | stake (%) | order 1 error | order 2 error |
 | --- | --- | --- |

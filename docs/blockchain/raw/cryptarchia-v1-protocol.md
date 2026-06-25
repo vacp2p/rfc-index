@@ -89,8 +89,8 @@ Our design starts from the solid foundation provided by Ouroboros Crypsinous: Pr
 
 | Symbol | Name | Description | Value |
 | --- | --- | --- | --- |
-| $`f`$ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [ANALYSIS-BLOCK-TIMES-BLEND-NETWORK](analysis-block-times-blend-network.md) for analysis leading to the choice of value) | 1/30 |
-| $`k`$ | security parameter | Block depth finality. Blocks deeper than $`k`$ on any given chain are considered immutable. | 2160 blocks |
+| $f$ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [ANALYSIS-BLOCK-TIMES-BLEND-NETWORK](analysis-block-times-blend-network.md) for analysis leading to the choice of value) | 1/30 |
+| $k$ | security parameter | Block depth finality. Blocks deeper than $k$ on any given chain are considered immutable. | 2160 blocks |
 | *none* | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
 | MAX_BLOCK_TXS | max block transactions | The maximum number of transactions in a block | 1024 |
@@ -99,19 +99,19 @@ Our design starts from the solid foundation provided by Ouroboros Crypsinous: Pr
 
 | Symbol | Name | Description | Value |
 | --- | --- | --- | --- |
-| $`s`$ | slot security parameter | Sufficient slots such that $`k`$ blocks have been produced with high probability. | $`3\lfloor \frac{k}{f}\rfloor`$ |
-| $`T`$ | the block tree | This is the block tree observed by a node. |  |
-| $`F_T`$ | tips of block tree $`T`$ | The set of concurrent forks of some block tree $`T`$. | $`F_T=\{b\in T:\forall c \in T\space \textbf{parent}(c) \neq b \}`$ |
-| $`c_{loc}`$ | tip of local chain | The chain that a node considers to be the honest chain. | $`c_{loc} \in F_{T}`$ |
-| $`B_\text{imm}`$ | the latest immutable block | The latest block which was committed (finalized) by the chain maintenance. | $`B_\text{imm} \in \textbf{ancestors}(c_{loc})`$ |
-| $`sl`$ | slot number | Index of slot. $`sl=0`$ denotes the genesis slot. | $`sl=0,1,2,3,\dots`$ |
-| $`ep`$ | epoch number | Index of epoch. $`ep=0`$ denotes the genesis epoch. | $`ep=0,1,2,3,\dots`$ |
+| $s$ | slot security parameter | Sufficient slots such that $k$ blocks have been produced with high probability. | $3\lfloor \frac{k}{f}\rfloor$ |
+| $T$ | the block tree | This is the block tree observed by a node. |  |
+| $F_T$ | tips of block tree $T$ | The set of concurrent forks of some block tree $T$. | $F_T=\{b\in T:\forall c \in T\space \textbf{parent}(c) \neq b \}$ |
+| $c_{loc}$ | tip of local chain | The chain that a node considers to be the honest chain. | $c_{loc} \in F_{T}$ |
+| $B_\text{imm}$ | the latest immutable block | The latest block which was committed (finalized) by the chain maintenance. | $B_\text{imm} \in \textbf{ancestors}(c_{loc})$ |
+| $sl$ | slot number | Index of slot. $sl=0$ denotes the genesis slot. | $sl=0,1,2,3,\dots$ |
+| $ep$ | epoch number | Index of epoch. $ep=0$ denotes the genesis epoch. | $ep=0,1,2,3,\dots$ |
 
 ## Latest Immutable Block
 
-The latest immutable block $`B_\text{imm}`$ is the most recent block considered permanently finalized. The blocks deeper than $`B_\text{imm}`$ in the local chain $`c_{loc}`$ are never to be reorganized.
+The latest immutable block $B_\text{imm}$ is the most recent block considered permanently finalized. The blocks deeper than $B_\text{imm}$ in the local chain $c_{loc}$ are never to be reorganized.
 
-This is maintained locally by the [Chain Maintenance](#chain-maintenance) procedure. When the [Online fork choice rule](fork-choice.md) is in use, $`B_\text{imm}`$ corresponds to the $`k`$-deep block. However, it may be deeper than the $`k`$-deep block if the fork choice rule has been switched from Online to [Bootstrap](fork-choice.md). Unlike the $`k`$-deep block, $`B_\text{imm}`$ does not advance as new blocks are added unless the Online fork choice rule is used.
+This is maintained locally by the [Chain Maintenance](#chain-maintenance) procedure. When the [Online fork choice rule](fork-choice.md) is in use, $B_\text{imm}$ corresponds to the $k$-deep block. However, it may be deeper than the $k$-deep block if the fork choice rule has been switched from Online to [Bootstrap](fork-choice.md). Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added unless the Online fork choice rule is used.
 
 The details of fork choice rule transitions are defined in the bootstrap spec: [[1.0.0] Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md)
 
@@ -135,49 +135,49 @@ An epoch is divided into 3 phases, as outlined below.
 
 | Epoch Phase | Phase Length | Description |
 | --- | --- | --- |
-| Stake Distribution Snapshot | $`s`$ slots | A snapshot of note commitments are taken at the beginning of the epoch. We wait for this value to finalize before entering the next phase. |
-| Buffer phase | $`s`$ slots | After the stake distribution is finalized, we wait another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage. |
-| Lottery Constants Finalization | $`s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor`$ slots | On the $`2s^{th}`$ slot into the epoch, the epoch nonce $`\eta`$ and the inferred total stake $`D`$ can be computed. We wait another $`4\frac{k}{f}`$ slots for these values to finalize. |
+| Stake Distribution Snapshot | $s$ slots | A snapshot of note commitments are taken at the beginning of the epoch. We wait for this value to finalize before entering the next phase. |
+| Buffer phase | $s$ slots | After the stake distribution is finalized, we wait another slot finality period before entering the next phase. This is to further ensure that there is at least one honest leader contributing to the epoch nonce randomness. If an adversary can predict the nonce, they can grind their coin secret keys to gain an advantage. |
+| Lottery Constants Finalization | $s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor$ slots | On the $2s^{th}$ slot into the epoch, the epoch nonce $\eta$ and the inferred total stake $D$ can be computed. We wait another $4\frac{k}{f}$ slots for these values to finalize. |
 
-The **epoch length** is the sum of the individual phases: $`3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor =10 \lfloor \frac{k}{f} \rfloor`$ slots.
+The **epoch length** is the sum of the individual phases: $3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor =10 \lfloor \frac{k}{f} \rfloor$ slots.
 
 ### Epoch State
 
-The epoch state holds the variables derived over the course of the epoch schedule. It is the 3-tuple $`(\mathbb{C}_\text{LEAD}, \eta, D)`$ described below.
+The epoch state holds the variables derived over the course of the epoch schedule. It is the 3-tuple $(\mathbb{C}_\text{LEAD}, \eta, D)$ described below.
 
 | Symbol | Name | Description | Value |
 | --- | --- | --- | --- |
-| $`\mathbb{C}_{\text{LEAD}}`$ | Eligible Leader Notes Commitment | A commitment to the set of notes eligible for leadership. | See [Eligible Leader Notes](#eligible-leader-notes) |
-| $`\eta`$ | Epoch Nonce | Randomness used in the leadership lottery (selected once per epoch) | See [Epoch Nonce](#epoch-nonce) |
-| $`D`$ | Inferred Total Stake (Lottery Difficulty) | Total stake inferred from watching the results of the lottery during the course of the epoch. $`D`$ is used as the stake relativization constant for the following epoch. | See [Total Stake Inference](#total-stake-inference) |
+| $\mathbb{C}_{\text{LEAD}}$ | Eligible Leader Notes Commitment | A commitment to the set of notes eligible for leadership. | See [Eligible Leader Notes](#eligible-leader-notes) |
+| $\eta$ | Epoch Nonce | Randomness used in the leadership lottery (selected once per epoch) | See [Epoch Nonce](#epoch-nonce) |
+| $D$ | Inferred Total Stake (Lottery Difficulty) | Total stake inferred from watching the results of the lottery during the course of the epoch. $D$ is used as the stake relativization constant for the following epoch. | See [Total Stake Inference](#total-stake-inference) |
 
 ### Eligible Leader Notes
 
-A note is eligible to participate in the leadership lottery if it has not been spent and was a member of the note set at the beginning of the previous epoch, i.e. they are members of $`\mathbb{C}_\text{LEAD}`$.
+A note is eligible to participate in the leadership lottery if it has not been spent and was a member of the note set at the beginning of the previous epoch, i.e. they are members of $\mathbb{C}_\text{LEAD}$.
 
 **Note Ageing**
 
-If an adversary knows the epoch nonce $`\eta`$, they may grind a note that wins the lottery more frequently than should be statistically expected. Thus, it’s critical that notes participating in the lottery are sufficiently old to ensure that they have no predictive power over $`\eta`$.
+If an adversary knows the epoch nonce $\eta$, they may grind a note that wins the lottery more frequently than should be statistically expected. Thus, it’s critical that notes participating in the lottery are sufficiently old to ensure that they have no predictive power over $\eta$.
 
 ### Epoch Nonce
 
-The epoch nonce $`\eta`$ is evolved after each block.
+The epoch nonce $\eta$ is evolved after each block.
 
-Given block $`B = (parent,sl, \rho_\text{LEAD},\dots)`$ where
+Given block $B = (parent,sl, \rho_\text{LEAD},\dots)$ where
 
-- $`parent`$ is the parent of block $`B`$
-- $`sl`$ is the slot that $`B`$ is occupying.
-- $`\rho_\text{LEAD}`$ is the epoch nonce entropy contribution from the block’s leadership proof
+- $parent$ is the parent of block $B$
+- $sl$ is the slot that $B$ is occupying.
+- $\rho_\text{LEAD}$ is the epoch nonce entropy contribution from the block’s leadership proof
 
-Then, $`\eta_B`$ is derived as
+Then, $\eta_B$ is derived as
 
 $$
 \eta_{B} = \mathrm{zkHASH}(D_{\mathrm{epoch}}\mathbin{\|}\eta_{\mathrm{parent}}\mathbin{\|}\rho_{\mathrm{LEAD}}\mathbin{\|}\mathrm{Fr}(sl))
 $$
 
-where $`D_{\mathrm{epoch}}`$ is the domain separator `EPOCH_NONCE_V1`, $`\mathrm{Fr}(sl)`$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $`\mathrm{zkHASH}(..)`$ is Poseidon2 as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md) .
+where $D_{\mathrm{epoch}}$ is the domain separator `EPOCH_NONCE_V1`, $\mathrm{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\mathrm{zkHASH}(..)$ is Poseidon2 as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md) .
 
-The epoch nonce used in the next epoch is $`\eta_{B'}`$ where $`B'`$ is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.
+The epoch nonce used in the next epoch is $\eta_{B'}$ where $B'$ is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.
 
 ### Total Stake Inference
 
@@ -189,39 +189,39 @@ Given that stake is private in Cryptarchia, and that we want to maintain an appr
 
 At the start of each epoch, each validator must derive the new epoch state variables. This is done through the following protocol:
 
-$`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\text{LEAD}^{ep},\eta^{ep},D^{ep})`$ :
+$\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\text{LEAD}^{ep},\eta^{ep},D^{ep})$ :
 
-  $`\textbf{case}\space ep = 0:`$
+  $\textbf{case}\space ep = 0:$
 
 > The genesis epoch state is hardcoded upon chain initialization.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{return}\space (\mathbb{C}_\text{GENESIS}, \eta_\text{GENESIS}, D_\text{GENESIS})`$
+&nbsp;&nbsp;&nbsp;&nbsp;$\textbf{return}\space (\mathbb{C}_\text{GENESIS}, \eta_\text{GENESIS}, D_\text{GENESIS})$
 
-  $`\textbf{otherwise}:`$
+  $\textbf{otherwise}:$
 
 > The epoch state is derived w.r.t. observations in the previous epoch. Here we compute the slot at the start of the previous epoch. We will query observations relative to this slot.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`sl_{ep-1} \coloneqq (ep-1) \cdot \text{EPOCH\_LENGTH}`$
+&nbsp;&nbsp;&nbsp;&nbsp;$sl_{ep-1} \coloneqq (ep-1) \cdot \text{EPOCH\_LENGTH}$
 
 > Notes eligible for leadership lottery are those present in the commitment root at the start of the previous epoch.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\mathbb{C}_\text{LEAD}^{ep} \coloneqq \textbf{commitment\_root\_at\_slot}(sl_{ep-1}, tip)`$
+&nbsp;&nbsp;&nbsp;&nbsp;$\mathbb{C}_\text{LEAD}^{ep} \coloneqq \textbf{commitment\_root\_at\_slot}(sl_{ep-1}, tip)$
 
-> The epoch nonce for epoch $`ep`$ is the value of $`\eta`$ at the beginning of the lottery constants finalization phase in the epoch schedule
+> The epoch nonce for epoch $ep$ is the value of $\eta$ at the beginning of the lottery constants finalization phase in the epoch schedule
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\eta^{ep} \coloneqq \textbf{epoch\_nonce\_at\_slot}(sl_{ep-1} + \lfloor6\frac{k}{f}\rfloor, tip)`$
+&nbsp;&nbsp;&nbsp;&nbsp;$\eta^{ep} \coloneqq \textbf{epoch\_nonce\_at\_slot}(sl_{ep-1} + \lfloor6\frac{k}{f}\rfloor, tip)$
 
-> Total active stake is inferred from the number of blocks produced in the previous epoch during the stake freezing phase. It is also derived from the previous estimate of total stake, thus we recurse here to retrieve the previous epochs estimate $`D^{ep-1}`$
+> Total active stake is inferred from the number of blocks produced in the previous epoch during the stake freezing phase. It is also derived from the previous estimate of total stake, thus we recurse here to retrieve the previous epochs estimate $D^{ep-1}$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`(\_,\_,D^{ep-1}) \coloneqq \textbf{compute\_epoch\_state}(ep-1,tip)`$
+&nbsp;&nbsp;&nbsp;&nbsp;$(\_,\_,D^{ep-1}) \coloneqq \textbf{compute\_epoch\_state}(ep-1,tip)$
 
-> The number of blocks produced during the first $`6\frac{k}{f}`$ slots of the previous epoch
+> The number of blocks produced during the first $6\frac{k}{f}$ slots of the previous epoch
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`N_\text{BLOCKS}^{ep-1} \coloneqq |\{B \in T | sl_{ep - 1} \le sl_B \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor\}|`$
+&nbsp;&nbsp;&nbsp;&nbsp;$N_\text{BLOCKS}^{ep-1} \coloneqq |\{B \in T | sl_{ep - 1} \le sl_B \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor\}|$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`D^{ep} \coloneqq \textbf{infer\_total\_active\_stake}(D^{ep-1}, N_\text{BLOCKS}^{ep-1})`$
+&nbsp;&nbsp;&nbsp;&nbsp;$D^{ep} \coloneqq \textbf{infer\_total\_active\_stake}(D^{ep-1}, N_\text{BLOCKS}^{ep-1})$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{return}\space (\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})`$
+&nbsp;&nbsp;&nbsp;&nbsp;$\textbf{return}\space (\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})$
 
 ## Leadership Lottery
 
@@ -243,7 +243,7 @@ We use two fork choice rules, one during bootstrapping and a second once a node 
 
 During bootstrapping, we must be resilient to malicious peers feeding us false chains, this calls for a more expensive fork choice rule that can differentiate between malicious long-range attacks and honest chains.
 
-After bootstrapping we commit to the most honest looking chain we found and switch to a fork choice rule that rejects chains that diverge by more than $`k`$ blocks
+After bootstrapping we commit to the most honest looking chain we found and switch to a fork choice rule that rejects chains that diverge by more than $k$ blocks
 
 [[1.0.0] Cryptarchia Fork Choice Rule](fork-choice.md)
 
@@ -290,129 +290,129 @@ class ProofOfLeadership:                     # 224 bytes
 
 ### Block Header Validation
 
-Given block $`B=(header, transactions)`$ and the block tree $`T`$ where:
+Given block $B=(header, transactions)$ and the block tree $T$ where:
 
-- $`header`$ is the header defined in [Header](bedrock-v1.1-block-construction.md#header)
-- $`transactions`$ is the sequence of transactions in the block
+- $header$ is the header defined in [Header](bedrock-v1.1-block-construction.md#header)
+- $transactions$ is the sequence of transactions in the block
 
-We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constraints hold, otherwise it returns False.
+We say $\textbf{valid\_header}(B)$ returns True if all of the following constraints hold, otherwise it returns False.
 
-1. $`header.\text{version}.\text{bedrock\_version} = 1`$
+1. $header.\text{version}.\text{bedrock\_version} = 1$
   Ensure bedrock version number.
 
-2. $`\textbf{bytes}(transactions) \lt \text{MAX\_BLOCK\_SIZE}`$
+2. $\textbf{bytes}(transactions) \lt \text{MAX\_BLOCK\_SIZE}$
   Ensure block size is smaller than the maximum allowed block size
 
-3. $`\textbf{length}(transactions) \lt \text{MAX\_BLOCK\_TXS}`$
+3. $\textbf{length}(transactions) \lt \text{MAX\_BLOCK\_TXS}$
   Ensure the number of transactions in the block is below the limit
 
-4. $`\textbf{merkle\_root}(transactions) = header.\text{block\_root}`$
+4. $\textbf{merkle\_root}(transactions) = header.\text{block\_root}$
   Ensure block root is over the transaction list. Compute the block root by using transaction hashes (see 🔀[1.5.0] Mantle - Mantle Transaction Hash) as leaves, and `0` to represent the hash of an empty transaction, padding leaves to the closest power of two.
 
-5. $`header.\text{slot} \gt \textbf{fetch\_header}(header.\text{parent\_block}).\text{slot}`$
+5. $header.\text{slot} \gt \textbf{fetch\_header}(header.\text{parent\_block}).\text{slot}$
   Ensure the block’s slot comes after the parent block’s slot.
 
-6. $`\textbf{wallclock\_time}().\textbf{to\_slot}() \ge header\text{.slot}`$
+6. $\textbf{wallclock\_time}().\textbf{to\_slot}() \ge header\text{.slot}$
   Ensure this block’s slot time has elapsed. Local time is used in this validation. See [Clocks](#clocks) for discussion around clock synchronization.
 
-7. $`header.\text{parent} \in T`$
+7. $header.\text{parent} \in T$
   Ensure we have already accepted the block’s parent into the block tree.
 
-8. $`\textbf{height}(B) \gt \textbf{height}(B_{imm})`$
-  Ensure the block comes after the latest immutable block. Assuming that $`T`$ prunes all forks diverged deeper than $`B_\text{imm}`$, this step, along with step 5, ensures that $`B`$ is descendant from $`B_\text{imm}`$. If all forks cannot be pruned completely in the implementation, this step must be replaced with $`\textbf{is\_ancestor}(B_\text{imm}, B)`$, which checks whether $`B_\text{imm}`$ is an ancestor of $`B`$.
+8. $\textbf{height}(B) \gt \textbf{height}(B_{imm})$
+  Ensure the block comes after the latest immutable block. Assuming that $T$ prunes all forks diverged deeper than $B_\text{imm}$, this step, along with step 5, ensures that $B$ is descendant from $B_\text{imm}$. If all forks cannot be pruned completely in the implementation, this step must be replaced with $\textbf{is\_ancestor}(B_\text{imm}, B)$, which checks whether $B_\text{imm}$ is an ancestor of $B$.
 
 9. Verify the leader’s right to propose and ensure it is the one proposing this block:
-  Given leadership proof $`\pi_\text{LEAD} = (\pi_\text{PoL},P_\text{LEAD},\sigma)`$, where
+  Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL},P_\text{LEAD},\sigma)$, where
 
-  - $`\pi_\text{PoL}`$ is the slot lottery win proof as defined in [[1.1.0] Proof of Leadership](cryptarchia-proof-of-leadership.md)
-  - $`P_\text{LEAD}`$ is the public key committed to in $`\pi_\text{PoL}`$.
-  - $`\sigma`$ is a signature.
+  - $\pi_\text{PoL}$ is the slot lottery win proof as defined in [[1.1.0] Proof of Leadership](cryptarchia-proof-of-leadership.md)
+  - $P_\text{LEAD}$ is the public key committed to in $\pi_\text{PoL}$.
+  - $\sigma$ is a signature.
 
   A leaders proposal is valid if
 
-  - $`\textbf{verify\_PoL}(T, parent,sl,P_\text{LEAD}, \pi_\text{PoL})=True`$
-  - $`\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True`$
+  - $\textbf{verify\_PoL}(T, parent,sl,P_\text{LEAD}, \pi_\text{PoL})=True$
+  - $\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True$
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
 
 ### Chain Maintenance
 
-We define the chain maintenance procedure $`\textbf{on\_block}(state,B)`$ that governs how the block tree $`T`$ is updated.
+We define the chain maintenance procedure $\textbf{on\_block}(state,B)$ that governs how the block tree $T$ is updated.
 
 **Note:** It’s assumed that block contents have already been validated by the execution layer w.r.t. the parent block’s execution state.
 
-$`\text{define } \textbf{on\_block}(state, B)\to state'`$:
+$\text{define } \textbf{on\_block}(state, B)\to state'$:
 
-  $`(c_{loc}, B_\text{imm}, T) \coloneqq state`$
+  $(c_{loc}, B_\text{imm}, T) \coloneqq state$
 
-  **if** $`B \in T \lor \lnot \textbf{valid\_header}(B)`$:
+  **if** $B \in T \lor \lnot \textbf{valid\_header}(B)$:
 
-> Either we’ve already seen $`B`$ or it’s invalid, in both cases we ignore this block
+> Either we’ve already seen $B$ or it’s invalid, in both cases we ignore this block
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{return} \space state`$
+&nbsp;&nbsp;&nbsp;&nbsp;$\textbf{return} \space state$
 
-  $`T' \coloneqq T \cup \{B\}`$
+  $T' \coloneqq T \cup \{B\}$
 
-  $`c_{loc}' \coloneqq \begin{cases} B &\text{if } \textbf{parent}(B) = c_{loc}\\ \textbf{fork\_choice}(c_{loc}, F_{T'}, k, s) &\text{if } \textbf{parent}(B) \neq c_{loc} \end{cases}`$
+  $c_{loc}' \coloneqq \begin{cases} B &\text{if } \textbf{parent}(B) = c_{loc}\\ \textbf{fork\_choice}(c_{loc}, F_{T'}, k, s) &\text{if } \textbf{parent}(B) \neq c_{loc} \end{cases}$
 
-  $`\text{if } \text{fork\_choice\_rule} = \text{ONLINE}:`$
+  $\text{if } \text{fork\_choice\_rule} = \text{ONLINE}:$
 
-> Explicitly commit to the $`k`$-deep block if the [Online Fork Choice Rule](fork-choice.md) is being used.
+> Explicitly commit to the $k$-deep block if the [Online Fork Choice Rule](fork-choice.md) is being used.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`(T', B_\text{imm}) \coloneqq \textbf{commit}(T', c_{loc}', k)`$
+&nbsp;&nbsp;&nbsp;&nbsp;$(T', B_\text{imm}) \coloneqq \textbf{commit}(T', c_{loc}', k)$
 
-  $`\textbf{return} \space (c_{loc}', B_\text{imm}, T')`$
+  $\textbf{return} \space (c_{loc}', B_\text{imm}, T')$
 
 ### Commit
 
-We define the procedure that commits to the block, which is $`depth`$ deep from $`c_{loc}`$. This procedure computes the new latest immutable block $`B_\text{imm}`$.
+We define the procedure that commits to the block, which is $depth$ deep from $c_{loc}$. This procedure computes the new latest immutable block $B_\text{imm}$.
 
-$`\text{define } \textbf{commit}(T,c_{loc},depth)\to (T', B_\text{imm}):`$
+$\text{define } \textbf{commit}(T,c_{loc},depth)\to (T', B_\text{imm}):$
 
-  $`\textbf{assert } \text{fork\_choice\_rule} = \text{ONLINE}`$
+  $\textbf{assert } \text{fork\_choice\_rule} = \text{ONLINE}$
 
-> Compute the latest immutable block, which is $`depth`$ deep from $`c_{loc}`$.
+> Compute the latest immutable block, which is $depth$ deep from $c_{loc}$.
 
-  $`B_\text{imm} \coloneqq \textbf{block\_at\_depth}(c_{loc}, depth)`$
+  $B_\text{imm} \coloneqq \textbf{block\_at\_depth}(c_{loc}, depth)$
 
-> Prune all forks diverged deeper than $`B_\text{imm}`$, so that future blocks on those forks can be rejected by [Block Header Validation](#block-header-validation).
+> Prune all forks diverged deeper than $B_\text{imm}$, so that future blocks on those forks can be rejected by [Block Header Validation](#block-header-validation).
 
-  $`T' \coloneqq \textbf{prune\_forks}(T, B_\text{imm}, c_{loc})`$
+  $T' \coloneqq \textbf{prune\_forks}(T, B_\text{imm}, c_{loc})$
 
-  $`\textbf{return} \space (T', B_\text{imm})`$
+  $\textbf{return} \space (T', B_\text{imm})$
 
 ### Fork Pruning
 
 We define the fork pruning procedure that removes all blocks which are part of forks diverged deeper than a certain block.
 
-$`\text{define } \textbf{prune\_forks}(T, B)\to T':`$
+$\text{define } \textbf{prune\_forks}(T, B)\to T':$
 
-  $`T' \coloneqq T`$
+  $T' \coloneqq T$
 
-  $`\text{for each } B_\text{tip} \in F_T:`$
+  $\text{for each } B_\text{tip} \in F_T:$
 
-> If $`B_\text{tip}`$ is a fork diverged deeper than $`B`$, prune the fork.
+> If $B_\text{tip}$ is a fork diverged deeper than $B$, prune the fork.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`B_{\text{div}} \coloneqq \textbf{common\_ancestor}(B_\text{tip}, B)`$
+&nbsp;&nbsp;&nbsp;&nbsp;$B_{\text{div}} \coloneqq \textbf{common\_ancestor}(B_\text{tip}, B)$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\text{if } B_\text{div} \neq B:`$
+&nbsp;&nbsp;&nbsp;&nbsp;$\text{if } B_\text{div} \neq B:$
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$`T' \coloneqq \textbf{prune\_blocks}(B_\text{tip}, B_\text{div}, T)`$
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$T' \coloneqq \textbf{prune\_blocks}(B_\text{tip}, B_\text{div}, T)$
 
-  $`\textbf{return } T'`$
+  $\textbf{return } T'$
 
-$`\text{define } \textbf{prune\_blocks}(B_\text{new}, B_\text{old}, T)\to T':`$
+$\text{define } \textbf{prune\_blocks}(B_\text{new}, B_\text{old}, T)\to T':$
 
-> Remove all blocks in the chain within range $`(B_\text{old}, B_\text{new}]`$ from $`T`$.
+> Remove all blocks in the chain within range $(B_\text{old}, B_\text{new}]$ from $T$.
 
-  $`(B, T') \coloneqq (B_\text{new}, T)`$
+  $(B, T') \coloneqq (B_\text{new}, T)$
 
-  $`\text{while } B \ne B_\text{old}:`$
+  $\text{while } B \ne B_\text{old}:$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`T' \coloneqq T' \setminus \{B\}`$
+&nbsp;&nbsp;&nbsp;&nbsp;$T' \coloneqq T' \setminus \{B\}$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`B \coloneqq \textbf{parent}(B)`$
+&nbsp;&nbsp;&nbsp;&nbsp;$B \coloneqq \textbf{parent}(B)$
 
-  $`\textbf{return } T'`$
+  $\textbf{return } T'$
 
 ### Versioning and Protocol Upgrades
 

@@ -146,18 +146,18 @@ The protocol for generating the initial randomness nonce can be found below.
 
 | Entropy Source | Details |
 | --- | --- |
-| Bitcoin block hash immediately after time `t`, denoted as $`r_1`$. | Block hash can be found on [`blockchain.com`](http://blockchain.com) ’s bitcoin block explorer, e.g. [https://www.blockchain.com/explorer/blocks/btc/905030](https://www.blockchain.com/explorer/blocks/btc/905030) |
-| Ethereum block hash immediately after time `t`, denoted as $`r_2`$. | Block hash can be found in the `more details` section of when viewing a block on etherscan, e.g. [https://etherscan.io/block/22894116](https://etherscan.io/block/22894116) |
-| DRAND beacon value for the round immediately after `t`, denoted as $`r_3`$. | Use the `default` beacon, and find the round number corresponding to `t`. [https://api.drand.sh/v2/beacons/default/rounds/1234](https://api.drand.sh/v2/beacons/default/rounds/1234) |
+| Bitcoin block hash immediately after time `t`, denoted as $r_1$. | Block hash can be found on [`blockchain.com`](http://blockchain.com) ’s bitcoin block explorer, e.g. [https://www.blockchain.com/explorer/blocks/btc/905030](https://www.blockchain.com/explorer/blocks/btc/905030) |
+| Ethereum block hash immediately after time `t`, denoted as $r_2$. | Block hash can be found in the `more details` section of when viewing a block on etherscan, e.g. [https://etherscan.io/block/22894116](https://etherscan.io/block/22894116) |
+| DRAND beacon value for the round immediately after `t`, denoted as $r_3$. | Use the `default` beacon, and find the round number corresponding to `t`. [https://api.drand.sh/v2/beacons/default/rounds/1234](https://api.drand.sh/v2/beacons/default/rounds/1234) |
 
 3. **Randomness Derivation:**
-  Once all above entropy contributions, i.e., $`r_1,r_2,r_3`$ are collected, then we can compute the initial epoch randomness $`\eta_{\text{GENESIS}}`$ as:
+  Once all above entropy contributions, i.e., $r_1,r_2,r_3$ are collected, then we can compute the initial epoch randomness $\eta_{\text{GENESIS}}$ as:
 
 $$
 \eta_\text{GENESIS}={H}(r_1,r_2,r_3)
 $$
 
-  where $`H`$ is a collision-resistant zkhash function.
+  where $H$ is a collision-resistant zkhash function.
 
 ## Genesis Mantle Transaction
 
@@ -279,9 +279,9 @@ Cryptarchia progresses in epochs where the variables governing the lottery are f
 
 To initialize the Epoch State, we derive the epoch variables from the genesis block.
 
-1. $`\eta`$ : the epoch nonce is taken directly from the `genesis_epoch_nonce`.
-2. $`\mathbb{C}_\text{LEAD}`$: Eligible leader commitment is set to the the Ledger Root over all notes from the initial token distribution. The derivation of this root is specified in [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root).
-3. $`D`$: The initial estimate of total stake will be the total tokens distributed at genesis.
+1. $\eta$ : the epoch nonce is taken directly from the `genesis_epoch_nonce`.
+2. $\mathbb{C}_\text{LEAD}$: Eligible leader commitment is set to the the Ledger Root over all notes from the initial token distribution. The derivation of this root is specified in [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root).
+3. $D$: The initial estimate of total stake will be the total tokens distributed at genesis.
 
 ## Bedrock Services Initialization
 

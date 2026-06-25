@@ -481,12 +481,12 @@ In addition to simulations, we could try to use this analytical results to deter
 
 ### Theorem Condition
 
-First we must satisfy the condition $`\alpha (1-f)^{\Delta + 1} \ge \frac{1+\epsilon}{2}`$ where
+First we must satisfy the condition $\alpha (1-f)^{\Delta + 1} \ge \frac{1+\epsilon}{2}$ where
 
 - $\alpha$ is the stake held by honest parties
 - $f$ is the active slot coefficient
 - $\Delta$ is the max network delay
-- $`\epsilon \gt 0`$ is the advantage of the honest network over the adversarial network
+- $\epsilon \gt 0$ is the advantage of the honest network over the adversarial network
 
 We want to understand for a given parameter set, what is the required honest stake $\alpha$ to satisfy the safety condition:
 
@@ -502,11 +502,11 @@ We can then look at the minimum $\alpha$ that satisfies this condition for Carda
 
 ![Diagram](analysis-block-times-blend-network/assets/210261aa-09df-805d-a8eb-d3d3cc364eac.png)
 
-> <sub>Cardano’s parameter set $`f=1/20,\epsilon=1e-6`$</sub>
+> <sub>Cardano’s parameter set $f=1/20,\epsilon=1e-6$</sub>
 
 ![Diagram](analysis-block-times-blend-network/assets/210261aa-09df-805b-8d27-ecc458607bef.png)
 
-> <sub>Nomos’ parameter set $`f=1/30,\epsilon=1e-6`$</sub>
+> <sub>Nomos’ parameter set $f=1/30,\epsilon=1e-6$</sub>
 
 Surprisingly, at at 5s max network delay, we are already requiring ~70% of stake to be honest in Cardano.
 
@@ -534,7 +534,7 @@ $$
 \end{align}
 $$
 
-So, we have the ratio $`\frac{P(\text{violate common prefix in cardano})}{P(\text{violate common prefix in nomos}}=\exp(\Delta_{cardano} - \Delta_{nomos})`$. Plotting this for $`\Delta_{cardano}=5`$ against different network delays in Nomos gives this plot:
+So, we have the ratio $\frac{P(\text{violate common prefix in cardano})}{P(\text{violate common prefix in nomos}}=\exp(\Delta_{cardano} - \Delta_{nomos})$. Plotting this for $\Delta_{cardano}=5$ against different network delays in Nomos gives this plot:
 
 ![Diagram](analysis-block-times-blend-network/assets/210261aa-09df-8099-97a6-e04c50aa92af.png)
 

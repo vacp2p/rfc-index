@@ -12,7 +12,7 @@ The current Mantle Specification (v1.4) has accumulated several areas of unneces
 
 We propose four complementary changes:
 1. Refactor the Ledger code into a dedicated Section. We introduce common helper functions for note consumption and creation that are reused by every Operation. This eliminates code duplication and guarantees uniform validation across `TRANSFER`, `CHANNEL_DEPOSIT`, `CHANNEL_WITHDRAW` and `LEADER_CLAIM`.
-2. Simplify `mantle_tx_hash` to only a classical Blake2b `Hash` instead of returning a `ZkHash`. ZK circuits that consumes transaction hash as a public input will instead consume the modular reduction modulo $`p`$, identical to the treatment of `op_id` in `derive_note_id`.
+2. Simplify `mantle_tx_hash` to only a classical Blake2b `Hash` instead of returning a `ZkHash`. ZK circuits that consumes transaction hash as a public input will instead consume the modular reduction modulo $p$, identical to the treatment of `op_id` in `derive_note_id`.
 3. Remove gas prices from Mantle Transaction. The `permanent_storage_gas_price` becomes a protocol parameter fixed per epoch. The execution gas is split into a base fee (protocol-determined, same for all transactions in a block) and a tip (the leftover balance after mandatory fees). The balance validation of a Mantle Transaction checks that the balance covers at least the mandatory fees. Any excess is treated as the execution tip.
 ## Discussion
 
@@ -21,7 +21,7 @@ We propose four complementary changes:
 The duplicated note validation and ledger manipulation across four Operations is the primary source of specification drift risk. By extracting these into shared functions, reviewers need only audit one code path for correctness. Future Operations that consume or creates notes automatically inherit the same checks.
 ### Transaction Hash Simplification
 
-The current two-stage hash (Blake2b and then Poseidon2) was introduced to fasten the transaction hash derivation (that was previously slowing down bootstrapping). Before it was only Poseidon2 because the transaction hash is also used as a public input of Operations’ zero-knowledge proofs to achieve binding to the transaction and avoid replay attacks. With the `derive_op_id` and `derive_note_id` refactoring from [[RFC] Enforce NoteId uniqueness](rfc-enforce-noteid-uniqueness.md), we already have a well-understood pattern for reducing classical digests to field elements via a modulo $`p`$ operation. Applying the same pattern to the transaction hash removes Poseidon2 evaluation for transactions and unifies the hash-to-field approach across the Mantle Specification. The modular reduction is slightly non-uniform but since $`p \approx 2^{254}`$, the bias is negligible and does not affect security.
+The current two-stage hash (Blake2b and then Poseidon2) was introduced to fasten the transaction hash derivation (that was previously slowing down bootstrapping). Before it was only Poseidon2 because the transaction hash is also used as a public input of Operations’ zero-knowledge proofs to achieve binding to the transaction and avoid replay attacks. With the `derive_op_id` and `derive_note_id` refactoring from [[RFC] Enforce NoteId uniqueness](rfc-enforce-noteid-uniqueness.md), we already have a well-understood pattern for reducing classical digests to field elements via a modulo $p$ operation. Applying the same pattern to the transaction hash removes Poseidon2 evaluation for transactions and unifies the hash-to-field approach across the Mantle Specification. The modular reduction is slightly non-uniform but since $p \approx 2^{254}$, the bias is negligible and does not affect security.
 ### Fee Model Simplification
 
 Embedding gas prices in the transaction couples the encoding format to the fee market mechanism. By deriving prices from protocol state instead, transaction become smaller and the fee market can evolve independently of the transaction encoding. The new model is closer to EIP-1559-style designs where the base fee is protocol-determined and users only express willingness to pay through the balance of their Mantle Transaction.
@@ -288,12 +288,12 @@ for output in transfer.outputs:
 In the Mantle Transaction section explaining that ZK proofs are linked to Mantle Transaction Hash:
 >
 
-  Each proof (op proof and signature) must be cryptographically bound to the `MantleTx` through the `mantle_txhash` to prevent replay attacks. This binding is achieved by including the `MantleTx` hash reduced modulo $`p`$ as a public input in every ZK proof.
+  Each proof (op proof and signature) must be cryptographically bound to the `MantleTx` through the `mantle_txhash` to prevent replay attacks. This binding is achieved by including the `MantleTx` hash reduced modulo $p$ as a public input in every ZK proof.
 ```text
 mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 ```
 
-`mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
+`mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $p$ (via `FiniteField(..., modulus=p)`). Since $p \approx 2^{254}$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $2^{-254}$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $F_p$.
 
 #### Updating ZK Proofs Inputs
 

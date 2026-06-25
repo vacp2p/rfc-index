@@ -22,16 +22,16 @@
     ![Diagram](../assets/1fd261aa-09df-81aa-854a-f7bbb9f0bfea.png)
   - In a nutshell, adversary guesses based on the prediction that messages input earlier to the mixing node are more likely to be delivered earlier to the intended recipient.
 - **Analysis of the FIFO attack**
-  - Without loss of generality, assume that the users $`u_0`$ and $`u_1`$ provide the messages $`m_0`$ and $`m_1`$, respectively, in a “direct” manner to $`R`$ (due to symmetry and independence, the “cross” case can be analysed similarly?).
+  - Without loss of generality, assume that the users $u_0$ and $u_1$ provide the messages $m_0$ and $m_1$, respectively, in a “direct” manner to $R$ (due to symmetry and independence, the “cross” case can be analysed similarly?).
   - We denote the following random variables:
-    1. The delay $`x_0`$ until $`m_0`$ is sent to TTP by $`u_0`$.
-    1. The delay $`x_1`$ until $`m_1`$ is sent to TTP by $`u_1`$.
-    1. The delay $`y_0`$ of TTP until $`m_0`$ is forwarded to $`R`$, i.e. the time $`m_0`$ stays in the TTP.
-    1. The delay $`y_1`$ of the TTP until $`m_1`$ is forwarded to $`R`$, i.e. the time $`m_1`$ stays in the TTP
-  - We have that $`t_{s,0}`$,$`t_{s,1}`$, $`t_{r,0}`$ and $`t_{r,1}`$ are the time values of $`x_0`$, $`x_1`$, $`x_0`$+$`y_0`$, $`x_1 + y_1`$, that adversary observes, in the direct case.
+    1. The delay $x_0$ until $m_0$ is sent to TTP by $u_0$.
+    1. The delay $x_1$ until $m_1$ is sent to TTP by $u_1$.
+    1. The delay $y_0$ of TTP until $m_0$ is forwarded to $R$, i.e. the time $m_0$ stays in the TTP.
+    1. The delay $y_1$ of the TTP until $m_1$ is forwarded to $R$, i.e. the time $m_1$ stays in the TTP
+  - We have that $t_{s,0}$,$t_{s,1}$, $t_{r,0}$ and $t_{r,1}$ are the time values of $x_0$, $x_1$, $x_0$+$y_0$, $x_1 + y_1$, that adversary observes, in the direct case.
   - Thus adversary wins when either one of the following events happen:
-    1. $`E_{0 \lt 1}: x_0 \lt x_1`$ and $`x_0 + y_0 \lt x_1 + y_1`$;
-    1. or $`E_{0\geq1}: x_0 \geq x_1`$ and $`x_0 +y_0 \geq x_1 +y_1`$;
+    1. $E_{0 \lt 1}: x_0 \lt x_1$ and $x_0 + y_0 \lt x_1 + y_1$;
+    1. or $E_{0\geq1}: x_0 \geq x_1$ and $x_0 +y_0 \geq x_1 +y_1$;
       ![Diagram](../assets/1fd261aa-09df-81da-a602-c25b89420a49.png)
 - **User unlinkability definition**
   ![Diagram](../assets/1fd261aa-09df-81f5-8820-e6bb07548644.png)
