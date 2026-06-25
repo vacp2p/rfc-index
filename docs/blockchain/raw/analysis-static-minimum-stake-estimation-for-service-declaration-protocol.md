@@ -75,39 +75,18 @@ Let
 - $`S_{\text{max}}`$ denote the maximum supply of LGO (e.g., 10 million LGO).
 - $`\text{FDV}`$ denote the expected fully diluted valuation in FIAT (e.g., \$100 million).
 - $`S_{\text{TGE}}`$ denote the supply at token generation event (e.g., 1 million LGO).
-- $`M_{\text{cap}}`$ denote the market cap at TGE in FIAT.
-    $$
-    M_{\text{cap}} = \dfrac{S_{\text{TGE}}}{S_{\text{max}}} \times \text{FDV}
-    $$
-- $`P_{\text{LGO}}`$ denote the Price per LGO in FIAT.
-    $$
-    P_{\text{LGO}} = \dfrac{M_{\text{cap}}}{S_{\text{TGE}}}
-    $$
+- $`M_{\text{cap}}`$ denote the market cap at TGE in FIAT: $`M_{\text{cap}} = \dfrac{S_{\text{TGE}}}{S_{\text{max}}} \times \text{FDV}`$
+- $`P_{\text{LGO}}`$ denote the Price per LGO in FIAT: $`P_{\text{LGO}} = \dfrac{M_{\text{cap}}}{S_{\text{TGE}}}`$
 - $`r_{\text{stake}}`$ denote the fraction of TGE supply expected to be staked by a service (e.g., 15%).
 - $`N_{\text{stakers}}`$ denote the expected initial number of stakers (e.g., 1,000).
 
 The following quantities are derived from the definitions above:
 
-- Total LGO to be staked:
+- Total LGO to be staked: $`S_{\text{staked}} = r_{\text{stake}} \times S_{\text{TGE}}`$
 
-    $$
-    S_{\text{staked}} = r_{\text{stake}} \times S_{\text{TGE}}
-    $$
+- Amount of stake per staker in LGO: $`\text{Stake}_{LGO} = \frac{S_{\text{staked}}}{N_{\text{stakers}}} = r_{\text{stake}} \times \frac{S_{\text{TGE}}}{N_{\text{stakers}}}`$
 
-- Amount of stake per staker in LGO:
-
-    $$
-    \text{Stake}_{LGO} = \frac{S_{\text{staked}}}{N_{\text{stakers}}} = r_{\text{stake}} \times \frac{S_{\text{TGE}}}{N_{\text{stakers}}}
-    $$
-
-- Amount of stake per staker in FIAT:
-
-    $$
-    \text{Stake}_{\text{FIAT}} = \text{Stake}_{LGO} \times P_{\text{LGO}} = \dfrac{r_{\text{stake}}}
-    {N_{\text{stakers}}} \times
-    \frac{S_{\text{TGE}}}{S_{\text{max}}} \times
-    \text{FDV}
-    $$
+- Amount of stake per staker in FIAT: $`\text{Stake}_{\text{FIAT}} = \text{Stake}_{LGO} \times P_{\text{LGO}} = \dfrac{r_{\text{stake}}}{N_{\text{stakers}}} \times\frac{S_{\text{TGE}}}{S_{\text{max}}} \times \text{FDV}`$
 
 ## Staking Ratio ($`r_{\text{stake}}`$)
 
