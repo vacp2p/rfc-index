@@ -1093,26 +1093,30 @@ assert locked_note.locked_until <= block_height
 
   3. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
      1. Ensure declaration exists.
-```python
-assert withdraw.declaration in declarations
-declare_info = declarations[withdraw.declaration]
-```
 
-    2. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
-```python
-locked_note = ledger[withdraw.locked_note_id]
-assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
-```
+        ```python
+        assert withdraw.declaration in declarations
+        declare_info = declarations[withdraw.declaration]
+        ```
 
-    3. Ensure the declaration has not already been withdrawn.
-```python
-assert declare_info.withdrawn == 0
-```
+     2. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
 
-    4. Ensure that the nonce is greater than the previous one.
-```python
-assert withdraw.nonce > declare_info.nonce
-```
+        ```python
+        locked_note = ledger[withdraw.locked_note_id]
+        assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
+        ```
+
+     3. Ensure the declaration has not already been withdrawn.
+
+        ```python
+        assert declare_info.withdrawn == 0
+        ```
+
+     4. Ensure that the nonce is greater than the previous one.
+
+        ```python
+        assert withdraw.nonce > declare_info.nonce
+        ```
 
 **Execution**
 
