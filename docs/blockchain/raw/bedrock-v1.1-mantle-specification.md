@@ -1645,35 +1645,35 @@ verification is factored out in the following routine:
 
 *Given*
 
-    ```python
-    msg: zkhash                        # the message being signed (the mantle txhash)
-    signatures: list[Ed25519Signature]
-    indexes: list[u16]                 # for each signature, the index in `keys` of
-                                       # the signing key
-    keys: list[Ed25519PublicKey]       # the accredited keys
-    threshold: u16                     # the number of required signatures
-    ```
+```python
+msg: zkhash                        # the message being signed (the mantle txhash)
+signatures: list[Ed25519Signature]
+indexes: list[u16]                 # for each signature, the index in `keys` of
+                                   # the signing key
+keys: list[Ed25519PublicKey]       # the accredited keys
+threshold: u16                     # the number of required signatures
+```
 
 *Verify*
 
-    ```python
-    def MultiEd25519_verify(msg, signatures, indexes, keys, threshold):
-        # There must be exactly one index per signature
-        assert len(signatures) == len(indexes)
-        
-        # There must be exactly `threshold` signatures
-        assert len(signatures) == threshold
-        
-        # Indexes must be ordered from smallest to biggest without duplication.
-        # Being strictly increasing rejects duplicates and, since `idx` is used to
-        # index `keys`, guarantees every index stays within bounds.
-        for i in range(len(indexes) - 1):
-            assert indexes[i] < indexes[i + 1]
-            
-        # Each signature must be valid for the accredited key at its index
-        for sig, idx in zip(signatures, indexes):
-            assert Ed25519_verify(msg, keys[idx], sig)
-    ```
+```python
+def MultiEd25519_verify(msg, signatures, indexes, keys, threshold):
+    # There must be exactly one index per signature
+    assert len(signatures) == len(indexes)
+
+    # There must be exactly `threshold` signatures
+    assert len(signatures) == threshold
+
+    # Indexes must be ordered from smallest to biggest without duplication.
+    # Being strictly increasing rejects duplicates and, since `idx` is used to
+    # index `keys`, guarantees every index stays within bounds.
+    for i in range(len(indexes) - 1):
+        assert indexes[i] < indexes[i + 1]
+
+    # Each signature must be valid for the accredited key at its index
+    for sig, idx in zip(signatures, indexes):
+        assert Ed25519_verify(msg, keys[idx], sig)
+```
 
 ## Proof of Claim
 
