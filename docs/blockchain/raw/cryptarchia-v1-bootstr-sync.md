@@ -146,7 +146,7 @@ def initial_block_download(peers, local_tree):
 
     # If none of download succeeds (e.g. network errors or invalid blocks),
     # IBD is considered failed.
-    if num_success == 0
+    if num_success == 0:
         raise IBDFailure
 ```
 

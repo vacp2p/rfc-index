@@ -219,7 +219,7 @@ def block_rewards(
     It implements equation (1).
     """
     emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
-    emission_from_rewards = (1. - emission_rate_fator) * R_block_cur
+    emission_from_rewards = (1. - emission_rate_factor) * R_block_cur
     return emission_from_inflation + emission_from_rewards
 ```
 
@@ -246,7 +246,7 @@ All terms are displayed in annualized form to ease comparison.
 def calculate_emission_rate_factor(
     alpha_dev:float,
     weighted_target_deviation: float,
-    alpha_avg:float
+    alpha_avg:float,
     weighted_avg: float,
     i_min: float = 0.0,
     i_max: float = 0.01

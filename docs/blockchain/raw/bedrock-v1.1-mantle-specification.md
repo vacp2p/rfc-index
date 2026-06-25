@@ -374,7 +374,7 @@ block_slot: Slot
 
   1. If the channel does not exist, create it just-in-time.
       ```python
-      if msg.channel is not in channels
+      if msg.channel not in channels:
           channels[msg.channel] = default_channel(block_slot, [msg.signer])
       ```
 
@@ -1635,7 +1635,7 @@ Such that the following constraints hold:
   ```python
   assert all(
       notes[i].public_key == zkhash(FiniteField(b"KDF", byte_order="little", modulus= p), secret_keys[i])
-      for i in range(len(public_keys)
+      for i in range(len(public_keys))
   )
   ```
 
@@ -1693,7 +1693,7 @@ assert voucher_root == path_root(leaf=reward_voucher,
 
 - The voucher nullifier is derived from the secret voucher correctly.
 ```python
-assert voucher_nullifer == zkhash(
+assert voucher_nullifier == zkhash(
     FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
     secret_voucher)
 ```
