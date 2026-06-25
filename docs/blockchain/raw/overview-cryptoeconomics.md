@@ -150,10 +150,10 @@ At the start of each Blend epoch, a Blend reward variable is computed. Its amoun
 
 ```python
 def get_blend_reward(e: epoch): # rewards for the epoch e
-        blend_rewards = 0
-for b in e.blocks: # for each block of the previous epoch
-                blend_rewards += 0.6 * get_block_rewards(b) # get 60% of the rewards
-return blend_rewards
+    blend_rewards = 0
+    for b in e.blocks: # for each block of the previous epoch
+        blend_rewards += 0.6 * get_block_rewards(b) # get 60% of the rewards
+    return blend_rewards
 ```
 
 At the start of each epoch, the rewards are added to the leader rewards. Its amount is increased by 40% of the total block rewards of the previous epoch. The blocks from the previous epoch are denoted by B in the pseudocode below:
@@ -161,10 +161,10 @@ At the start of each epoch, the rewards are added to the leader rewards. Its amo
 ```python
 def update_leader_rewards(e: epoch, # rewards for the epoch e
     leader_rewards: int): # added to the leader reward pool
-for b in e.blocks: # for each block of the previous epoch
-                leader_rewards += 0.4 * get_block_rewards(b) # get 40% of the rewards
-                leader_rewards += get_execution_market_tips(b) # get Execution market tips
-return leader_rewards
+    for b in e.blocks: # for each block of the previous epoch
+        leader_rewards += 0.4 * get_block_rewards(b) # get 40% of the rewards
+        leader_rewards += get_execution_market_tips(b) # get Execution market tips
+    return leader_rewards
 ```
 
 ## Reward Distribution Protocols

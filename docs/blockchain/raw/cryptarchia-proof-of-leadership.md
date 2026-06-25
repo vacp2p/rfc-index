@@ -80,47 +80,47 @@ In order to prove that the winning note exists in the ledger and existed at the 
 
 ```python
 def insert_new_note(note_set: list[NoteId], new_note: NoteId):
-        i = 0
-        while i < len(note_set) and note_set[i] != 0:
-                i += 1
-        if i < len(note_set):
-                note_set[i] = new_note
-        else:
-                note_set.append(new_note)
-        return note_set
+    i = 0
+    while i < len(note_set) and note_set[i] != 0:
+        i += 1
+    if i < len(note_set):
+        note_set[i] = new_note
+    else:
+        note_set.append(new_note)
+    return note_set
 
 def delete_note(note_set: list[NodeId], note: NoteId):
-        i = 0
-        while i < len(note_set) and note_set[i] != note:
-                i += 1
+    i = 0
+    while i < len(note_set) and note_set[i] != note:
+        i += 1
 
-        if i == len(note_set):
-            # note not in the set
-            return note_set
-
-        note_set[i] = 0
+    if i == len(note_set):
+        # note not in the set
         return note_set
 
+    note_set[i] = 0
+    return note_set
+
 def empty_tree_root(depth: int):
-        root = 0
-        for i in range(depth):
-                h = hasher()   # zk hash
-                h.update(root)
-                h.update(root)
-                root = h.digest()
-        return root
+    root = 0
+    for i in range(depth):
+        h = hasher()   # zk hash
+        h.update(root)
+        h.update(root)
+        root = h.digest()
+    return root
 
 def get_ledger_root(note_set: list[NoteId]):
-        assert(len(note_set) < 2**32)
-        ledger_root = get_merkle_root(note_set)  # return the Merkle root of the set
-                                                 # padded with 0 to next power of 2
-        ledger_root_height = len(note_set).bit_length()
-        for height in range(ledger_root_height, 32):
-                h= Hasher()    # zk hash
-                h.update(ledger_root)
-                h.update(empty_tree_root(height))
-                ledger_root = h.digest()
-        return ledger_root
+    assert(len(note_set) < 2**32)
+    ledger_root = get_merkle_root(note_set)  # return the Merkle root of the set
+                                             # padded with 0 to next power of 2
+    ledger_root_height = len(note_set).bit_length()
+    for height in range(ledger_root_height, 32):
+        h= Hasher()    # zk hash
+        h.update(ledger_root)
+        h.update(empty_tree_root(height))
+        ledger_root = h.digest()
+    return ledger_root
 ```
 
   The ledger root may not be unique because the note Ids set can cycle. Indeed, even if it’s not possible to insert the same note Id twice, it’s possible to cycle on a previous set state by removing notes. However, note Ids uniqueness guarantees protection against attacks on note aging.

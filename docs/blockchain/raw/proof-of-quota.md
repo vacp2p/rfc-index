@@ -54,17 +54,17 @@ A proof attesting that for the following public values derived from blockchain p
 
 ```python
 class ProofOfQuotaPublic:
-        core_quota: int       # Allowed messages per epoch for core nodes (20 bits)
-        leader_quota: int     # Allowed messages per epoch for potential leaders (20 bits)
-        core_root: zkhash     # Merkle root of zk_id of the core nodes
-        K_part_one: int       # First part of the signature public key (16 bytes)
-        K_part_two: int       # Second part of the signature public key (16 bytes)
-        pol_epoch_nonce: int  # PoL Epoch nonce
-        pol_t0: int           # PoL constant t0
-        pol_t1: int           # PoL constant t1
-        pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
-        # Outputs:
-        key_nullifier: zkhash   # derived from epoch, private index and private sk
+    core_quota: int       # Allowed messages per epoch for core nodes (20 bits)
+    leader_quota: int     # Allowed messages per epoch for potential leaders (20 bits)
+    core_root: zkhash     # Merkle root of zk_id of the core nodes
+    K_part_one: int       # First part of the signature public key (16 bytes)
+    K_part_two: int       # Second part of the signature public key (16 bytes)
+    pol_epoch_nonce: int  # PoL Epoch nonce
+    pol_t0: int           # PoL constant t0
+    pol_t1: int           # PoL constant t1
+    pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
+    # Outputs:
+    key_nullifier: zkhash   # derived from epoch, private index and private sk
 ```
 
 ### Witness
@@ -73,20 +73,20 @@ The prover knows a witness:
 
 ```python
 class ProofOfQuotaWitness:
-        index: int                            # This is the index of the generated key. Limiting this index limits the maximum number of key generated. (20 bits)
-        selector: bool                        # Indicates if it's a leader (=1) or a core node (=0)
-        # This part is filled randomly by potential leaders
-        core_sk: zkhash                       # sk corresponding to the zk_id of the core node
-        core_path: list[zkhash]               # Merkle path proving zk_id membership (len = 20)
-        core_path_selectors: list[bool]       # Indicates how to read the core_path (if Merkle nodes are left or right in the path)
-        # This part is filled randomly by core nodes
-        pol_sl: int                           # PoL slot
-        pol_secret_key: int                   # PoL note secret key
-        pol_note_value: int                   # PoL note value
-        pol_note_tx_hash: zkhash              # PoL note transaction
-        pol_note_output_number: int           # PoL note transaction output number
-        pol_noteid_path: list[zkhash]         # PoL Merkle path proving noteID membership in ledger aged (len = 32)
-        pol_noteid_path_selectors: list[bool] # Indicates how to read the note_path (if Merkle nodes are left or right in the path)
+    index: int                            # This is the index of the generated key. Limiting this index limits the maximum number of key generated. (20 bits)
+    selector: bool                        # Indicates if it's a leader (=1) or a core node (=0)
+    # This part is filled randomly by potential leaders
+    core_sk: zkhash                       # sk corresponding to the zk_id of the core node
+    core_path: list[zkhash]               # Merkle path proving zk_id membership (len = 20)
+    core_path_selectors: list[bool]       # Indicates how to read the core_path (if Merkle nodes are left or right in the path)
+    # This part is filled randomly by core nodes
+    pol_sl: int                           # PoL slot
+    pol_secret_key: int                   # PoL note secret key
+    pol_note_value: int                   # PoL note value
+    pol_note_tx_hash: zkhash              # PoL note transaction
+    pol_note_output_number: int           # PoL note transaction output number
+    pol_noteid_path: list[zkhash]         # PoL Merkle path proving noteID membership in ledger aged (len = 32)
+    pol_noteid_path_selectors: list[bool] # Indicates how to read the note_path (if Merkle nodes are left or right in the path)
 ```
 
 Note that every inputs and outputs of zero-knowledge proofs are all scalar field elements.
@@ -175,9 +175,9 @@ The proof confirming that the PoQ is correct must be compressed to a size of 128
 
 ```python
 class UncompressedProof:
-   pi_a: G1 # BN256 element
-   pi_b: G2 # BN256 element
-   pi_c: G1 # BN256 element
+    pi_a: G1 # BN256 element
+    pi_b: G2 # BN256 element
+    pi_c: G1 # BN256 element
 ```
 
 ## Proof Serialization
@@ -186,8 +186,8 @@ The `ProofOfQuota` structure contains `key_nullifier` and the compressed `proof`
 
 ```python
 class ProofOfQuota:
-  key_nullifier: zkhash # 32 bytes
-  proof: bytes # 128 bytes
+    key_nullifier: zkhash # 32 bytes
+    proof: bytes # 128 bytes
 ```
 
 # Appendix

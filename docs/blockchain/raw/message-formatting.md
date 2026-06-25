@@ -44,9 +44,9 @@ The `Message` is a structure that contains a `public_header`, `private_header` a
 
 ```python
 class Message:
-      public_header: PublicHeader,
-      private_header: Private_Header,
-      payload: bytes
+    public_header: PublicHeader,
+    private_header: Private_Header,
+    payload: bytes
 ```
 
 ### Public Header
@@ -57,10 +57,10 @@ The `public_header` is defined as follows:
 
 ```python
 class PublicHeader:
-        version: byte,
-      public_key: PublicKey,
-      proof_of_quota: ProofOfQuota,
-      signature: Signature
+    version: byte,
+    public_key: PublicKey,
+    proof_of_quota: ProofOfQuota,
+    signature: Signature
 ```
 
 Where:
@@ -86,11 +86,11 @@ The `BlendingHeader` ($\mathbf b_l$) is defined as follows:
 
 ```python
 class BlendingHeader:
-      public_key: PublicKey,
-      proof_of_quota: ProofOfQuota,
-      signature: Signature,
-      proof_of_selection: ProofOfSelection
-      is_last: byte
+    public_key: PublicKey,
+    proof_of_quota: ProofOfQuota,
+    signature: Signature,
+    proof_of_selection: ProofOfSelection
+    is_last: byte
 ```
 
 Where:

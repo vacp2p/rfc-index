@@ -271,17 +271,17 @@ def block_id(header: Header) -> hash
 
 ```python
 class Header:                                # 297 bytes
-      bedrock_version: byte                    # 1 bytes
-      parent_block: hash                       # 32 bytes
-      slot: int                                # 8 bytes
-      block_root: hash                         # 32 bytes
-      proof_of_leadership: ProofOfLeadership   # 224 bytes
+    bedrock_version: byte                    # 1 bytes
+    parent_block: hash                       # 32 bytes
+    slot: int                                # 8 bytes
+    block_root: hash                         # 32 bytes
+    proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
-      leader_voucher: zkhash                   # 32 bytes
-      entropy_contribution: zkhash             # 32 bytes
-      proof: Groth16Proof                      # 128 bytes
-      leader_key: Ed25519PublicKey             # 32 bytes
+    leader_voucher: zkhash                   # 32 bytes
+    entropy_contribution: zkhash             # 32 bytes
+    proof: Groth16Proof                      # 128 bytes
+    leader_key: Ed25519PublicKey             # 32 bytes
 ```
 
 ### Block

@@ -73,9 +73,9 @@ We define the following message structure:
 
 ```python
 class Proposal:                              # 33129 bytes
-      header: Header                           # 297 bytes
-      references: References                   # 32768 bytes
-      signature: Ed25519Signature              # 64 bytes
+    header: Header                           # 297 bytes
+    references: References                   # 32768 bytes
+    signature: Ed25519Signature              # 64 bytes
 ```
 
 Where:
@@ -90,11 +90,11 @@ Where:
 
 ```python
 class Header:                                # 297 bytes
-      bedrock_version: byte                    # 1 byte
-      parent_block: hash                       # 32 bytes
-      slot: SlotNumber                         # 8 bytes
-      block_root: hash                         # 32 bytes
-      proof_of_leadership: ProofOfLeadership   # 224 bytes
+    bedrock_version: byte                    # 1 byte
+    parent_block: hash                       # 32 bytes
+    slot: SlotNumber                         # 8 bytes
+    block_root: hash                         # 32 bytes
+    proof_of_leadership: ProofOfLeadership   # 224 bytes
 ```
 
 Where:
@@ -118,10 +118,10 @@ Where `mempool_transactions` is a set of up to 1024 references to transactions o
 
 ```python
 class ProofOfLeadership:                     # 224 bytes
-      leader_voucher: RewardVoucher            # 32 bytes
-      entropy_contribution: zkhash             # 32 bytes
-      proof: ProofOfLeadership                 # 128 bytes
-      leader_key: Ed25519PublicKey             # 32 bytes
+    leader_voucher: RewardVoucher            # 32 bytes
+    entropy_contribution: zkhash             # 32 bytes
+    proof: ProofOfLeadership                 # 128 bytes
+    leader_key: Ed25519PublicKey             # 32 bytes
 ```
 
 Where:
@@ -183,9 +183,9 @@ signature = Ed25519.sign(leader_secret_key, header)
 6. Assemble the block proposal.
 ```python
 proposal = Proposal(
-  header,
-  references,
-  signature
+    header,
+    references,
+    signature
 )
 ```
 

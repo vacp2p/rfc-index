@@ -18,15 +18,15 @@ We adapt the Mantle Transaction Encoding to include the Channel Deposit and Chan
 We add  `ChannelDeposit` and `ChannelWithdraw` to [Operations:](../../mantle-transaction-encoding.md)
 ```text
 OpPayload = Transfer /
-      ChannelInscribe /
-            ChannelBlob /
-            ChannelSetKeys /
-+           ChannelDeposit /
-+           ChannelWithdraw /
-            SDPDeclare /
-            SDPWithdraw /
-            SDPActive /
-            LeaderClaim
+    ChannelInscribe /
+    ChannelBlob /
+    ChannelSetKeys /
++   ChannelDeposit /
++   ChannelWithdraw /
+    SDPDeclare /
+    SDPWithdraw /
+    SDPActive /
+    LeaderClaim
 ```
 
 Then define the structures in [Channel Operations](../../mantle-transaction-encoding.md):
@@ -40,9 +40,9 @@ Then define the structures in [Channel Operations](../../mantle-transaction-enco
 
 +   ChannelWithdraw = ChannelId Amount
 
-   ChannelId = Hash32
-   Parent    = Hash32
-   Signer    = Ed25519PublicKey
+    ChannelId = Hash32
+    Parent    = Hash32
+    Signer    = Ed25519PublicKey
 ```
 
 Next we add `ChannelWithdrawOpProof` to [Op Proofs:](../../mantle-transaction-encoding.md)
@@ -52,10 +52,10 @@ OpsProofs  = *OpProof ; 1. Lenth must equal OpCount
                       ;    That is, type(OpProofs[i]) == ProofFor(Op[i])
 
 OpProof  =  Ed25519SigProof /
-            ZkSigProof /
-            ZkAndEd25519SigsProof /
-+           ChannelWithdrawOpProof /
-            ProofOfClaimProof
+    ZkSigProof /
+    ZkAndEd25519SigsProof /
++   ChannelWithdrawOpProof /
+    ProofOfClaimProof
 
 Ed25519SigProof        = Ed25519Signature
 ZkSigProof             = ZkSignature

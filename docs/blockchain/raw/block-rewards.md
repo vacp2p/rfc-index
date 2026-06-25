@@ -207,17 +207,17 @@ where:
 
 ```python
 def block_rewards(
-        S_tge:float,
+    S_tge:float,
     emission_rate_factor:float,
     I_max:float,
     Delta_t:float,
     f:float,
     D_1_t: float
 ) -> float:
-"""
-            Calculate the rewards per block.
-            It implements equation (1).
-        """
+    """
+    Calculate the rewards per block.
+    It implements equation (1).
+    """
     emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
     emission_from_rewards = (1. - emission_rate_fator) * R_block_cur
     return emission_from_inflation + emission_from_rewards
@@ -244,18 +244,18 @@ All terms are displayed in annualized form to ease comparison.
 
 ```python
 def calculate_emission_rate_factor(
-        alpha_dev:float,
+    alpha_dev:float,
     weighted_target_deviation: float,
     alpha_avg:float
     weighted_avg: float,
     i_min: float = 0.0,
     i_max: float = 0.01
 ) -> float:
-"""It calculates the current emission rate factor"""
+    """It calculates the current emission rate factor"""
     emission_rate:float = alpha_dev * weighted_target_deviation + alpha_avg * weighted_avg + i_min
     emission_rate_factor:float = emission_rate / i_max
     emission_rate_factor = min(1.0, max(emission_rate_factor, 0.0))
-return emission_rate_factor
+    return emission_rate_factor
 ```
 
 ### KPI Deviation from Target
@@ -272,7 +272,7 @@ def weighted_deviation_from_target(
     kpi_weights: List[float],
     kpi_deviations: List[float]
 ) -> float:
-"""
+    """
     Calculate the normalized deviation (delta_t).
     Inputs:
     * kpi_weights: constant list of floats
@@ -280,10 +280,10 @@ def weighted_deviation_from_target(
     Returns:
     * a normalized annualized KPI in units of %.
     """
-assert len(kpi_weights) == len(kpi_deviations)
-    
+    assert len(kpi_weights) == len(kpi_deviations)
+
     weighted_target_deviation:float = 0.0
-for deviation, weight in zip(kpi_deviations, kpi_weights):
+    for deviation, weight in zip(kpi_deviations, kpi_weights):
         weighted_target_deviation += weight * deviation value
 
     return weighted_target_deviation
@@ -315,15 +315,15 @@ def weighted_average(
     kpi_weights: List[float],
     kpi_average: List[float]
 ) -> float:
-"""
+    """
     Calculate the weighted average metric (gamma_t)
     * kpi_weights: constant list of floats
     * kpi_average: for each KPI, it contains the results of "average_kpi"
     """
-assert len(kpi_weights) == len(kpi_deviations)
-    
+    assert len(kpi_weights) == len(kpi_deviations)
+
     weighted_avg:float = 0.0
-for avg, weight in zip(kpi_average, kpi_weights):
+    for avg, weight in zip(kpi_average, kpi_weights):
         weighted_avg += weight * avg
 
     return weighted_avg

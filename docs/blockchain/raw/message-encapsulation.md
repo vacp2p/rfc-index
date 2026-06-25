@@ -64,8 +64,8 @@ This document outlines the cryptographic notation, data structures, and algorith
       proof_of_quota: ProofOfQuota
 
   class ProofOfQuota:
-    key_nullifier: zkhash # 32 bytes
-    proof: bytes # 128 bytes
+      key_nullifier: zkhash # 32 bytes
+      proof: bytes # 128 bytes
   ```
 
   For more information about key generation mechanism please refer to [Key Types and Generation](key-types-and-generation.md).
@@ -267,7 +267,7 @@ The first step is to generate a set of keys alongside all necessary proofs that 
         selected_nodes = []
         for keypair in key_collection:
             rand = pseudo_random(
-              b"BlendNode",
+                b"BlendNode",
                 selection_randomness,
                 8
             )
