@@ -110,7 +110,7 @@ Such that the following constraints hold:
 **Step 4:** The prover derives a `key_nullifier` maintained by blend nodes during the epoch for message deduplication purpose.
 
 ```python
-selection_randomness = zkhash(b"SELECTION_RANDOMNESS_V1", sk, index, validity_period)
+selection_randomness = zkhash(b"SELECTION_RANDOMNESS_V1", sk, index, period_nonce)
 key_nullifier = zkhash(b"KEY_NULLIFIER_V1", selection_randomness)
 ```
 
