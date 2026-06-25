@@ -102,7 +102,7 @@ Each proof (op proof and signature) must be cryptographically bound to the `Mant
 mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 ```
 
-  `mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
+`mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
 
 ## Mantle Transaction Fee
 
@@ -264,7 +264,7 @@ def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey])
                 withdraw_threshold = 1)
 ```
 
-  Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
+Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
 
 ### Decentralized Sequencing
 
@@ -319,11 +319,11 @@ Ed25519Signature
 
 **Execution Gas**
 
-  Channel Inscribe Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_INSCRIBE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Inscribe Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_INSCRIBE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 txhash: hash
@@ -355,7 +355,7 @@ assert Ed25519_verify(txhash, msg.signer, sig)
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 msg: Inscribe
@@ -365,15 +365,15 @@ channels: dict[ChannelId, ChannelState]
 block_slot: Slot
 ```
 
-  *Execute*
+*Execute*
 
-  1. If the channel does not exist, create it just-in-time.
+1. If the channel does not exist, create it just-in-time.
 ```python
 if msg.channel is not in channels
     channels[msg.channel] = default_channel(block_slot, [msg.signer])
 ```
 
-  2. Update the channel sequencer.
+2. Update the channel sequencer.
 ```text
 chan = channels[msg.channel]
 (new_sequencer_index, new_sequencer_starting_slot) = round_robin(
@@ -384,7 +384,7 @@ chan.tip_sequencer_starting_slot = new_sequencer_starting_slot
 chan.tip_sequencer = new_sequencer_index
 ```
 
-  3. Update the channel tip.
+3. Update the channel tip.
 ```python
 chan = channels[msg.channel]
 chan.tip_hash = hash(encode(msg))
@@ -440,6 +440,8 @@ class ChannelConfig:
 
 **Proof**
 
+A Channel Config is authorized by a threshold of the channel's accredited keys using [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification).
+
 ```python
 class ChannelConfigOpProof:
         signatures: list[Ed25519Signature] # signatures from configuration_threshold
@@ -450,11 +452,11 @@ class ChannelConfigOpProof:
 
 **Execution Gas**
 
-  Channel Config Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Config Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash
@@ -463,30 +465,30 @@ proof: ChannelConfigOpProof
 channels: dict[ChannelId, ChannelState]
 ```
 
-  *Validate*
+*Validate*
 
 ```python
-assert len(proof.signatures) == len(proof.indexes)
 assert config.configuration_threshold > 0
 assert config.withdraw_threshold > 0
 assert len(config.keys) > 0
 assert len(config.keys) < 2^16
+# The configuration threshold must be reachable with the accredited keys,
+# otherwise the channel would be locked out of any future reconfiguration
+assert config.configuration_threshold <= len(config.keys)
 
 if config.channel in channels:
         chan = channels[config.channel]
-        # Check there are enough signatures
-        assert len(proof.signatures) == chan.configuration_threshold
-        # Check that indexes are ordered to avoid duplication
-        for i in range(len(proof.indexes)-1):
-                assert proof.indexes[i] < proof.indexes[i+1]
-        for sig, idx in zip(proof.signatures, proof.indexes):
-                # and at the same time that chan.accredited_keys[idx] isn't out of bound
-                assert Ed25519_verify(txhash, chan.accredited_keys[idx], sig)
+        # Verify the configuration_threshold signatures (see Appendix)
+        MultiEd25519_verify(txhash,
+                            proof.signatures,
+                            proof.indexes,
+                            chan.accredited_keys,
+                            chan.configuration_threshold)
 ```
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 config: ChannelConfig
@@ -495,16 +497,16 @@ channels: dict[ChannelId, ChannelState]
 block_slot: Slot
 ```
 
-  *Execute*
+*Execute*
 
-  1. If the channel does not exist, create it just-in-time.
+1. If the channel does not exist, create it just-in-time.
 
 ```python
 if config.channel not in channels:
         channels[config.channel] = default_channel(block_slot, config.keys)
 ```
 
-  1. Update the configuration.
+1. Update the configuration.
 
 ```python
 chan = channels[config.channel]
@@ -523,7 +525,7 @@ chan.posting_timeout = config.posting_timeout
 chan.withdraw_threshold = config.withdraw_threshold
 ```
 
-  1. Update the channel tip.
+1. Update the channel tip.
 
 ```python
 chan = channels[config.channel]
@@ -533,7 +535,7 @@ chan.tip_hash = hash(encode(config))
 
 **Example**
 
-  Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
+Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
 
 ```python
 # Given a key to add
@@ -579,7 +581,7 @@ class ChannelDeposit:
 
 **Proof**
 
-  A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 ```text
 ZkSignature
@@ -587,11 +589,11 @@ ZkSignature
 
 **Execution Gas**
 
-  Channel Deposit Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_DEPOSIT_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Deposit Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_DEPOSIT_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
@@ -603,19 +605,19 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Validate*
+*Validate*
 
-  1. Verify that the channel exist
+1. Verify that the channel exist
 ```python
 assert deposit.channel in channels
 ```
 
-  2. Ensure all inputs are spendable.
+2. Ensure all inputs are spendable.
 ```text
 ledger.assert_spendable(note_id)
 ```
 
-  3. Validate  ownership over deposited notes.
+3. Validate  ownership over deposited notes.
 ```python
 input_notes = [ledger[input_note_id] for input_note_id in deposit.inputs]
 input_pks = [note.public_key for note in input_notes]
@@ -624,7 +626,7 @@ assert ZkSignature_verify(mantle_txhash, deposit_proof, input_pks)
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 deposit: ChannelDeposit
@@ -634,14 +636,14 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Execute*
+*Execute*
 
-  1. Remove inputs from the ledger.
+1. Remove inputs from the ledger.
 ```text
 ledger.execute_spending(deposit.inputs)
 ```
 
-  2. Increase the balance of the channel
+2. Increase the balance of the channel
 ```python
 for inp in deposit.inputs:
         channels[deposit.channel].balance += inp.value
@@ -649,7 +651,7 @@ for inp in deposit.inputs:
 
 **Example**
 
-  Suppose Alice wants to make a deposit of 50 tokens on Zone A.
+Suppose Alice wants to make a deposit of 50 tokens on Zone A.
 
 ```python
 # Alice encodes her deposit
@@ -674,7 +676,7 @@ signed_tx = SignedMantleTx(
 )
 ```
 
-  Note that the Zone may wait for the deposit to be finalized before interpreting the deposit in order to guarantee that the deposit will occur on-chain and won't be removed due to reorganization of the chain.
+Note that the Zone may wait for the deposit to be finalized before interpreting the deposit in order to guarantee that the deposit will occur on-chain and won't be removed due to reorganization of the chain.
 
 ### CHANNEL_WITHDRAW
 
@@ -691,6 +693,8 @@ class ChannelWithdraw:
 
 **Proof**
 
+A Channel Withdraw is authorized by a threshold of the channel's accredited keys using [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification).
+
 ```python
 class ChannelWithdrawOpProof:
         signatures: list[Ed25519Signature] # signature from withdraw_threshold keys
@@ -701,11 +705,11 @@ class ChannelWithdrawOpProof:
 
 **Execution Gas**
 
-  Channel Withdraw Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_WITHDRAW_GAS * withdraw_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Withdraw Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_WITHDRAW_GAS * withdraw_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash
@@ -716,52 +720,41 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Validate*
+*Validate*
 
-  1. Check that the outputs are valid
+1. Check that the outputs are valid
 ```text
 ledger.assert_valid_output(withdrawal.outputs)
 ```
 
-  2. Check that the channel exists
+2. Check that the channel exists
 ```python
 assert withdrawal.channel in channels
 ```
 
-  3. Check that the withdraw nonce is correct
+3. Check that the withdraw nonce is correct
 ```python
 assert channels[withdrawal.channel].withdrawal_nonce == withdrawal.withdrawal_nonce
 ```
 
-  4. Check that the channel has enough funds
+4. Check that the channel has enough funds
 ```python
 withdrawal_amount = sum(output.value for output in withdrawal.outputs)
 assert channels[withdrawal.channel].balance >= withdrawal_amount
 ```
 
-  5. Check that there are enough signatures
+5. Check the signatures (see [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification))
 ```python
-assert len(proof.signatures) == len(proof.indexes)
-assert len(proof.signatures) == channels[withdrawal.channel]
-                                                                                .withdraw_threshold
-```
-
-  6. Check that every proof index is unique
-```python
-assert len(proof.indexes) == len(set(proof.indexes))
-```
-
-  7. Check the signatures
-```python
-for sig, idx in zip(proof.signatures, proof.indexes):
-        assert Ed25519_verify(txhash,
-                        channels[withdrawal.channel].accredited_keys[idx],
-                        sig)
+MultiEd25519_verify(txhash,
+                    proof.signatures,
+                    proof.indexes,
+                    channels[withdrawal.channel].accredited_keys,
+                    channels[withdrawal.channel].withdraw_threshold)
 ```
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 withdrawal: ChannelWithdraw
@@ -770,28 +763,28 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Execute*
+*Execute*
 
-  1. Decrease the balance of the Channel
+1. Decrease the balance of the Channel
 ```python
 for output in withdrawal.outputs:
         channels[withdrawal.channel].balance -= output.value
 ```
 
-  2. Add outputs to the ledger.
+2. Add outputs to the ledger.
 ```python
 withdrawal_id = derive_op_id(withdrawal)
 ledger.execute_adding(withdrawal_id, withdrawal.outputs)
 ```
 
-  3. Increase the channel `withraw_nonce`
+3. Increase the channel `withraw_nonce`
 ```text
 channels[withdrawal.channel].withdrawal_nonce += 1
 ```
 
 **Example**
 
-  Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.
+Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.
 
 ```python
 # Sequencer encodes his withdrawal
@@ -890,15 +883,15 @@ class DeclarationProof:
     provider_sig: Ed25519Signature  # signature proving ownership of provider key
 ```
 
-  see: [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+see: [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 **Execution Gas**
 
-  SDP Declare Operations have a fixed Execution Gas cost of `EXECUTION_SDP_DECLARE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+SDP Declare Operations have a fixed Execution Gas cost of `EXECUTION_SDP_DECLARE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash                  # the txhash of the transaction we are validating
@@ -911,11 +904,11 @@ locked_notes: dict[NoteId, LockedNote]
 declarations: dict[NoteId, DeclarationInfo]
 ```
 
-  *Validate*
+*Validate*
 
-  The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
+The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
 
-  1. Ensure ownership over the locked note, `zk_id` and `provider_id`.
+1. Ensure ownership over the locked note, `zk_id` and `provider_id`.
 ```python
 assert ZkSignature_verify(
   txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
@@ -923,24 +916,24 @@ assert ZkSignature_verify(
 assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
 ```
 
-  2. Ensure declaration does not already exist.
+2. Ensure declaration does not already exist.
 ```python
 assert declaration_id(declaration) not in declarations
 ```
 
-  3. Ensure it has no more than 8 locators.
+3. Ensure it has no more than 8 locators.
 ```python
 assert len(declaration.locators) <= 8
 ```
 
-  4. Ensure locked note exists and value of locked note is sufficient for joining the service.
+4. Ensure locked note exists and value of locked note is sufficient for joining the service.
 ```python
 assert ledger.is_unspent(declaration.locked_note_id)
 note = ledger.get_note(declaration.locked_note_id)
 assert note.value >= min_stake.stake_threshold
 ```
 
-  5. Ensure the note has not already been locked for this service.
+5. Ensure the note has not already been locked for this service.
 ```python
 if declaration.locked_note in locked_notes:
     locked_note = locked_notes[declaration.locked_note]
@@ -950,7 +943,7 @@ if declaration.locked_note in locked_notes:
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 declaration: DeclarationMessage # the declaration we are executing
@@ -959,9 +952,9 @@ current_block_height: int
 locked_notes : dict[NoteId, LockedNote]
 ```
 
-  *Execute*
+*Execute*
 
-  1. Create the locked note state if it doesn't already exist.
+1. Create the locked note state if it doesn't already exist.
 ```python
 if declaration.locked_note not in locked_notes:
     locked_notes[declaration.locked_note_id] = \
@@ -970,20 +963,20 @@ if declaration.locked_note not in locked_notes:
 locked_note = locked_notes[declaration.locked_note_id]
 ```
 
-  2. Update the locked notes timeout using this services lock period.
+2. Update the locked notes timeout using this services lock period.
 ```python
 lock_period = service_parameters[declaration.service_type].lock_period
 service_lock = current_block_height + lock_period
 locked_note.locked_until = max(service_lock, locked_note.locked_until)
 ```
 
-  3. Add this declaration to the locked note.
+3. Add this declaration to the locked note.
 ```python
 declare_id = declaration_id(declaration)
 locked_note.declarations.add(declare_id)
 ```
 
-  4. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
+4. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
 ```python
 declarations[declare_id] = DeclarationInfo(
     service: declaration.service
@@ -1056,7 +1049,7 @@ class WithdrawMessage:
 
 **Proof**
 
-  A signature from the `zk_id` and the locked note `pk` attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)).
+A signature from the `zk_id` and the locked note `pk` attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)).
 
 ```text
 ZkSignature
@@ -1064,11 +1057,11 @@ ZkSignature
 
 **Execution Gas**
 
-  SDP Withdraw Operations have a fixed Execution Gas cost of `EXECUTION_SDP_WITHDRAW_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+SDP Withdraw Operations have a fixed Execution Gas cost of `EXECUTION_SDP_WITHDRAW_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash # Mantle transaction hash of the tx containing this operation
@@ -1081,9 +1074,9 @@ locked_notes: dict[NoteId, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
-  *Validate*
+*Validate*
 
-  1. Ensure that the locked note exists, is locked and bound to this declaration.
+1. Ensure that the locked note exists, is locked and bound to this declaration.
 ```python
 assert ledger.is_unspent(withdraw.locked_note_id)
 assert withdraw.locked_note_id in locked_notes
@@ -1093,13 +1086,13 @@ locked_note = locked_notes[withdraw.locked_note_id]
 assert withdraw.declaration in locked_note.declarations
 ```
 
-  2. Ensure that the locked note has expired.
+2. Ensure that the locked note has expired.
 ```python
 assert locked_note.locked_until <= block_height
 ```
 
-  3. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
-    1. Ensure declaration exists.
+3. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
+   1. Ensure declaration exists.
 ```python
 assert withdraw.declaration in declarations
 declare_info = declarations[withdraw.declaration]
@@ -1123,7 +1116,7 @@ assert withdraw.nonce > declare_info.nonce
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 withdraw: WithdrawMessage
@@ -1135,24 +1128,24 @@ locked_notes: dict[NoteId, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
-  *Execute*
+*Execute*
 
-  Executes the withdrawal protocol [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
+Executes the withdrawal protocol [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
 
-  1. Update declaration info with nonce and withdrawn timestamp.
+1. Update declaration info with nonce and withdrawn timestamp.
 ```text
 declare_info = declarations[withdraw.declaration]
 declare_info.nonce = withdraw.nonce
 declare_info.withdrawn = block_height
 ```
 
-  2. Remove this declaration from the locked note.
+2. Remove this declaration from the locked note.
 ```text
 locked_note = locked_notes[withdraw.locked_note_id]
 locked_note.declarations.remove(withdraw.declaration)
 ```
 
-  3. Remove the locked note if it is no longer bound to any declarations.
+3. Remove the locked note if it is no longer bound to any declarations.
 ```python
 if len(locked_note.declarations) == 0:
     del locked_notes[withdraw.locked_note_id)
@@ -1205,11 +1198,11 @@ ZkSignature
 
 **Execution Gas**
 
-  SDP Active Operations have a fixed Execution Gas cost of `EXECUTION_SDP_ACTIVE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+SDP Active Operations have a fixed Execution Gas cost of `EXECUTION_SDP_ACTIVE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash # Mantle transaction hash of the tx containing this operation
@@ -1219,7 +1212,7 @@ signature: ZkSignature
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
-  *Validate*
+*Validate*
 
 ```python
 assert active.declaration in declarations
@@ -1232,7 +1225,7 @@ assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
 
 **Execution**
 
-  Executes the active protocol [Active](bedrock-service-declaration-protocol.md#active). The activation, i.e. setting the `declaration.active`, is handled by the service-specific logic.
+Executes the active protocol [Active](bedrock-service-declaration-protocol.md#active). The activation, i.e. setting the `declaration.active`, is handled by the service-specific logic.
 
 **Example**
 
@@ -1274,15 +1267,15 @@ class ClaimRequest:
 
 **Proof**
 
-  The provider proves that they have won a proof of Leadership before the start of the current epoch, i.e., their reward voucher is indeed in the voucher set: [Proof of Claim](#proof-of-claim).
+The provider proves that they have won a proof of Leadership before the start of the current epoch, i.e., their reward voucher is indeed in the voucher set: [Proof of Claim](#proof-of-claim).
 
 **Execution gas**
 
-  Leader Claim Operations have a fixed Execution Gas cost of `EXECUTION_LEADER_CLAIM_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Leader Claim Operations have a fixed Execution Gas cost of `EXECUTION_LEADER_CLAIM_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 mantle_txhash: zkhash
@@ -1293,7 +1286,7 @@ voucher_nullifier_set: set[zkhash]
 proof: ProofOfClaim
 ```
 
-  Validate
+Validate
 
 ```python
 assert claim.voucher_nf not in voucher_nullifier_set
@@ -1303,7 +1296,7 @@ validate_proof(claim, proof, mantle_txhash)
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```python
 claim: ClaimRequest
@@ -1314,10 +1307,10 @@ leaders_rewards: TokenValue   # The pool of tokens to be claim by leaders
 leader_reward: TokenValue     # The amount one leader can claim
 ```
 
-  *Execution*
+*Execution*
 
-  1. Add `claim.voucher_nf` to the `voucher_nullifier_set`.
-  2. Denoting by `leader_reward` the amount defined for leader rewards in [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
+1. Add `claim.voucher_nf` to the `voucher_nullifier_set`.
+2. Denoting by `leader_reward` the amount defined for leader rewards in [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
 ```python
 output_note=Note(
         value = leader_reward
@@ -1327,7 +1320,7 @@ claim_id = derive_op_id(claim)
 ledger.execute_adding(claim_id, [output_note])
 ```
 
-  3. Reduce the leader’s reward `leaders_rewards` value by the same amount (without ZK proof).
+3. Reduce the leader’s reward `leaders_rewards` value by the same amount (without ZK proof).
 
 **Example**
 
@@ -1379,7 +1372,7 @@ class Transfer:
 
 **Proof**
 
-  A Transfer proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+A Transfer proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 ```text
 ZkSignature
@@ -1387,11 +1380,11 @@ ZkSignature
 
 **Execution Gas**
 
-  Transfer have a fixed Execution Gas cost of `EXECUTION_TRANSFER_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Transfer have a fixed Execution Gas cost of `EXECUTION_TRANSFER_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 **Validation**
 
-  *Given*
+*Given*
 
 ```python
 mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
@@ -1401,33 +1394,33 @@ transfer_proof: ZkSignature
 ledger: Ledger
 ```
 
-  *Validate*
+*Validate*
 
-  1. Ensure the Transfer in non-empty
+1. Ensure the Transfer in non-empty
 ```python
 assert len(transfer.inputs) > 0
 ```
 
-  2. Ensure all inputs are spendable.
+2. Ensure all inputs are spendable.
 ```text
 ledger.assert_spendable(transfer.inputs)
 ```
 
-  3. Validate transfer proof to show ownership over input notes.
+3. Validate transfer proof to show ownership over input notes.
 ```python
 input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
 input_pks = [note.public_key for note in input_notes]
 assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
 ```
 
-  4. Ensure outputs are valid.
+4. Ensure outputs are valid.
 ```text
 ledger.assert_valid_output(transfer.output)
 ```
 
 **Execution**
 
-  *Given*
+*Given*
 
 ```text
 transfer: Transfer
@@ -1436,14 +1429,14 @@ transfer_proof: ZkSignature
 ledger: Ledger
 ```
 
-  *Execution*
+*Execution*
 
-  1. Remove inputs from the ledger.
+1. Remove inputs from the ledger.
 ```text
 ledger.execute_spending(transfer.inputs)
 ```
 
-  2. Add outputs to the ledger.
+2. Add outputs to the ledger.
 ```python
 transfer_id = derive_operation_id(transfer)
 ledger.execute_adding(transfer_id, transfer.outputs)
@@ -1636,6 +1629,46 @@ The material used for the benchmarks is the following:
 - Kernel    : 6.8.0-59-generic
 
 ![Diagram](bedrock-v1.1-mantle-specification/assets/477261aa-09df-8268-8845-8145f3f8d670.png)
+
+## Multiple Ed25519 Signatures Verification
+
+Several operations (e.g. [Channel Configuration](#channel-configuration) and
+[Channel Withdraw](#channel-withdraw)) authorize an action with a threshold of
+Ed25519 signatures produced by a list of accredited keys. Each signature comes
+with the index, in the accredited keys list, of the key that produced it. The
+verification is factored out in the following routine:
+
+*Given*
+
+    ```python
+    msg: zkhash                        # the message being signed (the mantle txhash)
+    signatures: list[Ed25519Signature]
+    indexes: list[u16]                 # for each signature, the index in `keys` of
+                                       # the signing key
+    keys: list[Ed25519PublicKey]       # the accredited keys
+    threshold: u16                     # the number of required signatures
+    ```
+
+*Verify*
+
+    ```python
+    def MultiEd25519_verify(msg, signatures, indexes, keys, threshold):
+        # There must be exactly one index per signature
+        assert len(signatures) == len(indexes)
+        
+        # There must be exactly `threshold` signatures
+        assert len(signatures) == threshold
+        
+        # Indexes must be ordered from smallest to biggest without duplication.
+        # Being strictly increasing rejects duplicates and, since `idx` is used to
+        # index `keys`, guarantees every index stays within bounds.
+        for i in range(len(indexes) - 1):
+            assert indexes[i] < indexes[i + 1]
+            
+        # Each signature must be valid for the accredited key at its index
+        for sig, idx in zip(signatures, indexes):
+            assert Ed25519_verify(msg, keys[idx], sig)
+    ```
 
 ## Proof of Claim
 
