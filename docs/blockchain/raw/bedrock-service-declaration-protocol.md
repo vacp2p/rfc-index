@@ -177,8 +177,8 @@ class DeclarationInfo:
     zk_id: ZkPublicKey
     locators: list[Locator]
     created: EpochNumber
-    active: EpochNumber
-    withdraw_at: EpochNumber
+    active: EpochNumber | None
+    withdraw_at: EpochNumber | None
     nonce: Nonce
 ```
 
