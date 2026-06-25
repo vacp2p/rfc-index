@@ -67,7 +67,7 @@ In this section we present an overview of the cryptoeconomical aspects of the Lo
 
 ## Minimum Stake
 
-To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The [\[1.0.0\]\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md) defines the methodology on how to calculate the minimum stake value.
+To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The [\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md) defines the methodology on how to calculate the minimum stake value.
 
 ## Gas
 
@@ -173,7 +173,7 @@ return leader_rewards
 
 To protect leaders' privacy, we must not link leaders to their blocks and rewards. Therefore, we designed a mechanism for anonymous reward claiming. A key design decision in this mechanism is that the amount of rewards a leader receives cannot be associated with or calculated based on the block they proposed. Without this approach, leaders could be linked back to their proposed blocks based on the value of their claimed rewards. This mechanism creates an anonymity pool where all leaders contribute, turning the leader-to-block assignment into a guessing game.
 
-The [\[1.0.0\] Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md) defines how leader rewards are maintained in the ledger and how leaders can claim them. Leader rewards follow a two-step procedure:
+The [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md) defines how leader rewards are maintained in the ledger and how leaders can claim them. Leader rewards follow a two-step procedure:
 
 1. When a new epoch e starts, the unique reward pool variable for leaders is updated, increasing by the reward amount for the previous epoch e-1. This reward amount is calculated as the sum of leader block rewards from epoch e-1. Simultaneously, consensus nodes update the voucher set, adding vouchers of leaders from epoch e-1 to the global voucher set.
 1. From epoch e onward, leaders can exchange their vouchers for shares of the rewards pool, as their vouchers are now in the set. Each unclaimed voucher represents an equal share of the leader rewards pool.

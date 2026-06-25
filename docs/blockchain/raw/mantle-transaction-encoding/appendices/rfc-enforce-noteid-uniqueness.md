@@ -4,7 +4,7 @@
 
 ## Motivation
 
-In [[1.3.0] Mantle](../../../deprecated/v1.2.0-mantle.md), the NoteId is derived from the Transfer Operation that mints it:
+In [Mantle](../../../deprecated/v1.2.0-mantle.md), the NoteId is derived from the Transfer Operation that mints it:
 The introduction of `LEADER_CLAIM` and `CHANNEL_WITHDRAW` operations creates a collision risk in `NoteId` derivation. Both operations allow a Mantle transaction to be balanced without consuming any note as input, breaking the hash chain that previously guaranteed `NoteId` uniqueness. As a result, two distinct Mantle transactions can produce notes with identical `NoteId`s whenever their `TRANSFER` operations share the same output value and public key and carry no inputs.
 ## Proposal
 
@@ -688,9 +688,9 @@ to
 
 ### Deprecated
 
-[[1.3.0] Mantle](../../../deprecated/v1.2.0-mantle.md)
-[[1.3.0] [Analysis] Gas Cost Determination](../../../deprecated/v1.4.0-analysis-gas-cost-determination.md)
-[[1.2.0] Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md)
-[[1.0.0] [Template] Cross-Channel Messaging](../../../deprecated/v1.1.0-template-cross-channel-messaging.md)
-[[1.1.0] Service Reward Distribution Protocol](../../../deprecated/v1.0.0-bedrock-service-reward-distribution.md)
+[Mantle](../../../deprecated/v1.2.0-mantle.md)
+[[Analysis] Gas Cost Determination](../../../deprecated/v1.4.0-analysis-gas-cost-determination.md)
+[Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md)
+[[Template] Cross-Channel Messaging](../../../deprecated/v1.1.0-template-cross-channel-messaging.md)
+[Service Reward Distribution Protocol](../../../deprecated/v1.0.0-bedrock-service-reward-distribution.md)
 ### Retired

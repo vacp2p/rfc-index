@@ -36,7 +36,7 @@ The Genesis Block defines the starting state for the Bedrock chain, including th
 
 The Genesis Block establishes the initializing values for the various protocols and services. This includes the initial token distribution, initial nodes participating in Blend Network and the result of running the epoch nonce ceremony.
 
-The block body is a single Mantle Transaction (see [[1.5.0] Mantle](bedrock-v1.1-mantle-specification.md)) containing a Transfer Operation distributing the notes to initial token holders. The bedrock services are initialized through `SDP_DECLARE` Operations embedded in the Mantle Transaction’s Operations list and protocol initializing constants are encoded through a `CHANNEL_INSCRIBE` Operation also embedded in the Operations list.
+The block body is a single Mantle Transaction (see [Mantle](bedrock-v1.1-mantle-specification.md)) containing a Transfer Operation distributing the notes to initial token holders. The bedrock services are initialized through `SDP_DECLARE` Operations embedded in the Mantle Transaction’s Operations list and protocol initializing constants are encoded through a `CHANNEL_INSCRIBE` Operation also embedded in the Operations list.
 
 Not all protocol constants are encoded in the Genesis block. The principle we use to decide whether a value should be in the Genesis block or not is whether it is a value that is derived from blockchain activity or whether it is updated through a protocol update (hard / soft fork). For example, the epoch nonce is updated through normal blockchain Operations and therefore it should be specified in the Genesis block. Gas constants are only changed through protocol updates and hard forks and therefore they will be hardcoded in the node implementation.
 

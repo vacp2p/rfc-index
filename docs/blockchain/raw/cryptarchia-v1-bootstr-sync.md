@@ -32,7 +32,7 @@ When a new node joins the network or a previously-bootstrapped node has been off
 
 This document specifies a protocol for nodes to bootstrap with the honest chain efficiently while mitigating long range attacks. It also defines how to handle the case which the node falls behind after the bootstrapping is complete.
 
-This protocol adheres to the key invariant: We never roll back blocks that are deeper than the latest immutable block $B_\text{imm}$ in the local chain $c_{loc}$, as defined in [[1.0.2] Cryptarchia Protocol](cryptarchia-v1-protocol.md) .
+This protocol adheres to the key invariant: We never roll back blocks that are deeper than the latest immutable block $B_\text{imm}$ in the local chain $c_{loc}$, as defined in [Cryptarchia Protocol](cryptarchia-v1-protocol.md) .
 
 # Overview
 

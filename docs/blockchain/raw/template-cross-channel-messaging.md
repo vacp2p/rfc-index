@@ -29,7 +29,7 @@
 
 This document outlines the cross-channel messaging framework. A channel is a reserved identifier where only authorized keys can post messages on-chain, while anyone can read them. Cross-channel messaging allows different channels (including channels representing a Zone) to communicate and coordinate actions (such as Zone state transitions), enabling interoperability while maintaining security and decentralization.
 
-## Reference: [\[1.5.0\] Mantle](bedrock-v1.1-mantle-specification.md).
+## Reference: [Mantle](bedrock-v1.1-mantle-specification.md).
 
 ## Objectives
 

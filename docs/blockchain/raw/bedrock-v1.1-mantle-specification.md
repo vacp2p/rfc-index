@@ -820,7 +820,7 @@ signed_tx = SignedMantleTx(
 
 ## Service Declaration Protocol (SDP) Operations
 
-These Operations implement the [[1.0.0] Service Declaration Protocol](bedrock-service-declaration-protocol.md).
+These Operations implement the [Service Declaration Protocol](bedrock-service-declaration-protocol.md).
 
 Validators must keep the following state when implementing SDP Operations:
 

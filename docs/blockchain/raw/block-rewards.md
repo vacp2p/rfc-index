@@ -151,7 +151,7 @@ Let us define the following variables:
 - $A_t \in [0,1]$ denotes the emission rate factor on a per year basis.
     - This implies that $A_t \cdot I_{max} \cdot \Delta_t$ denotes the emission within the time-step.
 - $D_{i,t}$ denotes the $i$-th key performance indicator at time $t$ (e.g., TVL, staked amount, active users).
-- $R_\text{block}$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [🔀\[1.0.0\] Execution Market](execution-market.md) and [🔀\[1.0.0\] Storage Markets](storage-markets.md) for how to compute $R_{block}$.
+- $R_\text{block}$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [Execution Market](execution-market.md) and [Storage Markets](storage-markets.md) for how to compute $R_{block}$.
 
 ## Parametrization
 
@@ -160,7 +160,7 @@ Let us define the following variables:
 | $S_{tge}$​ | Token supply at TGE | 10 billion LGO | N.A. |
 | $T$​ | The number of periods in the look-back window for the moving average. | $120$​ | As the system is expected to mint 1 block every 30 seconds, this look-back window defines that the minting averages the fees burned in the last hour. |
 | $\alpha_a$​ | Denotes the control responsiveness to KPI average metrics. | $1$​ | This parameter drives the token emission from the burn rate. It must be one-to-one. |
-| $\alpha_d$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [\[1.0.0\]\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
+| $\alpha_d$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
 | $w_i$​ | Denotes the weight of the $i$-th KPI in the normalized deviation from target | $1$​ | There's only one KPI of this type in our system. |
 | $D_{0,target}$​ | Denotes the target value for the first KPI based on stake. | 3 billion LOGOS | $30\%$ of the token supply. |
 | $D_{1,target}$​ | Denotes the target value for the second KPI based on fees. | $10$ billon LOGOS | In the context of this KPI, this value behaves as a normalizer |
@@ -169,7 +169,7 @@ Let us define the following variables:
 | $f$​ | The average number of block proposal within $\Delta_{t}$ units | $1$​ | The time step $\Delta_t$ was chosen so that $f$ equals to $1$. |
 | $\Delta_t$​ | Time step, the fraction of year in one time step (per e.g., epoch, block, or day) | $1/(365 \times 2880)$​ | The time step is 1 block every $30$ seconds; there are 2880 blocks of 30 seconds in a day. |
 
-The calibration of these parameters can be found in [🔀\[1.0.0\]\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md).
+The calibration of these parameters can be found in [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md).
 
 ## Block Rewards
 

@@ -113,7 +113,7 @@ graph TD
 
 If the node is statically configured by the operator to be Public, the procedure is stopped.
 
-The node utilizes bootstrapping (see [[1.0.1] P2P Network Bootstrapping](p2p-network-bootstrapping.md)) and discovery (see [[1.0.1] P2P Network](../draft/p2p-network.md)) to find other Public nodes. The [Identify](https://github.com/libp2p/specs/blob/master/identify/README.md) protocol is used to confirm which of the detected Public nodes support [AutoNAT v2](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md).
+The node utilizes bootstrapping (see [P2P Network Bootstrapping](p2p-network-bootstrapping.md)) and discovery (see [P2P Network](../draft/p2p-network.md)) to find other Public nodes. The [Identify](https://github.com/libp2p/specs/blob/master/identify/README.md) protocol is used to confirm which of the detected Public nodes support [AutoNAT v2](https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md).
 
 The node then moves to the next phase.
 

@@ -258,7 +258,7 @@ The first step is to generate a set of keys alongside all necessary proofs that 
             1. We assume that the leader quota is used and the `selector=1` value must be specified.
             2. The `index` counts the number of data messages and must be below `leader_quota`.
             3. The `core_sk`, `core_path`, `core_path_selector` are filled with arbitrary data.
-            4. The rest is filled with Proof of Leadership (PoL — [[1.1.0] Proof of Leadership](cryptarchia-proof-of-leadership.md)) related data.
+            4. The rest is filled with Proof of Leadership (PoL — [Proof of Leadership](cryptarchia-proof-of-leadership.md)) related data.
         3. The `ProofOfQuotaPublic` and `ProofOfQuotaWitness` are passed to the zero-knowledge circuits that generate the proof $\pi^{K^{n}_{l}}_{Q}$ which derives the `key_nullifier` ($\nu_e$) from `pol_epoch_nonce`, private `index`, private secret key during proof generation.
 
 2. Select $h$ nodes from the set of nodes $\mathcal{N}$ in a random and verifiable manner. For $i \in \{1,…,h\}$, select $l_i = \text{CSPRBG}(H_{\mathbf N}(\rho))_{8} \mod N$, where $\rho$ is a [selection randomness](proof-of-quota.md) (using little-endian encoding), a shared secret derived during Proof of Quota generation, the output of the $\text{CSPRBG}()_8$ is returns 8 bytes (little-endian).

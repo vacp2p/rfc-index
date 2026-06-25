@@ -8,8 +8,8 @@
 
 ## Motivation
 
-[[1.1.0] Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md) does not cover channel deposit and withdraw operations, even though they have been already added to the [[1.3.0] Mantle](../../../deprecated/v1.2.0-mantle.md).
-This RFC proposes adding the encoding format of channel deposit and withdraw operations and their proofs to the [[1.1.0] Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md).
+[Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md) does not cover channel deposit and withdraw operations, even though they have been already added to the [Mantle](../../../deprecated/v1.2.0-mantle.md).
+This RFC proposes adding the encoding format of channel deposit and withdraw operations and their proofs to the [Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md).
 ## Proposal
 
 We adapt the Mantle Transaction Encoding to include the Channel Deposit and Channel Withdraw operations as defined below:
@@ -91,7 +91,7 @@ Byte      = OCTET
 
 ## Justification
 
-[[1.1.0] Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md) does not cover channel deposit and withdraw operations, even though they have been already added to the [[1.3.0] Mantle](../../../deprecated/v1.2.0-mantle.md).
+[Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md) does not cover channel deposit and withdraw operations, even though they have been already added to the [Mantle](../../../deprecated/v1.2.0-mantle.md).
 ## Specifications Update
 
 - [v1.2] Mantle Transaction Encoding

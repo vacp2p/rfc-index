@@ -360,7 +360,7 @@ class MantleTx:
 
 ### Mantle Transaction Fee
 
-  The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_``base_fee`~~`gas_price`~~, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[1.0.0] Execution Market](../../analysis-execution-market.md) and [[1.0.0] Storage Markets](../../storage-markets.md).
+  The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_``base_fee`~~`gas_price`~~, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [Execution Market](../../analysis-execution-market.md) and [Storage Markets](../../storage-markets.md).
 
 We replaced this **old code:**
 ```python
@@ -435,11 +435,11 @@ SignedMantleTx(
 
 #### [Gas Determination Storage Definition](../../analysis-gas-cost-determination.md)
 
-> Permanent Storage is paid directly for the entire signed Mantle Transaction. The Permanent Storage Gas price is derived from [[1.0.0] Storage Markets](../../storage-markets.md) ~~included in the Mantle Transaction structure~~ and is used to determine the Permanent Storage fee. 1 Permanent Storage Gas corresponds to 1 byte.
+> Permanent Storage is paid directly for the entire signed Mantle Transaction. The Permanent Storage Gas price is derived from [Storage Markets](../../storage-markets.md) ~~included in the Mantle Transaction structure~~ and is used to determine the Permanent Storage fee. 1 Permanent Storage Gas corresponds to 1 byte.
 
 #### [Gas Determination Execution Definition](../../analysis-gas-cost-determination.md)
 
-> Execution is a second general market that represents how costly an Operation is to execute. This cost can be fixed or variable based on the content of the Operation. The Execution Gas base price is derived from [[1.0.0] Execution Market](../../analysis-execution-market.md) ~~contained in the Mantle Transaction structure ~~and each Operation defines its execution gas amount. 1 Execution Gas corresponds to 1,000 CPU cycles.
+> Execution is a second general market that represents how costly an Operation is to execute. This cost can be fixed or variable based on the content of the Operation. The Execution Gas base price is derived from [Execution Market](../../analysis-execution-market.md) ~~contained in the Mantle Transaction structure ~~and each Operation defines its execution gas amount. 1 Execution Gas corresponds to 1,000 CPU cycles.
 
 ```text
 execution_base_fee = tx.ops.get_summed_gas() * execution_gas_base_price
@@ -511,24 +511,24 @@ WithdrawThreshold = UINT16
 
 ### Update
 
-- [1.5.0] Mantle
+- Mantle
 
-- \[1.4.1\]\[Analysis\] Gas Cost Determination
+- \[Analysis\] Gas Cost Determination
 
-- [1.4.0] Mantle Transaction Encoding
+- Mantle Transaction Encoding
 
-- \[1.1.1\]\[Template\] Cross-Channel Messaging
+- \[Template\] Cross-Channel Messaging
 
-- [1.1.1] Block Construction, Validation and Execution
+- Block Construction, Validation and Execution
 
-- [1.1.0] Bedrock Genesis Block
+- Bedrock Genesis Block
 
 ### Deprecate
 
-[[1.4.0] Mantle](../../../deprecated/v1.2.0-mantle.md)
-[\[1.4.0\]\[Analysis\] Gas Cost Determination](../../../deprecated/v1.4.0-analysis-gas-cost-determination.md)
-[[1.3.0] Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md)
-[\[1.1.0\]\[Template\] Cross-Channel Messaging](../../../deprecated/v1.1.0-template-cross-channel-messaging.md)
-[[1.1.0] Block Construction, Validation and Execution](../../../deprecated/v1.0.0-bedrock-block-construction.md)
-[[1.1.0] Bedrock Genesis Block](../../../deprecated/v1.0.0-bedrock-genesis-block.md)
+[Mantle](../../../deprecated/v1.2.0-mantle.md)
+[\[Analysis\] Gas Cost Determination](../../../deprecated/v1.4.0-analysis-gas-cost-determination.md)
+[Mantle Transaction Encoding](../../../deprecated/v1.1.0-mantle-transaction-encoding.md)
+[\[Template\] Cross-Channel Messaging](../../../deprecated/v1.1.0-template-cross-channel-messaging.md)
+[Block Construction, Validation and Execution](../../../deprecated/v1.0.0-bedrock-block-construction.md)
+[Bedrock Genesis Block](../../../deprecated/v1.0.0-bedrock-genesis-block.md)
 ### Retire

@@ -64,7 +64,7 @@ Working to give leaders confidence in this statement has had ripple effects thro
 
 - **The block proposals should not be linkable to a leader**. An adversary should not be able to connect together the block proposals of a leader in order to build a profile. In particular, one should not be able to infer a proposer's stake from their past on-chain activity.
 - **Cryptarchia must not reveal the stake of the leader** - that is, it must be a Private Proof of Stake (PPoS) protocol. If the activity of the leader reveals their stake values (e.g. through weighted voting), then this value can be used to reduce the anonymity set for the leader by bucketing the leader as high/low stake and can open him up to targeting.
-- **Leaders should be protected against network triangulation attacks**. This is outside of the scope of this document, but it suffices to say that in-protocol cryptographic privacy is not sufficient to guarantee a leader's privacy. This topic is dealt with directly in [[1.0.0] Blend Protocol](blend-protocol.md).
+- **Leaders should be protected against network triangulation attacks**. This is outside of the scope of this document, but it suffices to say that in-protocol cryptographic privacy is not sufficient to guarantee a leader's privacy. This topic is dealt with directly in [Blend Protocol](blend-protocol.md).
 
 ## Limitations of Cryptarchia V1
 
@@ -113,7 +113,7 @@ The latest immutable block $B_\text{imm}$ is the most recent block considered pe
 
 This is maintained locally by the [Chain Maintenance](#chain-maintenance) procedure. When the [Online fork choice rule](fork-choice.md) is in use, $B_\text{imm}$ corresponds to the $k$-deep block. However, it may be deeper than the $k$-deep block if the fork choice rule has been switched from Online to [Bootstrap](fork-choice.md). Unlike the $k$-deep block, $B_\text{imm}$ does not advance as new blocks are added unless the Online fork choice rule is used.
 
-The details of fork choice rule transitions are defined in the bootstrap spec: [[1.0.0] Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md)
+The details of fork choice rule transitions are defined in the bootstrap spec: [Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md)
 
 ## Slot
 
@@ -175,7 +175,7 @@ $$
 \eta_{B} = \mathrm{zkHASH}(D_{\mathrm{epoch}}\mathbin{\|}\eta_{\mathrm{parent}}\mathbin{\|}\rho_{\mathrm{LEAD}}\mathbin{\|}\mathrm{Fr}(sl))
 $$
 
-where $D_{\mathrm{epoch}}$ is the domain separator `EPOCH_NONCE_V1`, $\mathrm{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\mathrm{zkHASH}(..)$ is Poseidon2 as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md) .
+where $D_{\mathrm{epoch}}$ is the domain separator `EPOCH_NONCE_V1`, $\mathrm{Fr}(sl)$ maps the slot number to the corresponding scalser in Poseidon’s scalar field and $\mathrm{zkHASH}(..)$ is Poseidon2 as specified in [Common Cryptographic Components](common-cryptographic-components.md) .
 
 The epoch nonce used in the next epoch is $\eta_{B'}$ where $B'$ is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.
 
@@ -183,7 +183,7 @@ The epoch nonce used in the next epoch is $\eta_{B'}$ where $B'$ is the last blo
 
 Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The details can be found in the following document:
 
-[[1.0.0] Total Stake Inference](cryptarchia-total-stake-inference.md)
+[Total Stake Inference](cryptarchia-total-stake-inference.md)
 
 ### Epoch State Pseudocode
 
@@ -233,7 +233,7 @@ The specifications of how a leader can prove that they have won the lottery are 
 
 ### Leader Rewards
 
-As an incentive for producing blocks, leaders are rewarded with every block proposal. The rewarding protocol is specified in [**[1.0.0] Anonymous Leaders Reward Protocol**](bedrock-anonymous-leaders-reward.md).
+As an incentive for producing blocks, leaders are rewarded with every block proposal. The rewarding protocol is specified in [**Anonymous Leaders Reward Protocol**](bedrock-anonymous-leaders-reward.md).
 
 ## Block Chain
 
@@ -245,11 +245,11 @@ During bootstrapping, we must be resilient to malicious peers feeding us false c
 
 After bootstrapping we commit to the most honest looking chain we found and switch to a fork choice rule that rejects chains that diverge by more than $k$ blocks
 
-[[1.0.0] Cryptarchia Fork Choice Rule](fork-choice.md)
+[Cryptarchia Fork Choice Rule](fork-choice.md)
 
 ### Block ID
 
-Block ID is defined by the hash of the block header [Block Header](#block-header), where `hash` is Blake2b as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md)
+Block ID is defined by the hash of the block header [Block Header](#block-header), where `hash` is Blake2b as specified in [Common Cryptographic Components](common-cryptographic-components.md)
 
 ```python
 def block_id(header: Header) -> hash
@@ -286,7 +286,7 @@ class ProofOfLeadership:                     # 224 bytes
 
 ### Block
 
-[[1.1.1] Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)
+[Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)
 
 ### Block Header Validation
 
@@ -307,7 +307,7 @@ We say $\textbf{valid\_header}(B)$ returns True if all of the following constrai
   Ensure the number of transactions in the block is below the limit
 
 4. $\textbf{merkle\_root}(transactions) = header.\text{block\_root}$
-  Ensure block root is over the transaction list. Compute the block root by using transaction hashes (see 🔀[1.5.0] Mantle - Mantle Transaction Hash) as leaves, and `0` to represent the hash of an empty transaction, padding leaves to the closest power of two.
+  Ensure block root is over the transaction list. Compute the block root by using transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, and `0` to represent the hash of an empty transaction, padding leaves to the closest power of two.
 
 5. $header.\text{slot} \gt \textbf{fetch\_header}(header.\text{parent\_block}).\text{slot}$
   Ensure the block’s slot comes after the parent block’s slot.
@@ -324,7 +324,7 @@ We say $\textbf{valid\_header}(B)$ returns True if all of the following constrai
 9. Verify the leader’s right to propose and ensure it is the one proposing this block:
   Given leadership proof $\pi_\text{LEAD} = (\pi_\text{PoL},P_\text{LEAD},\sigma)$, where
 
-  - $\pi_\text{PoL}$ is the slot lottery win proof as defined in [[1.1.0] Proof of Leadership](cryptarchia-proof-of-leadership.md)
+  - $\pi_\text{PoL}$ is the slot lottery win proof as defined in [Proof of Leadership](cryptarchia-proof-of-leadership.md)
   - $P_\text{LEAD}$ is the public key committed to in $\pi_\text{PoL}$.
   - $\sigma$ is a signature.
 

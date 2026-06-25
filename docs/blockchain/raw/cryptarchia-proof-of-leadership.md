@@ -38,7 +38,7 @@ This document extends the work presented in the [Ouroboros Crypsinous paper](htt
 
 ## References
 
-- [[1.0.2] Cryptarchia Protocol](cryptarchia-v1-protocol.md).
+- [Cryptarchia Protocol](cryptarchia-v1-protocol.md).
 
 # Overview
 

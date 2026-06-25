@@ -32,7 +32,7 @@
 
 # Introduction
 
-This document explains the rationale behind the parameter values proposed in [🔀\[1.0.0\] Block Rewards](block-rewards.md).
+This document explains the rationale behind the parameter values proposed in [Block Rewards](block-rewards.md).
 
 The block reward mechanism adjusts the protocol’s token emission rate based on on-chain signals such as the deviation of the inferred total stake from its target and the moving average of the fee-burning rate. The parameters calibrated here control how strongly the emission rate reacts to those signals, how quickly it transitions between regimes, and the bounds it must respect.
 
