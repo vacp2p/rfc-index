@@ -49,7 +49,7 @@ The PoL mechanism ensures that a note has legitimately won the leadership electi
 
 - Setup: The note becomes eligible for PoS when it has aged sufficiently.
 - PoL generation:
-	1. First, check if the note is winning by simulating the lottery
+  1. First, check if the note is winning by simulating the lottery
   2. Prove the membership of the note identifier in an old snapshot of the Mantle Ledger, proving its age and its existence.
   3. Prove the membership of the note identifier in the most recent Mantle ledger, proving it’s unspent.
   4. Prove that the note won the PoS lottery.
