@@ -148,7 +148,7 @@ The prover (the leader) and the verifiers (nodes of the chain) must agree on the
 5. The latest root of the note Merkle tree: $`ledger_\text{LATEST}`$.
 	- Used to ensure the leadership note has not been spent.
 
-7. The leader's one-time public key $`P_\text{LEAD}`$ represented by 2 public inputs, each of 16 bytes in little endian. This key is needed to sign the proposed block.
+6. The leader's one-time public key $`P_\text{LEAD}`$ represented by 2 public inputs, each of 16 bytes in little endian. This key is needed to sign the proposed block.
 	- For details see [Linking the Proof of Leadership to a Block](#linking-the-proof-of-leadership-to-a-block).
 
 7. The entropy contribution $`\rho_{LEAD}`$ verified to be correctly derived.
