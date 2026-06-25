@@ -89,21 +89,24 @@ Let
 The following quantities are derived from the definitions above:
 
 - Total LGO to be staked:
+
     $$
     S_{\text{staked}} = r_{\text{stake}} \times S_{\text{TGE}}
     $$
+
 - Amount of stake per staker in LGO:
+
     $$
     \text{Stake}_{LGO} = \frac{S_{\text{staked}}}{N_{\text{stakers}}} = r_{\text{stake}} \times \frac{S_{\text{TGE}}}{N_{\text{stakers}}}
     $$
+
 - Amount of stake per staker in FIAT:
+
     $$
-    \begin{equation}
     \text{Stake}_{\text{FIAT}} = \text{Stake}_{LGO} \times P_{\text{LGO}} = \dfrac{r_{\text{stake}}}
     {N_{\text{stakers}}} \times
     \frac{S_{\text{TGE}}}{S_{\text{max}}} \times
     \text{FDV}
-    \end{equation}
     $$
 
 ## Staking Ratio ($`r_{\text{stake}}`$)
@@ -157,7 +160,7 @@ For a yet-to-be-released L1 blockchain, fundamental valuation is more challengin
 | Oasis Network | \$246M | July 2024 | Trusted Execution Environments (TEEs) Privacy-preserving smart contracts; data tokenization for DeFi. |
 | Secret Network | \$62M | July 2024 | Encrypted contract states, secure MPC Private NFTs; encrypted data governance for decentralized apps. |
 
-Given that the mean and median of the above valuations of already established projects are \$949.5 million and \$332.5 million, respectively, we establish Logos Blockchain valuation with a starting point of $\text{FDV}= \$100$ million.
+Given that the mean and median of the above valuations of already established projects are \$949.5 million and \$332.5 million, respectively, we establish Logos Blockchain valuation with a starting point of $`\text{FDV}= \$100`$ million.
 
 <a id="minimum-stake-in-fiat-terms-textstaketextfiat"></a>
 
@@ -165,7 +168,7 @@ Given that the mean and median of the above valuations of already established pr
 
 For the sake of this analysis, suppose that
 
-- $\text{FDV}= \$100$ million.
+- $`\text{FDV}= \$100`$ million.
 - $`S_{\text{max}} = 100,000,000`$ LGO.
 - $`S_{\text{TGE}} = S_{\text{max}} = 100,000,000`$ LGO.
 - $`\text{Stake}_{\text{LGO}} = 0.001\% \cdot S_{\text{TGE}}.`$
@@ -175,8 +178,8 @@ From the Construction section,
 
 $$
 \begin{array}{rclrclrclrcl}
-\text{Stake}_{\text{FIAT}} & = & \text{Stake}_{\text{LGO}} \times P_{\text{LGO}} = \text{Stake}_{\text{LGO}} \times \dfrac{M_{\text{cap}}}{S_{\text{TGE}}} \\[12pt]
-& = & \text{Stake}_{\text{LGO}} \times \dfrac{\dfrac{S_{\text{TGE}}}{S_{\text{max}}} \times \text{FDV}}{S_{\text{TGE}}} = \text{Stake}_{\text{LGO}} \times \dfrac{\text{FDV}}{S_{\text{TGE}}} \\[14pt]
+\text{Stake}_{\text{FIAT}} & = & \text{Stake}_{\text{LGO}} \times P_{\text{LGO}} = \text{Stake}_{\text{LGO}} \times \dfrac{M_{\text{cap}}}{S_{\text{TGE}}} \\\\
+& = & \text{Stake}_{\text{LGO}} \times \dfrac{\dfrac{S_{\text{TGE}}}{S_{\text{max}}} \times \text{FDV}}{S_{\text{TGE}}} = \text{Stake}_{\text{LGO}} \times \dfrac{\text{FDV}}{S_{\text{TGE}}} \\\\\\
 & = & 0.001\% \cdot S_{\text{TGE}} \times \dfrac{\text{FDV}}{S_{\text{TGE}}} = 0.001\% \cdot \text{FDV}
 \end{array}
 $$
