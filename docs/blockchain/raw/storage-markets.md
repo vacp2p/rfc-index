@@ -115,15 +115,11 @@ To ensure on-chain efficiency, the protocol shall use an Exponential Moving Aver
 - The precise value of $`P_{\text{STR}}(0)`$ is not critical to the long-term behavior of the mechanism. As established in the equilibrium analysis, the price update rule converges autonomously to the market-clearing price $`P^*`$ regardless of the starting point, provided the stability condition $(*)$ holds (see [\[Analysis\] Storage Market - Price Stability Analysis](analysis-storage-market.md#price-stability-analysis)). The only hard requirement is for $`P_{\text{STR}}(0)`$ to be sufficiently low so as not to suppress early adoption before the mechanism has observed enough demand to self-correct.
 
     More precisely, since the price can increase by at most $\alpha = 12.5\%$ per epoch, the number
-    of epochs required to reach a target price $`P^*`$ from an initial price $`P_{\text{STR}}(0) \lt P^*`$ is bounded above by:
-    
-    $`N \leq \left\lceil \log_{1+\alpha}\!\left(\frac{P^*}{P_{\text{STR}}(0)}\right) \right\rceil = \left\lceil \frac{\ln(P^*/P_{\text{STR}}(0))}{\ln(1.125)} \right\rceil`$
+    of epochs required to reach a target price $`P^*`$ from an initial price $`P_{\text{STR}}(0) \lt P^*`$ is bounded above by $`N \leq \left\lceil \log_{1+\alpha}\!\left(\frac{P^*}{P_{\text{STR}}(0)}\right) \right\rceil = \left\lceil \frac{\ln(P^*/P_{\text{STR}}(0))}{\ln(1.125)} \right\rceil`$.
     
     For example, if $`P_{\text{STR}}(0)`$ is set to one tenth of the true equilibrium price, the mechanism reaches $`P^*`$ within at most $\lceil \ln(10)/\ln(1.125) \rceil = 20$ epochs. Starting
     one hundredth below requires at most $40$ epochs. Both are negligible relative to the expected lifetime of the network.
-    We therefore set:
-
-    $`P_{\text{STR}}(0) = 1\ \text{LGO per Permanent Storage Gas}`$
+    We therefore set $`P_{\text{STR}}(0) = 1\ \text{LGO per Permanent Storage Gas}`$.
 
     This corresponds to a cost of 1 LGO per permanently stored byte. Genesis governance may adjust this value based on the LGO price at TGE, but the adjustment has no long-term consequence: the mechanism will converge to the true market price $`P^*`$ within $`O(\log P^*/P_{\text{STR}}(0))`$ epochs regardless.
 
@@ -142,41 +138,18 @@ The protocol must maintain the following state variables, updated at the end of 
 
 At the conclusion of each timeframe $s$, the protocol shall execute the following algorithm to determine the price for the next timeframe, $`P_{\text{STR}}(s+1)`$. This is done as follows.
 
- 1. Tally Usage: Aggregate the total Logos Blockchain Storage Gas consumed during timeframe $s$ into a final value, $`C_\text{usage}(s)`$:
+ 1. Tally Usage: Aggregate the total Logos Blockchain Storage Gas consumed during timeframe $s$ into a final value, $`C_{\text{usage}}(s)=\sum_{t\in\mathcal{B}_s}\mathsf{StorageGasUsed}[t]`$, where $`\mathcal{B}_s`$ corresponds to one block in timeframe $s$ and $`\mathsf{StorageGasUsed}[t]`$ corresponds to the Logos Blockchain Storage Gas used by transaction $t$.
 
-    $`C_{\text{usage}}(s)=\sum_{t\in\mathcal{B}_s}\mathsf{StorageGasUsed}[t]`$, where $`\mathcal{B}_s`$ corresponds to one block in timeframe $s$ and $`\mathsf{StorageGasUsed}[t]`$ corresponds to the Logos Blockchain Storage Gas used by transaction $t$.
+ 2. Update Usage EMA: Update the Exponential Moving Average of usage: $`T_{\text{RA}}(s) = \beta \cdot C_{\text{usage}}(s) + (1-\beta) \cdot T_{\text{RA}}(s-1)`$
 
- 2. Update Usage EMA: Update the Exponential Moving Average of usage.
+ 3. Calculate Effective Target: Calculate the blended, effective target, $`T_{\text{effective}}(s) = w \cdot T_{\text{base}} + (1-w) \cdot T_{\text{RA}}(s)`$
 
-$$
-T_{\text{RA}}(s) = \beta \cdot C_{\text{usage}}(s) + (1-\beta) \cdot T_{\text{RA}}(s-1)
-$$
+ 4. Calculate Adjustment Factor: Determine the fractional deviation of usage from the target and clamp the result to the range $[-\alpha, \alpha]$:
+ - $`\text{adjustment}(s) = \frac{C_{\text{usage}}(s) - T_{\text{effective}}(s)}{T_{\text{effective}}(s)}`$
 
- 3. Calculate Effective Target: Calculate the blended, effective target, $`T_{\text{effective}}(s)`$.
+- $`\mathrm{clampedAdjustment}(s)= \max\bigl(-\alpha,\,\min\bigl(\alpha,\, \mathrm{adjustment}(s)\bigr)\bigr)`$
 
-$$
-T_{\text{effective}}(s) = w \cdot T_{\text{base}} + (1-w) \cdot T_{\text{RA}}(s)
-$$
-
- 4. Calculate Adjustment Factor: Determine the fractional deviation of usage from the target and clamp the result to the range $[-\alpha, \alpha]$.
-
-$$
-\text{adjustment}(s) = \frac{C_{\text{usage}}(s) - T_{\text{effective}}(s)}{T_{\text{effective}}(s)}
-$$
-
-$$
-\mathrm{clampedAdjustment}(s)
-= \max\bigl(-\alpha,\,
-\min\bigl(\alpha,\, \mathrm{adjustment}(s)\bigr)
-\bigr)
-$$
-
- 5. Update Price: Calculate the price for the next timeframe, $s+1$
-
-$$
-P_{\mathrm{STR}}(s+1)
-= P_{\mathrm{STR}}(s) \cdot [1 + \mathrm{clampedAdjustment}(s)]
-$$
+ 5. Update Price: Calculate the price for the next timeframe, $s+1$: $`P_{\mathrm{STR}}(s+1) = P_{\mathrm{STR}}(s) \cdot [1 + \mathrm{clampedAdjustment}(s)]`$
 
 ### Implementation
 
