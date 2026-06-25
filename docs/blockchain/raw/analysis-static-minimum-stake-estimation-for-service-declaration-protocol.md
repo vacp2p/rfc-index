@@ -73,7 +73,7 @@ $$
 Let
 
 - $`S_{\text{max}}`$ denote the maximum supply of LGO (e.g., 10 million LGO).
-- $`\text{FDV}`$ denote the expected fully diluted valuation in FIAT (e.g., $100 million).
+- $`\text{FDV}`$ denote the expected fully diluted valuation in FIAT (e.g., \$100 million).
 - $`S_{\text{TGE}}`$ denote the supply at token generation event (e.g., 1 million LGO).
 - $`M_{\text{cap}}`$ denote the market cap at TGE in FIAT.
     $$
@@ -150,14 +150,14 @@ For a yet-to-be-released L1 blockchain, fundamental valuation is more challengin
 
 | Project | Valuation | Last update | Remark |
 | --- | --- | --- | --- |
-| Monero (XMR) | $4.19B | Feb 2025 | Ring signatures, stealth addresses, confidential transactions Fully private transactions by default; resistance to ASIC mining. |
-| Zcash (ZEC) | $534M | Feb 2025 | zk-SNARKs Optional transparency ("shielded" vs. "transparent" addresses). |
-| Dash (DASH) | $309M | Feb 2025 | CoinJoin mixing (PrivateSend) Instant transactions (InstantSend); hybrid consensus (masternodes) |
-| Mina Protocol | $356M | July 2024 | Recursive zk-SNARKs Constant-sized blockchain (22 KB); lightweight node participation. |
-| Oasis Network | $246M | July 2024 | Trusted Execution Environments (TEEs) Privacy-preserving smart contracts; data tokenization for DeFi. |
-| Secret Network | $62M | July 2024 | Encrypted contract states, secure MPC Private NFTs; encrypted data governance for decentralized apps. |
+| Monero (XMR) | \$4.19B | Feb 2025 | Ring signatures, stealth addresses, confidential transactions Fully private transactions by default; resistance to ASIC mining. |
+| Zcash (ZEC) | \$534M | Feb 2025 | zk-SNARKs Optional transparency ("shielded" vs. "transparent" addresses). |
+| Dash (DASH) | \$309M | Feb 2025 | CoinJoin mixing (PrivateSend) Instant transactions (InstantSend); hybrid consensus (masternodes) |
+| Mina Protocol | \$356M | July 2024 | Recursive zk-SNARKs Constant-sized blockchain (22 KB); lightweight node participation. |
+| Oasis Network | \$246M | July 2024 | Trusted Execution Environments (TEEs) Privacy-preserving smart contracts; data tokenization for DeFi. |
+| Secret Network | \$62M | July 2024 | Encrypted contract states, secure MPC Private NFTs; encrypted data governance for decentralized apps. |
 
-Given that the mean and median of the above valuations of already established projects are $949.5 million and $332.5 million, respectively, we establish Logos Blockchain valuation with a starting point of $\text{FDV}= \$100$ million.
+Given that the mean and median of the above valuations of already established projects are \$949.5 million and \$332.5 million, respectively, we establish Logos Blockchain valuation with a starting point of $\text{FDV}= \$100$ million.
 
 <a id="minimum-stake-in-fiat-terms-textstaketextfiat"></a>
 
