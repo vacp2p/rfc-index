@@ -112,3 +112,37 @@ and filters the observation against the running median.
 - When the number of valid observations in the current round reaches the predetermined quorum threshold `N`,
 the `indexer` computes then outputs the attested price as the median of all valid observations.
 - On each push round as heartbeats, the `indexer` repeats the progress.
+
+## Price Fetching
+
+Each `oracle node` fetches the price of the feed from external sources.
+The protocol is agnostic to the specific sources and to the local pre-aggregation method;
+it is RECOMMENDED that a node query at least three independent sources and
+submit a local median to reduce discarding price as outliers.
+
+Each observation is encoded as a `PriceObservation`.
+The price is carried as an integer `price` together with a `decimals` field
+so that no floating-point representation crosses the protocol boundary:
+the real value is `price * 10^(-decimals)`.
+The encoding, not the fetching method, is what this specification governs.
+
+The `signature` field carries a [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)
+Schnorr signature over the SHA-256 hash of the canonical serialization of fields 1-6,
+not over the raw payload bytes directly;
+this follows the hash-then-sign convention specified in BIP-340.
+
+The `PriceObservation` is specified using [protocol buffers v3](https://protobuf.dev/):
+
+```protobuf
+syntax = "proto3";
+
+message PriceObservation {
+  string feed_id      = 1;  // asset pair identifier; i.e. "BTC/USDT" 
+  int64  price        = 2;  // integer-encoded price; real value = price * 10^(-decimals)
+  int32  decimals     = 3;  // number of decimal places in `price`
+  int64  timestamp    = 4;  // observation time (unix milliseconds), advisory only
+  bytes  oracle_id    = 5;  // public key / identifier of the submitting oracle node
+  bytes  source_set   = 6;  // OPTIONAL: list of source identifiers used for local median
+  bytes  signature    = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1-6
+}
+```
