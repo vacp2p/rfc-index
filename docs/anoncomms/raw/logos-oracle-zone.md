@@ -146,3 +146,35 @@ message PriceObservation {
   bytes  signature    = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1-6
 }
 ```
+## Aggregation
+
+The `indexer` is the core logic of the Oracle Zone.
+Within each round it performs the following steps deterministically
+over the ordered inscription stream:
+
+1. **Deserialize.** Decode each finalized inscription into a `PriceObservation`.
+2. **Verify signature.** Verify `signature` against `oracle_id`
+as in [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki).
+Invalid signature observations MUST be discarded.
+3. **Check membership.** Confirm `oracle_id` is a member of the active oracle set
+by verifying a Merkle inclusion proof against the membership root held in LEZ.
+Observations from non-members MUST be discarded.
+4. **Compute median.** When the count of valid observations reaches the quorum threshold `N`,
+compute and output the `attested price` as the median of the `N` valid observations.
+The median structurally tolerates up to `N/2 - 1` adversarial values without moving outside the honest range.
+
+The attested price is specified as follows:
+
+```protobuf
+syntax = "proto3";
+
+message AttestedPrice {
+  string feed_id          = 1;  // asset pair identifier; "BTC/USDT" in v1
+  int64  price            = 2;  // attested median; real value = price * 10^(-decimals)
+  int32  decimals         = 3;  // number of decimal places in `price`
+  uint32 valid_count      = 4;  // valid observations aggregated; packed once this reaches N
+  int64  attested_at      = 5;  // height/inscription index at which quorum was met
+  bytes confidence ;        // OPTIONAL: 1.4826 * median(|xᵢ - median|) over valid observations
+
+}
+```
