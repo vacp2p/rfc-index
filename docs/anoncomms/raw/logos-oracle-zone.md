@@ -78,7 +78,10 @@ any single attestation are honest and follow this protocol.
 - The indexer cannot manipulate observation ordering;
 ordering authority is delegated entirely to Bedrock's immutable inscription order.
 - The indexer has no execution logic beyond aggregation;
-stake custody and slashing enforcement are delegated entirely to LEZ smart contracts via cross zone transactions.
+stake custody and slashing enforcement are delegated entirely
+to LEZ smart contracts via cross zone transactions.
+- The active oracle set is large enough that quorum `N` is reached every round;
+liveness of attestation depends on this oversizing.
 
 ## Roles
 
@@ -178,3 +181,20 @@ message AttestedPrice {
 
 }
 ```
+
+## Rounds and Timing
+
+The Logos Oracle Zone has no separate zone-level blocks,
+since it runs no independent consensus.
+Ordering and finality come entirely from the Logos Blockchain.
+Every reference to block height or block time in this document is to the Logos Blockchain block.
+
+The Oracle Zone operates in rounds of length `R_round`.
+Two rules govern the timing:
+
+1. **Deterministic windowing.** Round boundaries MUST be defined by block height, instead of a wall-clock time.
+A wall-clock window is non-deterministic across standby indexer replicas.
+Defining the window as a fixed block range lets every replica derive the identical attested price.
+2. **Push cadence.** Delivery is push: every heartbeat the indexer writes the current attested price into LEZ over PACT.
+An on-chain write cannot occur faster than the Logos Blockchain produces blocks, so `R_round >= T_block`.
+With the default `T_block = 30 s`, the default heartbeat is one block (approximately `30 s`).
