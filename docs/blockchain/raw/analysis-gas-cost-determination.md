@@ -155,7 +155,9 @@ Execution: ~56k CPU cycles * stake_manipulation_threshold.
 
 ## Channel Stake Transfer
 
-The Execution Gas of the Transfer Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof.
+The Execution Gas of the Channel Transfer Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof.
+The execution require consuming the channel notes, deriving note Id and adding new channel notes to the ledger.
+
 
 Execution: ~590k CPU cycles.
 

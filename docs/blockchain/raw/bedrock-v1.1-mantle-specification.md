@@ -292,12 +292,13 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 ### Bridging
 
-Channels represent their bridge funds as channel note that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
+Channels represent their bridged funds as channel notes that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
 
-When funds are deposited through a [`CHANNEL_DEPOSIT`](#channel_deposit) Operation, the funds are first materialized as a single Channel Note of the deposited amount under the `ZkPublicKey = 0` so nobody can use them.
-These Channel Notes can be assigned to a different `ZkPublicKey` using a [`CHANNEL_STAKE_ASSIGNATION`](#channel_stake_assignation) operation.
+When funds are deposited through a [`CHANNEL_DEPOSIT`](#channel_deposit) operation, the funds are first materialized as a single channel note of the deposited amount under the `ZkPublicKey = 0`, so nobody can use them.
+These Channel Notes can be assigned to a different `ZkPublicKey` using a [`CHANNEL_STAKE_ASSIGNATION`](#channel_stake_assignation) operation without ZkSignature verification.
 Later, the owner of the note can use this note to create a PoL or transfer it to a different `ZkPublicKey` through a [`CHANNEL_STAKE_TRANSFER`](#channel_stake_transfer) operation but it cannot be used as a service stake.
-These funds can be spent by sequencers to cover withdraws in [`CHANNEL_WITHDRAW`](#channel_withdraw).
+The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification.
+These funds can be spent by sequencers to cover withdraws in [`CHANNEL_WITHDRAW`](#channel_withdraw) as well without `ZkSignature` verification.
 
 ### CHANNEL_INSCRIBE
 
@@ -675,7 +676,7 @@ tx = MantleTx(
 
 signed_tx = SignedMantleTx(
     tx=tx,
-    op_proofs=[transfer.prove(Alice_sk)],
+    op_proofs=[deposit.prove(Alice_sk), transfer.prove(Alice_sk)],
 )
 ```
 
@@ -856,7 +857,7 @@ ledger: Ledger
 
 1. Ensure the Transfer in non-empty
 ```python
-assert len(transfer.inputs) > 0
+assert len(stake_transfer.inputs) > 0
 ```
 
 2. Ensure all inputs are spendable.
@@ -866,20 +867,20 @@ ledger.assert_spendable([(note_id, stake_transfer.channel) for note_id in stake_
 
 3. Validate transfer proof to show ownership over input notes.
 ```python
-input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
+input_notes = [ledger[input_note_id] for input_note_id in stake_transfer.inputs]
 input_pks = [note.public_key for note in input_notes]
-assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
+assert ZkSignature_verify(mantle_txhash, stake_transfer_proof, input_pks)
 ```
 
 4. Ensure outputs are valid.
 ```python
-ledger.assert_valid_output(transfer.output)
+ledger.assert_valid_output(stake_transfer.output)
 ```
 
 5. Ensure the Operation is balanced
 ```python
-input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
-output_amount = sum(output.value for output in withdrawal.outputs)
+input_amount = sum(ledger.get_note(input).value for input in stake_transfer.inputs)
+output_amount = sum(output.value for output in stake_transfer.outputs)
 assert input_amount == output_amount
 ```
 
@@ -929,8 +930,7 @@ tx = MantleTx(
 
 signed_tx = SignedMantleTx(
     tx=tx,
-    op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
-                              transfer.prove(Sequencer_node_sk)],
+        op_proofs=[stake_transfer.prove(Alice_sk), transfer.prove(Sequencer_sk)],
 )
 ```
 
