@@ -56,9 +56,9 @@ That means the same logical Logos method/event interface MUST remain valid
 across all supported runtime realizations:
 
 - **Direct mode** — in-process C calls using the derived/generated C API
-- **Socket mode (local IPC)** — the same contract carried over local
-  deterministic CBOR transport
-- **Remote mode** — the same contract carried over remote transport
+- **Local transport mode** — the same contract carried over local IPC using
+  Logos deterministic CBOR transport
+- **Remote transport mode** — the same contract carried over remote transport
 
 The execution boundary may change how a call is routed, serialised, scheduled,
 or authorised, but it MUST NOT change:
@@ -712,7 +712,9 @@ deterministic CBOR event payloads into typed C structs.
 
 ### 2.6 Module Lifecycle Symbols
 
-Every module shared library MUST export these C symbols:
+This section classifies the C symbols that belong to the portable module ABI.
+
+Every module shared library MUST export these mandatory module symbols:
 
 - `logos_<module>_name()` returns the module name as a static string that
   remains valid for the library lifetime.
@@ -725,17 +727,36 @@ Every module shared library MUST export these C symbols:
 - `logos_<module>_destroy()` is called once before unloading.
 - `logos_<module>_free()` releases dynamic memory returned by this module
   across this ABI.
+
+Every module shared library MUST also export the schema-derived per-method C
+functions specified in section 2.4.
+
+Modules SHOULD export this recommended bootstrap symbol:
+
 - `logos_module_name()` is the bootstrap symbol for runtimes that do not know
   the module name in advance.
   The runtime calls `dlsym("logos_module_name")` to discover the module
   name, then uses the module-specific prefix for all other symbols.
-  Modules SHOULD export this symbol so directory scanners can discover them
-  without sidecar metadata.
+  This allows directory scanners to discover modules without sidecar metadata.
   Runtimes MUST also support loading modules whose name is already known from
   a manifest, static registration table, command-line argument, or equivalent
   host/deployment metadata.
 
-The following declarations show the required symbol signatures:
+Modules MAY export these optional well-known runtime callback setter symbols:
+
+- `logos_<module>_set_publish()`
+- `logos_<module>_set_call_module()`
+
+These symbols are optional because not every module publishes events or makes
+outbound calls to other modules.
+When present, they MUST use the signatures and semantics defined by
+LOGOS-MODULE-RUNTIME.
+Runtimes MUST NOT reject a module solely because either callback setter is
+absent.
+Runtimes MAY bind and use these symbols when present.
+
+The following declarations show the mandatory and recommended symbol
+signatures:
 
 ```c
 /* Module name (static string, valid for library lifetime) */
@@ -761,10 +782,6 @@ const char* logos_module_name(void);
 void logos_<module>_free(void* ptr);
 ```
 
-In addition to these lifecycle and helper symbols, a conforming module exports
-the per-method C functions derived from the CDDL schema as specified in
-section 2.4.
-
 **Note on `_version()`:** The current ABI keeps `logos_<module>_version()`
 as a separate well-known symbol even though the schema text returned by
 `logos_<module>_schema()` also contains version metadata. A future revision
@@ -786,9 +803,9 @@ The benefits of keeping `_version()` in v0.1 are pragmatic:
 
 In **direct mode** (in-process), the runtime calls per-method functions
 directly.
-In **socket mode**, the module host decodes deterministic CBOR requests,
-invokes the corresponding per-method C function, and encodes deterministic
-CBOR responses.
+In **local transport mode**, the module host decodes deterministic CBOR
+requests, invokes the corresponding per-method C function, and encodes
+deterministic CBOR responses.
 
 **Important distinction: lifecycle `_init()` vs schema method `init`.**
 
@@ -1130,11 +1147,11 @@ For module method payloads, schema validation is owned by the module dispatch
 layer generated from or implemented against the module's CDDL schema.
 The runtime and transport layers validate envelopes and routing fields.
 They MUST NOT be required to introspect module payload schemas while forwarding
-socket or remote calls.
+local or remote transport calls.
 
 ### 4.7 Error Propagation
 
-In socket or remote transport mode,
+In local or remote transport mode,
 the error path from module to caller spans all three specs:
 
 ```
@@ -1217,51 +1234,22 @@ logos_result = {
 ; -- module handle (opaque, not on wire) --
 ; logos_module_handle_t is a runtime concept, not serialised.
 
-; -- introspection (well-known method, available on all modules) --
+; -- introspection bootstrap (well-known method, available on all modules) --
 logos.schema_request = {}
 logos.schema_response = {
     schema: tstr,
 }
 ```
 
-All three well-known methods are provided automatically by the runtime and
-codegen. Module authors do not declare them.
+`logos.schema` is the universal module-introspection bootstrap.
+It returns the raw CDDL text via the `_schema()` lifecycle symbol.
+Module authors do not declare it.
 
-`logos.schema` returns the raw CDDL text via the `_schema()` lifecycle
-symbol. `logos.methods` returns a structured method list (derived from
-the CDDL schema, not a parallel structure). `logos.modules` is provided
-by the runtime (not individual modules) and returns all known modules.
-
-```cddl
-; -- method listing (well-known, on all modules) --
-logos.methods_request = {}
-logos.methods_response = {
-    methods: [* method_info],
-}
-
-method_info = {
-    name:    tstr,
-    params:  [* param_info],
-    returns: [* param_info],
-}
-
-param_info = {
-    name: tstr,
-    type: tstr,                 ; CDDL type name ("int64", "tstr", etc.)
-}
-
-; -- module listing (well-known, provided by runtime) --
-logos.modules_request = {}
-logos.modules_response = {
-    modules: [* module_info],
-}
-
-module_info = {
-    name:    tstr,
-    version: [uint32, uint32],
-    state:   tstr,              ; "ready", "loaded", "error", etc.
-}
-```
+Module introspection is schema-first:
+method listings, event listings, request/response shapes, and type information
+are derived from the module schema and its canonical schema model.
+Runtime module listings are runtime introspection state and are exposed through
+the runtime-control contract defined by LOGOS-MODULE-RUNTIME.
 
 ### 5.2 C Definitions (`logos_types.h`)
 
@@ -1287,8 +1275,8 @@ concepts defined above.
   API defined in LOGOS-MODULE-RUNTIME.
 - In direct mode, a handle may wrap function pointers or equivalent
   in-process dispatch state.
-  In socket mode, it may wrap a transport connection or equivalent runtime
-  state.
+  In local transport mode, it may wrap a transport connection or equivalent
+  runtime state.
 - The execution mode behind a handle is runtime-internal and MUST NOT change
   the module contract seen by callers.
 - Handles are not intrinsically thread-safe.
@@ -1342,7 +1330,8 @@ typedef struct logos_call_context logos_call_context_t;
  * logos_runtime_connect() (see LOGOS-MODULE-RUNTIME section 4.1).
  *
  * In direct mode, the handle wraps function pointers to the target
- * module's C API. In socket mode, it wraps a socket connection.
+ * module's C API. In local transport mode, it wraps a local transport
+ * connection.
  * The caller does not know or care which mode is active.
  *
  * Handles are NOT thread-safe: a single handle MUST NOT be used
@@ -1391,8 +1380,8 @@ Version metadata applies in all execution modes.
 In direct mode, the runtime MAY query `logos_<module>_version()` during
 loading, registration, or connection setup and apply its compatibility policy
 before routing calls.
-In socket or remote mode, version negotiation is carried in the Transport Hello
-exchange.
+In local or remote transport mode, version negotiation is carried in the
+Transport Hello exchange.
 In all modes, `_version` and `logos_<module>_version()` are compatibility
 metadata only; structural schema identity is defined by
 LOGOS-MODULE-COMMITMENT-MODEL.
@@ -1442,7 +1431,7 @@ in Appendix A.1.
 
 ### A.3 Generated Dispatch Adapter
 
-A module kit or runtime profile MAY generate a dispatch adapter as an
+A module kit or runtime implementation MAY generate a dispatch adapter as an
 implementation strategy.
 This adapter is not part of the portable module ABI defined in section 2.6.
 It is an optional generated layer that can support a uniform dispatch table,

@@ -336,8 +336,8 @@ Frames larger than that configured maximum MUST be rejected with error code
 A conforming stream implementation MUST support a configured maximum of at
 least 16 MiB.
 Portable module interfaces MUST NOT require single transport messages larger
-than 16 MiB unless a deployment profile, transport binding, or future protocol
-extension specifies a larger supported size.
+than 16 MiB unless deployment-specific configuration, a transport binding, or a
+future protocol extension specifies a larger supported size.
 
 ### 2.2 Message Ordering
 
@@ -386,7 +386,7 @@ Caller                                  Callee
 
 2. **Caller sends Hello.** Fields:
    - `protocol`: the offered transport protocol revision
-   - `module`: the caller's flat runtime module or endpoint name.
+   - `module`: the callee's selected flat runtime module or endpoint name.
      In this transport specification, "module" includes ordinary modules,
      Logos-defined system modules, runtime-control surfaces, and runtime-host
      endpoints that expose a Logos interface.
@@ -396,6 +396,14 @@ Caller                                  Callee
    - `schema`: structural schema identity of the caller.
      Every transport endpoint exposes a Logos schema and MUST provide this
      field.
+     The field identifies the schema of the endpoint participating in this
+     transport connection.
+     For a runtime-control connection, it identifies the Runtime Control
+     contract.
+     For an ordinary module invocation connection, it identifies the ordinary
+     module contract exposed on that connection.
+     It does not identify every module provider, facade, or route known behind a
+     runtime.
    - `expect_schema`: optional structural schema identity the caller expects
      for the callee
 
@@ -429,7 +437,7 @@ Caller                                  Callee
 
 4. **Callee sends Hello response.** Fields:
    - `protocol`: the negotiated protocol revision
-   - `module`: the callee's module name
+   - `module`: the callee's selected flat runtime module or endpoint name
    - `version`: the callee's current compatibility version metadata
    - `token`: echoed or a session token for the connection
    - `schema`: structural schema identity of the callee.
@@ -634,9 +642,8 @@ To prevent socket squatting:
   `getpeereid()`) after connecting
 - The runtime SHOULD delete stale socket files on startup
 
-The runtime environment, typically a host shell, SHOULD derive a fresh instance
-identity for each local runtime session and set `LOGOS_RUNTIME_DIR` to the
-per-instance runtime directory.
+The runtime host SHOULD derive a fresh instance identity for each local runtime
+session and set `LOGOS_RUNTIME_DIR` to the per-instance runtime directory.
 Socket filenames inside that directory should remain stable, such as
 `logos_<module>.sock`.
 The instance identity MAY also be exposed to hosted processes as
@@ -655,8 +662,9 @@ All incoming CBOR MUST be validated before processing:
 - Reject unknown or unallocated message-kind values with `INVALID_PARAMS`
 - Validate required envelope fields and envelope field types
 
-The runtime MUST NOT be required to validate `params`, `result`, or `data`
-against the module's CDDL schema when forwarding a socket or remote call.
+LOGOS-MODULE-TRANSPORT does not require validation of `params`, `result`, or
+`data` against the module's CDDL schema as part of local or remote transport
+message handling.
 Those payload maps are validated by the module host, generated adapter, native
 module method boundary, or generated client helper that interprets the concrete
 module schema.
@@ -683,9 +691,10 @@ or untrusted peers before any module traffic is accepted.
 
 ## 9. Transport Selection
 
-This specification defines stream bindings for two modes:
+This specification defines stream bindings for local transport mode and remote
+transport mode:
 
-### 9.1 Unix Domain Sockets (Inter-Process)
+### 9.1 Unix Domain Sockets (Local Transport Mode)
 
 Default on Linux and macOS. Socket path:
 
@@ -697,12 +706,12 @@ where `<runtime-dir>` is:
 - Linux: `/run/user/<uid>/logos/` or `$XDG_RUNTIME_DIR/logos/`
 - macOS: `~/Library/Caches/logos/`
 
-### 9.2 TCP (Remote)
+### 9.2 TCP (Remote Transport Mode)
 
 For accessing modules on a remote machine. The runtime connects to
 `<host>:<port>` where the module host is listening.
 
-The stream binding is identical to Unix domain socket mode, except:
+The stream binding is identical to the Unix domain socket binding, except:
 - TLS 1.3 is required (section 8.4)
 
 This draft defines commitment-aware Hello fields for structural schema
@@ -750,7 +759,7 @@ Commitment-aware Hello validation compares `commitment_model`, `schema_root`,
 This document does not select a production hash suite.
 
 A commitment-aware deployment MUST define the accepted hash profile and hash
-suite set by local policy, deployment profile, or a future transport profile.
+suite set by local policy or deployment-specific configuration.
 Implementations MUST reject a Hello schema commitment whose `hash_profile` or
 `hash_suite` is not in that accepted set.
 

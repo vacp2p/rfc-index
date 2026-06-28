@@ -337,12 +337,11 @@ Construction proceeds as follows:
 7. Sort imports, declarations, map fields, and choice arms according to
    Section 9.1 before hashing or comparison.
 
-Well-known runtime/common methods such as `logos.schema`, `logos.methods`, and
-`logos.modules` are not automatically included in an ordinary module's schema
-root.
-They are runtime-provided or common-schema surfaces defined by
+The `logos.schema` introspection bootstrap is not automatically included in an
+ordinary module's schema root.
+It is a runtime-provided common-schema surface defined by
 LOGOS-MODULE-INTERFACE.
-They participate in a module schema only when that schema explicitly references
+It participates in a module schema only when that schema explicitly references
 the corresponding common-schema definitions through the import/reference rules
 in this specification.
 
@@ -633,14 +632,11 @@ The prelude fixed-width integer aliases normalize to built-in primitive schema
 leaves and do not create external references.
 The Logos common schema surface contains reusable Logos-defined schema
 definitions such as `logos_result`, `logos.schema_request`,
-`logos.schema_response`, `logos.methods_request`, `logos.methods_response`,
-`method_info`, `param_info`, `logos.modules_request`,
-`logos.modules_response`, and `module_info`.
+and `logos.schema_response`.
 These definitions belong to a well-known common schema namespace.
 The well-known common schema namespace for this revision is `logos`.
-Unqualified common names in source CDDL, such as `method_info`, are interpreted
-as names in that namespace when they are represented as qualified schema
-definition names.
+Unqualified common names in source CDDL are interpreted as names in that
+namespace when they are represented as qualified schema definition names.
 The common schema surface is a pinned Logos schema dependency.
 Its canonical schema root and named schema subtree roots are computed from the
 common schema definitions in LOGOS-MODULE-INTERFACE Section 5 using this
