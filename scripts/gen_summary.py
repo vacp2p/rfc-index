@@ -7,6 +7,7 @@ This keeps a consistent navigation structure for mdBook without manual edits.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 from pathlib import Path
 import re
 from typing import Iterable, List, Optional
@@ -16,18 +17,26 @@ import blockchain_structure as bc
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 OUTPUT = DOCS / "SUMMARY.md"
+BLOCKCHAIN_TREE_JSON = DOCS / "blockchain-structure.json"
 
-SKIP_FILES = {"README.md", "SUMMARY.md", "template.md"}
+SKIP_FILES = {"README.md", "SUMMARY.md"}
+AUXILIARY_DIR_NAMES = ("appendices", "appendix")
 
 TOP_LEVEL = ["messaging", "blockchain", "storage", "anoncomms", "research"]
 
 LABEL_OVERRIDES = {
     "anoncomms": "AnonComms",
-    "messaging/raw": "Raw",
-    "messaging/draft": "Draft",
-    "messaging/stable": "Stable",
-    "messaging/deprecated": "Deprecated",
-    "messaging/deleted": "Deleted",
+    "messaging/core/raw": "Raw",
+    "messaging/core/draft": "Draft",
+    "messaging/core/stable": "Stable",
+    "messaging/core/deprecated": "Deprecated",
+    "messaging/application/raw": "Raw",
+    "messaging/application/draft": "Draft",
+    "messaging/application/stable": "Stable",
+    "messaging/application/deprecated": "Deprecated",
+    "messaging/application/deleted": "Deleted",
+    "messaging/informational/raw": "Raw",
+    "messaging/informational/draft": "Draft",
     "blockchain/raw": "Raw",
     "blockchain/draft": "Draft",
     "blockchain/deprecated": "Deprecated",
@@ -43,12 +52,13 @@ LABEL_OVERRIDES = {
 
 ORDER_OVERRIDES = {
     "messaging": [
-        "raw",
-        "draft",
-        "stable",
-        "deprecated",
-        "deleted",
+        "core",
+        "application",
+        "informational",
     ],
+    "messaging/core": ["raw", "draft", "stable", "deprecated", "deleted"],
+    "messaging/application": ["raw", "draft", "stable", "deprecated", "deleted"],
+    "messaging/informational": ["raw", "draft", "stable", "deprecated", "deleted"],
     "blockchain": ["raw", "draft", "deprecated"],
     "storage": ["raw", "draft", "deprecated"],
     "anoncomms": ["raw", "draft", "deleted"],
@@ -68,7 +78,6 @@ ACRONYMS = {
     "id",
     "mls",
     "mvds",
-    "nomosda",
     "p2p",
     "rfc",
     "rln",
@@ -121,6 +130,23 @@ def label_for_file(path: Path) -> str:
     return title
 
 
+def appendix_items_for_file(path: Path) -> List[Item]:
+    """Return auxiliary appendix pages stored beside a spec file."""
+    items: List[Item] = []
+    base = path.with_suffix("")
+    for dirname in AUXILIARY_DIR_NAMES:
+        appendix_dir = base / dirname
+        if not appendix_dir.is_dir():
+            continue
+        for file in sorted(appendix_dir.rglob("*.md"), key=lambda p: p.as_posix()):
+            if file.name in SKIP_FILES:
+                continue
+            if "previous-versions" in file.parts:
+                continue
+            items.append(Item(label=label_for_file(file), path=file, children=[]))
+    return sorted(items, key=lambda item: item.label.lower())
+
+
 def label_for_dir(rel_dir: Path) -> str:
     key = rel_dir.as_posix()
     return LABEL_OVERRIDES.get(key, humanize(rel_dir.name))
@@ -165,6 +191,10 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
     for subdir in sorted_dirs(base, rel_base):
         if subdir.name == "previous-versions":
             continue
+        if subdir.name in AUXILIARY_DIR_NAMES:
+            continue
+        if (base / f"{subdir.name}.md").exists():
+            continue
         rel_subdir = subdir.relative_to(DOCS)
         readme = subdir / "README.md"
         if readme.exists():
@@ -182,7 +212,7 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
                 if "previous-versions" not in p.parts and p.name not in SKIP_FILES
             ]
         for file in sorted(md_files, key=lambda p: p.name):
-            item = Item(label=label_for_file(file), path=file, children=[])
+            item = Item(label=label_for_file(file), path=file, children=appendix_items_for_file(file))
             prev_dir = subdir / "previous-versions"
             if prev_dir.exists() and prev_dir.is_dir():
                 for version_dir in sorted(prev_dir.iterdir(), key=lambda p: p.name):
@@ -196,7 +226,7 @@ def build_items(base: Path, rel_base: Path) -> List[Item]:
     for file in sorted(base.glob("*.md"), key=lambda p: p.name):
         if file.name in SKIP_FILES:
             continue
-        items.append(Item(label=label_for_file(file), path=file, children=[]))
+        items.append(Item(label=label_for_file(file), path=file, children=appendix_items_for_file(file)))
 
     items.sort(key=item_sort_key)
 
@@ -233,6 +263,27 @@ def read_status(path: Path) -> Optional[str]:
     return None
 
 
+def blockchain_groups() -> list[tuple[str, list[str]]]:
+    groups = getattr(bc, "GROUPS", None)
+    if not groups:
+        return [(bc.BEDROCK_LABEL, bc.TOPIC_ORDER)]
+    return [(label, list(topics)) for label, topics in groups]
+
+
+def blockchain_topic_order() -> list[str]:
+    topics: list[str] = []
+    for _, group_topics in blockchain_groups():
+        topics.extend(group_topics)
+    return topics
+
+
+def empty_blockchain_grouped() -> dict:
+    return {
+        topic: {bucket: [] for bucket in bc.buckets_for_topic(topic)}
+        for topic in blockchain_topic_order()
+    }
+
+
 def build_blockchain_items() -> List[Item]:
     """
     Build the Blockchain section under the Notion-style topology defined in
@@ -241,29 +292,102 @@ def build_blockchain_items() -> List[Item]:
     as draft links so the full target structure stays visible.
     """
     # Group real files by (topic, bucket).
-    grouped: dict = {topic: {b: [] for b in bc.buckets_for_topic(topic)} for topic in bc.TOPIC_ORDER}
+    grouped: dict = empty_blockchain_grouped()
     for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
         abs_path = DOCS / rel_path
         if not abs_path.exists():
             continue
         status = read_status(abs_path) or "raw"
         bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if topic not in grouped:
+            grouped[topic] = {b: [] for b in bc.buckets_for_topic(topic)}
         if bucket not in grouped[topic]:
             grouped[topic][bucket] = []
-        grouped[topic][bucket].append(Item(label=label, path=abs_path))
+        grouped[topic][bucket].append(
+            Item(label=label, path=abs_path, children=appendix_items_for_file(abs_path))
+        )
 
-    topic_items: List[Item] = []
-    for topic in bc.TOPIC_ORDER:
-        bucket_items: List[Item] = []
-        placeholders = bc.PLACEHOLDERS.get(topic, {})
-        for bucket in bc.buckets_for_topic(topic):
-            children: List[Item] = sorted(grouped[topic].get(bucket, []), key=lambda i: i.label.lower())
-            for placeholder_label in placeholders.get(bucket, []):
-                children.append(Item(label=placeholder_label, path=None))
-            bucket_items.append(Item(label=bucket, path=None, children=children))
-        topic_items.append(Item(label=topic, path=None, children=bucket_items))
+    group_items: List[Item] = []
+    for group_label, group_topics in blockchain_groups():
+        topic_items: List[Item] = []
+        for topic in group_topics:
+            bucket_items: List[Item] = []
+            placeholders = bc.PLACEHOLDERS.get(topic, {})
+            for bucket in bc.buckets_for_topic(topic):
+                children: List[Item] = sorted(
+                    grouped.get(topic, {}).get(bucket, []),
+                    key=lambda i: i.label.lower(),
+                )
+                for placeholder_label in placeholders.get(bucket, []):
+                    children.append(Item(label=placeholder_label, path=None))
+                if not children:
+                    continue
+                bucket_items.append(Item(label=bucket, path=None, children=children))
+            if bucket_items:
+                if group_topics == [group_label]:
+                    topic_items.extend(bucket_items)
+                else:
+                    topic_items.append(Item(label=topic, path=None, children=bucket_items))
+        if topic_items:
+            group_items.append(Item(label=group_label, path=None, children=topic_items))
 
-    return [Item(label=bc.BEDROCK_LABEL, path=None, children=topic_items)]
+    return group_items
+
+
+def build_blockchain_tree_data() -> dict:
+    """
+    Same topology as `build_blockchain_items`, but emitted as a JSON-friendly
+    dict for the in-page tree view on the Blockchain landing page.
+    Each spec entry carries its `path` (relative to docs/) and `status`.
+    Placeholder entries have `path: null` and `status: null`.
+    """
+    grouped: dict = empty_blockchain_grouped()
+    for rel_path, (topic, label) in bc.FILE_ASSIGNMENTS.items():
+        abs_path = DOCS / rel_path
+        if not abs_path.exists():
+            continue
+        status = read_status(abs_path) or "raw"
+        bucket = bc.STATUS_TO_BUCKET.get(status, "Merged")
+        if topic not in grouped:
+            grouped[topic] = {b: [] for b in bc.buckets_for_topic(topic)}
+        if bucket not in grouped[topic]:
+            grouped[topic][bucket] = []
+        grouped[topic][bucket].append({
+            "label": label,
+            "path": rel_path,
+            "status": status,
+        })
+
+    groups_out = []
+    legacy_topics_out = []
+    for group_label, group_topics in blockchain_groups():
+        topics_out = []
+        group_data = {"label": group_label, "topics": topics_out}
+        for topic in group_topics:
+            placeholders = bc.PLACEHOLDERS.get(topic, {})
+            buckets_out = []
+            for bucket in bc.buckets_for_topic(topic):
+                specs = sorted(
+                    grouped.get(topic, {}).get(bucket, []),
+                    key=lambda s: s["label"].lower(),
+                )
+                for placeholder_label in placeholders.get(bucket, []):
+                    specs.append({"label": placeholder_label, "path": None, "status": None})
+                buckets_out.append({"name": bucket, "specs": specs})
+            if group_topics == [group_label]:
+                group_data = {"label": group_label, "buckets": buckets_out}
+                legacy_topics_out.append({"name": group_label, "buckets": buckets_out})
+            else:
+                topic_data = {"name": topic, "buckets": buckets_out}
+                topics_out.append(topic_data)
+                legacy_topics_out.append(topic_data)
+        groups_out.append(group_data)
+
+    return {
+        "label": "Blockchain",
+        "topics": legacy_topics_out,
+        "groups": groups_out,
+    }
 
 
 def main() -> None:
@@ -291,6 +415,12 @@ def main() -> None:
 
     OUTPUT.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(f"Wrote {OUTPUT}")
+
+    tree_data = build_blockchain_tree_data()
+    BLOCKCHAIN_TREE_JSON.write_text(
+        json.dumps(tree_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(f"Wrote {BLOCKCHAIN_TREE_JSON}")
 
 
 if __name__ == "__main__":

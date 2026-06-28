@@ -14,7 +14,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/process/draft/1/coss.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/research/draft/1/coss.md) — chore: split ift ts specs (#334)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/ift-ts/raw/1/coss.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-03-23** — [`011eea8`](https://github.com/logos-co/logos-lips/blob/011eea8f069feed3a4feee1c2cc2669f8ed498d9/docs/ift-ts/raw/1/coss.md) — docs(1/coss): add Approved/Verified statuses, CFR doc type, and raw-spec leniency (#301)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/1/coss.md) — chore: fix links (#260)
@@ -47,7 +47,7 @@ It is equivalent except for some areas:
 - recommending the use of a permissive licenses,
 such as CC0 (with the exception of this document);
 - miscellaneous metadata, editor, and format/link updates;
-- more inheritance from the [IETF Standards Process](https://www.rfc-editor.org/rfc/rfc2026.txt),
+- more inheritance from the [IETF Standards Process](https://datatracker.ietf.org/doc/html/rfc2026),
   e.g. using RFC categories: Standards Track, Informational, and Best Common Practice;
 - standards track specifications SHOULD
 follow a specific structure that both streamlines editing,
@@ -160,7 +160,7 @@ documents clearly its current status.
 For a specification to receive a lifecycle status,
 a new specification SHOULD be presented by the team of the sub-domain.
 After discussion amongst the contributors has reached a rough consensus,
-as described in [RFC7282](https://www.rfc-editor.org/rfc/rfc7282.html),
+as described in [RFC7282](https://datatracker.ietf.org/doc/html/rfc7282),
 the specification MAY begin the process to upgrade its status.
 
 A specification has eight possible states that reflect its maturity and
@@ -331,22 +331,23 @@ editing a specification, and
 promoting the status of a specification along with other tasks.
 Once a specification reaches some level of maturity by rough consensus,
 the specification SHOULD enter the [Logos LIP](https://lip.logos.co/) process.
-Similar to the IETF working group adoption described in [RFC6174](https://www.rfc-editor.org/rfc/rfc6174.html),
+Similar to the IETF working group adoption described in [RFC6174](https://datatracker.ietf.org/doc/html/rfc6174),
 the Logos LIP process SHOULD facilitate all updates to the specification.
 
 Specifications are introduced by projects,
 under a specific *domain*, with the intention of becoming technically mature documents.
 The IFT domain currently houses the following projects:
 
-- [Messaging](https://waku.org/)
-- [Storage](https://codex.storage/)
-- [Blockchain](https://nomos.tech/)
+- Messaging
+- Storage
+- Blockchain
+- Annoncomms
 
 When a specification is promoted to *draft* status,
 the number that is assigned MAY be incremental
 or by the *sub-domain* and the Logos LIP process.
 Standards track specifications MUST be based on the
-[Logos LIP template](../../template.md) before obtaining a new status.
+[Logos LIP template](../template.md) before obtaining a new status.
 All changes, comments, and contributions SHOULD be documented.
 
 ### Document Types

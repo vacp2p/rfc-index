@@ -21,7 +21,7 @@
 ## Abstract
 
 This specification describes the Store Module,
-the core storage abstraction in [Codex](https://github.com/codex-storage/nim-codex),
+the core storage abstraction in [Codex](https://github.com/logos-storage/logos-storage-nim),
 providing a unified interface for storing and retrieving content-addressed blocks
 and associated metadata.
 
@@ -463,7 +463,7 @@ QuotaUsage* {.serialize.} = object
 
 The Store Module does not define a wire format specification.
 It provides an internal storage abstraction
-for [Codex](https://github.com/codex-storage/nim-codex)
+for [Codex](https://github.com/logos-storage/logos-storage-nim)
 and relies on underlying datastore implementations for serialization
 and persistence.
 
@@ -518,7 +518,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### normative
 
-- [Codex](https://github.com/codex-storage/nim-codex)
+- [Codex](https://github.com/logos-storage/logos-storage-nim)
 - [Component Specification - Store](https://github.com/codex-storage/codex-docs-obsidian/blob/main/10%20Notes/Specs/Component%20Specification%20-%20Store.md)
 
 ### informative
@@ -528,4 +528,4 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [chronos](https://github.com/status-im/nim-chronos) - Async runtime
 - [libp2p](https://github.com/status-im/nim-libp2p) - P2P networking and CID types
 - [questionable](https://github.com/codex-storage/questionable) - Error handling
-- [lrucache](https://github.com/status-im/lrucache) - LRU cache implementation
+- [lrucache](https://github.com/status-im/nim-minilru) - LRU cache implementation

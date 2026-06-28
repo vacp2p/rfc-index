@@ -28,7 +28,7 @@ pipeline {
   stages {
     stage('Build') {
       steps { script {
-        nix.develop('make build')
+        nix.develop('LIPS_GENERATE_HISTORY=1 make build')
         jenkins.genBuildMetaJSON('book/build.json')
       } }
     }

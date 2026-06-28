@@ -14,7 +14,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/draft/32/rln-v1.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/draft/32/rln-v1.md) — chore: split ift ts specs (#334)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/ift-ts/raw/32/rln-v1.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/ift-ts/raw/32/rln-v1.md) — chore: add math support (#287)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/32/rln-v1.md) — chore: fix links (#260)
@@ -52,7 +52,7 @@ an e-voting system can integrate RLN to contain the voting rate while
 protecting the voters-vote unlinkability.
 Another use case is to protect an anonymous messaging system against DDoS and
 spam attacks by constraining messaging rate of users.
-This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](../../../messaging/draft/17/rln-relay.md).
+This latter use case is explained in [17/WAKU2-RLN-RELAY RFC](../../../messaging/core/draft/17/rln-relay.md).
 
 ## Wire Format Specification
 
@@ -99,7 +99,7 @@ usually a financial or social stake is introduced.
 An example for financial stake is:
 
 For each registration a certain amount of ETH is required.
-An example for social stake is using [Interep](https://interep.link/) as a registry,
+An example for social stake is using [Interep](https://github.com/interep-project) as a registry,
 users need to prove that they have a highly reputable social media account.
 
 #### Implementation notes
@@ -792,8 +792,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [17/WAKU2-RLN-RELAY RFC](../../../messaging/draft/17/rln-relay.md)
-- [Interep](https://interep.link/)
+- [17/WAKU2-RLN-RELAY RFC](../../../messaging/core/draft/17/rln-relay.md)
+- [Interep](https://github.com/interep-project)
 - [incremental Merkle tree algorithm](https://github.com/appliedzkp/incrementalquintree/blob/master/ts/IncrementalQuinTree.ts)
 - [Shamir's Secret sharing scheme](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)
 - [Lagrange polynomials](https://en.wikipedia.org/wiki/Lagrange_polynomial)

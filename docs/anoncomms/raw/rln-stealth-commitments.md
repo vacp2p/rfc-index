@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/rln-stealth-commitments.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/rln-stealth-commitments.md) — chore: split ift ts specs (#334)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/rln-stealth-commitments.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/rln-stealth-commitments.md) — chore: fix links (#260)
 - **2026-01-16** — [`89f2ea8`](https://github.com/logos-co/logos-lips/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/rln-stealth-commitments.md) — Chore/mdbook updates (#258)
@@ -30,11 +30,11 @@
 
 This specification describes the usage of stealth commitments
 to add prospective users to a network-governed
-[32/RLN-V1](32/rln-v1.md) membership set.
+[32/RLN-V1](../draft/32/rln-v1.md) membership set.
 
 ## Motivation
 
-When [32/RLN-V1](32/rln-v1.md) is enforced in [10/Waku2](../../messaging/draft/10/waku2.md),
+When [32/RLN-V1](../draft/32/rln-v1.md) is enforced in [10/Waku2](../../messaging/core/draft/10/waku2.md),
 all users are required to register to a membership set.
 The membership set will store user identities
 allowing the secure interaction within an application.
@@ -47,14 +47,14 @@ to register identities on the user's behalf,
 while maintaining the user's anonymity.
 
 This document specifies a privacy-preserving mechanism,
-allowing a counterparty to utilize [32/RLN-V1](32/rln-v1.md)
+allowing a counterparty to utilize [32/RLN-V1](../draft/32/rln-v1.md)
 to register an `identityCommitment` on-chain.
 Counterparties will be able to register members
 to a RLN membership set without exposing the user's private keys.
 
 ## Background
 
-The [32/RLN-V1](32/rln-v1.md) protocol,
+The [32/RLN-V1](../draft/32/rln-v1.md) protocol,
 consists of a smart contract that stores a `idenitityCommitment`
 in a membership set.
 In order for a user to join the membership set,
@@ -63,17 +63,17 @@ A set of public keys is used to compute a stealth commitment for a user,
 as described in [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564).
 This specification is an implementation of the
 [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) scheme,
-tailored to the curve that is used in the [32/RLN-V1](32/rln-v1.md) protocol.
+tailored to the curve that is used in the [32/RLN-V1](../draft/32/rln-v1.md) protocol.
 
 This can be used in a couple of ways in applications:
 
 1. Applications can add users
-to the [32/RLN-V1](32/rln-v1.md) membership set in a batch.
+to the [32/RLN-V1](../draft/32/rln-v1.md) membership set in a batch.
 2. Users of the application
-can register other users to the [32/RLN-V1](32/rln-v1.md) membership set.
+can register other users to the [32/RLN-V1](../draft/32/rln-v1.md) membership set.
 
 This is useful when the prospective user does not have access to funds
-on the network that [32/RLN-V1](32/rln-v1.md) is deployed on.
+on the network that [32/RLN-V1](../draft/32/rln-v1.md) is deployed on.
 
 ## Wire Format Specification
 
@@ -140,6 +140,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [10/Waku2](../../messaging/draft/10/waku2.md)
-- [32/RLN-V1](32/rln-v1.md)
+- [10/Waku2](../../messaging/core/draft/10/waku2.md)
+- [32/RLN-V1](../draft/32/rln-v1.md)
 - [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564)

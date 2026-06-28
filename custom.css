@@ -265,6 +265,42 @@ code, pre, .hljs {
     font-family: "Source Code Pro", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+pre:has(> code.language-schema) {
+    margin: 1rem 0 1.5rem;
+    padding: 1.35rem 1.5rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #1f2020;
+}
+
+pre > code.language-schema {
+    line-height: 1.55;
+}
+
+blockquote:has(> p > sub) {
+    margin: 1rem 0 1.25rem;
+    padding: 0.35rem 0 0.35rem 1rem;
+    border-left: 0.25rem solid var(--quote-border);
+    background: transparent;
+    color: var(--sidebar-fg);
+}
+
+blockquote:has(> p > sub) > p {
+    margin: 0;
+}
+
+blockquote > p > sub:only-child {
+    display: block;
+    color: var(--sidebar-fg);
+    font-size: 1.10rem;
+    line-height: 1.45;
+    vertical-align: baseline;
+}
+
+blockquote > p > sub:only-child .katex {
+    font-size: 1em;
+}
+
 .site-nav {
     display: flex;
     align-items: center;
@@ -398,10 +434,24 @@ code, pre, .hljs {
 }
 
 .chapter-item > .chapter-link-wrapper > a,
-.chapter-item > a {
+.chapter-item > a,
+.chapter-item > div {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+}
+
+.chapter-item > div[role="button"] {
+    color: var(--sidebar-fg);
+    cursor: pointer;
+}
+
+.chapter-item > div.active {
+    color: var(--sidebar-active);
+}
+
+.chapter-item strong[aria-hidden="true"] {
+    display: none;
 }
 
 .section-toggle::before {
@@ -413,7 +463,8 @@ code, pre, .hljs {
 }
 
 .chapter-item.expanded > a .section-toggle::before,
-.chapter-item.expanded > .chapter-link-wrapper > a .section-toggle::before {
+.chapter-item.expanded > .chapter-link-wrapper > a .section-toggle::before,
+.chapter-item.expanded > div .section-toggle::before {
     transform: rotate(90deg);
 }
 
@@ -426,6 +477,153 @@ code, pre, .hljs {
 }
 
 .chapter-item:not(.expanded) > .chapter-link-wrapper > a .section-toggle::before,
-.chapter-item:not(.expanded) > a .section-toggle::before {
+.chapter-item:not(.expanded) > a .section-toggle::before,
+.chapter-item:not(.expanded) > div .section-toggle::before {
     transform: rotate(0deg);
 }
+
+/* ---------- Blockchain topic tree (mirrors SUMMARY sidebar) ---------- */
+
+.blockchain-tree-section {
+    margin: 1.25rem 0 1.75rem;
+}
+
+.blockchain-tree-heading {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.blockchain-tree {
+    border: 1px solid var(--table-border-color, rgba(127, 127, 127, 0.2));
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    background: var(--sidebar-bg, transparent);
+}
+
+.blockchain-tree-loading,
+.blockchain-tree-error {
+    margin: 0;
+    color: var(--fg-muted, #888);
+    font-style: italic;
+}
+
+.blockchain-tree details {
+    margin: 0;
+}
+
+.blockchain-tree summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 2px 0;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.blockchain-tree summary::-webkit-details-marker {
+    display: none;
+}
+
+.blockchain-tree summary::before {
+    content: "▸";
+    display: inline-block;
+    font-size: 0.75em;
+    width: 0.8em;
+    transition: transform 0.15s ease;
+    opacity: 0.6;
+}
+
+.blockchain-tree details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.blockchain-tree .tree-root > summary {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.4rem;
+}
+
+.blockchain-tree .tree-topics {
+    padding-left: 1.1rem;
+    border-left: 1px solid rgba(127, 127, 127, 0.18);
+    margin-left: 0.35rem;
+}
+
+.blockchain-tree .tree-topic > summary {
+    font-weight: 600;
+    margin-top: 0.35rem;
+}
+
+.blockchain-tree .tree-buckets {
+    padding-left: 1.1rem;
+}
+
+.blockchain-tree .tree-bucket {
+    margin: 0.15rem 0;
+}
+
+.blockchain-tree .tree-bucket > summary {
+    font-size: 0.95rem;
+}
+
+.blockchain-tree .tree-bucket-empty > summary {
+    opacity: 0.5;
+    font-style: italic;
+}
+
+.blockchain-tree .tree-bucket-count {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-left: 0.25rem;
+}
+
+.blockchain-tree .tree-specs {
+    list-style: none;
+    padding-left: 1.4rem;
+    margin: 0.15rem 0 0.3rem;
+}
+
+.blockchain-tree .tree-spec {
+    padding: 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.blockchain-tree .tree-spec a {
+    text-decoration: none;
+}
+
+.blockchain-tree .tree-spec a:hover {
+    text-decoration: underline;
+}
+
+.blockchain-tree .tree-spec-placeholder .tree-spec-label {
+    color: var(--fg-muted, #888);
+    font-style: italic;
+}
+
+.blockchain-tree .tree-badge {
+    display: inline-block;
+    padding: 0 0.4rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: rgba(127, 127, 127, 0.18);
+    color: inherit;
+}
+
+.blockchain-tree .tree-badge-raw       { background: rgba(255, 165, 0, 0.18);  color: #d87a00; }
+.blockchain-tree .tree-badge-draft     { background: rgba(0, 140, 220, 0.18);  color: #2486c5; }
+.blockchain-tree .tree-badge-approved  { background: rgba(120, 60, 220, 0.18); color: #7d4ad9; }
+.blockchain-tree .tree-badge-stable    { background: rgba(60, 180, 90, 0.18);  color: #2f9b54; }
+.blockchain-tree .tree-badge-verified  { background: rgba(60, 180, 160, 0.18); color: #2a9a85; }
+.blockchain-tree .tree-badge-deprecated{ background: rgba(200, 80, 80, 0.18);  color: #c4554e; }
+.blockchain-tree .tree-badge-retired   { background: rgba(120, 120, 120, 0.22);color: #888; }
+.blockchain-tree .tree-badge-deleted   { background: rgba(60, 60, 60, 0.35);   color: #aaa; }
+.blockchain-tree .tree-badge-tbd       { background: rgba(120, 120, 120, 0.18);color: #888; font-style: normal; }

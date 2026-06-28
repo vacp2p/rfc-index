@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/logos-service-discovery.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/logos-service-discovery.md) — chore: split ift ts specs (#334)
 - **2026-04-15** — [`5a3e844`](https://github.com/logos-co/logos-lips/blob/5a3e844679a0ac60e6b4e945a64c2f7d8650cba5/docs/ift-ts/raw/logos-service-discovery.md) — Chore/move repo into logos co (#312)
 - **2026-03-24** — [`513d8ea`](https://github.com/logos-co/logos-lips/blob/513d8eae6be8b7b30bf427023ac686df2f2918c0/docs/ift-ts/raw/logos-service-discovery.md) — feat: renaming capability to service discovery (#300)
 - **2026-02-27** — [`2ec272e`](https://github.com/logos-co/logos-lips/blob/2ec272e57f6110106297d062098110a3549c5db6/docs/ift-ts/raw/logos-capability-discovery.md) — docs: refactor and add algo explanation before pseudocode (#280)
@@ -484,34 +484,7 @@ to avoid coupling the protocol to specific formats
 
 ### Advertisement Encoding
 
-Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](https://github.com/logos-co/logos-lips/blob/d59c44477fcdc3c3b61655bea63068d6d94c51f6/vac/raw/extensible-peer-records.md):
-
-```protobuf
-ExtensiblePeerRecord {
-    peer_id: <advertiser_peer_id>
-    seq: <monotonic_sequence>
-    addresses: [
-        AddressInfo { multiaddr: <addr1> },
-        AddressInfo { multiaddr: <addr2> }
-    ]
-    services: [
-        ServiceInfo {
-            id: "/waku/store/1.0.0"  // service protocol identifier
-            data: <optional_metadata>
-        }
-    ]
-}
-```
-
-**Size constraints:**
-
-- Each `ServiceInfo.data` field SHOULD be ≤ 33 bytes
-- Total encoded XPR SHOULD be ≤ 1024 bytes
-
-The XPR MUST be wrapped in a signed envelope with:
-
-- Domain: `libp2p-routing-state`
-- Payload type: `/libp2p/extensible-peer-record/`
+Advertisements in the `Register.advertisement` and `GetAds.advertisements` fields are encoded as `bytes`. Implementations are RECOMMENDED to use [ExtensiblePeerRecord (XPR)](extensible-peer-records.md) encoding.
 
 Alternative encodings MAY be used if they provide equivalent functionality
 and can be verified by discoverers.

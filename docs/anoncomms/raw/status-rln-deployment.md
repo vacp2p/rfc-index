@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/status-rln-deployment.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/status-rln-deployment.md) — chore: split ift ts specs (#334)
 - **2026-04-01** — [`b042c3e`](https://github.com/logos-co/logos-lips/blob/b042c3eb64faa0202b3c80d8726d57aacf8ec82c/docs/ift-ts/raw/status-rln-deployment.md) — docs: Initial PR for SN RLN deployment RFC (#286)
 
 <!-- timeline:end -->
@@ -312,7 +312,7 @@ verifier module MUST extracts the `secret-hash` from two different message with 
 (see [RLN Specification](https://lip.logos.co/anoncomms/raw/rln-v2.html)), and invoke the `Karma contract`
 for slashing which maps user’s Karma to `MinK-1` then adds the `user` to `denylist`.
 
-Note that, Zerokit contains [a function named comput_id_secret](https://github.com/vacp2p/zerokit/blob/master/rln/src/protocol.rs#L526)
+Note that, Zerokit contains [a function named comput_id_secret](https://github.com/vacp2p/zerokit/tree/master/rln/src/protocol)
 for extracting the secret-hash for a given two recurring `internal_nullifier`.
 
 ## 3. Smart Contracts

@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/deleted/25/libp2p-dns-discovery.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/deleted/25/libp2p-dns-discovery.md) — chore: split ift ts specs (#334)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/ift-ts/raw/25/libp2p-dns-discovery.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/ift-ts/raw/25/libp2p-dns-discovery.md) — chore: add math support (#287)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/25/libp2p-dns-discovery.md) — chore: fix links (#260)
@@ -32,7 +32,7 @@ peer discovery via DNS for Waku v2.
 The generalised purpose is to retrieve an arbitrarily long, authenticated,
 updateable list of [`libp2p` peers](https://docs.libp2p.io/concepts/peer-id/)
 to bootstrap connection to a `libp2p` network.
-Since [`10/WAKU2`](../../../messaging/draft/10/waku2.md)
+Since [`10/WAKU2`](../../../messaging/core/draft/10/waku2.md)
 currently specifies use of [`libp2p` peer identities](https://docs.libp2p.io/concepts/peer-id/),
 this method is suitable for a new Waku v2 node
 to discover other Waku v2 nodes to connect to.
@@ -66,7 +66,7 @@ The example URL from EIP-1459, adapted to the above scheme becomes:
 matree://AM5FCQLWIZX2QFPNJAP7VUERCCRNGRHWZG3YYHIUV7BVDQ5FDPRT2@peers.example.org
 ```
 
-Each entry within the Merkle tree MUST be contained within a [DNS TXT record](https://www.rfc-editor.org/rfc/rfc1035.txt)
+Each entry within the Merkle tree MUST be contained within a [DNS TXT record](https://datatracker.ietf.org/doc/html/rfc1035)
 and stored in a subdomain (except for the base URL `matree` entry).
 The content of any TXT record
 MUST be small enough to fit into the 512-byte limit imposed on UDP DNS packets,
@@ -165,7 +165,7 @@ Copyright and related rights waived via
 
 ## References
 
-1. [`10/WAKU2`](../../../messaging/draft/10/waku2.md)
+1. [`10/WAKU2`](../../../messaging/core/draft/10/waku2.md)
 1. [EIP-1459: Client Protocol](https://eips.ethereum.org/EIPS/eip-1459#client-protocol)
 1. [EIP-1459: Node Discovery via DNS](https://eips.ethereum.org/EIPS/eip-1459)
 1. [`libp2p`](https://libp2p.io/)

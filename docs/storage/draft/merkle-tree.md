@@ -14,7 +14,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/storage/draft/merkle-tree.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/storage/draft/merkle-tree.md) — chore: split ift ts specs (#334)
 - **2026-04-28** — [`7c47307`](https://github.com/logos-co/logos-lips/blob/7c47307916f511bd16cfe97890613951cc4ebe6b/docs/storage/raw/merkle-tree.md) — chore: metadata validator improvements (#320)
 - **2026-04-20** — [`5cb91fc`](https://github.com/logos-co/logos-lips/blob/5cb91fc1553230b2ab49fdfe515020ef6d15c608/docs/storage/raw/merkle-tree.md) — improved Merkle tree spec (#293)
 - **2026-04-20** — [`c3d15a9`](https://github.com/logos-co/logos-lips/blob/c3d15a9c7c24b4d6b0eb4fb578f9670ede6f69b0/docs/storage/raw/merkle-tree.md) — COSS overhaul: new statuses, CFR type, raw-spec leniency (#308)
@@ -96,11 +96,11 @@ In the classical situation, like for example SHA2 or SHA3, the leaves are just b
 
 #### 1. Layer abuse attacks
 
-Using traditional functions like SHA256, one could express the compression `C(a,b)` as `H(f(a,b))`, where `f` is just concatenation: `f(a,b) = a || b` (Fig. 1(a)). This creates a type of symmetry one can then exploit - since a naive Merkle tree root does not encode its depth, one could pretend that `f(a,b)` is actually data, and construct a shorter (that is, less deep) Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., $T^{\prime}_3$ in the second tree is the same as $T_7$ in the original tree.
+Using traditional functions like SHA256, one could express the compression `C(a,b)` as `H(f(a,b))`, where `f` is just concatenation: `f(a,b) = a || b` (Fig. 1(a)). This creates a type of symmetry one can then exploit - since a naive Merkle tree root does not encode its depth, one could pretend that `f(a,b)` is actually data, and construct a shorter (that is, less deep) Merkle tree which evaluates to the same root as before (Fig. 1(b)); i.e., $`T^{\prime}_3`$ in the second tree is the same as $`T_7`$ in the original tree.
 
-![layer abuse attack](images/layer-abuse.png)
+![layer abuse attack](../raw/images/layer-abuse.png)
 
-**Figure 1.** **(a)** original Merkle tree; **(b)** a different Merkle tree with the same Merkle root as the original; i.e., $T^{\prime}_3 = T_7$, constructed from a layer abuse attack.
+**Figure 1.** **(a)** original Merkle tree; **(b)** a different Merkle tree with the same Merkle root as the original; i.e., $`T^{\prime}_3 = T_7`$, constructed from a layer abuse attack.
 
 #### 2. Padding attacks
 
@@ -108,7 +108,7 @@ A layer of a (binary) Merkle trees can be incomplete, when the number of leaves 
 
 If done carelessly, this can potentially allow an attacker to replace the padding with some fake data below that is equivalent to such padding (Fig. 2(b)), and again generate the same Merkle root from data that is different from what had been intended.
 
-![padding attack](images/padding.png)
+![padding attack](../raw/images/padding.png)
 
 **Figure 2.** **(a)** Original padded Merkle tree, and **(b)** a Merkle tree with the same root as the original built from a padding attack.
 
@@ -203,7 +203,7 @@ In that context, each such _data block_[^3] (of size `b`) then undergoes hashing
 
 For hashing functions which do not take bytestrings as input - like  Poseidon2, which operates on sequences of finite field elements - we must _encode_ our data blocks into the proper type first (Figure 3(b)).
 
-![encoding](images/encoding.png)
+![encoding](../raw/images/encoding.png)
 
 **Figure 3.** **(a)** A byte string (raw data), split into data blocks which are also bytestrings. **(b)** Data blocks after undergoing encoding.
 

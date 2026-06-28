@@ -12,7 +12,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/multi-message_id-burn-rln.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/multi-message_id-burn-rln.md) — chore: split ift ts specs (#334)
 - **2026-01-21** — [`70f3cfb`](https://github.com/logos-co/logos-lips/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/multi-message_id-burn-rln.md) — chore: mdbook font fix (#266)
 
 <!-- timeline:end -->
@@ -78,7 +78,7 @@ RLN-Diff introduces per-user rate limits. Therefore, **id_commitment** must depe
 0 ≤ `user_message_limit` ≤ `message_limit`.
 
 The user submits the same `identity_secret_hash` as in
-[32/RLN-V1](32/rln-v1.md), i.e.
+[32/RLN-V1](../draft/32/rln-v1.md), i.e.
 `poseidonHash(identity_secret)`, together with `user_message_limit` to a server or
 smart contract.
 
@@ -119,7 +119,7 @@ internal_nullifier = poseidonHash([a_1]);
 
 ### RLNv2 Verification/slashing
 
-Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](32/rln-v1.md).
+Verification and slashing in both subprotocols remain the same as in [32/RLN-V1](../draft/32/rln-v1.md).
 The only difference that may arise is the `message_limit` check in RLN-Same,
 since it is now a public input of the Circuit.
 
@@ -235,5 +235,5 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### References
 
-* [RLNv1](32/rln-v1.md)
+* [RLNv1](../draft/32/rln-v1.md)
 * [RLNv2](rln-v2.md)

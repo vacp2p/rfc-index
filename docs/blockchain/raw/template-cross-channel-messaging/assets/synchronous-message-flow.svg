@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 1460" role="img" aria-labelledby="title desc">
+  <title id="title">Synchronous cross-channel messaging flow</title>
+  <desc id="desc">Sequence diagram showing intention gathering, transaction construction, signature collection, submission, and atomic execution.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#d9d6e8"/>
+    </marker>
+  </defs>
+  <style>
+    .bg { fill: #1f2020; }
+    .actor { fill: #efedff; stroke: #d5d1f0; stroke-width: 1.2; rx: 2; }
+    .actor-text { fill: #17172a; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; text-anchor: middle; }
+    .life { stroke: #d7d0f3; stroke-width: 1.6; }
+    .arrow { stroke: #d7d0f3; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+    .reply { stroke: #d7d0f3; stroke-width: 1.4; stroke-dasharray: 4 4; fill: none; marker-end: url(#arrow); }
+    .loop { stroke: #d7d0f3; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+    .panel1 { fill: #e9e8ff; stroke: none; }
+    .panel2 { fill: #e8fae9; stroke: none; }
+    .panel3 { fill: #fbf5e7; stroke: none; }
+    .panel4 { fill: #fff0ef; stroke: none; }
+    .tag { fill: #fff6a5; stroke: #d8c94f; stroke-width: 1.2; }
+    .alt { fill: none; stroke: #d7d0f3; stroke-width: 1; }
+    .txt { fill: #111; font-family: Arial, Helvetica, sans-serif; font-size: 11px; text-anchor: middle; }
+    .tiny { fill: #111; font-family: Arial, Helvetica, sans-serif; font-size: 10px; text-anchor: middle; }
+    .num { fill: #111; font-family: Arial, Helvetica, sans-serif; font-size: 9px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+    .bubble { fill: #f1f1f1; stroke: #cfcfcf; stroke-width: 1; }
+  </style>
+
+  <rect class="bg" width="840" height="1460"/>
+
+  <rect class="actor" x="55" y="17" width="90" height="42"/>
+  <text class="actor-text" x="100" y="34">Sequencer A</text>
+  <text class="actor-text" x="100" y="49">(Channel A)</text>
+  <rect class="actor" x="205" y="17" width="100" height="42"/>
+  <text class="actor-text" x="255" y="34">Sequencer B</text>
+  <text class="actor-text" x="255" y="49">(Channel B)</text>
+  <rect class="actor" x="390" y="17" width="160" height="42"/>
+  <text class="actor-text" x="470" y="32">Coordinator</text>
+  <text class="actor-text" x="470" y="48">(one of the sequencers)</text>
+  <rect class="actor" x="640" y="17" width="110" height="42"/>
+  <text class="actor-text" x="695" y="43">Bedrock</text>
+
+  <line class="life" x1="100" y1="59" x2="100" y2="1385"/>
+  <line class="life" x1="255" y1="59" x2="255" y2="1385"/>
+  <line class="life" x1="470" y1="59" x2="470" y2="1385"/>
+  <line class="life" x1="695" y1="59" x2="695" y2="1385"/>
+
+  <rect class="panel1" x="80" y="80" width="410" height="235"/>
+  <rect class="tag" x="88" y="94" width="170" height="29"/>
+  <text class="tiny" x="173" y="113">1. Intention gathering</text>
+  <text class="tiny" x="280" y="153">Propose cross-channel operation</text>
+  <text class="tiny" x="280" y="169">(e.g., atomic cross-zone transfer</text>
+  <text class="tiny" x="280" y="185">burning tokens in A state)</text>
+  <line class="arrow" x1="100" y1="190" x2="468" y2="190"/>
+  <circle class="bubble" cx="100" cy="190" r="6"/>
+  <text class="num" x="100" y="190">1</text>
+  <text class="tiny" x="355" y="233">Propose cross-channel operation</text>
+  <text class="tiny" x="355" y="249">(e.g., the same atomic cross-zone</text>
+  <text class="tiny" x="355" y="265">transfer minting tokens in B state)</text>
+  <line class="arrow" x1="255" y1="278" x2="468" y2="278"/>
+  <circle class="bubble" cx="255" cy="278" r="6"/>
+  <text class="num" x="255" y="278">2</text>
+
+  <rect class="panel2" x="305" y="340" width="330" height="160"/>
+  <rect class="tag" x="390" y="355" width="170" height="28"/>
+  <text class="tiny" x="475" y="373">2. Transaction construction</text>
+  <text class="tiny" x="470" y="421">Build Mantle tx with ops for</text>
+  <text class="tiny" x="470" y="437">all involved channels</text>
+  <text class="tiny" x="470" y="453">(CHANNEL_INSCRIBE / WITHDRAW / DEPOSIT, etc.)</text>
+  <path class="loop" d="M470 459 C535 455, 542 483, 470 491"/>
+  <circle class="bubble" cx="470" cy="459" r="6"/>
+  <text class="num" x="470" y="459">3</text>
+
+  <rect class="panel3" x="35" y="540" width="505" height="440"/>
+  <rect class="tag" x="80" y="556" width="410" height="29"/>
+  <text class="tiny" x="285" y="575">3. Signature collection</text>
+  <line class="reply" x1="470" y1="625" x2="102" y2="625"/>
+  <text class="tiny" x="286" y="616">Send full Mantle Tx</text>
+  <circle class="bubble" cx="470" cy="625" r="6"/>
+  <text class="num" x="470" y="625">4</text>
+  <path class="loop" d="M100 654 C48 649, 44 677, 100 685"/>
+  <text class="tiny" x="126" y="671">Verify Mantle tx</text>
+  <text class="tiny" x="126" y="687">(channel A logic, fees, etc.)</text>
+  <circle class="bubble" cx="100" cy="654" r="6"/>
+  <text class="num" x="100" y="654">5</text>
+  <line class="arrow" x1="100" y1="760" x2="468" y2="760"/>
+  <text class="tiny" x="284" y="751">Proofs for A's Operations</text>
+  <text class="tiny" x="284" y="767">(sign mantle_txhash(Mantle tx))</text>
+  <circle class="bubble" cx="100" cy="760" r="6"/>
+  <text class="num" x="100" y="760">6</text>
+  <rect class="tag" x="220" y="795" width="270" height="28"/>
+  <text class="tiny" x="355" y="813">Repeat for all sequencers</text>
+  <line class="reply" x1="470" y1="870" x2="257" y2="870"/>
+  <text class="tiny" x="364" y="861">Send full Mantle Tx</text>
+  <circle class="bubble" cx="470" cy="870" r="6"/>
+  <text class="num" x="470" y="870">7</text>
+  <path class="loop" d="M255 894 C203 889, 199 917, 255 925"/>
+  <text class="tiny" x="282" y="910">Verify Mantle tx</text>
+  <text class="tiny" x="282" y="926">(channel B logic, fees, etc.)</text>
+  <line class="arrow" x1="255" y1="952" x2="468" y2="952"/>
+  <text class="tiny" x="365" y="943">Proofs for B's Operations</text>
+  <text class="tiny" x="365" y="959">(sign mantle_txhash(Mantle tx))</text>
+
+  <rect class="panel4" x="430" y="1000" width="380" height="365"/>
+  <rect class="tag" x="480" y="1018" width="260" height="28"/>
+  <text class="tiny" x="610" y="1036">4. Submission and atomic execution</text>
+  <line class="arrow" x1="470" y1="1115" x2="693" y2="1115"/>
+  <text class="tiny" x="582" y="1107">Submit fully proved Mantle tx</text>
+  <circle class="bubble" cx="470" cy="1115" r="6"/>
+  <text class="num" x="470" y="1115">10</text>
+  <path class="loop" d="M695 1150 C758 1145, 765 1174, 695 1183"/>
+  <text class="tiny" x="735" y="1162">Validate tx +</text>
+  <text class="tiny" x="735" y="1178">all op proofs</text>
+  <circle class="bubble" cx="695" cy="1150" r="6"/>
+  <text class="num" x="695" y="1150">11</text>
+  <rect class="alt" x="520" y="1210" width="215" height="118"/>
+  <line class="alt" x1="520" y1="1235" x2="735" y2="1235"/>
+  <text class="tiny" x="545" y="1227">alt</text>
+  <text class="tiny" x="662" y="1227">[All checks pass]</text>
+  <text class="tiny" x="628" y="1270">Apply all channel ops atomically</text>
+  <text class="tiny" x="628" y="1286">(all succeed together)</text>
+  <line class="alt" x1="520" y1="1306" x2="735" y2="1306"/>
+  <text class="tiny" x="628" y="1321">[Any check fails]</text>
+  <text class="tiny" x="628" y="1344">Reject Mantle tx</text>
+  <text class="tiny" x="628" y="1360">(no state changes applied)</text>
+
+  <rect class="actor" x="55" y="1385" width="90" height="42"/>
+  <text class="actor-text" x="100" y="1402">Sequencer A</text>
+  <text class="actor-text" x="100" y="1417">(Channel A)</text>
+  <rect class="actor" x="205" y="1385" width="100" height="42"/>
+  <text class="actor-text" x="255" y="1402">Sequencer B</text>
+  <text class="actor-text" x="255" y="1417">(Channel B)</text>
+  <rect class="actor" x="390" y="1385" width="160" height="42"/>
+  <text class="actor-text" x="470" y="1400">Coordinator</text>
+  <text class="actor-text" x="470" y="1416">(one of the sequencers)</text>
+  <rect class="actor" x="640" y="1385" width="110" height="42"/>
+  <text class="actor-text" x="695" y="1411">Bedrock</text>
+</svg>

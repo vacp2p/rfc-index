@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/mix-spam-protection-rln.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/mix-spam-protection-rln.md) — chore: split ift ts specs (#334)
 - **2026-04-15** — [`5a3e844`](https://github.com/logos-co/logos-lips/blob/5a3e844679a0ac60e6b4e945a64c2f7d8650cba5/docs/ift-ts/raw/mix-spam-protection-rln.md) — Chore/move repo into logos co (#312)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/ift-ts/raw/mix-spam-protection-rln.md) — chore: add math support (#287)
 - **2026-01-29** — [`3cd2d09`](https://github.com/logos-co/logos-lips/blob/3cd2d090a4c8aa7a762dd9357d21cd73bb57cd15/docs/ift-ts/raw/mix-spam-protection-rln.md) — fix title of doc (#282)
@@ -353,7 +353,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [libp2p mix protocol](https://github.com/logos-co/logos-lips/blob/cfc08e9f0e51de20fc5f24b77ad01163c113706e/vac/raw/mix.md/)
+- [libp2p mix protocol](mix.md)
 - [Rate Limiting Nullifiers (RLN)](https://vac.dev/rln)
 - [Rate Limiting Nullifiers v2](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/raw/rln-v2.md)
 - [RLN v1](https://github.com/logos-co/logos-lips/blob/dabc31786b4a4ca704ebcd1105239faff7ac2b47/vac/32/rln-v1.md)

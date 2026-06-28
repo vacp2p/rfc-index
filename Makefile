@@ -18,5 +18,6 @@ lint:
 	python scripts/gen_summary.py
 	python scripts/validate_metadata.py --check
 	python scripts/validate_generated_outputs.py
+	python scripts/validate_rendering.py --strict-github-inline-math
 	npx markdownlint-cli2@0.12.1 "docs/**/*.md" --config .markdownlint.yaml
 	npm run lint:remark

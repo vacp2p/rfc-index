@@ -12,7 +12,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/gossipsub-tor-push.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/gossipsub-tor-push.md) — chore: split ift ts specs (#334)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/gossipsub-tor-push.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/gossipsub-tor-push.md) — chore: fix links (#260)
 - **2026-01-16** — [`89f2ea8`](https://github.com/logos-co/logos-lips/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/ift-ts/raw/gossipsub-tor-push.md) — Chore/mdbook updates (#258)
@@ -69,7 +69,7 @@ The approach specified in this document is fully backwards compatible.
 Gossipsub nodes that do not support Tor Push can receive and relay Tor Push messages,
 because Tor Push uses the same Protocol ID as gossipsub.
 
-Messages are sent over Tor via [SOCKS5](https://www.rfc-editor.org/rfc/rfc1928).
+Messages are sent over Tor via [SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928).
 Tor Push uses a dedicated libp2p context to prevent information leakage.
 To significantly increase resilience and mitigate circuit failures,
 Tor Push establishes several connections,
@@ -118,7 +118,7 @@ Tp-peers MUST support `/meshsub/1.1.0`.
 For retrieving Tp-peers,
 Tp-nodes SHOULD use an ambient peer discovery method
 that retrieves a random peer sample (from the set of all peers),
-e.g. [33/WAKU2-DISCV5](../../messaging/draft/33/discv5.md).
+e.g. [33/WAKU2-DISCV5](../../messaging/core/draft/33/discv5.md).
 
 Tp-nodes MUST establish a connection as described in sub-section
 [Tor Push Connection Establishment](#connection-establishment) to at least one Tp-peer.
@@ -136,7 +136,7 @@ Control messages of any kind, e.g. gossipsub graft, MUST NOT be sent via Tor Pus
 #### Connection Establishment
 
 Tp-nodes establish a `/meshsub/1.1.0` connection to tp-peers via
-[SOCKS5](https://www.rfc-editor.org/rfc/rfc1928) over [Tor](https://www.torproject.org/).
+[SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928) over [Tor](https://www.torproject.org/).
 
 Establishing connections, which in turn establishes the respective Tor circuits,
 can be done ahead of time.
@@ -191,7 +191,7 @@ which might be critical to certain applications.
 
 #### Targeting the Gossipsub Network
 
-Without sophisticated rate limiting (for example using [17/WAKU2-RLN-RELAY](../../messaging/draft/17/rln-relay.md)),
+Without sophisticated rate limiting (for example using [17/WAKU2-RLN-RELAY](../../messaging/core/draft/17/rln-relay.md)),
 attackers can spam the gossipsub network.
 It is not enough to just block peers that send too many messages,
 because these messages might actually come from a Tor exit node
@@ -237,8 +237,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 * [libp2p pubsub](https://github.com/libp2p/specs/tree/master/pubsub)
 * [libp2p pubsub message](https://github.com/libp2p/specs/tree/master/pubsub#the-message)
 * [libp2p switch](https://docs.libp2p.io/concepts/multiplex/switch)
-* [SOCKS5](https://www.rfc-editor.org/rfc/rfc1928)
+* [SOCKS5](https://datatracker.ietf.org/doc/html/rfc1928)
 * [Tor](https://www.torproject.org/)
-* [33/WAKU2-DISCV5](../../messaging/draft/33/discv5.md)
+* [33/WAKU2-DISCV5](../../messaging/core/draft/33/discv5.md)
 * [Bitcoin over Tor isn't a Good Idea](https://ieeexplore.ieee.org/abstract/document/7163022)
-* [17/WAKU2-RLN-RELAY](../../messaging/draft/17/rln-relay.md)
+* [17/WAKU2-RLN-RELAY](../../messaging/core/draft/17/rln-relay.md)

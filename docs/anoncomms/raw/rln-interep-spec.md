@@ -12,7 +12,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/rln-interep-spec.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/rln-interep-spec.md) — chore: split ift ts specs (#334)
 - **2026-02-09** — [`afd94c8`](https://github.com/logos-co/logos-lips/blob/afd94c8bc1420376ae9af7e14a4feb246f2ed621/docs/ift-ts/raw/rln-interep-spec.md) — chore: add math support (#287)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/rln-interep-spec.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/rln-interep-spec.md) — chore: fix links (#260)
@@ -31,8 +31,8 @@
 
 ## Abstract
 
-This spec integrates [Interep](https://interep.link)
-into the [RLN](32/rln-v1.md) spec.
+This spec integrates [Interep](https://github.com/interep-project)
+into the [RLN](../draft/32/rln-v1.md) spec.
 Interep is a group management protocol
 that allows for the creation of groups of users and
 the management of their membership.
@@ -86,7 +86,7 @@ depicted in the [Semaphore documentation](https://semaphore.appliedzkp.org/docs/
 
 ### 2. Verify reputation and join Interep group
 
-Using the Interep app deployed on [Goerli](https://goerli.interep.link/),
+Using the Interep app deployed on Goerli,
 the user can check their reputation tier and join the corresponding group.
 This results in a transaction to the Interep contract, which adds them to the group.
 
@@ -121,11 +121,11 @@ in the RLN contract -
 
 ## Verification of messages
 
-Messages are verified the same way as in the [RLN spec](32/rln-v1.md#verification).
+Messages are verified the same way as in the [RLN spec](../draft/32/rln-v1.md#verification).
 
 ## Slashing
 
-The slashing mechanism is the same as in the [RLN spec](32/rln-v1.md#slashing).
+The slashing mechanism is the same as in the [RLN spec](../draft/32/rln-v1.md#slashing).
 It is important to note that the slashing
 may not have the intended effect on the user,
 since the only consequence is that they cannot send messages.
@@ -143,8 +143,8 @@ which integrates Interep with RLN.
 
 1. As mentioned in [Slashing](#slashing),
 the slashing mechanism may not have the intended effect on the user.
-2. This spec inherits the security considerations of the [RLN spec](32/rln-v1.md#security-considerations).
-3. This spec inherits the security considerations of [Interep](https://docs.interep.link/).
+2. This spec inherits the security considerations of the [RLN spec](../draft/32/rln-v1.md#appendix-a-security-considerations).
+3. This spec inherits the security considerations of [Interep](https://github.com/interep-project/docs).
 4. A user may make multiple registrations using the same Interep proofs but
 different identity commitments.
 The way to mitigate this is to check if the nullifier hash has been detected
@@ -152,10 +152,10 @@ previously in proof verification.
 
 ## References
 
-1. [RLN spec](32/rln-v1.md)
-2. [Interep](https://interep.link)
+1. [RLN spec](../draft/32/rln-v1.md)
+2. [Interep](https://github.com/interep-project)
 3. [Semaphore](https://semaphore.appliedzkp.org/)
 4. [Decentralized cloudflare using Interep](https://ethresear.ch/t/decentralised-cloudflare-using-rln-and-rich-user-identities/10774)
 5. [Interep contracts](https://github.com/interep-project/contracts)
 6. [RLN contract](https://github.com/vacp2p/rln-contract)
-7. [RLNP2P](https://rlnp2p.vac.dev/)
+7. [RLNP2P](https://github.com/vacp2p/rlnp2p.vac.dev)

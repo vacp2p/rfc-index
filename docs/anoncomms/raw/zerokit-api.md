@@ -12,7 +12,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/zerokit-api.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/zerokit-api.md) — chore: split ift ts specs (#334)
 - **2026-01-21** — [`70f3cfb`](https://github.com/logos-co/logos-lips/blob/70f3cfb4df4e9a94e56b1284e98ee1dc9df50ac7/docs/ift-ts/raw/zerokit-api.md) — chore: mdbook font fix (#266)
 
 <!-- timeline:end -->
@@ -40,7 +40,7 @@ are to be interpreted as described in [2119](https://www.ietf.org/rfc/rfc2119.tx
 
 ### Important Note
 
-All terms and parameters used remain the same as in [RLN-V2](rln-v2.md) and [RLN-V1](32/rln-v1.md#technical-overview).
+All terms and parameters used remain the same as in [RLN-V2](rln-v2.md) and [RLN-V1](../draft/32/rln-v1.md#technical-overview).
 
 ### Architecture Overview
 
@@ -171,7 +171,7 @@ but only one variant is compiled and available at runtime based on the enabled f
 `RLN::new_with_params(zkey_data)` - *Available in WASM | Stateless mode*
 
 - Creates a new stateless RLN instance for WASM with pre-loaded zkey data.
-- Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js)).
+- Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/tree/master/rln-wasm)).
 
 ### Key Generation
 
@@ -277,7 +277,7 @@ All tree management functions are only available when `stateless` feature is **N
 
 ### Witness Calculation
 
-For **native Rust**** environments, witness calculation is handled internally by the proof generation functions.
+For **native Rust** environments, witness calculation is handled internally by the proof generation functions.
 The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
 
 For **WASM** environments, witness calculation must be performed externally using a JavaScript witness calculator.
@@ -501,14 +501,14 @@ implement safeguards to prevent accidental violations.
 
 ### Normative
 
-- [RLN-V1 Specification](32/rln-v1.md) - Rate Limit Nullifier V1 protocol
+- [RLN-V1 Specification](../draft/32/rln-v1.md) - Rate Limit Nullifier V1 protocol
 
 ### Informative
 
 - [Zerokit GitHub Repository](https://github.com/vacp2p/zerokit) - Reference implementation
 - [RLN-V2 Specification](rln-v2.md) - Rate Limit Nullifier V2 protocol
 - [Sled Database](https://sled.rs) - Embedded database for persistent Merkle tree storage
-- [Witness Calculator](https://github.com/vacp2p/zerokit/blob/master/rln-wasm/resources/witness_calculator.js) - JavaScript witness calculator for WASM environments
+- [Witness Calculator](https://github.com/vacp2p/zerokit/tree/master/rln-wasm) - JavaScript witness calculator for WASM environments
 
 ## Copyright
 

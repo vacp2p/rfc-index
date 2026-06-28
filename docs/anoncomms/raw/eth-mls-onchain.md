@@ -13,7 +13,7 @@
 
 ## Timeline
 
-- **2026-05-11** — [`ae4c4a1`](https://github.com/logos-co/logos-lips/blob/ae4c4a11e4f7b0d09cbfd2333e22295d3df56582/docs/anoncomms/raw/eth-mls-onchain.md) — chore: split ift ts specs
+- **2026-05-11** — [`1ac7689`](https://github.com/logos-co/logos-lips/blob/1ac7689ee3fe1665d5d5d1bf9c180ed951cc660d/docs/anoncomms/raw/eth-mls-onchain.md) — chore: split ift ts specs (#334)
 - **2026-04-15** — [`5a3e844`](https://github.com/logos-co/logos-lips/blob/5a3e844679a0ac60e6b4e945a64c2f7d8650cba5/docs/ift-ts/raw/eth-mls-onchain.md) — Chore/move repo into logos co (#312)
 - **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/ift-ts/raw/eth-mls-onchain.md) — Chore/updates mdbook (#262)
 - **2026-01-16** — [`f01d5b9`](https://github.com/logos-co/logos-lips/blob/f01d5b9d9f2ef977b8c089d616991b24f2ee4efe/docs/ift-ts/raw/eth-mls-onchain.md) — chore: fix links (#260)
@@ -43,7 +43,7 @@ offering a robust solution to address these challenges.
 
 This document specifies a private messaging service using the
 Ethereum blockchain as authentication service.
-Rooted in the existing [model](../../messaging/draft/20/toy-eth-pm.md),
+Rooted in the existing [model](../../messaging/application/draft/20/toy-eth-pm.md),
 this proposal addresses the deficiencies related
 to forward privacy and authentication inherent
 in the current framework.
@@ -170,7 +170,7 @@ Credentials MUST follow the specifications of section 5.3 of
 
 Below follows the flow diagram for the generation of credentials.
 Users MUST generate key pairs by themselves.
-![figure1](images/eth-secpm_credential.png)
+![figure1](../deleted/images/eth-secpm_credential.png)
 
 ### Message framing
 
@@ -205,10 +205,10 @@ a message from that sender.
 ### Nodes contents
 
 > This section makes use of sections 4 and 7 of
-[RFC9420](https://datatracker.ietf.org/docrfc9420/).
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 The nodes of a ratchet tree
-(Section 4 in [RFC9420](https://datatracker.ietf.org/docrfc9420/))
+(Section 4 in [RFC9420](https://datatracker.ietf.org/doc/rfc9420/))
 contain several types of data:
 
 - Leaf nodes describe individual members.
@@ -216,7 +216,7 @@ contain several types of data:
 
 Contents of each kind of node, and its structure MUST follow
 the indications described in sections 7.1 and 7.2 of
-[RFC9420](https://datatracker.ietf.org/docrfc9420/).
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 ### Leaf node validation
 
@@ -514,11 +514,11 @@ struct {
 The flow diagram shows the procedure to fetch key material
 from other users:
 
-![figure2](images/eth-secpm_fetching.png)
+![figure2](../deleted/images/eth-secpm_fetching.png)
 
 Below follows the flow diagram for the creation of a group:
 
-![figure3](images/eth-secpm_creation.png)
+![figure3](../deleted/images/eth-secpm_creation.png)
 
 ### Group evolution
 
@@ -585,24 +585,24 @@ member who created the commit, or any group member processing
 such commit.
 The validation MUST be done according to one of the procedures
 described in Section 12.2 of
-[RFC9420](https://datatracker.ietf.orgdoc/rfc9420/).
+[RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 When creating or processing a Commit, a client applies a list of
 proposals to the ratchet tree and `GroupContext`.
 The client MUST apply the proposals in the list in the order described
-in Section 12.3 of [RFC9420](https://datatracker.ietf.org/docrfc9420/).
+in Section 12.3 of [RFC9420](https://datatracker.ietf.org/doc/rfc9420/).
 
 Below follows the flow diagram for the addition of a member to a group:
 
-![figure4](images/eth-secpm_add.png)
+![figure4](../deleted/images/eth-secpm_add.png)
 
 The diagram below shows the procedure to remove a group member:
 
-![figure5](images/eth-secpm_remove.png)
+![figure5](../deleted/images/eth-secpm_remove.png)
 
 The flow diagram below shows an update procedure:
 
-![figure6](images/eth-secpm_update.png)
+![figure6](../deleted/images/eth-secpm_update.png)
 
 ### Commit messages
 
@@ -680,7 +680,7 @@ confirming his Ethereum address and agreement to join.
 7. Off-chain: Alice sends a broadcast message to all group members,
 notifying them the addition of Bob.
 
-![figure8](images/eth-secpm_onchain-register-2.png)
+![figure8](../deleted/images/eth-secpm_onchain-register-2.png)
 
 ### Updates in groups
 
@@ -696,7 +696,7 @@ Alice sends it to the smart contract for registration.
 5. Off-chain: Alice sends a broadcast message
 communicating the update to all users.
 
-![figure9](images/eth-secpm_onchain-update.png)
+![figure9](../deleted/images/eth-secpm_onchain-update.png)
 
 ## Ethereum-based authentication protocol
 
@@ -789,7 +789,7 @@ in [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361).
 
 - `scheme` OPTIONAL. The URI scheme of the origin of the request.
 Its value MUST be a
-[RFC 3986](https://datatracker.ietf.org/doc/htmlrfc3986)
+[RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986)
 URI scheme.
 
 - `domain` REQUIRED.
@@ -808,7 +808,7 @@ specified in ERC-55 where applicable.
 - `statement` OPTIONAL. A human-readable ASCII assertion that the user
 will sign which MUST NOT include '\n' (the byte 0x0a).
 - `uri` REQUIRED. An
-[RFC 3986](https://datatracker.ietf.org/doc/htmlrfc3986)
+[RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986)
 URI referring to the resource that is the subject of the
 signing.
 
@@ -1007,7 +1007,7 @@ channels in a secure way. One of these situations is when a user A
 wants to add a new user B to an existing group.
 In such situations communications between users MUST be done following
 the instructions in this
-[specification](https://github.com/logos-co/logos-lips/blob/eth-secpm-splitted/vac/raw/eth-secure-channel.md)
+[specification](noise-x3dh-double-ratchet.md)
 describing the use of X3DH in combination with the double ratchet mechanism.
 
 ## Considerations with respect to decentralization
