@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-01-20 |
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
+| 1.1.0 | Added the `epoch_state_root` header field, the epoch boundary settlement, and the deterministic epoch state root computation used for verifiable checkpoints. | 2026-06-26 |
 
 # Introduction
 
@@ -223,6 +224,101 @@ $`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\te
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{return}\space (\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})`$
 
+### Epoch Boundary Settlement
+
+The first block of an epoch triggers an atomic settlement that is applied **before** executing that block’s transactions. The settlement is performed in the following order:
+
+1. Derive the new epoch state $`(\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})`$ as defined in [Epoch State Pseudocode](#epoch-state-pseudocode).
+2. Append every reward voucher committed during the previous epoch to the reward voucher tree, as defined in [[1.0.0] Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
+3. Aggregate the previous epoch’s leader rewards into the leader reward pool `leaders_rewards`, as defined in [[1.0.0] Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
+4. Finalize the storage market for the elapsed epoch, updating the storage price and usage moving average and resetting the within-epoch usage tally, as defined in [Storage Markets](storage-markets.md).
+
+The execution market base fee and its moving average evolve on every block and require no boundary action (see [Execution Market](execution-market.md)). The state resulting from this settlement is the *settled state* committed by the [Epoch State Root](#epoch-state-root).
+
+### Epoch State Root
+
+Every header carries an `epoch_state_root`. It commits the settled state produced by the [Epoch Boundary Settlement](#epoch-boundary-settlement) at the first block of the epoch, and is repeated unchanged in every subsequent header of that epoch. This commitment lets a joining node import a recent checkpoint and verify the imported state against the chain, as defined in [[1.0.0] Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md).
+
+The computation is deterministic, so every node derives the same root. Collections are committed in **leaf order** (the order they are kept in the ledger, not re-sorted). We use two kinds of commitment:
+
+- The note and voucher trees (`notes`, `C_LEAD`, `voucher_root`) reuse the existing depth-32 [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root); their current values are included as-is.
+- The other collections (`channels`, `locked_notes`, `declarations`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
+
+```python
+def channel_hash(channel: ChannelState) -> hash:
+    h = Hasher()
+    h.update(b"CHANNEL_HASH_V1")
+    for key in channel.accredited_keys:
+        h.update(key.compressed())
+    h.update(channel.configuration_threshold.to_bytes(2, byteorder='little'))
+    h.update(channel.tip_hash)
+    h.update(channel.tip_slot.to_bytes(8, byteorder='little'))
+    h.update(channel.tip_sequencer.to_bytes(2, byteorder='little'))
+    h.update(channel.tip_sequencer_starting_slot.to_bytes(8, byteorder='little'))
+    h.update(channel.posting_timeframe.to_bytes(4, byteorder='little'))
+    h.update(channel.posting_timeout.to_bytes(4, byteorder='little'))
+    h.update(channel.balance.to_bytes(8, byteorder='little'))
+    h.update(channel.withdraw_threshold.to_bytes(2, byteorder='little'))
+    return h.digest()
+
+def channels_root(channels: list[ChannelState]) -> hash:
+    return [channel_hash(channel) for channel in channels].root()
+
+def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
+    h = Hasher()
+    h.update(b"DECLARATION_INFO_HASH_V1")
+    h.update(declaration.service.to_byte())
+    for locator in declaration.locators:
+        h.update(locator.to_byte())
+    h.update(declaration.provider_id.compressed())
+    h.update(declaration.zk_id)
+    h.update(declaration.locked_note_id)
+    h.update(declaration.created.to_bytes(8, byteorder='little'))
+    h.update(declaration.active.to_bytes(8, byteorder='little'))
+    h.update(declaration.withdraw_at.to_bytes(8, byteorder='little'))
+    h.update(declaration.nonce.to_bytes(8, byteorder='little'))
+    return h.digest()
+
+def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> hash:
+    return [hash(b"DECLARATION_HASH_V1", declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
+            for declaration_id in declarations].root()
+
+def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
+    h = Hasher()
+    h.update(b"LOCKED_NOTE_HASH_V1")
+    for declaration_id in locked_note.declarations:
+        h.update(declaration_id)
+    return h.digest()
+
+def locked_notes_root(locked_notes: dict[NoteId, LockedNote]) -> hash:
+    return [hash(b"LOCKED_NOTE_DICT_HASH_V1", note_id, sdp_locked_note_hash(locked_notes[note_id]))
+            for note_id in locked_notes].root()
+
+def get_epoch_state_root(state) -> hash:
+    h = Hasher()
+    h.update(b"STATE_ROOT_V1")
+    h.update(state.notes.root())                            # latest unspent notes
+    h.update(state.aged_notes_root)                         # C_LEAD (Ledger Root)
+    h.update(channels_root(state.channels))
+    h.update(locked_notes_root(state.locked_notes))
+    h.update(declarations_root(state.declarations))
+    h.update(state.min_stake.stake_threshold.to_bytes(8))  # current minimum stake
+    h.update(state.inactivity_period.to_bytes(8))          # current inactivity period
+    h.update(state.voucher_root)                           # reward voucher tree
+    h.update(state.voucher_nullifier_set.root())
+    h.update(state.leaders_rewards.to_bytes(8))            # TokenValue
+    h.update(state.execution_base_fee.to_bytes(8))         # TokenValue
+    h.update(state.execution_gas_average.to_bytes(8))      # int (width undefined in spec)
+    h.update(state.storage_price.to_bytes(8))              # TokenValue
+    h.update(state.storage_usage_average.to_bytes(8))      # int (width undefined in spec)
+    h.update(state.epoch_nonce)                            # frozen nonce
+    h.update(state.epoch_nonce_running)                    # running nonce
+    h.update(state.inferred_total_stake.to_bytes(8))       # int (width undefined in spec)
+    return h.digest()
+```
+
+where `Hasher` is a classic hash function as specified in [[1.0.2] Common Cryptographic Components](common-cryptographic-components.md).
+
 ## Leadership Lottery
 
 A lottery is run for every slot to decide who is eligible to propose a block. For each slot, we can have 0 or more winners. In fact, it’s desirable to have short slots and many empty slots to allow for the network to propagate blocks and to reduce the chances of two leaders winning the same slot which are guaranteed forks.
@@ -259,6 +355,7 @@ def block_id(header: Header) -> hash
         header.parent_block,
         header.slot.to_bytes(8, byteorder='little'),
         header.block_root,
+        header.epoch_state_root,
         # PoL fields
         header.proof_of_leadership.leader_voucher,
         header.proof_of_leadership.entropy_contribution,
@@ -270,11 +367,12 @@ def block_id(header: Header) -> hash
 ### Block Header
 
 ```python
-class Header:                                # 297 bytes
+class Header:                                # 329 bytes
       bedrock_version: byte                    # 1 bytes
       parent_block: hash                       # 32 bytes
       slot: int                                # 8 bytes
       block_root: hash                         # 32 bytes
+      epoch_state_root: hash                   # 32 bytes
       proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
@@ -333,6 +431,8 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
   - $`\textbf{verify\_PoL}(T, parent,sl,P_\text{LEAD}, \pi_\text{PoL})=True`$
   - $`\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True`$
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
+
+10. If $`B`$ is the first block of an epoch, then $`header.\text{epoch\_state\_root} = \textbf{get\_epoch\_state\_root}(state')`$, where $`state'`$ is the settled state after applying the [Epoch Boundary Settlement](#epoch-boundary-settlement) and before executing $`B`$’s transactions. Otherwise $`header.\text{epoch\_state\_root} = header.\text{parent\_block}).header.\text{epoch\_state\_root}`$, since the epoch state root is constant within an epoch.
 
 ### Chain Maintenance
 

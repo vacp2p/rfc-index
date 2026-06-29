@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-02-12 |
 | 1.1.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md) Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
+| 1.2.0 | Added the `epoch_state_root` field to the genesis block header. | 2026-06-26 |
 
 # Introduction
 
@@ -177,6 +178,7 @@ The Genesis Block header fields are set to the following values:
 - `parent_block`: 0 (as this is the first block).
 - `slot`: 0 (the Genesis slot).
 - `block_root`: Block Merkle root over the (single) initial transaction.
+- `epoch_state_root`: the [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root) over the genesis settled state, namely the genesis ledger and initial epoch state (see [Initial Epoch State](#initial-epoch-state)). Slot 0 is the first block of epoch 0.
 - `proof_of_leadership`: Stubbed leadership proof.
   - `leader_voucher`: 0 (as there is no leader block reward for the initial block).
   - `entropy_contribution`: 0 (no entropy is provided through the initial PoL).
@@ -191,6 +193,7 @@ GENESIS_HEADER = Header(
     parent_block=0,
     slot=0,
     block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+    epoch_state_root=get_epoch_state_root(GENESIS_STATE),
     proof_of_leadership=ProofOfLeadership(
       leader_voucher=bytes(32),
       entropy_contribution=bytes(32),
@@ -246,6 +249,7 @@ GENESIS_HEADER = Header(
   parent_block=bytes(32),
   slot=0,
   block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+  epoch_state_root=get_epoch_state_root(GENESIS_STATE),
   proof_of_leadership=ProofOfLeadership(
     leader_voucher=bytes(32),
     entropy_contribution=bytes(32),
@@ -282,6 +286,8 @@ To initialize the Epoch State, we derive the epoch variables from the genesis bl
 1. $`\eta`$ : the epoch nonce is taken directly from the `genesis_epoch_nonce`.
 2. $`\mathbb{C}_\text{LEAD}`$: Eligible leader commitment is set to the the Ledger Root over all notes from the initial token distribution. The derivation of this root is specified in [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root).
 3. $`D`$: The initial estimate of total stake will be the total tokens distributed at genesis.
+
+The genesis `epoch_state_root` commits this initial epoch state together with the genesis ledger, as defined in [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root).
 
 ## Bedrock Services Initialization
 

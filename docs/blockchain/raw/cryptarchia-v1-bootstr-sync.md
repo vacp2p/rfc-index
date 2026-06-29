@@ -25,6 +25,7 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-02-17 |
+| 1.1.0 | Made verifiable-checkpoint the default fast bootstrap: checkpoint at epoch e−2 with state verified against `epoch_state_root`, background backfill of older blocks, and an explicit participation gate. | 2026-06-26 |
 
 # Introduction
 
@@ -288,13 +289,19 @@ If the requesting node is downloading blocks up to the peer’s tip $`c_{loc}`$ 
 
 Unlike [Listening for New Blocks](#listening-for-new-blocks), a node can start proposing blocks after [Prolonged Bootstrap Period](#prolonged-bootstrap-period) is complete. In other words, the node should not propose blocks before switching to the Online fork choice rule.
 
+In particular, a node bootstrapping from a checkpoint must not run the leader lottery, assemble, or broadcast blocks until it has switched to the Online fork choice rule and executed forward to the tip.
+
 ## Bootstrapping from Checkpoint
 
-Instead of bootstrapping from the Genesis block or from the local block tree, a node can choose to bootstrap the honest chain starting from a checkpoint block obtained from a trusted checkpoint provider. In this case, the node fully trusts the checkpoint provider and considers blocks deeper than the checkpoint block as immutable (including the checkpoint block itself).
+The default way to bootstrap is from a recent **verifiable checkpoint**, which lets a node catch up without replaying the chain from Genesis. A checkpoint is the pair `(checkpoint block, settled state)`, where the checkpoint block is the first block of epoch $`e-2`$ (with $`e`$ the current epoch) and the settled state is the ledger and consensus state committed by that block's `epoch_state_root` (see [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root)). Epoch $`e-2`$ is chosen so the checkpoint is well beyond the $`k`$-deep finality boundary and its epoch state is finalized. The node considers blocks up to and including the checkpoint block as immutable.
 
-A trusted checkpoint provider exposes a HTTP endpoint, allowing nodes to download the checkpoint block and the corresponding ledger state. The details are defined in [Checkpoint Provider HTTP API](#checkpoint-provider-http-api).
+The checkpoint block and its settled state can be obtained from any peer or from a checkpoint provider's HTTP endpoint, as defined in [Checkpoint Provider HTTP API](#checkpoint-provider-http-api). The node does not blindly trust the state: it recomputes the `epoch_state_root` over the downloaded state and requires it to equal the one committed in the checkpoint block. The state can therefore be served by untrusted peers; the only remaining assumption is that the checkpoint block is on the honest chain, which is the same assumption any node following consensus already makes. The node also requires the checkpoint boundary to be at least $`k`$ blocks below the peers' tips; otherwise it selects an older checkpoint.
 
-The bootstrapping node imports the downloaded checkpoint block and ledger state before starting bootstrapping. The imported checkpoint block is used as the latest immutable block $`B_{imm}`$ and the local chain tip $`c_{loc}`$. Starting from the checkpoint block, the same [Initial Block Download](#initial-block-download) is used to downloads blocks up to the tip of the local chain of each peer. As defined in [Setting the Fork Choice Rule](#setting-the-fork-choice-rule), the Bootstrap fork choice rule must be used upon startup.
+For extra protection, the node can fetch the checkpoint block and its state from two different sources. Since the state is checked against the block's `epoch_state_root`, a single dishonest source cannot supply a matching block and state: an attacker would have to control both sources at once. This adds only a low level of security, as an attacker may still control several peers, but it costs nothing.
+
+After verification, the bootstrapping node imports the settled state and uses the checkpoint block as the latest immutable block $`B_{imm}`$ and the local chain tip $`c_{loc}`$. Starting from the checkpoint block, the same [Initial Block Download](#initial-block-download) downloads and executes blocks up to the tip of the local chain of each peer. As defined in [Setting the Fork Choice Rule](#setting-the-fork-choice-rule), the Bootstrap fork choice rule must be used upon startup. While executing forward, at each epoch boundary the node asserts that its computed settled-state root matches that epoch's `epoch_state_root`.
+
+Blocks below the checkpoint are not required to follow consensus. They are downloaded in the background, after the node starts participating, for archival and serving purposes; their integrity can be checked against each block's `block_root` without execution.
 
 ![Diagram](cryptarchia-v1-bootstr-sync/assets/1fd261aa-09df-817b-883e-df4c9ca6ae54.png)
 
@@ -341,7 +348,7 @@ While the specific implementation is left to the discretion of implementers, one
 
 ## Checkpoint Provider HTTP API
 
-A trusted checkpoint provider serves the `GET /checkpoint` API, allowing users (which are not connected via p2p) to download the latest checkpoint block and its corresponding ledger state.
+A checkpoint provider serves the `GET /checkpoint` API, allowing users (which are not connected via p2p) to download a checkpoint block and its corresponding settled state. The downloaded state is verified against the block's `epoch_state_root` (see [Bootstrapping from Checkpoint](#bootstrapping-from-checkpoint)), so the provider need not be trusted for state integrity.
 
 ```yaml
 openapi: 3.0
