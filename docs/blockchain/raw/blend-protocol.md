@@ -817,7 +817,7 @@ The relaying logic is defined as follows:
 2. Release the message according to the [Releasing](#releasing) logic.
 3. Concurrently to the above step, add the message to the processing queue, where it is handled by the [Processing](#processing) logic.
 
-The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the safety buffer (see **Algorithm**) and [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
+The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
 $$
 \begin{aligned}
