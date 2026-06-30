@@ -125,7 +125,7 @@ parameters: list[ServiceParameters]
 At the start of epoch $`n`$, each node takes a snapshot of the SDP registry at the last block from the finalized epoch.
 Each snapshot updates the common view of the registry. Changes to the declaration registry take effect with up to a two-epoch delay: messages sent during epoch `n` are included in the next snapshot (for epoch `n+2`).
 
-Epochs 0 and 1 read the snapshot at the genesis block, because the chain has not yet progressed far enough to provide a later finalized block. While at epoch 2, the last block of epoch 2 is read, and so forth according to the above logic.
+Epochs 0 and 1 read the snapshot at the genesis block, because the chain has not yet progressed far enough to provide a later finalized block. While at epoch 2, the last block of epoch 0 is read, and so forth according to the above logic.
 
 ### Identifiers
 
