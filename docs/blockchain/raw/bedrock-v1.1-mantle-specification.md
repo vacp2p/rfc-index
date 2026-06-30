@@ -858,8 +858,8 @@ class DeclarationInfo:
     zk_id: ZkPublicKey
     locked_note_id: NoteId
     created: EpochNumber
-    active: EpochNumber
-    withdraw_at: EpochNumber
+    active: EpochNumber | None
+    withdraw_at: EpochNumber | None
     # SDP ops updating a declaration must use monotonically increasing nonces
     nonce: int
 ```
