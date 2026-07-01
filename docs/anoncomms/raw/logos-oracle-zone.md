@@ -382,3 +382,21 @@ An oracle node or watcher always starts it by sending evidence to the LEZ contra
 - **Incentivization parameters.** The concrete values for the stake requirement, the two slash fractions,
 the reward rate and backing, the epoch length, and the unbonding duration are left to tokenomics.
 They should be sized against the value secured so that the economic-security conditions above hold.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+### References
+
+- Logos Improvement Proposals (LIPs) index: [https://lip.logos.co/](https://lip.logos.co/)
+- PACT, Provable Atomic Cross-zone Transactions (Logos): [https://lip.logos.co/blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html?highlight=pact#zone-interoperability](https://lip.logos.co/blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html?highlight=pact#zone-interoperability)
+- Cryptarchia and Bedrock (Logos): [https://lip.logos.co/blockchain/raw/bedrock-architecture-overview.html?highlight=Cryptarchia#cryptarchia](https://lip.logos.co/blockchain/raw/bedrock-architecture-overview.html?highlight=Cryptarchia#cryptarchia)
+- [BIP-340: Schnorr Signatures for secp256k1](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)
+- [RFC 2119: Key words for use in RFCs](https://www.ietf.org/rfc/rfc2119.txt)
+- [protocol buffers v3](https://protobuf.dev/)
+- Flare Time Series Oracle (FTSO): [https://docs.flare.network/tech/ftso/](https://docs.flare.network/tech/ftso/)
+- Supra DORA (Distributed Oracle Agreement): [https://docs.supra.com/oracles/dora-price-feeds](https://docs.supra.com/oracles/dora-price-feeds)
+- LON proof-of-concept 1: [https://github.com/sydhds/lon_poc](https://github.com/sydhds/lon_poc)
+- LON proof-of-concept 2: [https://github.com/seugu/lon_oracle_zone_bench](https://github.com/seugu/lon_oracle_zone_bench)
+- LON proof-of-concept 3, mocked zone: [https://github.com/seugu/lon_oracle_zone_bench/tree/mocked-zone](https://github.com/seugu/lon_oracle_zone_bench/tree/mocked-zone)
