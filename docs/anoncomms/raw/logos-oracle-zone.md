@@ -215,3 +215,20 @@ Each `oracle id` is the submitting node's BIP-340 x-only public key,
 the membership tree stores these public keys directly.
 The indexer verifies `signature` against `oracle_id`
 and checks the accompanying `membership_proof` against the membership root.
+
+## Incentivization
+
+The Oracle Zone has no execution environment of its own,
+so it custodies no stake and runs no slashing logic.
+All economic security lives in `LEZ contract`.
+The stake and slash operations are bridged between the Oracle Zone
+and LEZ using `PACT` (Provable Atomic Cross-zone Transactions) provided by the Logos stack.
+
+Two distinct PACT usages exist:
+
+- **Regular PACT (price push).** The attested price is written into LEZ
+every heartbeat (see [Rounds and Timing](#rounds-and-timing)).
+This is high-frequency.
+- **Economic-security PACT (slash).** Slashing enforcement is bridged to LEZ.
+This is low-frequency, a slash fires only on an established fault,
+so the cross-zone cost is incurred only on those events.
