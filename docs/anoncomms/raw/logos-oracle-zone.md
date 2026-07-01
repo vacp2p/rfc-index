@@ -131,8 +131,8 @@ The encoding, not the fetching method, is what this specification governs.
 
 The `signature` field carries a [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)
 Schnorr signature over the SHA-256 hash of the canonical serialization of fields 1-6,
-not over the raw payload bytes directly;
-this follows the hash-then-sign convention specified in BIP-340.
+not over the raw payload bytes directly; this follows the hash-then-sign convention specified in BIP-340.
+The `membership_proof` is a separate witness and is not covered by the signature.
 
 The `PriceObservation` is specified using [protocol buffers v3](https://protobuf.dev/):
 
@@ -140,13 +140,14 @@ The `PriceObservation` is specified using [protocol buffers v3](https://protobuf
 syntax = "proto3";
 
 message PriceObservation {
-  string feed_id      = 1;  // asset pair identifier; i.e. "BTC/USDT" 
-  int64  price        = 2;  // integer-encoded price; real value = price * 10^(-decimals)
-  int32  decimals     = 3;  // number of decimal places in `price`
-  int64  timestamp    = 4;  // observation time (unix milliseconds), advisory only
-  bytes  oracle_id    = 5;  // public key / identifier of the submitting oracle node
-  bytes  source_set   = 6;  // OPTIONAL: list of source identifiers used for local median
-  bytes  signature    = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1-6
+  string feed_id           = 1;  // asset pair identifier; i.e. "BTC/USDT"
+  int64  price             = 2;  // integer-encoded price; real value = price * 10^(-decimals)
+  int32  decimals          = 3;  // number of decimal places in `price`
+  int64  timestamp         = 4;  // observation time (unix milliseconds), advisory only
+  bytes  oracle_id         = 5;  // submitting node's 32-byte BIP-340 x-only public key
+  bytes  source_set        = 6;  // OPTIONAL: list of source identifiers used for local median
+  bytes  signature         = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1-6
+  bytes  membership_proof  = 8;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
 }
 ```
 ## Aggregation
@@ -198,3 +199,19 @@ Defining the window as a fixed block range lets every replica derive the identic
 2. **Push cadence.** Delivery is push: every heartbeat the indexer writes the current attested price into LEZ over PACT.
 An on-chain write cannot occur faster than the Logos Blockchain produces blocks, so `R_round >= T_block`.
 With the default `T_block = 30 s`, the default heartbeat is one block (approximately `30 s`).
+
+## Oracle Set Membership
+
+Membership of the active oracle set determines which `oracle id`s submit observations that the indexer will accept.
+Membership is also the basis of incentivization, to join, an operator MUST bond stake in a LEZ contract
+and register itself in the membership tree held in LEZ.
+Registration is a LEZ-only operation and does not require a cross-zone write into the Oracle Zone.
+
+The indexer does not query LEZ state live, which would make aggregation non-deterministic across replicas.
+Instead, each observation carries a Merkle inclusion proof against the LEZ membership root,
+and the indexer verifies the proof against the membership root it holds.
+The indexer is assumed to hold the latest state of the membership tree.
+Each `oracle id` is the submitting node's BIP-340 x-only public key,
+the membership tree stores these public keys directly.
+The indexer verifies `signature` against `oracle_id`
+and checks the accompanying `membership_proof` against the membership root.
