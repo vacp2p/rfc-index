@@ -1,36 +1,35 @@
 # MANTLE
 
-| Field | Value |
-| --- | --- |
-| Name | Mantle |
-| Slug | 98 |
-| Status | raw |
-| Category | Informational |
-| Editor | Thomas Lavaur <thomaslavaur@logos.co> |
+| Field        | Value                                                                |
+| ------------ | -------------------------------------------------------------------- |
+| Name         | Mantle                                                               |
+| Slug         | 98                                                                   |
+| Status       | raw                                                                  |
+| Category     | Informational                                                        |
+| Editor       | Thomas Lavaur <thomaslavaur@logos.co>                                |
 | Contributors | David Rusu <davidrusu@logos.co>, Filip Dimitrijevic <filip@logos.co> |
-
-<!-- timeline:start -->
 
 ## Timeline
 
-- **2026-05-27** — [`b7602ed`](https://github.com/logos-co/logos-lips/blob/b7602ed8a225d41ca0bfaaa432524dc84d2ded7e/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md) — chore: move blockchain specs from notion to github
-- **2026-05-18** — [`58b5698`](https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md) — chore(blockchain): migrate contributor emails to @logos.co (#338)
-- **2026-01-19** — [`f24e567`](https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md) — Chore/updates mdbook (#262)
-- **2026-01-16** — [`89f2ea8`](https://github.com/logos-co/logos-lips/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md) — Chore/mdbook updates (#258)
+* **2026-05-27** — `b7602ed` — chore: move blockchain specs from notion to github
 
-<!-- timeline:end -->
+* **2026-05-18** — `58b5698` — chore(blockchain): migrate contributor emails to @logos.co (#338)
+
+* **2026-01-19** — `f24e567` — Chore/updates mdbook (#262)
+
+* **2026-01-16** — `89f2ea8` — Chore/mdbook updates (#258)
 
 # Revisions History
 
-| **Version** | **Changes** | Date |
-| --- | --- | --- |
-| 1.1.0 | Initial revision. | 2026-12-01 |
-| 1.2.0 | Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs.   Added bridging and decentralized sequencing for channels. | 2026-01-01 |
-| 1.2.1 | [RFC] Improve Mantle Transaction hash. | 2026-03-25 |
-| 1.3.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md). | 2026-04-02 |
-| 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
-| 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md). | 2026-05-06 |
-| 1.6.0 | Update channels to support proof of stake participation, including two new operations `CHANNEL_STAKE_ASSIGNATION` and `CHANNEL_STAKE_TRANSFER` | 2026-06-24 |
+| **Version** | **Changes**                                                                                                                                                                                            | Date       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| 1.1.0       | Initial revision.                                                                                                                                                                                      | 2026-12-01 |
+| 1.2.0       | Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs. Added bridging and decentralized sequencing for channels. | 2026-01-01 |
+| 1.2.1       | [RFC] Improve Mantle Transaction hash.                                                                                                                                                                 | 2026-03-25 |
+| 1.3.0       | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md).                                                                      | 2026-04-02 |
+| 1.4.0       | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md).                                                                                            | 2026-04-24 |
+| 1.5.0       | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md).                          | 2026-05-06 |
+| 1.6.0       | Update channels to support proof of stake participation, including two new operations `CHANNEL_STAKE_ASSIGNATION` and `CHANNEL_STAKE_TRANSFER`                                                         | 2026-06-24 |
 
 # Introduction
 
@@ -58,9 +57,9 @@ The Mantle Ledger enables asset transfers using a transparent UTXO model. While 
 
 Mantle Transaction fees are derived from a gas model. The Logos Blockchain has two different gas markets, accounting for permanent data storage, and execution costs. Each Operation has an associated Execution Gas cost. Users can build unbalanced Mantle Transactions to tip the leaders and incentivize the network to include their transaction.
 
-| Gas Market | Charged On | Pricing Basis |
-| --- | --- | --- |
-| Execution Gas | Operations | Fixed per Operation |
+| Gas Market            | Charged On                | Pricing Basis                |
+| --------------------- | ------------------------- | ---------------------------- |
+| Execution Gas         | Operations                | Fixed per Operation          |
 | Permanent Storage Gas | Signed Mantle Transaction | Proportional to encoded size |
 
 # Mantle Transaction
@@ -103,7 +102,7 @@ Each proof (op proof and signature) must be cryptographically bound to the `Mant
 mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 ```
 
-  `mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
+`mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
 
 ## Mantle Transaction Fee
 
@@ -142,11 +141,13 @@ signed_tx = SignedMantleTx(
 Mantle validators will ensure the following:
 
 1. We have a proof or a `None` value for each operation.
+
 ```python
 assert len(op_proofs) == len(ops)
 ```
 
 2. Each Operation is valid.
+
 ```python
 for op, op_proof in zip(ops, op_proofs):
     assert op.opcode in MANTLE_OPCODES
@@ -160,6 +161,7 @@ def validate_mantle_op(txhash, opcode, payload, op_proof):
 ```
 
 3. The Mantle Transaction excess balance pays least the mandatory fees.
+
 ```python
 tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
 tx_balance = get_transaction_balance(signed_tx)
@@ -194,23 +196,23 @@ Mantle Validators execute sequentially each Operation in `ops` according to its 
 
 ## Opcodes
 
-| **Operation** | **Opcode**    | **Description** |
-| --- |---------------| --- |
-| TRANSFER | 0x00          | Consume and create notes. |
-| *RESERVED* | *0x01 - 0x0F* |  |
-| CHANNEL_CONFIG | 0x10          | Configure a channel |
-| CHANNEL_INSCRIBE | 0x11          | Write a message permanently onto Mantle. |
-| CHANNEL_DEPOSIT | 0x12          | Deposit assets into a channel |
-| CHANNEL_STAKE_ASSIGNATION | 0x13          | Assign Channel Notes that are under `ZkPublicKey = 0` |
-| CHANNEL_STAKE_TRANSFER | 0x14          | Transfer Channel Notes |
-| CHANNEL_WITHDRAW | 0x15          | Withdraw assets from a channel |
-| *RESERVED* | *0x16 - 0x1F* |  |
-| SDP_DECLARE | 0x20          | Declare intention to participate as a node in a Bedrock Service, locking funds as collateral. |
-| SDP_WITHDRAW | 0x21          | Withdraw participation from a Bedrock Service, unlocking your funds in the process. |
-| SDP_ACTIVE | 0x22          | Signal that you are still an active participant of a Bedrock Service. |
-| *RESERVED* | *0x23 - 0xFF* |  |
-| LEADER_CLAIM | 0x30          | Claim leader reward anonymously. |
-| *RESERVED* | *0x31 - 0xFF* |  |
+| **Operation**             | **Opcode**    | **Description**                                                                               |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
+| TRANSFER                  | 0x00          | Consume and create notes.                                                                     |
+| *RESERVED*                | *0x01 - 0x0F* |                                                                                               |
+| CHANNEL_CONFIG            | 0x10          | Configure a channel                                                                           |
+| CHANNEL_INSCRIBE          | 0x11          | Write a message permanently onto Mantle.                                                      |
+| CHANNEL_DEPOSIT           | 0x12          | Deposit assets into a channel                                                                 |
+| CHANNEL_STAKE_ASSIGNATION | 0x13          | Assign Channel Notes that are under `ZkPublicKey = 0`                                         |
+| CHANNEL_STAKE_TRANSFER    | 0x14          | Transfer Channel Notes                                                                        |
+| CHANNEL_WITHDRAW          | 0x15          | Withdraw assets from a channel                                                                |
+| *RESERVED*                | *0x16 - 0x1F* |                                                                                               |
+| SDP_DECLARE               | 0x20          | Declare intention to participate as a node in a Bedrock Service, locking funds as collateral. |
+| SDP_WITHDRAW              | 0x21          | Withdraw participation from a Bedrock Service, unlocking your funds in the process.           |
+| SDP_ACTIVE                | 0x22          | Signal that you are still an active participant of a Bedrock Service.                         |
+| *RESERVED*                | *0x23 - 0xFF* |                                                                                               |
+| LEADER_CLAIM              | 0x30          | Claim leader reward anonymously.                                                              |
+| *RESERVED*                | *0x31 - 0xFF* |                                                                                               |
 
 ## Channel Operations
 
@@ -261,7 +263,7 @@ def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -> ChannelSt
         stake_manipulation_threshold = 1)
 ```
 
-  Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
+Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
 
 ### Decentralized Sequencing
 
@@ -294,11 +296,7 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 Channels represent their bridged funds as channel notes that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
 
-When funds are deposited through a [`CHANNEL_DEPOSIT`](#channel_deposit) operation, the funds are first materialized as a single channel note of the deposited amount under the `ZkPublicKey = 0`, so nobody can use them.
-These Channel Notes can be assigned to a different `ZkPublicKey` using a [`CHANNEL_STAKE_ASSIGNATION`](#channel_stake_assignation) operation without ZkSignature verification.
-Later, the owner of the note can use this note to create a PoL or transfer it to a different `ZkPublicKey` through a [`CHANNEL_STAKE_TRANSFER`](#channel_stake_transfer) operation but it cannot be used as a service stake.
-The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification.
-These funds can be spent by sequencers to cover withdraws in [`CHANNEL_WITHDRAW`](#channel_withdraw) as well without `ZkSignature` verification.
+When funds are deposited through a `CHANNEL_DEPOSIT` operation, the funds are first materialized as a single channel note of the deposited amount under the `ZkPublicKey = 0`, so nobody can use them. These Channel Notes can be assigned to a different `ZkPublicKey` using a `CHANNEL_STAKE_ASSIGNATION` operation without ZkSignature verification. Later, the owner of the note can use this note to create a PoL or transfer it to a different `ZkPublicKey` through a `CHANNEL_STAKE_TRANSFER` operation but it cannot be used as a service stake. The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification. These funds can be spent by sequencers to cover withdraws in `CHANNEL_WITHDRAW` as well without `ZkSignature` verification.
 
 ### CHANNEL_INSCRIBE
 
@@ -322,11 +320,11 @@ Ed25519Signature
 
 #### Execution Gas
 
-  Channel Inscribe Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_INSCRIBE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Inscribe Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_INSCRIBE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 txhash: hash
@@ -358,7 +356,7 @@ assert Ed25519_verify(txhash, msg.signer, sig)
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 msg: Inscribe
@@ -368,15 +366,17 @@ channels: dict[ChannelId, ChannelState]
 block_slot: Slot
 ```
 
-  *Execute*
+*Execute*
 
-  1. If the channel does not exist, create it just-in-time.
+1. If the channel does not exist, create it just-in-time.
+
 ```python
 if msg.channel is not in channels:
     channels[msg.channel] = default_channel(block_slot, [msg.signer])
 ```
 
-  2. Update the channel sequencer.
+2. Update the channel sequencer.
+
 ```python
 chan = channels[msg.channel]
 (new_sequencer_index, new_sequencer_starting_slot) = round_robin(block_slot,chan)
@@ -385,7 +385,8 @@ chan.tip_sequencer_starting_slot = new_sequencer_starting_slot
 chan.tip_sequencer = new_sequencer_index
 ```
 
-  3. Update the channel tip.
+3. Update the channel tip.
+
 ```python
 chan = channels[msg.channel]
 chan.tip_hash = hash(encode(msg))
@@ -450,11 +451,11 @@ class ChannelConfigOpProof:
 
 #### Execution Gas
 
-  Channel Config Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Config Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash
@@ -463,7 +464,7 @@ proof: ChannelConfigOpProof
 channels: dict[ChannelId, ChannelState]
 ```
 
-  *Validate*
+*Validate*
 
 ```python
 assert len(proof.signatures) == len(proof.indexes)
@@ -488,7 +489,7 @@ if config.channel in channels:
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 config: ChannelConfig
@@ -497,9 +498,9 @@ channels: dict[ChannelId, ChannelState]
 block_slot: Slot
 ```
 
-  *Execute*
+*Execute*
 
-  1. If the channel does not exist, create it just-in-time.
+1. If the channel does not exist, create it just-in-time.
 
 ```python
 if config.channel not in channels:
@@ -535,7 +536,7 @@ chan.tip_hash = hash(encode(config))
 
 #### Example
 
-  Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
+Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
 
 ```python
 # Given a key to add
@@ -581,7 +582,7 @@ class ChannelDeposit:
 
 #### Proof
 
-  A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 ```python
 ZkSignature
@@ -589,11 +590,11 @@ ZkSignature
 
 #### Execution Gas
 
-  Channel Deposit Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_DEPOSIT_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Deposit Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_DEPOSIT_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
@@ -605,19 +606,22 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Validate*
+*Validate*
 
-  1. Verify that the channel exist
+1. Verify that the channel exist
+
 ```python
 assert deposit.channel in channels
 ```
 
-  2. Ensure all inputs are spendable and not from a channel
+2. Ensure all inputs are spendable and not from a channel
+
 ```python
 ledger.assert_spendable([(note_id, None) for note_id in deposit.inputs])
 ```
 
-  3. Validate  ownership over deposited notes.
+3. Validate ownership over deposited notes.
+
 ```python
 input_notes = [ledger[input_note_id] for input_note_id in deposit.inputs]
 input_pks = [note.public_key for note in input_notes]
@@ -626,7 +630,7 @@ assert ZkSignature_verify(mantle_txhash, deposit_proof, input_pks)
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 deposit: ChannelDeposit
@@ -636,14 +640,16 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Execute*
+*Execute*
 
-  1. Remove inputs from the ledger.
+1. Remove inputs from the ledger.
+
 ```python
 ledger.execute_spending([(note_id, None) for note_id in deposit.inputs])
 ```
 
-  2. Create the channel note
+2. Create the channel note
+
 ```python
 deposited_amount = 0
 for inp in deposit.inputs:
@@ -655,7 +661,7 @@ ledger.execute_adding(deposit_id, [(channel_note, deposit.channel)])
 
 #### Example
 
-  Suppose Alice wants to make a deposit of 50 tokens on Zone A.
+Suppose Alice wants to make a deposit of 50 tokens on Zone A.
 
 ```python
 # Alice encodes her deposit
@@ -680,7 +686,7 @@ signed_tx = SignedMantleTx(
 )
 ```
 
-  Note that the Zone may wait for the deposit to be finalized before interpreting the deposit in order to guarantee that the deposit will occur on-chain and won't be removed due to reorganization of the chain.
+Note that the Zone may wait for the deposit to be finalized before interpreting the deposit in order to guarantee that the deposit will occur on-chain and won't be removed due to reorganization of the chain.
 
 ### CHANNEL_STAKE_ASSIGNATION
 
@@ -724,21 +730,25 @@ ledger: Ledger
 *Validate*
 
 1. Check that the outputs are valid
+
 ```python
 ledger.assert_valid_output(stake_assignation.outputs)
 ```
 
 2. Check that the channel exists
+
 ```python
 assert stake_assignation.channel in channels
 ```
 
 3. Check that the inputs are valid and belongs to the channel
+
 ```python
 ledger.assert_spendable([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
 ```
 
 4. Check the balance
+
 ```python
 input_amount = sum(ledger.get_note(input).value for input in stake_assignation.inputs)
 output_amount = sum(output.value for output in stake_assignation.outputs)
@@ -746,17 +756,20 @@ assert input_amount >= output_amount
 ```
 
 5. Check that there are enough signatures
+
 ```python
 assert len(proof.signatures) == len(proof.indexes)
 assert len(proof.signatures) == channels[stake_assignation.channel].stake_manipulation_treshold
 ```
 
 6. Check that every proof index is unique
+
 ```python
 assert len(proof.indexes) == len(set(proof.indexes))
 ```
 
 7. Check the signatures
+
 ```python
 for sig, idx in zip(proof.signatures, proof.indexes):
     assert Ed25519_verify(txhash,
@@ -778,12 +791,14 @@ ledger: Ledger
 *Execute*
 
 1. Remove inputs from the ledger
+
 ```python
 for input in stake_assignation.inputs:
     ledger.execute_spending([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
 ```
 
 2. Add outputs to the ledger.
+
 ```python
 stake_assignation_id = derive_op_id(stake_assignation)
 ledger.execute_adding(withdrawal_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
@@ -856,16 +871,19 @@ ledger: Ledger
 *Validate*
 
 1. Ensure the Transfer in non-empty
+
 ```python
 assert len(stake_transfer.inputs) > 0
 ```
 
 2. Ensure all inputs are spendable.
+
 ```python
 ledger.assert_spendable([(note_id, stake_transfer.channel) for note_id in stake_transfer.inputs])
 ```
 
 3. Validate transfer proof to show ownership over input notes.
+
 ```python
 input_notes = [ledger[input_note_id] for input_note_id in stake_transfer.inputs]
 input_pks = [note.public_key for note in input_notes]
@@ -873,11 +891,13 @@ assert ZkSignature_verify(mantle_txhash, stake_transfer_proof, input_pks)
 ```
 
 4. Ensure outputs are valid.
+
 ```python
 ledger.assert_valid_output(stake_transfer.output)
 ```
 
 5. Ensure the Operation is balanced
+
 ```python
 input_amount = sum(ledger.get_note(input).value for input in stake_transfer.inputs)
 output_amount = sum(output.value for output in stake_transfer.outputs)
@@ -898,11 +918,13 @@ ledger: Ledger
 *Execution*
 
 1. Remove inputs from the ledger.
+
 ```python
 ledger.execute_spending([(note_id, stake_transfer.channel) for note_id in stake_transfer.inputs])
 ```
 
 2. Add outputs to the ledger.
+
 ```python
 stake_transfer_id = derive_operation_id(stake_transfer)
 ledger.execute_adding(stake_transfer_id, [(note_id, stake_transfer.channel) for note_id in stake_transfer.outputs])
@@ -958,11 +980,11 @@ class ChannelWithdrawOpProof:
 
 #### Execution Gas
 
-  Channel Withdraw Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_WITHDRAW_GAS * stake_manipulation_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Channel Withdraw Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_WITHDRAW_GAS * stake_manipulation_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash
@@ -973,42 +995,49 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Validate*
+*Validate*
 
-  1. Check that the outputs are valid
+1. Check that the outputs are valid
+
 ```python
 ledger.assert_valid_output(withdrawal.outputs)
 ```
 
-  2. Check that the channel exists
+2. Check that the channel exists
+
 ```python
 assert withdrawal.channel in channels
 ```
 
 3. Check that the inputs are valid and belongs to the channel
+
 ```python
 ledger.assert_spendable([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
 ```
 
-  4. Check that the withdraw inputs cover the outputs
+4. Check that the withdraw inputs cover the outputs
+
 ```python
 input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
 output_amount = sum(output.value for output in withdrawal.outputs)
 assert input_amount >= output_amount
 ```
 
-  5. Check that there are enough signatures
+5. Check that there are enough signatures
+
 ```python
 assert len(proof.signatures) == len(proof.indexes)
 assert len(proof.signatures) == channels[withdrawal.channel].stake_manipulation_treshold
 ```
 
-  6. Check that every proof index is unique
+6. Check that every proof index is unique
+
 ```python
 assert len(proof.indexes) == len(set(proof.indexes))
 ```
 
-  7. Check the signatures
+7. Check the signatures
+
 ```python
 for sig, idx in zip(proof.signatures, proof.indexes):
     assert Ed25519_verify(txhash,
@@ -1018,7 +1047,7 @@ for sig, idx in zip(proof.signatures, proof.indexes):
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 withdrawal: ChannelWithdraw
@@ -1027,15 +1056,17 @@ channels: dict[ChannelId, ChannelState]
 ledger: Ledger
 ```
 
-  *Execute*
+*Execute*
 
-  1. Remove inputs from the ledger
+1. Remove inputs from the ledger
+
 ```python
 for input in withdrawal.inputs:
     ledger.execute_spending([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
 ```
 
-  2. Add outputs to the ledger by returning the exceeding balance to `ZkPublicKey = 0`.
+2. Add outputs to the ledger by returning the exceeding balance to `ZkPublicKey = 0`.
+
 ```python
 input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
 output_amount = sum(output.value for output in withdrawal.outputs)
@@ -1051,7 +1082,7 @@ ledger.execute_adding(withdrawal_id, pairs)
 
 #### Example
 
-  Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.
+Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.
 
 ```python
 # Sequencer encodes his withdrawal
@@ -1126,7 +1157,7 @@ class DeclarationInfo:
 
 ### SDP_DECLARE
 
-The service registration follows the definition given in [**Declaration Message**](bedrock-service-declaration-protocol.md#declaration-message):
+The service registration follows the definition given in **[Declaration Message](bedrock-service-declaration-protocol.md#declaration-message)**:
 
 #### Payload
 
@@ -1149,15 +1180,15 @@ class DeclarationProof:
     provider_sig: Ed25519Signature  # signature proving ownership of provider key
 ```
 
-  see: [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+see: [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 #### Execution Gas
 
-  SDP Declare Operations have a fixed Execution Gas cost of `EXECUTION_SDP_DECLARE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+SDP Declare Operations have a fixed Execution Gas cost of `EXECUTION_SDP_DECLARE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash                  # the txhash of the transaction we are validating
@@ -1170,27 +1201,31 @@ locked_notes: dict[NoteId, LockedNote]
 declarations: dict[NoteId, DeclarationInfo]
 ```
 
-  *Validate*
+*Validate*
 
-  The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
+The declaration is verified according to [Declare](bedrock-service-declaration-protocol.md#declare).
 
-  1. Ensure ownership over the locked note, `zk_id` and `provider_id`.
+1. Ensure ownership over the locked note, `zk_id` and `provider_id`.
+
 ```python
 assert ZkSignature_verify(txhash, proof.zk_sig, [note.public_key, declaration.zk_id])
 assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
 ```
 
-  2. Ensure declaration does not already exist.
+2. Ensure declaration does not already exist.
+
 ```python
 assert declaration_id(declaration) not in declarations
 ```
 
-  3. Ensure it has no more than 8 locators.
+3. Ensure it has no more than 8 locators.
+
 ```python
 assert len(declaration.locators) <= 8
 ```
 
-  4. Ensure locked note exists, is not a channel note and value of locked note is sufficient for joining the service.
+4. Ensure locked note exists, is not a channel note and value of locked note is sufficient for joining the service.
+
 ```python
 assert ledger.is_unspent(declaration.locked_note_id)
 assert declaration.locked_note_id not in ledger.channel_notes
@@ -1198,7 +1233,8 @@ note = ledger.get_note(declaration.locked_note_id)
 assert note.value >= min_stake.stake_threshold
 ```
 
-  5. Ensure the note has not already been locked for this service.
+5. Ensure the note has not already been locked for this service.
+
 ```python
 if declaration.locked_note in locked_notes:
     locked_note = locked_notes[declaration.locked_note]
@@ -1208,7 +1244,7 @@ if declaration.locked_note in locked_notes:
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 declaration: DeclarationMessage # the declaration we are executing
@@ -1217,29 +1253,33 @@ current_block_height: int
 locked_notes : dict[NoteId, LockedNote]
 ```
 
-  *Execute*
+*Execute*
 
-  1. Create the locked note state if it doesn't already exist.
+1. Create the locked note state if it doesn't already exist.
+
 ```python
 if declaration.locked_note not in locked_notes:
     locked_notes[declaration.locked_note_id] = LockedNote(declarations=set(), locked_until=0)
 locked_note = locked_notes[declaration.locked_note_id]
 ```
 
-  2. Update the locked notes timeout using this services lock period.
+2. Update the locked notes timeout using this services lock period.
+
 ```python
 lock_period = service_parameters[declaration.service_type].lock_period
 service_lock = current_block_height + lock_period
 locked_note.locked_until = max(service_lock, locked_note.locked_until)
 ```
 
-  3. Add this declaration to the locked note.
+3. Add this declaration to the locked note.
+
 ```python
 declare_id = declaration_id(declaration)
 locked_note.declarations.add(declare_id)
 ```
 
-  4. Store the declaration as explained in [**Declaration Storage**](bedrock-service-declaration-protocol.md#declaration-storage).
+4. Store the declaration as explained in **[Declaration Storage](bedrock-service-declaration-protocol.md#declaration-storage)**.
+
 ```python
 declarations[declare_id] = DeclarationInfo(
     service: declaration.service
@@ -1312,7 +1352,7 @@ class WithdrawMessage:
 
 #### Proof
 
-  A signature from the `zk_id` and the locked note `pk` attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)).
+A signature from the `zk_id` and the locked note `pk` attached to the declaration is required for withdrawing from a service, (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)).
 
 ```python
 ZkSignature
@@ -1320,11 +1360,11 @@ ZkSignature
 
 #### Execution Gas
 
-  SDP Withdraw Operations have a fixed Execution Gas cost of `EXECUTION_SDP_WITHDRAW_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+SDP Withdraw Operations have a fixed Execution Gas cost of `EXECUTION_SDP_WITHDRAW_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash # Mantle transaction hash of the tx containing this operation
@@ -1337,9 +1377,10 @@ locked_notes: dict[NoteId, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
-  *Validate*
+*Validate*
 
-  1. Ensure that the locked note exists, is locked and bound to this declaration.
+1. Ensure that the locked note exists, is locked and bound to this declaration.
+
 ```python
 assert ledger.is_unspent(withdraw.locked_note_id)
 assert withdraw.locked_note_id in locked_notes
@@ -1349,37 +1390,47 @@ locked_note = locked_notes[withdraw.locked_note_id]
 assert withdraw.declaration in locked_note.declarations
 ```
 
-  2. Ensure that the locked note has expired.
+2. Ensure that the locked note has expired.
+
 ```python
 assert locked_note.locked_until <= block_height
 ```
 
-  3. Validate SDP withdrawal according to [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
-    1. Ensure declaration exists.
+3. Validate SDP withdrawal according to **[Withdraw](bedrock-service-declaration-protocol.md#withdraw)**. 1. Ensure declaration exists.
+
 ```python
 assert withdraw.declaration in declarations
 declare_info = declarations[withdraw.declaration]
 ```
 
-    2. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
+```text
+2. Ensure locked note `pk` and `zk_id` attached to this declaration authorized this Operation.
+```
+
 ```python
 locked_note = ledger[withdraw.locked_note_id]
 assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
 ```
 
-    3. Ensure the declaration has not already been withdrawn.
+```text
+3. Ensure the declaration has not already been withdrawn.
+```
+
 ```python
 assert declare_info.withdrawn == 0
 ```
 
-    4. Ensure that the nonce is greater than the previous one.
+```text
+4. Ensure that the nonce is greater than the previous one.
+```
+
 ```python
 assert withdraw.nonce > declare_info.nonce
 ```
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 withdraw: WithdrawMessage
@@ -1391,24 +1442,27 @@ locked_notes: dict[NoteId, LockedNote]
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
-  *Execute*
+*Execute*
 
-  Executes the withdrawal protocol [**Withdraw**](bedrock-service-declaration-protocol.md#withdraw).
+Executes the withdrawal protocol **[Withdraw](bedrock-service-declaration-protocol.md#withdraw)**.
 
-  1. Update declaration info with nonce and withdrawn timestamp.
+1. Update declaration info with nonce and withdrawn timestamp.
+
 ```python
 declare_info = declarations[withdraw.declaration]
 declare_info.nonce = withdraw.nonce
 declare_info.withdrawn = block_height
 ```
 
-  2. Remove this declaration from the locked note.
+2. Remove this declaration from the locked note.
+
 ```python
 locked_note = locked_notes[withdraw.locked_note_id]
 locked_note.declarations.remove(withdraw.declaration)
 ```
 
-  3. Remove the locked note if it is no longer bound to any declarations.
+3. Remove the locked note if it is no longer bound to any declarations.
+
 ```python
 if len(locked_note.declarations) == 0:
     del locked_notes[withdraw.locked_note_id)
@@ -1461,11 +1515,11 @@ ZkSignature
 
 #### Execution Gas
 
-  SDP Active Operations have a fixed Execution Gas cost of `EXECUTION_SDP_ACTIVE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+SDP Active Operations have a fixed Execution Gas cost of `EXECUTION_SDP_ACTIVE_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 txhash: zkhash # Mantle transaction hash of the tx containing this operation
@@ -1475,7 +1529,7 @@ signature: ZkSignature
 declarations: dict[DeclarationID, DeclarationInfo]
 ```
 
-  *Validate*
+*Validate*
 
 ```python
 assert active.declaration in declarations
@@ -1488,7 +1542,7 @@ assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
 
 #### Execution
 
-  Executes the active protocol [Active](bedrock-service-declaration-protocol.md#active). The activation, i.e. setting the `declaration.active`, is handled by the service-specific logic.
+Executes the active protocol [Active](bedrock-service-declaration-protocol.md#active). The activation, i.e. setting the `declaration.active`, is handled by the service-specific logic.
 
 #### Example
 
@@ -1530,15 +1584,15 @@ class ClaimRequest:
 
 #### Proof
 
-  The provider proves that they have won a proof of Leadership before the start of the current epoch, i.e., their reward voucher is indeed in the voucher set: [Proof of Claim](#proof-of-claim).
+The provider proves that they have won a proof of Leadership before the start of the current epoch, i.e., their reward voucher is indeed in the voucher set: [Proof of Claim](#proof-of-claim).
 
 #### Execution gas
 
-  Leader Claim Operations have a fixed Execution Gas cost of `EXECUTION_LEADER_CLAIM_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Leader Claim Operations have a fixed Execution Gas cost of `EXECUTION_LEADER_CLAIM_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
-  *Given*
+*Given*
 
 ```python
 mantle_txhash: zkhash
@@ -1548,7 +1602,7 @@ voucher_nullifier_set: set[zkhash]
 proof: ProofOfClaim
 ```
 
-  Validate
+Validate
 
 ```python
 assert claim.voucher_nf not in voucher_nullifier_set
@@ -1558,7 +1612,7 @@ validate_proof(claim, proof, mantle_txhash)
 
 #### Execution
 
-  *Given*
+*Given*
 
 ```python
 claim: ClaimRequest
@@ -1569,10 +1623,12 @@ leaders_rewards: TokenValue   # The pool of tokens to be claim by leaders
 leader_reward: TokenValue     # The amount one leader can claim
 ```
 
-  *Execution*
+*Execution*
 
-  1. Add `claim.voucher_nf` to the `voucher_nullifier_set`.
-  2. Denoting by `leader_reward` the amount defined for leader rewards in [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
+1. Add `claim.voucher_nf` to the `voucher_nullifier_set`.
+
+2. Denoting by `leader_reward` the amount defined for leader rewards in [Leaders Reward](bedrock-anonymous-leaders-reward.md#leaders-reward), construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:
+
 ```python
 output_note=Note(
     value = leader_reward
@@ -1582,7 +1638,7 @@ claim_id = derive_op_id(claim)
 ledger.execute_adding(claim_id, [(note_id, None) for note_id in output_note])
 ```
 
-  3. Reduce the leader’s reward `leaders_rewards` value by the same amount (without ZK proof).
+3. Reduce the leader’s reward `leaders_rewards` value by the same amount (without ZK proof).
 
 #### Example
 
@@ -1633,7 +1689,7 @@ class Transfer:
 
 ### Proof
 
-  A Transfer proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+A Transfer proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 ```python
 ZkSignature
@@ -1641,11 +1697,11 @@ ZkSignature
 
 ### Execution Gas
 
-  Transfer have a fixed Execution Gas cost of `EXECUTION_TRANSFER_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+Transfer have a fixed Execution Gas cost of `EXECUTION_TRANSFER_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 ### Validation
 
-  *Given*
+*Given*
 
 ```python
 mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
@@ -1655,33 +1711,37 @@ transfer_proof: ZkSignature
 ledger: Ledger
 ```
 
-  *Validate*
+*Validate*
 
-  1. Ensure the Transfer in non-empty
+1. Ensure the Transfer in non-empty
+
 ```python
 assert len(transfer.inputs) > 0
 ```
 
-  2. Ensure all inputs are spendable and not in a channel.
+2. Ensure all inputs are spendable and not in a channel.
+
 ```python
 ledger.assert_spendable([(note_id, None) for note_id in transfer.inputs])
 ```
 
-  3. Validate transfer proof to show ownership over input notes.
+3. Validate transfer proof to show ownership over input notes.
+
 ```python
 input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
 input_pks = [note.public_key for note in input_notes]
 assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
 ```
 
-  4. Ensure outputs are valid.
+4. Ensure outputs are valid.
+
 ```python
 ledger.assert_valid_output(transfer.output)
 ```
 
 ### Execution
 
-  *Given*
+*Given*
 
 ```python
 transfer: Transfer
@@ -1690,14 +1750,16 @@ transfer_proof: ZkSignature
 ledger: Ledger
 ```
 
-  *Execution*
+*Execution*
 
-  1. Remove inputs from the ledger.
+1. Remove inputs from the ledger.
+
 ```python
 ledger.execute_spending([(note_id, None) for note_id in transfer.inputs])
 ```
 
-  2. Add outputs to the ledger.
+2. Add outputs to the ledger.
+
 ```python
 transfer_id = derive_operation_id(transfer)
 ledger.execute_adding(transfer_id, [(note_id, None) for note_id in transfer.outputs)
@@ -1762,10 +1824,7 @@ Locked notes are special notes in Mantle that serve as collateral for Service De
 
 ### Channel Notes
 
-Channel notes are on-ledger notes minted to represent channel funds.
-They are distinct from Locked Notes as they can’t be used to declare a service.
-Channel notes are excluded from services: they cannot be used as stake for service declaration.
-However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.
+Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Locked Notes as they can’t be used to declare a service. Channel notes are excluded from services: they cannot be used as stake for service declaration. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.
 
 The system maintains a `channel_notes` set in the Ledger tracking all active channel `NoteId` and their respective `ChannelId`.
 
@@ -1843,21 +1902,21 @@ class Ledger:
 
 ## Gas Determination
 
-From the [\[1.4.1\]\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md), we get the table below:
+From the [[1.4.1][Analysis] Gas Cost Determination](analysis-gas-cost-determination.md), we get the table below:
 
-| Constants | Value |
-| --- |-------|
-| EXECUTION_TRANSFER_GAS | 590   |
-| EXECUTION_CHANNEL_INSCRIBE_GAS | 56    |
-| EXECUTION_CHANNEL_CONFIG_GAS | 56    |
-| EXECUTION_CHANNEL_DEPOSIT_GAS | 590   |
+| Constants                               | Value |
+| --------------------------------------- | ----- |
+| EXECUTION_TRANSFER_GAS                  | 590   |
+| EXECUTION_CHANNEL_INSCRIBE_GAS          | 56    |
+| EXECUTION_CHANNEL_CONFIG_GAS            | 56    |
+| EXECUTION_CHANNEL_DEPOSIT_GAS           | 590   |
 | EXECUTION_CHANNEL_STAKE_ASSIGNATION_GAS | 56    |
-| EXECUTION_CHANNEL_STAKE_TRANSFER_GAS | 590   |
-| EXECUTION_CHANNEL_WITHDRAW_GAS | 56    |
-| EXECUTION_SDP_DECLARE_GAS | 646   |
-| EXECUTION_SDP_WITHDRAW_GAS | 590   |
-| EXECUTION_SDP_ACTIVE_GAS | 590   |
-| EXECUTION_LEADER_CLAIM_GAS | 580   |
+| EXECUTION_CHANNEL_STAKE_TRANSFER_GAS    | 590   |
+| EXECUTION_CHANNEL_WITHDRAW_GAS          | 56    |
+| EXECUTION_SDP_DECLARE_GAS               | 646   |
+| EXECUTION_SDP_WITHDRAW_GAS              | 590   |
+| EXECUTION_SDP_ACTIVE_GAS                | 590   |
+| EXECUTION_LEADER_CLAIM_GAS              | 580   |
 
 ## Zero Knowledge Signature Scheme (ZkSignature)
 
@@ -1879,12 +1938,14 @@ class ZkSignatureWitness:
 
 Such that the following constraints hold:
 
-- The number of secret keys is equal to the number of public keys.
+* The number of secret keys is equal to the number of public keys.
+
 ```python
 assert len(secret_keys) == len(public_keys)
 ```
 
-- Each public key is derived from the corresponding secret key.
+* Each public key is derived from the corresponding secret key.
+
 ```python
 assert all(
     notes[i].public_key == zkhash(
@@ -1894,19 +1955,23 @@ assert all(
 )
 ```
 
-- The proof is bound to `msg` (it’s the `mantle_tx_hash` reduced modulo $`p`$ in case of transactions).
+* The proof is bound to `msg` (it’s the `mantle_tx_hash` reduced modulo $`p`$ in case of transactions).
 
-  For implementation, the ZkSignature circuit will take a maximum of 32 public keys as inputs. To prove ownership of fewer keys, the remaining inputs will be padded with the public key corresponding to the secret key `0` and ignored during execution. The outputs have no size limit since they are included in the hashed message.
+For implementation, the ZkSignature circuit will take a maximum of 32 public keys as inputs. To prove ownership of fewer keys, the remaining inputs will be padded with the public key corresponding to the secret key `0` and ignored during execution. The outputs have no size limit since they are included in the hashed message.
 
 ### Benchmark
 
 The material used for the benchmarks is the following:
 
-- CPU       : 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
-- RAM       : 32GB - Speed: 5600 MT/s
-- Motherboard: Micro-Star International Co., Ltd. MS-17S1
-- OS        : Ubuntu 22.04.5 LTS
-- Kernel    : 6.8.0-59-generic
+* CPU : 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
+
+* RAM : 32GB - Speed: 5600 MT/s
+
+* Motherboard: Micro-Star International Co., Ltd. MS-17S1
+
+* OS : Ubuntu 22.04.5 LTS
+
+* Kernel : 6.8.0-59-generic
 
 ![Diagram](bedrock-v1.1-mantle-specification/assets/477261aa-09df-8268-8845-8145f3f8d670.png)
 
@@ -1932,38 +1997,45 @@ class ProofOfClaimWitness:
 
 such that the following constraints hold:
 
-- The reward voucher is derived from the secret voucher.
+* The reward voucher is derived from the secret voucher.
+
 ```python
 assert reward_voucher == zkhash(
     FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
     secret_voucher)
 ```
 
-- There exists a valid Merkle path from the reward voucher as a leaf to the Merkle root.
+* There exists a valid Merkle path from the reward voucher as a leaf to the Merkle root.
+
 ```python
 assert voucher_root == path_root(leaf=reward_voucher,
     path=voucher_merkle_path,
     selectors=voucher_merkle_path_selectors)
 ```
 
-- The voucher nullifier is derived from the secret voucher correctly.
+* The voucher nullifier is derived from the secret voucher correctly.
+
 ```python
 assert voucher_nullifer == zkhash(
     FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
     secret_voucher)
 ```
 
-- The proof is bound to the `mantle_tx_hash` reduced modulo $`p`$.
+* The proof is bound to the `mantle_tx_hash` reduced modulo $`p`$.
 
 ### Benchmark
 
 The material used for the benchmarks is the following:
 
-- CPU       : 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
-- RAM       : 32GB - Speed: 5600 MT/s
-- Motherboard: Micro-Star International Co., Ltd. MS-17S1
-- OS        : Ubuntu 22.04.5 LTS
-- Kernel    : 6.8.0-59-generic
+* CPU : 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)
+
+* RAM : 32GB - Speed: 5600 MT/s
+
+* Motherboard: Micro-Star International Co., Ltd. MS-17S1
+
+* OS : Ubuntu 22.04.5 LTS
+
+* Kernel : 6.8.0-59-generic
 
 ![Diagram](bedrock-v1.1-mantle-specification/assets/b23261aa-09df-827c-8565-014a68d98d4c.png)
 
@@ -1973,21 +2045,23 @@ To see what the payloads represent, refer to [[1.4.1] Mantle Transaction Encodin
 
 ### Operation Id
 
-| Operation | Payload | `op_id` |
-| --- | --- | --- |
-| `TRANSFER` | 0x02010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000264000000000000000a00000000000000000000000000000000000000000000000000000000000000c8000000000000000b00000000000000000000000000000000000000000000000000000000000000 | 0x5d935852efe3a5d6362b1473f962b02cf034ebb7aaec1ac4ae555f509559ac92 |
-| `CHANNEL_CONFIG` | 0x030303030303030303030303030303030303030303030303030303030303030302008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c8139770ea87d175f56a35466c34c7ecccb8d8a91b4ee37a25df60f5b8fc9b3940a0000001400000002000100020032000000000000000000000000000000000000000000000000000000000000003300000000000000000000000000000000000000000000000000000000000000 | 0x3a29ea4866ca9adae72dee2d2b8b3178cb24e38ce37f9e3b3eba2d553d2a134b |
-| `CHANNEL_INSCRIBE` | 0x04040404040404040404040404040404040404040404040404040404040404040b00000068656c6c6f206c6f676f7300000000000000000000000000000000000000000000000000000000000000006e7a1cdd29b0b78fd13af4c5598feff4ef2a97166e3ca6f2e4fbfccd80505bf1 | 0x23c5bd5a7f1ccdfeee5b472447359e6dbea352751c86de2a623dc93865e1bfac |
-| `CHANNEL_DEPOSIT` | 0x0101010101010101010101010101010101010101010101010101010101010101010300000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461 | 0x01aaa8ab7f5cbbf458ae739527dd872e2a0251b08e5d596a158e1da29d8cc1a6 |
-| `CHANNEL_WITHDRAW` | 0x020202020202020202020202020202020202020202020202020202020202020201f4010000000000000c0000000000000000000000000000000000000000000000000000000000000007000000 | 0x717d9f1b2a2040008ed020179ad96ee92261c99c0ae629c68157d70b36332917 |
-| `SDP_DECLARE` | 0x00010b00047f00000191020bb8cd03ea4a6c63e29c520abef5507b132ec5f9954776aebebe7b92421eea691446d22c46000000000000000000000000000000000000000000000000000000000000004700000000000000000000000000000000000000000000000000000000000000 | 0x1441ff8f56a31016669e00abe4ccc19be3f2331599184e5ca291b22bbecbc154 |
-| `SDP_WITHDRAW` | 0x080808080808080808080808080808080808080808080808080808080808080803000000000000005000000000000000000000000000000000000000000000000000000000000000 | 0x634d69299c7d0b8da217e858460d526f58a863b2ebe38ac83712dfda0ba9e5b7 |
-| `SDP_ACTIVE` | 0x09090909090909090909090909090909090909090909090909090909090909090500000000000000ea00000001010a000000000000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020303030303030303030303030303030303030303030303030303030303030303 | 0x2a2146b5e95539494ac60f33845bd0ec0a0fdb683d8a25e033f27c2a37d5951d |
-| `LEADER_CLAIM` | 0x2a000000000000000000000000000000000000000000000000000000000000002b000000000000000000000000000000000000000000000000000000000000002c00000000000000000000000000000000000000000000000000000000000000 | 0xe56aa68a97e66575a95c04b2cc70394f668c8ba38d02e027f76532c8543ddebf |
+| Operation                 | Payload                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `op_id`                                                            |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `TRANSFER`                | 0x0201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                         | 0x5e5e1b318aa0c2aec93fbb327e6af5f705e5684269a34e0c1319539d00d06cdb |
+| `CHANNEL_CONFIG`          | 0x070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00                                                                                                                                                                                                                                                                                                                                 | 0x0cf0dd115eadfc303eeb4c103a7d2faba3cf3a25b549da79c30857fb9eebc0cb |
+| `CHANNEL_INSCRIBE`        | 0x0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c                                                                                                                                                                                                                                                                                                                               | 0xfb9af7fb1384fff51780ec8c5afbcba76449ab7603484f797df3a472e48826c1 |
+| `CHANNEL_DEPOSIT`         | 0x1010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461                                                                                                                                                                                                                                                                                                                                                                                   | 0xf14ff0aad9bc5e8e30c5d1aa3710aaa1c1cc1f47c2c256e7d9e73104cb17ccaf |
+| CHANNEL_STAKE_ASSIGNATION | 0x12121212121212121212121212121212121212121212121212121212121212120113000000000000000000000000000000000000000000000000000000000000000114000000000000001500000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0x24ddc60397c5db6e5b2fb3b70cf43d1ccf227439dc674800562f93dbaacf63bc |
+| CHANNEL_STAKE_TRANSFER    | 0x16161616161616161616161616161616161616161616161616161616161616160117000000000000000000000000000000000000000000000000000000000000000118000000000000001900000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0xd24cab050a768f05a815155adf3f80b174265bbcc0b1eb24882ae54fdf208f52 |
+| `CHANNEL_WITHDRAW`        | 0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a011b00000000000000000000000000000000000000000000000000000000000000011c000000000000001d00000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0xab8a7effe4a40d13fed042160f02a3b245d96395e9f3a819be690e886bbf255f |
+| `SDP_DECLARE`             | 0x00010b00047f00000191020bb8cd03acdb0e29743f0ccb8686d0a104cb96e05abefec1538765e7595869f7dc8c49aa1f000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                               | 0xe7844053c60de1af200260223c605b946efd51b112a7abc8ac64649e04ab36ad |
+| `SDP_WITHDRAW`            | 0x212121212121212121212121212121212121212121212121212121212121212123000000000000002200000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                                                                                             | 0x836f872a35adef042fdf94fe9cb6b552f2304f58ec5a0de6bbc9585c4eb1b65c |
+| `SDP_ACTIVE`              | 0x2424242424242424242424242424242424242424242424242424242424242424250000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020303030303030303030303030303030303030303030303030303030303030303 | 0x153695d0f699c609cbb32f836a860fe21e6961fa302b2e28257a066a36e779ed |
+| `LEADER_CLAIM`            | 0x260000000000000000000000000000000000000000000000000000000000000027000000000000000000000000000000000000000000000000000000000000002800000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                                             | 0x22ba8b5a971686f71d2d0783e776a9c8bebb27370b0e29d48c5617ee878c3f44 |
 
 ### Mantle Transaction Hash
 
-| Transaction | Payload | Transaction Hash |
-| --- | --- | --- |
-| Empty transaction | 0x00 | 0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5 |
-| Transaction with one of each operation | 0x090002010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000264000000000000000a00000000000000000000000000000000000000000000000000000000000000c8000000000000000b00000000000000000000000000000000000000000000000000000000000000120101010101010101010101010101010101010101010101010101010101010101010300000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113020202020202020202020202020202020202020202020202020202020202020201f4010000000000000c0000000000000000000000000000000000000000000000000000000000000007000000302a000000000000000000000000000000000000000000000000000000000000002b000000000000000000000000000000000000000000000000000000000000002c0000000000000000000000000000000000000000000000000000000000000010030303030303030303030303030303030303030303030303030303030303030302008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c8139770ea87d175f56a35466c34c7ecccb8d8a91b4ee37a25df60f5b8fc9b3940a00000014000000020001000200320000000000000000000000000000000000000000000000000000000000000033000000000000000000000000000000000000000000000000000000000000001104040404040404040404040404040404040404040404040404040404040404040b00000068656c6c6f206c6f676f7300000000000000000000000000000000000000000000000000000000000000006e7a1cdd29b0b78fd13af4c5598feff4ef2a97166e3ca6f2e4fbfccd80505bf12000010b00047f00000191020bb8cd03ea4a6c63e29c520abef5507b132ec5f9954776aebebe7b92421eea691446d22c46000000000000000000000000000000000000000000000000000000000000004700000000000000000000000000000000000000000000000000000000000000210808080808080808080808080808080808080808080808080808080808080808030000000000000050000000000000000000000000000000000000000000000000000000000000002209090909090909090909090909090909090909090909090909090909090909090500000000000000ea00000001010a000000000000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020303030303030303030303030303030303030303030303030303030303030303 | 0x3483e7d424e4bc4fa65f8266a9d5553b253598503d58a95f06be697b1cfdd95a |
+| Transaction                            | Payload                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Transaction Hash                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| Empty transaction                      | 0x00                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5 |
+| Transaction with one of each operation | 0x0b00020100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002030000000000000004000000000000000000000000000000000000000000000000000000000000000500000000000000060000000000000000000000000000000000000000000000000000000000000010070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000001140000000000000015000000000000000000000000000000000000000000000000000000000000001416161616161616161616161616161616161616161616161616161616161616160117000000000000000000000000000000000000000000000000000000000000000118000000000000001900000000000000000000000000000000000000000000000000000000000000151a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a011b00000000000000000000000000000000000000000000000000000000000000011c000000000000001d000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd03acdb0e29743f0ccb8686d0a104cb96e05abefec1538765e7595869f7dc8c49aa1f00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000021212121212121212121212121212121212121212121212121212121212121212123000000000000002200000000000000000000000000000000000000000000000000000000000000222424242424242424242424242424242424242424242424242424242424242424250000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330260000000000000000000000000000000000000000000000000000000000000027000000000000000000000000000000000000000000000000000000000000002800000000000000000000000000000000000000000000000000000000000000 | 0xda4acf53cd9420254e8388a5b8f9fe07fad3e4df83858ecf96f70f9da722a875 |
