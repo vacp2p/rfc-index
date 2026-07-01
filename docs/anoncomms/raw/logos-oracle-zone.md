@@ -292,3 +292,29 @@ since no trust-minimized programmatic predicate for them exists.
 These are addressed economically rather than by slashing,
 through the franchise value of the reward stream above, the unbonding period below,
 and randomized selection, as discussed in [Security Considerations](#security-considerations).
+
+## Parameters
+
+The parameters below are drawn from values used by comparable oracle systems and adjusted for this design.
+Block-time and finality parameters are properties of the host chain and are listed for reference.
+
+| Parameter | Symbol | Default | Notes |
+| --- | --- | --- | --- |
+| Feed |  | `BTC/USDT` | Single feed, more added later. |
+| Quorum threshold | `N` | 50 | Valid observations required to attest a price for a round. |
+| Honest-majority assumption |  | `N/2 + 1` of the attesting set | Over the observations aggregated per attestation, not the total pool. |
+| Heartbeat / round cadence | `R_round` | 1 block (`~30 s`) | Defined in block-height terms; must be `>= T_block`. |
+| Aggregation function |  | median | Plain median of all signature- and membership-valid observations. |
+| Reward band | `D_reward` | 0.5%* | Tight band around the median for reward eligibility; `D_reward < D_slash`.  |
+| Hard validity bound | `D_slash` | 2.5%* | Wide sanity bound; a signed value outside it is a slashable out-of-bound fault.  |
+| Signature scheme | | BIP-340 Schnorr | `oracle_id` is the node's 32-byte x-only public key. |
+| Active oracle set size | `n` | 500* | Scarce, transferable seats (~10x `N`) so a random per-round subset resists majority capture; whitelist in v1. |
+| Stake requirement |  | fixed floor, greater of token amount or USD value* | Hybrid floor to resist token-price drawdown; magnitude set with tokenomics. |
+| Slash fraction (equivocation) |  | up to 100%* | Cryptographic proof, effectively zero false positives, so the highest tier is justified. |
+| Slash fraction (out-of-bound) |  | 5% cap* | Capped due to edge-case risk; MAY use a challenge window. |
+| Unbonding / cooldown period |  | 21 days* | Cosmos/Band anchor; must exceed fault-proving window plus deep-finality horizon. |
+| Reward settlement |  | per epoch, pull-based | Claim against a committed Merkle root|
+| Epoch length |  | 7 days* | Weekly settlement. |
+| Reward backing |  | fee-backed preferred* | Fees over pure emissions for sustainable franchise value. |
+| Host chain block time | `T_block` | 30 s | Logos default assumed here; verify against spec. |
+| Host chain finality depth | `k` | immutable bound (reference) | Worst-case bound; practical confirmation depth is much shallower. |
