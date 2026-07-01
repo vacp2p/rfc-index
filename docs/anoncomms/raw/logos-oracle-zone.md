@@ -23,13 +23,13 @@ and pushes it to consumers in the Logos ecosystem,
 in particular the Logos Execution Zone (LEZ).
 A set of `oracle nodes` fetch prices from external sources,
 sign and submit their attestation as inscriptions;
-a custom `indexer` logic deterministically verifies signatures, discards outliers,
-and computes an attested price as the median of valid observations once a quorum is reached.
+a custom `indexer` logic deterministically verifies signatures,
+and computes an attested price as the median once a quorum is reached.
 The attested price is delivered to LEZ over a regular PACT (Provable Atomic Cross-zone Transactions)
 write on a fixed cadence as PUSH method, so consumers always have a fresh value.
 
 The Oracle Zone deliberately holds no general-purpose execution environment.
-Therefore, economic security with oracle node staking and slashing, is therefore anchored in LEZ contracts
+Economic security with oracle node staking and slashing is therefore anchored in LEZ contracts
 and bridged to the Oracle Zone through PACT provided by the Logos stack.
 This RFC specifies the price-fetching format, the aggregation and attestation logic,
 the round/timing and push-delivery model, the incentivization bridge, and the parameters.
@@ -52,7 +52,7 @@ Separate Oracle Zone:
 Signature verification and aggregation run inside the dedicated zone's indexer logic;
 LEZ only consumes the final attested price.
 This raises the achievable signer count and update frequency,
-which directly improves both **liveness** (more submitters, faster rounds)
+which directly improves both **liveness** (more `oracle nodes`, faster rounds)
 and **price accuracy** (more independent sources feeding a robust median).
 
 The rationale for a separate zone is therefore performance.
@@ -93,7 +93,7 @@ signs and publishes it as an inscription.
 Each `oracle node` is identified by its public key as `oracle id`.
 - `indexer`: The interpretation layer of the Oracle zone.
 It subscribes to the ordered inscription stream, verifies each observation's signature,
-checks writer membership, discards outliers, and, once a quorum of valid observations exists,
+checks writer membership, and once a quorum exists,
 computes and writes the attested price to zone state.
 The indexer logic is deterministic and MAY be replicated for liveness.
 - `sequencer`: The interface through which an `oracle node`
@@ -109,11 +109,10 @@ General flow is as follows:
 computes a local observation and signs the observation.
 - Each `oracle node` publishes the signed observation as an inscription via its `sequencer` interface.
 The ordering layer via Bedrock totally orders and finalizes the inscriptions; no interpretation happens at this layer.
-- The `indexer` processes each finalized inscription for the current round:
-it deserializes the observation, verifies the signature, checks writer membership,
-and filters the observation against the running median.
-- When the number of valid observations in the current round reaches the predetermined quorum threshold `N`,
-the `indexer` computes then outputs the attested price as the median of all valid observations.
+- The `indexer` processes each finalized inscription for the current round.
+It deserializes the observation, verifies the signature, and checks writer membership.
+- When the number of observations in the current round reaches the predetermined quorum threshold `N`,
+the `indexer` computes then outputs the attested price as the median of all observations.
 - On each push round as heartbeats, the `indexer` repeats the progress.
 
 ## Price Fetching
@@ -163,9 +162,9 @@ Invalid signature observations MUST be discarded.
 3. **Check membership.** Confirm `oracle_id` is a member of the active oracle set
 by verifying a Merkle inclusion proof against the membership root held in LEZ.
 Observations from non-members MUST be discarded.
-4. **Compute median.** When the count of valid observations reaches the quorum threshold `N`,
-compute and output the `attested price` as the median of the `N` valid observations.
-The median structurally tolerates up to `N/2 - 1` adversarial values without moving outside the honest range.
+4. **Compute median.** Once the number of valid observations in the round reaches the quorum threshold `N`,
+compute and output the `attested price` as the median of all valid observations in the round, not only the first `N`.
+The median structurally tolerates up to half the observations being adversarial without moving outside the honest range.
 
 The attested price is specified as follows:
 
@@ -173,15 +172,22 @@ The attested price is specified as follows:
 syntax = "proto3";
 
 message AttestedPrice {
-  string feed_id          = 1;  // asset pair identifier; "BTC/USDT" in v1
+  string feed_id          = 1;  // asset pair identifier; "BTC/USDT"
   int64  price            = 2;  // attested median; real value = price * 10^(-decimals)
   int32  decimals         = 3;  // number of decimal places in `price`
-  uint32 valid_count      = 4;  // valid observations aggregated; packed once this reaches N
+  uint32 valid_count      = 4;  // observations aggregated; packed once this reaches N
   int64  attested_at      = 5;  // height/inscription index at which quorum was met
-  bytes confidence ;        // OPTIONAL: 1.4826 * median(|xᵢ - median|) over valid observations
+  bytes confidence        = 6 ; // OPTIONAL: 1.4826 * median(|xᵢ - median|) over observations
 
 }
 ```
+
+The indexer MAY also compute an optional `confidence` value
+that reports how tightly the observations cluster around the median.
+It is the median absolute deviation scaled to standard-deviation units, `1.4826 * median(|xᵢ - median|)`.
+A small value means the observations agree closely,
+a large value means they are dispersed.
+Consumers MAY use it to widen margins or pause when dispersion is high.
 
 ## Rounds and Timing
 
@@ -247,7 +253,7 @@ Reward accounting is computed in the Oracle Zone, since only the indexer knows w
 within-bound observations in the epoch.
 At each epoch boundary the indexer commits a reward table (e.g. a Merkle root of `oracle node` amounts)
 to a LEZ settlement contract in a single PACT message; this keeps reward traffic off the per-round path.
-The settlement contract does not run a scheduler. Oracle node claim against the committed root,
+The settlement contract does not run a scheduler. Oracle node claims against the committed root,
 so payout is pull-based and per-epoch rather than a per-block push, and the claimant pays their own settlement cost.
 
 Reward eligibility is assessed against a soft deviation band around the round's attested median.
@@ -258,7 +264,7 @@ so `oracle nodes` are not pushed to herd toward the median,
 while an ineligible observation earns nothing for that round but is not slashed.
 This soft band is distinct from, and much tighter than, the hard validity bound whose breach is a slashable out-of-bound fault.
 The band affects reward accounting only.
-The attested median is always the plain median of all signature- and membership-valid observations, unaffected by `D_reward`.
+The attested median is always the plain median of all signature and membership-observations, unaffected by `D_reward`.
 
 ### Slashing
 
@@ -275,7 +281,7 @@ this fault SHOULD carry the highest penalty, up to the full bonded stake.
 
 2. **Out-of-bound value.** A signed observation lies outside the hard validity bound `D_slash` for the round. 
 The signed value plus the round context is itself the proof. 
-`D_slash` is wider, absolute sanity bound checked during slashing,
+`D_slash` is absolute sanity bound checked during slashing,
 and it is much wider than the tight `D_reward` band used for reward eligibility (`D_reward < D_slash`),
 so that an honest node stays well inside it and a value outside it indicates malice or gross malfunction.
 Because bound-checking can still have edge cases (a stale reference or a genuine market dislocation may make an honest value appear out of bound),
@@ -283,7 +289,7 @@ this fault SHOULD carry a capped fraction rather than the full stake, and MAY be
 
 Slashed stake MAY be burnt or split between a bounty to the party that submitted the fault evidence,
 which funds a permissionless watchdog economy, and burn or treasury for the remainder.
-Liveness and non-participation are NOT slashed; missing submitters are tolerated by a sufficiently large active set,
+Liveness and non-participation are NOT slashed; missing `oracle nodes` are tolerated by a sufficiently large active set,
 and are handled through reward eligibility rather than penalties.
 Falling outside the `D_reward` band is likewise NOT a slashable fault;
 it only forfeits that round's reward.
@@ -301,14 +307,14 @@ Block-time and finality parameters are properties of the host chain and are list
 | Parameter | Symbol | Default | Notes |
 | --- | --- | --- | --- |
 | Feed |  | `BTC/USDT` | Single feed, more added later. |
-| Quorum threshold | `N` | 50 | Valid observations required to attest a price for a round. |
-| Honest-majority assumption |  | `N/2 + 1` of the attesting set | Over the observations aggregated per attestation, not the total pool. |
+| Quorum threshold | `N` | 50 | Minimum observations required to attest a price for a round. |
+| Honest-majority assumption |  | majority of the aggregated observations | Over the observations aggregated per attestation, not the total pool. |
 | Heartbeat / round cadence | `R_round` | 1 block (`~30 s`) | Defined in block-height terms; must be `>= T_block`. |
-| Aggregation function |  | median | Plain median of all signature- and membership-valid observations. |
+| Aggregation function |  | median | Plain median of all signature and membership-observations. |
 | Reward band | `D_reward` | 0.5%* | Tight band around the median for reward eligibility; `D_reward < D_slash`.  |
 | Hard validity bound | `D_slash` | 2.5%* | Wide sanity bound; a signed value outside it is a slashable out-of-bound fault.  |
 | Signature scheme | | BIP-340 Schnorr | `oracle_id` is the node's 32-byte x-only public key. |
-| Active oracle set size | `n` | 500* | Scarce, transferable seats (~10x `N`) so a random per-round subset resists majority capture; whitelist in v1. |
+| Active oracle set size | `AOS` | 500* | Scarce, transferable seats (~10x `N`) so a random per-round subset resists majority capture|
 | Stake requirement |  | fixed floor, greater of token amount or USD value* | Hybrid floor to resist token-price drawdown; magnitude set with tokenomics. |
 | Slash fraction (equivocation) |  | up to 100%* | Cryptographic proof, effectively zero false positives, so the highest tier is justified. |
 | Slash fraction (out-of-bound) |  | 5% cap* | Capped due to edge-case risk; MAY use a challenge window. |
@@ -326,19 +332,21 @@ One is liveness, meaning a fresh price is attested every round.
 The other is accuracy, meaning the attested price tracks the real market.
 Running as a separate zone serves both.
 It lifts the per-round signature-verification load off LEZ,
-so the zone can sustain a much higher signer count `N` than an LEZ-native design.
-A high `N` improves liveness, since quorum is reached even when many submitters are absent,
-and it improves accuracy, since more independent sources feed the median.
+so the zone can aggregate many more observations per round than an LEZ-native design.
+More observations per round improves liveness,
+since the quorum `N` is easily reached even when many `oracle nodes` are absent,
+and improves accuracy, since more independent observations feed the median.
 Accuracy is further backed by the median itself and by the slashing conditions in [Incentivization](#incentivization).
 The points below expand on the assumptions this relies on.
 
-1. **Quorum and honest majority.** The quorum `N` sets how many submitters must agree before a price is attested.
-A high `N` makes it unlikely that the whole set is malicious,
-since an attacker would need to control a majority of many independent submitters.
-Accuracy comes from source independence and the median,
-whose honest-majority assumption of `N/2 + 1` keeps the attested value within the honest range.
+1. **Quorum and honest majority.** The quorum `N` is the minimum number of valid observations needed before a price is attested.
+It is a floor, so every valid observation in the round is aggregated.
+The security assumption is that a majority of the aggregated observations are honest,
+which keeps the median within the honest range.
+A large active set makes it unlikely that a whole round is majority-malicious,
+since an attacker would need to control more than half of many independent observations.
 
-2. **Indexer liveness is not submitter liveness.** Replicating the indexer keeps the indexer layer live.
+2. **Indexer liveness is not oracle node liveness.** Replicating the indexer keeps the indexer layer live.
 It does not ensure that enough `oracle nodes` submit each round.
 `Oracle node` liveness is handled by keeping the active set large and by rewards,
 not by replication or by slashing non-participation.
