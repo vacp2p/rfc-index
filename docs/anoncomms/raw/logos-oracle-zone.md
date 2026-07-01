@@ -318,3 +318,67 @@ Block-time and finality parameters are properties of the host chain and are list
 | Reward backing |  | fee-backed preferred* | Fees over pure emissions for sustainable franchise value. |
 | Host chain block time | `T_block` | 30 s | Logos default assumed here; verify against spec. |
 | Host chain finality depth | `k` | immutable bound (reference) | Worst-case bound; practical confirmation depth is much shallower. |
+
+## Security Considerations
+
+Two properties matter most for a price oracle network.
+One is liveness, meaning a fresh price is attested every round.
+The other is accuracy, meaning the attested price tracks the real market.
+Running as a separate zone serves both.
+It lifts the per-round signature-verification load off LEZ,
+so the zone can sustain a much higher signer count `N` than an LEZ-native design.
+A high `N` improves liveness, since quorum is reached even when many submitters are absent,
+and it improves accuracy, since more independent sources feed the median.
+Accuracy is further backed by the median itself and by the slashing conditions in [Incentivization](#incentivization).
+The points below expand on the assumptions this relies on.
+
+1. **Quorum and honest majority.** The quorum `N` sets how many submitters must agree before a price is attested.
+A high `N` makes it unlikely that the whole set is malicious,
+since an attacker would need to control a majority of many independent submitters.
+Accuracy comes from source independence and the median,
+whose honest-majority assumption of `N/2 + 1` keeps the attested value within the honest range.
+
+2. **Indexer liveness is not submitter liveness.** Replicating the indexer keeps the indexer layer live.
+It does not ensure that enough `oracle nodes` submit each round.
+`Oracle node` liveness is handled by keeping the active set large and by rewards,
+not by replication or by slashing non-participation.
+
+3. **Cross-zone boundary.** Slashing crosses the PACT boundary.
+Its security therefore rests on the soundness of the fault evidence carried over PACT
+and on the correct verification of that evidence in LEZ, as defined by the PACT specification.
+
+## Future Work
+
+This section records design directions deferred beyond this version.
+
+- **Randomized attesting-set selection.** The current version RFC accepts observations
+in inscription order until quorum, which is adequate while the set is small and curated.
+As the set grows, an attacker holding many seats could place a majority into a round and bias the median.
+Randomly selecting each round's attesting set from the larger registered set removes this,
+since an attacker would then have to control a large fraction of the whole set rather than a bare majority.
+This future work also requires having shared randomness and specification of how it is used.
+
+- **Cooldown and unbonding period.** The unbonding period must be long enough
+that stake stays locked until any fault can be detected, proven, and settled in LEZ,
+plus the Logos Blockchain deep-finality margin.
+The exact duration is left to tokenomics and should be set well above the deep-finality bound.
+The LEZ contracts that hold stake and enforce the cooldown and unbonding are also left to be specified,
+since current version of RFC covers only the Oracle Zone side.
+
+- **Volatility handling.** In fast markets, honest prices spread out.
+A fixed `D_reward` band can then mark many honest observations ineligible for reward exactly
+when fresh prices matter most.
+A mechanism to widen the band or grow the attesting set during high volatility is left to future work.
+
+- **Slash proof submission.** The slashing flow is not yet specified formally.
+Who submits the fault evidence is one, and this is an open watcher role paid by the bounty.
+What the evidence holds is another.
+For equivocation it is the two conflicting signed observations.
+For an out-of-bound value it is the signed observation plus the round's attested price.
+How the LEZ contract checks the evidence is open.
+The challenge window for out-of-bound faults is open too.
+An oracle node or watcher always starts it by sending evidence to the LEZ contract.
+
+- **Incentivization parameters.** The concrete values for the stake requirement, the two slash fractions,
+the reward rate and backing, the epoch length, and the unbonding duration are left to tokenomics.
+They should be sized against the value secured so that the economic-security conditions above hold.
