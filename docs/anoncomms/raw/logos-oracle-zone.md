@@ -29,7 +29,7 @@ The attested price is delivered to LEZ over a regular PACT (Provable Atomic Cros
 write on a fixed cadence as PUSH method, so consumers always have a fresh value.
 
 The Oracle Zone deliberately holds no general-purpose execution environment.
-Therefore, economic security with operator staking and slashing, is therefore anchored in LEZ contracts
+Therefore, economic security with oracle node staking and slashing, is therefore anchored in LEZ contracts
 and bridged to the Oracle Zone through PACT provided by the Logos stack.
 This RFC specifies the price-fetching format, the aggregation and attestation logic,
 the round/timing and push-delivery model, the incentivization bridge, and the parameters.
@@ -203,7 +203,7 @@ With the default `T_block = 30 s`, the default heartbeat is one block (approxima
 ## Oracle Set Membership
 
 Membership of the active oracle set determines which `oracle id`s submit observations that the indexer will accept.
-Membership is also the basis of incentivization, to join, an operator MUST bond stake in a LEZ contract
+Membership is also the basis of incentivization, to join, an `oracle node` MUST bond stake in a LEZ contract
 and register itself in the membership tree held in LEZ.
 Registration is a LEZ-only operation and does not require a cross-zone write into the Oracle Zone.
 
@@ -232,3 +232,30 @@ This is high-frequency.
 - **Economic-security PACT (slash).** Slashing enforcement is bridged to LEZ.
 This is low-frequency, a slash fires only on an established fault,
 so the cross-zone cost is incurred only on those events.
+
+### Rewards and Revenue
+
+`oracle nodes` earn from serving the feed, and this reward stream is not just compensation but a security primitive.
+An `oracle node`'s admission right (see [Oracle Set Membership](#oracle-set-membership)) is a scarce,
+income-producing, transferable seat whose market value approximates the net present value of its future reward stream.
+This franchise value raises the cost of acquiring a median-controlling set and
+makes misbehavior economically self-defeating, since a fault forfeits that future income.
+For this to hold, rewards SHOULD be fee-backed (funded by consumers of the feed) rather than pure emissions,
+so that the seat's value reflects real, sustainable income rather than speculation.
+
+Reward accounting is computed in the Oracle Zone, since only the indexer knows which `oracle nodes` submitted valid,
+within-bound observations in the epoch.
+At each epoch boundary the indexer commits a reward table (e.g. a Merkle root of `oracle node` amounts)
+to a LEZ settlement contract in a single PACT message; this keeps reward traffic off the per-round path.
+The settlement contract does not run a scheduler. Oracle node claim against the committed root,
+so payout is pull-based and per-epoch rather than a per-block push, and the claimant pays their own settlement cost.
+
+Reward eligibility is assessed against a soft deviation band around the round's attested median.
+The indexer marks each observation as reward-eligible if it lies
+within a small deviation `D_reward` of the attested median, and reward-ineligible otherwise.
+An eligible observation earns a full, equal share regardless of its exact distance from the median (validity, not proximity),
+so `oracle nodes` are not pushed to herd toward the median,
+while an ineligible observation earns nothing for that round but is not slashed.
+This soft band is distinct from, and much tighter than, the hard validity bound whose breach is a slashable out-of-bound fault.
+The band affects reward accounting only.
+The attested median is always the plain median of all signature- and membership-valid observations, unaffected by `D_reward`.
