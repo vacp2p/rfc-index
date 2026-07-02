@@ -30,6 +30,7 @@
 | 1.3.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md). | 2026-04-02 |
 | 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
 | 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md). | 2026-05-06 |
+| 1.5.1 | Required checked arithmetic for all token value, balance, gas, and fee computations. | 2026-07-02 |
 
 # Introduction
 
@@ -104,25 +105,46 @@ mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
 
   `mantle_txhash` is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod $`p`$ (via `FiniteField(..., modulus=p)`). Since $`p \approx 2^{254}`$, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around $`2^{-254}`$, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over $`F_p`$.
 
+## Arithmetic
+
+All arithmetic in this specification is checked. Every addition, subtraction, and multiplication over token values, balances, gas amounts, and fees is performed on the stated integer type, and a Mantle Transaction is invalid if any intermediate or final result cannot be represented in that type; results must never silently wrap around or saturate. Token value computations use the `u64` precision of `TokenValue` (see the [Notes](#notes) section). The transaction balance uses a signed 128-bit integer: it can be legitimately negative before the fee check, and sums of valid note values can exceed $`2^{64}-1`$ even when every individual value fits in a `u64`.
+
+The pseudocode expresses these checks with the following helpers; a failed check makes the Mantle Transaction invalid:
+
+```python
+U64_MAX = 2**64 - 1
+I128_MIN = -2**127
+I128_MAX = 2**127 - 1
+
+def checked_u64(value: int) -> TokenValue:
+        assert 0 <= value <= U64_MAX
+        return value
+
+def checked_i128(value: int) -> int:
+        assert I128_MIN <= value <= I128_MAX
+        return value
+```
+
 ## Mantle Transaction Fee
 
-The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_base_fee`, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[1.0.0] Execution Market](execution-market.md) and [[1.0.0] Storage Markets](storage-markets.md).
+The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_base_fee`, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[1.0.0] Execution Market](execution-market.md) and [[1.0.0] Storage Markets](storage-markets.md). The fee is computed with checked `u64` arithmetic: a transaction whose fee computation overflows is invalid (see [Arithmetic](#arithmetic)).
 
 ```python
 def mandatory_fees(signed_tx: SignedMantleTx,
                                      permanent_storage_gas_price: TokenValue, # Given by Storage Market
-                                     execution_gas_base_price: TokenValue) -> int:  # Given by Execution Market
+                                     execution_gas_base_price: TokenValue) -> TokenValue:  # Given by Execution Market
         mantle_tx = signed_tx.tx
-        permanent_storage_fees = len(encode(signed_mantle_tx)) * permanent_storage_gas_price
+        permanent_storage_fees = checked_u64(
+                len(encode(signed_mantle_tx)) * permanent_storage_gas_price)
         tx_execution_gas = 0
 
         for op in mantle_tx.ops:
                 # Compute how much execution gas of this operation as defined
                 # in the gas determination Appendix
-                tx_execution_gas += execution_gas(op)
-        execution_base_fees = tx_execution_gas * execution_gas_base_price
+                tx_execution_gas = checked_u64(tx_execution_gas + execution_gas(op))
+        execution_base_fees = checked_u64(tx_execution_gas * execution_gas_base_price)
 
-        return execution_base_fees + permanent_storage_fees
+        return checked_u64(execution_base_fees + permanent_storage_fees)
 ```
 
 If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.
@@ -160,20 +182,20 @@ def validate_mantle_op(txhash, opcode, payload, op_proof):
 
 3. The Mantle Transaction excess balance pays least the mandatory fees.
 ```python
-tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
+tx_mandatory_fee = mandatory_gas_fees(signed_tx)
 tx_balance = get_transaction_balance(signed_tx)
 assert tx_mandatory_fee <= tx_balance
-tx_execution_tip = tx_balance - tx_mandatory_fee
+tx_execution_tip = checked_u64(tx_balance - tx_mandatory_fee)
 
 def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
-        balance = 0   # It's important to not use unsigned int here to avoid
-                                    # overflow vulnerabilities
+        balance = 0   # Signed 128-bit accumulator: the balance can be
+                                    # legitimately negative
         for op in signed_tx.tx.ops:
                 if op.opcode == TRANSFER:
                         for inp in op.inputs:
-                                balance += get_value_from_note_id(inp)
+                                balance = checked_i128(balance + get_value_from_note_id(inp))
                         for out in op.outputs:
-                                balance -= out.value
+                                balance = checked_i128(balance - out.value)
         return balance
 ```
 
@@ -644,7 +666,8 @@ ledger.execute_spending(deposit.inputs)
   2. Increase the balance of the channel
 ```python
 for inp in deposit.inputs:
-        channels[deposit.channel].balance += inp.value
+        channels[deposit.channel].balance = checked_u64(
+                channels[deposit.channel].balance + inp.value)
 ```
 
 **Example**
@@ -735,7 +758,9 @@ assert channels[withdrawal.channel].withdrawal_nonce == withdrawal.withdrawal_no
 
   4. Check that the channel has enough funds
 ```python
-withdrawal_amount = sum(output.value for output in withdrawal.outputs)
+withdrawal_amount = 0
+for output in withdrawal.outputs:
+        withdrawal_amount = checked_u64(withdrawal_amount + output.value)
 assert channels[withdrawal.channel].balance >= withdrawal_amount
 ```
 
@@ -775,7 +800,8 @@ ledger: Ledger
   1. Decrease the balance of the Channel
 ```python
 for output in withdrawal.outputs:
-        channels[withdrawal.channel].balance -= output.value
+        channels[withdrawal.channel].balance = checked_u64(
+                channels[withdrawal.channel].balance - output.value)
 ```
 
   2. Add outputs to the ledger.
