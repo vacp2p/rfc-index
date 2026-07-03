@@ -23,7 +23,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
 
-> Disclamer:
+> Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
 >
 > All information regarding project details, token design, distribution mechanisms, technical parameters, and any forward-looking statements is preliminary and subject to change without notice. No representations or warranties are made as to the completeness or accuracy of the information herein. 
@@ -151,7 +151,7 @@ Let us define the following variables:
 - $`A_t \in [0,1]`$ denotes the emission rate factor on a per year basis.
     - This implies that $`A_t \cdot I_{max} \cdot \Delta_t`$ denotes the emission within the time-step.
 - $`D_{i,t}`$ denotes the $i$-th key performance indicator at time $t$ (e.g., TVL, staked amount, active users).
-- $`R_\text{block}`$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [🔀\[1.0.0\] Execution Market](execution-market.md) and [🔀\[1.0.0\] Storage Markets](storage-markets.md) for how to compute $`R_{block}`$.
+- $`R_\text{block}`$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [Execution Market](execution-market.md) and [Storage Markets](storage-markets.md) for how to compute $`R_{block}`$.
 
 ## Parametrization
 
@@ -160,7 +160,7 @@ Let us define the following variables:
 | $`S_{tge}`$​ | Token supply at TGE | 10 billion LGO | N.A. |
 | $T$​ | The number of periods in the look-back window for the moving average. | $120$​ | As the system is expected to mint 1 block every 30 seconds, this look-back window defines that the minting averages the fees burned in the last hour. |
 | $`\alpha_a`$​ | Denotes the control responsiveness to KPI average metrics. | $1$​ | This parameter drives the token emission from the burn rate. It must be one-to-one. |
-| $`\alpha_d`$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [\[1.0.0\]\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
+| $`\alpha_d`$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
 | $`w_i`$​ | Denotes the weight of the $i$-th KPI in the normalized deviation from target | $1$​ | There's only one KPI of this type in our system. |
 | $`D_{0,target}`$​ | Denotes the target value for the first KPI based on stake. | 3 billion LOGOS | $30\%$ of the token supply. |
 | $`D_{1,target}`$​ | Denotes the target value for the second KPI based on fees. | $10$ billon LOGOS | In the context of this KPI, this value behaves as a normalizer |
@@ -169,7 +169,7 @@ Let us define the following variables:
 | $f$​ | The average number of block proposal within $`\Delta_{t}`$ units | $1$​ | The time step $`\Delta_t`$ was chosen so that $f$ equals to $1$. |
 | $`\Delta_t`$​ | Time step, the fraction of year in one time step (per e.g., epoch, block, or day) | $1/(365 \times 2880)$​ | The time step is 1 block every $30$ seconds; there are 2880 blocks of 30 seconds in a day. |
 
-The calibration of these parameters can be found in [🔀\[1.0.0\]\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md).
+The calibration of these parameters can be found in [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md).
 
 ## Block Rewards
 
@@ -207,19 +207,19 @@ where:
 
 ```python
 def block_rewards(
-        S_tge:float,
+    S_tge:float,
     emission_rate_factor:float,
     I_max:float,
     Delta_t:float,
     f:float,
     D_1_t: float
 ) -> float:
-"""
-            Calculate the rewards per block.
-            It implements equation (1).
-        """
+    """
+    Calculate the rewards per block.
+    It implements equation (1).
+    """
     emission_from_inflation = emission_rate_factor * I_max * S_tge * Delta_t / f
-    emission_from_rewards = (1. - emission_rate_fator) * R_block_cur
+    emission_from_rewards = (1. - emission_rate_factor) * R_block_cur
     return emission_from_inflation + emission_from_rewards
 ```
 
@@ -244,18 +244,18 @@ All terms are displayed in annualized form to ease comparison.
 
 ```python
 def calculate_emission_rate_factor(
-        alpha_dev:float,
+    alpha_dev:float,
     weighted_target_deviation: float,
-    alpha_avg:float
+    alpha_avg:float,
     weighted_avg: float,
     i_min: float = 0.0,
     i_max: float = 0.01
 ) -> float:
-"""It calculates the current emission rate factor"""
+    """It calculates the current emission rate factor"""
     emission_rate:float = alpha_dev * weighted_target_deviation + alpha_avg * weighted_avg + i_min
     emission_rate_factor:float = emission_rate / i_max
     emission_rate_factor = min(1.0, max(emission_rate_factor, 0.0))
-return emission_rate_factor
+    return emission_rate_factor
 ```
 
 ### KPI Deviation from Target
@@ -272,7 +272,7 @@ def weighted_deviation_from_target(
     kpi_weights: List[float],
     kpi_deviations: List[float]
 ) -> float:
-"""
+    """
     Calculate the normalized deviation (delta_t).
     Inputs:
     * kpi_weights: constant list of floats
@@ -280,10 +280,10 @@ def weighted_deviation_from_target(
     Returns:
     * a normalized annualized KPI in units of %.
     """
-assert len(kpi_weights) == len(kpi_deviations)
-    
+    assert len(kpi_weights) == len(kpi_deviations)
+
     weighted_target_deviation:float = 0.0
-for deviation, weight in zip(kpi_deviations, kpi_weights):
+    for deviation, weight in zip(kpi_deviations, kpi_weights):
         weighted_target_deviation += weight * deviation value
 
     return weighted_target_deviation
@@ -315,15 +315,15 @@ def weighted_average(
     kpi_weights: List[float],
     kpi_average: List[float]
 ) -> float:
-"""
+    """
     Calculate the weighted average metric (gamma_t)
     * kpi_weights: constant list of floats
     * kpi_average: for each KPI, it contains the results of "average_kpi"
     """
-assert len(kpi_weights) == len(kpi_deviations)
-    
+    assert len(kpi_weights) == len(kpi_deviations)
+
     weighted_avg:float = 0.0
-for avg, weight in zip(kpi_average, kpi_weights):
+    for avg, weight in zip(kpi_average, kpi_weights):
         weighted_avg += weight * avg
 
     return weighted_avg
@@ -474,26 +474,28 @@ $$
 
 So we propose a reference implementation that uses integers:
 
-```rust
-const A_SCALE: u128 = 120_000_000; // denominator of 1/(I_max * D1_target * Delta_t * T) 
-const INFLATION_NUM: u128 = 62_500; // numerator of I_max * S_TGE * DELTA_t / f
-const INFLATION_DEN: u128 = 657; // denominator of I_max * S_TGE * DELTA_t / f
-const FEE_AVG_NUM: u128 = 10_512; // numerator of 1/(I_max * D1_target * Delta_t * T) 
-const STAKE_TARGET: u128 = 3e9;
-fn block_reward(total_stake: u64, burned_fees_window: [u64; 120]) -> (u64, u64) {
-    let sum_fees: u128 = burned_fees_window.iter().map(|x| *x as u128).sum();
-    let last_burned_fee: u128 = *burned_fees_window.last().unwrap() as u128;
-    let a_num = STAKE_TARGET
-        .saturating_add(FEE_AVG_NUM.saturating_mul(sum_fees))
-        .saturating_sub(total_stake as u128)
-        .min(A_SCALE);
-    let reward_num =
-        INFLATION_NUM * a_num
-        + INFLATION_DEN * (A_SCALE - a_num) * last_burned_fee;
-    let reward_den = INFLATION_DEN * A_SCALE;
-    // 60% Blend, 40% leader, with truncation applied only once per share
-    let blend_reward = (reward_num * 6 / (reward_den * 10)) as u64;
-    let leader_reward = (reward_num * 4 / (reward_den * 10)) as u64;
-    (blend_reward, leader_reward)
-}
+```python
+A_SCALE = 120_000_000            # denominator of 1/(I_max * D1_target * Delta_t * T) 
+INFLATION_NUMERATOR = 62_500     # numerator of I_max * S_TGE * DELTA_t / f
+INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
+FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T) 
+STAKE_TARGET = int(3e9)
+
+def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int]:
+    sum_fees = sum(burned_fees_window)
+    last_burned_fee = burned_fees_window[-1]
+
+    a_numerator = min(
+        max(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, 0),
+        A_SCALE
+    )
+
+    reward_numerator = INFLATION_NUMERATOR * a_numerator
+									   + INFLATION_DENOMINATOR * (A_SCALE - a_num) * last_burned_fee
+    reward_denominator = INFLATION_DENOMINATOR * A_SCALE
+
+    blend_reward = reward_numerator * 6 // (reward_denominator * 10)
+    leader_reward = reward_numerator * 4 // (reward_denominator * 10)
+
+    return blend_reward, leader_reward
 ```

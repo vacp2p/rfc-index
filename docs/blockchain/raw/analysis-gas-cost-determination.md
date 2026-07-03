@@ -46,7 +46,7 @@ Our methodology involved measuring execution complexity and defining how gas is 
 
 ## Permanent Storage Gas
 
-Permanent Storage is paid directly for the entire signed Mantle Transaction. The Permanent Storage Gas price is derived from [🔀\[1.0.0\] Storage Markets](storage-markets.md) and is used to determine the Permanent Storage fee. 1 Permanent Storage Gas corresponds to 1 byte.
+Permanent Storage is paid directly for the entire signed Mantle Transaction. The Permanent Storage Gas price is derived from [Storage Markets](storage-markets.md) and is used to determine the Permanent Storage fee. 1 Permanent Storage Gas corresponds to 1 byte.
 
 ```python
 permanent_storage_fee = len(encode(tx_signed)) * permanent_storage_gas_price
@@ -54,7 +54,7 @@ permanent_storage_fee = len(encode(tx_signed)) * permanent_storage_gas_price
 
 ## Execution Gas
 
-Execution is a second general market that represents how costly an Operation is to execute. This cost can be fixed or variable based on the content of the Operation. The Execution Gas base price is derived from [🔀\[1.0.0\] Execution Market](execution-market.md) and each Operation defines its execution gas amount. 1 Execution Gas corresponds to 1,000 CPU cycles.
+Execution is a second general market that represents how costly an Operation is to execute. This cost can be fixed or variable based on the content of the Operation. The Execution Gas base price is derived from [Execution Market](execution-market.md) and each Operation defines its execution gas amount. 1 Execution Gas corresponds to 1,000 CPU cycles.
 
 ```python
 execution_base_fee = tx.ops.get_summed_gas() * execution_gas_base_price
