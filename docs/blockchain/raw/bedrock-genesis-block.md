@@ -92,7 +92,7 @@ SERVICE_DECLARATIONS = BLEND_DECLARATIONS
 
 Cryptarchia is initialized with the following parameters:
 
-- `genesis_time`: ISO 8601 encoded timestamp.
+- `genesis_time`: u32 unix timestamp (seconds since the Unix epoch).
   Cryptarchia uses slots as a measure of time offset from some start time. This timestamp must be agreed upon by all nodes in order to have a common clock.
 
 - `chain_id`: string.
@@ -106,25 +106,23 @@ These parameters are encoded in the Genesis block as an inscription sent to the 
 **Example**
 
 ```python
-from datetime import datetime
-
 CHAIN_ID = "logos-blockchain-mainnet"
-GENESIS_TIME = "2026-01-05T19:20:35+00:00"
+GENESIS_TIME = 1767640835  # 2026-01-05T19:20:35Z
 GENESIS_EPOCH_NONCE = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
 
 chain_id_enc = CHAIN_ID.encode("utf-8")
 chain_id_len = len(chain_id_enc).to_bytes(8, "little")
-genesis_time = int(datetime.fromisoformat(GENESIS_TIME).timestamp()).to_bytes(8, "little")
+genesis_time = GENESIS_TIME.to_bytes(4, "little")
 genesis_epoch_nonce = bytes.fromhex(GENESIS_EPOCH_NONCE)
 
 inscription = chain_id_len + chain_id_enc + genesis_time + genesis_epoch_nonce
 
 # >>> inscription.hex()
-# '0d000000000000006e6f6d6f732d6d61696e6e6574030f5c6900000000abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+# '18000000000000006c6f676f732d626c6f636b636861696e2d6d61696e6e6574030f5c69abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
 
 CRYPTARCHIA_INSCRIPTION = Inscribe(
     channel=bytes(32),
-    inscription=inscription
+    inscription=inscription,
     parent=bytes(32),
     signer=Ed25519PublicKey_ZERO,
 )
@@ -213,15 +211,21 @@ STAKE_DISTRIBUTION = Transfer(
 )
 
 # set Cryptarchia parameters
-CRYPTARCHIA_PARAMS = {
-    "chain_id": "logos-mainnet",
-    "genesis_time": "2026-01-05T19:20:35Z",
-    "genesis_epoch_nonce": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-}
+CHAIN_ID = "logos-blockchain-mainnet"
+GENESIS_TIME = 1767640835  # 2026-01-05T19:20:35Z
+GENESIS_EPOCH_NONCE = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+chain_id_enc = CHAIN_ID.encode("utf-8")
+inscription = (
+    len(chain_id_enc).to_bytes(8, "little")
+    + chain_id_enc
+    + GENESIS_TIME.to_bytes(4, "little")
+    + bytes.fromhex(GENESIS_EPOCH_NONCE)
+)
 
 CRYPTARCHIA_INSCRIPTION = Inscribe(
     channel=bytes(32),
-    inscription=json.dumps(CRYPTARCHIA_PARAMS).encode("utf-8"),
+    inscription=inscription,
     parent=bytes(32),
     signer=Ed25519PublicKey_ZERO,
 )
