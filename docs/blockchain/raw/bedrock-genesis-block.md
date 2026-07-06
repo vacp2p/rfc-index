@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-02-12 |
 | 1.1.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md) Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
-| 1.1.2 | Encode `genesis_time` as a u32 unix timestamp instead of an ISO 8601 datetime. | 2026-07-06 |
+| 1.1.2 | Encode `genesis_time` as a u32 unix timestamp instead of an ISO 8601 datetime. Encode the `chain_id` length prefix as a u8 instead of a u64. | 2026-07-06 |
 
 # Introduction
 
@@ -97,7 +97,7 @@ Cryptarchia is initialized with the following parameters:
   A unix timestamp is conventionally an `i64`; `genesis_time` is restricted to the `u32` range (0 to 2^32 - 1), which covers all plausible genesis dates (through February 2106).
   Cryptarchia uses slots as a measure of time offset from some start time. This timestamp must be agreed upon by all nodes in order to have a common clock.
 
-- `chain_id`: string.
+- `chain_id`: UTF-8 string, encoded with a u8 length prefix (at most 255 bytes).
   It is useful to differentiate testnets from mainnet. To avoid confusion, we place the chain ID in the Genesis block to guarantee that the networks are disjoint.
 
 - `genesis_epoch_nonce`: 32 bytes, hex encoded.
@@ -113,14 +113,14 @@ GENESIS_TIME = 1767640835  # 2026-01-05T19:20:35Z
 GENESIS_EPOCH_NONCE = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
 
 chain_id_enc = CHAIN_ID.encode("utf-8")
-chain_id_len = len(chain_id_enc).to_bytes(8, "little")
+chain_id_len = len(chain_id_enc).to_bytes(1, "little")
 genesis_time = GENESIS_TIME.to_bytes(4, "little")
 genesis_epoch_nonce = bytes.fromhex(GENESIS_EPOCH_NONCE)
 
 inscription = chain_id_len + chain_id_enc + genesis_time + genesis_epoch_nonce
 
 # >>> inscription.hex()
-# '18000000000000006c6f676f732d626c6f636b636861696e2d6d61696e6e6574030f5c69abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+# '186c6f676f732d626c6f636b636861696e2d6d61696e6e6574030f5c69abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
 
 CRYPTARCHIA_INSCRIPTION = Inscribe(
     channel=bytes(32),
@@ -219,7 +219,7 @@ GENESIS_EPOCH_NONCE = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef123
 
 chain_id_enc = CHAIN_ID.encode("utf-8")
 inscription = (
-    len(chain_id_enc).to_bytes(8, "little")
+    len(chain_id_enc).to_bytes(1, "little")
     + chain_id_enc
     + GENESIS_TIME.to_bytes(4, "little")
     + bytes.fromhex(GENESIS_EPOCH_NONCE)
