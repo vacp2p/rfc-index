@@ -26,7 +26,7 @@
 | 1.3.0 | [\[RFC\] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md). Updated project references to Logos Blockchain | N/A |
 | 1.4.0 | [\[RFC\] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md)​ | N/A |
 | 1.4.1 | [\[RFC\] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | N/A |
-| 1.5.0 | Introduce the two new Operations `CHANNEL_STAKE_ASSIGNATION` and `CHANNEL_STAKE_TRANSFER` and update of the channel operations to reflect changes in Mantle | 2026-06-24 |
+| 1.5.0 | Introduce the new Operation `CHANNEL_STAKE_ASSIGNATION` and update of the channel operations to reflect changes in Mantle | 2026-06-24 |
 
 # Introduction
 
@@ -69,7 +69,6 @@ CHANNEL_INSCRIBE_GAS          = 56
 CHANNEL_CONFIG_GAS            = 56 * configuration_threshold
 CHANNEL_DEPOSIT_GAS           = 590
 CHANNEL_STAKE_ASSIGNATION_GAS = 56 * stake_manipulation_threshold
-CHANNEL_STAKE_TRANSFER        = 590
 CHANNEL_WITHDRAW_GAS          = 56 * stake_manipulation_threshold
 SDP_DECLARE_GAS               = 646
 SDP_WITHDRAW_GAS              = 590
@@ -146,22 +145,6 @@ The execution require deriving note Id and adding notes to the ledger.
 Execution: ~56k CPU cycles * stake_manipulation_threshold.
 
 - Verification of `stake_manipulation_threshold` Ed25519Signatures: 56,000 cycles per signature.
-- Verification that the notes are in the ledger: negligible.
-- Verification that the notes are in the channel: negligible.
-- Removing of the note from the ledger: negligible.
-- Verification of the output validity: negligible.
-- Insertion of the note in the ledger: negligible.
-- Derivation of the note identifiers: negligible
-
-## Channel Stake Transfer
-
-The Execution Gas of the Channel Transfer Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof.
-The execution require consuming the channel notes, deriving note Id and adding new channel notes to the ledger.
-
-
-Execution: ~590k CPU cycles.
-
-- Verification of the ZK signature: 590,000 cycles.
 - Verification that the notes are in the ledger: negligible.
 - Verification that the notes are in the channel: negligible.
 - Removing of the note from the ledger: negligible.

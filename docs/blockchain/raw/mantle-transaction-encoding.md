@@ -27,7 +27,7 @@
 | 1.3.0 | [\[RFC\] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md) | 2026-04-24 |
 | 1.4.0 | [\[RFC\] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.4.1 | Removed mention of DA. Updated KeyCount from Byte to UINT16 to follow Mantle. | 2026-05-21 |
-| 1.5.0 | Introduce the two new Operations `CHANNEL_STAKE_ASSIGNATION` and `CHANNEL_STAKE_TRANSFER` and update of the channel operations to reflect changes in Mantle | 2026-06-24 |
+| 1.5.0 | Introduce the new Operation `CHANNEL_STAKE_ASSIGNATION` and update of the channel operations to reflect changes in Mantle | 2026-06-24 |
 
 # Introduction
 
@@ -66,9 +66,8 @@ OpPayload = Transfer /
             ChannelInscribe /
             ChannelConfig /
             ChannelDeposit /
-            ChannelStakeAssignation /
-            ChannelStakeTransfer /
             ChannelWithdraw /
+            ChannelStakeAssignation /
             SDPDeclare /
             SDPWithdraw /
             SDPActive /
@@ -94,8 +93,6 @@ InputCount        = Byte
 Metadata          = UINT32 *BYTE
 
 ChannelStakeAssignation = ChannelId Inputs Outputs
-
-ChannelStakeTransfer = ChannelId Inputs Outputs
 
 ChannelWithdraw   = ChannelId Inputs Outputs
 

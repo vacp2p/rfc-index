@@ -203,10 +203,9 @@ Mantle Validators execute sequentially each Operation in `ops` according to its 
 | CHANNEL_CONFIG            | 0x10          | Configure a channel                                                                           |
 | CHANNEL_INSCRIBE          | 0x11          | Write a message permanently onto Mantle.                                                      |
 | CHANNEL_DEPOSIT           | 0x12          | Deposit assets into a channel                                                                 |
-| CHANNEL_STAKE_ASSIGNATION | 0x13          | Assign Channel Notes that are under `ZkPublicKey = 0`                                         |
-| CHANNEL_STAKE_TRANSFER    | 0x14          | Transfer Channel Notes                                                                        |
-| CHANNEL_WITHDRAW          | 0x15          | Withdraw assets from a channel                                                                |
-| *RESERVED*                | *0x16 - 0x1F* |                                                                                               |
+| CHANNEL_WITHDRAW          | 0x13          | Withdraw assets from a channel                                                                |
+| CHANNEL_STAKE_ASSIGNATION | 0x14          | Assign Channel Notes to new `ZkPublicKey`                                                     |
+| *RESERVED*                | *0x15 - 0x1F* |                                                                                               |
 | SDP_DECLARE               | 0x20          | Declare intention to participate as a node in a Bedrock Service, locking funds as collateral. |
 | SDP_WITHDRAW              | 0x21          | Withdraw participation from a Bedrock Service, unlocking your funds in the process.           |
 | SDP_ACTIVE                | 0x22          | Signal that you are still an active participant of a Bedrock Service.                         |
@@ -296,7 +295,7 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 Channels represent their bridged funds as channel notes that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
 
-When funds are deposited through a `CHANNEL_DEPOSIT` operation, the funds are first materialized as a single channel note of the deposited amount under the `ZkPublicKey = 0`, so nobody can use them. These Channel Notes can be assigned to a different `ZkPublicKey` using a `CHANNEL_STAKE_ASSIGNATION` operation without ZkSignature verification. Later, the owner of the note can use this note to create a PoL or transfer it to a different `ZkPublicKey` through a `CHANNEL_STAKE_TRANSFER` operation but it cannot be used as a service stake. The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification. These funds can be spent by sequencers to cover withdraws in `CHANNEL_WITHDRAW` as well without `ZkSignature` verification.
+When funds are deposited through a `CHANNEL_DEPOSIT` operation, the funds are first materialized as a single channel note of the deposited amount under the same `ZkPublicKey` as the first note in the inputs. These Channel Notes can be assigned to different `ZkPublicKeys` using a `CHANNEL_STAKE_ASSIGNATION` operation without ZkSignature verification. Later, the owner of the note can use this note to create a PoL but it cannot be used as a service stake. The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification. These funds can be spent by sequencers to cover withdraws in `CHANNEL_WITHDRAW` as well without `ZkSignature` verification.
 
 ### CHANNEL_INSCRIBE
 
@@ -651,11 +650,18 @@ ledger.execute_spending([(note_id, None) for note_id in deposit.inputs])
 2. Create the channel note
 
 ```python
+# get the amount
 deposited_amount = 0
 for inp in deposit.inputs:
     deposited_amount += inp.value
+
+# get the ZkPublicKey
+first_input = ledger.get_note(deposit.inputs[0])
+key = first_input.public_key
+
+# create the deposit note
 deposit_id = derive_op_id(deposit)
-channel_note = Note(deposited_amount, 0)
+channel_note = Note(deposited_amount, key)
 ledger.execute_adding(deposit_id, [(channel_note, deposit.channel)])
 ```
 
@@ -687,273 +693,6 @@ signed_tx = SignedMantleTx(
 ```
 
 Note that the Zone may wait for the deposit to be finalized before interpreting the deposit in order to guarantee that the deposit will occur on-chain and won't be removed due to reorganization of the chain.
-
-### CHANNEL_STAKE_ASSIGNATION
-
-Assign funds from a channel to a `ZkPublicKey`. This funds are only usable to participate in PoS and to withdraw from the channel.
-
-#### Payload
-
-```python
-class ChannelStakeAssignation:
-    channel: ChannelId
-    inputs: list[NoteId]
-    outputs: list[Note]
-```
-
-#### Proof
-
-```python
-class ChannelStakeAssignationOpProof:
-    signatures: list[Ed25519Signature] # signature from stake_manipulation_threshold keys
-    indexes: list[int]    # signatures of accredited keys with their index.
-                          # indexes must be ordered from smallest to biggest without duplication
-```
-
-#### Execution Gas
-
-`CHANNEL_STAKE_ASSIGNATION` Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_STAKE_ASSIGNATURE_GAS * stake_manipulation_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
-
-#### Validation
-
-*Given*
-
-```python
-txhash: zkhash
-stake_assignation: ChannelStakeAssignation
-proof: ChannelStakeAssignationOpProof
-
-channels: dict[ChannelId, ChannelState]
-ledger: Ledger
-```
-
-*Validate*
-
-1. Check that the outputs are valid
-
-```python
-ledger.assert_valid_output(stake_assignation.outputs)
-```
-
-2. Check that the channel exists
-
-```python
-assert stake_assignation.channel in channels
-```
-
-3. Check that the inputs are valid and belongs to the channel
-
-```python
-ledger.assert_spendable([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
-```
-
-4. Check the balance
-
-```python
-input_amount = sum(ledger.get_note(input).value for input in stake_assignation.inputs)
-output_amount = sum(output.value for output in stake_assignation.outputs)
-assert input_amount >= output_amount
-```
-
-5. Check that there are enough signatures
-
-```python
-assert len(proof.signatures) == len(proof.indexes)
-assert len(proof.signatures) == channels[stake_assignation.channel].stake_manipulation_treshold
-```
-
-6. Check that every proof index is unique
-
-```python
-assert len(proof.indexes) == len(set(proof.indexes))
-```
-
-7. Check the signatures
-
-```python
-for sig, idx in zip(proof.signatures, proof.indexes):
-    assert Ed25519_verify(txhash,
-                          channels[withdrawal.channel].accredited_keys[idx],
-                          sig)
-```
-
-#### Execution
-
-*Given*
-
-```python
-stake_assignation: ChannelStakeAssignation
-
-channels: dict[ChannelId, ChannelState]
-ledger: Ledger
-```
-
-*Execute*
-
-1. Remove inputs from the ledger
-
-```python
-for input in stake_assignation.inputs:
-    ledger.execute_spending([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
-```
-
-2. Add outputs to the ledger.
-
-```python
-ledger.execute_adding(stake_assignation_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
-```
-
-#### Example
-
-Suppose the unique sequencer of Zone A wants to attribute 50 tokens to themself.
-
-```python
-# Sequencer encodes their assignation
-stake_assignation = ChannelStakeAssignation(
-    channel=ZONE_A,
-    inputs = [Note(pk=0, value=50)]
-    outputs = [Note(pk=alice, value=50)]
-)
-
-# Build the transfer operation to pay the fees
-transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
-
-tx = MantleTx(
-    ops=[Op(opcode=CHANNEL_STAKE_ASSIGNATION, payload=encode(stake_assignation)),
-         Op(opcode=TRANSFER, payload=encode(transfer)],
-)
-
-signed_tx = SignedMantleTx(
-    tx=tx,
-    op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
-                              transfer.prove(Sequencer_node_sk)],
-)
-```
-
-### CHANNEL_STAKE_TRANSFER
-
-Transfer funds from a channel internaly. It transfers the stake ownership to participate in PoS.
-
-#### Payload
-
-```python
-class ChannelStakeTransfer:
-    channel: ChannelId
-    inputs: list[NoteId]
-    outputs: list[Note]
-```
-
-#### Proof
-
-A `CHANNEL_STAKE_TRANSFER` proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
-
-```python
-ZkSignature
-```
-
-#### Execution Gas
-
-Channel Stake Transfer Operations have a fixed Execution Gas cost of `EXECUTION_CHANNEL_STAKE_TRANSFER_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values.
-
-### Validation
-
-*Given*
-
-```python
-mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
-stake_transfer: ChannelStakeTransfer
-stake_transfer_proof: ZkSignature
-
-ledger: Ledger
-```
-
-*Validate*
-
-1. Ensure the Transfer in non-empty
-
-```python
-assert len(stake_transfer.inputs) > 0
-```
-
-2. Ensure all inputs are spendable.
-
-```python
-ledger.assert_spendable([(note_id, stake_transfer.channel) for note_id in stake_transfer.inputs])
-```
-
-3. Validate transfer proof to show ownership over input notes.
-
-```python
-input_notes = [ledger[input_note_id] for input_note_id in stake_transfer.inputs]
-input_pks = [note.public_key for note in input_notes]
-assert ZkSignature_verify(mantle_txhash, stake_transfer_proof, input_pks)
-```
-
-4. Ensure outputs are valid.
-
-```python
-ledger.assert_valid_output(stake_transfer.output)
-```
-
-5. Ensure the Operation is balanced
-
-```python
-input_amount = sum(ledger.get_note(input).value for input in stake_transfer.inputs)
-output_amount = sum(output.value for output in stake_transfer.outputs)
-assert input_amount == output_amount
-```
-
-### Execution
-
-*Given*
-
-```python
-stake_transfer: ChannelStakeTransfer
-stake_transfer_proof: ZkSignature
-
-ledger: Ledger
-```
-
-*Execution*
-
-1. Remove inputs from the ledger.
-
-```python
-ledger.execute_spending([(note_id, stake_transfer.channel) for note_id in stake_transfer.inputs])
-```
-
-2. Add outputs to the ledger.
-
-```python
-stake_transfer_id = derive_operation_id(stake_transfer)
-ledger.execute_adding(stake_transfer_id, [(note_id, stake_transfer.channel) for note_id in stake_transfer.outputs])
-```
-
-#### Example
-
-Suppose one sequencer of Zone A wants to delegate the stake ownership of 50 tokens.
-
-```python
-# Sequencer encodes their stake transfer
-stake_transfer = ChannelStakeTransfer(
-    channel=ZONE_A,
-    inputs = [alice_note_id]
-    outputs = [Note(pk=bob, value=50)]
-)
-
-# Build the transfer operation to pay the fees
-transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
-
-tx = MantleTx(
-    ops=[Op(opcode=CHANNEL_STAKE_TRANSFER, payload=encode(stake_transfer)),
-         Op(opcode=TRANSFER, payload=encode(transfer)],
-)
-
-signed_tx = SignedMantleTx(
-    tx=tx,
-        op_proofs=[stake_transfer.prove(Alice_sk), transfer.prove(Sequencer_sk)],
-)
-```
 
 ### CHANNEL_WITHDRAW
 
@@ -1095,6 +834,149 @@ transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
     ops=[Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
+         Op(opcode=TRANSFER, payload=encode(transfer)],
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
+                              transfer.prove(Sequencer_node_sk)],
+)
+```
+
+### CHANNEL_STAKE_ASSIGNATION
+
+Assign funds from a channel to a new `ZkPublicKey`. This funds are only usable to participate in PoS and to withdraw from the channel.
+
+#### Payload
+
+```python
+class ChannelStakeAssignation:
+    channel: ChannelId
+    inputs: list[NoteId]
+    outputs: list[Note]
+```
+
+#### Proof
+
+```python
+class ChannelStakeAssignationOpProof:
+    signatures: list[Ed25519Signature] # signature from stake_manipulation_threshold keys
+    indexes: list[int]    # signatures of accredited keys with their index.
+                          # indexes must be ordered from smallest to biggest without duplication
+```
+
+#### Execution Gas
+
+`CHANNEL_STAKE_ASSIGNATION` Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_STAKE_ASSIGNATURE_GAS * stake_manipulation_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+
+#### Validation
+
+*Given*
+
+```python
+txhash: zkhash
+stake_assignation: ChannelStakeAssignation
+proof: ChannelStakeAssignationOpProof
+
+channels: dict[ChannelId, ChannelState]
+ledger: Ledger
+```
+
+*Validate*
+
+1. Check that the outputs are valid
+
+```python
+ledger.assert_valid_output(stake_assignation.outputs)
+```
+
+2. Check that the channel exists
+
+```python
+assert stake_assignation.channel in channels
+```
+
+3. Check that the inputs are valid and belongs to the channel
+
+```python
+ledger.assert_spendable([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
+```
+
+4. Check the balance
+
+```python
+input_amount = sum(ledger.get_note(input).value for input in stake_assignation.inputs)
+output_amount = sum(output.value for output in stake_assignation.outputs)
+assert input_amount >= output_amount
+```
+
+5. Check that there are enough signatures
+
+```python
+assert len(proof.signatures) == len(proof.indexes)
+assert len(proof.signatures) == channels[stake_assignation.channel].stake_manipulation_treshold
+```
+
+6. Check that every proof index is unique
+
+```python
+assert len(proof.indexes) == len(set(proof.indexes))
+```
+
+7. Check the signatures
+
+```python
+for sig, idx in zip(proof.signatures, proof.indexes):
+    assert Ed25519_verify(txhash,
+                          channels[withdrawal.channel].accredited_keys[idx],
+                          sig)
+```
+
+#### Execution
+
+*Given*
+
+```python
+stake_assignation: ChannelStakeAssignation
+
+channels: dict[ChannelId, ChannelState]
+ledger: Ledger
+```
+
+*Execute*
+
+1. Remove inputs from the ledger
+
+```python
+for input in stake_assignation.inputs:
+    ledger.execute_spending([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
+```
+
+2. Add outputs to the ledger.
+
+```python
+stake_assignation_id = derive_op_id(stake_assignation)
+ledger.execute_adding(stake_assignation_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
+```
+
+#### Example
+
+Suppose the unique sequencer of Zone A wants to attribute 50 tokens to themself.
+
+```python
+# Sequencer encodes their assignation
+stake_assignation = ChannelStakeAssignation(
+    channel=ZONE_A,
+    inputs = [Note(pk=0, value=50)]
+    outputs = [Note(pk=alice, value=50)]
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
+
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_STAKE_ASSIGNATION, payload=encode(stake_assignation)),
          Op(opcode=TRANSFER, payload=encode(transfer)],
 )
 
@@ -1909,9 +1791,8 @@ From the [[1.4.1][Analysis] Gas Cost Determination](analysis-gas-cost-determinat
 | EXECUTION_CHANNEL_INSCRIBE_GAS          | 56    |
 | EXECUTION_CHANNEL_CONFIG_GAS            | 56    |
 | EXECUTION_CHANNEL_DEPOSIT_GAS           | 590   |
-| EXECUTION_CHANNEL_STAKE_ASSIGNATION_GAS | 56    |
-| EXECUTION_CHANNEL_STAKE_TRANSFER_GAS    | 590   |
 | EXECUTION_CHANNEL_WITHDRAW_GAS          | 56    |
+| EXECUTION_CHANNEL_STAKE_ASSIGNATION_GAS | 56    |
 | EXECUTION_SDP_DECLARE_GAS               | 646   |
 | EXECUTION_SDP_WITHDRAW_GAS              | 590   |
 | EXECUTION_SDP_ACTIVE_GAS                | 590   |
@@ -2050,9 +1931,8 @@ To see what the payloads represent, refer to [[1.4.1] Mantle Transaction Encodin
 | `CHANNEL_CONFIG`          | 0x070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00                                                                                                                                                                                                                                                                                                                                 | 0x0cf0dd115eadfc303eeb4c103a7d2faba3cf3a25b549da79c30857fb9eebc0cb |
 | `CHANNEL_INSCRIBE`        | 0x0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c                                                                                                                                                                                                                                                                                                                               | 0xfb9af7fb1384fff51780ec8c5afbcba76449ab7603484f797df3a472e48826c1 |
 | `CHANNEL_DEPOSIT`         | 0x1010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461                                                                                                                                                                                                                                                                                                                                                                                   | 0xf14ff0aad9bc5e8e30c5d1aa3710aaa1c1cc1f47c2c256e7d9e73104cb17ccaf |
-| CHANNEL_STAKE_ASSIGNATION | 0x12121212121212121212121212121212121212121212121212121212121212120113000000000000000000000000000000000000000000000000000000000000000114000000000000001500000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0x24ddc60397c5db6e5b2fb3b70cf43d1ccf227439dc674800562f93dbaacf63bc |
-| CHANNEL_STAKE_TRANSFER    | 0x16161616161616161616161616161616161616161616161616161616161616160117000000000000000000000000000000000000000000000000000000000000000118000000000000001900000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0xd24cab050a768f05a815155adf3f80b174265bbcc0b1eb24882ae54fdf208f52 |
 | `CHANNEL_WITHDRAW`        | 0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a011b00000000000000000000000000000000000000000000000000000000000000011c000000000000001d00000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0xab8a7effe4a40d13fed042160f02a3b245d96395e9f3a819be690e886bbf255f |
+| CHANNEL_STAKE_ASSIGNATION | 0x12121212121212121212121212121212121212121212121212121212121212120113000000000000000000000000000000000000000000000000000000000000000114000000000000001500000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                         | 0x24ddc60397c5db6e5b2fb3b70cf43d1ccf227439dc674800562f93dbaacf63bc |
 | `SDP_DECLARE`             | 0x00010b00047f00000191020bb8cd03acdb0e29743f0ccb8686d0a104cb96e05abefec1538765e7595869f7dc8c49aa1f000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                               | 0xe7844053c60de1af200260223c605b946efd51b112a7abc8ac64649e04ab36ad |
 | `SDP_WITHDRAW`            | 0x212121212121212121212121212121212121212121212121212121212121212123000000000000002200000000000000000000000000000000000000000000000000000000000000                                                                                                                                                                                                                                                                                                                                                                                                             | 0x836f872a35adef042fdf94fe9cb6b552f2304f58ec5a0de6bbc9585c4eb1b65c |
 | `SDP_ACTIVE`              | 0x2424242424242424242424242424242424242424242424242424242424242424250000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020303030303030303030303030303030303030303030303030303030303030303 | 0x153695d0f699c609cbb32f836a860fe21e6961fa302b2e28257a066a36e779ed |
