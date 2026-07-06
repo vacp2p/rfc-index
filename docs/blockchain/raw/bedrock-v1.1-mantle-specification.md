@@ -800,8 +800,7 @@ for input in stake_assignation.inputs:
 2. Add outputs to the ledger.
 
 ```python
-stake_assignation_id = derive_op_id(stake_assignation)
-ledger.execute_adding(withdrawal_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
+ledger.execute_adding(stake_assignation_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
 ```
 
 #### Example
