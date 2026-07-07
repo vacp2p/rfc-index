@@ -125,7 +125,7 @@ Execution: ~56k CPU cycles.
 
 ## Channel Deposit
 
-The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof and for the check of the inputs and outputs.
+The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof and for the check of the inputs.
 
 Execution: ~590k CPU cycles.
 
@@ -137,10 +137,10 @@ Execution: ~590k CPU cycles.
 - Insertion of the note in the ledger: negligible.
 - Derivation of the note identifiers: negligible
 
-## Channel Stake Assignation
+## Channel Withdraw
 
-The validation process requires verifying multiple Eddsa25519 signatures, and managing the channel notes.
-The execution require deriving note Id and adding notes to the ledger.
+The validation process requires verifying multiple Eddsa25519 signatures.
+The execution require consuming the channel notes, deriving note Id and adding notes to the ledger.
 
 Execution: ~56k CPU cycles * stake_manipulation_threshold.
 
@@ -152,10 +152,10 @@ Execution: ~56k CPU cycles * stake_manipulation_threshold.
 - Insertion of the note in the ledger: negligible.
 - Derivation of the note identifiers: negligible
 
-## Channel Withdraw
+## Channel Stake Assignation
 
-The validation process requires verifying multiple Eddsa25519 signatures.
-The execution require consuming the channel notes, deriving note Id and adding notes to the ledger.
+The validation process requires verifying multiple Eddsa25519 signatures, and managing the channel notes.
+The execution require deriving note Id and adding notes to the ledger.
 
 Execution: ~56k CPU cycles * stake_manipulation_threshold.
 

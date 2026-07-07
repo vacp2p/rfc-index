@@ -302,7 +302,7 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 Channels represent their bridged funds as channel notes that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
 
-When funds are deposited through a `CHANNEL_DEPOSIT` operation, the funds are first materialized as a single channel note of the deposited amount under the same `ZkPublicKey` as the first note in the inputs. These Channel Notes can be assigned to different `ZkPublicKeys` using a `CHANNEL_STAKE_ASSIGNATION` operation without ZkSignature verification. Later, the owner of the note can use this note to create a PoL but it cannot be used as a service stake. The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification. These funds can be spent by sequencers to cover withdraws in `CHANNEL_WITHDRAW` as well without `ZkSignature` verification.
+When funds are deposited through a `CHANNEL_DEPOSIT` operation, the funds are first materialized as channels note of the same amount and `ZkPublicKey` as the notes in the inputs. These Channel Notes can be assigned to different `ZkPublicKeys` using a `CHANNEL_STAKE_ASSIGNATION` operation without ZkSignature verification. Later, the owner of the note can use this note to create a PoL but it cannot be used as a service stake. The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification. These funds can be spent by sequencers to cover withdraws in `CHANNEL_WITHDRAW` as well without `ZkSignature` verification.
 
 ### CHANNEL_INSCRIBE
 
@@ -648,21 +648,13 @@ ledger: Ledger
       ledger.execute_spending(deposit.inputs)
       ```
 
-  2. Create the channel note
+  2. Create the channel notes
       ```python
-      # get the amount
-      deposited_amount = 0
-      for inp in deposit.inputs:
-          deposited_amount += inp.value
-
-      # get the ZkPublicKey
-      first_input = ledger.get_note(deposit.inputs[0])
-      key = first_input.public_key
-
-      # create the deposit note
       deposit_id = derive_op_id(deposit)
-      channel_note = Note(deposited_amount, key)
-      ledger.execute_adding(deposit_id, [(channel_note, deposit.channel)])
+      channel_notes = []
+      for inp in deposit.inputs:
+          channel_notes.append(Note(inp.value, inp.key))
+      ledger.execute_adding(deposit_id, [(note, deposit.channel) for note in channel_notes])
       ```
 
 #### Example
@@ -751,11 +743,11 @@ ledger: Ledger
       ledger.assert_spendable([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
       ```
 
-  4. Check that the withdraw inputs cover the outputs
+  4. Check that the withdraw is balanced
       ```python
       input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
       output_amount = sum(output.value for output in withdrawal.outputs)
-      assert input_amount >= output_amount
+      assert input_amount == output_amount
       ```
 
   5. Check that there are enough signatures
@@ -797,18 +789,10 @@ ledger: Ledger
           ledger.execute_spending([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
       ```
 
-  2. Add outputs to the ledger by returning the exceeding balance to `ZkPublicKey = 0`.
+  2. Add outputs to the ledger.
       ```python
-      input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
-      output_amount = sum(output.value for output in withdrawal.outputs)
-      returned_amount = input_amount - output_amount
-
       withdrawal_id = derive_op_id(withdrawal)
-
-      pairs = [(note, None) for note in withdrawal.outputs]
-      if returned_amount != 0:
-          pairs.append((Note(returned_amount, 0), withdrawal.channel))
-      ledger.execute_adding(withdrawal_id, pairs)
+      ledger.execute_adding(withdrawal_id, [(note, None) for note in withdrawal.outputs])
       ```
 
 #### Example
@@ -902,7 +886,7 @@ ledger.assert_spendable([(note_id, stake_assignation.channel) for note_id in sta
 ```python
 input_amount = sum(ledger.get_note(input).value for input in stake_assignation.inputs)
 output_amount = sum(output.value for output in stake_assignation.outputs)
-assert input_amount >= output_amount
+assert input_amount == output_amount
 ```
 
 5. Check that there are enough signatures
@@ -1712,9 +1696,6 @@ A note is spendable if and only if it exists, it is not spent or locked. The fol
 ```python
 class Ledger:
     def assert_spendable(inputs: list[(NoteId, ChannelId | None)]):
-        # Check it's not empty
-        assert len(inputs) > 0
-        
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
