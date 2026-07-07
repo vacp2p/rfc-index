@@ -242,7 +242,7 @@ Every header carries an `epoch_state_root`. It commits the settled state produce
 The computation is deterministic, so every node derives the same root. Collections are committed in **leaf order** (the order they are kept in the ledger, not re-sorted). We use two kinds of commitment:
 
 - The note and voucher trees (`notes`, `C_LEAD`, `voucher_root`) reuse the existing depth-32 [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root); their current values are included as-is.
-- The other collections (`channels`, `locked_notes`, `declarations`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
+- The other collections (`channels`, `locked_notes`, active `declarations` in the [SDP registry](bedrock-service-declaration-protocol.md#snapshots), and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
 
 ```python
 def channel_hash(channel: ChannelState) -> hash:
