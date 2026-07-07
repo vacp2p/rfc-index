@@ -619,7 +619,7 @@ ledger: Ledger
 
   2. Ensure all inputs are spendable and not from a channel.
       ```python
-      ledger.assert_spendable([(note_id, None) for note_id in deposit.inputs])
+      ledger.assert_spendable(deposit.inputs)
       ```
 
   3. Validate ownership over deposited notes.
@@ -654,7 +654,7 @@ ledger: Ledger
       channel_notes = []
       for inp in deposit.inputs:
           channel_notes.append(Note(inp.value, inp.key))
-      ledger.execute_adding(deposit_id, [(note, deposit.channel) for note in channel_notes])
+      ledger.execute_adding(deposit_id, channel_notes, deposit.channel)
       ```
 
 #### Example
@@ -740,7 +740,7 @@ ledger: Ledger
 
   3. Check that the inputs are valid and belongs to the channel
       ```python
-      ledger.assert_spendable([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
+      ledger.assert_spendable(withdrawal.inputs, withdrawal.channel)
       ```
 
   4. Check that the withdraw is balanced
@@ -786,13 +786,13 @@ ledger: Ledger
   1. Remove inputs from the ledger.
       ```python
       for input in withdrawal.inputs:
-          ledger.execute_spending([(note_id, withdrawal.channel) for note_id in withdrawal.inputs])
+          ledger.execute_spending(withdrawal.inputs, withdrawal.channel)
       ```
 
   2. Add outputs to the ledger.
       ```python
       withdrawal_id = derive_op_id(withdrawal)
-      ledger.execute_adding(withdrawal_id, [(note, None) for note in withdrawal.outputs])
+      ledger.execute_adding(withdrawal_id, withdrawal.outputs)
       ```
 
 #### Example
@@ -878,7 +878,7 @@ assert stake_assignation.channel in channels
 3. Check that the inputs are valid and belongs to the channel
 
 ```python
-ledger.assert_spendable([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
+ledger.assert_spendable(stake_assignation.inputs, stake_assignation.channel)
 ```
 
 4. Check the balance
@@ -928,14 +928,14 @@ ledger: Ledger
 
 ```python
 for input in stake_assignation.inputs:
-    ledger.execute_spending([(note_id, stake_assignation.channel) for note_id in stake_assignation.inputs])
+    ledger.execute_spending(stake_assignation.inputs, stake_assignation.channel)
 ```
 
 2. Add outputs to the ledger.
 
 ```python
 stake_assignation_id = derive_op_id(stake_assignation)
-ledger.execute_adding(stake_assignation_id, [(note, stake_assignation.channel) for note in stake_assignation.outputs])
+ledger.execute_adding(stake_assignation_id, stake_assignation.outputs, stake_assignation.channel)
 ```
 
 #### Example
@@ -1492,7 +1492,7 @@ leader_reward: TokenValue     # The amount one leader can claim
           public_key = claim.public_key,
       )
       claim_id = derive_op_id(claim)
-      ledger.execute_adding(claim_id, [(note_id, None) for note_id in output_note])
+      ledger.execute_adding(claim_id, [output_note])
       ```
 
   3. Reduce the leader’s reward `leaders_rewards` value by the same amount (without ZK proof).
@@ -1578,7 +1578,7 @@ ledger: Ledger
 
   2. Ensure all inputs are spendable and not in a channel.
       ```python
-      ledger.assert_spendable([(note_id, None) for note_id in transfer.inputs])
+      ledger.assert_spendable(transfer.inputs])
       ```
 
   3. Validate transfer proof to show ownership over input notes.
@@ -1695,18 +1695,18 @@ A note is spendable if and only if it exists, it is not spent or locked. The fol
 
 ```python
 class Ledger:
-    def assert_spendable(inputs: list[(NoteId, ChannelId | None)]):
+    def assert_spendable(inputs: list[NoteId], channel_id: ChannelId | None):
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
-                # Check that each note is individualy not locked, for the correct channel and unspent
-                for (note_id, channel_id) in inputs:
-                        assert ledger.is_unspent(note_id)
-                        assert note_id not in locked_notes
-                        if channel_id is not None:
-                            assert ledger.channel_notes[note_id] == channel_id
-                        else:
-                            assert note_id not in ledger.channel_notes
+            # Check that each note is individualy not locked, for the correct channel and unspent
+            for note_id in inputs:
+                assert ledger.is_unspent(note_id)
+                assert note_id not in locked_notes
+                    if channel_id is not None:
+                        assert ledger.channel_notes[note_id] == channel_id
+                    else:
+                        assert note_id not in ledger.channel_notes
 ```
 
 ### Output Notes Validation
@@ -1727,8 +1727,8 @@ Consuming a set of notes removes them from the Ledger’s Merkle tree and recycl
 
 ```python
 class Ledger:
-    def execute_spending(inputs: list[(NoteId, ChannelId | None)]):
-        for (note_id, channel_id) in inputs:
+    def execute_spending(inputs: list[NoteId], channel_id: ChannelId | None):
+        for note_id in inputs:
             # updates the merkle tree to zero out the leaf for this entry
             # and adds that leaf index to the list of unused leaves
             ledger.remove(note_id)
@@ -1742,8 +1742,8 @@ Creating notes derives their `NoteId` from the Operation’s `OpId` and insert t
 
 ```python
 class Ledger:
-    def execute_adding(op_id: Hash, outputs: list[(Note, ChannelId | None)]):
-        for (output_index, (output_note, channel_id)) in enumerate(outputs):
+    def execute_adding(op_id: Hash, outputs: list[Note], channel_id: ChannelId | None):
+        for (output_index, output_note) in enumerate(outputs):
             output_note_id = derive_note_id(op_id, output_index, output_note)
             ledger.add(output_note_id)
             if channel_id is not None:
