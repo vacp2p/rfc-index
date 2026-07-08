@@ -280,8 +280,9 @@ def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     return h.digest()
 
 def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> hash:
+    # As specified in SDP declaration storage, declarations should already be indexed deterministically
     return [hash(b"DECLARATION_HASH_V1", declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
-            for declaration_id in declarations.sort()].root()
+            for declaration_id in declarations].root()
 
 def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
     h = Hasher()
