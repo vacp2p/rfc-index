@@ -302,7 +302,9 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 Channels represent their bridged funds as channel notes that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
 
-When funds are deposited through a `CHANNEL_DEPOSIT` operation, the funds are first materialized as channels note of the same amount and `ZkPublicKey` as the notes in the inputs. These Channel Notes can be assigned to different `ZkPublicKeys` using a `CHANNEL_STAKE_ASSIGNATION` operation without ZkSignature verification. Later, the owner of the note can use this note to create a PoL but it cannot be used as a service stake. The note can still be moved to a different `ZkPublicKey` by the sequencers using the `CHANNEL_STAKE_ASSIGNATION` operation without `ZkSignature` verification. These funds can be spent by sequencers to cover withdraws in `CHANNEL_WITHDRAW` as well without `ZkSignature` verification.
+When funds are deposited through a `CHANNEL_DEPOSIT` operation, the notes in the inputs are marked as channel notes. Ownership of a channel note always stays with the channel: the channel is recorded as the note's owner in the `channel_notes` set of the Ledger and keeps full control over it. The `ZkPublicKey` carried by a channel note does not transfer ownership; it only delegates the note's value, in the sense that the controller of that `ZkPublicKey` is the one allowed to use the note to create a PoL (the note can never be used as a service stake).
+
+Because ownership never leaves the channel, the sequencers can redelegate this value at any time by reassigning the note to a different `ZkPublicKey` with a `CHANNEL_STAKE_ASSIGNATION` operation, and can spend the note to cover withdraws in `CHANNEL_WITHDRAW`, both without `ZkSignature` verification.
 
 ### CHANNEL_INSCRIBE
 
