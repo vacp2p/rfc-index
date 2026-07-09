@@ -243,14 +243,14 @@ Every header carries an `epoch_state_root`. It commits the settled state produce
 The computation is deterministic, so every node derives the same root. Collections are committed in **leaf order** (the order they are kept in the ledger, not re-sorted). We use two kinds of commitment:
 
 - The note and voucher trees (`notes`, `C_LEAD`, `voucher_root`) reuse the existing depth-32 [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root); their current values are included as-is.
-- The other collections (`channels`, `locked_notes`, `declarations`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
+- The other collections (`channels`, `locked_notes`, `declarations`, `declarations_snapshot`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
 
-The `declarations` collection is the **mutable SDP registry**: declarations are inserted, activated, and removed as blocks are processed. It is the registry consulted when validating `SDP_DECLARE`, `SDP_WITHDRAW`, and `SDP_ACTIVE` operations, and it is what the chain needs in order to keep extending, so it is committed in full.
+The Epoch State Root commits **two SDP registries**:
 
-Validating the *activity proofs* carried by `SDP_ACTIVE` operations, and deciding whether a service has enough active providers to distribute its rewards, would in principle require the immutable SDP snapshot frozen at the start of the epoch. Committing that entire snapshot is unnecessary. For the Blend service it suffices to commit, from the Blend registry snapshot taken at the **last block of 2 epochs before the checkpoint's epoch** (whose activity is being settled and rewarded at this epoch boundary):
+- The **mutable SDP registry** (`declarations`): declarations are inserted, activated, and removed as blocks are processed. It is the registry consulted when validating `SDP_DECLARE`, `SDP_WITHDRAW`, and `SDP_ACTIVE` operations, and it is what the chain needs in order to keep extending.
+- The **immutable SDP snapshot** (`declarations_snapshot`): the SDP registry as of the last block of the epoch **two epochs before** the current one (i.e. frozen at the start of the *previous* epoch), held unchanged for the whole epoch. It is the registry against which per-service settlement is performed at the [Epoch Boundary Settlement](#epoch-boundary-settlement): validating the *activity proofs* carried by `SDP_ACTIVE` operations, and paying those rewards to each provider's `zk_id`.
 
-- `blend_core_zkid_root` — the Merkle root over the `zk_id`s of the Blend core nodes in that snapshot, used to validate Blend activity proofs (Proof of Quota); and
-- `blend_active_core_count` — the number of active core nodes in that snapshot, used to decide whether the minimal network size is reached before distributing Blend service rewards, as defined in [[1.0.0] Blend Protocol](blend-protocol.md).
+  Note that the snapshot taken at the *start of the current epoch* is **not** committed separately: because the Epoch Boundary Settlement runs before executing the first block's transactions, the mutable `declarations` registry at that point still equals the state as of the last block of the previous epoch: so that snapshot would be identical to `declarations`. The snapshot that is genuinely needed is the one from a whole epoch earlier, which is the provider set the activity proofs settled this epoch were produced against.
 
 ```python
 def channel_hash(channel: ChannelState) -> hash:
@@ -311,10 +311,9 @@ def get_epoch_state_root(state) -> hash:
     h.update(state.aged_notes_root)                         # C_LEAD (Ledger Root)
     h.update(channels_root(state.channels))
     h.update(locked_notes_root(state.locked_notes))
-    h.update(declarations_root(state.declarations))        # mutable SDP registry
-    h.update(state.blend_core_zkid_root)                   # Blend core-node zk_id set, snapshot at last block of 2 epochs before checkpoint's epoch
-    h.update(state.blend_active_core_count.to_bytes(8))    # number of active core nodes in that snapshot
-    h.update(state.min_stake.stake_threshold.to_bytes(8))  # current minimum stake
+    h.update(declarations_root(state.declarations))          # mutable SDP registry
+    h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, as of last block of two epochs before
+    h.update(state.min_stake.stake_threshold.to_bytes(8))    # current minimum stake
     h.update(state.inactivity_period.to_bytes(8))          # current inactivity period
     h.update(state.voucher_root)                           # reward voucher tree
     h.update(state.voucher_nullifier_set.root())
