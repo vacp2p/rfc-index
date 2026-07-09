@@ -22,11 +22,11 @@
 
 # Revision History
 
-| **Version** | **Changes** | **Date**   |
-| --- | --- |------------|
-| 1.0.0 | Initial revision. | 2026-01-20 |
+| **Version** | **Changes**                                          | **Date**   |
+| --- |------------------------------------------------------|------------|
+| 1.0.0 | Initial revision.                                    | 2026-01-20 |
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
-| 1.0.2 | Added details for block root computation | 2026-06-24 |
+| 1.0.2 | Added test vectors for block root computation        | 2026-06-24 |
 
 # Introduction
 

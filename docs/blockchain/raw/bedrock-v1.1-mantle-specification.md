@@ -31,7 +31,7 @@
 | 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
 | 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md). | 2026-05-06 |
 | 1.6.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.7.0 | [RFC] Update channels to support proof of stake participation | 2026-07-06 |
+| 1.7.0 | [RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
 
 # Introduction
 
@@ -697,7 +697,7 @@ class ChannelWithdraw:
 
 ```python
 class ChannelWithdrawOpProof:
-    signatures: list[Ed25519Signature] # signature from stake_manipulation_threshold keys
+    signatures: list[Ed25519Signature] # exactly stake_manipulation_threshold signatures
     indexes: list[int]    # signatures of accredited keys with their index
                           # indexes must be ordered from smallest to
                           # biggest without duplication
@@ -940,7 +940,7 @@ Suppose the unique sequencer of Zone A wants to attribute 50 tokens to themself.
 # Sequencer encodes their assignation
 stake_assignation = ChannelStakeAssignation(
     channel=ZONE_A,
-    inputs = [Note(pk=0, value=50)]
+    inputs = [Channel_note_id]
     outputs = [Note(pk=alice, value=50)]
 )
 
@@ -1670,7 +1670,7 @@ Locked notes are special notes in Mantle that serve as collateral for Service De
 
 ### Channel Notes
 
-Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Locked Notes as they can’t be used to declare a service. Channel notes are excluded from services: they cannot be used as stake for service declaration. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.
+Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Locked Notes as they can’t be used to declare a service. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.
 
 The system maintains a `channel_notes` set in the Ledger tracking all active channel `NoteId` and their respective `ChannelId`.
 
@@ -1697,10 +1697,10 @@ class Ledger:
             for note_id in inputs:
                 assert ledger.is_unspent(note_id)
                 assert note_id not in locked_notes
-                    if channel_id is not None:
-                        assert ledger.channel_notes[note_id] == channel_id
-                    else:
-                        assert note_id not in ledger.channel_notes
+                if channel_id is not None:
+                    assert ledger.channel_notes[note_id] == channel_id
+                else:
+                    assert note_id not in ledger.channel_notes
 ```
 
 ### Output Notes Validation
