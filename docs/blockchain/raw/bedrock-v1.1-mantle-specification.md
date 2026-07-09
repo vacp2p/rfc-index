@@ -31,6 +31,7 @@
 | 1.4.0 | [[RFC] Enforce NoteId uniqueness](mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.md). | 2026-04-24 |
 | 1.5.0 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md). | 2026-05-06 |
 | 1.6.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.7.0 | Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys                   | 2026-06-25 |
 
 # Introduction
 
@@ -443,6 +444,8 @@ class ChannelConfig:
 
 **Proof**
 
+A Channel Config is authorized by a threshold of the channel's accredited keys using [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification).
+
 ```python
 class ChannelConfigOpProof:
     signatures: list[Ed25519Signature] # signatures from configuration_threshold
@@ -469,22 +472,22 @@ channels: dict[ChannelId, ChannelState]
   *Validate*
 
 ```python
-assert len(proof.signatures) == len(proof.indexes)
 assert config.configuration_threshold > 0
 assert config.withdraw_threshold > 0
 assert len(config.keys) > 0
 assert len(config.keys) < 2^16
+# The configuration threshold must be reachable with the accredited keys,
+# otherwise the channel would be locked out of any future reconfiguration
+assert config.configuration_threshold <= len(config.keys)
 
 if config.channel in channels:
     chan = channels[config.channel]
-    # Check there are enough signatures
-    assert len(proof.signatures) == chan.configuration_threshold
-    # Check that indexes are ordered to avoid duplication
-    for i in range(len(proof.indexes)-1):
-        assert proof.indexes[i] < proof.indexes[i+1]
-    for sig, idx in zip(proof.signatures, proof.indexes):
-        # and at the same time that chan.accredited_keys[idx] isn't out of bound
-        assert Ed25519_verify(txhash, chan.accredited_keys[idx], sig)
+    # Verify the configuration_threshold signatures (see Appendix)
+    MultiEd25519_verify(txhash,
+                        proof.signatures,
+                        proof.indexes,
+                        chan.accredited_keys,
+                        chan.configuration_threshold)
 ```
 
 **Execution**
@@ -694,6 +697,8 @@ class ChannelWithdraw:
 
 **Proof**
 
+A Channel Withdraw is authorized by a threshold of the channel's accredited keys using [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification).
+
 ```python
 class ChannelWithdrawOpProof:
     signatures: list[Ed25519Signature] # signature from withdraw_threshold keys
@@ -742,24 +747,13 @@ ledger: Ledger
       assert channels[withdrawal.channel].balance >= withdrawal_amount
       ```
 
-  5. Check that there are enough signatures
+  5. Check the signatures (see [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification))
       ```python
-      assert len(proof.signatures) == len(proof.indexes)
-      assert len(proof.signatures) == channels[withdrawal.channel].withdraw_threshold
-      ```
-
-  6. Check that every proof index is unique
-      ```python
-      assert len(proof.indexes) == len(set(proof.indexes))
-      ```
-
-  7. Check the signatures
-      ```python
-      for sig, idx in zip(proof.signatures, proof.indexes):
-          assert Ed25519_verify(
-              txhash,
-              channels[withdrawal.channel].accredited_keys[idx],
-              sig)
+      MultiEd25519_verify(txhash,
+                          proof.signatures,
+                          proof.indexes,
+                          channels[withdrawal.channel].accredited_keys,
+                          channels[withdrawal.channel].withdraw_threshold)
       ```
 
 **Execution**
@@ -1314,7 +1308,7 @@ voucher_nullifier_set: set[zkhash]
 proof: ProofOfClaim
 ```
 
-  Validate
+  *Validate*
 
 ```python
 assert claim.voucher_nf not in voucher_nullifier_set
@@ -1430,7 +1424,7 @@ ledger: Ledger
       ```
 
   2. Ensure all inputs are spendable.
-      ```text
+      ```python
       ledger.assert_spendable(transfer.inputs)
       ```
 
@@ -1442,7 +1436,7 @@ ledger: Ledger
       ```
 
   4. Ensure outputs are valid.
-      ```text
+      ```python
       ledger.assert_valid_output(transfer.output)
       ```
 
@@ -1654,6 +1648,46 @@ The material used for the benchmarks is the following:
 - Kernel    : 6.8.0-59-generic
 
 ![Diagram](bedrock-v1.1-mantle-specification/assets/477261aa-09df-8268-8845-8145f3f8d670.png)
+
+## Multiple Ed25519 Signatures Verification
+
+Several operations (e.g. [Channel Configuration](#channel-configuration) and
+[Channel Withdraw](#channel-withdraw)) authorize an action with a threshold of
+Ed25519 signatures produced by a list of accredited keys. Each signature comes
+with the index, in the accredited keys list, of the key that produced it. The
+verification is factored out in the following routine:
+
+*Given*
+
+```python
+msg: zkhash                        # the message being signed (the mantle txhash)
+signatures: list[Ed25519Signature]
+indexes: list[u16]                 # for each signature, the index in `keys` of
+                                   # the signing key
+keys: list[Ed25519PublicKey]       # the accredited keys
+threshold: u16                     # the number of required signatures
+```
+
+*Verify*
+
+```python
+def MultiEd25519_verify(msg, signatures, indexes, keys, threshold):
+    # There must be exactly one index per signature
+    assert len(signatures) == len(indexes)
+
+    # There must be exactly `threshold` signatures
+    assert len(signatures) == threshold
+
+    # Indexes must be ordered from smallest to biggest without duplication.
+    # Being strictly increasing rejects duplicates and, since `idx` is used to
+    # index `keys`, guarantees every index stays within bounds.
+    for i in range(len(indexes) - 1):
+        assert indexes[i] < indexes[i + 1]
+
+    # Each signature must be valid for the accredited key at its index
+    for sig, idx in zip(signatures, indexes):
+        assert Ed25519_verify(msg, keys[idx], sig)
+```
 
 ## Proof of Claim
 
