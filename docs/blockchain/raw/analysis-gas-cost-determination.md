@@ -132,10 +132,7 @@ Execution: ~590k CPU cycles.
 - Verification of the ZK signature: 590,000 cycles.
 - Verification that the notes are in the ledger: negligible.
 - Verification that the notes are unlocked: negligible.
-- Removing of the note from the ledger: negligible.
-- Verification of the output validity: negligible.
-- Insertion of the note in the ledger: negligible.
-- Derivation of the note identifiers: negligible
+- Marking of the notes as channel notes: negligible.
 
 ## Channel Withdraw
 

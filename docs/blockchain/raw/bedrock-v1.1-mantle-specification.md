@@ -582,13 +582,13 @@ Deposit funds to a channel.
 ```python
 class ChannelDeposit:
     channel: ChannelId
-    inputs: list[NoteId]  # the list of consumed note identifiers
+    inputs: list[NoteId]  # the notes to be marked as channel notes
     metadata: bytes
 ```
 
 #### Proof
 
-  A Channel Deposit proves the ownership of the consumed notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+  A Channel Deposit proves the ownership of the notes being marked as channel notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 ```python
 ZkSignature
@@ -619,7 +619,7 @@ ledger: Ledger
       assert deposit.channel in channels
       ```
 
-  2. Ensure all inputs are spendable and not from a channel.
+  2. Ensure all inputs are spendable and not already channel notes.
       ```python
       ledger.assert_spendable(deposit.inputs)
       ```
@@ -645,18 +645,10 @@ ledger: Ledger
 
   *Execute*
 
-  1. Remove inputs from the ledger.
+  1. Mark the inputs as channel notes owned by the channel. The notes are neither consumed nor re-created: they keep their `NoteId`, value and `ZkPublicKey`, and are simply registered in the `channel_notes` set.
       ```python
-      ledger.execute_spending(deposit.inputs)
-      ```
-
-  2. Create the channel notes
-      ```python
-      deposit_id = derive_op_id(deposit)
-      channel_notes = []
-      for inp in deposit.inputs:
-          channel_notes.append(Note(inp.value, inp.key))
-      ledger.execute_adding(deposit_id, channel_notes, deposit.channel)
+      for note_id in deposit.inputs:
+          ledger.channel_notes[note_id] = deposit.channel
       ```
 
 #### Example
