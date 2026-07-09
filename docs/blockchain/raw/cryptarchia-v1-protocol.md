@@ -231,7 +231,8 @@ The first block of an epoch triggers an atomic settlement that is applied **befo
 1. Derive the new epoch state $`(\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})`$ as defined in [Epoch State Pseudocode](#epoch-state-pseudocode).
 2. Append every reward voucher committed during the previous epoch to the reward voucher tree, as defined in [[1.0.0] Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
 3. Aggregate the previous epoch’s leader rewards into the leader reward pool `leaders_rewards`, as defined in [[1.0.0] Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
-4. Finalize the storage market for the elapsed epoch, updating the storage price and usage moving average and resetting the within-epoch usage tally, as defined in [Storage Markets](storage-markets.md).
+4. Distribute the previous epoch’s service rewards, inserting the reward notes directly into the ledger without Mantle validation, as defined in [[1.0.0] Service Reward Distribution Protocol](bedrock-service-reward-distribution.md).
+5. Finalize the storage market for the elapsed epoch, updating the storage price and usage moving average and resetting the within-epoch usage tally, as defined in [Storage Markets](storage-markets.md).
 
 The execution market base fee and its moving average evolve on every block and require no boundary action (see [Execution Market](execution-market.md)). The state resulting from this settlement is the *settled state* committed by the [Epoch State Root](#epoch-state-root).
 
@@ -243,6 +244,13 @@ The computation is deterministic, so every node derives the same root. Collectio
 
 - The note and voucher trees (`notes`, `C_LEAD`, `voucher_root`) reuse the existing depth-32 [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root); their current values are included as-is.
 - The other collections (`channels`, `locked_notes`, `declarations`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
+
+The `declarations` collection is the **mutable SDP registry**: declarations are inserted, activated, and removed as blocks are processed. It is the registry consulted when validating `SDP_DECLARE`, `SDP_WITHDRAW`, and `SDP_ACTIVE` operations, and it is what the chain needs in order to keep extending, so it is committed in full.
+
+Validating the *activity proofs* carried by `SDP_ACTIVE` operations, and deciding whether a service has enough active providers to distribute its rewards, would in principle require the immutable SDP snapshot frozen at the start of the epoch. Committing that entire snapshot is unnecessary. For the Blend service it suffices to commit, from the Blend registry snapshot taken at the **last block of 2 epochs before the checkpoint's epoch** (whose activity is being settled and rewarded at this epoch boundary):
+
+- `blend_core_zkid_root` — the Merkle root over the `zk_id`s of the Blend core nodes in that snapshot, used to validate Blend activity proofs (Proof of Quota); and
+- `blend_active_core_count` — the number of active core nodes in that snapshot, used to decide whether the minimal network size is reached before distributing Blend service rewards, as defined in [[1.0.0] Blend Protocol](blend-protocol.md).
 
 ```python
 def channel_hash(channel: ChannelState) -> hash:
@@ -303,7 +311,9 @@ def get_epoch_state_root(state) -> hash:
     h.update(state.aged_notes_root)                         # C_LEAD (Ledger Root)
     h.update(channels_root(state.channels))
     h.update(locked_notes_root(state.locked_notes))
-    h.update(declarations_root(state.declarations))
+    h.update(declarations_root(state.declarations))        # mutable SDP registry
+    h.update(state.blend_core_zkid_root)                   # Blend core-node zk_id set, snapshot at last block of 2 epochs before checkpoint's epoch
+    h.update(state.blend_active_core_count.to_bytes(8))    # number of active core nodes in that snapshot
     h.update(state.min_stake.stake_threshold.to_bytes(8))  # current minimum stake
     h.update(state.inactivity_period.to_bytes(8))          # current inactivity period
     h.update(state.voucher_root)                           # reward voucher tree
