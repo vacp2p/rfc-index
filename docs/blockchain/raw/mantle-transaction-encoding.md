@@ -30,7 +30,7 @@
 
 # Introduction
 
-This document specifies the canonical encoding of Mantle transactions (see [\[1.5.0\] Mantle - Mantle Transaction](bedrock-v1.1-mantle-specification.md)) and its sub-components. Transactions sent through the mempool and included in blocks use this encoding.
+This document specifies the canonical encoding of Mantle transactions (see [Mantle - Mantle Transaction](bedrock-v1.1-mantle-specification.md)) and its sub-components. Transactions sent through the mempool and included in blocks use this encoding.
 
 # Overview
 
