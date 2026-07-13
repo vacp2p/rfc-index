@@ -301,11 +301,26 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 ### Bridging
 
-Channels represent their bridged funds as channel notes that can only be used for PoL creation (see [Channel Notes](#channel-notes)).
+Channels let their bridged funds keep participating in Proof of Stake. When a user deposits funds into a channel, the deposited notes are not removed from the ledger and are not turned into inert collateral. They become channel notes that continue to count toward Proof of Stake and can still be used to create PoLs (see [Channel Notes](#channel-notes)). Two goals motivate this design:
 
-When funds are deposited through a `CHANNEL_DEPOSIT` operation, the notes in the inputs are marked as channel notes. Ownership of a channel note always stays with the channel: the channel is recorded as the note's owner in the `channel_notes` set of the Ledger and keeps full control over it. The `ZkPublicKey` carried by a channel note does not transfer ownership; it only delegates the note's value, in the sense that the controller of that `ZkPublicKey` is the one allowed to use the note to create a PoL (the note can never be used as a service stake).
+- **More PoS participation, stronger security.** Funds deposited into a channel would otherwise leave the staking set. Keeping them as channel notes means the capital backing the application layer also backs consensus security, so bridging does not shrink the stake that secures the chain.
+- **No split between security and application.** A user no longer has to choose between staking funds or using them in a channel. The same funds do both at once. They stay usable inside the channel while still earning Proof of Leadership rewards, so capital is never fragmented between the two.
 
-Because ownership never leaves the channel, the sequencers can redelegate this value at any time by reassigning the note to a different `ZkPublicKey` with a `CHANNEL_STAKE_ASSIGNATION` operation, and can spend the note to cover withdraws in `CHANNEL_WITHDRAW`, both without `ZkSignature` verification.
+**Ownership vs. staking power.** A `CHANNEL_DEPOSIT` separates the two rights that a normal note bundles together:
+
+- *Ownership* moves to the channel. The note is registered in the ledger's `channel_notes` set with the channel as its owner, and the channel keeps full control over it. The deposited notes are neither consumed nor re-created. They keep their `NoteId`, value and `ZkPublicKey`, and are simply re-registered as channel-owned. The channel is now the party responsible for the note.
+- *Staking power* stays with the `ZkPublicKey` carried by the note. That key does not confer ownership. It only delegates the note's value for PoL creation. Whoever controls the key is the one allowed to turn the note into a PoL and collect the resulting rewards. On deposit this key is still the depositor's, so the user keeps the PoS participation power they had before bridging.
+
+Because the channel owns the note but does not hold the delegated key, the note earns rewards for the key holder, never for the channel itself.
+
+**What each party can do.**
+
+| Party | Can | Cannot |
+|---|---|---|
+| Holder of the note's `ZkPublicKey` (by default, the depositor) | Use the note to create a PoL and earn its leader rewards | Spend the note, withdraw it, reassign it, or use it as service stake |
+| Channel sequencers (owner of the note) | Reassign the note to a different `ZkPublicKey` (`CHANNEL_STAKE_ASSIGNATION`) and spend it to fund withdrawals (`CHANNEL_WITHDRAW`), both without `ZkSignature` verification | Use the note as service stake, or earn PoL rewards without first assigning the note to their own key |
+
+This makes delegated staking explicit. Sequencers can assign a channel note to their own `ZkPublicKey` and earn the Proof of Leadership rewards it produces, but those rewards always follow the assigned key, so the channel earns nothing merely by owning the note. Conversely, ownership never leaving the channel is exactly what lets sequencers redelegate value or cover withdrawals at any time without a user signature.
 
 ### CHANNEL_INSCRIBE
 
