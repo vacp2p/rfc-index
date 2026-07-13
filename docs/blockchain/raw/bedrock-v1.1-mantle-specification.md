@@ -1693,10 +1693,11 @@ class Ledger:
             for note_id in inputs:
                 assert ledger.is_unspent(note_id)
                 assert note_id not in locked_notes
-                if channel_id is not None:
-                    assert ledger.channel_notes[note_id] == channel_id
+                if channel_id is None:
+                	assert note_id not in ledger.channel_notes
                 else:
-                    assert note_id not in ledger.channel_notes
+                	assert note_id in ledger.channel_notes
+                    assert ledger.channel_notes[note_id] == channel_id
 ```
 
 ### Output Notes Validation
