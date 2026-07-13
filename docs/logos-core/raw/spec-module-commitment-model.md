@@ -345,6 +345,12 @@ It participates in a module schema only when that schema explicitly references
 the corresponding common-schema definitions through the import/reference rules
 in this specification.
 
+The `logos_<module>_dispatch()` ABI symbol defined by LOGOS-MODULE-INTERFACE is
+also not included in the Logos canonical schema model.
+It is an ABI entrypoint for invoking schema-defined methods, not a schema
+declaration, method declaration, request declaration, response declaration, or
+event declaration.
+
 Primitive schema forms translate as follows:
 
 - `bool`, `tstr`, `bstr`, and the Logos prelude fixed-width integer
@@ -539,6 +545,13 @@ commitment-model revision.
 Method identity is computed under the existing `logos.schema.node` domain from
 the `schema-node-payload` of the method declaration.
 It is not a separate hash domain.
+
+ABI entrypoints that dispatch to schema-defined methods, including
+`logos_<module>_dispatch()`, do not have method identities in this commitment
+model.
+Commitments, verified views, audit material, authorization material, and
+conformance vectors identify the target schema method and the corresponding
+request or response value, not the dispatch entrypoint used to invoke it.
 
 Schema identity uses schema namespaces and qualified schema definition names,
 not runtime module names, socket names, C ABI symbol prefixes, or package and

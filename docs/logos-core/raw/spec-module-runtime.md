@@ -150,8 +150,8 @@ This revision names the following privileged runtime modules:
 
 - **Module Launcher** (`logos_module_launcher`):
   realizes module implementations for a runtime instance by launching or
-  supervising processes, sandboxes, containers, Bubblewrap instances, or other
-  host-specific execution forms.
+  supervising processes, sandboxed processes, containers, or other
+  host-specific execution forms selected by Module Launcher.
   It prepares local endpoints and returns launch descriptors to the runtime.
 - **Package Manager** (`logos_package_manager`):
   owns package, catalog, install, update, removal, dependency, and package
@@ -248,7 +248,7 @@ void* lib = dlopen("storage_module.so", RTLD_NOW | RTLD_LOCAL);
 typedef const char* (*schema_fn)(void);
 schema_fn get_schema = (schema_fn)dlsym(lib, "logos_storage_module_schema");
 
-/* ... etc for _name, _version, _init, _destroy, and per-method C symbols */
+/* ... etc for the remaining mandatory ABI symbols */
 ```
 
 If any required symbol is missing, the module MUST be rejected with a
@@ -287,8 +287,6 @@ This is static direct mode.
 
 Static direct mode MUST bind the same mandatory C symbols defined by
 LOGOS-MODULE-INTERFACE.
-This includes metadata, lifecycle, schema, module deallocation, and
-schema-derived per-method C symbols.
 If a module exposes optional well-known callback setters, static direct mode
 MUST make those setters available through the selected binding mechanism.
 
@@ -300,6 +298,8 @@ known function pointers to the runtime.
 
 Static direct mode MUST NOT define a second callee-side module interface.
 It is a binding mechanism for the mandatory C module interface.
+Direct/static callers MAY call schema-derived per-method C functions directly
+instead of routing through the generic dispatch entrypoint.
 
 Applications using static direct mode MUST make the module bindings available
 before `logos_runtime_start()`.
@@ -802,8 +802,8 @@ The module host:
 2. Calls lifecycle `_init()` (this revision passes no typed configuration)
 3. Binds the Unix domain socket
 4. Enters an event loop, reading CBOR requests from the socket, creating an
-   opaque `logos_call_context_t` for each invocation, invoking the corresponding
-   schema-derived C method, and writing responses
+   opaque `logos_call_context_t` for each invocation, invoking the module's
+   generic dispatch entrypoint, and writing responses
 
 In this process-backed local transport mode, the runtime communicates with the
 module host over LOGOS-MODULE-TRANSPORT, while the module host executes the
@@ -887,8 +887,8 @@ In local transport mode, the module host process runs an event loop that:
 
 - Accepts connections from multiple callers
 - Reads requests from all connections (via `poll`/`epoll`/`kqueue`)
-- Supplies a `logos_call_context_t*` and invokes the corresponding
-  schema-derived C method for each request
+- Supplies a `logos_call_context_t*` and invokes the module's generic dispatch
+  entrypoint for each request
 
 The runtime MUST NOT mark a local-transport-hosted module as `ready` merely
 because a local endpoint exists.
@@ -940,16 +940,16 @@ When no host event loop is provided, the runtime provides its own event loop.
 
 Module host processes run their own event loop:
 
-In the pseudocode below, `invoke_schema_method` is illustrative host behavior,
+In the pseudocode below, `invoke_module_dispatch` is illustrative host behavior,
 not a required exported symbol.
 It means that the host decodes the transport request, identifies the requested
 schema method, creates or reuses the call context for the invocation, calls the
-corresponding native C function, and encodes the transport response.
+module's generic dispatch entrypoint, and encodes the transport response.
 
 ```
 while running:
     msg = read_framed_cbor(socket)
-    response = invoke_schema_method(msg)
+    response = invoke_module_dispatch(msg)
     write_framed_cbor(socket, response)
 ```
 
@@ -1113,28 +1113,90 @@ error, the error is encoded in `response_cbor` as an error-payload map
 
 The runtime does not define a configuration file format.
 
-A runtime instance consumes resolved module records supplied by a runtime host,
-Package Manager, deployment-specific mechanism, static registration API, or test
-harness.
-The producer of those records is outside this specification.
+A runtime instance consumes resolved module input records supplied by a runtime
+host, Package Manager, deployment-specific mechanism, static registration API,
+or test harness.
+The producer and storage format of those records are outside this specification.
+
+Runtime input records are non-security records.
+They do not grant authority, prove package trust, approve permissions, or define
+sandbox strength.
 
 A resolved module record supplies the information needed to create or update a
 runtime registry entry:
 
 - the flat runtime module name;
 - the execution mode;
-- the load path, static registration handle, local transport endpoint, or
-  remote transport endpoint;
+- the provider id or module instance id, when assigned by the runtime host;
+- a dynamic artifact, static binding, local transport endpoint, remote target,
+  or launch descriptor;
 - compatibility version expectations, when known;
 - schema namespace expectation, when known;
 - schema commitment expectation, when known;
 - runtime-local options needed by the selected implementation.
+
+```cddl
+logos_runtime_module_input = {
+  module: tstr .size (1..64),
+  mode: "direct" / "local-transport" / "remote-transport",
+  ? provider: tstr .size (1..128),
+  ? instance: tstr .size (1..128),
+  ? artifact: logos_runtime_artifact_input,
+  ? static: logos_runtime_static_binding,
+  ? endpoint: logos_runtime_transport_endpoint,
+  ? remote: logos.runtime_control.remote_provider_target,
+  ? launch: logos_launch_descriptor,
+  ? schema_namespace: tstr .size (1..128),
+  ? schema: logos.runtime_control.schema_commitment,
+  ? version: [uint, uint],
+  ? options: {* tstr => any},
+  ? extensions: {* tstr => any},
+}
+
+logos_runtime_artifact_input = {
+  ? id: tstr,
+  ? local_path: tstr,
+  ? store_path: tstr,
+  ? executable: bool,
+  ? media_type: tstr,
+}
+
+logos_runtime_static_binding = {
+  binding: tstr,
+  ? symbol_prefix: tstr,
+  ? table: tstr,
+  ? extensions: {* tstr => any},
+}
+
+logos_runtime_transport_endpoint = {
+  kind: tstr .size (1..64),
+  ? descriptor: bstr,
+  ? extensions: {* tstr => any},
+}
+```
+
+For `direct` mode, a module input MUST provide either `artifact` for dynamic
+direct loading or `static` for static direct binding.
+
+For `local-transport` mode, a module input MUST provide `launch`, `endpoint`,
+or another deployment-defined local transport binding.
+When `launch` is present, it is the Launcher-owned `logos_launch_descriptor`
+defined by LOGOS-MODULE-LAUNCHER.
+Runtime passes the descriptor to Module Launcher when it needs to realize the
+module implementation.
+Runtime MUST NOT reinterpret launcher-specific fields as authority or package
+trust.
+
+For `remote-transport` mode, a module input MUST provide `remote` or `endpoint`
+sufficient to construct a remote-module facade or remote invocation path.
 
 The runtime MUST validate resolved module records before routing calls through
 them.
 If a record includes a schema commitment expectation, the runtime MUST apply
 the schema-commitment checks defined in Section 3.3 before marking the module
 ready.
+The runtime MUST reject or quarantine malformed runtime input records rather
+than creating partially trusted registry entries from them.
 
 This specification does not define package catalogs, install roots,
 dependency-graph queries, capability decisions, action prompts, or persistent
@@ -1152,10 +1214,14 @@ ABI.
 
 If a module needs configuration, the selected deployment-specific or
 host-specific mechanism must arrange that configuration outside the lifecycle
-ABI, for example through resolved runtime records, environment, local files, or
-module-specific methods.
-A future specification may define a typed configuration handoff if it becomes
-part of the portable runtime contract.
+ABI, for example through environment, local files, provider-specific startup
+data, or module-specific methods.
+
+Runtime input `options` are runtime-local options unless a deployment profile
+explicitly defines how a module observes them.
+Runtime host directories, profile selection, concrete launcher backends, and
+privileged-module wiring are deployment or security-profile inputs, not portable
+Runtime input fields in this revision.
 
 ---
 
@@ -2136,31 +2202,14 @@ in LOGOS-MODULE-INTERFACE.
 
 ## Appendix A. Implementation Notes (Informative)
 
-A generic module host that receives LOGOS-MODULE-TRANSPORT requests still has
-to invoke schema-derived per-method C functions whose C signatures vary by
-method.
-Those functions take an opaque `logos_call_context_t*` as their first
-argument, supplied by the runtime or module host.
+Generic module hosts receive LOGOS-MODULE-TRANSPORT requests as method names and
+deterministic CBOR request payloads.
+For shared-library modules, the generic host invocation path is the dispatch ABI
+defined by LOGOS-MODULE-INTERFACE.
 
-This specification does not require one implementation strategy.
-
-Known implementation strategies include:
-
-- deriving calls at runtime with a foreign-function interface such as `libffi`
-  from the module schema and LOGOS-MODULE-INTERFACE C mapping, including the
-  call-context pointer;
-- generating per-module host adapter code that decodes transport requests and
-  calls the native C API directly;
-- generating a uniform dispatch table, vtable, or internal host-call ABI
-  alongside the ergonomic per-method C API.
-
-The preferred implementation strategy is the foreign-function-interface model,
-because it lets a generic runtime host call the ordinary native C API at
-runtime without making a generated dispatch function part of the portable
-module ABI.
-The dispatch-table or vtable strategy is allowed in this revision, but it is
-not the preferred strategy because it adds a second invocation surface beside
-the ordinary native C API.
+A foreign-function interface such as `libffi` could theoretically derive native
+C calls from schema information at runtime, but this revision does not define
+that as the interoperable module-host path.
 
 ### A.1 Fixed Static Applications
 

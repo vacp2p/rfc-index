@@ -727,9 +727,24 @@ Every module shared library MUST export these mandatory module symbols:
 - `logos_<module>_destroy()` is called once before unloading.
 - `logos_<module>_free()` releases dynamic memory returned by this module
   across this ABI.
+- `logos_<module>_dispatch()` dispatches a schema method name and deterministic
+  CBOR request payload to the corresponding schema-defined method.
+  It is a module ABI symbol, not a schema method.
 
 Every module shared library MUST also export the schema-derived per-method C
 functions specified in section 2.4.
+The per-method C functions are the canonical typed native provider ABI.
+`logos_<module>_dispatch()` is the canonical generic module-host and transport
+entrypoint.
+Both surfaces are mandatory in this revision and MUST be derived from, or
+implemented consistently with, the same module schema.
+
+`logos_<module>_dispatch()` MUST NOT be listed as a method in the module schema,
+`logos.schema` method listings, or generated client bindings.
+It MUST NOT be used as the method identity for commitments, authorization,
+audit records, or conformance vectors.
+Those surfaces identify the target schema method selected by the `method`
+argument and the corresponding request, response, or error value.
 
 Modules SHOULD export this recommended bootstrap symbol:
 
@@ -775,6 +790,16 @@ int logos_<module>_init(void);
 /* Shut down module (called once before unloading) */
 void logos_<module>_destroy(void);
 
+/* Generic module-host and transport dispatch entrypoint. */
+logos_result_t logos_<module>_dispatch(
+    logos_call_context_t* ctx,
+    const char*           method,
+    const uint8_t*        params_cbor,
+    size_t                params_len,
+    uint8_t**             out_response_cbor,
+    size_t*               out_response_len
+);
+
 /* Bootstrap symbol — universal probe for unknown modules. */
 const char* logos_module_name(void);
 
@@ -801,11 +826,20 @@ The benefits of keeping `_version()` in v0.1 are pragmatic:
 - **Low implementation cost:** codegen and hand-written modules can expose it
   trivially, while still keeping the schema authoritative for interface shape.
 
-In **direct mode** (in-process), the runtime calls per-method functions
+In **direct mode** (in-process), the runtime MAY call per-method functions
 directly.
-In **local transport mode**, the module host decodes deterministic CBOR
-requests, invokes the corresponding per-method C function, and encodes
-deterministic CBOR responses.
+In generic module-host, local transport, and remote transport paths, the runtime
+or module host MAY call `logos_<module>_dispatch()`.
+For dispatch calls, `method` is the bare schema method name after the target
+module has already been selected.
+`params_cbor` is the deterministic CBOR request map for that method, not the
+full Transport Request envelope.
+On success, `out_response_cbor` receives the deterministic CBOR response map for
+that method.
+The returned response buffer is released with `logos_<module>_free()`.
+Both direct and dispatch paths are equivalent only when they preserve the same
+target schema method, request value, response value, error behavior, and
+authorization boundary.
 
 **Important distinction: lifecycle `_init()` vs schema method `init`.**
 
@@ -1251,6 +1285,24 @@ are derived from the module schema and its canonical schema model.
 Runtime module listings are runtime introspection state and are exposed through
 the runtime-control contract defined by LOGOS-MODULE-RUNTIME.
 
+`logos_error_code` is the shared Logos module-boundary error-code registry.
+LOGOS-MODULE-INTERFACE owns allocation of this registry.
+Other Logos specifications may cite these values, but they do not allocate
+additional shared error codes.
+
+Values `0` through `9` are allocated in this revision.
+A conforming implementation of this revision MUST NOT emit any other
+`logos_error_code` value.
+When a serialized Logos value contains an unknown shared error-code value,
+the receiver MUST treat the enclosing value or message as invalid for this
+revision.
+For local or remote transport, that invalid value is handled through the
+transport or method validation path that rejected the message.
+When a direct-mode C function returns an integer outside the allocated
+`logos_error_code_t` range, the runtime or generated caller helper MUST treat
+the call as a module failure and MUST NOT serialize the unknown integer as a
+shared Logos error code.
+
 ### 5.2 C Definitions (`logos_types.h`)
 
 These C definitions are the C-side common ABI surface used by generated and
@@ -1429,14 +1481,22 @@ to the allowed subset in section 3.
 After deriving the CDDL schema, it may produce the same artifact family listed
 in Appendix A.1.
 
-### A.3 Generated Dispatch Adapter
+### A.3 Generated Dispatch Implementation
 
-A module kit or runtime implementation MAY generate a dispatch adapter as an
-implementation strategy.
-This adapter is not part of the portable module ABI defined in section 2.6.
-It is an optional generated layer that can support a uniform dispatch table,
-vtable, or internal host-call ABI while preserving the ordinary per-method C
-API as the module contract.
+The mandatory `logos_<module>_dispatch()` ABI symbol is commonly generated from
+the module schema and the C mapping rules in this specification.
+It MAY also be implemented by hand, but handwritten implementations MUST behave
+as if derived from the same schema:
+they dispatch only to schema methods, validate request payloads against the
+target method request schema, call the corresponding per-method implementation
+or equivalent provider logic, and encode responses according to the target
+method response schema.
+
+The dispatch function is not a schema method.
+It is a generic ABI entrypoint for hosts that carry method names and encoded
+payloads.
+The typed per-method C functions remain mandatory and form the native provider
+surface for direct/static integrations and generated bindings.
 
 For each method `M` declared in the schema, such an adapter commonly has a
 branch with this shape:
@@ -1465,10 +1525,11 @@ Such an adapter commonly:
 The generated adapter may also handle the `logos.schema` well-known method
 by returning `_schema()`, and unknown methods by returning
 `LOGOS_ERR_METHOD_NOT_FOUND`.
-This adapter pattern corresponds to the dispatch-table or vtable strategy
-described in LOGOS-MODULE-RUNTIME Appendix A.
-It is retained here as implementation guidance for this revision and may be
-removed or revised in a future version.
+
+Because dispatch is an ABI entrypoint rather than a schema method,
+commitment-model, hash-profile, authorization, audit, and conformance material
+MUST identify the target schema method and its request/response values.
+They MUST NOT identify a synthetic dispatch method.
 
 The generated `_init()` and `_destroy()` stubs are empty — module authors
 override them if they need initialisation/cleanup.
