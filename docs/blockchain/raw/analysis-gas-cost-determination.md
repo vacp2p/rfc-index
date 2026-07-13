@@ -111,7 +111,6 @@ Execution: negligible.
 - Verification of the output validity: negligible.
 - Insertion of the note in the ledger: negligible.
 - Derivation of the note identifiers: negligible
-
 ## Channel Inscription
 
 The validation process includes verifying an Eddsa25519 signature, confirming that the signer is authorized for the specified channel, and checking the chaining sequence of the channel. The execution encompasses creating channel records (if not previously used) and updating the tip of the channel.
@@ -122,7 +121,6 @@ Execution: ~56k CPU cycles.
 - Verification of the signer authorization: negligible.
 - Verification of channel sequencing: negligible
 - Update the channel state: negligible
-
 ## Channel Deposit
 
 The Execution Gas of the Channel Deposit Operation compensates for the verification of the [ZkSignature](bedrock-v1.1-mantle-specification.md) proof and for the check of the inputs.
