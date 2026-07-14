@@ -242,6 +242,11 @@ The application MAY deliver it internally or through any other `member` that obs
 To handle relays by multiple members, a joining `member` MUST deduplicate welcome messages
 by the hash of their associated `commit message` and process only the first valid copy for a given commit.
 
+Beyond the MLS state carried by the welcome message, a newly admitted `member` MUST also obtain the current group governance state
+required to participate, such as the `steward list`, timing parameters, peer scores, and group configuration.
+The delivery mechanism is implementation-defined, for example a state-sync message encrypted under the new epoch key
+so that the joining `member` can decrypt it.
+
 ## Single steward
 
 To naive way to create a decentralized secure group messaging is having a single transparent `steward`
