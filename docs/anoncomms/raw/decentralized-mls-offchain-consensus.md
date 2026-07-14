@@ -387,11 +387,10 @@ and the former steward becomes the `backup steward` in `epoch E`.
 
 Liveness criteria:
 
-Once the active `steward list` has completed its assigned epochs,
-
-members MUST proceed to elect the next set of stewards
-(which MAY include some or all of the previous members).
-This election is conducted through a type 2 consensus procedure, `Steward Election Proposal`.
+Upon completion of the active `steward list`'s assigned epochs, a new list MUST be established.
+A `Steward Election Proposal` is REQUIRED only when the total number of members exceeds `sn_max`.
+Otherwise, the new list is generated locally and deterministically from the ordering defined below, without a `Steward Election Proposal`.
+When an election is held, the next set of stewards MAY include some or all of the current stewards.
 
 A `Steward Election Proposal` is considered valid only if the resulting `steward list`
 is produced through a deterministic process that ensures an unbiased distribution of steward assignments,
