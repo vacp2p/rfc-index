@@ -324,7 +324,8 @@ This is the only proposal type common to both single steward and multi steward d
 which sets and orders stewards responsible for creating commits over a predefined number of range in (`sn_min`,`sn_max`).
 The validity of the choosen `steward list` ends
 when the last steward in the list (the one at the final index) completes its commit.
-At that point, a new `Steward Election Proposal` MUST be initiated again by any member during the corresponding epoch.
+At that point, a new `Steward Election Proposal` MUST be initiated again during the corresponding epoch,
+following the initiator selection defined in [Initiating "any member" actions](#initiating-any-member-actions).
 The `Proposal.payload` field MUST represent the ordered identities of the proposed stewards.
 Each steward election proposal MUST be verified and finalized through the consensus process
 so that members can identify which steward will be responsible in each epoch
@@ -368,6 +369,18 @@ Implementations MAY additionally penalize such behavior using peer scoring mecha
 
 To enforce this behavior, members MUST be able to identify the type of incoming consensus messages
 and apply priority-based filtering accordingly.
+
+#### Initiating "any member" actions
+
+Several actions in this protocol may be started by any member,
+such as a `Steward Election Proposal`, a deadlock `Emergency Criteria Proposal`,
+and a threshold-based removal `Emergency Criteria Proposal`.
+If every member acts at once, the network receives many identical proposals for the same action.
+
+To avoid this, any member MAY initiate such an action,
+but members SHOULD select a deterministic primary initiator, e.g. the first eligible steward in the `steward list` ordering.
+Other members MUST defer for a bounded window and initiate only if the primary initiator stays silent.
+Implementations MUST deduplicate equivalent proposals, for example by a deterministic proposal id.
 
 ### Steward list creation
 
@@ -449,9 +462,10 @@ If no eligible steward exists across the entire list, the protocol escalates to 
 ##### Layer 2 - Re-election
 
 Layer 2 enables re-election when Layer 1 fails to produce an eligible steward from the active `steward list`.
-In this layer, the members MAY initiate a new `Steward Election Proposal` within the same MLS epoch.
+In this layer, a new `Steward Election Proposal` MAY be initiated within the same MLS epoch,
+following the initiator selection defined in [Initiating "any member" actions](#initiating-any-member-actions).
 Since the MLS epoch does not advance in this case,
-the proposer MUST increment the local `retry_round` value and generate a new deterministic steward ordering using:
+the initiator MUST increment the local `retry_round` value and generate a new deterministic steward ordering using:
 
 `SHA256(epoch E || retry_round || member id || group id)`.
 
@@ -471,7 +485,8 @@ the system enters a steward deadlock condition, and Layer 3 MUST be activated.
 Layer 3 is the final layer of the liveness mechanism and is triggered only
 when Layer 2 fails after `max_reelection_attempts` many re-elections.
 
-At this point, any member MAY submit an `Emergency Criteria Proposal` with deadlock `violation_type`.
+At this point, any member MAY submit an `Emergency Criteria Proposal` with deadlock `violation_type`,
+following the initiator selection defined in [Initiating "any member" actions](#initiating-any-member-actions).
 This proposal does not target a specific member for removal.
 Instead, it signals that the protocol cannot produce a valid commit
 through the active steward list or through bounded re-election.
@@ -648,8 +663,9 @@ In particular, peer score updates MAY be triggered either by direct local observ
 Regardless of the trigger, score updates are applied locally by each peer to its own peer score table.
 
 Members MUST periodically evaluate peer scores against the predefined threshold `threshold_peer_score`.
-A removal operation based on the `threshold_peer_score` MUST be initiated as an `Emergency Criteria Proposal`
-by at least one member and, only after being finalized with a YES outcome, MUST be included in the subsequent commit.
+A removal operation based on the `threshold_peer_score` MUST be initiated as an `Emergency Criteria Proposal`,
+following the initiator selection defined in [Initiating "any member" actions](#initiating-any-member-actions),
+only after being finalized with a YES outcome, MUST be included in the subsequent commit.
 To prevent abuse, if such a removal emergency criteria proposal is finalized with a NO outcome,
 a low score MAY be applied to the proposal owner.
 This mechanism allows accidental or transient failures to be tolerated while still enabling
