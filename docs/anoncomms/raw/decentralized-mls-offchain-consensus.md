@@ -82,7 +82,8 @@ The three roles used in de-MLS is as follows:
 of any secure group messaging session but remain available as potential candidates for group membership.
 - `member`: Members are special nodes in the secure group messaging who
 obtains current group key of secure group messaging.
-Each node is assigned a unique identity represented as a 20-byte value named `member id`.
+Each node is assigned a unique identity named `member id`, represented as an opaque,
+implementation-defined byte string of any fixed length.
 - `steward`: Stewards are special and transparent members in the secure group
 messaging who organize the changes by releasing commit messages upon the voted proposals.
 There are two special subsets of steward as epoch and backup steward,
