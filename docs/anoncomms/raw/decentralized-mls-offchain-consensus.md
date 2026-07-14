@@ -83,7 +83,7 @@ of any secure group messaging session but remain available as potential candidat
 - `member`: Members are special nodes in the secure group messaging who
 obtains current group key of secure group messaging.
 Each node is assigned a unique identity named `member id`, represented as an opaque,
-implementation-defined byte string of any fixed length.
+implementation-defined byte string of any length.
 - `steward`: Stewards are special and transparent members in the secure group
 messaging who organize the changes by releasing commit messages upon the voted proposals.
 There are two special subsets of steward as epoch and backup steward,
