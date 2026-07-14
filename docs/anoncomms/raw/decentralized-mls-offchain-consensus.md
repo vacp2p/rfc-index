@@ -232,10 +232,15 @@ required to validate incoming commits and perform [Commit validation service](#c
 When a MLS `MLS proposal message` is created by the `steward`,
 a `commit message` SHOULD follow,
 as in section 12.04 [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/) to the members.
-In order for the new `member` joining the group to synchronize with the current members
-who received the `commit message`,
-the `steward` sends a welcome message to the node as the new `member`,
+In order for the new `member` joining the group to synchronize
+with the current members who received the `commit message`,
+the `steward` MUST produce a welcome message together with the `commit message`,
 as in section 12.4.3.1. [MLS RFC 9420](https://datatracker.ietf.org/doc/rfc9420/).
+The `steward` MUST broadcast it to the group rather than sending it directly to the joining `member`.
+Its delivery to the joining `member` is left to the application layer.
+The application MAY deliver it internally or through any other `member` that observed the broadcast.
+To handle relays by multiple members, a joining `member` MUST deduplicate welcome messages
+by the hash of their associated `commit message` and process only the first valid copy for a given commit.
 
 ## Single steward
 
