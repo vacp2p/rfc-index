@@ -626,8 +626,14 @@ such as commit and proposal incompatibility. Specifically, the broken commit can
     2. The commit message should equal the latest epoch
     3. The commit needs to be compatible with the previous epoch’s `MLS Proposal`.
 2. Broken MLS proposal: The steward prepares a different `MLS Proposal` for the corresponding `Voting Proposal`.
-This activity is identified by the `members` since both `MLS Proposal` and `Voting Proposal` are visible
-and can be identified by checking the hash of `Proposal.payload` and `MLSProposal.payload` is the same as RFC9240 section 12.1. Proposals.
+A `Voting Proposal` and an `MLS Proposal` express the same intent through different structures,
+so they cannot be compared by hashing or byte-by-byte equality.
+Instead, `members` MUST project both sides to a set of semantic `(action, target)` tuples and compare them as deduplicated sets.
+Here `action` distinguishes the membership operation (add or remove) and `target` is the affected `member id`.
+For a remove, the `target` is resolved to the `member id` that the removed leaf corresponds to in the current epoch,
+rather than the raw leaf index.
+If the two sets differ, the steward has committed a broken MLS proposal.
+This comparison is representation-independent and therefore also holds across different MLS or voting proposal implementations.
 3. Censorship and inactivity: The situation where there is a voting proposal that is visible for every member,
 and the Steward does not provide an MLS proposal and commit within the configured `threshold_duration`,
 after which the voting process is considered finalized by the majority timer.
