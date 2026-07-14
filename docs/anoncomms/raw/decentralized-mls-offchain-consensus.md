@@ -655,7 +655,10 @@ thereby preserving fairness while maintaining security and liveness.
 
 In this approach, each node maintains a local peer score table mapping `member_id` to a score,
 with new members starting from a configurable default value `default_peer_score`.
-Peer score updates MUST be performed only for stewards that are active in the current epoch context.
+Peer score updates for steward-duty events MUST be performed only for stewards
+that are active in the current epoch context.
+Peer scoring MAY additionally define member-level events that apply to any member regardless of steward status,
+such as the rewards and penalties for `Emergency Criteria Proposal` outcomes and the penalty for a false auto-YES self-removal claim.
 Peer scores may decrease due to violations and increase due to honest behavior;
 such score adjustments are derived from observable protocol events, such as
 successful commits or emergency criteria proposals, and each peer updates its local table accordingly.
