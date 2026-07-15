@@ -122,6 +122,10 @@ if the proposed value is wrong, disputes it before the window closes.
 
 ## Flow
 
+Before a round begins, each `oracle node` must be a member of the active oracle set.
+A node joins by bonding stake in the LEZ contract and registering its `oracle id` in the membership tree held in LEZ.
+Only observations from registered nodes are aggregated. 
+
 The general flow of a round is as follows:
 
 - Each `oracle node` fetches prices from external sources for the feed,
