@@ -136,7 +136,9 @@ and computes the attested price as the median of the valid observations.
 Because the input is immutable and the code is deterministic,
 all honest indexers MUST reach the same value.
 - One `indexer` acts as the `proposer` for the round.
-It writes its attested price to the LEZ contract, which opens a dispute window.
+On the optimistic path it writes to the LEZ contract its attested price together
+with the observations and their membership proofs,
+and this opens a dispute window.
 During the window, the contract waits for a dispute from any other `indexer`.
 - Every other `indexer` acts as a `challenger`.
 It reads the proposed value from the LEZ contract and compares it with the value it computed itself.
