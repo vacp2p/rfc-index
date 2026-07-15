@@ -37,7 +37,7 @@ If no dispute is raised before the window closes,
 the proposed price is accepted as final.
 If a dispute is raised, the value supported by the majority of disputing indexers is taken as correct,
 and the faulty proposer is slashed by LEZ contracts.
-The heavy signature verification phase is not performed on the happy path on LEZ.
+The heavy signature verification phase is not performed on the optimistic path on LEZ.
 It is performed only when a dispute is raised.
 
 The Oracle Zone deliberately holds no general-purpose execution environment.
@@ -63,7 +63,7 @@ Separate Oracle Zone:
 - This approach removes the signature verification load from LEZ.
 Prices are published as inscriptions on the Logos Blockchain,
 and the heavy work of checking them runs off the LEZ execution path.
-LEZ consumes only the final attested price on the happy path,
+LEZ consumes only the final attested price on the optimistic path,
 and performs signature verification only when a dispute is raised.
 This raises the achievable signer count and the update frequency,
 which improves both liveness, since more oracle nodes and faster rounds are possible,
