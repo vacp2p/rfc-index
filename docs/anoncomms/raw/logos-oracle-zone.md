@@ -19,20 +19,31 @@
 
 The following document specifies the Logos Oracle Network (LON),
 a dedicated Logos Blockchain zone that aggregates and attests external price data
-and pushes it to consumers in the Logos ecosystem,
+and delivers it to consumers in the Logos ecosystem,
 in particular the Logos Execution Zone (LEZ).
-A set of `oracle nodes` fetch prices from external sources,
-sign and submit their attestation as inscriptions;
-a custom `indexer` logic deterministically verifies signatures,
-and computes an attested price as the median once a quorum is reached.
-The attested price is delivered to LEZ over a regular PACT (Provable Atomic Cross-zone Transactions)
-write on a fixed cadence as PUSH method, so consumers always have a fresh value.
+A set of oracle nodes fetch prices from external sources, sign their observations,
+and publish them as inscriptions on the Logos Blockchain.
+Bedrock totally orders and finalizes these inscriptions,
+which makes the input data immutable and identical for every reader.
+Because the input is immutable and the aggregation code is fixed and deterministic,
+every honest indexer that reads the same finalized inscriptions computes the same attested price.
+
+The oracle nodes double as indexers that read the finalized inscriptions and compute the attested price.
+Aggregation follows an optimistic model, since an indexer can be malicious and cannot be trusted.
+In each round, one indexer acts as the proposer.
+It computes the attested price as the median of the valid observations and writes it to LEZ,
+which opens a dispute window.
+If no dispute is raised before the window closes,
+the proposed price is accepted as final.
+If a dispute is raised, the value supported by the majority of disputing indexers is taken as correct,
+and the faulty proposer is slashed by LEZ contracts.
+The heavy signature verification phase is not performed on the happy path on LEZ.
+It is performed only when a dispute is raised.
 
 The Oracle Zone deliberately holds no general-purpose execution environment.
-Economic security with oracle node staking and slashing is therefore anchored in LEZ contracts
-and bridged to the Oracle Zone through PACT provided by the Logos stack.
+Therefore, economic security with oracle node registration by staking and slashing is anchored in LEZ contracts.
 This RFC specifies the price-fetching format, the aggregation and attestation logic,
-the round/timing and push-delivery model, the incentivization bridge, and the parameters.
+the round and timing model, the optimistic delivery and dispute model, the incentivization bridge, and the parameters.
 
 ## Motivation
 
