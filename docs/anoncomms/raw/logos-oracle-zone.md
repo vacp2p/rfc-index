@@ -47,34 +47,36 @@ the round and timing model, the optimistic delivery and dispute model, the incen
 
 ## Motivation
 
-A decentralized price oracle must verify multiple independent signed attestation
-per update while sustaining a high update frequency.
-Regarding this functionality, two categorical design approaches exist:
+A decentralized price oracle must verify multiple independent signed observations
+per update while sustaining a reasonable update frequency.
+Two categorical design approaches are significant:
 
 LEZ-native design:
-- All oracle nodes and logic in LEZ environment.
+- All oracle nodes and logic live in the LEZ environment.
 Research shows that ECDSA signature verification exhausts the LEZ cycle budget
-at a relatively small committee size, small for a decentralized oracle.
-Aggregate-signature schemes relax this but
-still couple price-update load to the general-purpose execution layer.
+at a relatively small committee size which is too small for a decentralized oracle.
+It is still doable, but the verification must be split across several transactions and blocks, which breaks atomicity.
+Aggregate-signature schemes relax the per-signature cost
+but still couple the price-update load to the general-purpose execution layer.
 
 Separate Oracle Zone:
-- This approach removes the verification load from LEZ entirely.
-Signature verification and aggregation run inside the dedicated zone's indexer logic;
-LEZ only consumes the final attested price.
-This raises the achievable signer count and update frequency,
-which directly improves both **liveness** (more `oracle nodes`, faster rounds)
-and **price accuracy** (more independent sources feeding a robust median).
+- This approach removes the signature verification load from LEZ.
+Prices are published as inscriptions on the Logos Blockchain,
+and the heavy work of checking them runs off the LEZ execution path.
+LEZ consumes only the final attested price on the happy path,
+and performs signature verification only when a dispute is raised.
+This raises the achievable signer count and the update frequency,
+which improves both liveness, since more oracle nodes and faster rounds are possible,
+and price accuracy, since more independent sources feed a robust median.
 
 The rationale for a separate zone is therefore performance.
-Price-data feeding does not create load on the LEZ execution layer,
-and the zone can be tuned for fast aggregation and
-high signature-verification throughput independently of LEZ.
+Feeding price data does not load the LEZ execution layer,
+and the zone can be tuned for fast aggregation and high verification throughput independently of LEZ.
 
-The trade-off introduced by this separation is that the Oracle Zone
-has no execution environment in which to custody stake or run slashing logic.
-This RFC resolves that by keeping all economic security in LEZ and
-bridging the stake and slash operations over [PACT](https://lip.logos.co/blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html?highlight=pact#zone-interoperability).
+The trade-off introduced by this separation is that the Oracle Zone has no execution environment
+in which to custody stake or run slashing logic.
+This RFC resolves that by keeping all economic security
+in LEZ contracts for stake and slash operations.
 
 ## Format Specification
 
