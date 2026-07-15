@@ -119,22 +119,30 @@ writes the attested price to LEZ and opens the dispute window.
 Only one proposer acts per round.
 - `challenger`: Any indexer that reads the proposed price from LEZ, recomputes it from the same finalized inscriptions,
 if the proposed value is wrong, disputes it before the window closes.
-- `consumer`: Any program or client that uses the attested price.
-The primary consumer is LEZ. Other zones may be added later.
 
 ## Flow
 
-General flow is as follows:
+The general flow of a round is as follows:
 
 - Each `oracle node` fetches prices from external sources for the feed,
-computes a local observation and signs the observation.
-- Each `oracle node` publishes the signed observation as an inscription via its `sequencer` interface.
-The ordering layer via Bedrock totally orders and finalizes the inscriptions; no interpretation happens at this layer.
-- The `indexer` processes each finalized inscription for the current round.
-It deserializes the observation, verifies the signature, and checks writer membership.
-- When the number of observations in the current round reaches the predetermined quorum threshold `N`,
-the `indexer` computes then outputs the attested price as the median of all observations.
-- On each push round as heartbeats, the `indexer` repeats the progress.
+computes a local price observation, signs and publishes it as an inscription on `Bedrock`.
+Bedrock totally orders and finalizes the inscriptions.
+- Every `indexer` reads the finalized inscriptions of the current round
+and computes the attested price as the median of the valid observations.
+Because the input is immutable and the code is deterministic,
+all honest indexers MUST reach the same value.
+- One `indexer` acts as the `proposer` for the round.
+It writes its attested price to the LEZ contract, which opens a dispute window.
+During the window, the contract waits for a dispute from any other `indexer`.
+- Every other `indexer` acts as a `challenger`.
+It reads the proposed value from the LEZ contract and compares it with the value it computed itself.
+- If the proposed value differs, a `challenger` disputes it before the window closes.
+The dispute moves the round off the optimistic path.
+Here the LEZ contract verifies the signatures of the observations
+and takes the value supported by the majority of the honest indexers as correct.
+The faulty `proposer` is slashed.
+- If no dispute is raised before the window closes,
+this is the optimistic path, and the LEZ contract finalizes the proposed value as the attested price.
 
 ## Price Fetching
 
