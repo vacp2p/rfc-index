@@ -50,7 +50,7 @@ In this section we present an overview of the cryptoeconomical aspects of the Lo
 - Users (rollup sequencers, node operators, or leaders) acquire tokens through purchase or by earning them as rewards.
 - Tokens serve three main purposes:
     - Paying for transaction processing resources used: [Fee Markets](#fee-markets).
-    - Declaring service participation: node operators lock in a service note a [Minimum Stake](#minimum-stake) through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) to become Blend Service providers.
+    - Declaring service participation: node operators lock a [Minimum Stake](#minimum-stake) through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) to become Blend Service providers.
     - PoS Participation: leaders can propose (build) blocks by [participating in a lottery](cryptarchia-v1-protocol.md) where their chances of winning are proportional to their number of owned and unmoved tokens (aged tokens).
 - Transactions may incur up to two types of fees:
     - Execution fee: covers the computational resources consumed by the transaction.
@@ -67,7 +67,7 @@ In this section we present an overview of the cryptoeconomical aspects of the Lo
 
 ## Minimum Stake
 
-To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked as a service note through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The [\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md) defines the methodology on how to calculate the minimum stake value.
+To provide a service, a node must lock a minimum number of tokens to be considered valid. This stake is locked through the [Service Declaration Protocol](bedrock-service-declaration-protocol.md) and can be withdrawn after the node stops providing the service. The minimum stake enhances economic security by increasing the cost of connecting to the network, which makes Sybil attacks more expensive. While the stake value must be sufficiently high for security, it also raises the barrier to network participation, potentially reducing decentralization. We therefore aim to balance security needs with decentralization goals. The [\[Analysis\] Static Minimum Stake Estimation for Service Declaration Protocol](analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md) defines the methodology on how to calculate the minimum stake value.
 
 ## Gas
 

@@ -107,15 +107,15 @@ Inputs            = InputCount *NoteId
 ### SDP Operations
 
 ```schema
-SDPDeclare    = ServiceType LocatorCount *Locator ProviderId ZkId ServiceNoteId
+SDPDeclare    = ServiceType LocatorCount *Locator ProviderId ZkId LockedNoteId
 ServiceType   = Byte          ; 0 = BN
 LocatorCount  = Byte          ; Max 8
 Locator       = 2Byte *BYTE   ; Max 329 bytes, multiaddr format
 ProviderId    = Ed25519PublicKey
 ZkId          = ZkPublicKey
-ServiceNoteId  = NoteId
+LockedNoteId  = NoteId
 
-SDPWithdraw   = DeclarationId Nonce ServiceNoteId
+SDPWithdraw   = DeclarationId Nonce LockedNoteId
 DeclarationId = Hash32
 Nonce         = UINT64
 

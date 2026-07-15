@@ -80,7 +80,7 @@ BLEND_DECLARATIONS = [
         msg=DeclarationMessage(
             ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0
         ),
-        service_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
+        locked_note_id=STAKE_DISTRIBUTION_TX.output_note_id(0)
     ),
     # ... 32 total declarations
 ]
@@ -230,7 +230,7 @@ CRYPTARCHIA_INSCRIPTION = Inscribe(
 BLEND_DECLARATIONS = [
     Declaration(
         msg=DeclarationMessage(ServiceType.BLEND, ["ip://1.1.1.1:3000"], PROVIDER_ID_0, ZK_ID_0),
-        service_note_id=STAKE_DISTRIBUTION.output_note_id(0)
+        locked_note_id=STAKE_DISTRIBUTION.output_note_id(0)
     ),
     # ... more declarations
 ]
