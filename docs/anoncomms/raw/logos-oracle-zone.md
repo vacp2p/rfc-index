@@ -147,19 +147,22 @@ this is the optimistic path, and the LEZ contract finalizes the proposed value a
 ## Price Fetching
 
 Each `oracle node` fetches the price of the feed from external sources.
-The protocol is agnostic to the specific sources and to the local pre-aggregation method;
-it is RECOMMENDED that a node query at least three independent sources and
-submit a local median to reduce discarding price as outliers.
+The protocol is agnostic to the specific sources and to the local pre-aggregation method.
+It is RECOMMENDED that a node query at least three independent sources and submit a local median,
+to reduce the chance of its observation being discarded as an outlier.
 
 Each observation is encoded as a `PriceObservation`.
-The price is carried as an integer `price` together with a `decimals` field
-so that no floating-point representation crosses the protocol boundary:
-the real value is `price * 10^(-decimals)`.
-The encoding, not the fetching method, is what this specification governs.
+The price is carried as an integer `price` together with a `decimals` field,
+so that no floating-point value crosses the protocol boundary. The real value is `price * 10^(-decimals)`.
+Authentication of an observation on the optimistic path comes from Bedrock.
+An oracle node publishes to its own channel,
+so Bedrock verifies the writer signature at the inscription level and records who wrote each observation.
+No signature is checked during normal aggregation.
 
-The `signature` field carries a [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)
-Schnorr signature over the SHA-256 hash of the canonical serialization of fields 1-6,
-not over the raw payload bytes directly; this follows the hash-then-sign convention specified in BIP-340.
+The `signature` field carries a [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) Schnorr signature
+over the SHA-256 hash of the canonical serialization of fields 1 to 7.
+It is used only on the dispute path. When a dispute is raised, the LEZ contract verifies this signature directly,
+without depending on Bedrock, which is what lets the dispute be resolved inside LEZ.
 The `membership_proof` is a separate witness and is not covered by the signature.
 
 The `PriceObservation` is specified using [protocol buffers v3](https://protobuf.dev/):
@@ -168,16 +171,18 @@ The `PriceObservation` is specified using [protocol buffers v3](https://protobuf
 syntax = "proto3";
 
 message PriceObservation {
-  string feed_id           = 1;  // asset pair identifier; i.e. "BTC/USDT"
-  int64  price             = 2;  // integer-encoded price; real value = price * 10^(-decimals)
+  string feed_id           = 1;  // asset pair identifier, e.g. "BTC/USDT"
+  int64  price             = 2;  // integer-encoded price, real value = price * 10^(-decimals)
   int32  decimals          = 3;  // number of decimal places in `price`
-  int64  timestamp         = 4;  // observation time (unix milliseconds), advisory only
-  bytes  oracle_id         = 5;  // submitting node's 32-byte BIP-340 x-only public key
-  bytes  source_set        = 6;  // OPTIONAL: list of source identifiers used for local median
-  bytes  signature         = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1-6
-  bytes  membership_proof  = 8;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
+  int64  round             = 4;  // round identifier, in Bedrock block-height terms
+  int64  timestamp         = 5;  // observation time (unix milliseconds), advisory only
+  bytes  oracle_id         = 6;  // the node's 32-byte BIP-340 x-only public key, also its channel key and staking identity
+  bytes  source_set        = 7;  // OPTIONAL: source identifiers used for the local median
+  bytes  signature         = 8;  // BIP-340 Schnorr signature over SHA-256 of fields 1 to 7, checked only on the dispute path
+  bytes  membership_proof  = 9;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
 }
 ```
+
 ## Aggregation
 
 The `indexer` is the core logic of the Oracle Zone.
