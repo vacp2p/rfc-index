@@ -427,10 +427,12 @@ so the zone can aggregate many more observations per round than an LEZ-native de
 More observations per round improves liveness,
 since the quorum `N` is easily reached even when many `oracle nodes` are absent,
 and improves accuracy, since more independent observations feed the median.
-Accuracy is further backed by the median itself and by the slashing conditions in [Incentivization](#incentivization).
+Accuracy is further backed by the median itself
+and by the slashing conditions in [Incentivization](#incentivization).
 The points below expand on the assumptions this relies on.
 
-1. **Quorum and honest majority.** The quorum `N` is the minimum number of valid observations needed before a price is attested.
+1. **Quorum and honest majority.** The quorum `N` is the minimum number
+of valid observations needed before a price is attested.
 It is a floor, so every valid observation in the round is aggregated.
 The security assumption is that a majority of the aggregated observations are honest,
 which keeps the median within the honest range.
@@ -442,45 +444,88 @@ It does not ensure that enough `oracle nodes` submit each round.
 `Oracle node` liveness is handled by keeping the active set large and by rewards,
 not by replication or by slashing non-participation.
 
-3. **Cross-zone boundary.** Slashing crosses the PACT boundary.
-Its security therefore rests on the soundness of the fault evidence carried over PACT
-and on the correct verification of that evidence in LEZ, as defined by the PACT specification.
+3. **The optimistic path rests on one honest indexer.** On the optimistic path LEZ accepts
+the proposer's value without checking it.
+A wrong value is challenged if at least one honest indexer recomputes
+from the same finalized inscriptions and disputes it before the window closes.
+The dispute is then resolved to the value supported by the majority of the honest indexers,
+so a correct outcome needs both, one honest indexer to raise the dispute and an honest majority to resolve it.
+Safety of the attested price therefore rests on a one-of-many honest assumption,
+not on trusting the proposer.
+The dispute itself is trust-minimized,
+since LEZ resolves it by verifying signatures and recomputing the median over the immutable observations.
+
+4. **Cross-zone boundary.** The attested price and the slashing evidence
+both cross into LEZ over a cross-zone transaction.
+Bedrock guarantees that an inscription is validly ordered and finalized,
+but not that the sending side computed correctly,
+so the correctness of what LEZ consumes is re-established inside LEZ.
+On a dispute LEZ verifies the BIP-340 signatures and membership of the observations itself
+and recomputes the median, so a slash rests on evidence LEZ checks directly,
+not on trusting the party that delivered it.
+
+5. **Completeness of the observation set.** A proposer could omit valid observations to shift the median.
+Because the same observations are finalized on Bedrock and carry their own signatures,
+an honest indexer can present an omitted observation,
+with its `round` field and signature, to LEZ during the dispute window.
+LEZ contract verifies it and sees it should have been included.
+The `round` field prevents a proposer from claiming a valid observation arrived too late.
+Completeness therefore reduces to the same one-of-many honest assumption as the optimistic path.
 
 ## Future Work
 
 This section records design directions deferred beyond this version.
 
-- **Randomized attesting-set selection.** The current version RFC accepts observations
-in inscription order until quorum, which is adequate while the set is small and curated.
-As the set grows, an attacker holding many seats could place a majority into a round and bias the median.
-Randomly selecting each round's attesting set from the larger registered set removes this,
-since an attacker would then have to control a large fraction of the whole set rather than a bare majority.
-This future work also requires having shared randomness and specification of how it is used.
+- **Randomized selection.** This version fixes neither which nodes attest in a round
+nor which node proposes, and both are currently predictable.
+Two selections are left to future work, and both need a shared randomness source with a specified construction.
+First, the attesting set.
+Accepting observations in inscription order until quorum is adequate
+while the set is small and curated, but as it grows an attacker holding many seats could place a majority
+into a round and bias the median.
+Selecting each round's attesting set at random from the larger registered set
+forces an attacker to control a large fraction of the whole set rather than a bare majority.
+Second, the proposer. A simple round-robin is the starting point,
+but a proposer that is unpredictable in advance stops an attacker from targeting the known next writer.
 
-- **Cooldown and unbonding period.** The unbonding period must be long enough
-that stake stays locked until any fault can be detected, proven, and settled in LEZ,
-plus the Logos Blockchain deep-finality margin.
+- **Cooldown and unbonding period.** The unbonding period must be long enough that stake stays locked
+until any fault can be detected, proven, and settled in LEZ, plus the Logos Blockchain deep-finality margin.
 The exact duration is left to tokenomics and should be set well above the deep-finality bound.
 The LEZ contracts that hold stake and enforce the cooldown and unbonding are also left to be specified,
-since current version of RFC covers only the Oracle Zone side.
+since this version covers only the Oracle Zone side.
 
 - **Volatility handling.** In fast markets, honest prices spread out.
-A fixed `D_reward` band can then mark many honest observations ineligible for reward exactly
-when fresh prices matter most.
+A fixed `D_reward` band can then mark many honest observations ineligible for reward exactly when fresh prices matter most.
 A mechanism to widen the band or grow the attesting set during high volatility is left to future work.
 
 - **Slash proof submission.** The slashing flow is not yet specified formally.
 Who submits the fault evidence is one, and this is an open watcher role paid by the bounty.
 What the evidence holds is another.
 For equivocation it is the two conflicting signed observations.
-For an out-of-bound value it is the signed observation plus the round's attested price.
-How the LEZ contract checks the evidence is open.
-The challenge window for out-of-bound faults is open too.
-An oracle node or watcher always starts it by sending evidence to the LEZ contract.
+For an out-of-bound value it is the signed observation and the round context.
+For premature attestation it is the finalized inscriptions showing fewer than `N` observations.
+For a wrong median it is the observations behind the disputed value.
+How the LEZ contract checks each kind of evidence, and the challenge window for the faults that need one, are open.
+Slashing is never automatic. An oracle node or watcher always starts it by sending evidence to the LEZ contract.
 
-- **Incentivization parameters.** The concrete values for the stake requirement, the two slash fractions,
-the reward rate and backing, the epoch length, and the unbonding duration are left to tokenomics.
-They should be sized against the value secured so that the economic-security conditions above hold.
+- **Reward and slash amount analysis.** This version fixes the reward and slashing mechanisms
+but not their exact economic parameters.
+Several values are left to future work.
+These are the concrete stake requirement, the four slash fractions,
+the reward rate and its fee backing, the epoch length, and the unbonding duration.
+Each must be sized against the value the feed secures.
+The goal is to keep the cost of corruption above the profit from corruption.
+This work also covers how the reward table is committed.
+It covers whether that commitment needs the same optimistic-proposer-and-dispute protection as the attested price.
+
+- **LEZ contract specification.** This version defines what the LEZ contracts must achieve but not their implementation.
+On the optimistic path a contract only stores the proposed price, opens the dispute window,
+and finalizes if the window closes clean, so this path does no computation and must be cheap.
+On the dispute path the contract does real work.
+It verifies signatures, checks membership, recomputes the median, and applies the slash.
+This is the heavy path that a separate zone was meant to keep rare.
+Left to future work are the concrete contracts for registration and staking, price finalization,
+dispute resolution, and reward settlement, and a check that the dispute-path computation fits within the LEZ cycle budget.
 
 ## Copyright
 
@@ -489,7 +534,6 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ### References
 
 - Logos Improvement Proposals (LIPs) index: [https://lip.logos.co/](https://lip.logos.co/)
-- PACT, Provable Atomic Cross-zone Transactions (Logos): [https://lip.logos.co/blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html?highlight=pact#zone-interoperability](https://lip.logos.co/blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html?highlight=pact#zone-interoperability)
 - Cryptarchia and Bedrock (Logos): [https://lip.logos.co/blockchain/raw/bedrock-architecture-overview.html?highlight=Cryptarchia#cryptarchia](https://lip.logos.co/blockchain/raw/bedrock-architecture-overview.html?highlight=Cryptarchia#cryptarchia)
 - [BIP-340: Schnorr Signatures for secp256k1](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)
 - [RFC 2119: Key words for use in RFCs](https://www.ietf.org/rfc/rfc2119.txt)
