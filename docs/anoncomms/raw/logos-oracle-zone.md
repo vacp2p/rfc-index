@@ -35,10 +35,9 @@ It computes the attested price as the median of the valid observations and write
 which opens a dispute window.
 If no dispute is raised before the window closes,
 the proposed price is accepted as final.
-If a dispute is raised, the value supported by the majority of disputing indexers is taken as correct,
-and the faulty proposer is slashed by LEZ contracts.
-The heavy signature verification phase is not performed on the optimistic path on LEZ.
-It is performed only when a dispute is raised.
+If a dispute is raised, LEZ verifies the signatures and membership of the observations,
+recomputes the median itself, and compares it with the proposed value.
+The faulty proposer is slashed by LEZ contracts.
 
 The Oracle Zone deliberately holds no general-purpose execution environment.
 Therefore, economic security with oracle node registration by staking and slashing is anchored in LEZ contracts.
@@ -93,7 +92,9 @@ Ordering authority is delegated entirely to Bedrock's immutable inscription orde
 - Indexers have no immutable execution logic beyond aggregation.
 Stake custody and slashing enforcement are delegated entirely to LEZ contracts.
 - At least one honest indexer disputes a wrong proposal before the dispute window closes,
-and the honest majority above resolves the dispute to the correct value.
+by sending the observations to LEZ.
+LEZ resolves the dispute by recomputing the median.
+Correctness of the attested price rests on this one honest indexer existing.
 - The active oracle set is large enough that the quorum `N` is reached every round.
 Liveness of attestation depends on this oversizing.
 
@@ -143,10 +144,10 @@ During the window, the contract waits for a dispute from any other `indexer`.
 - Every other `indexer` acts as a `challenger`.
 It reads the proposed value from the LEZ contract and compares it with the value it computed itself.
 - If the proposed value differs, a `challenger` disputes it before the window closes.
-The dispute moves the round off the optimistic path.
-Here the LEZ contract verifies the signatures of the observations
-and takes the value supported by the majority of the honest indexers as correct.
-The faulty `proposer` is slashed.
+To dispute, it sends the observations to the LEZ contract.
+The contract verifies their signatures and membership, recomputes the median itself,
+and compares it with the proposed value.
+If they differ, the proposed value is rejected and the faulty `proposer` is slashed.
 - If no dispute is raised before the window closes,
 this is the optimistic path, and the LEZ contract finalizes the proposed value as the attested price.
 
@@ -363,8 +364,8 @@ The proposed price is rejected and the proposer is slashed.
 where valid means correctly signed and from a registered member.
 On a dispute, the LEZ contract discards observations that fail signature or membership,
 recomputes the median over the rest, and compares.
-If the proposed value does not match, the proposer is slashed, and the correct value,
-supported by the majority of the honest indexers, is taken.
+If the proposed value does not match, the proposer is slashed and LEZ takes
+its own recomputed median as the correct value.
 Including a non-member or badly signed observation is therefore only a fault when it changes the median.
 If it does not change the result, the attestation is still correct and nothing is slashed.
 A failed round is not re-proposed.
@@ -444,16 +445,15 @@ It does not ensure that enough `oracle nodes` submit each round.
 `Oracle node` liveness is handled by keeping the active set large and by rewards,
 not by replication or by slashing non-participation.
 
-3. **The optimistic path rests on one honest indexer.** On the optimistic path LEZ accepts
+3. **The optimistic path rests on honest indexers.** On the optimistic path LEZ accepts
 the proposer's value without checking it.
-A wrong value is challenged if at least one honest indexer recomputes
-from the same finalized inscriptions and disputes it before the window closes.
-The dispute is then resolved to the value supported by the majority of the honest indexers,
-so a correct outcome needs both, one honest indexer to raise the dispute and an honest majority to resolve it.
-Safety of the attested price therefore rests on a one-of-many honest assumption,
-not on trusting the proposer.
-The dispute itself is trust-minimized,
-since LEZ resolves it by verifying signatures and recomputing the median over the immutable observations.
+A wrong value is caught only if at least one honest indexer,
+having recomputed the median offchain from the same finalized inscriptions,
+sees the mismatch and raises a dispute.
+To dispute, the indexer only sends the observations to LEZ.
+LEZ then resolves it, by verifying signatures and membership and recomputing the median
+over the immutable observations, so the resolution is trust-minimized and does not rely on any indexer's word.
+Safety therefore rests on a one-of-many honest assumption to raise the dispute, and on LEZ to resolve it correctly.
 
 4. **Cross-zone boundary.** The attested price and the slashing evidence
 both cross into LEZ over a cross-zone transaction.
