@@ -294,18 +294,9 @@ so only registered nodes count toward the disputed value.
 
 The Oracle Zone has no execution environment of its own,
 so it custodies no stake and runs no slashing logic.
-All economic security lives in `LEZ contract`.
-The stake and slash operations are bridged between the Oracle Zone
-and LEZ using `PACT` (Provable Atomic Cross-zone Transactions) provided by the Logos stack.
-
-Two distinct PACT usages exist:
-
-- **Regular PACT (price push).** The attested price is written into LEZ
-every heartbeat (see [Rounds and Timing](#rounds-and-timing)).
-This is high-frequency.
-- **Economic-security PACT (slash).** Slashing enforcement is bridged to LEZ.
-This is low-frequency, a slash fires only on an established fault,
-so the cross-zone cost is incurred only on those events.
+All economic security lives in `LEZ contracts`.
+Setting membership by staking, reward settlement, and slashing all happen in `LEZ contracts`.
+The Oracle Zone only produces the data that these contracts act on.
 
 ### Rewards and Revenue
 
@@ -317,12 +308,16 @@ makes misbehavior economically self-defeating, since a fault forfeits that futur
 For this to hold, rewards SHOULD be fee-backed (funded by consumers of the feed) rather than pure emissions,
 so that the seat's value reflects real, sustainable income rather than speculation.
 
-Reward accounting is computed in the Oracle Zone, since only the indexer knows which `oracle nodes` submitted valid,
+Reward accounting is computed in the Oracle Zone,
+since only the indexer knows which `oracle nodes` submitted valid,
 within-bound observations in the epoch.
-At each epoch boundary the indexer commits a reward table (e.g. a Merkle root of `oracle node` amounts)
-to a LEZ settlement contract in a single PACT message; this keeps reward traffic off the per-round path.
-The settlement contract does not run a scheduler. Oracle node claims against the committed root,
-so payout is pull-based and per-epoch rather than a per-block push, and the claimant pays their own settlement cost.
+At each epoch boundary the indexer commits a reward table, for example a Merkle root of `oracle node` amounts,
+to a LEZ settlement contract in a single cross-zone transaction.
+This keeps reward traffic off the per-round path.
+The settlement contract does not run a scheduler.
+Each `oracle node` claims against the committed root,
+so payout is pull-based and per-epoch rather than a per-round push,
+and the claimant pays its own settlement cost.
 
 Reward eligibility is assessed against a soft deviation band around the round's attested median.
 The indexer marks each observation as reward-eligible if it lies
@@ -332,7 +327,7 @@ so `oracle nodes` are not pushed to herd toward the median,
 while an ineligible observation earns nothing for that round but is not slashed.
 This soft band is distinct from, and much tighter than, the hard validity bound whose breach is a slashable out-of-bound fault.
 The band affects reward accounting only.
-The attested median is always the plain median of all signature and membership-observations, unaffected by `D_reward`.
+The attested median is always the plain median of all valid observations, unaffected by `D_reward`.
 
 ### Slashing
 
