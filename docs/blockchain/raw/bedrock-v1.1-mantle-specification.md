@@ -1049,7 +1049,7 @@ declarations: dict[NoteId, DeclarationInfo]
       assert len(declaration.locators) <= 8
       ```
 
-  4. Ensure service note exists and value of service note is sufficient for joining the service.
+  4. Ensure the service note exists and its value is sufficient for joining the service.
       ```python
       assert ledger.is_unspent(declaration.service_note_id)
       note = ledger.get_note(declaration.service_note_id)
@@ -1189,7 +1189,7 @@ declarations: dict[DeclarationID, DeclarationInfo]
 
   *Validate*
 
-  1. Ensure that the service note exists and bound to this declaration.
+  1. Ensure that the service note exists and is bound to this declaration.
       ```python
       assert ledger.is_unspent(withdraw.service_note_id)
       assert withdraw.service_note_id in service_notes
