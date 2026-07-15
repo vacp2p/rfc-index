@@ -241,18 +241,32 @@ LEZ MAY use it to widen margins or pause when dispersion is high.
 
 The Logos Oracle Zone has no separate zone-level blocks,
 since it runs no independent consensus.
-Ordering and finality come entirely from the Logos Blockchain.
-Every reference to block height or block time in this document is to the Logos Blockchain block.
+Ordering and finality come entirely from the `Bedrock`.
+Every reference to block height or block time in this document is to the `Bedrock`.
 
 The Oracle Zone operates in rounds of length `R_round`.
 Two rules govern the timing:
 
-1. **Deterministic windowing.** Round boundaries MUST be defined by block height, instead of a wall-clock time.
-A wall-clock window is non-deterministic across standby indexer replicas.
+1. **Deterministic windowing.** Round boundaries MUST be defined by block height, not by wall-clock time.
+A wall-clock window is non-deterministic across indexer replicas.
 Defining the window as a fixed block range lets every replica derive the identical attested price.
-2. **Push cadence.** Delivery is push: every heartbeat the indexer writes the current attested price into LEZ over PACT.
+2. **Delivery cadence.** Once per round the proposer writes the attested price to LEZ,
+which opens the dispute window `W_dispute`.
 An on-chain write cannot occur faster than the Logos Blockchain produces blocks, so `R_round >= T_block`.
-With the default `T_block = 30 s`, the default heartbeat is one block (approximately `30 s`).
+With the default `T_block = 30 s`, the default round is one block, about `30 s`.
+
+The price is not final the moment it is written.
+It becomes final only after `W_dispute` passes with no dispute in LEZ contract.
+The effective freshness of a price is therefore the round cadence plus `W_dispute`.
+This design targets applications that tolerate this latency.
+It does not offer sub-second or high-frequency updates
+ and that is a deliberate limitation of the current version.
+
+If fewer than `N` observations are finalized within a round,
+no new price is attested for that round, and the last attested price remains the current value
+until a round again reaches quorum.
+Handling of a proposer that attests incorrectly,
+or before quorum, is covered in [Incentivization](#incentivization).
 
 ## Oracle Set Membership
 
