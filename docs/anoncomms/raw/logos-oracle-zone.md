@@ -101,19 +101,26 @@ Liveness of attestation depends on this oversizing.
 
 The roles used in the Oracle Zone are as follows:
 
+- `Bedrock`: The Logos Blockchain ordering layer, acting as the L1.
+It totally orders and finalizes the inscriptions,
+giving every indexer the same immutable input to aggregate over.
 - `oracle node`: An off-chain agent run by an oracle operator.
-It fetches prices from external sources, computes a local observation,
-signs and publishes it as an inscription.
+It fetches prices from external sources, computes a local price observation,
+signs and publishes it as an inscription on `Bedrock`.
 Each `oracle node` is identified by its public key as `oracle id`.
-- `indexer`: The interpretation layer of the Oracle zone.
-It subscribes to the ordered inscription stream, verifies each observation's signature,
-checks writer membership, and once a quorum exists,
-computes and writes the attested price to zone state.
-The indexer logic is deterministic and MAY be replicated for liveness.
-- `sequencer`: The interface through which an `oracle node`
-publishes an inscription to the ordering layer.
+The same key is its channel key on Bedrock and its staking identity in LEZ.
+- `indexer`: An `oracle node` in its second role.
+It reads the finalized inscription stream from `Bedrock` and computes the attested price
+as the median of the valid observations.
+Because the input is immutable and the aggregation code is fixed and deterministic,
+every honest indexer MUST derive the same value.
+- `proposer`: The one indexer that, in a given round,
+writes the attested price to LEZ and opens the dispute window.
+Only one proposer acts per round.
+- `challenger`: Any indexer that reads the proposed price from LEZ, recomputes it from the same finalized inscriptions,
+if the proposed value is wrong, disputes it before the window closes.
 - `consumer`: Any program or client that uses the attested price.
-The primary consumer is LEZ; other zones may be added later.
+The primary consumer is LEZ. Other zones may be added later.
 
 ## Flow
 
