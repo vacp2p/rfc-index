@@ -192,19 +192,25 @@ message PriceObservation {
 ## Aggregation
 
 The `indexer` is the core logic of the Oracle Zone.
-Within each round it performs the following steps deterministically
-over the ordered inscription stream:
+Within each round it performs the following steps deterministically over the ordered inscription stream.
 
-1. **Deserialize.** Decode each finalized inscription into a `PriceObservation`.
-2. **Verify signature.** Verify `signature` against `oracle_id`
-as in [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki).
-Invalid signature observations MUST be discarded.
-3. **Check membership.** Confirm `oracle_id` is a member of the active oracle set
-by verifying a Merkle inclusion proof against the membership root held in LEZ.
-Observations from non-members MUST be discarded.
-4. **Compute median.** Once the number of valid observations in the round reaches the quorum threshold `N`,
-compute and output the `attested price` as the median of all valid observations in the round, not only the first `N`.
+1. **Deserialize.** Decode each finalized inscription from `Bedrock` into a `PriceObservation`.
+2. **Check membership.** Confirm `oracle_id` is a member of the active oracle set by verifying
+its `membership_proof` against the membership root.
+Observations from non-members are discarded.
+3. **Compute median.** Once the number of observations in the round reaches the quorum threshold `N`,
+compute the `attested price` as the median of all observations in the round, not only the first `N`.
 The median structurally tolerates up to half the observations being adversarial without moving outside the honest range.
+
+Signature verification is not part of this optimistic path.
+On this optimistic path the writer identity is already established by Bedrock
+at the inscription level, so the indexer aggregates without checking the `signature` field.
+That field is verified only when a dispute is raised, and only by the LEZ contract,
+over the observations the proposer wrote.
+This is what keeps the heavy verification off the per-round path.
+
+Every honest indexer runs these steps over the same finalized inscriptions and,
+because the input is immutable and the code is deterministic, derives the same `attested price`.
 
 The attested price is specified as follows:
 
@@ -212,22 +218,24 @@ The attested price is specified as follows:
 syntax = "proto3";
 
 message AttestedPrice {
-  string feed_id          = 1;  // asset pair identifier; "BTC/USDT"
-  int64  price            = 2;  // attested median; real value = price * 10^(-decimals)
-  int32  decimals         = 3;  // number of decimal places in `price`
-  uint32 valid_count      = 4;  // observations aggregated; packed once this reaches N
-  int64  attested_at      = 5;  // height/inscription index at which quorum was met
-  bytes confidence        = 6 ; // OPTIONAL: 1.4826 * median(|xᵢ - median|) over observations
-
+  string feed_id      = 1;  // asset pair identifier, e.g. "BTC/USDT"
+  int64  price        = 2;  // attested median, real value = price * 10^(-decimals)
+  int32  decimals     = 3;  // number of decimal places in `price`
+  uint32 valid_count  = 4;  // number of observations aggregated in this round
+  int64  round        = 5;  // round identifier, in Bedrock block-height terms
+  int64  confidence   = 6;  // OPTIONAL: dispersion of observations, scaled like `price`
 }
 ```
 
 The indexer MAY also compute an optional `confidence` value
 that reports how tightly the observations cluster around the median.
 It is the median absolute deviation scaled to standard-deviation units, `1.4826 * median(|xᵢ - median|)`.
+The constant `1.4826` is the standard factor that rescales the median absolute deviation so that,
+for normally distributed data, it matches the ordinary standard deviation,
+which makes the value easier to read against familiar volatility figures.
 A small value means the observations agree closely,
 a large value means they are dispersed.
-Consumers MAY use it to widen margins or pause when dispersion is high.
+LEZ MAY use it to widen margins or pause when dispersion is high.
 
 ## Rounds and Timing
 
