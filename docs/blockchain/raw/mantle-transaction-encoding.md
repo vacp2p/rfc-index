@@ -67,7 +67,7 @@ OpPayload = Transfer /
             ChannelConfig /
             ChannelDeposit /
             ChannelWithdraw /
-            ChannelStakeAssignation /
+            ChannelTransfer /
             SDPDeclare /
             SDPWithdraw /
             SDPActive /
@@ -80,21 +80,21 @@ OpPayload = Transfer /
 ChannelInscribe = ChannelId Inscription Parent Signer
 Inscription     = UINT32 *BYTE 
 
-ChannelConfig     = ChannelId KeyCount *Signer PostingTimeframe PostingTimeout ConfigThreshold StakeManipulationThreshold
+ChannelConfig     = ChannelId KeyCount *Signer PostingTimeframe PostingTimeout ConfigThreshold TransferThreshold
 KeyCount                   = UINT16
 PostingTimeframe           = UINT32
 PostingTimeout             = UINT32
 ConfigThreshold            = UINT16
-StakeManipulationThreshold = UINT16
+TransferThreshold          = UINT16
 
 ChannelDeposit    = ChannelId Inputs Metadata
 Inputs            = InputCount *NoteId
 InputCount        = Byte
 Metadata          = UINT32 *BYTE
 
-ChannelStakeAssignation = ChannelId Inputs Outputs
+ChannelTransfer = ChannelId Inputs Outputs
 
-ChannelWithdraw   = ChannelId Inputs Outputs
+ChannelWithdraw   = ChannelId Inputs
 
 ChannelId         = Hash32
 Parent            = Hash32

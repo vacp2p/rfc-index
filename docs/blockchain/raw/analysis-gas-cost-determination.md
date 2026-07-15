@@ -68,7 +68,7 @@ TRANSFER_GAS                  = 590
 CHANNEL_INSCRIBE_GAS          = 56
 CHANNEL_CONFIG_GAS            = 56 * configuration_threshold
 CHANNEL_DEPOSIT_GAS           = 590
-CHANNEL_STAKE_ASSIGNATION_GAS = 56 * stake_manipulation_threshold
+CHANNEL_TRANSFER_GAS          = 56 * stake_manipulation_threshold
 CHANNEL_WITHDRAW_GAS          = 56 * stake_manipulation_threshold
 SDP_DECLARE_GAS               = 646
 SDP_WITHDRAW_GAS              = 590
@@ -137,24 +137,21 @@ Execution: ~590k CPU cycles.
 The validation process requires verifying multiple Eddsa25519 signatures.
 The execution require consuming the channel notes, deriving note Id and adding notes to the ledger.
 
-Execution: ~56k CPU cycles * stake_manipulation_threshold.
+Execution: ~56k CPU cycles * transfer_threshold.
 
-- Verification of `stake_manipulation_threshold` Ed25519Signatures: 56,000 cycles per signature.
+- Verification of `transfer_threshold` Ed25519Signatures: 56,000 cycles per signature.
 - Verification that the notes are in the ledger: negligible.
 - Verification that the notes are in the channel: negligible.
-- Removing of the note from the ledger: negligible.
-- Verification of the output validity: negligible.
-- Insertion of the note in the ledger: negligible.
-- Derivation of the note identifiers: negligible
+- Removing the notes from channel notes: negligible.
 
 ## Channel Stake Assignation
 
 The validation process requires verifying multiple Eddsa25519 signatures, and managing the channel notes.
 The execution require deriving note Id and adding notes to the ledger.
 
-Execution: ~56k CPU cycles * stake_manipulation_threshold.
+Execution: ~56k CPU cycles * transfer_threshold.
 
-- Verification of `stake_manipulation_threshold` Ed25519Signatures: 56,000 cycles per signature.
+- Verification of `transfer_threshold` Ed25519Signatures: 56,000 cycles per signature.
 - Verification that the notes are in the ledger: negligible.
 - Verification that the notes are in the channel: negligible.
 - Removing of the note from the ledger: negligible.

@@ -205,7 +205,7 @@ Mantle Validators execute sequentially each Operation in `ops` according to its 
 | CHANNEL_INSCRIBE | 0x11 | Write a message permanently onto Mantle. |
 | CHANNEL_DEPOSIT | 0x12 | Deposit assets into a channel |
 | CHANNEL_WITHDRAW | 0x13 | Withdraw assets from a channel |
-| CHANNEL_STAKE_ASSIGNATION | 0x14 | Assign notes to a channel |
+| CHANNEL_TRANSFER | 0x14 | Consume and create notes belonging to a channel |
 | *RESERVED* | *0x15 - 0x1F* |  |
 | SDP_DECLARE | 0x20 | Declare intention to participate as a node in a Bedrock Service, locking funds as collateral. |
 | SDP_WITHDRAW | 0x21 | Withdraw participation from a Bedrock Service, unlocking your funds in the process. |
@@ -247,8 +247,8 @@ class ChannelState:
     posting_timeout: u32    # number of slots (0 = no timeout)
 
     # Bridging
-    stake_manipulation_threshold: u16  # indicating how many keys are
-                             # required to withdraw funds from the channel
+    transfer_threshold: u16  # indicating how many keys are
+                             # required to transfer or withdraw funds from the channel
 
 def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -> ChannelState:
     return ChannelState(
@@ -260,7 +260,7 @@ def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -> ChannelSt
         posting_timeframe = 0,
         posting_timeout = 0,
         configuration_threshold = 1,
-        stake_manipulation_threshold = 1)
+        transfer_threshold = 1)
 ```
 
 Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.
@@ -318,7 +318,7 @@ Because the channel owns the note but does not hold the delegated key, the note 
 | Party | Can | Cannot |
 |---|---|---|
 | Holder of the note's `ZkPublicKey` (by default, the depositor) | Use the note to create a PoL and earn its leader rewards | Spend the note, withdraw it, reassign it, or use it as service stake |
-| Channel sequencers (owner of the note) | Reassign the note to a different `ZkPublicKey` (`CHANNEL_STAKE_ASSIGNATION`) and spend it to fund withdrawals (`CHANNEL_WITHDRAW`), both without `ZkSignature` verification | Use the note as service stake, or earn PoL rewards without first assigning the note to their own key |
+| Channel sequencers (owner of the note) | Reassign the note to a different `ZkPublicKey` (`CHANNEL_TRANSFER`) and spend it to fund withdrawals (`CHANNEL_WITHDRAW`), both without `ZkSignature` verification | Use the note as service stake, or earn PoL rewards without first assigning the note to their own key |
 
 This makes delegated staking explicit. Sequencers can assign a channel note to their own `ZkPublicKey` and earn the Proof of Leadership rewards it produces, but those rewards always follow the assigned key, so the channel earns nothing merely by owning the note. Conversely, ownership never leaving the channel is exactly what lets sequencers redelegate value or cover withdrawals at any time without a user signature.
 
@@ -460,7 +460,7 @@ class ChannelConfig:
     posting_timeframe: u32
     posting_timeout: u32
     configuration_threshold: u16
-    stake_manipulation_threshold: u16
+    transfer_threshold: u16
 ```
 
 #### Proof
@@ -494,7 +494,7 @@ channels: dict[ChannelId, ChannelState]
 
 ```python
 assert config.configuration_threshold > 0
-assert config.stake_manipulation_threshold > 0
+assert config.transfer_threshold > 0
 assert len(config.keys) > 0
 assert len(config.keys) < 2^16
 # The configuration threshold must be reachable with the accredited keys,
@@ -547,7 +547,7 @@ block_slot: Slot
       chan.posting_timeout = config.posting_timeout
 
       # Update Bridging Parameters
-      chan.stake_manipulation_threshold = config.stake_manipulation_threshold
+      chan.transfer_threshold = config.transfer_threshold
       ```
 
   3. Update the channel tip.
@@ -573,7 +573,7 @@ config = ChannelConfig(
     posting_timeframe = 5000,
     posting_timeout = 500,
     configuration_threshold = 2,
-    stake_manipulation_threshold = 1
+    transfer_threshold = 1
 )
 
 # Build the transfer operation to pay the fees
@@ -663,11 +663,11 @@ ledger: Ledger
 
   *Execute*
 
-  1. Mark the inputs as channel notes owned by the channel. The notes are neither consumed nor re-created: they keep their `NoteId`, value and `ZkPublicKey`, and are simply registered in the `channel_notes` set.
-      ```python
-      for note_id in deposit.inputs:
-          ledger.channel_notes[note_id] = deposit.channel
-      ```
+Mark the inputs as channel notes owned by the channel. The notes are neither consumed nor re-created: they keep their `NoteId`, value and `ZkPublicKey`, and are simply registered in the `channel_notes` set.
+```python
+for note_id in deposit.inputs:
+	ledger.channel_notes[note_id] = deposit.channel
+```
 
 #### Example
 
@@ -708,7 +708,6 @@ Withdraw notes from a channel.
 class ChannelWithdraw:
     channel: ChannelId
     inputs: list[NoteId]
-    outputs: list[Note]
 ```
 
 #### Proof
@@ -717,7 +716,7 @@ A Channel Withdraw is authorized by a threshold of the channel's accredited keys
 
 ```python
 class ChannelWithdrawOpProof:
-    signatures: list[Ed25519Signature] # exactly stake_manipulation_threshold signatures
+    signatures: list[Ed25519Signature] # exactly transfer_threshold signatures
     indexes: list[int]    # signatures of accredited keys with their index
                           # indexes must be ordered from smallest to
                           # biggest without duplication
@@ -725,7 +724,7 @@ class ChannelWithdrawOpProof:
 
 #### Execution Gas
 
-  Channel Withdraw Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_WITHDRAW_GAS * stake_manipulation_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+  Channel Withdraw Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_WITHDRAW_GAS * transfer_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
@@ -742,35 +741,23 @@ ledger: Ledger
 
   *Validate*
 
-  1. Check that the outputs are valid
-      ```python
-      ledger.assert_valid_output(withdrawal.outputs)
-      ```
-
-  2. Check that the channel exists
+  1. Check that the channel exists
       ```python
       assert withdrawal.channel in channels
       ```
 
-  3. Check that the withdraw nonce is correct
+  2. Check that the inputs are valid and belongs to the channel
       ```python
       ledger.assert_spendable(withdrawal.inputs, withdrawal.channel)
       ```
 
-  4. Check that the withdraw is balanced
-      ```python
-      input_amount = sum(ledger.get_note(input).value for input in withdrawal.inputs)
-      output_amount = sum(output.value for output in withdrawal.outputs)
-      assert input_amount == output_amount
-      ```
-
-  5. Check the signatures (see [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification))
+  3. Check the signatures (see [Multiple Ed25519 Signatures Verification](#multiple-ed25519-signatures-verification))
       ```python
       MultiEd25519_verify(txhash,
                           proof.signatures,
                           proof.indexes,
                           channels[withdrawal.channel].accredited_keys,
-                          channels[withdrawal.channel].stake_manipulation_treshold)
+                          channels[withdrawal.channel].transfer_treshold)
       ```
 
 #### Execution
@@ -786,18 +773,11 @@ ledger: Ledger
 
   *Execute*
 
-  1. Remove inputs from the ledger.
-      ```python
-      for input in withdrawal.inputs:
-          ledger.execute_spending(withdrawal.inputs, withdrawal.channel)
-      ```
-
-  2. Add outputs to the ledger.
-      ```python
-      withdrawal_id = derive_op_id(withdrawal)
-      ledger.execute_adding(withdrawal_id, withdrawal.outputs)
-      ```
-
+Remove the inputs from channel notes owned by the channel. The notes are neither consumed nor re-created: they keep their NoteId, value and ZkPublicKey, and are simply unregistered in the channel_notes set.
+```python
+for note_id in withdrawal.inputs:
+    ledger.channel_notes.pop(note_id)
+```
 #### Example
 
   Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.
@@ -807,7 +787,6 @@ ledger: Ledger
 withdrawal = ChannelWithdraw(
     channel=ZONE_A,
     inputs  = [Channel_note_id]
-    outputs = [Note(pk=alice, value=50)]
 )
 
 # Build the transfer operation to pay the fees
@@ -825,14 +804,14 @@ signed_tx = SignedMantleTx(
 )
 ```
 
-### CHANNEL_STAKE_ASSIGNATION
+### CHANNEL_TRANSFER
 
 Assign funds from a channel to new `ZkPublicKey`. This funds are only usable to participate in PoS and to withdraw from the channel.
 
 #### Payload
 
 ```python
-class ChannelStakeAssignation:
+class ChannelTransfer:
     channel: ChannelId
     inputs: list[NoteId]
     outputs: list[Note]
@@ -841,15 +820,15 @@ class ChannelStakeAssignation:
 #### Proof
 
 ```python
-class ChannelStakeAssignationOpProof:
-    signatures: list[Ed25519Signature] # signature from stake_manipulation_threshold keys
+class ChannelTransferOpProof:
+    signatures: list[Ed25519Signature] # signature from transfer_threshold keys
     indexes: list[int]    # signatures of accredited keys with their index.
                           # indexes must be ordered from smallest to biggest without duplication
 ```
 
 #### Execution Gas
 
-`CHANNEL_STAKE_ASSIGNATION` Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_STAKE_ASSIGNATURE_GAS * stake_manipulation_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
+`CHANNEL_TRANSFER` Operations have a linear Execution Gas cost equal to `EXECUTION_CHANNEL_TRANSFER_GAS * transfer_threshold`. See [Gas Determination](#gas-determination) for the Execution Gas values.
 
 #### Validation
 
@@ -857,8 +836,8 @@ class ChannelStakeAssignationOpProof:
 
 ```python
 txhash: zkhash
-stake_assignation: ChannelStakeAssignation
-proof: ChannelStakeAssignationOpProof
+chan_transfer: ChannelTransfer
+proof: ChannelTransferOpProof
 
 channels: dict[ChannelId, ChannelState]
 ledger: Ledger
@@ -869,26 +848,26 @@ ledger: Ledger
 1. Check that the outputs are valid
 
 ```python
-ledger.assert_valid_output(stake_assignation.outputs)
+ledger.assert_valid_output(chan_transfer.outputs)
 ```
 
 2. Check that the channel exists
 
 ```python
-assert stake_assignation.channel in channels
+assert chan_transfer.channel in channels
 ```
 
 3. Check that the inputs are valid and belongs to the channel
 
 ```python
-ledger.assert_spendable(stake_assignation.inputs, stake_assignation.channel)
+ledger.assert_spendable(chan_transfer.inputs, chan_transfer.channel)
 ```
 
 4. Check the balance
 
 ```python
-input_amount = sum(ledger.get_note(input).value for input in stake_assignation.inputs)
-output_amount = sum(output.value for output in stake_assignation.outputs)
+input_amount = sum(ledger.get_note(input).value for input in chan_transfer.inputs)
+output_amount = sum(output.value for output in chan_transfer.outputs)
 assert input_amount == output_amount
 ```
 
@@ -897,8 +876,8 @@ assert input_amount == output_amount
 MultiEd25519_verify(txhash,
 					proof.signatures,
                     proof.indexes,
-                    channels[stake_assignation.channel].accredited_keys,
-                    channels[stake_assignation.channel].stake_manipulation_treshold)
+                    channels[chan_transfer.channel].accredited_keys,
+                    channels[chan_transfer.channel].transfer_treshold)
 ```
 
 #### Execution
@@ -906,7 +885,7 @@ MultiEd25519_verify(txhash,
 *Given*
 
 ```python
-stake_assignation: ChannelStakeAssignation
+chan_transfer: ChannelTransfer
 
 channels: dict[ChannelId, ChannelState]
 ledger: Ledger
@@ -917,15 +896,14 @@ ledger: Ledger
 1. Remove inputs from the ledger
 
 ```python
-for input in stake_assignation.inputs:
-    ledger.execute_spending(stake_assignation.inputs, stake_assignation.channel)
+ledger.execute_spending(chan_transfer.inputs, chan_transfer.channel)
 ```
 
 2. Add outputs to the ledger.
 
 ```python
-stake_assignation_id = derive_op_id(stake_assignation)
-ledger.execute_adding(stake_assignation_id, stake_assignation.outputs, stake_assignation.channel)
+chan_transfer_id = derive_op_id(chan_transfer)
+ledger.execute_adding(chan_transfer_id, chan_transfer.outputs, chan_transfer.channel)
 ```
 
 #### Example
@@ -934,7 +912,7 @@ Suppose the unique sequencer of Zone A wants to attribute 50 tokens to themself.
 
 ```python
 # Sequencer encodes their assignation
-stake_assignation = ChannelStakeAssignation(
+chan_transfer = ChannelTransfer(
     channel=ZONE_A,
     inputs = [Channel_note_id]
     outputs = [Note(pk=alice, value=50)]
@@ -944,7 +922,7 @@ stake_assignation = ChannelStakeAssignation(
 transfer = Transfer(inputs=[Sequencer_funds], outputs=[<change_note>])
 
 tx = MantleTx(
-    ops=[Op(opcode=CHANNEL_STAKE_ASSIGNATION, payload=encode(stake_assignation)),
+    ops=[Op(opcode=CHANNEL_TRANSFER, payload=encode(chan_transfer)),
          Op(opcode=TRANSFER, payload=encode(transfer))],
 )
 
@@ -1754,7 +1732,7 @@ From the [[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md
 | EXECUTION_CHANNEL_CONFIG_GAS | 56 |
 | EXECUTION_CHANNEL_DEPOSIT_GAS | 590 |
 | EXECUTION_CHANNEL_WITHDRAW_GAS | 56 |
-| EXECUTION_CHANNEL_STAKE_ASSIGNATION_GAS | 56 |
+| EXECUTION_CHANNEL_TRANSFER_GAS | 56 |
 | EXECUTION_SDP_DECLARE_GAS | 646 |
 | EXECUTION_SDP_WITHDRAW_GAS | 590 |
 | EXECUTION_SDP_ACTIVE_GAS | 590 |
