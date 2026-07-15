@@ -86,15 +86,16 @@ in this document are to be interpreted as described in [RFC 2119](https://www.ie
 
 ### Assumptions
 
-- At least more than half of the observations aggregated into
-any single attestation are honest and follow this protocol.
-- The indexer cannot manipulate observation ordering;
-ordering authority is delegated entirely to Bedrock's immutable inscription order.
-- The indexer has no execution logic beyond aggregation;
-stake custody and slashing enforcement are delegated entirely
-to LEZ smart contracts via cross zone transactions.
-- The active oracle set is large enough that quorum `N` is reached every round;
-liveness of attestation depends on this oversizing.
+- At least more than half of the oracle nodes (indexers) are honest,
+who fetch-then-forward price data by following this protocol.
+- The indexer can manipulate observation ordering.
+Ordering authority is delegated entirely to Bedrock's immutable inscription order.
+- Indexers have no immutable execution logic beyond aggregation.
+Stake custody and slashing enforcement are delegated entirely to LEZ contracts.
+- At least one honest indexer disputes a wrong proposal before the dispute window closes,
+and the honest majority above resolves the dispute to the correct value.
+- The active oracle set is large enough that the quorum `N` is reached every round.
+Liveness of attestation depends on this oversizing.
 
 ## Roles
 
