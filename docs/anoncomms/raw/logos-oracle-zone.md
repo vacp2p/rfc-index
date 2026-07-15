@@ -334,33 +334,57 @@ The attested median is always the plain median of all valid observations, unaffe
 Slashing MUST fire only on strict and provable conditions.
 A slash is triggered by submitting fault evidence to the LEZ contract,
 which verifies it and applies the penalty.
-Two slashable faults are defined:
+Four slashable faults are defined:
 
-1. **Equivocation.** An `oracle id` produces two conflicting signed observations for the same feed and round.
+1. **Equivocation.** An `oracle id` produces two conflicting signed observations
+for the same feed and round.
 The two BIP-340 signatures are a self-contained fraud proof,
-cheaply verified in LEZ, and non-malleable signatures make this unambiguous. 
+verified in LEZ, and non-malleable signatures make this unambiguous.
 Because the proof is cryptographic and false positives are effectively impossible,
-this fault SHOULD carry the highest penalty, up to the full bonded stake.
+this fault SHOULD carry the highest penalty.
 
-2. **Out-of-bound value.** A signed observation lies outside the hard validity bound `D_slash` for the round. 
-The signed value plus the round context is itself the proof. 
-`D_slash` is absolute sanity bound checked during slashing,
+2. **Out-of-bound value.** A signed observation lies outside the hard validity bound `D_slash` for the round.
+The signed value plus the round context is itself the proof.
+`D_slash` is an absolute sanity bound checked during slashing,
 and it is much wider than the tight `D_reward` band used for reward eligibility (`D_reward < D_slash`),
 so that an honest node stays well inside it and a value outside it indicates malice or gross malfunction.
-Because bound-checking can still have edge cases (a stale reference or a genuine market dislocation may make an honest value appear out of bound),
-this fault SHOULD carry a capped fraction rather than the full stake, and MAY be paired with a challenge window.
+Because bound-checking can still have edge cases,
+a stale reference or a genuine market dislocation may make an honest value appear out of bound,
+this fault SHOULD carry a capped fraction rather than the full stake,
+and MAY be paired with a challenge window.
+
+3. **Premature attestation.** A proposer attests a price before the round reaches the quorum `N`.
+The number of observations finalized in a round is fixed and provable from the immutable Bedrock inscriptions,
+so a challenger proves that fewer than `N` observations existed when the proposer attested.
+The fault is objective and cheaply proven.
+The proposed price is rejected and the proposer is slashed.
+
+4. **Wrong median.** A proposer attests a value that is not the median of the valid observations of the round,
+where valid means correctly signed and from a registered member.
+On a dispute, the LEZ contract discards observations that fail signature or membership,
+recomputes the median over the rest, and compares.
+If the proposed value does not match, the proposer is slashed, and the correct value,
+supported by the majority of the honest indexers, is taken.
+Including a non-member or badly signed observation is therefore only a fault when it changes the median.
+If it does not change the result, the attestation is still correct and nothing is slashed.
+A failed round is not re-proposed.
+The feed continues from the next round,
+so a proposer that forces a failed round pays a slash for each attempt,
+which makes stalling the feed economically unsustainable.
 
 Slashed stake MAY be burnt or split between a bounty to the party that submitted the fault evidence,
 which funds a permissionless watchdog economy, and burn or treasury for the remainder.
-Liveness and non-participation are NOT slashed; missing `oracle nodes` are tolerated by a sufficiently large active set,
+Liveness and non-participation are NOT slashed.
+Missing `oracle nodes` are tolerated by a sufficiently large active set
 and are handled through reward eligibility rather than penalties.
-Falling outside the `D_reward` band is likewise NOT a slashable fault;
-it only forfeits that round's reward.
-Subjective "incorrect price" and within-bound majority bias are also deliberately excluded,
+Falling outside the `D_reward` band is likewise NOT a slashable fault.
+It only forfeits that round's reward.
+Subjective incorrect price and within-bound majority bias are also deliberately excluded,
 since no trust-minimized programmatic predicate for them exists.
 These are addressed economically rather than by slashing,
-through the franchise value of the reward stream above, the unbonding period below,
-and randomized selection, as discussed in [Security Considerations](#security-considerations).
+through the franchise value of the reward stream above,
+the unbonding period below, and randomized selection,
+as discussed in [Security Considerations](#security-considerations).
 
 ## Parameters
 
