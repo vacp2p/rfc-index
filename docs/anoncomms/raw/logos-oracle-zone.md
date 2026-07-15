@@ -397,7 +397,7 @@ Block-time and finality parameters are properties of the LEZ and are listed for 
 | Quorum threshold | `N` | 50 | Minimum observations required to attest a price for a round. |
 | Honest-majority assumption |  | majority of the aggregated observations | Over the observations aggregated per attestation, not the total pool. |
 | Heartbeat / round cadence | `R_round` | 1 block (`~30 s`) | Defined in block-height terms; must be `>= T_block`. |
-| Dispute window | `W_dispute` | 3 LEZ blocks (`~3 s`) | Time a proposed price waits for a dispute before it finalizes. |
+| Dispute window | `W_dispute` | 3 Bedrock blocks (`~90 s`) | Time a proposed price waits for a dispute before it finalizes. |
 | LEZ block time |  | `~1 s` | Consumer zone block time, faster than the host chain block. |
 | Aggregation function |  | median | Plain median of all signature and membership-observations. |
 | Reward band | `D_reward` | 0.5%* | Tight band around the median for reward eligibility; `D_reward < D_slash`.  |
