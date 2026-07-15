@@ -389,7 +389,7 @@ as discussed in [Security Considerations](#security-considerations).
 ## Parameters
 
 The parameters below are drawn from values used by comparable oracle systems and adjusted for this design.
-Block-time and finality parameters are properties of the host chain and are listed for reference.
+Block-time and finality parameters are properties of the LEZ and are listed for reference.
 
 | Parameter | Symbol | Default | Notes |
 | --- | --- | --- | --- |
@@ -397,6 +397,8 @@ Block-time and finality parameters are properties of the host chain and are list
 | Quorum threshold | `N` | 50 | Minimum observations required to attest a price for a round. |
 | Honest-majority assumption |  | majority of the aggregated observations | Over the observations aggregated per attestation, not the total pool. |
 | Heartbeat / round cadence | `R_round` | 1 block (`~30 s`) | Defined in block-height terms; must be `>= T_block`. |
+| Dispute window | `W_dispute` | 3 LEZ blocks (`~3 s`) | Time a proposed price waits for a dispute before it finalizes. |
+| LEZ block time |  | `~1 s` | Consumer zone block time, faster than the host chain block. |
 | Aggregation function |  | median | Plain median of all signature and membership-observations. |
 | Reward band | `D_reward` | 0.5%* | Tight band around the median for reward eligibility; `D_reward < D_slash`.  |
 | Hard validity bound | `D_slash` | 2.5%* | Wide sanity bound; a signed value outside it is a slashable out-of-bound fault.  |
@@ -405,6 +407,8 @@ Block-time and finality parameters are properties of the host chain and are list
 | Stake requirement |  | fixed floor, greater of token amount or USD value* | Hybrid floor to resist token-price drawdown; magnitude set with tokenomics. |
 | Slash fraction (equivocation) |  | up to 100%* | Cryptographic proof, effectively zero false positives, so the highest tier is justified. |
 | Slash fraction (out-of-bound) |  | 5% cap* | Capped due to edge-case risk; MAY use a challenge window. |
+| Slash fraction (premature attestation) |  | up to 100%* | Provable from immutable inscriptions, effectively zero false positives. |
+| Slash fraction (wrong median) |  | capped* | Proposer attested a value a successful dispute proved wrong. |
 | Unbonding / cooldown period |  | 21 days* | Cosmos/Band anchor; must exceed fault-proving window plus deep-finality horizon. |
 | Reward settlement |  | per epoch, pull-based | Claim against a committed Merkle root|
 | Epoch length |  | 7 days* | Weekly settlement. |
