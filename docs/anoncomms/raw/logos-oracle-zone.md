@@ -195,14 +195,17 @@ The `indexer` is the core logic of the Oracle Zone.
 Within each round it performs the following steps deterministically over the ordered inscription stream.
 
 1. **Deserialize.** Decode each finalized inscription from `Bedrock` into a `PriceObservation`.
-2. **Check membership.** Confirm `oracle_id` is a member of the active oracle set by verifying
+2. **Verify signature.** Verify the `signature` field against `oracle_id` as in [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki).
+Observations with an invalid signature are discarded.
+This runs off-chain in the indexer.
+3. **Check membership.** Confirm `oracle_id` is a member of the active oracle set by verifying
 its `membership_proof` against the membership root.
 Observations from non-members are discarded.
-3. **Compute median.** Once the number of observations in the round reaches the quorum threshold `N`,
+4. **Compute median.** Once the number of observations in the round reaches the quorum threshold `N`,
 compute the `attested price` as the median of all observations in the round, not only the first `N`.
 The median structurally tolerates up to half the observations being adversarial without moving outside the honest range.
 
-Signature verification is not part of this optimistic path.
+Signature verification is not part of this optimistic path in LEZ.
 On this optimistic path the writer identity is already established by Bedrock
 at the inscription level, so the indexer aggregates without checking the `signature` field.
 That field is verified only when a dispute is raised, and only by the LEZ contract,
@@ -270,19 +273,22 @@ or before quorum, is covered in [Incentivization](#incentivization).
 
 ## Oracle Set Membership
 
-Membership of the active oracle set determines which `oracle id`s submit observations that the indexer will accept.
-Membership is also the basis of incentivization, to join, an `oracle node` MUST bond stake in a LEZ contract
-and register itself in the membership tree held in LEZ.
-Registration is a LEZ-only operation and does not require a cross-zone write into the Oracle Zone.
+Membership of the active oracle set determines which `oracle id`s submit observations that indexers will accept.
+Membership is also the basis of incentivization.
+To join, an `oracle node` MUST bond stake in a LEZ contract and register its `oracle id` in the membership tree held in LEZ.Registration is a LEZ-only operation and does not require a cross-zone write into the Oracle Zone.
 
-The indexer does not query LEZ state live, which would make aggregation non-deterministic across replicas.
-Instead, each observation carries a Merkle inclusion proof against the LEZ membership root,
+An indexer does not query LEZ state live, which would make aggregation non-deterministic across replicas.
+Instead, each observation carries a `membership_proof`,
+a Merkle inclusion proof of its `oracle id` against the LEZ membership root,
 and the indexer verifies the proof against the membership root it holds.
-The indexer is assumed to hold the latest state of the membership tree.
-Each `oracle id` is the submitting node's BIP-340 x-only public key,
-the membership tree stores these public keys directly.
-The indexer verifies `signature` against `oracle_id`
-and checks the accompanying `membership_proof` against the membership root.
+The indexer is assumed to hold the latest membership root.
+Each `oracle id` is the node's BIP-340 x-only public key,
+and the membership tree stores these public keys directly.
+
+During aggregation an indexer discards observations whose `membership_proof` does not verify,
+so non-members' entrys are discarded by `proposer` so never enter the median.
+On the dispute path the LEZ contract checks the same proofs against its own membership root,
+so only registered nodes count toward the disputed value.
 
 ## Incentivization
 
