@@ -26,6 +26,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.2.0 | [RFC] Per-service uniqueness of `provider_id` and `zk_id` | 2026-07-08 |
 
 # Introduction
 
@@ -208,6 +209,19 @@ All `DeclarationInfo` references are stored in the `declarations` and are indexe
 declarations: list[declaration_id]
 ```
 
+### Identifier Uniqueness
+
+The SDP is responsible for enforcing the uniqueness of the `provider_id` and the `zk_id` in the context of a service. This means that, for a given `service`, each `provider_id` and each `zk_id` must appear in at most one active `DeclarationInfo` at a time.
+
+The `declaration_id` uniqueness alone is insufficient to guarantee this property. Because `declaration_id = Hash(service||provider_id||zk_id||locators)`, two declarations for the same `service` that reuse the same `provider_id` (or the same `zk_id`) but differ in any other component would produce distinct `declaration_id`s and would therefore not collide. The SDP must reject such declarations regardless.
+
+Consequently, within a single `service`:
+
+- A `provider_id` must not be bound to more than one `DeclarationInfo`.
+- A `zk_id` must not be bound to more than one `DeclarationInfo`.
+
+The uniqueness is scoped per-service: the same `provider_id` or `zk_id` may be reused across different services, but never more than once within the same service. A `provider_id` or `zk_id` becomes available for reuse in a service only once its previous `DeclarationInfo` for that service has been withdrawn and removed (see [Withdraw](#withdraw)).
+
 ### Active Message
 
 The construction of the active message is as follows:
@@ -268,6 +282,7 @@ The declaration message is considered valid when all of the following are met:
 
 - The sender meets the stake requirements and its `locked_note_id` is valid.
 - The `declaration_id` is unique.
+- The `provider_id` and the `zk_id` are each unique in the context of the `service` (as defined in [Identifier Uniqueness](#identifier-uniqueness)).
 - The sender knows the secret behind the `provider_id` identifier.
 - The length of the `locators` list must not be longer than 8.
 - The `nonce` increases monotonically.
