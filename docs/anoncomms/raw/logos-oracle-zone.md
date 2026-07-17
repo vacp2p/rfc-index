@@ -164,12 +164,13 @@ so that no floating-point value crosses the protocol boundary. The real value is
 Authentication of an observation on the optimistic path comes from Bedrock.
 An oracle node publishes to its own channel,
 so Bedrock verifies the writer signature at the inscription level and records who wrote each observation.
-No signature is checked during normal aggregation.
 
 The `signature` field carries a [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) Schnorr signature
 over the SHA-256 hash of the canonical serialization of fields 1 to 7.
-It is used only on the dispute path. When a dispute is raised, the LEZ contract verifies this signature directly,
-without depending on Bedrock, which is what lets the dispute be resolved inside LEZ.
+The indexer verifies this signature off-chain during aggregation.
+On the optimistic path LEZ does not verify it.
+LEZ verifies it only when a dispute is raised, without depending on Bedrock,
+which is what lets the dispute be resolved inside LEZ.
 The `membership_proof` is a separate witness and is not covered by the signature.
 
 The `PriceObservation` is specified using [protocol buffers v3](https://protobuf.dev/):
@@ -185,7 +186,7 @@ message PriceObservation {
   int64  timestamp         = 5;  // observation time (unix milliseconds), advisory only
   bytes  oracle_id         = 6;  // the node's 32-byte BIP-340 x-only public key, also its channel key and staking identity
   bytes  source_set        = 7;  // OPTIONAL: source identifiers used for the local median
-  bytes  signature         = 8;  // BIP-340 Schnorr signature over SHA-256 of fields 1 to 7, checked only on the dispute path
+  bytes  signature         = 8;  // BIP-340 Schnorr signature over SHA-256 of fields 1 to 7, verified off-chain by the indexer and on-chain by LEZ only on dispute
   bytes  membership_proof  = 9;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
 }
 ```
