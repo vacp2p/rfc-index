@@ -119,8 +119,6 @@ The user is designated as the vault's owner.
 A user MAY own multiple vaults.
 One vault MAY back multiple streams, possibly to different providers.
 Each vault uses exactly one token for its balance and for every stream it backs.
-That token is fixed for the life of the vault
-(see [Multi-Token Vaults](#multi-token-vaults)).
 
 A stream represents an individual flow of funds from a vault to one provider.
 Each stream MUST belong to exactly one vault.
@@ -158,10 +156,8 @@ allocation = accrued + unaccrued
 Vault operations include:
 
 - Initialize: create an empty vault.
-  Chain integrations MAY attach privacy, token identity, or other metadata fields
-  at initialization
-  (see [Multi-Token Vaults](#multi-token-vaults)
-  and [Security and privacy considerations](#security-and-privacy-considerations)).
+  Chain integrations MAY attach privacy, token identity, or other metadata
+  at initialization.
 - Deposit: increase `balance` and `unallocated`.
 - Withdraw: decrease `balance` by at most `unallocated`.
 
@@ -326,25 +322,20 @@ the vault token is the chain native token.
 
 The multi-token vaults extension records an explicit token identity on each vault
 and lets providers accept native and non-native tokens in policy.
-
 Each vault MUST record exactly one token identity in chain-specific form
 at initialization.
-That identity is immutable for the life of the vault.
+That identity is immutable afterward.
 Every stream in that vault MUST denominate
 rate, `allocation`, `accrued`, and claims in that vault's token.
-A vault MUST use a single token for all of its streams and its holding balance.
 
 When verifying a `StreamProposal`,
 the provider MUST read the vault's on-chain token identity
-and apply the matching economic thresholds from
-[`StreamProviderPolicy`](#streamproviderpolicy).
+and apply the matching economic thresholds from policy.
 A vault token with no matching accepted thresholds
 MUST yield `PARAMS_REJECTED`.
 
-`StreamParams` carries rate and allocation only.
-The unit of account is the vault's token.
-`VaultProof` carries `token_id` so the vault-owner signature binds that unit
-(see [`VaultProof`](#vaultproof)).
+`StreamParams` rate and allocation use the vault's token as their unit.
+`VaultProof.token_id` binds that unit in the vault-owner signature.
 
 Future work MAY move native thresholds into `TokenStreamPolicy` as well,
 so every accepted token uses the same repeated policy entry shape.
@@ -534,9 +525,8 @@ to back the proposed stream.
 For a `StreamProposal`, the vault account for `vault_id` MUST exist on-chain.
 Proposed `allocation` MUST be at most that vault's `unallocated` balance.
 `owner_public_key` MUST match the on-chain vault owner for that vault.
-`token_id` MUST equal the on-chain vault token identity.
-Under the [Multi-Token Vaults](#multi-token-vaults) extension,
-`token_id` is REQUIRED on every `VaultProof`.
+With multi-token vaults, `token_id` is REQUIRED
+and MUST equal the on-chain vault token identity.
 
 ```protobuf
 message VaultProof {
@@ -559,15 +549,13 @@ and separately map that identity to the chain account that receives stream claim
 Chain integrations MUST define how `owner_public_key`
 cryptographically binds to the vault owner stored on-chain.
 `token_id` is the vault token identity in chain-specific encoding.
-It is an authorized claim that MUST match on-chain vault state.
-On-chain vault state remains authoritative for the vault's token.
+On-chain vault state remains authoritative for that identity.
 `owner_signature` authorizes the proposed stream session.
-It MUST cover at least the other `VaultProof` fields,
-including `token_id`,
+It MUST cover the other `VaultProof` fields,
 the accompanying `StreamParams`,
 and `StreamProposal.public_key`.
 Chain integrations MUST document the canonical signed payload.
-LEZ defines vault-owner authorization in [Vault owner authorization](#vault-owner-authorization-vaultproofowner_signature).
+LEZ defines vault-owner authorization under Off-chain bytes below.
 
 #### `StreamParams`
 
@@ -611,39 +599,31 @@ message StreamProviderPolicy {
 ```
 
 Top-level `min_rate` and `min_allocation` apply to the chain native token.
-Each `TokenStreamPolicy` entry sets thresholds for one non-native token
+Each `TokenStreamPolicy` entry sets thresholds for one non-native fungible token
 in that token's base units.
-`token_id` uses the chain integration's token identity encoding
-(see [Multi-Token Vaults](#multi-token-vaults) and the LEZ mapping).
+`TokenStreamPolicy.token_id` uses the same encoding as `VaultProof.token_id`.
 
-Providers SHOULD NOT include the native token identity
-in `accepted_tokens`.
-Verifiers MUST ignore any `accepted_tokens` entry
-whose `token_id` is the native token identity.
-Providers SHOULD NOT advertise duplicate `token_id` values
-in `accepted_tokens`.
+Providers SHOULD NOT put the native token identity in `accepted_tokens`.
+Verifiers MUST ignore such entries.
+Providers SHOULD NOT advertise duplicate `token_id` values.
 When duplicates appear, verifiers MUST use the first matching entry.
 The RECOMMENDED maximum length of `accepted_tokens` is 16.
-This extension covers fungible vault tokens only.
-
-An empty `accepted_tokens` list means the provider accepts native-token vaults only.
+An empty list means native-token vaults only.
 
 Allocation caps on-chain payment exposure.
-It leaves service-quality judgment to the provider.
 Providers MAY adjust serving policy when users abuse pause, resume, or request patterns.
 
 Let `T` be the vault's on-chain token identity
-(equal to `VaultProof.token_id` after the equality check).
+after the `VaultProof.token_id` equality check.
 A `StreamProposal` satisfies a policy at verification time `t`
 when the policy is a `StreamProviderPolicy` and:
 
-- If `T` is the native token identity,
+- If `T` is native,
   `stream_params.stream_rate` MUST be greater than or equal to top-level `min_rate`,
   and `stream_params.allocation` MUST be greater than or equal to top-level `min_allocation`.
-- If `T` is a non-native token identity,
-  the policy MUST contain a `TokenStreamPolicy` whose `token_id` equals `T`.
-  Then `stream_params.stream_rate` MUST be greater than or equal to that entry's `min_rate`,
-  and `stream_params.allocation` MUST be greater than or equal to that entry's `min_allocation`.
+- If `T` is non-native,
+  the policy MUST contain a `TokenStreamPolicy` whose `token_id` equals `T`,
+  and rate and allocation MUST meet that entry's minima.
 - `stream_params.create_stream_deadline` MUST be greater than or equal to `t`
   and MUST be less than or equal to `t` plus `max_create_stream_deadline_delay`
 
@@ -825,25 +805,21 @@ The payment-streams guest program maps vault and stream state to
 #### Account types
 
 `VaultConfig` holds `total_allocated`, `owner`,
-an immutable privacy tier (`Public` or `PseudonymousFunder`),
-and an immutable `token_id` set at initialization.
+privacy tier (`Public` or `PseudonymousFunder`),
+and `token_id`, all set at initialization.
 For `PseudonymousFunder` vaults,
 `owner` MUST be an identifier derived from a nullifier public key.
 
 `token_id` is exactly 32 octets.
-The all-zeroes value denotes the LEZ native token.
-Any other value MUST be the Token program definition account `AccountId`
-of a fungible token.
-All-zeroes is reserved as the native sentinel for this integration.
+All-zeroes denotes the LEZ native token.
+Any other value MUST be a fungible Token program definition `AccountId`.
 
 Per-stream state is stored in `StreamConfig`.
 
-The vault liquidity account is addressed as the vault holding PDA
-(see [PDA derivation](#pda-derivation)).
-For a native vault, liquidity is native `Account.balance` on that PDA.
-For a non-native vault, that PDA is a Token program holding
-for the vault's `token_id`, and liquidity is `TokenHolding.balance`
-in account data.
+The vault holding PDA carries vault liquidity.
+For a native vault, that is native `Account.balance` on the PDA.
+For a non-native vault, the PDA is a Token program holding for `token_id`,
+and liquidity is `TokenHolding.balance` in account data.
 The guest MUST reject instructions when version bytes across
 `VaultConfig`, vault holding application data, and `StreamConfig`
 for a vault are unequal.
@@ -861,28 +837,28 @@ and the stream identifier assigned sequentially on stream creation.
 
 Off-chain vault resolution derives the same `VaultConfig` PDA from
 `VaultProof.vault_id` and the LEZ account identifier for
-`VaultProof.owner_public_key` (see [Vault owner authorization](#vault-owner-authorization-vaultproofowner_signature)).
+`VaultProof.owner_public_key`.
 
 #### Deposit and claim asset paths
 
 On deposit, the guest validates vault ownership and amount.
 
-For a native vault (`token_id` all-zeroes),
+For a native vault,
 deposit chains into the authenticated-transfer program
 to move native balance into the vault holding PDA.
 
 For a non-native vault,
 deposit chains into the Token program
 to transfer fungible units from the owner's Token holding
-into the vault holding PDA for that `token_id`.
-Withdraw and claim likewise chain Token transfers out of the vault holding,
+into the vault holding PDA.
+Withdraw and claim chain Token transfers out of the vault holding,
 using PDA seeds to authorize the vault holding as sender.
 Solvency checks read `TokenHolding.balance` on the vault holding.
 
 The deployed Token program `ProgramId` is pinned by the network
 and the reference integration.
-Exact account lists and instruction words for those chained calls
-follow the deployed guest and published test vectors.
+Exact account lists and instruction words follow that deployment
+and its published test vectors.
 
 ### Guest instructions
 
@@ -890,7 +866,7 @@ Reference instruction names and signers:
 
 | On-chain operation | Reference instruction | Authorizer |
 | --- | --- | --- |
-| Initialize vault | `InitializeVault` | Vault owner (sets immutable `token_id`) |
+| Initialize vault | `InitializeVault` | Vault owner |
 | Deposit | `Deposit` | Vault owner |
 | Withdraw unallocated | `Withdraw` | Vault owner |
 | Create stream | `CreateStream` | Vault owner |
@@ -935,10 +911,10 @@ transaction.
 | `VaultProof.owner_public_key` | Exactly 32 octets, x-only secp256k1 public key. |
 | `VaultProof.owner_signature` | Exactly 64 octets, Schnorr signature over the vault-owner digest. |
 | `VaultProof.token_id` | Exactly 32 octets. All-zeroes for native. Otherwise Token definition `AccountId`. |
+| `TokenStreamPolicy.token_id` | Same as `VaultProof.token_id`. |
 | `StreamProposal.public_key` | Exactly 32 octets, session key for `StreamProof.signature`. |
 | `StreamProof.signature` | Exactly 64 octets, Schnorr signature over the Store eligibility digest. |
 | `StreamParams.service_id` | UTF-8, no NUL terminator. Max length 128. |
-| `TokenStreamPolicy.token_id` | Same encoding as `VaultProof.token_id`. Native sentinel entries are ignored. |
 
 Decoders MUST reject wrong lengths for fixed-width fields.
 
@@ -979,7 +955,6 @@ Domain prefix (32 bytes):
 
 `VaultProof.owner_public_key` MUST bind to `VaultConfig.owner`
 via the LEZ account-identifier derivation in the reference implementation.
-`VaultProof.token_id` MUST equal `VaultConfig.token_id`.
 Updated reference test vectors MUST cover this body layout.
 
 #### Store eligibility signature
