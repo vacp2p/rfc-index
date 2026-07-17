@@ -527,6 +527,11 @@ This is the heavy path that a separate zone was meant to keep rare.
 Left to future work are the concrete contracts for registration and staking, price finalization,
 dispute resolution, and reward settlement, and a check that the dispute-path computation fits within the LEZ cycle budget.
 
+- **Confidence threshold.** The `confidence` value reports how tightly observations cluster around the median,
+but this version does not fix what counts as an acceptable value.
+A normal spread in a fast market can look too wide in a calm one.
+Defining this threshold, or a rule that adapts it, is left to future work together with the volatility handling above.
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
