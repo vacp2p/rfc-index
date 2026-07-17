@@ -87,7 +87,7 @@ in this document are to be interpreted as described in [RFC 2119](https://www.ie
 
 - At least more than half of the oracle nodes (indexers) are honest,
 who fetch-then-forward price data by following this protocol.
-- The indexer can manipulate observation ordering.
+- No indexer can manipulate observation ordering.
 Ordering authority is delegated entirely to Bedrock's immutable inscription order.
 - Indexers have no immutable execution logic beyond aggregation.
 Stake custody and slashing enforcement are delegated entirely to LEZ contracts.
