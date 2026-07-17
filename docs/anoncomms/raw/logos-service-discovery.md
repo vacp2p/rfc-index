@@ -313,7 +313,7 @@ the bucket index into which the peer will be inserted MUST be determined by:
 The bucket index `i` where `y` is placed in `x`'s table is calculated as:
 
 - Let `lz = CLZ(d)` = number of leading zeros in the 256-bit representation of `d`
-- `i = min( ⌊ (lz * m) / 256 ⌋ , m − 1 )`
+- `i = min( lz , m − 1 )`
 - Special case: For `d = 0` (same ID), `i = m - 1`
 
 Lower-index buckets represent peers far away from `service_id_hash` in the keyspace,
