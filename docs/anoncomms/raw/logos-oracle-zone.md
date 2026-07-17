@@ -207,12 +207,11 @@ Observations from non-members are discarded.
 compute the `attested price` as the median of all observations in the round, not only the first `N`.
 The median structurally tolerates up to half the observations being adversarial without moving outside the honest range.
 
-Signature verification is not part of this optimistic path in LEZ.
-On this optimistic path the writer identity is already established by Bedrock
-at the inscription level, so the indexer aggregates without checking the `signature` field.
-That field is verified only when a dispute is raised, and only by the LEZ contract,
-over the observations the proposer wrote.
-This is what keeps the heavy verification off the per-round path.
+LEZ does not verify signatures on the optimistic path.
+The indexer checks them off-chain during aggregation,
+and LEZ verifies them only when a dispute is raised,
+over the observations behind the disputed value.
+This keeps the heavy per-signature cost off LEZ.
 
 Every honest indexer runs these steps over the same finalized inscriptions and,
 because the input is immutable and the code is deterministic, derives the same `attested price`.
@@ -287,8 +286,8 @@ The indexer is assumed to hold the latest membership root.
 Each `oracle id` is the node's BIP-340 x-only public key,
 and the membership tree stores these public keys directly.
 
-During aggregation an indexer discards observations whose `membership_proof` does not verify,
-so non-members' entrys are discarded by `proposer` so never enter the median.
+During aggregation, every indexer discards observations whose `membership_proof` does not verify,
+so observations from non-members never enter the median.
 On the dispute path the LEZ contract checks the same proofs against its own membership root,
 so only registered nodes count toward the disputed value.
 
