@@ -160,7 +160,8 @@ to reduce the chance of its observation being discarded as an outlier.
 
 Each observation is encoded as a `PriceObservation`.
 The price is carried as an integer `price` together with a `decimals` field,
-so that no floating-point value crosses the protocol boundary. The real value is `price * 10^(-decimals)`.
+so that no floating-point value crosses the protocol boundary.
+The real value is `price * 10^(-decimals)`.
 Authentication of an observation on the optimistic path comes from Bedrock.
 An oracle node publishes to its own channel,
 so Bedrock verifies the writer signature at the inscription level and records who wrote each observation.
