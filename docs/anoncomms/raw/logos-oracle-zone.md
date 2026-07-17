@@ -166,7 +166,7 @@ An oracle node publishes to its own channel,
 so Bedrock verifies the writer signature at the inscription level and records who wrote each observation.
 
 The `signature` field carries a [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) Schnorr signature
-over the SHA-256 hash of the canonical serialization of fields 1 to 7.
+over the SHA-256 hash of the canonical serialization of fields 1 to 6.
 The indexer verifies this signature off-chain during aggregation.
 On the optimistic path LEZ does not verify it.
 LEZ verifies it only when a dispute is raised, without depending on Bedrock,
@@ -185,9 +185,8 @@ message PriceObservation {
   int64  round             = 4;  // round identifier, in Bedrock block-height terms
   int64  timestamp         = 5;  // observation time (unix milliseconds), advisory only
   bytes  oracle_id         = 6;  // the node's 32-byte BIP-340 x-only public key, also its channel key and staking identity
-  bytes  source_set        = 7;  // OPTIONAL: source identifiers used for the local median
-  bytes  signature         = 8;  // BIP-340 Schnorr signature over SHA-256 of fields 1 to 7, verified off-chain by the indexer and on-chain by LEZ only on dispute
-  bytes  membership_proof  = 9;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
+  bytes  signature         = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1 to 6, verified off-chain by the indexer and on-chain by LEZ only on dispute
+  bytes  membership_proof  = 8;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
 }
 ```
 
