@@ -432,3 +432,13 @@ Cryptarchia depends on honest nodes having relatively in-sync clocks. We are cur
 
 1. Ouroboros Crypsinous: Privacy-Preserving Proof-of-Stake [eprint.iacr.org](https://eprint.iacr.org/2018/1132.pdf)
 2. Ouroboros Chronos: Permissionless Clock Synchronization via Proof-of-Stake  [eprint.iacr.org](https://eprint.iacr.org/2019/838.pdf)
+
+## Test Vectors
+
+The operations used to derive the `block_root` are the same as those defined in Test Vectors.
+
+| Input | Output |
+|-|-|
+| empty block (no transaction) | `block_root`: 0x0000000000000000000000000000000000000000000000000000000000000000 |
+| one transaction per operation kind: <br />- `leaf[0]`: 0x6ab0046084f3ce8dad90eb28afe5692ad92d5d0588a4e868ad38d0d841d7a60e (Transfer)<br />- `leaf[1]`: 0xd3a1aa9d2df8383e389dba072b1397f5e7fc290f884e04147c787619f60493cf (ChannelConfig) <br />- `leaf[2]`: 0x50e5674eea7fa17f531a51159ea7c3cab843fb1c8e8bf9bd5518a8aad08865d3 (ChannelInscribe)<br />- `leaf[3]`: 0xd52da59d9db42391363d6c4f96447536e5dfff747b91b88320310b07581a8dee (ChannelDeposit)<br />- `leaf[4]`: 0x6f57c77dc872cc3f01380fbd57a97e9f7998a1cd8b24e84594ceba796cfa0822 (ChannelWithdraw)<br />- `leaf[5]`: 0x2c04be946507e2b8c239b85b03cf476a8be5af8e4de853660d0447a46ea460fc (ChannelTransfer)<br />- `leaf[6]`: 0x9ce9fa694b4c801eca6c9a1d3dca6401952404bda8c144fb16e03e3872fd475e (SDPDeclare)<br />- `leaf[7]`: 0x3555b3d8f5d05ea5d69efb17aab7639474738bcb4bfee8d354107433d781ef9c (SDPWithdraw)<br />- `leaf[8]`: 0x0a91ab8271016f212061e6b45ea35c95cfa0f9a70c5225508f284b2657f4d931 (SDPActive)<br />- `leaf[9]`: 0xc992f1a63a7ea665a3766fae6b032df3db12ef386caf0ef1f3654afedbc51c6c (LeaderClaim) | `block_root`: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 |
+| `Header`:<br />- `bedrock_version`: 0x01<br />- `parent_block`: 0x1111111111111111111111111111111111111111111111111111111111111111<br />- `slot`: 0x42<br />- `block_root`: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 <br />- `leader_voucher`: 0x4444000000000000000000000000000000000000000000000000000000000000<br />- `entropy_contribution`: 0x5555000000000000000000000000000000000000000000000000000000000000<br />- `proof`: 0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />- `leader_key`: 0x17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce | `block_id`: 0x ec351be5585023f3e96140b8903baba40028f222037b1dd12e1dbc1884788071 |
