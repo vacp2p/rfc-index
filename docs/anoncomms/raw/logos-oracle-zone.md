@@ -158,6 +158,28 @@ The protocol is agnostic to the specific sources and to the local pre-aggregatio
 It is RECOMMENDED that a node query at least three independent sources and submit a local median,
 to reduce the chance of its observation being discarded as an outlier.
 
+A node builds its observation deterministically,
+so that two honest nodes reading the same prices produce the same value. First, it reads its sources.
+How it connects to each source, which endpoints or APIs it uses, is left to the operator, and the protocol does not constrain the source side.
+A node MUST validate each source value before using it.
+A value that is not a positive number, or that deviates grossly from the others,
+MUST be dropped, so a broken or malicious source cannot enter the local median.
+Second, it reduces the remaining source values to one local value by taking their median.
+Sources report prices at different decimal precisions,
+so the node normalizes each to the fixed `decimals` of the feed, rounding half up.
+If the number of values is even, it takes the lower of the two middle values,
+so the result is always one of the observed prices and never an average.
+Third, it encodes that value as an integer at the fixed `decimals`.
+
+As an example, a node reads four sources for BTC/USDT and gets `67123.1`, `67124.2071`, `67125.40215`, and `67126.0`.
+Each is a valid positive number, and none is a gross outlier, so all are kept. 
+The feed fixes `decimals = 6`, so the node normalizes each to six decimals rounding half up,
+giving `67123.100000`, `67124.207100`, `67125.402150`, and `67126.000000`.
+Since the count is even, it takes the lower of the two middle values, `67124.207100`.
+It scales that to an integer at six decimals, `67124.207100 * 10^6 = 67124207100`,
+and sets `price = 67124207100` and `decimals = 6`.
+The indexer applies the same normalization and even-count rule when it takes the median over observations.
+
 Each observation is encoded as a `PriceObservation`.
 The price is carried as an integer `price` together with a `decimals` field,
 so that no floating-point value crosses the protocol boundary.
@@ -182,7 +204,7 @@ syntax = "proto3";
 message PriceObservation {
   string feed_id           = 1;  // asset pair identifier, e.g. "BTC/USDT"
   int64  price             = 2;  // integer-encoded price, real value = price * 10^(-decimals)
-  int32  decimals          = 3;  // number of decimal places in `price`
+  int32  decimals          = 3;  // number of decimal places in `price` which is 6
   int64  round             = 4;  // round identifier, in Bedrock block-height terms
   int64  timestamp         = 5;  // observation time (unix milliseconds), advisory only
   bytes  oracle_id         = 6;  // the node's 32-byte BIP-340 x-only public key, also its channel key and staking identity
@@ -395,6 +417,7 @@ Block-time and finality parameters are properties of the LEZ and are listed for 
 | Parameter | Symbol | Default | Notes |
 | --- | --- | --- | --- |
 | Feed |  | `BTC/USDT` | Single feed, more added later. |
+| Feed decimals |  | 6 | Fixed integer scale for the feed. Every observation uses it, so the indexer needs no rescaling. |
 | Quorum threshold | `N` | 50 | Minimum observations required to attest a price for a round. |
 | Honest-majority assumption |  | majority of the aggregated observations | Over the observations aggregated per attestation, not the total pool. |
 | Heartbeat / round cadence | `R_round` | 1 block (`~30 s`) | Defined in block-height terms; must be `>= T_block`. |
