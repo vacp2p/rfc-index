@@ -28,7 +28,7 @@
 | 1.0.0 | Initial revision. | 2025-12-03 |
 | 1.1.0 | Removed `service_rewards` due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Extended the [Block Execution](#block-execution) logic with rewards distribution due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Removed **Block Samples** subsection of the [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) from the [Annex](#annex). Reordered the [Block Execution](#block-execution) steps to enable immediate use of reward notes as inputs for transactions included in the proposal. | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
-| 1.1.2 | Added the `epoch_state_root` header field and aligned block execution with the epoch boundary settlement for verifiable checkpoints. | 2026-06-26 |
+| 1.2.0 | Added the `epoch_state_root` header field and aligned block execution with the epoch boundary settlement for verifiable checkpoints. | 2026-06-26 |
 
 # Introduction
 

@@ -238,12 +238,12 @@ The execution market base fee and its moving average evolve on every block and r
 
 ### Epoch State Root
 
-Every header carries an `epoch_state_root`. It commits the settled state produced by the [Epoch Boundary Settlement](#epoch-boundary-settlement) at the first block of the epoch, and is repeated unchanged in every subsequent header of that epoch. This commitment lets a joining node import a recent checkpoint and verify the imported state against the chain, as defined in [[1.0.0] Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md).
+Every header carries an `epoch_state_root`. It commits the settled state produced by the [Epoch Boundary Settlement](#epoch-boundary-settlement) at the first block of the epoch (i.e. the state as of the last block of the *previous* epoch, after the epoch-transition logic has been applied) and is repeated unchanged in every subsequent header of that epoch. Every block of an epoch therefore commits the state carried over from the end of the previous epoch, not any state produced within the epoch itself. This commitment lets a joining node import a recent checkpoint and verify the imported state against the chain, as defined in [[1.0.0] Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md).
 
-The computation is deterministic, so every node derives the same root. Collections are committed in **leaf order** (the order they are kept in the ledger, not re-sorted). We use two kinds of commitment:
+The computation is deterministic, so every node derives the same root. We use two kinds of commitment:
 
 - The note and voucher trees (`notes`, `C_LEAD`, `voucher_root`) reuse the existing depth-32 [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root); their current values are included as-is.
-- The other collections (`channels`, `locked_notes`, `declarations`, `declarations_snapshot`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, in leaf order, where each element is hashed by the dedicated function below.
+- The other collections (`channels`, `locked_notes`, `declarations`, `declarations_snapshot`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, sorted into a canonical order by their identifier compared as a little-endian integer — `channels` by `ChannelId`, `locked_notes` by `NoteId`, `declarations` and `declarations_snapshot` by `DeclarationId`, and the voucher nullifier set by nullifier value — where each element is hashed by the dedicated function below.
 
 The Epoch State Root commits **two SDP registries**:
 
@@ -269,8 +269,9 @@ def channel_hash(channel: ChannelState) -> hash:
     h.update(channel.withdraw_threshold.to_bytes(2, byteorder='little'))
     return h.digest()
 
-def channels_root(channels: list[ChannelState]) -> hash:
-    return [channel_hash(channel) for channel in channels.sort()].root()
+def channels_root(channels: dict[ChannelId, ChannelState]) -> hash:
+    # sorted by ChannelId (little-endian) in increasing order
+    return [channel_hash(channels[channel_id]) for channel_id in sorted(channels)].root()
 
 def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h = Hasher()
@@ -288,9 +289,9 @@ def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     return h.digest()
 
 def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> hash:
-    # As specified in SDP declaration storage, declarations should already be indexed deterministically
+    # sorted by DeclarationId (little-endian) in increasing order
     return [hash(b"DECLARATION_HASH_V1", declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
-            for declaration_id in declarations].root()
+            for declaration_id in sorted(declarations)].root()
 
 def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
     h = Hasher()
@@ -300,9 +301,13 @@ def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
     return h.digest()
 
 def locked_notes_root(locked_notes: dict[NoteId, LockedNote]) -> hash:
-    # locked note should already be deterministically ordered
+    # sorted by NoteId (little-endian) in increasing order
     return [hash(b"LOCKED_NOTE_DICT_HASH_V1", note_id, sdp_locked_note_hash(locked_notes[note_id]))
-            for note_id in locked_notes].root()
+            for note_id in sorted(locked_notes)].root()
+
+def voucher_nullifiers_root(voucher_nullifiers: set[Nullifier]) -> hash:
+    # sorted by nullifier value (little-endian) in increasing order
+    return [hash(b"VOUCHER_NULLIFIER_HASH_V1", nullifier) for nullifier in sorted(voucher_nullifiers)].root()
 
 def get_epoch_state_root(state) -> hash:
     h = Hasher()
@@ -316,7 +321,7 @@ def get_epoch_state_root(state) -> hash:
     h.update(state.min_stake.stake_threshold.to_bytes(8))    # current minimum stake
     h.update(state.inactivity_period.to_bytes(8))          # current inactivity period
     h.update(state.voucher_root)                           # reward voucher tree
-    h.update(state.voucher_nullifier_set.root())
+    h.update(voucher_nullifiers_root(state.voucher_nullifier_set))
     h.update(state.leaders_rewards.to_bytes(8))            # TokenValue
     h.update(state.execution_base_fee.to_bytes(8))         # TokenValue
     h.update(state.execution_gas_average.to_bytes(8))      # int (width undefined in spec)
@@ -443,7 +448,7 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
   - $`\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True`$
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
 
-10. If $`B`$ is the first block of an epoch, then $`header.\text{epoch\_state\_root} = \textbf{get\_epoch\_state\_root}(state')`$, where $`state'`$ is the settled state after applying the [Epoch Boundary Settlement](#epoch-boundary-settlement) and before executing $`B`$’s transactions. Otherwise $`header.\text{epoch\_state\_root} = header.\text{parent\_block}).header.\text{epoch\_state\_root}`$, since the epoch state root is constant within an epoch.
+10. If $`B`$ is the first block of an epoch, then $`header.\text{epoch\_state\_root} = \textbf{get\_epoch\_state\_root}(state')`$, where $`state'`$ is the settled state after applying the [Epoch Boundary Settlement](#epoch-boundary-settlement) and before executing $`B`$’s transactions. Otherwise $`header.\text{epoch\_state\_root} = \textbf{fetch\_header}(header.\text{parent\_block}).\text{epoch\_state\_root}`$, since the epoch state root is constant within an epoch.
 
 ### Chain Maintenance
 

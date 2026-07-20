@@ -7,7 +7,7 @@
 | Status | raw |
 | Category | Standards Track |
 | Editor | David Rusu <davidrusu@logos.co> |
-| Contributors | Hong-Sheng Zhou, Thomas Lavaur <thomaslavaur@logos.co>, Marcin Pawlowski <marcin@logos.co>, Mehmet Gonen <mehmet@logos.co>, Álvaro Castro-Castilla <alvaro@logos.co>, Daniel Sanchez Quiros <danielsq@logos.co>, Filip Dimitrijevic <filip@logos.co> |
+| Contributors | Hong-Sheng Zhou, Thomas Lavaur <thomas@logos.co>, Marcin Pawlowski <marcin@logos.co>, Mehmet Gonen <mehmet@logos.co>, Álvaro Castro-Castilla <alvaro@logos.co>, Daniel Sanchez Quiros <danielsq@logos.co>, Filip Dimitrijevic <filip@logos.co> |
 
 <!-- timeline:start -->
 
@@ -178,7 +178,7 @@ The Genesis Block header fields are set to the following values:
 - `parent_block`: 0 (as this is the first block).
 - `slot`: 0 (the Genesis slot).
 - `block_root`: Block Merkle root over the (single) initial transaction.
-- `epoch_state_root`: the [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root) over the genesis settled state, namely the genesis ledger and initial epoch state (see [Initial Epoch State](#initial-epoch-state)). Slot 0 is the first block of epoch 0.
+- `epoch_state_root`: 0 (At a normal epoch boundary this field commits the settled state produced *before* the block's transactions execute (see [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root)), but genesis has no prior epoch to settle and its header is not validated (see [Initializing Bedrock](#initializing-bedrock)), so no epoch state root is committed)
 - `proof_of_leadership`: Stubbed leadership proof.
   - `leader_voucher`: 0 (as there is no leader block reward for the initial block).
   - `entropy_contribution`: 0 (no entropy is provided through the initial PoL).
@@ -193,7 +193,7 @@ GENESIS_HEADER = Header(
     parent_block=0,
     slot=0,
     block_root=block_merkle_root([GENESIS_MANTLE_TX]),
-    epoch_state_root=get_epoch_state_root(GENESIS_STATE),
+    epoch_state_root=0,
     proof_of_leadership=ProofOfLeadership(
       leader_voucher=bytes(32),
       entropy_contribution=bytes(32),
@@ -249,7 +249,7 @@ GENESIS_HEADER = Header(
   parent_block=bytes(32),
   slot=0,
   block_root=block_merkle_root([GENESIS_MANTLE_TX]),
-  epoch_state_root=get_epoch_state_root(GENESIS_STATE),
+  epoch_state_root=0,
   proof_of_leadership=ProofOfLeadership(
     leader_voucher=bytes(32),
     entropy_contribution=bytes(32),
@@ -287,7 +287,7 @@ To initialize the Epoch State, we derive the epoch variables from the genesis bl
 2. $`\mathbb{C}_\text{LEAD}`$: Eligible leader commitment is set to the the Ledger Root over all notes from the initial token distribution. The derivation of this root is specified in [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root).
 3. $`D`$: The initial estimate of total stake will be the total tokens distributed at genesis.
 
-The genesis `epoch_state_root` commits this initial epoch state together with the genesis ledger, as defined in [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root).
+The genesis header sets `epoch_state_root` to 0: there is no prior epoch to settle and the genesis header is not validated, so no epoch state root is committed. The initial epoch state described here is established directly by the initialization procedure above, not through an [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root) commitment.
 
 ## Bedrock Services Initialization
 
