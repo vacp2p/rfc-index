@@ -241,8 +241,7 @@ An advertisement logically represents:
 An advertisement is for exactly one `service_id_hash`. An advertiser
 participating in multiple services holds a separate advertisement per
 service - one for each `service_id_hash` it advertises, using the same
-peer ID and addresses across all of them - never a single advertisement
-shared across services.
+peer ID and addresses across all of them.
 
 Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
 See the [Advertisement Encoding](#advertisement-encoding) section
@@ -679,8 +678,7 @@ Registrars MUST validate:
 6. Advertisement not already in `ad_cache` for this `service_id` -
 an advertisement is identical to a cached one when their encoded byte
 representations (the `register.advertisement` field) are equal;
-any change to the underlying content, including the addresses or the
-sequence number where the encoding carries one, produces a different
+any change to the underlying content, produces a different
 encoding and is therefore not a duplicate
 (see [Advertisement Cache](#advertisement-cache)).
 
@@ -729,8 +727,7 @@ From the discovery protocol's perspective, an advertisement supports
 exactly the `service_id_hash` it was registered or queried against.
 Any other entries in `xpr.services` are opaque to registrars and
 discoverers - they are meaningful only to the application that
-ultimately receives the advertisement, which MAY use them to learn about
-other services the advertiser supports.
+ultimately receives the advertisement.
 
 > **Note:** ExtensiblePeerRecord uses protocol strings (e.g., `/waku/store/1.0.0`) in `ServiceInfo.id`.
 Logos discovery uses `service_id_hash = SHA256(ServiceInfo.id)` for routing.
