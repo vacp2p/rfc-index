@@ -238,6 +238,12 @@ An advertisement logically represents:
 - **Network addresses**: How to reach the advertiser (multiaddrs)
 - **Authentication**: Cryptographic proof that the advertiser controls the peer ID
 
+An advertisement is for exactly one `service_id_hash`. An advertiser
+participating in multiple services holds a separate advertisement per
+service - one for each `service_id_hash` it advertises, using the same
+peer ID and addresses across all of them - never a single advertisement
+shared across services.
+
 Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
 See the [Advertisement Encoding](#advertisement-encoding) section
 in the wire protocol specification for transmission format details.
@@ -489,6 +495,11 @@ Advertisements in the `Register.advertisement` and `GetAds.advertisements` field
 Alternative encodings MAY be used if they provide equivalent functionality
 and can be verified by discoverers.
 
+Per [Advertisement](#advertisement), an encoded advertisement is for
+exactly one `service_id_hash`. Where the encoding carries a services
+field (e.g. XPR's `services`), it MUST list exactly the one `ServiceInfo`
+entry for the service being advertised.
+
 ### REGISTER Message
 
 Used by advertisers to register their advertisements with registrars.
@@ -665,7 +676,13 @@ Registrars MUST validate:
    - Retry within window: `ticket.t_mod + ticket.t_wait_for ≤ NOW() ≤ ticket.t_mod + ticket.t_wait_for + δ`
 5. Advertisement signature is valid
 (see [Advertisement Signature Verification](#advertisement-signature-verification))
-6. Advertisement not already in `ad_cache`
+6. Advertisement not already in `ad_cache` for this `service_id` -
+an advertisement is identical to a cached one when their encoded byte
+representations (the `register.advertisement` field) are equal;
+any change to the underlying content, including the addresses or the
+sequence number where the encoding carries one, produces a different
+encoding and is therefore not a duplicate
+(see [Advertisement Cache](#advertisement-cache)).
 
 Respond with `register.status = REJECTED` if validation fails.
 
@@ -703,6 +720,17 @@ VERIFY_ADVERTISEMENT(encoded_ad_bytes, service_id_hash):
 ```
 
 Discard advertisements with invalid signatures or that don't advertise the requested service.
+
+> **Note:** The loop over `xpr.services` above is a signature-binding check,
+confirming the requested `service_id_hash`
+is among the services the advertiser signed,
+not an interpretation of the advertisement's contents.
+From the discovery protocol's perspective, an advertisement supports
+exactly the `service_id_hash` it was registered or queried against.
+Any other entries in `xpr.services` are opaque to registrars and
+discoverers - they are meaningful only to the application that
+ultimately receives the advertisement, which MAY use them to learn about
+other services the advertiser supports.
 
 > **Note:** ExtensiblePeerRecord uses protocol strings (e.g., `/waku/store/1.0.0`) in `ServiceInfo.id`.
 Logos discovery uses `service_id_hash = SHA256(ServiceInfo.id)` for routing.
@@ -748,6 +776,12 @@ centered on that `service_id_hash`.
 The advertiser MAY bootstrap `AdvT(service_id_hash)`
 from the `KadDHT(peerID)` routing table using the formula
 described in the [Distance section](#distance).
+
+Registrations for each `service_id_hash` use their own advertisement,
+constructed and signed separately as shown in the
+[ADVERTISE algorithm](#example-advertise-algorithm) below
+(see [Advertisement](#advertisement) for what this means for advertisers
+participating in multiple services).
 
 The advertiser SHOULD try to maintain up to `K_register`
 active registrations per bucket.
@@ -921,6 +955,10 @@ Registrars MUST maintain a cache of advertisements, `ad_cache`,
 that associates each `advertisement`
 to its `service_id`,
 and an expiry timestamp based on admission time plus configured expiry time, `E`.
+Per [Advertisement](#advertisement), each `ad_cache` entry associates
+one advertisement with the single `service_id` it was registered for,
+admitted and expired independently of any entry for the advertiser's
+other advertisements.
 Once an `ad` has expired, it SHOULD be removed from the `ad_cache`
 
 ### Handling REGISTER requests
@@ -934,8 +972,10 @@ using the algorithm described in [Peer Table Updates](#peer-table-updates) secti
 
 To populate the rest of the response, the registrar MUST:
 
-1. If an identical `ad` already exists in the `ad_cache`,
-reject the request and respond with status `Rejected`.
+1. If an identical `ad` already exists in the `ad_cache` for this
+`service_id` (same encoded `register.advertisement` bytes as a cached
+entry for the same `service_id`), reject the request and
+respond with status `Rejected`.
 2. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
 using the formula in [Waiting Time Calculation](#waiting-time-calculation).
 3. If no `ticket` is provided in the `REGISTER` request
@@ -1179,10 +1219,12 @@ The IP similarity mechanism MUST:
 
 - Calculate a score (0-1): higher scores indicate similar IP prefixes (potential Sybil attacks)
 - Track IP addresses of `ads` currently in the `ad_cache`.
-- MUST update its tracking structure when:
-  - A new `ad` is admitted to the `ad_cache`: MUST add the IP
-  - An `ad` expires after time `E`:
-  MUST remove IP if there are no other active `ads` from the same IP
+- MUST update its tracking structure once per `ad_cache` entry
+(see [Advertisement Cache](#advertisement-cache) for what constitutes an entry), when:
+  - A new entry is admitted to the `ad_cache`: MUST add the IP for that entry,
+  regardless of whether other entries already track the same IP
+  - An entry expires after time `E`: MUST remove the IP for that entry,
+  regardless of whether other entries still track the same IP
 - Recalculate score for each registration attempt
 
 #### Tree Structure
@@ -1200,16 +1242,19 @@ Apart from root, the IP tree is a 32-level binary tree where:
 - Each vertex stores `IP_counter` (number of IPs passing through).
 It is initially set to 0.
 - Edges represent bits (0/1) in IPv4 binary representation
-- When an `ad` is admitted to the `ad_cache`,
-its IPv4 address is added to the IP tracking structure
-using the [`ADD_IP_TO_TREE()` algorithm](#add_ip_to_tree-algorithm).
+- When an entry is admitted to the `ad_cache`,
+its IPv4 address is added to the IP tracking structure once for that entry
+using the [`ADD_IP_TO_TREE()` algorithm](#add_ip_to_tree-algorithm) -
+per [Advertisement](#advertisement), a multi-service advertiser's IP is
+added once per service, one entry per advertisement.
 - Every time a waiting time is calculated for a registration attempt,
 the registrar calculates the IP similarity score for the advertiser's IP address.
 using [`CALCULATE_IP_SCORE()` algorithm](#calculate_ip_score-algorithm).
-- When an `ad` is removed from the `ad_cache` after `E`,
-The registrar also removes the IP from IP tracking structure
-using the [`REMOVE_FROM_IP_TREE()` algorithm](#remove_from_ip_tree-algorithm)
-if there are no other active `ad` in `ad_cache` from the same IP.
+- When an entry is removed from the `ad_cache` after `E`,
+the registrar also removes the IP from the IP tracking structure once
+for that entry, using the
+[`REMOVE_FROM_IP_TREE()` algorithm](#remove_from_ip_tree-algorithm),
+regardless of whether other entries still track the same IP.
 - All the algorithms work efficiently with O(32) time complexity.
 - The root `IP_counter` tracks total IPs currently in `ad_cache`
 
