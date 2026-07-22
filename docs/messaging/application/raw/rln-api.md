@@ -117,6 +117,7 @@ typedef struct {
 
 typedef struct {
     uint32_t tree_depth;      // depth of the registry's Merkle tree
+    uint64_t epoch_size_sec;  // duration of one epoch in seconds
     uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
 } RegistryParameters;
 
