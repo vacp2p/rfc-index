@@ -968,6 +968,11 @@ Per [Advertisement](#advertisement), each `ad_cache` entry associates
 one advertisement with the single `service_id` it was registered for,
 admitted and expired independently of any entry for the advertiser's
 other advertisements.
+An advertiser MUST have at most one `ad_cache` entry per `service_id`
+at a given registrar: a new, non-identical advertisement from the same
+`peer_id` for the same `service_id` replaces the existing entry through
+normal admission control, rather than coexisting alongside it
+(see [Handling REGISTER requests](#handling-register-requests)).
 Once an `ad` has expired, it SHOULD be removed from the `ad_cache`
 
 ### Handling REGISTER requests
@@ -982,9 +987,12 @@ using the algorithm described in [Peer Table Updates](#peer-table-updates) secti
 To populate the rest of the response, the registrar MUST:
 
 1. If an identical `ad` already exists in the `ad_cache` for this
-`service_id` (same encoded `register.advertisement` bytes as a cached
-entry for the same `service_id`), reject the request and
-respond with status `Rejected`.
+`service_id` and `peer_id` (same encoded `register.advertisement`
+bytes as a cached entry for the same `service_id`), reject the request
+and respond with status `Rejected`. If a non-identical `ad` from this
+`peer_id` already exists in the `ad_cache` for this `service_id`,
+processing continues below: on admission (step 6) it replaces the
+existing entry rather than adding a second one.
 2. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
 using the formula in [Waiting Time Calculation](#waiting-time-calculation).
 3. If no `ticket` is provided in the `REGISTER` request
@@ -1010,6 +1018,8 @@ validate the ticket and respond with the status `Rejected` if any of the followi
 This ensures advertisers accumulate waiting time across retries
 6. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
 with an expiry timestamp set to `current_time + E`.
+If an entry for this `peer_id` and `service_id` already exists,
+this replaces it rather than adding a second entry.
 The registrar SHOULD return a response with status `Confirmed`.
 7. If `t_remaining > 0`, issue a new signed `ticket`
 with `ticket.t_mod` set to `current_time`
@@ -1040,7 +1050,7 @@ procedure REGISTER(ad, ticket):
         t_remaining ← t_wait - (NOW() - ticket.t_init)
     end if
     if t_remaining ≤ 0:
-        ad_cache.add(ad)
+        ad_cache.add(ad)  # replaces any existing entry for (ad.peer_id, service_id)
         response.status ← Confirmed
     else:
         response.status ← Wait
@@ -1227,13 +1237,12 @@ by increasing their waiting time.
 The IP similarity mechanism MUST:
 
 - Calculate a score (0-1): higher scores indicate similar IP prefixes (potential Sybil attacks)
-- Track IP addresses of `ads` currently in the `ad_cache`.
-- MUST update its tracking structure once per `ad_cache` entry
-(see [Advertisement Cache](#advertisement-cache) for what constitutes an entry), when:
-  - A new entry is admitted to the `ad_cache`: MUST add the IP for that entry,
-  regardless of whether other entries already track the same IP
-  - An entry expires after time `E`: MUST remove the IP for that entry,
-  regardless of whether other entries still track the same IP
+- Track IP addresses as a multiset: each IP is counted once per
+`ad_cache` entry that uses it, not as a single present/absent flag
+(see [Advertisement Cache](#advertisement-cache) for what constitutes an entry)
+- MUST update the count once per `ad_cache` entry, when:
+  - A new entry is admitted to the `ad_cache`: MUST increment the count for that IP
+  - An entry expires after time `E`: MUST decrement the count for that IP
 - Recalculate score for each registration attempt
 
 #### Tree Structure
@@ -1248,24 +1257,23 @@ Implementations MAY use alternative data structures
 as long as they satisfy the requirements specified above.
 Apart from root, the IP tree is a 32-level binary tree where:
 
-- Each vertex stores `IP_counter` (number of IPs passing through).
-It is initially set to 0.
+- Each vertex stores `IP_counter`, a count of `ad_cache` entries whose
+IP passes through it - not a present/absent flag. It is initially set to 0.
 - Edges represent bits (0/1) in IPv4 binary representation
-- When an entry is admitted to the `ad_cache`,
-its IPv4 address is added to the IP tracking structure once for that entry
-using the [`ADD_IP_TO_TREE()` algorithm](#add_ip_to_tree-algorithm) -
-per [Advertisement](#advertisement), a multi-service advertiser's IP is
-added once per service, one entry per advertisement.
+- When an entry is admitted to the `ad_cache`, its IPv4 address
+increments the counters along its path once for that entry, using the
+[`ADD_IP_TO_TREE()` algorithm](#add_ip_to_tree-algorithm) - a multi-service
+advertiser's IP is incremented once per service, one entry per service.
 - Every time a waiting time is calculated for a registration attempt,
 the registrar calculates the IP similarity score for the advertiser's IP address.
 using [`CALCULATE_IP_SCORE()` algorithm](#calculate_ip_score-algorithm).
-- When an entry is removed from the `ad_cache` after `E`,
-the registrar also removes the IP from the IP tracking structure once
-for that entry, using the
-[`REMOVE_FROM_IP_TREE()` algorithm](#remove_from_ip_tree-algorithm),
-regardless of whether other entries still track the same IP.
+- When an entry is removed from the `ad_cache` after `E`, the registrar
+decrements the counters along its IP's path once for that entry, using the
+[`REMOVE_FROM_IP_TREE()` algorithm](#remove_from_ip_tree-algorithm) -
+the IP's effect on the score reaches zero only once every entry using
+it has been removed.
 - All the algorithms work efficiently with O(32) time complexity.
-- The root `IP_counter` tracks total IPs currently in `ad_cache`
+- The root `IP_counter` tracks the total count of `ad_cache` entries
 
 #### `ADD_IP_TO_TREE()` algorithm
 
