@@ -97,6 +97,9 @@ The available feature flags are:
 - `parallel` (`rln`, `zerokit_utils`, `rln-wasm`) enables rayon-based
   parallel computation for proof generation and tree operations.
 - `headers` (`rln`) enables C header generation for the FFI surface.
+- `panic_hook` (`rln-wasm`) enables the `initPanicHook` console panic hook.
+- `utils` (`rln-wasm`) builds a utility-only WASM module
+  (field elements, identity keys, hashing) without the proof surface.
 
 #### Merkle Tree Backends
 
@@ -113,7 +116,8 @@ This backend balances performance and memory efficiency.
 `PmTree` persists the tree to disk using a sled database.
 This backend enables state durability across process restarts.
 It is configured through `PmTreeSledConfig`
-(path, cache capacity, flush interval, temporary mode).
+(path, temporary flag, cache capacity, flush interval,
+sled mode, compression, tree depth).
 
 #### Proof Modes
 
@@ -122,9 +126,12 @@ selected by the circuit resources (zkey and graph) loaded at construction:
 
 - **Single message-id mode**: one `message_id` per proof.
   This is the default circuit on native targets.
-- **Multi message-id mode**: a batch of up to `DEFAULT_MAX_OUT = 4`
-  message ids per proof, with a boolean `selector_used` vector marking
-  the active slots. Proof values carry vectors `ys` and `nullifiers`
+- **Multi message-id mode**: a batch of message ids per proof.
+  The circuit has a fixed slot count `max_out`
+  (the embedded default circuit uses `DEFAULT_MAX_OUT = 4`);
+  `message_ids` and `selector_used` MUST match it in length,
+  with the boolean `selector_used` vector marking the active slots.
+  Proof values carry vectors `ys` and `nullifiers`
   instead of scalar `y` and `nullifier`.
 
 Embedded circuit resources are exposed as
@@ -281,7 +288,8 @@ Tree management methods exist **only** on stateful instances
 
 `get_subtree_root(level, index)`
 
-- Returns the root of a subtree at the specified level and index.
+- Returns the root of the subtree at the given `level` on the path to leaf `index`.
+- `level` 0 is the tree root; `level` equal to the tree depth is the leaf itself.
 
 `set_leaf(index, leaf)`
 
@@ -295,7 +303,8 @@ Tree management methods exist **only** on stateful instances
 
 `init_tree_with_leaves(leaves)`
 
-- Resets the tree state to default and initializes it with the provided leaves starting from index 0.
+- Resets the tree state to default (keeping the current depth) and
+  initializes it with the provided leaves starting from index 0.
 - Resets the internal `next_index` to 0 before setting the leaves.
 
 `get_leaf(index)`
@@ -304,20 +313,22 @@ Tree management methods exist **only** on stateful instances
 
 `get_empty_leaves_indices()`
 
-- Returns indices of leaves set to zero up to the final leaf that was set.
+- Returns the indices of the leaves set to the default value, up to the last set leaf.
 
 `atomic_operation(index, leaves, indices)`
 
-- Atomically inserts leaves starting from index and removes leaves at the specified indices.
+- Atomically sets `leaves` starting from `index` and resets each entry of `indices`
+  to the default value, in a single commit.
+- When a written position also appears in `indices`, the write wins.
 - Updates `next_index` to `max(next_index, index + n)` where `n` is the number of leaves inserted.
 
 `set_next_leaf(leaf)`
 
-- Sets a leaf at the next available index and increments `next_index`.
+- Sets a leaf at the next never-set index and increments `next_index` by one.
 
 `delete_leaf(index)`
 
-- Sets the leaf at the specified index to the default zero value.
+- Resets the leaf at the specified index to the default value.
 - Does not change the internal `next_index` value.
 
 `get_merkle_proof(index)`
@@ -333,8 +344,8 @@ Tree management methods exist **only** on stateful instances
 
 `close()`
 
-- Closes the connection to the Merkle tree database.
-- SHOULD be called before dropping the RLN object when using persistent storage.
+- Closes the tree, flushing pending writes for persistent backends.
+- Persistent backends also flush on drop; for in-memory backends this is a no-op.
 
 ### Witness Construction
 
@@ -353,15 +364,20 @@ are represented by the `RLNWitnessInput` enum
 
 - Constructs a Single message-id witness.
 - `build` checks the structural invariants
-  (`message_id < user_message_limit`,
-  matching `path_elements` / `identity_path_index` lengths)
+  (non-zero `user_message_limit`,
+  matching `path_elements` / `identity_path_index` lengths,
+  `message_id < user_message_limit`)
   and returns `WitnessInputSingleError` on violation.
 
 `RLNWitnessInput::new_multi(identity_secret, user_message_limit, merkle_proof, x, external_nullifier, message_ids, selector_used).build()`
 
 - Constructs a Multi message-id witness.
-- `build` additionally checks that `message_ids` and `selector_used`
-  agree in length and returns `WitnessInputMultiError` on violation.
+- `build` checks the Multi-mode invariants
+  (non-zero `user_message_limit`, matching path lengths,
+  non-empty `message_ids`, `selector_used` matching `message_ids` in length,
+  at least one active selector,
+  and unique in-range active `message_id`s)
+  and returns `WitnessInputMultiError` on violation.
 
 `RLNPartialWitnessInput`
 
@@ -452,7 +468,7 @@ WASM: `WasmRLNProofValues.recoverIdSecret` / `computeIdSecret`.
 
 `Hasher::<PoseidonHash>::hash_single(input)` / `hash_pair(left, right)` / `hash_list(inputs)`
 
-- Computes the Poseidon hash for arity 1, 2, or 3 inputs.
+- Computes the Poseidon hash for arity 1, 2, or list inputs.
 - All protocol hashes route through this facade.
 
 `hash_to_field_le(input)` / `hash_to_field_be(input)`
@@ -511,7 +527,8 @@ WASM bindings wrap the Rust API with JavaScript-compatible types. Key difference
   JavaScript supplies `path_elements` and `identity_path_index`.
 - When the `parallel` feature is enabled, call `initThreadPool()`
   to initialize the rayon thread pool.
-- `initPanicHook()` installs a console panic hook for debugging.
+- `initPanicHook()` (with the `panic_hook` feature) installs a console
+  panic hook for debugging.
 - Errors are returned as JavaScript strings that can be caught via try-catch blocks.
 
 ### FFI-Specific Notes
