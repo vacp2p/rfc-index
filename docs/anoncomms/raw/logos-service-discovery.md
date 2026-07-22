@@ -238,10 +238,15 @@ An advertisement logically represents:
 - **Network addresses**: How to reach the advertiser (multiaddrs)
 - **Authentication**: Cryptographic proof that the advertiser controls the peer ID
 
-An advertisement is for exactly one `service_id_hash`. An advertiser
-participating in multiple services holds a separate advertisement per
-service - one for each `service_id_hash` it advertises, using the same
-peer ID and addresses across all of them.
+Each `REGISTER` request registers an advertisement against exactly one
+`service_id_hash` - the request's `key` field - and the resulting
+`ad_cache` entry is scoped to that one service
+(see [Advertisement Cache](#advertisement-cache)).
+The advertisement's content MAY describe multiple services; an
+advertiser participating in several services MAY reuse the same signed
+advertisement across its registrations, provided it includes the
+`ServiceInfo` entry for each service being registered
+(see [Advertisement Encoding](#advertisement-encoding)).
 
 Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
 See the [Advertisement Encoding](#advertisement-encoding) section
@@ -494,10 +499,16 @@ Advertisements in the `Register.advertisement` and `GetAds.advertisements` field
 Alternative encodings MAY be used if they provide equivalent functionality
 and can be verified by discoverers.
 
-Per [Advertisement](#advertisement), an encoded advertisement is for
-exactly one `service_id_hash`. Where the encoding carries a services
-field (e.g. XPR's `services`), it MUST list exactly the one `ServiceInfo`
-entry for the service being advertised.
+Where the encoding carries a services field (e.g. XPR's `services`), it
+MUST include the `ServiceInfo` entry for the `service_id_hash` being
+registered; it MAY also list `ServiceInfo` entries for other services
+the advertiser supports (see
+[Advertisement Signature Verification](#advertisement-signature-verification)
+for how those other entries are treated).
+Per [Advertisement](#advertisement),
+each `REGISTER` is still scoped to
+exactly one `service_id_hash` regardless of
+how many services the advertisement's content covers.
 
 ### REGISTER Message
 
@@ -774,11 +785,12 @@ The advertiser MAY bootstrap `AdvT(service_id_hash)`
 from the `KadDHT(peerID)` routing table using the formula
 described in the [Distance section](#distance).
 
-Registrations for each `service_id_hash` use their own advertisement,
-constructed and signed separately as shown in the
-[ADVERTISE algorithm](#example-advertise-algorithm) below
-(see [Advertisement](#advertisement) for what this means for advertisers
-participating in multiple services).
+Each registration is scoped to one `service_id_hash`
+(see [Advertisement](#advertisement)). The advertiser MAY construct a
+fresh, single-service advertisement per registration, as the
+[ADVERTISE algorithm](#example-advertise-algorithm) below illustrates,
+or reuse one advertisement covering multiple services
+across its registrations.
 
 The advertiser SHOULD try to maintain up to `K_register`
 active registrations per bucket.
