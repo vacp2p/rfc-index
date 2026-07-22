@@ -178,7 +178,7 @@ The Genesis Block header fields are set to the following values:
 - `parent_block`: 0 (as this is the first block).
 - `slot`: 0 (the Genesis slot).
 - `block_root`: Block Merkle root over the (single) initial transaction.
-- `epoch_state_root`: 0 (At a normal epoch boundary this field commits the settled state produced *before* the block's transactions execute (see [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root)), but genesis has no prior epoch to settle and its header is not validated (see [Initializing Bedrock](#initializing-bedrock)), so no epoch state root is committed)
+- `epoch_state_root`: a 32-byte zero value (At a normal epoch boundary this field commits the settled state produced *before* the block's transactions execute (see [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root)), but genesis has no prior epoch to settle and its header is not validated (see [Initializing Bedrock](#initializing-bedrock)), so no epoch state root is committed)
 - `proof_of_leadership`: Stubbed leadership proof.
   - `leader_voucher`: 0 (as there is no leader block reward for the initial block).
   - `entropy_contribution`: 0 (no entropy is provided through the initial PoL).
@@ -249,7 +249,7 @@ GENESIS_HEADER = Header(
     parent_block=bytes(32),
     slot=0,
     block_root=block_merkle_root([GENESIS_MANTLE_TX]),
-    epoch_state_root=bytes(32)
+    epoch_state_root=bytes(32),
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),
         entropy_contribution=bytes(32),

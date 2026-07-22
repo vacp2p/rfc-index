@@ -68,7 +68,7 @@ We are using two hashing algorithms that have the same output length of 256 bits
 
 ## Block Proposal
 
-A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33129 bytes.
+A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33161 bytes.
 
 We define the following message structure:
 
@@ -95,7 +95,7 @@ class Header:                                # 329 bytes
     parent_block: hash                       # 32 bytes
     slot: SlotNumber                         # 8 bytes
     block_root: hash                         # 32 bytes
-    epoch_state_root: hash					 # 32 bytes
+    epoch_state_root: hash                   # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 ```
 

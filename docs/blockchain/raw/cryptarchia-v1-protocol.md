@@ -240,10 +240,12 @@ The execution market base fee and its moving average evolve on every block and r
 
 Every header carries an `epoch_state_root`. It commits the settled state produced by the [Epoch Boundary Settlement](#epoch-boundary-settlement) at the first block of the epoch (i.e. the state as of the last block of the *previous* epoch, after the epoch-transition logic has been applied) and is repeated unchanged in every subsequent header of that epoch. Every block of an epoch therefore commits the state carried over from the end of the previous epoch, not any state produced within the epoch itself. This commitment lets a joining node import a recent checkpoint and verify the imported state against the chain, as defined in [Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md).
 
-The computation is deterministic, so every node derives the same root. We use two kinds of commitment:
+The computation is deterministic, so every node derives the same root. Each collection is committed by its own Merkle tree, and every one of those trees follows the construction defined for the [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root): a tree of depth $`32`$ whose leaves are ordered by their **order of apparition on chain**, where the value $`0`$ marks an empty leaf, an insertion writes the new element into the first empty leaf, and a removal resets that element's leaf back to $`0`$. Leaves are never re-sorted, so the `insert_new_note`, `delete_note` and `get_ledger_root` procedures apply to each collection. What varies from one tree to the next is only the content of a leaf:
 
-- The note and voucher trees (`notes`, `C_LEAD`, `voucher_root`) reuse the existing depth-32 [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root); their current values are included as-is.
-- The other collections (`channels`, `locked_notes`, `declarations`, `declarations_snapshot`, and the voucher nullifier set) are committed through their own Merkle tree root over domain-separated leaves, sorted into a canonical order by their identifier compared as a little-endian integer — `channels` by `ChannelId`, `locked_notes` by `NoteId`, `declarations` and `declarations_snapshot` by `DeclarationId`, and the voucher nullifier set by nullifier value — where each element is hashed by the dedicated function below.
+- `notes`, `C_LEAD` and `voucher_root` take note IDs, aged note IDs and vouchers directly as leaves; their root is included as-is.
+- `channels`, `locked_notes`, `declarations`, `declarations_snapshot` and the voucher nullifier set take as leaf the domain-separated hash of the element, computed by the dedicated function below. That hash binds the element's identifier: `ChannelId`, `NoteId`, `DeclarationId` and the nullifier value respectively, together with its associated state, so that a leaf is meaningful on its own, independently of the slot it occupies.
+
+Every root above can be maintained incrementally, block by block, alongside the state it commits. The `epoch_state_root` is then a **snapshot** of those roots taken at the epoch boundary, right after the [Epoch Boundary Settlement](#epoch-boundary-settlement) has been applied and before the first block's transactions are executed. This is the same discipline that governs $`\mathbb{C}_\text{LEAD}`$ and `declarations_snapshot`, which are likewise frozen at a boundary and held unchanged for the whole epoch: nodes keep updating the live roots as blocks arrive, and only the boundary value is committed in the headers.
 
 The Epoch State Root commits **two SDP registries**:
 
@@ -253,9 +255,10 @@ The Epoch State Root commits **two SDP registries**:
   Note that the snapshot taken at the *start of the current epoch* is **not** committed separately: because the Epoch Boundary Settlement runs before executing the first block's transactions, the mutable `declarations` registry at that point still equals the state as of the last block of the previous epoch: so that snapshot would be identical to `declarations`. The snapshot that is genuinely needed is the one from a whole epoch earlier, which is the provider set the activity proofs settled this epoch were produced against.
 
 ```python
-def channel_hash(channel: ChannelState) -> hash:
+def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
     h = Hasher()
     h.update(b"CHANNEL_HASH_V1")
+    h.update(channel_id)
     for key in channel.accredited_keys:
         h.update(key.compressed())
     h.update(channel.configuration_threshold.to_bytes(2, byteorder='little'))
@@ -270,8 +273,9 @@ def channel_hash(channel: ChannelState) -> hash:
     return h.digest()
 
 def channels_root(channels: dict[ChannelId, ChannelState]) -> hash:
-    # sorted by ChannelId (little-endian) in increasing order
-    return [channel_hash(channels[channel_id]) for channel_id in sorted(channels)].root()
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
+    return [channel_hash(channel_id, channels[channel_id]) for channel_id in channels].root()
 
 def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h = Hasher()
@@ -289,9 +293,10 @@ def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     return h.digest()
 
 def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> hash:
-    # sorted by DeclarationId (little-endian) in increasing order
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
     return [hash(b"DECLARATION_HASH_V1", declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
-            for declaration_id in sorted(declarations)].root()
+            for declaration_id in declarations].root()
 
 def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
     h = Hasher()
@@ -301,13 +306,14 @@ def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
     return h.digest()
 
 def locked_notes_root(locked_notes: dict[NoteId, LockedNote]) -> hash:
-    # sorted by NoteId (little-endian) in increasing order
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
     return [hash(b"LOCKED_NOTE_DICT_HASH_V1", note_id, sdp_locked_note_hash(locked_notes[note_id]))
-            for note_id in sorted(locked_notes)].root()
+            for note_id in locked_notes].root()
 
-def voucher_nullifiers_root(voucher_nullifiers: set[Nullifier]) -> hash:
-    # sorted by nullifier value (little-endian) in increasing order
-    return [hash(b"VOUCHER_NULLIFIER_HASH_V1", nullifier) for nullifier in sorted(voucher_nullifiers)].root()
+def voucher_nullifiers_root(voucher_nullifiers: list[Nullifier]) -> hash:
+    # depth-32 append-only tree, leaves kept in order of apparition on chain
+    return [hash(b"VOUCHER_NULLIFIER_HASH_V1", nullifier) for nullifier in voucher_nullifiers].root()
 
 def get_epoch_state_root(state) -> hash:
     h = Hasher()
@@ -318,18 +324,18 @@ def get_epoch_state_root(state) -> hash:
     h.update(locked_notes_root(state.locked_notes))
     h.update(declarations_root(state.declarations))          # mutable SDP registry
     h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, as of last block of two epochs before
-    h.update(state.min_stake.stake_threshold.to_bytes(8))    # current minimum stake
-    h.update(state.inactivity_period.to_bytes(8))          # current inactivity period
-    h.update(state.voucher_root)                           # reward voucher tree
+    h.update(state.min_stake.stake_threshold.to_bytes(8, byteorder='little'))  # current minimum stake
+    h.update(state.inactivity_period.to_bytes(8, byteorder='little'))          # current inactivity period
+    h.update(state.voucher_root)                                               # reward voucher tree
     h.update(voucher_nullifiers_root(state.voucher_nullifier_set))
-    h.update(state.leaders_rewards.to_bytes(8))            # TokenValue
-    h.update(state.execution_base_fee.to_bytes(8))         # TokenValue
-    h.update(state.execution_gas_average.to_bytes(8))      # int (width undefined in spec)
-    h.update(state.storage_price.to_bytes(8))              # TokenValue
-    h.update(state.storage_usage_average.to_bytes(8))      # int (width undefined in spec)
-    h.update(state.epoch_nonce)                            # frozen nonce
-    h.update(state.epoch_nonce_running)                    # running nonce
-    h.update(state.inferred_total_stake.to_bytes(8))       # int (width undefined in spec)
+    h.update(state.leaders_rewards.to_bytes(8, byteorder='little'))            # TokenValue
+    h.update(state.execution_base_fee.to_bytes(8, byteorder='little'))         # TokenValue
+    h.update(state.execution_gas_average.to_bytes(8, byteorder='little'))      # int (width undefined in spec)
+    h.update(state.storage_price.to_bytes(8, byteorder='little'))              # TokenValue
+    h.update(state.storage_usage_average.to_bytes(8, byteorder='little'))      # int (width undefined in spec)
+    h.update(state.epoch_nonce)                                                # frozen nonce
+    h.update(state.epoch_nonce_running)                                        # running nonce
+    h.update(state.inferred_total_stake.to_bytes(8, byteorder='little'))       # int (width undefined in spec)
     return h.digest()
 ```
 
@@ -384,11 +390,11 @@ def block_id(header: Header) -> hash
 
 ```python
 class Header:                                # 329 bytes
-    bedrock_version: byte                    # 1 bytes
+    bedrock_version: byte                    # 1 byte
     parent_block: hash                       # 32 bytes
     slot: int                                # 8 bytes
     block_root: hash                         # 32 bytes
-    epoch_state_root: hash					 # 32 bytes
+    epoch_state_root: hash                   # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
