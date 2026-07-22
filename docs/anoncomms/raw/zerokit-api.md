@@ -19,7 +19,8 @@
 
 ## Abstract
 
-This document specifies the Zerokit API, an implementation of the RLN-V2 protocol.
+This document specifies the Zerokit API (version 3.0.0),
+an implementation of the RLN-V2 protocol.
 The specification covers the unified interface exposed through **native Rust**,
 C-compatible Foreign Function Interface (FFI) bindings,
 and WebAssembly (WASM) bindings.
@@ -73,33 +74,63 @@ share identical serialization formats for inputs and outputs.
                        └───────────────────┘
 ```
 
-### Supported Features
+The workspace consists of four crates:
+`rln` (protocol core, FFI bindings),
+`zerokit_utils` (Merkle trees and Poseidon primitives),
+`rln-wasm` (WASM bindings),
+and `rln-cli` (example CLI, not published).
+All published crates share the unified version 3.0.0.
 
-Zerokit provides [compile-time feature flags](https://github.com/vacp2p/zerokit/blob/c35e62a63517b0d32e91677422de4603760e41fa/rln/Cargo.toml#L65) that
-select the Merkle tree storage backend,
-configure the RLN operational mode (e.g., stateful vs. stateless),
-and enable or disable parallel execution.
+### Type-Level Configuration
+
+The Merkle tree backend and the stateful/stateless operating mode
+are chosen **at the type level** in Rust
+(and through dedicated constructors in FFI):
+
+- `RLN<Stateful<T>, ZkProof>` embeds a Merkle tree of type `T`
+  and exposes the full tree management API.
+- `RLN<Stateless, ZkProof>` carries no tree;
+  applications MUST provide Merkle proofs and roots externally.
+
+The available feature flags are:
+
+- `parallel` (`rln`, `zerokit_utils`, `rln-wasm`) enables rayon-based
+  parallel computation for proof generation and tree operations.
+- `headers` (`rln`) enables C header generation for the FFI surface.
 
 #### Merkle Tree Backends
 
-`fullmerkletree` allocates the complete tree structure in memory.
+All backends are always compiled and implement the common
+`ZerokitMerkleTree` trait; applications pick one by constructing it and
+passing it to the builder.
+
+`FullMerkleTree` allocates the complete tree structure in memory.
 This backend provides the fastest performance but consumes the most memory.
 
-`optimalmerkletree` uses sparse HashMap storage that only allocates nodes as needed.
+`OptimalMerkleTree` uses sparse HashMap storage that only allocates nodes as needed.
 This backend balances performance and memory efficiency.
 
-`pmtree` persists the tree to disk using a sled database.
+`PmTree` persists the tree to disk using a sled database.
 This backend enables state durability across process restarts.
+It is configured through `PmTreeSledConfig`
+(path, cache capacity, flush interval, temporary mode).
 
-#### Operational Modes
+#### Proof Modes
 
-`stateless` disables the internal Merkle tree.
-Applications MUST provide the Merkle root and
-membership proof externally when generating proofs.
+Every RLN instance operates in one of two circuit modes,
+selected by the circuit resources (zkey and graph) loaded at construction:
 
-When `stateless` is not enabled,
-the library operates in **Stateful** mode and
-requires one of the Merkle tree backends.
+- **Single message-id mode**: one `message_id` per proof.
+  This is the default circuit on native targets.
+- **Multi message-id mode**: a batch of up to `DEFAULT_MAX_OUT = 4`
+  message ids per proof, with a boolean `selector_used` vector marking
+  the active slots. Proof values carry vectors `ys` and `nullifiers`
+  instead of scalar `y` and `nullifier`.
+
+Embedded circuit resources are exposed as
+`default_zkey_single` / `default_graph_single` and
+`default_zkey_multi` / `default_graph_multi`.
+The default tree depth is `DEFAULT_TREE_DEPTH = 20`.
 
 #### Parallelization
 
@@ -118,8 +149,8 @@ concurrent proof generation.
 
 ### Overview
 
-The API exposes functional interfaces with strongly-typed parameters.
-All three platform bindings share the same function signatures,
+The API exposes strongly-typed interfaces.
+All three platform bindings share the same operations,
 differing only in language-specific conventions.
 Function signatures documented below are from the Rust perspective.
 
@@ -127,15 +158,22 @@ Function signatures documented below are from the Rust perspective.
 - FFI: <https://github.com/vacp2p/zerokit/tree/master/rln/src/ffi>
 - WASM: <https://github.com/vacp2p/zerokit/tree/master/rln-wasm>
 
+Rust consumers SHOULD import from `rln::prelude`,
+which re-exports the full public surface
+(RLN types, protocol types, hashers, errors, and serialization traits).
+
 ### Error Handling
 
 Error handling differs across platform bindings.
 
 For **native Rust**,
-functions return `Result<T, RLNError>` where `RLNError` is an enum
-representing specific error conditions.
-The enum variants provide type-safe error handling and
-pattern matching capabilities.
+each operation returns a `Result` with a **narrow, operation-specific error enum**
+whose variants are all reachable from that code path.
+There is no top-level union error type.
+The error enums are:
+`GenerateProofError`, `VerifyProofError`,
+`WitnessInputSingleError`, `WitnessInputMultiError`, `PartialWitnessInputError`,
+`ProofValuesMultiError`, `RecoverSecretError`, and `SerializationError`.
 
 For **WASM** and **FFI** bindings,
 errors are returned as human-readable string messages.
@@ -146,93 +184,92 @@ use error message prefixes to distinguish error types when needed.
 
 ### Initialization
 
-Functions with the same name but different signatures are **conditional compilation variants**.
-This means that multiple definitions exist in the source code,
-but only one variant is compiled and available at runtime based on the enabled feature flags.
+Native Rust construction goes exclusively through `RLNBuilder`,
+a type-state builder that fixes the proof backend to
+Groth16 over BN254 with the Poseidon hash
+(`ArkGroth16Backend<PoseidonHash>`).
 
-`RLN::new(tree_depth, tree_config)` - *Available in Rust, FFI | Stateful mode*
+`RLNBuilder::stateless().build()` - *Rust | Stateless mode*
 
-- Creates a new RLN instance by loading circuit resources from the default folder.
-- The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait: a JSON string, a direct config object (with `pmtree` feature), or an empty string for defaults.
+- Builds a stateless RLN instance.
+- Optional setters `.zkey(...)` and `.graph(...)` accept pre-loaded circuit
+  resources; on native targets both default to the Single message-id circuit.
+- On `wasm32` targets the resources MUST be supplied.
 
-`RLN::new()` - *Available in Rust, FFI | Stateless mode*
+`RLNBuilder::stateful().tree(tree).build()` - *Rust | Stateful mode*
 
-- Creates a new stateless RLN instance by loading circuit resources from the default folder.
+- Builds a stateful RLN instance around a caller-constructed Merkle tree
+  (`FullMerkleTree`, `OptimalMerkleTree`, or `PmTree`).
+- The tree hasher MUST match the proof backend hash;
+  a mismatch is a compile error.
+- Optional `.zkey(...)` / `.graph(...)` setters behave as in `stateless`.
 
-`RLN::new_with_params(tree_depth, zkey_data, graph_data, tree_config)` - *Available in Rust, FFI | Stateful mode*
+FFI exposes one constructor per backend and mode,
+each with a `_default` variant that uses the embedded Single message-id
+circuit and `DEFAULT_TREE_DEPTH`:
 
-- Creates a new RLN instance with pre-loaded circuit parameters passed as byte vectors.
-- The `tree_config` parameter accepts multiple types via the `TreeConfigInput` trait.
+- `ffi_rln_new_stateless(zkey_data, graph_data)` / `ffi_rln_new_stateless_default()`
+- `ffi_rln_new_with_full_merkle_tree(tree_depth, zkey_data, graph_data)` /
+  `ffi_rln_new_with_full_merkle_tree_default()`
+- `ffi_rln_new_with_optimal_merkle_tree(tree_depth, zkey_data, graph_data)` /
+  `ffi_rln_new_with_optimal_merkle_tree_default()`
+- `ffi_rln_new_with_pm_tree(tree_depth, zkey_data, graph_data, config_path)` /
+  `ffi_rln_new_with_pm_tree_default()`
+  (an empty `config_path` selects the default sled configuration)
 
-`RLN::new_with_params(zkey_data, graph_data)` - *Available in Rust, FFI | Stateless mode*
+WASM is **stateless only**:
 
-- Creates a new stateless RLN instance with pre-loaded circuit parameters.
+`WasmRLN.newWithParams(zkey_data, graph_data)` - *WASM | Stateless mode*
 
-`RLN::new_with_params(zkey_data)` - *Available in WASM | Stateless mode*
-
-- Creates a new stateless RLN instance for WASM with pre-loaded zkey data.
-- Graph data is not required as witness calculation is handled externally in WASM environments (e.g., using [witness_calculator.js](https://github.com/vacp2p/zerokit/tree/master/rln-wasm)).
+- Creates a stateless RLN instance from pre-loaded zkey and graph bytes.
+- Witness calculation is performed internally by the embedded witness graph.
 
 ### Key Generation
 
-`keygen()`
+Identity material is represented by dedicated structs.
+Secret components are wrapped in `SecretFr`,
+a zeroize-on-drop field element with a redacted `Debug` representation
+(see [Security/Privacy Considerations](#securityprivacy-considerations)).
 
-- Generates a random identity keypair returning `(identity_secret, id_commitment)`.
+`IdentityKeys::generate::<PoseidonHash, R>(rng)`
 
-`seeded_keygen(seed)`
+- Generates a random identity keypair using the caller-supplied
+  cryptographically secure RNG `R`.
+- Accessors: `identity_secret() -> SecretFr`, `id_commitment() -> Fr`.
 
-- Generates a deterministic identity keypair from a seed returning `(identity_secret, id_commitment)`.
+`IdentityKeys::generate_seeded::<PoseidonHash, R>(seed)`
 
-`extended_keygen()`
+- Generates a deterministic identity keypair from a byte seed.
+- The seed is expanded with Keccak-256 into the seed of the
+  type-level chosen seedable RNG `R`.
 
-- Generates a random extended identity keypair returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+`ExtendedIdentityKeys::generate::<PoseidonHash, R>(rng)`
 
-`extended_seeded_keygen(seed)`
+- Generates a random extended identity keypair.
+- Accessors: `identity_trapdoor()`, `identity_nullifier()`,
+  `identity_secret()` (all `SecretFr`), and `id_commitment() -> Fr`.
 
-- Generates a deterministic extended identity keypair from a seed returning `(identity_trapdoor, identity_nullifier, identity_secret, id_commitment)`.
+`ExtendedIdentityKeys::generate_seeded::<PoseidonHash, R>(seed)`
+
+- Deterministic variant of the extended keypair generation.
+
+FFI and WASM wrappers pin concrete RNG defaults
+(`ThreadRng` for random, `ChaCha20Rng` for seeded generation)
+so seeded outputs are bit-identical across platforms:
+`ffi_identity_keys_generate(_seeded)`,
+`ffi_extended_identity_keys_generate(_seeded)`,
+`WasmIdentityKeys.generate(Seeded)`,
+and `WasmExtendedIdentityKeys.generate(Seeded)`.
 
 ### Merkle Tree Management
 
-All tree management functions are only available when `stateless` feature is **NOT** enabled.
+Tree management methods exist **only** on stateful instances
+(`RLN<Stateful<T>, _>`); stateless instances do not expose them
+(in FFI, calling a tree operation on a stateless handle returns an error).
 
-`set_tree(tree_depth)`
+`tree_depth()`
 
-- Initializes the internal Merkle tree with the specified depth.
-- Leaves are set to the default zero value.
-
-`set_leaf(index, leaf)`
-
-- Sets a leaf value at the specified index.
-
-`get_leaf(index)`
-
-- Returns the leaf value at the specified index.
-
-`set_leaves_from(index, leaves)`
-
-- Sets multiple leaves starting from the specified index.
-- Updates `next_index` to `max(next_index, index + n)`.
-- If `n` leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
-
-`init_tree_with_leaves(leaves)`
-
-- Resets the tree state to default and initializes it with the provided leaves starting from index 0.
-- Resets the internal `next_index` to 0 before setting the leaves.
-
-`atomic_operation(index, leaves, indices)`
-
-- Atomically inserts leaves starting from index and removes leaves at the specified indices.
-- Updates `next_index` to `max(next_index, index + n)` where `n` is the number of leaves inserted.
-
-`set_next_leaf(leaf)`
-
-- Sets a leaf at the next available index and increments `next_index`.
-- The leaf is set at the current `next_index` value, then `next_index` is incremented.
-
-`delete_leaf(index)`
-
-- Sets the leaf at the specified index to the default zero value.
-- Does not change the internal `next_index` value.
+- Returns the depth of the internal Merkle tree.
 
 `leaves_set()`
 
@@ -246,173 +283,258 @@ All tree management functions are only available when `stateless` feature is **N
 
 - Returns the root of a subtree at the specified level and index.
 
-`get_merkle_proof(index)`
+`set_leaf(index, leaf)`
 
-- Returns the Merkle proof for the leaf at the specified index as `(path_elements, identity_path_index)`.
+- Sets a leaf value at the specified index.
+
+`set_leaves_from(index, leaves)`
+
+- Sets multiple leaves starting from the specified index.
+- Updates `next_index` to `max(next_index, index + n)`.
+- If `n` leaves are passed, they will be set at positions `index`, `index+1`, ..., `index+n-1`.
+
+`init_tree_with_leaves(leaves)`
+
+- Resets the tree state to default and initializes it with the provided leaves starting from index 0.
+- Resets the internal `next_index` to 0 before setting the leaves.
+
+`get_leaf(index)`
+
+- Returns the leaf value at the specified index.
 
 `get_empty_leaves_indices()`
 
 - Returns indices of leaves set to zero up to the final leaf that was set.
 
-`set_metadata(metadata)`
+`atomic_operation(index, leaves, indices)`
 
-- Stores arbitrary metadata in the RLN object for application use.
+- Atomically inserts leaves starting from index and removes leaves at the specified indices.
+- Updates `next_index` to `max(next_index, index + n)` where `n` is the number of leaves inserted.
+
+`set_next_leaf(leaf)`
+
+- Sets a leaf at the next available index and increments `next_index`.
+
+`delete_leaf(index)`
+
+- Sets the leaf at the specified index to the default zero value.
+- Does not change the internal `next_index` value.
+
+`get_merkle_proof(index)`
+
+- Returns the Merkle proof for the leaf at the specified index.
+- Any backend proof converts into the canonical `RLNMerkleProof`
+  data type (`path_elements`, `identity_path_index`) used by witness construction.
+
+`set_metadata(metadata)` / `get_metadata()`
+
+- Stores and retrieves arbitrary application metadata in the RLN object.
 - This metadata is not used by the RLN module.
 
-`get_metadata()`
-
-- Returns the metadata stored in the RLN object.
-
-`flush()`
+`close()`
 
 - Closes the connection to the Merkle tree database.
-- Should be called before dropping the RLN object when using persistent storage.
+- SHOULD be called before dropping the RLN object when using persistent storage.
 
 ### Witness Construction
 
-`RLNWitnessInput::new(identity_secret, user_message_limit, message_id, path_elements, identity_path_index, x, external_nullifier)`
+The canonical Merkle proof data type is:
 
-- Constructs a witness input for proof generation.
-- Validates that `message_id <= user_message_limit` and `path_elements` and `identity_path_index` have the same length.
+`RLNMerkleProof::new(path_elements, identity_path_index)`
 
-### Witness Calculation
+- Wraps externally supplied path data (stateless workflows).
+- Tree proofs returned by `get_merkle_proof` convert into it automatically.
 
-For **native Rust** environments, witness calculation is handled internally by the proof generation functions.
-The circuit witness is computed from the `RLNWitnessInput` and passed to the zero-knowledge proof system.
+Witness inputs are built through validating builders and
+are represented by the `RLNWitnessInput` enum
+(`Single` / `Multi` variants):
 
-For **WASM** environments, witness calculation must be performed externally using a JavaScript witness calculator.
-The workflow is:
+`RLNWitnessInput::new_single(identity_secret, user_message_limit, merkle_proof, x, external_nullifier, message_id).build()`
 
-1. Create a `WasmRLNWitnessInput` with the required parameters
-2. Export to JSON format using `toBigIntJson()` method
-3. Pass the JSON to an external JavaScript witness calculator
-4. Use the calculated witness with `generate_rln_proof_with_witness`
+- Constructs a Single message-id witness.
+- `build` checks the structural invariants
+  (`message_id < user_message_limit`,
+  matching `path_elements` / `identity_path_index` lengths)
+  and returns `WitnessInputSingleError` on violation.
 
-The witness calculator computes all intermediate values required by the RLN circuit.
+`RLNWitnessInput::new_multi(identity_secret, user_message_limit, merkle_proof, x, external_nullifier, message_ids, selector_used).build()`
+
+- Constructs a Multi message-id witness.
+- `build` additionally checks that `message_ids` and `selector_used`
+  agree in length and returns `WitnessInputMultiError` on violation.
+
+`RLNPartialWitnessInput`
+
+- The witness subset known ahead of time
+  (identity secret, user message limit, Merkle path),
+  used for two-step proof generation.
+- Constructed via the
+  `RLNPartialWitnessInput::new(identity_secret, user_message_limit, merkle_proof).build()`
+  builder (`build` checks the structural invariants and returns
+  `PartialWitnessInputError` on violation),
+  or converted from a full witness (`From<&RLNWitnessInput>`).
+
+Witness calculation is handled internally on **all** platforms,
+including WASM, by the embedded witness graph.
 
 ### Proof Generation
 
-`generate_zk_proof(witness)` - *Available in Rust, FFI*
+`generate_proof(witness)`
 
-- Generates a Groth16 zkSNARK proof from a witness.
-- Extract proof values separately using `proof_values_from_witness`.
+- Generates a Groth16 zkSNARK proof and its public proof values from a witness.
+- Returns `(proof, proof_values)`;
+  `proof_values` is an `RLNProofValues` enum (`Single` / `Multi`).
+- Fails with `GenerateProofError` on witness/graph inconsistency or backend fault.
 
-`generate_rln_proof(witness)` - *Available in Rust, FFI*
+`generate_partial_proof(partial_witness)`
 
-- Generates a complete RLN proof returning both the zkSNARK proof and proof values as `(proof, proof_values)`.
-- Combines proof generation and proof values extraction.
+- First step of **two-step proof generation**:
+  precomputes a partial proof from the inputs known ahead of time
+  (identity, message limit, Merkle path),
+  before the signal and external nullifier are known.
 
-`generate_rln_proof_with_witness(calculated_witness, witness)`
+`finish_proof(partial_proof, witness)`
 
-- Generates an RLN proof using a pre-calculated witness from an external witness calculator.
-- The `calculated_witness` should be a `Vec<BigInt>` obtained from the external witness calculator.
-- Returns `(proof, proof_values)`.
-- This is the primary proof generation method for **WASM** where witness calculation is handled by **JavaScript**.
+- Second step: completes the partial proof with the full witness and
+  returns `(proof, proof_values)`.
+- This split lets latency-sensitive applications move the bulk of the
+  proving work off the critical path.
 
 ### Proof Verification
 
-`verify_zk_proof(proof, proof_values)`
+All verification methods return an honest `Result<bool>`:
+`Ok(true)` / `Ok(false)` is the zkSNARK **verdict**
+(an invalid proof is a verdict, not an error),
+while `Err` reports only caller-input mismatch
+(`InvalidSignal`, `InvalidRoot`) or a backend fault.
+
+`verify(proof, proof_values)`
 
 - Verifies only the zkSNARK proof without root or signal validation.
-- Returns `true` if the proof is valid.
 
-`verify_rln_proof(proof, proof_values, x)` - *Stateful mode*
+`verify_with_signal(proof, proof_values, x)`
 
-- Verifies the proof against the internal Merkle tree root and validates that `x` matches the proof signal.
-- Returns an error if verification fails (invalid proof, invalid root, or invalid signal).
+- Checks that the signal `x` matches the value bound in the proof
+  (`Err(InvalidSignal)` on mismatch), then returns the zkSNARK verdict.
 
 `verify_with_roots(proof, proof_values, x, roots)`
 
-- Verifies the proof against a set of acceptable roots and validates the signal.
-- If the roots slice is empty, root verification is skipped.
-- Returns an error if verification fails.
+- Additionally checks that the proof root is among `roots`
+  (`Err(InvalidRoot)` on mismatch).
+- If the `roots` slice is empty, root verification is skipped.
+
+The FFI and WASM boundaries preserve this shape:
+an FFI `FFI_BoolResult { ok: false, err: null }` and
+a WASM `false` return are real "proof invalid" verdicts,
+not errors.
 
 ### Slashing
 
-`recover_id_secret(proof_values_1, proof_values_2)`
+`RLNProofValues::recover_secret(other)` (trait `RecoverSecret`)
 
-- Recovers the identity secret from two proof values that share the same external nullifier.
-- Used to detect and penalize rate limit violations.
+- Recovers the identity secret from two proof values that share the same
+  external nullifier and nullifier.
+- Returns `RecoverSecretError` when the two proofs do not yield a matching
+  nullifier (no slashing possible).
+- Recovery works across modes: Single with Single, Multi with Multi,
+  and Single combined with Multi.
+
+`compute_id_secret(share1, share2)`
+
+- Lower-level Shamir reconstruction from two `(x, y)` shares.
+
+FFI: `ffi_rln_recover_id_secret`, `ffi_rln_compute_id_secret`
+(the recovered secret is returned as a plain field element deliberately,
+since slashing is a reveal).
+WASM: `WasmRLNProofValues.recoverIdSecret` / `computeIdSecret`.
 
 ### Hash Utilities
 
-`poseidon_hash(inputs)`
+`Hasher::<PoseidonHash>::hash_single(input)` / `hash_pair(left, right)` / `hash_list(inputs)`
 
-- Computes the Poseidon hash of the input field elements.
+- Computes the Poseidon hash for arity 1, 2, or 3 inputs.
+- All protocol hashes route through this facade.
 
-`hash_to_field_le(input)`
+`hash_to_field_le(input)` / `hash_to_field_be(input)`
 
-- Hashes arbitrary bytes to a field element using little-endian byte order.
+- Hashes arbitrary bytes to a field element using Keccak-256,
+  interpreting the digest with little-endian or big-endian byte order.
 
-`hash_to_field_be(input)`
+Boundary equivalents: `ffi_poseidon_hash_pair`, `ffi_hash_to_field_le/be`,
+`ffi_uint_to_fr` (FFI); `poseidonHashPair`, `hashToFieldLE/BE` (WASM).
 
-- Hashes arbitrary bytes to a field element using big-endian byte order.
+### Serialization
 
-### Serialization Utilities
+Serialization is trait-based; there are no free serialization functions.
+Endianness is chosen at the call site:
 
-`rln_witness_to_bytes_le` / `rln_witness_to_bytes_be`
+- **Little-endian**: the arkworks `CanonicalSerialize` / `CanonicalDeserialize`
+  traits (re-exported by the prelude, so consumers do not depend on
+  `ark-serialize` directly).
+- **Big-endian**: the Zerokit `CanonicalSerializeBE` / `CanonicalDeserializeBE`
+  traits, implemented for field elements, vectors, identity keys,
+  witnesses, and proof values.
+- **Mixed**: `CanonicalSerializeMixed` / `CanonicalDeserializeMixed`
+  for `RLNProof` (proof and values in one buffer;
+  `toBytesMixed` / `fromBytesMixed` at the boundaries).
 
-- Serializes an RLN witness to bytes.
+Wire format properties:
 
-`bytes_le_to_rln_witness` / `bytes_be_to_rln_witness`
-
-- Deserializes bytes to an RLN witness.
-
-`rln_proof_to_bytes_le` / `rln_proof_to_bytes_be`
-
-- Serializes an RLN proof to bytes.
-
-`bytes_le_to_rln_proof` / `bytes_be_to_rln_proof`
-
-- Deserializes bytes to an RLN proof.
-
-`rln_proof_values_to_bytes_le` / `rln_proof_values_to_bytes_be`
-
-- Serializes proof values to bytes.
-
-`bytes_le_to_rln_proof_values` / `bytes_be_to_rln_proof_values`
-
-- Deserializes bytes to proof values.
-
-`fr_to_bytes_le` / `fr_to_bytes_be`
-
-- Serializes a field element to 32 bytes.
-
-`bytes_le_to_fr` / `bytes_be_to_fr`
-
-- Deserializes 32 bytes to a field element.
-
-`vec_fr_to_bytes_le` / `vec_fr_to_bytes_be`
-
-- Serializes a vector of field elements to bytes.
-
-`bytes_le_to_vec_fr` / `bytes_be_to_vec_fr`
-
-- Deserializes bytes to a vector of field elements.
+- A field element is 32 bytes; vectors carry an 8-byte length prefix.
+- Enum types (`RLNWitnessInput`, `RLNProofValues`) are tagged with one byte:
+  `0` = Single, `1` = Multi.
+- The zkSNARK `Proof` and `PartialProof` are little-endian only.
+- Deserialization of untrusted big-endian input MUST reject non-canonical
+  field elements (values `>=` the field modulus).
+- Deserialization enforces the same structural invariants as construction
+  and returns typed validation errors through `SerializationError`.
 
 ### WASM-Specific Notes
 
 WASM bindings wrap the Rust API with JavaScript-compatible types. Key differences:
 
-- Field elements are wrapped as `WasmFr` with `fromBytesLE`, `fromBytesBE`, `toBytesLE`, `toBytesBE` methods.
-- Vectors of field elements use `VecWasmFr` with `push`, `get`, `length` methods.
-- Identity generation uses `Identity.generate()` and `Identity.generateSeeded(seed)` static methods.
-- Extended identity uses `ExtendedIdentity.generate()` and `ExtendedIdentity.generateSeeded(seed)`.
-- Witness input uses `WasmRLNWitnessInput` constructor and `toBigIntJson()` for witness calculator integration.
-- Proof generation requires external witness calculation via `generateRLNProofWithWitness(calculatedWitness, witness)`.
-- When `parallel` feature is enabled, call `initThreadPool()` to initialize the thread pool.
+- Field elements are wrapped as `WasmFr`
+  (`zero`, `one`, `fromUint`, `fromBytesLE/BE`, `toBytesLE/BE`, `debug`).
+- Vectors of field elements use `VecWasmFr` with `push`, `get`, `length`.
+- Secrets are wrapped as `WasmSecretFr`, which exposes ONLY a redacted
+  `debug()` and an `equals()` comparison; raw byte export of a bare secret
+  is intentionally not available. Secret persistence goes through
+  `WasmIdentityKeys.toBytesLE/BE` (whole-struct).
+- Identity generation uses `WasmIdentityKeys.generate()` /
+  `generateSeeded(seed)` and `WasmExtendedIdentityKeys` equivalents.
+- Witness input uses `WasmRLNWitnessInput.newSingle(...)` / `newMulti(...)`;
+  proof generation is `WasmRLN.generateProof(witness)` with witness
+  calculation handled internally.
+- Two-step proving: `generatePartialProof` / `finishProof` with
+  `WasmRLNPartialWitnessInput` and `WasmRLNPartialProof`.
+- The WASM surface is stateless only and exposes **no tree methods**;
+  JavaScript supplies `path_elements` and `identity_path_index`.
+- When the `parallel` feature is enabled, call `initThreadPool()`
+  to initialize the rayon thread pool.
+- `initPanicHook()` installs a console panic hook for debugging.
 - Errors are returned as JavaScript strings that can be caught via try-catch blocks.
 
 ### FFI-Specific Notes
 
-FFI bindings use C-compatible types with the `ffi_` prefix. Key differences:
+FFI bindings use C-compatible types with the `ffi_` function prefix
+(pattern `ffi_<type>_<action>_<variant>`). Key differences:
 
-- Field elements are wrapped as `CFr` with corresponding conversion functions.
-- Results use `CResult` or `CBoolResult` structs with `ok` and `err` fields.
-- Errors are returned as C-compatible strings in the `err` field of result structs.
-- Memory must be explicitly freed using `ffi_*_free` functions.
-- Vectors use `repr_c::Vec` with `ffi_vec_*` helper functions.
-- Configuration is passed via file path to a JSON configuration file.
+- Field elements are wrapped as `FFI_Fr`; secrets as the opaque `FFI_SecretFr`
+  (redacted debug via `ffi_secret_fr_debug`, comparison via `ffi_secret_fr_eq`).
+- Fallible functions return `FFI_Result<T>` (heap pointer + error string),
+  or `FFI_BoolResult` / `FFI_UsizeResult` for bare values;
+  errors are C strings in the `err` field.
+- All protocol types cross the boundary as opaque handles:
+  `FFI_RLN`, `FFI_IdentityKeys`, `FFI_ExtendedIdentityKeys`,
+  `FFI_RLNMerkleProof`, `FFI_RLNWitnessInput`, `FFI_RLNPartialWitnessInput`,
+  `FFI_RLNProof`, `FFI_RLNPartialProof`, `FFI_RLNProofValues`.
+- Memory must be explicitly freed with the matching `ffi_*_free` function;
+  every owned vector type has one (`ffi_vec_fr_free`, `ffi_vec_u8_free`,
+  `ffi_vec_bool_free`, `ffi_vec_usize_free`); strings use `ffi_c_string_free`.
+- Returned strings and byte buffers are **not** NUL-terminated;
+  C callers MUST print them with an explicit length (`%.*s`), never `%s`.
+- The C header `rln.h` is generated with
+  `cargo run --bin generate_headers --features=headers`.
 
 ## Usage Patterns
 
@@ -437,43 +559,48 @@ Applies when membership is established once and remains static during an operati
 
 Initialize the tree using `init_tree_with_leaves` with the complete membership set.
 No root history is required.
-Verify proofs using `verify_rln_proof` which checks against the internal tree root directly.
+Verify proofs using `verify_with_signal`,
+optionally combined with `verify_with_roots` against the single internal root.
 
 ### Stateless
 
 Applies when membership state is managed externally,
 such as by a smart contract or relay network.
 
-Enable the `stateless` feature flag.
+Construct the instance with `RLNBuilder::stateless()`
+(or `ffi_rln_new_stateless` / `WasmRLN.newWithParams`).
 Obtain Merkle proofs and valid roots from the external source.
-Pass externally provided `path_elements` and `identity_path_index` to `RLNWitnessInput::new`.
+Wrap externally provided `path_elements` and `identity_path_index` in
+`RLNMerkleProof::new` and pass it to the witness builder.
 Verify using `verify_with_roots` with externally provided roots.
 
-### WASM Browser Integration
+### Two-Step Proving
 
-WASM environments require external witness calculation.
-Use `WasmRLNWitnessInput::toBigIntJson()` to export the witness for
-JavaScript witness calculators,
-then pass the result to `generateRLNProofWithWitness`.
+Applies when proof latency at message time matters.
 
-When `parallel` feature is enabled,
-call `initThreadPool()` before proof operations.
-This requires COOP/COEP headers for SharedArrayBuffer support.
+Build an `RLNPartialWitnessInput` as soon as the identity and Merkle path
+are known and call `generate_partial_proof`.
+When the signal arrives, build the full witness and call `finish_proof`
+to obtain `(proof, proof_values)` with reduced critical-path latency.
 
-#### Epoch and Rate Limit Configuration
+### Epoch and Rate Limit Configuration
 
 The external nullifier is computed as `poseidon_hash([epoch, rln_identifier])`.
 The `rln_identifier` is a field element that uniquely identifies your application (e.g., a hash of your app name).
 
 All values that will be hashed MUST be represented as field elements.
 For converting arbitrary data to field elements,
-use `hash_to_field_le` or `hash_to_field_be` functions which internally use Poseidon hash.
+use the `hash_to_field_le` or `hash_to_field_be` functions,
+which internally use Keccak-256.
 
 Each application SHOULD use a unique `rln_identifier` to
 prevent cross-application nullifier collisions.
 
-The `user_message_limit` in the rate commitment determines messages allowed per epoch. The `message_id` must be less than `user_message_limit` and
+The `user_message_limit` in the rate commitment determines messages allowed per epoch.
+Each `message_id` must be less than `user_message_limit` and
 should increment with each message.
+In Multi message-id mode a single proof covers a batch of message ids,
+with `selector_used` marking the active slots.
 
 Applications MUST persist the `message_id` counter to avoid violations after restarts.
 
@@ -488,6 +615,16 @@ Applications MUST ensure that:
 - External nullifiers are constructed correctly to prevent cross-application attacks
 - Merkle tree roots are validated when using stateless mode
 - Circuit parameters (zkey and graph data) are obtained from trusted sources
+
+Zerokit handles secrets defensively in-process:
+all secret field elements are carried as `SecretFr`,
+which zeroizes its memory on drop,
+cannot be implicitly copied,
+and prints a redacted `Debug` representation so secrets never leak into logs.
+The FFI boundary keeps secrets behind the opaque `FFI_SecretFr` handle,
+and the WASM boundary exposes no raw byte export for a bare secret.
+Note that WASM linear memory remains readable by the host page;
+this hygiene is best-effort, not isolation.
 
 When using the `parallel` feature in WASM,
 applications MUST serve content with appropriate COOP/COEP headers to
@@ -508,7 +645,6 @@ implement safeguards to prevent accidental violations.
 - [Zerokit GitHub Repository](https://github.com/vacp2p/zerokit) - Reference implementation
 - [RLN-V2 Specification](rln-v2.md) - Rate Limit Nullifier V2 protocol
 - [Sled Database](https://sled.rs) - Embedded database for persistent Merkle tree storage
-- [Witness Calculator](https://github.com/vacp2p/zerokit/tree/master/rln-wasm) - JavaScript witness calculator for WASM environments
 
 ## Copyright
 
