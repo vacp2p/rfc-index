@@ -268,8 +268,7 @@ def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
     h.update(channel.tip_sequencer_starting_slot.to_bytes(8, byteorder='little'))
     h.update(channel.posting_timeframe.to_bytes(4, byteorder='little'))
     h.update(channel.posting_timeout.to_bytes(4, byteorder='little'))
-    h.update(channel.balance.to_bytes(8, byteorder='little'))
-    h.update(channel.withdraw_threshold.to_bytes(2, byteorder='little'))
+    h.update(channel.transfer_threshold.to_bytes(2, byteorder='little'))
     return h.digest()
 
 def channels_root(channels: dict[ChannelId, ChannelState]) -> hash:
