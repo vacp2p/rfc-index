@@ -89,51 +89,61 @@ they are never submitted to the registry.
 
 ```c
 
-// CAIP-10 account identifier, canonicalized. e.g. "eip155:59144:0xb9cd..."
-// Configuration-time only: selects the registry an instance serves.
-typedef const char* RegistryId;
-
 typedef struct { const uint8_t* ptr; size_t len; } Bytes;
 
 // The minimum set of conditions an error result MUST distinguish.
 typedef enum {
-    RLN_ERR_NOT_READY,   // Module cannot serve this yet; retry once ready
-    RLN_ERR_TRANSIENT,   // e.g. registry/RPC failure; the caller MAY retry
-    RLN_ERR_PERMANENT    // e.g. invalid input; retrying cannot succeed
+    RLN_ERR_NOT_READY,         // Module cannot serve this yet; retry once ready
+    RLN_ERR_TRANSIENT,         // e.g. registry/RPC failure; the caller MAY retry
+    RLN_ERR_BUDGET_EXHAUSTED,  // the epoch's rate limit is spent; retry next epoch
+    RLN_ERR_PERMANENT          // e.g. invalid input; retrying cannot succeed
 } RlnErrorKind;
 
+// Everything a call operates on: the registry and the application context.
+// A default scope is set at start(); every function accepts an explicit scope.
 typedef struct {
-    uint8_t identity_trapdoor[32];
-    uint8_t identity_nullifier[32];
-    uint8_t identity_secret_hash[32];  // poseidon(trapdoor, nullifier)
-    uint8_t identity_commitment[32];   // poseidon(secret_hash)
-} IdentityCredential;
+    const char* registry_id;         // CAIP-10 account identifier, canonicalized,
+                                     // e.g. "eip155:59144:0xb9cd..."
+    uint8_t     rln_identifier[32];  // per-application identifier, mixed into
+                                     // the external nullifier
+} MembershipScope;
+
+// Open registration options; recognized keys are registry-specific,
+// e.g. selecting delegated registration through an allocation service.
+typedef struct { const char* key; const char* value; } RegistryOption;
+typedef struct { const RegistryOption* ptr; size_t len; } RegistryOptions;
+
+typedef enum {
+    MEMBERSHIP_UNKNOWN,                   // not present in the registry
+    MEMBERSHIP_PENDING,                   // submitted, not yet confirmed by the registry
+    MEMBERSHIP_FAILED,                    // observed absent after the confirmation window
+    MEMBERSHIP_ACTIVE,                    // confirmed and within its validity period
+    MEMBERSHIP_GRACE_PERIOD,              // still usable, but approaching expiry
+    MEMBERSHIP_EXPIRED,                   // validity period lapsed
+    MEMBERSHIP_ERASED_AWAITS_WITHDRAWAL,  // removed; deposit still recoverable
+    MEMBERSHIP_ERASED                     // removed; nothing left to recover
+} MembershipStatus;
+
+// Membership metadata. The identity credential backing it is generated,
+// persisted, and used only inside the Module; it never crosses this interface.
+typedef struct {
+    const char* membership_hash;  // stable one-way local handle,
+                                  // lowercase_hex(SHA256(registry_id || 0x00 || identity_commitment))
+    uint64_t    rate_limit;       // messages per epoch; provisional while PENDING
+    uint64_t    leaf_index;       // index of the rate commitment in the tree;
+                                  // meaningful once ACTIVE
+} Membership;
 
 typedef struct {
-    IdentityCredential credential;
-    uint64_t           rate_limit;  // messages per epoch
-    uint64_t           leaf_index;  // index of the rate commitment in the tree
-} Membership;
+    MembershipStatus status;
+    Membership       membership;  // meaningful unless status is UNKNOWN
+} MembershipState;
 
 typedef struct {
     uint32_t tree_depth;      // depth of the registry's Merkle tree
     uint64_t epoch_size_sec;  // duration of one epoch in seconds
     uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
 } RegistryParameters;
-
-// All fields derived from a single consistent snapshot of the registry's tree.
-typedef struct {
-    uint64_t       leaf_index;
-    uint8_t        leaf[32];        // rate commitment
-    uint8_t        root[32];
-    const uint8_t* path_elements;   // tree_depth * 32 bytes
-    const uint8_t* path_indices;    // tree_depth bytes
-} MerkleProof;
-
-typedef struct {
-    const uint8_t* roots;  // concatenated 32-byte roots
-    size_t         len;    // number of roots
-} RootSet;
 
 typedef struct {
     uint8_t proof[128];              // zero-knowledge proof
@@ -149,116 +159,110 @@ typedef struct {
 ## Required functions
 
 The Module SHALL expose the functions in this section.
+A function called before the Module can serve it
+SHALL fail with `RLN_ERR_NOT_READY`
+rather than be served from a cold registry view.
 
 ### Lifecycle
 
 #### `start()`
 
-Start the Module:
-establish the connection to the configured registry,
-load a persisted membership if one exists (see [Persistence](#persistence)),
-and start the tasks that maintain the valid-root window and the cached Merkle proof path.
+Start the Module with its configuration,
+which selects the registries the instance serves
+and a default `MembershipScope` for calls that do not pass one explicitly.
+Starting establishes the registry connections,
+loads persisted memberships (see [Persistence](#persistence)),
+and starts the tasks that maintain the Module's local registry view:
+the valid-root window, each membership's Merkle proof path, and each membership's state.
+A membership is not required to start:
+a Module started without one serves [`verify_proof`](#rate-limiting)
+from its registry view alone.
 
 #### `stop()`
 
 Stop the Module and all its maintenance tasks.
 In-flight requests SHALL be cancelled cleanly.
 
-#### `bool is_ready()`
-
-Return `true` only once the Module can serve current registry reads —
-in particular, once its valid-root window is warm.
-A read requested before the Module is ready
-SHALL fail as not-ready rather than be served from a cold window.
-
-#### `RegistryParameters parameters()`
-
-Return the registry's parameters.
-Every validator of a shard MUST agree on these;
-the consumer SHOULD validate them against its configuration at startup and refuse to proceed on mismatch.
-
-### Credential generation
-
-#### `IdentityCredential generate_credential()`
-
-Generate a new identity credential using the Module's Zerokit key-generation primitive —
-the same cryptography as the [rate-limiting portion](#rate-limiting).
-The Module MAY also offer deterministic generation from caller-supplied entropy.
-
 ### Registration
 
-#### `Membership register(IdentityCredential credential, uint64_t rate_limit)`
+#### `Membership register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
 
-Register a membership for `credential` at the requested `rate_limit`,
-and persist the resulting membership (see [Persistence](#persistence)).
-Only the `identity_commitment` is submitted to the registry.
+Generate a new identity credential inside the Module,
+register a membership for it at the requested `rate_limit`,
+and persist the credential and membership (see [Persistence](#persistence)).
+Only the rate commitment derived from the credential is submitted to the registry;
+the credential itself never leaves the Module.
+`options` carries registry-specific registration choices —
+for example, selecting delegated registration through the
+[RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html)
+rather than direct registration from a funded account.
 
-The function SHALL return only once the membership is confirmed in the registry —
-for example, once the registration transaction is mined and its registration event observed —
-with the confirmed `leaf_index` and `rate_limit`.
-Registration is not instantaneous — on some registries it takes minutes —
-so it MAY be long-running,
-and the consumer MUST be able to await it without blocking a shared event loop.
-A failed registration SHALL report whether it is retryable.
+Registration is not instantaneous — on some registries confirmation takes minutes —
+so the function SHALL return once the registration is submitted and durably persisted,
+with the membership `PENDING`
+and its `rate_limit` and `leaf_index` provisional.
+Confirmation is observed through [`get_membership_state`](#registration),
+which transitions to `ACTIVE` once the registration is confirmed in the registry,
+or to `FAILED` if it is observed absent after the confirmation window.
+A failed submission SHALL report whether it is retryable.
 
-#### `bool is_member(uint8_t identity_commitment[32])`
+#### `MembershipState get_membership_state(MembershipScope scope)`
 
-Return whether `identity_commitment` is present in the registry's membership set.
+Return the status and metadata of the scope's membership,
+whether registered in this run or loaded from persistence at `start()`.
+The Module SHALL track the registry
+so the reported status stays current through the full membership lifecycle;
+`UNKNOWN` is returned when no membership exists for the scope.
 
 ### Persistence
 
-The Module SHALL persist its membership,
+The Module SHALL persist each membership it registers,
 so that a membership registered before a restart is available after it
 without registering again.
-Persisted identity secrets SHALL be encrypted at rest.
-
-#### `Membership get_membership()`
-
-Return the Module's membership,
-from `register()` in this run or loaded from persistence at `start()`.
-
-### Registry reads
-
-#### `MerkleProof get_merkle_proof()`
-
-Return the Merkle proof for the membership's leaf.
-All fields MUST be derived from a single consistent snapshot of the registry's tree;
-the Module SHOULD retry snapshot acquisition when the tree changes mid-read.
-
-#### `RootSet get_valid_roots()`
-
-Return the current valid-root window.
-Root freshness is correctness-critical:
-a verifier accepts a proof only if it was generated against a root in this window.
+Persisted identity credentials SHALL be encrypted at rest.
 
 ## Rate limiting
 
-The rate-limiting portion is a set of stateless functions
-over a membership and a registry view supplied by the consumer,
-obtained through [`get_membership`](#persistence) and the [registry reads](#registry-reads).
-Detecting double-signalling
-— recovering an identity secret from two proofs that share a `message_id` within one epoch —
+The rate-limiting portion is the proof functions.
+All RLN state they need —
+the current epoch, message-id allocation within the rate limit,
+the membership's Merkle proof path, and the valid-root window —
+is maintained inside the Module;
+the consumer supplies only the scope and the signal.
+A membership is required only to generate proofs:
+verification runs against the registry view alone,
+so a consumer that only validates messages never registers.
+Detecting double-signalling across messages
+— recovering an identity secret from two proofs that share a nullifier within one epoch —
 is the consumer's responsibility and is out of scope of these functions.
 
-#### `RateLimitProof generate_proof(Membership membership, Bytes signal, MerkleProof merkle_proof, uint64_t epoch, uint64_t message_id, uint8_t rln_identifier[32])`
+#### `RateLimitProof generate_proof(MembershipScope scope, Bytes signal)`
 
-Generate an RLN proof that `signal` was produced by the holder of `membership`
-within its rate limit for the epoch.
-The function MUST fail permanently
-unless `message_id` is within the membership's rate limit.
-The proof is bound to the external nullifier `hash(epoch, rln_identifier)`.
-A proof generated from a stale `merkle_proof` — one whose root has left the valid-root window —
-is rejected by verifiers;
-the consumer SHOULD refresh the proof path via [`get_merkle_proof`](#registry-reads) and retry.
+Generate an RLN proof that `signal` was produced by the holder of the scope's membership
+within its rate limit for the current epoch.
+The Module determines the epoch,
+allocates the next unused `message_id` within the membership's `rate_limit`,
+and binds the proof to the external nullifier `hash(epoch, rln_identifier)`.
+The Module SHALL NOT issue two proofs for the same `(epoch, message_id)` pair:
+doing so reveals the identity secret.
+When the epoch's budget is exhausted,
+the function SHALL fail with `RLN_ERR_BUDGET_EXHAUSTED`;
+allocation resets at the next epoch.
+The membership MUST be usable — `ACTIVE` or `GRACE_PERIOD` —
+for proof generation to succeed.
 
-#### `bool verify_proof(Bytes signal, RateLimitProof proof, RootSet valid_roots)`
+#### `bool verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
 
 Verify an RLN proof for `signal`.
 Returns `true` only if the proof is valid and
-`proof.root` is a member of `valid_roots`;
-a proof whose root is absent — for example after root rotation — returns `false`.
-The consumer SHOULD verify against freshly read roots,
-so that a proof generated against a newer root is not falsely rejected.
+`proof.root` is within the Module's current valid-root window.
+Verification is on the message hot path —
+it runs for every message a validator receives —
+so the Module SHALL serve it from its locally maintained registry state
+and SHALL NOT perform registry access on the verification path.
+The valid-root window is maintained asynchronously as the registry changes,
+and SHOULD be maintained timely enough
+that a proof generated against a newly published root is not falsely rejected.
 
 ## Optional extensions
 
