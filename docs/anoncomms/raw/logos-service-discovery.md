@@ -507,8 +507,7 @@ the advertiser supports (see
 for how those other entries are treated).
 Per [Advertisement](#advertisement),
 each `REGISTER` is still scoped to
-exactly one `service_id_hash` regardless of
-how many services the advertisement's content covers.
+exactly one `service_id_hash`.
 
 ### REGISTER Message
 
@@ -732,8 +731,7 @@ Discard advertisements with invalid signatures or that don't advertise the reque
 
 > **Note:** The loop over `xpr.services` above is a signature-binding check,
 confirming the requested `service_id_hash`
-is among the services the advertiser signed,
-not an interpretation of the advertisement's contents.
+is among the services the advertiser signed.
 From the discovery protocol's perspective, an advertisement supports
 exactly the `service_id_hash` it was registered or queried against.
 Any other entries in `xpr.services` are opaque to registrars and
@@ -991,8 +989,8 @@ To populate the rest of the response, the registrar MUST:
 bytes as a cached entry for the same `service_id`), reject the request
 and respond with status `Rejected`. If a non-identical `ad` from this
 `peer_id` already exists in the `ad_cache` for this `service_id`,
-processing continues below: on admission (step 6) it replaces the
-existing entry rather than adding a second one.
+processing continues below: on admission (step 6)
+it replaces the existing entry.
 2. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
 using the formula in [Waiting Time Calculation](#waiting-time-calculation).
 3. If no `ticket` is provided in the `REGISTER` request
@@ -1019,7 +1017,7 @@ This ensures advertisers accumulate waiting time across retries
 6. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
 with an expiry timestamp set to `current_time + E`.
 If an entry for this `peer_id` and `service_id` already exists,
-this replaces it rather than adding a second entry.
+this replaces it.
 The registrar SHOULD return a response with status `Confirmed`.
 7. If `t_remaining > 0`, issue a new signed `ticket`
 with `ticket.t_mod` set to `current_time`
