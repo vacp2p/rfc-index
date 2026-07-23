@@ -2,43 +2,55 @@
 
 | Field | Value |
 | --- | --- |
-| Name | RLN API definition |
+| Name | RLN Module API |
 | Status | raw |
 | Category | application |
 | Tags | rln, membership, spam-protection, application, api |
-| Editor | Tanya Stubbs <tanya@status.im> |
+| Editor | Tanya Stubbs <tanya@status.im>, Arseniy Klempner <arseniyk@status.im> |
 
 ## Abstract
 
-This document specifies the interface a Logos Delivery node
-([logos-messaging/logos-delivery](https://github.com/logos-messaging/logos-delivery))
-requires of an external module in order to manage
-[RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html) memberships
-and to perform RLN message validation.
-
-RLN message validation is an optional feature of the Messaging API
-([MESSAGING-API, The Validation API](messaging-api.md#the-validation-api)).
-When it is enabled,
-the node manages memberships through the Module
-and generates and verifies proofs with functions the Module provides.
-The interface is registry-agnostic,
-so a single specification serves every deployment.
+This document specifies the RLN Module:
+a registry-agnostic API that manages
+[RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html) memberships —
+registration, persistence, and lifecycle state —
+and generates and verifies RLN proofs
+on behalf of consuming services.
+Registries are identified by
+[CAIP-10](https://standards.chainagnostic.org/CAIPs/caip-10) account identifiers
+and applications by their `rln_identifier`;
+together they scope every call,
+so one Module serves multiple registries and applications concurrently.
 
 ## Motivation
 
-[MESSAGING-API](messaging-api.md) already models RLN as message validation,
-configured through an EVM-specific `RlnConfig`.
+[RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html) requires a user
+to register an identity commitment in a membership set
+before participating in rate-limited anonymous signalling.
+Existing specifications assume that set is a smart contract
+on an EVM-compatible blockchain:
+[WAKU2-RLN-CONTRACT](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/core/raw/rln-contract.md)
+specifies the contract,
+[MESSAGING-API](messaging-api.md) configures validation
+through an EVM-specific `RlnConfig`,
+and [RLN-KEYSTORE](rln-keystore.md) identifies a registry
+by chain id and contract address.
+Registries now exist, and will continue to appear,
+in other execution environments.
+
 Supporting memberships that live in different registries,
 acquired in different ways,
-means generalizing that configuration and
-delegating the registry-specific work to a module Logos Delivery does not itself implement.
-
-This document defines what that module SHALL expose, so that:
+means generalizing registry identification and
+concentrating the registry-specific work in a module
+that consuming services do not themselves implement.
+This document defines that Module, so that:
 
 - the registry backing a deployment is selected by configuration, not by code;
-- Logos Delivery manages memberships and generates and verifies proofs through one stable interface,
-  independent of how the module packages its internals;
-- payment and account handling remain below the module, invisible to Logos Delivery.
+- a consumer manages memberships and generates and verifies proofs
+  through one stable interface,
+  independent of how the Module packages its internals;
+- payment and account handling remain below the Module,
+  invisible to the consumer.
 
 ## Semantic
 
@@ -51,8 +63,9 @@ are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc211
 | Term | Meaning |
 | --- | --- |
 | Module | The component implementing this interface. Exposes a membership-management portion and a rate-limiting portion. |
-| Consumer | The component calling this interface. |
-| Registry | A membership set — a Merkle tree of rate commitments — identified by a CAIP-10 `registry_id`. Internal registry access is the Module's concern. |
+| Consumer | The component calling this interface — e.g. a relay node implementing [WAKU2-RLN-RELAY](https://lip.logos.co/messaging/core/draft/17/rln-relay.html), a mix node, or a light client. |
+| Application | A network or protocol deployment that verifies RLN proofs against a registry, identified by an `rln_identifier`. |
+| Registry | A membership set — a Merkle tree of rate commitments — identified by a CAIP-10 `registry_id`; a smart contract, an on-chain program, or any other service maintaining such a tree. Internal registry access is the Module's concern. |
 | `registry_id` | `<namespace>:<reference>:<account_address>`, e.g. `eip155:59144:0xb9cd…` or `logos:testnet:<64 lowercase hex>`. MUST be canonicalized before comparison or hashing. |
 | `rln_identifier` | A 32-byte per-application identifier ([32/RLN-V1](https://github.com/logos-co/logos-lips/blob/master/docs/anoncomms/draft/32/rln-v1.md)), mixed into the external nullifier so one membership can serve several applications. |
 | Scope | The context a call operates on — a registry and an application: `registry_id` + `rln_identifier` (`MembershipScope`). |
@@ -60,6 +73,25 @@ are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc211
 | Rate commitment | `poseidon(identity_commitment, rate_limit)` — a registry tree leaf. |
 | Direct registration | The Module registers a membership itself, from a funded account. |
 | Delegated registration | The Module registers on a client's behalf as a participant in the [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html). |
+
+## Registry identification
+
+A `registry_id` is a [CAIP-10](https://standards.chainagnostic.org/CAIPs/caip-10)
+account identifier, `namespace:reference:account_address`,
+that MUST uniquely identify a single registry instance.
+A registry deployment typically spans several accounts —
+the contract or program, its configuration, the tree accounts —
+so each namespace binding MUST define which single account anchors the registry
+(the account from which its other objects can be resolved)
+and one canonical textual form for `account_address`, including letter case.
+
+The `registry_id` is compared as an opaque string
+and is an input to the `membership_hash`,
+so implementations MUST canonicalize it before comparing or hashing,
+and MUST NOT require the ability to parse the `account_address`
+of namespaces they do not support.
+The namespace binding for `logos` registries is given in
+[Appendix A](#appendix-a-the-logos-namespace-binding).
 
 ## API design
 
@@ -90,6 +122,8 @@ and used only inside proof generation.
 
 ## Type definitions
 
+### Common types
+
 ```c
 
 typedef struct { const uint8_t* ptr; size_t len; } Bytes;
@@ -115,6 +149,17 @@ typedef struct {
 // e.g. selecting delegated registration through an allocation service.
 typedef struct { const char* key; const char* value; } RegistryOption;
 typedef struct { const RegistryOption* ptr; size_t len; } RegistryOptions;
+
+typedef struct {
+    uint64_t epoch_size_sec;  // duration of one epoch in seconds
+    uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
+} RegistryParameters;
+
+```
+
+### Membership
+
+```c
 
 typedef enum {
     MEMBERSHIP_UNKNOWN,                   // not present in the registry
@@ -142,10 +187,45 @@ typedef struct {
     Membership       membership;  // meaningful unless status is UNKNOWN
 } MembershipState;
 
-typedef struct {
-    uint64_t epoch_size_sec;  // duration of one epoch in seconds
-    uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
-} RegistryParameters;
+```
+
+A membership belongs to exactly one registry
+and carries no application association:
+it MAY back any application whose scope names its registry,
+which is why a `MembershipScope` pairs the `registry_id` with an `rln_identifier`.
+
+`PENDING` and `FAILED` are Module-local states:
+accepting a submission confirms the registry received the registration,
+not that it applied it.
+A membership MUST NOT remain `PENDING` indefinitely —
+the Module bounds it with a confirmation window (see [`register`](#registration)),
+after which a membership observed absent is reported `FAILED`.
+While `PENDING`, `rate_limit` and `leaf_index` are provisional:
+the registry assigns the leaf position when the registration is applied,
+so the Module MUST re-read both once the membership is `ACTIVE`.
+
+A membership MAY leave the set involuntarily.
+Where a registry implements slashing —
+which removes the leaf and publicly reveals the identity secret
+([32/RLN-V1](https://github.com/logos-co/logos-lips/blob/master/docs/anoncomms/draft/32/rln-v1.md)) —
+an `ACTIVE` membership can disappear at any time.
+A registry that erases all record of a membership on removal
+makes `ERASED` indistinguishable from never-registered in a raw read,
+so the Module infers erasure from its own records.
+A consumer MUST stop generating proofs
+once a membership is reported `ERASED` or `UNKNOWN`.
+
+The `membership_hash` is derived deterministically from
+the canonical `registry_id` and the credential's identity commitment,
+and from nothing else —
+in particular not from provisional values such as `leaf_index` —
+so that Modules sharing a storage backend agree on it.
+The construction is given in
+[Appendix B](#appendix-b-membership-hash-construction).
+
+### Rate-limit proof
+
+```c
 
 typedef struct {
     uint8_t proof[128];              // zero-knowledge proof
@@ -157,6 +237,14 @@ typedef struct {
 } RateLimitProof;
 
 ```
+
+A `RateLimitProof` is opaque to the consumer,
+which passes it from [`generate_proof`](#rate-limiting) to
+[`verify_proof`](#rate-limiting) unchanged;
+its fields follow [RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html).
+Two proofs that share an external nullifier and message id
+expose `share_x`/`share_y` pairs that reconstruct the identity secret —
+the mechanism the rate limit rests on.
 
 ## Required functions
 
@@ -200,29 +288,58 @@ for example, selecting delegated registration through the
 [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html)
 rather than direct registration from a funded account.
 
+`register` is idempotent for a scope:
+if the scope already has a membership that is not `FAILED`,
+the function SHALL return that membership
+rather than generate a second credential or double-register,
+and its `rate_limit` MAY differ from the requested value.
+Re-registering a `FAILED` membership is therefore safe.
+Holding more than one membership for a scope is an
+[optional extension](#optional-extensions).
+
 Registration is not instantaneous — on some registries confirmation takes minutes —
 so the function SHALL return once the registration is submitted and durably persisted,
 with the membership `PENDING`
 and its `rate_limit` and `leaf_index` provisional.
 Confirmation is observed through [`get_membership_state`](#registration),
-which transitions to `ACTIVE` once the registration is confirmed in the registry,
-or to `FAILED` if it is observed absent after the confirmation window.
+which transitions to `ACTIVE` once the registration is confirmed in the registry.
+The transition to `FAILED` SHALL be based on a successful registry read
+observing the membership absent after the confirmation window;
+inability to reach the registry is not such an observation,
+and the membership SHALL remain `PENDING` while the registry cannot be read.
 A failed submission SHALL report whether it is retryable.
 
 #### `MembershipState get_membership_state(MembershipScope scope)`
 
 Return the status and metadata of the scope's membership,
 whether registered in this run or loaded from persistence at `start()`.
-The Module SHALL track the registry
-so the reported status stays current through the full membership lifecycle;
-`UNKNOWN` is returned when no membership exists for the scope.
+The reported status is the registry's view overlaid on the Module's local records:
+a submission the registry does not yet know about
+is reported `PENDING` or `FAILED` rather than `UNKNOWN`,
+and — symmetrically — a membership the Module has previously observed in the set
+that the registry no longer reports is `ERASED` rather than `UNKNOWN`.
+`UNKNOWN` is returned only when no membership exists for the scope,
+in this run or in persistence.
 
 ### Persistence
 
 The Module SHALL persist each membership it registers,
 so that a membership registered before a restart is available after it
 without registering again.
-Persisted identity credentials SHALL be encrypted at rest.
+The store SHALL satisfy:
+
+- identity credentials are encrypted at rest;
+- when the encryption key is password-derived,
+  the derivation uses a function suitable for password hashing
+  (e.g. PBKDF2, [RFC 2898](https://www.ietf.org/rfc/rfc2898.txt));
+- tampering with a stored credential is detectable before it is used;
+- plaintext identity secrets are never exposed outside the Module.
+
+The storage medium and encoding are the Module's concern.
+A keystore format portable across implementations is an
+[optional extension](#optional-extensions);
+identity secrets held in memory are covered by the
+[security considerations](#security-and-privacy-considerations).
 
 ## Rate limiting
 
@@ -298,6 +415,82 @@ SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERM
   erasing a membership and recovering its deposit, where the registry supports it —
   the operation that resolves the `ERASED_AWAITS_WITHDRAWAL` state.
 
+## Security and privacy considerations
+
+### Message-id allocation and shared credentials
+
+The rate limit rests on a single secret:
+two proofs that reuse an `(epoch, message_id)` pair under one external nullifier
+expose Shamir shares that reconstruct the identity secret,
+which on registries implementing slashing burns the credential
+(see [Rate-limit proof](#rate-limit-proof)).
+The Module owns `message_id` allocation for its memberships,
+so a single Module never reuses a pair.
+This safety holds only within one Module:
+a credential shared across Module instances —
+by exporting it (see [Credential export](#optional-extensions))
+and importing it elsewhere —
+splits allocation across uncoordinated allocators.
+A consumer that shares a credential this way
+MUST coordinate `message_id` allocation across the holders,
+the RECOMMENDED mechanism being static partitioning of the
+`[1, rate_limit]` range;
+otherwise a credential MUST be used by one Module at a time.
+
+### Credential reuse across applications
+
+One membership serving several applications is safe
+only because each application's `rln_identifier`
+is mixed into the external nullifier.
+An application's `rln_identifier` MUST be unique to it
+and MUST NOT be copied from another application;
+a collision lets proofs from one application
+consume another's rate budget and correlate the shared membership.
+
+### Registry trust
+
+The Module trusts its registry access for roots and proofs;
+a compromised registry connection can equivocate about membership state.
+A consumer with stronger trust requirements
+SHOULD arrange for the Module to read the registry directly,
+e.g. by running a node for the host network.
+Reading a registry through a third-party RPC provider
+MAY link the consumer's network identity to its membership.
+
+## Appendix A: The `logos` namespace binding
+
+The namespace binding required by [Registry identification](#registry-identification)
+for registries hosted on Logos execution environments:
+
+- **Namespace**: `logos`.
+- **Reference**: the network name, pinned to lowercase (e.g. `testnet`, `local`).
+  References are compared opaquely,
+  so without pinned casing `logos:Testnet:…` and `logos:testnet:…`
+  would identify distinct registries with distinct `membership_hash`es,
+  silently fragmenting stored memberships.
+- **Anchor account**: the registration program's configuration account —
+  the account from which every other object of the registry
+  (tree account, subtree accounts, membership accounts, treasury) is derived.
+- **Canonical `account_address` form**:
+  64 lowercase hexadecimal characters, without prefix.
+- **`RegistryOptions`**: `funding_holding_account_id` —
+  the token holding account paying `rate_limit × price_per_unit` at registration.
+- **Time base**: membership lifecycle state is derived from
+  the on-chain clock account, which reports Unix-epoch milliseconds;
+  lifecycle durations (active duration, grace period) use the same unit.
+
+## Appendix B: Membership hash construction
+
+```text
+membership_hash = lowercase_hex(
+    SHA256(utf8(registry_id) || 0x00 || identity_commitment))
+```
+
+`registry_id` is in canonical form,
+`0x00` is a single separator byte
+(CAIP-10 identifiers cannot contain it),
+and `identity_commitment` is its 32-byte little-endian representation.
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -307,6 +500,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 - [MESSAGING-API](messaging-api.md)
 - [RLN-KEYSTORE](rln-keystore.md)
 - [RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html)
+- [32/RLN-V1](https://github.com/logos-co/logos-lips/blob/master/docs/anoncomms/draft/32/rln-v1.md)
 - [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html)
-- [WAKU2-RLN-RELAY](https://lip.logos.co/messaging/draft/17/rln-relay.html)
+- [WAKU2-RLN-RELAY](https://lip.logos.co/messaging/core/draft/17/rln-relay.html)
+- [WAKU2-RLN-CONTRACT](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/core/raw/rln-contract.md)
+- [CAIP-10](https://standards.chainagnostic.org/CAIPs/caip-10)
+- [RFC 2898](https://www.ietf.org/rfc/rfc2898.txt)
 - [OnchainGroupManager, logos-delivery](https://github.com/logos-messaging/logos-delivery/blob/master/logos_delivery/waku/rln/group_manager/on_chain/group_manager.nim)
