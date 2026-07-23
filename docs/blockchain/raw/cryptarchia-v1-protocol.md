@@ -243,7 +243,7 @@ Every header carries an `epoch_state_root`. It commits the settled state produce
 The computation is deterministic, so every node derives the same root. Each collection is committed by its own Merkle tree, and every one of those trees follows the construction defined for the [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root): a tree of depth $`32`$ whose leaves are ordered by their **order of apparition on chain**, where the value $`0`$ marks an empty leaf, an insertion writes the new element into the first empty leaf, and a removal resets that element's leaf back to $`0`$. Leaves are never re-sorted, so the `insert_new_note`, `delete_note` and `get_ledger_root` procedures apply to each collection. Only that construction is shared: what varies from one tree to the next is the hash function it is built with and the content of a leaf.
 
 - `notes`, `C_LEAD` and `voucher_root` take note IDs, aged note IDs and vouchers directly as leaves and are built with `zkhasher`, since they are opened inside zero-knowledge proofs; their root is included as-is.
-- `channels`, `locked_notes`, `declarations`, `declarations_snapshot` and the voucher nullifier set are never opened inside a proof, so both their leaf hashes and the trees above them use a classic `hasher`, as specified in [Common Cryptographic Components](common-cryptographic-components.md) and as already used for the [Block ID](#block-id). Their leaf is the domain-separated hash of the element, computed by the dedicated function below. That hash binds the element's identifier: `ChannelId`, `NoteId`, `DeclarationId` and the nullifier value respectively, together with its associated state, so that a leaf is meaningful on its own, independently of the slot it occupies.
+- `channels`, `channel_notes`, `locked_notes`, `declarations`, `declarations_snapshot` and the voucher nullifier set are never opened inside a proof, so both their leaf hashes and the trees above them use a classic `hasher`, as specified in [Common Cryptographic Components](common-cryptographic-components.md) and as already used for the [Block ID](#block-id). Their leaf is the domain-separated hash of the element, computed by the dedicated function below. That hash binds the element's identifier (`ChannelId` for `channels`, `NoteId` for `channel_notes` and `locked_notes`, `DeclarationId` for `declarations` and `declarations_snapshot`, and the nullifier value for the voucher nullifier set) together with its associated state, so that a leaf is meaningful on its own, independently of the slot it occupies.
 
 Every root above can be maintained incrementally, block by block, alongside the state it commits. The `epoch_state_root` is then a **snapshot** of those roots taken at the epoch boundary, right after the [Epoch Boundary Settlement](#epoch-boundary-settlement) has been applied and before the first block's transactions are executed. This is the same discipline that governs $`\mathbb{C}_\text{LEAD}`$ and `declarations_snapshot`, which are likewise frozen at a boundary and held unchanged for the whole epoch: nodes keep updating the live roots as blocks arrive, and only the boundary value is committed in the headers.
 
@@ -275,6 +275,12 @@ def channels_root(channels: dict[ChannelId, ChannelState]) -> hash:
     # depth-32 tree, leaves kept in order of apparition on chain:
     # an insertion takes the first empty leaf, a removal resets its leaf to 0
     return [channel_hash(channel_id, channels[channel_id]) for channel_id in channels].root()
+
+def channel_notes_root(channel_notes: dict[NoteId, ChannelId]) -> hash:
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
+    return [hash(b"CHANNEL_NOTE_DICT_HASH_V1", note_id, channel_notes[note_id])
+            for note_id in channel_notes].root()
 
 def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h = Hasher()
@@ -320,6 +326,7 @@ def get_epoch_state_root(state) -> hash:
     h.update(state.notes.root())                            # latest unspent notes
     h.update(state.aged_notes_root)                         # C_LEAD (Ledger Root)
     h.update(channels_root(state.channels))
+    h.update(channel_notes_root(state.channel_notes))        # channel-owned notes and their owning channel
     h.update(locked_notes_root(state.locked_notes))
     h.update(declarations_root(state.declarations))          # mutable SDP registry
     h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, as of last block of two epochs before
