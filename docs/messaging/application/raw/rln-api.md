@@ -55,6 +55,8 @@ are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc211
 | Registry | A membership set — a Merkle tree of rate commitments — identified by a CAIP-10 `registry_id`. Internal registry access is the Module's concern. |
 | `registry_id` | `<namespace>:<reference>:<account_address>`, e.g. `eip155:59144:0xb9cd…` or `logos:testnet:<64 lowercase hex>`. MUST be canonicalized before comparison or hashing. |
 | `rln_identifier` | A 32-byte per-application identifier ([32/RLN-V1](https://github.com/logos-co/logos-lips/blob/master/docs/anoncomms/draft/32/rln-v1.md)), mixed into the external nullifier so one membership can serve several applications. |
+| Scope | The context a call operates on — a registry and an application: `registry_id` + `rln_identifier` (`MembershipScope`). |
+| Identity commitment | The public value derived from an identity credential ([RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html)); the only credential-derived value that appears in the registry. |
 | Rate commitment | `poseidon(identity_commitment, rate_limit)` — a registry tree leaf. |
 | Direct registration | The Module registers a membership itself, from a funded account. |
 | Delegated registration | The Module registers on a client's behalf as a participant in the [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html). |
@@ -63,27 +65,28 @@ are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc211
 
 ### The Module
 
-An instance of the Module serves a single registry,
-selected at configuration time by its `registry_id`;
-no function in the required interface is registry-specific.
+An instance of the Module serves the registries selected by its configuration;
+every call names the registry and application context it operates on
+through a `MembershipScope`,
+with a default scope configured at start.
 It exposes two portions:
 
-- **Membership management** — credential generation,
-  membership registration,
-  membership persistence,
-  a membership existence check,
-  and registry reads: the membership's Merkle proof and the valid-root set.
-- **Rate limiting** — stateless proof generation and verification functions
-  over a membership and a registry view supplied by the consumer.
+- **Membership management** — registration and membership state:
+  the Module generates the identity credential,
+  registers its rate commitment,
+  persists it,
+  and tracks the membership's lifecycle in the registry.
+- **Rate limiting** — proof generation and verification
+  over state the Module maintains itself:
+  the current epoch, message-id allocation,
+  the membership's Merkle proof path, and the valid-root window.
 
-The registry view — the membership's Merkle proof path and the window of valid roots —
-is maintained inside the Module (fetched, cached, and refreshed as the tree changes)
-and served to the consumer through the registry reads,
-which feed the proof functions.
+The consumer supplies only scopes, signals, and proofs.
 Registry access and payment — the latter via an accounts module beneath the Module —
 are internal to the Module and out of scope here.
-Identity secrets pass only between the Module and the consumer;
-they are never submitted to the registry.
+Identity credentials never leave the Module:
+they are generated at registration, persisted encrypted,
+and used only inside proof generation.
 
 ## Type definitions
 
@@ -140,7 +143,6 @@ typedef struct {
 } MembershipState;
 
 typedef struct {
-    uint32_t tree_depth;      // depth of the registry's Merkle tree
     uint64_t epoch_size_sec;  // duration of one epoch in seconds
     uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
 } RegistryParameters;
@@ -190,6 +192,7 @@ In-flight requests SHALL be cancelled cleanly.
 Generate a new identity credential inside the Module,
 register a membership for it at the requested `rate_limit`,
 and persist the credential and membership (see [Persistence](#persistence)).
+A `rate_limit` above the registry's `max_rate_limit` SHALL fail as `RLN_ERR_PERMANENT`.
 Only the rate commitment derived from the credential is submitted to the registry;
 the credential itself never leaves the Module.
 `options` carries registry-specific registration choices —
@@ -268,24 +271,32 @@ that a proof generated against a newly published root is not falsely rejected.
 
 A Module MAY additionally provide any of the following;
 the consumer MUST NOT require them and
-SHALL treat their absence as a permanent unsupported-operation error.
+SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERMANENT`.
 
-- **Delegated registration** —
-  registering on a client's behalf through the
-  [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html)
-  rather than from a funded account.
 - **Multiple memberships** —
-  holding more than one membership for the registry.
-  A Module that does so MUST require the consumer to select one explicitly
+  holding more than one membership for a scope.
+  A Module that does so MUST require the consumer to select one explicitly —
+  for example by `membership_hash` —
   and MUST NOT choose silently among candidates.
-- **Interoperable keystore format** —
-  storing the persisted membership (see [Persistence](#persistence))
+- **Credential export** —
+  exporting a persisted membership (see [Persistence](#persistence))
   per [RLN-KEYSTORE](rln-keystore.md),
   making credential files portable across implementations.
-- **Registry subscriptions** —
-  change notifications for the membership's Merkle proof or the valid-root set.
+  Export is the only operation through which a credential crosses this interface;
+  a consumer that invokes it takes custody of the identity secrets.
+- **Slot reclamation** —
+  returning a message-id allocation to the epoch's budget
+  when a proof was generated but its message was never published.
+- **Quota and parameters read** —
+  exposing the registry's `RegistryParameters`
+  and the membership's remaining budget in the current epoch,
+  for consumer-side send scheduling.
+- **Membership state subscriptions** —
+  change notifications for the membership lifecycle,
+  sparing the consumer polling [`get_membership_state`](#registration).
 - **Withdrawal** —
-  erasing a membership and recovering its deposit, where the registry supports it.
+  erasing a membership and recovering its deposit, where the registry supports it —
+  the operation that resolves the `ERASED_AWAITS_WITHDRAWAL` state.
 
 ## Copyright
 
