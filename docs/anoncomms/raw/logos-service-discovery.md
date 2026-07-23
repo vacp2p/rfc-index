@@ -1050,7 +1050,7 @@ procedure REGISTER(ad, ticket):
         t_remaining ← t_wait - (NOW() - ticket.t_init)
     end if
     if t_remaining ≤ 0:
-        ad_cache.add(ad)  # replaces any existing entry for (ad.peer_id, service_id)
+        ad_cache.add(ad)
         response.status ← Confirmed
     else:
         response.status ← Wait
