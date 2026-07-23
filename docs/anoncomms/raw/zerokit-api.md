@@ -380,7 +380,8 @@ Tree management methods exist **only** on stateful instances
   `ZerokitMerkleProof` trait, current and future backends alike.
 - The type carries its own LE and BE serde impls,
   so a Merkle proof can be stored or transmitted on its own
-  (exposed over FFI as `ffi_rln_merkle_proof_to/from_bytes_le/be`).
+  (exposed over FFI as `ffi_rln_merkle_proof_to/from_bytes_le/be` and
+  over WASM as `WasmRLNMerkleProof.toBytesLE/BE` / `fromBytesLE/BE`).
 
 ### Witness Construction
 
@@ -495,6 +496,9 @@ an invalid proof is reported as `Ok(false)`, not as an error.
 - Additionally checks that the proof root is among `roots`
   (`Err(InvalidRoot)` on mismatch).
 - If the `roots` slice is empty, root verification is skipped.
+- This is the RECOMMENDED verification entry point:
+  pass the accepted root window when membership changes over time,
+  or the externally obtained roots in stateless deployments.
 
 The FFI and WASM boundaries preserve this shape:
 an FFI `FFI_BoolResult { ok: false, err: null }` and
@@ -600,13 +604,19 @@ WASM bindings wrap the Rust API with JavaScript-compatible types. Key difference
   `WasmIdentityKeys.toBytesLE/BE` (whole-struct).
 - Identity generation uses `WasmIdentityKeys.generate()` /
   `generateSeeded(seed)` and `WasmExtendedIdentityKeys` equivalents.
-- Witness input uses `WasmRLNWitnessInput.newSingle(...)` / `newMulti(...)`;
+- The Merkle path crosses the boundary as `WasmRLNMerkleProof`
+  (built with `WasmRLNMerkleProof.new(pathElements, identityPathIndex)`,
+  with its own getters and LE/BE serialization),
+  mirroring the FFI `FFI_RLNMerkleProof` handle.
+- Witness input uses `WasmRLNWitnessInput.newSingle(...)` / `newMulti(...)`
+  taking a `WasmRLNMerkleProof`;
   proof generation is `WasmRLN.generateProof(witness)` with witness
   calculation handled internally.
 - Two-step proving: `generatePartialProof` / `finishProof` with
-  `WasmRLNPartialWitnessInput` and `WasmRLNPartialProof`.
+  `WasmRLNPartialWitnessInput` and `WasmRLNPartialProof`;
+  a partial witness reuses `witness.getMerkleProof()`.
 - The WASM surface is stateless only and exposes **no tree methods**;
-  JavaScript supplies `path_elements` and `identity_path_index`.
+  JavaScript supplies the Merkle path data itself.
 - When the `parallel` feature is enabled, call `initThreadPool()`
   to initialize the rayon thread pool.
 - `initPanicHook()` (with the `panic_hook` feature) installs a console
