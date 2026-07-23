@@ -7,6 +7,7 @@
 | Status | raw |
 | Category | Standards Track |
 | Editor | Vinh Trinh <vinh@status.im> |
+| Contributors | Ekaterina Broslavskaya [ekaterina@status.im](mailto:ekaterina@status.im), Sylvain Delhomme [sylvain@status.im](mailto:sylvain@status.im) |
 
 <!-- timeline:start -->
 
@@ -54,8 +55,11 @@ This core is wrapped by three interface layers:
 **native Rust** for direct library integration,
 **FFI** for C-compatible bindings consumed by languages (such as C and Nim),
 and **WASM** for browser and Node.js environments.
-All three interfaces maintain functional parity and
-share identical serialization formats for inputs and outputs.
+All three interfaces share identical serialization formats for
+inputs and outputs.
+Native Rust and FFI expose the full API surface,
+while WASM exposes the stateless subset
+(see [WASM-Specific Notes](#wasm-specific-notes)).
 
 ```text
       ┌─────────────────────────────────────────────────────┐
@@ -113,9 +117,11 @@ This backend provides the fastest performance but consumes the most memory.
 `OptimalMerkleTree` uses sparse HashMap storage that only allocates nodes as needed.
 This backend balances performance and memory efficiency.
 
-`PmTree` persists the tree to disk using a sled database.
-This backend enables state durability across process restarts.
-It is configured through `PmTreeSledConfig`
+`PmTree<D, H>` persists the tree to disk and
+enables state durability across process restarts.
+It is generic over the storage backend `D`;
+`SledDB` (a [sled](https://sled.rs) database) is the provided backend,
+configured through `PmTreeSledConfig`
 (path, temporary flag, cache capacity, flush interval,
 sled mode, compression, tree depth).
 
@@ -133,6 +139,9 @@ selected by the circuit resources (zkey and graph) loaded at construction:
   with the boolean `selector_used` vector marking the active slots.
   Proof values carry vectors `ys` and `nullifiers`
   instead of scalar `y` and `nullifier`.
+  The Multi circuit is larger than the Single one,
+  so proof generation is slower;
+  choose it only when batching message ids per proof is needed.
 
 Embedded circuit resources are exposed as
 `default_zkey_single` / `default_graph_single` and
@@ -177,10 +186,20 @@ For **native Rust**,
 each operation returns a `Result` with a **narrow, operation-specific error enum**
 whose variants are all reachable from that code path.
 There is no top-level union error type.
-The error enums are:
-`GenerateProofError`, `VerifyProofError`,
-`WitnessInputSingleError`, `WitnessInputMultiError`, `PartialWitnessInputError`,
-`ProofValuesMultiError`, `RecoverSecretError`, and `SerializationError`.
+The error enums map to operations as follows:
+
+- `WitnessInputSingleError` / `WitnessInputMultiError` / `PartialWitnessInputError`:
+  structural validation in the witness builders.
+- `ProofValuesMultiError`: structural validation of Multi-mode proof values.
+- `GenerateProofError`: proof generation
+  (witness/circuit mismatch or backend fault).
+- `VerifyProofError`: verification input mismatch
+  (`InvalidSignal`, `InvalidRoot`) or backend fault.
+- `RecoverSecretError`: slashing recovery when the two proofs do not
+  yield a matching nullifier.
+- `SerializationError`: deserialization failures,
+  including the construction-time validation errors surfaced through
+  typed wrap variants.
 
 For **WASM** and **FFI** bindings,
 errors are returned as human-readable string messages.
@@ -247,7 +266,8 @@ a zeroize-on-drop field element with a redacted `Debug` representation
 `IdentityKeys::generate_seeded::<PoseidonHash, R>(seed)`
 
 - Generates a deterministic identity keypair from a byte seed.
-- The seed is expanded with Keccak-256 into the seed of the
+- The seed is expanded with Keccak-256 (an out-of-circuit hash;
+  see [Hash Utilities](#hash-utilities)) into the seed of the
   type-level chosen seedable RNG `R`.
 
 `ExtendedIdentityKeys::generate::<PoseidonHash, R>(rng)`
@@ -347,31 +367,63 @@ Tree management methods exist **only** on stateful instances
 - Closes the tree, flushing pending writes for persistent backends.
 - Persistent backends also flush on drop; for in-memory backends this is a no-op.
 
-### Witness Construction
+### Merkle Proof
 
-The canonical Merkle proof data type is:
+`RLNMerkleProof` is the canonical Merkle proof data type
+(`path_elements`, `identity_path_index`) consumed by witness construction.
 
 `RLNMerkleProof::new(path_elements, identity_path_index)`
 
 - Wraps externally supplied path data (stateless workflows).
-- Tree proofs returned by `get_merkle_proof` convert into it automatically.
+- Tree proofs returned by `get_merkle_proof` convert into it automatically:
+  a blanket `From` impl covers every type implementing the
+  `ZerokitMerkleProof` trait, current and future backends alike.
+- The type carries its own LE and BE serde impls,
+  so a Merkle proof can be stored or transmitted on its own
+  (exposed over FFI as `ffi_rln_merkle_proof_to/from_bytes_le/be`).
+
+### Witness Construction
 
 Witness inputs are built through validating builders and
 are represented by the `RLNWitnessInput` enum
-(`Single` / `Multi` variants):
+(`Single` / `Multi` variants).
+Every builder takes its Merkle path through the `merkle_proof` setter,
+which accepts the [`RLNMerkleProof`](#merkle-proof) data type
+described above (or any tree proof convertible into it).
 
-`RLNWitnessInput::new_single(identity_secret, user_message_limit, merkle_proof, x, external_nullifier, message_id).build()`
+Single message-id witness:
 
-- Constructs a Single message-id witness.
+```rust
+let witness = RLNWitnessInput::new_single()
+    .identity_secret(identity_secret)
+    .user_message_limit(user_message_limit)
+    .merkle_proof(&merkle_proof)
+    .x(x)
+    .external_nullifier(external_nullifier)
+    .message_id(message_id)
+    .build()?;
+```
+
 - `build` checks the structural invariants
   (non-zero `user_message_limit`,
   matching `path_elements` / `identity_path_index` lengths,
   `message_id < user_message_limit`)
   and returns `WitnessInputSingleError` on violation.
 
-`RLNWitnessInput::new_multi(identity_secret, user_message_limit, merkle_proof, x, external_nullifier, message_ids, selector_used).build()`
+Multi message-id witness:
 
-- Constructs a Multi message-id witness.
+```rust
+let witness = RLNWitnessInput::new_multi()
+    .identity_secret(identity_secret)
+    .user_message_limit(user_message_limit)
+    .merkle_proof(&merkle_proof)
+    .x(x)
+    .external_nullifier(external_nullifier)
+    .message_ids(message_ids)
+    .selector_used(selector_used)
+    .build()?;
+```
+
 - `build` checks the Multi-mode invariants
   (non-zero `user_message_limit`, matching path lengths,
   non-empty `message_ids`, `selector_used` matching `message_ids` in length,
@@ -379,16 +431,21 @@ are represented by the `RLNWitnessInput` enum
   and unique in-range active `message_id`s)
   and returns `WitnessInputMultiError` on violation.
 
-`RLNPartialWitnessInput`
+Partial witness (the subset known ahead of time,
+used for two-step proof generation):
 
-- The witness subset known ahead of time
-  (identity secret, user message limit, Merkle path),
-  used for two-step proof generation.
-- Constructed via the
-  `RLNPartialWitnessInput::new(identity_secret, user_message_limit, merkle_proof).build()`
-  builder (`build` checks the structural invariants and returns
-  `PartialWitnessInputError` on violation),
-  or converted from a full witness (`From<&RLNWitnessInput>`).
+```rust
+let partial_witness = RLNPartialWitnessInput::new()
+    .identity_secret(identity_secret)
+    .user_message_limit(user_message_limit)
+    .merkle_proof(&merkle_proof)
+    .build()?;
+```
+
+- `build` checks the structural invariants and returns
+  `PartialWitnessInputError` on violation.
+- A partial witness can also be converted from a full witness
+  (`From<&RLNWitnessInput>`).
 
 Witness calculation is handled internally on **all** platforms,
 including WASM, by the embedded witness graph.
@@ -418,11 +475,11 @@ including WASM, by the embedded witness graph.
 
 ### Proof Verification
 
-All verification methods return an honest `Result<bool>`:
-`Ok(true)` / `Ok(false)` is the zkSNARK **verdict**
-(an invalid proof is a verdict, not an error),
-while `Err` reports only caller-input mismatch
-(`InvalidSignal`, `InvalidRoot`) or a backend fault.
+All verification methods return `Result<bool>`.
+The `Ok(bool)` value is the zkSNARK verification **verdict**:
+an invalid proof is reported as `Ok(false)`, not as an error.
+`Err` is reserved for caller-input mismatch
+(`InvalidSignal`, `InvalidRoot`) and backend faults.
 
 `verify(proof, proof_values)`
 
@@ -449,7 +506,11 @@ not errors.
 `RLNProofValues::recover_secret(other)` (trait `RecoverSecret`)
 
 - Recovers the identity secret from two proof values that share the same
-  external nullifier and nullifier.
+  nullifier.
+- Two proofs collide on a nullifier when they were generated with the same
+  `external_nullifier` **and** the same `message_id`
+  (the nullifier is derived from both),
+  i.e. a `message_id` was reused within an epoch.
 - Returns `RecoverSecretError` when the two proofs do not yield a matching
   nullifier (no slashing possible).
 - Recovery works across modes: Single with Single, Multi with Multi,
@@ -475,6 +536,9 @@ WASM: `WasmRLNProofValues.recoverIdSecret` / `computeIdSecret`.
 
 - Hashes arbitrary bytes to a field element using Keccak-256,
   interpreting the digest with little-endian or big-endian byte order.
+- Keccak-256 is used only for this out-of-circuit byte-to-field mapping
+  (and for seed expansion in seeded key generation);
+  Poseidon is the only hash evaluated inside the circuit.
 
 Boundary equivalents: `ffi_poseidon_hash_pair`, `ffi_hash_to_field_le/be`,
 `ffi_uint_to_fr` (FFI); `poseidonHashPair`, `hashToFieldLE/BE` (WASM).
@@ -482,28 +546,46 @@ Boundary equivalents: `ffi_poseidon_hash_pair`, `ffi_hash_to_field_le/be`,
 ### Serialization
 
 Serialization is trait-based; there are no free serialization functions.
-Endianness is chosen at the call site:
+Three trait pairs cover all protocol types
+(all re-exported by the prelude):
 
-- **Little-endian**: the arkworks `CanonicalSerialize` / `CanonicalDeserialize`
-  traits (re-exported by the prelude, so consumers do not depend on
-  `ark-serialize` directly).
-- **Big-endian**: the Zerokit `CanonicalSerializeBE` / `CanonicalDeserializeBE`
-  traits, implemented for field elements, vectors, identity keys,
-  witnesses, and proof values.
-- **Mixed**: `CanonicalSerializeMixed` / `CanonicalDeserializeMixed`
-  for `RLNProof` (proof and values in one buffer;
-  `toBytesMixed` / `fromBytesMixed` at the boundaries).
+- `CanonicalSerialize` / `CanonicalDeserialize` (arkworks):
+  **little-endian**, the arkworks/circom native encoding.
+- `CanonicalSerializeBE` / `CanonicalDeserializeBE`:
+  **big-endian**, matching EVM smart contracts and other on-chain
+  consumers. The zkSNARK `Proof` and `PartialProof` are little-endian
+  only and have no BE impls.
+- `CanonicalSerializeMixed` / `CanonicalDeserializeMixed`:
+  for types whose fields have conflicting encoding requirements.
+  `RLNProof` is the one such type: it bundles the Groth16 proof,
+  which only exists in arkworks compressed LE form,
+  with the proof values, which are transmitted BE for on-chain
+  consumers. Mixed writes both into a single buffer
+  (proof in LE, then values in BE),
+  so a complete proof can be sent as one payload.
 
-Wire format properties:
+Usage is uniform across types; endianness is chosen by the trait used:
 
-- A field element is 32 bytes; vectors carry an 8-byte length prefix.
-- Enum types (`RLNWitnessInput`, `RLNProofValues`) are tagged with one byte:
-  `0` = Single, `1` = Multi.
-- The zkSNARK `Proof` and `PartialProof` are little-endian only.
-- Deserialization of untrusted big-endian input MUST reject non-canonical
-  field elements (values `>=` the field modulus).
-- Deserialization enforces the same structural invariants as construction
-  and returns typed validation errors through `SerializationError`.
+```rust
+// Little-endian (arkworks traits).
+let mut le_bytes = Vec::new();
+witness.serialize_compressed(&mut le_bytes)?;
+let witness = RLNWitnessInput::deserialize_compressed(&le_bytes[..])?;
+
+// Big-endian (Zerokit BE traits).
+let mut be_bytes = Vec::new();
+CanonicalSerializeBE::serialize(&witness, &mut be_bytes)?;
+let witness = <RLNWitnessInput as CanonicalDeserializeBE>::deserialize(&be_bytes[..])?;
+
+// Mixed: a complete RLN proof (Groth16 proof LE + proof values BE) in one buffer.
+let rln_proof = RLNProof::new(proof, proof_values);
+let mut mixed_bytes = Vec::new();
+CanonicalSerializeMixed::serialize(&rln_proof, &mut mixed_bytes)?;
+let rln_proof = <RLNProof as CanonicalDeserializeMixed>::deserialize(&mixed_bytes[..])?;
+```
+
+Deserialization enforces the same structural invariants as construction
+and returns typed validation errors through `SerializationError`.
 
 ### WASM-Specific Notes
 
@@ -631,7 +713,10 @@ Applications MUST ensure that:
 - The `message_id` counter is properly persisted to prevent accidental rate limit violations
 - External nullifiers are constructed correctly to prevent cross-application attacks
 - Merkle tree roots are validated when using stateless mode
-- Circuit parameters (zkey and graph data) are obtained from trusted sources
+- Circuit parameters (zkey and graph data) are obtained from trusted sources;
+  production deployments SHOULD run or verify their own trusted setup
+  ceremony (Powers of Tau plus circuit-specific phase 2) for the circuit,
+  rather than relying solely on the ceremony behind the embedded zkey
 
 Zerokit handles secrets defensively in-process:
 all secret field elements are carried as `SecretFr`,
@@ -644,8 +729,10 @@ Note that WASM linear memory remains readable by the host page;
 this hygiene is best-effort, not isolation.
 
 When using the `parallel` feature in WASM,
-applications MUST serve content with appropriate COOP/COEP headers to
-enable SharedArrayBuffer support securely.
+applications MUST serve content with the
+`Cross-Origin-Opener-Policy: same-origin` and
+`Cross-Origin-Embedder-Policy: require-corp` HTTP response headers,
+which browsers require before enabling `SharedArrayBuffer`.
 
 The slashing mechanism exposes identity secrets when rate limits are violated.
 Applications SHOULD educate users about this risk and
