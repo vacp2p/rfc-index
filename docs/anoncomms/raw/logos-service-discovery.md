@@ -1238,7 +1238,7 @@ The IP similarity mechanism MUST:
 
 - Calculate a score (0-1): higher scores indicate similar IP prefixes (potential Sybil attacks)
 - Track IP addresses as a multiset: each IP is counted once per
-`ad_cache` entry that uses it, not as a single present/absent flag
+`ad_cache` entry that uses it
 (see [Advertisement Cache](#advertisement-cache) for what constitutes an entry)
 - MUST update the count once per `ad_cache` entry, when:
   - A new entry is admitted to the `ad_cache`: MUST increment the count for that IP
