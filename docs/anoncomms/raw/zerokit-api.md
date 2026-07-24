@@ -424,8 +424,10 @@ Tree management methods exist **only** on stateful instances
 
 `close()`
 
-- Closes the tree, flushing pending writes for persistent backends.
-- Persistent backends also flush on drop; for in-memory backends this is a no-op.
+- Closes the tree, flushing pending writes for persistent backends
+  (a no-op for in-memory backends).
+- Dropping the instance does not flush, so persistent-backend users
+  MUST call `close()` before exit to guarantee durability.
 
 ### Merkle Proof
 
