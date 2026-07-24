@@ -96,6 +96,16 @@ are chosen **at the type level** in Rust
 - `RLN<Stateless, ZkProof>` carries no tree;
   applications MUST provide Merkle proofs and roots externally.
 
+The core is also generic over the zkSNARK backend
+(the `RLNZkProof` / `RLNPartialZkProof` traits) and,
+through it, over the protocol hash (the `ZerokitHasher` trait);
+custom backends and hashes are **native-Rust-only** extension points.
+The shipped, proof-verifying implementation is
+`ArkGroth16Backend<PoseidonHash>` (Groth16 over BN254 with Poseidon),
+and the FFI and WASM bindings expose only this concrete combination.
+A hash implementation without matching circuit resources (zkey and graph)
+compiles but cannot produce valid proofs.
+
 The available feature flags are:
 
 - `parallel` (`rln`, `zerokit_utils`, `rln-wasm`) enables rayon-based
@@ -230,6 +240,16 @@ Groth16 over BN254 with the Poseidon hash
   a mismatch is a compile error.
 - Optional `.zkey(...)` / `.graph(...)` setters behave as in `stateless`.
 
+```rust
+// Stateless: embedded Single message-id circuit resources by default.
+let rln = RLNBuilder::stateless().build();
+
+// Stateful: around a caller-constructed persistent tree.
+let config = PmTreeSledConfig::new().temporary(true).build()?;
+let tree = PmTree::<SledDB, PoseidonHash>::new(DEFAULT_TREE_DEPTH, Fr::default(), config)?;
+let mut rln = RLNBuilder::stateful().tree(tree).build();
+```
+
 FFI exposes one constructor per backend and mode,
 each with a `_default` variant that uses the embedded Single message-id
 circuit and `DEFAULT_TREE_DEPTH`:
@@ -279,6 +299,17 @@ a zeroize-on-drop field element with a redacted `Debug` representation
 `ExtendedIdentityKeys::generate_seeded::<PoseidonHash, R>(seed)`
 
 - Deterministic variant of the extended keypair generation.
+
+Both the hash and the RNG are spelled at the call site;
+the Merkle leaf is the rate commitment derived from the commitment:
+
+```rust
+let identity_keys = IdentityKeys::generate::<PoseidonHash, ThreadRng>(&mut thread_rng());
+let seeded_keys = IdentityKeys::generate_seeded::<PoseidonHash, ChaCha20Rng>(b"seed bytes");
+
+let rate_commitment =
+    Hasher::<PoseidonHash>::hash_pair(identity_keys.id_commitment(), user_message_limit);
+```
 
 FFI and WASM wrappers pin concrete RNG defaults
 (`ThreadRng` for random, `ChaCha20Rng` for seeded generation)
@@ -499,6 +530,16 @@ an invalid proof is reported as `Ok(false)`, not as an error.
 - This is the RECOMMENDED verification entry point:
   pass the accepted root window when membership changes over time,
   or the externally obtained roots in stateless deployments.
+
+End-to-end, proof generation and verification compose as:
+
+```rust
+let (proof, proof_values) = rln.generate_proof(&witness)?;
+
+let root = rln.get_root();
+let verified = rln.verify_with_roots(&proof, &proof_values, &x, &[root])?;
+assert!(verified, "proof rejected");
+```
 
 The FFI and WASM boundaries preserve this shape:
 an FFI `FFI_BoolResult { ok: false, err: null }` and
