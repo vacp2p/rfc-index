@@ -279,8 +279,7 @@ def channels_root(channels: dict[ChannelId, ChannelState]) -> hash:
 def channel_notes_root(channel_notes: dict[NoteId, ChannelId]) -> hash:
     # depth-32 tree, leaves kept in order of apparition on chain:
     # an insertion takes the first empty leaf, a removal resets its leaf to 0
-    return [hash(b"CHANNEL_NOTE_DICT_HASH_V1", note_id, channel_notes[note_id])
-            for note_id in channel_notes].root()
+    return [hash(note_id, channel_notes[note_id]) for note_id in channel_notes].root()
 
 def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h = Hasher()
@@ -300,7 +299,7 @@ def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
 def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> hash:
     # depth-32 tree, leaves kept in order of apparition on chain:
     # an insertion takes the first empty leaf, a removal resets its leaf to 0
-    return [hash(b"DECLARATION_HASH_V1", declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
+    return [hash(declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
             for declaration_id in declarations].root()
 
 def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
@@ -313,12 +312,11 @@ def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
 def locked_notes_root(locked_notes: dict[NoteId, LockedNote]) -> hash:
     # depth-32 tree, leaves kept in order of apparition on chain:
     # an insertion takes the first empty leaf, a removal resets its leaf to 0
-    return [hash(b"LOCKED_NOTE_DICT_HASH_V1", note_id, sdp_locked_note_hash(locked_notes[note_id]))
-            for note_id in locked_notes].root()
+    return [hash(note_id, sdp_locked_note_hash(locked_notes[note_id]) for note_id in locked_notes].root()
 
 def voucher_nullifiers_root(voucher_nullifiers: list[Nullifier]) -> hash:
     # depth-32 append-only tree, leaves kept in order of apparition on chain
-    return [hash(b"VOUCHER_NULLIFIER_HASH_V1", nullifier) for nullifier in voucher_nullifiers].root()
+    return voucher_nullifiers.root()
 
 def get_epoch_state_root(state) -> hash:
     h = Hasher()
