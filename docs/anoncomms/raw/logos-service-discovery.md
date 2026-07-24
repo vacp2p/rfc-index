@@ -419,8 +419,8 @@ message Message {
         GET_PROVIDERS = 3;
         FIND_NODE = 4;
         PING = 5;
-        REGISTER = 6; // New DISC-NG capability discovery type
-        GET_ADS = 7; // New DISC-NG capability discovery type
+        REGISTER = 6; // New
+        GET_ADS = 7; // New
     }
 
     enum ConnectionType {
