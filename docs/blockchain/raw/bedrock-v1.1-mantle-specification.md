@@ -33,6 +33,7 @@
 | 1.6.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.7.0 | Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys | 2026-06-25 |
 | 1.8.0 | [RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
+| 1.9.0 | Update the execution of `CHANNEL_DEPOSIT` to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit | 2026-07-27 |
 
 # Introduction
 
@@ -595,20 +596,20 @@ signed_tx = SignedMantleTx(
 
 ### CHANNEL_DEPOSIT
 
-Deposit notes to a channel.
+Deposit notes to a channel. The inputs are consumed and recreated in the channel reseting their age and avoiding replay attacks in case the deposit is directly withdraw.
 
 #### Payload
 
 ```python
 class ChannelDeposit:
     channel: ChannelId
-    inputs: list[NoteId]  # the notes to be marked as channel notes
+    inputs: list[NoteId]  # the notes to be consume and recreated in as a channel notes
     metadata: bytes
 ```
 
 #### Proof
 
-  A Channel Deposit proves the ownership of the notes being marked as channel notes using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
+  A Channel Deposit proves the ownership of the notes being consumed using a [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature).
 
 ```python
 ZkSignature
@@ -665,10 +666,18 @@ ledger: Ledger
 
   *Execute*
 
-Mark the inputs as channel notes owned by the channel. The notes are neither consumed nor re-created: they keep their `NoteId`, value and `ZkPublicKey`, and are simply registered in the `channel_notes` set.
+Consume the inputs and create the same Note with new NoteId as channel notes owned by the channel.
+
 ```python
-for note_id in deposit.inputs:
-	ledger.channel_notes[note_id] = deposit.channel
+# get the note that will be moved
+notes_to_add = [ledger.get_note(input) for input in deposit.inputs]
+
+# consume inputs
+ledger.execute_spending(deposit.inputs, deposit.channel)
+
+# recreate the notes with new NoteId in the channel
+deposit_id = derive_op_id(deposit)
+ledger.execute_adding(deposit_id, notes_to_add, deposit.channel)
 ```
 
 #### Example
