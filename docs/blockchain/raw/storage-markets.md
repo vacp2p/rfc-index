@@ -23,6 +23,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.0.2 | Fix invalid python indentation due to github migration | 2026-07-27 | 
 
 > **Disclaimer:**
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -54,7 +55,7 @@ The proposed fee mechanism operates on a simple but powerful principle: the pric
 
 When a user submits data, a fee is calculated based on the Logos Blockchain Storage Gas consumption. This fee is determined by a price per Gas, $`P_{STR}`$, which is known in advance for the entire timeframe.
 
-At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive targeta "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price $`P_{STR}`$ for the next timeframe is adjusted slightly up or down.
+At the end of each timeframe, the protocol tallies the total amount of Logos Blockchain Storage Gas that was stored. It compares this actual usage to an adaptive target a "healthy" usage level that is itself a dynamic blend of a long-term policy goal and recent historical usage. Based on whether the actual usage was above or below this target, the price $`P_{STR}`$ for the next timeframe is adjusted slightly up or down.
 
 This flow can be visualized as follows:
 
@@ -198,20 +199,20 @@ CLAMP_DOWN_NUMERATOR = 7    # numerator of 1-alpha
 CLAMP_UP_NUMERATOR = 9      # numerator of 1+alpha
 
 def update_usage(total_gas_consumed: int, previous_usage: int) -> int:
-return (total_gas_consumed + previous_usage) // EMA_DENOMINATOR
+    return (total_gas_consumed + previous_usage) // EMA_DENOMINATOR
 
 def update_storage_price(prev_price: int, total_gas_consumed: int, usage: int) -> int:
-if CLAMP_DENOMINATOR * total_gas_consumed <= CLAMP_DOWN_NUMERATOR * usage:
-return prev_price * CLAMP_DOWN_NUMERATOR // CLAMP_DENOMINATOR
+    if CLAMP_DENOMINATOR * total_gas_consumed <= CLAMP_DOWN_NUMERATOR * usage:
+        return prev_price * CLAMP_DOWN_NUMERATOR // CLAMP_DENOMINATOR
     elif CLAMP_DENOMINATOR * total_gas_consumed >= CLAMP_UP_NUMERATOR * usage:
-return prev_price * CLAMP_UP_NUMERATOR // CLAMP_DENOMINATOR
-else:
-return prev_price * total_gas_consumed // usage
+        return prev_price * CLAMP_UP_NUMERATOR // CLAMP_DENOMINATOR
+    else:
+        return prev_price * total_gas_consumed // usage
 
 def update_storage_fee(total_gas_consumed: int, prev_price: int, prev_usage: int) -> tuple[int, int]:
     usage = update_usage(total_gas_consumed, prev_usage)
     price = update_storage_price(prev_price, total_gas_consumed, usage)
-return price, usage
+    return price, usage
 ```
 
 ### Genesis State
