@@ -199,20 +199,20 @@ CLAMP_DOWN_NUMERATOR = 7    # numerator of 1-alpha
 CLAMP_UP_NUMERATOR = 9      # numerator of 1+alpha
 
 def update_usage(total_gas_consumed: int, previous_usage: int) -> int:
-	return (total_gas_consumed + previous_usage) // EMA_DENOMINATOR
+    return (total_gas_consumed + previous_usage) // EMA_DENOMINATOR
 
 def update_storage_price(prev_price: int, total_gas_consumed: int, usage: int) -> int:
-	if CLAMP_DENOMINATOR * total_gas_consumed <= CLAMP_DOWN_NUMERATOR * usage:
-		return prev_price * CLAMP_DOWN_NUMERATOR // CLAMP_DENOMINATOR
+    if CLAMP_DENOMINATOR * total_gas_consumed <= CLAMP_DOWN_NUMERATOR * usage:
+        return prev_price * CLAMP_DOWN_NUMERATOR // CLAMP_DENOMINATOR
     elif CLAMP_DENOMINATOR * total_gas_consumed >= CLAMP_UP_NUMERATOR * usage:
-		return prev_price * CLAMP_UP_NUMERATOR // CLAMP_DENOMINATOR
-	else:
-		return prev_price * total_gas_consumed // usage
+        return prev_price * CLAMP_UP_NUMERATOR // CLAMP_DENOMINATOR
+    else:
+        return prev_price * total_gas_consumed // usage
 
 def update_storage_fee(total_gas_consumed: int, prev_price: int, prev_usage: int) -> tuple[int, int]:
-	usage = update_usage(total_gas_consumed, prev_usage)
-	price = update_storage_price(prev_price, total_gas_consumed, usage)
-	return price, usage
+    usage = update_usage(total_gas_consumed, prev_usage)
+    price = update_storage_price(prev_price, total_gas_consumed, usage)
+    return price, usage
 ```
 
 ### Genesis State
