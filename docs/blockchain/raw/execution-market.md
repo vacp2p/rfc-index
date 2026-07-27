@@ -22,6 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision | 2026-04-24 |
+| 1.0.1 | Fix base fee constants in pseudocode based on the correct $`G_{\mathrm{target}}`$ | 2026-07-27 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -180,8 +181,8 @@ And so we propose the following code reference:
 ```python
 EMA_DENOMINATOR = 10  # from q = 9/10
 EMA_PREV_WEIGHT = 9  # from q = 9/10
-BASE_FEE_NUMERATOR = 11_176_760  # = 7 * G_target
-BASE_FEE_DENOMINATOR = 12_773_440  # = 8 * G_target
+BASE_FEE_NUMERATOR = 11_177_110  # = 7 * G_target
+BASE_FEE_DENOMINATOR = 12_773_840  # = 8 * G_target
 
 def update_g_avg_num(prev_g_avg_num: int, block_gas_used: int) -> int:
     numerator = block_gas_used + EMA_PREV_WEIGHT * prev_g_avg_num
