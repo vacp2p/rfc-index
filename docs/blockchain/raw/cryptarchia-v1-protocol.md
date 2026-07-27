@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-01-20 |
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
+| 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
 
 # Introduction
 

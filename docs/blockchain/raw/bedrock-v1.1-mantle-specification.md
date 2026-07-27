@@ -302,14 +302,14 @@ def round_robin(block_slot: Slot, channel: ChannelState) -> (u16, u64):
 
 ### Bridging
 
-Channels let their bridged funds keep participating in Proof of Stake. When a user deposits funds into a channel, the deposited notes are not removed from the ledger and are not turned into inert collateral. They become channel notes that continue to count toward Proof of Stake and can still be used to create PoLs (see [Channel Notes](#channel-notes)). Two goals motivate this design:
+Channels let their bridged funds keep participating in Proof of Stake. When a user deposits funds into a channel, the deposited notes just updated in the ledger and are not turned into inert collateral. They become channel notes that continue to count toward Proof of Stake and can still be used to create PoLs (see [Channel Notes](#channel-notes)). Two goals motivate this design:
 
 - **More PoS participation, stronger security.** Funds deposited into a channel would otherwise leave the staking set. Keeping them as channel notes means the capital backing the application layer also backs consensus security, so bridging does not shrink the stake that secures the chain.
 - **No split between security and application.** A user no longer has to choose between staking funds or using them in a channel. The same funds do both at once. They stay usable inside the channel while still earning Proof of Leadership rewards, so capital is never fragmented between the two.
 
 **Ownership vs. staking power.** A `CHANNEL_DEPOSIT` separates the two rights that a normal note bundles together:
 
-- *Ownership* moves to the channel. The note is registered in the ledger's `channel_notes` set with the channel as its owner, and the channel keeps full control over it. The deposited notes are neither consumed nor re-created. They keep their `NoteId`, value and `ZkPublicKey`, and are simply re-registered as channel-owned. The channel is now the party responsible for the note.
+- *Ownership* moves to the channel. The note is registered in the ledger's `channel_notes` set with the channel as its owner, and the channel keeps full control over it. The deposited notes are re-created exactly matching the consumed inputs. They keep their value and `ZkPublicKey`, and are simply updating their `NoteId` and are channel-owned. The channel is now the party responsible for the note.
 - *Staking power* stays with the `ZkPublicKey` carried by the note. That key does not confer ownership. It only delegates the note's value for PoL creation. Whoever controls the key is the one allowed to turn the note into a PoL and collect the resulting rewards. On deposit this key is still the depositor's, so the user keeps the PoS participation power they had before bridging.
 
 Because the channel owns the note but does not hold the delegated key, the note earns rewards for the key holder, never for the channel itself.
@@ -673,7 +673,7 @@ Consume the inputs and create the same Note with new NoteId as channel notes own
 notes_to_add = [ledger.get_note(input) for input in deposit.inputs]
 
 # consume inputs
-ledger.execute_spending(deposit.inputs, deposit.channel)
+ledger.execute_spending(deposit.inputs)
 
 # recreate the notes with new NoteId in the channel
 deposit_id = derive_op_id(deposit)
@@ -712,7 +712,7 @@ A Zone that credits a deposit in its own state must be sure the deposit really l
 - Wait for the deposit to be finalized before interpreting it, at the cost of the finalization delay.
 - Make the inscription conditional on the deposit, by including a `CHANNEL_TRANSFER` that consumes the deposited note in the same Mantle Transaction as the inscription. Mantle Transactions execute atomically, so the inscription is included only if the deposited note exists and is consumed. This removes the waiting period entirely.
 
-The second option resets the ageing of the value. A `CHANNEL_TRANSFER` consumes its inputs and creates new notes, so the resulting note starts the ageing process again and must age before it can create a PoL. `CHANNEL_DEPOSIT` and `CHANNEL_WITHDRAW` keep the `NoteId` of the notes they touch and therefore never reset ageing.
+A `CHANNEL_WITHDRAW` keeps the `NoteId` of the notes they touch and therefore never reset ageing.
 
 ### CHANNEL_WITHDRAW
 
