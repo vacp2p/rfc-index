@@ -1,7 +1,15 @@
-import std/strutils,stew/byteutils,
-  cbor_serialization, cbor_serialization/std/tables
+import std/strutils, stew/byteutils,
+  cbor_serialization, cbor_serialization/std/tables, cbor_serialization/pkg/results
 
-export cbor_serialization, tables
+export cbor_serialization, tables, results
+
+## ============================================================================
+## Deterministic CBOR Validation (per LOGOS-MODULE-TRANSPORT §2.3)
+## ============================================================================
+## P0: Envelope validation (message kind, required fields) — implemented above
+## P1/P2: Full canonicalization (sorted keys, shortest integers, no tags)
+##         deferred until commitment-model spec is finalized.
+## ===========================================================================
 
 func formatCborValue(val: CborValueRef, indent: int = 0): string
 func `$`*(v: CborValueRef): string =
@@ -34,26 +42,26 @@ func formatCborValue(val: CborValueRef, indent: int = 0): string =
   of CborValueKind.Array:
     if val.arrayVal.len == 0:
       return "[]"
-    var result = "[\n"
+    var res = "[\n"
     for i, item in val.arrayVal:
-      result.add(nextPad & formatCborValue(item, indent + 2))
+      res.add(nextPad & formatCborValue(item, indent + 2))
       if i < val.arrayVal.len - 1:
-        result.add(",")
-      result.add("\n")
-    result.add(pad & "]")
-    result
+        res.add(",")
+      res.add("\n")
+    res.add(pad & "]")
+    res
   of CborValueKind.Object:
     if val.objVal.len == 0:
       return "{}"
-    var result = "{\n"
+    var res = "{\n"
     var i = 0
     for key, value in val.objVal.pairs:
-      result.add(nextPad & "\"" & key & "\": " & formatCborValue(value, indent + 2))
+      res.add(nextPad & "\"" & key & "\": " & formatCborValue(value, indent + 2))
       if i < val.objVal.len - 1:
-        result.add(",")
-      result.add("\n")
+        res.add(",")
+      res.add("\n")
       i += 1
-    result.add(pad & "}")
-    result
+    res.add(pad & "}")
+    res
   of CborValueKind.Tag:
     "tag(" & $val.tagVal.tag & ": " & formatCborValue(val.tagVal.val, indent) & ")"

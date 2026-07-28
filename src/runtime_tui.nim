@@ -1,4 +1,4 @@
-import std/[algorithm, os, strutils, random, unicode, sequtils, re, tables]
+import std/[algorithm, os, strutils, random, unicode]
 import illwill, results, stew/byteutils
 import logos_core/[cbor_stuff, schemas, runtime, tcp_host]
 
@@ -347,25 +347,24 @@ proc callMethodWithParams*(state: var AppState) =
     state.status = "No plugin loaded."
     return
   let pluginName = plugins[clampIndex(state.selectedPlugin, plugins.len)]
-  let cborParamsRes = buildCborParams(state.methodCall.params)
-  if cborParamsRes.isErr:
-    state.methodCall.error = cborParamsRes.error
+  let cborParams = buildCborParams(state.methodCall.params).valueOr:
+    state.methodCall.error = error
     state.methodCall.result = ""
     state.status = "Invalid parameter value"
     return
   let methodName = state.methodCall.methodName
-  let dispatchRes = state.runtime.dispatchPlugin(pluginName, methodName, cborParamsRes.get)
-  if dispatchRes.isOk:
-    state.methodCall.result =
-      "Success: " & $dispatchRes.get.len & " bytes returned\n" & toHex(dispatchRes.get) &
-      "\n" & $(Cbor.decode(dispatchRes.get(), CborValueRef))
-
-    state.methodCall.error = ""
-    state.status = "Method called successfully"
-  else:
-    state.methodCall.error = dispatchRes.error
+  let dispatch = state.runtime.dispatchPlugin(pluginName, methodName, cborParams).valueOr:
+    state.methodCall.error = error
     state.methodCall.result = ""
     state.status = "Method call failed"
+    return
+
+  state.methodCall.result =
+    "Success: " & $dispatch.len & " bytes returned\n" & toHex(dispatch) & "\n" &
+    $(Cbor.decode(dispatch, CborValueRef))
+
+  state.methodCall.error = ""
+  state.status = "Method called successfully"
 
 proc callMethodOnSelectedPlugin*(state: var AppState) =
   let plugins = state.runtime.listPlugins()
@@ -373,11 +372,9 @@ proc callMethodOnSelectedPlugin*(state: var AppState) =
     state.status = "No plugin selected."
     return
   let pluginName = plugins[clampIndex(state.selectedPlugin, plugins.len)]
-  let schemaRes = state.runtime.pluginSchema(pluginName)
-  if schemaRes.isErr:
-    state.status = "Failed to get schema x: " & schemaRes.error
+  let schema = state.runtime.pluginSchema(pluginName).valueOr:
+    state.status = "Failed to get schema x: " & error
     return
-  let schema = schemaRes.get
   state.methods = extractMethodsFromSchema(schema)
   if state.methods.len == 0:
     state.status = "No methods available."
@@ -406,24 +403,21 @@ proc dispatchSelectedMethod*(state: var AppState) =
   state.methodCall = initMethodCall(pluginName, methodName, params)
   if params.len == 0:
     # No parameters, call immediately
-    let cborParamsRes = buildCborParams(state.methodCall.params)
-    if cborParamsRes.isErr:
-      state.methodCall.error = cborParamsRes.error
+    let cborParams = buildCborParams(state.methodCall.params).valueOr:
+      state.methodCall.error = error
       state.methodCall.result = ""
       state.status = "Invalid parameter value"
       return
-    let dispatchRes = state.runtime.dispatchPlugin(pluginName, methodName, cborParamsRes.get)
-    if dispatchRes.isOk:
-      state.methodCall.result =
-        "Success: " & $dispatchRes.get.len & " bytes returned\n" & toHex(
-          dispatchRes.get
-        ) & "\n" & $(Cbor.decode(dispatchRes.get(), CborValueRef))
-      state.methodCall.error = ""
-      state.status = "Method called successfully"
-    else:
-      state.methodCall.error = dispatchRes.error
+    let dispatch = state.runtime.dispatchPlugin(pluginName, methodName, cborParams).valueOr:
+      state.methodCall.error = error
       state.methodCall.result = ""
       state.status = "Method call failed"
+      return
+    state.methodCall.result =
+      "Success: " & $dispatch.len & " bytes returned\n" & toHex(dispatch) & "\n" &
+      $(Cbor.decode(dispatch, CborValueRef))
+    state.methodCall.error = ""
+    state.status = "Method called successfully"
   else:
     state.status =
       "Enter parameter values (Up/Down to navigate, type to edit, Enter to confirm)"
@@ -573,7 +567,8 @@ proc runApp*() =
                 initMethodCall(pluginName, state.methods[state.selectedMethod], params)
               state.status = "Switched to method " & state.methods[state.selectedMethod]
             else:
-              state.status = "Error fetching schema " & pluginName & ": " & schemaRes.error
+              state.status =
+                "Error fetching schema " & pluginName & ": " & schemaRes.error
           else:
             state.status = "Already at last method"
         elif state.mode == methodCalling:

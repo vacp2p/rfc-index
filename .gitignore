@@ -5,3 +5,7 @@ docs/SUMMARY.md
 .DS_Store
 __pycache__
 *.so
+nimble.develop
+nimble.paths
+nimbledeps
+src/runtime_tui

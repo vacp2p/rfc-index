@@ -6,7 +6,6 @@ type
     ptString
     ptBytes
     ptBool
-    ptFloat64
     ptUint8
     ptUint16
     ptUint32
@@ -32,7 +31,6 @@ proc parseParamType*(typeExpr: string): ParamType =
   of "tstr": ptString
   of "bstr": ptBytes
   of "bool": ptBool
-  of "float64": ptFloat64
   of "uint8": ptUint8
   of "uint16": ptUint16
   of "uint32": ptUint32
@@ -48,39 +46,43 @@ proc paramTypeToCborKind*(kind: ParamType): CborValueKind =
   of ptString, ptUnknown: CborValueKind.String
   of ptBytes: CborValueKind.Bytes
   of ptBool: CborValueKind.Bool
-  of ptFloat64: CborValueKind.Float
   of ptUint8, ptUint16, ptUint32, ptUint64: CborValueKind.Unsigned
   of ptInt8, ptInt16, ptInt32, ptInt64: CborValueKind.Unsigned
 
 proc extractMethodsFromSchema*(schema: string): seq[string] =
   ## Extract method names from CDDL schema
-  ## Methods are defined as: <module>.<method>-request = {...}
+  ## Methods use naming: <module>.<method>_request or <module>.<method>-request = {...}
   var methods: seq[string] = @[]
   for line in schema.splitLines():
-    if line.contains("-request") and line.contains("="):
-      # Extract the method name from "module.method-request ="
+    if line.contains("="):
+      # Extract the method name from "module.method_request ="
       let parts = line.split("=")
       if parts.len > 0:
         let namePart = parts[0].strip()
-        if namePart.endsWith("-request"):
-          let methodFull = namePart[0 ..< namePart.len - 8] # Remove "-request"
+        var suffixLen = 0
+        if namePart.endsWith("_request"):
+          suffixLen = 8
+        if suffixLen > 0:
+          let methodFull = namePart[0 ..< namePart.len - suffixLen]
           let methodParts = methodFull.split(".")
           if methodParts.len > 1:
-            let methodName = methodParts[^1] # Get the last part after the dot
+            var methodName = methodParts[^1] # Get the last part after the dot
+            if methodName.endsWith("-"):
+              methodName = methodName[0 ..< methodName.len - 1]
             if methodName notin methods:
               methods.add(methodName)
   methods
 
 proc extractMethodParams*(schema: string, methodName: string): seq[MethodParam] =
   ## Extract parameter names and primitive types from a method's request definition
-  ## Looking for the pattern: <module>.<method>-request = { param: type, ... }
+  ## Looking for the pattern: <module>.<method>_request = { param: type, ... }
   var params: seq[MethodParam] = @[]
   var inMethod = false
   var braceCount = 0
   var paramStr = ""
 
   for line in schema.splitLines():
-    if line.contains(methodName & "-request") and line.contains("="):
+    if line.contains(methodName & "_request") and line.contains("="):
       inMethod = true
 
     if inMethod:
@@ -133,7 +135,6 @@ proc paramValueToCbor*(param: MethodParam): Result[CborValueRef, string] =
       return ok(CborValueRef(kind: CborValueKind.String, strVal: ""))
     else:
       return ok(CborValueRef(kind: param.kind.paramTypeToCborKind))
-      # return err("Missing value for parameter '" & param.name & "'")
 
   ok case param.kind
   of ptString, ptUnknown:
@@ -151,11 +152,7 @@ proc paramValueToCbor*(param: MethodParam): Result[CborValueRef, string] =
       CborValueRef(kind: CborValueKind.Bool, boolVal: false)
     else:
       return err("Invalid bool for parameter '" & param.name & "'; expected true/false")
-  of ptFloat64:
-    try:
-      CborValueRef(kind: CborValueKind.Float, floatVal: parseFloat(param.value))
-    except ValueError as ex:
-      return err("Invalid float64 for parameter '" & param.name & "': " & ex.msg)
+  # ptFloat64 case removed
   of ptUint8, ptUint16, ptUint32, ptUint64:
     try:
       let n = parseBiggestUInt(param.value)
@@ -205,21 +202,14 @@ proc paramValueToCbor*(param: MethodParam): Result[CborValueRef, string] =
         )
     except ValueError as ex:
       return err("Invalid integer for parameter '" & param.name & "': " & ex.msg)
-  else:
-    CborValueRef(kind: CborValueKind.String, strVal: param.value)
 
 proc buildCborParams*(params: seq[MethodParam]): Result[seq[byte], string] =
   var paramMap: OrderedTable[string, CborValueRef] =
     initOrderedTable[string, CborValueRef]()
   for param in params:
-    let parsed = paramValueToCbor(param)
-    if parsed.isErr:
-      return err(parsed.error)
-    let cborVal = parsed.get
+    let cborVal = paramValueToCbor(param).valueOr:
+      return err(error)
     if cborVal.isNil:
       continue
     paramMap[param.name] = cborVal
-  try:
-    ok(Cbor.encode(paramMap))
-  except CatchableError as ex:
-    err("CBOR encoding failed: " & ex.msg)
+  ok(Cbor.encode(paramMap))

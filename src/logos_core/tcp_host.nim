@@ -1,11 +1,14 @@
-# src/logos_core/tcp_host.nim
+# TCP host server for Logos modules
+# Per LOGOS-MODULE-TRANSPORT (stream binding, message types)
+
 {.push raises: [], gcsafe.}
 
-import std/[os, net, sequtils, strutils]
+import std/net
 import std/typedthreads
-import stew/byteutils
 import results
-import logos_core/[cbor_stuff, transport, tcp_protocols]
+import logos_core/[cbor_stuff, transport, tcp_protocols, modules]
+
+export net
 
 const defaultTcpHostPort* = 8543
 
@@ -24,7 +27,7 @@ type
     serverSocket*: Socket
     serverThread*: Thread[pointer]
     running*: bool
-    port*: int
+    port*: net.Port
     runtimeOps*: TcpHostRuntimeOps
 
   LoadPluginParams* = object
@@ -45,14 +48,15 @@ proc tcpHostThreadProc(arg: pointer) {.thread, nimcall.} =
   serverLoop(hostRef[])
 
 proc newTcpHost*(
-    runtimeOps: TcpHostRuntimeOps, port: int
+    runtimeOps: TcpHostRuntimeOps, port: net.Port
 ): Result[ref TcpHost, string] =
   var host = (ref TcpHost)(runtimeOps: runtimeOps, port: port, running: false)
   try:
     host.serverSocket = newSocket(AF_INET, SOCK_STREAM)
     host.serverSocket.setSockOpt(OptReuseAddr, true)
-    host.serverSocket.bindAddr(Port(port))
+    host.serverSocket.bindAddr(net.Port(port))
     host.serverSocket.listen()
+    host.port = host.serverSocket.getLocalAddr()[1]
   except CatchableError as e:
     try:
       host.serverSocket.close()
@@ -65,7 +69,6 @@ proc newTcpHost*(
     host.serverThread.createThread(tcpHostThreadProc, addr(host[]))
   except:
     raiseAssert "oops"
-
   ok(host)
 
 proc stopServer*(host: ref TcpHost) =
@@ -81,9 +84,6 @@ proc stopServer*(host: ref TcpHost) =
   except:
     discard
 
-proc makeErrorResponse*(err: string): seq[byte] =
-  Cbor.encode(ResponsePayload(result: @[], error: err))
-
 proc getSchema*(host: TcpHost): string =
   """
   ; -- metadata --
@@ -91,88 +91,121 @@ proc getSchema*(host: TcpHost): string =
   _version = [1, 0]
 
   ; -- methods --
-  tcp_host.load-plugin-request = {
+  tcp_host.load_plugin_request = {
       path: tstr,
   }
-  tcp_host.load-plugin-response = {
+  tcp_host.load_plugin_response = {
       data: [* tstr],
   }
 
-  tcp_host.unload-plugin-request = {
+  tcp_host.unload_plugin_request = {
       name: tstr,
   }
-  tcp_host.unload-plugin-response = {
+  tcp_host.unload_plugin_response = {
       message: tstr,
   }
 
-  tcp_host.list-plugins-request = {}
-  tcp_host.list-plugins-response = {
+  tcp_host.list_plugins_request = {}
+  tcp_host.list_plugins_response = {
       plugins: [* tstr],
   }
 
-  tcp_host.dispatch-plugin-request = {
+  tcp_host.dispatch_plugin_request = {
       plugin: tstr,
       methodName: tstr,
       payload: bstr,
   }
-  tcp_host.dispatch-plugin-response = {
+  tcp_host.dispatch_plugin_response = {
       result: bstr,
   }
 
-  tcp_host.logos.schema-request = {}
-  tcp_host.logos.schema-response = {
+  tcp_host.logos.schema_request = {}
+  tcp_host.logos.schema_response = {
       schema: tstr,
   }
 
-  tcp_host.ping-request = {}
-  tcp_host.ping-response = {
+  tcp_host.ping_request = {}
+  tcp_host.ping_response = {
       response: tstr,
   }
   """
 
-proc dispatchRequest*(host: TcpHost, req: RequestPayload): ResponsePayload =
-  var response = ResponsePayload(result: @[], error: "")
+proc dispatchRequest*(host: TcpHost, req: TransportRequest): TransportResponse =
+  ## Dispatch a transport request to the runtime ops
+  var response = TransportResponse(
+    callId: req.callId,
+    responseResult: Opt.none(seq[byte]),
+    responseError: Opt.none(string),
+  )
   try:
-    case req.meth
-    of "load-plugin":
+    # We use Cbor.encode/decode from cbor_stuff.nim for serialization
+    case req.methodName
+    of "load_plugin":
       let params = Cbor.decode(req.params, LoadPluginParams)
       let res = host.runtimeOps.loadPlugin(params.path)
       if res.isOk:
         let (name, version) = res.get
-        response.result = Cbor.encode(@[name, version])
+        response.responseResult = Opt.some(Cbor.encode(@[name, version]))
       else:
-        response.error = res.error
-    of "unload-plugin":
+        response.responseError = Opt.some(res.error)
+    of "unload_plugin":
       let params = Cbor.decode(req.params, UnloadPluginParams)
       let res = host.runtimeOps.unloadPlugin(params.name)
       if res.isOk:
-        response.result = Cbor.encode("unloaded")
+        response.responseResult = Opt.some(Cbor.encode("unloaded"))
       else:
-        response.error = res.error
-    of "list-plugins":
-      response.result = Cbor.encode(host.runtimeOps.listPlugins())
-    of "dispatch-plugin":
+        response.responseError = Opt.some(res.error)
+    of "list_plugins":
+      response.responseResult = Opt.some(Cbor.encode(host.runtimeOps.listPlugins()))
+    of "dispatch_plugin":
       let params = Cbor.decode(req.params, DispatchPluginParams)
       let res =
         host.runtimeOps.dispatchPlugin(params.plugin, params.methodName, params.payload)
       if res.isOk:
-        response.result = res.get
+        response.responseResult = Opt.some(res.get)
       else:
-        response.error = res.error
+        response.responseError = Opt.some(res.error)
     of "logos.schema":
-      response.result = Cbor.encode(host.getSchema())
+      response.responseResult = Opt.some(Cbor.encode(host.getSchema()))
     of "ping":
-      response.result = Cbor.encode("pong")
+      response.responseResult = Opt.some(Cbor.encode("pong"))
+    # ============================================================================
+    # Runtime Control methods (per LOGOS-MODULE-RUNTIME Section 9)
+    # ============================================================================
+    of "list_modules":
+      # TODO: implement with proper module records
+      response.responseResult = Opt.some(default(seq[byte]))
+    of "list_routes":
+      # TODO: implement with route records
+      response.responseResult = Opt.some(default(seq[byte]))
+    of "start_module":
+      # TODO: implement start_module
+      response.responseResult = Opt.some(default(seq[byte]))
+    of "stop_module":
+      # TODO: implement stop_module
+      response.responseResult = Opt.some(default(seq[byte]))
+    of "get_readiness":
+      # TODO: implement get_readiness
+      response.responseResult = Opt.some(default(seq[byte]))
+    of "revoke_route":
+      # TODO: implement revoke_route
+      response.responseResult = Opt.some(default(seq[byte]))
     else:
-      response.error = "Unknown method: " & req.meth
+      response.responseError = Opt.some("Unknown method: " & req.methodName)
   except CatchableError as exc:
-    response.error = "Invalid request payload: " & exc.msg
+    response.responseError = Opt.some("Invalid request payload: " & exc.msg)
   response
 
-proc sendErrorResponse*(client: Socket, err: string) =
-  let payload = Cbor.encode(ResponsePayload(result: @[], error: err))
-  let respMsg = TransportMessage(tag: tResponse, payload: payload)
-  discard sendTransportMessage(client, respMsg)
+proc sendProtocolError*(client: Socket, code: int, msg: string) =
+  let payload = Cbor.encode(
+    ProtocolErrorPayload(errCode: code, errMsg: msg, errDetail: Opt.none(seq[byte]))
+  )
+  let errMsg = TransportMessage(tag: tProtocolError, payload: payload)
+  discard sendTransportMessage(client, errMsg)
+
+# ============================================================================
+# Handle new message types per LOGOS-MODULE-TRANSPORT spec
+# ============================================================================
 
 proc handleClient*(host: TcpHost, client: Socket) {.gcsafe.} =
   try:
@@ -184,30 +217,85 @@ proc handleClient*(host: TcpHost, client: Socket) {.gcsafe.} =
       let msg = messageRes.get
       case msg.tag
       of tHello:
-        let helloReq = Cbor.decode(msg.payload, HelloRequest)
-        let helloResp = HelloResponse(
-          protocol: defaultTcpProtocol,
-          module: "tcp_host",
-          version: @[1'u32, 0'u32],
-          token: @[],
-        )
-        let respPayload = Cbor.encode(helloResp)
-        let respMsg = TransportMessage(tag: tHello, payload: respPayload)
-        if sendTransportMessage(client, respMsg).isErr:
+        # Handle Hello with schema commitment
+        try:
+          let helloReq = Cbor.decode(msg.payload, HelloRequest)
+          let helloResp = HelloResponse(
+            protocol: defaultTcpProtocol,
+            module: "tcp_host",
+            version: @[1'u32, 0'u32],
+            token: @[],
+            schema: SchemaCommitment(
+              commitmentModel: "logos.commitment-model.2026-06",
+              schemaRoot: @[],
+              hashProfile: "logos.hash-profile.2026-05",
+              hashSuite: "example-suite",
+            ),
+          )
+          let respPayload = Cbor.encode(helloResp)
+          let respMsg = TransportMessage(tag: tHello, payload: respPayload)
+          if sendTransportMessage(client, respMsg).isErr:
+            break
+        except:
+          sendProtocolError(client, 2, "Invalid Hello payload")
           break
       of tRequest:
-        let reqPayload = Cbor.decode(msg.payload, RequestPayload)
-        let response = host.dispatchRequest(reqPayload)
-        let respPayload = Cbor.encode(response)
-        let respMsg = TransportMessage(tag: tResponse, payload: respPayload)
-        if sendTransportMessage(client, respMsg).isErr:
+        try:
+          let reqPayload = Cbor.decode(msg.payload, TransportRequest)
+          let response = dispatchRequest(host, reqPayload)
+          let respPayload = Cbor.encode(response)
+          let respMsg = TransportMessage(tag: tResponse, payload: respPayload)
+          if sendTransportMessage(client, respMsg).isErr:
+            break
+        except:
+          sendProtocolError(client, 2, "Invalid request payload")
           break
+      of tSubscribe:
+        # NEW: Register event subscription (per LOGOS-MODULE-TRANSPORT Section 5)
+        # Per spec: no separate ack required
+        try:
+          let subReq = Cbor.decode(msg.payload, SubscribePayload)
+          # TODO: register subscriber, track subscription mapping
+          # Stub: acknowledge by doing nothing (spec says no ack in this revision)
+        except:
+          sendProtocolError(client, 2, "Invalid subscribe payload")
+          break
+      of tUnsubscribe:
+        # NEW: Cancel event subscription
+        try:
+          let unsubReq = Cbor.decode(msg.payload, UnsubscribePayload)
+          # TODO: remove subscription
+        except:
+          sendProtocolError(client, 2, "Invalid unsubscribe payload")
+          break
+      of tCancel:
+        # NEW: Abort in-flight request (per LOGOS-MODULE-TRANSPORT Section 6)
+        try:
+          let cancelReq = Cbor.decode(msg.payload, CancelPayload)
+          # TODO: cancel in-flight request, return cancelled error
+          # For now, send a cancelled error response
+          let resp = TransportResponse(
+            callId: cancelReq.callId,
+            responseResult: Opt.none(seq[byte]),
+            responseError: Opt.some("cancelled"),
+          )
+          let respPayload = Cbor.encode(resp)
+          discard sendTransportMessage(
+            client, TransportMessage(tag: tResponse, payload: respPayload)
+          )
+        except:
+          sendProtocolError(client, 2, "Invalid cancel payload")
+          break
+      of tProtocolError:
+        # NEW: Protocol error received (per LOGOS-MODULE-TRANSPORT Section 1.3 kind 6)
+        client.close()
+        break
       else:
-        sendErrorResponse(client, "Unsupported transport message")
+        sendProtocolError(client, 2, "Unsupported transport message")
         break
 
     client.close()
-  except CatchableError as exc:
+  except CatchableError:
     client.close()
 
 proc serverLoop*(host: TcpHost) =
@@ -231,7 +319,7 @@ proc startHost*(
     dispatchPlugin: proc(
       plugin: string, methodName: string, params: seq[byte]
     ): Result[seq[byte], string] {.api.},
-    port: int,
+    port: net.Port,
 ): Result[ref TcpHost, string] =
   newTcpHost(
     TcpHostRuntimeOps(

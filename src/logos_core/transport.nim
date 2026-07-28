@@ -1,27 +1,28 @@
 # src/logos_core/transport.nim
+# Per LOGOS-MODULE-TRANSPORT
 
-import ./iface, results
-import std/[net, sequtils], stew/byteutils, stew/endians2
+import results
+import std/net, stew/endians2
 
-## Message tags as defined in LOGOS-module-transport.
+## Message kinds per LOGOS-MODULE-TRANSPORT §1.1
 type TransportTag* = enum
-  tHello = 100
-  tRequest = 101
-  tResponse = 102
-  tSubscribe = 103
-  tUnsubscribe = 104
-  tEvent = 105
-  tProtocolError = 106
-  tCancel = 107
+  tHello = 0
+  tRequest = 1
+  tResponse = 2
+  tSubscribe = 3
+  tUnsubscribe = 4
+  tEvent = 5
+  tProtocolError = 6
+  tCancel = 7
 
 ## A simple wrapper for a length-prefixed message.
+## Per LOGOS-MODULE-TRANSPORT §2.1: 4-byte big-endian length prefix.
 type TransportMessage* = object
   tag*: TransportTag
   payload*: seq[byte]
 
 proc encodeMessage*(msg: TransportMessage): seq[byte] =
   ## Encodes a message with a 4-byte big-endian length prefix.
-  # Append length (4 bytes, big-endian)
   result.add msg.payload.len.uint32.toBytesBE()
 
   # Append tag (1 byte)
@@ -35,7 +36,7 @@ proc decodeMessage*(data: seq[byte]): Result[TransportMessage, string] =
   if data.len < 5:
     return err("Message too short")
 
-  # Read length (4.. bytes, big-endian)
+  # Read length (4 bytes, big-endian)
   var length = uint32.fromBytesBE(data[0..3]).int
 
   if data.len < 4 + length:
