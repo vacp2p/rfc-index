@@ -568,7 +568,7 @@ Message {
 
 - `CONFIRMED`: Advertisement stored in cache
 - `WAIT`: Not yet accepted, wait and retry with ticket
-- `REJECTED`: Invalid signature, duplicate, or error
+- `REJECTED`: Invalid signature, invalid ticket, or error
 
 **Example (WAIT):**
 
@@ -685,14 +685,13 @@ Registrars MUST validate:
    - Retry within window: `ticket.t_mod + ticket.t_wait_for ≤ NOW() ≤ ticket.t_mod + ticket.t_wait_for + δ`
 5. Advertisement signature is valid
 (see [Advertisement Signature Verification](#advertisement-signature-verification))
-6. Advertisement not already in `ad_cache` for this `service_id` -
-an advertisement is identical to a cached one when their encoded byte
-representations (the `register.advertisement` field) are equal;
-any change to the underlying content, produces a different
-encoding and is therefore not a duplicate
-(see [Advertisement Cache](#advertisement-cache)).
 
 Respond with `register.status = REJECTED` if validation fails.
+
+Every validated `REGISTER` request is evaluated the same way through admission
+control, whether its content matches a cached advertisement or not
+(see [Advertisement Cache](#advertisement-cache) and
+[Handling REGISTER requests](#handling-register-requests)).
 
 #### GET_ADS Request Validation
 
@@ -967,9 +966,12 @@ one advertisement with the single `service_id` it was registered for,
 admitted and expired independently of any entry for the advertiser's
 other advertisements.
 An advertiser MUST have at most one `ad_cache` entry per `service_id`
-at a given registrar: a new, non-identical advertisement from the same
-`peer_id` for the same `service_id` replaces the existing entry through
-normal admission control, rather than coexisting alongside it
+at a given registrar. There is no separate refresh or keep-alive
+mechanism, and no special case based on whether a new advertisement's
+content matches the cached one: an advertiser that successfully passes
+admission control for a `service_id` it already has an entry for
+replaces that entry through the same process every other registration
+attempt goes through
 (see [Handling REGISTER requests](#handling-register-requests)).
 Once an `ad` has expired, it SHOULD be removed from the `ad_cache`
 
@@ -984,20 +986,16 @@ using the algorithm described in [Peer Table Updates](#peer-table-updates) secti
 
 To populate the rest of the response, the registrar MUST:
 
-1. If an identical `ad` already exists in the `ad_cache` for this
-`service_id` and `peer_id` (same encoded `register.advertisement`
-bytes as a cached entry for the same `service_id`), reject the request
-and respond with status `Rejected`. If a non-identical `ad` from this
-`peer_id` already exists in the `ad_cache` for this `service_id`,
-processing continues below: on admission (step 6)
-it replaces the existing entry.
-2. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
+1. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
 using the formula in [Waiting Time Calculation](#waiting-time-calculation).
-3. If no `ticket` is provided in the `REGISTER` request
+This applies the same way regardless of whether the advertiser already
+has an entry in the `ad_cache` for this `service_id`, and regardless of
+whether this `ad`'s content matches that entry.
+2. If no `ticket` is provided in the `REGISTER` request
 this is the advertiser's first registration attempt for the `ad`.
 Create a new signed `ticket` based on `t_wait`,
 and return the signed `ticket` in a response with status `Wait`.
-4. If a `ticket` is provided in the `REGISTER` request,
+3. If a `ticket` is provided in the `REGISTER` request,
 validate the ticket and respond with the status `Rejected` if any of the following fails:
 
     - `ticket.signature` contains a valid signature, issued by this registrar
@@ -1011,15 +1009,22 @@ validate the ticket and respond with the status `Rejected` if any of the followi
     but SHOULD be just enough to accommodate for
     the maximum delay between the advertiser and the registrar.
 
-5. Calculate remaining wait time
+4. Calculate remaining wait time
 `t_remaining = t_wait - (current_time - ticket.t_init)`.
 This ensures advertisers accumulate waiting time across retries
-6. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
+5. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
 with an expiry timestamp set to `current_time + E`.
 If an entry for this `peer_id` and `service_id` already exists,
-this replaces it.
+this replaces it, regardless of whether the new `ad`'s content differs
+from the existing entry's.
 The registrar SHOULD return a response with status `Confirmed`.
-7. If `t_remaining > 0`, issue a new signed `ticket`
+Registrars SHOULD log this replacement when the new `ad`'s content is
+identical to the entry it replaces: under normal operation an advertiser
+does not resubmit an identical `ad` while its previous entry for this
+`service_id` is still active (see
+[Distributing ads across registrars](#distributing-ads-across-registrars)),
+so this is a signal worth observing even though it is not rejected.
+6. If `t_remaining > 0`, issue a new signed `ticket`
 with `ticket.t_mod` set to `current_time`
 and `ticket.t_wait_for = min(E, t_remaining)`.
 The registrar SHOULD return the signed `ticket` in a response with status `Wait`.
@@ -1031,7 +1036,6 @@ Registrars MAY follow this example.
 
 ```text
 procedure REGISTER(ad, ticket):
-    assert(ad not in ad_cache)
     response.ticket.ad ← ad
     t_wait ← CALCULATE_WAITING_TIME(ad)
 
@@ -1042,13 +1046,12 @@ procedure REGISTER(ad, ticket):
     else:
         assert(ticket.hasValidSignature())
         assert(ticket.ad = ad)
-        assert(ad.notInAdCache())
         t_scheduled ← ticket.t_mod + ticket.t_wait_for
         assert(t_scheduled ≤ NOW() ≤ t_scheduled + δ)
         t_remaining ← t_wait - (NOW() - ticket.t_init)
     end if
     if t_remaining ≤ 0:
-        ad_cache.add(ad)
+        ad_cache.add(ad)  # replaces any existing entry for (ad.peer_id, service_id)
         response.status ← Confirmed
     else:
         response.status ← Wait
@@ -1697,26 +1700,36 @@ Implementations should consider these trade-offs carefully when selecting approp
 
 Refer to the [Register Algorithm section](#example-register-algorithm) for the pseudocode
 
-1. Make sure this advertisement `ad` is not already in the registrar’s advertisement cache `ad_cache`.
-2. Prepare a response ticket `response.ticket` linked to this `ad`.
-3. Then calculate how long the advertiser should wait `t_wait` before being admitted.
+1. Prepare a response ticket `response.ticket` linked to this `ad`.
+2. Calculate how long the advertiser should wait `t_wait` before being admitted.
 Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for details.
-4. Check if this is the first registration attempt (no ticket yet):
+This is calculated the same way regardless of whether the advertiser
+already has an entry in the `ad_cache` for this `service_id`, and
+regardless of whether this `ad`'s content matches that entry -
+there is no separate duplicate or identical-advertisement path.
+3. Check if this is the first registration attempt (no ticket yet):
     1. If yes then it’s the first try. The advertiser must wait for the full waiting time `t_wait`.
     The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
     2. If no, then this is a retry, so a previous ticket exists.
-        1. Validate that the ticket is properly signed by the registrar,
-        belongs to this same advertisement and that the `ad` is still not already in the `ad_cache`.
+        1. Validate that the ticket is properly signed by the registrar
+        and belongs to this same advertisement.
         2. Ensure the retry is happening within the allowed time window `δ` after the scheduled time.
         If the advertiser waits too long or too short, the ticket is invalid.
         3. Calculate how much waiting time is left `t_remaining`
         by subtracting how long the advertiser has already waited
         (`NOW() - ticket.t_init`) from `t_wait`.
-5. Check if the remaining waiting time `t_remaining` is less than or equal to 0.
+4. Check if the remaining waiting time `t_remaining` is less than or equal to 0.
 This means  the waiting time is over.
 `t_remaining` can be 0 also when the registrar decides that
 the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting time `t_wait` is 0).
     1. If yes, add the `ad` to `ad_cache` and confirm registration.
+    If an entry for this `peer_id` and `service_id` already exists, this
+    replaces it, regardless of whether the new `ad`'s content differs
+    from the existing entry's. Registrars SHOULD log a replacement where
+    the new `ad` is identical to the one it replaces - under normal
+    operation an advertiser does not resubmit an identical `ad` while its
+    previous entry for this `service_id` is still active, so this is
+    worth observing even though it is not rejected.
     The advertisement is now officially registered.
     2. If no, then there is still time to wait.
     In this case registrar does not store `ad` but instead issues a ticket.
@@ -1724,9 +1737,9 @@ the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting ti
         2. Update the ticket with the new remaining waiting time `t_wait_for`
         3. Update the ticket last modification time `t_mod`
         4. Sign the ticket again. The advertiser will retry later using this new ticket.
-6. Add a list of peers closer to the `ad.service_id_hash` using the `GETPEERS()` function
+5. Add a list of peers closer to the `ad.service_id_hash` using the `GETPEERS()` function
 to the response (the advertiser uses this to update `AdvT(service_id_hash)`).
-7. Send the full response back to the advertiser
+6. Send the full response back to the advertiser
 
 Upon receiving a ticket, the advertiser waits for the specified `t_wait` time
 before trying to register again with the same registrar.
