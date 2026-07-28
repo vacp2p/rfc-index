@@ -960,8 +960,11 @@ using the algorithm described in [Peer Table Updates](#peer-table-updates) secti
 
 To populate the rest of the response, the registrar MUST:
 
-1. Calculate a waiting time for the `ad`, `t_wait`,
+1. Calculate (or recalculate, if this is a resubmission) a waiting time for the `ad`, `t_wait`,
 using the formula in [Waiting Time Calculation](#waiting-time-calculation).
+This applies the same way regardless of whether the advertiser already
+has an entry in the `ad_cache` for this `service_id`, and regardless of
+whether this `ad`'s content matches that entry.
 2. If no `ticket` is provided in the `REGISTER` request
 this is the advertiser's first registration attempt for the `ad`.
 Create a new signed `ticket` based on `t_wait`,
@@ -986,8 +989,15 @@ This ensures advertisers accumulate waiting time across retries
 5. If `t_remaining ≤ 0`, add the `ad` to the `ad_cache`,
 with an expiry timestamp set to `current_time + E`.
 If an entry for this `peer_id` and `service_id` already exists,
-this replaces it.
+this replaces it, regardless of whether the new `ad`'s content differs
+from the existing entry's.
 The registrar SHOULD return a response with status `Confirmed`.
+Registrars SHOULD log this replacement when the new `ad`'s content is
+identical to the entry it replaces: under normal operation an advertiser
+does not resubmit an identical `ad` while its previous entry for this
+`service_id` is still active (see
+[Distributing ads across registrars](#distributing-ads-across-registrars)),
+so this is a signal worth observing even though it is not rejected.
 6. If `t_remaining > 0`, issue a new signed `ticket`
 with `ticket.t_mod` set to `current_time`
 and `ticket.t_wait_for = min(E, t_remaining)`.
