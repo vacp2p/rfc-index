@@ -685,11 +685,6 @@ Registrars MUST validate:
 
 Respond with `register.status = REJECTED` if validation fails.
 
-Every validated `REGISTER` request is evaluated the same way through admission
-control, whether its content matches a cached advertisement or not
-(see [Advertisement Cache](#advertisement-cache) and
-[Handling REGISTER requests](#handling-register-requests)).
-
 #### GET_ADS Request Validation
 
 Registrars MUST validate:
