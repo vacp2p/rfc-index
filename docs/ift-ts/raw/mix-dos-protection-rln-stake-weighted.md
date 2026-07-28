@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Name | Stake-Weighted Mix RLN DoS Protection |
-| Slug | TBD |
+| Slug | 183 |
 | Status | raw |
 | Category | Standards Track |
 | Editor | Akshaya Mani <akshaya@status.im> |
@@ -236,6 +236,18 @@ before the network accepts registrations.
 The membership registry MUST reject registrations inconsistent with the published parameters.
 Verifiers trust the membership registry to enforce the correct value of these parameters at registration time.
 
+### 4.5 Cover Traffic Budget
+
+Cover emission under this mechanism follows [Mix Cover Traffic](./mix-cover-traffic.md):
+the deployment-wide cover budget `R_cover = f_cover × R_base` is uniform across all nodes,
+where `f_cover ∈ (0.0, 1.0]` is the `cover_rate_fraction` defined by the cover traffic specification
+(distinct from the `f` parameter in [Section 4.4](#44-system-parameters) of this specification).
+Per-node capacity in `(R_base, R_max]` is intentionally unused for cover
+and is exclusively available to non-cover origination and forwarding.
+The rationale for uniform `R_cover` &mdash; preventing high-`user_message_limit` nodes
+from overwhelming low-`user_message_limit` forwarders under uniform random path selection &mdash;
+is detailed in [Mix Cover Traffic §4](./mix-cover-traffic.md#4-rate-limit-budget-model).
+
 ## 5. Security and Privacy Considerations
 
 ### 5.1 Sybil-Resistance
@@ -309,6 +321,22 @@ The following are explicitly out of scope for this specification:
 - Detailed migration procedures and tooling for networks upgrading from flat-rate RLN
 - Voluntary deregistration mechanisms (a [RLN Per-Hop DoS Protection](./mix-dos-protection-rln.md) responsibility)
 - Membership registry implementation (smart contract, coordination layer, or other)
+- **Rate-weighted path selection.**
+  This specification preserves the uniform random path selection defined in the [Mix Protocol](./mix.md).
+
+  The trade-off is genuine.
+  Path-selection rules only constrain honest senders,
+  so attackers can target low-stake nodes under either strategy.
+  Under uniform random selection,
+  every honest path that includes at least one low-stake node is affected by such flooding.
+  Weighting selection proportional to registered rates &mdash; similar to Tor &mdash; would blunt this
+  by biasing honest paths toward high-rate nodes.
+
+  It is nonetheless out of scope here.
+  Well-funded adversaries can stake more to gain disproportionate path inclusion,
+  concentrating forwarding through nodes they control
+  and creating surveillance hotspots that defeat the mixnet's anonymity goal.
+  A future specification MAY revisit this trade-off.
 
 ## 7. Future Work
 
@@ -324,29 +352,6 @@ The following are explicitly out of scope for this specification:
 
 - **Dynamic stake top-up**:
   A mechanism for incrementally increasing stake without full deregistration would improve operational ergonomics.
-
-- **Rate-weighted path selection**:
-  The [Mix Protocol](./mix.md) currently specifies uniform random path selection,
-  which distributes forwarding load equally regardless of node capacity.
-  Under stake-weighted rate limits,
-  weighted path selection proportional to registered rates &mdash; similar to Tor &mdash; is an alternative,
-  with an open trade-off between the two.
-  Path-selection rules only constrain honest senders,
-  so attackers can target low-stake nodes under either strategy.
-  Weighted selection biases honest paths toward high-rate nodes,
-  reducing honest-path impact when low-stake nodes are flooded.
-  However, well-funded adversaries can stake more to gain disproportionate path inclusion,
-  enabling traffic surveillance.
-  Uniform random selection avoids this surveillance vector,
-  but every honest path that includes at least one low-stake node is affected by such flooding attacks.
-
-- **Cover traffic under stake-weighted rates**:
-  The [Mix Cover Traffic](./mix-cover-traffic.md) specification derives per-node cover emission bounds assuming uniform rate limits.
-  Under stake-weighted rates,
-  every node's `user_message_limit` satisfies `user_message_limit ≥ R_min ≥ R_base` by construction,
-  so `R_base` can serve as a common budget parameter across all nodes.
-  Whether stake-weighted capacity in the range `(R_base, R_max]` can be used for emission without breaking uniformity remains open.
-  Resolving this requires either accepting unused capacity above `R_base` or accommodating per-node budgets up to `R_max` without breaking emission uniformity.
 
 ## Copyright
 
