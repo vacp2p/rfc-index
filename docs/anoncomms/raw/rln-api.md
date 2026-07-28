@@ -235,12 +235,18 @@ The construction is given in
 ```c
 
 typedef struct {
-    uint8_t proof[128];              // zero-knowledge proof
+    uint8_t proof[128];              // zero-knowledge proof, compressed encoding
     uint8_t root[32];                // root the proof was generated against
-    uint8_t external_nullifier[32];  // hash(epoch, rln_identifier)
-    uint8_t share_x[32];             // Shamir share of the identity secret
-    uint8_t share_y[32];
-    uint8_t nullifier[32];
+    uint8_t epoch[32];               // epoch the proof was generated for,
+                                     // little-endian field element
+    uint8_t external_nullifier[32];  // poseidon(hash_to_field_le(epoch),
+                                     //          hash_to_field_le(rln_identifier))
+    uint8_t share_x[32];             // hash_to_field_le(signal) —
+                                     // the share's evaluation point
+    uint8_t share_y[32];             // Shamir share of the identity secret,
+                                     // evaluated at share_x
+    uint8_t nullifier[32];           // deterministic fingerprint of (identity
+                                     // secret, external_nullifier, message_id)
 } RateLimitProof;
 
 ```
@@ -388,7 +394,8 @@ Generate an RLN proof that `signal` was produced by the holder of the scope's me
 within its rate limit for the current epoch.
 The Module determines the epoch,
 allocates the next unused `message_id` within the membership's `rate_limit`,
-and binds the proof to the external nullifier `hash(epoch, rln_identifier)`.
+and binds the proof to the external nullifier
+`poseidon(hash_to_field_le(epoch), hash_to_field_le(rln_identifier))`.
 The Module SHALL NOT issue two proofs for the same `(epoch, message_id)` pair:
 doing so reveals the identity secret.
 When the epoch's budget is exhausted,
@@ -400,8 +407,12 @@ for proof generation to succeed.
 #### `bool verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
 
 Verify an RLN proof for `signal`.
-Returns `true` only if the proof is valid and
-`proof.root` is within the Module's current valid-root window.
+Returns `true` only if the proof is valid,
+`proof.root` is within the Module's current valid-root window,
+`proof.epoch` is within a configured maximum gap of the Module's current epoch —
+so a newly registered member cannot publish into past epochs —
+and `proof.external_nullifier` matches the value recomputed from
+`proof.epoch` and the scope's `rln_identifier`.
 Verification is on the message hot path —
 it runs for every message a validator receives —
 so the Module SHALL serve it from its locally maintained registry state
@@ -409,8 +420,9 @@ and SHALL NOT perform registry access on the verification path.
 The valid-root window is maintained asynchronously as the registry changes,
 and SHOULD be maintained timely enough
 that a proof generated against a newly published root is not falsely rejected.
-The window's length is a configuration parameter of the Module;
-validators of an application MUST use the same length,
+The window's length and the maximum epoch gap
+are configuration parameters of the Module;
+validators of an application MUST use the same values,
 or a proof accepted at one node is rejected at another.
 
 ## Optional extensions
