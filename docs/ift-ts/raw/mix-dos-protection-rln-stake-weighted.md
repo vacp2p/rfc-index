@@ -323,12 +323,20 @@ The following are explicitly out of scope for this specification:
 - Membership registry implementation (smart contract, coordination layer, or other)
 - **Rate-weighted path selection.**
   This specification preserves the uniform random path selection defined in the [Mix Protocol](./mix.md).
-  Weighting path selection by stake or rate would concentrate forwarding through high-stake nodes,
-  creating surveillance hotspots that defeat the mixnet's anonymity goal.
-  Uniform random selection is also what enables uniform cover-emission sizing
-  in [Mix Cover Traffic §4](./mix-cover-traffic.md#4-rate-limit-budget-model)
-  to fit within every node's `user_message_limit` budget;
-  weighted selection would invalidate that derivation.
+
+  The trade-off is genuine.
+  Path-selection rules only constrain honest senders,
+  so attackers can target low-stake nodes under either strategy.
+  Under uniform random selection,
+  every honest path that includes at least one low-stake node is affected by such flooding.
+  Weighting selection proportional to registered rates &mdash; similar to Tor &mdash; would blunt this
+  by biasing honest paths toward high-rate nodes.
+
+  It is nonetheless out of scope here.
+  Well-funded adversaries can stake more to gain disproportionate path inclusion,
+  concentrating forwarding through nodes they control
+  and creating surveillance hotspots that defeat the mixnet's anonymity goal.
+  A future specification MAY revisit this trade-off.
 
 ## 7. Future Work
 

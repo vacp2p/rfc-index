@@ -217,7 +217,8 @@ cover never draws from this headroom.
 
 **Why `R_cover` is uniform.**
 Under uniform random path selection, each node's forwarding load tracks the network-average origination rate, not its own `R_node`.
-Per-node `R_cover` would let high-`R_node` nodes drive the average up, and low-`R_node` forwarders would drop the cover packets they cannot absorb.
+Per-node `R_cover` would let high-`R_node` nodes drive the average up,
+leaving low-`R_node` forwarders unable to absorb the resulting forwarding load.
 Pinning `R_cover = f × R_base` keeps network-wide cover load at `f × R_base / (1 + L)` per node, which fits every node's budget since `R_node ≥ R_base` and `f ≤ 1`.
 A secondary registry-layer privacy benefit is noted in [§10.3](#103-network-wide-cover-rate-correlation).
 
@@ -301,7 +302,7 @@ If the claim fails, the packet SHOULD be handled as follows to avoid hitting DoS
 - **Forwarded packets**: queued for the next epoch.
   Since per-hop generated proofs are produced at send time ([§4](#4-rate-limit-budget-model)),
   the queued packet is re-emitted in the next epoch with a fresh proof generated then.
-  Implementations MAY bound the queue size; packets that would exceed the bound are dropped.
+  Queue bounding, ordering, and fairness rules are specified in [§9.5](#95-forwarded-packet-queueing).
 
 ### 5.3 Epoch Boundary
 
@@ -316,6 +317,11 @@ all remaining slots from the previous epoch are discarded,
 and a new pool of `R_node` slots is initialized.
 If pre-computation is enabled, the pre-built cover packets prepared during the previous epoch
 are loaded into the new pool.
+
+Forwarded packets queued on `ClaimSlot` failure ([§5.2](#52-non-cover-slot-claim)) are not part of
+the slot pool and are not discarded by `ResetEpoch`.
+They are carried into the new epoch and re-attempted against the refreshed pool,
+subject to the one-epoch lifetime cap in [§9.5](#95-forwarded-packet-queueing).
 
 Packets emitted near epoch end may arrive at later hops in a subsequent epoch
 due to accumulated mixing delays.
@@ -629,6 +635,23 @@ Implementations SHOULD observe the following:
 - **Bounded queue size**:
   Implementations MUST configure a maximum queue size.
   Forwards arriving when the queue is at bound MUST be dropped (tail-drop).
+  The queue size MUST NOT exceed `R_node − f × R_base / (1 + L)`,
+  the non-cover slot headroom one epoch is guaranteed to offer
+  (see [§5.2](#52-non-cover-slot-claim)).
+  A queue larger than this cannot drain within the one-epoch lifetime cap above,
+  so the excess is capacity that can never be used.
+  Implementations SHOULD size the queue to a fraction of that headroom rather than all of it,
+  since queued packets compete for slots with forwards and locally originated messages
+  arriving during the next epoch.
+- **Per-predecessor fairness**:
+  The queue is shared across every upstream node a forwarder receives packets from.
+  A single upstream sending at high rate near epoch end can otherwise fill the queue
+  and cause tail-drops of packets forwarded on behalf of others.
+  Implementations SHOULD partition the queue per immediate predecessor,
+  or apply a per-predecessor quota,
+  so that tail-drop applies within a partition rather than across the whole buffer.
+  This uses only the predecessor identity a node already observes on the incoming connection
+  and reveals nothing further about the packet's path.
 - **FIFO ordering**:
   Queued packets SHOULD be re-attempted in FIFO order in the next epoch.
 - **Stagger flush**:
@@ -686,6 +709,10 @@ of differentiated-`R_node` mechanisms (e.g.
 [Stake-Weighted Mix RLN DoS Protection §5.3](mix-dos-protection-rln-stake-weighted.md#53-registered-stake-privacy))
 may already partially expose.
 
+Cover-rate perturbation is not the only per-node signal slot consumption produces:
+forwarded-packet deferral ([§10.5](#105-cover-priority-and-forwarded-packet-deferral))
+exposes queue depth as a latency signal on the same nodes.
+
 ### 10.4 Timing Separability of Cover and Non-Cover Packets
 
 The default Constant-Rate strategy ([§7.1](#71-constant-rate-cover-traffic))
@@ -716,6 +743,26 @@ additional headroom in `(R_base, R_node]` further reduces forwarded-packet defer
 Deployments SHOULD adjust `f` based on observed network behavior;
 see [§11.1](#111-adaptive-cover-rate-fraction) for adaptive tuning as a future enhancement.
 See [§4](#4-rate-limit-budget-model) for why `R_cover` is uniform rather than scaled per-node.
+
+**Queue depth as a node-level observable.**
+Deferring a forwarded packet rather than dropping it changes the shape of the signal
+that slot exhaustion produces, but does not remove it.
+Dropping made exhaustion visible as packet loss;
+deferral makes it visible as latency, since a node's queue depth manifests
+as additional forwarding delay across the epoch boundary.
+A global passive adversary can therefore distinguish persistently congested forwarders
+from lightly loaded ones, which is a node-fingerprinting axis beyond the cover-rate perturbation
+discussed in [§10.3](#103-network-wide-cover-rate-correlation).
+The latency signal is the more legible of the two,
+because it persists for as long as the node stays congested.
+As with [§10.3](#103-network-wide-cover-rate-correlation) and
+[§10.4](#104-timing-separability-of-cover-and-non-cover-packets),
+the pre-scheduled emission timing enhancement ([§11.3](#113-pre-scheduled-emission-timing))
+addresses this by assigning outgoing packets to a fixed grid determined at epoch start,
+which decouples observable send times from queue state.
+Note that this is a property of the traffic a node emits;
+the queue-depth counter itself is separately restricted to in-memory use by
+[§9.5](#95-forwarded-packet-queueing).
 
 ## 11. Future Work
 
