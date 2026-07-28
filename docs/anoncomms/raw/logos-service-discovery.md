@@ -1691,7 +1691,7 @@ the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting ti
     The advertisement is now officially registered.
     2. If no, then there is still time to wait.
     In this case registrar does not store `ad` but instead issues a ticket.
-        1. set `reponse.status` to `wait`
+        1. set `response.status` to `wait`
         2. Update the ticket with the new remaining waiting time `t_wait_for`
         3. Update the ticket last modification time `t_mod`
         4. Sign the ticket again. The advertiser will retry later using this new ticket.
