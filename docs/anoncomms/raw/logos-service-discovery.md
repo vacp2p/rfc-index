@@ -1014,7 +1014,11 @@ procedure REGISTER(ad, ticket):
         t_remaining ← t_wait - (NOW() - ticket.t_init)
     end if
     if t_remaining ≤ 0:
-        ad_cache.add(ad)  # replaces any existing entry for (ad.peer_id, service_id)
+        if ad_cache.contains(ad.peer_id, ad.service_id_hash):
+            ad_cache.replace(ad)
+        else:
+            ad_cache.add(ad)
+        end if
         response.status ← Confirmed
     else:
         response.status ← Wait
@@ -1666,10 +1670,6 @@ Refer to the [Register Algorithm section](#example-register-algorithm) for the p
 1. Prepare a response ticket `response.ticket` linked to this `ad`.
 2. Calculate how long the advertiser should wait `t_wait` before being admitted.
 Refer to the [Waiting Time Calculation section](#waiting-time-calculation) for details.
-This is calculated the same way regardless of whether the advertiser
-already has an entry in the `ad_cache` for this `service_id`, and
-regardless of whether this `ad`'s content matches that entry -
-there is no separate duplicate or identical-advertisement path.
 3. Check if this is the first registration attempt (no ticket yet):
     1. If yes then it’s the first try. The advertiser must wait for the full waiting time `t_wait`.
     The ticket’s creation time `t_init` and last-modified time `t_mod` are both set to `NOW()`.
@@ -1682,17 +1682,12 @@ there is no separate duplicate or identical-advertisement path.
         by subtracting how long the advertiser has already waited
         (`NOW() - ticket.t_init`) from `t_wait`.
 4. Check if the remaining waiting time `t_remaining` is less than or equal to 0.
-This means  the waiting time is over.
+This means the waiting time is over.
 `t_remaining` can be 0 also when the registrar decides that
 the advertiser doesn’t have to wait for admission to the `ad_cache`(waiting time `t_wait` is 0).
     1. If yes, add the `ad` to `ad_cache` and confirm registration.
-    If an entry for this `peer_id` and `service_id` already exists, this
-    replaces it, regardless of whether the new `ad`'s content differs
-    from the existing entry's. Registrars SHOULD log a replacement where
-    the new `ad` is identical to the one it replaces - under normal
-    operation an advertiser does not resubmit an identical `ad` while its
-    previous entry for this `service_id` is still active, so this is
-    worth observing even though it is not rejected.
+    If an entry for this `peer_id` and `service_id` already exists,
+    this replaces it.
     The advertisement is now officially registered.
     2. If no, then there is still time to wait.
     In this case registrar does not store `ad` but instead issues a ticket.
