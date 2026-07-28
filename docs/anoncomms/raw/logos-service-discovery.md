@@ -544,15 +544,12 @@ Message {
 }
 ```
 
-Each `REGISTER` request registers an advertisement against exactly one
+Each `REGISTER` request MUST register an advertisement against exactly one
 `service_id_hash` - the request's `key` field - and the resulting
 `ad_cache` entry is scoped to that one service
 (see [Advertisement Cache](#advertisement-cache)).
 The advertisement's content MAY encode any further service information
 as required by the discovering application.
-Within the scope of the service discovery protocol, however,
-its association is strictly to the `service_id_hash` encoded in the `REGISTER` request.
-This `service_id_hash` MUST also be included in the signed encoded ad content.
 
 #### REGISTER Response
 
