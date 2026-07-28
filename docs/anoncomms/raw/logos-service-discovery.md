@@ -1226,7 +1226,7 @@ as long as they satisfy the requirements specified above.
 Apart from root, the IP tree is a 32-level binary tree where:
 
 - Each vertex stores `IP_counter`, a count of `ad_cache` entries whose
-IP passes through it - not a present/absent flag. It is initially set to 0.
+IP passes through it. It is initially set to 0.
 - Edges represent bits (0/1) in IPv4 binary representation
 - When an entry is admitted to the `ad_cache`, its IPv4 address
 increments the counters along its path once for that entry, using the
