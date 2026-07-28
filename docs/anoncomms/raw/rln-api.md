@@ -409,6 +409,9 @@ and SHALL NOT perform registry access on the verification path.
 The valid-root window is maintained asynchronously as the registry changes,
 and SHOULD be maintained timely enough
 that a proof generated against a newly published root is not falsely rejected.
+The window's length is a configuration parameter of the Module;
+validators of an application MUST use the same length,
+or a proof accepted at one node is rejected at another.
 
 ## Optional extensions
 
@@ -430,6 +433,13 @@ SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERM
 - **Slot reclamation** —
   returning a message-id allocation to the epoch's budget
   when a proof was generated but its message was never published.
+- **Proof staleness check** —
+  a lightweight check that a held proof would still pass
+  [`verify_proof`](#rate-limiting) —
+  its root still current, its epoch within tolerance —
+  without performing full verification,
+  so a consumer retrying a long-parked message can refresh its proof
+  before resending rather than after a rejection.
 - **Registry parameters read** —
   exposing the registry's `RegistryParameters`,
   e.g. `epoch_size_sec` for scheduling
