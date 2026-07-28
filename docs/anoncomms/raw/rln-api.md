@@ -150,11 +150,6 @@ typedef struct {
 typedef struct { const char* key; const char* value; } RegistryOption;
 typedef struct { const RegistryOption* ptr; size_t len; } RegistryOptions;
 
-typedef struct {
-    uint64_t epoch_size_sec;  // duration of one epoch in seconds
-    uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
-} RegistryParameters;
-
 // A consistent snapshot of one scope's rate-limit budget.
 typedef struct {
     uint64_t epoch_index;  // current epoch
@@ -293,7 +288,7 @@ In-flight requests SHALL be cancelled cleanly.
 Generate a new identity credential inside the Module,
 register a membership for it at the requested `rate_limit`,
 and persist the credential and membership (see [Persistence](#persistence)).
-A `rate_limit` above the registry's `max_rate_limit` SHALL fail as `RLN_ERR_PERMANENT`.
+A `rate_limit` outside the registry's accepted bounds SHALL fail as `RLN_ERR_PERMANENT`.
 Only the rate commitment derived from the credential is submitted to the registry;
 the credential itself never leaves the Module.
 `options` carries registry-specific registration choices —
@@ -420,8 +415,9 @@ and SHALL NOT perform registry access on the verification path.
 The valid-root window is maintained asynchronously as the registry changes,
 and SHOULD be maintained timely enough
 that a proof generated against a newly published root is not falsely rejected.
-The window's length and the maximum epoch gap
-are configuration parameters of the Module;
+The epoch size, the window's length, and the maximum epoch gap
+are configuration parameters of the Module —
+the registry does not enforce them;
 validators of an application MUST use the same values,
 or a proof accepted at one node is rejected at another.
 
@@ -453,10 +449,10 @@ SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERM
   so a consumer retrying a long-parked message can refresh its proof
   before resending rather than after a rejection.
 - **Registry parameters read** —
-  exposing the registry's `RegistryParameters`,
-  e.g. `epoch_size_sec` for scheduling
-  when the Module is not yet ready to serve
-  [`get_epoch_quota`](#rate-limiting).
+  exposing the registry-declared parameters that bound registration,
+  e.g. the accepted rate-limit range or an assumed epoch length;
+  a Module offering this read SHOULD reject
+  a configured epoch size that contradicts a declared one.
 - **Membership state subscriptions** —
   change notifications for the membership lifecycle,
   sparing the consumer polling [`get_membership_state`](#registration).
