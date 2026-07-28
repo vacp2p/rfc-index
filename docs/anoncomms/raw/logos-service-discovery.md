@@ -774,13 +774,7 @@ The advertiser MAY bootstrap `AdvT(service_id_hash)`
 from the `KadDHT(peerID)` routing table using the formula
 described in the [Distance section](#distance).
 
-Each registration is scoped to one `service_id_hash`
-(see [Advertisement](#advertisement)). The advertiser MAY construct a
-fresh, single-service advertisement per registration, as the
-[ADVERTISE algorithm](#example-advertise-algorithm) below illustrates,
-or reuse one advertisement covering multiple services
-across its registrations.
-
+Each registration is scoped to one `service_id_hash`.
 The advertiser SHOULD try to maintain up to `K_register`
 active registrations per bucket.
 It does so by selecting random registrars
@@ -953,19 +947,7 @@ Registrars MUST maintain a cache of advertisements, `ad_cache`,
 that associates each `advertisement`
 to its `service_id`,
 and an expiry timestamp based on admission time plus configured expiry time, `E`.
-Per [Advertisement](#advertisement), each `ad_cache` entry associates
-one advertisement with the single `service_id` it was registered for,
-admitted and expired independently of any entry for the advertiser's
-other advertisements.
-An advertiser MUST have at most one `ad_cache` entry per `service_id`
-at a given registrar. There is no separate refresh or keep-alive
-mechanism, and no special case based on whether a new advertisement's
-content matches the cached one: an advertiser that successfully passes
-admission control for a `service_id` it already has an entry for
-replaces that entry through the same process every other registration
-attempt goes through
-(see [Handling REGISTER requests](#handling-register-requests)).
-Once an `ad` has expired, it SHOULD be removed from the `ad_cache`
+Once an `ad` has expired, it SHOULD be removed from the `ad_cache`.
 
 ### Handling REGISTER requests
 
