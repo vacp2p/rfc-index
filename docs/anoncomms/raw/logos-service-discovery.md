@@ -723,8 +723,8 @@ Discard advertisements with invalid signatures or that don't advertise the reque
 > **Note:** The loop over `xpr.services` above is a signature-binding check,
 confirming the requested `service_id_hash`
 is among the services the advertiser signed.
-From the discovery protocol's perspective, an advertisement supports
-exactly the `service_id_hash` it was registered or queried against.
+An advertisement supports exactly the `service_id_hash`
+it was registered or queried against.
 Any other entries in `xpr.services` are opaque to registrars and
 discoverers - they are meaningful only to the application that
 ultimately receives the advertisement.
