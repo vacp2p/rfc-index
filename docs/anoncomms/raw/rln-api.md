@@ -5,7 +5,7 @@
 | Name | RLN Module API |
 | Status | raw |
 | Category | Standards Track |
-| Tags | rln, membership, spam-protection, application, api |
+| Tags | rln, membership, spam-protection, api |
 | Editor | Tanya Stubbs <tanya@status.im>, Arseniy Klempner <arseniyk@status.im> |
 
 ## Abstract
@@ -154,6 +154,13 @@ typedef struct {
     uint64_t epoch_size_sec;  // duration of one epoch in seconds
     uint64_t max_rate_limit;  // registry maximum; a Module MAY expose more parameters
 } RegistryParameters;
+
+// A consistent snapshot of one scope's rate-limit budget.
+typedef struct {
+    uint64_t epoch_index;  // current epoch
+    uint64_t rate_limit;   // messages the epoch grants the membership
+    uint64_t remaining;    // messages still unspent in this epoch
+} EpochQuota;
 
 ```
 
@@ -343,7 +350,7 @@ identity secrets held in memory are covered by the
 
 ## Rate limiting
 
-The rate-limiting portion is the proof functions.
+The rate-limiting portion is the proof functions and a quota read.
 All RLN state they need —
 the current epoch, message-id allocation within the rate limit,
 the membership's Merkle proof path, and the valid-root window —
@@ -355,6 +362,25 @@ so a consumer that only validates messages never registers.
 Detecting double-signalling across messages
 — recovering an identity secret from two proofs that share a nullifier within one epoch —
 is the consumer's responsibility and is out of scope of these functions.
+
+#### `EpochQuota get_epoch_quota(MembershipScope scope)`
+
+Return the scope's current epoch index,
+the membership's `rate_limit` for it,
+and the budget still unspent in it,
+for consumer-side send scheduling:
+rolling a metering window on the epoch boundary,
+parking traffic when the budget is spent,
+and releasing it when the epoch advances.
+All fields SHALL derive from one observation of the epoch:
+a `remaining` computed in one epoch MUST NOT be paired
+with the index of another,
+so a read taken across an epoch rollover reflects
+either the old epoch or the new one, never a mixture.
+The read is advisory:
+allocation happens in [`generate_proof`](#rate-limiting),
+which remains the authority and fails with `RLN_ERR_BUDGET_EXHAUSTED`
+when the budget is spent between a read and a proof.
 
 #### `RateLimitProof generate_proof(MembershipScope scope, Bytes signal)`
 
@@ -404,10 +430,11 @@ SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERM
 - **Slot reclamation** —
   returning a message-id allocation to the epoch's budget
   when a proof was generated but its message was never published.
-- **Quota and parameters read** —
-  exposing the registry's `RegistryParameters`
-  and the membership's remaining budget in the current epoch,
-  for consumer-side send scheduling.
+- **Registry parameters read** —
+  exposing the registry's `RegistryParameters`,
+  e.g. `epoch_size_sec` for scheduling
+  when the Module is not yet ready to serve
+  [`get_epoch_quota`](#rate-limiting).
 - **Membership state subscriptions** —
   change notifications for the membership lifecycle,
   sparing the consumer polling [`get_membership_state`](#registration).
