@@ -29,6 +29,7 @@
 | 1.1.0 | Removed `service_rewards` due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Extended the [Block Execution](#block-execution) logic with rewards distribution due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Removed **Block Samples** subsection of the [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) from the [Annex](#annex). Reordered the [Block Execution](#block-execution) steps to enable immediate use of reward notes as inputs for transactions included in the proposal. | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
+| 1.2.0 | Added the `uncles` field (a fixed-size array of up to `MAX_UNCLES` references) to the [Header](#header) due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). The size of the header increased to 425 bytes and the size of the proposal to 33257 bytes. | 2026-07-29 |
 
 # Introduction
 
@@ -68,13 +69,13 @@ We are using two hashing algorithms that have the same output length of 256 bits
 
 ## Block Proposal
 
-A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33129 bytes.
+A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33257 bytes.
 
 We define the following message structure:
 
 ```python
-class Proposal:                              # 33129 bytes
-    header: Header                           # 297 bytes
+class Proposal:                              # 33257 bytes
+    header: Header                           # 425 bytes
     references: References                   # 32768 bytes
     signature: Ed25519Signature              # 64 bytes
 ```
@@ -90,11 +91,12 @@ Where:
 ### Header
 
 ```python
-class Header:                                # 297 bytes
+class Header:                                # 425 bytes
     bedrock_version: byte                    # 1 byte
     parent_block: hash                       # 32 bytes
     slot: SlotNumber                         # 8 bytes
     block_root: hash                         # 32 bytes
+    uncles: array[hash, MAX_UNCLES]          # 128 bytes (MAX_UNCLES × 32), zero-padded
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 ```
 
@@ -104,6 +106,7 @@ Where:
 - `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `slot` is the consensus slot number; the size of the `SlotNumber` type is 8 bytes.
 - `block_root` is the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) used for constructing the `references` list in the `mempool_ransactions`; the size of the `hash` is 32 bytes.
+- `uncles` is a fixed-size array of `MAX_UNCLES` block IDs referencing uncles, which are valid fork blocks satisfying the rules defined in [Uncle References](cryptarchia-v1-protocol.md#uncle-references). The proposer chooses which uncles to reference according to [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection). Unused entries are set to the all-zero hash, which makes the size of the header independent of how many uncles are referenced. The uncles are used only for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) and are never executed; the size of each `hash` is 32 bytes, so the field is `MAX_UNCLES × 32` bytes.
 - `proof_of_leadership` is the proof confirming that the sender is the leader; defined below: [Proof of Leadership](#proof-of-leadership).
 
 ### References
@@ -157,6 +160,7 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
     - `parent_block`
     - `slot`
     - `block_root`
+    - `uncles`
     - `proof_of_leadership`:
       - `leader_voucher`
       - `entropy_contribution`
@@ -222,7 +226,7 @@ This section defines the procedure followed by a Logos Blockchain node to valida
 Given a `proposal`, a proposed block consisting of a `header` and `references`. This block proposal is considered valid if the following conditions are met:
 
 1. **Block Validation**
-  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation).
+  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), which include the validation of the `uncles` references according to [Uncle References](cryptarchia-v1-protocol.md#uncle-references).
 
 2. **Block Proposal Reconstruction**
   The `references` must refer to existing `mempool_transaction` entries that are retrievable from the node's local mempool.
@@ -241,6 +245,8 @@ Given a `ValidBlock` that has successfully passed proposal validation, the node 
 1. Append the `leader_voucher` contained in the block to the set of reward vouchers **when the following epoch starts**.
 2. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
 3. Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
+
+The `uncles` references are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference).
 
 # Annex
 

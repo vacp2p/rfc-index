@@ -28,6 +28,7 @@
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
+| 1.2.0 | Added uncle references: the `uncles` header field (up to `MAX_UNCLES` references), the uncle reference window $`w_u`$, the uncle validation rules, the proposer-side uncle selection procedure, and the counting of referenced uncles in the Total Stake Inference. | 2026-07-29 |
 
 # Introduction
 
@@ -95,6 +96,8 @@ Our design starts from the solid foundation provided by Ouroboros Crypsinous: Pr
 | *none* | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
 | MAX_BLOCK_TXS | max block transactions | The maximum number of transactions in a block | 1024 |
+| $`w_u`$ | uncle reference window | The maximum number of slots by which the slot of a referenced [uncle](#uncle-references) may precede the slot of the block referencing it. | 300 slots |
+| MAX_UNCLES | max uncle references | The maximum number of [uncles](#uncle-references) a block may reference. | 4 |
 
 ## Notation
 
@@ -182,7 +185,7 @@ The epoch nonce used in the next epoch is $`\eta_{B'}`$ where $`B'`$ is the last
 
 ### Total Stake Inference
 
-Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The details can be found in the following document:
+Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The inference counts the number of **occupied slots** of the honest chain — the slots holding a canonical block or one of the [uncle](#uncle-references) blocks it references. Therefore, lottery wins lost to forks still contribute to the estimate, and each slot is counted once however many blocks fall in it. The details can be found in the following document:
 
 [Total Stake Inference](cryptarchia-total-stake-inference.md)
 
@@ -216,9 +219,15 @@ $`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\te
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`(\_,\_,D^{ep-1}) \coloneqq \textbf{compute\_epoch\_state}(ep-1,tip)`$
 
-> The number of blocks produced during the first $`6\frac{k}{f}`$ slots of the previous epoch
+> The number of distinct occupied slots during the first $`6\frac{k}{f}`$ slots of the previous epoch: a slot counts if it holds a block of the chain of $`tip`$ and/or one or more [uncles](#uncle-references) referenced by that chain, and each slot is counted at most once. Referenced uncles are genuine lottery wins that were lost to forks; counting them gives a more accurate estimate of consensus participation.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`N_\text{BLOCKS}^{ep-1} \coloneqq |\{B \in T | sl_{ep - 1} \le sl_B \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor\}|`$
+&nbsp;&nbsp;&nbsp;&nbsp;$`W(sl) \coloneqq sl_{ep - 1} \le sl \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor`$
+
+&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{chain} \coloneqq \textbf{ancestors}(tip)`$
+
+&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{uncles} \coloneqq \{\textbf{fetch\_header}(u) : A \in \textbf{chain},\ u \in A.\text{uncles},\ u \neq \mathbf{0}\}`$
+
+&nbsp;&nbsp;&nbsp;&nbsp;$`N_\text{BLOCKS}^{ep-1} \coloneqq \left|\ \{sl_B : B \in \textbf{chain},\ W(sl_B)\}\ \cup\ \{sl_U : U \in \textbf{uncles},\ W(sl_U)\}\ \right|`$
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`D^{ep} \coloneqq \textbf{infer\_total\_active\_stake}(D^{ep-1}, N_\text{BLOCKS}^{ep-1})`$
 
@@ -260,6 +269,7 @@ def block_id(header: Header) -> hash
         header.parent_block,
         header.slot.to_bytes(8, byteorder='little'),
         header.block_root,
+        header.uncles.to_bytes(),            # MAX_UNCLES × 32 bytes, zero-padded (fixed-width)
         # PoL fields
         header.proof_of_leadership.leader_voucher,
         header.proof_of_leadership.entropy_contribution,
@@ -271,11 +281,12 @@ def block_id(header: Header) -> hash
 ### Block Header
 
 ```python
-class Header:                                # 297 bytes
+class Header:                                # 425 bytes
     bedrock_version: byte                    # 1 bytes
     parent_block: hash                       # 32 bytes
     slot: int                                # 8 bytes
     block_root: hash                         # 32 bytes
+    uncles: array[hash, MAX_UNCLES]          # 128 bytes (MAX_UNCLES × 32), zero-padded
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
@@ -288,6 +299,76 @@ class ProofOfLeadership:                     # 224 bytes
 ### Block
 
 [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md)
+
+### Uncle References
+
+A block may reference up to `MAX_UNCLES` **uncles** (see [Constants](#constants)). An uncle is a valid fork block that is not part of the chain of the referencing block but shares a common ancestor with it. The references are recorded in the `uncles` field of the [Block Header](#block-header), a fixed-size array of `MAX_UNCLES` entries. A block that references fewer than `MAX_UNCLES` uncles pads the remaining entries with the all-zero hash. The size of the field is fixed and independent of how many uncles are referenced. Therefore, the length of the header does not reveal how many uncles a block references, which preserves the indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md).
+
+The only purpose of an uncle reference is to feed the [Total Stake Inference](#total-stake-inference), which infers the total active stake from the number of **occupied slots** — the slots in which at least one leader won the lottery. A referenced uncle is a genuine lottery win, backed by a valid Proof of Leadership, that was lost to a fork (predominantly caused by network delays); its slot was occupied, but without the reference the canonical chain would not observe it. Counting the slots of the referenced uncles alongside those of the canonical blocks recovers those occupied slots and gives a more accurate estimate of the total active stake.
+
+At the moment a block is produced it is not yet known which branch of a fork will become canonical: some nodes build on one branch and some on the other. By referencing the blocks of the competing branches as uncles, whichever branch ultimately becomes canonical still counts the lottery wins of the branches that lost. This is the intent of uncle references — to let each branch count its counterpart branches — and it is what improves the total stake estimate.
+
+Each non-zero entry of the `uncles` field must satisfy all of the following rules, which are enforced by [Block Header Validation](#block-header-validation):
+
+- The referenced block must be part of the block tree $`T`$. Hence, the uncle is already validated, carries a valid Proof of Leadership, and is connected to the chain of the referencing block through a common ancestor. A block that is not part of $`T`$ must not be referenced, as its lineage cannot be traced and its Proof of Leadership cannot be verified.
+- The referenced block must not be part of the chain of the referencing block.
+- The slot of the referenced block must strictly precede the slot of the referencing block by at most $`w_u`$ slots (see [Constants](#constants)). Otherwise, the reference is invalid, and so is the block carrying it.
+
+Uncle references are **not** required to be unique, and validation does not reject repetitions — the same uncle may be referenced by more than one block on the canonical chain. This is harmless because the [Total Stake Inference](#total-stake-inference) counts **occupied slots**, not references: it forms the set of slots occupied by the canonical chain together with the slots of the uncles that chain references, and counts each slot once. A slot therefore contributes at most once to the estimate no matter how many blocks fall in it — the same uncle referenced several times, two distinct uncles that share a slot, and an uncle that shares its slot with a canonical block each add a single occupied slot, or none if that slot is already counted. This matches the slot lottery, which activates a slot with probability $`f`$ regardless of how many leaders win it.
+
+#### Uncle Selection
+
+When constructing a block $`B`$ at slot $`sl_B`$, the proposer fills the `uncles` field by selecting from the accepted fork blocks in its block tree $`T`$ that are still valid uncles for $`B`$ — the blocks of the competing branches that $`B`$'s own chain does not contain. Because the [Total Stake Inference](#total-stake-inference) counts occupied slots, the proposer builds the candidate set from only the uncles that would add a **new** occupied slot: it excludes any uncle whose slot is already occupied on the **chain that $`B`$ extends** (the ancestors of $`B`$) — whether that slot holds a canonical block or an uncle the chain already references — since referencing it would waste one of the $`\texttt{MAX\_UNCLES}`$ entries without changing the count. These exclusions are a best-effort, non-verifiable heuristic; validation does not enforce them.
+
+An uncle is **not** excluded because some *other* branch referenced it, nor because its slot is occupied on some other branch. The Total Stake Inference counts only the slots occupied by the canonical chain, and at production time it is unknown which branch will become canonical. If a competing branch referenced an uncle but that branch is later discarded, its reference does not count; $`B`$ must therefore remain free to reference the same uncle, so that its lottery win is still counted should $`B`$'s branch win.
+
+```python
+def uncle_candidates(B) -> Set[Block]:
+    # Slots already occupied on the chain B extends: the slots of B's ancestors (canonical
+    # blocks) and the slots of the uncles those ancestors already reference. The Total Stake
+    # Inference counts occupied slots, so an uncle whose slot is already occupied adds nothing —
+    # referencing it would waste an entry. Slots occupied on *other* branches are deliberately
+    # not excluded: they do not count unless that branch becomes canonical.
+    referenced_uncles = { fetch_header(u) for A in ancestors(B) for u in A.uncles if u != 0 }
+    occupied = { sl_A for A in ancestors(B) } | { sl_U for U in referenced_uncles }
+
+    # Accepted fork blocks that would add a new occupied slot for B (see Uncle References).
+    return { U for U in T if
+               not is_ancestor(U, B)              # a fork, not on B's chain
+               and 0 < sl_B - sl_U <= w_u         # within the uncle window
+               and sl_U not in occupied           # its slot is not already occupied on B's chain
+           }
+```
+
+The proposer then selects at most $`\texttt{MAX\_UNCLES}`$ of these candidates by deterministically taking the oldest ones first, because an uncle can only be referenced within $`w_u`$ slots of its own slot, so the oldest candidates are the closest to expiring:
+
+```python
+def select_uncles_oldest(B) -> array[hash, MAX_UNCLES]:   # exactly MAX_UNCLES entries, zero-padded
+    ordered = sorted(uncle_candidates(B), key=lambda U: (sl_U, block_id(U)))
+    selected, slots = [], set()
+    for U in ordered:
+        if len(selected) == MAX_UNCLES:
+            break
+        if sl_U in slots:              # at most one uncle per slot: a second adds no occupied slot
+            continue
+        slots.add(sl_U)
+        selected.append(block_id(U))
+    return selected + [bytes(32)] * (MAX_UNCLES - len(selected))
+```
+
+This deterministic rule is simple and, without communication between proposers, robust. Two non-communicating proposers with the same candidate set produce the same selection, but they also tend to produce **competing blocks** that extend the same tip, of which only one becomes part of the canonical chain — the [Fork Choice Rule](fork-choice.md) discards the rest. The identical uncle references on the discarded competitors therefore cost nothing, and along a single canonical chain, excluding the slots already occupied on a block's own chain keeps successive blocks from re-counting a slot.
+
+Uncle selection is a proposer-local procedure and is not consensus-critical: validators do not re-check how the uncles were selected — only that each referenced uncle satisfies the rules above (see [Block Header Validation](#block-header-validation)). Because uncle references carry no fork-choice weight and grant no reward, a proposer has no incentive to deviate, and any deviation only affects the accuracy of the [Total Stake Inference](#total-stake-inference).
+
+A referenced uncle never becomes part of the chain:
+
+- The transactions of the uncle are not executed and have no effect on the ledger state (see [Block Execution](bedrock-v1.1-block-construction.md#block-execution)).
+- The uncle carries no weight in the [Fork Choice Rule](fork-choice.md).
+- The uncle grants no block reward.
+
+The only effect of a valid uncle reference is its contribution to the [Total Stake Inference](#total-stake-inference).
+
+> **Note:** The uncle reference window $`w_u`$ (300 slots) and the maximum number of uncle references per block `MAX_UNCLES` (4) are the chosen values. Forks are predominantly caused by network delays and resolve within a few slots, so a 300-slot window comfortably captures the forks worth referencing while keeping the state a node must retain to validate uncles small. A larger window would gain little: it cannot usefully exceed $`s`$ slots, the horizon beyond which forks that diverged deeper than the latest immutable block are pruned from the block tree (see [Fork Pruning](#fork-pruning)) and can no longer be part of $`T`$.
 
 ### Block Header Validation
 
@@ -334,6 +415,20 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
   - $`\textbf{verify\_PoL}(T, parent,sl,P_\text{LEAD}, \pi_\text{PoL})=True`$
   - $`\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True`$
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
+
+10. Validate the uncle references according to the rules defined in [Uncle References](#uncle-references):
+  The header carries a fixed-size array $`header.\text{uncles}`$ of $`\texttt{MAX\_UNCLES}`$ entries. For each entry $`u \in header.\text{uncles}`$, if $`u = \mathbf{0}`$ (the all-zero hash), then that entry references no uncle and imposes no constraint. Otherwise, given $`U \coloneqq \textbf{fetch\_header}(u)`$, all of the following must hold:
+
+  - $`u \in T`$
+    Ensure the uncle has already been accepted into the block tree. Hence, it is validated, carries a valid Proof of Leadership, and is connected to the chain of $`B`$ through a common ancestor.
+
+  - $`\lnot\,\textbf{is\_ancestor}(U, B)`$
+    Ensure the uncle is not part of the chain that $`B`$ extends.
+
+  - $`0 \lt header.\text{slot} - U.\text{slot} \le w_u`$
+    Ensure the slot of the uncle strictly precedes the slot of $`B`$ by at most $`w_u`$ slots.
+
+  These three rules are the only consensus constraints on the `uncles` field. The slot-occupancy exclusions applied during [Uncle Selection](#uncle-selection) are **not** re-checked here: references need not be unique, two entries may share a slot, and an entry may name a slot already occupied on $`B`$'s own chain. Such redundancy is harmless because the [Total Stake Inference](#total-stake-inference) counts **occupied slots**, not references — a repeated uncle, two uncles that share a slot, or an uncle that shares a canonical block's slot each add a single occupied slot, or none if that slot is already counted.
 
 ### Chain Maintenance
 
