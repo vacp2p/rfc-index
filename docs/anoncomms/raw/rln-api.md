@@ -297,12 +297,18 @@ for example, selecting delegated registration through the
 rather than direct registration from a funded account.
 
 `register` is idempotent for a scope:
-if the scope already has a membership that is not `FAILED`,
+if the scope already has a membership that is `PENDING`, `ACTIVE`,
+or in its `GRACE_PERIOD`,
 the function SHALL return that membership
 rather than generate a second credential or double-register,
 and its `rate_limit` MAY differ from the requested value.
-Re-registering a `FAILED` membership is therefore safe.
-Holding more than one membership for a scope is an
+A membership in a terminal state — `FAILED`, `EXPIRED`,
+`ERASED_AWAITS_WITHDRAWAL`, or `ERASED` —
+does not block registration:
+the function SHALL register a fresh membership for the scope,
+and a prior recoverable deposit remains claimable through
+[withdrawal](#optional-extensions).
+Holding more than one live membership for a scope is an
 [optional extension](#optional-extensions).
 
 Registration is not instantaneous — on some registries confirmation takes minutes —
