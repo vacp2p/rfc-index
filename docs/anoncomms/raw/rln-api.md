@@ -111,7 +111,8 @@ It exposes two portions:
 - **Rate limiting** — proof generation and verification
   over state the Module maintains itself:
   the current epoch, message-id allocation,
-  the membership's Merkle proof path, and the valid-root window.
+  the membership's Merkle proof path, the valid-root window,
+  and the nullifier log for double-signalling detection.
 
 The consumer supplies only scopes, signals, and proofs.
 Registry access and payment — the latter via an accounts module beneath the Module —
@@ -244,6 +245,20 @@ typedef struct {
                                      // secret, external_nullifier, message_id)
 } RateLimitProof;
 
+typedef enum {
+    PROOF_VALID,                // all verification conditions hold
+    PROOF_INVALID,              // a verification condition fails
+    PROOF_DUPLICATE,            // exact replay of an already-verified proof
+    PROOF_RATE_LIMIT_VIOLATION  // nullifier reuse with a different signal
+} ProofVerdict;
+
+typedef struct {
+    ProofVerdict verdict;
+    uint8_t      recovered_secret[32];  // the double-signaller's identity secret,
+                                        // reconstructed from the colliding shares;
+                                        // set only on PROOF_RATE_LIMIT_VIOLATION
+} VerificationResult;
+
 ```
 
 A `RateLimitProof` is opaque to the consumer,
@@ -253,6 +268,12 @@ its fields follow [RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html).
 Two proofs that share an external nullifier and message id
 expose `share_x`/`share_y` pairs that reconstruct the identity secret —
 the mechanism the rate limit rests on.
+`verify_proof` performs that reconstruction when it detects the collision
+and reports the secret in its result.
+The `recovered_secret` is the violator's,
+revealed by their own double-signalling —
+not a credential of the Module's,
+which never crosses this interface.
 
 ## Required functions
 
@@ -364,15 +385,21 @@ identity secrets held in memory are covered by the
 The rate-limiting portion is the proof functions and a quota read.
 All RLN state they need —
 the current epoch, message-id allocation within the rate limit,
-the membership's Merkle proof path, and the valid-root window —
+the membership's Merkle proof path, the valid-root window,
+and the nullifier log for double-signalling detection —
 is maintained inside the Module;
 the consumer supplies only the scope and the signal.
 A membership is required only to generate proofs:
 verification runs against the registry view alone,
 so a consumer that only validates messages never registers.
-Detecting double-signalling across messages
-— recovering an identity secret from two proofs that share a nullifier within one epoch —
-is the consumer's responsibility and is out of scope of these functions.
+Detecting double-signalling across messages —
+two proofs sharing a nullifier within one epoch —
+is the Module's responsibility:
+it keeps a log of the nullifiers it has verified,
+recovers the identity secret two colliding proofs reveal,
+and reports it in the verification result.
+What to do with the evidence — slashing, banning, or nothing —
+is the application's decision.
 
 #### `EpochQuota get_epoch_quota(MembershipScope scope)`
 
@@ -409,10 +436,10 @@ allocation resets at the next epoch.
 The membership MUST be usable — `ACTIVE` or `GRACE_PERIOD` —
 for proof generation to succeed.
 
-#### `bool verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
+#### `VerificationResult verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
 
 Verify an RLN proof for `signal`.
-The following MUST hold for the Module to return `true`:
+The following MUST hold for the verdict to be `PROOF_VALID`:
 
 - the proof is valid;
 - `proof.root` is within the Module's current valid-root window;
@@ -423,6 +450,19 @@ The following MUST hold for the Module to return `true`:
 - `proof.share_x` matches `hash_to_field_le(signal)`,
   recomputed by the Module from the supplied `signal`,
   so the proof is bound to this signal and cannot be replayed onto another message.
+
+A proof that fails any of these is `PROOF_INVALID`.
+A proof that passes them
+but whose `nullifier` is already in the epoch's log
+is judged by its `share_x` against the recorded one:
+the same value is a retransmission of a message already verified,
+reported `PROOF_DUPLICATE`;
+a different value is double-signalling,
+and the Module SHALL reconstruct the identity secret from the two shares
+and report `PROOF_RATE_LIMIT_VIOLATION` with `recovered_secret` set.
+The nullifier log is verification state local to the Module,
+retained per epoch for at least the maximum epoch gap
+within which proofs are accepted.
 Verification is on the message hot path —
 it runs for every message a validator receives —
 so the Module SHALL serve it from its locally maintained registry state
@@ -451,7 +491,8 @@ SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERM
   exporting a persisted membership (see [Persistence](#persistence))
   per [RLN-KEYSTORE](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/application/raw/rln-keystore.md),
   making credential files portable across implementations.
-  Export is the only operation through which a credential crosses this interface;
+  Export is the only operation through which one of the Module's own credentials
+  crosses this interface;
   a consumer that invokes it takes custody of the identity secrets.
 - **Slot reclamation** —
   returning a message-id allocation to the epoch's budget
