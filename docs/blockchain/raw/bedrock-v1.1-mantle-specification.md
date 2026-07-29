@@ -967,10 +967,10 @@ class Locator(str):
 
 class MinStake:
     stake_threshold: int # stake value
-    epoch: EpochNumber # epoch number
+    epoch: EpochNumber # epoch number (4 bytes)
 
 class ServiceParameters:
-    inactivity_period: NumberOfEpochs # number of epochs
+    inactivity_period: NumberOfEpochs # number of epochs (4 bytes)
     epoch: EpochNumber                # epoch number at which the Service Parameters were set
 
 class DeclarationInfo:
