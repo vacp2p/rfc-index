@@ -254,6 +254,8 @@ The Epoch State Root commits **two SDP registries**:
 
   Note that the snapshot taken at the *start of the current epoch* is **not** committed separately: because the Epoch Boundary Settlement runs before executing the first block's transactions, the mutable `declarations` registry at that point still equals the state as of the last block of the previous epoch: so that snapshot would be identical to `declarations`. The snapshot that is genuinely needed is the one from a whole epoch earlier, which is the provider set the activity proofs settled this epoch were produced against.
 
+A field that is not set (`active` and `withdraw_at` in a `DeclarationInfo`, which are both optional) is encoded as zeros, over the number of bytes its value would occupy.
+
 ```python
 def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
     h = Hasher()
@@ -290,9 +292,9 @@ def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h.update(declaration.provider_id.compressed())
     h.update(declaration.zk_id)
     h.update(declaration.locked_note_id)
-    h.update(declaration.created.to_bytes(8, byteorder='little'))
-    h.update(declaration.active.to_bytes(8, byteorder='little'))
-    h.update(declaration.withdraw_at.to_bytes(8, byteorder='little'))
+    h.update(declaration.created.to_bytes(4, byteorder='little'))
+    h.update((declaration.active or 0).to_bytes(4, byteorder='little'))
+    h.update((declaration.withdraw_at or 0).to_bytes(4, byteorder='little'))
     h.update(declaration.nonce.to_bytes(8, byteorder='little'))
     return h.digest()
 
@@ -329,7 +331,7 @@ def get_epoch_state_root(state) -> hash:
     h.update(declarations_root(state.declarations))          # mutable SDP registry
     h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, as of last block of two epochs before
     h.update(state.min_stake.stake_threshold.to_bytes(8, byteorder='little'))  # current minimum stake
-    h.update(state.inactivity_period.to_bytes(8, byteorder='little'))          # current inactivity period
+    h.update(state.inactivity_period.to_bytes(4, byteorder='little'))          # current inactivity period
     h.update(state.voucher_root)                                               # reward voucher tree
     h.update(voucher_nullifiers_root(state.voucher_nullifier_set))
     h.update(state.leaders_rewards.to_bytes(8, byteorder='little'))            # TokenValue
