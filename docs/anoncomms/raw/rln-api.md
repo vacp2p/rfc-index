@@ -27,13 +27,14 @@ so one Module serves multiple memberships, registries and applications concurren
 [RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html) requires a user
 to register an identity commitment in a membership set
 before participating in rate-limited anonymous signalling.
-Existing specifications assume that set is a smart contract
-on an EVM-compatible blockchain:
+At the time of writing, existing specifications assume that set
+is a smart contract on an EVM-compatible blockchain —
+the links below are pinned to the versions this refers to:
 [WAKU2-RLN-CONTRACT](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/core/raw/rln-contract.md)
 specifies the contract,
-[MESSAGING-API](../../messaging/application/raw/messaging-api.md) configures validation
+[MESSAGING-API](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/application/raw/messaging-api.md) configures validation
 through an EVM-specific `RlnConfig`,
-and [RLN-KEYSTORE](../../messaging/application/raw/rln-keystore.md) identifies a registry
+and [RLN-KEYSTORE](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/application/raw/rln-keystore.md) identifies a registry
 by chain id and contract address.
 Registries now exist, and will continue to appear,
 in other execution environments.
@@ -443,7 +444,7 @@ SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERM
   and MUST NOT choose silently among candidates.
 - **Credential export** —
   exporting a persisted membership (see [Persistence](#persistence))
-  per [RLN-KEYSTORE](../../messaging/application/raw/rln-keystore.md),
+  per [RLN-KEYSTORE](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/application/raw/rln-keystore.md),
   making credential files portable across implementations.
   Export is the only operation through which a credential crosses this interface;
   a consumer that invokes it takes custody of the identity secrets.
@@ -551,8 +552,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ## References
 
-- [MESSAGING-API](../../messaging/application/raw/messaging-api.md)
-- [RLN-KEYSTORE](../../messaging/application/raw/rln-keystore.md)
+- [MESSAGING-API](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/application/raw/messaging-api.md)
+- [RLN-KEYSTORE](https://github.com/logos-co/logos-lips/blob/6ebd9c86bba66090b277fa49d6f08182debf1247/docs/messaging/application/raw/rln-keystore.md)
 - [RLN](https://lip.logos.co/anoncomms/raw/rln-v2.html)
 - [32/RLN-V1](https://github.com/logos-co/logos-lips/blob/master/docs/anoncomms/draft/32/rln-v1.md)
 - [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html)
