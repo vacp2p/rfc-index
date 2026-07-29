@@ -285,9 +285,14 @@ In-flight requests SHALL be cancelled cleanly.
 #### `Membership register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
 
 Generate a new identity credential inside the Module,
-register a membership for it at the requested `rate_limit`,
+attempt to register a membership for it at the requested `rate_limit`,
 and persist the credential and membership (see [Persistence](#persistence)).
 A `rate_limit` outside the registry's accepted bounds SHALL fail as `RLN_ERR_PERMANENT`.
+The `rate_limit` is a request, not a guarantee:
+a registry — notably under delegated registration —
+MAY grant a different value,
+which the membership reports once `ACTIVE`
+(its `rate_limit` is provisional while `PENDING`).
 Only the rate commitment derived from the credential is submitted to the registry;
 the credential itself never leaves the Module.
 `options` carries registry-specific registration choices —
