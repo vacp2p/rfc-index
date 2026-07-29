@@ -250,9 +250,9 @@ Every root above can be maintained incrementally, block by block, alongside the 
 The Epoch State Root commits **two SDP registries**:
 
 - The **mutable SDP registry** (`declarations`): declarations are inserted, activated, and removed as blocks are processed. It is the registry consulted when validating `SDP_DECLARE`, `SDP_WITHDRAW`, and `SDP_ACTIVE` operations, and it is what the chain needs in order to keep extending.
-- The **immutable SDP snapshot** (`declarations_snapshot`): the SDP registry as of the last block of the epoch **two epochs before** the current one (i.e. frozen at the start of the *previous* epoch), held unchanged for the whole epoch. It is the registry against which per-service settlement is performed at the [Epoch Boundary Settlement](#epoch-boundary-settlement): validating the *activity proofs* carried by `SDP_ACTIVE` operations, and paying those rewards to each provider's `zk_id`.
+- The **immutable SDP snapshot** (`declarations_snapshot`): the declarations of the SDP registry that are **active** (as defined in [Active](bedrock-service-declaration-protocol.md#active)) as of the last block of the epoch **two epochs before** the current one (i.e. frozen at the start of the *previous* epoch), held unchanged for the whole epoch. It is the set against which per-service settlement is performed at the [Epoch Boundary Settlement](#epoch-boundary-settlement): validating the *activity proofs* carried by `SDP_ACTIVE` operations, and paying those rewards to each provider's `zk_id`. The declarations it holds keep the position they occupy in the registry, the inactive ones being reset to the empty leaf like any other removal, so the snapshot commits the set the services actually read: a node that applies a different activity rule, or different [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters), computes a different root instead of silently disagreeing on the provider set.
 
-  Note that the snapshot taken at the *start of the current epoch* is **not** committed separately: because the Epoch Boundary Settlement runs before executing the first block's transactions, the mutable `declarations` registry at that point still equals the state as of the last block of the previous epoch: so that snapshot would be identical to `declarations`. The snapshot that is genuinely needed is the one from a whole epoch earlier, which is the provider set the activity proofs settled this epoch were produced against.
+  Note that the snapshot taken at the *start of the current epoch* is **not** committed separately: because the Epoch Boundary Settlement runs before executing the first block's transactions, the mutable `declarations` registry at that point still holds the state as of the last block of the previous epoch, so that snapshot is derivable from `declarations` by applying the activity rule. The snapshot that is genuinely needed is the one from a whole epoch earlier, which is the provider set the activity proofs settled this epoch were produced against.
 
 A field that is not set (`active` and `withdraw_at` in a `DeclarationInfo`, which are both optional) is encoded as zeros, over the number of bytes its value would occupy.
 
@@ -329,7 +329,7 @@ def get_epoch_state_root(state) -> hash:
     h.update(channel_notes_root(state.channel_notes))        # channel-owned notes and their owning channel
     h.update(locked_notes_root(state.locked_notes))
     h.update(declarations_root(state.declarations))          # mutable SDP registry
-    h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, as of last block of two epochs before
+    h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, active declarations as of last block of two epochs before
     h.update(state.min_stake.stake_threshold.to_bytes(8, byteorder='little'))  # current minimum stake
     h.update(state.inactivity_period.to_bytes(4, byteorder='little'))          # current inactivity period
     h.update(state.voucher_root)                                               # reward voucher tree
