@@ -99,8 +99,7 @@ The namespace binding for `logos` registries is given in
 
 An instance of the Module serves the registries selected by its configuration;
 every call names the registry and application context it operates on
-through a `MembershipScope`,
-with a default scope configured at start.
+through a `MembershipScope`.
 It exposes two portions:
 
 - **Membership management** — registration and membership state:
@@ -137,7 +136,7 @@ typedef enum {
 } RlnErrorKind;
 
 // Everything a call operates on: the registry and the application context.
-// A default scope is set at start(); every function accepts an explicit scope.
+// Every call passes its scope explicitly; the Module holds no default.
 typedef struct {
     const char* registry_id;         // CAIP-10 account identifier, canonicalized,
                                      // e.g. "eip155:59144:0xb9cd..."
@@ -266,8 +265,7 @@ rather than be served from a cold registry view.
 #### `start()`
 
 Start the Module with its configuration,
-which selects the registries the instance serves
-and a default `MembershipScope` for calls that do not pass one explicitly.
+which selects the registries the instance serves.
 Starting establishes the registry connections,
 loads persisted memberships (see [Persistence](#persistence)),
 and starts the tasks that maintain the Module's local registry view:
