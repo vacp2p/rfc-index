@@ -406,12 +406,17 @@ for proof generation to succeed.
 #### `bool verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
 
 Verify an RLN proof for `signal`.
-Returns `true` only if the proof is valid,
-`proof.root` is within the Module's current valid-root window,
-`proof.epoch` is within a configured maximum gap of the Module's current epoch —
-so a newly registered member cannot publish into past epochs —
-and `proof.external_nullifier` matches the value recomputed from
-`proof.epoch` and the scope's `rln_identifier`.
+The following MUST hold for the Module to return `true`:
+
+- the proof is valid;
+- `proof.root` is within the Module's current valid-root window;
+- `proof.epoch` is within a configured maximum gap of the Module's current epoch,
+  so a newly registered member cannot publish into past epochs;
+- `proof.external_nullifier` matches the value recomputed from
+  `proof.epoch` and the scope's `rln_identifier`;
+- `proof.share_x` matches `hash_to_field_le(signal)`,
+  recomputed by the Module from the supplied `signal`,
+  so the proof is bound to this signal and cannot be replayed onto another message.
 Verification is on the message hot path —
 it runs for every message a validator receives —
 so the Module SHALL serve it from its locally maintained registry state
