@@ -20,7 +20,7 @@ Registries are identified by
 [CAIP-10](https://standards.chainagnostic.org/CAIPs/caip-10) account identifiers
 and applications by their `rln_identifier`;
 together they scope every call,
-so one Module serves multiple registries and applications concurrently.
+so one Module serves multiple memberships, registries and applications concurrently.
 
 ## Motivation
 
@@ -270,7 +270,7 @@ Starting establishes the registry connections,
 loads persisted memberships (see [Persistence](#persistence)),
 and starts the tasks that maintain the Module's local registry view:
 the valid-root window, each membership's Merkle proof path, and each membership's state.
-A membership is not required to start:
+The module doesn't require a membership to start:
 a Module started without one serves [`verify_proof`](#rate-limiting)
 from its registry view alone.
 
