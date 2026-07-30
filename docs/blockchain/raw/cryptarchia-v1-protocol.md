@@ -256,6 +256,8 @@ The Epoch State Root commits **two SDP registries**:
 
 A field that is not set (`active` and `withdraw_at` in a `DeclarationInfo`, which are both optional) is encoded as zeros, over the number of bytes its value would occupy.
 
+A field whose byte length can vary is committed together with that length, and a list of such fields together with its element count, at the widths the [Mantle Transaction Encoding](mantle-transaction-encoding.md) gives them. Without it the preimage does not determine the value it was built from: the byte form of a multiaddr is self-describing, so concatenating the `locators` of a `DeclarationInfo` without their lengths gives `[A/B]` and `[A, B]` the same leaf.
+
 ```python
 def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
     h = Hasher()
@@ -285,10 +287,13 @@ def channel_notes_root(channel_notes: dict[NoteId, ChannelId]) -> hash:
 
 def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h = Hasher()
-    h.update(b"DECLARATION_INFO_HASH_V1")
+    h.update(b"DECLARATION_INFO_HASH_V2")
     h.update(declaration.service.to_byte())
+    h.update(len(declaration.locators).to_bytes(1, byteorder='little'))
     for locator in declaration.locators:
-        h.update(locator.to_byte())
+        locator_bytes = locator.to_byte()
+        h.update(len(locator_bytes).to_bytes(2, byteorder='little'))
+        h.update(locator_bytes)
     h.update(declaration.provider_id.compressed())
     h.update(declaration.zk_id)
     h.update(declaration.locked_note_id)
