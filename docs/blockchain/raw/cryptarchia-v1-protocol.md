@@ -287,7 +287,7 @@ def channel_notes_root(channel_notes: dict[NoteId, ChannelId]) -> hash:
 
 def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
     h = Hasher()
-    h.update(b"DECLARATION_INFO_HASH_V2")
+    h.update(b"DECLARATION_INFO_HASH_V1")
     h.update(declaration.service.to_byte())
     h.update(len(declaration.locators).to_bytes(1, byteorder='little'))
     for locator in declaration.locators:
