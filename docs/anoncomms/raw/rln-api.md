@@ -158,8 +158,11 @@ typedef struct {
                                      // the external nullifier
 } MembershipScope;
 
-// Open registration options; recognized keys are registry-specific,
-// e.g. selecting delegated registration through an allocation service.
+// Open registration options. The common key "rate_limit" carries the
+// requested per-epoch rate limit as a decimal string; omitted, the
+// registry applies its default. All other recognized keys are
+// registry-specific, e.g. selecting delegated registration through
+// an allocation service.
 typedef struct { const char* key; const char* value; } RegistryOption;
 typedef struct { const RegistryOption* ptr; size_t len; } RegistryOptions;
 
@@ -318,20 +321,24 @@ In-flight requests SHALL be cancelled cleanly.
 
 ### Registration
 
-#### `Result<MembershipState> register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
+#### `Result<MembershipState> register(MembershipScope scope, RegistryOptions options)`
 
 Generate a new identity credential inside the Module,
-attempt to register a membership for it at the requested `rate_limit`,
+attempt to register a membership for it,
 and persist the credential and membership (see [Persistence](#persistence)).
-A `rate_limit` outside the registry's accepted bounds SHALL fail as `RLN_ERR_PERMANENT`.
-The `rate_limit` is a request, not a guarantee:
-a registry — notably under delegated registration —
-MAY grant a different value,
+The membership's rate limit is requested through the common option key
+`rate_limit`:
+absent, the registry, or the allocation service under delegated registration,
+applies its default;
+present, it is a request, not a guarantee:
+a registry MAY grant a different value,
 which the membership reports once `ACTIVE`
 (its `rate_limit` is provisional while `PENDING`).
+A requested `rate_limit` outside the registry's accepted bounds
+SHALL fail as `RLN_ERR_PERMANENT`.
 Only the rate commitment derived from the credential is submitted to the registry;
 the credential itself never leaves the Module.
-`options` carries registry-specific registration choices —
+The remaining `options` keys carry registry-specific registration choices —
 for example, selecting delegated registration through the
 [RLN Membership Allocation Protocol](https://lip.logos.co/anoncomms/raw/rln-membership-service.html)
 rather than direct registration from a funded account.
@@ -341,7 +348,7 @@ if the scope already has a membership that is `PENDING`, `ACTIVE`,
 or in its `GRACE_PERIOD`,
 the function SHALL return that membership
 rather than generate a second credential or double-register,
-and its `rate_limit` MAY differ from the requested value.
+and its `rate_limit` MAY differ from any requested value.
 A membership in a terminal state — `FAILED`, `EXPIRED`,
 `ERASED_AWAITS_WITHDRAWAL`, or `ERASED` —
 does not block registration:
@@ -560,7 +567,7 @@ splits allocation across uncoordinated allocators.
 A consumer that shares a credential this way
 MUST coordinate `message_id` allocation across the holders,
 the RECOMMENDED mechanism being static partitioning of the
-`[1, rate_limit]` range;
+`[0, rate_limit)` range;
 otherwise a credential MUST be used by one Module at a time.
 
 ### Credential reuse across applications
