@@ -265,6 +265,7 @@ def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
     h = Hasher()
     h.update(b"CHANNEL_HASH_V1")
     h.update(channel_id)
+    h.update(len(channel.accredited_keys).to_bytes(2, byteorder='little'))
     for key in channel.accredited_keys:
         h.update(key.compressed())
     h.update(channel.configuration_threshold.to_bytes(2, byteorder='little'))
@@ -314,6 +315,7 @@ def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> has
 def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
     h = Hasher()
     h.update(b"LOCKED_NOTE_HASH_V1")
+    h.update(len(locked_note.declarations).to_bytes(1, byteorder='little'))
     for declaration_id in locked_note.declarations:
         h.update(declaration_id)
     return h.digest()
