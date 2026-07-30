@@ -39,6 +39,7 @@ pipeline {
           script {
             nix.develop("""
               ghp-import \
+                -o \
                 -b ${deployBranch()} \
                 -c ${deployDomain()} \
                 -p book
