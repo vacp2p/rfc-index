@@ -154,7 +154,8 @@ typedef struct { const RegistryOption* ptr; size_t len; } RegistryOptions;
 // A consistent snapshot of one scope's rate-limit budget.
 typedef struct {
     uint64_t epoch_index;  // current epoch
-    uint64_t rate_limit;   // messages the epoch grants the membership
+    uint64_t rate_limit;   // messages the epoch grants the membership;
+                           // zero when the scope has no usable membership
     uint64_t remaining;    // messages still unspent in this epoch
 } EpochQuota;
 
@@ -165,7 +166,7 @@ typedef struct {
 ```c
 
 typedef enum {
-    MEMBERSHIP_UNKNOWN,                   // not present in the registry
+    MEMBERSHIP_UNKNOWN,                   // no membership known for the scope
     MEMBERSHIP_PENDING,                   // submitted, not yet confirmed by the registry
     MEMBERSHIP_FAILED,                    // observed absent after the confirmation window
     MEMBERSHIP_ACTIVE,                    // confirmed and within its validity period
@@ -215,8 +216,8 @@ an `ACTIVE` membership can disappear at any time.
 A registry that erases all record of a membership on removal
 makes `ERASED` indistinguishable from never-registered in a raw read,
 so the Module infers erasure from its own records.
-A consumer MUST stop generating proofs
-once a membership is reported `ERASED` or `UNKNOWN`.
+A membership reported `ERASED` or `UNKNOWN` no longer backs proof generation:
+[`generate_proof`](#rate-limiting) requires a usable membership.
 
 The `membership_hash` is derived deterministically from
 the canonical `registry_id` and the credential's identity commitment,
@@ -248,7 +249,7 @@ typedef struct {
 typedef enum {
     PROOF_VALID,                // all verification conditions hold
     PROOF_INVALID,              // a verification condition fails
-    PROOF_DUPLICATE,            // exact replay of an already-verified proof
+    PROOF_DUPLICATE,            // a proof for a signal already verified
     PROOF_RATE_LIMIT_VIOLATION  // nullifier reuse with a different signal
 } ProofVerdict;
 
@@ -292,7 +293,7 @@ Starting establishes the registry connections,
 loads persisted memberships (see [Persistence](#persistence)),
 and starts the tasks that maintain the Module's local registry view:
 the valid-root window, each membership's Merkle proof path, and each membership's state.
-The module doesn't require a membership to start:
+The Module does not require a membership to start:
 a Module started without one serves [`verify_proof`](#rate-limiting)
 from its registry view alone.
 
@@ -303,7 +304,7 @@ In-flight requests SHALL be cancelled cleanly.
 
 ### Registration
 
-#### `Membership register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
+#### `MembershipState register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
 
 Generate a new identity credential inside the Module,
 attempt to register a membership for it at the requested `rate_limit`,
@@ -380,7 +381,7 @@ A keystore format portable across implementations is an
 identity secrets held in memory are covered by the
 [security considerations](#security-and-privacy-considerations).
 
-## Rate limiting
+### Rate limiting
 
 The rate-limiting portion is the proof functions and a quota read.
 All RLN state they need —
@@ -395,11 +396,9 @@ so a consumer that only validates messages never registers.
 Detecting double-signalling across messages —
 two proofs sharing a nullifier within one epoch —
 is the Module's responsibility:
-it keeps a log of the nullifiers it has verified,
+it keeps a log of the nullifiers it has verified, with their shares,
 recovers the identity secret two colliding proofs reveal,
 and reports it in the verification result.
-What to do with the evidence — slashing, banning, or nothing —
-is the application's decision.
 
 #### `EpochQuota get_epoch_quota(MembershipScope scope)`
 
@@ -419,6 +418,13 @@ The read is advisory:
 allocation happens in [`generate_proof`](#rate-limiting),
 which remains the authority and fails with `RLN_ERR_BUDGET_EXHAUSTED`
 when the budget is spent between a read and a proof.
+A scope without a usable membership — `ACTIVE` or `GRACE_PERIOD` — has no budget:
+the read SHALL return the current `epoch_index`
+with `rate_limit` and `remaining` both zero.
+A `rate_limit` of zero therefore indicates the absence of a usable membership,
+never an exhausted budget,
+and the consumer resolves which through
+[`get_membership_state`](#registration).
 
 #### `RateLimitProof generate_proof(MembershipScope scope, Bytes signal)`
 
@@ -479,8 +485,9 @@ or a proof accepted at one node is rejected at another.
 ## Optional extensions
 
 A Module MAY additionally provide any of the following;
-the consumer MUST NOT require them and
-SHALL treat their absence as an unsupported operation failing with `RLN_ERR_PERMANENT`.
+the consumer MUST NOT require them,
+and a Module SHALL fail a call to an extension it does not provide
+with `RLN_ERR_PERMANENT`.
 
 - **Multiple memberships** —
   holding more than one membership for a scope.
