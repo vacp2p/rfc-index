@@ -137,6 +137,18 @@ typedef enum {
     RLN_ERR_PERMANENT          // e.g. invalid input; retrying cannot succeed
 } RlnErrorKind;
 
+// An error: the kind the caller dispatches on,
+// and a human-readable detail for diagnostics.
+typedef struct {
+    RlnErrorKind kind;
+    const char*  message;
+} RlnError;
+
+// Result<T> denotes a fallible return carrying either a T or an RlnError,
+// never both. The notation is language-neutral: a binding maps it onto its
+// native idiom — a Rust Result, a C value-plus-error struct, an exception —
+// preserving the RlnErrorKind distinctions.
+
 // Everything a call operates on: the registry and the application context.
 // Every call passes its scope explicitly; the Module holds no default.
 typedef struct {
@@ -279,6 +291,8 @@ which never crosses this interface.
 ## Required functions
 
 The Module SHALL expose the functions in this section.
+Every function returns a `Result`:
+its declared value on success, an `RlnError` otherwise.
 A function called before the Module can serve it
 SHALL fail with `RLN_ERR_NOT_READY`
 rather than be served from a cold registry view.
@@ -304,7 +318,7 @@ In-flight requests SHALL be cancelled cleanly.
 
 ### Registration
 
-#### `MembershipState register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
+#### `Result<MembershipState> register(MembershipScope scope, uint64_t rate_limit, RegistryOptions options)`
 
 Generate a new identity credential inside the Module,
 attempt to register a membership for it at the requested `rate_limit`,
@@ -347,9 +361,10 @@ The transition to `FAILED` SHALL be based on a successful registry read
 observing the membership absent after the confirmation window;
 inability to reach the registry is not such an observation,
 and the membership SHALL remain `PENDING` while the registry cannot be read.
-A failed submission SHALL report whether it is retryable.
+A failed submission SHALL be reported as `RLN_ERR_TRANSIENT` or `RLN_ERR_PERMANENT`
+according to whether retrying can succeed.
 
-#### `MembershipState get_membership_state(MembershipScope scope)`
+#### `Result<MembershipState> get_membership_state(MembershipScope scope)`
 
 Return the status and metadata of the scope's membership,
 whether registered in this run or loaded from persistence at `start()`.
@@ -400,7 +415,7 @@ it keeps a log of the nullifiers it has verified, with their shares,
 recovers the identity secret two colliding proofs reveal,
 and reports it in the verification result.
 
-#### `EpochQuota get_epoch_quota(MembershipScope scope)`
+#### `Result<EpochQuota> get_epoch_quota(MembershipScope scope)`
 
 Return the scope's current epoch index,
 the membership's `rate_limit` for it,
@@ -426,7 +441,7 @@ never an exhausted budget,
 and the consumer resolves which through
 [`get_membership_state`](#registration).
 
-#### `RateLimitProof generate_proof(MembershipScope scope, Bytes signal)`
+#### `Result<RateLimitProof> generate_proof(MembershipScope scope, Bytes signal)`
 
 Generate an RLN proof that `signal` was produced by the holder of the scope's membership
 within its rate limit for the current epoch.
@@ -442,7 +457,7 @@ allocation resets at the next epoch.
 The membership MUST be usable — `ACTIVE` or `GRACE_PERIOD` —
 for proof generation to succeed.
 
-#### `VerificationResult verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
+#### `Result<VerificationResult> verify_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
 
 Verify an RLN proof for `signal`.
 The following MUST hold for the verdict to be `PROOF_VALID`:
@@ -457,7 +472,10 @@ The following MUST hold for the verdict to be `PROOF_VALID`:
   recomputed by the Module from the supplied `signal`,
   so the proof is bound to this signal and cannot be replayed onto another message.
 
-A proof that fails any of these is `PROOF_INVALID`.
+A proof that fails any of these is `PROOF_INVALID` —
+a verdict, not an error:
+the error channel is reserved for calls the Module cannot judge,
+e.g. `RLN_ERR_NOT_READY` before its registry view is warm.
 A proof that passes them
 but whose `nullifier` is already in the epoch's log
 is judged by its `share_x` against the recorded one:
