@@ -343,7 +343,7 @@ message RotationState {
   uint32 seed_cycle         = 2;  // permutation seed for the cycle
   uint32 permA              = 3;  // permutation multiplier, coprime with AOS_cycle
   uint32 AOS_cycle          = 4;  // set size frozen for the cycle
-  int64  cycleStartRound    = 5;  // first round of the current cycle and assined zero (0) when it is deployed 
+  int64  cycleStartRound    = 5;  // first round of the current cycle and assigned zero (0) when it is deployed 
   int64  lastAcceptedRound  = 6;  // last round written
 }
 ```
@@ -445,7 +445,7 @@ when the indexer builds the reward table committed to the LEZ settlement contrac
 ### Edge cases
 
 - **Two writes race:** contract takes the first by transaction order,
-rejects the rests so they still pay gas.
+rejects the rest so they still pay gas.
 - **All three miss:** no price for `round`.
 Next round proceeds normally by iterating primary.
 This round stays empty until the next Bedrock block arrives.
