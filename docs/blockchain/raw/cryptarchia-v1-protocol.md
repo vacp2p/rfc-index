@@ -260,6 +260,8 @@ A field that is not set (`active` and `withdraw_at` in a `DeclarationInfo`, whic
 
 A field whose byte length can vary is committed together with that length, and a list of such fields together with its element count, at the widths the [Mantle Transaction Encoding](mantle-transaction-encoding.md) gives them. Without it the preimage does not determine the value it was built from: the byte form of a multiaddr is self-describing, so concatenating the `locators` of a `DeclarationInfo` without their lengths gives `[A/B]` and `[A, B]` the same leaf.
 
+The minimum stake is a single value shared by every service, as defined in [Minimum Stake](bedrock-service-declaration-protocol.md#minimum-stake), and is committed as such. The [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) are instead held per service type, so every service contributes its own `inactivity_period`, in ascending `service_type` byte, the same byte a `DeclarationInfo` leaf commits. A service whose parameters have never been set contributes `0`, unambiguously, since a valid `inactivity_period` is at least 2 epochs.
+
 ```python
 def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
     h = Hasher()
@@ -339,8 +341,9 @@ def get_epoch_state_root(state) -> hash:
     h.update(locked_notes_root(state.locked_notes))
     h.update(declarations_root(state.declarations))          # mutable SDP registry
     h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, active declarations as of last block of two epochs before
-    h.update(state.min_stake.stake_threshold.to_bytes(8, byteorder='little'))  # current minimum stake
-    h.update(state.inactivity_period.to_bytes(4, byteorder='little'))          # current inactivity period
+    h.update(state.min_stake.stake_threshold.to_bytes(8, byteorder='little'))  # global minimum stake
+    for service in sorted(ServiceType):                                        # ascending service byte
+        h.update(state.parameters[service].inactivity_period.to_bytes(4, byteorder='little'))
     h.update(state.voucher_root)                                               # reward voucher tree
     h.update(voucher_nullifiers_root(state.voucher_nullifier_set))
     h.update(state.leaders_rewards.to_bytes(8, byteorder='little'))            # TokenValue
