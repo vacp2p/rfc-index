@@ -380,6 +380,11 @@ If they are not coprime, some indices repeat and others never appear,
 so some nodes would be primary more than once per cycle and others never.
 The `gcd(k, AOS_cycle) == 1` check in the formula above is exactly what prevents this.
 
+The hash type is SHA-256 over the byte concatenation of the arguments in listed order,
+where `cycleStartRound` is encoded as an 8-byte big-endian integer, `root_cycle` as its raw 32 bytes,
+and the string tag `"permA"` as its UTF-8 bytes.
+The 256-bit output is interpreted as a big-endian unsigned integer before the `mod AOS_cycle` reduction.
+
 ### Write path, checks in order on LEZ Contract
 
 A writing message from proposer to LEZ contract carries the `round`,
