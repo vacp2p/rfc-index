@@ -260,6 +260,8 @@ A field that is not set (`active` and `withdraw_at` in a `DeclarationInfo`, whic
 
 A field whose byte length can vary is committed together with that length, and a list of such fields together with its element count, at the widths the [Mantle Transaction Encoding](mantle-transaction-encoding.md) gives them. Without it the preimage does not determine the value it was built from: the byte form of a multiaddr is self-describing, so concatenating the `locators` of a `DeclarationInfo` without their lengths gives `[A/B]` and `[A, B]` the same leaf.
 
+`block_number` and `fee_window` are the state the block reward formula reads, as defined in [Block Rewards](block-rewards.md): the window holds the fees burned by each of the last $`T`$ blocks and `block_number` selects the entry the next block overwrites.
+
 The minimum stake is a single value shared by every service, as defined in [Minimum Stake](bedrock-service-declaration-protocol.md#minimum-stake), and is committed as such. The [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) are instead held per service type, so every service contributes its own `inactivity_period`, in ascending `service_type` byte, the same byte a `DeclarationInfo` leaf commits. A service whose parameters have never been set contributes `0`, unambiguously, since a valid `inactivity_period` is at least 2 epochs.
 
 ```python
@@ -347,6 +349,9 @@ def get_epoch_state_root(state) -> hash:
     h.update(state.voucher_root)                                               # reward voucher tree
     h.update(voucher_nullifiers_root(state.voucher_nullifier_set))
     h.update(state.leaders_rewards.to_bytes(8, byteorder='little'))            # TokenValue
+    h.update(state.block_number.to_bytes(8, byteorder='little'))               # blocks in the chain at the settled state
+    for burned in state.fee_window:                                            # T entries, in index order
+        h.update(burned.to_bytes(8, byteorder='little'))                       # TokenValue
     h.update(state.execution_base_fee.to_bytes(8, byteorder='little'))         # TokenValue
     h.update(state.execution_gas_average.to_bytes(8, byteorder='little'))      # int (width undefined in spec)
     h.update(state.storage_price.to_bytes(8, byteorder='little'))              # TokenValue
