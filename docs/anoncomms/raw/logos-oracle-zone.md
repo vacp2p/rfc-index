@@ -368,9 +368,9 @@ Cycle opening, run once when a new cycle starts:
 ```
 AOS_cycle   = current registered indexer count
 root_cycle  = current membership root
-seed_cycle  = hash(cycleStartRound, root_cycle) mod AOS_cycle
+seed_cycle  = SHA-256(cycleStartRound, root_cycle) mod AOS_cycle
 permA       = smallest k >= 1 such that
-              k >= hash(cycleStartRound, root_cycle, "permA") mod AOS_cycle
+              k >= SHA-256(cycleStartRound, root_cycle, "permA") mod AOS_cycle
               and gcd(k, AOS_cycle) == 1
               (search upward, wrap to 1 if it exceeds AOS_cycle)
 ```
