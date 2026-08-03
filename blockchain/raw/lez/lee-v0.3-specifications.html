@@ -1,0 +1,1529 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>LEE v0.3 Specifications - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../../favicon.svg">
+        <link rel="shortcut icon" href="../../../favicon.png">
+        <link rel="stylesheet" href="../../../css/variables.css">
+        <link rel="stylesheet" href="../../../css/general.css">
+        <link rel="stylesheet" href="../../../css/chrome.css">
+        <link rel="stylesheet" href="../../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../../highlight.css">
+        <link rel="stylesheet" href="../../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/execution-market.html"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-resilience-and-anonymity.html"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/message-encapsulation.html"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/lez/lee-v0.3-specifications.html" class="active"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/mix-lioness.html"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/logos-oracle-zone.html"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lee-v03-specifications"><a class="header" href="#lee-v03-specifications">LEE v0.3 Specifications</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>LEE v0.3 Specifications</td></tr>
+<tr><td>Slug</td><td>237</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Tags</td><td>LEZ, LEE, execution zone, private accounts</td></tr>
+<tr><td>Source</td><td><a href="https://github.com/logos-blockchain/logos-execution-zone/blob/schouhy/add-specs/docs/specs.md">logos-blockchain/logos-execution-zone docs/specs.md</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-06-08</strong> — <a href="https://github.com/logos-co/logos-lips/blob/9b6919fee7116cee4fd44f68778fe16d7c8b0570/docs/blockchain/raw/lez/lee-v0.3-specifications.md"><code>9b6919f</code></a> — Chore/move lez to lips (#353)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="lee-v03-basic-types-and-constants"><a class="header" href="#lee-v03-basic-types-and-constants">LEE v0.3 basic types and constants</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>type AccountId = [u8; 32];
+type NativeToken = u128;
+type ProgramId = [u32; 8];
+struct PdaSeed([u8; 32]);
+type Data = List&lt;u8&gt;;
+type Nonce = u128;
+type ByteString = List&lt;u8&gt;;
+type InstructionData = List&lt;u32&gt;;
+
+/// Sequencer-supplied block height and timestamp.
+type BlockId = u64;
+/// Unix timestamp in milliseconds.
+type Timestamp = u64;
+
+/// Diversifies private accounts for a given NPK.
+/// A single (nsk, vpk) keypair controls up to 2^128 distinct private accounts,
+/// one per identifier value.
+type Identifier = u128;
+
+type Commitment = [u8; 32];
+struct CommitmentSet {
+    merkle_tree: MerkleTree,
+    commitments: HashMap&lt;Commitment, usize&gt;,
+    root_history: HashSet&lt;CommitmentSetDigest&gt;,
+}
+type CommitmentSetDigest = [u8; 32];
+type MembershipProof = (usize, List&lt;[u8; 32]&gt;);
+
+type Nullifier = [u8; 32];
+type NullifierSecretKey = [u8; 32];
+type NullifierPublicKey = [u8; 32];
+type NullifierSet = BTreeSet&lt;Nullifier&gt;;
+
+/// A secp256k1 scalar (32 bytes).
+type EphemeralSecretKey = [u8; 32];
+/// A SEC1-compressed secp256k1 point (33 bytes).
+type EphemeralPublicKey = [u8; 33];
+
+/// A SEC1-compressed secp256k1 point (33 bytes).
+type ViewingPublicKey = [u8; 33];
+/// The x-coordinate of the ECDH shared point (32 bytes).
+type SharedSecretKey = [u8; 32];
+
+struct EncryptedAccountData {
+    ciphertext: Ciphertext,
+    epk: EphemeralPublicKey,
+    view_tag: u8,           // 1-byte view tag
+}
+
+/// BIP-340 Schnorr on secp256k1 (x-only pubkeys)
+type Signature = [u8; 64];
+type PublicKey = [u8; 32]; // 32-byte x-only secp256k1 public key
+
+/// The borsh serialization of a `risc0_zkvm::InnerReceipt`.
+type Proof = ByteString;
+
+const DATA_MAX_LENGTH_IN_BYTES = 100 * 1024;
+const MAX_NUMBER_CHAINED_CALLS: usize = 10;
+const DEFAULT_PROGRAM_ID: ProgramId = [0; 8];
+<span class="boring">}</span></code></pre></pre>
+<blockquote>
+<p><strong>Byte order:</strong> LEE uses little-endian encoding throughout for integers, with the exception of the key protocol which follows BIP-32 (big-endian).</p>
+</blockquote>
+<h2 id="accounts"><a class="header" href="#accounts">Accounts</a></h2>
+<p>All accounts (public and private) share a common schema with standard fields:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Account {
+    program_owner: ProgramId,
+    balance: NativeToken,
+    data: Data,
+    nonce: Nonce,
+}
+
+/// Account default value 
+/// (The notation `[]` means the unique array of length zero)
+impl Default for Account {
+    fn default() -&gt; Self {
+        Self {
+            program_owner: [0; 8],
+            balance: 0,
+            data: [],
+            nonce: 0,
+        }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="program-owner-field"><a class="header" href="#program-owner-field">Program owner field</a></h3>
+<p>The identification number of the program that can operate on this account's data. It's represented as a <code>[u32; 8]</code> identifier (<code>ProgramId</code>). This field ties the account to a specific program (often called the account's owner program <code>program_owner</code>) which defines the rules for how the account's data can be manipulated.</p>
+<h3 id="balance-field"><a class="header" href="#balance-field">Balance field</a></h3>
+<p>The number of native tokens held by the account. It's represented as a 128-bit number. That means, the total supply of the system should never exceed <span class="math-inline" data-tex="2^{128} - 1"></span>. As long as that is guaranteed, transfer operations on the balance will not overflow. This is because under normal transfer operations, no account can end up with a balance greater than the total supply of the system. LEE prevents overflow exploits on the balance field by upcasting each term to u256 when computing the total balances before and after an execution.</p>
+<h3 id="data-field"><a class="header" href="#data-field">Data field</a></h3>
+<p>An arbitrary byte string field to be managed by the <code>program_owner</code> program. The content and interpretation of this field are defined by the program logic. The maximum size of it is defined by the constant <code>DATA_MAX_LENGTH_IN_BYTES</code>.</p>
+<h3 id="nonce-field"><a class="header" href="#nonce-field">Nonce field</a></h3>
+<p>The nonce is a 128-bit integer value. It has different uses depending on the visibility of the account:</p>
+<ul>
+<li><strong>Public accounts:</strong> The nonce counts the number of transactions in which the associated public key of the account appears as a signer. This serves as a sequence number to prevent replay of transactions involving this account.</li>
+<li><strong>Private accounts:</strong> A pseudorandom value used to provide entropy for the account's commitment, making it unconditionally hiding. The initial nonce is derived from the account ID, and subsequent nonces are iteratively derived from the nullifier secret key (<code>nsk</code>) and the previous nonce. (<code>account_id</code> and <code>nsk</code> are formally defined in the <a href="#nullifier-public-key-derivation">Nullifier public key derivation</a> and <a href="#account-id">Account ID</a> subsections below.)</li>
+</ul>
+<p>In both cases the nonce is iteratively produced: each accepted transaction increments a public account's nonce by one, and each private state update derives a fresh nonce from the previous one.</p>
+<p><strong>Private account nonce initialization:</strong></p>
+<div class="math-block" data-tex="\mathsf{nonce}_{0} = \mathsf{SHA256}(\mathsf{accountId} \;||\; [0_{u8}; 32])_{[0..16]}"></div>
+<p>where the result is the first 16 bytes of the hash, interpreted as a <code>u128</code> little-endian integer. The full preimage is 64 bytes: the 32-byte account ID followed by 32 zero bytes.</p>
+<p><strong>Private account nonce update:</strong></p>
+<div class="math-block" data-tex="\mathsf{nonce}_{i+1} = \mathsf{SHA256}(\mathsf{nsk} \;||\; \mathsf{nonce}_{i} \;||\; [0_{u8}; 16])_{[0..16]}"></div>
+<p>where <code>nonce_i</code> is the 16-byte little-endian encoding of the current nonce, and the result is the first 16 bytes of the hash interpreted as a <code>u128</code> little-endian integer. The full preimage is 64 bytes: 32-byte <code>nsk</code> + 16-byte nonce + 16 zero bytes.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl Nonce {
+    fn private_account_nonce_init(account_id: &amp;AccountId) -&gt; Self {
+        let mut bytes = [0_u8; 64];
+        bytes[..32].copy_from_slice(account_id.value());
+        // bytes[32..64] are zero
+        let hash: [u8; 32] = sha256(bytes);
+        Self(u128::from_le_bytes(*hash.first_chunk::&lt;16&gt;().unwrap()))
+    }
+
+    fn private_account_nonce_increment(self, nsk: &amp;NullifierSecretKey) -&gt; Self {
+        let mut bytes = [0_u8; 64];
+        bytes[..32].copy_from_slice(nsk);
+        bytes[32..48].copy_from_slice(&amp;self.0.to_le_bytes());
+        // bytes[48..64] are zero
+        let hash: [u8; 32] = sha256(bytes);
+        Self(u128::from_le_bytes(*hash.first_chunk::&lt;16&gt;().unwrap()))
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Private accounts use a <em>nullifier public key</em> (<code>Npk</code>) as a core identifier. The next two subsections derive <code>Npk</code> and define the account ID formats — both are prerequisites for the commitment and nullifier fields that follow.</p>
+<h3 id="nullifier-public-key-derivation"><a class="header" href="#nullifier-public-key-derivation">Nullifier public key derivation</a></h3>
+<p>The nullifier public key is derived from the nullifier secret key via a pure hash function:</p>
+<div class="math-block" data-tex="\mathsf{Npk} = \mathsf{SHA256}(\text{&quot;LEE/keys&quot;} \;||\; \mathsf{nsk} \;||\; [7] \;||\; [0; 23])"></div>
+<p>The total input is 64 bytes: 8 bytes prefix + 32 bytes <code>nsk</code> + 1 byte <code>[7]</code> + 23 bytes zero padding.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl NullifierPublicKey {
+    fn from(nsk: &amp;NullifierSecretKey) -&gt; Self {
+        const PREFIX: &amp;[u8; 8] = b"LEE/keys";
+        const SUFFIX_1: &amp;[u8; 1] = &amp;[7];
+        const SUFFIX_2: &amp;[u8; 23] = &amp;[0; 23];
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(PREFIX);
+        bytes.extend_from_slice(nsk);
+        bytes.extend_from_slice(SUFFIX_1);
+        bytes.extend_from_slice(SUFFIX_2);
+        Self(sha256(bytes))
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="account-id"><a class="header" href="#account-id">Account ID</a></h3>
+<p><strong>Public account ID:</strong></p>
+<div class="math-block" data-tex="\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PublicAccountIdPrefix} \;||\; \mathsf{publicKey})"></div>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/AccountId/Public/" zero-padded to 32 bytes
+PUBLIC_ACCOUNT_ID_PREFIX: [u8; 32] = b"/LEE/v0.3/AccountId/Public/\x00\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Private account ID:</strong></p>
+<div class="math-block" data-tex="\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PrivateAccountIdPrefix} \;||\; \mathsf{Npk} \;||\; \mathsf{identifierLe})"></div>
+<p>The hash input is 80 bytes: 32-byte prefix + 32-byte <code>Npk</code> + 16-byte little-endian <code>identifier</code>. Each <code>(Npk, identifier)</code> pair yields a distinct account ID, so the same set of private account keys can be reused across up to <span class="math-inline" data-tex="2^{128}"></span> independent private accounts. One per <code>identifier</code> value.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/AccountId/Private/" zero-padded to 32 bytes
+PRIVATE_ACCOUNT_ID_PREFIX: [u8; 32] = b"/LEE/v0.3/AccountId/Private/\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl AccountId {
+    fn from_private(npk: &amp;NullifierPublicKey, identifier: Identifier) -&gt; Self {
+        let mut bytes = [0_u8; 80];
+        bytes[0..32].copy_from_slice(PRIVATE_ACCOUNT_ID_PREFIX);
+        bytes[32..64].copy_from_slice(&amp;npk.0);
+        bytes[64..80].copy_from_slice(&amp;identifier.to_le_bytes());
+        sha256(bytes)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Public program-derived account ID (public PDA):</strong></p>
+<div class="math-block" data-tex="\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PublicPdaPrefix} \;||\; \mathsf{programId} \;||\; \mathsf{seed})"></div>
+<p>The hash input is 96 bytes: 32-byte prefix + 32-byte <code>program_id</code> (as 8 LE u32 words) + 32-byte <code>seed</code>.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/AccountId/PDA/" zero-padded to 32 bytes
+PUBLIC_PDA_PREFIX: [u8; 32] = b"/LEE/v0.3/AccountId/PDA/\x00\x00\x00\x00\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Private program-derived account ID (private PDA):</strong></p>
+<div class="math-block" data-tex="\mathsf{AccountId} = \mathsf{SHA256}(\mathsf{PrivatePdaPrefix} \;||\; \mathsf{programId} \;||\; \mathsf{seed} \;||\; \mathsf{Npk} \;||\; \mathsf{identifierLe})"></div>
+<p>The hash input is 144 bytes: 32 + 32 + 32 + 32 + 16. Unlike public PDAs, the private PDA derivation includes <code>Npk</code> and <code>identifier</code>. This ensures two different users at the same <code>(program_id, seed)</code> get different addresses, and a single user at <code>(program_id, seed, Npk)</code> controls a family of <span class="math-inline" data-tex="2^{128}"></span> private PDA addresses (one per identifier value).</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/AccountId/PrivatePDA/" zero-padded to 32 bytes
+PRIVATE_PDA_PREFIX: [u8; 32] = b"/LEE/v0.3/AccountId/PrivatePDA/\x00"
+<span class="boring">}</span></code></pre></pre>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl AccountId {
+    fn for_private_pda(
+        program_id: &amp;ProgramId,
+        seed: &amp;PdaSeed,
+        npk: &amp;NullifierPublicKey,
+        identifier: Identifier,
+    ) -&gt; Self {
+        let mut bytes = [0_u8; 144];
+        bytes[0..32].copy_from_slice(PRIVATE_PDA_PREFIX);
+        let program_id_bytes: &amp;[u8] = bytemuck::cast_slice(program_id);
+        bytes[32..64].copy_from_slice(program_id_bytes);
+        bytes[64..96].copy_from_slice(&amp;seed.0);
+        bytes[96..128].copy_from_slice(&amp;npk.to_byte_array());
+        bytes[128..144].copy_from_slice(&amp;identifier.to_le_bytes());
+        sha256(bytes)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="commitment"><a class="header" href="#commitment">Commitment</a></h3>
+<p>The commitment of an account is computed as:</p>
+<div class="math-block" data-tex="\mathsf{Commitment} = \mathsf{SHA256}(\mathsf{CommitmentPrefix} \;||\; \mathsf{accountId} \;||\; \mathsf{ProgramOwner} \;||\; \mathsf{BalanceBytes} \;||\; \mathsf{NonceBytes} \;||\; \mathsf{DataDigest})"></div>
+<p>where</p>
+<ul>
+<li><code>COMMITMENT_PREFIX</code> is the domain separator:
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/Commitment/" zero-padded to 32 bytes
+COMMITMENT_PREFIX: [u8; 32] = b"/LEE/v0.3/Commitment/\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+</li>
+<li><code>account_id</code> is the 32-byte account ID of the private account (which encodes both the owner's <code>Npk</code> and the <code>Identifier</code>; see the Account ID section above).</li>
+<li><code>ProgramOwner</code> is the 32 bytes of the program owner field encoded as 8 little-endian <code>u32</code> words.</li>
+<li><code>BalanceBytes</code> are the 16 bytes of the little-endian representation of the balance.</li>
+<li><code>NonceBytes</code> are the 16 bytes of the little-endian representation of the nonce.</li>
+<li><code>DataDigest</code> are the 32 bytes of the SHA256 digest of the data field.</li>
+</ul>
+<p>The total preimage is 160 bytes.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl Commitment {
+    fn new(account_id: &amp;AccountId, account: &amp;Account) -&gt; Self {
+        const COMMITMENT_PREFIX: &amp;[u8; 32] =
+            b"/LEE/v0.3/Commitment/\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(COMMITMENT_PREFIX);
+        bytes.extend_from_slice(account_id.value());
+        for word in &amp;account.program_owner {
+            bytes.extend_from_slice(&amp;word.to_le_bytes());
+        }
+        bytes.extend_from_slice(&amp;account.balance.to_le_bytes());
+        bytes.extend_from_slice(&amp;account.nonce.to_le_bytes());
+        let data_digest: [u8; 32] = sha256(&amp;account.data);
+        bytes.extend_from_slice(&amp;data_digest);
+        sha256(bytes)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="nullifier"><a class="header" href="#nullifier">Nullifier</a></h3>
+<p>A private account's commitment is nullified each time the account's state is updated. There are two methods for computing a nullifier:</p>
+<ul>
+<li><strong>Initialization nullifier</strong> (used when the private account is created for the first time):</li>
+</ul>
+<div class="math-block" data-tex="\mathsf{Nullifier} = \mathsf{SHA256}(\mathsf{InitPrefix} \;||\; \mathsf{accountId})"></div>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/Nullifier/Initialize/" zero-padded to 32 bytes
+INIT_PREFIX: [u8; 32] = b"/LEE/v0.3/Nullifier/Initialize/\x00"
+<span class="boring">}</span></code></pre></pre>
+<ul>
+<li><strong>Update nullifier</strong> (used when an existing private account's state is updated):</li>
+</ul>
+<div class="math-block" data-tex="\mathsf{Nullifier} = \mathsf{SHA256}(\mathsf{UpdatePrefix} \;||\; \mathsf{commitment} \;||\; \mathsf{nsk})"></div>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/Nullifier/Update/" zero-padded to 32 bytes
+UPDATE_PREFIX: [u8; 32] = b"/LEE/v0.3/Nullifier/Update/\x00\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl Nullifier {
+    fn for_account_initialization(account_id: &amp;AccountId) -&gt; Self {
+        let mut bytes = INIT_PREFIX.to_vec();
+        bytes.extend_from_slice(account_id.value());
+        sha256(bytes)
+    }
+
+    fn for_account_update(commitment: &amp;Commitment, nsk: &amp;NullifierSecretKey) -&gt; Self {
+        let mut bytes = UPDATE_PREFIX.to_vec();
+        bytes.extend_from_slice(&amp;commitment.to_byte_array());
+        bytes.extend_from_slice(nsk);
+        sha256(bytes)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="private-account-kind-and-encryption-scheme"><a class="header" href="#private-account-kind-and-encryption-scheme">Private account kind and encryption scheme</a></h3>
+<h4 id="privateaccountkind"><a class="header" href="#privateaccountkind">PrivateAccountKind</a></h4>
+<p>Every private account output is tagged with a <code>PrivateAccountKind</code> that allows the receiver to reconstruct the account ID after decryption, without storing the ID on chain:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum PrivateAccountKind {
+    Regular(Identifier),
+    Pda {
+        program_id: ProgramId,
+        seed: PdaSeed,
+        identifier: Identifier,
+    },
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The kind is serialized as a fixed 81-byte header prepended to the encrypted account data:</p>
+<pre><code class="language-text">Regular(ident):                  0x00 || ident (16 bytes LE) || [0u8; 64]
+Pda { program_id, seed, ident }: 0x01 || program_id (8 × u32 LE) || seed (32 bytes) || ident (16 bytes LE)
+</code></pre>
+<p>Both variants produce 81 header bytes, so ciphertext lengths are uniform across account types.</p>
+<p>After decryption the receiver reconstructs the account ID from the kind:</p>
+<ul>
+<li><code>Regular(ident)</code> → <code>AccountId::from_private(npk, ident)</code></li>
+<li><code>Pda { program_id, seed, ident }</code> → <code>AccountId::for_private_pda(program_id, seed, npk, ident)</code></li>
+</ul>
+<h4 id="key-agreement-and-shared-secret"><a class="header" href="#key-agreement-and-shared-secret">Key agreement and shared secret</a></h4>
+<p>When creating a private account output, the sender generates an ephemeral secret key <code>esk</code> and the corresponding ephemeral public key <code>Epk = esk * G</code>. The shared secret is the <strong>x-coordinate</strong> of the ECDH result (32 bytes, not a SEC1-compressed point):</p>
+<ul>
+<li>Sender: <span class="math-inline" data-tex="\mathsf{ss} = x\text{-coordinate of } (\mathsf{esk} \cdot \mathsf{vpkRecipient})"></span></li>
+<li>Receiver: <span class="math-inline" data-tex="\mathsf{ss} = x\text{-coordinate of } (\mathsf{vsk} \cdot \mathsf{EpkSender})"></span></li>
+</ul>
+<p>where <code>vpk</code> is the receiver's <code>ViewingPublicKey</code> (a 33-byte SEC1-compressed secp256k1 point) and <code>vsk</code> is the corresponding viewing secret key (a secp256k1 scalar).</p>
+<h4 id="kdf"><a class="header" href="#kdf">KDF</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn kdf(
+    shared_secret: &amp;SharedSecretKey,    // 32-byte x-coordinate
+    commitment: &amp;Commitment,            // 32-byte output commitment
+    output_index: u32,                  // index of this output within the tx (LE)
+) -&gt; [u8; 32] {
+    let mut bytes = Vec::new();
+    bytes.extend_from_slice(b"LEE/v0.3/KDF-SHA256/");
+    bytes.extend_from_slice(&amp;shared_secret.0);
+    bytes.extend_from_slice(&amp;commitment.to_byte_array());
+    bytes.extend_from_slice(&amp;output_index.to_le_bytes());
+    sha256(bytes)
+}
+<span class="boring">}</span></code></pre></pre>
+<h4 id="encryption"><a class="header" href="#encryption">Encryption</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn encrypt(
+    account: &amp;Account,
+    kind: &amp;PrivateAccountKind,
+    shared_secret: &amp;SharedSecretKey,
+    commitment: &amp;Commitment,
+    output_index: u32,
+) -&gt; Ciphertext {
+    // Plaintext: 81-byte kind header || account serialization
+    let mut buffer = kind.to_header_bytes().to_vec();
+    buffer.extend_from_slice(&amp;account.to_bytes());
+    // Apply ChaCha20 keystream with a [0; 12] nonce
+    let key = kdf(shared_secret, commitment, output_index);
+    chacha20_xor(&amp;key, &amp;[0u8; 12], &amp;mut buffer);
+    Ciphertext(buffer)
+}
+<span class="boring">}</span></code></pre></pre>
+<p><code>account.to_bytes()</code> serializes the account as:
+<code>program_owner (8 × u32 LE) || balance (16 bytes LE) || nonce (16 bytes LE) || data_len (u32 LE) || data</code></p>
+<h4 id="decryption"><a class="header" href="#decryption">Decryption</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn decrypt(
+    ciphertext: &amp;Ciphertext,
+    shared_secret: &amp;SharedSecretKey,
+    commitment: &amp;Commitment,
+    output_index: u32,
+) -&gt; Option&lt;(PrivateAccountKind, Account)&gt; {
+    let mut buffer = ciphertext.0.clone();
+    let key = kdf(shared_secret, commitment, output_index);
+    chacha20_xor(&amp;key, &amp;[0u8; 12], &amp;mut buffer);
+
+    if buffer.len() &lt; PrivateAccountKind::HEADER_LEN {
+        return None;
+    }
+    let header: &amp;[u8; 81] = buffer[..81].try_into().unwrap();
+    let kind = PrivateAccountKind::from_header_bytes(header)?;
+    let account = Account::from_bytes(&amp;buffer[81..]).ok()?;
+    Some((kind, account))
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="programs"><a class="header" href="#programs">Programs</a></h2>
+<p>Programs define the logic for operating on accounts. They are stateless and can only execute instructions and modify the state of accounts passed to them. All changes to public or private accounts must be performed through program execution. There's no way to alter account state directly without invoking a program.</p>
+<p>A program can only directly modify the state of accounts that are owned by the program. A program can queue other program executions to modify accounts owned by those programs. These queued executions are called <em>chained calls</em>.</p>
+<p>All programs share the same function signature. They take as input:</p>
+<ol>
+<li>The executing program's own ID.</li>
+<li>The caller program's ID, or <code>None</code> if this is a top-level call.</li>
+<li>A list of accounts, each annotated with metadata.</li>
+<li>An instruction-specific data word list.</li>
+</ol>
+<p>Programs are treated as blackboxes: given some inputs, they produce a <code>ProgramOutput</code> that represents their claimed state transition. All validation is performed on the output, never on the raw inputs. In privacy-preserving transactions the program runs inside an off-chain ZK circuit; the sequencer receives only a proof that the circuit was executed correctly, without seeing the program's inputs. In public transactions the program is executed directly, but the same output-based validation applies — this uniformity is intentional, so that the constraint rules do not differ between the two execution paths.</p>
+<p><code>ProgramOutput</code> is the program's complete claimed state transition and contains:</p>
+<ul>
+<li><code>pre_states</code> — the accounts the program claims to have operated on, including their pre-execution state.</li>
+<li><code>post_states</code> — the resulting account states after execution.</li>
+<li><code>chained_calls</code> — queued executions of other programs.</li>
+<li><code>self_program_id</code> and <code>caller_program_id</code> — used by the verifier to check that the output was produced by the expected program and invoked through the correct call chain.</li>
+<li><code>instruction_data</code> — used to verify that each chained call was executed with the instruction the calling program requested.</li>
+<li><code>block_validity_window</code> and <code>timestamp_validity_window</code> — range constraints on which blocks/timestamps this output is valid for.</li>
+</ul>
+<p>Formally:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct AccountWithMetadata {
+    account: Account,
+    is_authorized: bool,
+    account_id: AccountId,
+}
+
+pub struct AccountPostState {
+    account: Account,
+    claim: Option&lt;Claim&gt;,
+}
+
+pub struct ProgramOutput {
+    self_program_id: ProgramId,
+    caller_program_id: Option&lt;ProgramId&gt;,
+    instruction_data: InstructionData,
+    pre_states: Vec&lt;AccountWithMetadata&gt;,
+    post_states: Vec&lt;AccountPostState&gt;,
+    chained_calls: Vec&lt;ChainedCall&gt;,
+    block_validity_window: BlockValidityWindow,
+    timestamp_validity_window: TimestampValidityWindow,
+}
+
+/// A claim request indicating the executing program intends to take ownership of an account.
+pub enum Claim {
+    /// Standard claim path, used for all account kinds that are not self-owned PDAs. Succeeds
+    /// when the account's `is_authorized` flag is true (public accounts, public PDAs, private
+    /// PDAs), or unconditionally for standalone private accounts.
+    Authorized,
+    /// Ownership via a PDA seed. Only valid for PDAs owned by the executing program itself:
+    /// the AccountId must match the derivation from (self_program_id, seed) for public PDAs,
+    /// or from (self_program_id, seed, npk, identifier) for private PDAs.
+    Pda(PdaSeed),
+}
+
+pub struct ChainedCall {
+    pub program_id: ProgramId,
+    pub pre_states: Vec&lt;AccountWithMetadata&gt;,
+    pub instruction_data: InstructionData,
+    /// PDA seeds authorized for the callee. For each seed, the callee is authorized to
+    /// mutate the AccountId derived from (caller_program_id, seed) — whether public or private.
+    pub pda_seeds: Vec&lt;PdaSeed&gt;,
+}
+
+type Program = fn(
+    ProgramId, Option&lt;ProgramId&gt;, List&lt;AccountWithMetadata&gt;, InstructionData
+) -&gt; ProgramOutput;
+<span class="boring">}</span></code></pre></pre>
+<p>The verifier validates that a <code>ProgramOutput</code> satisfies the following constraints:</p>
+<ol>
+<li>The output's <code>pre_states</code> contain unique account IDs. Each <code>AccountId</code> in the list is unique.</li>
+<li>The output's <code>pre_states</code> and <code>post_states</code> have the same length <code>N</code>.</li>
+<li>Program cannot update an account's nonce. For all <code>i in 0..N</code>, <code>pre_states[i].account.nonce == post_states[i].account.nonce</code>.</li>
+<li>Program cannot change the program owner of an account. For all <code>i in 0..N</code>, <code>pre_states[i].account.program_owner == post_states[i].account.program_owner</code>.</li>
+<li>Program can only decrease the native token balance for accounts that the program owns. For all <code>i in 0..N</code>, if <code>post_states[i].account.balance &lt; pre_states[i].account.balance</code>, then <code>pre_states[i].account.program_owner == executing_program_id</code>.</li>
+<li>Program can only change an account's data for accounts that the program owns (or if the account is default). For all <code>i in 0..N</code>, if <code>pre_states[i].account.data != post_states[i].account.data</code> then either <code>pre_states[i].account == Account::default()</code> or <code>pre_states[i].account.program_owner == executing_program_id</code>.</li>
+<li>Any account that has default program owner after execution must have been a default account before execution. For all <code>i in 0..N</code>, if <code>post_states[i].account.program_owner == DEFAULT_PROGRAM_ID</code> then <code>pre_states[i].account == Account::default()</code>.</li>
+<li>The sum of balances across all <code>pre_states</code> equals the sum across all <code>post_states</code>.</li>
+</ol>
+<p>In pseudocode:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn validate_execution(
+    pre_states: &amp;[AccountWithMetadata],
+    post_states: &amp;[AccountPostState],
+    executing_program_id: ProgramId,
+) -&gt; Result&lt;(), ExecutionValidationError&gt; {
+    // 1. Check account ids are all different
+    if !validate_uniqueness_of_account_ids(pre_states) {
+        return Err(ExecutionValidationError::PreStateAccountIdsNotUnique);
+    }
+
+    // 2. Lengths must match
+    if pre_states.len() != post_states.len() {
+        return Err(ExecutionValidationError::MismatchedPreStatePostStateLength { .. });
+    }
+
+    for (pre, post) in pre_states.iter().zip(post_states) {
+        // 3. Nonce must remain unchanged
+        if pre.account.nonce != post.account.nonce {
+            return Err(ExecutionValidationError::ModifiedNonce { .. });
+        }
+
+        // 4. Program ownership changes are not allowed
+        if pre.account.program_owner != post.account.program_owner {
+            return Err(ExecutionValidationError::ModifiedProgramOwner { .. });
+        }
+
+        let account_program_owner = pre.account.program_owner;
+
+        // 5. Decreasing balance only allowed if owned by executing program
+        if post.account.balance &lt; pre.account.balance
+            &amp;&amp; account_program_owner != executing_program_id
+        {
+            return Err(ExecutionValidationError::UnauthorizedBalanceDecrease { .. });
+        }
+
+        // 6. Data changes only allowed if owned by executing program or if account is default
+        if pre.account.data != post.account.data
+            &amp;&amp; pre.account != Account::default()
+            &amp;&amp; account_program_owner != executing_program_id
+        {
+            return Err(ExecutionValidationError::UnauthorizedDataModification { .. });
+        }
+
+        // 7. If post state has default program owner, pre state must have been default
+        if post.account.program_owner == DEFAULT_PROGRAM_ID &amp;&amp; pre.account != Account::default() {
+            return Err(ExecutionValidationError::NonDefaultAccountWithDefaultOwner { .. });
+        }
+    }
+
+    // 8. Total balance is preserved
+    let total_pre = WrappedBalanceSum::from_balances(pre_states.iter().map(|p| p.account.balance));
+    let total_post = WrappedBalanceSum::from_balances(post_states.iter().map(|p| p.account.balance));
+    if total_pre != total_post {
+        return Err(ExecutionValidationError::MismatchedTotalBalance { .. });
+    }
+
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>is_authorized</code> flag in <code>AccountWithMetadata</code> indicates whether the account owner has provided authorization. It is the program's responsibility to check it where needed. Authorization is granted via different mechanisms depending on the account type:</p>
+<ul>
+<li>For public accounts: through digital signatures.</li>
+<li>For private accounts: through knowledge proofs of the corresponding nullifier secret key.</li>
+<li>For PDAs: through the <code>pda_seeds</code> mechanism in chained calls (and, for self-owned PDAs, via <code>Claim::Pda</code> which proves ownership by address derivation).</li>
+</ul>
+<h3 id="account-authority-vs-program-ownership"><a class="header" href="#account-authority-vs-program-ownership">Account authority vs program ownership</a></h3>
+<p><code>is_authorized</code> and <code>program_owner</code> serve distinct purposes:</p>
+<ul>
+<li><code>is_authorized</code> indicates whether the account owner has authorized the account to be used in this transaction. For public accounts this comes from a signature; for private accounts from a valid nullifier secret key proof. For PDAs it is established through the <code>pda_seeds</code> mechanism.</li>
+<li><code>program_owner</code> indicates which program can mutate the account's state. It is set once via the claiming mechanism and cannot be changed by programs directly.</li>
+</ul>
+<h3 id="account-claiming-mechanism"><a class="header" href="#account-claiming-mechanism">Account claiming mechanism</a></h3>
+<p>Programs output a list of <code>AccountPostState</code>, each optionally carrying a <code>Claim</code>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl AccountPostState {
+    /// No claim — executing program does not request ownership.
+    pub fn new(account: Account) -&gt; Self { Self { account, claim: None } }
+
+    /// Always claims ownership with the given claim type.
+    pub fn new_claimed(account: Account, claim: Claim) -&gt; Self {
+        Self { account, claim: Some(claim) }
+    }
+
+    /// Claims ownership only if account.program_owner == DEFAULT_PROGRAM_ID.
+    pub fn new_claimed_if_default(account: Account, claim: Claim) -&gt; Self {
+        let is_default = account.program_owner == DEFAULT_PROGRAM_ID;
+        Self { account, claim: is_default.then_some(claim) }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After execution, the runtime processes each post-state's optional <code>claim</code>:</p>
+<ul>
+<li><code>Claim::Authorized</code> — the standard claim path: sets <code>program_owner = executing_program_id</code> (when currently default) for all account kinds except self-owned PDAs. Whether <code>is_authorized</code> is required depends on the account kind:
+<ul>
+<li><strong>Public accounts:</strong> <code>is_authorized</code> must be <code>true</code>, set when the transaction signer included the account in the authorized set.</li>
+<li><strong>Public PDAs:</strong> <code>is_authorized</code> must be <code>true</code>, set when the caller included the matching seed in <code>ChainedCall.pda_seeds</code>.</li>
+<li><strong>Private accounts (regular and PDA)</strong>: there's no enforcement for claiming. For regular accounts the circuit ensures the right authorization posture via the <code>PrivateAuthorizedInit</code>/<code>PrivateAuthorizedUpdate</code>/<code>PrivateUnauthorized</code> variant selection.</li>
+</ul>
+</li>
+<li><code>Claim::Pda(seed)</code> — sets <code>program_owner = executing_program_id</code> (when currently default) by proving the account's ID is structurally derived from the executing program's own ID and the given seed, with no user authorization required. Unlike <code>Claim::Authorized</code>, the claim is not backed by a signature or nullifier key proof; instead, the program demonstrates ownership by construction: if the address was computed from <code>(self_program_id, seed)</code>, then no other program could have produced that same address. The derivation formula depends on the account kind: for public accounts it is <code>AccountId::for_public_pda(executing_program_id, seed)</code>; for private PDAs it is <code>AccountId::for_private_pda(executing_program_id, seed, npk, identifier)</code> using the npk supplied for that pre-state, making the claim user-specific. <code>Claim::Pda</code> is not applicable to standalone private accounts.</li>
+</ul>
+<h3 id="program-derived-account-ids-pdas"><a class="header" href="#program-derived-account-ids-pdas">Program-derived account IDs (PDAs)</a></h3>
+<p><strong>Public PDA:</strong> derived from <code>(program_id, seed)</code> — see the Account ID section above.</p>
+<p><strong>Private PDA:</strong> derived from <code>(program_id, seed, npk, identifier)</code>. Unlike public PDAs, private PDAs are per-user: two users at the same <code>(program_id, seed)</code> get different addresses. Within a single user's namespace the <code>identifier</code> diversifies further.</p>
+<p>Authorization for private PDAs in chained calls is established by the caller including the PDA seed in <code>pda_seeds</code>, or via <code>Claim::Pda(seed)</code> for the owning program itself. When neither mechanism is available the seed can be externally supplied. For external seed the circuit verifies <code>AccountId::for_private_pda(authority_program_id, seed, npk, identifier) == pre_state.account_id</code> directly. In such case the pre-state must have <code>is_authorized == false</code>..</p>
+<h3 id="validity-windows"><a class="header" href="#validity-windows">Validity windows</a></h3>
+<p>Programs can constrain when their outputs are accepted by the sequencer:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// A half-open interval [from, to) with optional bounds.
+/// None means unbounded on that side.
+pub struct ValidityWindow&lt;T&gt; {
+    from: Option&lt;T&gt;,
+    to: Option&lt;T&gt;,
+}
+
+pub type BlockValidityWindow = ValidityWindow&lt;BlockId&gt;;
+pub type TimestampValidityWindow = ValidityWindow&lt;Timestamp&gt;;
+<span class="boring">}</span></code></pre></pre>
+<p>An output outside its window is rejected at the sequencer level before any state transition is applied.</p>
+<h2 id="lee-v03-state"><a class="header" href="#lee-v03-state">LEE v0.3 state</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct LeeState {
+    public_state: Map&lt;AccountId, Account&gt;,
+    private_state: (CommitmentSet, NullifierSet),
+    programs: Map&lt;ProgramId, Program&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<ul>
+<li><code>public_state</code>: A map from each account ID to its corresponding <code>Account</code> for all public accounts. The entire <code>AccountId</code> space is conceptually populated; account IDs not explicitly stored are treated as having default values (sparse representation).</li>
+<li><code>private_state</code>: A combination of two structures tracking private account state:
+<ul>
+<li><code>CommitmentSet</code>: An authenticated Merkle tree of all existing private account commitments.</li>
+<li><code>NullifierSet</code>: A <code>BTreeSet</code> of all revealed nullifiers.</li>
+</ul>
+</li>
+<li><code>programs</code>: A map from <code>ProgramId</code> to program bytecode for each deployed program.</li>
+</ul>
+<p>The <code>CommitmentSet</code> exposes:</p>
+<ul>
+<li><code>insert(element)</code> — add a commitment.</li>
+<li><code>get_authentication_path_for(element)</code> — Merkle inclusion path.</li>
+<li><code>compute_digest_for_path(element, proof)</code> — verify inclusion against a root.</li>
+<li><code>is_current_or_previous_digest(digest)</code> — check against the root history.</li>
+</ul>
+<p>The <code>NullifierSet</code> is a plain ordered set.</p>
+<h3 id="dummy-commitment-and-dummy-commitment-hash"><a class="header" href="#dummy-commitment-and-dummy-commitment-hash">Dummy commitment and dummy commitment hash</a></h3>
+<p>Two special constants are derived from the default account and the null account ID <code>[0; 32]</code>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// DUMMY_COMMITMENT = Commitment::new(&amp;AccountId([0; 32]), &amp;Account::default())
+/// Concretely: SHA256(COMMITMENT_PREFIX || [0]*32 || [0]*32 || [0]*16 || [0]*16 || SHA256([]))
+pub const DUMMY_COMMITMENT: Commitment = Commitment([
+    55, 228, 215, 207, 112, 221, 239, 49, 238, 79, 71, 135, 155, 15, 184, 45, 104, 74, 51, 211,
+    238, 42, 160, 243, 15, 124, 253, 62, 3, 229, 90, 27,
+]);
+
+pub const DUMMY_COMMITMENT_HASH: [u8; 32] = [
+    250, 237, 192, 113, 155, 101, 119, 30, 235, 183, 20, 84, 26, 32, 196, 229, 154, 74, 254, 249,
+    129, 241, 118, 39, 41, 253, 141, 171, 184, 71, 8, 41,
+];
+<span class="boring">}</span></code></pre></pre>
+<p><code>DUMMY_COMMITMENT</code> is the commitment of the default account (<code>Account::default()</code>) under the null account ID (<code>[0; 32]</code>). It is not a real user account: no keys exist that could spend it, so it can never be nullified.</p>
+<p>At genesis, the <code>CommitmentSet</code> is initialized by inserting <code>DUMMY_COMMITMENT</code> as its first entry. This bootstraps the Merkle tree before any real private accounts exist and gives the set a well-defined root from the very first state. Because the Merkle tree hashes each leaf as <code>SHA256(value)</code>, the root of a tree containing only <code>DUMMY_COMMITMENT</code> is <code>SHA256(DUMMY_COMMITMENT)</code> — which is exactly <code>DUMMY_COMMITMENT_HASH</code>. As a result, <code>DUMMY_COMMITMENT_HASH</code> is permanently present in the <code>CommitmentSet</code>'s <code>root_history</code> from genesis onward.</p>
+<p><strong>Role in initialization nullifiers.</strong> Every nullifier submitted in a <code>PrivacyPreservingTransaction</code> must be paired with a <code>CommitmentSetDigest</code>. For update nullifiers this is the Merkle root that was current when the sender computed their membership proof. For <strong>init nullifiers</strong> — emitted when a private account is created for the first time (<code>PrivateAuthorizedInit</code>, <code>PrivateUnauthorized</code>, <code>PrivatePdaInit</code>) — no prior commitment exists to be spent, so there is no natural Merkle root to cite. Rather than special-casing this in the sequencer's acceptance logic, init nullifiers uniformly use <code>DUMMY_COMMITMENT_HASH</code> as their digest. Since <code>DUMMY_COMMITMENT_HASH</code> is always in <code>root_history</code>, the standard <code>root_history.contains(digest)</code> check accepts them without any extra branching — the same validation path covers both init and update nullifiers.</p>
+<h2 id="built-in-programs"><a class="header" href="#built-in-programs">Built-in programs</a></h2>
+<p>See <a href="lee-v0.3-specifications/appendices/builtin-programs.html">Built-in Programs</a>. Additional user-defined programs may also be deployed via <code>ProgramDeploymentTransaction</code> (see "State transition from program deployment transactions").</p>
+<h2 id="structure-of-a-public-transaction"><a class="header" href="#structure-of-a-public-transaction">Structure of a public transaction</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Message {
+    program_id: ProgramId,
+    account_ids: List&lt;AccountId&gt;,
+    nonces: List&lt;Nonce&gt;,
+    instruction_data: InstructionData,
+}
+
+type WitnessSet = List&lt;(Signature, PublicKey)&gt;;
+
+struct PublicTransaction {
+    message: Message,
+    witness_set: WitnessSet,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The message hash prefix is:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/Message/Public/" zero-padded to 32 bytes
+PREFIX: [u8; 32] = b"/LEE/v0.3/Message/Public/\x00\x00\x00\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+<p>The message hash is <code>SHA256(PREFIX || borsh_serialize(message))</code>.</p>
+<h3 id="message"><a class="header" href="#message">Message</a></h3>
+<ul>
+<li><code>program_id</code>: The <code>ProgramId</code> of the program to invoke.</li>
+<li><code>account_ids</code>: The list of relevant account IDs that the program will operate on.</li>
+<li><code>nonces</code>: One nonce per signer (public account). Each must match the current nonce of the corresponding account in state.</li>
+<li><code>instruction_data</code>: Parameters encoded as a list of <code>u32</code> words.</li>
+</ul>
+<h3 id="witness-set"><a class="header" href="#witness-set">Witness set</a></h3>
+<p>A list of <code>(signature, public_key)</code> pairs. Each pair must produce a valid BIP-340 Schnorr signature over the message hash. The accounts derived from each <code>public_key</code> (via <code>AccountId::from(&amp;public_key)</code>) form the <em>authorized signer set</em>. The program receives <code>is_authorized = true</code> for any pre-state account in this set (programs use the flag to decide whether to permit user-driven actions like transfers). Programs may also gain authorization for additional accounts via the PDA mechanism in chained calls. Authorization propagates down the call chain monotonically: the authorized set passed to each child call is the union of the parent's own authorized set and the parent's verified authorized pre-states, so an account authorized at any hop remains authorized for all subsequent calls even if an intermediate hop does not include it in its pre-states. This monotonicity applies equally to PDA-authorized accounts. Upon acceptance, each signing account's nonce is incremented by 1.</p>
+<h2 id="structure-of-a-privacy-preserving-transaction"><a class="header" href="#structure-of-a-privacy-preserving-transaction">Structure of a privacy-preserving transaction</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct Message {
+    public_account_ids: List&lt;AccountId&gt;,
+    nonces: List&lt;Nonce&gt;,
+    public_post_states: List&lt;Account&gt;,
+    encrypted_private_post_states: List&lt;EncryptedAccountData&gt;,
+    new_commitments: List&lt;Commitment&gt;,
+    new_nullifiers: List&lt;(Nullifier, CommitmentSetDigest)&gt;,
+    block_validity_window: BlockValidityWindow,
+    timestamp_validity_window: TimestampValidityWindow,
+}
+
+struct WitnessSet {
+    signatures_and_public_keys: List&lt;(Signature, PublicKey)&gt;,
+    proof: Proof,
+}
+
+struct PrivacyPreservingTransaction {
+    message: Message,
+    witness_set: WitnessSet,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The message hash prefix is:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// ASCII "/LEE/v0.3/Message/Privacy/" zero-padded to 32 bytes
+PREFIX: [u8; 32] = b"/LEE/v0.3/Message/Privacy/\x00\x00\x00\x00\x00\x00"
+<span class="boring">}</span></code></pre></pre>
+<p>The hash is <code>SHA256(PREFIX || borsh_serialize(message))</code>.</p>
+<h3 id="message-1"><a class="header" href="#message-1">Message</a></h3>
+<ol>
+<li><code>public_account_ids</code>: Account IDs of all public accounts involved.</li>
+<li><code>nonces</code>: One nonce per signing public account.</li>
+<li><code>public_post_states</code>: New states of any public accounts modified by this transaction.</li>
+<li><code>encrypted_private_post_states</code>: Encrypted details of each new private account output, decryptable by the respective recipient.</li>
+<li><code>new_commitments</code>: New commitment values added to the <code>CommitmentSet</code>.</li>
+<li><code>new_nullifiers</code>: Nullifiers revealed by this transaction, each paired with the <code>CommitmentSetDigest</code> of the commitment being spent.</li>
+<li><code>block_validity_window</code> / <code>timestamp_validity_window</code>: Time-bound constraints propagated from the <code>ProgramOutput</code>. Outputs outside their window are rejected.</li>
+</ol>
+<h3 id="witness-set-1"><a class="header" href="#witness-set-1">Witness set</a></h3>
+<ul>
+<li><code>signatures_and_public_keys</code>: BIP-340 Schnorr signature pairs for any public accounts requiring authorization.</li>
+<li><code>proof</code>: A borsh-serialized <code>risc0_zkvm::InnerReceipt</code> proving correct execution of the privacy-preserving circuit.</li>
+</ul>
+<h2 id="the-privacy-preserving-execution-circuit"><a class="header" href="#the-privacy-preserving-execution-circuit">The privacy-preserving execution circuit</a></h2>
+<p>The circuit is a RISC-V program proven with the risc0 zkVM. It is executed entirely off-chain by the transaction sender; the sequencer only verifies the proof. It is not a built-in program in the LEE sense. It wraps the execution of built-in programs inside a ZK proof.</p>
+<p><strong>Workflow:</strong>
+The circuit takes as private inputs a <code>PrivacyPreservingCircuitInput</code>: the sequence of <code>ProgramOutput</code>s for each call in the execution chain, one <code>InputAccountIdentity</code> per pre-state (carrying nullifier secret keys, shared secret keys, membership proofs, and identifiers as required by each account variant), and the top-level program ID.</p>
+<ol>
+<li>Verify that each <code>ProgramOutput</code> in the chain has a valid proof of execution for the corresponding program.</li>
+<li>Verify that <code>validate_execution</code> passes for each program call.</li>
+<li>Check that chained-call instruction data, accounts, and <code>is_authorized</code> flags are consistent across caller/callee boundaries, using the same <code>CallerData</code>-based authorization propagation as the public execution path: the initial <code>authorized_accounts</code> is the set of public accounts whose <code>is_authorized</code> flag is <code>true</code> in the top-level <code>public_pre_states</code> (i.e. the signers), and each hop propagates its authorized pre-states to child calls. The total number of calls must not exceed <code>MAX_NUMBER_CHAINED_CALLS + 1</code> (same bound enforced in the public acceptance criteria).</li>
+<li>For each account:
+<ul>
+<li>Public: collect pre/post state; increment nonce if authorized.</li>
+<li>Private init: verify pre-state is default; derive account_id; compute init nullifier; set nonce via <code>nonce_init</code>; encrypt post-state.</li>
+<li>Private update: verify membership proof; compute update nullifier; increment nonce via <code>nonce_increment</code>; encrypt post-state.</li>
+</ul>
+</li>
+<li>Emit <code>PrivacyPreservingCircuitOutput</code>.</li>
+</ol>
+<p><strong>Transaction-wide private PDA family binding.</strong> The same <code>(program_id, seed)</code> pair can produce different program-derived account IDs for different <code>npk</code> and <code>identifier</code>. This creates a subtle authorization hazard: a caller that places seed <code>S</code> in <code>pda_seeds</code> intends to authorize exactly one account to the callee. Without an additional constraint, however, a callee could present two private PDA pre-states that both derive from <code>(caller_program_id, S)</code> and the single seed entry would authorize both.</p>
+<p>To close this, the circuit enforces the following rule across an entire transaction:</p>
+<blockquote>
+<p>Each <code>(program_id, seed)</code> pair may resolve to <strong>at most one</strong> account ID for the duration of the transaction.</p>
+</blockquote>
+<p>The rule applies to both the <code>Claim::Pda(seed)</code> path and the <code>pda_seeds</code> authorization path. Every time either path resolves an account under a given <code>(program_id, seed)</code>, the resolved account ID is recorded. A later resolution of the same pair must agree with the recorded account ID, or the transaction is rejected.</p>
+<p>In pseudocode:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Checked at every Claim::Pda(seed) and at every pda_seeds match, for both public and private PDAs.
+fn record_or_assert_pda_binding(
+    bindings: &amp;mut Map&lt;(ProgramId, Seed), AccountId&gt;,
+    program_id: ProgramId,
+    seed: Seed,
+    resolved_account_id: AccountId,
+) {
+    match bindings.get((program_id, seed)) {
+        None =&gt; bindings.insert((program_id, seed), resolved_account_id),
+        Some(existing) =&gt; assert_eq!(
+            existing, resolved_account_id,
+            "two different accounts resolved under (program_id, seed) in one transaction",
+        ),
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="circuit-input"><a class="header" href="#circuit-input">Circuit input</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct PrivacyPreservingCircuitInput {
+    /// Outputs of the program execution chain.
+    pub program_outputs: Vec&lt;ProgramOutput&gt;,
+    /// One entry per pre-state, in the same order as they appear across program_outputs.
+    pub account_identities: Vec&lt;InputAccountIdentity&gt;,
+    /// Top-level program ID.
+    pub program_id: ProgramId,
+}
+
+pub enum InputAccountIdentity {
+    /// Public account. The guest reads pre/post state from program_outputs and emits no
+    /// commitment, ciphertext, or nullifier.
+    Public,
+
+    /// Initialization of a standalone private account the caller owns.
+    /// Pre-state must be Account::default().
+    /// AccountId = AccountId::from_private(npk(nsk), identifier).
+    PrivateAuthorizedInit {
+        ssk: SharedSecretKey,
+        nsk: NullifierSecretKey,
+        identifier: Identifier,
+    },
+
+    /// Update of an existing standalone private account the caller owns.
+    /// Membership proof for the current on-chain commitment is required.
+    PrivateAuthorizedUpdate {
+        ssk: SharedSecretKey,
+        nsk: NullifierSecretKey,
+        membership_proof: MembershipProof,
+        identifier: Identifier,
+    },
+
+    /// Initialization of a standalone private account the caller does not own
+    /// (e.g. a recipient who does not yet exist on chain). No nsk, no membership proof.
+    PrivateUnauthorized {
+        npk: NullifierPublicKey,
+        ssk: SharedSecretKey,
+        identifier: Identifier,
+    },
+
+    /// Initialization of a private PDA.
+    /// Authorization comes via Claim::Pda(seed) or the caller's pda_seeds.
+    /// The identifier diversifies the PDA within the (program_id, seed, npk) family.
+    PrivatePdaInit {
+        npk: NullifierPublicKey,
+        ssk: SharedSecretKey,
+        identifier: Identifier,
+        /// When `Some((seed, authority_program_id))`, the circuit verifies
+        /// `AccountId::for_private_pda(authority_program_id, seed, npk, identifier) ==
+        /// pre_state.account_id` directly, binding the position without requiring a
+        /// `Claim::Pda` or caller `pda_seeds`. The `pre_state` must have
+        /// `is_authorized == false`; a seed in this field does not provide authorization.
+        seed: Option&lt;(PdaSeed, ProgramId)&gt;,
+    },
+
+    /// Update of an existing private PDA. npk is derived from nsk.
+    /// Membership proof is required.
+    PrivatePdaUpdate {
+        ssk: SharedSecretKey,
+        nsk: NullifierSecretKey,
+        membership_proof: MembershipProof,
+        identifier: Identifier,
+        /// When `Some((seed, authority_program_id))`, the circuit verifies
+        /// `AccountId::for_private_pda(authority_program_id, seed, npk(nsk), identifier) ==
+        /// pre_state.account_id` directly, binding the position without requiring a
+        /// caller `pda_seeds`. The `pre_state` must have `is_authorized == false`. A seed in
+        /// this field does not provide authorization.
+        seed: Option&lt;(PdaSeed, ProgramId)&gt;,
+    },
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>ssk</code> field carries the <strong>shared secret key</strong> — the 32-byte x-coordinate of the ECDH shared point used to encrypt the post-state. Note that the key protocol uses <code>ssk</code> for "spending secret key" (the master key that derives <code>nsk</code> and <code>vsk</code>); here <code>ssk</code> means the per-output ECDH shared secret. It is computed in two equivalent ways:</p>
+<ul>
+<li>Sender: <code>ssk = x-coordinate of (esk · vpk_recipient)</code></li>
+<li>Receiver: <code>ssk = x-coordinate of (vsk · Epk_sender)</code></li>
+</ul>
+<p>where <code>esk</code>/<code>Epk</code> are the ephemeral key pair, <code>vpk</code> is the recipient's viewing public key, and <code>vsk</code> is the corresponding viewing secret key.</p>
+<h3 id="circuit-output"><a class="header" href="#circuit-output">Circuit output</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct PrivacyPreservingCircuitOutput {
+    pub public_pre_states: Vec&lt;AccountWithMetadata&gt;,
+    pub public_post_states: Vec&lt;Account&gt;,
+    pub ciphertexts: Vec&lt;Ciphertext&gt;,
+    pub new_commitments: Vec&lt;Commitment&gt;,
+    pub new_nullifiers: Vec&lt;(Nullifier, CommitmentSetDigest)&gt;,
+    pub block_validity_window: BlockValidityWindow,
+    pub timestamp_validity_window: TimestampValidityWindow,
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="circuit-logic-summary"><a class="header" href="#circuit-logic-summary">Circuit logic summary</a></h3>
+<p>For each <code>InputAccountIdentity</code> the circuit performs the following:</p>
+<div class="table-wrapper"><table><thead><tr><th>Variant</th><th>AccountId derivation</th><th>Nonce init</th><th>Nullifier emitted</th><th>Auth requires</th><th><code>Claim::Authorized</code> precondition</th></tr></thead><tbody>
+<tr><td><code>Public</code></td><td>from pre-state</td><td>+1 if authorized</td><td>none</td><td>signature</td><td><code>is_authorized</code> must be <code>true</code></td></tr>
+<tr><td><code>PrivateAuthorizedInit</code></td><td><code>from_private(npk(nsk), ident)</code></td><td><code>nonce_init(account_id)</code></td><td>init nullifier</td><td>nsk</td><td><strong>not enforced</strong> (skipped)</td></tr>
+<tr><td><code>PrivateAuthorizedUpdate</code></td><td><code>from_private(npk(nsk), ident)</code></td><td><code>nonce_increment(nsk)</code></td><td>update nullifier</td><td>nsk + membership proof</td><td><strong>not enforced</strong> (skipped)</td></tr>
+<tr><td><code>PrivateUnauthorized</code></td><td><code>from_private(npk, ident)</code></td><td><code>nonce_init(account_id)</code></td><td>init nullifier</td><td>none</td><td><strong>not enforced</strong> (skipped)</td></tr>
+<tr><td><code>PrivatePdaInit</code></td><td><code>for_private_pda(prog, seed, npk, ident)</code></td><td><code>nonce_init(account_id)</code></td><td>init nullifier</td><td>chained call pda_seed or Claim::Pda</td><td><strong>not enforced</strong> (skipped)</td></tr>
+<tr><td><code>PrivatePdaUpdate</code></td><td><code>for_private_pda(prog, seed, npk(nsk), ident)</code></td><td><code>nonce_increment(nsk)</code></td><td>update nullifier</td><td>chained call pda_seed + nsk + membership proof</td><td><strong>not enforced</strong> (skipped)</td></tr>
+</tbody></table>
+</div>
+<p>For each private account the post-state commitment is <code>Commitment::new(account_id, post_account)</code> (with the new nonce applied). The ciphertext is <code>EncryptionScheme::encrypt(post_account, kind, ssk, commitment, output_index)</code>.</p>
+<p>The chain-of-calls logic and <code>validate_execution</code> rules are identical to the public execution path. The claiming rules diverge for <strong>all private accounts</strong>: <code>Claim::Authorized</code> on any private kind (regular or PDA) is allowed unconditionally. No <code>is_authorized</code> check is performed for claiming. For public accounts, <code>Claim::Authorized</code> still requires <code>is_authorized == true</code>.</p>
+<h2 id="encrypted-private-account-discovery-and-tagging"><a class="header" href="#encrypted-private-account-discovery-and-tagging">Encrypted private account discovery and tagging</a></h2>
+<h3 id="ephemeral-view-tags"><a class="header" href="#ephemeral-view-tags">Ephemeral view tags</a></h3>
+<p>Each private account output includes a 1-byte view tag to allow wallets to quickly filter outputs before attempting decryption:</p>
+<div class="math-block" data-tex="\mathsf{ViewTag} = \mathsf{firstByte}\!\left(\mathsf{SHA256}(\text{&quot;/LEE/v0.3/ViewTag/&quot;} \;||\; \mathsf{Npk} \;||\; \mathsf{vpk})\right)"></div>
+<p>where <code>Npk</code> is the 32-byte nullifier public key and <code>vpk</code> is the 33-byte SEC1-compressed <code>ViewingPublicKey</code> of the recipient. On average only 1 in 256 outputs will pass this filter for a given account, avoiding expensive ECDH on irrelevant outputs.</p>
+<h3 id="private-account-discovery-with-viewing-keys"><a class="header" href="#private-account-discovery-with-viewing-keys">Private account discovery with viewing keys</a></h3>
+<ol>
+<li>For each encrypted output, compute the expected view tag from <code>(Npk, vpk)</code>. Skip if it does not match.</li>
+<li>Perform ECDH: <code>ss = x-coordinate of (vsk * Epk)</code>.</li>
+<li>Run <code>kdf(ss, commitment, output_index)</code> to derive the symmetric key.</li>
+<li>Decrypt the ciphertext with ChaCha20.</li>
+<li>Parse the 81-byte header to recover <code>PrivateAccountKind</code>.</li>
+<li>Parse the remaining bytes to recover the <code>Account</code>.</li>
+<li>Recompute the account ID from the kind and verify that <code>Commitment::new(account_id, account)</code> equals the on-chain commitment. Discard on mismatch (false positive).</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn private_account_discovery(
+    tx: &amp;PrivacyPreservingTransaction,
+    vsk: &amp;ViewingSecretKey,
+    npk: &amp;NullifierPublicKey,
+    vpk: &amp;ViewingPublicKey,
+) -&gt; Vec&lt;(PrivateAccountKind, Account)&gt; {
+    let expected_tag = EncryptedAccountData::compute_view_tag(npk, vpk);
+    let mut discovered = Vec::new();
+
+    for (output_index, (encrypted_account, commitment)) in tx.message.encrypted_private_post_states
+        .iter()
+        .zip(&amp;tx.message.new_commitments)
+        .enumerate()
+    {
+        if encrypted_account.view_tag != expected_tag {
+            continue;
+        }
+        let ss = SharedSecretKey::new(vsk, &amp;encrypted_account.epk);
+        if let Some((kind, account)) = EncryptionScheme::decrypt(
+            &amp;encrypted_account.ciphertext, &amp;ss, commitment, output_index as u32
+        ) {
+            let account_id = AccountId::for_private_account(npk, &amp;kind);
+            if Commitment::new(&amp;account_id, &amp;account) == *commitment {
+                discovered.push((kind, account));
+            }
+        }
+    }
+    discovered
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="domain-separator-summary"><a class="header" href="#domain-separator-summary">Domain separator summary</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Purpose</th><th>Domain separator</th></tr></thead><tbody>
+<tr><td>Commitment</td><td><code>b"/LEE/v0.3/Commitment/\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"</code></td></tr>
+<tr><td>Nullifier — initialization</td><td><code>b"/LEE/v0.3/Nullifier/Initialize/\x00"</code></td></tr>
+<tr><td>Nullifier — update</td><td><code>b"/LEE/v0.3/Nullifier/Update/\x00\x00\x00\x00\x00"</code></td></tr>
+<tr><td>Account ID — public</td><td><code>b"/LEE/v0.3/AccountId/Public/\x00\x00\x00\x00\x00"</code></td></tr>
+<tr><td>Account ID — private</td><td><code>b"/LEE/v0.3/AccountId/Private/\x00\x00\x00\x00"</code></td></tr>
+<tr><td>Account ID — public PDA</td><td><code>b"/LEE/v0.3/AccountId/PDA/\x00\x00\x00\x00\x00\x00\x00\x00"</code></td></tr>
+<tr><td>Account ID — private PDA</td><td><code>b"/LEE/v0.3/AccountId/PrivatePDA/\x00"</code></td></tr>
+<tr><td>Nullifier public key (from NSK)</td><td><code>b"LEE/keys"</code> + nsk + <code>[7]</code> + <code>[0; 23]</code></td></tr>
+<tr><td>KDF</td><td><code>b"LEE/v0.3/KDF-SHA256/"</code></td></tr>
+<tr><td>View tag</td><td><code>b"/LEE/v0.3/ViewTag/"</code></td></tr>
+<tr><td>Public transaction message hash</td><td><code>b"/LEE/v0.3/Message/Public/\x00\x00\x00\x00\x00\x00\x00"</code></td></tr>
+<tr><td>Privacy transaction message hash</td><td><code>b"/LEE/v0.3/Message/Privacy/\x00\x00\x00\x00\x00\x00"</code></td></tr>
+</tbody></table>
+</div>
+<h2 id="public-transaction-acceptance-criteria"><a class="header" href="#public-transaction-acceptance-criteria">Public transaction acceptance criteria</a></h2>
+<p>For a public transaction to be accepted and applied to the state:</p>
+<ul>
+<li><strong>No duplicate account IDs:</strong> The <code>account_ids</code> list must not contain repeated entries.</li>
+<li><strong>Signature/nonce count match:</strong> The number of nonces in the message must equal the number of <code>(signature, public_key)</code> pairs in the witness set.</li>
+<li><strong>Valid signatures:</strong> All BIP-340 Schnorr signatures must verify against the message hash.</li>
+<li><strong>Nonce checks:</strong> For each signing account, the nonce in the transaction must match the account's current nonce in state.</li>
+<li><strong>Program existence:</strong> The <code>program_id</code> must correspond to a deployed program.</li>
+<li><strong>Valid execution:</strong> The program is invoked with the provided accounts and instruction data. <code>validate_execution</code> must pass. At each call in the chain, an account in <code>pre_states</code> receives <code>is_authorized = true</code> if it is either a top-level signer (derived from a public key in the witness set), a PDA explicitly seeded by the immediate caller via <code>pda_seeds</code>, or an account that was <code>is_authorized</code> in the parent program's verified pre-states (authorization propagates down the call chain).</li>
+<li><strong>Pre-state consistency:</strong> Each <code>program_output.pre_states[i]</code> must equal the current state of <code>pre_states[i].account_id</code> (or the diffed value from earlier chained calls). The <code>is_authorized</code> flag in each pre-state must match the actual authorization status.</li>
+<li><strong>Program identity consistency:</strong> Each program output's <code>self_program_id</code> must equal the program ID it was invoked under, and its <code>caller_program_id</code> must equal the caller (or <code>None</code> for the top-level call).</li>
+<li><strong>Validity window enforcement:</strong> For <em>each</em> <code>ProgramOutput</code> in the chain (top-level and chained calls), the current <code>block_id</code> must fall within <code>program_output.block_validity_window</code> and the current <code>timestamp</code> must fall within <code>program_output.timestamp_validity_window</code>. Out-of-window outputs are rejected.</li>
+<li><strong>Maximum chained-call depth:</strong> The total number of chained call executions (not including the top-level call) must not exceed <code>MAX_NUMBER_CHAINED_CALLS</code>.</li>
+<li><strong>Claiming:</strong> Any <code>AccountPostState</code> with a <code>Claim</code> causes the runtime to set <code>program_owner = executing_program_id</code> for that account, but only if the account's current <code>program_owner == DEFAULT_PROGRAM_ID</code>. In the public path all accounts are public, so <code>Claim::Authorized</code> always requires <code>is_authorized == true</code> (signature, or PDA via caller's <code>pda_seeds</code>), and <code>Claim::Pda(seed)</code> requires the account ID to match <code>AccountId::for_public_pda(executing_program_id, seed)</code>. (The privacy path relaxes the <code>Claim::Authorized</code> precondition for standalone private accounts — see the Programs section.)</li>
+<li><strong>No silent default-account modifications:</strong> Any account whose pre-state has <code>program_owner == DEFAULT_PROGRAM_ID</code> and whose post-state differs from the pre-state must have been claimed (i.e. its post-state <code>program_owner</code> is no longer the default).</li>
+</ul>
+<p>In pseudocode:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn validate_and_produce_public_state_diff(
+    tx: PublicTransaction,
+    lee_state: LeeState,
+    block_id: BlockId,
+    timestamp: Timestamp,
+) -&gt; Map&lt;AccountId, Account&gt; {
+    let message = tx.message;
+    let witness_set = tx.witness_set;
+
+    // No duplicate account ids
+    assert_no_duplicates(message.account_ids);
+
+    // One nonce per signature
+    assert_eq!(message.nonces.len(), witness_set.signatures_and_public_keys.len());
+
+    // Verify signatures and nonces
+    let mut signer_account_ids = [];
+    for ((signature, public_key), nonce) in witness_set.signatures_and_public_keys.zip(message.nonces) {
+        assert!(signature.is_valid_for(message.hash(), public_key));
+        let account_id = AccountId::from(public_key);
+        assert_eq!(lee_state.public_state.get(account_id).nonce, nonce);
+        signer_account_ids.push(account_id);
+    }
+
+    let input_pre_states = message.account_ids.map(|id| AccountWithMetadata {
+        account: lee_state.public_state.get(id),
+        is_authorized: signer_account_ids.contains(id),
+        account_id: id,
+    });
+
+    let mut state_diff = {};
+
+    // The chained-call queue. Each entry carries the call to execute and the program ID
+    // of its caller (None for the top-level call).
+    let initial_call = ChainedCall {
+        program_id: message.program_id,
+        instruction_data: message.instruction_data,
+        pre_states: input_pre_states,
+        pda_seeds: [],
+    };
+
+    struct CallerData {
+        program_id: Option&lt;ProgramId&gt;,
+        /// Accounts that were `is_authorized` in the parent program's verified pre-states.
+        /// For the top-level call this is the signer set; for chained calls it propagates
+        /// from the parent's authorized pre-states, enabling multi-hop authorization.
+        authorized_accounts: Set&lt;AccountId&gt;,
+    }
+
+    let initial_caller_data = CallerData {
+        program_id: None,
+        authorized_accounts: signer_account_ids,
+    };
+
+    let mut queue = [(initial_call, initial_caller_data)];
+    let mut counter = 0;
+
+    while let Some((call, caller_data)) = queue.pop_front() {
+        assert!(counter &lt;= MAX_NUMBER_CHAINED_CALLS);
+
+        let program = lee_state.programs.get(call.program_id);
+        let program_output = program.execute(
+            call.program_id,
+            caller_data.program_id,
+            call.pre_states,
+            call.instruction_data,
+        );
+
+        // Compute the set of public PDAs the callee is authorized to mutate via the
+        // caller's pda_seeds. For the top-level call (caller_data.program_id == None) this is
+        // always the empty set.
+        let authorized_pdas = compute_public_authorized_pdas(caller_data.program_id, call.pda_seeds);
+        // An account is authorized if it was in the parent's authorized set (propagated from
+        // its verified pre-states) or if it is a PDA the caller explicitly seeded.
+        let is_authorized = |account_id| {
+            caller_data.authorized_accounts.contains(account_id)
+                || authorized_pdas.contains(account_id)
+        };
+
+        // Verify pre-state and authorization consistency: programs cannot fabricate inputs.
+        for pre in program_output.pre_states {
+            let expected_pre = state_diff.get(pre.account_id)
+                .unwrap_or(lee_state.public_state.get(pre.account_id));
+            assert_eq!(pre.account, expected_pre);
+            // The is_authorized flag must exactly match the actual authorization status:
+            // programs cannot forge it (flag true on an unauthorized account) nor
+            // under-report it (flag false on a truly-authorized account).
+            assert_eq!(pre.is_authorized, is_authorized(pre.account_id));
+        }
+
+        // Verify the output identifies its own program ID and caller correctly.
+        assert_eq!(program_output.self_program_id, call.program_id);
+        assert_eq!(program_output.caller_program_id, caller_data.program_id);
+
+        validate_execution(
+            program_output.pre_states,
+            program_output.post_states,
+            call.program_id,
+        );
+
+        // Validity window: this output is valid only within its declared block / timestamp range.
+        assert!(program_output.block_validity_window.is_valid_for(block_id));
+        assert!(program_output.timestamp_validity_window.is_valid_for(timestamp));
+
+        // Apply claims and update the state diff.
+        for (pre, post) in program_output.pre_states.zip(program_output.post_states) {
+            if let Some(claim) = post.claim {
+                // Claims only fire when the account currently has the default program owner.
+                assert_eq!(post.account.program_owner, DEFAULT_PROGRAM_ID);
+                match claim {
+                    Claim::Authorized =&gt; assert!(pre.is_authorized),
+                    Claim::Pda(seed) =&gt; {
+                        assert_eq!(pre.account_id, AccountId::for_public_pda(call.program_id, seed));
+                    }
+                }
+                post.account.program_owner = call.program_id;
+            }
+            state_diff.insert(pre.account_id, post.account);
+        }
+
+        // Build the authorized set for child calls: the union of the caller's authorized set
+        // and the verified authorized pre-states of this call. Using program_output.pre_states
+        // (not call.pre_states) ensures the new entries are derived from already-validated data
+        // and cannot be forged by a caller-supplied input. Authorization is monotonically
+        // growing — once an account is authorized at any point in the chain it remains
+        // authorized for all subsequent calls, even if an intermediate hop does not include
+        // it in its own pre-states.
+        let authorized_accounts = caller_data.authorized_accounts
+            .union(
+                program_output.pre_states
+                    .filter(|pre| pre.is_authorized)
+                    .map(|pre| pre.account_id)
+            );
+
+        // Push chained calls (in declared order). Pushing them to the front of the queue
+        // produces a depth-first traversal.
+        for new_call in program_output.chained_calls.reversed() {
+            queue.push_front((new_call, CallerData {
+                program_id: Some(call.program_id),
+                authorized_accounts: authorized_accounts,
+            }));
+        }
+
+        counter += 1;
+    }
+
+    // Default-owner accounts that were modified must have been claimed.
+    for (account_id, post) in state_diff {
+        let pre = lee_state.public_state.get(account_id);
+        if pre.program_owner == DEFAULT_PROGRAM_ID &amp;&amp; pre != post {
+            assert_ne!(post.program_owner, DEFAULT_PROGRAM_ID);
+        }
+    }
+
+    state_diff
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="note-on-replay-attacks"><a class="header" href="#note-on-replay-attacks">Note on replay attacks</a></h3>
+<p>The nonce mechanism ensures authorized public transactions cannot be replayed. Once accepted, nonces for all signing accounts are incremented — the same transaction can never be valid again. Purely unauthorized transactions (no signatures required) could theoretically be replayed.</p>
+<h2 id="privacy-preserving-transaction-acceptance-criteria"><a class="header" href="#privacy-preserving-transaction-acceptance-criteria">Privacy-preserving transaction acceptance criteria</a></h2>
+<p>For a privacy transaction to be accepted:</p>
+<ul>
+<li><strong>Non-empty commitments or nullifiers:</strong> At least one new commitment or nullifier must be present.</li>
+<li><strong>No duplicate public account IDs:</strong> The <code>public_account_ids</code> list must not contain repeated entries.</li>
+<li><strong>Commitment uniqueness:</strong> No two entries within the transaction's <code>new_commitments</code> list may be equal.</li>
+<li><strong>Commitment freshness:</strong> No new commitment may already exist in the <code>CommitmentSet</code>.</li>
+<li><strong>Nullifier uniqueness:</strong> No new nullifier may already exist in the <code>NullifierSet</code>. No duplicates within the transaction's <code>new_nullifiers</code> list either.</li>
+<li><strong>Valid commitment set digests:</strong> Each nullifier's associated <code>CommitmentSetDigest</code> must match a current or previous digest of the <code>CommitmentSet</code>.</li>
+<li><strong>Signature/nonce count match:</strong> The number of nonces in the message must equal the number of <code>(signature, public_key)</code> pairs in the witness set.</li>
+<li><strong>Nonce checks and valid signatures:</strong> Same rules as for public transactions, applied to any public accounts present.</li>
+<li><strong>Validity window enforcement:</strong> The current <code>block_id</code> must fall within <code>message.block_validity_window</code> and the current <code>timestamp</code> must fall within <code>message.timestamp_validity_window</code>. These windows are the intersection of all per-<code>ProgramOutput</code> windows in the chain, computed and committed by the circuit.</li>
+<li><strong>Proof verification:</strong> The ZK proof must verify against the circuit output values in the message and the current public pre-states. Public accounts in <code>public_pre_states</code> receive <code>is_authorized = true</code> if they are top-level signers; the circuit then applies the same <code>CallerData</code>-based authorization propagation as the public execution path, so authorized accounts (including PDAs) flow through chained calls as described there.</li>
+</ul>
+<p>In pseudocode:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn verify_privacy_preserving_transaction(
+    tx: PrivacyPreservingTransaction,
+    lee_state: LeeState,
+    block_id: BlockId,
+    timestamp: Timestamp,
+) {
+    let message = tx.message;
+    let witness_set = tx.witness_set;
+
+    // 1. Non-empty
+    assert!(!message.new_commitments.is_empty() || !message.new_nullifiers.is_empty());
+
+    // 2. No duplicate public account ids
+    assert_no_duplicates(message.public_account_ids);
+
+    // 3. Commitment uniqueness within the transaction
+    assert_no_duplicates(message.new_commitments);
+
+    // 4. Nullifier uniqueness within the transaction
+    assert_no_duplicates(message.new_nullifiers.map(|(n, _)| n));
+
+    // 5. Nonce checks and valid signatures
+    assert_eq!(witness_set.signatures_and_public_keys.len(), message.nonces.len());
+    let mut authorized_ids = [];
+    for ((sig, pk), nonce) in witness_set.signatures_and_public_keys.zip(message.nonces) {
+        assert!(sig.is_valid_for(message.hash(), pk));
+        let account_id = AccountId::from(pk);
+        assert_eq!(lee_state.public_state.get(account_id).nonce, nonce);
+        authorized_ids.push(account_id);
+    }
+
+    // 6. Validity window enforcement
+    assert!(message.block_validity_window.is_valid_for(block_id));
+    assert!(message.timestamp_validity_window.is_valid_for(timestamp));
+
+    // 7. Build public pre-states for proof verification
+    let public_pre_states = message.public_account_ids.map(|id| AccountWithMetadata {
+        account: lee_state.public_state.get(id),
+        is_authorized: authorized_ids.contains(id),
+        account_id: id,
+    });
+
+    // 8. Proof verification
+    assert_privacy_circuit_proof_is_valid(
+        witness_set.proof,
+        public_pre_states,
+        message.public_post_states,
+        message.encrypted_private_post_states.map(|e| e.ciphertext),
+        message.new_commitments,
+        message.new_nullifiers,
+        message.block_validity_window,
+        message.timestamp_validity_window,
+    );
+
+    // 9. Commitment freshness and valid digests are checked against the current CommitmentSet
+    //    and NullifierSet.
+    for commitment in message.new_commitments {
+        assert!(!lee_state.private_state.0.contains(commitment));
+    }
+    for (nullifier, digest) in message.new_nullifiers {
+        assert!(!lee_state.private_state.1.contains(nullifier));
+        assert!(lee_state.private_state.0.is_current_or_previous_digest(digest));
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="note-on-replay-attacks-1"><a class="header" href="#note-on-replay-attacks-1">Note on replay attacks</a></h3>
+<p>Replay attacks are not possible for privacy transactions. Any accepted transaction either adds commitments or nullifiers to the state. A replay attempt is rejected by commitment freshness or nullifier uniqueness checks.</p>
+<h2 id="state-transitions"><a class="header" href="#state-transitions">State transitions</a></h2>
+<h3 id="state-transition-from-public-transactions"><a class="header" href="#state-transition-from-public-transactions">State transition from public transactions</a></h3>
+<ol>
+<li>Verify acceptance criteria — including the per-<code>ProgramOutput</code> validity windows — and produce a state diff.</li>
+<li>Apply the state diff: update (or insert) each account in <code>public_state</code>.</li>
+<li>Increment nonces for all signing accounts.</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn transition_from_public_transaction(
+    tx: PublicTransaction,
+    lee_state: LeeState,
+    block_id: BlockId,
+    timestamp: Timestamp,
+) {
+    let state_diff = validate_and_produce_public_state_diff(tx, lee_state, block_id, timestamp);
+
+    for (account_id, post) in state_diff {
+        lee_state.public_state[account_id] = post;
+    }
+
+    for account_id in tx.signer_account_ids() {
+        lee_state.public_state[account_id].nonce += 1;
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="state-transition-from-privacy-preserving-transactions"><a class="header" href="#state-transition-from-privacy-preserving-transactions">State transition from privacy-preserving transactions</a></h3>
+<ol>
+<li>Verify acceptance criteria — including the message's validity windows.</li>
+<li>Add new commitments to the <code>CommitmentSet</code>.</li>
+<li>Add new nullifiers to the <code>NullifierSet</code>.</li>
+<li>Apply public account changes from <code>public_post_states</code>.</li>
+<li>Increment nonces for all signing public accounts.</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn transition_from_privacy_preserving_transaction(
+    tx: PrivacyPreservingTransaction,
+    lee_state: LeeState,
+    block_id: BlockId,
+    timestamp: Timestamp,
+) {
+    verify_privacy_preserving_transaction(tx, lee_state, block_id, timestamp);
+
+    for commitment in tx.message.new_commitments {
+        lee_state.private_state.0.insert(commitment);
+    }
+
+    for (nullifier, _) in tx.message.new_nullifiers {
+        lee_state.private_state.1.insert(nullifier);
+    }
+
+    for (account_id, post) in tx.message.public_account_ids.zip(tx.message.public_post_states) {
+        lee_state.public_state[account_id] = post;
+    }
+
+    for account_id in tx.signer_account_ids() {
+        lee_state.public_state[account_id].nonce += 1;
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>For both transaction types, the validity-window check is part of the acceptance criteria — outputs outside their declared windows are rejected before any state mutation occurs.</p>
+<h3 id="state-transition-from-program-deployment-transactions"><a class="header" href="#state-transition-from-program-deployment-transactions">State transition from program deployment transactions</a></h3>
+<p>A program deployment transaction contains only the program bytecode. The program ID is derived from the bytecode image.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>struct ProgramDeploymentMessage {
+    bytecode: ByteString,
+}
+
+struct ProgramDeploymentTransaction {
+    message: ProgramDeploymentMessage,
+}
+<span class="boring">}</span></code></pre></pre>
+<ol>
+<li>Verify the derived <code>ProgramId</code> does not already exist in <code>programs</code>.</li>
+<li>Insert the new program.</li>
+</ol>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn transition_from_program_deployment_transaction(
+    tx: &amp;ProgramDeploymentTransaction,
+    lee_state: &amp;mut LeeState,
+) {
+    let program = Program::new(tx.message.bytecode.clone()).expect("Valid program bytecode");
+    assert!(!lee_state.programs.contains_key(&amp;program.id()), "Program already deployed");
+    lee_state.programs.insert(program.id(), program);
+}
+<span class="boring">}</span></code></pre></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../../blockchain/deprecated/da-rewarding.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../../blockchain/deprecated/da-rewarding.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../../elasticlunr.min.js"></script>
+        <script src="../../../mark.min.js"></script>
+        <script src="../../../searcher.js"></script>
+
+        <script src="../../../clipboard.min.js"></script>
+        <script src="../../../highlight.js"></script>
+        <script src="../../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../../theme/katex/katex.min.js"></script>
+        <script src="../../../theme/katex/auto-render.min.js"></script>
+        <script src="../../../scripts/katex-render.js"></script>
+        <script src="../../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>

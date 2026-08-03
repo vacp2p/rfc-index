@@ -1,0 +1,1789 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Mantle - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html" class="active"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/execution-market.html"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity.html"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-encapsulation.html"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications.html"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-lioness.html"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-oracle-zone.html"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="mantle"><a class="header" href="#mantle">MANTLE</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Mantle</td></tr>
+<tr><td>Slug</td><td>98</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Informational</td></tr>
+<tr><td>Editor</td><td>Thomas Lavaur <a href="mailto:thomas@logos.co">thomas@logos.co</a></td></tr>
+<tr><td>Contributors</td><td>David Rusu <a href="mailto:davidrusu@logos.co">davidrusu@logos.co</a>, Filip Dimitrijevic <a href="mailto:filip@logos.co">filip@logos.co</a>, Marcin Pawlowski <a href="mailto:marcin@logos.co">marcin@logos.co</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
+<li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
+<li><strong>2026-07-09</strong> — <a href="https://github.com/logos-co/logos-lips/blob/18c373bf24127e1894be8bc074c2741d5946c9c4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>18c373b</code></a> — docs(blockchain): Factor out multiple Ed25519 threshold verification and validate configuration threshold (#367)</li>
+<li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
+<li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
+<li><strong>2026-05-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>58b5698</code></a> — chore(blockchain): migrate contributor emails to @logos.co (#338)</li>
+<li><strong>2026-01-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
+<li><strong>2026-01-16</strong> — <a href="https://github.com/logos-co/logos-lips/blob/89f2ea89fc1d69ab238b63c7e6fb9e4203fd8529/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>89f2ea8</code></a> — Chore/mdbook updates (#258)</li>
+</ul>
+<!-- timeline:end -->
+<h1 id="revisions-history"><a class="header" href="#revisions-history">Revisions History</a></h1>
+<div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th>Date</th></tr></thead><tbody>
+<tr><td>1.1.0</td><td>Initial revision.</td><td>2026-12-01</td></tr>
+<tr><td>1.2.0</td><td>Removed DA references. Removed notions of Sovereignty and Rollups and used Zones for simplicity. Removed Nomos from specifications and DSTs. Added bridging and decentralized sequencing for channels.</td><td>2026-01-01</td></tr>
+<tr><td>1.2.1</td><td>[RFC] Improve Mantle Transaction hash.</td><td>2026-03-25</td></tr>
+<tr><td>1.3.0</td><td><a href="mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html">[RFC] Make Ledger Transaction an Operation</a>.</td><td>2026-04-02</td></tr>
+<tr><td>1.4.0</td><td><a href="mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html">[RFC] Enforce NoteId uniqueness</a>.</td><td>2026-04-24</td></tr>
+<tr><td>1.5.0</td><td><a href="mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html">[RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a>.</td><td>2026-05-06</td></tr>
+<tr><td>1.6.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
+<tr><td>1.7.0</td><td>Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys</td><td>2026-06-25</td></tr>
+<tr><td>1.8.0</td><td>[RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash</td><td>2026-07-06</td></tr>
+<tr><td>1.9.0</td><td>Update the execution of <code>CHANNEL_DEPOSIT</code> to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit</td><td>2026-07-27</td></tr>
+</tbody></table>
+</div>
+<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Mantle is a foundational element of Bedrock, designed to provide a minimal and efficient execution layer that connects together Bedrock Services in order to provide the necessary functionality for Zones. It can be viewed as the system call interface of Bedrock, exposing a safe and constrained set of Operations to interact with lower-level Bedrock services, similar to syscalls in an operating system.</p>
+<p>Mantle Transactions provide Operations for Zones and blockchain Services to interact with Bedrock. For example, a Zone sequencer posting an update to Bedrock, or a node operator declaring its participation in the Blend Network, would be done through the corresponding Operations within a Mantle Transaction.</p>
+<p>Mantle manages assets using a note-based ledger that follows an UTXO model. Each Mantle Transaction can include Transfer Operation, and any excess balance serves as the fee payment.</p>
+<h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
+<h2 id="mantle-transaction"><a class="header" href="#mantle-transaction">Mantle Transaction</a></h2>
+<p>The features of the Logos Blockchain are exposed through Mantle Transactions. Each transaction can contain zero or more <strong>Operations</strong>. Mantle Transactions enable users to execute multiple Operations atomically.</p>
+<h2 id="mantle-operations"><a class="header" href="#mantle-operations">Mantle Operations</a></h2>
+<p>Logos Blockchain features are exposed through Mantle Operations, which can be combined and executed together in a single Mantle Transaction atomically. These Operations enable transfers and functions such as on-chain data posting, Cross-Zone interactions, SDP interaction, and leader reward claims.</p>
+<h2 id="mantle-ledger"><a class="header" href="#mantle-ledger">Mantle Ledger</a></h2>
+<p>The Mantle Ledger enables asset transfers using a transparent UTXO model. While a Transfer Operation can consume more tokens than it creates, the Mantle Transaction excess balance must exactly pay for the fees. The ledger tracks three kinds of notes: regular notes, locked notes (collateral for service declarations) and channel notes (channel bridge funds eligible for PoS participation only).</p>
+<h2 id="transaction-fees"><a class="header" href="#transaction-fees">Transaction Fees</a></h2>
+<p>Mantle Transaction fees are derived from a gas model. The Logos Blockchain has two different gas markets, accounting for permanent data storage, and execution costs. Each Operation has an associated Execution Gas cost. Users can build unbalanced Mantle Transactions to tip the leaders and incentivize the network to include their transaction.</p>
+<div class="table-wrapper"><table><thead><tr><th>Gas Market</th><th>Charged On</th><th>Pricing Basis</th></tr></thead><tbody>
+<tr><td>Execution Gas</td><td>Operations</td><td>Fixed per Operation</td></tr>
+<tr><td>Permanent Storage Gas</td><td>Signed Mantle Transaction</td><td>Proportional to encoded size</td></tr>
+</tbody></table>
+</div>
+<h1 id="mantle-transaction-1"><a class="header" href="#mantle-transaction-1">Mantle Transaction</a></h1>
+<p>Mantle Transactions form the core of Mantle, enabling users to combine multiple Operations to access different functions. Each transaction contains zero or more Operations. The system executes all Operations atomically, while using the Mantle Transaction's excess balance—calculated as the difference between the consumed and created value— as the fee payment.</p>
+<pre><code class="language-python">class MantleTx:
+    ops: list[Op]
+
+class Op:
+    opcode: byte
+    payload: bytes
+
+def mantle_txhash(tx: MantleTx) -&gt; Hash:
+    tx_bytes = encode(tx)
+
+    h = Hasher()
+    h.update(b"MANTLE_TXHASH_V1")
+    h.update(tx_bytes)
+
+    return h.digest()
+</code></pre>
+<p>The <a href="common-cryptographic-components.html">hash function used</a>, as well as other cryptographic primitives like ZK proofs and signature schemes, are described in <a href="common-cryptographic-components.html">Common Cryptographic Components</a>.</p>
+<h2 id="mantle-transaction-hash"><a class="header" href="#mantle-transaction-hash">Mantle Transaction Hash</a></h2>
+<p>A Mantle Transaction must include all relevant signatures and proofs for each Operation.</p>
+<pre><code class="language-python">class SignedMantleTx:
+    tx: MantleTx
+    op_proofs: list[OpProof | None] # each Op has at most 1 associated proof
+</code></pre>
+<p>Each proof (op proof and signature) must be cryptographically bound to the <code>MantleTx</code> through the <code>mantle_txhash</code> to prevent replay attacks. This binding is achieved by including the <code>MantleTx</code> hash reduced modulo <span class="math-inline" data-tex="p"></span> as a public input in every ZK proof.</p>
+<pre><code class="language-python">mantle_txhash_fr = FiniteField(mantle_txhash, byte_order="little", modulus = p)
+</code></pre>
+<p><code>mantle_txhash</code> is a classical 256-bit hash digest and must be reduced to a field element before being passed to any ZkHasher or used as a ZK public input. We apply a direct modular reduction mod <span class="math-inline" data-tex="p"></span> (via <code>FiniteField(..., modulus=p)</code>). Since <span class="math-inline" data-tex="p \approx 2^{254}"></span>, the reduction is slightly non-uniform. This is inconsequential in practice as the collision probability remains around <span class="math-inline" data-tex="2^{-254}"></span>, and proof binding is derived from the collision-resistance of the classic hash, not from uniformity over <span class="math-inline" data-tex="F_p"></span>.</p>
+<h2 id="mantle-transaction-fee"><a class="header" href="#mantle-transaction-fee">Mantle Transaction Fee</a></h2>
+<p>The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the <code>execution_base_fee</code>, and the total size of the encoded signed Mantle Transaction multiplied by the <code>permanent_storage_gas_price</code>. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [<a href="execution-market.html">Execution Market</a> and <a href="storage-markets.html">Storage Markets</a>.</p>
+<pre><code class="language-python">def mandatory_fees(signed_tx: SignedMantleTx,
+                   permanent_storage_gas_price: TokenValue, # Given by Storage Market
+                   execution_gas_base_price: TokenValue) -&gt; int:  # Given by Execution Market
+    mantle_tx = signed_tx.tx
+    permanent_storage_fees = len(encode(signed_mantle_tx)) * permanent_storage_gas_price
+    tx_execution_gas = 0
+
+    for op in mantle_tx.ops:
+        # Compute how much execution gas of this operation as defined
+        # in the gas determination Appendix
+        tx_execution_gas += execution_gas(op)
+    execution_base_fees = tx_execution_gas * execution_gas_base_price
+
+    return execution_base_fees + permanent_storage_fees
+</code></pre>
+<p>If the Mantle Transaction is unbalanced (meaning that the Transaction consume more value than it creates) and that the leftover balance cover more than the mandatory fees, the remaining is treated as execution tip fees.</p>
+<h2 id="validation"><a class="header" href="#validation"><strong>Validation</strong></a></h2>
+<p><em>Given</em></p>
+<pre><code class="language-python">signed_tx = SignedMantleTx(
+    tx=MantleTx(ops),
+    op_proofs
+)
+</code></pre>
+<p>Mantle validators will ensure the following:</p>
+<ol>
+<li>
+<p>We have a proof or a <code>None</code> value for each operation.</p>
+<pre><code class="language-python">assert len(op_proofs) == len(ops)
+</code></pre>
+</li>
+<li>
+<p>Each Operation is valid.</p>
+<pre><code class="language-python">for op, op_proof in zip(ops, op_proofs):
+    assert op.opcode in MANTLE_OPCODES
+    validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+
+def validate_mantle_op(txhash, opcode, payload, op_proof):
+    if opcode == CHANNEL_INSCRIBE:
+        validate_channel_inscribe(txhash, payload, op_proof)
+    # elif opcode == ...
+    #    ...
+</code></pre>
+</li>
+<li>
+<p>The Mantle Transaction excess balance pays least the mandatory fees.</p>
+<pre><code class="language-python">tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
+tx_balance = get_transaction_balance(signed_tx)
+assert tx_mandatory_fee &lt;= tx_balance
+tx_execution_tip = tx_balance - tx_mandatory_fee
+
+def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int:
+    balance = 0   # It's important to not use unsigned int here to avoid
+                  # overflow vulnerabilities
+    for op in signed_tx.tx.ops:
+        if op.opcode == TRANSFER:
+            for inp in op.inputs:
+                balance += get_value_from_note_id(inp)
+            for out in op.outputs:
+                balance -= out.value
+    return balance
+</code></pre>
+</li>
+</ol>
+<h2 id="execution"><a class="header" href="#execution">Execution</a></h2>
+<p><em>Given</em></p>
+<pre><code class="language-python">SignedMantleTx(
+    tx=MantleTx(ops),
+    op_proofs
+)
+</code></pre>
+<p>Mantle Validators execute sequentially each Operation in <code>ops</code> according to its opcode.</p>
+<h1 id="operations"><a class="header" href="#operations">Operations</a></h1>
+<h2 id="opcodes"><a class="header" href="#opcodes">Opcodes</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Operation</strong></th><th><strong>Opcode</strong></th><th><strong>Description</strong></th></tr></thead><tbody>
+<tr><td>TRANSFER</td><td>0x00</td><td>Consume and create notes.</td></tr>
+<tr><td><em>RESERVED</em></td><td><em>0x01 - 0x0F</em></td><td></td></tr>
+<tr><td>CHANNEL_CONFIG</td><td>0x10</td><td>Configure a channel</td></tr>
+<tr><td>CHANNEL_INSCRIBE</td><td>0x11</td><td>Write a message permanently onto Mantle.</td></tr>
+<tr><td>CHANNEL_DEPOSIT</td><td>0x12</td><td>Deposit assets into a channel</td></tr>
+<tr><td>CHANNEL_WITHDRAW</td><td>0x13</td><td>Withdraw assets from a channel</td></tr>
+<tr><td>CHANNEL_TRANSFER</td><td>0x14</td><td>Consume and create notes belonging to a channel</td></tr>
+<tr><td><em>RESERVED</em></td><td><em>0x15 - 0x1F</em></td><td></td></tr>
+<tr><td>SDP_DECLARE</td><td>0x20</td><td>Declare intention to participate as a node in a Bedrock Service, locking funds as collateral.</td></tr>
+<tr><td>SDP_WITHDRAW</td><td>0x21</td><td>Withdraw participation from a Bedrock Service, unlocking your funds in the process.</td></tr>
+<tr><td>SDP_ACTIVE</td><td>0x22</td><td>Signal that you are still an active participant of a Bedrock Service.</td></tr>
+<tr><td><em>RESERVED</em></td><td><em>0x23 - 0xFF</em></td><td></td></tr>
+<tr><td>LEADER_CLAIM</td><td>0x30</td><td>Claim leader reward anonymously.</td></tr>
+<tr><td><em>RESERVED</em></td><td><em>0x31 - 0xFF</em></td><td></td></tr>
+</tbody></table>
+</div>
+<h2 id="channel-operations"><a class="header" href="#channel-operations">Channel Operations</a></h2>
+<p>Channels allow Zones to post their updates on chain. Channels form virtual chains that overlay on top of the Cryptarchia blockchain. Clients and Followers of a Zone can watch its channel to learn the state of that Zone. Each channel has an associated balance, enabling bridging between Zones and Bedrock.</p>
+<h3 id="message-ordering"><a class="header" href="#message-ordering">Message Ordering</a></h3>
+<p>Channels form virtual chains by having each message reference its parent message. The order of messages in these channels is enforced by the sequencer by building a hash chain of messages, i.e. new messages reference the previous messages through a parent hash. Given that Cryptarchia has long finality times, these message parent references allow Zone sequencers to continue to post new updates to channels without having to wait for finality. No matter how Cryptarchia forks and reorgs, the channel messages from honest sequencers will eventually be re-included in a way that satisfies the virtual chain order.</p>
+<p>The first time a message is sent to an unclaimed channel, the key that signs the initial message becomes the only accredited key in the list (Note that this key may correspond to a threshold signature key). Accredited keys of a channel forms a committee that can configure the channel, withdraw funds and take turns to write messages to that channel following a round-robin algorithm. Configuring a channel includes modifying the list of accredited keys, the round-robin parameters and the required number of signatures to withdraw funds or establish a new configuration.</p>
+<p>Validators must maintain the following state to process channel Operations:</p>
+<pre><code class="language-python">channels: dict[ChannelId, ChannelState] # ChannelId is 32 bytes
+
+class ChannelState:
+    # Channel Configuration
+    accredited_keys: list[Ed25519PublicKey]  # limited to 65 535 keys
+    configuration_threshold: u16  # indicating how many keys are
+                                  # required to update the configuration
+
+    # Message Ordering
+    tip_hash: hash
+
+    # Decentralized Sequencing
+    tip_slot: Slot
+    tip_sequencer: u16      # indicating the actual
+                            # sequencer position in the list of accredited keys
+    tip_sequencer_starting_slot: Slot
+    posting_timeframe: u32  # number of slots (0 = infinity)
+    posting_timeout: u32    # number of slots (0 = no timeout)
+
+    # Bridging
+    transfer_threshold: u16  # indicating how many keys are
+                             # required to transfer or withdraw funds from the channel
+
+def default_channel(block_slot: Slot, keys: list[Ed25519PublicKey]) -&gt; ChannelState:
+    return ChannelState(
+        tip_hash = ZERO,
+        tip_slot = block_slot,
+        accredited_keys = keys,
+        tip_sequencer = 0,
+        tip_sequencer_starting_slot = block_slot,
+        posting_timeframe = 0,
+        posting_timeout = 0,
+        configuration_threshold = 1,
+        transfer_threshold = 1)
+</code></pre>
+<p>Note that the user chooses the ChannelId mapping to the ChannelState (but it’s restricted to 32 bytes). We don't currently impose restrictions on it, but we may do so in the future to prevent undesirable behaviors.</p>
+<h3 id="decentralized-sequencing"><a class="header" href="#decentralized-sequencing">Decentralized Sequencing</a></h3>
+<p>To determine which sequencer is currently authorized to send messages, we use a round-robin algorithm. When a message is posted to a channel, the following algorithm is used to determine who the sequencer is:</p>
+<pre><code class="language-python"># Round Robin algorithm determining the new sequencer index and the
+# new sequencer starting slot
+def round_robin(block_slot: Slot, channel: ChannelState) -&gt; (u16, u64):
+    elapsed_slots = block_slot - channel.tip_slot
+    if elapsed_slots &gt;= channel.posting_timeout and channel.posting_timeout != 0:
+        # Get the number of sequencers that get timed out
+        sequencers_timed_out = elapsed_slots // channel.posting_timeout
+        index = (
+            (channel.tip_sequencer + sequencers_timed_out)
+            % len(channel.accredited_keys)
+        )
+        starting_slot = (
+            channel.tip_slot
+            + sequencers_timed_out * channel.posting_timeout
+        )
+    else:
+        # Get the number of timeframes elapsed to get who is the sequencer
+        tip_sequencer_duration = block_slot - channel.tip_sequencer_starting_slot
+        index = (
+            (channel.tip_sequencer + (tip_sequencer_duration // channel.posting_timeframe))
+            % len(channel.accredited_keys)
+        )
+        starting_slot = (
+            channel.tip_sequencer_starting_slot
+            + (tip_sequencer_duration // channel.posting_timeframe) * channel.posting_timeframe
+        )
+    return (index, starting_slot)
+</code></pre>
+<h3 id="bridging"><a class="header" href="#bridging">Bridging</a></h3>
+<p>Channels let their bridged funds keep participating in Proof of Stake. When a user deposits funds into a channel, the deposited notes stay on the ledger and are not turned into inert collateral. They are consumed and immediately re-created as channel notes that continue to count toward Proof of Stake and can still be used to create PoLs (see <a href="#channel-notes">Channel Notes</a>). Two goals motivate this design:</p>
+<ul>
+<li><strong>More PoS participation, stronger security.</strong> Funds deposited into a channel would otherwise leave the staking set. Keeping them as channel notes means the capital backing the application layer also backs consensus security, so bridging does not shrink the stake that secures the chain.</li>
+<li><strong>No split between security and application.</strong> A user no longer has to choose between staking funds or using them in a channel. The same funds do both at once. They stay usable inside the channel while still earning Proof of Leadership rewards, so capital is never fragmented between the two.</li>
+</ul>
+<p><strong>Ownership vs. staking power.</strong> A <code>CHANNEL_DEPOSIT</code> separates the two rights that a normal note bundles together:</p>
+<ul>
+<li><em>Ownership</em> moves to the channel. The note is registered in the ledger's <code>channel_notes</code> set with the channel as its owner, and the channel keeps full control over it. The deposited notes are consumed and re-created identically: they keep their value and <code>ZkPublicKey</code>, receive a new <code>NoteId</code> derived from the deposit's <code>OpId</code>, and are registered as channel-owned. The channel is now the party responsible for the note.</li>
+<li><em>Staking power</em> stays with the <code>ZkPublicKey</code> carried by the note. That key does not confer ownership. It only delegates the note's value for PoL creation. Whoever controls the key is the one allowed to turn the note into a PoL and collect the resulting rewards. On deposit this key is still the depositor's, so the user keeps the PoS participation power they had before bridging.</li>
+</ul>
+<p>Because the channel owns the note but does not hold the delegated key, the note earns rewards for the key holder, never for the channel itself.</p>
+<p><strong>Ageing.</strong> Because the deposit re-creates the notes under a new <code>NoteId</code>, a deposited note restarts the ageing process and must age again before it can create a PoL. Bridged funds still count toward Proof of Stake, so the goals above hold, but the participation is not continuous across the deposit.</p>
+<p><strong>What each party can do.</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Party</th><th>Can</th><th>Cannot</th></tr></thead><tbody>
+<tr><td>Holder of the note's <code>ZkPublicKey</code> (by default, the depositor)</td><td>Use the note to create a PoL and earn its leader rewards</td><td>Spend the note, withdraw it, reassign it, or use it as service stake</td></tr>
+<tr><td>Channel sequencers (owner of the note)</td><td>Reassign the note to a different <code>ZkPublicKey</code> (<code>CHANNEL_TRANSFER</code>) and spend it to fund withdrawals (<code>CHANNEL_WITHDRAW</code>), both without <code>ZkSignature</code> verification</td><td>Use the note as service stake, or earn PoL rewards without first assigning the note to their own key</td></tr>
+</tbody></table>
+</div>
+<p>This makes delegated staking explicit. Sequencers can assign a channel note to their own <code>ZkPublicKey</code> and earn the Proof of Leadership rewards it produces, but those rewards always follow the assigned key, so the channel earns nothing merely by owning the note. Conversely, ownership never leaving the channel is exactly what lets sequencers redelegate value or cover withdrawals at any time without a user signature.</p>
+<p><strong>Warning: a deposit is a transfer of custody.</strong> Depositors must understand that channel note handling is fully defined by the channel. Once a <code>CHANNEL_DEPOSIT</code> is executed the note belongs to the channel, and its sequencers can reassign it to any <code>ZkPublicKey</code> with <code>CHANNEL_TRANSFER</code> or release it to whoever they choose with <code>CHANNEL_WITHDRAW</code>, at any time and without any signature from the depositor. The ledger enforces no return path to the original depositor. Holding the note's <code>ZkPublicKey</code> grants PoS participation power only and never a claim on the value, so it confers no ability to recover the funds. A user who deposits into a dishonest or faulty channel has no on-chain recourse. Deposit only into channels you trust to honour their own withdrawal policy.</p>
+<h3 id="channel_inscribe"><a class="header" href="#channel_inscribe">CHANNEL_INSCRIBE</a></h3>
+<p>Write a message to a channel with the message data being permanently stored on the Logos Blockchain.</p>
+<h4 id="payload"><a class="header" href="#payload">Payload</a></h4>
+<pre><code class="language-python">class Inscribe:
+    channel: ChannelId       # 32 bytes Channel being written to
+    inscription : bytes      # Message to be written on the blockchain
+    parent: hash             # Previous message in the channel
+    signer: Ed25519PublicKey # Identity of message sender
+</code></pre>
+<h4 id="proof"><a class="header" href="#proof">Proof</a></h4>
+<pre><code class="language-python">Ed25519Signature
+</code></pre>
+<h4 id="execution-gas"><a class="header" href="#execution-gas">Execution Gas</a></h4>
+<p>Channel Inscribe Operations have a fixed Execution Gas cost of <code>EXECUTION_CHANNEL_INSCRIBE_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-1"><a class="header" href="#validation-1">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: hash
+msg: Inscribe
+sig: Ed25519Signature
+
+channels: dict[ChannelId, ChannelState]
+block_slot: Slot
+</code></pre>
+<p><em>Validate</em></p>
+<pre><code class="language-python">if msg.channel in channels:
+    chan = channels[msg.channel]
+    current_sequencer_index = round_robin(block_slot, chan)[0]
+
+    # Ensure the signer is the one authorized to write to the channel
+    assert msg.signer == chan.accredited_keys[current_sequencer_index]
+
+    # Ensure message is continuing the channel sequence
+    assert msg.parent == chan.tip_hash
+else:
+    # Channel will be created automatically upon execution
+    # Ensure that this message is the genesis message (parent == ZERO)
+    assert msg.parent == ZERO
+
+# Ensure the msg signer signature
+assert Ed25519_verify(txhash, msg.signer, sig)
+</code></pre>
+<h4 id="execution-1"><a class="header" href="#execution-1">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">msg: Inscribe
+sig: Ed25519Signature
+
+channels: dict[ChannelId, ChannelState]
+block_slot: Slot
+</code></pre>
+<p><em>Execute</em></p>
+<ol>
+<li>
+<p>If the channel does not exist, create it just-in-time.</p>
+<pre><code class="language-python">if msg.channel not in channels:
+    channels[msg.channel] = default_channel(block_slot, [msg.signer])
+</code></pre>
+</li>
+<li>
+<p>Update the channel sequencer.</p>
+<pre><code class="language-python">chan = channels[msg.channel]
+(new_sequencer_index, new_sequencer_starting_slot) = round_robin(block_slot, chan)
+
+chan.tip_sequencer_starting_slot = new_sequencer_starting_slot
+chan.tip_sequencer = new_sequencer_index
+</code></pre>
+</li>
+<li>
+<p>Update the channel tip.</p>
+<pre><code class="language-python">chan = channels[msg.channel]
+chan.tip_hash = hash(encode(msg))
+chan.tip_slot = block_slot
+</code></pre>
+</li>
+</ol>
+<h4 id="example"><a class="header" href="#example">Example</a></h4>
+<pre><code class="language-python"># Build the inscription
+greeting = Inscription(
+    channel=CHANNEL_EARTH,
+    inscription=b"Live long and prosper",
+    parent=ZERO
+    signer=spock_pk
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[&lt;spocks_note_id&gt;], outputs=[&lt;change_note&gt;])
+
+# Wrap it in a transaction
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_INSCRIBE, payload=encode(greeting)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+# Sign the transaction
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[Ed25519_sign(mantle_txhash(tx), spock_sk),
+               transfer.prove(spock_sk)]
+)
+
+# Send the transaction to the mempool
+mempool.push(signed_tx)
+</code></pre>
+<h3 id="channel_config"><a class="header" href="#channel_config">CHANNEL_CONFIG</a></h3>
+<p>Overwrite the configuration of a channel.</p>
+<h4 id="payload-1"><a class="header" href="#payload-1">Payload</a></h4>
+<pre><code class="language-python">class ChannelConfig:
+    channel: ChannelId
+    keys: list[Ed25519PublicKey]
+    posting_timeframe: u32
+    posting_timeout: u32
+    configuration_threshold: u16
+    transfer_threshold: u16
+</code></pre>
+<h4 id="proof-1"><a class="header" href="#proof-1">Proof</a></h4>
+<p>A Channel Config is authorized by a threshold of the channel's accredited keys using <a href="#multiple-ed25519-signatures-verification">Multiple Ed25519 Signatures Verification</a>.</p>
+<pre><code class="language-python">class ChannelConfigOpProof:
+    signatures: list[Ed25519Signature] # signatures from configuration_threshold
+    indexes: list[u16]  # signatures of accredited keys with their index.
+                        # indexes must be ordered from smallest to
+                        # biggest without duplication
+</code></pre>
+<h4 id="execution-gas-1"><a class="header" href="#execution-gas-1">Execution Gas</a></h4>
+<p>Channel Config Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_CONFIG_GAS * configuration_threshold</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-2"><a class="header" href="#validation-2">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: zkhash
+config: ChannelConfig
+proof: ChannelConfigOpProof
+channels: dict[ChannelId, ChannelState]
+</code></pre>
+<p><em>Validate</em></p>
+<pre><code class="language-python">assert config.configuration_threshold &gt; 0
+assert config.transfer_threshold &gt; 0
+assert len(config.keys) &gt; 0
+assert len(config.keys) &lt; 2^16
+# The configuration threshold must be reachable with the accredited keys,
+# otherwise the channel would be locked out of any future reconfiguration
+assert config.configuration_threshold &lt;= len(config.keys)
+
+if config.channel in channels:
+    chan = channels[config.channel]
+    # Verify the configuration_threshold signatures (see Appendix)
+    MultiEd25519_verify(txhash,
+                        proof.signatures,
+                        proof.indexes,
+                        chan.accredited_keys,
+                        chan.configuration_threshold)
+</code></pre>
+<h4 id="execution-2"><a class="header" href="#execution-2">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">config: ChannelConfig
+
+channels: dict[ChannelId, ChannelState]
+block_slot: Slot
+</code></pre>
+<p><em>Execute</em></p>
+<ol>
+<li>
+<p>If the channel does not exist, create it just-in-time.</p>
+<pre><code class="language-python">if config.channel not in channels:
+    channels[config.channel] = default_channel(block_slot, config.keys)
+</code></pre>
+</li>
+<li>
+<p>Update the configuration.</p>
+<pre><code class="language-python">chan = channels[config.channel]
+
+# Update Channel Configuration Parameters
+chan.accredited_keys = config.keys
+chan.configuration_threshold = config.configuration_threshold
+
+# Update Decentralized Sequencing Parameters
+chan.tip_sequencer = 0
+chan.tip_sequencer_starting_slot = block_slot
+chan.posting_timeframe = config.posting_timeframe
+chan.posting_timeout = config.posting_timeout
+
+# Update Bridging Parameters
+chan.transfer_threshold = config.transfer_threshold
+</code></pre>
+</li>
+<li>
+<p>Update the channel tip.</p>
+<pre><code class="language-python">chan = channels[config.channel]
+chan.tip_slot = block_slot
+chan.tip_hash = hash(encode(config))
+</code></pre>
+</li>
+</ol>
+<h4 id="example-1"><a class="header" href="#example-1">Example</a></h4>
+<p>Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:</p>
+<pre><code class="language-python"># Given a key to add
+new_sequencer_pk: Ed25519PublicKey
+
+# The unique sequencer encodes the update and builds the payload
+config = ChannelConfig(
+    channel=ZONE_A,
+    keys=[old_sequencer_pk, new_sequencer_pk],
+    posting_timeframe = 5000,
+    posting_timeout = 500,
+    configuration_threshold = 2,
+    transfer_threshold = 1
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[old_sequencer_funds], outputs=[&lt;change_note&gt;])
+
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_CONFIG, payload=encode(config)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[[Ed25519_sign(mantle_txhash(tx), old_sequencer_sk)], [0]],
+               transfer.prove(old_sequencer_sk)]
+)
+</code></pre>
+<h3 id="channel_deposit"><a class="header" href="#channel_deposit">CHANNEL_DEPOSIT</a></h3>
+<p>Deposit notes to a channel. The inputs are consumed and re-created as channel notes under a new <code>NoteId</code>, which resets their ageing and prevents the deposit from being replayed after a withdrawal.</p>
+<h4 id="payload-2"><a class="header" href="#payload-2">Payload</a></h4>
+<pre><code class="language-python">class ChannelDeposit:
+    channel: ChannelId
+    inputs: list[NoteId]  # the notes to be consumed and re-created as channel notes
+    metadata: bytes
+</code></pre>
+<h4 id="proof-2"><a class="header" href="#proof-2">Proof</a></h4>
+<p>A Channel Deposit proves the ownership of the notes being consumed using a <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>.</p>
+<pre><code class="language-python">ZkSignature
+</code></pre>
+<h4 id="execution-gas-2"><a class="header" href="#execution-gas-2">Execution Gas</a></h4>
+<p>Channel Deposit Operations have a fixed Execution Gas cost of <code>EXECUTION_CHANNEL_DEPOSIT_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-3"><a class="header" href="#validation-3">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
+deposit: ChannelDeposit
+deposit_proof: ZkSignature
+
+channels: dict[ChannelId, ChannelState]
+
+ledger: Ledger
+</code></pre>
+<p><em>Validate</em></p>
+<ol>
+<li>
+<p>Verify that the channel exist</p>
+<pre><code class="language-python">assert deposit.channel in channels
+</code></pre>
+</li>
+<li>
+<p>Ensure all inputs are spendable and not already channel notes.</p>
+<pre><code class="language-python">ledger.assert_spendable(deposit.inputs)
+</code></pre>
+</li>
+<li>
+<p>Validate ownership over deposited notes.</p>
+<pre><code class="language-python">input_notes = [ledger[input_note_id] for input_note_id in deposit.inputs]
+input_pks = [note.public_key for note in input_notes]
+assert ZkSignature_verify(mantle_txhash, deposit_proof, input_pks)
+</code></pre>
+</li>
+</ol>
+<h4 id="execution-3"><a class="header" href="#execution-3">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">deposit: ChannelDeposit
+
+channels: dict[ChannelId, ChannelState]
+
+ledger: Ledger
+</code></pre>
+<p><em>Execute</em></p>
+<p>Consume the inputs and create the same Note with new NoteId as channel notes owned by the channel.</p>
+<pre><code class="language-python"># read the notes that are being moved into the channel
+notes_to_add = [ledger[input_note_id] for input_note_id in deposit.inputs]
+
+# consume the inputs, which are regular notes and not registered in channel_notes
+ledger.execute_spending(deposit.inputs)
+
+# re-create them as channel notes under a new NoteId
+deposit_id = derive_op_id(deposit)
+ledger.execute_adding(deposit_id, notes_to_add, deposit.channel)
+</code></pre>
+<h4 id="example-2"><a class="header" href="#example-2">Example</a></h4>
+<p>Suppose Alice wants to make a deposit of 50 tokens on Zone A.</p>
+<pre><code class="language-python"># Alice encodes her deposit
+deposit = ChannelDeposit(
+    channel=ZONE_A,
+    inputs=[alice_deposit_note_id]    # This is a note of 50 tokens
+    metadata=b"deposit to address: 0x..."
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[Alice_funds], outputs=[&lt;change_note&gt;])
+
+
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_DEPOSIT, payload=encode(deposit)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[deposit.prove(Alice_sk), transfer.prove(Alice_sk)],
+)
+</code></pre>
+<p>A Zone that credits a deposit in its own state must be sure the deposit really lands on-chain. If the Zone reflects the deposit through a <code>CHANNEL_INSCRIBE</code> posted in a separate Mantle Transaction, a reorganization can reorder the two so that the inscription is included while the deposit is not, leaving the Zone crediting funds it never received. Two options avoid this:</p>
+<ul>
+<li>Wait for the deposit to be finalized before interpreting it, at the cost of the finalization delay.</li>
+<li>Make the inscription conditional on the deposit, by including a <code>CHANNEL_TRANSFER</code> that consumes the deposited note in the same Mantle Transaction as the inscription. Mantle Transactions execute atomically, so the inscription is included only if the deposited note exists and is consumed. This removes the waiting period entirely.</li>
+</ul>
+<p>The second option resets the ageing of the value. A <code>CHANNEL_TRANSFER</code> consumes its inputs and creates new notes, so the resulting note starts the ageing process again and must age before it can create a PoL. A <code>CHANNEL_DEPOSIT</code> resets ageing for the same reason, since it consumes its inputs and re-creates them under a new <code>NoteId</code>. A <code>CHANNEL_WITHDRAW</code> keeps the <code>NoteId</code> of the notes it releases and therefore never resets ageing.</p>
+<h3 id="channel_withdraw"><a class="header" href="#channel_withdraw">CHANNEL_WITHDRAW</a></h3>
+<p>Withdraw notes from a channel.</p>
+<h4 id="payload-3"><a class="header" href="#payload-3">Payload</a></h4>
+<pre><code class="language-python">class ChannelWithdraw:
+    channel: ChannelId
+    inputs: list[NoteId]
+</code></pre>
+<h4 id="proof-3"><a class="header" href="#proof-3">Proof</a></h4>
+<p>A Channel Withdraw is authorized by a threshold of the channel's accredited keys using <a href="#multiple-ed25519-signatures-verification">Multiple Ed25519 Signatures Verification</a>.</p>
+<pre><code class="language-python">class ChannelWithdrawOpProof:
+    signatures: list[Ed25519Signature] # exactly transfer_threshold signatures
+    indexes: list[int]    # signatures of accredited keys with their index
+                          # indexes must be ordered from smallest to
+                          # biggest without duplication
+</code></pre>
+<h4 id="execution-gas-3"><a class="header" href="#execution-gas-3">Execution Gas</a></h4>
+<p>Channel Withdraw Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_WITHDRAW_GAS * transfer_threshold</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-4"><a class="header" href="#validation-4">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: zkhash
+withdrawal: ChannelWithdraw
+proof: ChannelWithdrawOpProof
+
+channels: dict[ChannelId, ChannelState]
+ledger: Ledger
+</code></pre>
+<p><em>Validate</em></p>
+<ol>
+<li>
+<p>Check that the channel exists</p>
+<pre><code class="language-python">assert withdrawal.channel in channels
+</code></pre>
+</li>
+<li>
+<p>Check that the inputs are valid and belongs to the channel</p>
+<pre><code class="language-python">ledger.assert_spendable(withdrawal.inputs, withdrawal.channel)
+</code></pre>
+</li>
+<li>
+<p>Check the signatures (see <a href="#multiple-ed25519-signatures-verification">Multiple Ed25519 Signatures Verification</a>)</p>
+<pre><code class="language-python">MultiEd25519_verify(txhash,
+                    proof.signatures,
+                    proof.indexes,
+                    channels[withdrawal.channel].accredited_keys,
+                    channels[withdrawal.channel].transfer_treshold)
+</code></pre>
+</li>
+</ol>
+<h4 id="execution-4"><a class="header" href="#execution-4">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">withdrawal: ChannelWithdraw
+
+channels: dict[ChannelId, ChannelState]
+ledger: Ledger
+</code></pre>
+<p><em>Execute</em></p>
+<p>Remove the inputs from channel notes owned by the channel. The notes are neither consumed nor re-created: they keep their NoteId, value and ZkPublicKey, and are simply unregistered in the channel_notes set.</p>
+<pre><code class="language-python">for note_id in withdrawal.inputs:
+    ledger.channel_notes.pop(note_id)
+</code></pre>
+<h4 id="example-3"><a class="header" href="#example-3">Example</a></h4>
+<p>Suppose the unique sequencer of Zone A wants to withdraw 50 tokens.</p>
+<pre><code class="language-python"># Sequencer encodes his withdrawal
+withdrawal = ChannelWithdraw(
+    channel=ZONE_A,
+    inputs  = [Channel_note_id]
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[Sequencer_funds], outputs=[&lt;change_note&gt;])
+
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_WITHDRAW, payload=encode(withdrawal)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
+               transfer.prove(Sequencer_node_sk)],
+)
+</code></pre>
+<h3 id="channel_transfer"><a class="header" href="#channel_transfer">CHANNEL_TRANSFER</a></h3>
+<p>Assign funds from a channel to new <code>ZkPublicKey</code>. This funds are only usable to participate in PoS and to withdraw from the channel.</p>
+<h4 id="payload-4"><a class="header" href="#payload-4">Payload</a></h4>
+<pre><code class="language-python">class ChannelTransfer:
+    channel: ChannelId
+    inputs: list[NoteId]
+    outputs: list[Note]
+</code></pre>
+<h4 id="proof-4"><a class="header" href="#proof-4">Proof</a></h4>
+<pre><code class="language-python">class ChannelTransferOpProof:
+    signatures: list[Ed25519Signature] # signature from transfer_threshold keys
+    indexes: list[int]    # signatures of accredited keys with their index.
+                          # indexes must be ordered from smallest to biggest without duplication
+</code></pre>
+<h4 id="execution-gas-4"><a class="header" href="#execution-gas-4">Execution Gas</a></h4>
+<p><code>CHANNEL_TRANSFER</code> Operations have a linear Execution Gas cost equal to <code>EXECUTION_CHANNEL_TRANSFER_GAS * transfer_threshold</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-5"><a class="header" href="#validation-5">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: zkhash
+chan_transfer: ChannelTransfer
+proof: ChannelTransferOpProof
+
+channels: dict[ChannelId, ChannelState]
+ledger: Ledger
+</code></pre>
+<p><em>Validate</em></p>
+<ol>
+<li>Check that the outputs are valid</li>
+</ol>
+<pre><code class="language-python">ledger.assert_valid_output(chan_transfer.outputs)
+</code></pre>
+<ol start="2">
+<li>Check that the channel exists</li>
+</ol>
+<pre><code class="language-python">assert chan_transfer.channel in channels
+</code></pre>
+<ol start="3">
+<li>Check that the inputs are valid and belongs to the channel</li>
+</ol>
+<pre><code class="language-python">ledger.assert_spendable(chan_transfer.inputs, chan_transfer.channel)
+</code></pre>
+<ol start="4">
+<li>Check the balance</li>
+</ol>
+<pre><code class="language-python">input_amount = sum(ledger.get_note(input).value for input in chan_transfer.inputs)
+output_amount = sum(output.value for output in chan_transfer.outputs)
+assert input_amount == output_amount
+</code></pre>
+<ol start="5">
+<li>Check the signatures (see <a href="#multiple-ed25519-signatures-verification">Multiple Ed25519 Signatures Verification</a>)</li>
+</ol>
+<pre><code class="language-python">MultiEd25519_verify(txhash,
+					proof.signatures,
+                    proof.indexes,
+                    channels[chan_transfer.channel].accredited_keys,
+                    channels[chan_transfer.channel].transfer_treshold)
+</code></pre>
+<h4 id="execution-5"><a class="header" href="#execution-5">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">chan_transfer: ChannelTransfer
+
+channels: dict[ChannelId, ChannelState]
+ledger: Ledger
+</code></pre>
+<p><em>Execute</em></p>
+<ol>
+<li>Remove inputs from the ledger</li>
+</ol>
+<pre><code class="language-python">ledger.execute_spending(chan_transfer.inputs, chan_transfer.channel)
+</code></pre>
+<ol start="2">
+<li>Add outputs to the ledger.</li>
+</ol>
+<pre><code class="language-python">chan_transfer_id = derive_op_id(chan_transfer)
+ledger.execute_adding(chan_transfer_id, chan_transfer.outputs, chan_transfer.channel)
+</code></pre>
+<h4 id="example-4"><a class="header" href="#example-4">Example</a></h4>
+<p>Suppose the unique sequencer of Zone A wants to attribute 50 tokens to themself.</p>
+<pre><code class="language-python"># Sequencer encodes their assignation
+chan_transfer = ChannelTransfer(
+    channel=ZONE_A,
+    inputs = [Channel_note_id]
+    outputs = [Note(pk=alice, value=50)]
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[Sequencer_funds], outputs=[&lt;change_note&gt;])
+
+tx = MantleTx(
+    ops=[Op(opcode=CHANNEL_TRANSFER, payload=encode(chan_transfer)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+signed_tx = SignedMantleTx(
+    tx=tx,
+    op_proofs=[[[Ed25519_sign(mantle_txhash(tx), sequencer_sk)],[0]],
+                              transfer.prove(Sequencer_node_sk)],
+)
+</code></pre>
+<h2 id="service-declaration-protocol-sdp-operations"><a class="header" href="#service-declaration-protocol-sdp-operations">Service Declaration Protocol (SDP) Operations</a></h2>
+<p>These Operations implement the <a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>.</p>
+<p>Validators must keep the following state when implementing SDP Operations:</p>
+<pre><code class="language-python">locked_notes: dict[NoteID, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+
+class LockedNote:
+    declarations: set[DeclarationID]
+</code></pre>
+<h3 id="common-sdp-structures"><a class="header" href="#common-sdp-structures">Common SDP Structures</a></h3>
+<pre><code class="language-python">class ServiceType(Enum):
+    BN="BN" # Blend Network
+
+class Locator(str):
+    def validate(self):
+        assert len(self) &lt;= 329
+        assert validate_multiaddr(self)
+
+class MinStake:
+    stake_threshold: int # stake value
+    epoch: EpochNumber # epoch number
+
+class ServiceParameters:
+    inactivity_period: NumberOfEpochs # number of epochs
+    epoch: EpochNumber                # epoch number at which the Service Parameters were set
+
+class DeclarationInfo:
+    service: ServiceType
+    locators: list[Locator]
+    provider_id: Ed25519PublicKey
+    zk_id: ZkPublicKey
+    locked_note_id: NoteId
+    created: EpochNumber
+    active: EpochNumber | None
+    withdraw_at: EpochNumber | None
+    # SDP ops updating a declaration must use monotonically increasing nonces
+    nonce: int
+</code></pre>
+<h3 id="sdp_declare"><a class="header" href="#sdp_declare">SDP_DECLARE</a></h3>
+<p>The service registration follows the definition given in <a href="bedrock-service-declaration-protocol.html#declaration-message"><strong>Declaration Message</strong></a>:</p>
+<h4 id="payload-5"><a class="header" href="#payload-5">Payload</a></h4>
+<pre><code class="language-python">class DeclarationMessage:
+    service_type: ServiceType
+    locators: list[Locator]
+    provider_id: Ed25519PublicKey
+    zk_id: ZkPublicKey
+    locked_note_id: NoteId
+</code></pre>
+<p>Locked notes are introduced in <a href="#locked-notes">Locked notes</a> and serve as Service collaterals. They cannot be spent before the owner withdraw its participation from the declared service(s).</p>
+<h4 id="proof-5"><a class="header" href="#proof-5">Proof</a></h4>
+<pre><code class="language-python">class DeclarationProof:
+    zk_sig: ZkSignature             # signature proving ownership over
+                                    # locked note and zk_id
+    provider_sig: Ed25519Signature  # signature proving ownership of provider key
+</code></pre>
+<p>see: <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>.</p>
+<h4 id="execution-gas-5"><a class="header" href="#execution-gas-5">Execution Gas</a></h4>
+<p>SDP Declare Operations have a fixed Execution Gas cost of <code>EXECUTION_SDP_DECLARE_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-6"><a class="header" href="#validation-6">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: zkhash                  # the txhash of the transaction we are validating
+declaration: DeclarationMessage # the declaration we are validating
+proof: DeclarationProof
+
+min_stake: MinStake      # the (global) minimum stake setting
+ledger: Ledger           # the set of unspent notes
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[NoteId, DeclarationInfo]
+</code></pre>
+<p><em>Validate</em></p>
+<p>The declaration is verified according to <a href="bedrock-service-declaration-protocol.html#declare">Declare</a>.</p>
+<ol>
+<li>
+<p>Ensure ownership over the locked note, <code>zk_id</code> and <code>provider_id</code>.</p>
+<pre><code class="language-python">assert ZkSignature_verify(
+    txhash, proof.zk_sig, [note.public_key, declaration.zk_id]
+)
+assert Ed25519_verify(txhash, proof.provider_sig, provider_id)
+</code></pre>
+</li>
+<li>
+<p>Ensure declaration does not already exist.</p>
+<pre><code class="language-python">assert declaration_id(declaration) not in declarations
+</code></pre>
+</li>
+<li>
+<p>Ensure the locators list is non-empty and has no more than 8 entries.</p>
+<pre><code class="language-python">assert len(declaration.locators) &gt;= 1
+assert len(declaration.locators) &lt;= 8
+</code></pre>
+</li>
+<li>
+<p>Ensure the locked note exists and its value is sufficient for joining the service.</p>
+<pre><code class="language-python">assert ledger.is_unspent(declaration.locked_note_id)
+note = ledger.get_note(declaration.locked_note_id)
+assert note.value &gt;= min_stake.stake_threshold
+</code></pre>
+</li>
+<li>
+<p>Ensure the note has not already been locked for this service.</p>
+<pre><code class="language-python">if declaration.locked_note in locked_notes:
+    locked_note = locked_notes[declaration.locked_note]
+    services = [declarations[declare_id] for declare_id in locked_note.declarations]
+    assert declaration.service_type not in services
+</code></pre>
+</li>
+</ol>
+<h4 id="execution-6"><a class="header" href="#execution-6">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">declaration: DeclarationMessage # the declaration we are executing
+current_epoch: EpochNumber
+locked_notes : dict[NoteId, LockedNote]
+</code></pre>
+<p><em>Execute</em></p>
+<ol>
+<li>
+<p>Create the locked note state if it doesn't already exist.</p>
+<pre><code class="language-python">if declaration.locked_note not in locked_notes:
+    locked_notes[declaration.locked_note_id] = LockedNote(declarations=set())
+
+locked_note = locked_notes[declaration.locked_note_id]
+</code></pre>
+</li>
+<li>
+<p>Add this declaration to the locked note.</p>
+<pre><code class="language-python">declare_id = declaration_id(declaration)
+locked_note.declarations.add(declare_id)
+</code></pre>
+</li>
+<li>
+<p>Store the declaration as explained in <a href="bedrock-service-declaration-protocol.html#declaration-storage"><strong>Declaration Storage</strong></a>.</p>
+<pre><code class="language-python">declarations[declare_id] = DeclarationInfo(
+    service: declaration.service
+    locators: declaration.locators
+    provider_id: declaration.provider_id
+    zk_id: declaration.zk_id
+    locked_note_id: declaration.locked_note_id
+    declaration,
+    created=current_epoch,
+    active=None,
+    withdraw_at=None
+    nonce=0
+)
+</code></pre>
+</li>
+</ol>
+<h4 id="example-5"><a class="header" href="#example-5">Example</a></h4>
+<pre><code class="language-python"># Assume `alice_note` is in the ledger:
+alice_note = Utxo(
+    txhash=0x2948904F2F0F479B8F8197694B30184B0D2ED1C1CD2A1EC0FB85D299A192A447,
+    output_number=3,
+    note=Note(value=500, public_key=alice_pk_1),
+)
+
+# Alice wishes to lock it to join the Blend network
+declaration=DeclarationMessage(
+    service_type=ServiceType.BN,
+    locators=["/ip4/203.0.113.10/tcp/4001/p2p"],
+    provider_id=alice_provider_pk,
+    zk_id=alice_pk_2,
+    locked_note_id=alice_note.id()
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[fee_note_id], outputs=[])
+
+
+tx = MantleTx(
+    ops=[Op(opcode=SDP_DECLARE, payload=encode(declaration)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+txhash = mantle_txhash(tx)
+
+declaration_proof = DeclarationProof(
+    # proof of ownership of the staked note and zk_id
+    zk_sig=ZkSignature([alice_sk_1, alice_sk_2], txhash),
+    # proof of ownership of the provider id
+    provider_sig=Ed25519Signature(alice_provider_sk, txhash),
+)
+
+SignedMantleTx(
+    tx=tx,
+    op_proofs=[declaration_proof, transfer.prove(alice_sk_1)],
+)
+</code></pre>
+<h3 id="sdp_withdraw"><a class="header" href="#sdp_withdraw">SDP_WITHDRAW</a></h3>
+<p>The service withdrawal follows the definition given in <a href="bedrock-service-declaration-protocol.html#withdraw-message">Withdraw Message</a>.</p>
+<h4 id="payload-6"><a class="header" href="#payload-6">Payload</a></h4>
+<pre><code class="language-python">class WithdrawMessage:
+    declaration: DeclarationID
+    locked_note_id: NoteId
+    nonce: int
+</code></pre>
+<h4 id="proof-6"><a class="header" href="#proof-6">Proof</a></h4>
+<p>A signature from the <code>zk_id</code> and the locked note <code>pk</code> attached to the declaration is required for withdrawing from a service, (see <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>).</p>
+<pre><code class="language-python">ZkSignature
+</code></pre>
+<h4 id="execution-gas-6"><a class="header" href="#execution-gas-6">Execution Gas</a></h4>
+<p>SDP Withdraw Operations have a fixed Execution Gas cost of <code>EXECUTION_SDP_WITHDRAW_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-7"><a class="header" href="#validation-7">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: zkhash # Mantle transaction hash of the tx containing this operation
+withdraw: WithdrawMessage
+signature: ZkSignature
+
+ledger: Ledger
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p><em>Validate</em></p>
+<ol>
+<li>
+<p>Ensure that the locked note exists, is locked and bound to this declaration.</p>
+<pre><code class="language-python">assert ledger.is_unspent(withdraw.locked_note_id)
+assert withdraw.locked_note_id in locked_notes
+
+locked_note = locked_notes[withdraw.locked_note_id]
+
+assert withdraw.declaration in locked_note.declarations
+</code></pre>
+</li>
+<li>
+<p>Validate SDP withdrawal according to <a href="bedrock-service-declaration-protocol.html#withdraw"><strong>Withdraw</strong></a>.</p>
+<ol>
+<li>Ensure declaration exists.
+<pre><code class="language-python">assert withdraw.declaration in declarations
+declare_info = declarations[withdraw.declaration]
+</code></pre>
+</li>
+<li>Ensure the declaration is not already scheduled for withdrawal.
+<pre><code class="language-python">assert declare_info.withdraw_at is None
+</code></pre>
+</li>
+<li>Ensure locked note <code>pk</code> and <code>zk_id</code> attached to this declaration authorized this Operation.
+<pre><code class="language-python">locked_note = ledger[withdraw.locked_note_id]
+assert ZkSignature_verify(txhash, signature, [locked_note.pk, declare_info.zk_id])
+</code></pre>
+</li>
+<li>Ensure that the nonce is greater than the previous one.
+<pre><code class="language-python">assert withdraw.nonce &gt; declare_info.nonce
+</code></pre>
+</li>
+</ol>
+</li>
+</ol>
+<h4 id="execution-7"><a class="header" href="#execution-7">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">withdraw: WithdrawMessage
+signature: ZkSignature
+
+current_epoch: EpochNumber # current epoch
+ledger: Ledger
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p><em>Execute</em></p>
+<p>Executes the withdrawal protocol <a href="bedrock-service-declaration-protocol.html#withdraw"><strong>Withdraw</strong></a>.</p>
+<p>Withdrawal only records the intent: <code>withdraw_at</code> is set to the current
+(withdrawal) epoch <code>e</code>, the node's last rewardable epoch. The declaration is
+removed and its stake unlocked at epoch <code>e+2</code> by the
+<a href="#sdp-epoch-finalization">SDP Epoch Finalization</a> step, right after the final
+reward is paid out.</p>
+<ol>
+<li>Update the declaration info with the nonce and the withdrawal epoch.
+<pre><code class="language-python">declare_info = declarations[withdraw.declaration]
+declare_info.nonce = withdraw.nonce
+declare_info.withdraw_at = current_epoch
+</code></pre>
+</li>
+</ol>
+<h4 id="example-6"><a class="header" href="#example-6">Example</a></h4>
+<pre><code class="language-python">withdraw=Withdraw(
+    declaration=alice_declaration_id,
+    locked_note_id=alices_locked_note_id
+    nonce=1579532
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[alices_locked_note_id],
+                    outputs=[Note(100, alice_note_pk)])
+
+tx = MantleTx(
+    ops=[Op(opcode=SDP_WITHDRAW, payload=encode(withdraw)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+SignedMantleTx(
+    tx=tx,
+    # proof ownership of the withdrawn note and zk id
+    op_proofs=[ZkSignature_sign([alice_note_sk, alice_sk], mantle_txhash(tx)),
+               transfer.prove(alice_sk)]
+)
+</code></pre>
+<h3 id="sdp-epoch-finalization"><a class="header" href="#sdp-epoch-finalization">SDP Epoch Finalization</a></h3>
+<p>Withdrawn declarations are removed by Mantle as part of the epoch transition,
+not when the <code>WithdrawMessage</code> is processed. A node that withdrew in epoch <code>e</code>
+has <code>withdraw_at == e</code>, and its last rewardable epoch is <code>e</code>; the epoch-<code>e</code>
+rewards are distributed in the first block of epoch <code>e+2</code> (see
+<a href="bedrock-service-reward-distribution.html">Service Reward Distribution Protocol</a>).
+In that same first block, <strong>after</strong> the rewards have been distributed, every
+declaration whose final reward has been paid out (<code>withdraw_at &lt;= current_epoch - 2</code>)
+is removed and its stake unlocked. Performing the removal after the reward
+distribution guarantees a declaration is never removed before its final reward
+is paid. Declarations that withdrew without earning a final reward are removed
+by the same step, so their stake is always released.</p>
+<p><em>Given</em></p>
+<pre><code class="language-python">current_epoch: EpochNumber
+locked_notes: dict[NoteId, LockedNote]
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p><em>Execute</em></p>
+<p>For every <code>declare_id</code>, <code>declare_info</code> in <code>declarations</code> where
+<code>declare_info.withdraw_at is not None and declare_info.withdraw_at &lt;= current_epoch - 2</code>:</p>
+<ol>
+<li>
+<p>Remove the declaration from its locked note.</p>
+<pre><code class="language-python">locked_note = locked_notes[declare_info.locked_note_id]
+locked_note.declarations.remove(declare_id)
+</code></pre>
+</li>
+<li>
+<p>Remove the declaration.</p>
+<pre><code class="language-python">del declarations[declare_id]
+</code></pre>
+</li>
+<li>
+<p>Unlock the note once it is no longer bound to any declaration.</p>
+<pre><code class="language-python">if len(locked_note.declarations) == 0:
+    del locked_notes[declare_info.locked_note_id]
+</code></pre>
+</li>
+</ol>
+<h3 id="sdp_active"><a class="header" href="#sdp_active">SDP_ACTIVE</a></h3>
+<p>The service active action follows the definition given in <a href="bedrock-service-declaration-protocol.html#active-message">Active Message</a>.</p>
+<h4 id="payload-7"><a class="header" href="#payload-7">Payload</a></h4>
+<pre><code class="language-python">class Active:
+    declaration: DeclarationID
+    nonce: int
+    metadata: bytes # a service-specific node activeness metadata
+</code></pre>
+<h4 id="proof-7"><a class="header" href="#proof-7">Proof</a></h4>
+<pre><code class="language-python">ZkSignature
+</code></pre>
+<h4 id="execution-gas-7"><a class="header" href="#execution-gas-7">Execution Gas</a></h4>
+<p>SDP Active Operations have a fixed Execution Gas cost of <code>EXECUTION_SDP_ACTIVE_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-8"><a class="header" href="#validation-8">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">txhash: zkhash # Mantle transaction hash of the tx containing this operation
+active: Active
+signature: ZkSignature
+
+declarations: dict[DeclarationID, DeclarationInfo]
+</code></pre>
+<p><em>Validate</em></p>
+<pre><code class="language-python">assert active.declaration in declarations
+declaration_info = declarations[active.declaration]
+
+assert active.nonce &gt; declaration_info.nonce
+
+assert ZkSignature_verify(txhash, signature, declaration_info.zk_id)
+</code></pre>
+<h4 id="execution-8"><a class="header" href="#execution-8">Execution</a></h4>
+<p>Executes the active protocol <a href="bedrock-service-declaration-protocol.html#active">Active</a>. The activation, i.e. setting the <code>declaration.active</code>, is handled by the service-specific logic.</p>
+<h4 id="example-7"><a class="header" href="#example-7">Example</a></h4>
+<pre><code class="language-python">active=Active(
+    declaration=alice_declaration_id,
+    nonce=1579532,
+    metadata=b"Look, I am still doing my job"
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[fee_note_id], outputs=[])
+
+tx = MantleTx(
+    ops=[Op(opcode=SDP_ACTIVE, payload=encode(active))],
+)
+txhash = mantle_txhash(tx)
+
+SignedMantleTx(
+    tx=tx,
+    op_proofs=[Ed25519_sign(txhash, validator_sk), transfer.prove(fee_note_sk)]
+)
+</code></pre>
+<h2 id="leader-operations"><a class="header" href="#leader-operations">Leader Operations</a></h2>
+<h3 id="leader_claim"><a class="header" href="#leader_claim">LEADER_CLAIM</a></h3>
+<p>This Operation claims the leader's block reward anonymously.</p>
+<h4 id="payload-8"><a class="header" href="#payload-8">Payload</a></h4>
+<pre><code class="language-python">class ClaimRequest:
+    rewards_root: zkhash # Merkle root used in the proof for voucher membership
+    voucher_nf: zkhash
+    public_key: ZkPublicKey
+</code></pre>
+<h4 id="proof-8"><a class="header" href="#proof-8">Proof</a></h4>
+<p>The provider proves that they have won a proof of Leadership before the start of the current epoch, i.e., their reward voucher is indeed in the voucher set: <a href="#proof-of-claim">Proof of Claim</a>.</p>
+<h4 id="execution-gas-8"><a class="header" href="#execution-gas-8">Execution gas</a></h4>
+<p>Leader Claim Operations have a fixed Execution Gas cost of <code>EXECUTION_LEADER_CLAIM_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h4 id="validation-9"><a class="header" href="#validation-9">Validation</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">mantle_txhash: zkhash
+claim : ClaimRequest
+last_voucher_root: zkhash # The last root of the voucher Merkle tree
+                          # at the start of the epoch
+voucher_nullifier_set: set[zkhash]
+proof: ProofOfClaim
+</code></pre>
+<p><em>Validate</em></p>
+<pre><code class="language-python">assert claim.voucher_nf not in voucher_nullifier_set
+assert claim.rewards_root == last_voucher_root
+validate_proof(claim, proof, mantle_txhash)
+</code></pre>
+<h4 id="execution-9"><a class="header" href="#execution-9">Execution</a></h4>
+<p><em>Given</em></p>
+<pre><code class="language-python">claim: ClaimRequest
+
+ledger: Ledger
+voucher_nullifier_set: set[zkhash]
+leaders_rewards: TokenValue   # The pool of tokens to be claim by leaders
+leader_reward: TokenValue     # The amount one leader can claim
+</code></pre>
+<p><em>Execution</em></p>
+<ol>
+<li>
+<p>Add <code>claim.voucher_nf</code> to the <code>voucher_nullifier_set</code>.</p>
+</li>
+<li>
+<p>Denoting by <code>leader_reward</code> the amount defined for leader rewards in <a href="bedrock-anonymous-leaders-reward.html#leaders-reward">Leaders Reward</a>, construct a single output note with value leader_reward under the public key defined in the payload, and insert it into the Ledger:</p>
+<pre><code class="language-python">output_note=Note(
+    value = leader_reward
+    public_key = claim.public_key,
+)
+claim_id = derive_op_id(claim)
+ledger.execute_adding(claim_id, [output_note])
+</code></pre>
+</li>
+<li>
+<p>Reduce the leader’s reward <code>leaders_rewards</code> value by the same amount (without ZK proof).</p>
+</li>
+</ol>
+<h4 id="example-8"><a class="header" href="#example-8">Example</a></h4>
+<pre><code class="language-python">secret_voucher = 0xDEADBEAF;
+reward_voucher = leader_claim_voucher(secret_voucher)
+voucher_nullifier = leader_claim_nullifier(secret_voucher)
+
+claim=ClaimRequest(
+    rewards_root=REWARDS_MERKLE_TREE.root(),
+    voucher_nf=voucher_nullifier,
+    public_key=leader_one_time_key
+)
+
+# Build the transfer operation to pay the fees
+transfer = Transfer(inputs=[&lt;fee_note&gt;], outputs=[&lt;change_note&gt;])
+
+tx = MantleTx(
+    ops=[Op(opcode=LEADER_CLAIM, payload=encode(claim)),
+         Op(opcode=TRANSFER, payload=encode(transfer))],
+)
+
+claim_proof = claim.prove(
+    secret_voucher,
+    REWARDS_MERKLE_TREE.path(leaf=reward_voucher),
+    mantle_txhash(tx)
+)
+
+SignedMantleTx(
+    tx=tx,
+    op_proofs=[claim_proof, transfer.prove(fee_note_sk)]
+)
+</code></pre>
+<h2 id="transfer"><a class="header" href="#transfer">TRANSFER</a></h2>
+<p>Transactions must prove the ownership of spent notes. In classical blockchains, this is done through a signature. To stay compatible with our architecture, the signature is done by a ZK proof (see <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>), proving the knowledge of the secret key associated with the public key.</p>
+<p>Transactions allow complete transaction linkability and the public key spending the note is not hidden.</p>
+<h3 id="payload-9"><a class="header" href="#payload-9">Payload</a></h3>
+<pre><code class="language-python">class Transfer:
+    inputs: list[NoteId]  # the list of consumed note identifiers
+                          # must be non-empty
+    outputs: list[Note]
+</code></pre>
+<h3 id="proof-9"><a class="header" href="#proof-9">Proof</a></h3>
+<p>A Transfer proves the ownership of the consumed notes using a <a href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a>.</p>
+<pre><code class="language-python">ZkSignature
+</code></pre>
+<h3 id="execution-gas-9"><a class="header" href="#execution-gas-9">Execution Gas</a></h3>
+<p>Transfer have a fixed Execution Gas cost of <code>EXECUTION_TRANSFER_GAS</code>. See <a href="#gas-determination">Gas Determination</a> for the Execution Gas values.</p>
+<h3 id="validation-10"><a class="header" href="#validation-10">Validation</a></h3>
+<p><em>Given</em></p>
+<pre><code class="language-python">mantle_txhash: zkhash # zkhash of mantle tx containing this ledger tx
+transfer: Transfer
+transfer_proof: ZkSignature
+
+ledger: Ledger
+</code></pre>
+<p><em>Validate</em></p>
+<ol>
+<li>
+<p>Ensure the Transfer in non-empty</p>
+<pre><code class="language-python">assert len(transfer.inputs) &gt; 0
+</code></pre>
+</li>
+<li>
+<p>Ensure all inputs are spendable and not in a channel.</p>
+<pre><code class="language-python">ledger.assert_spendable(transfer.inputs)
+</code></pre>
+</li>
+<li>
+<p>Validate transfer proof to show ownership over input notes.</p>
+<pre><code class="language-python">input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
+input_pks = [note.public_key for note in input_notes]
+assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
+</code></pre>
+</li>
+<li>
+<p>Ensure outputs are valid.</p>
+<pre><code class="language-python">ledger.assert_valid_output(transfer.output)
+</code></pre>
+</li>
+</ol>
+<h3 id="execution-10"><a class="header" href="#execution-10">Execution</a></h3>
+<p><em>Given</em></p>
+<pre><code class="language-python">transfer: Transfer
+transfer_proof: ZkSignature
+
+ledger: Ledger
+</code></pre>
+<p><em>Execution</em></p>
+<ol>
+<li>
+<p>Remove inputs from the ledger.</p>
+<pre><code class="language-python">ledger.execute_spending(transfer.inputs)
+</code></pre>
+</li>
+<li>
+<p>Add outputs to the ledger.</p>
+<pre><code class="language-python">transfer_id = derive_operation_id(transfer)
+ledger.execute_adding(transfer_id, transfer.outputs)
+</code></pre>
+</li>
+</ol>
+<h3 id="example-9"><a class="header" href="#example-9">Example</a></h3>
+<pre><code class="language-python">alice_note_id = ... # assume Alice holds a note worth 501 tokens
+bob_note=Note(
+    value=500
+    public_key=bob_pk,
+)
+
+transfer = Transfer(
+    inputs=[alice_note_id],
+    outputs=[bob_note],
+)
+</code></pre>
+<h1 id="mantle-ledger-1"><a class="header" href="#mantle-ledger-1">Mantle Ledger</a></h1>
+<h2 id="notes"><a class="header" href="#notes">Notes</a></h2>
+<p>Notes are composed of two fields representing their value and their owner:</p>
+<pre><code class="language-python">class Note:
+    value: TokenValue   # u64
+    public_key: ZkPublicKey # 32 bytes
+</code></pre>
+<h3 id="note-id"><a class="header" href="#note-id">Note Id</a></h3>
+<p>A note can be uniquely identified by the Operation that created it and its output number: <code>(op_id, output_number)</code> if each Operation are uniquely identifiable. For this reason, every Operation that output notes have a unique payload that is used to derive the Operation identifier. Because it is often useful to have a commitment to the note fields for use in ZK proofs (e.g., for PoL), we included the note in the note identifier derivation.</p>
+<pre><code class="language-python">def derive_op_id(operation: Op) -&gt; Hash:
+    op_bytes = encode(op)
+    h = Hasher() # /!\ This is a classic hash not a zkhash /!\
+    h.update(b"OPERATION_ID_V1")
+    h.update(op_bytes)
+    return h.digest()
+
+def derive_note_id(op_id: Hash, output_number: int, note: Note) -&gt; NoteId:
+    return zkhash(
+        FiniteField(b"NOTE_ID_V1", byte_order="little", modulus= p),
+        FiniteField(op_id, byte_order="little", modulus= p),
+        FiniteField(output_number, byte_order="little", modulus= p),
+        FiniteField(note.value, byte_order="little", modulus= p),
+        note.public_key
+    )
+</code></pre>
+<p><code>op_id</code> is a classical 256-bit hash digest and must be reduced to a field element before being passed to the ZkHasher. We apply a direct modular reduction mod <code>p</code> (via <code>FiniteField(..., modulus=p)</code>). Since <span class="math-inline" data-tex="p \approx2^{-254}"></span>, the reduction is slightly non-uniform, values in <span class="math-inline" data-tex="[0, 2^{256} \mod p)"></span> appear one extra time, but this is inconsequential in practice: the collision probability remains around <span class="math-inline" data-tex="2^{-254}"></span>, and <code>NoteId</code> uniqueness is not derived from uniformity of <code>op_id</code> over <span class="math-inline" data-tex="𝔽_p"></span> but from the collision-resistance of the underlying hash and per-operation payload uniqueness.</p>
+<p>These note identifiers uniquely define notes in the system and cannot be chosen by the user. Nodes maintain the set of notes through a dictionary mapping the NoteId to the note.</p>
+<h3 id="locked-notes"><a class="header" href="#locked-notes">Locked notes</a></h3>
+<p>Locked notes are special notes in Mantle that serve as collateral for Service Declarations. A note can become locked after executing a Declare Operation, preventing it from being spent until explicitly released through a Withdraw Operation. The system maintains a mapping of locked note IDs to their supporting declarations. Though locked, these notes remain in the Ledger and can still participate in Proof of Stake. When service providers withdraw all their declarations, the associated note(s) become unlocked and available for spending again.</p>
+<h3 id="channel-notes"><a class="header" href="#channel-notes">Channel Notes</a></h3>
+<p>Channel notes are on-ledger notes minted to represent channel funds. They are distinct from Locked Notes as they can’t be used to declare a service. However, they follow the same ageing rule as ordinary notes since they are part of the ledger and can be used for PoL creation once aged enough.</p>
+<p>The system maintains a <code>channel_notes</code> set in the Ledger tracking all active channel <code>NoteId</code> and their respective <code>ChannelId</code>.</p>
+<h2 id="ledger"><a class="header" href="#ledger">Ledger</a></h2>
+<pre><code class="language-python">class Ledger:
+    notes: list[Note]
+    locked_notes: dict[NoteId, LockedNote]
+    channel_notes: dict[NoteId, ChannelId]
+</code></pre>
+<h3 id="input-notes-spendability-validation"><a class="header" href="#input-notes-spendability-validation">Input Notes Spendability Validation</a></h3>
+<p>A note is spendable if and only if it exists, it is not spent or locked. The following function validates that an input of notes can be consumed:</p>
+<pre><code class="language-python">class Ledger:
+    def assert_spendable(inputs: list[NoteId], channel_id: ChannelId | None):
+        ## Check there is no duplicate
+        assert len(inputs) == len(set(inputs))
+
+            # Check that each note is individualy not locked, for the correct channel and unspent
+            for note_id in inputs:
+                assert ledger.is_unspent(note_id)
+                assert note_id not in locked_notes
+                if channel_id is None:
+                	assert note_id not in ledger.channel_notes
+                else:
+                	assert note_id in ledger.channel_notes
+                    assert ledger.channel_notes[note_id] == channel_id
+</code></pre>
+<h3 id="output-notes-validation"><a class="header" href="#output-notes-validation">Output Notes Validation</a></h3>
+<p>Before an output of notes can be inserted into the Ledger, every note field must satisfy the following constraints:</p>
+<pre><code class="language-python">class Ledger:
+    def assert_valid_output(outputs: list[Note]):
+        for note in outputs:
+            assert note.value &gt; 0
+            assert note.value &lt;= 2**64-1
+</code></pre>
+<h3 id="consuming-input-notes-execution"><a class="header" href="#consuming-input-notes-execution">Consuming Input Notes Execution</a></h3>
+<p>Consuming a set of notes removes them from the Ledger’s Merkle tree and recycles their leaf indices:</p>
+<pre><code class="language-python">class Ledger:
+    def execute_spending(inputs: list[NoteId], channel_id: ChannelId | None):
+        for note_id in inputs:
+            # updates the merkle tree to zero out the leaf for this entry
+            # and adds that leaf index to the list of unused leaves
+            ledger.remove(note_id)
+            if channel_id is not None:
+                ledger.channel_notes.pop(note_id)
+</code></pre>
+<h3 id="creating-output-notes-execution"><a class="header" href="#creating-output-notes-execution">Creating Output Notes Execution</a></h3>
+<p>Creating notes derives their <code>NoteId</code> from the Operation’s <code>OpId</code> and insert them in the Ledger:</p>
+<pre><code class="language-python">class Ledger:
+    def execute_adding(op_id: Hash, outputs: list[Note], channel_id: ChannelId | None):
+        for (output_index, output_note) in enumerate(outputs):
+            output_note_id = derive_note_id(op_id, output_index, output_note)
+            ledger.add(output_note_id)
+            if channel_id is not None:
+                ledger.channel_notes[output_note_id] = channel_id
+</code></pre>
+<h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
+<h2 id="gas-determination"><a class="header" href="#gas-determination">Gas Determination</a></h2>
+<p>From the [<a href="analysis-gas-cost-determination.html">Analysis] Gas Cost Determination</a>, we get the table below:</p>
+<div class="table-wrapper"><table><thead><tr><th>Constants</th><th>Value</th></tr></thead><tbody>
+<tr><td>EXECUTION_TRANSFER_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_CHANNEL_INSCRIBE_GAS</td><td>56</td></tr>
+<tr><td>EXECUTION_CHANNEL_CONFIG_GAS</td><td>56</td></tr>
+<tr><td>EXECUTION_CHANNEL_DEPOSIT_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_CHANNEL_WITHDRAW_GAS</td><td>56</td></tr>
+<tr><td>EXECUTION_CHANNEL_TRANSFER_GAS</td><td>56</td></tr>
+<tr><td>EXECUTION_SDP_DECLARE_GAS</td><td>646</td></tr>
+<tr><td>EXECUTION_SDP_WITHDRAW_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_SDP_ACTIVE_GAS</td><td>590</td></tr>
+<tr><td>EXECUTION_LEADER_CLAIM_GAS</td><td>580</td></tr>
+</tbody></table>
+</div>
+<h2 id="zero-knowledge-signature-scheme-zksignature"><a class="header" href="#zero-knowledge-signature-scheme-zksignature">Zero Knowledge Signature Scheme (ZkSignature)</a></h2>
+<p>A proof attesting that for the following public values:</p>
+<pre><code class="language-python">class ZkSignaturePublic:
+    public_keys: list[ZkPublicKey] # public keys signing the message (len = 32)
+    msg: zkhash # a finite field element uniquely representing the message
+</code></pre>
+<p>The prover knows a witness:</p>
+<pre><code class="language-python">class ZkSignatureWitness:
+    # The list of secret keys used to signed the message
+    secret_keys: list[ZkSecretKey] # (len = 32)
+</code></pre>
+<p>Such that the following constraints hold:</p>
+<ul>
+<li>
+<p>The number of secret keys is equal to the number of public keys.</p>
+<pre><code class="language-python">assert len(secret_keys) == len(public_keys)
+</code></pre>
+</li>
+<li>
+<p>Each public key is derived from the corresponding secret key.</p>
+<pre><code class="language-python">assert all(
+    notes[i].public_key == zkhash(FiniteField(b"KDF", byte_order="little", modulus= p), secret_keys[i])
+    for i in range(len(public_keys))
+)
+</code></pre>
+</li>
+<li>
+<p>The proof is bound to <code>msg</code> (it’s the <code>mantle_tx_hash</code> reduced modulo <span class="math-inline" data-tex="p"></span> in case of transactions).</p>
+<p>For implementation, the ZkSignature circuit will take a maximum of 32 public keys as inputs. To prove ownership of fewer keys, the remaining inputs will be padded with the public key corresponding to the secret key <code>0</code> and ignored during execution. The outputs have no size limit since they are included in the hashed message.</p>
+</li>
+</ul>
+<h3 id="benchmark"><a class="header" href="#benchmark">Benchmark</a></h3>
+<p>The material used for the benchmarks is the following:</p>
+<ul>
+<li>CPU       : 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)</li>
+<li>RAM       : 32GB - Speed: 5600 MT/s</li>
+<li>Motherboard: Micro-Star International Co., Ltd. MS-17S1</li>
+<li>OS        : Ubuntu 22.04.5 LTS</li>
+<li>Kernel    : 6.8.0-59-generic</li>
+</ul>
+<p><img src="bedrock-v1.1-mantle-specification/assets/477261aa-09df-8268-8845-8145f3f8d670.png" alt="Diagram" /></p>
+<h2 id="multiple-ed25519-signatures-verification"><a class="header" href="#multiple-ed25519-signatures-verification">Multiple Ed25519 Signatures Verification</a></h2>
+<p>Several operations (e.g. <a href="#channel-configuration">Channel Configuration</a> and
+<a href="#channel-withdraw">Channel Withdraw</a>) authorize an action with a threshold of
+Ed25519 signatures produced by a list of accredited keys. Each signature comes
+with the index, in the accredited keys list, of the key that produced it. The
+verification is factored out in the following routine:</p>
+<p><em>Given</em></p>
+<pre><code class="language-python">msg: zkhash                        # the message being signed (the mantle txhash)
+signatures: list[Ed25519Signature]
+indexes: list[u16]                 # for each signature, the index in `keys` of
+                                   # the signing key
+keys: list[Ed25519PublicKey]       # the accredited keys
+threshold: u16                     # the number of required signatures
+</code></pre>
+<p><em>Verify</em></p>
+<pre><code class="language-python">def MultiEd25519_verify(msg, signatures, indexes, keys, threshold):
+    # There must be exactly one index per signature
+    assert len(signatures) == len(indexes)
+
+    # There must be exactly `threshold` signatures
+    assert len(signatures) == threshold
+
+    # Indexes must be ordered from smallest to biggest without duplication.
+    # Being strictly increasing rejects duplicates and, since `idx` is used to
+    # index `keys`, guarantees every index stays within bounds.
+    for i in range(len(indexes) - 1):
+        assert indexes[i] &lt; indexes[i + 1]
+
+    # Each signature must be valid for the accredited key at its index
+    for sig, idx in zip(signatures, indexes):
+        assert Ed25519_verify(msg, keys[idx], sig)
+</code></pre>
+<h2 id="proof-of-claim"><a class="header" href="#proof-of-claim">Proof of Claim</a></h2>
+<p>A proof attesting that given these public values:</p>
+<pre><code class="language-python">class ProofOfClaimPublic:
+    voucher_root: zkhash # Merkle root of the reward_voucher maintained by everyone
+    voucher_nullifier: zkhash
+    mantle_tx_hash_fr: zkhash # attached hash reduced modulo p
+</code></pre>
+<p>The prover knows the following witness:</p>
+<pre><code class="language-python">class ProofOfClaimWitness:
+    secret_voucher: zkhash
+    voucher_merkle_path: list[zkhash]
+    voucher_merkle_path_selectors: list[bool]
+</code></pre>
+<p>such that the following constraints hold:</p>
+<ul>
+<li>The reward voucher is derived from the secret voucher.</li>
+</ul>
+<pre><code class="language-python">assert reward_voucher == zkhash(
+    FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
+    secret_voucher)
+</code></pre>
+<ul>
+<li>There exists a valid Merkle path from the reward voucher as a leaf to the Merkle root.</li>
+</ul>
+<pre><code class="language-python">assert voucher_root == path_root(leaf=reward_voucher,
+    path=voucher_merkle_path,
+    selectors=voucher_merkle_path_selectors)
+</code></pre>
+<ul>
+<li>The voucher nullifier is derived from the secret voucher correctly.</li>
+</ul>
+<pre><code class="language-python">assert voucher_nullifier == zkhash(
+    FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
+    secret_voucher)
+</code></pre>
+<ul>
+<li>The proof is bound to the <code>mantle_tx_hash</code> reduced modulo <span class="math-inline" data-tex="p"></span>.</li>
+</ul>
+<h3 id="benchmark-1"><a class="header" href="#benchmark-1">Benchmark</a></h3>
+<p>The material used for the benchmarks is the following:</p>
+<ul>
+<li>CPU       : 13th Gen Intel(R) Core(TM) i9-13980HX (24 cores / 32 threads)</li>
+<li>RAM       : 32GB - Speed: 5600 MT/s</li>
+<li>Motherboard: Micro-Star International Co., Ltd. MS-17S1</li>
+<li>OS        : Ubuntu 22.04.5 LTS</li>
+<li>Kernel    : 6.8.0-59-generic</li>
+</ul>
+<p><img src="bedrock-v1.1-mantle-specification/assets/b23261aa-09df-827c-8565-014a68d98d4c.png" alt="Diagram" /></p>
+<h2 id="test-vectors"><a class="header" href="#test-vectors">Test Vectors</a></h2>
+<p>To see what the payloads represent, refer to <a href="mantle-transaction-encoding.html">Mantle Transaction Encoding</a>.</p>
+<h3 id="operation-id"><a class="header" href="#operation-id">Operation Id</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Operation</th><th>Payload</th><th><code>op_id</code></th></tr></thead><tbody>
+<tr><td><code>TRANSFER</code></td><td>0x0201000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020300000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000600000000000000000000000000000000000000000000000000000000000000</td><td>0x5e5e1b318aa0c2aec93fbb327e6af5f705e5684269a34e0c1319539d00d06cdb</td></tr>
+<tr><td><code>CHANNEL_CONFIG</code></td><td>0x070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00</td><td>0x0cf0dd115eadfc303eeb4c103a7d2faba3cf3a25b549da79c30857fb9eebc0cb</td></tr>
+<tr><td><code>CHANNEL_INSCRIBE</code></td><td>0x0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c</td><td>0xfb9af7fb1384fff51780ec8c5afbcba76449ab7603484f797df3a472e48826c1</td></tr>
+<tr><td><code>CHANNEL_DEPOSIT</code></td><td>0x1010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d65746164617461</td><td>0xf14ff0aad9bc5e8e30c5d1aa3710aaa1c1cc1f47c2c256e7d9e73104cb17ccaf</td></tr>
+<tr><td><code>CHANNEL_WITHDRAW</code></td><td>0x1212121212121212121212121212121212121212121212121212121212121212011300000000000000000000000000000000000000000000000000000000000000</td><td>0x503d0d08f9faef971864943103965d13be7159fe6e0361c8ea614c6d0431e59c</td></tr>
+<tr><td><code>CHANNEL_TRANSFER</code></td><td>0x14141414141414141414141414141414141414141414141414141414141414140115000000000000000000000000000000000000000000000000000000000000000116000000000000001700000000000000000000000000000000000000000000000000000000000000</td><td>0xfb24c17731954e8bbe1b0dedd69e4857c8083d1689aff331ba16f3ed5883f0ce</td></tr>
+<tr><td><code>SDP_DECLARE</code></td><td>0x00010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000</td><td>0x42e93fdce121a5ab4da3201a6fd2da1d42ca8b7d8c1a8c9e2a657a6cdc7aa468</td></tr>
+<tr><td><code>SDP_WITHDRAW</code></td><td>0x1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000</td><td>0xc95aea0e46f60c12a8b29b259ca1b39947093c0d88a1ea8400c49e392ca491a0</td></tr>
+<tr><td><code>SDP_ACTIVE</code></td><td>0x1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020303030303030303030303030303030303030303030303030303030303030303</td><td>0x76afa55f5733db75a982dc5ccabb5c6a7dab992eda78cdfd5f657f314e388354</td></tr>
+<tr><td><code>LEADER_CLAIM</code></td><td>0x200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000</td><td>0x0dc1a007fdd184b4553a83d166b749a621f5be2de4b3b0429ebf0520d1dd9a51</td></tr>
+</tbody></table>
+</div>
+<h3 id="mantle-transaction-hash-1"><a class="header" href="#mantle-transaction-hash-1">Mantle Transaction Hash</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Transaction</th><th>Payload</th><th>Transaction Hash</th></tr></thead><tbody>
+<tr><td>Empty transaction</td><td>0x00</td><td>0x2eba3f667b80a508f3d44d149a1c27a90ea365a51e4fc8209289088142b364e5</td></tr>
+<tr><td>Transaction with one of each operation</td><td>0x0a00020100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002030000000000000004000000000000000000000000000000000000000000000000000000000000000500000000000000060000000000000000000000000000000000000000000000000000000000000010070707070707070707070707070707070707070707070707070707070707070702001398f62c6d1a457c51ba6a4b5f3dbd2f69fca93216218dc8997e416bd17d93cafd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f6180a0000000b0000000c000d00110e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0b00000068656c6c6f206c6f676f730000000000000000000000000000000000000000000000000000000000000000d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c121010101010101010101010101010101010101010101010101010101010101010011100000000000000000000000000000000000000000000000000000000000000100000006465706f7369742d6d6574616461746113121212121212121212121212121212121212121212121212121212121212121201130000000000000000000000000000000000000000000000000000000000000014141414141414141414141414141414141414141414141414141414141414141401150000000000000000000000000000000000000000000000000000000000000001160000000000000017000000000000000000000000000000000000000000000000000000000000002000010b00047f00000191020bb8cd0353470962558a6e0839022ae65c6b2723b32772e5c0c5f4776cb8e6a3e10ba2f319000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000211b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1d000000000000001c00000000000000000000000000000000000000000000000000000000000000221e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f0000000000000001010a0000008a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030330200000000000000000000000000000000000000000000000000000000000000021000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000</td><td>0x5d3ff950e0752dc4ebf8c8d73a8cc7b22445b9245ea317f7ebdaa8d6fd881589</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/bedrock-v1.1-block-construction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/mantle-transaction-encoding.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/bedrock-v1.1-block-construction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/mantle-transaction-encoding.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
+        <script src="../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>

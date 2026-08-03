@@ -1,0 +1,402 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Execution Market - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/execution-market.html" class="active"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity.html"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-encapsulation.html"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications.html"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-lioness.html"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-oracle-zone.html"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="execution-market"><a class="header" href="#execution-market">EXECUTION-MARKET</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Execution Market</td></tr>
+<tr><td>Slug</td><td>201</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Juan Pablo Madrigal-Cianci <a href="mailto:jp@logos.co">jp@logos.co</a></td></tr>
+<tr><td>Contributors</td><td>Filip Dimitrijevic <a href="mailto:filip@logos.co">filip@logos.co</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/execution-market.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
+<li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/ff40ae99c8e76a2bb36dcd83184434625a8daeb5/docs/blockchain/raw/execution-market.md"><code>ff40ae9</code></a> — docs(blockchain): TKE: fix base fees in the pseudocode based on G_target (#380)</li>
+<li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/execution-market.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
+<li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/execution-market.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
+<li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/execution-market.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
+</ul>
+<!-- timeline:end -->
+<h1 id="revisions-history"><a class="header" href="#revisions-history">Revisions History</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Version</th><th>Changes</th><th>Date</th></tr></thead><tbody>
+<tr><td>1.0.0</td><td>Initial revision</td><td>2026-04-24</td></tr>
+<tr><td>1.0.1</td><td>Fix base fee constants in pseudocode based on the correct <span class="math-inline" data-tex="G_{\mathrm{target}}"></span></td><td>2026-07-27</td></tr>
+<tr><td>1.1.0</td><td>Round the base fee update upwards</td><td>2026-07-28</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p>Disclaimer:
+This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.</p>
+<p>All information regarding project details, token design, distribution mechanisms, technical parameters, and any forward-looking statements is preliminary and subject to change without notice. No representations or warranties are made as to the completeness or accuracy of the information herein.</p>
+<p>Nothing in this material should be relied upon for investment or business decisions. Recipients of this information assume all risks associated with its use and are responsible for seeking independent professional advice regarding any actions based on it.</p>
+</blockquote>
+<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
+<p>This specification details the transaction fee mechanism (TFM) for the Logos Blockchain Execution Market, which encompasses the finite resources of on-chain computation. The design is engineered to achieve four primary, interconnected objectives:</p>
+<ol>
+<li>To implement a market that allocates execution resources to transactions that derive the highest economic value from it, ensuring the network's limited capacity is used to maximize total utility.</li>
+<li>To create an environment where the process of bidding for execution is intuitive and the transaction costs are predictable. This is paramount for fostering a healthy developer ecosystem and serving the professional entities that are the intended primary users of the Logos Blockchain network.</li>
+<li>To design a system of rules where the dominant, profit-maximizing strategy for all participants (users and block builders) is to behave honestly and in accordance with the protocol's intended function. This minimizes the potential for manipulative behaviors like transaction censorship or mempool gaming.</li>
+<li>To ensure that network usage contributes directly to the economic value of the native Logos Blockchain token, creating a positive feedback loop between network adoption and the health of its underlying asset.</li>
+</ol>
+<h2 id="design-rationale"><a class="header" href="#design-rationale">Design Rationale</a></h2>
+<p>The design is founded on a target-based mechanism, philosophically aligned with Ethereum's EIP-1559. This model is crucial for long-term network health and security, as it actively steers execution utilization around a predefined target. This ensures the network remains performant and accessible for nodes with minimal hardware specifications, thereby promoting decentralization.</p>
+<p>To further enhance security, this specification addresses a known vulnerability in the classic EIP-1559 design. As demonstrated by recent research (<a href="https://arxiv.org/pdf/2304.11478">Cachin et al., 2023</a>), EIP-1559 is susceptible to base fee manipulation by rational, non-myopic block builders. Our design incorporates a direct mitigation for this threat, as proposed in <a href="https://arxiv.org/pdf/2304.11478">Cachin et al., 2023</a>: an Exponential Moving Average (EMA) based update rule for the base fee. Given the EMA nature of this update, these enhancements smooth fluctuations in execution gas consumption, making the protocol significantly more resilient to strategic manipulation without compromising its core benefits of responsiveness and predictability</p>
+<p>Furthermore, as opposed to the standard EIP-1559 mechanism, where base fee is burned and tips are immediately given to miners, in our setting we burn fees, and later, we mint rewards to which we add tips which are given to the block builders at a later block through the <a href="bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>, for privacy preservation.</p>
+<h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
+<p>Our fee mechanism adapts Ethereum's EIP-1559 to the specific economic and security goals of the Logos Blockchain network. It provides predictable execution gas costs for users while creating a robust incentive structure for block builders and Blend nodes that minimizes harmful emergent strategies.</p>
+<p>The mechanism operates on four core principles:</p>
+<ul>
+<li>Dynamic Base Fee: A protocol-defined base_fee for Execution Gas must be paid for a transaction to be included in a block. This fee adjusts automatically based on a smoothed average of recent network demand relative to a predefined capacity target, ensuring sustainable network load. This base_fee is the minimal threshold to be paid for the transaction to be accepted by the block builder.</li>
+<li>Priority Fee (Tip): To incentivize faster inclusion by block builders, users add a priority_fee on top of the base fee. This creates a simple and transparent auction for block space during periods of high demand. The proceeds of this goes to the block builder.</li>
+<li>Fee Splitting and Deflation: The two fee components are treated differently. The entire base_fee is burned, permanently removing it from the supply. This creates a direct link between network activity and the economic value of the native token, applying deflationary pressure as usage grows. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream. 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via <a href="bedrock-anonymous-leaders-reward.html">Anonymous Leaders Reward Protocol</a>.</li>
+</ul>
+<p>The entire lifecycle can be visualized in the following flow:</p>
+<p><img src="execution-market/assets/execution-market-lifecycle.svg" alt="Execution market lifecycle flow" /></p>
+<h2 id="incentive-analysis"><a class="header" href="#incentive-analysis">Incentive Analysis</a></h2>
+<ul>
+<li>User Strategy: The mechanism promotes a straightforward bidding strategy. A rational user should set their execution_gas_price (<span class="math-inline" data-tex="c_t"></span>) to their true maximum willingness to pay. Setting it higher provides no advantage and risks overpayment, while setting it lower risks the transaction being delayed if the base_fee rises. The priority_fee acts as a simple tip to gauge the market rate for priority inclusion during congestion.</li>
+<li>Block Builder Strategy: The dominant strategy for a rational, profit-maximizing block builder is to follow the prescribed block construction algorithm honestly. The block builder's revenue is derived from (a) priority fees and (b) block rewards in accordance with network Key Performance Indicators (KPIs) as described in <a href="block-rewards.html">Block Rewards</a>, which incentivize them to include the transactions that maximize their revenue. Because the base_fee is determined algorithmically based on historical data, a block builder cannot manipulate it for their own immediate gain.</li>
+</ul>
+<h2 id="economic-properties"><a class="header" href="#economic-properties">Economic Properties</a></h2>
+<ul>
+<li>Sustainable Resource Management: The TFM automatically steers network usage toward the target (<span class="math-inline" data-tex="G_\text{target}"></span>). By increasing the cost of Execution Gas during high demand, the protocol prevents network overload. This protects the ability of nodes with modest hardware to participate, safeguarding decentralization.</li>
+<li>Deflationary Pressure: Burning the base_fee (and minting later a proportion of it back as rewards, cf <a href="block-rewards.html">Block Rewards</a>) establishes a direct link between network activity and the intrinsic economic utility of the Logos Blockchain token. As usage grows, the rate of token burn increases, applying deflationary pressure on the total supply and creating a sustainable economic flywheel.</li>
+</ul>
+<h2 id="security-properties-mitigation-of-base-fee-manipulation"><a class="header" href="#security-properties-mitigation-of-base-fee-manipulation">Security Properties: Mitigation of Base Fee Manipulation</a></h2>
+<p>A critical feature of this design is its resilience to the base fee manipulation attack identified in classic EIP-1559. Our EMA-based update rule directly mitigates this vulnerability in two ways:</p>
+<ol>
+<li>Impact Dampening: The influence of any single block's Execution Gas consumption (e.g., an empty block) on the fee update is dampened by a factor of (<span class="math-inline" data-tex="1q"></span>), preventing sharp, manipulative drops in the base_fee.</li>
+<li>Exponential Decay: The effect of a manipulative block on subsequent base_fee calculations decays exponentially, making it economically infeasible for an attacker to sustain the attack.</li>
+</ol>
+<h1 id="construction"><a class="header" href="#construction">Construction</a></h1>
+<h2 id="notation"><a class="header" href="#notation">Notation</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Symbol</th><th>Name</th><th>Value</th><th>Description</th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="s"></span></td><td>Block Number</td><td>-</td><td>The index of a block in the chain.</td></tr>
+<tr><td><span class="math-inline" data-tex="t"></span></td><td>Transaction</td><td>-</td><td>A single transaction submitted by a user.</td></tr>
+<tr><td><span class="math-inline" data-tex="g_t"></span></td><td>Execution Gas Consumed</td><td>-</td><td>The actual amount of Execution Gas consumed by transaction <span class="math-inline" data-tex="t"></span> upon execution.</td></tr>
+<tr><td><span class="math-inline" data-tex="c_t"></span></td><td>Execution Gas Price</td><td>-</td><td>The user-specified price per unit of execution gas they will pay.</td></tr>
+<tr><td><span class="math-inline" data-tex="b_{\mathrm{exec}}[s]"></span></td><td>Base Fee</td><td>-</td><td>The protocol-defined Execution Gas price for inclusion in block <span class="math-inline" data-tex="s"></span>. This is initialized at 1 for the first block.</td></tr>
+<tr><td><span class="math-inline" data-tex="p_t"></span></td><td>Priority Fee</td><td>-</td><td>The portion of the Execution Gas price that serves as a tip to the block builder (<span class="math-inline" data-tex="p_t = c_t - b_{\mathrm{exec}}[s]"></span>).</td></tr>
+<tr><td><span class="math-inline" data-tex="G[s]"></span></td><td>Total Execution Gas Used</td><td>-</td><td>The sum of Execution Gas consumed by all transactions in block <span class="math-inline" data-tex="s"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="G_{\mathrm{avg}}[s]"></span></td><td>Smoothed Average Execution Gas</td><td>-</td><td>The Exponential Moving Average (EMA) of Execution Gas used up to block <span class="math-inline" data-tex="s"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="G_{\max}"></span></td><td>Max Execution Gas Per Block</td><td>3,193,460</td><td>A protocol constant defining the hard limit on <span class="math-inline" data-tex="G[s]"></span>.</td></tr>
+<tr><td><span class="math-inline" data-tex="G_{\mathrm{target}}"></span></td><td>Target Execution Gas Per Block</td><td>1,596,730</td><td>A protocol constant for the ideal Execution Gas usage. The TFM steers usage towards this target. This is set to half of <span class="math-inline" data-tex="G_{max}"></span> execution gas units.</td></tr>
+<tr><td><span class="math-inline" data-tex="\phi"></span></td><td>Fee Adjustment Rate</td><td>1/8</td><td>A protocol constant controlling how quickly the base fee adjusts to demand.</td></tr>
+<tr><td><span class="math-inline" data-tex="q"></span></td><td>EMA Smoothing Factor</td><td>9/10</td><td>A protocol constant defining the weight of historical average in the EMA update rule.</td></tr>
+<tr><td><span class="math-inline" data-tex="F_t"></span></td><td>Total fee</td><td>-</td><td><span class="math-inline" data-tex="F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t"></span></td></tr>
+<tr><td><span class="math-inline" data-tex="\hat{R}_{\mathrm{burned}}[s]"></span></td><td>Amount of base fees burnt</td><td>-</td><td>This is used as an input to compute the block rewards</td></tr>
+</tbody></table>
+</div>
+<h3 id="parameter-justification"><a class="header" href="#parameter-justification">Parameter Justification</a></h3>
+<p>We set <span class="math-inline" data-tex="\phi=1/8"></span>, which results in up to a <span class="math-inline" data-tex="\pm"></span>12.5% increase or decrease in the fee at every block. This choice of parameter is made following empirical evidence on other protocols where it has worked sufficiently well, such as Ethereum (cf. <a href="https://ethereum.github.io/abm1559/notebooks/eip1559.html">EIP 1559: A transaction fee market proposal</a>).</p>
+<p>We set a value of <span class="math-inline" data-tex="q=0.9"></span> as it robustly achieves the primary security goal of mitigating base fee manipulation while retaining sufficient market responsiveness. This setting heavily dampens the influence of any single block's gas usage on the new smoothed average to a mere 10%, making manipulation attacks prohibitively expensive for their limited impact. This is economically equivalent to a lookback period of approximately 19 blocks.</p>
+<p>Furthermore, we set <span class="math-inline" data-tex="G_\text{max} = 3,193,460"></span> Execution Gas units (cf as explained in <a href="overview-cryptoeconomics.html">[Overview] Cryptoeconomics</a>), and <span class="math-inline" data-tex="G_\text{target} = 1,596,730"></span> Execution Gas units. The 50% target creates a perfectly symmetrical buffer, giving the network equal capacity to elastically expand block sizes to absorb demand spikes or contract them during lulls. Any other value would create an asymmetric system, making it either too volatile and over-reactive to demand increases (e.g., a 75% target) or too sluggish to respond to periods of low activity. This rationale is also borrowed from Ethereums EIP-1559 (cf <a href="https://ethereum.github.io/abm1559/notebooks/eip1559.html">EIP 1559: A transaction fee market proposal</a>) and is also used in (<a href="https://arxiv.org/pdf/2304.11478">Base Fee Manipulation In Ethereums EIP-1559 Transaction Fee Mechanism</a>).</p>
+<h2 id="block-builder-mechanism-block-construction"><a class="header" href="#block-builder-mechanism-block-construction">Block Builder Mechanism: Block Construction</a></h2>
+<p>A rational, profit-maximizing block builder must follow this algorithm to construct a valid and optimal block <span class="math-inline" data-tex="s"></span>.</p>
+<p>Algorithm Steps:</p>
+<ol>
+<li>Fetch State: Retrieve the current base fee for the block to be built, <span class="math-inline" data-tex="b_{\mathrm{exec}}[s]"></span>.</li>
+<li>Filter Mempool: From the set of all available transactions <span class="math-inline" data-tex="\mathcal{M}"></span>, create a candidate set <span class="math-inline" data-tex="\mathcal{M}&#x27;"></span> containing only valid transactions where the user's Execution Gas price cap is sufficient to pay the base fee.</li>
+</ol>
+<div class="math-block" data-tex="\mathcal{M}&#x27; = \{\,t \in \mathcal{M} \mid c_t \ge b_{\mathrm{exec}}[s] \,\}"></div>
+<ol>
+<li>Sort Candidates: Sort the valid transactions in <span class="math-inline" data-tex="\mathcal{M}&#x27;"></span> in descending order of revenue</li>
+<li>Greedy Inclusion: Initialize an empty block and a running total for Execution Gas used, current_block_gas = 0. Iterate through the sorted transactions and add them to the block one by one, as long as the block's total Execution Gas does not exceed the <span class="math-inline" data-tex="G_{\max}"></span> limit.</li>
+</ol>
+<p>Pseudocode for Block Construction:</p>
+<pre><code class="language-python">def construct_block(mempool, base_fee, gt, G_max):
+    # Step 2: Filter Mempool
+    valid_txs = [tx for tx in mempool if tx.execution_gas_price &gt;= base_fee]
+    # Step 3: Sort Candidates by priority fee (descending)
+    valid_txs.sort(key=lambda tx: tx.revenue, reverse=True)
+    # Step 4: Greedy Inclusion
+    block_txs = []
+    current_block_gas = 0
+    for tx in valid_txs:
+        if current_block_gas + tx.gas_limit &lt;= G_max:
+            block_txs.append(tx)
+            current_block_gas += tx.gas_limit # Using gas_limit for packing
+    return block_txs
+</code></pre>
+<h2 id="on-chain-rules-fee-update-and-revenue"><a class="header" href="#on-chain-rules-fee-update-and-revenue">On-Chain Rules: Fee Update and Revenue</a></h2>
+<p>After a block <span class="math-inline" data-tex="s"></span> is executed and its total Execution Gas usage <span class="math-inline" data-tex="G[s]"></span> is known, the protocol deterministically applies the following rules.</p>
+<h3 id="base-fee-update-rule"><a class="header" href="#base-fee-update-rule">Base Fee Update Rule</a></h3>
+<p>The base fee for the next block, <span class="math-inline" data-tex="s+1"></span>, is calculated based on the state of block <span class="math-inline" data-tex="s"></span>.</p>
+<ol>
+<li>Total Execution Gas Used: First, sum the actual Execution Gas consumed, <span class="math-inline" data-tex="g_t"></span>, for all transactions <span class="math-inline" data-tex="t"></span> in the block <span class="math-inline" data-tex="\mathcal{B}_s"></span>: <span class="math-inline" data-tex="G[s] = \sum_{t \in \mathcal{B}_s} g_t"></span>.</li>
+<li>Smoothed Average Update: Update the EMA of Execution Gas usage: <span class="math-inline" data-tex="G_{\mathrm{avg}}[s] = (1 - q) \cdot G[s] + q \cdot G_{\mathrm{avg}}[s-1]"></span>.</li>
+<li>Next Base Fee Calculation: Update the base fee for block <span class="math-inline" data-tex="s+1"></span>: <span class="math-inline" data-tex="b_{\mathrm{exec}}[s+1] = b_{\mathrm{exec}}[s] \cdot \left(1 + \phi \cdot \frac{G_{\mathrm{avg}}[s] - G_{\mathrm{target}}}{G_{\mathrm{target}}}\right)"></span>.</li>
+</ol>
+<p>Pseudocode for Base Fee Update:</p>
+<p>Because base fee computation affects consensus state, the implementation must be fully deterministic across all nodes. For that reason, the normative implementation of the reward function should not rely on floating-point arithmetic, machine-dependent rounding behavior, or comparisons against machine epsilon. Earlier sections use real-valued formulas to explain the mechanism and its economic meaning, but the consensus rule itself should be defined only in terms of integer arithmetic.</p>
+<p>The goal of this section is not to change the execution mechanism. It is only to restate the already-specified mechanism in a canonical deterministic form with explicit named constants. Therefore we provide here a reference implementation that uses unsigned integers to have a common reference.</p>
+<p>First we rewrite</p>
+<div class="math-block" data-tex="\begin{align*}&#10;G_{\mathrm{avg}}[s] &amp;= (1 - 0.9) \cdot G[s] + 0.9 \cdot G_{\mathrm{avg}}[s-1]= \frac{G[s] + 9 \cdot G_\text{avg}[s-1]}{10}&#10;\end{align*}"></div>
+<div class="math-block" data-tex="\begin{align*} b_\text{exec}[s+1] &amp;= b_\text{exec}[s]\cdot \left( 1 + \frac{1}{8} \cdot \frac{G_\text{avg}[s] - G_\text{target}}{G_\text{target}} \right)\\&#10;&amp;=b_\text{exec}[s] \cdot \frac{7 \cdot G_\text{target} + G_\text{avg}[s]}{8 \cdot G_\text{target}}&#10;\end{align*}"></div>
+<p>The integer base fee is obtained by rounding this quantity upwards, while the smoothed average <span class="math-inline" data-tex="G_\text{avg}[s]"></span> is rounded downwards:</p>
+<div class="math-block" data-tex="b_\text{exec}[s+1] = \left\lceil b_\text{exec}[s] \cdot \frac{7 \cdot G_\text{target} + G_\text{avg}[s]}{8 \cdot G_\text{target}} \right\rceil,\qquad G_\text{avg}[s] = \left\lfloor \frac{G[s] + 9 \cdot G_\text{avg}[s-1]}{10} \right\rfloor"></div>
+<p>And so we propose the following code reference:</p>
+<pre><code class="language-python">EMA_DENOMINATOR = 10  # from q = 9/10
+EMA_PREV_WEIGHT = 9  # from q = 9/10
+BASE_FEE_NUMERATOR = 11_177_110  # = 7 * G_target
+BASE_FEE_DENOMINATOR = 12_773_840  # = 8 * G_target
+
+def ceil_div(numerator: int, denominator: int) -&gt; int:
+    return (numerator + denominator - 1) // denominator
+
+def update_g_avg(prev_g_avg: int, block_gas_used: int) -&gt; int:
+    numerator = block_gas_used + EMA_PREV_WEIGHT * prev_g_avg
+    return numerator // EMA_DENOMINATOR
+
+def update_base_fee(base_fee: int, g_avg: int) -&gt; int:
+    numerator = base_fee * (BASE_FEE_NUMERATOR + g_avg)
+    return ceil_div(numerator, BASE_FEE_DENOMINATOR)
+</code></pre>
+<p>The two rounding directions are not interchangeable. The base fee is multiplied by a factor smaller than one whenever the smoothed average is below the target, so rounding it downwards would make 0 an absorbing state: a base fee of 1 would be mapped to 0 by the first downward update, and every subsequent update would keep it at 0, making execution permanently free. Rounding upwards makes 1 the effective floor of the base fee and leaves the mechanism unchanged at every other price level, as the rounding error is at most one unit against an adjustment of up to <span class="math-inline" data-tex="\pm 12.5\%"></span>. The smoothed average is a measurement rather than a price and is not subject to this failure mode, as it is additive and recovers from 0 as soon as demand resumes. Rounding it upwards would instead pin it at 1 once it has been positive, reporting residual demand on an idle network.</p>
+<h3 id="fee-distribution"><a class="header" href="#fee-distribution">Fee Distribution</a></h3>
+<p>For every transaction t, the effective priority fee is</p>
+<div class="math-block" data-tex="p_t = c_t - b_{\mathrm{exec}}[s]."></div>
+<p>The final fee <span class="math-inline" data-tex="F_t"></span> paid by the transaction <span class="math-inline" data-tex="t"></span> is:</p>
+<div class="math-block" data-tex="F_t = g_t \,\cdot\bigl(b_{\mathrm{exec}}[s] + p_t\bigr)= g_t\cdot c_t"></div>
+<p>Let the amount of Execution fee burnt in a block be:</p>
+<div class="math-block" data-tex="\hat{R}_{\mathrm{burned}}(s)&#10;= \sum_{t \in \mathcal{B}_s} \bigl(g_t \cdot b_{\mathrm{exec}}[s]\bigr)."></div>
+<p>This burned quantity is then used as a input for the computation of the block rewards, as described in  <a href="block-rewards.html">Block Rewards</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/block-rewards.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/storage-markets.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/block-rewards.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/storage-markets.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
+        <script src="../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>

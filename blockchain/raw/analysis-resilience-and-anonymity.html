@@ -1,0 +1,636 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>[Analysis] Resilience and Anonymity - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/execution-market.html"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity.html" class="active"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-encapsulation.html"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications.html"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-lioness.html"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-oracle-zone.html"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="analysis-resilience-and-anonymity"><a class="header" href="#analysis-resilience-and-anonymity">ANALYSIS-RESILIENCE-AND-ANONYMITY</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>[Analysis] Resilience and Anonymity</td></tr>
+<tr><td>Slug</td><td>195</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Informational</td></tr>
+<tr><td>Editor</td><td>Alexander Mozeika <a href="mailto:alexander.mozeika@logos.co">alexander.mozeika@logos.co</a></td></tr>
+<tr><td>Contributors</td><td>Filip Dimitrijevic <a href="mailto:filip@logos.co">filip@logos.co</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/analysis-resilience-and-anonymity.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
+<li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/analysis-resilience-and-anonymity.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
+</ul>
+<!-- timeline:end -->
+<h1 id="revision-history"><a class="header" href="#revision-history">Revision History</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Version</th><th>Changes</th><th>Date</th></tr></thead><tbody>
+<tr><td>1.0.0</td><td>Initial revision.</td><td>2025-08-25</td></tr>
+</tbody></table>
+</div>
+<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>In order to guide a design of the <a href="blend-protocol.html">Blend Network</a>, this document summarises parameters (and results of analysis) of the <a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html">leader election process</a>, <a href="analysis-communication-on-trees.html">communication on trees</a> and <a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html">inference of relative stake</a>. In addition to this, we considered sampling of linear trees and derived conditions under which results for communication on trees can be used. Also, we analysed the probability of linking a sender node to its message which allows us to quantify the “unlinkability of block proposer.” All these parameters (and results) were used to design (and implement) the “calculator” which can be used to quantify resilience and anonymity of communication in the Blend Network.</p>
+<p>Finally, in this document we also analysed strategies which can be used to reduce anonymity failure and statistical properties of number of time-slots between two consecutive blocks in <a href="cryptarchia-v1-protocol.html">Cryptarchia</a>.</p>
+<h1 id="analysis"><a class="header" href="#analysis">Analysis</a></h1>
+<h2 id="leader-election-process"><a class="header" href="#leader-election-process">Leader election process</a></h2>
+<p>The <a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html">leader election process</a> is organised into epochs and each epoch is divided into <span class="math-inline" data-tex="T"></span> time-slots.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8132-947c-f18dddfbee58.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>One epoch of the leader election process. Node <span class="math-inline" data-tex="i"></span> participates in the leader election at time-slots <span class="math-inline" data-tex="t_1,\ldots,t_T"></span>. The (binary) outcome of this lottery, where 0/1 corresponds to lost/won, is either <em>observed</em> (numbers in square brackets) or <em>unobserved</em>.</sub></p>
+</blockquote>
+<p>The leader election process has the following parameters</p>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Description</th><th>Value/Range</th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="N"></span></td><td>Number of nodes</td><td><span class="math-inline" data-tex="10^2\ldots10^4"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="T"></span>​</td><td>Number of time-slots per epoch</td><td><span class="math-inline" data-tex="\approx 432,000"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="f"></span>​</td><td>Fraction of time-slots with at least one winner</td><td><span class="math-inline" data-tex="0.05"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="\Delta t"></span>​</td><td>The duration of a single time-slot</td><td><span class="math-inline" data-tex="1"></span> s</td></tr>
+</tbody></table>
+</div>
+<h2 id="sampling-of-linear-trees"><a class="header" href="#sampling-of-linear-trees">Sampling of Linear Trees</a></h2>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81aa-9eaa-f915c3998915.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>Communication on Linear Trees. A message is sent from a root node through <span class="math-inline" data-tex="K"></span> communication paths where each path has <span class="math-inline" data-tex="L"></span> nodes.</sub></p>
+</blockquote>
+<p>The number of nodes in linear tree design is <span class="math-inline" data-tex="1+KL"></span>, where <span class="math-inline" data-tex="K"></span> is the number of paths and <span class="math-inline" data-tex="L"></span> is the number of nodes in each path excluding the sender node. In the linear tree design, one node is the sender node and the other <span class="math-inline" data-tex="KL"></span> nodes are mix nodes.</p>
+<p>We assume that in each epoch of the protocol there are <span class="math-inline" data-tex="n"></span> sender nodes, labelled by the set <span class="math-inline" data-tex="[n]"></span>.  Each of the <span class="math-inline" data-tex="n"></span> sender nodes sample <span class="math-inline" data-tex="K \times L"></span> nodes from the population of <span class="math-inline" data-tex="N"></span> nodes (labeled by the set <span class="math-inline" data-tex="[N]"></span>). The total number of nodes involved in communication is <span class="math-inline" data-tex="n(1+KL)"></span>.</p>
+<p>We assume that each sender node samples <span class="math-inline" data-tex="K\times L"></span> nodes, independently from other nodes, using sampling without replacement. A node among the <span class="math-inline" data-tex="K\times L"></span> nodes sampled from <span class="math-inline" data-tex="[N]"></span> just by chance can also appear in other <span class="math-inline" data-tex="n-1"></span> random subsets of nodes.</p>
+<p>The result of the sampling process described above can be represented by the following random factor-graph:</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8129-b5fb-e05cf6f66bd0.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The random factor-graph generated by sampling of <span class="math-inline" data-tex="n"></span> subsets of <span class="math-inline" data-tex="K\times L"></span> nodes, represented by factors (squares), from the set of all nodes <span class="math-inline" data-tex="[N]"></span> represented by (filled) circles. If a node is a member of a subset then this is represented by an edge on this graph. Each node in the subset of <span class="math-inline" data-tex="[N]"></span>, <span class="math-inline" data-tex="[n]"></span>, is a member of at least <span class="math-inline" data-tex="1"></span> of these subsets. Here <span class="math-inline" data-tex="K\times L=4"></span>.</sub></p>
+</blockquote>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81b6-8d35-fabff822c957.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>Structure of a factor <span class="math-inline" data-tex="\mu"></span> in the random factor graph associated with sampling of linear trees. Here <span class="math-inline" data-tex="K=L=2"></span>. Node <span class="math-inline" data-tex="i"></span>, associated with <span class="math-inline" data-tex="\mu"></span>, is a sending a message to nodes <span class="math-inline" data-tex="i_2"></span> and <span class="math-inline" data-tex="i_4"></span> via the mix nodes <span class="math-inline" data-tex="i_1"></span> and <span class="math-inline" data-tex="i_3"></span>.</sub></p>
+</blockquote>
+<p>Connectivity of a node <span class="math-inline" data-tex="i\in[N]"></span> is the number of random edges connecting this nodes to factors labelled by the set <span class="math-inline" data-tex="[n]"></span>. The connectivity of a node <span class="math-inline" data-tex="i \in [N]"></span> is the number of linear trees that <span class="math-inline" data-tex="i"></span> appears in. The connectivity is a <a href="analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html">random number from the binomial distribution</a></p>
+<div class="math-block" data-tex="\mathrm{P}\left(c\vert n,\frac{KL}{N}\right)={n\choose c}\left(\frac{KL}{N}\right)^c\left(1-\frac{KL}{N}\right)^{n-c}"></div>
+<p>with parameters <span class="math-inline" data-tex="n"></span> and <span class="math-inline" data-tex="\frac{KL}{N}"></span>.</p>
+<p>The probability that a node has more than one random connection <span class="math-inline" data-tex="\mathrm{P}\left(c \gt 1\vert n,\frac{KL}{N}\right)"></span>, i.e. the prob. that a mix node participates in more than one subset of mix nodes used in linear trees, for <span class="math-inline" data-tex="n\geq2"></span> is given by the sum</p>
+<div class="math-block" data-tex="\mathrm{P}\left(c&gt;1\vert n,\frac{KL}{N}\right)=\sum_{c=2}^n\mathrm{P}\left(c\vert n,\frac{KL}{N}\right)\\\quad =1-\sum_{c=0}^1\mathrm{P}\left(c\vert n,\frac{KL}{N}\right)\\\quad =1-\left(1-\frac{KL}{N}\right)^{n}\\\quad -n\left(\frac{KL}{N}\right)\left(1-\frac{KL}{N}\right)^{n-1}\\\quad =1-\left(1-\frac{KL}{N}\right)^{\alpha N}\\\quad -\alpha KL\left(1-\frac{KL}{N}\right)^{\alpha N-1}\\\quad \leq1-\left(1-\frac{KL}{N}\right)^{\alpha N}"></div>
+<p>where <span class="math-inline" data-tex="\alpha=n/N"></span> with <span class="math-inline" data-tex="n\geq2"></span>.</p>
+<p>We note that <span class="math-inline" data-tex="\mathrm{P}\left(c \gt 1\vert 2,\frac{KL}{N}\right)=\left(\frac{KL}{N}\right)^2"></span> and <span class="math-inline" data-tex="\mathrm{P}\left(c \gt 1\vert n+1,\frac{KL}{N}\right) \gt \mathrm{P}\left(c \gt 1\vert n,\frac{KL}{N}\right)"></span> for <span class="math-inline" data-tex="KL \lt N"></span>, i.e. the probability <span class="math-inline" data-tex="\mathrm{P}\left(c \gt 1\vert n,\frac{KL}{N}\right)"></span> is monotonic increasing function of <span class="math-inline" data-tex="n"></span> for <span class="math-inline" data-tex="KL \lt N"></span>. Furthermore, the probability <span class="math-inline" data-tex="\mathrm{P}\left(c \gt 1\vert n,\frac{KL}{N}\right)"></span> is monotonic increasing function of <span class="math-inline" data-tex="\frac{KL}{N}"></span>, i.e. increasing the number of nodes , <span class="math-inline" data-tex="KL"></span>, in the linear tree sampled by each sender node in <span class="math-inline" data-tex="[n]"></span> increases probability that a node in <span class="math-inline" data-tex="[N]"></span> has more than one random connection.</p>
+<p>The probability <span class="math-inline" data-tex="\mathrm{P}\left(c \gt 1\vert n,\frac{KL}{N}\right)"></span> is computed using the following parameters</p>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Description</th><th>Value/Range</th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="N"></span>​</td><td>Number of nodes</td><td><span class="math-inline" data-tex="10^2\ldots10^4"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="n"></span>​</td><td>Number of sender nodes</td><td><span class="math-inline" data-tex="2\ldots N"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="K\times L"></span>​</td><td>Number of nodes in a linear tree</td><td><span class="math-inline" data-tex="2\ldots N-1"></span>​</td></tr>
+</tbody></table>
+</div>
+<h2 id="communication-on-linear-trees"><a class="header" href="#communication-on-linear-trees">Communication on Linear Trees</a></h2>
+<p>We consider the following communication system</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81f8-a9d8-f3bf17954d0a.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>Communication on Linear Trees. A message is sent from a node through <span class="math-inline" data-tex="K"></span> communication paths where each path has <span class="math-inline" data-tex="L"></span> nodes. A node could be faulty (circle with dashed boundary), or adversarial (red circle). The presence of faulty node leads to communication failures. The presence of adversarial nodes could lead to communication and anonymity failures.</sub></p>
+</blockquote>
+<p>We assume that <span class="math-inline" data-tex="M_F"></span> nodes in the population are “faulty” (faulty node is unable to relay a message) and the probability that a node is faulty is <span class="math-inline" data-tex="q_F=M_F/N"></span>.</p>
+<p>We assume that <span class="math-inline" data-tex="M_A"></span> nodes in the population are “adversarial” (adversarial nodes are controlled by an adversary which can make nodes faulty, use them for traffic analysis, etc.) and the probability that a node is adversarial is <span class="math-inline" data-tex="q_A=M_A/N"></span>.</p>
+<p>If a path contains at least one faulty node then communication failure occurred.</p>
+<p>If a path does not have any faulty nodes then this path is functioning.</p>
+<p>If all <span class="math-inline" data-tex="K"></span> paths have a communication failure then broadcast failure occurred.</p>
+<p>The probability of broadcast failure is given by</p>
+<div class="math-block" data-tex="\mathrm{P}_b(K,L,q_F)=\left[1-(1-q_F)^L\right]^{K}"></div>
+<p>We note that <span class="math-inline" data-tex="q_F(C)=\frac{C-2}{C-1}"></span> is the <a href="#bibliography">site percolation threshold of random regular graph (RRG) with connectivity C</a>, i.e. for <span class="math-inline" data-tex="q_F \gt q_F(C)"></span> the RRG becomes disconnected with high probability as <span class="math-inline" data-tex="N\rightarrow\infty"></span>. The latter suggests if our model of the network is RRG then for the fraction of faulty nodes <span class="math-inline" data-tex="q_F \gt q_F(C)"></span> the communication is not possible with high probability in <span class="math-inline" data-tex="N\rightarrow\infty"></span>.</p>
+<p>If all nodes in a communication path are non-faulty then this is a functioning communication path.</p>
+<p>If there is at least one functioning communication paths where all nodes are adversarial, then adversary has opportunity to cause anonymity failure.</p>
+<p>The probability of anonymity failure is given by</p>
+<div class="math-block" data-tex="\mathrm{P}_a(K,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]^{K}"></div>
+<p>If there is at least one adversarial node in each functioning communication paths then the adversary has an opportunity to cause broadcast failure. The probability of adversarial broadcast failure is given by</p>
+<div class="math-block" data-tex="\mathrm{P}_{ab}(K,L,q_F,q_A)=\left[1-[(1- q_F)(1- q_A)]^L\right]^K-\left[1-(1- q_F)^L\right]^{K}"></div>
+<p>The probabilities <span class="math-inline" data-tex="\mathrm{P}_a"></span>, <span class="math-inline" data-tex="\mathrm{P}_b"></span> and <span class="math-inline" data-tex="\mathrm{P}_{ab}"></span> are computed the following parameters</p>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Description</th><th>Value/Range</th><th></th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="q_F"></span>​</td><td>Fraction of faulty nodes</td><td><span class="math-inline" data-tex="[0,1)"></span>​</td><td></td></tr>
+<tr><td><span class="math-inline" data-tex="q_A"></span>​</td><td>Fraction of adversarial nodes</td><td><span class="math-inline" data-tex="[0,1)"></span>​</td><td></td></tr>
+<tr><td><span class="math-inline" data-tex="K"></span>​</td><td>Number of communication paths</td><td><span class="math-inline" data-tex="1\ldots N-1"></span>​</td><td></td></tr>
+<tr><td><span class="math-inline" data-tex="L"></span>​</td><td>Number of nodes in a communication path</td><td><span class="math-inline" data-tex="2\ldots N-1"></span>​</td><td></td></tr>
+</tbody></table>
+</div>
+<p>The code which computes above probabilities is given below</p>
+<pre><code class="language-python">def Prob_b(K, L, qF):
+    """
+    Compute the probability of broadcast failure.
+    Formula: (1 - (1 - qF)^L)^K
+    """
+    return (1 - (1 - qF) ** L) ** K
+
+def Prob_ab(K, L, qF, qA):
+    """
+    Compute the probability of adversarial broadcast failure.
+    Formula: (1 - ((1 - qF)^L * (1 - qA)^L))^K - (1 - (1 - qF)^L)^K
+    """
+    term1 = (1 - qF) ** L
+    term2 = (1 - qA) ** L
+    return (1 - (term1 * term2)) ** K - (1 - term1) ** K
+
+def Prob_a(K, L, qF, qA):
+    """
+    Compute the probability of anonymity failure.
+    Formula: 1 - (1 - ((1 - qF)^L * qA^L))^K
+    """
+    term1 = (1 - qF) ** L
+    term2 = qA ** L
+    return 1 - (1 - (term1 * term2)) ** K
+</code></pre>
+<h2 id="inference-of-relative-stake"><a class="header" href="#inference-of-relative-stake">Inference of relative stake</a></h2>
+<p>The <a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html">adversary observes the leader election process</a> of a node with the relative stake <span class="math-inline" data-tex="\alpha"></span>.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81f1-9deb-f03fe24a8efa.png" alt="Diagram" /></p>
+<p>In <span class="math-inline" data-tex="T"></span> time-slots, the adversary is able to observe fraction <span class="math-inline" data-tex="v"></span> of wins in <span class="math-inline" data-tex="m"></span> observations. The probability of observing the election outcome of a node is <span class="math-inline" data-tex="q"></span>. For <span class="math-inline" data-tex="m\geq1"></span> adversary uses the “naive” estimator <span class="math-inline" data-tex="\hat{\alpha}=\frac{\log\left(1-v\right)}{\log(1-f)}"></span> of the true relative stake <span class="math-inline" data-tex="\alpha"></span>. For large <span class="math-inline" data-tex="T"></span>, the probability that <span class="math-inline" data-tex="\alpha(1-\gamma)\leq\hat{\alpha}\leq\alpha(1+\gamma)"></span> is <a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html#statistical-inference-of-relative-stake-1">given by</a></p>
+<div class="math-block" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)=\frac{2 \,\mathrm{erf}\! \left(\frac{ \epsilon}{\sqrt{2\sigma^2(\alpha,q)}}\right)}{\mathrm{erf}\! \left(\frac{\phi(\alpha) }{ \sqrt{2\sigma^2(\alpha,q)}}\right)+\mathrm{erf}\! \left(\frac{ 1-\phi(\alpha)}{ \sqrt{2\sigma^2(\alpha,q)}}\right)}"></div>
+<p>In the above, <span class="math-inline" data-tex="\phi(\alpha)=1-(1-f)^\alpha"></span> is the lottery function with parameter <span class="math-inline" data-tex="f"></span>, <span class="math-inline" data-tex="\epsilon=\gamma\alpha\frac{\mathrm{d}}{\mathrm{d}\alpha}\phi(\alpha)"></span> and <span class="math-inline" data-tex="\sigma^2(\alpha ,q)=\phi(\alpha)[1-\phi(\alpha)]/T q"></span>, where <span class="math-inline" data-tex="q"></span> is the fraction of observed time-slots such that <span class="math-inline" data-tex="Tq"></span> slots are observed on average.</p>
+<p>The probability <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)"></span> can be interpreted as adversarial “confidence” and the parameter <span class="math-inline" data-tex="\gamma"></span> as “accuracy”. An example of the above probability is given below</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-813c-9e95-d6a39857faae.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The probability that inferred relative stake <span class="math-inline" data-tex="\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]"></span>, i.e. adversarial “confidence”, as a function of true relative stake <span class="math-inline" data-tex="\alpha"></span> obtained in <span class="math-inline" data-tex="T=432000"></span> time-slots (this value is used in Cardano) when the fraction <span class="math-inline" data-tex="q=0.657"></span> of slots is observed. Here the probability that stake of a node with the true stake <span class="math-inline" data-tex="\alpha=0.0126"></span> (the max. stake in the Bitcoin network), represented by a red vertical line, is inferred with an “accuracy” within the fraction <span class="math-inline" data-tex="\gamma=0.1"></span> of relative stake <span class="math-inline" data-tex="\alpha"></span>, represented by <span class="math-inline" data-tex="\alpha(1\pm\gamma)"></span> red vertical dotted lines, is approx. <span class="math-inline" data-tex="0.824"></span>. The red dashed horizontal line corresponds to the threshold <span class="math-inline" data-tex="\theta=0.5"></span>. The blue vertical line at <span class="math-inline" data-tex="\alpha=0.00252"></span> is the result of dividing the stake <span class="math-inline" data-tex="\alpha=0.0126"></span> among the <span class="math-inline" data-tex="5"></span> nodes.</sub></p>
+</blockquote>
+<p>The probability <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)"></span>, i.e. adversarial “confidence,” is computed using the following parameters:</p>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Description</th><th>Value/Range</th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="T"></span>​</td><td>Number of slots per epoch</td><td><span class="math-inline" data-tex="\approx 432,000"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="f"></span>​</td><td>Fraction of non-empty slots</td><td><span class="math-inline" data-tex="0.05"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="\alpha"></span>​</td><td>Relative stake of a node</td><td><span class="math-inline" data-tex="(0, 1)"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="\gamma"></span>​</td><td>“Accuracy” parameter</td><td><span class="math-inline" data-tex="(0, 1)"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="q"></span>​</td><td>Fraction of observed time-slots</td><td><span class="math-inline" data-tex="(0, 1]"></span>​</td></tr>
+</tbody></table>
+</div>
+<p>The code which computes adversarial “confidence” is given below</p>
+<pre><code class="language-python">def phi(alpha, f):
+    return 1 - (1 - f) ** alpha
+
+def dphi(alpha, f):
+    return -((1 - f) ** alpha) * log(1 - f)
+def Prob2(alpha, epsilon, T, q):
+    sqrt2 = sqrt(2.0)
+    phi_alpha = phi(alpha, f)
+    # Denominator term
+    denominator = (
+        erf((phi_alpha - 1) * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
+        - erf(phi_alpha * sqrt2 / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q))))
+    )
+    # Numerator term
+    numerator = -2.0 * erf(
+        sqrt2 * epsilon / (2 * sqrt(phi_alpha * (1 - phi_alpha) / (T * q)))
+    )
+    # Final result
+    return numerator / denominator
+
+# Compute epsilon = dphi(alpha) * alpha * gamma
+epsilon = dphi(alpha, f) * alpha * gamma
+
+# Compute Prob2
+Prob2_result = Prob2(alpha, epsilon, T, q)
+</code></pre>
+<p>The <a href="#inference-of-relative-stake">probability</a> can also compute the (minimum) number of time-slots, <span class="math-inline" data-tex="t"></span>, such that <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,t\right)\geq\delta"></span>, for some <span class="math-inline" data-tex="\delta\in (0,1)"></span>. Here <span class="math-inline" data-tex="t"></span> is the time needed by an adversary to achieve “confidence” greater than <span class="math-inline" data-tex="\delta"></span>. The code which computes <span class="math-inline" data-tex="t"></span> is given below</p>
+<pre><code class="language-python">T0 = T # One epoch
+T1 = 730 * T # 10 years
+dT = 10**3 # Step size
+if Prob2_t &lt; delta:
+    # Increase T until Prob2_result &gt;= delta
+    t = T0
+    while t &lt;= T1 and Prob2_t &lt; delta:
+        Prob2_t = Prob2(alpha, epsilon, t, result3)
+        t += dT
+
+else:
+    # Decrease T until Prob2_result &lt;= delta
+    t = T
+    while t &gt;= 100 and Prob2_t &gt; delta:
+        Prob2_t = Prob2(alpha, epsilon, t, result3)
+        t -= dT
+</code></pre>
+<h3 id="adversarial-confidence-as-a-measure-of-statistical-noise"><a class="header" href="#adversarial-confidence-as-a-measure-of-statistical-noise">Adversarial Confidence as a Measure of Statistical “Noise”</a></h3>
+<p>The probability <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)"></span>, where <span class="math-inline" data-tex="q\,T"></span> is the (average) number of time-slots observed by adversary in one epoch, can be seen as a measure of the magnitude of “noise” which prevents accurate measurements of the relative stake <span class="math-inline" data-tex="\alpha"></span>. One source of this noise is the actual (stochastic) leader election process and the other is the sampling (or “observation”), controlled by parameter <span class="math-inline" data-tex="q"></span>, of the latter by an adversary. For <span class="math-inline" data-tex="q=1"></span>, i.e. all time-slots are observed, and leader election process is the only source of noise. In this regime, for a given accuracy (<span class="math-inline" data-tex="\gamma= 0.1"></span>), the relative stake can be inferred with high confidence as can be seen in the figure below</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81c5-ad2c-e9d3fc3596b9.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The (relative) stake estimator <span class="math-inline" data-tex="\hat{\alpha}"></span>, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with <em>true</em> (relative stake) <span class="math-inline" data-tex="\alpha\in\{0.007482,\ldots,0.013476\}"></span>, represented by solid horizontal lines. For a node with the stake <span class="math-inline" data-tex="\alpha=0.013476"></span> the prob. <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.915965"></span>, where <span class="math-inline" data-tex="\gamma=0.1"></span>, <span class="math-inline" data-tex="q=1"></span> (fraction of observed time-slots) and <span class="math-inline" data-tex="T=432000"></span> (number of time-slots in one epoch). The boundaries of the interval <span class="math-inline" data-tex="[\alpha(1-\gamma), \alpha(1+\gamma)]"></span> for <span class="math-inline" data-tex="\alpha=0.013476"></span> are represented by dashed horizontal lines.</sub></p>
+</blockquote>
+<p>For <span class="math-inline" data-tex="q \lt 1"></span>, sampling becomes an additional source of noise interfering with measurements done by adversary. Here, for a given accuracy, the confidence deteriorates as <span class="math-inline" data-tex="q\rightarrow0"></span> (see figures below).</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8190-8b30-f301042f7a25.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The (relative) stake estimator <span class="math-inline" data-tex="\hat{\alpha}"></span>, computed in one epoch of the leader election process, plotted as a function of time-slots for five nodes with <em>true</em> (relative stake) <span class="math-inline" data-tex="\alpha\in\{0.007482,\ldots,0.013476\}"></span>, represented by solid horizontal lines. For a node with the stake <span class="math-inline" data-tex="\alpha=0.013476"></span> the prob. <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.778177"></span>, where <span class="math-inline" data-tex="\gamma=0.1"></span>, <span class="math-inline" data-tex="q=0.5"></span> (fraction of observed time-slots) and <span class="math-inline" data-tex="T=432000"></span> (number of time-slots in one epoch). The boundaries of the interval <span class="math-inline" data-tex="[\alpha(1-\gamma), \alpha(1+\gamma)]"></span> for <span class="math-inline" data-tex="\alpha=0.013476"></span> are represented by dashed horizontal lines.</sub></p>
+</blockquote>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81c3-8aff-c0f8a172694f.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The (relative) stake estimator <span class="math-inline" data-tex="\hat{\alpha}"></span>, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with <em>true</em> (relative stake) <span class="math-inline" data-tex="\alpha\in\{0.007482,\ldots,0.013476\}"></span>, represented by solid horizontal lines. For a node with the stake <span class="math-inline" data-tex="\alpha=0.013476"></span> the prob. <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.415180"></span>, where <span class="math-inline" data-tex="\gamma=0.1"></span>, <span class="math-inline" data-tex="q=0.1"></span> (fraction of observed time-slots) and <span class="math-inline" data-tex="T=432000"></span> (number of time-slots in one epoch). The boundaries of the interval <span class="math-inline" data-tex="[\alpha(1-\gamma), \alpha(1+\gamma)]"></span> for <span class="math-inline" data-tex="\alpha=0.013476"></span> are represented by dashed horizontal lines.</sub></p>
+</blockquote>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81a6-8a72-edc73562fe5d.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The (relative) stake estimator <span class="math-inline" data-tex="\hat{\alpha}"></span>, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with <em>true</em> (relative stake) <span class="math-inline" data-tex="\alpha\in\{0.007482,\ldots,0.013476\}"></span>, represented by solid horizontal lines. For a node with the stake <span class="math-inline" data-tex="\alpha=0.013476"></span> the prob. <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)=0.1431790734"></span>, where <span class="math-inline" data-tex="\gamma=0.1"></span>, <span class="math-inline" data-tex="q=0.01"></span> (fraction of observed time-slots) and <span class="math-inline" data-tex="T=432000"></span> (number of time-slots in one epoch). The boundaries of the interval <span class="math-inline" data-tex="[\alpha(1-\gamma), \alpha(1+\gamma)]"></span> for <span class="math-inline" data-tex="\alpha=0.013476"></span> are represented by dashed horizontal lines.</sub></p>
+</blockquote>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81b1-b947-ed8642714222.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The (relative) stake estimator <span class="math-inline" data-tex="\hat{\alpha}"></span>, computed in one epoch of leader election process, plotted as a function of time-slots for five nodes with <em>true</em> (relative stake) <span class="math-inline" data-tex="\alpha\in\{0.007482,\ldots,0.013476\}"></span>, represented by solid horizontal lines. For a node with the stake <span class="math-inline" data-tex="\alpha=0.013476"></span> the prob. <span class="math-inline" data-tex="\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\,q\,T\right)= 0.061572"></span>, where <span class="math-inline" data-tex="\gamma=0.1"></span>, <span class="math-inline" data-tex="q=0.001"></span> (fraction of observed time-slots) and <span class="math-inline" data-tex="T=432000"></span> (number of time-slots in one epoch). The boundaries of the interval <span class="math-inline" data-tex="[\alpha(1-\gamma), \alpha(1+\gamma)]"></span> for <span class="math-inline" data-tex="\alpha=0.013476"></span> are represented by dashed horizontal lines.</sub></p>
+</blockquote>
+<p>Let us define a function which compares properties of inference for <span class="math-inline" data-tex="q=1"></span> and <span class="math-inline" data-tex="q\in(0,1)"></span> as follows</p>
+<div class="math-block" data-tex="\log\left(\frac{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, T\right)}{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)}\right)"></div>
+<p>We note that above is <span class="math-inline" data-tex="0"></span> when <span class="math-inline" data-tex="q=1"></span>, i.e. no sampling noise, and is growing when <span class="math-inline" data-tex="q\rightarrow0"></span> (see figure below). Hence, above can be seen as “amplitude” of the sampling noise.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-815c-85c7-d0813b45f345.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub><span class="math-inline" data-tex="\log\left(\frac{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, T\right)}{\mathrm{P}\left(\hat{\alpha}\in[\alpha(1-\gamma), \alpha(1+\gamma)]\,\vert\, q\,T\right)}\right)"></span> plotted as function of <span class="math-inline" data-tex="q"></span> for <span class="math-inline" data-tex="\alpha=0.013476"></span> and <span class="math-inline" data-tex="\gamma=0.1"></span>.</sub></p>
+</blockquote>
+<h2 id="the-unlinkability-of-block-proposers"><a class="header" href="#the-unlinkability-of-block-proposers">The Unlinkability of Block Proposers</a></h2>
+<p>We assume that node <span class="math-inline" data-tex="\mathrm{S}"></span> wins the <a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html">election</a> and broadcasts message <span class="math-inline" data-tex="\mathrm{m}"></span> to the network using <a href="#communication-on-linear-trees">linear trees</a>. We assume that in the network the sender node <span class="math-inline" data-tex="\mathrm{S}"></span> has <span class="math-inline" data-tex="C"></span> neighbouring nodes. Message <span class="math-inline" data-tex="\mathrm{m}"></span> is first sent to the neighbouring nodes then, via the latter, to the rest of the network. A node in the neighbourhood <span class="math-inline" data-tex="\partial\mathrm{S}"></span>, where <span class="math-inline" data-tex="\vert\partial\mathrm{S}\vert=C"></span>, is adversarial with the prob. <span class="math-inline" data-tex="q_A"></span>. The prob. that at least one node in <span class="math-inline" data-tex="\partial\mathrm{S}"></span> is adversarial is <span class="math-inline" data-tex="1-(1-q_A)^C"></span>.</p>
+<p>If <span class="math-inline" data-tex="\mathrm{S}"></span> has at least one adversarial neighbour and <a href="#communication-on-linear-trees">anonymity failure</a> occurred then the message <span class="math-inline" data-tex="\mathrm{m}"></span> can linked to the sender node <span class="math-inline" data-tex="\mathrm{S}"></span>. We note that just occurrence of the <a href="#communication-on-linear-trees">anonymity failure</a> alone is not sufficient to link <span class="math-inline" data-tex="\mathrm{m}"></span> to <span class="math-inline" data-tex="\mathrm{S}"></span> and at least one compromised node is also needed in <span class="math-inline" data-tex="\partial\mathrm{S}"></span>. Furthermore, an adversary may need not one but at least <span class="math-inline" data-tex="n_A"></span> compromised nodes in <span class="math-inline" data-tex="\partial\mathrm{S}"></span>. The probability of the latter is given by the binomial</p>
+<div class="math-block" data-tex="\mathrm{P}(n\geq n_A\vert C,q_A)=\sum_{n=n_A}^C{C\choose n}[1-q_A]^{C-n}q_A^n"></div>
+<p>We note that the case one adversarial node in <span class="math-inline" data-tex="\partial\mathrm{S}"></span> is recovered by setting <span class="math-inline" data-tex="n_A=1"></span> in the above. The probability of above event, given that <span class="math-inline" data-tex="\mathrm{S}"></span> won the election, is the product of two probabilities</p>
+<div class="math-block" data-tex="\mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)"></div>
+<p>We note that in above we assumed that <span class="math-inline" data-tex="q_F=0"></span>, i.e. there are no faulty nodes in the network. The probability above is an upper bound for a scenario with faulty nodes. Since <span class="math-inline" data-tex="\mathrm{P}(n\geq n_A\vert C,q_A) \lt 1"></span> for <span class="math-inline" data-tex="n_A\geq1"></span>, the prob. of anonymity failure <span class="math-inline" data-tex="\mathrm{P}_a(K,L,0,q_A)"></span> is an upper bound on the above prob. If node <span class="math-inline" data-tex="\mathrm{S}"></span> has (relative) stake <span class="math-inline" data-tex="\alpha"></span> then the prob. of node <span class="math-inline" data-tex="\mathrm{S}"></span> winning is <span class="math-inline" data-tex="\phi(\alpha)"></span>, where <span class="math-inline" data-tex="\phi(\alpha)"></span> is the<a href="analysis-cryptarchia-de-anonymisation-of-relative-stake.html">lottery function</a>. Hence, the prob. that the message <span class="math-inline" data-tex="\mathrm{m}"></span>, sent by the winning node <span class="math-inline" data-tex="\mathrm{S}"></span>, can be linked to <span class="math-inline" data-tex="\mathrm{S}"></span> is given by</p>
+<div class="math-block" data-tex="\phi(\alpha)\, \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)"></div>
+<p>The prob. that message <span class="math-inline" data-tex="\mathrm{m}"></span> can not be linked to the sender <span class="math-inline" data-tex="\mathrm{S}"></span> is</p>
+<div class="math-block" data-tex="1-\phi(\alpha)\, \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)"></div>
+<p>Hence the prob. that any message sent by node <span class="math-inline" data-tex="\mathrm{S}"></span> can be linked to <span class="math-inline" data-tex="\mathrm{S}"></span> in <span class="math-inline" data-tex="t"></span> elections is given by</p>
+<div class="math-block" data-tex="1-\left[1-\phi(\alpha)\, \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A)\right]^t"></div>
+<p>For the above prob. to be greater than some threshold <span class="math-inline" data-tex="\theta"></span> (for example <span class="math-inline" data-tex="\theta=1/2"></span>) the number of elections <span class="math-inline" data-tex="t"></span> has to satisfy the following inequality</p>
+<div class="math-block" data-tex="t&gt;\left\lceil\frac{\log(1-\theta)}{\log(1-\phi(\alpha)\, \mathrm{P}(n\geq n_A\vert C,q_A)\,\mathrm{P}_a(K,L,0,q_A))}\right\rceil"></div>
+<p>The minimum <span class="math-inline" data-tex="t"></span> for which above inequality holds <span class="math-inline" data-tex="t(\theta)"></span>, which is the RHS of the above, is computed using the following parameters</p>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Description</th><th>Value/Range</th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="\theta"></span>​</td><td>Prob. threshold</td><td><span class="math-inline" data-tex="(0, 1)"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="f"></span>​</td><td>Fraction of non-empty slots</td><td><span class="math-inline" data-tex="0.05"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="\alpha"></span>​</td><td>Relative stake of a node</td><td><span class="math-inline" data-tex="(0, 1)"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="C"></span>​</td><td>Node neighbourhood size</td><td><span class="math-inline" data-tex="\geq 4"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="n_A"></span>​</td><td>Number of adver. nodes threshold</td><td><span class="math-inline" data-tex="\geq 1"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="q_A"></span>​</td><td>Fraction of adversarial nodes</td><td><span class="math-inline" data-tex="[0, 1)"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="K"></span>​</td><td>Number of communication paths</td><td><span class="math-inline" data-tex="1\ldots N-1"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="L"></span>​</td><td>Number of nodes per communication path</td><td><span class="math-inline" data-tex="2\ldots N-1"></span>​</td></tr>
+</tbody></table>
+</div>
+<p>The code which computes <span class="math-inline" data-tex="t(\theta)"></span> is given below</p>
+<pre><code class="language-python">def phi(alpha, f):
+    return 1 - (1 - f) ** alpha
+
+def calculate_t(qA, L, K, alpha, f, C, nA, theta):
+    #compute prob. Pa
+    x = 1 - pow(qA, L)
+    Pa = (1 - pow(x, K))
+    #compute prob. Pan
+    p = 1 - qA
+    Pan = 0
+    for n in range(nA, C + 1):
+        Pan += comb(C, n) * (p ** (C - n)) * (qA ** n)
+    #compute prod. of prob.
+    Prob = Pan * Pa
+
+    #compute t
+    numerator = log(1 - theta)
+    denominator = log(1 - phi(alpha, f) * Prob)
+    t = ceil(numerator / denominator)
+    return t
+</code></pre>
+<h2 id="design-of-the-calculator"><a class="header" href="#design-of-the-calculator">Design of the “Calculator”</a></h2>
+<p>Here we combine the results for leader election process, sampling of linear trees, broadcasting on linear trees and inference of relative stake to design a calculator which takes parameters of the latter and computes properties of a node related to the resilience and anonymity of communication. The calculator has the following modules:</p>
+<blockquote>
+<p><strong>PDF attachment:</strong> <a href="analysis-resilience-and-anonymity/appendices/Modules.pdf">Modules.pdf</a></p>
+</blockquote>
+<p>The dependencies between modules can be represented as the following diagram</p>
+<blockquote>
+<p><strong>PDF attachment:</strong> <a href="analysis-resilience-and-anonymity/appendices/Flowchart.pdf">Flowchart.pdf</a></p>
+</blockquote>
+<p>Using above diagram of dependencies a first and later versions of the calculator were implemented as an online app. The input and output of the most recent version is presented below. The app is available in the <a href="https://github.com/AMozeika/Calculator">repository.</a></p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-817b-9867-ff1d5eda6d4d.png" alt="Diagram" /></p>
+<h2 id="strategies-to-reduce-anonymity-failure"><a class="header" href="#strategies-to-reduce-anonymity-failure">Strategies to Reduce Anonymity Failure</a></h2>
+<p>Let us assume that a node won at time <span class="math-inline" data-tex="t"></span> of the <a href="#leader-election-process">election process</a> and it broadcasts a message to the network using <a href="#communication-on-linear-trees">linear trees</a>. Furthermore, assume that the neighbourhood of this node has at least one adversarial node. Conditioned that these two assumptions are true, the probability of anonymity failure is given by</p>
+<div class="math-block" data-tex="\mathrm{P}_a(K,L,q_F,q_A)=1-\left[1-(1-q_F)^L\, q_A^L\right]^{K}"></div>
+<p>Above corresponds to a scenario when a node at time <span class="math-inline" data-tex="t"></span> sends a message through <span class="math-inline" data-tex="K"></span> paths of length <span class="math-inline" data-tex="L"></span> (see <a href="#sampling-of-linear-trees">figure</a>) constructed from nodes sampled (with replacement) from the set of network nodes <span class="math-inline" data-tex="[N]"></span>. Here <span class="math-inline" data-tex="q_F"></span> and <span class="math-inline" data-tex="q_A"></span> is, respectively, the fraction of faulty and adversarial nodes in the network.</p>
+<p>For <span class="math-inline" data-tex="K=1"></span>, i.e. a message is sent through one path, the probability of anonymity failure is given by</p>
+<div class="math-block" data-tex="\mathrm{P}_a(1,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]\\\quad =(1-q_F)^L\, q_A^L"></div>
+<p>We note that in above <span class="math-inline" data-tex="(1-q_F)^L"></span> is the prob. that path is functional and <span class="math-inline" data-tex="q_A^L"></span> is the prob. that every single node on this path is adversarial. Hence <span class="math-inline" data-tex="1-(1-q_F)^L\, q_A^L"></span> is the prob. that either the path is not functional or at least one node in the path is not adversarial.</p>
+<p>Now let us assume that node sends the same message (or different messages) through different paths of length <span class="math-inline" data-tex="L"></span> at times <span class="math-inline" data-tex="t_1 \lt t_2 \lt \cdots \lt t_K"></span> (see figure below)</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8199-b602-e80244ff5dc0.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>Communication on Linear Trees. Node sends a message at times <span class="math-inline" data-tex="t_1, t_2,\ldots,t_K"></span>. Each time a different, sampled randomly (with replacement) from <span class="math-inline" data-tex="[N]"></span>, communication path of <span class="math-inline" data-tex="L"></span> nodes is used.</sub></p>
+</blockquote>
+<p>After sending the first message at time <span class="math-inline" data-tex="t_1"></span> the prob. of anonymity failure is <span class="math-inline" data-tex="\mathrm{P}_a(1,L,q_F,q_A)=(1-q_F)^L\, q_A^L"></span>, after sending the second message at time <span class="math-inline" data-tex="t_2"></span> the prob. of anonymity failure is <span class="math-inline" data-tex="\mathrm{P}_a(2,L,q_F,q_A)=1-\left[1-[(1-q_F)\, q_A]^L\right]^2"></span>, etc. Thus after sending the last message at time <span class="math-inline" data-tex="t_K"></span> the prob. anonymity failure is <span class="math-inline" data-tex="\mathrm{P}_a(K,L,q_F,q_A)"></span>, i.e. the same as <a href="#sampling-of-linear-trees">sending a message through</a><span class="math-inline" data-tex="K"></span> paths simultaneously. We note that for fixed <span class="math-inline" data-tex="L"></span> the prob. <span class="math-inline" data-tex="\mathrm{P}_a(K,L,q_F,q_A)"></span> is <a href="analysis-communication-on-trees.html">monotonic increasing function</a> of <span class="math-inline" data-tex="K"></span> and hence <span class="math-inline" data-tex="\mathrm{P}_a(n_{m},L,q_F,q_A)"></span> is monotonic increasing function of the number of sent messages <span class="math-inline" data-tex="n_{m}\in\{1,\ldots,K\}"></span> as can be seen in the figure below.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8126-8b44-d03a7c40471c.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. of anonymity failure as a function of the number of sent messages plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (top to bottom). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span> and the fraction of adversarial nodes is <span class="math-inline" data-tex="q_A=0.1"></span>.</sub></p>
+</blockquote>
+<p>Furthermore, the probability that no anonymity failure occurred after sending <span class="math-inline" data-tex="n_m"></span> messages is given by</p>
+<div class="math-block" data-tex="1-\mathrm{P}_a(n_m,L,q_F,q_A)=\left[1-(1-q_F)^L\, q_A^L\right]^{n_m}"></div>
+<p>From above, it follows that for <span class="math-inline" data-tex="n_m\leq K"></span> we have</p>
+<div class="math-block" data-tex="\frac{1-\mathrm{P}_a(n_m,L,q_F,q_A)}{1-\mathrm{P}_a(K,L,q_F,q_A)}=\frac{1}{\left[1-(1-q_F)^L\, q_A^L\right]^{K-n_m}}\geq1"></div>
+<p>Hence the probability that no anonymity failure occurred is much larger if the number of messages sent <span class="math-inline" data-tex="n_m"></span> is much less than <span class="math-inline" data-tex="K"></span>. Equivalently, the probability of anonymity failure is much smaller if the number of messages sent <span class="math-inline" data-tex="n_m"></span> is much less than <span class="math-inline" data-tex="K"></span>.</p>
+<p>We now consider the prob. of broadcast failure</p>
+<div class="math-block" data-tex="\mathrm{P}_b(K,L,q_F)=\left[1-(1-q_F)^L\right]^{K}"></div>
+<p>which is a <a href="analysis-communication-on-trees.html">monotonic decreasing function</a> of <span class="math-inline" data-tex="K"></span> when <span class="math-inline" data-tex="L"></span> is fixed. Hence <span class="math-inline" data-tex="\mathrm{P}_b(n_{m},L,q_F)"></span> is monotonic decreasing function of the number of sent messages <span class="math-inline" data-tex="n_{m}\in\{1,\ldots,K\}"></span> as can be seen in the figure below.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81c5-bb23-e9518270b1b0.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. of broadcast failure as a function of the number of sent messages plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (bottom to top). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span>.</sub></p>
+</blockquote>
+<p>We note that the <a href="#communication-on-linear-trees">probability of adversarial broadcast-failure</a> behaves in a similar way as can be seen in the figure below</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-817d-9a8c-eb0486d2873d.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. of adversarial broadcast-failure as a function of the number of sent messages plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (bottom to top). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span> and the fraction of adversarial nodes is <span class="math-inline" data-tex="q_A=0.1"></span>.</sub></p>
+</blockquote>
+<p>The number of nodes used for broadcasting of <span class="math-inline" data-tex="n_m"></span> messages is <span class="math-inline" data-tex="n_mL"></span>, i.e. grows linearly with the number of messages <span class="math-inline" data-tex="n_m"></span>.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8103-80d1-d641677cc17e.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The number of nodes used in broadcasting as a function of the number of sent messages plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (bottom to top).</sub></p>
+</blockquote>
+<p>We note that</p>
+<div class="math-block" data-tex="\left[\prod_{i=1}^{t-1}\mathrm{P}_b(i,L,q_F)\right]\left[1-\mathrm{P}_b(t,L,q_F)\right]"></div>
+<p>is the probability that the first occurrence of a successful broadcast requires sending <span class="math-inline" data-tex="t"></span> messages. We note that above is generalisation of the <a href="https://en.wikipedia.org/wiki/Geometric_distribution">Geometric prob. distribution</a>.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8198-a8ff-e319ff4e7b0c.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The probability that the first occurrence of a successful broadcast requires sending number of messages (<span class="math-inline" data-tex="\mathrm{num.\, of\, msg}"></span>) plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (black, red, orange,yellow). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span>.</sub></p>
+</blockquote>
+<p>From the above, it follows that</p>
+<div class="math-block" data-tex="1-\sum_{t=1}^n\left[\prod_{i=1}^{t-1}\mathrm{P}_b(i,L,q_F)\right]\left[1-\mathrm{P}_b(t,L,q_F)\right]"></div>
+<p>is the prob. that the first occurrence of a successful broadcast requires sending more than <span class="math-inline" data-tex="n"></span> messages.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81ef-baa7-d67e73eb5bea.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. that the first occurrence of broadcast requires sending more than <span class="math-inline" data-tex="n"></span> messages as a function of <span class="math-inline" data-tex="n"></span> plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (bottom to top). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span>.</sub></p>
+</blockquote>
+<p>In a similar manner, we obtain the probability</p>
+<div class="math-block" data-tex="\left[\prod_{i=1}^{t-1}\left[1-\mathrm{P}_a(i,L,q_F,q_A)\right]\right]\mathrm{P}_a(t,L,q_F,q_A)"></div>
+<p>that the first occurrence of anonymity failure requires sending <span class="math-inline" data-tex="t"></span> messages.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8144-993d-d4d618b78845.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. that the first occurrence of anonymity failure requires sending number of messages (<span class="math-inline" data-tex="\mathrm{num.\, of\, msg}"></span>) plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (yellow, orange, red, black). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span> and the fraction of adversarial nodes is <span class="math-inline" data-tex="q_A=0.1"></span>.</sub></p>
+</blockquote>
+<p>From the above, it follows that</p>
+<div class="math-block" data-tex="\sum_{t=1}^{n-1}\left[\prod_{i=1}^{t-1}\left[1-\mathrm{P}_a(i,L,q_F,q_A)\right]\right]\mathrm{P}_a(t,L,q_F,q_A)"></div>
+<p>is the prob. that the first occurrence of anonymity failure requires sending less than <span class="math-inline" data-tex="n"></span> messages.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-810b-b79d-d351f5519165.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. that the first occurrence of anonymity failure requires sending less than <span class="math-inline" data-tex="n"></span> messages as a function of <span class="math-inline" data-tex="n"></span> plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (top to bottom). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span> and the fraction of adversarial nodes is <span class="math-inline" data-tex="q_A=0.1"></span>.</sub></p>
+</blockquote>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81f1-ada1-c48c09e799e7.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The prob. that the first occurrence of anonymity failure requires sending less than <span class="math-inline" data-tex="n"></span> messages as a function of <span class="math-inline" data-tex="n"></span> plotted for the number of nodes per path <span class="math-inline" data-tex="L\in\{2,\ldots,5\}"></span> (top to bottom). Here the fraction of faulty nodes is <span class="math-inline" data-tex="q_F=0.1"></span> and the fraction of adversarial nodes is <span class="math-inline" data-tex="q_A=0.1"></span>.</sub></p>
+</blockquote>
+<h3 id="analysis-of-latency"><a class="header" href="#analysis-of-latency">Analysis of Latency</a></h3>
+<p>We consider a network <span class="math-inline" data-tex="\mathcal{N}"></span> constructed from <span class="math-inline" data-tex="N=\vert\mathcal{N} \vert"></span> nodes. We assume that a message sent from node <span class="math-inline" data-tex="0\in \mathcal{N}"></span>, via <span class="math-inline" data-tex="L"></span> nodes of <span class="math-inline" data-tex="\mathcal{N}"></span>, to the network <span class="math-inline" data-tex="\mathcal{N}"></span>using the broadcast method of communication. The message is delayed at the node <span class="math-inline" data-tex="0"></span> by the <span class="math-inline" data-tex="\Delta_0"></span> amount of time, at the node <span class="math-inline" data-tex="1"></span> by the <span class="math-inline" data-tex="\Delta_1"></span> amount of time, etc. Furthermore, a message traveling between the nodes <span class="math-inline" data-tex="i"></span> and <span class="math-inline" data-tex="i+1"></span> is delayed by <span class="math-inline" data-tex="d_{i\,i+1}"></span> due to the latency of broadcast on <span class="math-inline" data-tex="\mathcal{N}"></span> used for communication.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8177-83d3-eb0b07a5c71b.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>A message is sent by node <span class="math-inline" data-tex="0"></span> to the network <span class="math-inline" data-tex="\mathcal{N}"></span> via <span class="math-inline" data-tex="L"></span> nodes using the broadcast mode of communication. Here nodes are represented by blue circles and <span class="math-inline" data-tex="\mathcal{N}"></span> is represented by large blue circle.</sub></p>
+</blockquote>
+<p>Assuming that the message was successfully broadcasted by the last node <span class="math-inline" data-tex="L"></span> to the network <span class="math-inline" data-tex="\mathcal{N}"></span>, the total delay is given by <span class="math-inline" data-tex="\sum_{i=0}^L\left[\Delta_i+ d_{i\,i+1}\right]"></span>. We note that for <span class="math-inline" data-tex="\Delta=\max_{i}\Delta_i"></span> and <span class="math-inline" data-tex="d=\max_{i}d_{i\,i+1}"></span> we have a simple upper bound</p>
+<div class="math-block" data-tex="\sum_{i=0}^L\left[\Delta_i+ d_{i\,i+1}\right]\leq [L+1](\Delta + d)"></div>
+<p>We note that we have equality in the above when <span class="math-inline" data-tex="\Delta=\Delta_i"></span> and <span class="math-inline" data-tex="d=d_{i\,i+1}"></span>, i.e. all delays are the same.</p>
+<p>Assuming that sender node monitors, via observation of broadcasts on <span class="math-inline" data-tex="\mathcal{N}"></span>, how a message is propagated along the <a href="analysis-resilience-and-anonymity.html">path</a>, the sender node sends first messages and if this message is not broadcasted to <span class="math-inline" data-tex="\mathcal{N}"></span> after some time, for example after time <span class="math-inline" data-tex="\sum_{i=0}^1\left[\Delta_{i}(1)+ d_{i\,i+1}(1)\right]"></span>, it will send a second message and if this message is not broadcasted it send a third message, etc. We note that a worst case scenario of above strategy is when the 1st message “travels” to the last node <span class="math-inline" data-tex="L"></span>, but is not broadcasted to the network <span class="math-inline" data-tex="\mathcal{N}"></span>. Then nodes send a 2nd message and again this message is not broadcasted by the last node, etc. Assuming that the <span class="math-inline" data-tex="K"></span>-th message is broadcasted by the last node to <span class="math-inline" data-tex="\mathcal{N}"></span>, gives us that the total delay in the <a href="#strategies-to-reduce-anonymity-failure">sequential scenario</a> is at most</p>
+<div class="math-block" data-tex="\sum_{\ell=1}^K\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]"></div>
+<p>if the delay on each <span class="math-inline" data-tex="\ell"></span>-th path, i.e. the value of <span class="math-inline" data-tex="\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]"></span>, is known exactly.</p>
+<p>Furthermore, we have the following inequality</p>
+<div class="math-block" data-tex="\sum_{\ell=1}^K\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]\leq K[L+1](\Delta + d)"></div>
+<p>where <span class="math-inline" data-tex="\Delta=\max_{i,\ell}\Delta_i(\ell)"></span> and <span class="math-inline" data-tex="d=\max_{i,\ell}d_{i\,i+1}(\ell)"></span>. We can assume that <span class="math-inline" data-tex="\Delta=10s"></span> and <span class="math-inline" data-tex="d=5s"></span>.</p>
+<p>We note that when <span class="math-inline" data-tex="K"></span> messages are sent <a href="analysis-resilience-and-anonymity.html">simultaneously</a> and if at least one of them is successfully broadcasted by a last node to the network <span class="math-inline" data-tex="\mathcal{N}"></span>, then the total delay is at most</p>
+<div class="math-block" data-tex="\max_{\ell\in[K]}\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]"></div>
+<p>if the delay on each <span class="math-inline" data-tex="\ell"></span>-th path, i.e. the value of <span class="math-inline" data-tex="\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]"></span>, is known exactly. Furthermore, for <span class="math-inline" data-tex="\Delta=\max_{i,\ell}\Delta_i(\ell)"></span> and <span class="math-inline" data-tex="d=\max_{i,\ell}d_{i\,i+1}(\ell)"></span> we have the following inequality</p>
+<div class="math-block" data-tex="\max_{\ell\in[K]}\sum_{i=0}^L\left[\Delta_{i}(\ell)+ d_{i\,i+1}(\ell)\right]\leq [L+1](\Delta + d)"></div>
+<p>From the above, it follows that in the worst case the latency of <a href="#strategies-to-reduce-anonymity-failure">sequential</a> communication is <span class="math-inline" data-tex="K"></span> times the latency of <a href="#communication-on-linear-trees">synchronous</a> communication.</p>
+<p>Let us assume that <span class="math-inline" data-tex="\Delta=10s"></span>, <span class="math-inline" data-tex="d=5s"></span> and sender node is not delaying messages. The latter gives us the upper bound <span class="math-inline" data-tex="\Delta L+ d(L+1)= 15\times L+5\,s"></span> on latency in <a href="#sampling-of-linear-trees">synchronous</a> communication and <span class="math-inline" data-tex="K[\Delta L+ d(L+1)]= K[15\times L+5]\,s"></span> for the upper bound on latency of <a href="#strategies-to-reduce-anonymity-failure">sequential</a> communication.</p>
+<h2 id="the-number-of-time-slots-between-two-consecutive-blocks"><a class="header" href="#the-number-of-time-slots-between-two-consecutive-blocks">The Number of Time-Slots Between Two Consecutive Blocks</a></h2>
+<p>In the <a href="#leader-election-process">leader election process</a> the probability of winning a slot is <span class="math-inline" data-tex="f=1/30"></span> and the number of time-slots per epoch is <span class="math-inline" data-tex="T=648000"></span>. Assuming that winning a slots results in generation of a valid block, the number of time-slots between two consecutive blocks, <span class="math-inline" data-tex="n_0"></span>, follow the <a href="https://en.wikipedia.org/wiki/Geometric_distribution">geometric distribution</a></p>
+<div class="math-block" data-tex="\mathrm{P}(n_0)=(1-f)^{n_0}f"></div>
+<p>where <span class="math-inline" data-tex="n_0\in\mathbb{N}\cup\{0\}"></span>. Follows from above that the average of <span class="math-inline" data-tex="n_0"></span> is <span class="math-inline" data-tex="\langle n_0\rangle=(1-f)/f\approx0.967/0.033=29"></span>, i.e. on average we expected to see a next block after <span class="math-inline" data-tex="29"></span> time-slots. The probability that <span class="math-inline" data-tex="n_0"></span> is greater than the average <span class="math-inline" data-tex="\langle n_0\rangle"></span> is given by</p>
+<div class="math-block" data-tex="\mathrm{P}(n_0&gt; \langle n_0\rangle)=(1-f)^{\langle n_0\rangle+1}"></div>
+<p>For <span class="math-inline" data-tex="f=1/30"></span>, the above gives us <span class="math-inline" data-tex="\mathrm{P}(n_0 \gt 29)=(1-1/30)^{30}\approx0.362"></span>. Furthermore, the maximum of <span class="math-inline" data-tex="n_0"></span> observed in <span class="math-inline" data-tex="T"></span> time-slots (approximately) follows the <a href="#bibliography">distribution</a></p>
+<div class="math-block" data-tex="\mathrm{P}\left(x\right)=\int_{-\infty}^{\infty} \mathrm{e}^{-t-\mathrm{e}^{-t}}\delta\left(x-\frac{t+\log(T(1-p))}{\log(1/p)}\right)\mathrm{d} t\\\quad =\vert\log(p)\vert\, \mathrm{e}^{-\left[x\log(p)+\log(T(1-p))\right]-\mathrm{e}^{-\left[x\log(p)+\log(T(1-p))\right]}}"></div>
+<p>where <span class="math-inline" data-tex="p=1-f"></span>.</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-81c2-9b70-df6e52ab9176.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>The probability distribution <span class="math-inline" data-tex="\mathrm{P}(x)"></span> as a function of <span class="math-inline" data-tex="x"></span> plotted for <span class="math-inline" data-tex="T= 648000"></span> and <span class="math-inline" data-tex="f=1/30"></span>.</sub></p>
+</blockquote>
+<p>We note that the mode of <span class="math-inline" data-tex="\mathrm{P}\left(x\right)"></span> is at <span class="math-inline" data-tex="x=\frac{\log(T(1-p))}{\log(1/p)}"></span> and hence the typical value of the maximum of <span class="math-inline" data-tex="n_0"></span> observed in <span class="math-inline" data-tex="T=648000"></span> time-slots for <span class="math-inline" data-tex="f=1/30"></span> is <span class="math-inline" data-tex="\approx 295"></span>. The prob. that the maximum of <span class="math-inline" data-tex="n_0"></span> observed in <span class="math-inline" data-tex="T=648000"></span> time-slots for <span class="math-inline" data-tex="f=1/30"></span> is greater than <span class="math-inline" data-tex="295"></span> can be computed with high accuracy from simulations and is <span class="math-inline" data-tex="\approx 0.62"></span> as suggested by the simulation data tabulated below.</p>
+<div class="table-wrapper"><table><thead><tr><th>Num. of samples</th><th>Prob. <span class="math-inline" data-tex="n_0 \gt 295"></span>​</th></tr></thead><tbody>
+<tr><td><span class="math-inline" data-tex="10^3"></span>​</td><td><span class="math-inline" data-tex="0.612"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="10^4"></span>​</td><td><span class="math-inline" data-tex="0.617"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="10^5"></span>​</td><td><span class="math-inline" data-tex="0.62379"></span>​</td></tr>
+<tr><td><span class="math-inline" data-tex="10^6"></span>​</td><td><span class="math-inline" data-tex="0.624018"></span>​</td></tr>
+</tbody></table>
+</div>
+<p>The histogram of the maximum of <span class="math-inline" data-tex="n_0"></span> obtained in one such simulation is presented below</p>
+<p><img src="analysis-resilience-and-anonymity/assets/1fd261aa-09df-8106-8b30-df0034a2e6d9.png" alt="Diagram" /></p>
+<blockquote>
+<p><sub>This histogram of the maximum number of time-slots between two consecutive blocks, <span class="math-inline" data-tex="n_0"></span>, obtained in <span class="math-inline" data-tex="10^6"></span> simulations of one epoch with <span class="math-inline" data-tex="T=648000"></span> and <span class="math-inline" data-tex="f=1/30"></span>. The red vertical line corresponds to the typical value of <span class="math-inline" data-tex="295"></span>. Here estimating the prob. that <span class="math-inline" data-tex="n_0 \gt 295"></span> gives us the value of <span class="math-inline" data-tex="0.624018"></span>.</sub></p>
+</blockquote>
+<h1 id="bibliography"><a class="header" href="#bibliography">Bibliography</a></h1>
+<p>Svante Janson. (2009). On percolation in random graphs with given vertex degrees. Electron. J. Probab. 14: 86 - 118. <a href="https://doi.org/10.1214/EJP.v14-603">https://doi.org/10.1214/EJP.v14-603</a></p>
+<p>Gordon, L., Schilling, M. F. and Waterman, M. S. (1986). An extreme value theory for long head runs.  Probability Theory and Related Fields  72: 279-287. <a href="https://doi.org/10.1007/BF00699107">https://doi.org/10.1007/BF00699107</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
+        <script src="../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>LON-ORACLE-ZONE - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/execution-market.html"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity.html"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-encapsulation.html"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications.html"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-lioness.html"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-oracle-zone.html" class="active"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lon-oracle-zone"><a class="header" href="#lon-oracle-zone">LON-ORACLE-ZONE</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Logos Oracle Network (LON) Oracle Zone</td></tr>
+<tr><td>Slug</td><td>244</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Ugur Sen <a href="mailto:ugur@status.im">ugur@status.im</a></td></tr>
+<tr><td>Contributors</td><td></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-07-21</strong> — <a href="https://github.com/logos-co/logos-lips/blob/0ab178356cb7cecb1f732b19cda5fbc73c7c276f/docs/anoncomms/raw/logos-oracle-zone.md"><code>0ab1783</code></a> — docs(anoncomms): commit the initial Logos Oracle Zone RFC (#366)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>The following document specifies the Logos Oracle Network (LON),
+a dedicated Logos Blockchain zone that aggregates and attests external price data
+and delivers it to consumers in the Logos ecosystem,
+in particular the Logos Execution Zone (LEZ).
+A set of oracle nodes fetch prices from external sources, sign their observations,
+and publish them as inscriptions on the Logos Blockchain.
+Bedrock totally orders and finalizes these inscriptions,
+which makes the input data immutable and identical for every reader.
+Because the input is immutable and the aggregation code is fixed and deterministic,
+every honest indexer that reads the same finalized inscriptions computes the same attested price.</p>
+<p>The oracle nodes double as indexers that read the finalized inscriptions and compute the attested price.
+Aggregation follows an optimistic model, since an indexer can be malicious and cannot be trusted.
+In each round, one indexer acts as the proposer.
+It computes the attested price as the median of the valid observations and writes it to LEZ,
+which opens a dispute window.
+If no dispute is raised before the window closes,
+the proposed price is accepted as final.
+If a dispute is raised, LEZ verifies the signatures and membership of the observations,
+recomputes the median itself, and compares it with the proposed value.
+The faulty proposer is slashed by LEZ contracts.</p>
+<p>The Oracle Zone deliberately holds no general-purpose execution environment.
+Therefore, economic security with oracle node registration by staking and slashing is anchored in LEZ contracts.
+This RFC specifies the price-fetching format, the aggregation and attestation logic,
+the round and timing model, the optimistic delivery and dispute model, the incentivization bridge, and the parameters.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>A decentralized price oracle must verify multiple independent signed observations
+per update while sustaining a reasonable update frequency.
+Two categorical design approaches are significant:</p>
+<p>LEZ-native design:</p>
+<ul>
+<li>All oracle nodes and logic live in the LEZ environment.
+Research shows that ECDSA signature verification exhausts the LEZ cycle budget
+at a relatively small committee size which is too small for a decentralized oracle.
+It is still doable, but the verification must be split across several transactions and blocks, which breaks atomicity.
+Aggregate-signature schemes relax the per-signature cost
+but still couple the price-update load to the general-purpose execution layer.</li>
+</ul>
+<p>Separate Oracle Zone:</p>
+<ul>
+<li>This approach removes the signature verification load from LEZ.
+Prices are published as inscriptions on the Logos Blockchain,
+and the heavy work of checking them runs off the LEZ execution path.
+LEZ consumes only the final attested price on the optimistic path,
+and performs signature verification only when a dispute is raised.
+This raises the achievable signer count and the update frequency,
+which improves both liveness, since more oracle nodes and faster rounds are possible,
+and price accuracy, since more independent sources feed a robust median.</li>
+</ul>
+<p>The rationale for a separate zone is therefore performance.
+Feeding price data does not load the LEZ execution layer,
+and the zone can be tuned for fast aggregation and high verification throughput independently of LEZ.</p>
+<p>The trade-off introduced by this separation is that the Oracle Zone has no execution environment
+in which to custody stake or run slashing logic.
+This RFC resolves that by keeping all economic security
+in LEZ contracts for stake and slash operations.</p>
+<h2 id="format-specification"><a class="header" href="#format-specification">Format Specification</a></h2>
+<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<h3 id="assumptions"><a class="header" href="#assumptions">Assumptions</a></h3>
+<ul>
+<li>At least more than half of the oracle nodes (indexers) are honest,
+who fetch-then-forward price data by following this protocol.</li>
+<li>No indexer can manipulate observation ordering.
+Ordering authority is delegated entirely to Bedrock's immutable inscription order.</li>
+<li>Indexers have no immutable execution logic beyond aggregation.
+Stake custody and slashing enforcement are delegated entirely to LEZ contracts.</li>
+<li>At least one honest indexer disputes a wrong proposal before the dispute window closes,
+by sending the observations to LEZ.
+LEZ resolves the dispute by recomputing the median.
+Correctness of the attested price rests on this one honest indexer existing.</li>
+<li>The active oracle set is large enough that the quorum <code>N</code> is reached every round.
+Liveness of attestation depends on this oversizing.</li>
+</ul>
+<h2 id="roles"><a class="header" href="#roles">Roles</a></h2>
+<p>The roles used in the Oracle Zone are as follows:</p>
+<ul>
+<li><code>Bedrock</code>: The Logos Blockchain ordering layer, acting as the L1.
+It totally orders and finalizes the inscriptions,
+giving every indexer the same immutable input to aggregate over.</li>
+<li><code>oracle node</code>: An off-chain agent run by an oracle operator.
+It fetches prices from external sources, computes a local price observation,
+signs and publishes it as an inscription on <code>Bedrock</code>.
+Each <code>oracle node</code> is identified by its public key as <code>oracle id</code>.
+The same key is its channel key on Bedrock and its staking identity in LEZ.</li>
+<li><code>indexer</code>: An <code>oracle node</code> in its second role.
+It reads the finalized inscription stream from <code>Bedrock</code> and computes the attested price
+as the median of the valid observations.
+Because the input is immutable and the aggregation code is fixed and deterministic,
+every honest indexer MUST derive the same value.</li>
+<li><code>proposer</code>: The one indexer that, in a given round,
+writes the attested price to LEZ and opens the dispute window.
+Only one proposer acts per round.</li>
+<li><code>challenger</code>: Any indexer that reads the proposed price from LEZ, recomputes it from the same finalized inscriptions,
+if the proposed value is wrong, disputes it before the window closes.</li>
+</ul>
+<h2 id="flow"><a class="header" href="#flow">Flow</a></h2>
+<p>Before a round begins, each <code>oracle node</code> must be a member of the active oracle set.
+A node joins by bonding stake in the LEZ contract and registering its <code>oracle id</code> in the membership tree held in LEZ.
+Only observations from registered nodes are aggregated.</p>
+<p>The general flow of a round is as follows:</p>
+<ul>
+<li>Each <code>oracle node</code> fetches prices from external sources for the feed,
+computes a local price observation, signs and publishes it as an inscription on <code>Bedrock</code>.
+Bedrock totally orders and finalizes the inscriptions.</li>
+<li>Every <code>indexer</code> reads the finalized inscriptions of the current round
+and computes the attested price as the median of the valid observations.
+Because the input is immutable and the code is deterministic,
+all honest indexers MUST reach the same value.</li>
+<li>One <code>indexer</code> acts as the <code>proposer</code> for the round.
+On the optimistic path it writes to the LEZ contract its attested price together
+with the observations and their membership proofs,
+and this opens a dispute window.
+During the window, the contract waits for a dispute from any other <code>indexer</code>.</li>
+<li>Every other <code>indexer</code> acts as a <code>challenger</code>.
+It reads the proposed value from the LEZ contract and compares it with the value it computed itself.</li>
+<li>If the proposed value differs, a <code>challenger</code> disputes it before the window closes.
+To dispute, it sends the observations to the LEZ contract.
+The contract verifies their signatures and membership, recomputes the median itself,
+and compares it with the proposed value.
+If they differ, the proposed value is rejected and the faulty <code>proposer</code> is slashed.</li>
+<li>If no dispute is raised before the window closes,
+this is the optimistic path, and the LEZ contract finalizes the proposed value as the attested price.</li>
+</ul>
+<h2 id="price-fetching"><a class="header" href="#price-fetching">Price Fetching</a></h2>
+<p>Each <code>oracle node</code> fetches the price of the feed from external sources.
+The protocol is agnostic to the specific sources and to the local pre-aggregation method.
+It is RECOMMENDED that a node query at least three independent sources and submit a local median,
+to reduce the chance of its observation being discarded as an outlier.</p>
+<p>A node builds its observation deterministically,
+so that two honest nodes reading the same prices produce the same value. First, it reads its sources.
+How it connects to each source, which endpoints or APIs it uses, is left to the operator, and the protocol does not constrain the source side.
+A node MUST validate each source value before using it.
+A value that is not a positive number, or that deviates grossly from the others,
+MUST be dropped, so a broken or malicious source cannot enter the local median.
+Second, it reduces the remaining source values to one local value by taking their median.
+Sources report prices at different decimal precisions,
+so the node normalizes each to the fixed <code>decimals</code> of the feed, rounding half up.
+If the number of values is even, it takes the lower of the two middle values,
+so the result is always one of the observed prices and never an average.
+Third, it encodes that value as an integer at the fixed <code>decimals</code>.</p>
+<p>As an example, a node reads four sources for BTC/USDT and gets <code>67123.1</code>, <code>67124.2071</code>, <code>67125.40215</code>, and <code>67126.0</code>.
+Each is a valid positive number, and none is a gross outlier, so all are kept.
+The feed fixes <code>decimals = 6</code>, so the node normalizes each to six decimals rounding half up,
+giving <code>67123.100000</code>, <code>67124.207100</code>, <code>67125.402150</code>, and <code>67126.000000</code>.
+Since the count is even, it takes the lower of the two middle values, <code>67124.207100</code>.
+It scales that to an integer at six decimals, <code>67124.207100 * 10^6 = 67124207100</code>,
+and sets <code>price = 67124207100</code> and <code>decimals = 6</code>.
+The indexer applies the same normalization and even-count rule when it takes the median over observations.</p>
+<p>Each observation is encoded as a <code>PriceObservation</code>.
+The price is carried as an integer <code>price</code> together with a <code>decimals</code> field,
+so that no floating-point value crosses the protocol boundary.
+The real value is <code>price * 10^(-decimals)</code>.
+Authentication of an observation on the optimistic path comes from Bedrock.
+An oracle node publishes to its own channel,
+so Bedrock verifies the writer signature at the inscription level and records who wrote each observation.</p>
+<p>The <code>signature</code> field carries a <a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki">BIP-340</a> Schnorr signature
+over the SHA-256 hash of the canonical serialization of fields 1 to 6.
+The indexer verifies this signature off-chain during aggregation.
+On the optimistic path LEZ does not verify it.
+LEZ verifies it only when a dispute is raised, without depending on Bedrock,
+which is what lets the dispute be resolved inside LEZ.
+The <code>membership_proof</code> is a separate witness and is not covered by the signature.</p>
+<p>The <code>PriceObservation</code> is specified using <a href="https://protobuf.dev/">protocol buffers v3</a>:</p>
+<pre><code class="language-protobuf">syntax = "proto3";
+
+message PriceObservation {
+  string feed_id           = 1;  // asset pair identifier, e.g. "BTC/USDT"
+  int64  price             = 2;  // integer-encoded price, real value = price * 10^(-decimals)
+  int32  decimals          = 3;  // number of decimal places in `price` which is 6
+  int64  round             = 4;  // round identifier, in Bedrock block-height terms
+  int64  timestamp         = 5;  // observation time (unix milliseconds), advisory only
+  bytes  oracle_id         = 6;  // the node's 32-byte BIP-340 x-only public key, also its channel key and staking identity
+  bytes  signature         = 7;  // BIP-340 Schnorr signature over SHA-256 of fields 1 to 6, verified off-chain by the indexer and on-chain by LEZ only on dispute
+  bytes  membership_proof  = 8;  // Merkle inclusion proof of oracle_id under the LEZ membership root (outside signature scope)
+}
+</code></pre>
+<h2 id="aggregation"><a class="header" href="#aggregation">Aggregation</a></h2>
+<p>The <code>indexer</code> is the core logic of the Oracle Zone.
+Within each round it performs the following steps deterministically over the ordered inscription stream.</p>
+<ol>
+<li><strong>Deserialize.</strong> Decode each finalized inscription from <code>Bedrock</code> into a <code>PriceObservation</code>.</li>
+<li><strong>Verify signature.</strong> Verify the <code>signature</code> field against <code>oracle_id</code> as in <a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki">BIP-340</a>.
+Observations with an invalid signature are discarded.
+This runs off-chain in the indexer.</li>
+<li><strong>Check membership.</strong> Confirm <code>oracle_id</code> is a member of the active oracle set by verifying
+its <code>membership_proof</code> against the membership root.
+Observations from non-members are discarded.</li>
+<li><strong>Compute median.</strong> Once the number of observations in the round reaches the quorum threshold <code>N</code>,
+compute the <code>attested price</code> as the median of all observations in the round, not only the first <code>N</code>.
+The median structurally tolerates up to half the observations being adversarial without moving outside the honest range.</li>
+</ol>
+<p>LEZ does not verify signatures on the optimistic path.
+The indexer checks them off-chain during aggregation,
+and LEZ verifies them only when a dispute is raised,
+over the observations behind the disputed value.
+This keeps the heavy per-signature cost off LEZ.</p>
+<p>Every honest indexer runs these steps over the same finalized inscriptions and,
+because the input is immutable and the code is deterministic, derives the same <code>attested price</code>.</p>
+<p>The attested price is specified as follows:</p>
+<pre><code class="language-protobuf">syntax = "proto3";
+
+message AttestedPrice {
+  string feed_id      = 1;  // asset pair identifier, e.g. "BTC/USDT"
+  int64  price        = 2;  // attested median, real value = price * 10^(-decimals)
+  int32  decimals     = 3;  // number of decimal places in `price`
+  uint32 valid_count  = 4;  // number of observations aggregated in this round
+  int64  round        = 5;  // round identifier, in Bedrock block-height terms
+  int64  confidence   = 6;  // OPTIONAL: dispersion of observations, scaled like `price`
+}
+</code></pre>
+<p>The indexer MAY also compute an optional <code>confidence</code> value
+that reports how tightly the observations cluster around the median.
+It is the median absolute deviation scaled to standard-deviation units, <code>1.4826 * median(|xᵢ - median|)</code>.
+The constant <code>1.4826</code> is the standard factor that rescales the median absolute deviation so that,
+for normally distributed data, it matches the ordinary standard deviation,
+which makes the value easier to read against familiar volatility figures.
+A small value means the observations agree closely,
+a large value means they are dispersed.
+LEZ MAY use it to widen margins or pause when dispersion is high.</p>
+<h2 id="rounds-and-timing"><a class="header" href="#rounds-and-timing">Rounds and Timing</a></h2>
+<p>The Logos Oracle Zone has no separate zone-level blocks,
+since it runs no independent consensus.
+Ordering and finality come entirely from the <code>Bedrock</code>.
+Every reference to block height or block time in this document is to the <code>Bedrock</code>.</p>
+<p>The Oracle Zone operates in rounds of length <code>R_round</code>.
+Two rules govern the timing:</p>
+<ol>
+<li><strong>Deterministic windowing.</strong> Round boundaries MUST be defined by block height, not by wall-clock time.
+A wall-clock window is non-deterministic across indexer replicas.
+Defining the window as a fixed block range lets every replica derive the identical attested price.</li>
+<li><strong>Delivery cadence.</strong> Once per round the proposer writes the attested price to LEZ,
+which opens the dispute window <code>W_dispute</code>.
+An on-chain write cannot occur faster than the Logos Blockchain produces blocks, so <code>R_round &gt;= T_block</code>.
+With the default <code>T_block = 30 s</code>, the default round is one block, about <code>30 s</code>.</li>
+</ol>
+<p>The price is not final the moment it is written.
+It becomes final only after <code>W_dispute</code> passes with no dispute in LEZ contract.
+The effective freshness of a price is therefore the round cadence plus <code>W_dispute</code>.
+This design targets applications that tolerate this latency.
+It does not offer sub-second or high-frequency updates
+and that is a deliberate limitation of the current version.</p>
+<p>If fewer than <code>N</code> observations are finalized within a round,
+no new price is attested for that round, and the last attested price remains the current value
+until a round again reaches quorum.
+Handling of a proposer that attests incorrectly,
+or before quorum, is covered in <a href="#incentivization">Incentivization</a>.</p>
+<h2 id="oracle-set-membership"><a class="header" href="#oracle-set-membership">Oracle Set Membership</a></h2>
+<p>Membership of the active oracle set determines which <code>oracle id</code>s submit observations that indexers will accept.
+Membership is also the basis of incentivization.
+To join, an <code>oracle node</code> MUST bond stake in a LEZ contract and register its <code>oracle id</code> in the membership tree held in LEZ.Registration is a LEZ-only operation and does not require a cross-zone write into the Oracle Zone.</p>
+<p>An indexer does not query LEZ state live, which would make aggregation non-deterministic across replicas.
+Instead, each observation carries a <code>membership_proof</code>,
+a Merkle inclusion proof of its <code>oracle id</code> against the LEZ membership root,
+and the indexer verifies the proof against the membership root it holds.
+The indexer is assumed to hold the latest membership root.
+Each <code>oracle id</code> is the node's BIP-340 x-only public key,
+and the membership tree stores these public keys directly.</p>
+<p>During aggregation, every indexer discards observations whose <code>membership_proof</code> does not verify,
+so observations from non-members never enter the median.
+On the dispute path the LEZ contract checks the same proofs against its own membership root,
+so only registered nodes count toward the disputed value.</p>
+<h2 id="incentivization"><a class="header" href="#incentivization">Incentivization</a></h2>
+<p>The Oracle Zone has no execution environment of its own,
+so it custodies no stake and runs no slashing logic.
+All economic security lives in <code>LEZ contracts</code>.
+Setting membership by staking, reward settlement, and slashing all happen in <code>LEZ contracts</code>.
+The Oracle Zone only produces the data that these contracts act on.</p>
+<h3 id="rewards-and-revenue"><a class="header" href="#rewards-and-revenue">Rewards and Revenue</a></h3>
+<p><code>oracle nodes</code> earn from serving the feed, and this reward stream is not just compensation but a security primitive.
+An <code>oracle node</code>'s admission right (see <a href="#oracle-set-membership">Oracle Set Membership</a>) is a scarce,
+income-producing, transferable seat whose market value approximates the net present value of its future reward stream.
+This franchise value raises the cost of acquiring a median-controlling set and
+makes misbehavior economically self-defeating, since a fault forfeits that future income.
+For this to hold, rewards SHOULD be fee-backed (funded by consumers of the feed) rather than pure emissions,
+so that the seat's value reflects real, sustainable income rather than speculation.</p>
+<p>Reward accounting is computed in the Oracle Zone,
+since only the indexer knows which <code>oracle nodes</code> submitted valid,
+within-bound observations in the epoch.
+At each epoch boundary the indexer commits a reward table, for example a Merkle root of <code>oracle node</code> amounts,
+to a LEZ settlement contract in a single cross-zone transaction.
+This keeps reward traffic off the per-round path.
+The settlement contract does not run a scheduler.
+Each <code>oracle node</code> claims against the committed root,
+so payout is pull-based and per-epoch rather than a per-round push,
+and the claimant pays its own settlement cost.</p>
+<p>Reward eligibility is assessed against a soft deviation band around the round's attested median.
+The indexer marks each observation as reward-eligible if it lies
+within a small deviation <code>D_reward</code> of the attested median, and reward-ineligible otherwise.
+An eligible observation earns a full, equal share regardless of its exact distance from the median (validity, not proximity),
+so <code>oracle nodes</code> are not pushed to herd toward the median,
+while an ineligible observation earns nothing for that round but is not slashed.
+This soft band is distinct from, and much tighter than, the hard validity bound whose breach is a slashable out-of-bound fault.
+The band affects reward accounting only.
+The attested median is always the plain median of all valid observations, unaffected by <code>D_reward</code>.</p>
+<h3 id="slashing"><a class="header" href="#slashing">Slashing</a></h3>
+<p>Slashing MUST fire only on strict and provable conditions.
+A slash is triggered by submitting fault evidence to the LEZ contract,
+which verifies it and applies the penalty.
+Four slashable faults are defined:</p>
+<ol>
+<li>
+<p><strong>Equivocation.</strong> An <code>oracle id</code> produces two conflicting signed observations
+for the same feed and round.
+The two BIP-340 signatures are a self-contained fraud proof,
+verified in LEZ, and non-malleable signatures make this unambiguous.
+Because the proof is cryptographic and false positives are effectively impossible,
+this fault SHOULD carry the highest penalty.</p>
+</li>
+<li>
+<p><strong>Out-of-bound value.</strong> A signed observation lies outside the hard validity bound <code>D_slash</code> for the round.
+The signed value plus the round context is itself the proof.
+<code>D_slash</code> is an absolute sanity bound checked during slashing,
+and it is much wider than the tight <code>D_reward</code> band used for reward eligibility (<code>D_reward &lt; D_slash</code>),
+so that an honest node stays well inside it and a value outside it indicates malice or gross malfunction.
+Because bound-checking can still have edge cases,
+a stale reference or a genuine market dislocation may make an honest value appear out of bound,
+this fault SHOULD carry a capped fraction rather than the full stake,
+and MAY be paired with a challenge window.</p>
+</li>
+<li>
+<p><strong>Premature attestation.</strong> A proposer attests a price before the round reaches the quorum <code>N</code>.
+The number of observations finalized in a round is fixed and provable from the immutable Bedrock inscriptions,
+so a challenger proves that fewer than <code>N</code> observations existed when the proposer attested.
+The fault is objective and cheaply proven.
+The proposed price is rejected and the proposer is slashed.</p>
+</li>
+<li>
+<p><strong>Wrong median.</strong> A proposer attests a value that is not the median of the valid observations of the round,
+where valid means correctly signed and from a registered member.
+On a dispute, the LEZ contract discards observations that fail signature or membership,
+recomputes the median over the rest, and compares.
+If the proposed value does not match, the proposer is slashed and LEZ takes
+its own recomputed median as the correct value.
+Including a non-member or badly signed observation is therefore only a fault when it changes the median.
+If it does not change the result, the attestation is still correct and nothing is slashed.
+A failed round is not re-proposed.
+The feed continues from the next round,
+so a proposer that forces a failed round pays a slash for each attempt,
+which makes stalling the feed economically unsustainable.</p>
+</li>
+</ol>
+<p>Slashed stake MAY be burnt or split between a bounty to the party that submitted the fault evidence,
+which funds a permissionless watchdog economy, and burn or treasury for the remainder.
+Liveness and non-participation are NOT slashed.
+Missing <code>oracle nodes</code> are tolerated by a sufficiently large active set
+and are handled through reward eligibility rather than penalties.
+Falling outside the <code>D_reward</code> band is likewise NOT a slashable fault.
+It only forfeits that round's reward.
+Subjective incorrect price and within-bound majority bias are also deliberately excluded,
+since no trust-minimized programmatic predicate for them exists.
+These are addressed economically rather than by slashing,
+through the franchise value of the reward stream above,
+the unbonding period below, and randomized selection,
+as discussed in <a href="#security-considerations">Security Considerations</a>.</p>
+<h2 id="parameters"><a class="header" href="#parameters">Parameters</a></h2>
+<p>The parameters below are drawn from values used by comparable oracle systems and adjusted for this design.
+Block-time and finality parameters are properties of the LEZ and are listed for reference.</p>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Symbol</th><th>Default</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Feed</td><td></td><td><code>BTC/USDT</code></td><td>Single feed, more added later.</td></tr>
+<tr><td>Feed decimals</td><td></td><td>6</td><td>Fixed integer scale for the feed. Every observation uses it, so the indexer needs no rescaling.</td></tr>
+<tr><td>Quorum threshold</td><td><code>N</code></td><td>50</td><td>Minimum observations required to attest a price for a round.</td></tr>
+<tr><td>Honest-majority assumption</td><td></td><td>majority of the aggregated observations</td><td>Over the observations aggregated per attestation, not the total pool.</td></tr>
+<tr><td>Heartbeat / round cadence</td><td><code>R_round</code></td><td>1 block (<code>~30 s</code>)</td><td>Defined in block-height terms; must be <code>&gt;= T_block</code>.</td></tr>
+<tr><td>Dispute window</td><td><code>W_dispute</code></td><td>3 Bedrock blocks (<code>~90 s</code>)</td><td>Time a proposed price waits for a dispute before it finalizes.</td></tr>
+<tr><td>LEZ block time</td><td></td><td><code>~1 s</code></td><td>Consumer zone block time, faster than the host chain block.</td></tr>
+<tr><td>Aggregation function</td><td></td><td>median</td><td>Plain median of all signature and membership-observations.</td></tr>
+<tr><td>Reward band</td><td><code>D_reward</code></td><td>0.5%*</td><td>Tight band around the median for reward eligibility; <code>D_reward &lt; D_slash</code>.</td></tr>
+<tr><td>Hard validity bound</td><td><code>D_slash</code></td><td>2.5%*</td><td>Wide sanity bound; a signed value outside it is a slashable out-of-bound fault.</td></tr>
+<tr><td>Signature scheme</td><td></td><td>BIP-340 Schnorr</td><td><code>oracle_id</code> is the node's 32-byte x-only public key.</td></tr>
+<tr><td>Active oracle set size</td><td><code>AOS</code></td><td>500*</td><td>Scarce, transferable seats (~10x <code>N</code>) so a random per-round subset resists majority capture</td></tr>
+<tr><td>Stake requirement</td><td></td><td>fixed floor, greater of token amount or USD value*</td><td>Hybrid floor to resist token-price drawdown; magnitude set with tokenomics.</td></tr>
+<tr><td>Slash fraction (equivocation)</td><td></td><td>up to 100%*</td><td>Cryptographic proof, effectively zero false positives, so the highest tier is justified.</td></tr>
+<tr><td>Slash fraction (out-of-bound)</td><td></td><td>5% cap*</td><td>Capped due to edge-case risk; MAY use a challenge window.</td></tr>
+<tr><td>Slash fraction (premature attestation)</td><td></td><td>up to 100%*</td><td>Provable from immutable inscriptions, effectively zero false positives.</td></tr>
+<tr><td>Slash fraction (wrong median)</td><td></td><td>capped*</td><td>Proposer attested a value a successful dispute proved wrong.</td></tr>
+<tr><td>Unbonding / cooldown period</td><td></td><td>21 days*</td><td>Cosmos/Band anchor; must exceed fault-proving window plus deep-finality horizon.</td></tr>
+<tr><td>Reward settlement</td><td></td><td>per epoch, pull-based</td><td>Claim against a committed Merkle root</td></tr>
+<tr><td>Epoch length</td><td></td><td>7 days*</td><td>Weekly settlement.</td></tr>
+<tr><td>Reward backing</td><td></td><td>fee-backed preferred*</td><td>Fees over pure emissions for sustainable franchise value.</td></tr>
+<tr><td>Host chain block time</td><td><code>T_block</code></td><td>30 s</td><td>Logos default assumed here; verify against spec.</td></tr>
+<tr><td>Host chain finality depth</td><td><code>k</code></td><td>immutable bound (reference)</td><td>Worst-case bound; practical confirmation depth is much shallower.</td></tr>
+</tbody></table>
+</div>
+<h2 id="security-considerations"><a class="header" href="#security-considerations">Security Considerations</a></h2>
+<p>Two properties matter most for a price oracle network.
+One is liveness, meaning a fresh price is attested every round.
+The other is accuracy, meaning the attested price tracks the real market.
+Running as a separate zone serves both.
+It lifts the per-round signature-verification load off LEZ,
+so the zone can aggregate many more observations per round than an LEZ-native design.
+More observations per round improves liveness,
+since the quorum <code>N</code> is easily reached even when many <code>oracle nodes</code> are absent,
+and improves accuracy, since more independent observations feed the median.
+Accuracy is further backed by the median itself
+and by the slashing conditions in <a href="#incentivization">Incentivization</a>.
+The points below expand on the assumptions this relies on.</p>
+<ol>
+<li>
+<p><strong>Quorum and honest majority.</strong> The quorum <code>N</code> is the minimum number
+of valid observations needed before a price is attested.
+It is a floor, so every valid observation in the round is aggregated.
+The security assumption is that a majority of the aggregated observations are honest,
+which keeps the median within the honest range.
+A large active set makes it unlikely that a whole round is majority-malicious,
+since an attacker would need to control more than half of many independent observations.</p>
+</li>
+<li>
+<p><strong>Indexer liveness is not oracle node liveness.</strong> Replicating the indexer keeps the indexer layer live.
+It does not ensure that enough <code>oracle nodes</code> submit each round.
+<code>Oracle node</code> liveness is handled by keeping the active set large and by rewards,
+not by replication or by slashing non-participation.</p>
+</li>
+<li>
+<p><strong>The optimistic path rests on honest indexers.</strong> On the optimistic path LEZ accepts
+the proposer's value without checking it.
+A wrong value is caught only if at least one honest indexer,
+having recomputed the median offchain from the same finalized inscriptions,
+sees the mismatch and raises a dispute.
+To dispute, the indexer only sends the observations to LEZ.
+LEZ then resolves it, by verifying signatures and membership and recomputing the median
+over the immutable observations, so the resolution is trust-minimized and does not rely on any indexer's word.
+Safety therefore rests on a one-of-many honest assumption to raise the dispute, and on LEZ to resolve it correctly.</p>
+</li>
+<li>
+<p><strong>Cross-zone boundary.</strong> The attested price and the slashing evidence
+both cross into LEZ over a cross-zone transaction.
+Bedrock guarantees that an inscription is validly ordered and finalized,
+but not that the sending side computed correctly,
+so the correctness of what LEZ consumes is re-established inside LEZ.
+On a dispute LEZ verifies the BIP-340 signatures and membership of the observations itself
+and recomputes the median, so a slash rests on evidence LEZ checks directly,
+not on trusting the party that delivered it.</p>
+</li>
+<li>
+<p><strong>Completeness of the observation set.</strong> A proposer could omit valid observations to shift the median.
+Because the same observations are finalized on Bedrock and carry their own signatures,
+an honest indexer can present an omitted observation,
+with its <code>round</code> field and signature, to LEZ during the dispute window.
+LEZ contract verifies it and sees it should have been included.
+The <code>round</code> field prevents a proposer from claiming a valid observation arrived too late.
+Completeness therefore reduces to the same one-of-many honest assumption as the optimistic path.</p>
+</li>
+</ol>
+<h2 id="future-work"><a class="header" href="#future-work">Future Work</a></h2>
+<p>This section records design directions deferred beyond this version.</p>
+<ul>
+<li>
+<p><strong>Randomized selection.</strong> This version fixes neither which nodes attest in a round
+nor which node proposes, and both are currently predictable.
+Two selections are left to future work, and both need a shared randomness source with a specified construction.
+First, the attesting set.
+Accepting observations in inscription order until quorum is adequate
+while the set is small and curated, but as it grows an attacker holding many seats could place a majority
+into a round and bias the median.
+Selecting each round's attesting set at random from the larger registered set
+forces an attacker to control a large fraction of the whole set rather than a bare majority.
+Second, the proposer. A simple round-robin is the starting point,
+but a proposer that is unpredictable in advance stops an attacker from targeting the known next writer.</p>
+</li>
+<li>
+<p><strong>Cooldown and unbonding period.</strong> The unbonding period must be long enough that stake stays locked
+until any fault can be detected, proven, and settled in LEZ, plus the Logos Blockchain deep-finality margin.
+The exact duration is left to tokenomics and should be set well above the deep-finality bound.
+The LEZ contracts that hold stake and enforce the cooldown and unbonding are also left to be specified,
+since this version covers only the Oracle Zone side.</p>
+</li>
+<li>
+<p><strong>Volatility handling.</strong> In fast markets, honest prices spread out.
+A fixed <code>D_reward</code> band can then mark many honest observations ineligible for reward exactly when fresh prices matter most.
+A mechanism to widen the band or grow the attesting set during high volatility is left to future work.</p>
+</li>
+<li>
+<p><strong>Slash proof submission.</strong> The slashing flow is not yet specified formally.
+Who submits the fault evidence is one, and this is an open watcher role paid by the bounty.
+What the evidence holds is another.
+For equivocation it is the two conflicting signed observations.
+For an out-of-bound value it is the signed observation and the round context.
+For premature attestation it is the finalized inscriptions showing fewer than <code>N</code> observations.
+For a wrong median it is the observations behind the disputed value.
+How the LEZ contract checks each kind of evidence, and the challenge window for the faults that need one, are open.
+Slashing is never automatic. An oracle node or watcher always starts it by sending evidence to the LEZ contract.</p>
+</li>
+<li>
+<p><strong>Reward and slash amount analysis.</strong> This version fixes the reward and slashing mechanisms
+but not their exact economic parameters.
+Several values are left to future work.
+These are the concrete stake requirement, the four slash fractions,
+the reward rate and its fee backing, the epoch length, and the unbonding duration.
+Each must be sized against the value the feed secures.
+The goal is to keep the cost of corruption above the profit from corruption.
+This work also covers how the reward table is committed.
+It covers whether that commitment needs the same optimistic-proposer-and-dispute protection as the attested price.</p>
+</li>
+<li>
+<p><strong>LEZ contract specification.</strong> This version defines what the LEZ contracts must achieve but not their implementation.
+On the optimistic path a contract only stores the proposed price, opens the dispute window,
+and finalizes if the window closes clean, so this path does no computation and must be cheap.
+On the dispute path the contract does real work.
+It verifies signatures, checks membership, recomputes the median, and applies the slash.
+This is the heavy path that a separate zone was meant to keep rare.
+Left to future work are the concrete contracts for registration and staking, price finalization,
+dispute resolution, and reward settlement, and a check that the dispute-path computation fits within the LEZ cycle budget.</p>
+</li>
+<li>
+<p><strong>Confidence threshold.</strong> The <code>confidence</code> value reports how tightly observations cluster around the median,
+but this version does not fix what counts as an acceptable value.
+A normal spread in a fast market can look too wide in a calm one.
+Defining this threshold, or a rule that adapts it, is left to future work together with the volatility handling above.</p>
+</li>
+</ul>
+<h2 id="copyright"><a class="header" href="#copyright">Copyright</a></h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a></p>
+<h3 id="references"><a class="header" href="#references">References</a></h3>
+<ul>
+<li>Logos Improvement Proposals (LIPs) index: <a href="https://lip.logos.co/">https://lip.logos.co/</a></li>
+<li>Cryptarchia and Bedrock (Logos): <a href="https://lip.logos.co/blockchain/raw/bedrock-architecture-overview.html?highlight=Cryptarchia#cryptarchia">https://lip.logos.co/blockchain/raw/bedrock-architecture-overview.html?highlight=Cryptarchia#cryptarchia</a></li>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki">BIP-340: Schnorr Signatures for secp256k1</a></li>
+<li><a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs</a></li>
+<li><a href="https://protobuf.dev/">protocol buffers v3</a></li>
+<li>Flare Time Series Oracle (FTSO): <a href="https://docs.flare.network/tech/ftso/">https://docs.flare.network/tech/ftso/</a></li>
+<li>Supra DORA (Distributed Oracle Agreement): <a href="https://docs.supra.com/oracles/dora-price-feeds">https://docs.supra.com/oracles/dora-price-feeds</a></li>
+<li>LON proof-of-concept 1: <a href="https://github.com/sydhds/lon_poc">https://github.com/sydhds/lon_poc</a></li>
+<li>LON proof-of-concept 2: <a href="https://github.com/seugu/lon_oracle_zone_bench">https://github.com/seugu/lon_oracle_zone_bench</a></li>
+<li>LON proof-of-concept 3, mocked zone: <a href="https://github.com/seugu/lon_oracle_zone_bench/tree/mocked-zone">https://github.com/seugu/lon_oracle_zone_bench/tree/mocked-zone</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../anoncomms/raw/logos-service-discovery.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../anoncomms/raw/mix.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../anoncomms/raw/logos-service-discovery.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../anoncomms/raw/mix.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
+        <script src="../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>

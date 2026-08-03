@@ -1,0 +1,1240 @@
+{
+  "label": "Blockchain",
+  "topics": [
+    {
+      "name": "P2P Network",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "Network Wire Format",
+              "path": "blockchain/raw/network-wire-format.md",
+              "status": "raw"
+            },
+            {
+              "label": "P2P Nat Solution",
+              "path": "blockchain/raw/p2p-nat-solution.md",
+              "status": "raw"
+            },
+            {
+              "label": "P2P Network",
+              "path": "blockchain/draft/p2p-network.md",
+              "status": "draft"
+            },
+            {
+              "label": "P2P Network Bootstrapping",
+              "path": "blockchain/raw/p2p-network-bootstrapping.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": [
+            {
+              "label": "Hardware Requirements",
+              "path": "blockchain/deprecated/p2p-hardware-requirements.md",
+              "status": "deprecated"
+            }
+          ]
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "Consensus",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "[Analysis] Block Times & Blend Network",
+              "path": "blockchain/raw/analysis-block-times-blend-network.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Cryptarchia De-anonymisation of Relative Stake",
+              "path": "blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Total Stake Inference",
+              "path": "blockchain/raw/analysis-total-stake-inference.md",
+              "status": "raw"
+            },
+            {
+              "label": "Cryptarchia Bootstrapping & Synchronization",
+              "path": "blockchain/raw/cryptarchia-v1-bootstr-sync.md",
+              "status": "raw"
+            },
+            {
+              "label": "Cryptarchia Fork Choice Rule",
+              "path": "blockchain/raw/fork-choice.md",
+              "status": "raw"
+            },
+            {
+              "label": "Cryptarchia Protocol",
+              "path": "blockchain/raw/cryptarchia-v1-protocol.md",
+              "status": "raw"
+            },
+            {
+              "label": "Proof of Leadership",
+              "path": "blockchain/raw/cryptarchia-proof-of-leadership.md",
+              "status": "raw"
+            },
+            {
+              "label": "Total Stake Inference",
+              "path": "blockchain/raw/cryptarchia-total-stake-inference.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": [
+            {
+              "label": "[1.0.0] Proof of Leadership",
+              "path": "blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "Claro Consensus Protocol",
+              "path": "blockchain/deprecated/claro.md",
+              "status": "deprecated"
+            }
+          ]
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "Mantle",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "[Analysis] Gas Cost Determination",
+              "path": "blockchain/raw/analysis-gas-cost-determination.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Overview] Bedrock Architecture",
+              "path": "blockchain/raw/bedrock-architecture-overview.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Template] Cross-Channel Messaging",
+              "path": "blockchain/raw/template-cross-channel-messaging.md",
+              "status": "raw"
+            },
+            {
+              "label": "Anonymous Leaders Reward Protocol",
+              "path": "blockchain/raw/bedrock-anonymous-leaders-reward.md",
+              "status": "raw"
+            },
+            {
+              "label": "Bedrock Genesis Block",
+              "path": "blockchain/raw/bedrock-genesis-block.md",
+              "status": "raw"
+            },
+            {
+              "label": "Block Construction, Validation and Execution",
+              "path": "blockchain/raw/bedrock-v1.1-block-construction.md",
+              "status": "raw"
+            },
+            {
+              "label": "Mantle",
+              "path": "blockchain/raw/bedrock-v1.1-mantle-specification.md",
+              "status": "raw"
+            },
+            {
+              "label": "Mantle Transaction Encoding",
+              "path": "blockchain/raw/mantle-transaction-encoding.md",
+              "status": "raw"
+            },
+            {
+              "label": "Service Declaration Protocol",
+              "path": "blockchain/raw/bedrock-service-declaration-protocol.md",
+              "status": "raw"
+            },
+            {
+              "label": "Service Reward Distribution Protocol",
+              "path": "blockchain/raw/bedrock-service-reward-distribution.md",
+              "status": "raw"
+            },
+            {
+              "label": "Wallet Technical Standard",
+              "path": "blockchain/raw/wallet-technical-standard.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": [
+            {
+              "label": "[1.0.0] [Analysis] Gas Cost Determination",
+              "path": "blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] [Overview] Bedrock Architecture",
+              "path": "blockchain/deprecated/v1.0.0-bedrock-architecture-overview.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] [Template] Cross-Channel Messaging",
+              "path": "blockchain/deprecated/v1.0.0-template-cross-channel-messaging.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] Bedrock Genesis Block",
+              "path": "blockchain/deprecated/v1.0.0-bedrock-genesis-block.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] Block Construction, Validation and Execution",
+              "path": "blockchain/deprecated/v1.0.0-bedrock-block-construction.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] Mantle",
+              "path": "blockchain/deprecated/v1.0.0-mantle.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] Mantle Transaction Encoding",
+              "path": "blockchain/deprecated/v1.0.0-mantle-transaction-encoding.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.0.0] Service Reward Distribution Protocol",
+              "path": "blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] [Analysis] Gas Cost Determination",
+              "path": "blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] Bedrock Genesis Block",
+              "path": "blockchain/deprecated/v1.1.0-bedrock-genesis-block.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] Block Construction, Validation and Execution",
+              "path": "blockchain/deprecated/v1.1.0-bedrock-block-construction.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] Block Construction, Validation and Execution_2",
+              "path": "blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] Mantle",
+              "path": "blockchain/deprecated/v1.1.0-mantle.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] Mantle Transaction Encoding",
+              "path": "blockchain/deprecated/v1.1.0-mantle-transaction-encoding.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0] Service Reward Distribution Protocol",
+              "path": "blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.1.0][Template] Cross-Channel Messaging",
+              "path": "blockchain/deprecated/v1.1.0-template-cross-channel-messaging.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.2.0] [Analysis] Gas Cost Determination",
+              "path": "blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.2.0] Mantle",
+              "path": "blockchain/deprecated/v1.2.0-mantle.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.2.0] Mantle Transaction Encoding",
+              "path": "blockchain/deprecated/v1.2.0-mantle-transaction-encoding.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.2.1] Mantle",
+              "path": "blockchain/deprecated/v1.2.1-mantle.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.3.0] [Analysis] Gas Cost Determination",
+              "path": "blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.3.0] Mantle",
+              "path": "blockchain/deprecated/v1.3.0-mantle.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.3.0] Mantle Transaction Encoding",
+              "path": "blockchain/deprecated/v1.3.0-mantle-transaction-encoding.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.4.0] Mantle",
+              "path": "blockchain/deprecated/v1.4.0-mantle.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "[1.4.0][Analysis] Gas Cost Determination",
+              "path": "blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.md",
+              "status": "deprecated"
+            }
+          ]
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "Cryptoeconomics",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "[Analysis] Block Reward Parameter Calibration",
+              "path": "blockchain/raw/analysis-block-reward-parameter-calibration.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Block Rewards",
+              "path": "blockchain/raw/analysis-block-rewards.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Execution Market",
+              "path": "blockchain/raw/analysis-execution-market.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Static Minimum Stake Estimation for Service Declaration Protocol",
+              "path": "blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Storage Market",
+              "path": "blockchain/raw/analysis-storage-market.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Overview] Cryptoeconomics",
+              "path": "blockchain/raw/overview-cryptoeconomics.md",
+              "status": "raw"
+            },
+            {
+              "label": "Block Rewards",
+              "path": "blockchain/raw/block-rewards.md",
+              "status": "raw"
+            },
+            {
+              "label": "Execution Market",
+              "path": "blockchain/raw/execution-market.md",
+              "status": "raw"
+            },
+            {
+              "label": "Storage Markets",
+              "path": "blockchain/raw/storage-markets.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": []
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "Blend Network",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "[Analysis] Anonymity",
+              "path": "blockchain/raw/analysis-anonymity.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Communication on Trees",
+              "path": "blockchain/raw/analysis-communication-on-trees.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Correlation Functions",
+              "path": "blockchain/raw/analysis-correlation-functions.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake",
+              "path": "blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Latency",
+              "path": "blockchain/raw/analysis-latency.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Queuing System in the Mix Node",
+              "path": "blockchain/raw/analysis-queuing-system-in-the-mix-node.md",
+              "status": "raw"
+            },
+            {
+              "label": "[Analysis] Resilience and Anonymity",
+              "path": "blockchain/raw/analysis-resilience-and-anonymity.md",
+              "status": "raw"
+            },
+            {
+              "label": "Blend Protocol",
+              "path": "blockchain/raw/blend-protocol.md",
+              "status": "raw"
+            },
+            {
+              "label": "Key Types and Generation",
+              "path": "blockchain/raw/key-types-and-generation.md",
+              "status": "raw"
+            },
+            {
+              "label": "Message Encapsulation Mechanism",
+              "path": "blockchain/raw/message-encapsulation.md",
+              "status": "raw"
+            },
+            {
+              "label": "Message Formatting",
+              "path": "blockchain/raw/message-formatting.md",
+              "status": "raw"
+            },
+            {
+              "label": "Payload Formatting",
+              "path": "blockchain/raw/payload-formatting.md",
+              "status": "raw"
+            },
+            {
+              "label": "Proof of Quota",
+              "path": "blockchain/raw/proof-of-quota.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": [
+            {
+              "label": "[1.0.0] Proof of Quota",
+              "path": "blockchain/deprecated/v1.0.0-proof-of-quota.md",
+              "status": "deprecated"
+            }
+          ]
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "Cryptography",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "Common Cryptographic Components",
+              "path": "blockchain/raw/common-cryptographic-components.md",
+              "status": "raw"
+            },
+            {
+              "label": "Trusted Setup Ceremony",
+              "path": "blockchain/raw/trusted-setup-ceremony.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": [
+            {
+              "label": "Digital Signature",
+              "path": "blockchain/deprecated/digital-signature.md",
+              "status": "deprecated"
+            }
+          ]
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "Data Availability",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": []
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": [
+            {
+              "label": "DA Cryptographic Protocol",
+              "path": "blockchain/deprecated/da-cryptographic-protocol.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "DA Network",
+              "path": "blockchain/deprecated/da-network.md",
+              "status": "deprecated"
+            },
+            {
+              "label": "DA Rewarding",
+              "path": "blockchain/deprecated/da-rewarding.md",
+              "status": "deprecated"
+            }
+          ]
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    },
+    {
+      "name": "LEZ",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "LEE v0.3 Specifications",
+              "path": "blockchain/raw/lez/lee-v0.3-specifications.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": []
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "label": "Bedrock",
+      "topics": [
+        {
+          "name": "P2P Network",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": [
+                {
+                  "label": "Network Wire Format",
+                  "path": "blockchain/raw/network-wire-format.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "P2P Nat Solution",
+                  "path": "blockchain/raw/p2p-nat-solution.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "P2P Network",
+                  "path": "blockchain/draft/p2p-network.md",
+                  "status": "draft"
+                },
+                {
+                  "label": "P2P Network Bootstrapping",
+                  "path": "blockchain/raw/p2p-network-bootstrapping.md",
+                  "status": "raw"
+                }
+              ]
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": [
+                {
+                  "label": "Hardware Requirements",
+                  "path": "blockchain/deprecated/p2p-hardware-requirements.md",
+                  "status": "deprecated"
+                }
+              ]
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            }
+          ]
+        },
+        {
+          "name": "Consensus",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": [
+                {
+                  "label": "[Analysis] Block Times & Blend Network",
+                  "path": "blockchain/raw/analysis-block-times-blend-network.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Cryptarchia De-anonymisation of Relative Stake",
+                  "path": "blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Total Stake Inference",
+                  "path": "blockchain/raw/analysis-total-stake-inference.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Cryptarchia Bootstrapping & Synchronization",
+                  "path": "blockchain/raw/cryptarchia-v1-bootstr-sync.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Cryptarchia Fork Choice Rule",
+                  "path": "blockchain/raw/fork-choice.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Cryptarchia Protocol",
+                  "path": "blockchain/raw/cryptarchia-v1-protocol.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Proof of Leadership",
+                  "path": "blockchain/raw/cryptarchia-proof-of-leadership.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Total Stake Inference",
+                  "path": "blockchain/raw/cryptarchia-total-stake-inference.md",
+                  "status": "raw"
+                }
+              ]
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": [
+                {
+                  "label": "[1.0.0] Proof of Leadership",
+                  "path": "blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "Claro Consensus Protocol",
+                  "path": "blockchain/deprecated/claro.md",
+                  "status": "deprecated"
+                }
+              ]
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            },
+            {
+              "name": "Deleted",
+              "specs": []
+            }
+          ]
+        },
+        {
+          "name": "Mantle",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": [
+                {
+                  "label": "[Analysis] Gas Cost Determination",
+                  "path": "blockchain/raw/analysis-gas-cost-determination.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Overview] Bedrock Architecture",
+                  "path": "blockchain/raw/bedrock-architecture-overview.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Template] Cross-Channel Messaging",
+                  "path": "blockchain/raw/template-cross-channel-messaging.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Anonymous Leaders Reward Protocol",
+                  "path": "blockchain/raw/bedrock-anonymous-leaders-reward.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Bedrock Genesis Block",
+                  "path": "blockchain/raw/bedrock-genesis-block.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Block Construction, Validation and Execution",
+                  "path": "blockchain/raw/bedrock-v1.1-block-construction.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Mantle",
+                  "path": "blockchain/raw/bedrock-v1.1-mantle-specification.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Mantle Transaction Encoding",
+                  "path": "blockchain/raw/mantle-transaction-encoding.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Service Declaration Protocol",
+                  "path": "blockchain/raw/bedrock-service-declaration-protocol.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Service Reward Distribution Protocol",
+                  "path": "blockchain/raw/bedrock-service-reward-distribution.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Wallet Technical Standard",
+                  "path": "blockchain/raw/wallet-technical-standard.md",
+                  "status": "raw"
+                }
+              ]
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": [
+                {
+                  "label": "[1.0.0] [Analysis] Gas Cost Determination",
+                  "path": "blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] [Overview] Bedrock Architecture",
+                  "path": "blockchain/deprecated/v1.0.0-bedrock-architecture-overview.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] [Template] Cross-Channel Messaging",
+                  "path": "blockchain/deprecated/v1.0.0-template-cross-channel-messaging.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] Bedrock Genesis Block",
+                  "path": "blockchain/deprecated/v1.0.0-bedrock-genesis-block.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] Block Construction, Validation and Execution",
+                  "path": "blockchain/deprecated/v1.0.0-bedrock-block-construction.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] Mantle",
+                  "path": "blockchain/deprecated/v1.0.0-mantle.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] Mantle Transaction Encoding",
+                  "path": "blockchain/deprecated/v1.0.0-mantle-transaction-encoding.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.0.0] Service Reward Distribution Protocol",
+                  "path": "blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] [Analysis] Gas Cost Determination",
+                  "path": "blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] Bedrock Genesis Block",
+                  "path": "blockchain/deprecated/v1.1.0-bedrock-genesis-block.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] Block Construction, Validation and Execution",
+                  "path": "blockchain/deprecated/v1.1.0-bedrock-block-construction.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] Block Construction, Validation and Execution_2",
+                  "path": "blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] Mantle",
+                  "path": "blockchain/deprecated/v1.1.0-mantle.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] Mantle Transaction Encoding",
+                  "path": "blockchain/deprecated/v1.1.0-mantle-transaction-encoding.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0] Service Reward Distribution Protocol",
+                  "path": "blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.1.0][Template] Cross-Channel Messaging",
+                  "path": "blockchain/deprecated/v1.1.0-template-cross-channel-messaging.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.2.0] [Analysis] Gas Cost Determination",
+                  "path": "blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.2.0] Mantle",
+                  "path": "blockchain/deprecated/v1.2.0-mantle.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.2.0] Mantle Transaction Encoding",
+                  "path": "blockchain/deprecated/v1.2.0-mantle-transaction-encoding.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.2.1] Mantle",
+                  "path": "blockchain/deprecated/v1.2.1-mantle.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.3.0] [Analysis] Gas Cost Determination",
+                  "path": "blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.3.0] Mantle",
+                  "path": "blockchain/deprecated/v1.3.0-mantle.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.3.0] Mantle Transaction Encoding",
+                  "path": "blockchain/deprecated/v1.3.0-mantle-transaction-encoding.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.4.0] Mantle",
+                  "path": "blockchain/deprecated/v1.4.0-mantle.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "[1.4.0][Analysis] Gas Cost Determination",
+                  "path": "blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.md",
+                  "status": "deprecated"
+                }
+              ]
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            },
+            {
+              "name": "Deleted",
+              "specs": []
+            }
+          ]
+        },
+        {
+          "name": "Cryptoeconomics",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": [
+                {
+                  "label": "[Analysis] Block Reward Parameter Calibration",
+                  "path": "blockchain/raw/analysis-block-reward-parameter-calibration.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Block Rewards",
+                  "path": "blockchain/raw/analysis-block-rewards.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Execution Market",
+                  "path": "blockchain/raw/analysis-execution-market.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Static Minimum Stake Estimation for Service Declaration Protocol",
+                  "path": "blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Storage Market",
+                  "path": "blockchain/raw/analysis-storage-market.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Overview] Cryptoeconomics",
+                  "path": "blockchain/raw/overview-cryptoeconomics.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Block Rewards",
+                  "path": "blockchain/raw/block-rewards.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Execution Market",
+                  "path": "blockchain/raw/execution-market.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Storage Markets",
+                  "path": "blockchain/raw/storage-markets.md",
+                  "status": "raw"
+                }
+              ]
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": []
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            },
+            {
+              "name": "Deleted",
+              "specs": []
+            }
+          ]
+        },
+        {
+          "name": "Blend Network",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": [
+                {
+                  "label": "[Analysis] Anonymity",
+                  "path": "blockchain/raw/analysis-anonymity.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Communication on Trees",
+                  "path": "blockchain/raw/analysis-communication-on-trees.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Correlation Functions",
+                  "path": "blockchain/raw/analysis-correlation-functions.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake",
+                  "path": "blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Latency",
+                  "path": "blockchain/raw/analysis-latency.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Queuing System in the Mix Node",
+                  "path": "blockchain/raw/analysis-queuing-system-in-the-mix-node.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "[Analysis] Resilience and Anonymity",
+                  "path": "blockchain/raw/analysis-resilience-and-anonymity.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Blend Protocol",
+                  "path": "blockchain/raw/blend-protocol.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Key Types and Generation",
+                  "path": "blockchain/raw/key-types-and-generation.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Message Encapsulation Mechanism",
+                  "path": "blockchain/raw/message-encapsulation.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Message Formatting",
+                  "path": "blockchain/raw/message-formatting.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Payload Formatting",
+                  "path": "blockchain/raw/payload-formatting.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Proof of Quota",
+                  "path": "blockchain/raw/proof-of-quota.md",
+                  "status": "raw"
+                }
+              ]
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": [
+                {
+                  "label": "[1.0.0] Proof of Quota",
+                  "path": "blockchain/deprecated/v1.0.0-proof-of-quota.md",
+                  "status": "deprecated"
+                }
+              ]
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            },
+            {
+              "name": "Deleted",
+              "specs": []
+            }
+          ]
+        },
+        {
+          "name": "Cryptography",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": [
+                {
+                  "label": "Common Cryptographic Components",
+                  "path": "blockchain/raw/common-cryptographic-components.md",
+                  "status": "raw"
+                },
+                {
+                  "label": "Trusted Setup Ceremony",
+                  "path": "blockchain/raw/trusted-setup-ceremony.md",
+                  "status": "raw"
+                }
+              ]
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": [
+                {
+                  "label": "Digital Signature",
+                  "path": "blockchain/deprecated/digital-signature.md",
+                  "status": "deprecated"
+                }
+              ]
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            },
+            {
+              "name": "Deleted",
+              "specs": []
+            }
+          ]
+        },
+        {
+          "name": "Data Availability",
+          "buckets": [
+            {
+              "name": "Merged",
+              "specs": []
+            },
+            {
+              "name": "Stable",
+              "specs": []
+            },
+            {
+              "name": "Deprecated",
+              "specs": [
+                {
+                  "label": "DA Cryptographic Protocol",
+                  "path": "blockchain/deprecated/da-cryptographic-protocol.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "DA Network",
+                  "path": "blockchain/deprecated/da-network.md",
+                  "status": "deprecated"
+                },
+                {
+                  "label": "DA Rewarding",
+                  "path": "blockchain/deprecated/da-rewarding.md",
+                  "status": "deprecated"
+                }
+              ]
+            },
+            {
+              "name": "Retired",
+              "specs": []
+            },
+            {
+              "name": "Deleted",
+              "specs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "LEZ",
+      "buckets": [
+        {
+          "name": "Merged",
+          "specs": [
+            {
+              "label": "LEE v0.3 Specifications",
+              "path": "blockchain/raw/lez/lee-v0.3-specifications.md",
+              "status": "raw"
+            }
+          ]
+        },
+        {
+          "name": "Stable",
+          "specs": []
+        },
+        {
+          "name": "Deprecated",
+          "specs": []
+        },
+        {
+          "name": "Retired",
+          "specs": []
+        },
+        {
+          "name": "Deleted",
+          "specs": []
+        }
+      ]
+    }
+  ]
+}

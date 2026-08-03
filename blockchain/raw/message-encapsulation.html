@@ -1,0 +1,1246 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Message Encapsulation Mechanism - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/execution-market.html"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity.html"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-encapsulation.html" class="active"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications.html"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-lioness.html"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-oracle-zone.html"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="message-encapsulation-mechanism"><a class="header" href="#message-encapsulation-mechanism">MESSAGE-ENCAPSULATION-MECHANISM</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>Message Encapsulation Mechanism</td></tr>
+<tr><td>Slug</td><td>91</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Marcin Pawlowski <a href="mailto:marcin@logos.co">marcin@logos.co</a></td></tr>
+<tr><td>Contributors</td><td>Youngjoon Lee <a href="mailto:youngjoon@logos.co">youngjoon@logos.co</a>, Alexander Mozeika <a href="mailto:alexander.mozeika@logos.co">alexander.mozeika@logos.co</a>, Mehmet Gonen <a href="mailto:mehmet@logos.co">mehmet@logos.co</a>, Álvaro Castro-Castilla <a href="mailto:alvaro@logos.co">alvaro@logos.co</a>, Daniel Kashepava <a href="mailto:danielkashepava@logos.co">danielkashepava@logos.co</a>, Daniel Sanchez Quiros <a href="mailto:danielsq@logos.co">danielsq@logos.co</a>, Filip Dimitrijevic <a href="mailto:filip@logos.co">filip@logos.co</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/message-encapsulation.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
+<li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/message-encapsulation.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
+<li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/message-encapsulation.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
+</ul>
+<!-- timeline:end -->
+<h1 id="revision-history"><a class="header" href="#revision-history">Revision History</a></h1>
+<div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
+<tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-09</td></tr>
+<tr><td>1.0.1</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
+</tbody></table>
+</div>
+<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>The message encapsulation mechanism is part of the Blend Protocol and it describes the cryptographic operations necessary for building and processing messages by a Blend node.</p>
+<p>This document is part of the <a href="blend-protocol.html#formatting">Formatting</a> section. Please read through that document to better understand the context of the encapsulation mechanism and constructions used here.</p>
+<h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
+<p>The Message Encapsulation Mechanism is a core component of the Blend Protocol that ensures privacy and security during node-to-node message transmission. By implementing multiple encryption layers and cryptographic operations, this mechanism keeps messages confidential while concealing their origins.</p>
+<p>The encapsulation process includes:</p>
+<ul>
+<li>Building a multi-layered structure with public headers, private headers, and encrypted payloads</li>
+<li>Using cryptographic keys and proofs for layer security and authentication</li>
+<li>Applying verifiable random node selection for message routing</li>
+<li>Using shared key derivation for secure inter-node communication</li>
+</ul>
+<p>This document outlines the cryptographic notation, data structures, and algorithms essential to the encapsulation process, providing a complete specification for implementing this mechanism within the Blend Protocol.</p>
+<h2 id="notation"><a class="header" href="#notation">Notation</a></h2>
+<ul>
+<li>
+<p><span class="math-inline" data-tex="\mathbf K^{n}_h = \{(K^{n}_{0}, k^{n}_{0}, \pi_{Q}^{K_{0}^{n}}),...,(K^{n}_{h-1}, k^{n}_{h-1}, \pi_{Q}^{K_{h-1}^{n}}) \}"></span> is a collection of <span class="math-inline" data-tex="h"></span> key pairs for a node <span class="math-inline" data-tex="n"></span> with proofs of quota, where <span class="math-inline" data-tex="K_{i}^{n}"></span> is the <span class="math-inline" data-tex="i"></span>-th public key and <span class="math-inline" data-tex="k_{i}^{n}"></span> is its corresponding private key, and <span class="math-inline" data-tex="\pi_{Q}^{K_{i}^{n}}"></span> is its proof of quota.</p>
+<pre><code class="language-python">Ed25519PublicKey = bytes
+Ed25519PrivateKey = bytes
+KEY_SIZE = 32
+ProofOfQuota = bytes
+PROOF_OF_QUOTA_SIZE = 160
+
+KeyCollection = List[KeyPair]
+
+class KeyPair:
+    signing_public_key: Ed25519PublicKey
+    signing_private_key: Ed25519PrivateKey
+    proof_of_quota: ProofOfQuota
+
+class ProofOfQuota:
+    key_nullifier: zkhash # 32 bytes
+    proof: bytes # 128 bytes
+</code></pre>
+<p>For more information about key generation mechanism please refer to <a href="key-types-and-generation.html">Key Types and Generation</a>.</p>
+<p>For more information about proof of quota please refer to <a href="blend-protocol.html#proof-of-quota">Proof of Quota</a>.</p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="P^n"></span> is a public key of the node <span class="math-inline" data-tex="n"></span>, which is globally accessible using the Service Declaration Protocol (SDP). We are using this notation to distinguish the origin of the key, hence the following simplified notation.
+For more information about Service Declaration Protocol please refer to <a href="bedrock-service-declaration-protocol.html">Service Declaration Protocol</a>.</p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\mathcal{N} = \text{SDP}(e)"></span> is the set of nodes globally accessible using the SDP.</p>
+<pre><code class="language-python">Nodes = set[Ed25519PublicKey]  # set of signing public keys
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="N =|\mathcal{N}|"></span> is the number of nodes globally accessible using the SDP.</p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\kappa^{n,m}_{i} = k^{n}_{i} \cdot P^{m} = p^{m} \cdot K^{n}_{i}"></span>, is a shared key calculated between node <span class="math-inline" data-tex="n"></span> and node <span class="math-inline" data-tex="m"></span> using the <span class="math-inline" data-tex="i"></span>-th key of the node <span class="math-inline" data-tex="n"></span>, <span class="math-inline" data-tex="P^{m}"></span> is the public key of the node <span class="math-inline" data-tex="m"></span> retrieved from the SDP protocol and <span class="math-inline" data-tex="p^m"></span> is its corresponding private key.</p>
+<pre><code class="language-python">SharedKey = bytes  # KEY_SIZE
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\pi^{K^{n}_{l},m}_{S}"></span> is the proof of selection of the public key <span class="math-inline" data-tex="K^{n}_l"></span> to the node index <span class="math-inline" data-tex="m"></span> from a set of all nodes <span class="math-inline" data-tex="\mathcal N"></span>.</p>
+<pre><code class="language-python">ProofOfSelection = bytes
+PROOF_OF_SELECTION_SIZE = 32
+</code></pre>
+<p>For more information about the proof of selection, please refer to <a href="blend-protocol.html#proof-of-selection">Proof of Selection</a>.</p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="H_{\mathbf N}()"></span> is a domain-separated hash function dedicated to the node index selection (the implementation of the hash function is <code>blake2b</code>).</p>
+<pre><code class="language-python">def hashds(domain=b"BlendNode", data: bytes) -&gt; bytes:
+    return Blake2B.hash512(domain + data)
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="H_\mathbf{I}()"></span> is a domain-separated hash function dedicated to the initialization of the blend header (the implementation of the hash function is <code>blake2b</code>).</p>
+<pre><code class="language-python">def hashds(domain=b"BlendInitialization", data: bytes) -&gt; bytes:
+    return Blake2b.hash512(domain + data)
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="H_\mathbf{b}()"></span> is a domain-separated hash function dedicated to the blend header encryption operations (the implementation of the hash function is <code>blake2b</code>).</p>
+<pre><code class="language-python">def hashds(domain=b"BlendHeader", data: bytes) -&gt; bytes:
+    return Blake2b.hash512(domain + data)
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="H_\mathbf{P}()"></span> is a domain-separated hash function dedicated to the payload encryption operations (the implementation of the hash function is <code>blake2b</code>).</p>
+<pre><code class="language-python">def hashds(domain=b"BlendPayload", data: bytes) -&gt; bytes:
+    return Blake2b.hash512(domain + data)
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\beta_{max}"></span> is the maximal number of blending headers in the private header.</p>
+<pre><code class="language-python">ENCAPSULATION_COUNT: int
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\text {CSPRBG}()"></span> is a generalized cryptographically secure pseudo-random bytes generator, it is implemented as <a href="common-cryptographic-components.html#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a>.</p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\text {CSPRBG}()_{x}"></span> is a cryptographically secure pseudo-random bytes generator whose output is restricted to <span class="math-inline" data-tex="x"></span> bytes, it is implemented as <a href="common-cryptographic-components.html#blake2b-based-prng-construction">BLAKE2b-Based PRNG Construction</a>.</p>
+<pre><code class="language-python">def pseudo_random(domain: bytes, key: bytes, size: int) -&gt; bytes:
+    rand = BlakeRng.from_seed(hashds(domain, key)).generate(size)
+    assert len(rand) == size
+    return rand
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="|t|"></span> returns the length of the <span class="math-inline" data-tex="t"></span> expressed in bytes.</p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\oplus"></span> is a XOR operation.</p>
+<pre><code class="language-python">def xor(a: bytes, b: bytes) -&gt; bytes:
+    assert len(a) == len(b)
+    return bytes(x ^ y for x, y in zip(a, b))
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="E_{k}(x)=\text{CSPRBG}(k) \oplus x"></span> is an encryption that uses a cryptographically secure pseudo-random bytes generator with a secret <span class="math-inline" data-tex="k"></span> and payload <span class="math-inline" data-tex="x"></span>.</p>
+<pre><code class="language-python">def encrypt(data: bytes, key: bytes -&gt; bytes:
+    return xor(data, pseudo_random(b"BlendEncapsulation", key, len(data))))
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="D_{k}(x)=\text{CSPRBG}(k) \oplus x"></span> is a decryption that uses using cryptographically secure pseudo-random bytes generator with a secret <span class="math-inline" data-tex="k"></span> and payload <span class="math-inline" data-tex="x"></span>.</p>
+<pre><code class="language-python">def decrypt(data: bytes, key: bytes) -&gt; bytes:
+    return xor(data, pseudo_random(b"BlendEncapsulation", key, len(data))))
+</code></pre>
+</li>
+</ul>
+<h1 id="construction"><a class="header" href="#construction">Construction</a></h1>
+<h2 id="message-structure"><a class="header" href="#message-structure">Message Structure</a></h2>
+<p>We start with a definition of the message structure that must be used to provide the protocol with the envisioned capabilities.</p>
+<p>A node <span class="math-inline" data-tex="n"></span> constructs a message <span class="math-inline" data-tex="\mathbf M = (\mathbf H, \mathbf h, \mathbf P)"></span> according to the format presented below.</p>
+<p><img src="message-encapsulation/assets/215261aa-09df-818e-9ffd-ed2d35b9d288.jpg" alt="Diagram" /></p>
+<pre><code class="language-python">class Message:
+    public_header: PublicHeader
+    private_header: PrivateHeader
+    payload: EncryptedPayload
+</code></pre>
+<ol>
+<li>
+<p><span class="math-inline" data-tex="\mathbf H"></span> is a public header:</p>
+<ol>
+<li><span class="math-inline" data-tex="V"></span>, version of the header, it is set to <span class="math-inline" data-tex="1"></span>.</li>
+<li><span class="math-inline" data-tex="K^{n}_i"></span>, a public key from the set <span class="math-inline" data-tex="\mathbf K^n_h"></span>.</li>
+<li><span class="math-inline" data-tex="\pi^{K^{n}_i}_{Q}"></span>, a corresponding proof of quota for the key <span class="math-inline" data-tex="K^{n}_i"></span> from the set <span class="math-inline" data-tex="\mathbf K^n_h"></span> and contains its proof nullifier.</li>
+<li><span class="math-inline" data-tex="\sigma_{K^{n}_{i}}(\mathbf {h|P}_i)"></span>, a signature of the concatenation of the <span class="math-inline" data-tex="i"></span>-th encapsulation of the payload <span class="math-inline" data-tex="\mathbf P"></span> and the private header <span class="math-inline" data-tex="\mathbf h"></span>, that can be verified by the public key <span class="math-inline" data-tex="K^{n}_{i}"></span>.</li>
+</ol>
+<pre><code class="language-python">Signature = bytes
+SIGNATURE_SIZE = 64
+
+class PublicHeader:
+    version: int = 1  # u8
+    signing_public_key: Ed25519PublicKey
+    proof_of_quota: ProofOfQuota
+    signature: Signature
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})"></span> is an encrypted private blending header <span class="math-inline" data-tex="\mathbf b_l"></span>:</p>
+<ol>
+<li><span class="math-inline" data-tex="K^{n}_{l}"></span>, a public key from the set <span class="math-inline" data-tex="\mathbf K^n_h"></span>.</li>
+<li><span class="math-inline" data-tex="\pi^{K^{n}_{l}}_{Q}"></span>, a corresponding proof of quota for the key <span class="math-inline" data-tex="K^{n}_l"></span> from the <span class="math-inline" data-tex="\mathbf K^n_h"></span> and contains its proof nullifier.</li>
+<li><span class="math-inline" data-tex="\sigma_{K^{n}_{l}}(\mathbf {h|P}_l)"></span>, a signature of the concatenation of the <span class="math-inline" data-tex="l"></span>-th encapsulation of the payload <span class="math-inline" data-tex="\mathbf P"></span> and the private header <span class="math-inline" data-tex="\mathbf h"></span>, that can be verified by public key <span class="math-inline" data-tex="K^{n}_{l}"></span>.</li>
+<li><span class="math-inline" data-tex="\pi^{K^{n}_{l+1},m_{l+1}}_{S}"></span>, a proof of selection of the node index <span class="math-inline" data-tex="m_{l+1}"></span> assuming public key <span class="math-inline" data-tex="K^{n}_{l+1}"></span>.</li>
+<li><span class="math-inline" data-tex="\Omega"></span>, a flag that indicates that this is the last blending header.</li>
+</ol>
+<pre><code class="language-python">PrivateHeader = List[EncryptedBlendingHeader]  # length: ENCAPSULATION_COUNT
+EncryptedBlendingHeader = bytes
+
+class BlendingHeader:
+    signing_public_key: Ed25519PublicKey
+    proof_of_quota: ProofOfQuota
+    signature: Signature
+    proof_of_selection: ProofOfSelection
+    is_last: bool  # 1 byte
+</code></pre>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\mathbf P"></span> is a payload.</p>
+<pre><code class="language-python">EncryptedPayload = bytes
+
+PAYLOAD_BODY_SIZE = 34 * 1024
+
+class Payload:
+    header: PayloadHeader
+    body: bytes  # PAYLOAD_BODY_SIZE
+
+class PayloadHeader:
+    payload_type: PayloadType  # 1 byte
+    body_len: int  # u16
+
+class PayloadType(Enum):
+    COVER = 0x00
+    DATA = 0x01
+</code></pre>
+</li>
+</ol>
+<h2 id="keys-and-proof-generation"><a class="header" href="#keys-and-proof-generation"><strong>Keys and Proof Generation</strong></a></h2>
+<p>For simplicity of the presentation, we do not distinguish between signing and encryption keys. However, in practice, such a distinction is necessary, that is:</p>
+<ul>
+<li>The <span class="math-inline" data-tex="\mathbf K^n_h"></span> contains Ephemeral Signing Keys (ESK) that are part of the PoQ generation and are used for message signing; these are included in the public and private headers.</li>
+<li>Shared secret keys used for encryption of messages are generated from an Ephemeral Encryption Key (sender), which is derived from the ESK, and from a Non-ephemeral Encryption Key (NEK) (receiver), which is derived from a Non-ephemeral Signing Key (NSK) retrieved from the SDP protocol.</li>
+</ul>
+<p>For more information, look at <a href="key-types-and-generation.html">Key Types and Generation</a>.</p>
+<p>The first step is to generate a set of keys alongside all necessary proofs that will be used in the next steps of the algorithm.</p>
+<ol>
+<li>
+<p>Generate the collection <span class="math-inline" data-tex="\mathbf K^n_h"></span>, where <span class="math-inline" data-tex="h"></span> defines the number of encapsulation layers such that <span class="math-inline" data-tex="h \le \beta_{max}"></span>.</p>
+<pre><code class="language-python">def generate_key_collection(num_layers: int) -&gt; List[KeyPair]:
+    assert num_layers &lt;= ENCAPSULATION_COUNT
+    # Generate `num_layers` random KeyPairs non-deterministically.
+    return [KeyPair.random() for _ in range(num_layers)]
+</code></pre>
+<p>The key collection generation requires generation of Proof of Quota (<a href="proof-of-quota.html">Proof of Quota</a>) for each key, as defined in the following steps.</p>
+<ol>
+<li>The <code>ProofOfQuotaPublic</code> (<a href="proof-of-quota.html#public-values">Public values</a>) structure must be filled with public information:
+<ol>
+<li><code>core_quota</code>, <code>leader_quota</code>, <code>core_root</code>, <code>pol_epoch_nonce</code>, <code>pol_t0</code>, <code>pol_t1</code>, <code>pol_ledger_aged</code> are retrieved from the blockchain.</li>
+<li><code>K_part_one</code> and <code>K_part_two</code> are first and second part of the signature key (<code>KeyPair</code>) generated by the above <code>generate_key_collection</code>.</li>
+</ol>
+</li>
+<li>The <code>ProofOfQuotaWitness</code> (<a href="proof-of-quota.html#witness">Witness</a>) structure must be filled as follows:
+<ol>
+<li>If the message contains cover traffic then:
+<ol>
+<li>We assume that the core quota is used and the <code>selector=0</code> value must be specified.</li>
+<li>The <code>index</code> counts the number of cover messages and must be below <code>core_quota</code>.</li>
+<li>The <code>core_sk</code>, <code>core_path</code>, <code>core_path_selector</code> are filled by the node to prove that the node is the core node.</li>
+<li>The rest of the <code>ProofOfQuotaWitness</code>, is filled with arbitrary data.</li>
+</ol>
+</li>
+<li>If the message contains data then:
+<ol>
+<li>We assume that the leader quota is used and the <code>selector=1</code> value must be specified.</li>
+<li>The <code>index</code> counts the number of data messages and must be below <code>leader_quota</code>.</li>
+<li>The <code>core_sk</code>, <code>core_path</code>, <code>core_path_selector</code> are filled with arbitrary data.</li>
+<li>The rest is filled with Proof of Leadership (PoL — <a href="cryptarchia-proof-of-leadership.html">Proof of Leadership</a>) related data.</li>
+</ol>
+</li>
+<li>The <code>ProofOfQuotaPublic</code> and <code>ProofOfQuotaWitness</code> are passed to the zero-knowledge circuits that generate the proof <span class="math-inline" data-tex="\pi^{K^{n}_{l}}_{Q}"></span> which derives the <code>key_nullifier</code> (<span class="math-inline" data-tex="\nu_e"></span>) from <code>pol_epoch_nonce</code>, private <code>index</code>, private secret key during proof generation.</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>Select <span class="math-inline" data-tex="h"></span> nodes from the set of nodes <span class="math-inline" data-tex="\mathcal{N}"></span> in a random and verifiable manner. For <span class="math-inline" data-tex="i \in \{1,…,h\}"></span>, select <span class="math-inline" data-tex="l_i = \text{CSPRBG}(H_{\mathbf N}(\rho))_{8} \mod N"></span>, where <span class="math-inline" data-tex="\rho"></span> is a <a href="proof-of-quota.html">selection randomness</a> (using little-endian encoding), a shared secret derived during Proof of Quota generation, the output of the <span class="math-inline" data-tex="\text{CSPRBG}()_8"></span> is returns 8 bytes (little-endian).</p>
+<pre><code class="language-python">def select_nodes(key_collection: List[KeyPair], nodes: List[Node]) -&gt; List[Node]:
+    selected_nodes = []
+    for keypair in key_collection:
+        rand = pseudo_random(
+            b"BlendNode",
+            selection_randomness,
+            8
+        )
+        index = modular_bytes(rand, NUM_NODES)
+        selected_nodes.append(nodes[index])
+    return selected_nodes
+
+def modular_bytes(data: bytes, modulus: int) -&gt; int:
+    # Convert data into an unsigned big integer using little-endian.
+    return int.from_bytes(data, byteorder='little') % modulus
+</code></pre>
+</li>
+<li>
+<p>Generate proofs of selection <span class="math-inline" data-tex="\pi^{K^{n}_i,l_i}_{S}"></span> for <span class="math-inline" data-tex="i \in \{1,…,h\}"></span>, which proves that the public key <span class="math-inline" data-tex="K^{n}_i"></span> correctly maps to the index <span class="math-inline" data-tex="l_i"></span> from the set of nodes <span class="math-inline" data-tex="\mathcal{N}"></span>.</p>
+</li>
+<li>
+<p>For <span class="math-inline" data-tex="i \in \{1,…,h\}"></span>, retrieve public keys <span class="math-inline" data-tex="\mathcal P = \{ {P^{l_1},..., P^{l_h}} \}"></span> for all <span class="math-inline" data-tex="h"></span> selected nodes using the SDP protocol (defined as <code>provider_id</code> in <a href="bedrock-service-declaration-protocol.html#identifiers">Identifiers</a>).</p>
+<pre><code class="language-python">def blend_node_signing_public_keys(selected_nodes: List[Node]) -&gt; List[Ed25519PublicKey]:
+    return [node.signing_public_key for node in selected_nodes]
+</code></pre>
+</li>
+<li>
+<p>For <span class="math-inline" data-tex="i \in \{1,…,h\}"></span>, calculate shared keys from a set of public keys of selected nodes <span class="math-inline" data-tex="\kappa^{n,i}_{i} = k^{n}_{i} \cdot P^{l_i}"></span>.</p>
+<pre><code class="language-python">def derive_shared_keys(key_collection: List[KeyPair], blend_node_signing_public_keys: List[Ed25519PublicKey]) -&gt; List[SharedKey]:
+    assert len(key_collection) == len(blend_node_signing_public_keys)
+    assert len(key_collection) &lt;= ENCAPSULATION_COUNT
+
+    shared_keys = []
+    for (keypair, blend_node_signing_public_key) in zip(key_collection, blend_node_signing_public_keys):
+        encryption_private_key = signing_private_key.derive_x25519()
+        blend_node_encryption_public_key = blend_node_signing_public_key
+        shared_key = diffie_hellman(encryption_private_key, blend_node_encryption_public_key)
+        shared_keys.append(shared_key)
+    return shared_keys
+</code></pre>
+</li>
+</ol>
+<p>In step 2 of the algorithm above, the sender constructs a blending path from nodes sampled at random but in a verifiable manner. The nodes are selected deterministically (and randomly) by the key value. The <em>key to node</em> mapping is proven in step 3.</p>
+<p>The node selection proof <span class="math-inline" data-tex="\pi^{K^n_i,l_i}_{S}"></span> is constructed in such a way that it proves only the fact that the key <span class="math-inline" data-tex="K^n_i"></span> used for the encryption maps correctly to the node index <span class="math-inline" data-tex="l_i"></span> from the stable set of nodes <span class="math-inline" data-tex="\mathcal{N}"></span>. This proof should be considered a private proof intended only for the recipient blend node.</p>
+<p>This mechanism intends to limit the possibility of “double spending” the emission token. This restricts the sender's ability to use the same emission token twice, first for constructing and emitting a message and then for claiming a reward for it.</p>
+<p>For more information about proof of selection please refer to <a href="blend-protocol.html#proof-of-selection">Proof of Selection</a>.</p>
+<h2 id="message-initialization"><a class="header" href="#message-initialization"><strong>Message</strong> <strong>Initialization</strong></a></h2>
+<p>The second step is to create an empty message <span class="math-inline" data-tex="\mathbf M"></span> and fill the private header with random values.</p>
+<ol>
+<li>
+<p>Create an empty message <span class="math-inline" data-tex="\mathbf M"></span> (filled with zeros).</p>
+</li>
+<li>
+<p>Randomize the private header: For <span class="math-inline" data-tex="\mathbf b_i \in \mathbf h = (\mathbf b_{1},...,\mathbf b_{\beta_{max}})"></span>, set <span class="math-inline" data-tex="\mathbf b_{i} = \text {CSPRBG}( \rho_{i})_{|\mathbf b|}"></span>, where <span class="math-inline" data-tex="\rho_i"></span> is some random value.</p>
+<pre><code class="language-python">def randomize_private_header() -&gt; PrivateHeader:
+    blending_headers = []
+    for _ in range(ENCAPSULATION_COUNT):
+        blending_header = pseudo_random(b"BlendRandom", entropy(), BlendingHeader.SIZE)
+        blending_headers.append(blending_header)
+    return blending_headers
+</code></pre>
+</li>
+<li>
+<p>Fill the last <span class="math-inline" data-tex="h"></span> blend headers with reconstructable payloads: For <span class="math-inline" data-tex="i = \{ 1+\beta_{max}-h,...,\beta_{max})"></span>, do the following:</p>
+<ol>
+<li><span class="math-inline" data-tex="t=\beta_{max} - i + 1"></span></li>
+<li><span class="math-inline" data-tex="r_{t,1} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,t}_t|1))_{|K|}"></span></li>
+<li><span class="math-inline" data-tex="r_{t,2} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,t}_t|2))_{|\pi^{K}_{Q}|}"></span></li>
+<li><span class="math-inline" data-tex="r_{t,3}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,t}_t|3))_{|\sigma_{K}(\mathbf P)|}"></span></li>
+<li><span class="math-inline" data-tex="r_{t,4}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,t}_t|4))_{|\pi^{K,k}_{S}|}"></span></li>
+<li><span class="math-inline" data-tex="\Omega=0"></span></li>
+<li><span class="math-inline" data-tex="\mathbf{b}_i = \{ r_{t,1}, r_{t,2}, r_{t,3}, r_{t,4}, \Omega\}"></span>.</li>
+</ol>
+<pre><code class="language-python">def fill_last_blending_headers(private_header: PrivateHeader, shared_keys: List[SharedKeys]) -&gt; PrivateHeader:
+    assert len(private_header) == ENCAPSULATION_COUNT
+    assert len(shared_keys) &lt;= ENCAPSULATION_COUNT
+
+    pseudo_random_blending_headers = []
+    for shared_key in shared_keys:
+        r1 = pseudo_random(b"BlendInitialization", shared_key + b"\x01", KEY_SIZE)
+        r2 = pseudo_random(b"BlendInitialization", shared_key + b"\x02", PROOF_OF_QUOTA_SIZE)
+        r3 = pseudo_random(b"BlendInitialization", shared_key + b"\x03", SIGNATURE_SIZE)
+        r4 = pseudo_random(b"BlendInitialization", shared_key + b"\x04", PROOF_OF_SELECTION_SIZE)
+        is_last = False
+        pseudo_random_blending_headers.append(r1 + r2 + r3 + r4 + is_last)
+
+    # Replace the last `len(shared_keys)` blending headers.
+    private_header[-num_layers:] = pseudo_random_blending_headers
+    return private_header
+</code></pre>
+</li>
+<li>
+<p>Encrypt the last <span class="math-inline" data-tex="h"></span> blend headers in a reconstructable manner:</p>
+<p>For <span class="math-inline" data-tex="i=\{ 1,...,h \}"></span>, for <span class="math-inline" data-tex="j=\{1, ..., i \}"></span>, encrypt blend header <span class="math-inline" data-tex="\mathbf{b}_{\beta_{max}-i+1}=E_{H_{\mathbf{b}}(\kappa^{n,l_j}_{j})}(\mathbf{b}_{\beta_{max}-i+1})"></span>.</p>
+<pre><code class="language-python">def encrypt_last_blending_headers(private_header: PrivateHeader, shared_keys: List[SharedKeys]) -&gt; PrivateHeader:
+    assert len(private_header) == ENCAPSULATION_COUNT
+    assert len(shared_keys) &lt;= ENCAPSULATION_COUNT
+
+    for i, _ in enumerate(shared_keys):
+        index = len(private_header) - i - 1
+        for shared_key in shared_keys[:i + 1]:
+            private_header[index] = encrypt(private_header[index], shared_key)
+
+    return private_header
+</code></pre>
+<p>This prevents leakage of the encryption sequence when a message is encapsulated less than <span class="math-inline" data-tex="\beta_{max}"></span> times, and enables us to encode the header in a way that it can be reconstructed during the decapsulation.</p>
+</li>
+</ol>
+<h2 id="message-encapsulation"><a class="header" href="#message-encapsulation"><strong>Message Encapsulation</strong></a></h2>
+<p>The final part of the algorithm is the true encapsulation of the payload. That is, given the payload <span class="math-inline" data-tex="\mathbf P_0"></span> and number of encapsulations <span class="math-inline" data-tex="h \le \beta_{max}"></span> we do the following.</p>
+<p>For <span class="math-inline" data-tex="i \in \{ 1,…,h \}"></span> do the following:</p>
+<ol>
+<li>
+<p>If <span class="math-inline" data-tex="i=1"></span> then generate a new ephemeral key pair:</p>
+<p><span class="math-inline" data-tex="(K^n_0, k^n_0) \notin \mathbf K^n_h"></span>.</p>
+</li>
+<li>
+<p>Calculate the signature of the concatenation of the <em>current</em> header and payload:</p>
+<p><span class="math-inline" data-tex="\sigma_{K^{n}_{i-1}}(\mathbf h_{i-1}| \mathbf P_{i-1})"></span>.</p>
+</li>
+<li>
+<p>Using the shared key <span class="math-inline" data-tex="\kappa^{n,l_i}_i"></span>, encrypt the payload:</p>
+<p><span class="math-inline" data-tex="\mathbf{P}_i = E_{H_\mathbf{P}( \kappa^{n,l_i}_i)}(\mathbf P_{i-1})=\mathbf{P}_{i-1} \oplus \text {CSPRBG}(H_\mathbf{P}(\kappa^{n,l_i}_i))"></span></p>
+<p>Note that the uniqueness of the key stream is preserved as the encryption is done on a domain separated checksum of the shared key, which renders a different key stream than the encryption of the header.</p>
+</li>
+<li>
+<p>Shift blending headers by one downward:</p>
+<p><span class="math-inline" data-tex="\mathbf b_z \rightarrow \mathbf b_{z+1}"></span> for <span class="math-inline" data-tex="z \in \{ 1,…,\beta_{max} \}"></span>.</p>
+<p>The first blending header is now empty, and the last blending header is truncated.</p>
+</li>
+<li>
+<p>Fill the blending header <span class="math-inline" data-tex="\mathbf b_1"></span>, where <span class="math-inline" data-tex="1"></span> refers to the top position:</p>
+<ol>
+<li>
+<p>If <span class="math-inline" data-tex="i=1"></span> then:</p>
+<ol>
+<li>
+<p>Fill the proof of quota with random data:</p>
+<p><span class="math-inline" data-tex="\pi^{K^{n}_0}_{Q}= \text {CSPRBG}(H_\mathbf{I}(k^{n}_0))_{|\pi^{K}_{Q}|}"></span></p>
+</li>
+<li>
+<p>Set the last flag to 1:</p>
+<p><span class="math-inline" data-tex="\Omega=1"></span></p>
+</li>
+</ol>
+</li>
+<li>
+<p>Else set the last flag to 0:</p>
+<p><span class="math-inline" data-tex="\Omega = 0"></span></p>
+</li>
+<li>
+<p><span class="math-inline" data-tex="\mathbf{b}_1 = \{ K^n_{i-1}, \pi^{K^{n}_{i-1}}_{Q}, \sigma_{K^{n}_{i-1}}(\mathbf h_{i-1}|\mathbf P_{i-1}), \pi^{K^{n}_i,l_i}_{S}, \Omega \}"></span>.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_i}_i"></span>, encrypt the private header <span class="math-inline" data-tex="\mathbf{h}_{E_{i}} = E_{H_{\mathbf b}(\kappa^{n,l_i}_i)}(\mathbf{h}_i)"></span>:</p>
+<p>For each <span class="math-inline" data-tex="\mathbf b_j \in \mathbf h_i = (\mathbf b_1,...,\mathbf b_{m_{max}})"></span> using a shared key <span class="math-inline" data-tex="\kappa^{n,l_i}_i"></span>, encrypt the blending header:</p>
+<p><span class="math-inline" data-tex="\mathbf{b}_j = E_{H_\mathbf{b}(\kappa^{n,l_i}_i)}(\mathbf{b}_j)=\mathbf{b}_j \oplus \text {CSPRBG}(H_\mathbf{b}(\kappa^{n,l_i}_i))"></span>.</p>
+</li>
+</ol>
+<p>Fill in the public header: <span class="math-inline" data-tex="\mathbf H=\{ K^{n}_h, \pi^{K^{n}_h}_{Q}, \sigma_{K^{n}_h}(\mathbf P_h) \}"></span>.</p>
+<p>The message is encapsulated.</p>
+<pre><code class="language-python">def encapsulate(
+        private_header: PrivateHeader,
+        payload: Payload,
+        shared_keys: List[SharedKeys],
+        key_collection: List[KeyPair],
+        list_of_pos: List[ProofOfSelection]
+) -&gt; bytes:
+    # Step 1 ~ 6: Encapsulate private header and payload
+    prev_keypair = KeyPair.random()
+    is_first_selected = True
+    for shared_key, keypair, proof_of_selection) in zip(shared_keys, key_collection, list_of_pos):
+        private_header, payload = encapsulate_private_part(
+            private_header,
+            payload.bytes(),
+            shared_key,
+            prev_keypair.signing_private_key,
+            prev_keypair.proof_of_quota,
+            proof_of_selection,
+            # The first encapsulation is for the last decapsulation.
+            is_last=is_first_selected,
+        )
+        prev_keypair = keypair
+        is_first = False
+
+    # Fill in the public header
+    public_header = PublicHeader(
+        prev_keypair.signing_public_key,
+        prev_keypair.proof_of_quota,
+        signature=sign(private_part, prev_keypair.signing_private_key),
+        version=1,
+    )
+
+    return public_header.bytes() + b"".join(private_headers) + payload
+
+def encapsulate_private_part(
+    private_header: PrivateHeader,
+    payload: EncryptedPayload,
+    shared_key: SharedKey,
+    signing_private_key: Ed25519PrivateKey,
+    proof_of_quota: ProofOfQuota,
+    proof_of_selection: ProofOfSelection,
+    is_last: bool
+) -&gt; bytes:
+    # Step 2: Calculate a signature on `private_header + payload`.
+    signature = sign(
+        signing_body(private_header, payload),
+        signing_private_key
+    )
+    # Step 3: Encrypt the payload
+    payload = encrypt(payload, shared_key)
+    # Step 4: Shift blending headers by one rightward.
+    private_header.pop()  # Remove the last blending header
+    # Step 5: Add the new blending header to the front.
+    blending_header = BlendingHeader(
+        signing_private_key.public(),
+        proof_of_quota,
+        signature,
+        proof_of_selection,
+        is_last
+    )
+    private_header.insert(0, blending_header.bytes())
+    # Step 6: Encrypt the private header
+    for i, _ in enumerate(private_header):
+        private_header[i] = encrypt(private_header[i], shared_key)
+
+    return private_header, payload
+
+
+def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt; bytes:
+    return b"".join(private_headers) + payload
+</code></pre>
+<h2 id="message-decapsulation"><a class="header" href="#message-decapsulation">Message Decapsulation</a></h2>
+<p>If a message <span class="math-inline" data-tex="\mathbf M"></span> is received by the node and its public header is correct - that is, it was verified according to the relay logic defined here: <a href="blend-protocol.html#relaying">Relaying</a> - then the node <span class="math-inline" data-tex="l"></span> executes the following logic:</p>
+<ol>
+<li>
+<p>Calculate the shared secret. Using the key <span class="math-inline" data-tex="K^{n}_l \in \mathbf H"></span> from the public header of the message <span class="math-inline" data-tex="\mathbf M"></span> and the private key <span class="math-inline" data-tex="p^l"></span> of the node <span class="math-inline" data-tex="l"></span> calculate:</p>
+<p><span class="math-inline" data-tex="\kappa^{n,l}_l = K^{n}_l \cdot p^l"></span>.</p>
+</li>
+<li>
+<p>Decrypt the private header using the shared key <span class="math-inline" data-tex="\kappa^{n,l}_l"></span>.</p>
+<p>For each <span class="math-inline" data-tex="\mathbf b_j \in \mathbf h = (\mathbf b_1,...,\mathbf b_{\beta_{max}})"></span> using a shared key <span class="math-inline" data-tex="\kappa^{n,l}_l"></span> decrypt the blending header:</p>
+<p><span class="math-inline" data-tex="\mathbf{b}_j = D_{H_\mathbf{b}(\kappa^{n,l}_l)}(\mathbf{b}_j)=\mathbf{b}_j \oplus \text {CSPRBG}(H_\mathbf{b}(\kappa^{n,l}_l))"></span>.</p>
+</li>
+<li>
+<p>Verify the header:</p>
+<ol>
+<li>If the proof <span class="math-inline" data-tex="\pi^{K^{n}_l,l}_{S}\in \mathbf b_1"></span> is not correct, discard the message. That is, if the node index <span class="math-inline" data-tex="l"></span> does not correspond to the <span class="math-inline" data-tex="K^{n}_l\in \mathbf H"></span>, then the message must be rejected.</li>
+<li>If the key <span class="math-inline" data-tex="K^{n}_l \in \mathbf b_1"></span> was already seen, discard the message.</li>
+<li>If the proof <span class="math-inline" data-tex="\pi^{K^{n}_l,l}_{Q} \in \mathbf b_1"></span> is incorrect, discard the message.</li>
+<li>If <span class="math-inline" data-tex="\Omega \in \mathbf b_1"></span> equals <span class="math-inline" data-tex="1"></span>, then stop processing the message and process the payload.</li>
+</ol>
+</li>
+<li>
+<p>Using the blending header <span class="math-inline" data-tex="\mathbf b_1"></span>, set the public header:</p>
+<p><span class="math-inline" data-tex="\mathbf H_l = \{K^{n}_l \in \mathbf b_1,\pi^{K^{n}_l,l}_{Q} \in \mathbf b_1 ,\sigma_{K^{n}_l}(\mathbf {h|P}) \in \mathbf b_1\}"></span>.</p>
+</li>
+<li>
+<p>Decrypt the payload, using the shared key <span class="math-inline" data-tex="\kappa^{n,l}_l"></span>:</p>
+<p><span class="math-inline" data-tex="\mathbf{P}_l =D_{H_\mathbf{P}(\kappa^{n,l}_l)}=\mathbf{P} \oplus \text {CSPRBG}(H_{\mathbf P}(\kappa^{n,l}_l))"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the blend header:</p>
+<ol>
+<li><span class="math-inline" data-tex="r_{l,1} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|1))_{|K|}"></span></li>
+<li><span class="math-inline" data-tex="r_{l,2} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|2))_{|\pi^{K}_{Q}|}"></span></li>
+<li><span class="math-inline" data-tex="r_{l,3}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|3))_{|\sigma_{K}(\mathbf P)|}"></span></li>
+<li><span class="math-inline" data-tex="r_{l,4}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|4))_{|\pi^{K,k}_{S}|}"></span></li>
+<li><span class="math-inline" data-tex="\Omega=0"></span></li>
+<li><span class="math-inline" data-tex="b = \{ r_{l,1}, r_{l,2}, r_{l,3}, r_{l,4}, \Omega \}"></span>.</li>
+</ol>
+</li>
+<li>
+<p>Encrypt the blending header:</p>
+<p><span class="math-inline" data-tex="\hat b = E_{H_\mathbf{b}(\kappa^{n,{l}}_{l})}(b)"></span></p>
+</li>
+<li>
+<p>Shift blending headers by one upward:</p>
+<p><span class="math-inline" data-tex="\mathbf b_z \rightarrow \mathbf b_{z-1}"></span> for <span class="math-inline" data-tex="z \in \{ 1,…,\beta_{max} \}"></span>. The first blending header is truncated, and the last blending header is empty.</p>
+</li>
+<li>
+<p>Reconstruct the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{E_{l}} = \{"></span> <span class="math-inline" data-tex="…"></span> <span class="math-inline" data-tex="\mathbf{b}_{\beta_{max}} = \hat b"></span>, <span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>If the signature from the public header does not match the signature of the reconstructed header and the decrypted payload, discard the message:</p>
+<p><span class="math-inline" data-tex="\text{verify\_sig}(\sigma_{K^n_l}(\mathbf{h}_{E_l}| \mathbf{P}_l), \mathbf{h}| \mathbf{P},{K^n_l})"></span>.</p>
+</li>
+<li>
+<p>The message is decapsulated.</p>
+</li>
+<li>
+<p>Follow the message processing logic: <a href="blend-protocol.html#processing">Processing</a>.</p>
+</li>
+</ol>
+<pre><code class="language-python">def decapsulate(
+    message: bytes,
+    signing_private_key: Ed25519PrivateKey
+) -&gt; bytes:
+    # Step 1: Derive the shared key.
+    encryption_private_key = signing_private_key.derive_x25519()
+    public_header = PublicHeader.from_bytes(
+        message[Header.SIZE : Header.SIZE + PublicHeader.SIZE]
+    )
+    shared_key = diffie_hellman(
+        encryption_private_key,
+        public_header.signing_public_key.derive_x25519()
+    )
+
+    # Step 2: Decrypt the private header
+    private_header = message[
+        Header.SIZE + PublicHeader.SIZE:
+        Header.SIZE + PublicHeader.SIZE + (BlendingHeader.SIZE * ENCAPSULATION_COUNT)
+    ]
+    for i, _ in enumerate(private_header):
+        private_header[i] = decrypt(private_header[i], shared_key)
+
+    # Step 3: Verify the first blending header
+    first_blending_header = BlendingHeader.from_bytes(private_header[0])
+    first_blending_header.validate()
+
+    # Step 4: Construct the new public header
+    public_header = PublicHeader(
+        first_blending_header.signing_public_key,
+        first_blending_header.proof_of_quota,
+        first_blending_header.signature,
+        version= 1,
+    )
+
+    # Step 5: Decrypt the payload
+    payload_offset = (
+        Header.SIZE + PublicHeader.SIZE + (BlendingHeader.SIZE * ENCAPSULATION_COUNT)
+    )
+    payload = message[payload_offset:]
+    payload = decrypt(payload, shared_key)
+
+    # Step 6: Reconstruct the new blending header
+    r1 = pseudo_random(b"BlendInitialization", shared_key + b"\x01", KEY_SIZE)
+    r2 = pseudo_random(b"BlendInitialization", shared_key + b"\x02", PROOF_OF_QUOTA_SIZE)
+    r3 = pseudo_random(b"BlendInitialization", shared_key + b"\x03", SIGNATURE_SIZE)
+    r4 = pseudo_random(b"BlendInitialization", shared_key + b"\x04", PROOF_OF_SELECTION_SIZE)
+    is_last = False
+
+    # Step 7: Encrypt the new blending header
+    encrypted_new_blending_header = encrypt(r1 + r2 + r3 + r4 + is_last, shared_key)
+
+    # Step 8: Shift blending headers by one leftward.
+    private_header.pop(0)  # Remove the first blending header.
+
+    # Step 9: Add the new blending header to the end.
+    private_header.append(encrypted_new_blending_header)
+
+    # Step 10: Verify the signature
+    verify_signature(
+        first_blending_header.signature,
+        signing_body(private_header, payload)
+        first_blending_header.signing_public_key,
+    )
+
+    header = message[0:Header.SIZE]
+    return header + public_header.bytes() + b"".join(private_header) + payload
+</code></pre>
+<h1 id="appendix"><a class="header" href="#appendix">Appendix</a></h1>
+<h2 id="example"><a class="header" href="#example"><strong>Example</strong></a></h2>
+<p>Let us look at an example of the above mechanism. Let us assume that <span class="math-inline" data-tex="\beta_{max}=4,h=3"></span>. We are omitting protocol version in the header for simplicity.</p>
+<h3 id="initialization"><a class="header" href="#initialization"><strong>Initialization</strong></a></h3>
+<ol>
+<li>
+<p>Create an empty message:</p>
+<p><span class="math-inline" data-tex="\mathbf{M} = (\mathbf{H}=0,\mathbf{h}=0,\mathbf{P}=0)"></span></p>
+</li>
+<li>
+<p>Randomize the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_0 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = \text {CSPRBG}( \rho_{2})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = \text {CSPRBG}( \rho_{3})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = \text {CSPRBG}( \rho_{4})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Fill the last <span class="math-inline" data-tex="h"></span> blend headers with reconstructable payloads:</p>
+<p><span class="math-inline" data-tex="\mathbf h_0 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = \{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = \{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = \{ r_{l_1,1}, r_{l_1,2} ,r_{l_1,3}, r_{l_1,4}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Encrypt the last <span class="math-inline" data-tex="h"></span> blend headers in a reconstructable manner:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{E_0} = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\{ r_{l_1,1}, r_{l_1,2} ,r_{l_1,3}, r_{l_1,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+</ol>
+<h3 id="encapsulation"><a class="header" href="#encapsulation"><strong>Encapsulation</strong></a></h3>
+<p><span class="math-inline" data-tex="i=1"></span>:</p>
+<ol>
+<li>
+<p>Generate a new ephemeral key pair:</p>
+<p><span class="math-inline" data-tex="(K^n_0, k^n_0) \notin \mathbf K^n"></span>.</p>
+</li>
+<li>
+<p>Calculate the signature of the header and the payload:</p>
+<p><span class="math-inline" data-tex="\sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0)"></span>.</p>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_1}_{1}"></span> encrypt the payload:
+<span class="math-inline" data-tex="\mathbf P_1 = E_{H_\mathbf{P}(\kappa^{n,l_1}_{1})}(\mathbf P_0)"></span>.</p>
+</li>
+<li>
+<p>Shift blending headers by one down:</p>
+<p><span class="math-inline" data-tex="\mathbf h_1 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \emptyset"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{1})}E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Fill the first blending header (the <span class="math-inline" data-tex="\Omega=1"></span> in this case):</p>
+<p><span class="math-inline" data-tex="\mathbf h_1 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega=1 \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_1}_{1}"></span> encrypt the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf{h}_{E_{1}} = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\mathbf{h}_1) = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+</ol>
+<p><span class="math-inline" data-tex="i=2"></span>:</p>
+<ol>
+<li>
+<p><span class="math-inline" data-tex="i \ne 1"></span>.</p>
+</li>
+<li>
+<p>Calculate the signature of the header and the payload:</p>
+<p><span class="math-inline" data-tex="\sigma_{K^{n}_1}(\mathbf{h}_{E_1}| \mathbf{P}_1)"></span>.</p>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_2}_{2}"></span> encrypt the payload:</p>
+<p><span class="math-inline" data-tex="\mathbf P_2 = E_{H_\mathbf{P}(\kappa^{n,l_2}_{2})}(\mathbf P_1)"></span>.</p>
+</li>
+<li>
+<p>Shift blending headers by one down:</p>
+<p><span class="math-inline" data-tex="\mathbf h_2 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \emptyset"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Fill the first blending header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_2 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_2}_2"></span> encrypt the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf{h}_{E_2} = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\mathbf{h}_2) = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+</ol>
+<p><span class="math-inline" data-tex="i=3"></span>:</p>
+<ol>
+<li>
+<p><span class="math-inline" data-tex="i \ne 1"></span>.</p>
+</li>
+<li>
+<p>Calculate the signature of the header and the payload:</p>
+<p><span class="math-inline" data-tex="\sigma_{K^{n}_2}(\mathbf{h}_{E_2}| \mathbf{P}_2)"></span>.</p>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_3}_{3}"></span> encrypt the payload:</p>
+<p><span class="math-inline" data-tex="\mathbf P_3 = E_{H_\mathbf{P}(\kappa^{n,l_3}_{3})}(\mathbf P_2)"></span>.</p>
+</li>
+<li>
+<p>Shift blending headers by one down:</p>
+<p><span class="math-inline" data-tex="\mathbf h_3 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \emptyset"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Fill the first blending header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_3 = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \{K^{n}_2,\pi_Q^{K^{n}_2},\sigma_{K^n_2}(\mathbf{h}_{E_2}| \mathbf{P}_2),\pi^{K^{n}_3,l_3}_{S}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+<li>
+<p>Using shared key <span class="math-inline" data-tex="\kappa^{n,l_3}_3"></span> encrypt the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf{h}_{E_3} = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}(\mathbf{h}_3) = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}(\{K^{n}_2,\pi_Q^{K^{n}_2},\sigma_{K^n_2}(\mathbf{h}_{E_2}| \mathbf{P}_2),\pi^{K^{n}_3,l_3}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>.</p>
+</li>
+</ol>
+<p>The above calculations give us the final message <span class="math-inline" data-tex="\mathbf {M = (H,h,P)}"></span> where:</p>
+<p><span class="math-inline" data-tex="\mathbf H = (K^{n}_3,~ \pi^{K^{n}_3}_Q,~ \sigma_{K^{n}_3}(\mathbf{h}_{E_3}|\mathbf{P}_3))"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf{h} = \mathbf{h}_{E_3} = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}(\{K^{n}_2,\pi_Q^{K^{n}_2},\sigma_{K^n_2}(\mathbf{h}_{E_2}| \mathbf{P}_2),\pi^{K^{n}_3,l_3}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathcal{P}), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_{\mathbf b}(\kappa^{n,l_3}_3)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf{P} = \mathbf P_3= E_{H_{\mathbf P_0}(\kappa^{n,l_3}_3)}E_{H_{\mathbf P}(\kappa^{n,l_2}_2)}E_{H_{\mathbf P}(\kappa^{n,l_1}_1)}(\mathbf{P}_0)"></span>.</p>
+<h3 id="decapsulation"><a class="header" href="#decapsulation">Decapsulation</a></h3>
+<p>Now let us take the above message and decapsulate it. We verify that the node doing the processing is the rightful recipient of the message and that the public header is correct.</p>
+<p><span class="math-inline" data-tex="l=l_3"></span>:</p>
+<ol>
+<li>
+<p>Calculate shared secret:</p>
+<p><span class="math-inline" data-tex="\kappa^{n,l_3}_{3}=K^n_{3} \cdot p^{l_3}"></span>, where <span class="math-inline" data-tex="K^{n}_{3} \in \mathbf H"></span> and <span class="math-inline" data-tex="p^{l_3}"></span> is the private part of the public key of the node <span class="math-inline" data-tex="l_3"></span>.</p>
+</li>
+<li>
+<p>Decrypt the header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{l_3} = D_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\mathbf{h}) = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \{K^{n}_2,\pi_Q^{K^{n}_2},\sigma_{K^n_2}(\mathbf{h}_{E_2}| \mathbf{P}_2),\pi^{K^{n}_3,l_3}_{S}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_{E_1}| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Verify the header:</p>
+<ol>
+<li>If the proof of selection <span class="math-inline" data-tex="\pi^{K^{n}_3,l_3}_{S} \in \mathbf{b}_1"></span> fails then stop.</li>
+<li>If the key <span class="math-inline" data-tex="K^{n}_2 \in \mathbf b_1"></span> was already seen, discard the message.</li>
+<li>If the proof <span class="math-inline" data-tex="\pi^{K^{n}_2,l_2}_{Q} \in \mathbf b_1"></span> is incorrect, discard the message.</li>
+</ol>
+</li>
+<li>
+<p>Reconstruct the public header:</p>
+<p><span class="math-inline" data-tex="\mathbf H = (K^{n}_2,~ \pi^{K^{n}_2}_Q,~ \sigma_{K^{n}_2}(\mathbf{h}_{E_2}|\mathbf{P}_2))"></span></p>
+</li>
+<li>
+<p>Decrypt the payload:</p>
+<p><span class="math-inline" data-tex="\mathbf{P}_{l_3} = D_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\mathbf P)"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the blend header:</p>
+<p><span class="math-inline" data-tex="b = \{"></span></p>
+<p><span class="math-inline" data-tex="r_{l_3,1} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|1))_{|K|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_3,2} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|2))_{|\pi^{K}_{Q}|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_3,3}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|3))_{|\sigma_{K}(\mathbf P)|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_3,4}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|4))_{|\pi^{K,k}_{S}|}"></span>,</p>
+<p><span class="math-inline" data-tex="\Omega = 0"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Encrypt the blend header:</p>
+<p><span class="math-inline" data-tex="\hat b = E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(b)"></span>.</p>
+</li>
+<li>
+<p>Shift blending headers by one upward, the first blending header is discarded:</p>
+<p><span class="math-inline" data-tex="\mathbf b_i \rightarrow \mathbf b_{i-1}"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{E_{l_3}} = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}(\{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_1| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S} , \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = \hat b=E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>If the signature from the public header does not match the signature of the reconstructed header and the decrypted payload then discard the message:</p>
+<p><span class="math-inline" data-tex="\sigma_{K^n_2}(\mathbf{h}_{E_2}| \mathbf{P}_2) == \sigma_{K^n_2}(\mathbf{h}_{E_{l_3}}| \mathbf{P}_{l_3})"></span> <span class="math-inline" data-tex="\text{verify\_sig}(\sigma_{K^{n}_2}(\mathbf{h}_{E_2}|\mathbf{P}_2), \mathbf{h}_{E_{l_3}}| \mathbf{P}_{l_3},{K^n_2})"></span></p>
+</li>
+<li>
+<p>The message is decapsulated.</p>
+</li>
+<li>
+<p>Follow the processing logic: <a href="blend-protocol.html#processing">Processing</a>.</p>
+</li>
+</ol>
+<p><span class="math-inline" data-tex="l=l_2"></span>:</p>
+<ol>
+<li>
+<p>Calculate shared secret:</p>
+<p><span class="math-inline" data-tex="\kappa^{n,l_2}_{2}=K^n_{2} \cdot p^{l_2}"></span>, where <span class="math-inline" data-tex="K^{n}_{2} \in \mathbf H"></span> and <span class="math-inline" data-tex="p^{l_2}"></span> is the private part of the public key of the node <span class="math-inline" data-tex="l_2"></span>.</p>
+</li>
+<li>
+<p>Decrypt the header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{l_2} = D_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\mathbf{h}_{E_{l_3}}) = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \{K^{n}_1,\pi_Q^{K^{n}_1},\sigma_{K^n_1}(\mathbf{h}_1| \mathbf{P}_1),\pi^{K^{n}_2,l_2}_{S}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Verify the header:</p>
+<ol>
+<li>If the proof of selection <span class="math-inline" data-tex="\pi^{K^{n}_2,l_2}_{S} \in \mathbf{b}_1"></span> fails then stop.</li>
+<li>If the key <span class="math-inline" data-tex="K^{n}_1 \in \mathbf b_1"></span> was already seen, discard the message.</li>
+<li>If the proof <span class="math-inline" data-tex="\pi^{K^{n}_1,l_1}_{Q} \in \mathbf b_1"></span> is incorrect, discard the message.</li>
+</ol>
+</li>
+<li>
+<p>Reconstruct the public header:</p>
+<p><span class="math-inline" data-tex="\mathbf H = (K^{n}_1,~ \pi^{K^{n}_1}_Q,~ \sigma_{K^{n}_1}(\mathbf{h}_{E_1}|\mathbf{P}_1))"></span></p>
+</li>
+<li>
+<p>Decrypt the payload:</p>
+<p><span class="math-inline" data-tex="\mathbf{P}_x = D_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\mathbf P)"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the blend header:</p>
+<p><span class="math-inline" data-tex="b = \{"></span></p>
+<p><span class="math-inline" data-tex="r_{l_2,1} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|1))_{|K|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_2,2} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|2))_{|\pi^{K}_{Q}|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_2,3}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|3))_{|\sigma_{K}(\mathbf P)|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_2,4}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|4))_{|\pi^{K,k}_{S}|}"></span>,</p>
+<p><span class="math-inline" data-tex="\Omega=0"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Encrypt the reconstructed blend header:</p>
+<p><span class="math-inline" data-tex="\hat b = E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(b)"></span>.</p>
+</li>
+<li>
+<p>Shift blending headers by one upward, the first blending header is discarded:</p>
+<p><span class="math-inline" data-tex="\mathbf b_i \rightarrow \mathbf b_{i-1}"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{E_{l_2}} = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ K^n_0, \pi^{K^{n}_{0}}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\text {CSPRBG}( \rho_{1})_{|\mathbf b|})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3=E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega\})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = \hat b=E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Check the signature:</p>
+<p><span class="math-inline" data-tex="\sigma_{K^n_2}(\mathbf{h}_{E_1}| \mathbf{P}_1) == \sigma_{K^n_2}(\mathbf{h}_{E_{l_2}}| \mathbf{P}_{l_2})"></span> <span class="math-inline" data-tex="\text{verify\_sig}(\sigma_{K^{n}_1}(\mathbf{h}_{E_1}|\mathbf{P}_1), \mathbf{h}_{E_{l_2}}| \mathbf{P}_{{l_2}},{K^n_1})"></span></p>
+</li>
+<li>
+<p>The message is decapsulated.</p>
+</li>
+<li>
+<p>Follow the message processing logic: <a href="blend-protocol.html#processing">Processing</a>.</p>
+</li>
+</ol>
+<p><span class="math-inline" data-tex="l=l_1"></span>:</p>
+<ol>
+<li>
+<p>Calculate shared secret:</p>
+<p><span class="math-inline" data-tex="\kappa^{n,l_1}_{1}=K^n_{1} \cdot k^{l_1}"></span>, where <span class="math-inline" data-tex="K^{n}_{l_1} \in \mathbf H"></span> and <span class="math-inline" data-tex="p^{l_1}"></span> is the private part of the public key of the node <span class="math-inline" data-tex="l_1"></span>.</p>
+</li>
+<li>
+<p>Decrypt the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{l_1} = D_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(\mathbf{h}_{E_{l_2}}) = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \{ K^n_0, \pi^{K^{n}_{0},l_0}_{Q}, \sigma_{K^{n}_0}(\mathbf{h}_{E_0}| \mathbf{P}_0), \pi^{K^{n}_1,l_1}_{S}, \Omega \}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3=E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{3})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 =E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4}, \Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Verify the header:</p>
+<ol>
+<li>If the proof of selection <span class="math-inline" data-tex="\pi^{K^{n}_1,l_1}_{S} \in \mathbf{b}_1"></span> fails then stop.</li>
+<li>If the key <span class="math-inline" data-tex="K^{n}_0 \in \mathbf b_1"></span> was already seen, discard the message.</li>
+<li>If the proof <span class="math-inline" data-tex="\pi^{K^{n}_0,l_0}_{Q} \in \mathbf b_1"></span> is incorrect, discard the message.</li>
+</ol>
+</li>
+<li>
+<p>Reconstruct the public header:</p>
+<p><span class="math-inline" data-tex="\mathbf H = (K^{n}_0,~ \pi^{K^{n}_0}_Q,~ \sigma_{K^{n}_0}(\mathbf{h}_{E_0}|\mathbf{P}_0))"></span></p>
+</li>
+<li>
+<p>Decrypt the payload:</p>
+<p><span class="math-inline" data-tex="\mathbf{P}_{l_1} = D_{H_\mathbf{P}(\kappa^{n,{l_1}}_{1})}(\mathbf P)"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the blend header:</p>
+<p><span class="math-inline" data-tex="b = \{"></span>
+<span class="math-inline" data-tex="r_{l_1,1} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|1))_{|K|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_1,2} = \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|2))_{|\pi^{K}_{Q}|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_1,3}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|3))_{|\sigma_{K}(\mathbf P)|}"></span>,</p>
+<p><span class="math-inline" data-tex="r_{l_1,4}= \text {CSPRBG}(H_\mathbf{I}(\kappa^{n,l}_l|4))_{|\pi^{K,k}_{S}|}"></span>,</p>
+<p><span class="math-inline" data-tex="\Omega = 0"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>Encrypt the reconstructed blend header:</p>
+<p><span class="math-inline" data-tex="\hat b = E_{H_\mathbf{b}(\kappa^{n,{l_1}}_{1})}(b)"></span>.</p>
+</li>
+<li>
+<p>Shift blending headers by one upward, the first blending header is discarded:</p>
+<p><span class="math-inline" data-tex="\mathbf b_i \rightarrow \mathbf b_{i-1}"></span>.</p>
+</li>
+<li>
+<p>Reconstruct the private header:</p>
+<p><span class="math-inline" data-tex="\mathbf h_{E_{l_1}} = \{"></span></p>
+<p><span class="math-inline" data-tex="\mathbf b_1 = \text {CSPRBG}( \rho_{1})_{|\mathbf b|}"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_2=E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}E_{H_{\mathbf b}(\kappa^{n,l_2}_2)}E_{H_\mathbf{b}(\kappa^{n,{l_3}}_{l_3})}(\{ r_{l_3,1}, r_{l_3,2} ,r_{l_3,3}, r_{l_3,4},\Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_3 =E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}E_{H_\mathbf{b}(\kappa^{n,{l_2}}_{2})}(\{ r_{l_2,1}, r_{l_2,2} ,r_{l_2,3}, r_{l_2,4},\Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\mathbf b_4 = \hat b=E_{H_{\mathbf b}(\kappa^{n,l_1}_1)}(\{ r_{l_1,1}, r_{l_1,2} ,r_{l_1,3}, r_{l_1,4},\Omega \})"></span>,</p>
+<p><span class="math-inline" data-tex="\}."></span></p>
+</li>
+<li>
+<p>If the signature from the public header does not match the signature of the reconstructed header and the decrypted payload then discard the message: <span class="math-inline" data-tex="\text{verify\_sig}(\sigma_{K^{n}_0}(\mathbf{h}_{E_0}|\mathbf{P}_0), \mathbf{h}_{E_{l_1}}| \mathbf{P}_{{l_1}},{K^n_0})"></span>.</p>
+</li>
+<li>
+<p>The message is decapsulated.</p>
+</li>
+<li>
+<p>Follow the message processing logic: <a href="blend-protocol.html#processing">Processing</a>.</p>
+</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../blockchain/raw/key-types-and-generation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../blockchain/raw/message-formatting.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../blockchain/raw/key-types-and-generation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../blockchain/raw/message-formatting.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
+        <script src="../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>

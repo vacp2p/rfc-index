@@ -1,0 +1,651 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX - Logos LIP</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/katex/katex.min.css">
+        <link rel="stylesheet" href="../../theme/fonts/fonts.css">
+        <link rel="stylesheet" href="../../theme/FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../../about.html">About</a></li><li class="chapter-item expanded "><a href="../../messaging/index.html"><strong aria-hidden="true">1.</strong> Messaging</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/index.html"><strong aria-hidden="true">1.1.</strong> Core</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/index.html"><strong aria-hidden="true">1.1.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/raw/relay-sharding.html"><strong aria-hidden="true">1.1.1.1.</strong> RELAY-SHARDING</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/lightpush.html"><strong aria-hidden="true">1.1.1.2.</strong> WAKU-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/mix.html"><strong aria-hidden="true">1.1.1.3.</strong> WAKU-MIX</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rendezvous.html"><strong aria-hidden="true">1.1.1.4.</strong> WAKU-RENDEZVOUS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/store-sync.html"><strong aria-hidden="true">1.1.1.5.</strong> WAKU-STORE-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/sync.html"><strong aria-hidden="true">1.1.1.6.</strong> WAKU-SYNC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/incentivization.html"><strong aria-hidden="true">1.1.1.7.</strong> WAKU2-INCENTIVIZATION</a></li><li class="chapter-item expanded "><a href="../../messaging/core/raw/rln-contract.html"><strong aria-hidden="true">1.1.1.8.</strong> WAKU2-RLN-CONTRACT</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/index.html"><strong aria-hidden="true">1.1.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/10/waku2.html"><strong aria-hidden="true">1.1.2.1.</strong> 10/WAKU2</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/filter.html"><strong aria-hidden="true">1.1.2.2.</strong> 12/WAKU2-FILTER</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/12/previous-versions/00/filter.html"><strong aria-hidden="true">1.1.2.2.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/store.html"><strong aria-hidden="true">1.1.2.3.</strong> 13/WAKU2-STORE</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/draft/13/previous-versions/00/store.html"><strong aria-hidden="true">1.1.2.3.1.</strong> 00 (previous)</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/15/bridge.html"><strong aria-hidden="true">1.1.2.4.</strong> 15/WAKU-BRIDGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/17/rln-relay.html"><strong aria-hidden="true">1.1.2.5.</strong> 17/WAKU2-RLN-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/19/lightpush.html"><strong aria-hidden="true">1.1.2.6.</strong> 19/WAKU2-LIGHTPUSH</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/31/enr.html"><strong aria-hidden="true">1.1.2.7.</strong> 31/WAKU2-ENR</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/33/discv5.html"><strong aria-hidden="true">1.1.2.8.</strong> 33/WAKU2-DISCV5</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/34/peer-exchange.html"><strong aria-hidden="true">1.1.2.9.</strong> 34/WAKU2-PEER-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/36/bindings-api.html"><strong aria-hidden="true">1.1.2.10.</strong> 36/WAKU2-BINDINGS-API</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/64/network.html"><strong aria-hidden="true">1.1.2.11.</strong> 64/WAKU2-NETWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/core/draft/66/metadata.html"><strong aria-hidden="true">1.1.2.12.</strong> 66/WAKU2-METADATA</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/index.html"><strong aria-hidden="true">1.1.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/stable/2/mvds.html"><strong aria-hidden="true">1.1.3.1.</strong> 2/MVDS</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/6/waku1.html"><strong aria-hidden="true">1.1.3.2.</strong> 6/WAKU1</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/9/rpc.html"><strong aria-hidden="true">1.1.3.3.</strong> 9/WAKU-RPC</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/11/relay.html"><strong aria-hidden="true">1.1.3.4.</strong> 11/WAKU2-RELAY</a></li><li class="chapter-item expanded "><a href="../../messaging/core/stable/14/message.html"><strong aria-hidden="true">1.1.3.5.</strong> 14/WAKU2-MESSAGE</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/index.html"><strong aria-hidden="true">1.1.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/5/waku0.html"><strong aria-hidden="true">1.1.4.1.</strong> 5/WAKU0</a></li><li class="chapter-item expanded "><a href="../../messaging/core/deprecated/16/rpc.html"><strong aria-hidden="true">1.1.4.2.</strong> 16/WAKU2-RPC</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/index.html"><strong aria-hidden="true">1.2.</strong> Application</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/index.html"><strong aria-hidden="true">1.2.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/raw/chat-framework.html"><strong aria-hidden="true">1.2.1.1.</strong> CHAT-FRAMEWORK</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/contentframe.html"><strong aria-hidden="true">1.2.1.2.</strong> CONTENTFRAME</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/conversationtypes.html"><strong aria-hidden="true">1.2.1.3.</strong> ConversationTypes</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/dandelion.html"><strong aria-hidden="true">1.2.1.4.</strong> DANDELION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/introduction-encoding.html"><strong aria-hidden="true">1.2.1.5.</strong> Introduction Bundle Encoding</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/segmentation.html"><strong aria-hidden="true">1.2.1.6.</strong> MESSAGE-SEGMENTATION-AND-RECONSTRUCTION</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/messaging-api.html"><strong aria-hidden="true">1.2.1.7.</strong> MESSAGING-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/opchan.html"><strong aria-hidden="true">1.2.1.8.</strong> OP-CHAN</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/privatev1.html"><strong aria-hidden="true">1.2.1.9.</strong> PRIVATE1</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/reliable-channel-api.html"><strong aria-hidden="true">1.2.1.10.</strong> RELIABLE-CHANNEL-API</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/p2p-reliability.html"><strong aria-hidden="true">1.2.1.11.</strong> WAKU-P2P-RELIABILITY</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/rln-keystore.html"><strong aria-hidden="true">1.2.1.12.</strong> WAKU-RLN-KEYSTORE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/device-pairing.html"><strong aria-hidden="true">1.2.1.13.</strong> WAKU2-DEVICE-PAIRING</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise.html"><strong aria-hidden="true">1.2.1.14.</strong> WAKU2-NOISE</a></li><li class="chapter-item expanded "><a href="../../messaging/application/raw/noise-sessions.html"><strong aria-hidden="true">1.2.1.15.</strong> WAKU2-NOISE-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/index.html"><strong aria-hidden="true">1.2.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/draft/3/remote-log.html"><strong aria-hidden="true">1.2.2.1.</strong> 3/REMOTE-LOG</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/4/mvds-meta.html"><strong aria-hidden="true">1.2.2.2.</strong> 4/MVDS-META</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/20/toy-eth-pm.html"><strong aria-hidden="true">1.2.2.3.</strong> 20/TOY-ETH-PM</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/26/payload.html"><strong aria-hidden="true">1.2.2.4.</strong> 26/WAKU2-PAYLOAD</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/53/x3dh.html"><strong aria-hidden="true">1.2.2.5.</strong> 53/WAKU2-X3DH</a></li><li class="chapter-item expanded "><a href="../../messaging/application/draft/54/x3dh-sessions.html"><strong aria-hidden="true">1.2.2.6.</strong> 54/WAKU2-X3DH-SESSIONS</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/index.html"><strong aria-hidden="true">1.2.3.</strong> Stable</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/stable/7/data.html"><strong aria-hidden="true">1.2.3.1.</strong> 7/WAKU-DATA</a></li><li class="chapter-item expanded "><a href="../../messaging/application/stable/8/mail.html"><strong aria-hidden="true">1.2.3.2.</strong> 8/WAKU-MAIL</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/index.html"><strong aria-hidden="true">1.2.4.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deprecated/18/swap.html"><strong aria-hidden="true">1.2.4.1.</strong> 18/WAKU2-SWAP</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/application/deleted/index.html"><strong aria-hidden="true">1.2.5.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/application/deleted/fault-tolerant-store.html"><strong aria-hidden="true">1.2.5.1.</strong> 21/WAKU2-FAULT-TOLERANT-STORE</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/index.html"><strong aria-hidden="true">1.3.</strong> Informational</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/index.html"><strong aria-hidden="true">1.3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/raw/adversarial-models.html"><strong aria-hidden="true">1.3.1.1.</strong> ADVERSARIAL-MODELS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chat-cast.html"><strong aria-hidden="true">1.3.1.2.</strong> CHAT-CAST</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/chatdefs.html"><strong aria-hidden="true">1.3.1.3.</strong> CHAT-DEFINITIONS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/raw/relay-static-shard-alloc.html"><strong aria-hidden="true">1.3.1.4.</strong> RELAY-STATIC-SHARD-ALLOC</a></li></ol></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/index.html"><strong aria-hidden="true">1.3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../messaging/informational/draft/22/toy-chat.html"><strong aria-hidden="true">1.3.2.1.</strong> 22/TOY-CHAT</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/23/topics.html"><strong aria-hidden="true">1.3.2.2.</strong> 23/WAKU2-TOPICS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/27/peers.html"><strong aria-hidden="true">1.3.2.3.</strong> 27/WAKU2-PEERS</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/29/config.html"><strong aria-hidden="true">1.3.2.4.</strong> 29/WAKU2-CONFIG</a></li><li class="chapter-item expanded "><a href="../../messaging/informational/draft/30/adaptive-nodes.html"><strong aria-hidden="true">1.3.2.5.</strong> 30/ADAPTIVE-NODES</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/index.html"><strong aria-hidden="true">2.</strong> Blockchain</a></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.</strong> Bedrock</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.</strong> P2P Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/network-wire-format.html"><strong aria-hidden="true">2.1.1.1.1.</strong> Network Wire Format</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-nat-solution.html"><strong aria-hidden="true">2.1.1.1.2.</strong> P2P Nat Solution</a></li><li class="chapter-item expanded "><a href="../../blockchain/draft/p2p-network.html"><strong aria-hidden="true">2.1.1.1.3.</strong> P2P Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/p2p-network-bootstrapping.html"><strong aria-hidden="true">2.1.1.1.4.</strong> P2P Network Bootstrapping</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.1.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/p2p-hardware-requirements.html"><strong aria-hidden="true">2.1.1.2.1.</strong> Hardware Requirements</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.</strong> Consensus</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-times-blend-network.html"><strong aria-hidden="true">2.1.2.1.1.</strong> [Analysis] Block Times & Blend Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-cryptarchia-de-anonymisation-of-relative-stake.html"><strong aria-hidden="true">2.1.2.1.2.</strong> [Analysis] Cryptarchia De-anonymisation of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.3.</strong> [Analysis] Total Stake Inference</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-bootstr-sync.html"><strong aria-hidden="true">2.1.2.1.4.</strong> Cryptarchia Bootstrapping & Synchronization</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/fork-choice.html"><strong aria-hidden="true">2.1.2.1.5.</strong> Cryptarchia Fork Choice Rule</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-v1-protocol.html"><strong aria-hidden="true">2.1.2.1.6.</strong> Cryptarchia Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.1.7.</strong> Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/cryptarchia-total-stake-inference.html"><strong aria-hidden="true">2.1.2.1.8.</strong> Total Stake Inference</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.2.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-cryptarchia-proof-of-leadership.html"><strong aria-hidden="true">2.1.2.2.1.</strong> [1.0.0] Proof of Leadership</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/claro.html"><strong aria-hidden="true">2.1.2.2.2.</strong> Claro Consensus Protocol</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.</strong> Mantle</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.1.1.</strong> [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.1.2.</strong> [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.1.3.</strong> [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-anonymous-leaders-reward.html"><strong aria-hidden="true">2.1.3.1.4.</strong> Anonymous Leaders Reward Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.1.5.</strong> Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-block-construction.html"><strong aria-hidden="true">2.1.3.1.6.</strong> Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-v1.1-mantle-specification.html"><strong aria-hidden="true">2.1.3.1.7.</strong> Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.1.8.</strong> Mantle Transaction Encoding</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-add-deposit-withdraw-to-tx-encoding.html"><strong aria-hidden="true">2.1.3.1.8.1.</strong> [RFC] Add Deposit/Withdraw to Tx Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-enforce-noteid-uniqueness.html"><strong aria-hidden="true">2.1.3.1.8.2.</strong> [RFC] Enforce NoteId uniqueness</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-improve-mantle-transaction-hash.html"><strong aria-hidden="true">2.1.3.1.8.3.</strong> [RFC] Improve Mantle Transaction hash</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html"><strong aria-hidden="true">2.1.3.1.8.4.</strong> [RFC] Make Ledger Transaction an Operation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html"><strong aria-hidden="true">2.1.3.1.8.5.</strong> [RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-declaration-protocol.html"><strong aria-hidden="true">2.1.3.1.9.</strong> Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.1.10.</strong> Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/wallet-technical-standard.html"><strong aria-hidden="true">2.1.3.1.11.</strong> Wallet Technical Standard</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.3.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.1.</strong> [1.0.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-architecture-overview.html"><strong aria-hidden="true">2.1.3.2.2.</strong> [1.0.0] [Overview] Bedrock Architecture</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.3.</strong> [1.0.0] [Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.4.</strong> [1.0.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.5.</strong> [1.0.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle.html"><strong aria-hidden="true">2.1.3.2.6.</strong> [1.0.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.7.</strong> [1.0.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.8.</strong> [1.0.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.9.</strong> [1.1.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-genesis-block.html"><strong aria-hidden="true">2.1.3.2.10.</strong> [1.1.0] Bedrock Genesis Block</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction.html"><strong aria-hidden="true">2.1.3.2.11.</strong> [1.1.0] Block Construction, Validation and Execution</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.html"><strong aria-hidden="true">2.1.3.2.12.</strong> [1.1.0] Block Construction, Validation and Execution_2</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle.html"><strong aria-hidden="true">2.1.3.2.13.</strong> [1.1.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.14.</strong> [1.1.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-bedrock-service-reward-distribution.html"><strong aria-hidden="true">2.1.3.2.15.</strong> [1.1.0] Service Reward Distribution Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.1.0-template-cross-channel-messaging.html"><strong aria-hidden="true">2.1.3.2.16.</strong> [1.1.0][Template] Cross-Channel Messaging</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.17.</strong> [1.2.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle.html"><strong aria-hidden="true">2.1.3.2.18.</strong> [1.2.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.19.</strong> [1.2.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.2.1-mantle.html"><strong aria-hidden="true">2.1.3.2.20.</strong> [1.2.1] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.21.</strong> [1.3.0] [Analysis] Gas Cost Determination</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle.html"><strong aria-hidden="true">2.1.3.2.22.</strong> [1.3.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.3.0-mantle-transaction-encoding.html"><strong aria-hidden="true">2.1.3.2.23.</strong> [1.3.0] Mantle Transaction Encoding</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-mantle.html"><strong aria-hidden="true">2.1.3.2.24.</strong> [1.4.0] Mantle</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.4.0-analysis-gas-cost-determination.html"><strong aria-hidden="true">2.1.3.2.25.</strong> [1.4.0][Analysis] Gas Cost Determination</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.</strong> Cryptoeconomics</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.4.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-reward-parameter-calibration.html"><strong aria-hidden="true">2.1.4.1.1.</strong> [Analysis] Block Reward Parameter Calibration</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-block-rewards.html"><strong aria-hidden="true">2.1.4.1.2.</strong> [Analysis] Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-execution-market.html"><strong aria-hidden="true">2.1.4.1.3.</strong> [Analysis] Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-static-minimum-stake-estimation-for-service-declaration-protocol.html"><strong aria-hidden="true">2.1.4.1.4.</strong> [Analysis] Static Minimum Stake Estimation for Service Declaration Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-storage-market.html"><strong aria-hidden="true">2.1.4.1.5.</strong> [Analysis] Storage Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/overview-cryptoeconomics.html"><strong aria-hidden="true">2.1.4.1.6.</strong> [Overview] Cryptoeconomics</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/block-rewards.html"><strong aria-hidden="true">2.1.4.1.7.</strong> Block Rewards</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/execution-market.html"><strong aria-hidden="true">2.1.4.1.8.</strong> Execution Market</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/storage-markets.html"><strong aria-hidden="true">2.1.4.1.9.</strong> Storage Markets</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.</strong> Blend Network</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity.html"><strong aria-hidden="true">2.1.5.1.1.</strong> [Analysis] Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-anonymity/appendices/literature-review.html"><strong aria-hidden="true">2.1.5.1.1.1.</strong> Literature review</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-communication-on-trees.html"><strong aria-hidden="true">2.1.5.1.2.</strong> [Analysis] Communication on Trees</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-correlation-functions.html"><strong aria-hidden="true">2.1.5.1.3.</strong> [Analysis] Correlation Functions</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-impact-of-the-service-declaration-protocol-on-the-statistical-inference-of-relative-stake.html"><strong aria-hidden="true">2.1.5.1.4.</strong> [Analysis] Impact of the Service Declaration Protocol on the Statistical Inference of Relative Stake</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-latency.html"><strong aria-hidden="true">2.1.5.1.5.</strong> [Analysis] Latency</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-queuing-system-in-the-mix-node.html"><strong aria-hidden="true">2.1.5.1.6.</strong> [Analysis] Queuing System in the Mix Node</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity.html"><strong aria-hidden="true">2.1.5.1.7.</strong> [Analysis] Resilience and Anonymity</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/analysis-resilience-and-anonymity/appendices/analysis-of-rewarding-in-data-availability-network.html"><strong aria-hidden="true">2.1.5.1.7.1.</strong> Analysis of Rewarding in DA Network</a></li></ol></li><li class="chapter-item expanded "><a href="../../blockchain/raw/blend-protocol.html"><strong aria-hidden="true">2.1.5.1.8.</strong> Blend Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/key-types-and-generation.html"><strong aria-hidden="true">2.1.5.1.9.</strong> Key Types and Generation</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-encapsulation.html"><strong aria-hidden="true">2.1.5.1.10.</strong> Message Encapsulation Mechanism</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/message-formatting.html"><strong aria-hidden="true">2.1.5.1.11.</strong> Message Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/payload-formatting.html"><strong aria-hidden="true">2.1.5.1.12.</strong> Payload Formatting</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/proof-of-quota.html"><strong aria-hidden="true">2.1.5.1.13.</strong> Proof of Quota</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.5.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/v1.0.0-proof-of-quota.html"><strong aria-hidden="true">2.1.5.2.1.</strong> [1.0.0] Proof of Quota</a></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.</strong> Cryptography</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/common-cryptographic-components.html"><strong aria-hidden="true">2.1.6.1.1.</strong> Common Cryptographic Components</a></li><li class="chapter-item expanded "><a href="../../blockchain/raw/trusted-setup-ceremony.html"><strong aria-hidden="true">2.1.6.1.2.</strong> Trusted Setup Ceremony</a></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.6.2.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature.html"><strong aria-hidden="true">2.1.6.2.1.</strong> Digital Signature</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/common-ledger-specification.html"><strong aria-hidden="true">2.1.6.2.1.1.</strong> Common Ledger Specification</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/digital-signature/appendices/the-logos-blockchain-whitepaper.html"><strong aria-hidden="true">2.1.6.2.1.2.</strong> The Logos Blockchain Whitepaper</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.</strong> Data Availability</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.1.7.1.</strong> Deprecated</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-cryptographic-protocol.html"><strong aria-hidden="true">2.1.7.1.1.</strong> DA Cryptographic Protocol</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-network.html"><strong aria-hidden="true">2.1.7.1.2.</strong> DA Network</a></li><li class="chapter-item expanded "><a href="../../blockchain/deprecated/da-rewarding.html"><strong aria-hidden="true">2.1.7.1.3.</strong> DA Rewarding</a></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.</strong> LEZ</div></li><li><ol class="section"><li class="chapter-item expanded "><div><strong aria-hidden="true">2.2.1.</strong> Merged</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications.html"><strong aria-hidden="true">2.2.1.1.</strong> LEE v0.3 Specifications</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../blockchain/raw/lez/lee-v0.3-specifications/appendices/builtin-programs.html"><strong aria-hidden="true">2.2.1.1.1.</strong> Built-in Programs</a></li></ol></li></ol></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../storage/index.html"><strong aria-hidden="true">3.</strong> Storage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/index.html"><strong aria-hidden="true">3.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/raw/codex-block-exchange.html"><strong aria-hidden="true">3.1.1.</strong> CODEX-BLOCK-EXCHANGE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/community-history.html"><strong aria-hidden="true">3.1.2.</strong> CODEX-COMMUNITY-HISTORY</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dht.html"><strong aria-hidden="true">3.1.3.</strong> CODEX-DHT</a></li><li class="chapter-item expanded "><a href="../../storage/raw/manifest.html"><strong aria-hidden="true">3.1.4.</strong> CODEX-MANIFEST</a></li><li class="chapter-item expanded "><a href="../../storage/raw/codex-store.html"><strong aria-hidden="true">3.1.5.</strong> CODEX-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/dataset-store.html"><strong aria-hidden="true">3.1.6.</strong> DATASET-STORE</a></li><li class="chapter-item expanded "><a href="../../storage/raw/datasets.html"><strong aria-hidden="true">3.1.7.</strong> DATASETS</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/draft/index.html"><strong aria-hidden="true">3.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/draft/merkle-tree.html"><strong aria-hidden="true">3.2.1.</strong> MERKLE-TREE</a></li></ol></li><li class="chapter-item expanded "><a href="../../storage/deprecated/index.html"><strong aria-hidden="true">3.3.</strong> Deprecated</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../storage/deprecated/erasure-coding.html"><strong aria-hidden="true">3.3.1.</strong> CODEX-ERASUE-CODING</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-marketplace.html"><strong aria-hidden="true">3.3.2.</strong> CODEX-MARKETPLACE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-merkle-tree.html"><strong aria-hidden="true">3.3.3.</strong> CODEX-MERKLE-TREE</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/codex-prover.html"><strong aria-hidden="true">3.3.4.</strong> CODEX-PROVER</a></li><li class="chapter-item expanded "><a href="../../storage/deprecated/slot-buIlder.html"><strong aria-hidden="true">3.3.5.</strong> CODEX-SLOT-BUILDER</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/index.html"><strong aria-hidden="true">4.</strong> AnonComms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/index.html"><strong aria-hidden="true">4.1.</strong> Raw</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-mls-offchain-consensus.html"><strong aria-hidden="true">4.1.1.</strong> DECENTRALIZED-MLS-OFFCHAIN-CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/decentralized-messaging-ethereum.html"><strong aria-hidden="true">4.1.2.</strong> ETH-DCGKA</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/eth-mls-onchain.html"><strong aria-hidden="true">4.1.3.</strong> ETH-MLS-ONCHAIN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extended-kad-disco.html"><strong aria-hidden="true">4.1.4.</strong> EXTENDED-KADEMLIA-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/extensible-peer-records.html"><strong aria-hidden="true">4.1.5.</strong> EXTENSIBLE-PEER-RECORDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/gossipsub-tor-push.html"><strong aria-hidden="true">4.1.6.</strong> GOSSIPSUB-TOR-PUSH</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/consensus-hashgraphlike.html"><strong aria-hidden="true">4.1.7.</strong> HASHGRAPHLIKE CONSENSUS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-lioness.html" class="active"><strong aria-hidden="true">4.1.8.</strong> LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-service-discovery.html"><strong aria-hidden="true">4.1.9.</strong> LOGOS-SERVICE-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/logos-oracle-zone.html"><strong aria-hidden="true">4.1.10.</strong> LON-ORACLE-ZONE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix.html"><strong aria-hidden="true">4.1.11.</strong> MIX</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-cover-traffic.html"><strong aria-hidden="true">4.1.12.</strong> Mix Cover Traffic</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-dos-protection.html"><strong aria-hidden="true">4.1.13.</strong> Mix DoS Protection</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/multi-message_id-burn-rln.html"><strong aria-hidden="true">4.1.14.</strong> Multi-message_id Burn RLN</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/noise-x3dh-double-ratchet.html"><strong aria-hidden="true">4.1.15.</strong> NOISE-X3DH-DOUBLE-RATCHET</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/payment-streams.html"><strong aria-hidden="true">4.1.16.</strong> Payment Streams</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/mix-spam-protection-rln.html"><strong aria-hidden="true">4.1.17.</strong> RLN DoS Protection for Mixnet</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-api.html"><strong aria-hidden="true">4.1.18.</strong> RLN-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-interep-spec.html"><strong aria-hidden="true">4.1.19.</strong> RLN-INTEREP-SPEC</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-membership-service.html"><strong aria-hidden="true">4.1.20.</strong> RLN-MEMBERSHIP-SERVICE</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-stealth-commitments.html"><strong aria-hidden="true">4.1.21.</strong> RLN-STEALTH-COMMITMENTS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/rln-v2.html"><strong aria-hidden="true">4.1.22.</strong> RLN-V2</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/sds.html"><strong aria-hidden="true">4.1.23.</strong> SDS</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/service-discovery-api.html"><strong aria-hidden="true">4.1.24.</strong> SERVICE-DISCOVERY-API</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/status-rln-deployment.html"><strong aria-hidden="true">4.1.25.</strong> STATUS-RLN-DEPLOYMENT</a></li><li class="chapter-item expanded "><a href="../../anoncomms/raw/zerokit-api.html"><strong aria-hidden="true">4.1.26.</strong> Zerokit API</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/draft/index.html"><strong aria-hidden="true">4.2.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/draft/32/rln-v1.html"><strong aria-hidden="true">4.2.1.</strong> 32/RLN-V1</a></li></ol></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/index.html"><strong aria-hidden="true">4.3.</strong> Deleted</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../anoncomms/deleted/25/libp2p-dns-discovery.html"><strong aria-hidden="true">4.3.1.</strong> 25/LIBP2P-DNS-DISCOVERY</a></li><li class="chapter-item expanded "><a href="../../anoncomms/deleted/eth-secpm.html"><strong aria-hidden="true">4.3.2.</strong> ETH-SECPM</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../research/index.html"><strong aria-hidden="true">5.</strong> Research</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/index.html"><strong aria-hidden="true">5.1.</strong> Draft</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../research/draft/1/coss.html"><strong aria-hidden="true">5.1.1.</strong> 1/COSS</a></li><li class="chapter-item expanded "><a href="../../research/draft/template.html"><strong aria-hidden="true">5.1.2.</strong> TEMPLATE</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Logos LIP</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/logos-co/logos-lips" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="lioness-payload-encryption-for-mix"><a class="header" href="#lioness-payload-encryption-for-mix">LIONESS-PAYLOAD-ENCRYPTION-FOR-MIX</a></h1>
+<div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
+<tr><td>Name</td><td>LIONESS encryption scheme for LIBP2P-MIX payload encryption</td></tr>
+<tr><td>Slug</td><td>183</td></tr>
+<tr><td>Status</td><td>raw</td></tr>
+<tr><td>Category</td><td>Standards Track</td></tr>
+<tr><td>Editor</td><td>Mohammed Alghazwi <a href="mailto:mohalghazwi@status.im">mohalghazwi@status.im</a></td></tr>
+<tr><td>Contributors</td><td>Balázs Kőműves <a href="mailto:balazs@status.im">balazs@status.im</a></td></tr>
+</tbody></table>
+</div><!-- timeline:start -->
+<h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
+<ul>
+<li><strong>2026-06-12</strong> — <a href="https://github.com/logos-co/logos-lips/blob/124f8957915f349347532d802d9e4bb5cc2a5ce7/docs/anoncomms/raw/mix-lioness.md"><code>124f895</code></a> — chore: fix broken links (#357)</li>
+<li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/15f410b414da7e5cc1d5e2e742c81a2510ee6c68/docs/anoncomms/raw/mix-lioness.md"><code>15f410b</code></a> — chore: fix math issue (#349)</li>
+<li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/anoncomms/raw/mix-lioness.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
+<li><strong>2026-05-25</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f1017b9f30cfdf8cb4f53d5f3286e4bdf0bdfcd1/docs/anoncomms/raw/mix-lioness.md"><code>f1017b9</code></a> — Add LIONESS specification for Mix payload encryption (#329)</li>
+</ul>
+<!-- timeline:end -->
+<h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
+<p>This specification defines the LIONESS wide-block encryption scheme for the Sphinx payload encryption. The purpose of this is to perform layered-encryption and preserve payload integrity in the Sphinx construction used by the <a href="./mix.html">Mix Protocol</a> while keeping the payload fixed-size. The routing header integrity mechanism defined in the <a href="./mix.html">Mix Protocol</a> remains unchanged. Only the payload field <span class="math-inline" data-tex="\delta"></span> is affected by this specification.</p>
+<h3 id="scope"><a class="header" href="#scope">Scope</a></h3>
+<p>This specification defines:</p>
+<ul>
+<li>the LIONESS construction to use for payload encryption and decryption,</li>
+<li>the concrete primitives used to instantiate LIONESS for the <a href="./mix.html">Mix Protocol</a>.</li>
+<li>the required Sphinx payload format and construction.</li>
+<li>the hop payload processing and integrity verification.</li>
+</ul>
+<h2 id="1-introduction"><a class="header" href="#1-introduction">1. Introduction</a></h2>
+<p>The <a href="./mix.html">Mix Protocol</a> uses a Sphinx packet format with four fields (<span class="math-inline" data-tex="\alpha,\ \beta,\ \gamma,\ \delta"></span>). The header fields (<span class="math-inline" data-tex="\alpha,\ \beta,\ \gamma"></span>) provide per-hop layered-encrypted routing information which includes header integrity. The payload field <span class="math-inline" data-tex="\delta"></span> carries only the application message in layered-encrypted form.</p>
+<p>In the current Mix Protocol, AES-CTR is used to encrypt the routing header <span class="math-inline" data-tex="\beta"></span>. This is sufficient for <span class="math-inline" data-tex="\beta"></span> because header integrity is separately protected by the per-hop MAC field <span class="math-inline" data-tex="\gamma"></span>. However, the integrity of <span class="math-inline" data-tex="\delta"></span> is not covered by <span class="math-inline" data-tex="\gamma"></span>, since the Sphinx design intentionally separates header integrity from payload integrity.</p>
+<p>This separation is necessary because SURB replies require the sender of the SURB to construct the return header before the reply payload is known. As a result, payload integrity MUST be provided independently of header integrity.</p>
+<p>A malleable encryption scheme such as AES-CTR does not satisfy this requirement. Bit modifications to the ciphertext result in modifications to the decrypted plaintext. This violates the integrity of the Sphinx payload. Therefore, the payload-encryption scheme MUST satisfy the following:</p>
+<ol>
+<li>It MUST preserve the fixed payload size <span class="math-inline" data-tex="|\delta|"></span>.</li>
+<li>It MUST support layered encryption and per-hop layer removal.</li>
+<li>It MUST be compatible with SURBs and therefore MUST NOT require payload-dependent header authentication.</li>
+<li>It MUST allow the final hop to detect payload tampering.</li>
+<li>It MUST avoid adding external authentication material/tags that change the packet or payload size.</li>
+</ol>
+<p>To achieve this, this specification uses LIONESS as described in <a href="https://www.cl.cam.ac.uk/archive/rja14/Papers/bear-lion.pdf">anderson et al</a>. LIONESS is a wide-block cipher built from a stream cipher and a keyed hash function. LIONESS acts as a pseudo-random permutation (PRP) over the entire payload block, allowing us to add the payload integrity prefix into the plaintext and verify it after decryption.</p>
+<h2 id="2-terminology"><a class="header" href="#2-terminology">2. Terminology</a></h2>
+<p>The following terms are used throughout this specification. Other terms are as defined in the <a href="./mix.html">Mix Protocol</a>.</p>
+<ul>
+<li><strong>Sphinx packet</strong>:
+The packet format as defined in the <a href="./mix.html">Mix Protocol</a>, consisting of (<span class="math-inline" data-tex="\alpha,\ \beta,\ \gamma,\ \delta"></span>).</li>
+<li><strong>Sphinx payload (<span class="math-inline" data-tex="\mathbf{\delta}"></span>)</strong>
+The fixed-size encrypted field <span class="math-inline" data-tex="\delta"></span> of a Sphinx packet.
+It carries the padded application message and any payload extensions such as SURBs.</li>
+<li><strong>Payload integrity prefix</strong>
+A fixed all-zero byte string prepended to the plaintext payload before applying the payload encryption. The final hop verifies this prefix after payload decryption to detect payload tampering.</li>
+<li><strong>Payload encryption key (<span class="math-inline" data-tex="\mathbf{\delta_{key}}"></span>)</strong>
+A per-hop key used to encrypt or decrypt one layer of the Sphinx payload field <span class="math-inline" data-tex="δ"></span>.
+For LIONESS payload encryption, this key is used as the seed for deriving the internal LIONESS round keys.</li>
+<li><strong>Round keys</strong>:
+The four keys <span class="math-inline" data-tex="(K_1, K_2, K_3, K_4)"></span> used by the LIONESS Feistel network.</li>
+<li><strong>Wide-block cipher</strong>:
+A block cipher with a large block size compared to conventional fixed-size block ciphers such as AES. LIONESS is a wide-block cipher that supports variable-length input blocks above a lower bound.</li>
+<li><strong>Pseudo-random permutation (PRP)</strong>:
+A keyed permutation over a fixed-size message block that is computationally indistinguishable from a uniformly random permutation. Changing even one bit of the input is expected to produce unpredictable changes to a large number of output bits.</li>
+</ul>
+<h2 id="3-cryptographic-primitives"><a class="header" href="#3-cryptographic-primitives">3. Cryptographic Primitives</a></h2>
+<p>This section defines the primitives used by this specification. In this specification, we will assume the following constants:</p>
+<ul>
+<li>The security parameter <span class="math-inline" data-tex="\kappa = 16"></span> bytes (<span class="math-inline" data-tex="128"></span>-bits) as defined in the <a href="./mix.html">Mix Protocol</a>.</li>
+<li>The LIONESS internal parameter <span class="math-inline" data-tex="\mu = 32"></span> bytes, which defines the size of multiple LIONESS components.</li>
+</ul>
+<h3 id="31-stream-cipher"><a class="header" href="#31-stream-cipher">3.1 Stream Cipher</a></h3>
+<p>The stream cipher <span class="math-inline" data-tex="\mathsf{S}"></span> used in LIONESS can be abstracted as the following keyed function that produces an arbitrary-length keystream:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\mathsf{S}(k) \to \mathsf{ks}&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="k"></span> is a <span class="math-inline" data-tex="\mu"></span>-byte key</li>
+<li><span class="math-inline" data-tex="\mathsf{ks}"></span> is the output arbitrary-length keystream.</li>
+</ul>
+<p>Encryption and decryption can then be done by first generating a key stream <span class="math-inline" data-tex="\mathsf{ks}"></span> and then XORing the key stream with the message/ciphertext. Encryption and decryption work in the same way:</p>
+<div class="math-block" data-tex="\begin{aligned}&#10;c &amp;= m \oplus \mathsf{ks} \\&#10;m &amp;= c \oplus \mathsf{ks}&#10;\end{aligned}"></div>
+<p>where <span class="math-inline" data-tex="m"></span> is the plaintext and <span class="math-inline" data-tex="c"></span> is the ciphertext.</p>
+<ul>
+<li><span class="math-inline" data-tex="m"></span> is the arbitrary-length message</li>
+<li><span class="math-inline" data-tex="c"></span> is the arbitrary-length ciphertext of the same size as <span class="math-inline" data-tex="m"></span>, i.e., <span class="math-inline" data-tex="|m| = |c|"></span></li>
+</ul>
+<h3 id="32-keyed-hash-function"><a class="header" href="#32-keyed-hash-function">3.2 Keyed Hash Function</a></h3>
+<p>In this specification, the keyed hash function used in LIONESS is denoted as:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\mathsf{H}_k(m) \to h&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="k"></span> is a <span class="math-inline" data-tex="\mu"></span>-byte key</li>
+<li><span class="math-inline" data-tex="m"></span> is an arbitrary-length input message.</li>
+<li><span class="math-inline" data-tex="h"></span> is the <span class="math-inline" data-tex="\mu"></span>-byte digest output</li>
+</ul>
+<h3 id="33-key-derivation-function-kdf"><a class="header" href="#33-key-derivation-function-kdf">3.3 Key Derivation Function (KDF)</a></h3>
+<p>The key derivation function <span class="math-inline" data-tex="\mathsf{KDF}"></span> is used to derive fixed-size keys from a domain-separation string and a seed:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\mathsf{KDF}(\mathsf{dom}, \mathsf{seed}) \to u&#10;\end{array}"></div>
+<p>where</p>
+<ul>
+<li><span class="math-inline" data-tex="\mathsf{dom}"></span>: is an arbitrary-length domain-separation string.</li>
+<li><span class="math-inline" data-tex="\mathsf{seed}"></span>: is an arbitrary-length seed at least <span class="math-inline" data-tex="\kappa"></span> bytes in size.</li>
+<li><span class="math-inline" data-tex="u"></span> is a <span class="math-inline" data-tex="\mu"></span>-byte output key.</li>
+</ul>
+<h2 id="4-concrete-primitive-instantiation"><a class="header" href="#4-concrete-primitive-instantiation">4. Concrete Primitive Instantiation</a></h2>
+<p>This section defines the concrete primitive choices used by this specification.</p>
+<h3 id="41-stream-cipher-instantiation"><a class="header" href="#41-stream-cipher-instantiation">4.1 Stream Cipher Instantiation</a></h3>
+<p>The LIONESS stream cipher <span class="math-inline" data-tex="\mathsf{S}"></span> is instantiated using AES-CTR.</p>
+<p>Each LIONESS stream-cipher round key <span class="math-inline" data-tex="k"></span> is <span class="math-inline" data-tex="\mu = 32"></span> bytes. For AES-CTR, this <span class="math-inline" data-tex="32"></span>-byte value is split as follows:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;k = k_{\mathsf{aes}} \parallel IV&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="k_{\mathsf{aes}}"></span> is the first <span class="math-inline" data-tex="16"></span> bytes of <span class="math-inline" data-tex="k"></span>.</li>
+<li><span class="math-inline" data-tex="IV"></span> is the last <span class="math-inline" data-tex="16"></span> bytes of <span class="math-inline" data-tex="k"></span>.</li>
+</ul>
+<h3 id="42-keyed-hash-instantiation"><a class="header" href="#42-keyed-hash-instantiation">4.2 Keyed Hash Instantiation</a></h3>
+<p>The LIONESS keyed hash function <span class="math-inline" data-tex="\mathsf{H}_k"></span> is instantiated as SHA-256 with the key prepended to the input message:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\mathsf{H}_k(m) = \mathsf{SHA256}(k \parallel m)&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="k"></span> is a <span class="math-inline" data-tex="\mu"></span>-byte key.</li>
+<li><span class="math-inline" data-tex="m"></span> is the input message.</li>
+<li>the output is a <span class="math-inline" data-tex="\mu"></span>-byte digest.</li>
+</ul>
+<p>This construction is used only as the keyed hash function inside the LIONESS Feistel construction. It is not (and must not be used as) a general-purpose MAC.</p>
+<h3 id="43-kdf-instantiation"><a class="header" href="#43-kdf-instantiation">4.3 KDF Instantiation</a></h3>
+<p>The KDF is instantiated using SHA-256 with domain-separation:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\mathsf{KDF}(\mathsf{dom}, \mathsf{seed}) =&#10;\mathsf{SHA256}(\mathsf{dom} \parallel \mathsf{seed})&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="\mathsf{dom}"></span> is a domain-separation string.</li>
+<li><span class="math-inline" data-tex="\mathsf{seed}"></span> is an arbitrary-length seed at least <span class="math-inline" data-tex="\kappa"></span> bytes in size.</li>
+<li>the output is a <span class="math-inline" data-tex="\mu"></span>-byte key.</li>
+</ul>
+<p>The following domain-separation strings are used by this specification:</p>
+<div class="table-wrapper"><table><thead><tr><th>Purpose</th><th>Domain-separator</th></tr></thead><tbody>
+<tr><td>Payload encryption key <span class="math-inline" data-tex="\delta_{\mathrm{key}}"></span></td><td><code>payload_enc_key</code></td></tr>
+<tr><td>LIONESS round key <span class="math-inline" data-tex="K_1"></span></td><td><code>lioness_key1</code></td></tr>
+<tr><td>LIONESS round key <span class="math-inline" data-tex="K_2"></span></td><td><code>lioness_key2</code></td></tr>
+<tr><td>LIONESS round key <span class="math-inline" data-tex="K_3"></span></td><td><code>lioness_key3</code></td></tr>
+<tr><td>LIONESS round key <span class="math-inline" data-tex="K_4"></span></td><td><code>lioness_key4</code></td></tr>
+</tbody></table>
+</div>
+<h2 id="5-lioness-construction"><a class="header" href="#5-lioness-construction">5. LIONESS Construction</a></h2>
+<h3 id="51-high-level-api"><a class="header" href="#51-high-level-api">5.1 High-level API</a></h3>
+<p>In general, the LIONESS wide-block cipher provides the following:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\mathsf{LIONESS.Enc}(k,x) \to y \\&#10;\mathsf{LIONESS.Dec}(k,y) \to x &#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="k"></span> is the arbitrary-length LIONESS seed from which the internal round keys are derived, with size at least <span class="math-inline" data-tex="\kappa"></span> bytes</li>
+<li><span class="math-inline" data-tex="x"></span> is the plaintext message with size <span class="math-inline" data-tex="|x| \ge 2\mu"></span> bytes.</li>
+<li><span class="math-inline" data-tex="y"></span> is the corresponding ciphertext with size <span class="math-inline" data-tex="|y| = |x|"></span></li>
+</ul>
+<h3 id="52-block-structure"><a class="header" href="#52-block-structure">5.2 Block Structure</a></h3>
+<p>LIONESS is a wide-block cipher, meaning that its block size is large compared to conventional fixed-size block ciphers such as AES. In this specification, LIONESS is applied once to the entire Sphinx payload <span class="math-inline" data-tex="\delta"></span>. The whole payload is treated as a single message block, and LIONESS acts as a PRP over that full payload block.
+For both LIONESS encryption and decryption, the input block <span class="math-inline" data-tex="B"></span> is split into two chunks:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;B = L \parallel R &#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="B"></span> is the plaintext message block of any size <span class="math-inline" data-tex="|B| \ge 2\mu"></span></li>
+<li><span class="math-inline" data-tex="L"></span> is the left chunk with size <span class="math-inline" data-tex="|L| = \mu"></span> bytes</li>
+<li><span class="math-inline" data-tex="R"></span> is the right chunk with size <span class="math-inline" data-tex="|R| = |B| - \mu"></span> bytes.</li>
+</ul>
+<p>In this specification, we require the size of the message to be at least <span class="math-inline" data-tex="2\mu"></span>, i.e., <span class="math-inline" data-tex="|B| \ge 2\mu"></span>. This requirement ensures that <span class="math-inline" data-tex="|L| = \mu"></span> and <span class="math-inline" data-tex="|R| \ge \mu"></span>. The Mix protocol payload size satisfies this requirement since the expected payload is much larger than <span class="math-inline" data-tex="2\mu"></span>.</p>
+<p>In summary, we set <span class="math-inline" data-tex="\mu = 32"></span> bytes. Therefore:</p>
+<ul>
+<li><span class="math-inline" data-tex="|B| \ge 64"></span> bytes</li>
+<li><span class="math-inline" data-tex="|L| = \mu = 32"></span> bytes,</li>
+<li><span class="math-inline" data-tex="|R| = |B| - |L|"></span> bytes.</li>
+</ul>
+<p>The choice <span class="math-inline" data-tex="\mu = 32"></span> bytes must match:</p>
+<ul>
+<li>the stream cipher (<span class="math-inline" data-tex="\mathsf{S}"></span>) key size, and</li>
+<li>the keyed hash (<span class="math-inline" data-tex="H_k"></span>) key size and digest (<span class="math-inline" data-tex="h"></span>) size.</li>
+</ul>
+<p>As a result, we can observe that for large messages, the right chunk is expected to be much larger than the left chunk.</p>
+<pre><code class="language-text">+----------------+----------------------------------+
+|       L        |          R                       |
+|   mu bytes     |    (|B| - mu) bytes              |
++----------------+----------------------------------+
+</code></pre>
+<h3 id="53-key-derivation"><a class="header" href="#53-key-derivation">5.3 Key Derivation</a></h3>
+<p>LIONESS requires four internal round keys, one for each round: <span class="math-inline" data-tex="(K_1, K_2, K_3, K_4)"></span>:</p>
+<ul>
+<li><span class="math-inline" data-tex="K_1"></span> and <span class="math-inline" data-tex="K_3"></span> are the keys used for the stream cipher.</li>
+<li><span class="math-inline" data-tex="K_2"></span> and <span class="math-inline" data-tex="K_4"></span> are the keys used for the keyed hash function.</li>
+</ul>
+<p>All internal round keys are <span class="math-inline" data-tex="\mu = 32"></span> bytes in size. Given a LIONESS seed <span class="math-inline" data-tex="k"></span>, we require four calls to the <span class="math-inline" data-tex="\mathsf{KDF}"></span>, each with a different domain-separation string:</p>
+<div class="math-block" data-tex="\begin{aligned}&#10;K_1 &amp;= \mathsf{KDF}(\mathrm{lioness\_key1}, k) \\&#10;K_2 &amp;= \mathsf{KDF}(\mathrm{lioness\_key2}, k) \\&#10;K_3 &amp;= \mathsf{KDF}(\mathrm{lioness\_key3}, k) \\&#10;K_4 &amp;= \mathsf{KDF}(\mathrm{lioness\_key4}, k)&#10;\end{aligned}"></div>
+<p>The LIONESS seed is arbitrary-length and MUST be at least <span class="math-inline" data-tex="\kappa"></span> bytes. The derivation of the seed depends on whether the packet is a forward packet or a reply packet. Further details are specified in <a href="#6-payload-construction">Section 6</a> and <a href="#7-sphinx-payload-processing">section 7</a>.</p>
+<h3 id="54-encryption"><a class="header" href="#54-encryption">5.4 Encryption</a></h3>
+<p>Let:</p>
+<ul>
+<li>plaintext message <span class="math-inline" data-tex="B = L_0 \parallel R_0"></span></li>
+<li>round keys <span class="math-inline" data-tex="(K_1, K_2, K_3, K_4)"></span></li>
+<li><span class="math-inline" data-tex="\mathsf{S}"></span> is the stream cipher as defined in <a href="#31-stream-cipher">section 3.1</a></li>
+<li><span class="math-inline" data-tex="\mathsf{H}_k"></span> is the keyed hash function as defined in <a href="#32-keyed-hash-function">section 3.2</a></li>
+</ul>
+<p>LIONESS encryption proceeds with applying a small Feistel network of four rounds:</p>
+<div class="math-block" data-tex="\begin{aligned}&#10;B &amp;= L_0 \parallel R_0 \\&#10;R_1 &amp;= R_0 \oplus S(K_1 \oplus L_0) \\&#10;L_1 &amp;= L_0 \oplus H_{K_2}(R_1) \\&#10;R_2 &amp;= R_1 \oplus S(K_3 \oplus L_1) \\&#10;L_2 &amp;= L_1 \oplus H_{K_4}(R_2) \\&#10;C   &amp;= L_2 \parallel R_2&#10;\end{aligned}"></div>
+<pre><code class="language-text">round 1:  R1 = R0 ^ S(L0 ^ K1)                        
+                                                      
++-----------+                           +-----------+ 
+|    L0     |                           |    R0     | 
++-----------+                           +-----------+ 
+      |                 K1                    |       
+      |                 │                     | xor   
+      |                 │                     v       
+      |                 v              +-------------+
+      +----------------xor------------&gt;|      S      |
+                                       +-------------+
+                                              |       
+                                              v       
++-----------+                           +-----------+ 
+|    L0     |                           |    R1     | 
++-----------+                           +-----------+ 
+                                                      
+                                                      
+round 2:  L1 = L0 ^ H_K2(R1)                          
+                                                      
++-----------+                           +-----------+ 
+|    L0     |                           |    R1     | 
++-----------+                           +-----------+ 
+      |                                       |       
+      | xor                                   |       
+      v                                       |       
++-------------+&lt;------------------------------+       
+|      H      |&lt;----- K2                              
++-------------+                                       
+      |                                               
+      v                                               
++-----------+                           +-----------+ 
+|    L1     |                           |    R1     | 
++-----------+                           +-----------+ 
+                                                      
+                                                      
+round 3:  R2 = R1 ^ S(L1 ^ K3)                        
+                                                      
++-----------+                           +-----------+ 
+|    L1     |                           |    R1     | 
++-----------+                           +-----------+ 
+      |                K3                     |       
+      |                │                      | xor   
+      |                │                      v       
+      |                v               +-------------+
+      +---------------xor-------------&gt;|      S      |
+                                       +-------------+
+                                              |       
+                                              v       
++-----------+                           +-----------+ 
+|    L1     |                           |    R2     | 
++-----------+                           +-----------+ 
+                                                      
+                                                      
+round 4:  L2 = L1 ^ H_K4(R2)                          
+                                                      
++-----------+                           +-----------+ 
+|    L1     |                           |    R2     | 
++-----------+                           +-----------+ 
+      |                                       |       
+      | xor                                   |       
+      v                                       |       
++-------------+&lt;------------------------------+       
+|      H      |&lt;----- K4                              
++-------------+                                       
+      |                                               
+      v                                               
++-----------+                           +-----------+ 
+|    L2     |                           |    R2     | 
++-----------+                           +-----------+ 
+</code></pre>
+<h3 id="55-decryption"><a class="header" href="#55-decryption">5.5 Decryption</a></h3>
+<p>LIONESS decryption is the inverse of the four internal rounds defined in the previous section:</p>
+<div class="math-block" data-tex="\begin{aligned}&#10;C &amp;= L_2 \parallel R_2 \\&#10;L_1 &amp;= L_2 \oplus H_{K_4}(R_2) \\&#10;R_1 &amp;= R_2 \oplus S(K_3 \oplus L_1) \\&#10;L_0 &amp;= L_1 \oplus H_{K_2}(R_1) \\&#10;R_0 &amp;= R_1 \oplus S(K_1 \oplus L_0) \\&#10;B &amp;= L_0 \parallel R_0&#10;\end{aligned}"></div>
+<h2 id="6-payload-construction"><a class="header" href="#6-payload-construction">6. Payload Construction</a></h2>
+<p>This section specifies how the Sphinx payload is constructed using the LIONESS wide-block encryption. Some parts of this section restates the Mix specification for clarity. For full specification of how the Sphinx packet is constructed, refer to the <a href="./mix.html">mix protocol specification</a>.</p>
+<h3 id="61-payload-plaintext-format"><a class="header" href="#61-payload-plaintext-format">6.1 Payload Plaintext Format</a></h3>
+<p>Before layered encryption, the sender MUST construct the payload plaintext as the following concatenation:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;B = z \parallel m&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="z = 0_\kappa"></span> is the payload integrity prefix, consisting of <span class="math-inline" data-tex="\kappa"></span> zero bytes.</li>
+<li><span class="math-inline" data-tex="m"></span> is the application message padded to fill the remaining payload space.</li>
+</ul>
+<p>Thus:</p>
+<ul>
+<li><span class="math-inline" data-tex="|z| = \kappa"></span> bytes</li>
+<li><span class="math-inline" data-tex="|B| = |\delta|"></span></li>
+<li><span class="math-inline" data-tex="|m| = |B| - |z|"></span></li>
+</ul>
+<p>The size of the payload <span class="math-inline" data-tex="|\delta|"></span> is specified in the Mix protocol, and if the application message <span class="math-inline" data-tex="|m|"></span> is small payload padding is added as specified in the <a href="./mix.html">mix protocol</a>.</p>
+<h3 id="62-sphinx-payload-construction"><a class="header" href="#62-sphinx-payload-construction">6.2 Sphinx Payload Construction</a></h3>
+<h4 id="621-forward-payload"><a class="header" href="#621-forward-payload">6.2.1 Forward Payload</a></h4>
+<p>Once the plaintext is formatted as specified in <a href="#61-payload-plaintext-format">section 6.1</a>, it needs to be encrypted in layers such that each hop in the mix path removes exactly one layer using the per-hop session key. This ensures that only the final hop (i.e., the exit node) can fully recover the plaintext message <span class="math-inline" data-tex="m"></span>, validate its integrity, and forward it to the destination. To compute the encrypted payload, perform the following steps for each hop <span class="math-inline" data-tex="i = L-1"></span> down to <span class="math-inline" data-tex="0"></span>, recursively:</p>
+<ol>
+<li>
+<p>Derive the payload encryption key:</p>
+<div class="math-block" data-tex="    \begin{array}{l}&#10;    \delta_{\mathrm{key}_i} = \mathsf{KDF}(\mathrm{payload\_enc\_key}, s_i)&#10;    \end{array}"></div> 
+<p>where <span class="math-inline" data-tex="s_i"></span> is the per-hop shared secret for hop <code>i</code> as defined in the Mix protocol specification.</p>
+</li>
+<li>
+<p>Using <span class="math-inline" data-tex="\delta_{\mathrm{key}_i}"></span>, compute the encrypted payload <span class="math-inline" data-tex="\delta_i"></span>:</p>
+</li>
+</ol>
+<ul>
+<li>If <span class="math-inline" data-tex="i = L-1"></span> (<em>i.e.,</em> exit node):</li>
+</ul>
+   <div class="math-block" data-tex="    \begin{array}{l}&#10;    \delta_i = \mathsf{LIONESS.Enc}\bigl(\delta_{\mathrm{key}_i}, B&#10;    \bigr)&#10;    \end{array}"></div>
+<ul>
+<li>Otherwise (<em>i.e.,</em> intermediary node):</li>
+</ul>
+   <div class="math-block" data-tex="    \begin{array}{l}&#10;    \delta_i = \mathsf{LIONESS.Enc}\bigl(\delta_{\mathrm{key}_i},&#10;    \delta_{i+1} \bigr)&#10;    \end{array}"></div>
+<p>The resulting <span class="math-inline" data-tex="\delta"></span> is placed into the final Sphinx packet.</p>
+<h4 id="622-reply-payload-surb-payload"><a class="header" href="#622-reply-payload-surb-payload">6.2.2 Reply payload (SURB payload)</a></h4>
+<p>For a SURB reply, the reply sender (i.e., the SURB user not the SURB creator) does not know the return-path shared secrets <span class="math-inline" data-tex="s_0, \ldots, s_{L-1}"></span>. Instead, it only has the first node in the return path (<span class="math-inline" data-tex="\mathrm{hop}_0"></span>), a pre-computed Sphinx header (<span class="math-inline" data-tex="\alpha, \beta, \gamma"></span>), and a reply key (<span class="math-inline" data-tex="\tilde{k}"></span>).</p>
+<p>Therefore, the reply sender encrypts the reply payload <span class="math-inline" data-tex="B"></span> only once using <span class="math-inline" data-tex="\tilde{k}"></span> as the LIONESS seed:</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;\delta = \mathsf{LIONESS.Enc}(\tilde{k}, B)&#10;\end{array}"></div>
+<p>Note that the reply key <span class="math-inline" data-tex="\tilde{k}"></span> is <span class="math-inline" data-tex="\kappa"></span> bytes in size as defined in the <a href="./mix.html">Mix Protocol</a>, so it satisfies the LIONESS seed requirement. The resulting <span class="math-inline" data-tex="\delta"></span> is placed into the SURB reply packet. Then each hop on the return path subsequently applies the normal payload-processing rule, namely one LIONESS decryption under its per-hop payload encryption key, resulting in one layer of LIONESS encryption and <span class="math-inline" data-tex="L"></span> layers of LIONESS decryptions. These <span class="math-inline" data-tex="L + 1"></span> return path layers are later removed during reply recovery as described in <a href="#73-exit-processing---reply-packet">section 7.3</a>.</p>
+<h2 id="7-sphinx-payload-processing"><a class="header" href="#7-sphinx-payload-processing">7. Sphinx Payload Processing</a></h2>
+<p>Once the Sphinx packet is deserialized into (<span class="math-inline" data-tex="\alpha,\ \beta,\ \gamma,\ \delta"></span>) and the header is preprocessed as specified in the Mix protocol, the mix node performs the following steps depending on its role (as defined in the <a href="mix.html#862-node-role-determination">Mix Protocol, Section 8.6.2</a>):</p>
+<h3 id="71-intermediary-processing"><a class="header" href="#71-intermediary-processing">7.1 Intermediary Processing</a></h3>
+<p>If the node is an intermediary, it MUST:</p>
+<ol>
+<li>
+<p>Derive the payload encryption key using the shared secret <span class="math-inline" data-tex="s"></span>:</p>
+<div class="math-block" data-tex="    \begin{array}{l}&#10;    \delta_{\mathrm{key}} = \mathsf{KDF}(\mathrm{payload\_enc\_key}, s)&#10;    \end{array}"></div>
+</li>
+<li>
+<p>Decrypt one layer of the payload using the payload encryption key <span class="math-inline" data-tex="\delta_{\mathrm{key}}"></span>:</p>
+<div class="math-block" data-tex="    \begin{array}{l}&#10;    \delta&#x27; = \mathsf{LIONESS.Dec}\bigl(\delta_{\mathrm{key}}, \delta \bigr)&#10;    \end{array}"></div>
+</li>
+<li>
+<p>use <span class="math-inline" data-tex="\delta&#x27;"></span> as the outgoing payload,</p>
+</li>
+<li>
+<p>forward the updated packet as defined by the <a href="./mix.html">Mix Protocol</a>.</p>
+</li>
+</ol>
+<h3 id="72-exit-processing---forward-packet"><a class="header" href="#72-exit-processing---forward-packet">7.2 Exit Processing - Forward packet</a></h3>
+<p>If the node is the exit, and the packet is not a reply (using SURBs), it MUST:</p>
+<ol>
+<li>Derive the payload encryption key using the shared secret <span class="math-inline" data-tex="s"></span> in the same way as defined in <a href="#71-intermediary-processing">section 7.1 step 1</a>.</li>
+<li>Decrypt one layer of the payload using the payload encryption key <span class="math-inline" data-tex="\delta_{\mathrm{key}}"></span> in the same way as defined in <a href="#71-intermediary-processing">section 7.1 step 2</a>.</li>
+<li>perform the payload integrity prefix check as follows:</li>
+</ol>
+<ul>
+<li>parse the decrypted payload <span class="math-inline" data-tex="\delta&#x27;"></span> as <span class="math-inline" data-tex="B = z \parallel m"></span>, where <span class="math-inline" data-tex="|z| = \kappa"></span> bytes.</li>
+<li>verify that <span class="math-inline" data-tex="z = 0_\kappa"></span></li>
+<li>discard the packet if this payload integrity prefix check fails.</li>
+<li>otherwise remove <span class="math-inline" data-tex="z"></span> (i.e., the <span class="math-inline" data-tex="\kappa"></span> bytes of payload integrity prefix) and return <span class="math-inline" data-tex="m"></span>.</li>
+</ul>
+<ol start="4">
+<li>pass <span class="math-inline" data-tex="m"></span> to the Mix Exit Layer.</li>
+</ol>
+<h3 id="73-exit-processing---reply-packet"><a class="header" href="#73-exit-processing---reply-packet">7.3 Exit Processing - Reply packet</a></h3>
+<p>If the node is the exit, and the packet is a reply, it MUST:</p>
+<ol>
+<li>
+<p>reverse the return-path transformations, i.e., since the hops apply LIONESS decryption, the exit must apply LIONESS encryption. Therefore, the node must perform the same LIONESS layered encryption pattern as defined in <a href="#621-forward-payload">Section 6.2.1</a>, with the reply payload <span class="math-inline" data-tex="\delta"></span> used as the initial input instead of the plaintext payload block <span class="math-inline" data-tex="B"></span>.</p>
+</li>
+<li>
+<p>Decrypt the final layer i.e., reversing the effect of the initial encryption in <a href="#622-reply-payload-surb-payload">section 6.2.2</a>:</p>
+<div class="math-block" data-tex="    \begin{array}{l}&#10;    B = \mathsf{LIONESS.Dec}(\tilde{k}, \delta)&#10;    \end{array}"></div>
+</li>
+<li>
+<p>perform the payload integrity prefix check as defined in <a href="#72-exit-processing---forward-packet">section 7.2 step 3</a> and then pass <span class="math-inline" data-tex="m"></span> to the Mix Exit Layer.</p>
+</li>
+</ol>
+<p><em>Note: We assume here that the exit is the SURB creator, if not then the exit will simply forward <span class="math-inline" data-tex="\delta"></span> to the destination which will process the reply payload as specified above.</em></p>
+<h2 id="8-security-considerations"><a class="header" href="#8-security-considerations">8. Security Considerations</a></h2>
+<h3 id="81-lioness-blocksmessages"><a class="header" href="#81-lioness-blocksmessages">8.1 LIONESS Blocks/Messages</a></h3>
+<p>This specification requires the LIONESS input block to be at least <span class="math-inline" data-tex="2\mu"></span> bytes, i.e., 64 bytes since we assume <span class="math-inline" data-tex="\mu = 32"></span>.</p>
+<p>LIONESS splits the input block into two parts</p>
+<div class="math-block" data-tex="\begin{array}{l}&#10;B = L \parallel R&#10;\end{array}"></div>
+<p>where:</p>
+<ul>
+<li><span class="math-inline" data-tex="|L| = \mu = 32"></span> bytes,</li>
+<li><span class="math-inline" data-tex="|R| = |B| - \mu"></span> bytes.</li>
+</ul>
+<p>Therefore, the 64-byte minimum ensures that both <span class="math-inline" data-tex="L"></span> and <span class="math-inline" data-tex="R"></span> contain at least <span class="math-inline" data-tex="\mu"></span> bytes. The <a href="./mix.html">Mix Protocol</a> payload size is expected to be much larger than this minimum, so this requirement is satisfied by normal Mix payloads.</p>
+<h3 id="82-lioness-integrity"><a class="header" href="#82-lioness-integrity">8.2 LIONESS Integrity</a></h3>
+<p>This specification does not use an explicit payload authentication tag. Instead, integrity is obtained by:</p>
+<ul>
+<li>embedding a fixed payload integrity prefix, specified as <span class="math-inline" data-tex="\kappa"></span> bytes of zeros, into the plaintext,</li>
+<li>encrypting the whole payload as a single block with LIONESS.</li>
+</ul>
+<p>Because the payload is encrypted as a single block, LIONESS acts as a pseudo-random permutation (PRP) over the entire payload, a modification to the ciphertext will, except with negligible probability, produce a decrypted plaintext whose first <span class="math-inline" data-tex="\kappa = 16"></span> bytes are not all zero. Replacing LIONESS with a malleable stream construction invalidates this property.</p>
+<h3 id="83-primitive-choices"><a class="header" href="#83-primitive-choices">8.3 Primitive Choices</a></h3>
+<p>The security of LIONESS depends on the security of the primitives used to instantiate it:</p>
+<ul>
+<li>the stream cipher <span class="math-inline" data-tex="\mathsf{S}"></span>,</li>
+<li>the keyed hash function <span class="math-inline" data-tex="\mathsf{H}_k"></span>,</li>
+<li>the key derivation function <span class="math-inline" data-tex="\mathsf{KDF}"></span>.</li>
+</ul>
+<p>For detailed analysis on the security of LIONESS, refer to the <a href="https://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf">paper</a>.</p>
+<h2 id="9-reference-implementations"><a class="header" href="#9-reference-implementations">9. Reference Implementations</a></h2>
+<ul>
+<li><a href="https://github.com/logos-storage/lioness_blockcipher">Rust reference implementation of LIONESS</a></li>
+<li><a href="https://github.com/logos-storage/transport-over-mix">Haskell reference implementation</a>.</li>
+</ul>
+<p>These reference implementations are generic and can support any compatible <span class="math-inline" data-tex="\mathsf{S}"></span>, <span class="math-inline" data-tex="\mathsf{H}_k"></span>, and <span class="math-inline" data-tex="\mathsf{KDF}"></span>.</p>
+<h2 id="10-future-work"><a class="header" href="#10-future-work">10. Future Work</a></h2>
+<p>The following are under research/consideration:</p>
+<ul>
+<li>support for faster alternative wide-block ciphers:
+<ul>
+<li><a href="https://www.cs.ucdavis.edu/~rogaway/aez/index.html">AEZ authenticated encryption scheme</a></li>
+<li><a href="https://csrc.nist.gov/csrc/media/Events/2024/accordion-cipher-mode-workshop-2024/documents/papers/accordion-mode-based-hash-encrypt-hash.pdf">Accordion mode based on Hash-Encrypt-Hash</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<ul>
+<li><a href="https://eprint.iacr.org/2008/475.pdf">Sphinx: A Compact and Provably Secure Mix Format</a></li>
+<li><a href="https://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf">The Bear and Lion Block Cipher Design</a></li>
+<li><a href="./mix.html">Mix Protocol</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../anoncomms/raw/consensus-hashgraphlike.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../anoncomms/raw/logos-service-discovery.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../anoncomms/raw/consensus-hashgraphlike.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../anoncomms/raw/logos-service-discovery.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../theme/katex/katex.min.js"></script>
+        <script src="../../theme/katex/auto-render.min.js"></script>
+        <script src="../../scripts/katex-render.js"></script>
+        <script src="../../scripts/logos-lips.js"></script>
+
+
+    </div>
+    </body>
+</html>
