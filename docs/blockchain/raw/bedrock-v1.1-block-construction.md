@@ -106,7 +106,7 @@ Where:
 - `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `slot` is the consensus slot number; the size of the `SlotNumber` type is 8 bytes.
 - `block_root` is the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) used for constructing the `references` list in the `mempool_ransactions`; the size of the `hash` is 32 bytes.
-- `uncles` is a fixed-size array of `MAX_UNCLES` block IDs referencing uncles, which are valid fork blocks satisfying the rules defined in [Uncle References](cryptarchia-v1-protocol.md#uncle-references). The proposer chooses which uncles to reference according to [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection). Unused entries are set to the all-zero hash, which makes the size of the header independent of how many uncles are referenced. The uncles are used only for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) and are never executed; the size of each `hash` is 32 bytes, so the field is `MAX_UNCLES × 32` bytes.
+- `uncles` is a fixed-size array of `MAX_UNCLES` block IDs referencing uncles (valid fork blocks; see [Uncle References](cryptarchia-v1-protocol.md#uncle-references)). The proposer chooses which uncles to reference according to [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection). Unused entries are set to the all-zero hash, which makes the size of the header independent of how many uncles are referenced. The `uncles` field is committed in the header but imposes no validity constraint; it is used only for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) and is never executed. The size of each `hash` is 32 bytes, so the field is `MAX_UNCLES × 32` bytes.
 - `proof_of_leadership` is the proof confirming that the sender is the leader; defined below: [Proof of Leadership](#proof-of-leadership).
 
 ### References
@@ -226,7 +226,7 @@ This section defines the procedure followed by a Logos Blockchain node to valida
 Given a `proposal`, a proposed block consisting of a `header` and `references`. This block proposal is considered valid if the following conditions are met:
 
 1. **Block Validation**
-  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), which include the validation of the `uncles` references according to [Uncle References](cryptarchia-v1-protocol.md#uncle-references).
+  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation). The `uncles` field is **not** validated for block validity; it is used only for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) (see [Uncle References](cryptarchia-v1-protocol.md#uncle-references)).
 
 2. **Block Proposal Reconstruction**
   The `references` must refer to existing `mempool_transaction` entries that are retrievable from the node's local mempool.
