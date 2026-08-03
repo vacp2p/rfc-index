@@ -114,7 +114,8 @@ It exposes two portions:
   the membership's Merkle proof path, the valid-root window,
   and the nullifier log for double-signalling detection.
 
-The consumer supplies only scopes, signals, and proofs.
+The consumer supplies only scopes, signals, timestamps,
+and received proofs for validation.
 Registry access and payment — the latter via an accounts module beneath the Module —
 are internal to the Module and out of scope here.
 Identity credentials never leave the Module:
@@ -411,7 +412,8 @@ the current epoch, message-id allocation within the rate limit,
 the membership's Merkle proof path, the valid-root window,
 and the nullifier log for double-signalling detection —
 is maintained inside the Module;
-the consumer supplies only the scope and the signal.
+the consumer supplies only the scope, the signal,
+and the message's timestamp.
 A membership is required only to generate proofs:
 verification runs against the registry view alone,
 so a consumer that only validates messages never registers.
@@ -448,14 +450,26 @@ never an exhausted budget,
 and the consumer resolves which through
 [`get_membership_state`](#registration).
 
-#### `Result<RateLimitProof> generate_proof(MembershipScope scope, Bytes signal)`
+#### `Result<RateLimitProof> generate_proof(MembershipScope scope, Bytes signal, uint64_t timestamp)`
 
 Generate an RLN proof that `signal` was produced by the holder of the scope's membership
-within its rate limit for the current epoch.
-The Module determines the epoch,
-allocates the next unused `message_id` within the membership's `rate_limit`,
+within its rate limit for the epoch of `timestamp`.
+The consumer supplies `timestamp` — the message's timestamp, Unix-epoch seconds —
+and the Module derives the epoch from it,
+`epoch_index = timestamp / epoch_size`,
+so the message and its proof agree on one time
+regardless of when the proof is generated.
+The Module allocates the next unused `message_id`
+within the membership's `rate_limit` for that epoch,
 and binds the proof to the external nullifier
 `poseidon(hash_to_field_le(epoch), hash_to_field_le(rln_identifier))`.
+Before returning, the Module SHALL validate the generated proof
+against the conditions [`verify_proof`](#rate-limiting) requires for `PROOF_VALID` —
+in particular that the derived epoch falls within
+the configured maximum epoch gap of the Module's current epoch —
+and SHALL fail with `RLN_ERR_PERMANENT`,
+rather than return a proof verifiers would reject,
+when the `timestamp` lies outside that window.
 The Module SHALL NOT issue two proofs for the same `(epoch, message_id)` pair:
 doing so reveals the identity secret.
 When the epoch's budget is exhausted,
