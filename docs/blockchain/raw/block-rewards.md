@@ -22,6 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
+| 1.0.1 | Define $`D_{1,t}`$ as base plus storage fees excluding tips; declare the burned-fees window as ledger state; fix the reference-code `a_num` typo | 2026-08-04 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -151,7 +152,7 @@ Let us define the following variables:
 - $`A_t \in [0,1]`$ denotes the emission rate factor on a per year basis.
     - This implies that $`A_t \cdot I_{max} \cdot \Delta_t`$ denotes the emission within the time-step.
 - $`D_{i,t}`$ denotes the $i$-th key performance indicator at time $t$ (e.g., TVL, staked amount, active users).
-- $`R_\text{block}`$ denotes the total amount of Execution Gas and Permanent Storage fees burnt in a block. Refer to [Execution Market](execution-market.md) and [Storage Markets](storage-markets.md) for how to compute $`R_{block}`$.
+- $`R_\text{block}`$ denotes the total amount of Execution base fees and Permanent Storage fees burnt in a block, excluding priority fees (tips), which are escrowed for the leader reward pool and are supply-neutral. Refer to [Execution Market](execution-market.md) and [Storage Markets](storage-markets.md) for how to compute $`R_{block}`$.
 
 ## Parametrization
 
@@ -203,7 +204,7 @@ where:
 - $`S_{tge}`$ denotes the token supply at Token Generation Event (TGE).
 - $`\Delta_t`$ denotes the fraction of year in one time step per e.g., epoch, block, or day.
 - $f$ be the average number of block proposal within $`\Delta_{t}`$ units.
-- $`R_\text{block} = D_{1,t}`$ denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed.
+- $`R_\text{block} = D_{1,t}`$ denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed, excluding priority fees (tips): tips are re-minted in full to the leader reward pool, so counting them here would re-mint them a second time through the $`(1-A_t) \cdot R_\text{block}`$ term.
 
 ```python
 def block_rewards(
@@ -472,13 +473,30 @@ $$
 .
 $$
 
+## Burned-Fees Window State
+
+The moving average above requires the protocol to maintain a dedicated piece of ledger state, which we declare here explicitly:
+
+| State variable | Type | Genesis value | Update |
+| --- | --- | --- | --- |
+| `burned_fees_window` | List of $T = 120$ integers | All zeros | At the end of the execution of block $t$, append $`D_{1,t}`$ (Execution base fees plus Permanent Storage fees burned in block $t$, excluding priority fees) and drop the oldest entry. |
+
+```python
+def update_burned_fees_window(window: list[int], d1_t: int) -> list[int]:
+    # keeps len(window) == T = 120; after the update the window covers
+    # tau = t-119 ... t, so the sum below includes the current block
+    return window[1:] + [d1_t]
+```
+
+The window includes the current block, matching the sum $`\sum_{\tau=t-T+1}^{t}`$ used throughout this document. With the all-zero genesis seed, the average is biased low during the first $T$ blocks; this is intended: bootstrap emission is then driven by the stake-deviation KPI. The append step is part of Block Execution and must be reflected in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md).
+
 So we propose a reference implementation that uses integers:
 
 ```python
-A_SCALE = 120_000_000            # denominator of 1/(I_max * D1_target * Delta_t * T) 
+A_SCALE = 120_000_000            # denominator of 1/(I_max * D1_target * Delta_t * T)
 INFLATION_NUMERATOR = 62_500     # numerator of I_max * S_TGE * DELTA_t / f
 INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
-FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T) 
+FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T)
 STAKE_TARGET = int(3e9)
 
 def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int]:
@@ -490,8 +508,8 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, 
         A_SCALE
     )
 
-    reward_numerator = INFLATION_NUMERATOR * a_numerator
-									   + INFLATION_DENOMINATOR * (A_SCALE - a_num) * last_burned_fee
+    reward_numerator = (INFLATION_NUMERATOR * a_numerator
+                        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_burned_fee)
     reward_denominator = INFLATION_DENOMINATOR * A_SCALE
 
     blend_reward = reward_numerator * 6 // (reward_denominator * 10)
