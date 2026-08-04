@@ -25,7 +25,7 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
-| 1.1.0 | Updated `Max_Body_Length` to 35213 bytes, following the block proposal size increase from the added uncle references (the `uncles` header field and the carried `uncle_headers`) in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md). | 2026-07-09 |
+| 1.1.0 | Updated `Max_Body_Length` to 35218 bytes — the maximum block proposal size under the variable-size uncle references (the count-prefixed `uncles` header field and the carried `uncle_headers`) of [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md) — to which the body padding fixes every payload, preserving proposal indistinguishability. | 2026-07-09 |
 
 # Introduction
 
@@ -72,7 +72,7 @@ We define the `body_length` as uint16 (encoded as little-endian). Therefore, the
 
 ## Body
 
-The `Max_Body_Length` parameter defines the maximum length of the `body`. Currently, we assume that the maximal length of a raw data message is 35213 ([Block Proposal](bedrock-v1.1-block-construction.md#block-proposal)), so the `Max_Body_Length=35213`.
+The `Max_Body_Length` parameter defines the maximum length of the `body`. The maximal length of a raw data message is the maximum size of a [Block Proposal](bedrock-v1.1-block-construction.md#block-proposal) — 35218 bytes, reached at the maximum header size together with `MAX_UNCLES` carried maximum-size signed uncle headers — so the `Max_Body_Length=35218`. Because the padding below fixes every `body` to this length, the variable size of a proposal (which depends on the number of referenced uncles) is not observable on the wire, which is what preserves the indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md).
 
 The `body` length is fixed to `Max_Body_Length` bytes. Therefore, if the length of the raw message is shorter than the `Max_Body_Length`, then it must be padded with random data.
 

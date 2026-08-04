@@ -177,7 +177,7 @@ The Genesis Block header fields are set to the following values:
 - `parent_block`: 0 (as this is the first block).
 - `slot`: 0 (the Genesis slot).
 - `block_root`: Block Merkle root over the (single) initial transaction.
-- `uncles`: all `MAX_UNCLES` entries are 0 (as the Genesis Block references no uncle).
+- `uncle_count`: 0 and `uncles`: an empty list (as the Genesis Block references no uncle).
 - `proof_of_leadership`: Stubbed leadership proof.
   - `leader_voucher`: 0 (as there is no leader block reward for the initial block).
   - `entropy_contribution`: 0 (no entropy is provided through the initial PoL).
@@ -192,7 +192,8 @@ GENESIS_HEADER = Header(
     parent_block=0,
     slot=0,
     block_root=block_merkle_root([GENESIS_MANTLE_TX]),
-    uncles=[bytes(32)] * MAX_UNCLES,
+    uncle_count=0,
+    uncles=[],
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),
         entropy_contribution=bytes(32),
@@ -248,7 +249,8 @@ GENESIS_HEADER = Header(
     parent_block=bytes(32),
     slot=0,
     block_root=block_merkle_root([GENESIS_MANTLE_TX]),
-    uncles=[bytes(32)] * MAX_UNCLES,
+    uncle_count=0,
+    uncles=[],
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),
         entropy_contribution=bytes(32),
