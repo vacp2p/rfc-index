@@ -22,6 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
+| 1.0.1 | Reconcile the $`\alpha_d`$ derivation with the normative value $1/4$ of [Block Rewards](block-rewards.md) | 2026-08-04 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -77,7 +78,9 @@ The parameter $`\alpha_d`$ also controls the sensitivity of the normalized devia
 
 The parameter $`\alpha_d`$ therefore allows for a smooth transition from the maximum inflationary regime (driven by $`I_{max}`$) to the stable regime (driven by the averaged burned fees).
 
-The value $`\alpha_d=1/6`$ is chosen so that when the total inferred stake is off target by $16.6\%$ (i.e. $`\delta_t=16.6\%`$), the system starts moving from the maximum inflationary regime to the regime driven by the burned fees. If $`D_{0,target}=30\%`$, this means that this happens when the security level reaches $25\%$.
+The system leaves the maximum inflationary regime ($`A_t \lt 1`$) once $`\alpha_d \cdot \delta_t \lt I_{max}`$, i.e. once the deviation falls below $`\delta_t = I_{max}/\alpha_d`$. With the normative value $`\alpha_d=1/4`$ (see [Block Rewards](block-rewards.md#parametrization)) and $`I_{max}=1\%`$, the transition starts when the total inferred stake is $4\%$ below target. If $`D_{0,target}=30\%`$, this means that this happens when the security level reaches $28.8\%$.
+
+> **Note (reconciled inconsistency).** A previous version of this analysis stated $`\alpha_d=1/6`$ with a transition at $`\delta_t=16.6\%`$. That pair is internally inconsistent: with $`I_{max}=1\%`$, $`\alpha_d=1/6`$ yields a transition at $`\delta_t=6\%`$, while a transition at $16.6\%$ would require $`\alpha_d = I_{max}/0.166 \approx 0.06 = 3/50`$. The normative specification fixes $`\alpha_d=1/4`$ in both the [parameter table](block-rewards.md#parametrization) and the integer reference implementation, so this analysis is aligned to it. If the intended design goal was instead a transition at $16.6\%$ below target (security level $25\%$), then $`\alpha_d`$ must be set to $3/50$ in [Block Rewards](block-rewards.md) — a normative change that is out of scope here and is flagged for reviewers.
 
 ## The Parameter $`\alpha_a`$​
 
