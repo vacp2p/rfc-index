@@ -945,7 +945,7 @@ and serve cached advertisements,
 by handling `GET_ADS` requests.
 Registrars MUST maintain a cache of advertisements, `ad_cache`,
 that associates each `advertisement`
-to its `service_id`,
+to its `service_id`, the advertiser's `peer_id`
 and an expiry timestamp based on admission time plus configured expiry time, `E`.
 Once an `ad` has expired, it SHOULD be removed from the `ad_cache`.
 
@@ -1137,20 +1137,20 @@ while still learning rare peers in buckets close to `service_id_hash`.
 
 The waiting time is the time advertisers have to
 wait before their `ad` is admitted to the `ad_cache`.
-The waiting time is given based on the `ad` itself
+The waiting time is given based on the `ad` itself, the advertiser
 and the current state of the registrar’s `ad_cache`.
 
 The waiting time for an advertisement MUST be calculated using:
 
 ```text
-w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(ad.addrs)) + G)
+w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(advertiser.addrs)) + G)
 ```
 
 - `c`: Current cache occupancy
 - `c(ad.service_id_hash)`: Number of advertisements for `service_id_hash` in cache
-- `getIP(ad.addrs)` is a function to get the IP address
-from the multiaddress of the advertisement.
-- `score(getIP(ad.addrs))`: IP similarity score (0 to 1).
+- `getIP(advertiser.addrs)` is a function to get the IP addresses
+from the multiaddresses of the advertiser.
+- `score(getIP(advertiser.addrs))`: IP similarity score (0 to 1).
 Refer to the [IP Similarity Score section](#ip-similarity-score)
 
 Section [System Parameters](#system-parameters) can be referred
@@ -1196,11 +1196,11 @@ The service similarity score promotes diversity:
 ### IP Similarity Score
 
 The IP similarity score is used to detect and limit
-Sybil attacks where malicious actors create multiple advertisements
+Sybil attacks where malicious actors create multiple advertisement requests
 from the same network or IP prefix.
 
 Registrars MUST use an IP similarity score to
-limit the number of `ads` coming from the same subnetwork
+limit the number of requests coming from the same subnetwork
 by increasing their waiting time.
 The IP similarity mechanism MUST:
 
@@ -1218,7 +1218,7 @@ The IP similarity mechanism MUST:
 We RECOMMEND using an IP tree data structure
 to efficiently track and calculate IP similarity scores.
 An IP tree is a binary tree that stores
-IPs used by `ads` currently present in the `ad_cache`.
+IPs used by advertiser currently present in the `ad_cache`.
 This data structure provides logarithmic time complexity
 for insertion, deletion, and score calculation.
 Implementations MAY use alternative data structures
