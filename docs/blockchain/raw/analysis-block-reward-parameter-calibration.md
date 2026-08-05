@@ -80,7 +80,7 @@ The parameter $`\alpha_d`$ therefore allows for a smooth transition from the max
 
 The system leaves the maximum inflationary regime ($`A_t \lt 1`$) once $`\alpha_d \cdot \delta_t \lt I_{max}`$, i.e. once the deviation falls below $`\delta_t = I_{max}/\alpha_d`$. With the normative value $`\alpha_d=1/4`$ (see [Block Rewards](block-rewards.md#parametrization)) and $`I_{max}=1\%`$, the transition starts when the total inferred stake is $4\%$ below target. If $`D_{0,target}=30\%`$, this means that this happens when the security level reaches $28.8\%$.
 
-> **Note (reconciled inconsistency).** A previous version of this analysis stated $`\alpha_d=1/6`$ with a transition at $`\delta_t=16.6\%`$. That pair is internally inconsistent: with $`I_{max}=1\%`$, $`\alpha_d=1/6`$ yields a transition at $`\delta_t=6\%`$, while a transition at $16.6\%$ would require $`\alpha_d = I_{max}/0.166 \approx 0.06 = 3/50`$. The normative specification fixes $`\alpha_d=1/4`$ in both the [parameter table](block-rewards.md#parametrization) and the integer reference implementation, so this analysis is aligned to it. If the intended design goal was instead a transition at $16.6\%$ below target (security level $25\%$), then $`\alpha_d`$ must be set to $3/50$ in [Block Rewards](block-rewards.md) — a normative change that is out of scope here and is flagged for reviewers.
+> **Alternative calibrations.** The transition point scales inversely with $`\alpha_d`$ ($`\delta_t = I_{max}/\alpha_d`$): a transition at $16.6\%$ below target (security level $25\%$) would require $`\alpha_d = 3/50`$, and $`\alpha_d = 1/6`$ would place it at $6\%$. Selecting $`\alpha_d`$ is a normative decision that belongs to [Block Rewards](block-rewards.md).
 
 ## The Parameter $`\alpha_a`$​
 

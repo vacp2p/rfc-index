@@ -194,6 +194,9 @@ EMA_PREV_WEIGHT = 9  # from q = 9/10
 BASE_FEE_NUMERATOR = 11_177_110  # = 7 * G_target
 BASE_FEE_DENOMINATOR = 12_773_840  # = 8 * G_target
 MAX_PRICE = 5_776_413_067_240  # = (2^64 - 1) // G_max
+# Largest base_fee whose ceil_div numerator still fits in uint64. The
+# BASE_FEE_DENOMINATOR term accounts for the "+ denominator - 1" that
+# ceil_div adds to the numerator before dividing:
 MAX_PRICE_UPDATE = 1_283_647_348_274  # = (2^64 - BASE_FEE_DENOMINATOR) // (BASE_FEE_NUMERATOR + G_max)
 
 def ceil_div(numerator: int, denominator: int) -> int:
@@ -204,14 +207,14 @@ def update_g_avg(prev_g_avg: int, block_gas_used: int) -> int:
     return numerator // EMA_DENOMINATOR
 
 def update_base_fee(base_fee: int, g_avg: int) -> int:
-    # The product MUST be evaluated with at least 128-bit intermediate
-    # arithmetic: in u64 it overflows for base_fee > MAX_PRICE_UPDATE,
-    # far below MAX_PRICE (see Range Limits and Overflow Safety).
+    # The product MUST be evaluated in uint128 arithmetic: in uint64 it
+    # overflows for base_fee > MAX_PRICE_UPDATE, far below MAX_PRICE
+    # (see Range Limits and Overflow Safety).
     numerator = base_fee * (BASE_FEE_NUMERATOR + g_avg)
     return min(MAX_PRICE, ceil_div(numerator, BASE_FEE_DENOMINATOR))
 ```
 
-The two rounding directions are not interchangeable. The base fee is multiplied by a factor smaller than one whenever the smoothed average is below the target, so rounding it downwards would make 0 an absorbing state: a base fee of 1 would be mapped to 0 by the first downward update, and every subsequent update would keep it at 0, making execution permanently free. Note that under the pre-1.1.0 floor rule this happened *even under full congestion*: the smoothed average is seeded at 0 and needs approximately 7 full blocks to cross $`G_\text{target}`$, so the first updates of a fresh chain are downward whatever the load, and $`\lfloor 1 \cdot x \rfloor = 0`$ for every $x \lt 1$.
+The two rounding directions are not interchangeable. The base fee is multiplied by a factor smaller than one whenever the smoothed average is below the target, so rounding it downwards would make 0 an absorbing state: a base fee of 1 would be mapped to 0 by the first downward update, and every subsequent update would keep it at 0, making execution permanently free. A downward-rounded rule would reach 0 *even under full congestion*: the smoothed average is seeded at 0 and needs approximately 7 full blocks to cross $`G_\text{target}`$, so the first updates of a fresh chain are downward whatever the load, and $`\lfloor 1 \cdot x \rfloor = 0`$ for every $x \lt 1$.
 
 Rounding upwards makes 1 the effective floor of the base fee: whenever $`G_\text{avg}[s] \lt G_\text{target}`$, the update satisfies $`\lceil b \cdot (7 G_\text{target} + G_\text{avg}) / (8 G_\text{target}) \rceil = b`$ exactly for $`b \lt 8 G_\text{target} / (G_\text{target} - G_\text{avg})`$, so no price $\geq 1$ can ever reach 0. Three qualifications apply:
 
@@ -223,7 +226,7 @@ The smoothed average is a measurement rather than a price and is not subject to 
 
 ### Range Limits and Overflow Safety
 
-The update rule is multiplicative and, without a cap, unbounded above: under sustained full congestion the base fee grows by a factor approaching $9/8$ per block once the smoothed average saturates, so exceeding the 64-bit integer range is a question of *when*, not *if*. Starting from the genesis price under sustained full blocks, the relevant thresholds are crossed in this order (exact integer block counts, validated by integer-exact simulation):
+In exact arithmetic the update rule is multiplicative and unbounded above: under sustained full blocks the base fee grows by a factor approaching $9/8$ per block once the smoothed average saturates. Setting aside for a moment the cost of producing such blocks, and starting from the genesis price, the relevant uint64 thresholds are crossed in this order (exact integer block counts, validated by integer-exact simulation):
 
 | Blocks | Threshold crossed |
 | --- | --- |
@@ -234,16 +237,18 @@ The update rule is multiplicative and, without a cap, unbounded above: under sus
 
 The update product overflows *first*, because the update multiplies the price by $`7 G_\text{target} + G_\text{avg} \approx 1.44 \times 10^{7}`$. This ordering drives two normative requirements on the reference implementation above:
 
-1. **Widened intermediate arithmetic.** The product $`b_\text{exec}[s] \cdot (7 G_\text{target} + G_\text{avg}[s])`$ must be evaluated in arithmetic wider than 64 bits (e.g. u128) before the division. This requirement is load-bearing, not stylistic: at MAX_PRICE the update product is $`\approx 8.3 \times 10^{19} \gg 2^{64}`$. An implementation restricted to 64-bit arithmetic must instead clamp at $`\mathrm{MAX\_PRICE\_UPDATE} = \lfloor (2^{64} - 8 G_\text{target}) / (7 G_\text{target} + G_\text{max}) \rfloor = 1{,}283{,}647{,}348{,}274`$, the largest price whose update product fits in u64.
-1. **The MAX_PRICE clamp.** $`\mathrm{MAX\_PRICE} = \lfloor (2^{64}-1)/G_\text{max} \rfloor = 5{,}776{,}413{,}067{,}240`$ is the largest price at which every per-block fee computation ($`g \cdot b`$ with $`g \le G_\text{max}`$) still fits in u64.
+1. **uint128 intermediate arithmetic.** The product $`b_\text{exec}[s] \cdot (7 G_\text{target} + G_\text{avg}[s])`$ must be evaluated in uint128 arithmetic before the division. This requirement is load-bearing, not stylistic: at MAX_PRICE the update product is $`\approx 8.3 \times 10^{19} \gg 2^{64}`$. An implementation restricted to uint64 arithmetic must instead clamp at $`\mathrm{MAX\_PRICE\_UPDATE} = \lfloor (2^{64} - 8 G_\text{target}) / (7 G_\text{target} + G_\text{max}) \rfloor = 1{,}283{,}647{,}348{,}274`$, the largest price whose update product fits in uint64.
+1. **The MAX_PRICE clamp.** $`\mathrm{MAX\_PRICE} = \lfloor (2^{64}-1)/G_\text{max} \rfloor = 5{,}776{,}413{,}067{,}240`$ is the largest price at which every per-block fee computation ($`g \cdot b`$ with $`g \le G_\text{max}`$) still fits in uint64.
 
-No other 64-bit overflow behavior is acceptable, because each one breaks the protocol in a distinct way at the first divergent update (update 234 under sustained congestion, at price $`1{,}416{,}553{,}344{,}943`$):
+No overflow behavior of uint64 arithmetic is an acceptable substitute, because each one breaks the protocol in a distinct way at the first divergent update (update 234 under sustained full blocks, at price $`1{,}416{,}553{,}344{,}943`$):
 
-- **Wrapping** (e.g. release-mode builds): the price silently crashes by a factor of $\approx 9.5$ and re-climbs in an irregular sawtooth; two implementations with different overflow semantics fork the chain at this update, and even identical builds produce economically meaningless fees.
-- **Checked/panicking** arithmetic: the update aborts and the chain halts — before any fee-side product overflows — turning sustained congestion into a denial-of-service vector.
-- **Naive saturating** arithmetic: the price pins at $`(2^{64}-1)/(8 G_\text{target}) = 1{,}444{,}103{,}266{,}810`$, an arbitrary level roughly $4\times$ below MAX_PRICE. That this pin happens to keep fee products inside u64 is a coincidence of the current parameters ($`G_\text{max} \lt 8 G_\text{target}`$), not a designed invariant; it is not an acceptable substitute for the explicit clamp.
+- **Wrapping** (unchecked modular arithmetic): the price silently crashes by a factor of $\approx 9.5$ and re-climbs in an irregular sawtooth; two implementations with different overflow semantics fork the chain at this update, and even identical implementations produce economically meaningless fees.
+- **Checked/aborting** arithmetic: the update aborts and the chain halts — before any fee-side product overflows — turning sustained congestion into a denial-of-service vector.
+- **Naive saturating** arithmetic: the price pins at $`(2^{64}-1)/(8 G_\text{target}) = 1{,}444{,}103{,}266{,}810`$, an arbitrary level roughly $4\times$ below MAX_PRICE. That this pin happens to keep fee products inside uint64 is a coincidence of the current parameters ($`G_\text{max} \lt 8 G_\text{target}`$), not a designed invariant; it is not an acceptable substitute for the explicit clamp.
 
-The clamp is economically free, whatever denomination the token eventually uses: a full block priced at MAX_PRICE costs $`G_\text{max} \cdot \mathrm{MAX\_PRICE} \approx 2^{64}`$ base units, which by construction exceeds the entire token supply (itself required to fit in u64), and a single minimal transfer becomes unpayable only at a price $`\approx 5{,}400\times`$ above the cap. No honest demand path approaches it.
+The thresholds above are arithmetic, not economic: raising the base fee is not free. Every unit of gas that drives the smoothed average upward pays the base fee, which is burned, and the total supply — required to fit in uint64 — bounds what can ever be burned. Sustaining full blocks along the geometric ramp toward a base fee $b$ burns approximately $`\sum_i G_\text{max} \cdot b \cdot (8/9)^i \approx 9 \cdot G_\text{max} \cdot b`$, so the highest base fee reachable by burning the entire supply is $`\approx 2^{64}/(9 G_\text{max}) = \mathrm{MAX\_PRICE}/9`$, a factor of two below $`\mathrm{MAX\_PRICE\_UPDATE}`$: none of the thresholds above is reachable on an economically feasible path. Likewise, a full block priced at MAX_PRICE would cost $`G_\text{max} \cdot \mathrm{MAX\_PRICE} \approx 2^{64}`$ base units — more than the entire supply — and a single minimal transfer becomes unpayable at $`\approx 5{,}400\times`$ above the cap.
+
+The clamp and the uint128 requirement are therefore defense in depth, and they cost nothing on any reachable price path. Their purpose is to turn "fee arithmetic cannot overflow" from a theorem resting on supply bounds, burn budgets, and re-minting behavior into a local arithmetic invariant of the update function — one that survives implementation bugs, changes to the token denomination, and future re-parameterizations.
 
 ### Fee Distribution
 
