@@ -34,6 +34,7 @@
 | 1.7.0 | Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys | 2026-06-25 |
 | 1.8.0 | [RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
 | 1.9.0 | Update the execution of `CHANNEL_DEPOSIT` to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit | 2026-07-27 |
+| 1.10.0 | Add the parent of the message being extended in the `CHANNEL_CONFIG` payload to order the configurations in the channel sequence and avoid replaying them | 2026-08-05 |
 
 # Introduction
 
@@ -461,6 +462,7 @@ Overwrite the configuration of a channel.
 ```python
 class ChannelConfig:
     channel: ChannelId
+    parent: hash             # Previous message in the channel
     keys: list[Ed25519PublicKey]
     posting_timeframe: u32
     posting_timeout: u32
@@ -508,12 +510,20 @@ assert config.configuration_threshold <= len(config.keys)
 
 if config.channel in channels:
     chan = channels[config.channel]
+
+    # Ensure the configuration is continuing the channel sequence
+    assert config.parent == chan.tip_hash
+
     # Verify the configuration_threshold signatures (see Appendix)
     MultiEd25519_verify(txhash,
                         proof.signatures,
                         proof.indexes,
                         chan.accredited_keys,
                         chan.configuration_threshold)
+else:
+    # Channel will be created automatically upon execution
+    # Ensure that this configuration is the genesis message (parent == ZERO)
+    assert config.parent == ZERO
 ```
 
 #### Execution
@@ -568,12 +578,14 @@ block_slot: Slot
   Suppose the unique sequencer of Zone A wants to add a key to the list of accredited keys:
 
 ```python
-# Given a key to add
+# Given a key to add and the current tip of the channel
 new_sequencer_pk: Ed25519PublicKey
+zone_a_tip: hash
 
 # The unique sequencer encodes the update and builds the payload
 config = ChannelConfig(
     channel=ZONE_A,
+    parent=zone_a_tip,
     keys=[old_sequencer_pk, new_sequencer_pk],
     posting_timeframe = 5000,
     posting_timeout = 500,
