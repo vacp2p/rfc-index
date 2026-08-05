@@ -34,6 +34,7 @@
 | 1.7.0 | Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys | 2026-06-25 |
 | 1.8.0 | [RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
 | 1.9.0 | Update the execution of `CHANNEL_DEPOSIT` to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit | 2026-07-27 |
+| 1.9.1 | Rename the excess balance left after the mandatory fees into `tx_priority_tip` and convert it back into a `TokenValue` explicitly | 2026-08-05 |
 
 # Introduction
 
@@ -167,7 +168,9 @@ Mantle validators will ensure the following:
     tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
     tx_balance = get_transaction_balance(signed_tx)
     assert tx_mandatory_fee <= tx_balance
-    tx_execution_tip = tx_balance - tx_mandatory_fee
+    tx_priority_tip = TokenValue(tx_balance - tx_mandatory_fee)  # The assertion
+                      # above makes the difference non negative, so it can be
+                      # converted back into a TokenValue
 
     def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
         balance = 0   # It's important to not use unsigned int here to avoid
@@ -1626,7 +1629,7 @@ Notes are composed of two fields representing their value and their owner:
 
 ```python
 class Note:
-    value: TokenValue   # u64
+    value: TokenValue   # uint64
     public_key: ZkPublicKey # 32 bytes
 ```
 
