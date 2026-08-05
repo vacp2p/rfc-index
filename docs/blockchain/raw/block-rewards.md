@@ -152,7 +152,7 @@ Let us define the following variables:
 - $`A_t \in [0,1]`$ denotes the emission rate factor on a per year basis.
     - This implies that $`A_t \cdot I_{max} \cdot \Delta_t`$ denotes the emission within the time-step.
 - $`D_{i,t}`$ denotes the $i$-th key performance indicator at time $t$ (e.g., TVL, staked amount, active users).
-- $`R_\text{block}`$ denotes the total amount of Execution base fees and Permanent Storage fees burnt in a block, excluding priority fees (tips), which are escrowed for the leader reward pool and are supply-neutral. Refer to [Execution Market](execution-market.md) and [Storage Markets](storage-markets.md) for how to compute $`R_{block}`$.
+- $`R_\text{block}`$ denotes the total amount of Execution base fees and Permanent Storage fees burnt in a block, excluding Execution priority fees (tips), which are escrowed for the leader reward pool and are supply-neutral. Refer to [Execution Market](execution-market.md) and [Storage Markets](storage-markets.md) for how to compute $`R_{block}`$.
 
 ## Parametrization
 
@@ -204,7 +204,7 @@ where:
 - $`S_{tge}`$ denotes the token supply at Token Generation Event (TGE).
 - $`\Delta_t`$ denotes the fraction of year in one time step per e.g., epoch, block, or day.
 - $f$ be the average number of block proposal within $`\Delta_{t}`$ units.
-- $`R_\text{block} = D_{1,t}`$ denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed, excluding priority fees (tips): tips are re-minted in full to the leader reward pool, so counting them here would re-mint them a second time through the $`(1-A_t) \cdot R_\text{block}`$ term.
+- $`R_\text{block} = D_{1,t}`$ denotes the total amount of Execution base fees and Storage fees that are burned when the block is proposed, excluding Execution priority fees (tips). Tips are directed in full to the leader reward pool, whereas the block reward computed from $`R_\text{block}`$ is split between the Blend service and the leaders: counting tips in $`R_\text{block}`$ would both re-mint them a second time through the $`(1-A_t) \cdot R_\text{block}`$ term and redirect part of their value to the Blend service.
 
 ```python
 def block_rewards(
@@ -477,9 +477,11 @@ $$
 
 The moving average above requires the protocol to maintain a dedicated piece of ledger state, which we declare here explicitly:
 
-| State variable | Type | Genesis value | Update |
-| --- | --- | --- | --- |
-| `burned_fees_window` | List of $T = 120$ integers | All zeros | At the end of the execution of block $t$, append $`D_{1,t}`$ (Execution base fees plus Permanent Storage fees burned in block $t$, excluding priority fees) and drop the oldest entry. |
+| State variable | Type | Update |
+| --- | --- | --- |
+| `burned_fees_window` | List of $T = 120$ integers | At the end of the execution of block $t$, append $`D_{1,t}`$ (Execution base fees plus Permanent Storage fees burned in block $t$, excluding Execution priority fees) and drop the oldest entry. |
+
+The genesis value of `burned_fees_window` is defined in [Genesis Block](bedrock-genesis-block.md#block-rewards-state-initialization).
 
 ```python
 def update_burned_fees_window(window: list[int], d1_t: int) -> list[int]:
@@ -488,7 +490,7 @@ def update_burned_fees_window(window: list[int], d1_t: int) -> list[int]:
     return window[1:] + [d1_t]
 ```
 
-The window includes the current block, matching the sum $`\sum_{\tau=t-T+1}^{t}`$ used throughout this document. With the all-zero genesis seed, the average is biased low during the first $T$ blocks; this is intended: bootstrap emission is then driven by the stake-deviation KPI. The append step is part of Block Execution and must be reflected in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md).
+The window includes the current block, matching the sum $`\sum_{\tau=t-T+1}^{t}`$ used throughout this document. With the all-zero genesis seed defined in [Genesis Block](bedrock-genesis-block.md#block-rewards-state-initialization), the average is biased low during the first $T$ blocks; this is intended: bootstrap emission is then driven by the stake-deviation KPI. The append step is part of Block Execution and must be reflected in [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md).
 
 So we propose a reference implementation that uses integers:
 

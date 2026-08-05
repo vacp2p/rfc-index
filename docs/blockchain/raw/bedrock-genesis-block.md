@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-02-12 |
 | 1.1.0 | [[RFC] Make Ledger Transaction an Operation](mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.md) Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
+| 1.1.2 | Initialize the Block Rewards burned-fees window at genesis | 2026-08-05 |
 
 # Introduction
 
@@ -266,6 +267,10 @@ Bedrock is initialized by executing the Mantle Transaction without validating th
 ## Mantle Ledger Initialization
 
 The Transfer Operation should be executed without checking that the transaction is balanced. However, other validations are checked, e.g. that output note values are positive and smaller than the maximum allowed value. The result of normal transfer execution adds all outputs to the Ledger.
+
+## Block Rewards State Initialization
+
+The `burned_fees_window` state used by the [Block Rewards](block-rewards.md#burned-fees-window-state) moving average is initialized to a list of $T = 120$ zeros. From the first block onward it is updated at the end of every block's execution, as specified in [Block Rewards](block-rewards.md#burned-fees-window-state).
 
 ## Cryptarchia Initialization
 

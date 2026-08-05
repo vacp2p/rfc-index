@@ -24,7 +24,7 @@
 | 1.0.0 | Initial revision | 2026-04-24 |
 | 1.0.1 | Fix base fee constants in pseudocode based on the correct $`G_{\mathrm{target}}`$ | 2026-07-27 |
 | 1.1.0 | Round the base fee update upwards | 2026-07-28 |
-| 1.1.1 | Clarify that priority fees are excluded from the burned-fees input to Block Rewards | 2026-08-04 |
+| 1.1.1 | Clarify that Execution priority fees are excluded from the burned-fees input to Block Rewards | 2026-08-04 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -233,4 +233,4 @@ $$
 D_{1,t} = \hat{R}_{\mathrm{burned}}(t) + \text{Permanent Storage fees burned in block } t.
 $$
 
-Priority fees are excluded from $`D_{1,t}`$. Although they are technically burned and later re-minted for privacy (cf. [Design Rationale](#design-rationale)), they are supply-neutral transfers escrowed for the leader reward pool: counting them in $`D_{1,t}`$ would re-mint them a second time through the $`(1-A_t) \cdot R_\text{block}`$ term of the block reward, inflating the supply and overstating the burn signal.
+Execution priority fees are excluded from $`D_{1,t}`$. Although they are technically burned and later re-minted for privacy (cf. [Design Rationale](#design-rationale)), they are supply-neutral transfers directed in full to the leader reward pool, whereas the block reward computed from $`R_\text{block}`$ is split between the Blend service and the leaders. Counting tips in $`D_{1,t}`$ would therefore re-mint them a second time through the $`(1-A_t) \cdot R_\text{block}`$ term — inflating the supply and overstating the burn signal — and would redirect part of their value to the Blend service.
