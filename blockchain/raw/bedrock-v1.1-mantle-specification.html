@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
 <li><strong>2026-07-09</strong> — <a href="https://github.com/logos-co/logos-lips/blob/18c373bf24127e1894be8bc074c2741d5946c9c4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>18c373b</code></a> — docs(blockchain): Factor out multiple Ed25519 threshold verification and validate configuration threshold (#367)</li>
@@ -214,6 +215,7 @@
 <tr><td>1.7.0</td><td>Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys</td><td>2026-06-25</td></tr>
 <tr><td>1.8.0</td><td>[RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash</td><td>2026-07-06</td></tr>
 <tr><td>1.9.0</td><td>Update the execution of <code>CHANNEL_DEPOSIT</code> to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit</td><td>2026-07-27</td></tr>
+<tr><td>1.9.1</td><td>Rename the excess balance left after the mandatory fees into <code>tx_priority_tip</code> and convert it back into a <code>TokenValue</code> explicitly</td><td>2026-08-05</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -313,7 +315,9 @@ def validate_mantle_op(txhash, opcode, payload, op_proof):
 <pre><code class="language-python">tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
 tx_balance = get_transaction_balance(signed_tx)
 assert tx_mandatory_fee &lt;= tx_balance
-tx_execution_tip = tx_balance - tx_mandatory_fee
+tx_priority_tip = TokenValue(tx_balance - tx_mandatory_fee)  # The assertion
+                  # above makes the difference non negative, so it can be
+                  # converted back into a TokenValue
 
 def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int:
     balance = 0   # It's important to not use unsigned int here to avoid
@@ -1493,7 +1497,7 @@ transfer = Transfer(
 <h2 id="notes"><a class="header" href="#notes">Notes</a></h2>
 <p>Notes are composed of two fields representing their value and their owner:</p>
 <pre><code class="language-python">class Note:
-    value: TokenValue   # u64
+    value: TokenValue   # uint64
     public_key: ZkPublicKey # 32 bytes
 </code></pre>
 <h3 id="note-id"><a class="header" href="#note-id">Note Id</a></h3>

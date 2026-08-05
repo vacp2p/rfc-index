@@ -21303,6 +21303,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 </div><!-- timeline:start -->
 <h2 id="timeline-81"><a class="header" href="#timeline-81">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/bedrock-anonymous-leaders-reward.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-anonymous-leaders-reward.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/bedrock-anonymous-leaders-reward.md"><code>58b5698</code></a> — chore(blockchain): migrate contributor emails to @logos.co (#338)</li>
 <li><strong>2026-01-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f24e567d0b1e10c178bfa0c133495fe83b969b76/docs/blockchain/raw/bedrock-anonymous-leaders-reward.md"><code>f24e567</code></a> — Chore/updates mdbook (#262)</li>
@@ -21312,6 +21313,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 <h1 id="revision-history-14"><a class="header" href="#revision-history-14">Revision History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-03-30</td></tr>
+<tr><td>1.1.0</td><td>Round the leader share downwards and align the voucher commitment and nullifier domain separation tags with Mantle</td><td>2026-08-05</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-20"><a class="header" href="#introduction-20">Introduction</a></h1>
@@ -21337,7 +21339,13 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 <p>When producing a block, a leader performs the following:</p>
 <ol>
 <li>Generate a one-time random secret <span class="math-inline" data-tex="voucher \overset{\$}{\leftarrow} \mathbb F_p"></span>.</li>
-<li>Compute the commitment: <code>voucher_cm := zkHash(b"LEAD_VOUCHER_CM_V1, voucher)</code>.</li>
+<li>Compute the commitment:</li>
+</ol>
+<pre><code class="language-python">voucher_cm = zkhash(
+    FiniteField(b"REWARD_VOUCHER", byte_order="little", modulus= p),
+    voucher)
+</code></pre>
+<ol start="3">
 <li>Include the <code>voucher_cm</code> in the block header.</li>
 </ol>
 <p>Each <code>voucher_cm</code> is added to a Merkle tree of voucher commitments by validators during the execution of the first block of the following epoch, maintained throughout the entire blockchain history by everyone.</p>
@@ -21352,9 +21360,10 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 <p>This means that a leader may use their funds directly, getting their reward and using them atomically.</p>
 <p>Note that every leader will receive a reward that is independent of the block content to avoid de-anonymization. This means that the fees of the block cannot be collected by the leader directly, or need to be pooled for all the leaders.</p>
 <h3 id="leaders-reward"><a class="header" href="#leaders-reward">Leaders Reward</a></h3>
-<p>At the start of epoch <strong>N+1</strong>, validators aggregate the leaders rewards of epoch <strong>N</strong> into the leader rewards variable. The amount of the reward claimable with a voucher corresponds to a share of the <code>leaders_rewards</code>. This share is exactly equal to the total value of rewards divided by the size of the anonymity set of leaders, that is:</p>
-<div class="math-block" data-tex="share = \begin{cases}&#10;  0 &amp;\textbf{if } |voucher\_cm|=|voucher\_nf| \\&#10;\frac{leader\_rewards}{|voucher\_cm| - |voucher\_nf|} &amp;\textbf{if } |voucher\_cm| \neq |voucher\_nf|&#10;\end{cases}"></div>
-<p>This amount is stable through an epoch because when a leader withdraws, both the pool value and the number of unclaimed vouchers decrease proportionally, so the price per share remains unchanged. However, the share value will vary across epochs if the leader rewards are variable.</p>
+<p>At the start of epoch <strong>N+1</strong>, validators aggregate the leaders rewards of epoch <strong>N</strong> into the leader rewards variable. The amount of the reward claimable with a voucher corresponds to a share of the <code>leaders_rewards</code>. This share is equal to the total value of rewards divided by the size of the anonymity set of leaders, rounded down, that is:</p>
+<div class="math-block" data-tex="share = \begin{cases}&#10;  0 &amp;\textbf{if } |voucher\_cm|=|voucher\_nf| \\&#10;\left\lfloor\frac{leader\_rewards}{|voucher\_cm| - |voucher\_nf|}\right\rfloor &amp;\textbf{if } |voucher\_cm| \neq |voucher\_nf|&#10;\end{cases}"></div>
+<p>The division is the integer division over <code>TokenValue</code>, so the share is a whole number of tokens and its computation is deterministic for every node. Rounding down guarantees that <span class="math-inline" data-tex="share \times (|voucher\_cm| - |voucher\_nf|) \leq leader\_rewards"></span>, an inequality that every claim preserves since it decreases both sides by one share and one voucher respectively. The pool can therefore never be overdrawn and every unclaimed voucher remains payable.</p>
+<p>This amount is almost stable through an epoch because when a leader withdraws, both the pool value and the number of unclaimed vouchers decrease proportionally, so the exact price per share remains unchanged and only its rounding may move. Writing <span class="math-inline" data-tex="leader\_rewards = q \times n + r"></span> at the start of the epoch, where <span class="math-inline" data-tex="n"></span> is the number of unclaimed vouchers and <span class="math-inline" data-tex="r &lt; n"></span> the remainder of the division, the first <span class="math-inline" data-tex="n-r"></span> leaders to claim receive <span class="math-inline" data-tex="q"></span> and the last <span class="math-inline" data-tex="r"></span> receive <span class="math-inline" data-tex="q+1"></span>. Two leaders claiming during the same epoch therefore never differ by more than one token, which is small enough not to justify freezing the share for the duration of the epoch. Nothing is lost to the rounding either: the remainder stays in <code>leader_rewards</code> until it is claimed or aggregated with the rewards of the next epoch. The marginally larger reward of the late claimants also mildly encourages leaders to spread their claims over time, which keeps the set of unclaimed vouchers large. However, the share value will vary across epochs if the leader rewards are variable.</p>
 <h2 id="validation-1"><a class="header" href="#validation-1">Validation</a></h2>
 <p>Nodes validate a <code>LEADER_CLAIM</code> Operation by:</p>
 <ol>
@@ -21375,7 +21384,12 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 <h2 id="zk-proof-of-membership"><a class="header" href="#zk-proof-of-membership">ZK Proof of Membership</a></h2>
 <p>When claiming a reward, the leader provides a ZK proof that they know a leaf in the global Merkle tree of reward vouchers and the preimage of that leaf. Crucially, the ZK proof does not reveal which leaf is being proven. The verifier only learns that <em>some</em> valid leaf exists in the tree for which the prover knows the secret voucher. This property ensures that the claim cannot be linked to any specific block header or reward voucher commitment.</p>
 <h2 id="preventing-double-claims-without-breaking-privacy"><a class="header" href="#preventing-double-claims-without-breaking-privacy">Preventing Double Claims Without Breaking Privacy</a></h2>
-<p>To prevent double claiming, the leader derives a voucher nullifier. This nullifier is unique to the voucher but reveals nothing about the original reward voucher or block. It acts as a one-way identifier that allows nodes to track whether a voucher has already been claimed, without compromising the anonymity of the claim.</p>
+<p>To prevent double claiming, the leader derives a voucher nullifier from the same secret voucher:</p>
+<pre><code class="language-python">voucher_nf = zkhash(
+    FiniteField(b"VOUCHER_NF", byte_order="little", modulus= p),
+    voucher)
+</code></pre>
+<p>This nullifier is unique to the voucher but reveals nothing about the original reward voucher or block. It acts as a one-way identifier that allows nodes to track whether a voucher has already been claimed, without compromising the anonymity of the claim.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bedrock-genesis-block"><a class="header" href="#bedrock-genesis-block">BEDROCK-GENESIS-BLOCK</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Bedrock Genesis Block</td></tr>
@@ -21922,6 +21936,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </div><!-- timeline:start -->
 <h2 id="timeline-84"><a class="header" href="#timeline-84">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
 <li><strong>2026-07-09</strong> — <a href="https://github.com/logos-co/logos-lips/blob/18c373bf24127e1894be8bc074c2741d5946c9c4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>18c373b</code></a> — docs(blockchain): Factor out multiple Ed25519 threshold verification and validate configuration threshold (#367)</li>
@@ -21944,6 +21959,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 <tr><td>1.7.0</td><td>Factor out the multi eddsa threshold verification and added a validation step in channel config to check the new config threshold is lower or equal than the number of accredited keys</td><td>2026-06-25</td></tr>
 <tr><td>1.8.0</td><td>[RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash</td><td>2026-07-06</td></tr>
 <tr><td>1.9.0</td><td>Update the execution of <code>CHANNEL_DEPOSIT</code> to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit</td><td>2026-07-27</td></tr>
+<tr><td>1.9.1</td><td>Rename the excess balance left after the mandatory fees into <code>tx_priority_tip</code> and convert it back into a <code>TokenValue</code> explicitly</td><td>2026-08-05</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-23"><a class="header" href="#introduction-23">Introduction</a></h1>
@@ -22043,7 +22059,9 @@ def validate_mantle_op(txhash, opcode, payload, op_proof):
 <pre><code class="language-python">tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
 tx_balance = get_transaction_balance(signed_tx)
 assert tx_mandatory_fee &lt;= tx_balance
-tx_execution_tip = tx_balance - tx_mandatory_fee
+tx_priority_tip = TokenValue(tx_balance - tx_mandatory_fee)  # The assertion
+                  # above makes the difference non negative, so it can be
+                  # converted back into a TokenValue
 
 def get_transaction_balance(signed_tx: SignedMantleTx) -&gt; int:
     balance = 0   # It's important to not use unsigned int here to avoid
@@ -23223,7 +23241,7 @@ transfer = Transfer(
 <h2 id="notes"><a class="header" href="#notes">Notes</a></h2>
 <p>Notes are composed of two fields representing their value and their owner:</p>
 <pre><code class="language-python">class Note:
-    value: TokenValue   # u64
+    value: TokenValue   # uint64
     public_key: ZkPublicKey # 32 bytes
 </code></pre>
 <h3 id="note-id"><a class="header" href="#note-id">Note Id</a></h3>
@@ -36909,6 +36927,7 @@ This material, including any linked pages or documents, is provided for informat
 </div><!-- timeline:start -->
 <h2 id="timeline-119"><a class="header" href="#timeline-119">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/overview-cryptoeconomics.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-07-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/38916aa474164ac4acd81e62d19715e17626be17/docs/blockchain/raw/overview-cryptoeconomics.md"><code>38916aa</code></a> — docs(blockchain): prevent execution and storage fees from rounding down to zero (#384)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/overview-cryptoeconomics.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/overview-cryptoeconomics.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -36919,6 +36938,7 @@ This material, including any linked pages or documents, is provided for informat
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-25</td></tr>
 <tr><td>1.0.1</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
 <tr><td>1.1.0</td><td>Reflect the upward rounding of the fee market price updates</td><td>2026-07-28</td></tr>
+<tr><td>1.2.0</td><td>Reflect the downward rounding of the leader share</td><td>2026-08-05</td></tr>
 </tbody></table>
 </div>
 <blockquote>
@@ -37043,7 +37063,7 @@ When an epoch e ends, Blend validators have one additional epoch <span class="ma
 <li>When a new epoch e starts, the unique reward pool variable for leaders is updated, increasing by the reward amount for the previous epoch e-1. This reward amount is calculated as the sum of leader block rewards from epoch e-1. Simultaneously, consensus nodes update the voucher set, adding vouchers of leaders from epoch e-1 to the global voucher set.</li>
 <li>From epoch e onward, leaders can exchange their vouchers for shares of the rewards pool, as their vouchers are now in the set. Each unclaimed voucher represents an equal share of the leader rewards pool.</li>
 </ol>
-<p>Claimable rewards remain stable during an epoch because the reward pool decreases proportionally to the number of unclaimed vouchers, and the pool is neither increased nor are new vouchers added to the set during an epoch.</p>
+<p>Claimable rewards remain stable during an epoch because the reward pool decreases proportionally to the number of unclaimed vouchers, and the pool is neither increased nor are new vouchers added to the set during an epoch. The share being a whole number of tokens, it is rounded down, so two leaders claiming during the same epoch may still differ by one token, the last claimants of the epoch being the ones receiving the extra token. The remainder of the division is left in the pool and redistributed at the next epoch.</p>
 <h3 id="blend-service"><a class="header" href="#blend-service">Blend Service</a></h3>
 <p>The <a href="blockchain/raw/blend-protocol.html">Blend Protocol - Rewarding</a> mechanism determines how Blend nodes receive compensation. Only active nodes qualify for rewards, with activity verification conducted through a probabilistic system that works as follows:</p>
 <ol>

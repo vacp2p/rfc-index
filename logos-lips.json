@@ -554,7 +554,7 @@
     "title": "[Overview] Cryptoeconomics",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-07-28",
+    "updated": "2026-08-05",
     "path": "blockchain/raw/overview-cryptoeconomics.html"
   },
   {
@@ -869,7 +869,7 @@
     "title": "Anonymous Leaders Reward Protocol",
     "status": "raw",
     "category": "Standards Track",
-    "updated": "2026-05-28",
+    "updated": "2026-08-05",
     "path": "blockchain/raw/bedrock-anonymous-leaders-reward.html"
   },
   {
@@ -986,7 +986,7 @@
     "title": "Mantle",
     "status": "raw",
     "category": "Informational",
-    "updated": "2026-07-27",
+    "updated": "2026-08-05",
     "path": "blockchain/raw/bedrock-v1.1-mantle-specification.html"
   },
   {
