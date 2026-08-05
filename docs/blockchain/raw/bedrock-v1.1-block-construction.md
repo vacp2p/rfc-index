@@ -29,6 +29,7 @@
 | 1.1.0 | Removed `service_rewards` due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Extended the [Block Execution](#block-execution) logic with rewards distribution due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Removed **Block Samples** subsection of the [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) from the [Annex](#annex). Reordered the [Block Execution](#block-execution) steps to enable immediate use of reward notes as inputs for transactions included in the proposal. | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
+| 1.2.0 | Added the `epoch_state_root` header field and aligned block execution with the epoch boundary settlement for verifiable checkpoints. | 2026-06-26 |
 
 # Introduction
 
@@ -68,13 +69,13 @@ We are using two hashing algorithms that have the same output length of 256 bits
 
 ## Block Proposal
 
-A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33129 bytes.
+A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33161 bytes.
 
 We define the following message structure:
 
 ```python
-class Proposal:                              # 33129 bytes
-    header: Header                           # 297 bytes
+class Proposal:                              # 33161 bytes
+    header: Header                           # 329 bytes
     references: References                   # 32768 bytes
     signature: Ed25519Signature              # 64 bytes
 ```
@@ -90,11 +91,12 @@ Where:
 ### Header
 
 ```python
-class Header:                                # 297 bytes
+class Header:                                # 329 bytes
     bedrock_version: byte                    # 1 byte
     parent_block: hash                       # 32 bytes
     slot: SlotNumber                         # 8 bytes
     block_root: hash                         # 32 bytes
+    epoch_state_root: hash                   # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 ```
 
@@ -104,6 +106,7 @@ Where:
 - `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `slot` is the consensus slot number; the size of the `SlotNumber` type is 8 bytes.
 - `block_root` is the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) used for constructing the `references` list in the `mempool_ransactions`; the size of the `hash` is 32 bytes.
+- `epoch_state_root` is the commitment to the settled epoch state, identical for every block of the same epoch; its computation is defined in [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root); the size of the `hash` is 32 bytes.
 - `proof_of_leadership` is the proof confirming that the sender is the leader; defined below: [Proof of Leadership](#proof-of-leadership).
 
 ### References
@@ -157,6 +160,7 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
     - `parent_block`
     - `slot`
     - `block_root`
+    - `epoch_state_root`
     - `proof_of_leadership`:
       - `leader_voucher`
       - `entropy_contribution`
@@ -238,9 +242,10 @@ This section specifies how a Logos Blockchain node executes a valid block propos
 
 Given a `ValidBlock` that has successfully passed proposal validation, the node must:
 
-1. Append the `leader_voucher` contained in the block to the set of reward vouchers **when the following epoch starts**.
-2. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
-3. Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
+1. If the block is the first block of an epoch, apply the [Epoch Boundary Settlement](cryptarchia-v1-protocol.md#epoch-boundary-settlement) atomically, before executing any transaction. The resulting settled state is what `header.epoch_state_root` commits to, as defined in [Epoch State Root](cryptarchia-v1-protocol.md#epoch-state-root).
+2. Record the `leader_voucher` contained in the block in the set of reward vouchers for the current epoch, which is appended to the reward voucher tree at the next [Epoch Boundary Settlement](cryptarchia-v1-protocol.md#epoch-boundary-settlement), as defined in [**Anonymous Leaders Reward Protocol**](bedrock-anonymous-leaders-reward.md).
+3. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
+4. Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
 
 # Annex
 

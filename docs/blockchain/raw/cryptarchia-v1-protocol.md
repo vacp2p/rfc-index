@@ -28,6 +28,8 @@
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
+| 1.2.0 | Added the `epoch_state_root` header field, the epoch boundary settlement, and the deterministic epoch state root computation used for verifiable checkpoints. | 2026-06-26 |
+
 
 # Introduction
 
@@ -224,6 +226,144 @@ $`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\te
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{return}\space (\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})`$
 
+### Epoch Boundary Settlement
+
+The first block of an epoch triggers an atomic settlement that is applied **before** executing that block’s transactions. The settlement is performed in the following order:
+
+1. Derive the new epoch state $`(\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})`$ as defined in [Epoch State Pseudocode](#epoch-state-pseudocode).
+2. Append every reward voucher committed during the previous epoch to the reward voucher tree, as defined in [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
+3. Aggregate the previous epoch’s leader rewards into the leader reward pool `leaders_rewards`, as defined in [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
+4. Distribute the previous epoch’s service rewards, inserting the reward notes directly into the ledger without Mantle validation, as defined in [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md).
+5. Finalize the storage market for the elapsed epoch, updating the storage price and usage moving average and resetting the within-epoch usage tally, as defined in [Storage Markets](storage-markets.md).
+
+The execution market base fee and its moving average evolve on every block and require no boundary action (see [Execution Market](execution-market.md)). The state resulting from this settlement is the *settled state* committed by the [Epoch State Root](#epoch-state-root).
+
+### Epoch State Root
+
+Every header carries an `epoch_state_root`. It commits the settled state produced by the [Epoch Boundary Settlement](#epoch-boundary-settlement) at the first block of the epoch (i.e. the state as of the last block of the *previous* epoch, after the epoch-transition logic has been applied) and is repeated unchanged in every subsequent header of that epoch. Every block of an epoch therefore commits the state carried over from the end of the previous epoch, not any state produced within the epoch itself. This commitment lets a joining node import a recent checkpoint and verify the imported state against the chain, as defined in [Cryptarchia Bootstrapping & Synchronization](cryptarchia-v1-bootstr-sync.md).
+
+The computation is deterministic, so every node derives the same root. Each collection is committed by its own Merkle tree, and every one of those trees follows the construction defined for the [Ledger Root](cryptarchia-proof-of-leadership.md#ledger-root): a tree of depth $`32`$ whose leaves are ordered by their **order of apparition on chain**, where the value $`0`$ marks an empty leaf, an insertion writes the new element into the first empty leaf, and a removal resets that element's leaf back to $`0`$. Leaves are never re-sorted, so the `insert_new_note`, `delete_note` and `get_ledger_root` procedures apply to each collection. Only that construction is shared: what varies from one tree to the next is the hash function it is built with and the content of a leaf.
+
+- `notes`, `C_LEAD` and `voucher_root` take note IDs, aged note IDs and vouchers directly as leaves and are built with `zkhasher`, since they are opened inside zero-knowledge proofs; their root is included as-is.
+- `channels`, `channel_notes`, `locked_notes`, `declarations`, `declarations_snapshot` and the voucher nullifier set are never opened inside a proof, so both their leaf hashes and the trees above them use a classic `hasher`, as specified in [Common Cryptographic Components](common-cryptographic-components.md) and as already used for the [Block ID](#block-id). Their leaf is the domain-separated hash of the element, computed by the dedicated function below. That hash binds the element's identifier (`ChannelId` for `channels`, `NoteId` for `channel_notes` and `locked_notes`, `DeclarationId` for `declarations` and `declarations_snapshot`, and the nullifier value for the voucher nullifier set) together with its associated state, so that a leaf is meaningful on its own, independently of the slot it occupies.
+
+Every root above can be maintained incrementally, block by block, alongside the state it commits. The `epoch_state_root` is then a **snapshot** of those roots taken at the epoch boundary, right after the [Epoch Boundary Settlement](#epoch-boundary-settlement) has been applied and before the first block's transactions are executed. This is the same discipline that governs $`\mathbb{C}_\text{LEAD}`$ and `declarations_snapshot`, which are likewise frozen at a boundary and held unchanged for the whole epoch: nodes keep updating the live roots as blocks arrive, and only the boundary value is committed in the headers.
+
+The Epoch State Root commits **two SDP registries**:
+
+- The **mutable SDP registry** (`declarations`): declarations are inserted, activated, and removed as blocks are processed. It is the registry consulted when validating `SDP_DECLARE`, `SDP_WITHDRAW`, and `SDP_ACTIVE` operations, and it is what the chain needs in order to keep extending.
+- The **immutable SDP snapshot** (`declarations_snapshot`): the declarations of the SDP registry that are **active** (as defined in [Active](bedrock-service-declaration-protocol.md#active)) as of the last block of the epoch **two epochs before** the current one (i.e. frozen at the start of the *previous* epoch), held unchanged for the whole epoch. It is the set against which per-service settlement is performed at the [Epoch Boundary Settlement](#epoch-boundary-settlement): validating the *activity proofs* carried by `SDP_ACTIVE` operations, and paying those rewards to each provider's `zk_id`. The declarations it holds keep the position they occupy in the registry, the inactive ones being reset to the empty leaf like any other removal, so the snapshot commits the set the services actually read: a node that applies a different activity rule, or different [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters), computes a different root instead of silently disagreeing on the provider set.
+
+  Note that the snapshot taken at the *start of the current epoch* is **not** committed separately: because the Epoch Boundary Settlement runs before executing the first block's transactions, the mutable `declarations` registry at that point still holds the state as of the last block of the previous epoch, so that snapshot is derivable from `declarations` by applying the activity rule. The snapshot that is genuinely needed is the one from a whole epoch earlier, which is the provider set the activity proofs settled this epoch were produced against.
+
+A field that is not set (`active` and `withdraw_at` in a `DeclarationInfo`, which are both optional) is encoded as zeros, over the number of bytes its value would occupy.
+
+A field whose byte length can vary is committed together with that length, and a list of such fields together with its element count, at the widths the [Mantle Transaction Encoding](mantle-transaction-encoding.md) gives them. Without it the preimage does not determine the value it was built from: the byte form of a multiaddr is self-describing, so concatenating the `locators` of a `DeclarationInfo` without their lengths gives `[A/B]` and `[A, B]` the same leaf.
+
+`block_number` and `fee_window` are the state the block reward formula reads, as defined in [Block Rewards](block-rewards.md): the window holds the fees burned by each of the last $`T`$ blocks and `block_number` selects the entry the next block overwrites.
+
+The minimum stake is a single value shared by every service, as defined in [Minimum Stake](bedrock-service-declaration-protocol.md#minimum-stake), and is committed as such. The [Service Parameters](bedrock-service-declaration-protocol.md#service-parameters) are instead held per service type, so every service contributes its own `inactivity_period`, in ascending `service_type` byte, the same byte a `DeclarationInfo` leaf commits. A service whose parameters have never been set contributes `0`, unambiguously, since a valid `inactivity_period` is at least 2 epochs.
+
+```python
+def channel_hash(channel_id: ChannelId, channel: ChannelState) -> hash:
+    h = Hasher()
+    h.update(b"CHANNEL_HASH_V1")
+    h.update(channel_id)
+    h.update(len(channel.accredited_keys).to_bytes(2, byteorder='little'))
+    for key in channel.accredited_keys:
+        h.update(key.compressed())
+    h.update(channel.configuration_threshold.to_bytes(2, byteorder='little'))
+    h.update(channel.tip_hash)
+    h.update(channel.tip_slot.to_bytes(8, byteorder='little'))
+    h.update(channel.tip_sequencer.to_bytes(2, byteorder='little'))
+    h.update(channel.tip_sequencer_starting_slot.to_bytes(8, byteorder='little'))
+    h.update(channel.posting_timeframe.to_bytes(4, byteorder='little'))
+    h.update(channel.posting_timeout.to_bytes(4, byteorder='little'))
+    h.update(channel.transfer_threshold.to_bytes(2, byteorder='little'))
+    return h.digest()
+
+def channels_root(channels: dict[ChannelId, ChannelState]) -> hash:
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
+    return [channel_hash(channel_id, channels[channel_id]) for channel_id in channels].root()
+
+def channel_notes_root(channel_notes: dict[NoteId, ChannelId]) -> hash:
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
+    return [hash(note_id, channel_notes[note_id]) for note_id in channel_notes].root()
+
+def sdp_declaration_info_hash(declaration: DeclarationInfo) -> hash:
+    h = Hasher()
+    h.update(b"DECLARATION_INFO_HASH_V1")
+    h.update(declaration.service.to_byte())
+    h.update(len(declaration.locators).to_bytes(1, byteorder='little'))
+    for locator in declaration.locators:
+        locator_bytes = locator.to_byte()
+        h.update(len(locator_bytes).to_bytes(2, byteorder='little'))
+        h.update(locator_bytes)
+    h.update(declaration.provider_id.compressed())
+    h.update(declaration.zk_id)
+    h.update(declaration.locked_note_id)
+    h.update(declaration.created.to_bytes(4, byteorder='little'))
+    h.update((declaration.active or 0).to_bytes(4, byteorder='little'))
+    h.update((declaration.withdraw_at or 0).to_bytes(4, byteorder='little'))
+    h.update(declaration.nonce.to_bytes(8, byteorder='little'))
+    return h.digest()
+
+def declarations_root(declarations: dict[DeclarationID, DeclarationInfo]) -> hash:
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
+    return [hash(declaration_id, sdp_declaration_info_hash(declarations[declaration_id]))
+            for declaration_id in declarations].root()
+
+def sdp_locked_note_hash(locked_note: LockedNote) -> hash:
+    h = Hasher()
+    h.update(b"LOCKED_NOTE_HASH_V1")
+    h.update(len(locked_note.declarations).to_bytes(1, byteorder='little'))
+    for declaration_id in locked_note.declarations:
+        h.update(declaration_id)
+    return h.digest()
+
+def locked_notes_root(locked_notes: dict[NoteId, LockedNote]) -> hash:
+    # depth-32 tree, leaves kept in order of apparition on chain:
+    # an insertion takes the first empty leaf, a removal resets its leaf to 0
+    return [hash(note_id, sdp_locked_note_hash(locked_notes[note_id]) for note_id in locked_notes].root()
+
+def voucher_nullifiers_root(voucher_nullifiers: list[Nullifier]) -> hash:
+    # depth-32 append-only tree, leaves kept in order of apparition on chain
+    return voucher_nullifiers.root()
+
+def get_epoch_state_root(state) -> hash:
+    h = Hasher()
+    h.update(b"STATE_ROOT_V1")
+    h.update(state.notes.root())                            # latest unspent notes
+    h.update(state.aged_notes_root)                         # C_LEAD (Ledger Root)
+    h.update(channels_root(state.channels))
+    h.update(channel_notes_root(state.channel_notes))        # channel-owned notes and their owning channel
+    h.update(locked_notes_root(state.locked_notes))
+    h.update(declarations_root(state.declarations))          # mutable SDP registry
+    h.update(declarations_root(state.declarations_snapshot)) # immutable SDP snapshot, active declarations as of last block of two epochs before
+    h.update(state.min_stake.stake_threshold.to_bytes(8, byteorder='little'))  # global minimum stake
+    for service in sorted(ServiceType):                                        # ascending service byte
+        h.update(state.parameters[service].inactivity_period.to_bytes(4, byteorder='little'))
+    h.update(state.voucher_root)                                               # reward voucher tree
+    h.update(voucher_nullifiers_root(state.voucher_nullifier_set))
+    h.update(state.leaders_rewards.to_bytes(8, byteorder='little'))            # TokenValue
+    h.update(state.block_number.to_bytes(8, byteorder='little'))               # blocks in the chain at the settled state
+    for burned in state.fee_window:                                            # T entries, in index order
+        h.update(burned.to_bytes(8, byteorder='little'))                       # TokenValue
+    h.update(state.execution_base_fee.to_bytes(8, byteorder='little'))         # TokenValue
+    h.update(state.execution_gas_average.to_bytes(8, byteorder='little'))      # int (width undefined in spec)
+    h.update(state.storage_price.to_bytes(8, byteorder='little'))              # TokenValue
+    h.update(state.storage_usage_average.to_bytes(8, byteorder='little'))      # int (width undefined in spec)
+    h.update(state.epoch_nonce)                                                # frozen nonce
+    h.update(state.epoch_nonce_running)                                        # running nonce
+    h.update(state.inferred_total_stake.to_bytes(8, byteorder='little'))       # int (width undefined in spec)
+    return h.digest()
+```
+
+where `Hasher` is a classic hash function as specified in [Common Cryptographic Components](common-cryptographic-components.md).
+
 ## Leadership Lottery
 
 A lottery is run for every slot to decide who is eligible to propose a block. For each slot, we can have 0 or more winners. In fact, it’s desirable to have short slots and many empty slots to allow for the network to propagate blocks and to reduce the chances of two leaders winning the same slot which are guaranteed forks.
@@ -260,6 +400,7 @@ def block_id(header: Header) -> hash
         header.parent_block,
         header.slot.to_bytes(8, byteorder='little'),
         header.block_root,
+        header.epoch_state_root,
         # PoL fields
         header.proof_of_leadership.leader_voucher,
         header.proof_of_leadership.entropy_contribution,
@@ -271,11 +412,12 @@ def block_id(header: Header) -> hash
 ### Block Header
 
 ```python
-class Header:                                # 297 bytes
-    bedrock_version: byte                    # 1 bytes
+class Header:                                # 329 bytes
+    bedrock_version: byte                    # 1 byte
     parent_block: hash                       # 32 bytes
     slot: int                                # 8 bytes
     block_root: hash                         # 32 bytes
+    epoch_state_root: hash                   # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
@@ -334,6 +476,8 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
   - $`\textbf{verify\_PoL}(T, parent,sl,P_\text{LEAD}, \pi_\text{PoL})=True`$
   - $`\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True`$
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
+
+10. If $`B`$ is the first block of an epoch, then $`header.\text{epoch\_state\_root} = \textbf{get\_epoch\_state\_root}(state')`$, where $`state'`$ is the settled state after applying the [Epoch Boundary Settlement](#epoch-boundary-settlement) and before executing $`B`$’s transactions. Otherwise $`header.\text{epoch\_state\_root} = \textbf{fetch\_header}(header.\text{parent\_block}).\text{epoch\_state\_root}`$, since the epoch state root is constant within an epoch.
 
 ### Chain Maintenance
 
