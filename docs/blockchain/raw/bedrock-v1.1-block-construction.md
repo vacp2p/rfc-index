@@ -148,6 +148,7 @@ A **block** is what a proposal becomes once its references have been resolved ag
 ```python
 class Block:
     header: Header                           # 298..426 bytes
+    signature: Ed25519Signature              # 64 bytes
     uncle_headers: list[SignedHeader]        # 1 + len(header.uncles) × (362..490) bytes
     transactions: list[SignedMantleTx]       # up to MAX_BLOCK_SIZE
 ```
@@ -155,6 +156,7 @@ class Block:
 Where:
 
 - `header` is the header of the proposal the block was reconstructed from, unchanged; defined above: [Header](#header).
+- `signature` is the proposal signature over that `header`, carried over unchanged. It is retained because `block_id` commits to the header alone and therefore does not cover the signature, so a node that receives the block without ever seeing the proposal — as happens during synchronization — would otherwise have nothing to check against step 9 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation); the size of the `Ed25519Signature` type is 64 bytes.
 - `uncle_headers` is the list carried over verbatim from the proposal, defined above: [Block Proposal](#block-proposal). It must satisfy the same consistency conditions, so the block holds exactly one signed header per entry of `header.uncles`, in the same order.
 - `transactions` is the sequence of Mantle Transactions resolved from `references` during [Block Proposal Reconstruction](#block-proposal-reconstruction).
 
@@ -247,7 +249,7 @@ The process works as follows:
 9. If any transaction is missing, the entire proposal is rejected.
 10. If all transactions are present, the block proposal is reconstructed and proceeds to further validation steps.
 
-Reconstruction assembles the [Block](#block) from the proposal's `header`, its `uncle_headers` copied over verbatim, and the transactions resolved from `references` in the order the references appear. The `uncle_headers` list is retained rather than discarded: it is not recoverable from the mempool, and once the proposal has been consumed the block is the only carrier of the signed uncle headers that the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) needs.
+Reconstruction assembles the [Block](#block) from the proposal's `header` and `signature`, its `uncle_headers` copied over verbatim, and the transactions resolved from `references` in the order the references appear. The `uncle_headers` list is retained rather than discarded: it is not recoverable from the mempool, and once the proposal has been consumed the block is the only carrier of the signed uncle headers that the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) needs.
 
 ## Block Proposal Validation
 
