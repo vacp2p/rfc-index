@@ -30,10 +30,11 @@
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
 | 1.2.0 | Added the `uncles` field to the [Header](#header) and the `uncle_headers` field carrying their signed headers to the [Proposal](#block-proposal), due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). Defined the [Block](#block) structure. | 2026-07-29 |
+| 1.2.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 
 # Introduction
 
-In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to `MAX_BLOCK_SIZE`, which is 1 MB and covers the transactions only, and the proposal compresses its size down to 33 kB, which saves the bandwidth necessary to broadcast new blocks.
+In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to `MAX_BLOCK_SIZE`, which is 2 MiB and covers the transactions only, and the proposal compresses its size down to 33 kB, which saves the bandwidth necessary to broadcast new blocks.
 
 # Overview
 

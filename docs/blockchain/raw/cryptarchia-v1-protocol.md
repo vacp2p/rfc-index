@@ -29,6 +29,7 @@
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
 | 1.2.0 | Added uncle references: the `uncles` header field, the uncle reference window $`w_u`$, the uncle selection procedure, and the counting of the referenced uncles in the Total Stake Inference. Clarified that a block signature is verified over the header rather than over its block ID. | 2026-07-29 |
+| 1.2.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 
 # Introduction
 
@@ -94,7 +95,7 @@ Our design starts from the solid foundation provided by Ouroboros Crypsinous: Pr
 | $`f`$ | slot activation coefficient | The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see [ANALYSIS-BLOCK-TIMES-BLEND-NETWORK](analysis-block-times-blend-network.md) for analysis leading to the choice of value) | 1/30 |
 | $`k`$ | security parameter | Block depth finality. Blocks deeper than $`k`$ on any given chain are considered immutable. | 2160 blocks |
 | *none* | slot length | The duration of a single slot. | 1 second |
-| MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 1 MB |
+| MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 2 MiB (2,097,152 bytes) |
 | MAX_BLOCK_TXS | max block transactions | The maximum number of transactions in a block | 1024 |
 | $`W`$ | window absorption parameter | The width of the [uncle reference window](#uncle-references) $`w_u`$ expressed in expected block-intervals (each of $`f^{-1}`$ slots). Constrained to $`1 \le W \le \lfloor 0.6\,k \rfloor`$ so that $`w_u`$ stays strictly inside the finalization window. | 10 |
 | $`w_u`$ | uncle reference window | The maximum number of slots by which the slot of a referenced [uncle](#uncle-references) may precede the slot of the block referencing it. Derived from the window absorption parameter as $`w_u \coloneqq W\cdot f^{-1}`$. | $`W\cdot f^{-1}`$ (300 slots at $`W=10`$) |
