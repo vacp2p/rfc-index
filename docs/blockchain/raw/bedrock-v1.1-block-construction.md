@@ -29,8 +29,8 @@
 | 1.1.0 | Removed `service_rewards` due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Extended the [Block Execution](#block-execution) logic with rewards distribution due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Removed **Block Samples** subsection of the [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) from the [Annex](#annex). Reordered the [Block Execution](#block-execution) steps to enable immediate use of reward notes as inputs for transactions included in the proposal. | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
-| 1.2.0 | Added the `uncles` field to the [Header](#header) and the `uncle_headers` field carrying their signed headers to the [Proposal](#block-proposal), due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). Defined the [Block](#block) structure. | 2026-07-29 |
-| 1.2.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
+| 1.1.3 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
+| 1.2.0 | Added the `uncle_headers` field, carrying the signed headers of the referenced uncles, to the [Proposal](#block-proposal) and to the newly defined [Block](#block) structure, due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). Replaced `block_root` with `body_root` in the [Header](#header), which commits to `uncle_headers` — signatures included — as well as to the transactions; the header stays 297 bytes and the proposal grows to 33130..34574 bytes. Added the carried-header well-formedness check to [Block Proposal Validation](#block-proposal-validation). | 2026-08-06 |
 
 # Introduction
 
@@ -70,26 +70,26 @@ We are using two hashing algorithms that have the same output length of 256 bits
 
 ## Block Proposal
 
-A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. The proposal also carries the full signed headers of the uncles referenced by its own header, so that every node holding the block holds the referenced headers as well. The size of the proposal varies with the number of referenced uncles: from 33131 bytes (no uncles) up to the maximum of 35219 bytes (`MAX_UNCLES` referenced uncles whose carried headers each themselves reference `MAX_UNCLES` uncles). The indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md) is provided at the message layer: every dispersed proposal is padded up to the maximum payload size `Max_Body_Length = 35219` bytes — set from the maximum header and proposal sizes — by [Payload Formatting](payload-formatting.md).
+A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. The proposal also carries the full signed headers of the uncles it references, so that every node holding the block holds those headers as well. The size of the proposal varies with the number of referenced uncles: from 33130 bytes (no uncles) up to the maximum of 34574 bytes (`MAX_UNCLES` referenced uncles). The indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md) is provided at the message layer: every dispersed proposal is padded up to the maximum payload size `Max_Body_Length = 34574` bytes — set from the maximum proposal size — by [Payload Formatting](payload-formatting.md).
 
 We define the following message structure:
 
 ```python
-class Proposal:                                     # 33131..35219 bytes
-    header: Header                                  # 298..426 bytes
-    uncle_headers: list[SignedHeader]               # 1 + n × (362..490) bytes
+class Proposal:                                     # 33130..34574 bytes
+    header: Header                                  # 297 bytes
+    uncle_headers: list[SignedHeader]               # 1 + n × 361 bytes
     references: References                          # 32768 bytes
     signature: Ed25519Signature                     # 64 bytes
 
-class SignedHeader:                                 # 362..490 bytes
-    header: Header                                  # 298..426 bytes
+class SignedHeader:                                 # 361 bytes
+    header: Header                                  # 297 bytes
     signature: Ed25519Signature                     # 64 bytes
 ```
 
 Where:
 
 - `header` is the header of the proposal; defined below: [Header](#header).
-- `uncle_headers` is a variable-size list carrying the full signed headers of the referenced uncles, in the same order as `header.uncles`: entry `i` must hold the header whose block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) equals `header.uncles[i]`, together with the signature of that uncle block header under its `leader_key` — the header and signature as originally received with the uncle's own proposal (see [Block Proposal Validation](#block-proposal-validation)). Like every list, it is serialized as a 1-byte little-endian element count followed by that many entries; that count is redundant with the length of `header.uncles` and [Block Proposal Validation](#block-proposal-validation) therefore requires the two to agree. The header part of each entry is bound through `header.uncles` and thus indirectly by the proposal signature; the signature part is not hash-committed, which is why [Block Proposal Validation](#block-proposal-validation) verifies it as part of the well-formedness of the message — both checks are pure functions of the message bytes, since the verifying key is inside the carried header. Each carried header is itself length-prefixed, so the list parses unambiguously; an entry is at most 490 bytes (a 426-byte maximum header plus a 64-byte signature). The proposal length therefore reveals how many uncles are referenced — proposal indistinguishability is provided by the message-layer padding of [Payload Formatting](payload-formatting.md), not by the encoding. The same list is carried over into the reconstructed [Block](#block), which is what makes every referenced uncle structurally available: the counting rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) can be evaluated by any node holding the chain, including nodes bootstrapping from genesis that never receive the proposal.
+- `uncle_headers` is a variable-size list carrying the full signed headers of the referenced uncles, with at most `MAX_UNCLES` entries. Each entry holds an uncle block header together with the signature of that header under its `leader_key` — the header and signature as originally received with the uncle's own proposal. This list *is* the reference: the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md#block-id)) of an uncle is derived from its carried header and is not recorded separately. Like every list, it is serialized as a 1-byte little-endian element count followed by that many entries, and a decoder must reject a count exceeding `MAX_UNCLES`. The `uncles` field having been removed from the [Header](#header), each entry is a fixed 361 bytes — a 297-byte header plus a 64-byte signature — so the list of carried headers parses unambiguously from its element count alone. The whole list, signatures included, is committed by `header.body_root` and therefore by the block ID, so no two blocks sharing an ID can differ in a carried signature. The proposal length reveals how many uncles are referenced — proposal indistinguishability is provided by the message-layer padding of [Payload Formatting](payload-formatting.md), not by the encoding. The proposer chooses which uncles to reference according to [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection), and every entry must satisfy the validity rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) or the block is rejected. The same list is carried over into the reconstructed [Block](#block), which is what makes every referenced uncle structurally available: those rules can be evaluated by any node holding the chain, including nodes bootstrapping from genesis that never receive the proposal.
 - `references` is a set of 1024 references to transactions of a `hash` type; the size of the `hash` type is 32 bytes and is the transaction hash as defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction).
 - `signature` is the signature of the complete `header` using the `leader_key` from the `ProofOfLeadership`; the size of the `Ed25519Signature` type is 64 bytes.
 
@@ -98,12 +98,11 @@ Where:
 ### Header
 
 ```python
-class Header:                                # 298 + len(uncles) × 32 bytes (298..426)
+class Header:                                # 297 bytes
     bedrock_version: byte                    # 1 byte
     parent_block: hash                       # 32 bytes
     slot: SlotNumber                         # 8 bytes
-    block_root: hash                         # 32 bytes
-    uncles: list[hash]                       # 1 + len(uncles) × 32 bytes (no padding)
+    body_root: hash                          # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 ```
 
@@ -112,8 +111,7 @@ Where:
 - `bedrock_version` is the version of the proposal message structure that supports other protocols defined in linked reference; its size is 1 byte and is fixed to `0x01`.
 - `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `slot` is the consensus slot number; the size of the `SlotNumber` type is 8 bytes.
-- `block_root` is the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) used for constructing the `references` list in the `mempool_ransactions`; the size of the `hash` is 32 bytes.
-- `uncles` is a variable-size list of block IDs referencing uncles (valid fork blocks; see [Uncle References](cryptarchia-v1-protocol.md#uncle-references)), with at most `MAX_UNCLES` entries and no padding. It is serialized as a 1-byte little-endian element count followed by that many 32-byte block IDs, so the field is `1 + len(uncles) × 32` bytes and the header length varies between 298 and 426 bytes. A single byte suffices because `MAX_UNCLES` is 4; as in the [Mantle Transaction Encoding](mantle-transaction-encoding.md), the width of a list's count is chosen to fit that list's own bound. A decoder must reject a count exceeding `MAX_UNCLES`; that bound is a constraint of the serialization schema, not a validation of the referenced uncles. The proposer chooses which uncles to reference according to [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection). The field is committed in the header (via the block ID) but imposes no validity constraint; it is used only for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) and is never executed. The header itself does not hide how many uncles are referenced; proposal indistinguishability is provided by the message-layer padding of [Payload Formatting](payload-formatting.md). The full signed headers of the referenced uncles are carried in the `uncle_headers` field of both the [Block Proposal](#block-proposal) and the reconstructed [Block](#block).
+- `body_root` is the commitment to the block body — both the carried `uncle_headers` and the transactions. It is computed as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), which combines a hash of the serialized `uncle_headers` list with the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) — the same hashes used for constructing the `references` list in the `mempool_ransactions`; the size of the `hash` is 32 bytes. Since the block ID is taken over the header, committing the uncle headers here is what makes two blocks with the same ID identical byte for byte.
 - `proof_of_leadership` is the proof confirming that the sender is the leader; defined below: [Proof of Leadership](#proof-of-leadership).
 
 ### References
@@ -148,9 +146,9 @@ A **block** is what a proposal becomes once its references have been resolved ag
 
 ```python
 class Block:
-    header: Header                           # 298..426 bytes
+    header: Header                           # 297 bytes
     signature: Ed25519Signature              # 64 bytes
-    uncle_headers: list[SignedHeader]        # 1 + len(header.uncles) × (362..490) bytes
+    uncle_headers: list[SignedHeader]        # 1 + n × 361 bytes, n <= MAX_UNCLES
     transactions: list[SignedMantleTx]       # up to MAX_BLOCK_SIZE
 ```
 
@@ -158,10 +156,10 @@ Where:
 
 - `header` is the header of the proposal the block was reconstructed from, unchanged; defined above: [Header](#header).
 - `signature` is the proposal signature over that `header`, carried over unchanged. It is retained because `block_id` commits to the header alone and therefore does not cover the signature, so a node that receives the block without ever seeing the proposal — as happens during synchronization — would otherwise have nothing to check against step 9 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation); the size of the `Ed25519Signature` type is 64 bytes.
-- `uncle_headers` is the list carried over verbatim from the proposal, defined above: [Block Proposal](#block-proposal). It must satisfy the same consistency conditions, so the block holds exactly one signed header per entry of `header.uncles`, in the same order.
+- `uncle_headers` is the list carried over verbatim from the proposal, defined above: [Block Proposal](#block-proposal). It is committed by `header.body_root`, so it cannot be altered, reordered or truncated without changing the block ID, and every entry must satisfy the validity rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) for the block to be valid.
 - `transactions` is the sequence of Mantle Transactions resolved from `references` during [Block Proposal Reconstruction](#block-proposal-reconstruction).
 
-The `uncle_headers` list is part of the block rather than only of the proposal because the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) needs it. The counting rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) are evaluated over the chain, and `header.uncles` holds only block IDs; without the signed headers travelling with the block, a node that obtained the chain by synchronizing from its peers — which transfers blocks, not proposals — could not evaluate those rules, could not compute $`N_\text{BLOCKS}`$, and therefore could not derive the difficulty $`D`$ that gates Proof-of-Leadership validity in the following epoch. Carrying them in the block makes the inference reproducible from chain data alone, for a bootstrapping node exactly as for a node that followed the chain live.
+The `uncle_headers` list is part of the block rather than only of the proposal because both [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) and the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) need it. A node that obtained the chain by synchronizing from its peers — which transfers blocks, not proposals — would otherwise hold no record of the referenced uncles at all: it could not apply the validity rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) to the blocks it downloads, could not compute $`N_\text{BLOCKS}`$, and therefore could not derive the difficulty $`D`$ that gates Proof-of-Leadership validity in the following epoch. Carrying the list in the block makes both the validation and the inference reproducible from chain data alone, for a bootstrapping node exactly as for a node that followed the chain live.
 
 As with the header, `uncle_headers` does not count towards `MAX_BLOCK_SIZE`, which bounds the block body — the serialized `transactions` — only. The uncle payload is bounded independently by `MAX_UNCLES` entries per block.
 
@@ -189,14 +187,13 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
     - `bedrock_version`
     - `parent_block`
     - `slot`
-    - `block_root`
-    - `uncles`
+    - `body_root` — left unset here; it is computed in step 4, once both parts of the body are known
     - `proof_of_leadership`:
       - `leader_voucher`
       - `entropy_contribution`
       - `proof`
       - `leader_key`
-  - `uncle_headers`: the full signed headers — header and signature as received with the uncle's own proposal — of the uncles selected into `header.uncles` ([Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection)), in the same order and with the same number of entries as `header.uncles`.
+  - `uncle_headers`: the full signed headers — header and signature as received with the uncle's own proposal — of the uncles chosen by [Uncle Selection](cryptarchia-v1-protocol.md#uncle-selection), in selection order. Every entry must satisfy the validity rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references) against the chain the proposal extends, or the resulting block will be rejected; because those rules read only that chain and the entry itself, the proposer can verify this before publishing.
 
 2. Construct the `mempool_transactions` object:
 1. Select Mantle transactions:
@@ -210,7 +207,7 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
 references: list[hash] = [mantle_txhash(tx) for tx in mempool_transactions]
 ```
 
-4. Compute the `header.block_root` as the root of the Merkle tree constructed from the `mempool_transactions` transactions used to build `references`.
+4. Compute the `header.body_root` over both parts of the body, as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation): the hash of the serialized `uncle_headers` list from step 1, combined with the root of the Merkle tree constructed from the `mempool_transactions` transactions used to build `references`. This step therefore comes after both uncle selection and transaction selection.
 5. Sign the block proposal header.
 ```text
 signature = Ed25519.sign(leader_secret_key, header)
@@ -220,6 +217,7 @@ signature = Ed25519.sign(leader_secret_key, header)
 ```python
 proposal = Proposal(
     header,
+    uncle_headers,
     references,
     signature
 )
@@ -250,7 +248,7 @@ The process works as follows:
 9. If any transaction is missing, the entire proposal is rejected.
 10. If all transactions are present, the block proposal is reconstructed and proceeds to further validation steps.
 
-Reconstruction assembles the [Block](#block) from the proposal's `header` and `signature`, its `uncle_headers` copied over verbatim, and the transactions resolved from `references` in the order the references appear. The `uncle_headers` list is retained rather than discarded: it is not recoverable from the mempool, and once the proposal has been consumed the block is the only carrier of the signed uncle headers that the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) needs.
+Reconstruction assembles the [Block](#block) from the proposal's `header` and `signature`, its `uncle_headers` copied over verbatim, and the transactions resolved from `references` in the order the references appear. The `uncle_headers` list is retained rather than discarded: it is not recoverable from the mempool, it is committed by `header.body_root` and so cannot be dropped without invalidating the block, and once the proposal has been consumed the block is the only carrier of the signed uncle headers that [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) and the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) need.
 
 ## Block Proposal Validation
 
@@ -259,10 +257,10 @@ This section defines the procedure followed by a Logos Blockchain node to valida
 Given a `proposal`, a proposed block consisting of a `header`, `uncle_headers` and `references`. This block proposal is considered valid if the following conditions are met:
 
 1. **Block Validation**
-  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation). The `uncles` field is **not** validated for block validity; it is used only for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) (see [Uncle References](cryptarchia-v1-protocol.md#uncle-references)).
+  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation). This includes step 10, which requires every entry of `uncle_headers` to be a valid uncle of the block (see [Uncle References](cryptarchia-v1-protocol.md#uncle-references)).
 
-2. **Uncle Headers Consistency**
-  The `uncle_headers` list must contain exactly `len(header.uncles)` entries — its own 1-byte element count must equal the element count of `header.uncles` — and for each `i` in `0..len(header.uncles)`: the block ID of `uncle_headers[i].header` must equal `header.uncles[i]`, and `uncle_headers[i].signature` must be a valid signature of `uncle_headers[i].header` under the `leader_key` of that header — the same binding a proposer creates for its own header in [Construction Procedure](#construction-procedure). The signature must be verified at the message level because the signature bytes are not covered by `header.uncles`; without this check a copy with a corrupted signature could circulate undetected and nodes would disagree on the countable set. Both checks are well-formedness conditions on the proposal message alone — pure functions of its bytes, with no dependence on any data external to the proposal — so they re-introduce no coupling between block validity and uncle visibility. They are **not** a check of the counting rules of [Uncle References](cryptarchia-v1-protocol.md#uncle-references): whether a carried uncle is actually countable is evaluated independently by each node for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference) and never affects the validity of the proposal. A proposal failing this condition is malformed in transit or by its proposer; well-formed bytes exist and are held by the proposer and by every node that accepted the block, so the block can be re-requested from any other holder.
+2. **Body Root Consistency**
+  `header.body_root` must equal the body root computed over the carried `uncle_headers` and the transactions the `references` resolve to. This restates step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) at the message level, because the consequence of failing it here is different: a mismatch means the message was corrupted in transit or malformed by its proposer, not that the block it names is invalid. The block ID is taken over the header, so a corrupted copy and the genuine block share no identity, and well-formed bytes exist and are held by the proposer and by every node that accepted the block. Such a proposal must be discarded and may be re-requested from any other holder, and no verdict about the underlying block may be recorded from it. Once `body_root` matches, the `uncle_headers` are exactly the bytes the proposer committed to, and step 10 decides the block on their merits.
 
 3. **Block Proposal Reconstruction**
   The `references` must refer to existing `mempool_transaction` entries that are retrievable from the node's local mempool.
@@ -282,7 +280,7 @@ Given a `ValidBlock` that has successfully passed proposal validation, the node 
 2. Execute the reward distribution protocol defined in [**Service Reward Distribution Protocol**](bedrock-service-reward-distribution.md) to generate reward notes locally and include them in the ledger.
 3. Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md).
 
-The `uncles` references and the carried `uncle_headers` are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference).
+The carried `uncle_headers` are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the [Total Stake Inference](cryptarchia-v1-protocol.md#total-stake-inference).
 
 # Annex
 

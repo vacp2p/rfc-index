@@ -28,8 +28,8 @@
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
-| 1.2.0 | Added uncle references: the `uncles` header field, the uncle reference window $`w_u`$, the uncle selection procedure, and the counting of the referenced uncles in the Total Stake Inference. Clarified that a block signature is verified over the header rather than over its block ID. | 2026-07-29 |
-| 1.2.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
+| 1.1.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
+| 1.2.0 | Added [uncle references](#uncle-references): a block carries the signed headers of the fork blocks it references, the validity of each is a condition of the block's own validity (step 10 of [Block Header Validation](#block-header-validation)), and the [Total Stake Inference](#total-stake-inference) counts their slots alongside those of the canonical blocks. Added the uncle reference window $`w_u`$ with its window absorption parameter $`W`$, `MAX_UNCLES`, and the [Uncle Selection](#uncle-selection) procedure. Replaced `block_root` with `body_root`, which commits to the carried headers as well as to the transactions. Clarified that a block signature is verified over the header rather than over its block ID. | 2026-08-06 |
 
 # Introduction
 
@@ -187,7 +187,7 @@ The epoch nonce used in the next epoch is $`\eta_{B'}`$ where $`B'`$ is the last
 
 ### Total Stake Inference
 
-Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The inference counts the number of **occupied slots** of the honest chain — the slots holding a canonical block or one of the [uncle](#uncle-references) blocks it references that the node can verify. Therefore, lottery wins lost to forks still contribute to the estimate, and each slot is counted once however many blocks fall in it. The details can be found in the following document:
+Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The inference counts the number of **occupied slots** of the honest chain — the slots holding a canonical block or one of the [uncle](#uncle-references) blocks it references. Therefore, lottery wins lost to forks still contribute to the estimate, and each slot is counted once however many blocks fall in it. The details can be found in the following document:
 
 [Total Stake Inference](cryptarchia-total-stake-inference.md)
 
@@ -221,17 +221,17 @@ $`\text{define } \textbf{compute\_epoch\_state}(ep, tip \in T)\to(\mathbb{C}_\te
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`(\_,\_,D^{ep-1}) \coloneqq \textbf{compute\_epoch\_state}(ep-1,tip)`$
 
-> The number of distinct occupied slots during the first $`6\frac{k}{f}`$ slots of the previous epoch: a slot counts if it holds a block of the chain of $`tip`$ and/or one or more [uncles](#uncle-references) referenced by that chain that pass the counting rules, and each slot is counted at most once. Referenced uncles are genuine lottery wins that were lost to forks; counting them gives a more accurate estimate of consensus participation. The referenced headers are carried by the blocks of the chain and the counting rules are functions of the chain and those headers alone, so every node holding the chain computes the same count (see [Uncle References](#uncle-references)).
+> The number of distinct occupied slots during the first $`6\frac{k}{f}`$ slots of the previous epoch: a slot counts if it holds a block of the chain of $`tip`$ and/or one or more [uncles](#uncle-references) referenced by that chain, and each slot is counted at most once. Referenced uncles are genuine lottery wins that were lost to forks; counting them gives a more accurate estimate of consensus participation. No filtering is needed here: an uncle carried by a block of the chain was validated as a condition of that block's acceptance (see [Uncle References](#uncle-references)), so every node holding the chain counts exactly the same uncles.
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{in\_window}(sl) \coloneqq sl_{ep - 1} \le sl \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor`$
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{chain} \coloneqq \textbf{ancestors}(tip)`$
 
-> The countable uncles are the referenced fork blocks that pass the counting rules of [Uncle References](#uncle-references): the parent of the uncle lies on the chain while the uncle itself does not, its slot precedes the slot of its referencer by at most $`w_u`$, and its Proof of Leadership verifies against inputs derived from the chain. Here $`\textbf{fetch\_header}(u)`$ resolves from the signed headers carried by the referencing blocks, which every node holding the chain possesses. The rules depend only on the chain and the carried entries, so all nodes compute the same set; an entry that fails the rules contributes nothing.
+> The referenced uncles are simply the headers carried by the blocks of the chain in their `uncle_headers` field. Each was checked against the rules of [Uncle References](#uncle-references) when its referencing block was validated — the parent of the uncle lies on the chain while the uncle itself does not, its slot precedes the slot of its referencer by at most $`w_u`$, its Proof of Leadership verifies against inputs derived from the chain, and its signature verifies over its header — so no entry needs to be re-examined or skipped here.
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{countable\_uncles} \coloneqq \{\, U : A \in \textbf{chain},\ u \in A.\text{uncles},\ U \coloneqq \textbf{fetch\_header}(u),\ \textbf{countable}(U, A) \,\}`$
+&nbsp;&nbsp;&nbsp;&nbsp;$`\textbf{referenced\_uncles} \coloneqq \{\, U : A \in \textbf{chain},\ (U, \sigma_U) \in A.\text{uncle\_headers} \,\}`$
 
-&nbsp;&nbsp;&nbsp;&nbsp;$`N_\text{BLOCKS}^{ep-1} \coloneqq \left|\ \{sl_B : B \in \textbf{chain},\ \textbf{in\_window}(sl_B)\}\ \cup\ \{sl_U : U \in \textbf{countable\_uncles},\ \textbf{in\_window}(sl_U)\}\ \right|`$
+&nbsp;&nbsp;&nbsp;&nbsp;$`N_\text{BLOCKS}^{ep-1} \coloneqq \left|\ \{sl_B : B \in \textbf{chain},\ \textbf{in\_window}(sl_B)\}\ \cup\ \{sl_U : U \in \textbf{referenced\_uncles},\ \textbf{in\_window}(sl_U)\}\ \right|`$
 
 &nbsp;&nbsp;&nbsp;&nbsp;$`D^{ep} \coloneqq \textbf{infer\_total\_active\_stake}(D^{ep-1}, N_\text{BLOCKS}^{ep-1})`$
 
@@ -263,7 +263,7 @@ After bootstrapping we commit to the most honest looking chain we found and swit
 
 ### Block ID
 
-Block ID is defined by the hash of the block header [Block Header](#block-header), where `hash` is Blake2b as specified in [Common Cryptographic Components](common-cryptographic-components.md)
+Block ID is defined by the hash of the block header [Block Header](#block-header), where `hash` is Blake2b as specified in [Common Cryptographic Components](common-cryptographic-components.md). The header commits to the whole block body through $`body\_root`$ (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#header)), so the block ID transitively commits to the signed uncle headers the block carries as well as to its transactions: two blocks with the same ID are identical byte for byte.
 
 ```python
 def block_id(header: Header) -> hash
@@ -272,8 +272,7 @@ def block_id(header: Header) -> hash
         header.bedrock_version,
         header.parent_block,
         header.slot.to_bytes(8, byteorder='little'),
-        header.block_root,
-        header.uncles.to_bytes(),            # 1-byte little-endian count, then count × 32 bytes
+        header.body_root,
         # PoL fields
         header.proof_of_leadership.leader_voucher,
         header.proof_of_leadership.entropy_contribution,
@@ -285,12 +284,11 @@ def block_id(header: Header) -> hash
 ### Block Header
 
 ```python
-class Header:                                # 298 + len(uncles) × 32 bytes (298..426)
+class Header:                                # 297 bytes
     bedrock_version: byte                    # 1 bytes
     parent_block: hash                       # 32 bytes
     slot: int                                # 8 bytes
-    block_root: hash                         # 32 bytes
-    uncles: list[hash]                       # 1 + len(uncles) × 32 bytes (no padding)
+    body_root: hash                          # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
@@ -306,30 +304,29 @@ class ProofOfLeadership:                     # 224 bytes
 
 ### Uncle References
 
-A block may reference up to `MAX_UNCLES` **uncles** (see [Constants](#constants)). An uncle is a valid fork block that is not part of the chain of the referencing block but shares a common ancestor with it. The references are recorded in the `uncles` field of the [Block Header](#block-header): a variable-size list of block IDs, with at most `MAX_UNCLES` entries and no padding. Following the list convention of the [Mantle Transaction Encoding](mantle-transaction-encoding.md) — *"Any lists are length-prefixed with fixed width uints"* — the list is serialized as a 1-byte little-endian element count followed by that many 32-byte block IDs (one byte suffices for the `MAX_UNCLES` bound), so it carries its own length and needs no separate count field in the header. The full signed headers of the referenced uncles are carried alongside the header in the `uncle_headers` field of both the block proposal and the reconstructed block ([Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#block)) — so any node holding a block also holds the signed headers of the uncles it references, however it obtained that block. The sizes of the header and of the proposal therefore vary with the number of referenced uncles; the indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md) is preserved at the message layer instead: [Payload Formatting](payload-formatting.md) fixes every dispersed payload body to the maximum payload size `Max_Body_Length` — set from the maximum header and proposal sizes — padding shorter proposals with random data.
+A block may reference up to `MAX_UNCLES` **uncles** (see [Constants](#constants)). An uncle is a valid fork block that is not part of the chain of the referencing block but shares a common ancestor with it. A block references an uncle by carrying its full signed header in the `uncle_headers` field of both the block proposal and the reconstructed block ([Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#block)); the block ID of an uncle is derived from the carried header as $`\textbf{block\_id}(U)`$ and is not recorded separately. Following the list convention of the [Mantle Transaction Encoding](mantle-transaction-encoding.md) — *"Any lists are length-prefixed with fixed width uints"* — the list is serialized as a 1-byte little-endian element count followed by that many fixed-size entries (one byte suffices for the `MAX_UNCLES` bound), so it carries its own length. The header holds no uncle data of its own and is fixed-size; it commits to the carried entries — signatures included — through $`body\_root`$, and hence so does the [Block ID](#block-id). Any node holding a block therefore also holds the signed headers of the uncles it references, however it obtained that block, and cannot hold a variant of them. The size of a proposal varies with the number of referenced uncles; the indistinguishability of proposals required by the [Blend Protocol](blend-protocol.md) is preserved at the message layer instead: [Payload Formatting](payload-formatting.md) fixes every dispersed payload body to the maximum payload size `Max_Body_Length` — set from the maximum proposal size — padding shorter proposals with random data.
 
 The only purpose of an uncle reference is to feed the [Total Stake Inference](#total-stake-inference), which infers the total active stake from the number of **occupied slots** — the slots in which at least one leader won the lottery. A referenced uncle is a genuine lottery win, backed by a valid Proof of Leadership, that was lost to a fork (predominantly caused by network delays); its slot was occupied, but without the reference the canonical chain would not observe it. Counting the slots of the referenced uncles alongside those of the canonical blocks recovers those occupied slots and gives a more accurate estimate of the total active stake.
 
 At the moment a block is produced it is not yet known which branch of a fork will become canonical: some nodes build on one branch and some on the other. By referencing the blocks of the competing branches as uncles, whichever branch ultimately becomes canonical still counts the lottery wins of the branches that lost. This is the intent of uncle references — to let each branch count its counterpart branches — and it is what improves the total stake estimate.
 
-**Uncle references never affect block validity.** The `uncles` field is committed in `block_id` — so it is fixed and signed — but a block is [valid](#block-header-validation) regardless of the uncles it references, including references the node cannot see or verify. This decoupling is deliberate and is a security requirement: the visibility of a fork block can be influenced by an adversary, so if uncle validity gated block validity, that adversary could make the same block valid for some nodes and invalid for others and thereby control block inclusion. By making uncles **counting-only**, any such influence is confined to the Total Stake Inference estimate and can never change whether a block is included.
+**A block is valid only if every uncle it carries is valid.** The rules below are validity conditions, checked as step 10 of [Block Header Validation](#block-header-validation): a block carrying an entry that fails any of them is rejected, exactly as one carrying an invalid Proof of Leadership is. Gating validity this way is safe because every rule is a function of the chain being extended and of the carried entry alone — never of the block tree $`T`$, the node's pruning state, or the node's network history. All nodes therefore reach the same verdict on the same block; no node can be starved of the inputs needed to decide, since the entry travels inside the very block whose validity depends on it; and an adversary manipulating which fork blocks are visible can neither make a block valid for some nodes and invalid for others nor thereby influence block inclusion. Requiring validity also keeps fabricated uncles out of the chain permanently, instead of leaving every node that ever synchronizes to detect and discard the same entries again.
 
-Instead, each node applies the following **counting rules** when it decides whether a referenced uncle contributes to the [Total Stake Inference](#total-stake-inference). An entry $`u`$ of the uncle list of a block $`A`$ is **counted** — we say $`\textbf{countable}(U, A)`$ holds — only if all of the following hold; otherwise the entry is silently skipped and the block $`A`$ remains valid regardless:
+An entry $`(U, \sigma_U)`$ of the `uncle_headers` list of a block $`A`$ is **valid** — we say $`\textbf{valid\_uncle}(U, \sigma_U, A)`$ holds — only if all of the following hold:
 
-- The node holds the header $`U`$ with $`\textbf{block\_id}(U) = u`$ together with its signature $`\sigma_U`$. Both are carried by the block $`A`$ in its `uncle_headers` field (see [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#block)), so every node holding $`A`$ holds them — including a node that obtained it by synchronizing from its peers, which transfers blocks rather than proposals; headers are hash-addressed, so the carried header bytes are unfalsifiable.
-- The parent of the uncle is part of the chain of the referencing block: $`U.\text{parent\_block} \in \textbf{ancestors}(A)`$. Hence the uncle is the **first block of its fork**, and its chain is a prefix of the chain of $`A`$. Blocks deeper in a fork branch are not countable: verifying their Proof of Leadership requires the ledger state of the fork branch, which cannot be reconstructed from the chain of $`A`$ (see the verification rule below).
+- The parent of the uncle is part of the chain of the referencing block: $`U.\text{parent\_block} \in \textbf{ancestors}(A)`$. Hence the uncle is the **first block of its fork**, and its chain is a prefix of the chain of $`A`$. Blocks deeper in a fork branch cannot be referenced: verifying their Proof of Leadership requires the ledger state of the fork branch, which cannot be reconstructed from the chain of $`A`$ (see the verification rule below).
 - The uncle itself is not part of the chain of the referencing block: $`\lnot\,\textbf{is\_ancestor}(U, A)`$ — equivalently, $`U`$ is not the block of the chain of $`A`$ at slot $`sl_U`$.
 - The slot of the uncle strictly precedes the slot of $`A`$ by at most $`w_u`$ slots (see [Constants](#constants)): $`0 \lt sl_A - sl_U \le w_u`$.
-- The [Proof of Leadership](cryptarchia-proof-of-leadership.md) of $`U`$ verifies against public inputs derived from the chain of $`A`$: the slot, $`P_\text{LEAD}`$ and $`\rho_\text{LEAD}`$ taken from the header of $`U`$; the epoch state $`(\mathbb{C}_\text{LEAD}, \eta, D)`$ of the epoch of $`sl_U`$ as derived on the chain of $`A`$; and $`ledger_\text{LATEST}`$ as of $`U.\text{parent\_block}`$, which is a historical ledger root of the chain of $`A`$ because the parent lies on that chain. Since the chain of the uncle is a prefix of the chain of $`A`$, a genuine fork win was proven against exactly these values and verifies; a fabricated header does not. These are the same inputs a node derives to validate the Proofs of Leadership of the canonical blocks themselves; in particular $`ledger_\text{LATEST}`$ is a function of the **executed** chain, so counting requires a full node's possession of the chain — headers alone do not suffice, exactly as they do not suffice to validate canonical blocks.
+- The [Proof of Leadership](cryptarchia-proof-of-leadership.md) of $`U`$ verifies against public inputs derived from the chain of $`A`$: the slot, $`P_\text{LEAD}`$ and $`\rho_\text{LEAD}`$ taken from the header of $`U`$; the epoch state $`(\mathbb{C}_\text{LEAD}, \eta, D)`$ of the epoch of $`sl_U`$ as derived on the chain of $`A`$; and $`ledger_\text{LATEST}`$ as of $`U.\text{parent\_block}`$, which is a historical ledger root of the chain of $`A`$ because the parent lies on that chain. Since the chain of the uncle is a prefix of the chain of $`A`$, a genuine fork win was proven against exactly these values and verifies; a fabricated header does not. These are the same inputs a node derives to validate the Proofs of Leadership of the canonical blocks themselves; in particular $`ledger_\text{LATEST}`$ is a function of the **executed** chain, so this check requires a full node's possession of the chain — headers alone do not suffice, exactly as they do not suffice to validate canonical blocks.
 - The carried signature verifies over the header of $`U`$: $`\textbf{verify\_signature}(U, \sigma_U, P_\text{LEAD})=True`$, with $`P_\text{LEAD}`$ taken from that header — the same binding required of a canonical proposal by step 9 of [Block Header Validation](#block-header-validation). This ensures the uncle is a block authorized by the leader who won the lottery, not a fabricated header wrapped around a replayed proof.
 
-Every rule is a function only of the chain of $`A`$ and the contents of the carried entry — never of the block tree $`T`$, the node's pruning state, or the node's network history. Since the referenced signed headers are carried inside the blocks, every node holding the chain holds them: all nodes — including a node bootstrapping from genesis — evaluate exactly the same countable set and derive exactly the same estimate. A carried uncle is thus checked exactly as a received proposal is — the Proof of Leadership and the signature binding it to the header — minus the chain-context steps that do not apply to a fork block. One caveat is recorded for honesty: the signature proves that the winning leader authorized this header, not that the block was published in its slot — the owner of a winning note can fabricate and self-sign such a header later. This is benign: the Proof of Leadership still attests a genuine lottery win at that slot, which is precisely the signal the [Total Stake Inference](#total-stake-inference) measures, and the count is taken per distinct slot, so neither replay nor self-wrapping can add occupied slots beyond genuine wins.
+A proposer can always determine in advance whether an entry will be accepted: the chain of $`A`$ is fixed the moment it selects the parent of $`A`$, and every rule reads only that chain and the entry itself, so proposer and validators evaluate identically and a well-implemented proposer never builds a block that others reject. For the same reason all nodes — including a node bootstrapping from genesis — accept exactly the same blocks and, having accepted them, count exactly the same uncles and derive exactly the same estimate. A carried uncle is checked exactly as a received proposal is — the Proof of Leadership and the signature binding it to the header — minus the chain-context steps that do not apply to a fork block. One caveat is recorded for honesty: the signature proves that the winning leader authorized this header, not that the block was published in its slot — the owner of a winning note can fabricate and self-sign such a header later. This is benign: the Proof of Leadership still attests a genuine lottery win at that slot, which is precisely the signal the [Total Stake Inference](#total-stake-inference) measures, and the count is taken per distinct slot, so neither replay nor self-wrapping can add occupied slots beyond genuine wins.
 
-Uncle references are **not** required to be unique, and duplicates are permitted — the same uncle may be referenced by more than one block on the canonical chain. This is harmless because the [Total Stake Inference](#total-stake-inference) counts **occupied slots**, not references: it forms the set of slots occupied by the canonical chain together with the slots of the uncles that chain references, and counts each slot once. A slot therefore contributes at most once to the estimate no matter how many blocks fall in it — the same uncle referenced several times, two distinct uncles that share a slot, and an uncle that shares its slot with a canonical block each add a single occupied slot, or none if that slot is already counted. This matches the slot lottery, which activates a slot with probability $`f`$ regardless of how many leaders win it.
+Uncle references are **not** required to be unique, and duplicates are permitted — the same uncle may be referenced by more than one block on the canonical chain, and a single block may carry the same entry twice. Each occurrence is validated on its own and a duplicate passes the rules above exactly as the first occurrence does; it merely wastes one of the `MAX_UNCLES` entries. Duplication is harmless because the [Total Stake Inference](#total-stake-inference) counts **occupied slots**, not references: it forms the set of slots occupied by the canonical chain together with the slots of the uncles that chain references, and counts each slot once. A slot therefore contributes at most once to the estimate no matter how many blocks fall in it — the same uncle referenced several times, two distinct uncles that share a slot, and an uncle that shares its slot with a canonical block each add a single occupied slot, or none if that slot is already counted. This matches the slot lottery, which activates a slot with probability $`f`$ regardless of how many leaders win it.
 
 #### Uncle Selection
 
-When constructing a block $`B`$ at slot $`sl_B`$, the proposer fills the `uncles` field by selecting from the accepted fork blocks in its block tree $`T`$ that are countable uncles for $`B`$ — the first blocks of the competing branches that $`B`$'s own chain does not contain. Only a block whose parent is on $`B`$'s chain can be counted (see the counting rules above), so only such blocks are candidates. Because the [Total Stake Inference](#total-stake-inference) counts occupied slots, the proposer further narrows the candidate set to only the uncles that would add a **new** occupied slot: it excludes any uncle whose slot is already occupied on the **chain that $`B`$ extends** (the ancestors of $`B`$) — whether that slot holds a canonical block or an uncle the chain already references — since referencing it would waste one of the $`\texttt{MAX\_UNCLES}`$ entries without changing the count. These exclusions are a best-effort, non-verifiable heuristic; validation does not enforce them.
+When constructing a block $`B`$ at slot $`sl_B`$, the proposer fills the `uncle_headers` field by selecting from the accepted fork blocks in its block tree $`T`$ that are valid uncles for $`B`$ — the first blocks of the competing branches that $`B`$'s own chain does not contain. Only a block whose parent is on $`B`$'s chain qualifies (see the validity rules above), so only such blocks are candidates; carrying anything else would make $`B`$ itself invalid. Because the [Total Stake Inference](#total-stake-inference) counts occupied slots, the proposer further narrows the candidate set to only the uncles that would add a **new** occupied slot: it excludes any uncle whose slot is already occupied on the **chain that $`B`$ extends** (the ancestors of $`B`$) — whether that slot holds a canonical block or an uncle the chain already references — since referencing it would waste one of the $`\texttt{MAX\_UNCLES}`$ entries without changing the count. This last narrowing is a best-effort optimization and is **not** a validity rule: a proposer that references an already-occupied slot produces a block that is still valid, merely one entry poorer. The preceding conditions are not optional — validation enforces every one of them.
 
 An uncle is **not** excluded because some *other* branch referenced it, nor because its slot is occupied on some other branch. The Total Stake Inference counts only the slots occupied by the canonical chain and its uncles, and at production time it is unknown which branch will become canonical. If a competing branch referenced an uncle but that branch is later discarded, its reference does not count; $`B`$ must therefore remain free to reference the same uncle, so that its lottery win is still counted should $`B`$'s branch win.
 
@@ -340,13 +337,13 @@ def uncle_candidates(B) -> Set[Block]:
     # Inference counts occupied slots, so an uncle whose slot is already occupied adds nothing —
     # referencing it would waste an entry. Slots occupied on *other* branches are deliberately
     # not excluded: they do not count unless that branch becomes canonical.
-    referenced_uncles = { fetch_header(u) for A in ancestors(B) for u in A.uncles if u != 0 }
+    referenced_uncles = { U for A in ancestors(B) for (U, _) in A.uncle_headers }
     occupied = { sl_A for A in ancestors(B) } | { sl_U for U in referenced_uncles }
 
-    # Accepted fork blocks that are countable for B and would add a new occupied slot
-    # (see the counting rules in Uncle References).
+    # Accepted fork blocks that are valid uncles for B and would add a new occupied slot
+    # (see the validity rules in Uncle References).
     return { U for U in T if
-               parent(U) in ancestors(B)          # first block of its fork: the only countable kind
+               parent(U) in ancestors(B)          # first block of its fork: the only referenceable kind
                and not is_ancestor(U, B)          # a fork, not on B's chain
                and 0 < sl_B - sl_U <= w_u         # within the uncle window
                and sl_U not in occupied           # its slot is not already occupied on B's chain
@@ -356,7 +353,7 @@ def uncle_candidates(B) -> Set[Block]:
 The proposer then selects at most $`\texttt{MAX\_UNCLES}`$ of these candidates by deterministically taking the oldest ones first, because an uncle can only be referenced within $`w_u`$ slots of its own slot, so the oldest candidates are the closest to expiring:
 
 ```python
-def select_uncles_oldest(B) -> array[hash]:   # at most MAX_UNCLES entries, in selection order
+def select_uncles_oldest(B) -> array[SignedHeader]:   # at most MAX_UNCLES entries, in selection order
     ordered = sorted(uncle_candidates(B), key=lambda U: (sl_U, block_id(U)))
     selected, slots = [], set()
     for U in ordered:
@@ -365,13 +362,13 @@ def select_uncles_oldest(B) -> array[hash]:   # at most MAX_UNCLES entries, in s
         if sl_U in slots:              # at most one uncle per slot: a second adds no occupied slot
             continue
         slots.add(sl_U)
-        selected.append(block_id(U))
+        selected.append(signed_header(U))   # header of U with the signature it arrived under
     return selected                    # the list carries its own length; no padding entries
 ```
 
 This deterministic rule is simple and, without communication between proposers, robust. Two non-communicating proposers with the same candidate set produce the same selection, but they also tend to produce **competing blocks** that extend the same tip, of which only one becomes part of the canonical chain — the [Fork Choice Rule](fork-choice.md) discards the rest. The identical uncle references on the discarded competitors therefore cost nothing, and along a single canonical chain, excluding the slots already occupied on a block's own chain keeps successive blocks from re-counting a slot.
 
-Uncle selection is a proposer-local procedure and is not consensus-critical: the `uncles` field is not validated for block validity at all (see [Block Header Validation](#block-header-validation)); each node independently applies the counting rules above when it computes the [Total Stake Inference](#total-stake-inference). Because uncle references carry no fork-choice weight and grant no reward, a proposer has no incentive to deviate, and any deviation only affects the accuracy of the [Total Stake Inference](#total-stake-inference).
+*Which* candidates a proposer selects is proposer-local: it may reference fewer uncles than it could, or pass over a candidate for another, and its block remains valid. *What* it may reference is not — every carried entry must satisfy the validity rules above, and a block carrying one that does not is rejected (see [Block Header Validation](#block-header-validation)). The procedure given here is therefore a recommendation for filling the entries well, not a consensus rule. Because uncle references carry no fork-choice weight and grant no reward, a proposer has no incentive to deviate from it, and deviating within the rules only affects the accuracy of the [Total Stake Inference](#total-stake-inference).
 
 A referenced uncle never becomes part of the chain:
 
@@ -379,17 +376,18 @@ A referenced uncle never becomes part of the chain:
 - The uncle carries no weight in the [Fork Choice Rule](fork-choice.md).
 - The uncle grants no block reward.
 
-The only effect of a referenced uncle is its contribution — when the node can verify it — to the [Total Stake Inference](#total-stake-inference).
+The only effect of a referenced uncle is its contribution to the [Total Stake Inference](#total-stake-inference). It is unconditional: an uncle carried by a block of the chain has already been verified as a condition of that block's validity, so the inference counts it without further checks.
 
 > **Note:** The uncle reference window is derived from the window absorption parameter as $`w_u = W\cdot f^{-1}`$, i.e. $`W`$ expected block-intervals; with the default $`W=10`$ and $`f=1/30`$ this is 300 slots, and `MAX_UNCLES` is 4. Forks are predominantly caused by network delays and resolve within a few slots, so this window comfortably captures the forks worth referencing. $`W`$ is bounded by $`1 \le W \le \lfloor 0.6\,k \rfloor`$, equivalently $`w_u \le 0.6\frac{k}{f} = \frac{s}{5}`$, which keeps the window strictly inside the finalization window and serves the proposer and the estimate alike. For the proposer, a candidate within $`w_u`$ slots is still present in its block tree, since only forks that diverged deeper than the latest immutable block — at most $`s`$ slots back — are pruned (see [Fork Pruning](#fork-pruning)). For the estimate, every block able to reference an uncle of a given observation window lies at most $`w_u \lt 4\frac{k}{f}`$ slots after that window and hence within the same epoch as it, so recomputing $`N_\text{BLOCKS}`$ for a past epoch always encounters the same referencing blocks and yields the same value.
 >
-> **Note:** The counting rules are functions only of the referencing chain and the referenced entry, and the referenced signed headers are carried inside the blocks themselves (the `uncle_headers` field of [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#block)) — availability is structural, and referencing an uncle is inseparable from publishing its signed header. Every node holding the chain therefore computes exactly the same countable set, the same $`N_\text{BLOCKS}`$ and the same $`D`$, at any time; a bootstrapping node reproduces the estimate of every past epoch from the chain data alone. An adversary manipulating the visibility of fork blocks can thus affect neither block inclusion nor the agreement of the estimate — only whether its own lottery wins are referenced at all. The carried signed headers are retained as part of the chain data, bounded by `MAX_UNCLES` entries per block.
+> **Note:** The validity rules are functions only of the referencing chain and the carried entry, and the signed headers are carried inside the blocks themselves (the `uncle_headers` field of [Block Construction, Validation and Execution](bedrock-v1.1-block-construction.md#block)) — availability is structural, and referencing an uncle is inseparable from publishing its signed header. Every node therefore accepts exactly the same blocks and, from them, computes the same $`N_\text{BLOCKS}`$ and the same $`D`$, at any time; a bootstrapping node reproduces the estimate of every past epoch from the chain data alone. An adversary manipulating the visibility of fork blocks can thus affect neither block inclusion nor the agreement of the estimate — only whether its own lottery wins are referenced at all. Because a block carrying an unverifiable entry is rejected outright, no such entry ever becomes chain data, and the cost of checking one is paid once by the receiving node rather than by every node that later synchronizes. The carried signed headers are retained as part of the chain data, bounded by `MAX_UNCLES` entries per block.
 
 ### Block Header Validation
 
-Given block $`B=(header, transactions)`$ and the block tree $`T`$ where:
+Given block $`B=(header, uncle\_headers, transactions)`$ and the block tree $`T`$ where:
 
 - $`header`$ is the header defined in [Header](bedrock-v1.1-block-construction.md#header)
+- $`uncle\_headers`$ is the list of signed headers of the uncles the block references, defined in [Block](bedrock-v1.1-block-construction.md#block)
 - $`transactions`$ is the sequence of transactions in the block
 
 We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constraints hold, otherwise it returns False.
@@ -403,8 +401,19 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
 3. $`\textbf{length}(transactions) \le \text{MAX\_BLOCK\_TXS}`$
   Ensure the number of transactions in the block does not exceed the limit.
 
-4. $`\textbf{merkle\_root}(transactions) = header.\text{block\_root}`$
-  Ensure block root is over the transaction list. Compute the block root by using transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, and `0` to represent the hash of an empty transaction, padding leaves to the closest power of two.
+4. $`\textbf{body\_root}(uncle\_headers, transactions) = header.\text{body\_root}`$
+  Ensure the body root commits to both parts of the block body. It is computed as
+
+  ```python
+  def body_root(uncle_headers: list[SignedHeader], transactions: list[SignedMantleTx]) -> hash:
+      return hash(
+          b"BODY_ROOT_V1",
+          hash(b"UNCLE_HEADERS_V1", serialize(uncle_headers)),  # 1-byte count, then the entries
+          merkle_root(transactions),
+      )
+  ```
+
+  where $`\textbf{merkle\_root}`$ is the root of the Merkle tree built from transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, using `0` to represent the hash of an empty transaction and padding the leaves to the closest power of two, and $`\textbf{serialize}`$ is the list encoding of [Block Proposal](bedrock-v1.1-block-construction.md#block-proposal) — a 1-byte little-endian element count followed by that many entries, so an empty list encodes as a single zero byte. Because the signatures of the carried uncle headers are inside $`\textbf{serialize}(uncle\_headers)`$, they are committed here and hence in the [Block ID](#block-id); a copy of a block that differs in any of those bytes has a different ID and is a different block.
 
 5. $`header.\text{slot} \gt \textbf{fetch\_header}(header.\text{parent\_block}).\text{slot}`$
   Ensure the block’s slot comes after the parent block’s slot.
@@ -431,8 +440,12 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
   - $`\textbf{verify\_signature}(H, \sigma, P_\text{LEAD})=True`$
     Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.
 
-10. The `uncles` field imposes **no** validity constraint.
-  The header carries a length-prefixed list $`header.\text{uncles}`$ of at most $`\texttt{MAX\_UNCLES}`$ entries — the bound `len(uncles) <= MAX_UNCLES` is a constraint of the serialization schema, rejected at decode time (a header that does not parse is no header), not a validation of the referenced uncles — committed in $`\textbf{block\_id}`$ and therefore fixed and signed, but its contents are **not** validated here: a header is accepted regardless of which uncles it references, including entries that fail the counting rules of [Uncle References](#uncle-references). Referenced uncles feed only the [Total Stake Inference](#total-stake-inference), which counts a referenced uncle solely when it passes those rules. Decoupling uncle validity from block validity is deliberate: the validity of a fork block is a statement about data outside the chain being extended, and were it to gate block validity, an adversary influencing what nodes know of forks could control block inclusion. Confining uncles to the Total Stake Inference limits any such influence to the stake estimate and never to block inclusion.
+10. $`\forall\,(U, \sigma_U) \in uncle\_headers:\ \textbf{valid\_uncle}(U, \sigma_U, B) = True`$
+  Ensure every carried uncle is valid, as defined by the rules of [Uncle References](#uncle-references): the parent of $`U`$ lies on the chain of $`B`$, $`U`$ itself does not, its slot precedes $`sl_B`$ by at most $`w_u`$, its Proof of Leadership verifies against inputs derived from the chain of $`B`$, and $`\sigma_U`$ verifies over $`U`$ under the $`P_\text{LEAD}`$ of that header. A block carrying an entry that fails any of these is rejected.
+
+  The list bound `len(uncle_headers) <= MAX_UNCLES` is a constraint of the serialization schema, rejected at decode time (a block that does not parse is no block), and so is not restated here. Duplicate entries are permitted: each is validated independently and a repeat passes exactly as the first occurrence does.
+
+  Every input to these checks comes from the chain of $`B`$ or from the carried entry itself, both of which any node validating $`B`$ necessarily has — the entries travel inside $`B`$ and are committed by its $`body\_root`$. Validity is therefore a function of the block and the chain it extends alone, so all nodes agree on it and an adversary influencing what nodes know of forks cannot influence block inclusion.
 
 ### Chain Maintenance
 
@@ -535,10 +548,13 @@ Cryptarchia depends on honest nodes having relatively in-sync clocks. We are cur
 
 ## Test Vectors
 
-The operations used to derive the `block_root` are the same as those defined in Test Vectors.
+The operations used to derive the transaction Merkle root are the same as those defined in Test Vectors. That root is no longer a header field on its own: it is one of the two inputs to the `body_root` defined in step 4 of [Block Header Validation](#block-header-validation), alongside the hash of the carried `uncle_headers`.
+
+> **Note:** The last two vectors below are **not yet regenerated** for the `body_root` construction and must not be relied on. The two Merkle-root vectors are unaffected — that operation is unchanged — but every value downstream of it changes, because `body_root` wraps the Merkle root together with the uncle-header hash and the block ID is taken over a header that now carries `body_root`.
 
 | Input | Output |
 |-|-|
-| empty block (no transaction) | `block_root`: 0x0000000000000000000000000000000000000000000000000000000000000000 |
-| one transaction per operation kind: <br />- `leaf[0]`: 0x6ab0046084f3ce8dad90eb28afe5692ad92d5d0588a4e868ad38d0d841d7a60e (Transfer)<br />- `leaf[1]`: 0xd3a1aa9d2df8383e389dba072b1397f5e7fc290f884e04147c787619f60493cf (ChannelConfig) <br />- `leaf[2]`: 0x50e5674eea7fa17f531a51159ea7c3cab843fb1c8e8bf9bd5518a8aad08865d3 (ChannelInscribe)<br />- `leaf[3]`: 0xd52da59d9db42391363d6c4f96447536e5dfff747b91b88320310b07581a8dee (ChannelDeposit)<br />- `leaf[4]`: 0x6f57c77dc872cc3f01380fbd57a97e9f7998a1cd8b24e84594ceba796cfa0822 (ChannelWithdraw)<br />- `leaf[5]`: 0x2c04be946507e2b8c239b85b03cf476a8be5af8e4de853660d0447a46ea460fc (ChannelTransfer)<br />- `leaf[6]`: 0x9ce9fa694b4c801eca6c9a1d3dca6401952404bda8c144fb16e03e3872fd475e (SDPDeclare)<br />- `leaf[7]`: 0x3555b3d8f5d05ea5d69efb17aab7639474738bcb4bfee8d354107433d781ef9c (SDPWithdraw)<br />- `leaf[8]`: 0x0a91ab8271016f212061e6b45ea35c95cfa0f9a70c5225508f284b2657f4d931 (SDPActive)<br />- `leaf[9]`: 0xc992f1a63a7ea665a3766fae6b032df3db12ef386caf0ef1f3654afedbc51c6c (LeaderClaim) | `block_root`: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 |
-| `Header`:<br />- `bedrock_version`: 0x01<br />- `parent_block`: 0x1111111111111111111111111111111111111111111111111111111111111111<br />- `slot`: 0x42<br />- `block_root`: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 <br />- `leader_voucher`: 0x4444000000000000000000000000000000000000000000000000000000000000<br />- `entropy_contribution`: 0x5555000000000000000000000000000000000000000000000000000000000000<br />- `proof`: 0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />- `leader_key`: 0x17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce | `block_id`: 0x ec351be5585023f3e96140b8903baba40028f222037b1dd12e1dbc1884788071 |
+| empty block (no transaction) | `merkle_root(transactions)`: 0x0000000000000000000000000000000000000000000000000000000000000000 |
+| one transaction per operation kind: <br />- `leaf[0]`: 0x6ab0046084f3ce8dad90eb28afe5692ad92d5d0588a4e868ad38d0d841d7a60e (Transfer)<br />- `leaf[1]`: 0xd3a1aa9d2df8383e389dba072b1397f5e7fc290f884e04147c787619f60493cf (ChannelConfig) <br />- `leaf[2]`: 0x50e5674eea7fa17f531a51159ea7c3cab843fb1c8e8bf9bd5518a8aad08865d3 (ChannelInscribe)<br />- `leaf[3]`: 0xd52da59d9db42391363d6c4f96447536e5dfff747b91b88320310b07581a8dee (ChannelDeposit)<br />- `leaf[4]`: 0x6f57c77dc872cc3f01380fbd57a97e9f7998a1cd8b24e84594ceba796cfa0822 (ChannelWithdraw)<br />- `leaf[5]`: 0x2c04be946507e2b8c239b85b03cf476a8be5af8e4de853660d0447a46ea460fc (ChannelTransfer)<br />- `leaf[6]`: 0x9ce9fa694b4c801eca6c9a1d3dca6401952404bda8c144fb16e03e3872fd475e (SDPDeclare)<br />- `leaf[7]`: 0x3555b3d8f5d05ea5d69efb17aab7639474738bcb4bfee8d354107433d781ef9c (SDPWithdraw)<br />- `leaf[8]`: 0x0a91ab8271016f212061e6b45ea35c95cfa0f9a70c5225508f284b2657f4d931 (SDPActive)<br />- `leaf[9]`: 0xc992f1a63a7ea665a3766fae6b032df3db12ef386caf0ef1f3654afedbc51c6c (LeaderClaim) | `merkle_root(transactions)`: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 |
+| `uncle_headers`: empty list (encoded as the single byte 0x00)<br />- `merkle_root(transactions)`: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 | `body_root`: *to be regenerated* |
+| `Header`:<br />- `bedrock_version`: 0x01<br />- `parent_block`: 0x1111111111111111111111111111111111111111111111111111111111111111<br />- `slot`: 0x42<br />- `body_root`: *the value of the preceding vector* <br />- `leader_voucher`: 0x4444000000000000000000000000000000000000000000000000000000000000<br />- `entropy_contribution`: 0x5555000000000000000000000000000000000000000000000000000000000000<br />- `proof`: 0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />- `leader_key`: 0x17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce | `block_id`: *to be regenerated* |
