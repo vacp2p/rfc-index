@@ -234,9 +234,13 @@ For a single advertisement object we use `ad`.
 An advertisement logically represents:
 
 - **Service identification**: Which service the node participates in (via `service_id_hash`)
-- **Peer identification**: The advertiser's unique peer ID
-- **Network addresses**: How to reach the advertiser (multiaddrs)
-- **Authentication**: Cryptographic proof that the advertiser controls the peer ID
+- **Peer identification**: The node's unique peer ID
+- **Network addresses**: How to reach the node (multiaddrs)
+- **Authentication**: Cryptographic proof that the node controls the peer ID
+
+> Ads are authenticated but the containing information can still be false.
+It is trivial to create valid ads that refer to nodes that don't exist.
+Similarly, the advertiser's IP and peer ID should not be confused with the ad's, they may be different.
 
 Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
 See the [Advertisement Encoding](#advertisement-encoding) section
@@ -945,8 +949,8 @@ and serve cached advertisements,
 by handling `GET_ADS` requests.
 Registrars MUST maintain a cache of advertisements, `ad_cache`,
 that associates each `advertisement`
-to its `service_id`, the advertiser's `peer_id`
-and an expiry timestamp based on admission time plus configured expiry time, `E`.
+to only one advertiser's `peer_id`, `service_id`
+and expiry timestamp based on admission time plus configured expiry time, `E`.
 Once an `ad` has expired, it SHOULD be removed from the `ad_cache`.
 
 ### Handling REGISTER requests
@@ -1149,7 +1153,7 @@ w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(adver
 - `c`: Current cache occupancy
 - `c(ad.service_id_hash)`: Number of advertisements for `service_id_hash` in cache
 - `getIP(advertiser.addrs)` is a function to get the IP addresses
-from the multiaddresses of the advertiser.
+from the multiaddresses of the advertiser's connection information.
 - `score(getIP(advertiser.addrs))`: IP similarity score (0 to 1).
 Refer to the [IP Similarity Score section](#ip-similarity-score)
 
@@ -1196,8 +1200,10 @@ The service similarity score promotes diversity:
 ### IP Similarity Score
 
 The IP similarity score is used to detect and limit
-Sybil attacks where malicious actors create multiple advertisement requests
+Sybil attacks where malicious advertisers create multiple advertisement requests
 from the same network or IP prefix.
+
+> The IP being refered to here is NOT the ad's but the one from the advertiser connection information.
 
 Registrars MUST use an IP similarity score to
 limit the number of requests coming from the same subnetwork
