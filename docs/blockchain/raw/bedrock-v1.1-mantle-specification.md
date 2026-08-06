@@ -189,7 +189,7 @@ Mantle validators will ensure the following:
     tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
     tx_balance = get_transaction_balance(signed_tx)
     assert tx_mandatory_fee <= tx_balance
-    tx_execution_tip = checked_uint64(tx_balance - tx_mandatory_fee)
+    tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
 
     def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
         balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
@@ -905,8 +905,8 @@ ledger.assert_spendable(chan_transfer.inputs, chan_transfer.channel)
 4. Check the balance
 
 ```python
-input_amount = sum(ledger.get_note(input).value for input in chan_transfer.inputs)
-output_amount = sum(output.value for output in chan_transfer.outputs)
+input_amount = checked_uint64(sum(ledger.get_note(input).value for input in chan_transfer.inputs))
+output_amount = checked_uint64(sum(output.value for output in chan_transfer.outputs))
 assert input_amount == output_amount
 ```
 
