@@ -24,6 +24,7 @@
 | 1.0.0 | Initial revision | 2026-04-24 |
 | 1.0.1 | Fix base fee constants in pseudocode based on the correct $`G_{\mathrm{target}}`$ | 2026-07-27 |
 | 1.1.0 | Round the base fee update upwards | 2026-07-28 |
+| 1.1.1 | Clarify that Execution priority fees are excluded from the burned-fees input to Block Rewards | 2026-08-04 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -59,7 +60,7 @@ The mechanism operates on four core principles:
 
 - Dynamic Base Fee: A protocol-defined base_fee for Execution Gas must be paid for a transaction to be included in a block. This fee adjusts automatically based on a smoothed average of recent network demand relative to a predefined capacity target, ensuring sustainable network load. This base_fee is the minimal threshold to be paid for the transaction to be accepted by the block builder.
 - Priority Fee (Tip): To incentivize faster inclusion by block builders, users add a priority_fee on top of the base fee. This creates a simple and transparent auction for block space during periods of high demand. The proceeds of this goes to the block builder.
-- Fee Splitting and Deflation: The two fee components are treated differently. The entire base_fee is burned, permanently removing it from the supply. This creates a direct link between network activity and the economic value of the native token, applying deflationary pressure as usage grows. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream. 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
+- Fee Splitting and Deflation: The two fee components are treated differently. The entire base_fee is burned, permanently removing it from the supply. This creates a direct link between network activity and the economic value of the native token, applying deflationary pressure as usage grows. The priority_fee is not immediately distributed to the block builder (to preserve privacy), but instead it is directed into the block builders reward stream; it is supply-neutral and is not counted in the burned-fees input to [Block Rewards](block-rewards.md) (see [Fee Distribution](#fee-distribution)). 40% of the rewards will be allocated to block builders and the remaining 60% to Blend nodes. Rewards are privacy-preserving via [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md).
 
 The entire lifecycle can be visualized in the following flow:
 
@@ -226,4 +227,10 @@ $$
 = \sum_{t \in \mathcal{B}_s} \bigl(g_t \cdot b_{\mathrm{exec}}[s]\bigr).
 $$
 
-This burned quantity is then used as a input for the computation of the block rewards, as described in  [Block Rewards](block-rewards.md).
+This burned quantity is the Execution market's contribution to the burned-fees input $`D_{1,t}`$ of [Block Rewards](block-rewards.md):
+
+$$
+D_{1,t} = \hat{R}_{\mathrm{burned}}(t) + \text{Permanent Storage fees burned in block } t.
+$$
+
+Execution priority fees are excluded from $`D_{1,t}`$. Although they are technically burned and later re-minted for privacy (cf. [Design Rationale](#design-rationale)), they are supply-neutral transfers directed in full to the leader reward pool, whereas the block reward computed from $`R_\text{block}`$ is split between the Blend service and the leaders. Counting tips in $`D_{1,t}`$ would therefore re-mint them a second time through the $`(1-A_t) \cdot R_\text{block}`$ term — inflating the supply and overstating the burn signal — and would redirect part of their value to the Blend service.
