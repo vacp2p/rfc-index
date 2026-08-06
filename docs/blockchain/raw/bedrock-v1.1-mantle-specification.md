@@ -186,12 +186,12 @@ Mantle validators will ensure the following:
 
 3. The Mantle Transaction excess balance pays least the mandatory fees.
     ```python
-    tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # Not an unsigned int
-    tx_balance = get_transaction_balance(signed_tx)
+    tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
+    tx_balance = get_transaction_balance(signed_tx)   # int128
     assert tx_mandatory_fee <= tx_balance
     tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
 
-    def get_transaction_balance(signed_tx: SignedMantleTx) -> int:
+    def get_transaction_balance(signed_tx: SignedMantleTx) -> int128:
         balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
         for op in signed_tx.tx.ops:
             if op.opcode == TRANSFER:
