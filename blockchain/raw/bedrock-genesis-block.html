@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-06</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5ead1e7184b9072d70e34d8c1f7f25e709ea3e16/docs/blockchain/raw/bedrock-genesis-block.md"><code>5ead1e7</code></a> — docs(blockchain): encode genesis_time as u32 unix timestamp (#370)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-genesis-block.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-genesis-block.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/bedrock-genesis-block.md"><code>58b5698</code></a> — chore(blockchain): migrate contributor emails to @logos.co (#338)</li>
@@ -204,6 +205,7 @@
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-02-12</td></tr>
 <tr><td>1.1.0</td><td><a href="mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html">[RFC] Make Ledger Transaction an Operation</a> Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price</td><td>2026-03-27</td></tr>
 <tr><td>1.1.1</td><td><a href="mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html">[RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></td><td>2026-05-06</td></tr>
+<tr><td>1.1.2</td><td>Encode <code>genesis_time</code> as a u32 unix timestamp instead of an ISO 8601 datetime. Encode the <code>chain_id</code> length prefix as a u8 instead of a u64.</td><td>2026-07-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
@@ -249,11 +251,12 @@ SERVICE_DECLARATIONS = BLEND_DECLARATIONS
 <p>Cryptarchia is initialized with the following parameters:</p>
 <ul>
 <li>
-<p><code>genesis_time</code>: ISO 8601 encoded timestamp.
+<p><code>genesis_time</code>: u32 unix timestamp (seconds since the Unix epoch).
+A unix timestamp is conventionally an <code>i64</code>; <code>genesis_time</code> is restricted to the <code>u32</code> range (0 to 2^32 - 1), which covers all plausible genesis dates (through February 2106).
 Cryptarchia uses slots as a measure of time offset from some start time. This timestamp must be agreed upon by all nodes in order to have a common clock.</p>
 </li>
 <li>
-<p><code>chain_id</code>: string.
+<p><code>chain_id</code>: UTF-8 string, encoded with a u8 length prefix (at most 255 bytes).
 It is useful to differentiate testnets from mainnet. To avoid confusion, we place the chain ID in the Genesis block to guarantee that the networks are disjoint.</p>
 </li>
 <li>
@@ -263,25 +266,23 @@ The initial source of randomness for the Cryptarchia lottery. The process for se
 </ul>
 <p>These parameters are encoded in the Genesis block as an inscription sent to the null channel.</p>
 <p><strong>Example</strong></p>
-<pre><code class="language-python">from datetime import datetime
-
-CHAIN_ID = "logos-blockchain-mainnet"
-GENESIS_TIME = "2026-01-05T19:20:35+00:00"
+<pre><code class="language-python">CHAIN_ID = "logos-blockchain-mainnet"
+GENESIS_TIME = 1767640835  # 2026-01-05T19:20:35Z
 GENESIS_EPOCH_NONCE = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
 
 chain_id_enc = CHAIN_ID.encode("utf-8")
-chain_id_len = len(chain_id_enc).to_bytes(8, "little")
-genesis_time = int(datetime.fromisoformat(GENESIS_TIME).timestamp()).to_bytes(8, "little")
+chain_id_len = len(chain_id_enc).to_bytes(1, "little")
+genesis_time = GENESIS_TIME.to_bytes(4, "little")
 genesis_epoch_nonce = bytes.fromhex(GENESIS_EPOCH_NONCE)
 
 inscription = chain_id_len + chain_id_enc + genesis_time + genesis_epoch_nonce
 
 # &gt;&gt;&gt; inscription.hex()
-# '0d000000000000006e6f6d6f732d6d61696e6e6574030f5c6900000000abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+# '186c6f676f732d626c6f636b636861696e2d6d61696e6e6574030f5c69abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
 
 CRYPTARCHIA_INSCRIPTION = Inscribe(
     channel=bytes(32),
-    inscription=inscription
+    inscription=inscription,
     parent=bytes(32),
     signer=Ed25519PublicKey_ZERO,
 )
@@ -358,15 +359,21 @@ STAKE_DISTRIBUTION = Transfer(
 )
 
 # set Cryptarchia parameters
-CRYPTARCHIA_PARAMS = {
-    "chain_id": "logos-mainnet",
-    "genesis_time": "2026-01-05T19:20:35Z",
-    "genesis_epoch_nonce": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-}
+CHAIN_ID = "logos-blockchain-mainnet"
+GENESIS_TIME = 1767640835  # 2026-01-05T19:20:35Z
+GENESIS_EPOCH_NONCE = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+chain_id_enc = CHAIN_ID.encode("utf-8")
+inscription = (
+    len(chain_id_enc).to_bytes(1, "little")
+    + chain_id_enc
+    + GENESIS_TIME.to_bytes(4, "little")
+    + bytes.fromhex(GENESIS_EPOCH_NONCE)
+)
 
 CRYPTARCHIA_INSCRIPTION = Inscribe(
     channel=bytes(32),
-    inscription=json.dumps(CRYPTARCHIA_PARAMS).encode("utf-8"),
+    inscription=inscription,
     parent=bytes(32),
     signer=Ed25519PublicKey_ZERO,
 )
