@@ -81,10 +81,8 @@ We target the following design goals:
 
 - Performance: Low latency and fees without settling each service request on chain.
 - Security: Limited loss exposure when service stops or the user is offline.
-- Privacy: Funder unlinkability between the user's primary public key
-  and on-chain vault and stream activity under the vault owner identity,
-  and provider receiving privacy between on-chain claims
-  and the provider's primary public key.
+- Privacy: Funder unlinkability (on-chain deposits unlinkable from off-chain service use)
+and provider receiving privacy (on-chain claims unlinkable from the provider's primary identity).
 - Extendability: A simple base protocol with room for optional extensions.
 
 Payment streams enable unidirectional time-based fund flows.
@@ -112,10 +110,10 @@ The protocol has two roles:
 
 On chain, the user authorized to operate a vault is the vault owner
 (for example `VaultConfig.owner` on LEZ).
-The vault owner and the stream provider MAY each be identified
-by a public account or by an identifier derived from a nullifier public key,
+The vault owner and the stream provider MAY each be a public account or a private account,
 as defined by the chain integration
 (see [Security and privacy considerations](#security-and-privacy-considerations)).
+A private account is identified by a nullifier public key, or NPK.
 
 ### Vaults and streams
 
@@ -145,8 +143,7 @@ Each stream MUST record `provider_id`,
 a byte string designating the party authorized to claim accrued funds.
 Each chain integration MUST define that encoding
 and its mapping to the on-chain account authorized to claim those funds.
-That claim account MAY be a public account
-or an identifier derived from a nullifier public key.
+That claim account MAY be a public account or a private account.
 
 Each stream MUST specify a positive accrual rate per time unit.
 Each chain integration MUST define the time unit used by rates and accrual.
@@ -239,8 +236,7 @@ A `CLOSED` stream MUST NOT transition to any other state.
 Accrued funds of a `CLOSED` stream remain available for the provider to claim.
 
 The provider MAY claim accrued funds from a stream in any state.
-A claim MUST transfer all accrued funds from this stream
-to the account designated by `provider_id`.
+A claim MUST transfer all accrued funds from this stream to the provider.
 
 ### Lazy accrual and folding
 
@@ -785,7 +781,7 @@ The payment-streams guest program maps vault and stream state to
 privacy tier (`Public` or `PseudonymousFunder`),
 and `token_id`, all set at initialization.
 For `PseudonymousFunder` vaults,
-`owner` MUST be an identifier derived from a nullifier public key.
+`owner` MUST be a private account.
 
 `token_id` is the LEZ encoding of the vault token.
 It is exactly 32 octets.
@@ -794,8 +790,7 @@ Any other value MUST be a fungible Token program definition `AccountId`.
 
 Per-stream state is stored in `StreamConfig`.
 `StreamConfig.provider` MUST identify the account authorized to claim accrued funds.
-That account MAY be a public account
-or an identifier derived from a nullifier public key.
+That account MAY be public or private.
 Vault privacy tier and provider account kind are independent choices.
 
 The vault holding PDA carries vault liquidity.
@@ -868,13 +863,13 @@ non-signing account equal to the vault owner.
 LEZ private execution governs how private accounts are included in a transaction.
 When a private account is included in a transaction
 as a signing account or as a required non-signing account,
-LEZ requires shielded submission.
+LEZ requires a shielded transaction.
 Payment streams inherits that platform rule
 whenever a private `VaultConfig.owner` or `StreamConfig.provider`
 is included in the transaction.
 `VaultConfig`, `VaultHolding`, and `StreamConfig` remain public
 non-signing accounts
-under both transparent and shielded submission.
+under both transparent and shielded transactions.
 
 ### Private execution mapping
 
@@ -898,12 +893,12 @@ For funder unlinkability on a `PseudonymousFunder` vault:
 For provider receiving privacy:
 
 A provider MAY obtain receiving privacy
-by using a private account identifier as `provider_id`
-and claiming under the private-account submit rule above.
+by using a private account as `provider_id`
+and claiming under the shielded-transaction rule above.
 That private `provider_id` is included on claim as a private signing account.
 When a public `provider_id` claim also includes another private account
 (for example a `PseudonymousFunder` vault owner as a private non-signing account),
-claim MUST use shielded submission under the same rule.
+claim MUST use a shielded transaction under the same rule.
 
 Deposit and claim amounts remain visible on `VaultHolding`.
 The vault-to-stream graph remains visible from public account identifiers.
@@ -911,8 +906,8 @@ The vault-to-stream graph remains visible from public account identifiers.
 through the same account-identifier derivation used for public vaults
 (see [Vault owner authorization](#vault-owner-authorization-vaultproofowner_signature)).
 For a private vault owner,
-that binding uses the nullifier public key derivation
-and the owner signature is produced with the corresponding nullifier secret key.
+that binding uses NPK derivation
+and the owner signature is produced with the corresponding nullifier secret key (NSK).
 
 ### System clock accounts
 
@@ -1054,8 +1049,8 @@ folding updates visible timestamps on stream accounts.
 
 Privacy tiers (see [Account types](#account-types)) express intent at vault creation.
 The guest records `Public` or `PseudonymousFunder` on LEZ.
-Wallet and submitter policy select shielded execution for funder unlinkability.
-Vault and stream accounts remain public and accept transparent submissions.
+Wallet and submitter policy select shielded transactions for funder unlinkability.
+Vault and stream accounts remain public and accept transparent transactions.
 Funder unlinkability therefore depends on wallet policy for `PseudonymousFunder` vaults.
 
 To obtain funder unlinkability on a `PseudonymousFunder` vault,
@@ -1073,7 +1068,7 @@ When funder unlinkability is intended,
 wallets SHOULD submit vault and stream operations only as shielded transactions.
 
 For a `PseudonymousFunder` vault,
-the in-protocol vault owner identity is an identifier derived from a nullifier public key.
+the in-protocol vault owner identity is a private account.
 That identity is globally linkable across vaults and streams that share it.
 Funder unlinkability is the unlinkability of that identity
 to the user's primary public key.
@@ -1084,16 +1079,15 @@ Provider receiving privacy is the unlinkability of a private `provider_id`
 to the provider's primary public key.
 
 A provider MAY obtain receiving privacy for a stream.
-To do so, the provider MUST publish a private account identifier
-derived from a nullifier public key as `provider_id`.
+To do so, the provider MUST publish a private account as `provider_id`.
 Claim then includes that private account
-and therefore uses shielded submission
+and therefore uses a shielded transaction
 (see [Guest instructions](#guest-instructions)
 and [Private execution mapping](#private-execution-mapping)).
 The same LEZ rule applies when another private account
 is included in the claim
 (for example a `PseudonymousFunder` vault owner as a private non-signing account).
-The provider MAY also use shielded submission for other reasons.
+The provider MAY also use a shielded transaction for other reasons.
 
 `provider_id` is globally linkable across streams that share it.
 
@@ -1108,7 +1102,7 @@ and correlates streams that reuse the same provider identity.
 Providers that use a private `provider_id` SHOULD reuse one private account
 identifier across claims
 so accrued funds credit a single private account chain.
-Claiming under distinct identifiers under the same nullifier public key
+Claiming under distinct identifiers under the same NPK
 produces distinct private accounts and requires distinct spend inputs.
 
 The [Automatic Claim on Closure](#automatic-claim-on-closure) extension
