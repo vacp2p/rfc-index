@@ -86,7 +86,6 @@ FILE_ASSIGNMENTS = {
     "blockchain/deprecated/v1.1.0-bedrock-block-construction-alt.md": ("Mantle", "[1.1.0] Block Construction, Validation and Execution_2"),
     "blockchain/deprecated/v1.0.0-bedrock-block-construction.md": ("Mantle", "[1.0.0] Block Construction, Validation and Execution"),
     "blockchain/raw/bedrock-genesis-block.md": ("Mantle", "Bedrock Genesis Block"),
-    "blockchain/deprecated/v1.1.1-bedrock-genesis-block.md": ("Mantle", "[1.1.1] Bedrock Genesis Block"),
     "blockchain/deprecated/v1.1.0-bedrock-genesis-block.md": ("Mantle", "[1.1.0] Bedrock Genesis Block"),
     "blockchain/deprecated/v1.0.0-bedrock-genesis-block.md": ("Mantle", "[1.0.0] Bedrock Genesis Block"),
     "blockchain/raw/bedrock-service-declaration-protocol.md": ("Mantle", "Service Declaration Protocol"),
