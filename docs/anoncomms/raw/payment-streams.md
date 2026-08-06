@@ -868,9 +868,6 @@ LEZ requires a shielded transaction.
 Payment streams inherits that platform rule
 whenever a private `VaultConfig.owner` or `StreamConfig.provider`
 is included in the transaction.
-`VaultConfig`, `VaultHolding`, and `StreamConfig` remain public
-non-signing accounts
-under both transparent and shielded transactions.
 
 ### System clock accounts
 
@@ -992,12 +989,9 @@ Payment streams leverage LEZ private accounts and shielded transactions
 to achieve user unlinkability and provider unlinkability.
 As per LEZ architecture, guest logic remains the same
 for transparent and shielded transactions.
-
-Privacy tiers (see [Account types](#account-types)) express intent at vault creation.
-The guest records `Public` or `PseudonymousFunder` on LEZ.
 The guest does not enforce whether transactions are transparent or shielded.
-Wallet and submitter policy select shielded transactions for user unlinkability.
-User unlinkability therefore depends on wallet policy for `PseudonymousFunder` vaults.
+
+#### User unlinkability
 
 To obtain user unlinkability on a `PseudonymousFunder` vault,
 the user creates a private account whose identifier becomes `VaultConfig.owner`.
@@ -1009,6 +1003,10 @@ Wallets MUST NOT transfer directly into a `VaultHolding` for `PseudonymousFunder
 When user unlinkability is intended,
 wallets SHOULD submit vault and stream operations only as shielded transactions.
 
+Privacy tiers (see [Account types](#account-types)) express intent at vault creation.
+The guest records `Public` or `PseudonymousFunder` on LEZ.
+User unlinkability therefore depends on wallet policy for `PseudonymousFunder` vaults.
+
 The public leg of the pre-shield transfer links the user's primary public key
 to the shielding commitment.
 Downstream nullifiers used by the vault owner private account
@@ -1017,18 +1015,21 @@ are unlinkable to that commitment under the LEZ nullifier scheme.
 For a `PseudonymousFunder` vault,
 the in-protocol vault owner identity is a private account.
 That identity is globally linkable across vaults and streams that share it.
-
 A transparent stream creation permanently links the vault owner on chain.
-A transparent claim links the stream to the provider on chain.
 Linkage established by an earlier transparent operation remains on chain
 after later shielded operations.
 
-A provider MAY obtain provider unlinkability for a stream
-by using a private account as `provider_id`.
-`provider_id` is globally linkable across streams that share it.
+#### Provider unlinkability
 
+To obtain provider unlinkability for a stream,
+the provider MUST use a private account as `provider_id`.
+
+`provider_id` is globally linkable across streams that share it.
 The user who creates the stream learns `provider_id` at creation time
 and correlates streams that reuse the same provider identity.
+A transparent claim links the stream to the provider on chain.
+Linkage established by an earlier transparent operation remains on chain
+after later shielded operations.
 
 Providers that use a private `provider_id` SHOULD reuse one private account
 identifier across claims
@@ -1047,10 +1048,10 @@ User unlinkability and provider unlinkability apply at funding entry and claim e
 Coarser [system clock accounts](#system-clock-accounts) reduce how often
 folding updates visible timestamps on stream accounts.
 
-### Residual linkage and future work
+### Limits of unlinkability and future work
 
-The following residual linkages remain under the privacy goals above
-and MAY motivate future extensions:
+The following linkages remain under the privacy goals above
+and MAY motivate future research:
 
 - Amount and timing correlation across the shielding boundary.
 - Public visibility of `VaultHolding` balances and the vault-to-stream graph.
