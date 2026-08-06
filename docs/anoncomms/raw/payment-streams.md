@@ -42,9 +42,9 @@ The document specifies generic on-chain and off-chain requirements,
 a reference integration with the Logos Execution Zone and Logos Delivery Store queries,
 security and privacy considerations,
 and optional protocol extensions.
-On LEZ, vault owners and providers MAY use private accounts
-and shielded transactions
-to obtain user unlinkability and provider unlinkability.
+On LEZ, users and providers MAY obtain
+user unlinkability and provider unlinkability
+via private accounts and shielded transactions.
 
 ## Language
 
@@ -82,8 +82,9 @@ We target the following design goals:
 
 - Performance: Low latency and fees without settling each service request on chain.
 - Security: Limited loss exposure when service stops or the user is offline.
-- Privacy: user unlinkability and provider unlinkability
-  (primary public keys unlinkable from on-chain funding and claiming).
+- Privacy: optional user unlinkability and provider unlinkability
+  (each party's primary public key unlinkable from its on-chain
+  funding or claiming activity).
 - Extendability: A simple base protocol with room for optional extensions.
 
 Payment streams enable unidirectional time-based fund flows.
@@ -143,7 +144,8 @@ Each stream MUST belong to exactly one vault.
 Each stream MUST record `provider_id`,
 a byte string designating the party authorized to claim accrued funds.
 Each chain integration MUST define that encoding
-and its mapping to the on-chain account authorized to claim those funds.
+and how it is stored as the on-chain claim account.
+On LEZ, `StreamConfig.provider` holds that `provider_id`.
 
 Each stream MUST specify a positive accrual rate per time unit.
 Each chain integration MUST define the time unit used by rates and accrual.
@@ -524,10 +526,10 @@ message VaultProof {
 ```
 
 `vault_id` is the on-chain identifier of the vault.
-`provider_id` is the provider identity for this protocol.
+`provider_id` is the provider identity for this protocol session.
 It pins the proposal to one provider and prevents replay across providers.
-Chain integrations MUST define how `provider_id` maps to on-chain claim authorization
-(for example octet equality with `StreamConfig.provider` on LEZ).
+It MUST match the stream `provider_id`
+(see [Vaults and streams](#vaults-and-streams)).
 A chain integration MAY map `provider_id` to a long-lived service identity
 and separately map that identity to the chain account that receives stream claims.
 `owner_public_key` is the key used to verify `owner_signature`.
@@ -780,6 +782,10 @@ The payment-streams guest program maps vault and stream state to
 `VaultConfig` holds `total_allocated`, `owner`,
 privacy tier (`Public` or `PseudonymousFunder`),
 and `token_id`, all set at initialization.
+
+The privacy tier records vault-owner privacy intent for that vault.
+`Public` means a public vault owner.
+`PseudonymousFunder` means user unlinkability is intended for that vault.
 For `PseudonymousFunder` vaults,
 `owner` MUST be a private account.
 
@@ -789,11 +795,14 @@ All-zeroes denotes the LEZ native token.
 Any other value MUST be a fungible Token program definition `AccountId`.
 
 Per-stream state is stored in `StreamConfig`.
-`StreamConfig.provider` MUST identify the account authorized to claim accrued funds.
+`StreamConfig.provider` holds the stream `provider_id`
+(the account authorized to claim accrued funds).
 That account MAY be a public account or a private account.
 Vault privacy tier and provider account kind are independent choices.
 A `Public` vault MAY stream to a private provider.
 A `PseudonymousFunder` vault MAY stream to a public provider.
+Provider unlinkability has no vault-style privacy tier.
+It is chosen per stream by using a private account as `provider_id`.
 
 The vault holding PDA carries vault liquidity.
 For a native vault, that is native `Account.balance` on the PDA.
@@ -821,24 +830,14 @@ Off-chain vault resolution derives the same `VaultConfig` PDA from
 
 #### Deposit and claim asset paths
 
-On deposit, the guest validates vault ownership and amount.
+On deposit, the guest validates vault ownership and amount,
+then move the tokens into `VaultHolding`
+using integration-deifned authenticated-transfer or Token program
+for native and non-native vault token, respectively.
 
-For a native vault,
-deposit chains into the authenticated-transfer program
-to move native balance into the vault holding PDA.
-
-For a non-native vault,
-deposit chains into the Token program
-to transfer fungible units from the owner's Token holding
-into the vault holding PDA.
-Withdraw and claim chain Token transfers out of the vault holding,
-using PDA seeds to authorize the vault holding as sender.
-Solvency checks read `TokenHolding.balance` on the vault holding.
-
-The deployed Token program `ProgramId` is pinned by the network
-and the reference integration.
-Exact account lists and instruction words follow that deployment
-and its published test vectors.
+For `PseudonymousFunder` vaults,
+`Deposit` MUST debit the vault owner private account.
+Wallets MUST NOT transfer directly into a `VaultHolding` for `PseudonymousFunder` vaults.
 
 ### Guest instructions
 
@@ -865,7 +864,7 @@ non-signing account equal to the vault owner.
 When a private account is included in a transaction
 as a signing account or as a required non-signing account,
 LEZ requires a shielded transaction.
-Payment streams inherits that platform rule
+Payment streams inherit that platform rule
 whenever a private `VaultConfig.owner` or `StreamConfig.provider`
 is included in the transaction.
 
@@ -975,93 +974,64 @@ The reference Store integration sets `StreamParams.service_id` to
 
 ### Privacy goals
 
-User unlinkability separates the user's primary public key from on-chain vault and stream activity
-carried out under the vault owner identity.
+We define two independent, optional privacy goals:
+user unlinkability and provider unlinkability.
+The base protocol is not private by default.
 
-Provider unlinkability separates on-chain claims from the provider's primary public key.
-A provider MAY pursue that goal per stream.
+User unlinkability separates the user's (vault owner's) primary public key
+from their on-chain vault and stream activity.
+Provider unlinkability separates the provider's primary public key
+from their on-chain claims.
+A primary public key is the party's long-lived public identity
+outside the in-protocol vault-owner or `provider_id` account.
 
-User unlinkability and provider unlinkability are independent choices.
+A user MAY pursue user unlinkability per vault.
+On LEZ that requires a `PseudonymousFunder` vault
+(see [Account types](#account-types)).
+A provider MAY choose provider unlinkability independently for each stream.
 
 ### Achieving the privacy goals on LEZ
 
 Payment streams leverage LEZ private accounts and shielded transactions
 to achieve user unlinkability and provider unlinkability.
-As per LEZ architecture, guest logic remains the same
+Under the LEZ architecture, guest logic remains the same
 for transparent and shielded transactions.
 The guest does not enforce whether transactions are transparent or shielded.
 
 #### User unlinkability
 
-To obtain user unlinkability on a `PseudonymousFunder` vault,
-the user creates a private account whose identifier becomes `VaultConfig.owner`.
-The user initializes the vault with privacy tier `PseudonymousFunder`.
-The user MUST pre-shield funds into the vault owner private account before deposit.
-Deposit then moves funds from that private account into `VaultHolding`.
-The vault owner MUST run all vault and stream operations through shielded transactions.
-Wallets MUST NOT transfer directly into a `VaultHolding` for `PseudonymousFunder` vaults.
-When user unlinkability is intended,
-wallets SHOULD submit vault and stream operations only as shielded transactions.
+To obtain user unlinkability, the user MUST
+use a private account as `VaultConfig.owner`,
+initialize the vault with privacy tier `PseudonymousFunder`
+(see [Account types](#account-types)),
+pre-shield funds into that private account before deposit,
+and run all vault and stream operations through shielded transactions.
 
-Privacy tiers (see [Account types](#account-types)) express intent at vault creation.
-The guest records `Public` or `PseudonymousFunder` on LEZ.
-User unlinkability therefore depends on wallet policy for `PseudonymousFunder` vaults.
-
-The public leg of the pre-shield transfer links the user's primary public key
-to the shielding commitment.
-Downstream nullifiers used by the vault owner private account
-are unlinkable to that commitment under the LEZ nullifier scheme.
-
-For a `PseudonymousFunder` vault,
-the in-protocol vault owner identity is a private account.
-That identity is globally linkable across vaults and streams that share it.
-A transparent stream creation permanently links the vault owner on chain.
-Linkage established by an earlier transparent operation remains on chain
-after later shielded operations.
+The user SHOULD NOT reuse the same vault owner identity
+across vaults intended to remain unlinked.
 
 #### Provider unlinkability
 
 To obtain provider unlinkability for a stream,
-the provider MUST use a private account as `provider_id`.
+the provider MUST use a private account as `provider_id`
+and claim through shielded transactions.
 
-`provider_id` is globally linkable across streams that share it.
-The user who creates the stream learns `provider_id` at creation time
-and correlates streams that reuse the same provider identity.
-A transparent claim links the stream to the provider on chain.
-Linkage established by an earlier transparent operation remains on chain
-after later shielded operations.
-
-Providers that use a private `provider_id` SHOULD reuse one private account
-identifier across claims
-so accrued funds credit a single private account chain.
-Claiming under distinct identifiers under the same NPK
-produces distinct private accounts and requires distinct spend inputs.
-
-### Public protocol state
-
-Vault and stream accounts are public.
-Observers can read each stream's terms and accrual state
-from on-chain data and reconstruct the vault-to-stream graph from account identifiers.
-Deposit and claim amounts remain visible on `VaultHolding`.
-User unlinkability and provider unlinkability apply at funding entry and claim exit.
-
-Coarser [system clock accounts](#system-clock-accounts) reduce how often
-folding updates visible timestamps on stream accounts.
+The provider SHOULD NOT reuse the same `provider_id`
+across streams intended to remain unlinked.
 
 ### Limits of unlinkability and future work
 
-The following linkages remain under the privacy goals above
-and MAY motivate future research:
+The following issues MAY motivate future research:
+- Vault and stream accounts are public, including stream terms, accrual state,
+the vault-to-stream graph, and deposit and claim amounts on `VaultHolding`.
+- Observers can match amounts or timing between pre-shield and vault deposit,
+and between claim and a later deshield.
+- Vault owner and `provider_id` identities remain linkable
+across vaults and streams that reuse those identifiers.
 
-- Amount and timing correlation across the shielding boundary.
-- Public visibility of `VaultHolding` balances and the vault-to-stream graph.
-- Linkability of the in-protocol vault owner and `provider_id` identities
-  across relationships that reuse those identifiers.
-
-Future work MAY add vault rotation guidance,
-provider identity hygiene beyond single-account reuse,
-or coarser public state disclosure for amounts and graphs.
-The base protocol leaves those items to later documents.
+Coarser [system clock accounts](#system-clock-accounts) reveal less precise activity timing to observers.
+The [Automatic Claim on Closure](#automatic-claim-on-closure) extension
+strengthens timing correlation by merging close and payout.
 
 ## References
 
