@@ -355,7 +355,7 @@ At the start of a cycle the contract freezes three values.
 - `permA`, the permutation multiplier, derived below.
 
 ```
-slot    = (R - cycleStartRound) mod AOS_cycle
+slot    = (round - cycleStartRound) mod AOS_cycle
 primary = (permA * slot + seed_cycle) mod AOS_cycle
 backup1 = (primary + 1) mod AOS_cycle
 backup2 = (primary + 2) mod AOS_cycle
