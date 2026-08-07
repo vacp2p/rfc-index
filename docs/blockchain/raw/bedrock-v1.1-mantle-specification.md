@@ -137,7 +137,7 @@ The transaction mandatory fee is a sum of two components: the multiplication of 
 ```python
 def mandatory_fees(signed_tx: SignedMantleTx,
                    permanent_storage_gas_price: TokenValue, # Given by Storage Market
-                   execution_gas_base_price: TokenValue) -> int:  # Given by Execution Market
+                   execution_gas_base_price: TokenValue) -> int128:  # Given by Execution Market
     mantle_tx = signed_tx.tx
     permanent_storage_fees = checked_uint64(len(encode(signed_mantle_tx)) * permanent_storage_gas_price)
     tx_execution_gas = 0
