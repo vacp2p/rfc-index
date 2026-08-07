@@ -632,9 +632,8 @@ Off-chain proofs use vault-owner authorization on `StreamProposal`
 and per-request eligibility on `StreamProof`.
 Each signature role MUST use a chain-specific canonical form
 and its own domain separation prefix.
-A chain integration MUST define signed payload coverage for each role,
-document the canonical bytes,
-and publish deterministic test vectors.
+A chain integration MUST define signed payload coverage for each role
+and document the canonical bytes.
 
 ### Protocol Flow
 
@@ -766,8 +765,8 @@ onto LEZ account layout, guest instructions, and reference off-chain bytes.
 Clock account ids, domain prefixes, and other demo fixtures
 are pinned in the reference integration and MAY change when the network is redeployed.
 Instruction wire layout and error codes are defined only there.
-Implementations MUST follow the deployed network and published test vectors
-from the reference integration when they differ from this section
+Implementations MUST follow the deployed network
+and the reference integration when they differ from this section
 on demo-only fields.
 Account layout, authorization, and privacy-tier rules here are normative
 and are not overridden by the reference integration.
@@ -779,9 +778,12 @@ The payment-streams guest program maps vault and stream state to
 
 #### Account types
 
-`VaultConfig` holds `total_allocated`, `owner`,
+`VaultConfig` holds `owner`,
 privacy tier (`Public` or `PseudonymousFunder`),
-and `token_id`, all set at initialization.
+and `token_id`,
+fixed at initialization,
+and `total_allocated`,
+updated by stream operations.
 
 The privacy tier records vault-owner privacy intent for that vault.
 `Public` means a public vault owner.
@@ -830,10 +832,10 @@ Off-chain vault resolution derives the same `VaultConfig` PDA from
 
 #### Deposit and claim asset paths
 
-On deposit, the guest validates vault ownership and amount,
-then move the tokens into `VaultHolding`
-using integration-deifned authenticated-transfer or Token program
-for native and non-native vault token, respectively.
+Deposit, withdraw, and claim move vault funds
+by composing with the platform program for the vault token:
+authenticated-transfer for native,
+Token program for non-native.
 
 For `PseudonymousFunder` vaults,
 `Deposit` MUST debit the vault owner private account.
@@ -917,8 +919,6 @@ with Schnorr signatures over
 `SHA-256(domain_prefix || canonical_body_bytes)`.
 Each role below defines a 32-byte ASCII `domain_prefix` (NUL-padded)
 and `canonical_body_bytes`.
-Implementations MUST match published reference test vectors
-(including cross-language Store parity).
 
 #### Vault owner authorization (`VaultProof.owner_signature`)
 
@@ -1022,12 +1022,13 @@ across streams intended to remain unlinked.
 ### Limits of unlinkability and future work
 
 The following issues MAY motivate future research:
+
 - Vault and stream accounts are public, including stream terms, accrual state,
-the vault-to-stream graph, and deposit and claim amounts on `VaultHolding`.
+  the vault-to-stream graph, and deposit and claim amounts on `VaultHolding`.
 - Observers can match amounts or timing between pre-shield and vault deposit,
-and between claim and a later deshield.
+  and between claim and a later deshield.
 - Vault owner and `provider_id` identities remain linkable
-across vaults and streams that reuse those identifiers.
+  across vaults and streams that reuse those identifiers.
 
 Coarser [system clock accounts](#system-clock-accounts) reveal less precise activity timing to observers.
 The [Automatic Claim on Closure](#automatic-claim-on-closure) extension
