@@ -399,7 +399,7 @@ and recompute `AOS_cycle`, `root_cycle`, `seed_cycle`, `permA` as above.
 - **Freshness.** Require `round > lastAcceptedRound`. Fail and revert.
 - **Turn.** Compute `primary`, `backup1`, `backup2` for `round`.
 Require `index` equals one of the three. Fail and revert.
-- **Accept.** Store price and observations. Set `lastAcceptedRound = round`.
+- **Accept.** Store `AttestedPrice`. Set `lastAcceptedRound = round`.
 Open `W_dispute`.
 
 ### Offchain Calculations for Indexers
