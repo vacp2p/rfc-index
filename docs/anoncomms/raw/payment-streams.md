@@ -779,7 +779,7 @@ The payment-streams guest program maps vault and stream state to
 #### Account types
 
 `VaultConfig` holds `owner`,
-privacy tier (`Public` or `PseudonymousFunder`),
+privacy tier (`Public` or `PseudonymousFunding`),
 and `token_id`,
 fixed at initialization,
 and `total_allocated`,
@@ -787,8 +787,9 @@ updated by stream operations.
 
 The privacy tier records vault-owner privacy intent for that vault.
 `Public` means a public vault owner.
-`PseudonymousFunder` means user unlinkability is intended for that vault.
-For `PseudonymousFunder` vaults,
+`PseudonymousFunding` means funding routes through a private (pseudonymous)
+owner account in service of user unlinkability.
+For `PseudonymousFunding` vaults,
 `owner` MUST be a private account.
 
 `token_id` is the LEZ encoding of the vault token.
@@ -802,7 +803,7 @@ Per-stream state is stored in `StreamConfig`.
 That account MAY be a public account or a private account.
 Vault privacy tier and provider account kind are independent choices.
 A `Public` vault MAY stream to a private provider.
-A `PseudonymousFunder` vault MAY stream to a public provider.
+A `PseudonymousFunding` vault MAY stream to a public provider.
 Provider unlinkability has no vault-style privacy tier.
 It is chosen per stream by using a private account as `provider_id`.
 
@@ -837,9 +838,9 @@ by composing with the platform program for the vault token:
 authenticated-transfer for native,
 Token program for non-native.
 
-For `PseudonymousFunder` vaults,
+For `PseudonymousFunding` vaults,
 `Deposit` MUST debit the vault owner private account.
-Wallets MUST NOT transfer directly into a `VaultHolding` for `PseudonymousFunder` vaults.
+Wallets MUST NOT transfer directly into a `VaultHolding` for `PseudonymousFunding` vaults.
 
 ### Guest instructions
 
@@ -986,7 +987,7 @@ A primary public key is the party's long-lived public identity
 outside the in-protocol vault-owner or `provider_id` account.
 
 A user MAY pursue user unlinkability per vault.
-On LEZ that requires a `PseudonymousFunder` vault
+On LEZ that requires a `PseudonymousFunding` vault
 (see [Account types](#account-types)).
 A provider MAY choose provider unlinkability independently for each stream.
 
@@ -1002,7 +1003,7 @@ The guest does not enforce whether transactions are transparent or shielded.
 
 To obtain user unlinkability, the user MUST
 use a private account as `VaultConfig.owner`,
-initialize the vault with privacy tier `PseudonymousFunder`
+initialize the vault with privacy tier `PseudonymousFunding`
 (see [Account types](#account-types)),
 pre-shield funds into that private account before deposit,
 and run all vault and stream operations through shielded transactions.
