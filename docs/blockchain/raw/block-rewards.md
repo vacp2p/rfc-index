@@ -22,7 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
-| 1.0.1 | Define $`D_{1,t}`$ as base plus storage fees excluding tips; declare the burned-fees window as ledger state; fix the reference-code `a_num` typo | 2026-08-04 |
+| 1.0.1 | Define $`D_{1,t}`$ as base plus storage fees excluding Execution priority fees; declare the burned-fees window as ledger state; specify the integer widths of the reward computation; fix the reference-code `a_num` typo | 2026-08-04 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -479,11 +479,12 @@ The moving average above requires the protocol to maintain a dedicated piece of 
 
 | State variable | Type | Update |
 | --- | --- | --- |
-| `burned_fees_window` | List of $T = 120$ integers | At the end of the execution of block $t$, append $`D_{1,t}`$ (Execution base fees plus Permanent Storage fees burned in block $t$, excluding Execution priority fees) and drop the oldest entry. |
+| `burned_fees_window` | List of $T = 120$ uint64 values | At the end of the execution of block $t$, append $`D_{1,t}`$ (Execution base fees plus Permanent Storage fees burned in block $t$, excluding Execution priority fees) and drop the oldest entry. |
 
 The genesis value of `burned_fees_window` is defined in [Genesis Block](bedrock-genesis-block.md#block-rewards-state-initialization).
 
 ```python
+# window holds exactly T = 120 uint64 entries; d1_t is a uint64
 def update_burned_fees_window(window: list[int], d1_t: int) -> list[int]:
     # keeps len(window) == T = 120; after the update the window covers
     # tau = t-119 ... t, so the sum below includes the current block
@@ -501,21 +502,29 @@ INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
 FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T)
 STAKE_TARGET = int(3e9)
 
+# total_stake, the window entries and both return values are uint64
 def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int]:
-    sum_fees = sum(burned_fees_window)
-    last_burned_fee = burned_fees_window[-1]
+    sum_fees = sum(burned_fees_window)          # uint64
+    last_burned_fee = burned_fees_window[-1]    # uint64
 
+    # int128 (signed): the deviation is negative once total_stake is above target
     a_numerator = min(
         max(STAKE_TARGET + FEE_AVG_NUMERATOR * sum_fees - total_stake, 0),
         A_SCALE
-    )
+    )                                           # uint64 after the clamp
 
-    reward_numerator = (INFLATION_NUMERATOR * a_numerator
-                        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_burned_fee)
-    reward_denominator = INFLATION_DENOMINATOR * A_SCALE
+    inflation_term = INFLATION_NUMERATOR * a_numerator                             # uint64
+    burn_term = INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_burned_fee  # uint128
+    reward_numerator = inflation_term + burn_term                                  # uint128
+    reward_denominator = INFLATION_DENOMINATOR * A_SCALE                           # uint64
 
-    blend_reward = reward_numerator * 6 // (reward_denominator * 10)
-    leader_reward = reward_numerator * 4 // (reward_denominator * 10)
+    blend_reward = reward_numerator * 6 // (reward_denominator * 10)   # uint128, quotient is uint64
+    leader_reward = reward_numerator * 4 // (reward_denominator * 10)  # uint128, quotient is uint64
 
     return blend_reward, leader_reward
 ```
+
+All state and all results of this computation are uint64: the window entries, the inferred total stake, and both rewards are bounded by the token supply. Two intermediates are not, and their widths are part of the consensus rule:
+
+- The deviation $`\mathrm{STAKE\_TARGET} + \mathrm{FEE\_AVG\_NUMERATOR} \cdot \mathrm{sum\_fees} - \mathrm{total\_stake}`$ must be evaluated in **signed** 128-bit arithmetic. It is negative whenever the inferred total stake is above its target, which is the intended steady state of the mechanism, and its middle term leaves the uint64 range for a window total above $`1{,}754{,}827{,}252{,}065{,}216`$. The result is non-negative and below $`\mathrm{A\_SCALE}`$ once clamped.
+- The burn term $`\mathrm{INFLATION\_DENOMINATOR} \cdot (\mathrm{A\_SCALE} - \mathrm{a\_numerator}) \cdot \mathrm{last\_burned\_fee}`$ must be evaluated in uint128. Its leading factor is at most $`657 \cdot \mathrm{A\_SCALE} \approx 7.9 \cdot 10^{10}`$, so the product exceeds $`2^{64}`$ as soon as a single block burns more than $`233{,}976{,}966`$ — a level reached in ordinary operation, not only at the extremes.
