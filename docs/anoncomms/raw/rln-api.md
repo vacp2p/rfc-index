@@ -114,6 +114,23 @@ It exposes two portions:
   the membership's Merkle proof path, the valid-root window,
   and the nullifier log for double-signalling detection.
 
+Rate limiting divides time into fixed-length epochs:
+a timestamp, in Unix-epoch seconds,
+falls in the epoch `epoch_index = timestamp / epoch_size`.
+A proof is generated from a registry root at a specific point in time;
+because the registry's tree may update as members join and leave,
+validators accept a proof against any root in the *valid-root window*
+(a bounded set of the most recent roots),
+so a proof is not rejected because the tree moved
+between generation and validation.
+The epoch size, the valid-root window length, and the maximum epoch gap
+are configured per registry,
+and proof generators and validators of a registry
+MUST use the same values
+(see [`validate_proof`](#rate-limiting)).
+The mechanism for multiple configurations (of multiple memberships) 
+is out of scope for this document.
+
 The consumer supplies only scopes, signals, timestamps,
 and received proofs for validation.
 Registry access and payment — the latter via an accounts module beneath the Module —
@@ -169,7 +186,7 @@ typedef struct { const RegistryOption* ptr; size_t len; } RegistryOptions;
 
 // A consistent snapshot of one scope's rate-limit budget.
 typedef struct {
-    uint64_t epoch_index;  // current epoch
+    uint64_t epoch_index;  // the queried epoch, from the timestamp
     uint64_t rate_limit;   // messages the epoch grants the membership;
                            // zero when the scope has no usable membership
     uint64_t remaining;    // messages still unspent in this epoch
@@ -430,30 +447,33 @@ so a consumer that only validates messages never registers.
 Detecting double-signalling across messages —
 two proofs sharing a nullifier within one epoch —
 is the Module's responsibility:
-it keeps a log of the nullifiers it has validated, with their shares,
+it keeps a log of the nullifiers it has verified, with their shares,
 recovers the identity secret two colliding proofs reveal,
 and reports it in the validation result.
 
-#### `Result<EpochQuota> get_epoch_quota(MembershipScope scope)`
+#### `Result<EpochQuota> get_epoch_quota(MembershipScope scope, uint64_t timestamp)`
 
-Return the scope's current epoch index,
+Return the epoch of `timestamp`,
+`epoch_index = timestamp / epoch_size`,
 the membership's `rate_limit` for it,
-and the scope's remaining budget,
+and the scope's remaining budget in that epoch,
 for consumer-side send scheduling:
 rolling a metering window on the epoch boundary,
 parking traffic when the budget is spent,
 and releasing it when the epoch advances.
-All fields SHALL derive from one observation of the epoch:
-a `remaining` computed in one epoch MUST NOT be paired
-with the index of another,
-so a read taken across an epoch rollover reflects
-either the old epoch or the new one, never a mixture.
+The queried epoch is fixed by `timestamp`,
+so `remaining` SHALL be a single consistent observation of that epoch.
 The read is advisory:
 allocation happens in [`generate_proof`](#rate-limiting),
 which remains the authority and fails with `RLN_ERR_BUDGET_EXHAUSTED`
 when the budget is spent between a read and a proof.
+When the epoch of `timestamp` lies outside
+the configured maximum epoch gap of the Module's current epoch —
+so [`generate_proof`](#rate-limiting) would reject it —
+the read SHALL fail with `RLN_ERR_PERMANENT`,
+letting a consumer test a timestamp before committing to it.
 A scope without a usable membership — `ACTIVE` or `GRACE_PERIOD` — has no budget:
-the read SHALL return the current `epoch_index`
+the read SHALL return the epoch of `timestamp`
 with `rate_limit` and `remaining` both zero.
 A `rate_limit` of zero therefore indicates the absence of a usable membership,
 never an exhausted budget,
@@ -485,6 +505,10 @@ the configured maximum epoch gap of the Module's current epoch —
 and SHALL fail with `RLN_ERR_PERMANENT`,
 rather than return a proof validators would reject,
 when the `timestamp` lies outside that window.
+This self-check evaluates only those stateless conditions;
+it neither consults nor updates the nullifier log,
+so a generator never records its own proof
+and cannot later report its own message a duplicate.
 The Module SHALL NOT issue two proofs for the same
 `(scope, epoch, message_id)` triple:
 doing so reveals the identity secret.
@@ -494,13 +518,16 @@ allocation resets at the next epoch.
 The membership MUST be usable — `ACTIVE` or `GRACE_PERIOD` —
 for proof generation to succeed.
 
-#### `Result<ValidationResult> validate_proof(MembershipScope scope, Bytes signal, RateLimitProof proof)`
+#### `Result<ValidationResult> validate_proof(MembershipScope scope, Bytes signal, uint64_t timestamp, RateLimitProof proof)`
 
-Validate an RLN proof for `signal`.
+Validate an RLN proof for `signal` against the message's `timestamp`.
 The following MUST hold for the verdict to be `PROOF_VALID`:
 
 - the zero-knowledge proof verifies;
 - `proof.root` is within the Module's current valid-root window;
+- `proof.epoch` equals the epoch derived from `timestamp`,
+  `epoch_index = timestamp / epoch_size`,
+  so the budget the proof spends belongs to the epoch the message claims;
 - `proof.epoch` is within a configured maximum gap of the Module's current epoch,
   so a newly registered member cannot publish into past epochs;
 - `proof.external_nullifier` matches the value recomputed from
@@ -513,14 +540,19 @@ A proof that fails any of these is `PROOF_INVALID` —
 a verdict, not an error:
 the error channel is reserved for calls the Module cannot judge,
 e.g. `RLN_ERR_NOT_READY` before its registry view is warm.
+A proof that passes them and whose `nullifier` the epoch's log
+does not yet hold is `PROOF_VALID`,
+and the Module records its `nullifier` and `share_x` there —
+the record subsequent proofs are checked against.
 A proof that passes them
-but whose `nullifier` is already in the epoch's log
+but whose `nullifier` is already logged
 is judged by its `share_x` against the recorded one:
 the same value is a retransmission of a message already validated,
 reported `PROOF_DUPLICATE`;
 a different value is double-signalling,
 and the Module SHALL reconstruct the identity secret from the two shares
 and report `PROOF_RATE_LIMIT_VIOLATION` with `recovered_secret` set.
+Only `validate_proof` writes the nullifier log.
 The nullifier log is validation state local to the Module,
 retained per epoch for at least the maximum epoch gap
 within which proofs are accepted.
@@ -532,9 +564,9 @@ The valid-root window is maintained asynchronously as the registry changes,
 and SHOULD be maintained timely enough
 that a proof generated against a newly published root is not falsely rejected.
 The epoch size, the window's length, and the maximum epoch gap
-are configuration parameters of the Module —
-the registry does not enforce them;
-validators of an application MUST use the same values,
+are the per-registry configuration named in [The Module](#the-module):
+the registry does not enforce them,
+so proof generators and validators MUST use the same values,
 or a proof accepted at one node is rejected at another.
 
 ## Optional extensions
