@@ -35,7 +35,7 @@
 | 1.8.0 | [RFC] Update channels to support proof of stake participation and test vectors for OpId and Mantle Transaction Hash | 2026-07-06 |
 | 1.9.0 | Update the execution of `CHANNEL_DEPOSIT` to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit | 2026-07-27 |
 | 1.9.1 | Rename the excess balance left after the mandatory fees into `tx_priority_tip` and convert it back into a `TokenValue` explicitly | 2026-08-05 |
-| 1.10.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay without letting inscriptions invalidate a pending configuration | 2026-08-06 |
+| 1.10.0 | Track the configuration lineage of a channel: `ChannelState` gains `config_tip_hash` and the `CHANNEL_CONFIG` payload carries the `parent` configuration it extends, ordering configurations and preventing their replay | 2026-08-10 |
 
 # Introduction
 
@@ -227,7 +227,7 @@ Channels allow Zones to post their updates on chain. Channels form virtual chain
 
 Channels form virtual chains by having each message reference its parent message. The order of messages in these channels is enforced by the sequencer by building a hash chain of messages, i.e. new messages reference the previous messages through a parent hash. Given that Cryptarchia has long finality times, these message parent references allow Zone sequencers to continue to post new updates to channels without having to wait for finality. No matter how Cryptarchia forks and reorgs, the channel messages from honest sequencers will eventually be re-included in a way that satisfies the virtual chain order.
 
-Configurations form a second hash chain within the channel: each configuration names the configuration it supersedes, so a pending reconfiguration stays valid while the sequencer keeps posting inscriptions. Executing a configuration also advances the message tip, so the position of a configuration relative to the inscriptions is committed by the message hashes rather than by the order in which block producers include transactions.
+Configurations form a second hash chain within the channel: each configuration names the configuration it supersedes, so a pending reconfiguration stays valid while the sequencer keeps posting inscriptions.
 
 The first time a message is sent to an unclaimed channel, the key that signs the initial message becomes the only accredited key in the list (Note that this key may correspond to a threshold signature key). Accredited keys of a channel forms a committee that can configure the channel, withdraw funds and take turns to write messages to that channel following a round-robin algorithm. Configuring a channel includes modifying the list of accredited keys, the round-robin parameters and the required number of signatures to withdraw funds or establish a new configuration.
 
@@ -564,6 +564,7 @@ block_slot: Slot
       chan.configuration_threshold = config.configuration_threshold
 
       # Update Decentralized Sequencing Parameters
+      chan.tip_slot = block_slot
       chan.tip_sequencer = 0
       chan.tip_sequencer_starting_slot = block_slot
       chan.posting_timeframe = config.posting_timeframe
@@ -573,17 +574,11 @@ block_slot: Slot
       chan.transfer_threshold = config.transfer_threshold
       ```
 
-  3. Update the channel tips.
+  3. Update the configuration tip.
 
       ```python
       chan = channels[config.channel]
-      config_hash = hash(encode(config))
-
-      # A configuration advances the message tip as well, so inscriptions
-      # signed against an earlier tip are invalidated once it executes
-      chan.tip_slot = block_slot
-      chan.tip_hash = config_hash
-      chan.config_tip_hash = config_hash
+      chan.config_tip_hash = hash(encode(config))
       ```
 
 #### Example
