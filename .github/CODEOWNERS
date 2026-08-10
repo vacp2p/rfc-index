@@ -4,4 +4,4 @@
 /docs/**/raw/
 
 # CI changes require DevOps review.
-/Jenkinsfile @status-im/devops
+/Jenkinsfile @logos-co/devops
