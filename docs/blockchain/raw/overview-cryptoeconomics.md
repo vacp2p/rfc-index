@@ -24,6 +24,7 @@
 | 1.0.0 | Initial revision. | 2026-04-25 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0   | Reflect the upward rounding of the fee market price updates | 2026-07-28 |
+| 1.2.0 | Reflect the downward rounding of the leader share | 2026-08-05 |
 
 > **Disclaimer**:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -181,7 +182,7 @@ The [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md) def
 1. When a new epoch e starts, the unique reward pool variable for leaders is updated, increasing by the reward amount for the previous epoch e-1. This reward amount is calculated as the sum of leader block rewards from epoch e-1. Simultaneously, consensus nodes update the voucher set, adding vouchers of leaders from epoch e-1 to the global voucher set.
 1. From epoch e onward, leaders can exchange their vouchers for shares of the rewards pool, as their vouchers are now in the set. Each unclaimed voucher represents an equal share of the leader rewards pool.
 
-Claimable rewards remain stable during an epoch because the reward pool decreases proportionally to the number of unclaimed vouchers, and the pool is neither increased nor are new vouchers added to the set during an epoch.
+Claimable rewards remain stable during an epoch because the reward pool decreases proportionally to the number of unclaimed vouchers, and the pool is neither increased nor are new vouchers added to the set during an epoch. The share being a whole number of tokens, it is rounded down, so two leaders claiming during the same epoch may still differ by one token, the last claimants of the epoch being the ones receiving the extra token. The remainder of the division is left in the pool and redistributed at the next epoch.
 
 ### Blend Service
 
