@@ -29,11 +29,11 @@
 | 1.1.0 | Removed `service_rewards` due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Extended the [Block Execution](#block-execution) logic with rewards distribution due to updated [SERVICE-REWARD-DISTRIBUTION-PROTOCOL](bedrock-service-reward-distribution.md). Removed **Block Samples** subsection of the [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) from the [Annex](#annex). Reordered the [Block Execution](#block-execution) steps to enable immediate use of reward notes as inputs for transactions included in the proposal. | 2026-03-27 |
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
-| 1.2.0 | Compressed Block Proposal: 8-byte transaction reference prefixes and a variable-length `references` list, reducing the proposal to at most 8,555 bytes. Added [Canonical Encoding](#canonical-encoding) and [Prefix Collision Resolution](#prefix-collision-resolution). | 2026-08-10 |
+| 1.2.0 | Compressed Block Proposal: 16-byte transaction reference prefixes and a variable-length `references` list, reducing the proposal from a constant 33,129 bytes to at most 16,747 bytes. Added the [Canonical Encoding](#canonical-encoding) section. | 2026-08-10 |
 
 # Introduction
 
-In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to `MAX_BLOCK_SIZE`, which is 1 MB and covers the transactions only, and the proposal compresses its size down to at most ≈8.5 kB (8,555 bytes), which saves the bandwidth necessary to broadcast new blocks.
+In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to `MAX_BLOCK_SIZE`, which is 1 MB and covers the transactions only, and the proposal compresses its size down to at most ≈16.7 kB (16,747 bytes), which saves the bandwidth necessary to broadcast new blocks.
 
 # Overview
 
@@ -69,26 +69,26 @@ We are using two hashing algorithms that have the same output length of 256 bits
 
 ## Block Proposal
 
-A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains short fixed-size references to the transactions. The number of references varies from block to block, so the proposal is variable-size: 363 bytes when it references no transaction, and at most 8,555 bytes when it references the maximum of `MAX_BLOCK_TXS` transactions.
+A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains short fixed-size references to the transactions. The number of references varies from block to block, so the proposal is variable-size: 363 bytes when it references no transaction, and at most 16,747 bytes when it references the maximum of `MAX_BLOCK_TXS` transactions.
 
 We define the following message structure:
 
 ```python
-class Proposal:                              # 363..8555 bytes
+class Proposal:                              # 363..16747 bytes
     header: Header                           # 297 bytes
-    references: References                   # 2..8194 bytes (2-byte count + entries)
+    references: References                   # 2..16386 bytes (2-byte count + entries)
     signature: Ed25519Signature              # 64 bytes
 ```
 
 Where:
 
 - `header` is the header of the proposal; defined below: [Header](#header).
-- `references` is a variable-length list of up to `MAX_BLOCK_TXS` [references](#references) to transactions, each being an 8-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the transaction hash defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction).
+- `references` is a variable-length list of up to `MAX_BLOCK_TXS` [references](#references) to transactions, each being a 16-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the transaction hash defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction).
 - `signature` is the signature of the complete `header` using the `leader_key` from the `ProofOfLeadership`; the size of the `Ed25519Signature` type is 64 bytes.
 
 The proposal carries no padding of its own. Proposal indistinguishability is provided at the message layer: [Payload Formatting](payload-formatting.md#body) already mandates a fixed body length (`Max_Body_Length`) for every dispersed payload, with shorter messages padded with **random** data and the true length carried in `body_length`. An in-proposal zero-padded layout would duplicate that guarantee while charging every proposal the full `MAX_BLOCK_TXS` cost even when it references few transactions. The padding lies outside the signed proposal and is discarded via `body_length` on decapsulation, so no consensus meaning ever attaches to it.
 
-Note that this makes the random-padding requirement of [Payload Formatting](payload-formatting.md#body) load-bearing for the first time. While the proposal was a constant 8,555 bytes it always filled the body exactly and the padding path never fired for a real proposal. Implementations must pad with random data, not zeros, or the padding region will itself distinguish proposals by their reference count.
+Note that this makes the random-padding requirement of [Payload Formatting](payload-formatting.md#body) load-bearing for the first time. While the proposal was a constant size it always filled the body exactly and the padding path never fired for a real proposal. Implementations must pad with random data, not zeros, or the padding region will itself distinguish proposals by their reference count.
 
 ### Header
 
@@ -111,23 +111,23 @@ Where:
 
 ### References
 
-Each reference is a fixed-length prefix of the transaction hash rather than the full hash. The prefix length is the protocol parameter `REFERENCE_PREFIX_LENGTH = 8` bytes, and the prefix is taken by:
+Each reference is a fixed-length prefix of the transaction hash rather than the full hash. The prefix length is the protocol parameter `REFERENCE_PREFIX_LENGTH = 16` bytes, and the prefix is taken by:
 
 ```python
-REFERENCE_PREFIX_LENGTH = 8   # bytes
+REFERENCE_PREFIX_LENGTH = 16   # bytes
 
 def prefix(hash_input: bytes, length: int) -> bytes:
     return hash_input[:length]
 ```
 
 ```python
-class References:                            # 2..8194 bytes
+class References:                            # 2..16386 bytes
     mempool_transactions: list[bytes]        # UINT16 count + len * REFERENCE_PREFIX_LENGTH
 ```
 
 Where `mempool_transactions` is a variable-length list of up to `MAX_BLOCK_TXS` references to transactions, each being `prefix(mantle_txhash(tx), REFERENCE_PREFIX_LENGTH)` of the transaction hash defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction).
 
-The list is not padded. As specified in [Canonical Encoding](#canonical-encoding), it is serialized as a 2-byte little-endian element count followed by that many `REFERENCE_PREFIX_LENGTH`-byte entries, so its encoded size is `2 + len(mempool_transactions) * REFERENCE_PREFIX_LENGTH` bytes — 2 bytes when the proposal references no transaction, and `2 + 1024 * 8 = 8194` bytes at `MAX_BLOCK_TXS`.
+The list is not padded. As specified in [Canonical Encoding](#canonical-encoding), it is serialized as a 2-byte little-endian element count followed by that many `REFERENCE_PREFIX_LENGTH`-byte entries, so its encoded size is `2 + len(mempool_transactions) * REFERENCE_PREFIX_LENGTH` bytes — 2 bytes when the proposal references no transaction, and `2 + 1024 * 16 = 16386` bytes at `MAX_BLOCK_TXS`.
 
 A decoder must reject a count greater than `MAX_BLOCK_TXS` **before** allocating for it or performing any mempool lookup, on every ingress path.
 
@@ -177,7 +177,7 @@ LeaderVoucher     = FieldElement
 
 References        = ReferenceCount *Reference
 ReferenceCount    = UINT16          ; MUST NOT exceed MAX_BLOCK_TXS
-Reference         = 8BYTE           ; REFERENCE_PREFIX_LENGTH bytes
+Reference         = 16BYTE          ; REFERENCE_PREFIX_LENGTH bytes
 ```
 
 The terminals `Byte`, `UINT16`, `UINT64`, `Hash32`, `FieldElement`, `Groth16`, `Ed25519PublicKey` and `Ed25519Signature` are those defined in [Mantle Transaction Encoding](mantle-transaction-encoding.md#common-structures). Note in particular that `FieldElement` is a little-endian BN254 field element, which fixes the byte order of `entropy_contribution` and `leader_voucher`.
@@ -188,10 +188,10 @@ This yields the following sizes, where `n` is the number of references:
 | --- | --- | --- | --- |
 | `Header` | `1 + 32 + 8 + 32 + 224` | 297 | 297 |
 | `ProofOfLeadership` | `128 + 32 + 32 + 32` | 224 | 224 |
-| `References` | `2 + 8n` | 2 | 8,194 |
-| `Proposal` | `297 + (2 + 8n) + 64` | 363 | 8,555 |
+| `References` | `2 + 16n` | 2 | 16,386 |
+| `Proposal` | `297 + (2 + 16n) + 64` | 363 | 16,747 |
 
-The maximum of 8,555 bytes is what [Payload Formatting](payload-formatting.md#body) uses as `Max_Body_Length`.
+The maximum of 16,747 bytes is what [Payload Formatting](payload-formatting.md#body) uses as `Max_Body_Length`.
 
 ## Proposal Construction
 
@@ -230,25 +230,8 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
     - Ensure each transaction:
       - Is valid according to [Mantle](bedrock-v1.1-mantle-specification.md).
       - Has no conflicts with others (e.g., two transactions trying to spend the same note).
-    - Bound the ambiguity the selection creates. For each selected transaction, let `a_i` be the number of transactions in the local mempool that share its `REFERENCE_PREFIX_LENGTH`-byte hash prefix, so `a_i = 1` when the prefix is unique there. The selection must satisfy:
 
-      ```python
-      # A colliding transaction the proposer did not hold raises one a_i by one, which
-      # multiplies the product by (a_i + 1) / a_i, at most 2. Tolerating
-      # DIVERGENCE_TOLERANCE such surprises therefore costs 2 ** DIVERGENCE_TOLERANCE
-      # against the validator's bound.
-      DIVERGENCE_TOLERANCE = 2
-
-      MAX_PROPOSAL_AMBIGUITY = MAX_RECONSTRUCTION_COMBINATIONS // (2 ** DIVERGENCE_TOLERANCE)   # 1024 // 4 = 256
-
-      product(a_i for all selected i) <= MAX_PROPOSAL_AMBIGUITY
-      ```
-
-  This is the construction-side counterpart of the validator's `MAX_RECONSTRUCTION_COMBINATIONS` (see [Prefix Collision Resolution](#prefix-collision-resolution)), and it is what keeps reconstruction an unambiguous lookup in the ordinary case rather than a search. The bound is derived from the validator's rather than set independently, so that `MAX_PROPOSAL_AMBIGUITY < MAX_RECONSTRUCTION_COMBINATIONS` holds by construction: a proposer working to its own mempool must leave room for a validator that holds a colliding transaction it did not.
-
-  `DIVERGENCE_TOLERANCE` is not sized for accidental divergence, which does not need it — with `MAX_BLOCK_TXS` references and a mempool differing by even ten thousand transactions, the chance that any of that difference collides with a referenced prefix is around $`10^{-12}`$. It is sized for *timed* divergence: an adversary who delivers one half of a ground pair late, and to some validators only, places a collision the proposer could not have seen. A tolerance of two covers two such deliveries; beyond that the proposal is rejected at the affected validators alone rather than network-wide, since validators that never received the late transactions reconstruct normally. A validator that rejected for this reason converges on the block later through ordinary chain synchronisation, once the chain extends it.
-
-  In practice a builder satisfies this by preferring transactions whose prefix is unique in its mempool, which costs a lookup on an index it already maintains, and spending the remaining budget on at most a few ambiguous ones. A transaction passed over for this reason is deferred rather than dropped: it stays eligible, and the budget is recomputed against a fresh mempool for every proposal.
+  No prefix-collision avoidance is needed at selection time. At `REFERENCE_PREFIX_LENGTH = 16` a collision between two distinct transaction hashes is infeasible to encounter or to manufacture (see [Prefix length and collision resistance](#prefix-length-and-collision-resistance)), so a 16-byte prefix identifies a transaction as unambiguously as the full hash does for reconstruction purposes.
 
 3. Derive references values:
 ```python
@@ -293,37 +276,22 @@ The process works as follows:
 6. Block proposal is sent through the Blend Network, which requires multiple rounds of gossiping. This introduces a delay that ensures the transaction has reached most of the network participants' mempools.
 7. Block proposal is received by validators.
 8. Validators match each reference prefix in `references` against the transactions in their local mempool.
-9. If every reference matches, the block proposal is reconstructed (resolving any prefix collisions as described below) and proceeds to further validation steps; otherwise the entire proposal is rejected.
+9. If every reference resolves to a mempool transaction and the resolved set reproduces `header.block_root`, the block proposal is reconstructed and proceeds to further validation steps; otherwise the entire proposal is rejected.
 
-### Prefix Collision Resolution
+### Reference Resolution
 
-Because a reference is only an 8-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the transaction hash, a single reference may match more than one transaction in a validator's mempool. The full-hash Merkle commitment in `header.block_root` still uniquely binds the proposal to one ordered transaction selection, so collisions affect only reconstruction cost, not correctness. Reconstruction is bounded by a single parameter:
-
-```python
-MAX_RECONSTRUCTION_COMBINATIONS = 1024  # maximum candidate combinations to try
-```
-
-The value is derived from a time budget rather than chosen arbitrarily. Trying one combination costs a Merkle root over at most `MAX_BLOCK_TXS` leaves, so the worst case is `MAX_RECONSTRUCTION_COMBINATIONS * MAX_BLOCK_TXS` evaluations of the general-purpose hash — the tree is built with `Hash`, not `zkhash`, since `block_root` is never verified inside a circuit. That is about $`10^{6}`$ hashes, which is a small fraction of a second and so a small fraction of the expected block interval of 30 slots at a slot length of 1 second ([Cryptarchia Protocol](cryptarchia-v1-protocol.md#protocol)).
-
-The bound is deliberately conservative in two further respects: consecutive combinations differ in only a few leaves, so an implementation may cache the unchanged subtrees rather than recomputing a whole root each time, and a proposal that reaches this path at all is already exceptional (see [Construction Procedure](#construction-procedure)).
-
-No separate per-reference cap is needed. A single reference with many candidates raises `N_comb` by the same factor, so the combination bound already covers it, and having only one bound removes any need to truncate a candidate set — which keeps the outcome identical across validators holding the same mempool.
-
-Reconstruction considers every entry of `references`; the list has no padding. A proposal whose reference count exceeds `MAX_BLOCK_TXS` is rejected at decode time, as specified in [References](#references). For each reference `i`, the validator collects the candidate set of local mempool transactions whose hash prefix equals `references[i]`:
+A reference is a 16-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the transaction hash. Because two distinct transaction hashes cannot be made or found to share a 16-byte prefix at any feasible cost (see [Prefix length and collision resistance](#prefix-length-and-collision-resistance)), a validator resolves each reference to exactly one local mempool transaction:
 
 ```python
-C_i = [tx for tx in mempool if prefix(mantle_txhash(tx), REFERENCE_PREFIX_LENGTH) == references[i]]
+def resolve(reference, mempool):
+    matches = [tx for tx in mempool
+               if prefix(mantle_txhash(tx), REFERENCE_PREFIX_LENGTH) == reference]
+    return matches[0] if len(matches) == 1 else None
 ```
 
-The validator then proceeds as follows:
+Reconstruction considers every entry of `references`; the list has no padding. A proposal whose reference count exceeds `MAX_BLOCK_TXS` is rejected at decode time, as specified in [References](#references). The proposal is reconstructed when every reference resolves to a transaction and the Merkle root over the resolved transactions' full hashes reproduces `header.block_root`; otherwise it is rejected. Resolution is a function of the proposal and the validator's mempool alone, so two validators holding the same mempool always reach the same decision.
 
-- If any `C_i` is empty, a referenced transaction is missing from the local mempool and the proposal is rejected.
-- If the number of candidate combinations `N_comb = product(len(C_i) for all i)` exceeds `MAX_RECONSTRUCTION_COMBINATIONS`, the proposal is rejected.
-- Otherwise the validator tries each combination, taking one candidate per reference. Reconstruction succeeds for the combination whose full transaction hashes reproduce `header.block_root`. If no combination reproduces `header.block_root`, the proposal is rejected.
-
-Every outcome above is a function of the proposal and the validator's mempool alone, so two validators holding the same mempool always reach the same decision.
-
-An honest proposal should never reach the second case, because a proposer bounds the ambiguity of its selection to `MAX_PROPOSAL_AMBIGUITY` against its own mempool (see [Construction Procedure](#construction-procedure)) and validators hold comparable mempools by the transaction maturity assumption above. Rejection there is a backstop against mempool divergence, not a routine path; the cost of deliberately provoking it is analysed in [Cost of provoking a reconstruction failure](#cost-of-provoking-a-reconstruction-failure).
+A reference resolving to no local transaction means the referenced transaction has not reached this validator's mempool, which the transaction maturity assumption above is designed to prevent; the proposal is rejected and the block, if valid, is obtained later through ordinary chain synchronisation. Rejection here records no verdict on the block's validity — the same `block_id` may be received and accepted later once the transaction is present. The `header.block_root` check is what makes resolution safe against the residual, cryptographically-negligible case of a prefix matching the wrong transaction: a mismatched set never reproduces the root.
 
 ### Binding of the reference list
 
@@ -332,7 +300,7 @@ Neither the reference entries nor their count are covered by `signature` or by `
 Two operational consequences follow:
 
 - Tampered copies of a genuine proposal are cheap to produce, since `references` is unauthenticated. They are also cheap to discard: `block_id` is computable from the 297-byte header alone, so duplicate suppression on `block_id` collapses every tampered variant of one genuine proposal into a single unit of reconstruction work.
-- Reconstruction must not be the first expensive step. It is bounded by `MAX_RECONSTRUCTION_COMBINATIONS`, but it should follow signature and PoL verification so that an unauthenticated proposal is discarded before any mempool scanning takes place.
+- Reconstruction must not be the first expensive step. It is a mempool scan, so it should follow signature and PoL verification, and an unauthenticated proposal must be discarded before any mempool scanning takes place.
 
 ## Block Proposal Validation
 
@@ -347,7 +315,7 @@ Given a `proposal`, a proposed block consisting of a `header`, `references` and 
   The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation).
 
 3. **Block Proposal Reconstruction**
-  The `references` prefixes must resolve to a candidate combination of local mempool transactions that reproduces `header.block_root`, within the bound defined in [Prefix Collision Resolution](#prefix-collision-resolution).
+  Every `references` prefix must resolve to a local mempool transaction, and the resolved set must reproduce `header.block_root`, as defined in [Reference Resolution](#reference-resolution).
 
 4. **Mempool Transactions Validation**
   `mempool_transactions` must refer to a valid sequence of Mantle Transactions from the mempool. Each transaction must be valid according to the rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md). In order to verify ZK proofs, they are batched for verification as explained in [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) to get better performance.
@@ -366,35 +334,17 @@ Given a `ValidBlock` that has successfully passed proposal validation, the node 
 
 # Annex
 
-## Cost of provoking a reconstruction failure
+## Prefix length and collision resistance
 
-`REFERENCE_PREFIX_LENGTH = 8` is sized against **targeted** grinding: producing a transaction whose prefix collides with one specific other transaction costs ≈ $`2^{64}`$ work. Provoking a reconstruction failure is a cheaper problem, because an attacker may collide their **own** transactions with each other, which is a birthday search over ≈ $`2^{32.5}`$ candidates for one colliding pair and ≈ $`2^{32.5}\sqrt{k}`$ for `k` pairs. Grinding a candidate is cheap: `mantle_txhash` covers the `MantleTx` alone and not the `op_proofs` of the enclosing `SignedMantleTx`, so a candidate costs one encoding and one hash, and only the pairs actually used are ever signed.
+`REFERENCE_PREFIX_LENGTH = 16` is chosen so that a collision between two 16-byte prefixes cannot be manufactured. Two distinct attacks have to be priced separately, because they cost very differently.
 
-If such pairs could be selected into a proposal, `k` of them would give `N_comb = 2^k` and a modest `k` would exceed any bound a validator can afford to evaluate — raising `MAX_RECONSTRUCTION_COMBINATIONS` is no defence, since the attacker's work grows only as $`\sqrt{k}`$ while the validator's grows as `N_comb`.
+**Targeted collision.** To make a reference resolve to the wrong transaction — for example to censor one specific transaction `T` — an attacker must produce a transaction whose prefix equals `T`'s. That is a fixed target of `8 * REFERENCE_PREFIX_LENGTH = 128` bits, so it costs ≈ $`2^{128}`$ work: infeasible by an enormous margin.
 
-This is why the validator's bound is not the defence. The `MAX_PROPOSAL_AMBIGUITY` rule in [Construction Procedure](#construction-procedure) caps the ambiguity at selection time, so ground pairs are simply never referenced in the quantity the attack needs, and the transactions passed over are the attacker's own.
+**Self-collision.** To merely create *ambiguity* — two transactions sharing a prefix, so a reference matches more than one — the attacker does not need a specific target. They generate their own candidate transactions and wait for any two to collide. This is a birthday search, which finds a colliding pair after only ≈ $`2^{b/2}`$ candidates rather than $`2^{b}`$: the number of candidate *pairs* grows as the square of the number of candidates, so a collision appears once $`N^2/2 \approx 2^{b}`$, i.e. $`N \approx 2^{b/2}`$. Grinding a candidate is cheap — `mantle_txhash` covers the `MantleTx` alone and not the `op_proofs` of the enclosing `SignedMantleTx`, so each candidate costs one encoding and one hash, and nothing is signed until a pair is found.
 
-Denying an *honest* transaction is a different and far dearer proposition. It requires a transaction colliding with that specific one, which is the targeted $`2^{64}`$ case the prefix length is chosen for, and it must be repeated whenever the sender rebroadcasts with any field altered, since that yields a fresh prefix. Exhausting the whole ambiguity budget with other people's transactions requires roughly $`\log_2`$(`MAX_PROPOSAL_AMBIGUITY`) such collisions at once. Note that a collision consumes budget rather than removing a transaction from consideration outright, so a victim colliding with one ground transaction remains selectable.
+The self-collision cost is the one that governs the parameter, because it is the cheaper of the two and it is what an attacker needs to force reconstruction failures. At the 8-byte prefix of an earlier revision it was only ≈ $`2^{32.5}`$ — a few seconds on one GPU — which is why that revision needed a construction-side ambiguity bound and a validator-side reconstruction cap to survive grindable collisions. At 16 bytes the birthday cost is ≈ $`2^{64}`$: about 58 years on one GPU at $`10^{10}`$ hashes per second, and still ~214 days against a 100× adversary. Manufacturing even a single ambiguous pair is therefore infeasible, and the whole class of grinding attacks disappears along with the machinery that managed it. Every reference resolves to exactly one transaction, reconstruction is a deterministic lookup, and `header.block_root` remains the backstop for the residual, cryptographically-negligible random collision.
 
-Two costs bound the attack further, though neither is what the design relies on. Both halves of a pair must coexist in a mempool without conflicting, which requires a distinct channel or funded note per transaction and therefore a one-time, fee-paying setup. Against that, an attacker whose transactions are never included never pays their fees, so the recurring cost is nil; only the setup is charged.
-
-## Salted references
-
-An alternative to bounding ambiguity at selection time is to make the reference derivation depend on the block, so that collisions cannot be ground in advance at all. Each reference would be derived as
-
-```python
-reference = prefix(Hash(salt, mantle_txhash(tx)), REFERENCE_PREFIX_LENGTH)
-```
-
-where `salt` is fixed by the header, `parent_block` concatenated with `slot` being the natural choice.
-
-What this changes is the search space. Under the unsalted derivation an attacker grinds offline against a fixed function and may generate unboundedly many candidates. Under a salted one, the prefixes an attacker needs to collide only exist once the salt does, and by then the transactions must already be resident and mature in mempools — so the search is confined to transactions that are actually there. For a mempool of ≈ $`2^{20}`$ transactions the probability that any pair collides under a given salt is ≈ $`2^{-25}`$, and it is resampled every block rather than accumulating.
-
-The salt need not be unpredictable, only unpredictable *in time to act on it*. `parent_block` and `slot` are known roughly one block interval ahead, which is ample GPU time for a birthday search, but a transaction ground during that window cannot propagate and reach maturity before the salt it was ground for is spent. `entropy_contribution` would be a worse choice, being leader-chosen and therefore grindable by the leader.
-
-The cost is that reference prefixes can no longer be indexed once and reused. Both the proposer and every validator must derive one salted hash per candidate mempool transaction per proposal — on the order of $`2^{20}`$ hashes, tens of milliseconds, against a mempool of that size.
-
-This is recorded as an alternative, not as an addition: it addresses the same failure as the `MAX_PROPOSAL_AMBIGUITY` rule in [Construction Procedure](#construction-procedure), and adopting it would make that rule unnecessary rather than reinforcing it. The rule in the Construction Procedure is the normative one. Salting would also dispense with the ambiguity budget altogether, and with it the question of how an adversary might consume that budget.
+The cost is that references are twice as long as at 8 bytes, so the proposal grows from at most 8,555 bytes to at most 16,747 bytes. That is still a ≈2× reduction against the 33,129-byte fixed layout of master, and it buys reconstruction that no adversary can perturb — for a consensus structure, the stronger property is worth the bytes.
 
 ## Why `block_root` alone binds the reference list
 
