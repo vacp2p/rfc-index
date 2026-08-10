@@ -303,7 +303,9 @@ Because a reference is only an 8-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the 
 MAX_RECONSTRUCTION_COMBINATIONS = 1024  # maximum candidate combinations to try
 ```
 
-The value is derived from a time budget rather than chosen arbitrarily. Trying one combination costs a Merkle root over at most `MAX_BLOCK_TXS` leaves, so the worst case is `MAX_RECONSTRUCTION_COMBINATIONS * MAX_BLOCK_TXS` hash evaluations. Reconstruction must finish well inside the expected block interval, which is 30 slots at a slot length of 1 second ([Cryptarchia Protocol](cryptarchia-v1-protocol.md#protocol)); the value above keeps the worst case within a third of that interval even under the pessimistic assumption that `block_root` is built with the ZK-friendly hash, and leaves roughly fifty times that margin if it is built with BLAKE2b. Implementations that pin the hash may re-derive the constant on the same basis.
+The value is derived from a time budget rather than chosen arbitrarily. Trying one combination costs a Merkle root over at most `MAX_BLOCK_TXS` leaves, so the worst case is `MAX_RECONSTRUCTION_COMBINATIONS * MAX_BLOCK_TXS` evaluations of the general-purpose hash — the tree is built with `Hash`, not `zkhash`, since `block_root` is never verified inside a circuit. That is about $`10^{6}`$ hashes, which is a small fraction of a second and so a small fraction of the expected block interval of 30 slots at a slot length of 1 second ([Cryptarchia Protocol](cryptarchia-v1-protocol.md#protocol)).
+
+The bound is deliberately conservative in two further respects: consecutive combinations differ in only a few leaves, so an implementation may cache the unchanged subtrees rather than recomputing a whole root each time, and a proposal that reaches this path at all is already exceptional (see [Construction Procedure](#construction-procedure)).
 
 No separate per-reference cap is needed. A single reference with many candidates raises `N_comb` by the same factor, so the combination bound already covers it, and having only one bound removes any need to truncate a candidate set — which keeps the outcome identical across validators holding the same mempool.
 
