@@ -239,14 +239,14 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
       # against the validator's bound.
       DIVERGENCE_TOLERANCE = 2
 
-      MAX_PROPOSAL_AMBIGUITY = MAX_RECONSTRUCTION_COMBINATIONS // (2 ** DIVERGENCE_TOLERANCE)
+      MAX_PROPOSAL_AMBIGUITY = MAX_RECONSTRUCTION_COMBINATIONS // (2 ** DIVERGENCE_TOLERANCE)   # 1024 // 4 = 256
 
       product(a_i for all selected i) <= MAX_PROPOSAL_AMBIGUITY
       ```
 
   This is the construction-side counterpart of the validator's `MAX_RECONSTRUCTION_COMBINATIONS` (see [Prefix Collision Resolution](#prefix-collision-resolution)), and it is what keeps reconstruction an unambiguous lookup in the ordinary case rather than a search. The bound is derived from the validator's rather than set independently, so that `MAX_PROPOSAL_AMBIGUITY < MAX_RECONSTRUCTION_COMBINATIONS` holds by construction: a proposer working to its own mempool must leave room for a validator that holds a colliding transaction it did not.
 
-  `DIVERGENCE_TOLERANCE` is not sized for accidental divergence, which does not need it — with `MAX_BLOCK_TXS` references and a mempool differing by even ten thousand transactions, the chance that any of that difference collides with a referenced prefix is around $`10^{-12}`$. It is sized for *timed* divergence: an adversary who delivers one half of a ground pair late, and to some validators only, places a collision the proposer could not have seen. A tolerance of two covers two such deliveries; beyond that the proposal is rejected at the affected validators alone rather than network-wide, since validators that never received the late transactions reconstruct normally.
+  `DIVERGENCE_TOLERANCE` is not sized for accidental divergence, which does not need it — with `MAX_BLOCK_TXS` references and a mempool differing by even ten thousand transactions, the chance that any of that difference collides with a referenced prefix is around $`10^{-12}`$. It is sized for *timed* divergence: an adversary who delivers one half of a ground pair late, and to some validators only, places a collision the proposer could not have seen. A tolerance of two covers two such deliveries; beyond that the proposal is rejected at the affected validators alone rather than network-wide, since validators that never received the late transactions reconstruct normally. A validator that rejected for this reason converges on the block later through ordinary chain synchronisation, once the chain extends it.
 
   In practice a builder satisfies this by preferring transactions whose prefix is unique in its mempool, which costs a lookup on an index it already maintains, and spending the remaining budget on at most a few ambiguous ones. A transaction passed over for this reason is deferred rather than dropped: it stays eligible, and the budget is recomputed against a fresh mempool for every proposal.
 
@@ -297,7 +297,7 @@ The process works as follows:
 
 ### Prefix Collision Resolution
 
-Because a reference is only an 8-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the transaction hash, a single reference may match more than one transaction in a validator's mempool. The full-hash Merkle commitment in `header.block_root` still uniquely binds the proposal to one ordered transaction selection, so collisions affect only reconstruction cost, not correctness. Reconstruction is bounded by two parameters:
+Because a reference is only an 8-byte (`REFERENCE_PREFIX_LENGTH`) prefix of the transaction hash, a single reference may match more than one transaction in a validator's mempool. The full-hash Merkle commitment in `header.block_root` still uniquely binds the proposal to one ordered transaction selection, so collisions affect only reconstruction cost, not correctness. Reconstruction is bounded by a single parameter:
 
 ```python
 MAX_RECONSTRUCTION_COMBINATIONS = 1024  # maximum candidate combinations to try
@@ -332,7 +332,7 @@ Neither the reference entries nor their count are covered by `signature` or by `
 Two operational consequences follow:
 
 - Tampered copies of a genuine proposal are cheap to produce, since `references` is unauthenticated. They are also cheap to discard: `block_id` is computable from the 297-byte header alone, so duplicate suppression on `block_id` collapses every tampered variant of one genuine proposal into a single unit of reconstruction work.
-- Reconstruction must not be the first expensive step. It is bounded by the caps above, but it should follow signature and PoL verification so that an unauthenticated proposal is discarded before any mempool scanning takes place.
+- Reconstruction must not be the first expensive step. It is bounded by `MAX_RECONSTRUCTION_COMBINATIONS`, but it should follow signature and PoL verification so that an unauthenticated proposal is discarded before any mempool scanning takes place.
 
 ## Block Proposal Validation
 
