@@ -25,7 +25,7 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
-| 1.1.0 | Add the transaction `body_type` and state the fixed-length padding cost it inherits | 2026-08-10 |
+| 1.1.0 | Add the transaction `body_type`, bound a carried transaction to `Max_Body_Length`, and state the fixed-length padding cost it inherits | 2026-08-11 |
 
 # Introduction
 
@@ -78,6 +78,10 @@ We define the `body_length` as uint16 (encoded as little-endian). Therefore, the
 ## Body
 
 The `Max_Body_Length` parameter defines the maximum length of the `body`. Currently, we assume that the maximal length of a raw data message is 33129 ([Block Proposal](bedrock-v1.1-block-construction.md#block-proposal)), so the `Max_Body_Length=33129`.
+
+**A transaction carried over the Blend network must not exceed `Max_Body_Length` once encoded.** The body is a fixed-size field, so a payload longer than it cannot be represented at all: there is no fragmentation across messages and no larger body type. A transaction that does not fit is not sendable over this protocol and must reach the network by other means. A node must check the encoded length before constructing the message rather than discovering the limit at encapsulation, and must discard on receipt any payload whose `body_length` exceeds `Max_Body_Length`, since a well-formed message can never carry one.
+
+The limit is not restrictive in practice: `Max_Body_Length` is derived from the size of a block proposal, which is far larger than any single transaction, and a transaction is separately bounded by the block it must eventually fit into.
 
 The `body` length is fixed to `Max_Body_Length` bytes. Therefore, if the length of the raw message is shorter than the `Max_Body_Length`, then it must be padded with random data.
 

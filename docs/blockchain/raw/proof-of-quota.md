@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | Remove the protection against adaptive adversary from PoL. It impacts the PoL section of PoQ. Update the performance according to the new circuit. Remove old project name from DSTs | 2026-04-09 |
 | 1.1.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
-| 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, `pow_sk` and `pow_block_hash` witnesses, Lagrange branch selection, and the binding and precomputation properties | 2026-08-10 |
+| 1.2.0 | Add the proof of work branch: third selector value, `pow_quota` and `pow_blend_difficulty` public inputs, `pow_sk` witness, Lagrange branch selection, and the binding and precomputation properties | 2026-08-11 |
 
 
 # Introduction
@@ -97,12 +97,13 @@ class ProofOfQuotaWitness:
     pol_noteid_path_selectors: list[bool] # Indicates how to read the note_path (if Merkle nodes are left or right in the path)
     # This part is filled randomly by core nodes and by potential leaders
     pow_sk: zkhash                        # Secret key the prover ground to solve the puzzle
-    pow_block_hash: zkhash                # Block the puzzle solution is anchored to
 ```
 
 `selector` is private, so a verifier learns that *some* branch held without learning which. This is what makes a proof of work backed message indistinguishable from a core node's, and it is the property the whole construction exists to provide.
 
-`pow_block_hash` is a **private witness and the circuit does not verify it**. Nothing constrains it to be the hash of a real block, a recent block, or a block on the canonical chain: any field element is accepted. It therefore contributes no freshness, and a verifier cannot tell how old a proof of work solution is. Because the only other input binding a solution to a point in time is `pol_epoch_nonce`, and that value is public from the moment it is fixed part way through the preceding epoch, solutions for an epoch can be computed before that epoch begins. See [Precomputation of proof of work solutions](#precomputation-of-proof-of-work-solutions).
+The puzzle for this branch takes no block reference. A block hash could only serve as a recency anchor, and it cannot serve as one here: the circuit has no means to establish that a given value is the hash of a real block, let alone a recent or canonical one, so any field element would be accepted and the prover would simply choose whichever suited it. Including it would add an input that constrains nothing while suggesting to a reader that solutions are anchored in time. What does bind a solution to a period is `pol_epoch_nonce`, and its limits are set out in [Precomputation of proof of work solutions](#precomputation-of-proof-of-work-solutions).
+
+This differs from the proof of work credential used to claim a token reward, which does carry a block reference. That reference is meaningful there because it is checked against the canonical chain outside any circuit, where the chain is available to check against.
 
 Note that every inputs and outputs of zero-knowledge proofs are all scalar field elements.
 
@@ -128,10 +129,10 @@ What the quota bounds differs by branch, because what the nullifier is derived f
 
 **Step 4:** If the prover indicated that the proof is backed by proof of work, the proof checks that:
 
-  1. The prover knows a `pow_sk` whose puzzle ticket satisfies the Blend threshold. The ticket is derived from the public key corresponding to `pow_sk`, together with the epoch nonce and the anchoring block hash, and must be strictly below `pow_blend_difficulty`. Because a smaller threshold admits fewer tickets, a smaller `pow_blend_difficulty` makes the puzzle harder.
+  1. The prover knows a `pow_sk` whose puzzle ticket satisfies the Blend threshold. The ticket is derived from the public key corresponding to `pow_sk` together with the epoch nonce, and must be strictly below `pow_blend_difficulty`. Because a smaller threshold admits fewer tickets, a smaller `pow_blend_difficulty` makes the puzzle harder.
   2. The index is valid: `index < pow_quota`.
 
-  The ticket is computed over three field elements and, unlike the two derivations in step 5, **without a domain separation tag**. This means the puzzle shares its hash domain with any other three input `zkhash` invocation over the same values.
+  The ticket is computed over two field elements and, unlike the two derivations in step 5, **without a domain separation tag**. This means the puzzle shares its hash domain with any other two input `zkhash` invocation over the same values.
 
 **Step 5:** The prover derives a `key_nullifier` maintained by blend nodes during the epoch for message deduplication purpose.
 
@@ -201,7 +202,7 @@ is_leader = would_win_leadership(pol_epoch_nonce,
 # ground secret key with the same derivation the core branch uses for zk_id, and
 # the comparison is over the whole scalar field rather than a truncation of it.
 pow_public_key = zkhash(b"KDF", pow_sk)
-pow_ticket = zkhash(pol_epoch_nonce, pow_block_hash, pow_public_key)
+pow_ticket = zkhash(pol_epoch_nonce, pow_public_key)
 is_winning_pow = pow_ticket < pow_blend_difficulty
 
 # Verify that it's a core node, a leader, or a valid proof of work solution.
@@ -233,7 +234,7 @@ Together these give the property the Blend network needs, which is that a valid 
 
 ## Precomputation of proof of work solutions
 
-The proof of work branch places no bound on how old a solution may be. `pow_block_hash` is unverified, so it cannot serve as a recency anchor, and the only remaining time dependent input is `pol_epoch_nonce`.
+The proof of work branch places no bound on how old a solution may be. The only time dependent input to the puzzle is `pol_epoch_nonce`, so a solution is bound to an epoch and to nothing finer.
 
 That value does not become known when its epoch starts. It is fixed at the beginning of the lottery constants finalization phase of the *preceding* epoch, as specified in [Epoch](cryptarchia-v1-protocol.md#epoch), and is public from that moment. An epoch is $`10\lfloor k/f \rfloor`$ slots and the nonce is fixed $`6\lfloor k/f \rfloor`$ slots into the preceding epoch, so it is known for the final $`4\lfloor k/f \rfloor`$ slots of that epoch — with the parameters in [Cryptarchia](cryptarchia-v1-protocol.md#constants), roughly three days of a seven and a half day epoch.
 

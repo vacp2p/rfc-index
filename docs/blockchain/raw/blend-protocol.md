@@ -920,7 +920,7 @@ When a message $`\mathbf M`$ is received by the node, then it is processed by th
 
     3. If the last flag is set ($`\Omega == 1`$) then examine the header type of the payload as defined in the [Payload Formatting](payload-formatting.md), then:
         1. If the payload is a block proposal, then the payload structure is verified and broadcast, as defined in the [Broadcasting](#broadcasting) section.
-        2. If the payload is a transaction, then the payload structure is verified, the transaction is submitted to the node's mempool, and it is broadcast as defined in the [Broadcasting](#broadcasting) section. As with a block proposal, only the structure is checked here; whether the transaction is valid against the ledger is decided by Mantle and is out of scope for this protocol.
+        2. If the payload is a transaction, then the payload structure is verified, the transaction is submitted to the node's mempool, and it is broadcast as defined in the [Broadcasting](#broadcasting) section. As with a block proposal, only the structure is checked here; whether the transaction is valid against the ledger is decided by Mantle and is out of scope for this protocol. A transaction must fit within the fixed payload body defined in [Payload Formatting](payload-formatting.md), so one that does not is not sendable over this protocol at all.
         3. If the payload is a cover message, then the payload is discarded.
 
     4. Else:
