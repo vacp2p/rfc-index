@@ -484,8 +484,7 @@ The moving average above requires the protocol to maintain a dedicated piece of 
 The genesis value of `burned_fees_window` is defined in [Genesis Block](bedrock-genesis-block.md#block-rewards-state-initialization).
 
 ```python
-# window holds exactly T = 120 uint64 entries; d1_t is a uint64
-def update_burned_fees_window(window: list[int], d1_t: int) -> list[int]:
+def update_burned_fees_window(window: list[uint64], d1_t: uint64) -> list[uint64]:
     # keeps len(window) == T = 120; after the update the window covers
     # tau = t-119 ... t, so the sum below includes the current block
     return window[1:] + [d1_t]
@@ -502,8 +501,7 @@ INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
 FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T)
 STAKE_TARGET = int(3e9)
 
-# total_stake, the window entries and both return values are uint64
-def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int]:
+def block_reward(total_stake: uint64, burned_fees_window: list[uint64]) -> tuple[uint64, uint64]:
     sum_fees = sum(burned_fees_window)          # uint64
     last_burned_fee = burned_fees_window[-1]    # uint64
 
