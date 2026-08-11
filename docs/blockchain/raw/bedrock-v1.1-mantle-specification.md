@@ -1770,8 +1770,8 @@ Both properties are required. If the reward varied within the epoch the wallet c
 The reward per claim is a fixed fraction of the pool, divided by the number of claims an epoch is expected to accept:
 
 ```python
-EPOCH_POW_DISTRIBUTION_RATE_NUM: uint64   # rho, as a fraction NUM / DEN
-EPOCH_POW_DISTRIBUTION_RATE_DEN: uint64
+EPOCH_POW_DISTRIBUTION_RATE_NUM: uint64 = 1     # rho, as a fraction NUM / DEN
+EPOCH_POW_DISTRIBUTION_RATE_DEN: uint64 = 100
 TARGET_CLAIMS_PER_BLOCK: uint64 = 10      # T
 EXPECTED_BLOCKS_PER_EPOCH: uint64         # N_b
 
@@ -1825,7 +1825,11 @@ Claiming recovers by itself. At the next epoch boundary the refill is credited a
 
 Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, and $`\sigma_e`$ is the pool's fraction $`\rho`$ divided by $`T \cdot N_b`$, an epoch running at the target rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target rate is set to. The target claim rate therefore governs how many participants share the epoch's distribution and how much each receives, not how much is distributed in total.
 
-`EPOCH_POW_DISTRIBUTION_RATE` and `POW_REWARD_POOL_GENESIS` remain to be chosen. Together with `POW_SHARE` they determine both the reward a claim yields at launch and the level it settles at, and until they are set it cannot be established that a claim is worth more than the fee required to submit it — the condition on which the whole mechanism depends. A pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
+`EPOCH_POW_DISTRIBUTION_RATE` is set to a hundredth. It does not determine the reward: as shown below, the level the reward settles at contains no $`\rho`$ at all. What it sets is **the size of the standing reserve**, because the pool settles where the refill and the payout balance, which is at $`1/\rho`$ epochs' worth of distribution. A hundredth therefore means the pool holds about a hundred epochs of distribution — some two years — permanently.
+
+Three things argue for a larger $`\rho`$ and one for a smaller. Larger reduces the reserve held out of circulation, reduces the genesis endowment needed to clear the floor below, and shortens the lag with which the reward follows a change in fee revenue, all in the same proportion. Smaller widens the margin against the pool being drained within a single epoch, which by [Exhaustion within an epoch](#exhaustion-within-an-epoch) takes `TARGET_CLAIMS_PER_BLOCK` divided by $`\rho`$ claims in every block. At a hundredth that is a thousand claims per block against a `MAX_BLOCK_TXS` of 1024, so the static margin is thin; halving $`\rho`$ would make it unreachable outright but would double the reserve, the endowment floor and the lag, to guard against a case the difficulty controller already prevents and whose failure is in any event graceful. Doubling $`\rho`$ instead would put the drain within reach of blocks half full of claims, which is not acceptable. A hundredth is where those pressures meet, and is the value the proposal gives.
+
+`POW_REWARD_POOL_GENESIS` is set to **five thousandths of the supply at network launch**. Its constraints and the relationship the three parameters must satisfy are given below and in [Genesis](#genesis).
 
 The relationship the three must satisfy is that a claim's reward exceeds its fee. Two of them fix where the reward settles, and the third fixes how long it takes to get there.
 
@@ -1840,6 +1844,10 @@ Below that level of traffic the pool pays out more than it takes in and draws do
 ### Genesis
 
 The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through the epoch-boundary refill and through claims.
+
+The seed is **five thousandths of the supply at network launch**. Two floors bound it from below. The first is the pool size at which a claim stops covering its own fee, which is the fee multiplied by the target claim rate and the blocks in an epoch, divided by $`\rho`$; nothing smaller is a working endowment at all. The second is larger and is what actually decides the value: the pool must stay above that floor for as long as it takes the fee inflow to grow into sustaining the reward by itself, and since the pool drains at $`\rho`$ throughout that period, a slower arrival of traffic costs disproportionately more. Five thousandths covers an adoption path reaching full blocks over five years with roughly half again in margin, and sustains claiming for close to two years even if the network carries no traffic at all.
+
+It is stated as a fraction of the launch supply rather than as a quantity of base units because the two are not interchangeable here. The opening reward per claim follows from the fraction, $`\rho`$ and the target claim rate alone, none of which depend on the denomination; the fee it must exceed is a fixed number of base units and therefore does depend on it. **A seed of this size requires at least about eight hundred base units to the token for the opening reward to be twice the fee**, and the denomination must be fixed with that constraint in view. A larger seed relaxes it proportionally.
 
 The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: the seed consists of tokens that exist from genesis, and the refill of fees that were paid and would otherwise have been burnt, so claiming redirects tokens rather than creating them. It never raises issuance above what the emission model would otherwise allow.
 
