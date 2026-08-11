@@ -490,13 +490,15 @@ $$
 So we propose a reference implementation that uses integers:
 
 ```python
-A_SCALE = 120_000_000            # denominator of 1/(I_max * D1_target * Delta_t * T) 
-INFLATION_NUMERATOR = 62_500     # numerator of I_max * S_TGE * DELTA_t / f
-INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
-FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T) 
-STAKE_TARGET = int(3e9)
+A_SCALE = 3_600_000_000_000      # D0_target * I_max / alpha_d: the A_t denominator
+INFLATION_NUMERATOR = 625_000_000  # numerator of I_max * S_TGE * DELTA_t / f
+INFLATION_DENOMINATOR = 219        # denominator of I_max * S_TGE * DELTA_t / f
+FEE_AVG_NUMERATOR = 10_512       # coefficient of the summed fees in the A_t numerator
+STAKE_TARGET = int(9e13)
 
 def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int]:
+    # The products below reach ~2**72; intermediates must be computed in
+    # arithmetic wider than 64 bits, as the fee markets already require.
     sum_fees = sum(burned_fees_window)
     last_burned_fee = burned_fees_window[-1]
 
@@ -505,8 +507,8 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, 
         A_SCALE
     )
 
-    reward_numerator = INFLATION_NUMERATOR * a_numerator
-									   + INFLATION_DENOMINATOR * (A_SCALE - a_num) * last_burned_fee
+    reward_numerator = (INFLATION_NUMERATOR * a_numerator
+                        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_burned_fee)
     reward_denominator = INFLATION_DENOMINATOR * A_SCALE
 
     blend_reward = reward_numerator * 6 // (reward_denominator * 10)
