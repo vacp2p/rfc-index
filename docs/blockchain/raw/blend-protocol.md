@@ -643,12 +643,18 @@ where $`x`$ is the exact number of leader elections won by the node $`n`$ in an 
 **The proof of work quota (**$`Q_W`$**) defines the number of blending operations that a single proof of work solution entitles its holder to perform.** It differs from the two quotas above in what it is attached to. The core quota is attached to a node declared through the SDP, and the leadership quota to a won leader election; both are consequences of something the network already knows about the participant. A proof of work solution is attached to nothing but the work itself, and a participant may hold as many solutions as it is willing to compute. There is therefore no per node bound on this branch, and $`Q_W`$ must be read as a per solution allowance:
 
 $$
-Q^{n}_W = y \cdot Q_W
+Q^{n}_W = y \cdot Q_W, \qquad Q_W = \beta_{max}
 $$
 
 where $`y`$ is the number of distinct solutions held by the node $`n`$ that satisfy the Blend threshold $`d_{blend}`$ for the epoch. As with the leadership quota, $`y`$ is known only to the node.
 
-This is the quota that admits participants holding neither stake nor a declaration. Its purpose is to make the Blend network reachable without a prior relationship to the protocol, and consequently the cost of sending a message over this branch is the cost of the work divided by $`Q_W`$. The two levers governing that cost are $`Q_W`$ itself and the threshold $`d_{blend}`$; both are set per epoch. Neither has been calibrated.
+Setting $`Q_W = \beta_{max}`$ makes **one solution buy exactly one message**. A quota unit is one blending operation, not one message: a message carries $`\beta_{max}`$ blending operations and therefore consumes $`\beta_{max}`$ keys, one per encapsulation. Expressing the quota as a multiple of $`\beta_{max}`$ rather than as a bare number keeps that relationship correct if the number of blending operations per message ever changes, and makes the messages-per-solution figure explicit rather than something a reader must derive.
+
+The choice matters for what $`d_{blend}`$ means. With one solution per message, the threshold is the work price of sending a single message, which is exactly the quantity the admission control is trying to regulate. A larger quota would make the threshold price a batch instead, so the controller would no longer be steering the quantity it names. A smaller one would be unusable: at $`Q_W \lt \beta_{max}`$ a participant cannot assemble a complete message from one solution at all, and a value that does not divide evenly would leave unusable remainders.
+
+This is the quota that admits participants holding neither stake nor a declaration, so the cost of reaching the Blend network without a prior relationship to the protocol is one puzzle solution per message. That cost is set entirely by $`d_{blend}`$, which has not been calibrated.
+
+Note that the puzzle is not the only per message cost. Each of the $`\beta_{max}`$ encapsulations carries its own proof, and those proofs must be generated whatever the quota is. The work required by $`d_{blend}`$ is therefore an addition to a cost floor that already exists, and calibration should account for both rather than treating the puzzle as the whole price of admission.
 
 The rate at which this branch admits messages cannot be bounded in the way the other two are. The core quota is bounded by $`N`$, which the SDP publishes, and the leadership quota by the total stake. The proof of work quota is bounded only by how much work the network's participants choose to perform, which is not observable in advance and not bounded by the protocol. Every quantity derived from a bound on total messages — most directly the nullifier cache size in [Relaying](#relaying) — must therefore be re-derived against $`d_{blend}`$ rather than against a count of registered nodes.
 
