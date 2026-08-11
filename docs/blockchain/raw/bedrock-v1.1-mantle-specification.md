@@ -132,6 +132,8 @@ def checked_int128(value: int) -> int:
         return value
 ```
 
+Proof of work targets are the deliberate exception. `PowTarget` values are field-sized, and the two difficulty controllers multiply them before dividing: the reward retarget's intermediate product reaches about $`2^{261}`$, and the Blend retarget's radicand about $`2^{487}`$. Those computations are specified over unbounded integers — an implementation must carry them in arbitrary-precision or sufficiently wide arithmetic, and the checked bounds above do not apply to them. What is bounded instead is each controller's *result*, which is capped below the field modulus so that it remains a meaningful threshold.
+
 ## Mantle Transaction Fee
 
 The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_base_fee`, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[Execution Market](execution-market.md) and [Storage Markets](storage-markets.md).
@@ -1915,7 +1917,10 @@ def compute_epoch_blend_difficulty(epoch_blocks: list[Block],
     den = TARGET_TXS_PER_BLOCK * len(epoch_blocks)
 
     lo = previous // BLEND_MAX_STEP
-    hi = previous * BLEND_MAX_STEP
+    # Capped below the field modulus for the same reason as the reward retarget:
+    # a target at or above p is no threshold at all, since every ticket is a
+    # field element and would satisfy it.
+    hi = min(previous * BLEND_MAX_STEP, p - 1)
 
     if num == 0:
         return hi   # No load observed: as permissive as this epoch's clamp allows.
@@ -1930,6 +1935,8 @@ def compute_epoch_blend_difficulty(epoch_blocks: list[Block],
 ```
 
 Applied once at the boundary, before any block of the new epoch is processed.
+
+The upper clamp is capped at $`p-1`$ in addition to the per-epoch step bound. Without the cap, an idle network — every epoch observing no load and returning `hi` — would double the threshold each epoch and pass the field modulus after a few months of empty epochs, at which point every ticket would satisfy it and admission would be free. The reward controller bounds its result for the same reason, and the two failure modes are the same one.
 
 Raising `difficulty_blend` shrinks the anonymity set, so an adversary able to drive it up could degrade privacy for everyone. Three properties bound that.
 
