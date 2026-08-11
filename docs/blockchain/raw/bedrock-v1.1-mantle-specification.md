@@ -1569,7 +1569,7 @@ block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the wi
 
 `PowTarget` is a scalar field element. A puzzle ticket is accepted when it is strictly below the target, so a **smaller** target is a **harder** puzzle.
 
-The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the block rewards, as specified in [Reward Pool](#reward-pool). It is not minted on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
+The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the fees collected over the previous epoch, as specified in [Reward Pool](#reward-pool). It is not minted on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
 
 ### Window of Acceptance
 
@@ -1786,13 +1786,18 @@ Its value is chosen as a fraction of what a block can carry. A block holds at mo
 
 It is stated as an absolute count rather than as a proportion of the transactions a block actually carries. A proportion would let claim throughput follow demand, and would keep the reward per claim in a fixed relation to the fee at any level of usage; it would also make the target vary block by block, which the reward computation above and the controller below both assume it does not. The absolute form is specified here.
 
-At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the rewards accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
+At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the refill accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
 
 ```python
+POW_SHARE: uint64                         # beta, as the fraction POW_SHARE / SHARE_DEN
+SHARE_DEN: uint64
+
 def on_epoch_boundary(epoch_blocks: list[Block]):
     pow_reward_pool = checked_uint64(pow_reward_pool + get_pow_pool_refill(epoch_blocks))
     epoch_pow_reward = compute_epoch_pow_reward(pow_reward_pool)
 ```
+
+`get_pow_pool_refill` sums, over the blocks of the epoch that just ended, the fraction `POW_SHARE / SHARE_DEN` of the fees each block collected, as specified in [Proof of Work Reward Pool](overview-cryptoeconomics.md#proof-of-work-reward-pool). Those tokens are diverted from the fee burn rather than minted, so refilling the pool does not add to the supply.
 
 All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic). The pool must not saturate: saturating at the maximum representable value would create tokens that were never allocated, which is precisely the failure the checked-arithmetic rule exists to prevent.
 
@@ -1802,13 +1807,19 @@ Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, a
 
 `EPOCH_POW_DISTRIBUTION_RATE`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` remain to be chosen, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are, it cannot be established that a claim is worth more than the fee required to submit it — the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
 
-The relationship those three must satisfy is that a claim's reward exceeds its fee. Once the network is mature enough that block rewards consist mostly of recycled fees rather than newly minted tokens, the reward per claim and the fee are both proportional to the fee level, so the comparison reduces to one between the mining share and the claim rate: a claim covers its own fee when the transactions a block carries exceed `TARGET_CLAIMS_PER_BLOCK` divided by `POW_SHARE`'s fraction of the block reward. While the network is young and block rewards are dominated by minting instead, that relation does not hold and the pool is drawn from its genesis endowment, which is what the endowment is for.
+The relationship those three must satisfy is that a claim's reward exceeds its fee. Two of them fix where the reward settles, and the third fixes how long it takes to get there.
+
+Left alone, the pool converges: each epoch it gains the refill and loses the fraction $`\rho`$ it distributes, so it approaches the level at which the two balance, and there the reward per claim is simply the refill divided by the number of claims the epoch is expected to accept. Since the refill is the share $`\beta`$ of the fees the epoch collected, and those fees are the number of transactions times the fee each pays, the settled reward per claim is $`\beta`$ times the fees one block collects, divided by `TARGET_CLAIMS_PER_BLOCK`. The distribution rate $`\rho`$ cancels out of this: it sets how fast the pool converges and how much of the pool is paid out in any one epoch, not the level the reward settles at.
+
+Comparing that against the fee a claim itself pays, and taking every transaction in a block to pay a comparable fee, the reward covers the fee once a block carries at least `TARGET_CLAIMS_PER_BLOCK` divided by $`\beta`$ transactions. At a target of 50 claims per block, a one tenth share needs blocks of about 500 transactions, and a one twentieth share needs about 1000 — the latter close to `MAX_BLOCK_TXS`, and so not reachable in practice. The share and the claim target must be chosen together against the level of traffic the network is expected to sustain, and the arithmetic is unforgiving: a low share or a high claim target puts self-funding out of reach at any realistic volume.
+
+Below that level of traffic the pool pays out more than it takes in and draws down toward the settled level from above. Starting it above that level is what the genesis endowment is for: it buys a period during which the reward exceeds the fee even though the fee inflow alone would not sustain it. `POW_REWARD_POOL_GENESIS` and $`\rho`$ together set how long that period lasts.
 
 ### Genesis
 
 The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through the epoch-boundary refill and through claims.
 
-The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: both the seed and the refill consist of tokens that already exist or that have already been counted as issuance, so claiming moves tokens into circulation without adding to total supply.
+The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: the seed consists of tokens that exist from genesis, and the refill of fees that were paid and would otherwise have been burnt, so claiming redirects tokens rather than adding to total supply. Its effect on supply is to slow the burn, not to raise issuance.
 
 ### Reward Difficulty
 
