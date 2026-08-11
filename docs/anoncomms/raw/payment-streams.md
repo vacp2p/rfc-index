@@ -142,6 +142,7 @@ a byte string designating the party authorized to claim accrued funds.
 Each chain integration MUST define that encoding
 and how it is stored as the on-chain claim account.
 On LEZ, `StreamConfig.provider` holds that `provider_id`.
+Stream create MUST NOT set `provider_id` equal to the vault owner account id.
 
 Each stream MUST specify a positive accrual rate per time unit.
 Each chain integration MUST define the time unit used by rates and accrual.
@@ -294,22 +295,20 @@ In the base streams protocol,
 close does not pay the provider.
 Accrued funds remain on a `CLOSED` stream until the provider claims them.
 
-The automatic claim on closure extension merges close and claim.
-Close MUST transfer all accrued funds to the provider in the same operation,
-so that the closed stream holds no funds afterward.
+The automatic claim on closure extension merges provider-initiated close and claim.
+Provider-initiated close MUST transfer all accrued funds to the provider in the same operation.
+This removes the need for the provider to track or claim balances
+on streams the provider closed.
+User-initiated close MUST keep base close semantics.
 
-This removes the need for the provider to track or claim balances on closed streams.
 Trade-offs include:
 
-- The provider can no longer batch claims across streams.
-- Close and payout happen in one transaction,
+- The provider can no longer batch claims across streams closed under this extension.
+- Provider close and payout happen in one transaction,
   which can increase timing correlation for observers.
-- When the user initiates close on a fee-charging chain,
-  the same transaction runs the provider payout logic.
-  The user pays transaction fees for that logic,
-  instead of the provider paying via a separate claim.
 - If the payout fails,
-  close fails atomically and the stream does not transition to the `CLOSED` state.
+  the transaction fails atomically,
+  and the stream does not transition to the `CLOSED` state.
 
 #### Activation fee
 
@@ -882,11 +881,15 @@ On LEZ that account is a signing account.
 | Pause stream | `PauseStream` | Vault owner |
 | Resume stream | `ResumeStream` | Vault owner |
 | Top-up stream | `TopUpStream` | Vault owner |
-| Close stream | `CloseStream` | Vault owner or stream provider |
+| Close stream (owner) | `CloseStreamByOwner` | Vault owner |
+| Close stream (provider) | `CloseStreamByProvider` | Stream provider |
 | Claim accrued | `Claim` | Stream provider |
 
-`CloseStream` and `Claim` MUST include `VaultConfig.owner` as an explicit
-non-signing account.
+Either the vault owner or the stream provider MAY close.
+LEZ encodes that policy as two reference instructions.
+`CloseStreamByOwner` uses the vault owner as the signing authorizer.
+`CloseStreamByProvider` and `Claim` MUST include `VaultConfig.owner` as an
+explicit non-signing account.
 
 When a private account is included in a transaction
 as a signing account or as a required non-signing account,
@@ -1057,7 +1060,7 @@ The following issues MAY motivate future research:
 
 Coarser [System clock accounts](#system-clock-accounts) reveal less precise activity timing to observers.
 The [Automatic claim on closure](#automatic-claim-on-closure) extension
-strengthens timing correlation by merging close and payout.
+strengthens timing correlation by merging provider-initiated close and payout.
 
 ## References
 
@@ -1162,6 +1165,8 @@ function topUpStream(uint256 streamId, uint128 additionalAllocation) external;
 /// @notice Close stream permanently
 /// @dev Callable by user or provider. Unaccrued funds (allocation - accruedBalance)
 ///      MUST be returned to vaultBalance. Accrued funds remain claimable by provider.
+///      On LEZ the same either-party policy uses CloseStreamByOwner and
+///      CloseStreamByProvider reference instructions.
 function closeStream(uint256 streamId) external;
 
 /// @notice Provider claims accrued funds from a stream
