@@ -22,6 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
+| 1.1.0 | Split the block reward three ways to fund the proof of work reward pool, and fix the reference implementation's line continuation and undefined variable name | 2026-08-10 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -481,7 +482,7 @@ INFLATION_DENOMINATOR = 657      # denominator of I_max * S_TGE * DELTA_t / f
 FEE_AVG_NUMERATOR = 10_512       # numerator of 1/(I_max * D1_target * Delta_t * T) 
 STAKE_TARGET = int(3e9)
 
-def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int]:
+def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, int, int]:
     sum_fees = sum(burned_fees_window)
     last_burned_fee = burned_fees_window[-1]
 
@@ -490,12 +491,17 @@ def block_reward(total_stake: int, burned_fees_window: list[int]) -> tuple[int, 
         A_SCALE
     )
 
-    reward_numerator = INFLATION_NUMERATOR * a_numerator
-									   + INFLATION_DENOMINATOR * (A_SCALE - a_num) * last_burned_fee
+    reward_numerator = (INFLATION_NUMERATOR * a_numerator
+                        + INFLATION_DENOMINATOR * (A_SCALE - a_numerator) * last_burned_fee)
     reward_denominator = INFLATION_DENOMINATOR * A_SCALE
 
-    blend_reward = reward_numerator * 6 // (reward_denominator * 10)
-    leader_reward = reward_numerator * 4 // (reward_denominator * 10)
+    blend_reward = reward_numerator * BLEND_SHARE // (reward_denominator * SHARE_DEN)
+    leader_reward = reward_numerator * LEADER_SHARE // (reward_denominator * SHARE_DEN)
+    pow_reward = reward_numerator * POW_SHARE // (reward_denominator * SHARE_DEN)
 
-    return blend_reward, leader_reward
+    return blend_reward, leader_reward, pow_reward
 ```
+
+where `BLEND_SHARE`, `LEADER_SHARE` and `POW_SHARE` are the per-recipient shares defined in [\[Overview\] Cryptoeconomics](overview-cryptoeconomics.md#blend-service-and-consensus-leaders), expressed over the common denominator `SHARE_DEN` and required to sum to it. Setting `POW_SHARE` to zero and the other two to a 6:4 ratio reproduces the two-way split this function previously computed.
+
+Each share is floored independently, so their sum may fall short of the full reward by up to two units. The shortfall is not allocated to any recipient.

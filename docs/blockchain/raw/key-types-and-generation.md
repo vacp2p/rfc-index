@@ -26,6 +26,7 @@
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
+| 1.1.0 | Add the Proof of Work Key | 2026-08-10 |
 
 # Introduction
 
@@ -38,6 +39,7 @@ This document ensures that the keys are used and generated in a common manner, w
 - **Non-ephemeral Quota Key (NQK)** — used for proving that a node is a core node.
 - **Non-ephemeral Signing Key (NSK)** — used to authenticate the node on the network level and derive the Non-ephemeral Encryption Key.
 - **Ephemeral Signing Key (ESK)** — used for signing Blend messages, one per encapsulation.
+- **Proof of Work Key (PWK)** — used for proving that a node holds a proof of work solution, one per solution.
 - **Non-ephemeral Encryption Key (NEK)** — used for deriving shared secrets for message encryption.
 - **Ephemeral Encryption Key (EEK)** — used for encrypting Blend messages, one per encapsulation.
 
@@ -62,6 +64,18 @@ A node generates Ephemeral Signing Keys (ESK) that are proved to be limited in n
 A unique signing key must be generated for every encapsulation as required by the [Message Encapsulation Mechanism](message-encapsulation.md).
 
 The key must not be reused. Otherwise, the messages that reuse the same key can be linked together. The node is responsible for not reusing the key.
+
+## Proof of Work Key
+
+A node generates a Proof of Work Key (PWK) by searching for a secret key whose puzzle ticket falls below the Blend threshold for the epoch, as defined in [Proof of Quota](proof-of-quota.md). Unlike the other keys, it is not chosen but found: the node generates candidates until one satisfies the threshold, and the work of doing so is what the key represents.
+
+A PWK entitles its holder to a quota of Blend messages for the epoch it was found in. It is not a signing key and is never used to sign anything. It is supplied to the PoQ circuit as a private witness and never appears in a message.
+
+The PWK must be sampled with full entropy from the scalar field rather than enumerated from a starting point. Because the key remains secret and is the sole basis on which the quota is granted, a predictable generation procedure would let an observer reconstruct it and consume the remaining quota.
+
+A PWK is bound to the epoch it was found in, since the epoch nonce enters the ticket derivation. It cannot be carried into the following epoch and must be found again.
+
+The relationship between a PWK and an ESK is worth stating explicitly, because it is easy to assume a binding that does not exist. They are separate keys: the PWK proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. A node holding one PWK generates a distinct ESK for each message it sends against that solution's quota.
 
 ## Non-ephemeral Encryption Key
 

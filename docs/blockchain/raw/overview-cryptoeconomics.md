@@ -25,6 +25,7 @@
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0   | Reflect the upward rounding of the fee market price updates | 2026-07-28 |
 | 1.2.0 | Reflect the downward rounding of the leader share | 2026-08-05 |
+| 1.3.0 | Split each block reward three ways, adding the proof of work reward pool, with the shares expressed over a common denominator and required to sum to it | 2026-08-10 |
 
 > **Disclaimer**:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -138,12 +139,22 @@ The Blend service and the leaders proposing the blocks share a same block reward
 - Blend rewards are distributed among all active Blend Nodes. Blend rewards are composed of a fraction of the block rewards. These rewards of epoch $e$ are defined when a new Blend epoch $e+1$ starts (a defined number of blocks) and are allocated to nodes based on their reported Active Messages and the [Reward Distribution Protocols](#reward-distribution-protocols) during epoch $e+2$. The [Service Reward Distribution Protocol](bedrock-service-reward-distribution.md) manages the direct payment to nodes.
 - Leaders get a voucher for each included block in epoch e. Vouchers represent an equal share of the leader reward pool. At the start of epoch e+1, the leaders rewards of epoch e are added to the pool (represented by a variable) and the voucher of epoch e can start being used. The amount added to the pool is composed of a fraction of the block rewards and a portion of the Execution fees minted back according to the [Execution Market](execution-market.md) from all blocks of epoch e. Vouchers can be exchanged with a reward through a [Leader Claim Operation](bedrock-v1.1-mantle-specification.md) (on-chain transaction) that preserves privacy by decoupling the leader reward from the proposed block. The reward amount, represented by a share of the pool, is computed when the claim Operation is executed (c.f. [Anonymous Leaders Reward Protocol](bedrock-anonymous-leaders-reward.md)).
 
-Each block reward of each block is split as follows between the Blend service and the leader:
+Each block reward of each block is split between the Blend service, the leader, and the proof of work reward pool. The three shares are expressed as integer numerators over a common denominator, and must satisfy:
+
+$$
+\text{BLEND\_SHARE} + \text{LEADER\_SHARE} + \text{POW\_SHARE} = \text{SHARE\_DEN}
+$$
+
+This is a normative invariant, not a convention: the three shares divide one block reward, so any other sum either creates tokens or discards them. It must be enforced rather than assumed, because the shares are otherwise independent values and nothing about them makes a mistake self-evident.
+
+Setting `POW_SHARE` to zero recovers the earlier two-way split exactly. The historical ratio was:
 
 - 40% for the leader.
 - 60% for the Blend service.
 
-The reasons for this split ratio are:
+and that ratio is preserved between those two recipients by choosing their numerators in proportion, leaving the proof of work pool's share to be taken from both. The values are a calibration decision and are constrained only by the invariant above.
+
+The reasons for the split between the leader and the Blend service are:
 
 - Blend nodes must stake a minimum amount while leaders have no such requirement, making Blend nodes more exposed to risks.
 - Blend nodes, having met the minimum stake requirement, are incentivized to run the validator protocol to earn greater rewards.
@@ -156,20 +167,34 @@ At the start of each Blend epoch, a Blend reward variable is computed. Its amoun
 def get_blend_reward(e: epoch): # rewards for the epoch e
     blend_rewards = 0
     for b in e.blocks: # for each block of the previous epoch
-        blend_rewards += 0.6 * get_block_rewards(b) # get 60% of the rewards
+        blend_rewards += get_block_rewards(b) * BLEND_SHARE // SHARE_DEN
     return blend_rewards
 ```
 
-At the start of each epoch, the rewards are added to the leader rewards. Its amount is increased by 40% of the total block rewards of the previous epoch. The blocks from the previous epoch are denoted by B in the pseudocode below:
+At the start of each epoch, the rewards are added to the leader rewards. Its amount is increased by the leader's share of the total block rewards of the previous epoch. The blocks from the previous epoch are denoted by B in the pseudocode below:
 
 ```python
 def update_leader_rewards(e: epoch, # rewards for the epoch e
     leader_rewards: int): # added to the leader reward pool
     for b in e.blocks: # for each block of the previous epoch
-        leader_rewards += 0.4 * get_block_rewards(b) # get 40% of the rewards
+        leader_rewards += get_block_rewards(b) * LEADER_SHARE // SHARE_DEN
         leader_rewards += get_execution_market_tips(b) # get Execution market tips
     return leader_rewards
 ```
+
+The proof of work reward pool receives its share on the same basis, credited at the epoch boundary:
+
+```python
+def get_pow_pool_refill(e: epoch): # refill for the epoch e
+    refill = 0
+    for b in e.blocks: # for each block of the previous epoch
+        refill += get_block_rewards(b) * POW_SHARE // SHARE_DEN
+    return refill
+```
+
+All three shares are computed with integer division, which rounds down, so the three shares of a block reward may sum to slightly less than the reward itself. The remainder is handled deterministically in the same way as elsewhere in this specification, and is not allocated to any recipient.
+
+Because the pool is funded from block rewards rather than minted on demand, adding it as a recipient does not change how much the protocol issues. It changes only how issuance is divided, and the tokens it distributes are ones already accounted for by [Block Rewards](block-rewards.md).
 
 ## Reward Distribution Protocols
 

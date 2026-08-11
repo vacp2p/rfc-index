@@ -28,6 +28,7 @@
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
+| 1.2.0 | Scope the Proof of Stake vs. Proof of Work annex to leader election, and state that proof of work does not enter fork choice | 2026-08-10 |
 
 # Introduction
 
@@ -424,6 +425,15 @@ Protocol versions are signalled through the `bedrock_version` field of the block
 ## Proof of Stake vs. Proof of Work
 
 From a privacy and resiliency point of view, Proof of Work is highly attractive. The amount of hashing power of a node is private, they can provide a new public key for each block he mines ensuring that his blocks cannot be connected by this identity, and PoW is not susceptible to long range attacks as is PoS. Unfortunately, it is wasteful and demands that leaders have powerful machines. We want to ensure strong decentralization by having a low barrier to entry and we believe we can achieve a good enough level of security given by having participants have an economic stake in the protocol.
+
+This objection is scoped to **leader election**: Cryptarchia selects block proposers by the stake lottery described in [Leadership Lottery](#leadership-lottery), and no proof of work participates in that selection.
+
+The protocol does use proof of work elsewhere, in two roles that do not bear on consensus:
+
+- as an additional way to qualify for Blend Network admission, alongside the core-node and leadership branches, specified in [Proof of Quota](proof-of-quota.md);
+- as the authorisation for claiming a token reward from a protocol pool, specified in [Mantle](bedrock-v1.1-mantle-specification.md).
+
+Neither role changes leader election, and **proof of work does not enter fork choice**. The chain selection rules in [Fork Choice](fork-choice.md) compare chains by block count and by block-count density; the protocol maintains no accumulated-work quantity, and a chain carrying more proof of work is not thereby preferred. The security argument for chain selection therefore rests on stake alone, exactly as it did before proof of work was introduced.
 
 ## Clocks
 

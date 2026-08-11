@@ -37,6 +37,7 @@
 | 1.9.1 | Rename the excess balance left after the mandatory fees into `tx_priority_tip` and convert it back into a `TokenValue` explicitly | 2026-08-05 |
 | 1.9.2 | Required checked arithmetic for all token value, balance, gas, and fee computations. | 2026-08-06 |
 | 1.10.0| Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability | 2026-08-11 |
+| 1.11.0 | Add the `CLAIM_POW_REWARD` Operation, the proof of work reward pool and its difficulty retargeting, and interleave Operation validation with execution so a note created by one Operation can be spent by a later one in the same transaction | 2026-08-11 |
 
 # Introduction
 
@@ -172,36 +173,50 @@ Mantle validators will ensure the following:
     assert len(op_proofs) == len(ops)
     ```
 
-2. Each Operation is valid.
+2. Each Operation is valid, and is executed before the next one is validated.
     ```python
+    balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
+
     for op, op_proof in zip(ops, op_proofs):
         assert op.opcode in MANTLE_OPCODES
-        validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof)
+        # Validated against the state left by the Operations before it.
+        validate_mantle_op(mantle_txhash(tx), op.opcode, op.payload, op_proof, state)
+        balance = accumulate_balance(balance, op, state)
+        execute_mantle_op(op, state)
 
-    def validate_mantle_op(txhash, opcode, payload, op_proof):
+    def validate_mantle_op(txhash, opcode, payload, op_proof, state):
         if opcode == CHANNEL_INSCRIBE:
-            validate_channel_inscribe(txhash, payload, op_proof)
+            validate_channel_inscribe(txhash, payload, op_proof, state)
         # elif opcode == ...
         #    ...
-    ```
 
-3. The Mantle Transaction excess balance pays least the mandatory fees.
-    ```python
-    tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
-    tx_balance = get_transaction_balance(signed_tx)   # int128
-    assert tx_mandatory_fee <= tx_balance
-    tx_priority_tip = checked_uint64(tx_balance - tx_mandatory_fee)
-
-    def get_transaction_balance(signed_tx: SignedMantleTx) -> int128:
-        balance = 0   # Signed 128-bit accumulator: the balance can be legitimately negative
-        for op in signed_tx.tx.ops:
-            if op.opcode == TRANSFER:
-                for inp in op.inputs:
-                    balance = checked_int128(balance + get_value_from_note_id(inp))
-                for out in op.outputs:
-                    balance = checked_int128(balance - out.value)
+    def accumulate_balance(balance: int128, op, state) -> int128:
+        if op.opcode == TRANSFER:
+            for inp in op.inputs:
+                balance = checked_int128(balance + get_value_from_note_id(inp, state))
+            for out in op.outputs:
+                balance = checked_int128(balance - out.value)
         return balance
     ```
+
+3. The Mantle Transaction excess balance pays at least the mandatory fees.
+    ```python
+    tx_mandatory_fee = mandatory_gas_fees(signed_tx)  # int128
+    assert tx_mandatory_fee <= balance
+    tx_priority_tip = checked_uint64(balance - tx_mandatory_fee)
+    ```
+
+Validation and execution are **interleaved**: each Operation is validated, its contribution to the balance accumulated, and then executed, before the next Operation is validated. Earlier versions of this specification validated every Operation against the pre-transaction state and only then executed them all.
+
+The reason for the change is that a note created by one Operation must be spendable by a later Operation in the same transaction. Under the previous ordering such a note did not exist at the time any Operation was validated, so it could not be referenced, and an Operation that issues a note could not have that note spent to pay the transaction's own fee. Interleaving is what makes that possible, and it is a general property of Mantle rather than one specific to any single Operation.
+
+Two consequences follow, and both are load-bearing.
+
+The first is that the balance must be **accumulated as the Operations execute** rather than computed from the ledger afterwards. A `TRANSFER` consumes its input notes when it executes, so by the time the last Operation has run those notes are gone and their values can no longer be looked up. Computing the balance after the fact would therefore fail for every transaction that spends anything, not merely for those that spend a note created within the transaction.
+
+The second is an **ordering rule**: a note created by Operation $`i`$ is spendable only by Operations $`j \gt i`$ in the same transaction. An Operation cannot consume a note created later in the same transaction, because it does not yet exist when that Operation is validated, and it cannot consume its own output.
+
+Atomicity is unaffected. The interleaving changes only what each Operation can see; if any Operation fails validation, or the fee check at the end does not hold, the whole transaction is rejected and none of its effects are applied.
 
 ## Execution
 
@@ -214,7 +229,7 @@ SignedMantleTx(
 )
 ```
 
-Mantle Validators execute sequentially each Operation in `ops` according to its opcode.
+Mantle Validators execute each Operation in `ops` according to its opcode, in order, interleaved with validation as described above. An Operation is executed only once the Operations before it have been validated and executed.
 
 # Operations
 
@@ -233,9 +248,11 @@ Mantle Validators execute sequentially each Operation in `ops` according to its 
 | SDP_DECLARE | 0x20 | Declare intention to participate as a node in a Bedrock Service, locking funds as collateral. |
 | SDP_WITHDRAW | 0x21 | Withdraw participation from a Bedrock Service, unlocking your funds in the process. |
 | SDP_ACTIVE | 0x22 | Signal that you are still an active participant of a Bedrock Service. |
-| *RESERVED* | *0x23 - 0xFF* |  |
+| *RESERVED* | *0x23 - 0x2F* |  |
 | LEADER_CLAIM | 0x30 | Claim leader reward anonymously. |
-| *RESERVED* | *0x31 - 0xFF* |  |
+| *RESERVED* | *0x31 - 0x3F* |  |
+| CLAIM_POW_REWARD | 0x40 | Claim a reward from the proof of work reward pool. |
+| *RESERVED* | *0x41 - 0xFF* |  |
 
 ## Channel Operations
 
@@ -1538,6 +1555,333 @@ SignedMantleTx(
 )
 ```
 
+## Proof of Work Operations
+
+Validators must maintain the following state to process proof of work Operations:
+
+```python
+pow_reward_pool: TokenValue      # Reserve the rewards are paid from
+epoch_pow_reward: TokenValue     # sigma_e: reward per claim, fixed for the epoch
+difficulty_reward: PowTarget     # d_reward: the reward threshold, retargeted every block
+pow_nullifiers: set[zkhash]      # Spent solutions, retained for the acceptance window
+block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the window check
+```
+
+`PowTarget` is a scalar field element. A puzzle ticket is accepted when it is strictly below the target, so a **smaller** target is a **harder** puzzle.
+
+The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the block rewards, as specified in [Reward Pool](#reward-pool). It is not minted on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
+
+### Window of Acceptance
+
+A claim references a recent block by hash. The reference is checked against the slot of the block including the claim, so that a solution cannot be presented arbitrarily long after it was found:
+
+```python
+EXPECTED_BLOCKS_PER_WINDOW: uint64 = 10   # W_b: window depth, in expected blocks
+
+def accept_claim_pow_op(claim: ClaimPowRewardOp, current_slot: SlotNumber) -> bool:
+    block = get_block_from_hash(claim.block_hash)   # None if unknown or not canonical
+    if block is None:
+        return False
+    return 0 <= current_slot - block.slot <= WINDOW
+```
+
+The window is measured in slots, but it is **specified in blocks** and derived from the slot activation coefficient $`f`$ given in [Constants](cryptarchia-v1-protocol.md#constants):
+
+$$
+\mathrm{WINDOW} = \left\lfloor \frac{W_b}{f} \right\rfloor
+$$
+
+With $`W_b = 10`$ and $`f = 1/30`$ this is $`300`$ slots.
+
+The derivation matters more than the number. What the window bounds is staleness, and staleness is a property of how far the chain has moved on, not of elapsed time. Only $`f`$ relates the two: a slot count fixed independently of it would silently come to mean a different number of blocks whenever the block rate were retuned, tightening or loosening the check without anyone changing it. Expressing the window as a block depth keeps its meaning stable under that change, and states the quantity a reader actually needs — how many blocks deep a claim's anchor may be — rather than one they would have to convert.
+
+Because block production is a lottery, $`W_b`$ is an expectation rather than a bound. A run of empty slots means fewer than $`W_b`$ blocks fall inside the window, and a dense run means more.
+
+The window also bounds how long nullifiers must be retained. A solution referencing a block that has aged out of the window is rejected by this check regardless of whether its nullifier is still held, so nullifier entries may be discarded once their referenced block leaves the window. Retention is therefore proportional to $`W_b`$, and enlarging the window enlarges every validator's nullifier set in proportion.
+
+Because `get_block_from_hash` resolves against the canonical chain, a claim whose referenced block is reorganised out becomes invalid. A claim already propagated but not yet included may therefore stop being includable, and must be re-mined against a block that is still canonical. Note that $`W_b`$ is far shallower than the security parameter $`k`$, so a block inside the window is not yet immutable and this case is expected rather than exceptional.
+
+### CLAIM_POW_REWARD
+
+This Operation claims a reward from the proof of work reward pool by presenting a puzzle solution.
+
+#### Payload
+
+```python
+class ClaimPowRewardOp:
+    epoch_nonce: zkhash        # Epoch nonce the solution was found against
+    block_hash: hash           # Recent canonical block the solution is anchored to
+    public_key: ZkPublicKey    # Key the reward note is paid to
+```
+
+The puzzle ticket is derived from the payload:
+
+```python
+def get_puzzle_ticket(claim: ClaimPowRewardOp) -> zkhash:
+    return zkhash(
+        claim.epoch_nonce,
+        FiniteField(claim.block_hash, byte_order="little", modulus=p),
+        claim.public_key,
+    )
+```
+
+where $`p`$ is the scalar field modulus given in [Common Cryptographic Components](common-cryptographic-components.md). A miner searches for a `public_key` whose ticket falls below the reward threshold; the corresponding secret key is what allows the reward note to be spent afterwards. The secret key must be sampled with full entropy rather than enumerated, because it both remains secret and authorises spending the reward.
+
+Note that this derivation carries no domain separation tag.
+
+#### Proof
+
+  `None`. This Operation carries no signature and no zero-knowledge proof. The authorisation is the puzzle solution itself, which is re-derived from the payload and checked during validation. The corresponding entry in `op_proofs` is `None`.
+
+#### Execution gas
+
+  Claim Operations have a fixed Execution Gas cost of `EXECUTION_CLAIM_POW_REWARD_GAS`. See [Gas Determination](#gas-determination) for the Execution Gas values. It is paid as part of the transaction's normal fee, which is typically settled from the reward note itself.
+
+#### Validation
+
+  *Given*
+
+```python
+claim: ClaimPowRewardOp            # the CLAIM_POW_REWARD payload
+                                   # op_proof is None for this Operation
+
+current_slot: SlotNumber           # slot of the block including this claim
+difficulty_reward: PowTarget       # d_reward, retargeted every block
+pow_nullifiers: set[zkhash]        # spent solutions, retained for WINDOW
+pow_reward_pool: TokenValue
+epoch_pow_reward: TokenValue       # sigma_e
+```
+
+  *Validate*
+
+```python
+# 1. Claiming must be enabled for this block: the pool must be able to cover a reward.
+assert epoch_pow_reward > 0
+assert pow_reward_pool >= epoch_pow_reward
+
+# 2. The referenced block must be canonical and within the acceptance window.
+assert accept_claim_pow_op(claim, current_slot)
+
+# 3. The solution must have been found against the current epoch.
+assert claim.epoch_nonce == get_current_epoch_nonce()   # the Cryptarchia epoch nonce
+
+# 4. The ticket must satisfy the reward threshold.
+puzzle_ticket = get_puzzle_ticket(claim)
+assert puzzle_ticket < difficulty_reward
+
+# 5. The solution must not have been claimed before. The nullifier is the ticket,
+#    so the value computed in step 4 is reused.
+assert puzzle_ticket not in pow_nullifiers
+```
+
+  The nullifier of a claim is its puzzle ticket, which is determined by the payload and unique to a winning key:
+
+```python
+def pow_nullifier(claim: ClaimPowRewardOp) -> zkhash:
+    return get_puzzle_ticket(claim)
+```
+
+  This Operation performs no fee or balance check of its own. The transaction's fee is settled at the transaction level as normal.
+
+  The first condition is what prevents the pool being drawn negative. Note that of its two clauses only the first can bind in practice: `epoch_pow_reward` is a small fraction of `pow_reward_pool` by construction, so any pool large enough to be positive can cover one reward. The operative condition is `epoch_pow_reward > 0`, which fails once the pool falls below the point where the division in [Reward Pool](#reward-pool) rounds down to zero. Claiming therefore stops abruptly at that point rather than tapering.
+
+  The epoch nonce in step 3 is the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), the same value the consensus lottery uses. A claim built against any other epoch is rejected, so a solution is usable only within the epoch it was found in and must be re-mined afterwards.
+
+  Note that this does not make a solution unpredictable in advance. The epoch nonce is fixed part way through the *preceding* epoch and is public from that moment, so solutions for an epoch can be computed before it begins. What bounds a solution's age is the acceptance window on `block_hash`, which is $`W_b`$ blocks deep and therefore far tighter than an epoch.
+
+#### Execution
+
+  *Given*
+
+```python
+claim: ClaimPowRewardOp
+
+ledger: Ledger
+pow_reward_pool: TokenValue
+epoch_pow_reward: TokenValue       # sigma_e, fixed for the epoch
+pow_nullifiers: set[zkhash]
+```
+
+  *Execution*
+
+  1. Add `pow_nullifier(claim)` to the `pow_nullifiers` set, so the solution cannot be claimed again. The entry is retained until the claim's referenced block leaves the acceptance window.
+  2. Construct a single output note of value `epoch_pow_reward` under the public key given in the payload, and insert it into the Ledger:
+      ```python
+      output_note = Note(
+          value = epoch_pow_reward,
+          public_key = claim.public_key,
+      )
+      claim_id = derive_op_id(claim)
+      ledger.execute_adding(claim_id, [output_note])
+      ```
+
+  3. Reduce the `pow_reward_pool` by the same amount:
+      ```python
+      pow_reward_pool = checked_uint64(pow_reward_pool - epoch_pow_reward)
+      ```
+
+  This mirrors `LEADER_CLAIM`: a single output note of a protocol-determined value, inserted with no zero-knowledge proof of any input, with the source pool decremented by the same amount.
+
+#### Example
+
+A miner searches for a key whose ticket clears the reward threshold, then spends the resulting note to pay the fee of the very transaction that creates it. No tokens are required beforehand.
+
+```python
+# Mine against a recent canonical block and the current epoch nonce.
+block_hash   = recent_canonical_block_hash()
+epoch_nonce  = get_current_epoch_nonce()
+reward_sk, reward_pk = pow_search(block_hash, epoch_nonce, difficulty_reward)
+
+claim = ClaimPowRewardOp(
+    epoch_nonce=epoch_nonce,
+    block_hash=block_hash,
+    public_key=reward_pk,
+)
+
+# The reward note's id is known before submission, because epoch_pow_reward is
+# fixed for the epoch and the payload determines the Operation id.
+claim_id       = derive_op_id(claim)
+reward_note    = Note(value=epoch_pow_reward, public_key=reward_pk)
+reward_note_id = derive_note_id(claim_id, 0, reward_note)
+
+# A following TRANSFER spends that note to pay the fee and keep the change.
+transfer = Transfer(inputs=[reward_note_id], outputs=[change_note])
+
+tx = MantleTx(
+    ops=[Op(opcode=CLAIM_POW_REWARD, payload=encode(claim)),
+         Op(opcode=TRANSFER,         payload=encode(transfer))],
+)
+
+SignedMantleTx(
+    tx=tx,
+    op_proofs=[None,                       # authorisation is the solution in the payload
+               transfer.prove(reward_sk)],
+)
+```
+
+This is what makes a claim **self-funding**, and it works only because of two properties established elsewhere in this specification. The reward amount is fixed for the whole epoch, so the note's value — and therefore its identifier — can be computed before the transaction is submitted. And validation is interleaved with execution, so by the time the `TRANSFER` is validated the note it spends already exists.
+
+Both properties are required. If the reward varied within the epoch the wallet could not name the note in advance, and if validation ran entirely before execution the note would not exist when the `TRANSFER` was checked.
+
+### Reward Pool
+
+The reward per claim is a fixed fraction of the pool, divided by the number of claims an epoch is expected to accept:
+
+```python
+EPOCH_POW_DISTRIBUTION_RATE_NUM: uint64   # rho, as a fraction NUM / DEN
+EPOCH_POW_DISTRIBUTION_RATE_DEN: uint64
+TARGET_CLAIMS_PER_BLOCK: uint64           # T
+EXPECTED_BLOCKS_PER_EPOCH: uint64         # N_b
+
+def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
+    denominator = (EPOCH_POW_DISTRIBUTION_RATE_DEN
+                   * TARGET_CLAIMS_PER_BLOCK
+                   * EXPECTED_BLOCKS_PER_EPOCH)
+    return (pow_reward_pool * EPOCH_POW_DISTRIBUTION_RATE_NUM) // denominator
+```
+
+At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the rewards accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
+
+```python
+def on_epoch_boundary(epoch_blocks: list[Block]):
+    pow_reward_pool = checked_uint64(pow_reward_pool + get_pow_pool_refill(epoch_blocks))
+    epoch_pow_reward = compute_epoch_pow_reward(pow_reward_pool)
+```
+
+All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic). The pool must not saturate: saturating at the maximum representable value would create tokens that were never allocated, which is precisely the failure the checked-arithmetic rule exists to prevent.
+
+Fixing the reward for the whole epoch is what allows a wallet to compute a reward note's identifier before submitting a claim, and therefore what makes a self-funding claim possible at all. The pool is drawn down by claims within the epoch, but the per-claim value is not recomputed until the next boundary.
+
+Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, and $`\sigma_e`$ is the pool's fraction $`\rho`$ divided by $`T \cdot N_b`$, an epoch running at the target rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target rate is set to. The target claim rate therefore governs how many participants share the epoch's distribution and how much each receives, not how much is distributed in total.
+
+None of the parameters governing the pool have been calibrated. `EPOCH_POW_DISTRIBUTION_RATE`, `TARGET_CLAIMS_PER_BLOCK`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` are all open, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are chosen, and until `EXECUTION_CLAIM_POW_REWARD_GAS` is determined, it cannot be established that a claim is worth more than the fee required to submit it — which is the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
+
+### Genesis
+
+The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through the epoch-boundary refill and through claims.
+
+The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: both the seed and the refill consist of tokens that already exist or that have already been counted as issuance, so claiming moves tokens into circulation without adding to total supply.
+
+### Reward Difficulty
+
+`difficulty_reward` is part of consensus state and is updated **every block**, steering the number of accepted claims toward `TARGET_CLAIMS_PER_BLOCK`. It is independent of the Blend threshold used by [Proof of Quota](proof-of-quota.md), which is a per-epoch value and is never evaluated here.
+
+```python
+EMA_SMOOTHING_FACTOR: uint64      # F, the weight given to the previous estimate
+EMA_SMOOTHING_PRECISION: uint64   # P, the scale F is expressed against; F < P
+
+def compute_new_reward_difficulty(claims_in_block: uint64,
+                                  current_target: PowTarget) -> PowTarget:
+    # The demand implied by this block, reconstructed from the target that
+    # produced it, then smoothed against the target rate. Floored at 1 so the
+    # division below is always defined, including when no claims arrived.
+    demand = max(1, (EMA_SMOOTHING_PRECISION - EMA_SMOOTHING_FACTOR) * claims_in_block
+                    + EMA_SMOOTHING_FACTOR * TARGET_CLAIMS_PER_BLOCK)
+    new_target = (TARGET_CLAIMS_PER_BLOCK * current_target
+                  * EMA_SMOOTHING_PRECISION) // demand
+    # Capped so that converting back into the field cannot reduce modulo p and
+    # turn a very easy target into a very hard one.
+    return min(new_target, p - 1)
+```
+
+The controller holds no state of its own beyond the current target. Rather than remembering a running estimate of demand, it reconstructs one from the target in force, on the assumption that the target was calibrated to the intended rate. This is what keeps it a single value in consensus state.
+
+Two properties follow, and both matter for its safety. When a block accepts exactly the target number of claims the target is unchanged, so the intended rate is a fixed point. When a block accepts none, the numerator is floored at 1 and the target moves up by a factor of $`P/F`$ — bounded, and in the direction of making claiming easier, so a period without claims cannot lock the mechanism. The smoothing means a single unusual block moves the target only slightly, so no separate per-block clamp is required.
+
+The rate the controller observes is the rate of claims **included in blocks**, not the rate at which solutions are found. Solutions that are never included, because a block builder declined to include them or because block space was exhausted, are invisible to it. Difficulty therefore tracks accepted demand rather than offered demand, and the two diverge when block space is contended.
+
+A block builder may include its own claims. The controller makes this self-correcting: claims a builder awards itself raise the observed rate like any other, which tightens the target and raises the work required for every subsequent claim, including the builder's own.
+
+### Blend Difficulty
+
+`difficulty_blend` is the threshold used by the proof of work branch of [Proof of Quota](proof-of-quota.md) to admit messages to the Blend network. It is consensus state and is maintained here, alongside the reward difficulty, because it must be agreed by every node and is derived from on-chain observations. It is never evaluated by any Operation.
+
+The two difficulties are independent. They gate different things, are computed from different observations, and neither implies the other: a solution may satisfy one, both, or neither. Coupling them would force one objective to distort the other, since they are steering unrelated quantities.
+
+Unlike the reward difficulty, `difficulty_blend` is recomputed **once per epoch**, at the boundary, and held fixed for the whole epoch. This is required rather than a simplification: the value is a public input to the proof, so a value that changed within an epoch would partition that epoch's proofs into distinguishable classes and leak which participants produced which messages.
+
+The control objective is transaction load, for the anonymity-set reason given in [Blend Difficulty](blend-protocol.md#blend-difficulty). At the reference load the threshold sits at a baseline; above it admission tightens, below it admission loosens.
+
+```python
+BLEND_DIFFICULTY_BASE: PowTarget   # Threshold in effect at the reference load
+TARGET_TXS_PER_BLOCK: uint64       # Reference transactions per block
+BLEND_DAMPING_NUM: uint64          # a, where the response exponent is alpha = a / b
+BLEND_DAMPING_DEN: uint64          # b, with 0 < a <= b so that alpha <= 1
+BLEND_MAX_STEP: uint64             # Maximum factor the threshold may move in one epoch
+
+def compute_epoch_blend_difficulty(epoch_blocks: list[Block],
+                                   previous: PowTarget) -> PowTarget:
+    # Observed load as an exact ratio, never divided: num == den at the reference load.
+    num = sum(num_transactions(b) for b in epoch_blocks)
+    den = TARGET_TXS_PER_BLOCK * len(epoch_blocks)
+
+    lo = previous // BLEND_MAX_STEP
+    hi = previous * BLEND_MAX_STEP
+
+    if num == 0:
+        return hi   # No load observed: as permissive as this epoch's clamp allows.
+
+    # A smaller target is harder, so load divides the baseline:
+    #     target = BASE / load ** alpha
+    # Every quantity is an integer and only the final root is floored, so the
+    # result is at most one unit away from the exact value.
+    a, b = BLEND_DAMPING_NUM, BLEND_DAMPING_DEN
+    radicand = (BLEND_DIFFICULTY_BASE ** b * den ** a) // num ** a
+    return clamp(integer_nth_root(radicand, b), lo, hi)
+```
+
+Applied once at the boundary, before any block of the new epoch is processed.
+
+Raising `difficulty_blend` shrinks the anonymity set, so an adversary able to drive it up could degrade privacy for everyone. Three properties bound that.
+
+The input is the **mean over a whole epoch**, so moving it requires paying fees to inflate transaction counts across every block of the epoch rather than spiking one. The response is **sub-linear**: with $`\alpha \le 1`$, and at $`\alpha = 1/2`$ in particular, quadrupling the load only doubles the threshold, so each additional attacker-funded transaction buys less effect than the last while costing the same. And the **per-epoch clamp** bounds movement to a factor of `BLEND_MAX_STEP` in either direction, so even sustained pressure moves the value gradually and honest participants have at least an epoch to react.
+
+The attack must therefore be paid for continuously while its effect stays bounded and gradual. This is the opposite trade-off from the reward difficulty, which may move every block precisely because its input is cheap to measure, self-correcting, and carries no privacy consequence.
+
+Note what this controller cannot see. Its input is transactions included in blocks, so messages that are never included — including messages sent purely to consume Blend capacity — do not raise it. It regulates admission against observed chain load, not against network load, and is therefore not by itself a defence against flooding the Blend network with messages that never reach a block.
+
+None of `BLEND_DIFFICULTY_BASE`, `TARGET_TXS_PER_BLOCK`, the damping ratio or `BLEND_MAX_STEP` has been calibrated.
+
 ## TRANSFER
 
 Transactions must prove the ownership of spent notes. In classical blockchains, this is done through a signature. To stay compatible with our architecture, the signature is done by a ZK proof (see [Zero Knowledge Signature Scheme (ZkSignature)](#zero-knowledge-signature-scheme-zksignature)), proving the knowledge of the secret key associated with the public key.
@@ -1775,6 +2119,9 @@ From the [[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md
 | EXECUTION_SDP_WITHDRAW_GAS | 590 |
 | EXECUTION_SDP_ACTIVE_GAS | 590 |
 | EXECUTION_LEADER_CLAIM_GAS | 580 |
+| EXECUTION_CLAIM_POW_REWARD_GAS | TBD |
+
+`EXECUTION_CLAIM_POW_REWARD_GAS` has not been determined. Its value bounds the fee a claim transaction must pay, and therefore decides whether a claim is worth making at all: a claim whose fee exceeds its reward is never submitted. It must be derived alongside the other Execution Gas values in [\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md) before claiming can be enabled.
 
 ## Zero Knowledge Signature Scheme (ZkSignature)
 
