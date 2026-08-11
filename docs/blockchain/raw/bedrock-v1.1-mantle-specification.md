@@ -1889,7 +1889,7 @@ The smoothing is nine parts in ten, matching the exponential moving average the 
 
 `difficulty_reward` is set at genesis to the scalar field modulus divided by $`2^{26}`$. The value matters much less than it appears to, because it is only the seed of a controller that re-derives the target every block, and **its error is asymmetric**. Setting it too permissive over-pays: the first blocks accept more than the target, and the excess is bounded by how quickly the controller tightens, which for an initial value a hundredfold too permissive comes to some twelve hundred extra claims over about twenty blocks — a few thousand tokens against a pool of tens of millions. Setting it too hard costs only time: with no claims arriving the target rises by a factor of $`P/F`$ each block, so an initial value a hundredfold too hard corrects itself within an hour and nothing is lost.
 
-Since being wrong in one direction costs tokens and in the other costs minutes, the genesis value is chosen on the hard side. At $`2^{26}`$ a solution is a few minutes of work on one core, so reaching the target claim rate requires on the order of a hundred cores of honest mining across the whole network — deliberately more than a launch is likely to attract, so that the controller's first move is to loosen.
+Since being wrong in one direction costs tokens and in the other costs minutes, the genesis value is chosen on the hard side. At $`2^{26}`$ a solution is around twenty-five minutes of work on one core, so reaching the target claim rate requires several hundred cores of honest mining across the whole network — deliberately more than a launch is likely to attract, so that the controller's first move is to loosen. It is set independently of the Blend threshold, and more conservatively, because the two answer different questions: one is the price of a message, the other only the seed of a controller that will correct it within the hour.
 
 ### Blend Difficulty
 
@@ -1902,7 +1902,7 @@ Unlike the reward difficulty, `difficulty_blend` is recomputed **once per epoch*
 The control objective is transaction load, for the anonymity-set reason given in [Blend Difficulty](blend-protocol.md#blend-difficulty). At the reference load the threshold sits at a baseline; above it admission tightens, below it admission loosens.
 
 ```python
-BLEND_DIFFICULTY_BASE: PowTarget = p // 2**24   # Threshold at the reference load
+BLEND_DIFFICULTY_BASE: PowTarget = p // 2**22   # Threshold at the reference load
 TARGET_TXS_PER_BLOCK: uint64 = 512              # Reference transactions per block
 BLEND_DAMPING_NUM: uint64 = 1                   # a, where the exponent is alpha = a / b
 BLEND_DAMPING_DEN: uint64 = 2                   # b, with 0 < a <= b so that alpha <= 1
@@ -1947,9 +1947,13 @@ The damping exponent is a half, as one over two. The argument for it is the one 
 
 `BLEND_MAX_STEP` is two. At a damping exponent of a half, a factor of two in the threshold corresponds to a factor of four in load, so the clamp does not bind on ordinary variation and engages only on swings larger than that within a single epoch. A sustained hundredfold change in load is tracked over four epochs, which is a month; that is slow enough that participants can react and fast enough that the threshold is not left badly wrong for long.
 
-`BLEND_DIFFICULTY_BASE` is the one with no anchor elsewhere in this specification tree, because it fixes what a message ought to *cost*, and nothing states that. It is therefore set from the work itself. A candidate solution costs two `zkhash` invocations, so a threshold of the scalar field modulus divided by $`2^{24}`$ puts the expected cost of one solution at about sixteen million candidates, which on a single core of an ordinary machine is on the order of a minute. Since one solution admits exactly one message, a participant with a single core and no stake can send on the order of a thousand messages a day, and needs no tokens to do it. Below about $`2^{20}`$ the work is not a cost at all; above about $`2^{28}`$ that same participant manages a few messages an hour, which is not an on-ramp. The chosen value sits between those.
+`BLEND_DIFFICULTY_BASE` is the one with no anchor elsewhere in this specification tree, because it fixes what a message ought to *cost*, and nothing states that. It is therefore set from the work itself, against a measurement of that work.
 
-**This estimate rests on the throughput of `zkhash`, which has not been measured.** An order of magnitude either way moves the cost of a message by the same factor, and the value should be re-derived once a benchmark exists.
+A candidate solution derives a public key and then a ticket, which is two `zkhash` invocations. Each of those absorbs its inputs and a padding element through a sponge of width three, so a two-input hash is three permutations and a candidate is six — or four, if a miner precomputes the state following each hash's constant first input. Measured against the reference implementation on one core of a current machine, a candidate costs a little over twenty microseconds, and precomputing those prefixes improves it by only about forty percent.
+
+At a threshold of the scalar field modulus divided by $`2^{22}`$, one solution is about four million candidates, which is around a minute and a half of a single core. Since one solution admits exactly one message, a participant with a single core and no stake can send on the order of nine hundred messages a day, and needs no tokens to do it. Below about $`2^{20}`$ the work ceases to be a meaningful cost; above about $`2^{26}`$ that same participant manages a message every half hour, which is not an on-ramp. The chosen value sits between those.
+
+The measurement was taken on one machine, on an implementation that uses no assembly and no batching. A participant on older hardware should expect the cost to be several times higher, and a determined miner using a faster field implementation should expect it lower by an amount that has not been measured. The forty percent figure above bounds only the *algorithmic* headroom, not the implementation headroom.
 
 `difficulty_blend` is set to `BLEND_DIFFICULTY_BASE` at genesis, so the network begins at its reference load rather than at a guess about the first epoch's traffic.
 
