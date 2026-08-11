@@ -1770,7 +1770,7 @@ The reward per claim is a fixed fraction of the pool, divided by the number of c
 ```python
 EPOCH_POW_DISTRIBUTION_RATE_NUM: uint64   # rho, as a fraction NUM / DEN
 EPOCH_POW_DISTRIBUTION_RATE_DEN: uint64
-TARGET_CLAIMS_PER_BLOCK: uint64 = 50      # T
+TARGET_CLAIMS_PER_BLOCK: uint64 = 10      # T
 EXPECTED_BLOCKS_PER_EPOCH: uint64         # N_b
 
 def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
@@ -1782,7 +1782,13 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
 
 `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
 
-Its value is chosen as a fraction of what a block can carry. A block holds at most `MAX_BLOCK_TXS` transactions, and the execution fee market steers gas usage toward a target of half its per-block limit; at that target the transaction count is the binding cap rather than the gas. Setting the claim target to 50 makes claims roughly one twentieth of a full block, leaving the remainder to ordinary traffic while keeping the count high enough that the rate a block observes is not dominated by chance — the relative variation in a Poisson count of `T` is `1/√T`.
+Its value does not determine how much an epoch distributes. As shown below, an epoch running at the target rate pays out the fraction $`\rho`$ of the pool whatever the target is, so the target divides a fixed amount into a chosen number of parts rather than setting the amount. What it determines is how much of that amount survives being divided.
+
+Every claim pays a transaction fee out of the reward it receives, so of the amount an epoch distributes, a part equal to the target times the fee is immediately returned as fees and only the remainder reaches a claimant. Writing $`\beta`$ for the pool's share of the fees collected and $`n`$ for the transactions a block carries, the amount an epoch delivers net of those fees is proportional to $`\beta n - T`$. **The target subtracts from what the mechanism delivers, at whatever share is chosen.** Raising it does not spread the same benefit more widely; it spreads a smaller benefit more widely, and at $`T = \beta n`$ the reward per claim falls to the fee, nothing reaches anyone, and claiming stops.
+
+The target is therefore set as low as the remaining consideration allows, which is variance. The relative variation in a Poisson count of `T` is $`1/\sqrt{T}`$, so a low target makes the number of claims a given block carries erratic. That variation is absorbed by the difficulty controller and affects which blocks carry claims rather than what a claim is worth: the per-claim reward is fixed for the whole epoch and does not depend on how many claims any one block happens to contain.
+
+The target is set to 10, at which a block's claim count varies by about a third. At a share of a fifth of the fees collected on a block of six hundred transactions this leaves about nine tenths of the distribution reaching claimants; the same share at a target of 50 would leave about half. Claims occupy roughly one percent of a full block at this target, so they do not compete for block space with ordinary traffic.
 
 It is stated as an absolute count rather than as a proportion of the transactions a block actually carries. A proportion would let claim throughput follow demand, and would keep the reward per claim in a fixed relation to the fee at any level of usage; it would also make the target vary block by block, which the reward computation above and the controller below both assume it does not. The absolute form is specified here.
 
@@ -1811,7 +1817,9 @@ The relationship those three must satisfy is that a claim's reward exceeds its f
 
 Left alone, the pool converges: each epoch it gains the refill and loses the fraction $`\rho`$ it distributes, so it approaches the level at which the two balance, and there the reward per claim is simply the refill divided by the number of claims the epoch is expected to accept. Since the refill is the share $`\beta`$ of the fees the epoch collected, and those fees are the number of transactions times the fee each pays, the settled reward per claim is $`\beta`$ times the fees one block collects, divided by `TARGET_CLAIMS_PER_BLOCK`. The distribution rate $`\rho`$ cancels out of this: it sets how fast the pool converges and how much of the pool is paid out in any one epoch, not the level the reward settles at.
 
-Comparing that against the fee a claim itself pays, and taking every transaction in a block to pay a comparable fee, the reward covers the fee once a block carries at least `TARGET_CLAIMS_PER_BLOCK` divided by $`\beta`$ transactions. At a target of 50 claims per block, a one tenth share needs blocks of about 500 transactions, and a one twentieth share needs about 1000 — the latter close to `MAX_BLOCK_TXS`, and so not reachable in practice. The share and the claim target must be chosen together against the level of traffic the network is expected to sustain, and the arithmetic is unforgiving: a low share or a high claim target puts self-funding out of reach at any realistic volume.
+Comparing that against the fee a claim itself pays, and taking every transaction in a block to pay a comparable fee, the reward covers the fee once a block carries at least `TARGET_CLAIMS_PER_BLOCK` divided by $`\beta`$ transactions. At a target of 10, a share of a twentieth of the fees collected reaches that point at about two hundred transactions per block and pays twice the fee at about four hundred; a share of a fifth reaches it at about fifty and pays twice the fee at about a hundred.
+
+**The share and the claim target are not independent**: holding the margin fixed, the share required is proportional to the target. They must be chosen together against the traffic the network is expected to sustain, and the target should be chosen first and low, because for any given share it subtracts directly from what the mechanism delivers.
 
 Below that level of traffic the pool pays out more than it takes in and draws down toward the settled level from above. Starting it above that level is what the genesis endowment is for: it buys a period during which the reward exceeds the fee even though the fee inflow alone would not sustain it. `POW_REWARD_POOL_GENESIS` and $`\rho`$ together set how long that period lasts.
 
