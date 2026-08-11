@@ -881,6 +881,10 @@ The cost of this ordering is latency. A proof verification is now on the path be
 
 Deduplication by nullifier, step 1.4, is deliberately ordered before this check and must remain so. A duplicate is detected by a lookup, while an invalid proof is detected by a verification, and there is no reason to pay the more expensive check for a message the cheaper one has already rejected.
 
+What this ordering does **not** address is a flood of messages whose proofs are valid. Such messages pass every check in step 1 and are relayed normally, so verifying earlier does not reduce their cost; it only ensures the network is paying to carry messages someone genuinely paid to create. Nor does the [Blend Difficulty](#blend-difficulty) controller respond to them: it is driven by transactions that reach a block, and messages sent only to consume capacity never do, so admission does not tighten however many are sent. Verifying before relaying therefore bounds the amplification an invalid proof can achieve, and does not by itself bound the volume a determined participant can generate.
+
+Closing that gap requires an admission cost each node can raise on its own in response to the resources it is actually spending, rather than one derived from a value the whole network agrees on and which lags what any individual node observes. Such a mechanism is not specified here.
+
 The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
 $$
