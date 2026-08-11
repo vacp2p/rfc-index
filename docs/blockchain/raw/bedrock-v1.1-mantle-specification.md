@@ -1578,24 +1578,19 @@ ledger: Ledger
 
   *Validate*
 
-  1. Ensure the Transfer in non-empty
-      ```python
-      assert len(transfer.inputs) > 0
-      ```
-
-  2. Ensure all inputs are spendable and not in a channel.
+  1. Ensure all inputs are spendable and not in a channel.
       ```python
       ledger.assert_spendable(transfer.inputs)
       ```
 
-  3. Validate transfer proof to show ownership over input notes.
+  2. Validate transfer proof to show ownership over input notes.
       ```python
       input_notes = [ledger[input_note_id] for input_note_id in transfer.inputs]
       input_pks = [note.public_key for note in input_notes]
       assert ZkSignature_verify(mantle_txhash, transfer_proof, input_pks)
       ```
 
-  4. Ensure outputs are valid.
+  3. Ensure outputs are valid.
       ```python
       ledger.assert_valid_output(transfer.output)
       ```
@@ -1703,6 +1698,9 @@ A note is spendable if and only if it exists, it is not spent or locked. The fol
 ```python
 class Ledger:
     def assert_spendable(inputs: list[NoteId], channel_id: ChannelId | None):
+		# Assert inputs are empty
+		assert len(inputs) > 0
+
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
