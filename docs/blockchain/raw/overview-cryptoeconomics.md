@@ -188,9 +188,17 @@ where `get_collected_fees(b)` is the total Execution base fees and Permanent Sto
 
 Fees rather than block rewards, because the two scale differently with usage. The block reward is governed by the emission model of [Block Rewards](block-rewards.md), which caps it whatever the level of activity; the fees a block collects have no such cap and grow with the traffic it carries. A share of the block reward would therefore hold the reward per claim near a fixed ceiling however busy the network became, while the fee a claim must itself pay would keep rising with that traffic — and above some level of usage the claim would cost more than it pays. A share of the fees moves with the same quantity that sets the fee, so the ratio between the two is a function of the parameters rather than of how busy the network happens to be.
 
-Diverting a share of the fees reduces the amount burnt and therefore leaves more tokens in circulation than burning all of them would. It does not change how much the protocol issues: the pool distributes tokens that were already in circulation and were on their way to being destroyed, and no new tokens are created to fill it.
+### Who bears the cost of the diversion
 
-The proof of work pool does not participate in the split between the Blend service and the leader described above, which applies to the block reward and is unchanged by this.
+The answer is not the same at every point in the network's life, and both cases are worth stating because the parameter is one choice with two consequences.
+
+The emission model measures the fees that are actually burnt and mints against them, so diverting a share before the burn reduces that measurement by the same share. When emission is dominated by minting — early, while staking is far below its target — the amount burnt does not feed into the block reward at all, so the block reward is unchanged and the Blend service and the leaders receive exactly what they would have received. What changes is that the diverted tokens are not destroyed, so the supply is larger than it would otherwise have been. **The cost falls on the supply.**
+
+When emission is dominated by recycling — the design's stated long-run behaviour, where the protocol mints back what was burnt — the block reward is the amount burnt, so reducing that amount reduces the block reward in the same proportion. The supply is unaffected, because as many tokens are left unburnt as are left unminted. **The cost falls on the Blend service and the leaders**, in the 60/40 proportion in which they divide the block reward.
+
+In neither case does the protocol issue more than its emission cap allows, and in neither case are tokens created to fill the pool. But the pool is a genuine third claim on the same flow that funds the privacy layer and consensus, and `POW_SHARE` must be chosen on that basis rather than as a charge against the burn alone.
+
+The split between the Blend service and the leader is itself unchanged: they continue to divide the block reward 60/40, on whatever the block reward turns out to be.
 
 ## Reward Distribution Protocols
 

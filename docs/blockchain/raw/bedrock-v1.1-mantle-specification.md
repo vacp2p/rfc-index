@@ -1795,15 +1795,17 @@ It is stated as an absolute count rather than as a proportion of the transaction
 At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the refill accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
 
 ```python
-POW_SHARE: uint64                         # beta, as the fraction POW_SHARE / SHARE_DEN
-SHARE_DEN: uint64
+POW_SHARE: uint64 = 10                    # beta, as the fraction POW_SHARE / SHARE_DEN
+SHARE_DEN: uint64 = 100
 
 def on_epoch_boundary(epoch_blocks: list[Block]):
     pow_reward_pool = checked_uint64(pow_reward_pool + get_pow_pool_refill(epoch_blocks))
     epoch_pow_reward = compute_epoch_pow_reward(pow_reward_pool)
 ```
 
-`get_pow_pool_refill` sums, over the blocks of the epoch that just ended, the fraction `POW_SHARE / SHARE_DEN` of the fees each block collected, as specified in [Proof of Work Reward Pool](overview-cryptoeconomics.md#proof-of-work-reward-pool). Those tokens are diverted from the fee burn rather than minted, so refilling the pool does not add to the supply.
+`get_pow_pool_refill` sums, over the blocks of the epoch that just ended, the fraction `POW_SHARE / SHARE_DEN` of the fees each block collected, as specified in [Proof of Work Reward Pool](overview-cryptoeconomics.md#proof-of-work-reward-pool). Those tokens are diverted from the fee burn rather than minted, so refilling the pool never adds to the supply; who bears the cost of the diversion is set out in that section, and depends on where the emission model's blend of minting and recycling sits.
+
+The share is set to a tenth, and it is bounded from both directions. From below, the reward must exceed the fee by enough margin that a claim is worth making and that the tip a block builder recovers on its own claims is not a material advantage, which by the relation above requires the share to be at least twice the target claim rate divided by the transactions a block carries. From above, [Cryptoeconomics](overview-cryptoeconomics.md#who-bears-the-cost-of-the-diversion) shows that in the mature network the diversion is borne by the Blend service and the leaders, so the share is a claim on the funding of the privacy layer and consensus, and proof of work is intended to be an entry path rather than a competitive alternative to them. A tenth leaves the mining share at rather less than a third of the leader share while giving a reward several times the fee at the traffic levels the fee market is designed around. Setting it to zero disables refilling and leaves the pool to run down from its genesis seed alone.
 
 All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic). The pool must not saturate: saturating at the maximum representable value would create tokens that were never allocated, which is precisely the failure the checked-arithmetic rule exists to prevent.
 
@@ -1811,13 +1813,13 @@ Fixing the reward for the whole epoch is what allows a wallet to compute a rewar
 
 Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, and $`\sigma_e`$ is the pool's fraction $`\rho`$ divided by $`T \cdot N_b`$, an epoch running at the target rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target rate is set to. The target claim rate therefore governs how many participants share the epoch's distribution and how much each receives, not how much is distributed in total.
 
-`EPOCH_POW_DISTRIBUTION_RATE`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` remain to be chosen, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are, it cannot be established that a claim is worth more than the fee required to submit it — the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
+`EPOCH_POW_DISTRIBUTION_RATE` and `POW_REWARD_POOL_GENESIS` remain to be chosen. Together with `POW_SHARE` they determine both the reward a claim yields at launch and the level it settles at, and until they are set it cannot be established that a claim is worth more than the fee required to submit it — the condition on which the whole mechanism depends. A pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
 
-The relationship those three must satisfy is that a claim's reward exceeds its fee. Two of them fix where the reward settles, and the third fixes how long it takes to get there.
+The relationship the three must satisfy is that a claim's reward exceeds its fee. Two of them fix where the reward settles, and the third fixes how long it takes to get there.
 
 Left alone, the pool converges: each epoch it gains the refill and loses the fraction $`\rho`$ it distributes, so it approaches the level at which the two balance, and there the reward per claim is simply the refill divided by the number of claims the epoch is expected to accept. Since the refill is the share $`\beta`$ of the fees the epoch collected, and those fees are the number of transactions times the fee each pays, the settled reward per claim is $`\beta`$ times the fees one block collects, divided by `TARGET_CLAIMS_PER_BLOCK`. The distribution rate $`\rho`$ cancels out of this: it sets how fast the pool converges and how much of the pool is paid out in any one epoch, not the level the reward settles at.
 
-Comparing that against the fee a claim itself pays, and taking every transaction in a block to pay a comparable fee, the reward covers the fee once a block carries at least `TARGET_CLAIMS_PER_BLOCK` divided by $`\beta`$ transactions. At a target of 10, a share of a twentieth of the fees collected reaches that point at about two hundred transactions per block and pays twice the fee at about four hundred; a share of a fifth reaches it at about fifty and pays twice the fee at about a hundred.
+Comparing that against the fee a claim itself pays, and taking every transaction in a block to pay a comparable fee, the reward covers the fee once a block carries at least `TARGET_CLAIMS_PER_BLOCK` divided by $`\beta`$ transactions. At the specified target of 10 and share of a tenth, that point is about one hundred and twenty transactions per block, and the reward is twice the fee at about two hundred and forty and five times the fee at six hundred.
 
 **The share and the claim target are not independent**: holding the margin fixed, the share required is proportional to the target. They must be chosen together against the traffic the network is expected to sustain, and the target should be chosen first and low, because for any given share it subtracts directly from what the mechanism delivers.
 
@@ -1827,7 +1829,7 @@ Below that level of traffic the pool pays out more than it takes in and draws do
 
 The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specified in [Bedrock Genesis Block](bedrock-genesis-block.md). After that it changes only through the epoch-boundary refill and through claims.
 
-The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: the seed consists of tokens that exist from genesis, and the refill of fees that were paid and would otherwise have been burnt, so claiming redirects tokens rather than adding to total supply. Its effect on supply is to slow the burn, not to raise issuance.
+The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: the seed consists of tokens that exist from genesis, and the refill of fees that were paid and would otherwise have been burnt, so claiming redirects tokens rather than creating them. It never raises issuance above what the emission model would otherwise allow.
 
 ### Reward Difficulty
 
