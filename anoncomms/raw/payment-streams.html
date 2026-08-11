@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/435a6f183a92b871473d80a720b427f70cbf1b68/docs/anoncomms/raw/payment-streams.md"><code>435a6f1</code></a> — docs(anoncomms): Payment streams user and provider unlinkability (#397)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/f09f9e9ef12bf00b3da36729a8bdae339bedf1ad/docs/anoncomms/raw/payment-streams.md"><code>f09f9e9</code></a> — docs(anoncomms): Non-native token support for payment streams (#379)</li>
 <li><strong>2026-07-08</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b9b4160de40d011b0d8c80eb131e684310d6a3d4/docs/anoncomms/raw/payment-streams.md"><code>b9b4160</code></a> — Add on-chain part of payment streams spec (#299)</li>
 <li><strong>2026-06-16</strong> — <a href="https://github.com/logos-co/logos-lips/blob/16e8af10af316557eda5813b6039c0bdf435baa1/docs/anoncomms/raw/payment-streams.md"><code>16e8af1</code></a> — Chore/separate messaging specs (#361)</li>
@@ -202,8 +203,8 @@
 <!-- timeline:end -->
 <h2 id="abstract"><a class="header" href="#abstract">Abstract</a></h2>
 <p>This specification defines payment streams for incentivized Logos request-response services.
-Users pay providers over time from vault deposits instead of settling each request on chain,
-while <code>allocation</code> caps how much funds may accrue to a provider.</p>
+Users pay providers over time from vault deposits instead of settling each request on-chain,
+while <code>allocation</code> caps the funds that accrue to a provider.</p>
 <p>On chain, users deposit funds into vaults
 and allocate streams from which funds accrue to providers at a configured rate.
 The chain enforces allocation accounting and lazy accrual on each stream operation
@@ -218,7 +219,10 @@ and an on-chain stream matching the accepted <code>StreamParams</code> backs the
 <p>The document specifies generic on-chain and off-chain requirements,
 a reference integration with the Logos Execution Zone and Logos Delivery Store queries,
 security and privacy considerations,
-and optional protocol extensions.</p>
+and optional protocol extensions.
+On LEZ, users and providers MAY obtain
+user unlinkability and provider unlinkability
+via private accounts and shielded transactions.</p>
 <h2 id="language"><a class="header" href="#language">Language</a></h2>
 <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
@@ -241,13 +245,15 @@ One such protocol is Store,
 which allows users to query historical messages
 from Logos Messaging relay nodes.</p>
 <p>Logos Blockchain includes the Logos Execution Zone (LEZ),
-which enables both transparent and shielded execution.</p>
+which enables both transparent and shielded transactions.</p>
 <p>We target the following design goals:</p>
 <ul>
-<li>Performance: Low latency and fees without settling each service request on chain.</li>
-<li>Security: Limited loss exposure when service stops or the user is offline.</li>
-<li>Privacy: On-chain deposit activity unlinkable from off-chain service use.</li>
-<li>Extendability: A simple base protocol with room for optional extensions.</li>
+<li>Performance: low latency and fees without settling each service request on-chain.</li>
+<li>Security: limited loss exposure when service stops or the user is offline.</li>
+<li>Privacy: optional user unlinkability and provider unlinkability
+(each party's primary public key unlinkable from its on-chain
+funding or claiming activity).</li>
+<li>Extensibility: a simple base protocol with room for optional extensions.</li>
 </ul>
 <p>Payment streams enable unidirectional time-based fund flows.
 Streams map well to this use case.
@@ -290,7 +296,8 @@ Each stream MUST belong to exactly one vault.</p>
 <p>Each stream MUST record <code>provider_id</code>,
 a byte string designating the party authorized to claim accrued funds.
 Each chain integration MUST define that encoding
-and its mapping to the on-chain account authorized to claim those funds.</p>
+and how it is stored as the on-chain claim account.
+On LEZ, <code>StreamConfig.provider</code> holds that <code>provider_id</code>.</p>
 <p>Each stream MUST specify a positive accrual rate per time unit.
 Each chain integration MUST define the time unit used by rates and accrual.</p>
 <p>To start using the protocol,
@@ -312,7 +319,7 @@ allocation = accrued + unaccrued
 <li>Initialize: create an empty vault and record the vault token identity.
 Chain integrations MAY set other metadata at initialization.</li>
 <li>Deposit: increase <code>balance</code> and <code>unallocated</code>.</li>
-<li>Withdraw: decrease <code>balance</code> by at most <code>unallocated</code>.</li>
+<li>Withdraw: decrease <code>balance</code> and <code>unallocated</code> by the same amount, at most <code>unallocated</code>.</li>
 </ul>
 <p>The user MAY withdraw unallocated funds at any time.
 Vault operations MUST NOT modify allocated funds.</p>
@@ -337,7 +344,7 @@ insufficient.</p>
 <ul>
 <li>Create: assign a provider, set rate and initial <code>allocation</code>.</li>
 <li>Pause: stop fund accrual on an <code>ACTIVE</code> stream.</li>
-<li>Resume: resume fund accrual on a non-depleted <code>PAUSED</code> stream.</li>
+<li>Resume: restart fund accrual on a non-depleted <code>PAUSED</code> stream.</li>
 <li>Top-up: increase the stream's <code>allocation</code>.</li>
 <li>Close: release remaining <code>unaccrued</code> to vault <code>unallocated</code> and mark the stream <code>CLOSED</code>.</li>
 <li>Claim: transfer all <code>accrued</code> funds to the provider.
@@ -348,18 +355,18 @@ decrease <code>allocation</code> and the vault's <code>total_allocated</code> by
 Stream creation MUST assign a stable <code>stream_id</code> in chain-specific encoding.
 A newly created stream MUST be <code>ACTIVE</code>.
 Funds MUST accrue only on <code>ACTIVE</code> streams.
-Each stream MUST store <code>accrued_as_of</code>, the fold timestamp through which stored <code>accrued</code> has been computed
+Each stream stores <code>accrued_as_of</code>, the fold timestamp through which stored <code>accrued</code> has been computed
 (see <a href="#lazy-accrual-and-folding">Lazy accrual and folding</a>).</p>
 <p>The user MAY pause an <code>ACTIVE</code> stream.
 An <code>ACTIVE</code> stream MUST also transition to <code>PAUSED</code> automatically upon depletion.</p>
 <p>The user MAY resume a <code>PAUSED</code> stream.
 Resume of a depleted stream MUST fail.</p>
-<p>The user MAY top-up a stream.
+<p>The user MAY top up a stream.
 Top-up MUST increase the stream's <code>allocation</code> under the allocation increase rules above.
 Top-up MUST transition the stream to <code>ACTIVE</code>.
 To add funds and keep the stream <code>PAUSED</code>,
 the user MUST pause the stream after top-up.</p>
-<p>Either user or provider MAY close the stream from any non-<code>CLOSED</code> state.
+<p>Either the user or the provider MAY close the stream from any non-<code>CLOSED</code> state.
 Unaccrued funds of a <code>CLOSED</code> stream MUST be immediately transferred to the vault's <code>unallocated</code> balance.
 A <code>CLOSED</code> stream MUST NOT transition to any other state.
 Accrued funds of a <code>CLOSED</code> stream remain available for the provider to claim.</p>
@@ -367,7 +374,7 @@ Accrued funds of a <code>CLOSED</code> stream remain available for the provider 
 A claim MUST transfer all accrued funds from this stream to the provider.</p>
 <h3 id="lazy-accrual-and-folding"><a class="header" href="#lazy-accrual-and-folding">Lazy accrual and folding</a></h3>
 <p>To fold a stream means to apply accrual and lifecycle updates through a fold timestamp <code>t</code>.
-A fold timestamp is monotonic chain time up to which the fold applies accrual.</p>
+A fold timestamp is a monotonic chain time up to which the fold applies accrual.</p>
 <p>Each stream MUST record <code>accrued_as_of</code>, the latest fold timestamp.
 Let <code>Δt</code> be <code>t</code> minus <code>accrued_as_of</code>.
 Folding a non-<code>ACTIVE</code> stream MUST leave <code>accrued</code> and <code>accrued_as_of</code> unchanged.
@@ -375,8 +382,8 @@ Otherwise the fold MUST set:</p>
 <pre><code class="language-text">accrued := min(allocation, accrued + rate × Δt)
 </code></pre>
 <p>When folding results in a depleted stream,
-<code>accrued_as_of</code> MUST be set to the fold timestamp at which depletion occurred
-(MAY be earlier than <code>t</code>).
+<code>accrued_as_of</code> MUST be set to the timestamp at which depletion occurred
+(which MAY be earlier than <code>t</code>).
 Otherwise <code>accrued_as_of</code> MUST be set to <code>t</code>.</p>
 <p>Any stream operation MUST fold the stream before executing its logic.</p>
 <p>A chain integration MUST expose a monotonic system timestamp.
@@ -387,8 +394,8 @@ until a transaction folds the stream.</p>
 <h3 id="on-chain-protocol-extensions"><a class="header" href="#on-chain-protocol-extensions">On-chain protocol extensions</a></h3>
 <p>This section describes optional modifications to the streams protocol.
 The user MAY enable an extension when creating a vault or stream,
-as specified in that extension.</p>
-<h4 id="auto-pause"><a class="header" href="#auto-pause">Auto-Pause</a></h4>
+as specified for that extension.</p>
+<h4 id="auto-pause"><a class="header" href="#auto-pause">Auto-pause</a></h4>
 <p>In the base streams protocol,
 the user SHOULD pause or close a stream when the provider stops delivering service.
 If the user is offline,
@@ -398,12 +405,13 @@ which increases loss exposure while service is unavailable.</p>
 in addition to the funds cap from <code>allocation</code>.
 The stream records an auto-pause duration in the chain integration time unit.
 When that duration has elapsed in chain time since stream creation
-or since the last resume,
+or since the last resume or top-up,
 an <code>ACTIVE</code> stream MUST automatically transition to <code>PAUSED</code> at fold time.
 For an already-<code>PAUSED</code> stream, that transition has no further effect.
 The user MAY resume the stream.
-Each resume MUST restart the auto-pause duration from the time of that resume.</p>
-<h4 id="automatic-claim-on-closure"><a class="header" href="#automatic-claim-on-closure">Automatic Claim on Closure</a></h4>
+Each resume or top-up MUST restart the auto-pause duration
+from the time of that operation.</p>
+<h4 id="automatic-claim-on-closure"><a class="header" href="#automatic-claim-on-closure">Automatic claim on closure</a></h4>
 <p>In the base streams protocol,
 close does not pay the provider.
 Accrued funds remain on a <code>CLOSED</code> stream until the provider claims them.</p>
@@ -417,13 +425,13 @@ Trade-offs include:</p>
 <li>Close and payout happen in one transaction,
 which can increase timing correlation for observers.</li>
 <li>When the user initiates close on a fee-charging chain,
-the same transaction runs the provider payout logic,
-so the user pays transaction fees for that logic,
+the same transaction runs the provider payout logic.
+The user pays transaction fees for that logic,
 instead of the provider paying via a separate claim.</li>
 <li>If the payout fails,
 close fails atomically and the stream does not transition to the <code>CLOSED</code> state.</li>
 </ul>
-<h4 id="activation-fee"><a class="header" href="#activation-fee">Activation Fee</a></h4>
+<h4 id="activation-fee"><a class="header" href="#activation-fee">Activation fee</a></h4>
 <p>In the base streams protocol,
 funds accrue only on <code>ACTIVE</code> streams.
 The user MAY pause at any time and MAY resume a non-depleted <code>PAUSED</code> stream.
@@ -431,12 +439,13 @@ A user can leave a stream <code>PAUSED</code> for long periods,
 resume briefly to obtain service,
 and pay only during brief <code>ACTIVE</code> intervals.</p>
 <p>The activation fee extension charges a fixed fee when fund accrual starts.
-Only the operation that transitions the stream to <code>ACTIVE</code> MUST charge the activation fee.
+The operation that transitions the stream to <code>ACTIVE</code> MUST charge the activation fee.
+Other operations MUST NOT charge it.
 The fee SHOULD reflect the provider's minimum acceptable payment for a service session.
 If <code>unaccrued</code> is less than the activation fee,
-the activation MUST fail.</p>
+the operation MUST fail.</p>
 <p>Providers MAY also mitigate pause-and-resume attacks through off-chain policy.</p>
-<h4 id="delivery-receipts"><a class="header" href="#delivery-receipts">Delivery Receipts</a></h4>
+<h4 id="delivery-receipts"><a class="header" href="#delivery-receipts">Delivery receipts</a></h4>
 <p>In the base streams protocol,
 funds accrue based purely on on-chain stream state.
 The provider does not submit off-chain proof that service was delivered.</p>
@@ -454,14 +463,23 @@ while batched receipts reduce overhead but bundle user approval.</p>
 <p>In the base streams protocol paired with stream-backed eligibility,
 the user MUST send the first stream-proof-backed <code>ServiceRequest</code>
 by <code>create_stream_deadline</code>.
-That request proves a matching on-chain stream was open by naming it in
-<code>StreamProof</code> and supplying a valid session signature.</p>
+That request proves a matching on-chain stream existed
+by naming it in <code>StreamProof</code> and supplying a valid session signature.</p>
 <p>With this extension,
 the user MUST still create an on-chain stream that matches the accepted
 <code>StreamParams</code> before <code>create_stream_deadline</code>,
 but MAY send the first stream-proof-backed request later.
-The provider MAY scan on-chain streams for the vault to verify that a matching
-stream existed by <code>create_stream_deadline</code>.
+The provider MAY verify timely creation
+by locating the transaction that created a matching stream
+and comparing its chain time against <code>create_stream_deadline</code>.
+This verification requires historical chain access.
+The stream account and its creation time remain public
+even when creation runs in a shielded transaction.
+For sessions using this extension,
+the session MUST NOT end when <code>create_stream_deadline</code> passes
+without the first stream-proof-backed request.
+The provider MAY end the session
+if no matching stream was created by <code>create_stream_deadline</code>.
 The provider SHOULD advertise support for this extension via discovery.</p>
 <h2 id="stream-backed-eligibility-for-request-response-services"><a class="header" href="#stream-backed-eligibility-for-request-response-services">Stream-Backed Eligibility for Request-Response Services</a></h2>
 <p>This section specifies how stream-backed eligibility
@@ -560,8 +578,8 @@ Exactly one of <code>stream_proposal</code> or <code>stream_proof</code> MUST be
   bytes public_key = 3;
 }
 </code></pre>
-<p><code>public_key</code> commits the session key pair used for <code>StreamProof</code> signatures.
-The user signs each <code>StreamProof</code> with the session key private key.</p>
+<p><code>public_key</code> is the session public key used for <code>StreamProof</code> signatures.
+The user signs each <code>StreamProof</code> with the corresponding session private key.</p>
 <h4 id="streamproof"><a class="header" href="#streamproof"><code>StreamProof</code></a></h4>
 <p>A <code>StreamProof</code> links a request to an active stream.</p>
 <pre><code class="language-protobuf">message StreamProof {
@@ -595,10 +613,10 @@ Proposed <code>allocation</code> MUST be at most that vault's <code>unallocated<
 }
 </code></pre>
 <p><code>vault_id</code> is the on-chain identifier of the vault.
-<code>provider_id</code> is the provider identity for this protocol.
+<code>provider_id</code> is the provider identity for this protocol session.
 It pins the proposal to one provider and prevents replay across providers.
-Chain integrations MUST define how <code>provider_id</code> maps to on-chain claim authorization
-(for example octet equality with <code>StreamConfig.provider</code> on LEZ).
+It MUST match the stream <code>provider_id</code>
+(see <a href="#vaults-and-streams">Vaults and streams</a>).
 A chain integration MAY map <code>provider_id</code> to a long-lived service identity
 and separately map that identity to the chain account that receives stream claims.
 <code>owner_public_key</code> is the key used to verify <code>owner_signature</code>.
@@ -612,7 +630,7 @@ It MUST cover the other <code>VaultProof</code> fields,
 the accompanying <code>StreamParams</code>,
 and <code>StreamProposal.public_key</code>.
 Chain integrations MUST document the canonical signed payload.
-LEZ defines vault-owner authorization under Off-chain bytes below.</p>
+LEZ defines vault-owner authorization in <a href="#off-chain-bytes">Off-chain bytes</a>.</p>
 <h4 id="streamparams"><a class="header" href="#streamparams"><code>StreamParams</code></a></h4>
 <pre><code class="language-protobuf">message StreamParams {
   bytes service_id = 1;
@@ -627,7 +645,11 @@ The provider assigns or advertises acceptable <code>service_id</code> values via
 The user MUST set <code>service_id</code> to a value the provider accepts for that session.
 <code>create_stream_deadline</code> is the latest chain time by which the stream MUST exist on-chain.</p>
 <p>For a service session, an on-chain stream matches accepted <code>StreamParams</code>
-when the chain integration reports exact equality on every comparable field.</p>
+when its rate is at least <code>stream_rate</code>
+and its <code>allocation</code> is at least the accepted <code>allocation</code>.
+Exact equality is not required.
+<code>service_id</code> and <code>create_stream_deadline</code> are not on-chain fields
+and are enforced via session state and <code>create_stream_deadline</code>.</p>
 <h4 id="streamproviderpolicy"><a class="header" href="#streamproviderpolicy"><code>StreamProviderPolicy</code></a></h4>
 <p>The provider advertises a policy as the following message.</p>
 <pre><code class="language-protobuf">message TokenStreamPolicy {
@@ -648,7 +670,7 @@ Each <code>TokenStreamPolicy</code> entry sets thresholds for one vault token
 in that token's base units.
 <code>TokenStreamPolicy.token_id</code> uses the same encoding as <code>VaultProof.token_id</code>.
 The RECOMMENDED maximum length of <code>accepted_tokens</code> is 16.</p>
-<p>Allocation caps on-chain payment exposure.
+<p><code>allocation</code> caps on-chain payment exposure.
 Providers MAY adjust serving policy when users abuse pause, resume, or request patterns.</p>
 <p>Let <code>T</code> be <code>VaultProof.token_id</code>
 after the on-chain equality check.
@@ -658,12 +680,12 @@ A <code>StreamProposal</code> satisfies a policy at verification time <code>t</c
 <li><code>stream_params.stream_rate</code> MUST be greater than or equal to that entry's <code>min_rate</code>.</li>
 <li><code>stream_params.allocation</code> MUST be greater than or equal to that entry's <code>min_allocation</code>.</li>
 <li><code>stream_params.create_stream_deadline</code> MUST be greater than or equal to <code>t</code>
-and MUST be less than or equal to <code>t</code> plus <code>max_create_stream_deadline_delay</code></li>
+and MUST be less than or equal to <code>t</code> plus <code>max_create_stream_deadline_delay</code>.</li>
 </ul>
 <p>RECOMMENDED default for <code>max_create_stream_deadline_delay</code>: 300 seconds.</p>
 <p><code>vault_proof_max_response_bytes</code> sets the per-response byte limit for <code>response_data</code>
 when the provider serves the initial vault-proof-backed request.
-Deadline and byte-cap fields are policy-global.</p>
+Deadline and byte-cap fields apply to the whole policy.</p>
 <h4 id="servicetermination"><a class="header" href="#servicetermination"><code>ServiceTermination</code></a></h4>
 <pre><code class="language-protobuf">message ServiceTermination {
   enum TerminationType {
@@ -682,10 +704,9 @@ after which service MAY resume.</p>
 and per-request eligibility on <code>StreamProof</code>.
 Each signature role MUST use a chain-specific canonical form
 and its own domain separation prefix.
-A chain integration MUST define signed payload coverage for each role,
-document the canonical bytes,
-and publish deterministic test vectors.</p>
-<h3 id="protocol-flow"><a class="header" href="#protocol-flow">Protocol Flow</a></h3>
+A chain integration MUST define signed payload coverage for each role
+and document the canonical bytes.</p>
+<h3 id="protocol-flow"><a class="header" href="#protocol-flow">Protocol flow</a></h3>
 <h4 id="discovery"><a class="header" href="#discovery">Discovery</a></h4>
 <p>A discovery protocol (out of scope for this specification)
 SHOULD enable providers to announce which eligibility proof types they accept.
@@ -711,11 +732,11 @@ within 600 seconds (RECOMMENDED).</p>
 On acceptance the provider MUST record accepted <code>StreamParams</code>,
 the policy pinned at acceptance,
 <code>StreamProposal.public_key</code> as the session key,
-and <code>vault_id</code>, <code>provider_id</code>, <code>owner_public_key</code>, and <code>token_id</code> from the vault proof.
+and <code>vault_id</code>, <code>provider_id</code>, <code>owner_public_key</code>, and <code>token_id</code> from the <code>VaultProof</code>.
 Later stream-proof verification MUST use that pinned policy and session record.</p>
 <p>After acceptance the user MUST create an on-chain stream that matches the
 accepted <code>StreamParams</code> before <code>create_stream_deadline</code>.
-Until an on-chain stream matching those params exists or the deadline passes,
+Until an on-chain stream matching those parameters exists or the deadline passes,
 vault <code>unallocated</code> MUST remain at least the accepted allocation,
 and the user MUST NOT send another <code>StreamProposal</code> to the same provider.
 If <code>unallocated</code> falls below the accepted allocation after acceptance,
@@ -725,17 +746,26 @@ the provider SHOULD send <code>PERMANENT</code> <code>ServiceTermination</code>.
 matching the accepted <code>StreamParams</code> exists for the service session.
 Each such request MUST carry <code>EligibilityProof.stream_proof</code> only.</p>
 <p>The first stream-proof-backed <code>ServiceRequest</code> MUST arrive by <code>create_stream_deadline</code>.
-That request proves a matching on-chain stream was open by the deadline.</p>
+That request proves a matching on-chain stream existed by the deadline.</p>
 <p>The provider learns <code>stream_id</code> from each <code>StreamProof</code>.
 For verification it MUST read that stream's on-chain account state
 for the session <code>vault_id</code> under the chain integration,
 and then fold that state to the current chain time.</p>
-<p>Each <code>StreamProof</code> MUST name the on-chain stream that matches the accepted
-<code>StreamParams</code> for the service session,
-and MUST carry a valid signature over <code>request_data</code> with the session key.
-The referenced stream MUST be <code>ACTIVE</code>.
+<p>Each <code>StreamProof</code> MUST carry a valid signature over <code>request_data</code>
+with the session key.</p>
+<p>The first stream-proof-backed <code>ServiceRequest</code> binds a stream to the session.
+The named stream MUST match the accepted <code>StreamParams</code>,
+its recorded <code>provider_id</code> MUST equal the session <code>provider_id</code>,
+and it MUST be <code>ACTIVE</code>.
 On the first valid stream-proof request,
-the provider MUST record <code>stream_id</code> in session state if not already set.</p>
+the provider MUST record <code>stream_id</code> in session state.</p>
+<p>Later stream-proof-backed requests MUST name the session <code>stream_id</code>.
+The referenced stream MUST be <code>ACTIVE</code>,
+its recorded <code>provider_id</code> MUST equal the session <code>provider_id</code>,
+and its rate MUST remain at least the accepted <code>stream_rate</code>.
+<code>allocation</code> is not re-checked after binding,
+because claims decrease it
+(see <a href="#stream-lifecycle">Stream lifecycle</a>).</p>
 <p>The provider MAY retain session state across on-chain pause and resume.
 After resume, the user MAY continue stream-proof-backed requests under the same session.</p>
 <h4 id="termination"><a class="header" href="#termination">Termination</a></h4>
@@ -759,7 +789,7 @@ Further service requires a newly accepted <code>StreamProposal</code>.</p>
 <h3 id="request-response-protocol-extensions"><a class="header" href="#request-response-protocol-extensions">Request-response protocol extensions</a></h3>
 <p>This section describes optional extensions
 to the request-response protocol with stream-backed eligibility.</p>
-<h4 id="load-cap"><a class="header" href="#load-cap">Load Cap</a></h4>
+<h4 id="load-cap"><a class="header" href="#load-cap">Load cap</a></h4>
 <p>The base protocol bounds one vault-proof-backed response through
 <code>vault_proof_max_response_bytes</code> in policy.
 The load cap extension adds a cumulative limit per stream per time window
@@ -769,9 +799,9 @@ the provider MUST advertise a load cap via discovery.
 The provider MAY refuse to serve requests that would exceed the cap.</p>
 <p>When sustained load requires a higher cap,
 the user SHOULD open multiple streams to the same provider.
-Note that the user MAY request work without knowing the response size in advance
+The user MAY request work without knowing the response size in advance
 (such as message history over a time range).</p>
-<h4 id="multi-round-stream-parameter-negotiation"><a class="header" href="#multi-round-stream-parameter-negotiation">Multi-round Stream Parameter Negotiation</a></h4>
+<h4 id="multi-round-stream-parameter-negotiation"><a class="header" href="#multi-round-stream-parameter-negotiation">Multi-round stream parameter negotiation</a></h4>
 <p>In the base request-response protocol,
 <code>PARAMS_REJECTED</code> does not carry provider counter-proposals.
 A future extension MAY allow counter-proposed parameters in a
@@ -785,8 +815,8 @@ onto LEZ account layout, guest instructions, and reference off-chain bytes.</p>
 <p>Clock account ids, domain prefixes, and other demo fixtures
 are pinned in the reference integration and MAY change when the network is redeployed.
 Instruction wire layout and error codes are defined only there.
-Implementations MUST follow the deployed network and published test vectors
-from the reference integration when they differ from this section
+Implementations MUST follow the deployed network
+and the reference integration when they differ from this section
 on demo-only fields.
 Account layout, authorization, and privacy-tier rules here are normative
 and are not overridden by the reference integration.</p>
@@ -794,23 +824,40 @@ and are not overridden by the reference integration.</p>
 <p>The payment-streams guest program maps vault and stream state to
 <code>VaultConfig</code>, <code>VaultHolding</code>, and <code>StreamConfig</code> accounts.</p>
 <h4 id="account-types"><a class="header" href="#account-types">Account types</a></h4>
-<p><code>VaultConfig</code> holds <code>total_allocated</code>, <code>owner</code>,
-privacy tier (<code>Public</code> or <code>PseudonymousFunder</code>),
-and <code>token_id</code>, all set at initialization.
-For <code>PseudonymousFunder</code> vaults,
-<code>owner</code> MUST be an identifier derived from a nullifier public key.</p>
+<p>On LEZ, an account is either public or private.
+A private account is identified by a nullifier public key (NPK).</p>
+<p><code>VaultConfig</code> holds <code>owner</code>,
+privacy tier (<code>Public</code> or <code>PseudonymousFunding</code>),
+and <code>token_id</code>,
+fixed at initialization,
+and <code>total_allocated</code>,
+updated by stream operations.</p>
+<p>The privacy tier records vault-owner privacy intent for that vault.
+<code>Public</code> means a public vault owner.
+<code>PseudonymousFunding</code> means funding routes through a private (pseudonymous)
+owner account in service of user unlinkability.
+For <code>PseudonymousFunding</code> vaults,
+<code>owner</code> MUST be a private account.</p>
 <p><code>token_id</code> is the LEZ encoding of the vault token.
 It is exactly 32 octets.
 All-zeroes denotes the LEZ native token.
 Any other value MUST be a fungible Token program definition <code>AccountId</code>.</p>
-<p>Per-stream state is stored in <code>StreamConfig</code>.</p>
-<p>The vault holding PDA carries vault liquidity.
-For a native vault, that is native <code>Account.balance</code> on the PDA.
+<p>Per-stream state is stored in <code>StreamConfig</code>.
+<code>StreamConfig.provider</code> holds the stream <code>provider_id</code>
+(the account authorized to claim accrued funds).
+That account MAY be a public account or a private account.
+Vault privacy tier and provider account kind are independent choices.
+A <code>Public</code> vault MAY stream to a private provider.
+A <code>PseudonymousFunding</code> vault MAY stream to a public provider.
+Provider unlinkability has no vault-style privacy tier.
+It is chosen per stream by using a private account as <code>provider_id</code>.</p>
+<p>The <code>VaultHolding</code> PDA holds the vault funds.
+For a native vault, that is the native <code>Account.balance</code> on the PDA.
 For a non-native vault,
 the PDA is a Token program holding for <code>token_id</code>,
-and liquidity is <code>TokenHolding.balance</code> in account data.
+and the funds are <code>TokenHolding.balance</code> in account data.
 The guest MUST reject instructions when version bytes across
-<code>VaultConfig</code>, vault holding application data, and <code>StreamConfig</code>
+<code>VaultConfig</code>, <code>VaultHolding</code> application data, and <code>StreamConfig</code>
 for a vault are unequal.
 The reference guest uses version <code>1</code> on the demo network.</p>
 <h4 id="pda-derivation"><a class="header" href="#pda-derivation">PDA derivation</a></h4>
@@ -825,23 +872,18 @@ and the stream identifier assigned sequentially on stream creation.
 <code>VaultProof.vault_id</code> and the LEZ account identifier for
 <code>VaultProof.owner_public_key</code>.</p>
 <h4 id="deposit-and-claim-asset-paths"><a class="header" href="#deposit-and-claim-asset-paths">Deposit and claim asset paths</a></h4>
-<p>On deposit, the guest validates vault ownership and amount.</p>
-<p>For a native vault,
-deposit chains into the authenticated-transfer program
-to move native balance into the vault holding PDA.</p>
-<p>For a non-native vault,
-deposit chains into the Token program
-to transfer fungible units from the owner's Token holding
-into the vault holding PDA.
-Withdraw and claim chain Token transfers out of the vault holding,
-using PDA seeds to authorize the vault holding as sender.
-Solvency checks read <code>TokenHolding.balance</code> on the vault holding.</p>
-<p>The deployed Token program <code>ProgramId</code> is pinned by the network
-and the reference integration.
-Exact account lists and instruction words follow that deployment
-and its published test vectors.</p>
+<p>Deposit, withdraw, and claim move vault funds
+by composing with the platform program for the vault token:
+authenticated-transfer for native,
+Token program for non-native.</p>
+<p>For <code>PseudonymousFunding</code> vaults,
+<code>Deposit</code> MUST debit the vault owner private account.
+Wallets MUST NOT transfer directly into a <code>VaultHolding</code> for <code>PseudonymousFunding</code> vaults.</p>
 <h3 id="guest-instructions"><a class="header" href="#guest-instructions">Guest instructions</a></h3>
-<p>Reference instruction names and signers:</p>
+<p>Reference instruction names and authorizers.
+The authorizer is the payment-streams role whose account MUST authorize the
+instruction.
+On LEZ that account is a signing account.</p>
 <div class="table-wrapper"><table><thead><tr><th>On-chain operation</th><th>Reference instruction</th><th>Authorizer</th></tr></thead><tbody>
 <tr><td>Initialize vault</td><td><code>InitializeVault</code></td><td>Vault owner</td></tr>
 <tr><td>Deposit</td><td><code>Deposit</code></td><td>Vault owner</td></tr>
@@ -854,8 +896,14 @@ and its published test vectors.</p>
 <tr><td>Claim accrued</td><td><code>Claim</code></td><td>Stream provider</td></tr>
 </tbody></table>
 </div>
-<p><code>CloseStream</code> and <code>Claim</code> MUST pass <code>VaultConfig.owner</code> as an explicit
-non-signing account equal to the vault owner.</p>
+<p><code>CloseStream</code> and <code>Claim</code> MUST include <code>VaultConfig.owner</code> as an explicit
+non-signing account.</p>
+<p>When a private account is included in a transaction
+as a signing account or as a required non-signing account,
+LEZ requires a shielded transaction.
+Payment streams inherit that platform rule
+whenever a private <code>VaultConfig.owner</code> or <code>StreamConfig.provider</code>
+is included in the transaction.</p>
 <h3 id="system-clock-accounts"><a class="header" href="#system-clock-accounts">System clock accounts</a></h3>
 <p>Guest instructions that fold streams read time from a caller-supplied
 clock account.
@@ -896,9 +944,7 @@ zero-extending <code>StreamParams.allocation</code> from protobuf <code>uint64</
 with Schnorr signatures over
 <code>SHA-256(domain_prefix || canonical_body_bytes)</code>.
 Each role below defines a 32-byte ASCII <code>domain_prefix</code> (NUL-padded)
-and <code>canonical_body_bytes</code>.
-Implementations MUST match published reference test vectors
-(including cross-language Store parity).</p>
+and <code>canonical_body_bytes</code>.</p>
 <h4 id="vault-owner-authorization-vaultproofowner_signature"><a class="header" href="#vault-owner-authorization-vaultproofowner_signature">Vault owner authorization (<code>VaultProof.owner_signature</code>)</a></h4>
 <p>Domain prefix (32 bytes):</p>
 <pre><code class="language-text">/LEZ/v0.1/VaultOwnerAuth/ followed by seven NUL bytes (32 bytes total)
@@ -918,7 +964,8 @@ Implementations MUST match published reference test vectors
 </div>
 <p><code>VaultProof.owner_public_key</code> MUST bind to <code>VaultConfig.owner</code>
 via the LEZ account-identifier derivation in the reference implementation.
-Updated reference test vectors MUST cover this body layout.</p>
+For a private vault owner, that binding uses NPK derivation
+and the owner signature is produced with the corresponding nullifier secret key (NSK).</p>
 <h4 id="store-eligibility-signature"><a class="header" href="#store-eligibility-signature">Store eligibility signature</a></h4>
 <p>Domain prefix (32 bytes):</p>
 <pre><code class="language-text">/LEZ/v0.1/StoreEligibility/ followed by five NUL bytes (32 bytes total)
@@ -928,59 +975,73 @@ with field order and optional-field encoding matching Logos Delivery
 <code>StoreQueryRequest</code> without eligibility fields
 (presence-byte optional encoding, Borsh strings,
 message hash array, pagination fields).</p>
-<p>Providers derive <code>digest</code> by decoding the Store query from <code>request_data</code>
+<p>Providers derive the digest by decoding the Store query from <code>request_data</code>
 and applying the encoding rules above.</p>
 <h4 id="logos-delivery-store-query-integration"><a class="header" href="#logos-delivery-store-query-integration">Logos Delivery Store query integration</a></h4>
 <p>The reference Store integration sets <code>StreamParams.service_id</code> to
 <code>/vac/waku/store-query/3.0.0</code> and signs <code>request_data</code> with
 <a href="#store-eligibility-signature">Store eligibility signature</a>.</p>
-<h2 id="security-and-privacy-considerations"><a class="header" href="#security-and-privacy-considerations">Security and privacy considerations</a></h2>
+<h2 id="security-and-privacy-considerations"><a class="header" href="#security-and-privacy-considerations">Security and Privacy Considerations</a></h2>
 <h3 id="privacy-goals"><a class="header" href="#privacy-goals">Privacy goals</a></h3>
-<p>The primary goal is funder unlinkability:
-separating the user's primary public key from on-chain vault and stream activity
-carried out under the vault owner identity.</p>
-<p>The secondary goal is provider receiving privacy:
-limiting linkage between on-chain claims and the provider's real receiving addresses.</p>
-<h3 id="lez-visibility-and-execution"><a class="header" href="#lez-visibility-and-execution">LEZ visibility and execution</a></h3>
-<p>Vault and stream accounts are public.
-Observers can read each stream's terms and accrual state
-from on-chain data and reconstruct the vault-to-stream graph from account identifiers.</p>
-<p>Transparent and shielded transactions run the same guest logic.
-They differ in which signing identities and transfer endpoints appear on chain.
-Shielded execution hides the vault owner and claim destinations,
-but it does not hide the vault-to-stream relationship or how funds accrue on streams.
-A transparent stream creation permanently links the vault owner on chain.
-Each transparent claim links that stream to the visible receiving address.
-Later shielded operations cannot remove linkage from an earlier transparent operation.</p>
-<p>Coarser <a href="#system-clock-accounts">system clock accounts</a> reduce how often
-folding updates visible timestamps on stream accounts.</p>
-<h3 id="funder-unlinkability"><a class="header" href="#funder-unlinkability">Funder unlinkability</a></h3>
-<p>Privacy tiers (see <a href="#account-types">Account types</a>) express intent at vault creation.
-The guest records <code>Public</code> or <code>PseudonymousFunder</code> on LEZ and does not enforce execution mode.
-Any submitter can still post transparent transactions against public accounts.</p>
-<p>To obtain funder unlinkability on a <code>PseudonymousFunder</code> vault,
-the vault owner MUST run all vault and stream operations through shielded transactions,
-and the user MUST pre-shield funds before deposit so no transparent path
-links the primary public key to the vault.</p>
-<p>Wallets MUST NOT transfer directly into a <code>VaultHolding</code> for <code>PseudonymousFunder</code> vaults.
-Wallets SHOULD avoid other transparent paths that link the user's primary public key
-to vault activity when funder unlinkability is intended.</p>
-<h3 id="receiver-privacy"><a class="header" href="#receiver-privacy">Receiver privacy</a></h3>
-<p>To obtain receiving-address unlinkability,
-the provider SHOULD claim through shielded transactions
-to receiving addresses not tied to its primary identity.</p>
+<p>We define two independent, optional privacy goals:
+user unlinkability and provider unlinkability.
+The base protocol is not private by default.</p>
+<p>User unlinkability separates the user's (vault owner's) primary public key
+from their on-chain vault and stream activity.
+Provider unlinkability separates the provider's primary public key
+from their on-chain claims.
+A primary public key is the party's long-lived public identity
+outside the in-protocol vault-owner or <code>provider_id</code> account.</p>
+<p>A user MAY pursue user unlinkability per vault.
+On LEZ that requires a <code>PseudonymousFunding</code> vault
+(see <a href="#account-types">Account types</a>).
+A provider MAY choose provider unlinkability independently for each stream.</p>
+<h3 id="achieving-the-privacy-goals-on-lez"><a class="header" href="#achieving-the-privacy-goals-on-lez">Achieving the privacy goals on LEZ</a></h3>
+<p>Payment streams leverage LEZ private accounts and shielded transactions
+to achieve user unlinkability and provider unlinkability.
+Under the LEZ architecture, guest logic remains the same
+for transparent and shielded transactions.
+The guest does not enforce whether transactions are transparent or shielded.</p>
+<h4 id="user-unlinkability"><a class="header" href="#user-unlinkability">User unlinkability</a></h4>
+<p>To obtain user unlinkability, the user MUST
+use a private account as <code>VaultConfig.owner</code>,
+initialize the vault with privacy tier <code>PseudonymousFunding</code>
+(see <a href="#account-types">Account types</a>),
+pre-shield funds into that private account before deposit,
+and run all vault and stream operations through shielded transactions.</p>
+<p>The user SHOULD NOT reuse the same vault owner identity
+across vaults intended to remain unlinked.</p>
+<h4 id="provider-unlinkability"><a class="header" href="#provider-unlinkability">Provider unlinkability</a></h4>
+<p>To obtain provider unlinkability for a stream,
+the provider MUST use a private account as <code>provider_id</code>
+and claim through shielded transactions.</p>
+<p>The provider SHOULD NOT reuse the same <code>provider_id</code>
+across streams intended to remain unlinked.</p>
+<h3 id="limits-of-unlinkability-and-future-work"><a class="header" href="#limits-of-unlinkability-and-future-work">Limits of unlinkability and future work</a></h3>
+<p>The following issues MAY motivate future research:</p>
+<ul>
+<li>Vault and stream accounts are public, including stream terms, accrual state,
+the vault-to-stream graph, and deposit and claim amounts on <code>VaultHolding</code>.</li>
+<li>Observers can match amounts or timing between pre-shield and vault deposit,
+and between claim and a later de-shield.</li>
+<li>Vault owner and <code>provider_id</code> identities remain linkable
+across vaults and streams that reuse those identifiers.</li>
+</ul>
+<p>Coarser <a href="#system-clock-accounts">System clock accounts</a> reveal less precise activity timing to observers.
+The <a href="#automatic-claim-on-closure">Automatic claim on closure</a> extension
+strengthens timing correlation by merging close and payout.</p>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <h3 id="normative"><a class="header" href="#normative">Normative</a></h3>
 <ul>
 <li><a href="../../messaging/core/raw/incentivization.html">Incentivization for Waku Light Protocols</a></li>
 </ul>
 <h3 id="informative"><a class="header" href="#informative">Informative</a></h3>
-<h4 id="related-work"><a class="header" href="#related-work">Related Work</a></h4>
+<h4 id="related-work"><a class="header" href="#related-work">Related work</a></h4>
 <ul>
 <li><a href="https://forum.vac.dev/t/off-chain-payment-protocols-classification-and-architectural-choice/596">Off-Chain Payment Protocols: Classification and Architectural Choice</a></li>
 <li><a href="https://github.com/logos-blockchain/logos-execution-zone">Logos Execution Zone</a></li>
 </ul>
-<h4 id="payment-streaming-protocols"><a class="header" href="#payment-streaming-protocols">Payment Streaming Protocols</a></h4>
+<h4 id="payment-streaming-protocols"><a class="header" href="#payment-streaming-protocols">Payment streaming protocols</a></h4>
 <p>Existing payment streaming protocols target EVM-like architectures.
 Protocols vary in duration
 (fixed-duration in Sablier Lockup or open-ended in Sablier Flow)
@@ -996,8 +1057,8 @@ and in deposit architectures
 <p>This appendix provides an illustrative EVM-based implementation outline.
 The actual implementation will target LEZ.
 The sketch uses one vault per contract and one vault token,
-and omits multi-vault support from the main protocol.</p>
-<h3 id="a1-contract-structure"><a class="header" href="#a1-contract-structure">A.1 Contract Structure</a></h3>
+and omits the main protocol's multi-vault support.</p>
+<h3 id="a1-contract-structure"><a class="header" href="#a1-contract-structure">A.1 Contract structure</a></h3>
 <pre><code class="language-solidity">contract PaymentVault {
     enum StreamState { ACTIVE, PAUSED, CLOSED }
 
@@ -1017,14 +1078,14 @@ and omits multi-vault support from the main protocol.</p>
     mapping(uint256 =&gt; Stream) public streams;
 }
 </code></pre>
-<h3 id="a2-vault-operations"><a class="header" href="#a2-vault-operations">A.2 Vault Operations</a></h3>
+<h3 id="a2-vault-operations"><a class="header" href="#a2-vault-operations">A.2 Vault operations</a></h3>
 <pre><code class="language-solidity">event Deposited(uint256 amount);
 event Withdrawn(uint256 amount, address indexed to);
 
 function deposit(uint256 amount) external;
 function withdraw(uint256 amount, address to) external;
 </code></pre>
-<h3 id="a3-stream-lifecycle"><a class="header" href="#a3-stream-lifecycle">A.3 Stream Lifecycle</a></h3>
+<h3 id="a3-stream-lifecycle"><a class="header" href="#a3-stream-lifecycle">A.3 Stream lifecycle</a></h3>
 <pre><code class="language-solidity">event StreamCreated(
     uint256 indexed streamId,
     address indexed provider,
@@ -1064,9 +1125,10 @@ function closeStream(uint256 streamId) external;
 /// @notice Provider claims accrued funds from a stream
 /// @dev Callable in any state (ACTIVE, PAUSED, or CLOSED).
 ///      Transfers full accruedBalance to provider and resets it to zero.
+///      Decreases allocation by the claimed amount.
 function claim(uint256 streamId) external;
 </code></pre>
-<h3 id="a4-internal-accrual"><a class="header" href="#a4-internal-accrual">A.4 Internal Accrual</a></h3>
+<h3 id="a4-internal-accrual"><a class="header" href="#a4-internal-accrual">A.4 Internal accrual</a></h3>
 <pre><code class="language-solidity">/// @notice Update accruedBalance based on elapsed time since lastUpdatedAt
 /// @dev Called by createStream, pauseStream, resumeStream, topUpStream, closeStream, and claim
 ///      before modifying stream state. Caps accrual at allocation and
