@@ -1847,7 +1847,9 @@ The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specifie
 
 The seed is **five thousandths of the supply at network launch**. Two floors bound it from below. The first is the pool size at which a claim stops covering its own fee, which is the fee multiplied by the target claim rate and the blocks in an epoch, divided by $`\rho`$; nothing smaller is a working endowment at all. The second is larger and is what actually decides the value: the pool must stay above that floor for as long as it takes the fee inflow to grow into sustaining the reward by itself, and since the pool drains at $`\rho`$ throughout that period, a slower arrival of traffic costs disproportionately more. Five thousandths covers an adoption path reaching full blocks over five years with roughly half again in margin, and sustains claiming for close to two years even if the network carries no traffic at all.
 
-It is stated as a fraction of the launch supply rather than as a quantity of base units because the two are not interchangeable here. The opening reward per claim follows from the fraction, $`\rho`$ and the target claim rate alone, none of which depend on the denomination; the fee it must exceed is a fixed number of base units and therefore does depend on it. **A seed of this size requires at least about eight hundred base units to the token for the opening reward to be twice the fee**, and the denomination must be fixed with that constraint in view. A larger seed relaxes it proportionally.
+It is stated as a fraction of the launch supply rather than as a quantity of base units because that is the form in which it is a decision about how the initial supply is divided, which is what it is. The opening reward per claim follows from the fraction, $`\rho`$ and the target claim rate alone.
+
+Whether that reward is generous enough is a separate question, and it is settled by the **price level the two fee markets are initialised at**, since the fee a claim pays is its size and gas multiplied by those prices. A seed of five thousandths yields an opening reward that exceeds twice the claim's fee for as long as the launch fee is at or below $`1.157 \times 10^{-10}`$ of the launch supply. Genesis governance sets those initial prices, and this is the constraint they must respect; it is stated as a fraction of supply so that it holds whatever [Denomination](#denomination) is settled on. A larger seed relaxes it in proportion.
 
 The seed is drawn from the initial token distribution rather than minted. This is what keeps claiming outside the protocol's emission envelope: the seed consists of tokens that exist from genesis, and the refill of fees that were paid and would otherwise have been burnt, so claiming redirects tokens rather than creating them. It never raises issuance above what the emission model would otherwise allow.
 
@@ -2039,6 +2041,18 @@ class Note:
     value: TokenValue   # uint64
     public_key: ZkPublicKey # 32 bytes
 ```
+
+### Denomination
+
+Every quantity of type `TokenValue` — note values, balances, fees, prices and pool balances — is counted in the smallest amount the protocol can represent. How many of those go to one LGO is **not settled by this specification**; it is a tree-wide decision affecting the fee markets and the emission model as much as this document, and it is being made separately.
+
+Two things about it are fixed here, because [Proof of Work Operations](#proof-of-work-operations) depends on both.
+
+The first is a bound. `TokenValue` is a 64-bit unsigned integer, so the largest representable amount is $`2^{64}-1 \approx 1.84 \times 10^{19}`$. Against the launch supply of $`10^{10}`$ LGO given in [Block Rewards](block-rewards.md), no more than about $`1.84 \times 10^{9}`$ of the smallest unit may go to one LGO, and a value close to that bound leaves no margin for the supply to grow.
+
+The second is that **one LGO cannot itself be the smallest unit**. The maximum block reward derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number, so the emission model already requires a finer unit than one LGO. Independently, both fee markets have an effective floor of one unit of `TokenValue` per unit of gas; were that unit one LGO, the claim transaction described in [CLAIM_POW_REWARD](#claim_pow_reward) would cost 952 LGO at the cheapest price either market can ever offer, which is ten times the entire maximum block reward, and the reward pool would have to hold twice the total token supply for a claim to cover its own fee. Claiming could not work at any endowment.
+
+Where amounts appear in LGO in this specification they are a human-readable convenience. The genesis reward pool is given as a fraction of the launch supply for the same reason, in [Genesis](#genesis).
 
 ### Note Id
 

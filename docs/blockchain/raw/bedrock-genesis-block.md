@@ -77,7 +77,7 @@ POW_REWARD_POOL_GENESIS: TokenValue   # Initial balance of the proof of work rew
                                       # = 5/1000 of the supply at network launch
 ```
 
-The seed is **five thousandths of the supply at network launch**. It is stated as a fraction of that supply rather than as a quantity of base units, because the reward the pool yields per claim depends only on the fraction, the distribution rate and the target claim rate, none of which depend on how the token is subdivided, whereas the fee that reward must exceed is a fixed number of base units and does. Fixing the fraction therefore fixes the allocation, and places a floor of roughly eight hundred base units to the token under the denomination for the opening reward to be twice the fee. The reasoning behind the size is given in [Genesis](bedrock-v1.1-mantle-specification.md#genesis).
+The seed is **five thousandths of the supply at network launch**. It is stated as a fraction of that supply because that is the form in which it is a decision about how the initial supply is divided: the reward the pool yields per claim follows from the fraction, the distribution rate and the target claim rate alone. Whether that reward is generous enough depends on the price level the fee markets are initialised at, not on the seed, and the constraint that places on genesis governance is given in [Genesis](bedrock-v1.1-mantle-specification.md#genesis) along with the reasoning behind the size.
 
 This allocation is **drawn from the initial token distribution**, not minted in addition to it. The tokens exist from genesis and the seed determines how many of them are held in the pool rather than distributed to stakeholders directly. This is what keeps claiming outside the protocol's emission envelope, as described in [Reward Pool](bedrock-v1.1-mantle-specification.md#reward-pool), and it means the seed is a decision about how the initial supply is divided rather than about how much supply exists.
 
@@ -85,7 +85,7 @@ The pool holds a balance rather than notes, so unlike the stakeholder allocation
 
 The seed is not part of the Cryptarchia parameter inscription, because it is not a Cryptarchia parameter. It is established during [Mantle Ledger Initialization](#mantle-ledger-initialization).
 
-Its size governs how generous claiming is during the network's earliest epochs, and therefore how quickly a participant with no tokens can accumulate a usable balance. It has not been determined.
+Its size governs how generous claiming is during the network's earliest epochs, and therefore how quickly a participant with no tokens can accumulate a usable balance.
 
 ## Initial Service Declarations
 
