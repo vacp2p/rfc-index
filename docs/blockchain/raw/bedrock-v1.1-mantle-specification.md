@@ -1894,11 +1894,11 @@ Unlike the reward difficulty, `difficulty_blend` is recomputed **once per epoch*
 The control objective is transaction load, for the anonymity-set reason given in [Blend Difficulty](blend-protocol.md#blend-difficulty). At the reference load the threshold sits at a baseline; above it admission tightens, below it admission loosens.
 
 ```python
-BLEND_DIFFICULTY_BASE: PowTarget   # Threshold in effect at the reference load
-TARGET_TXS_PER_BLOCK: uint64       # Reference transactions per block
-BLEND_DAMPING_NUM: uint64          # a, where the response exponent is alpha = a / b
-BLEND_DAMPING_DEN: uint64          # b, with 0 < a <= b so that alpha <= 1
-BLEND_MAX_STEP: uint64             # Maximum factor the threshold may move in one epoch
+BLEND_DIFFICULTY_BASE: PowTarget = p // 2**24   # Threshold at the reference load
+TARGET_TXS_PER_BLOCK: uint64 = 512              # Reference transactions per block
+BLEND_DAMPING_NUM: uint64 = 1                   # a, where the exponent is alpha = a / b
+BLEND_DAMPING_DEN: uint64 = 2                   # b, with 0 < a <= b so that alpha <= 1
+BLEND_MAX_STEP: uint64 = 2                      # Max factor the threshold may move per epoch
 
 def compute_epoch_blend_difficulty(epoch_blocks: list[Block],
                                    previous: PowTarget) -> PowTarget:
@@ -1931,7 +1931,25 @@ The attack must therefore be paid for continuously while its effect stays bounde
 
 Note what this controller cannot see. Its input is transactions included in blocks, so messages that are never included — including messages sent purely to consume Blend capacity — do not raise it. It regulates admission against observed chain load, not against network load, and is therefore not by itself a defence against flooding the Blend network with messages that never reach a block.
 
-None of `BLEND_DIFFICULTY_BASE`, `TARGET_TXS_PER_BLOCK`, the damping ratio or `BLEND_MAX_STEP` has been calibrated.
+#### Choosing the four constants
+
+`TARGET_TXS_PER_BLOCK` is the load at which the threshold sits at its baseline, and is set to half of `MAX_BLOCK_TXS`. This mirrors the execution market, which steers toward half its per-block gas limit: a block at the fee market's own target is the natural definition of ordinary load, and defining the reference any other way would leave the two markets disagreeing about what busy means.
+
+The damping exponent is a half, as one over two. The argument for it is the one given above — quadrupling the load only doubles the threshold, so each additional attacker-funded transaction buys less effect than the last while costing the same as the first.
+
+`BLEND_MAX_STEP` is two. At a damping exponent of a half, a factor of two in the threshold corresponds to a factor of four in load, so the clamp does not bind on ordinary variation and engages only on swings larger than that within a single epoch. A sustained hundredfold change in load is tracked over four epochs, which is a month; that is slow enough that participants can react and fast enough that the threshold is not left badly wrong for long.
+
+`BLEND_DIFFICULTY_BASE` is the one with no anchor elsewhere in this specification tree, because it fixes what a message ought to *cost*, and nothing states that. It is therefore set from the work itself. A candidate solution costs two `zkhash` invocations, so a threshold of the scalar field modulus divided by $`2^{24}`$ puts the expected cost of one solution at about sixteen million candidates, which on a single core of an ordinary machine is on the order of a minute. Since one solution admits exactly one message, a participant with a single core and no stake can send on the order of a thousand messages a day, and needs no tokens to do it. Below about $`2^{20}`$ the work is not a cost at all; above about $`2^{28}`$ that same participant manages a few messages an hour, which is not an on-ramp. The chosen value sits between those.
+
+**This estimate rests on the throughput of `zkhash`, which has not been measured.** An order of magnitude either way moves the cost of a message by the same factor, and the value should be re-derived once a benchmark exists.
+
+`difficulty_blend` is set to `BLEND_DIFFICULTY_BASE` at genesis, so the network begins at its reference load rather than at a guess about the first epoch's traffic.
+
+#### What the threshold does not bound
+
+It sets a price per message; it does not set a ceiling on the rate. A participant able to bring a large amount of computation to bear obtains solutions in proportion to it, and at any threshold cheap enough to serve as an on-ramp that rate exceeds the honest one by orders of magnitude. Raising the threshold to prevent this would put the on-ramp out of reach of the participants it exists for, and would still not bound an adversary willing to spend more.
+
+What bounds the damage is elsewhere: verification of the proof of quota before relaying rather than after, so an invalid message is dropped at the first hop rather than propagated; the nullifier cache, which must be sized against $`d_{blend}`$ rather than against a count of registered nodes; and the fact that the work must be paid for continuously, in energy, for as long as the flood is to be sustained. The threshold is one term in that, not the whole of it.
 
 ## TRANSFER
 
