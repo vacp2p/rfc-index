@@ -298,7 +298,7 @@ The proof of work reward pool is initialized at the same time:
 1. `pow_reward_pool` is set to `POW_REWARD_POOL_GENESIS`, as described in [Initial Proof of Work Reward Pool](#initial-proof-of-work-reward-pool).
 2. `epoch_pow_reward` is derived from it by the computation given in [Reward Pool](bedrock-v1.1-mantle-specification.md#reward-pool), so that claiming is productive from the first epoch rather than waiting for the first refill.
 3. `difficulty_blend` is set to `BLEND_DIFFICULTY_BASE`, as given in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), so that the network begins at its reference load rather than at a guess about the first epoch's traffic.
-4. `difficulty_reward` is set to its genesis value, and `pow_nullifiers` is empty.
+4. `difficulty_reward` is set to the genesis value given in [Reward Difficulty](bedrock-v1.1-mantle-specification.md#reward-difficulty), which is deliberately on the hard side so that the controller's first correction loosens rather than tightens, and `pow_nullifiers` is empty.
 
 ## Cryptarchia Initialization
 

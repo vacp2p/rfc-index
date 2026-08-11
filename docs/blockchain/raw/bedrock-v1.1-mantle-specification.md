@@ -1858,8 +1858,8 @@ The seed is drawn from the initial token distribution rather than minted. This i
 `difficulty_reward` is part of consensus state and is updated **every block**, steering the number of accepted claims toward `TARGET_CLAIMS_PER_BLOCK`. It is independent of the Blend threshold used by [Proof of Quota](proof-of-quota.md), which is a per-epoch value and is never evaluated here.
 
 ```python
-EMA_SMOOTHING_FACTOR: uint64      # F, the weight given to the previous estimate
-EMA_SMOOTHING_PRECISION: uint64   # P, the scale F is expressed against; F < P
+EMA_SMOOTHING_FACTOR: uint64 = 9      # F, the weight given to the previous estimate
+EMA_SMOOTHING_PRECISION: uint64 = 10  # P, the scale F is expressed against; F < P
 
 def compute_new_reward_difficulty(claims_in_block: uint64,
                                   current_target: PowTarget) -> PowTarget:
@@ -1882,6 +1882,14 @@ Two properties follow, and both matter for its safety. When a block accepts exac
 The rate the controller observes is the rate of claims **included in blocks**, not the rate at which solutions are found. Solutions that are never included, because a block builder declined to include them or because block space was exhausted, are invisible to it. Difficulty therefore tracks accepted demand rather than offered demand, and the two diverge when block space is contended.
 
 A block builder may include its own claims. The controller makes this self-correcting: claims a builder awards itself raise the observed rate like any other, which tightens the target and raises the work required for every subsequent claim, including the builder's own.
+
+#### Choosing the smoothing and the genesis target
+
+The smoothing is nine parts in ten, matching the exponential moving average the execution market uses for the same reason. The ratio is what sets both of the properties above: at the target rate the response has slope $`F/P`$, which is below one and therefore stable, with a time constant of about ten blocks; at zero claims it has slope $`P/F`$, which is above one, so the no-claims state pushes away rather than trapping. Any pair with $`F \lt P`$ preserves both signs, so the choice sets how fast the controller responds rather than whether it is stable, and nine in ten places the response an order of magnitude slower than the block rate — fast enough to track a change in hashrate within minutes, slow enough that one unusual block barely moves the target.
+
+`difficulty_reward` is set at genesis to the scalar field modulus divided by $`2^{26}`$. The value matters much less than it appears to, because it is only the seed of a controller that re-derives the target every block, and **its error is asymmetric**. Setting it too permissive over-pays: the first blocks accept more than the target, and the excess is bounded by how quickly the controller tightens, which for an initial value a hundredfold too permissive comes to some twelve hundred extra claims over about twenty blocks — a few thousand tokens against a pool of tens of millions. Setting it too hard costs only time: with no claims arriving the target rises by a factor of $`P/F`$ each block, so an initial value a hundredfold too hard corrects itself within an hour and nothing is lost.
+
+Since being wrong in one direction costs tokens and in the other costs minutes, the genesis value is chosen on the hard side. At $`2^{26}`$ a solution is a few minutes of work on one core, so reaching the target claim rate requires on the order of a hundred cores of honest mining across the whole network — deliberately more than a launch is likely to attract, so that the controller's first move is to loosen.
 
 ### Blend Difficulty
 
@@ -2062,21 +2070,15 @@ class Note:
 
 ### Denomination
 
-Every quantity of type `TokenValue` — note values, balances, fees, prices and pool balances — is counted in **base units**, and
+Every quantity of type `TokenValue` — note values, balances, fees, prices and pool balances — is counted in the smallest amount the protocol can represent. How many of those go to one LGO is **not settled by this specification**; it is a tree-wide decision affecting the fee markets and the emission model as much as this document, and it is being made separately.
 
-```python
-BASE_UNITS_PER_LGO: uint64 = 100_000_000   # 10**8
-```
+Two things about it are fixed here, because [Proof of Work Operations](#proof-of-work-operations) depends on both.
 
-so one LGO is a hundred million base units and a base unit is the smallest amount the protocol can represent, transfer or price. Amounts given in LGO anywhere in this specification tree are a human-readable convenience; the protocol arithmetic is over base units throughout.
+The first is a bound. `TokenValue` is a 64-bit unsigned integer, so the largest representable amount is $`2^{64}-1 \approx 1.84 \times 10^{19}`$. Against the launch supply of $`10^{10}`$ LGO given in [Block Rewards](block-rewards.md), no more than about $`1.84 \times 10^{9}`$ of the smallest unit may go to one LGO, and a value close to that bound leaves no margin for the supply to grow.
 
-The value is bounded above by the type. `TokenValue` is a 64-bit unsigned integer, so the largest representable amount is $`2^{64}-1 \approx 1.84 \times 10^{19}`$ base units. Against the launch supply of $`10^{10}`$ LGO given in [Block Rewards](block-rewards.md), $`10^{8}`$ places the entire supply at $`10^{18}`$ base units, leaving a factor of eighteen before a single `TokenValue` could no longer hold it — some three centuries at the protocol's maximum emission rate. A value of $`10^{9}`$ would leave a factor of under two, and fewer than a hundred years, which is not a sensible margin for a quantity that cannot be changed after genesis.
+The second is that **one LGO cannot itself be the smallest unit**. The maximum block reward derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number, so the emission model already requires a finer unit than one LGO. Independently, both fee markets have an effective floor of one unit of `TokenValue` per unit of gas, and neither rests at that floor: the downward step of each has fixed points across the first several units, so an idle market settles a little above it. Were that unit one LGO, the claim transaction described in [CLAIM_POW_REWARD](#claim_pow_reward) would cost 952 LGO at the cheapest price either market could ever offer — ten times the entire maximum block reward — and several times that at the level the markets actually rest at. The reward pool would have to hold more than the total token supply for a claim to cover its own fee, and claiming could not work at any endowment.
 
-It is bounded below by the need for the fee markets to have room to price. Both round their updates upwards and therefore cannot go below one base unit per unit of gas, and neither rests at that floor: the downward step of each has fixed points across the first several units, so an idle market settles a little above it. That floor exists to stop zero becoming an absorbing state, and it should sit far enough below any price the market would actually discover that it never binds. Eight decimal places puts the smallest expressible transaction fee many orders of magnitude below any economically meaningful amount, which is what allows the floor to be a safety net rather than a price.
-
-**One LGO could not itself have been the smallest unit.** The maximum block reward derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, not a whole number, so the emission model already requires a finer unit. And at a floor of one LGO per byte and per gas, the claim transaction described in [CLAIM_POW_REWARD](#claim_pow_reward) would cost 952 LGO — ten times the entire maximum block reward, and several times that again at the level the markets rest at — while the reward pool would have to hold more than the total token supply for a claim to cover its own fee.
-
-**The denomination does not determine what a transaction costs.** The fee is the transaction's size and gas multiplied by prices the two markets set, and those prices are initialised by genesis governance and discovered thereafter. The denomination fixes only how finely a price can be expressed and how large a value can be represented.
+Where amounts appear in LGO in this specification they are a human-readable convenience. The genesis reward pool is given as a fraction of the launch supply for the same reason, in [Genesis](#genesis).
 
 ### Note Id
 
