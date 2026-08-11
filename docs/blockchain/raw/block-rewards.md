@@ -22,6 +22,7 @@
 | Version | Changes | Date |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-04-24 |
+| 1.1.0 | Size the TGE supply against the fee schedule, so that the deflationary phase is reachable and begins at the fee market's target utilisation | 2026-08-11 |
 
 > Disclaimer:
 > This material, including any linked pages or documents, is provided for informational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any securities, tokens, or other financial instruments, nor should it be construed as legal, financial, or tax advice.
@@ -157,19 +158,33 @@ Let us define the following variables:
 
 | Symbol | Definition | Default Value | Explanation |
 | --- | --- | --- | --- |
-| $`S_{tge}`$​ | Token supply at TGE | 10 billion LGO | N.A. |
+| $`S_{tge}`$​ | Token supply at TGE | 300 trillion LGO | Sized so that the deflationary phase described below is reachable at all, and begins at the fee market's target utilisation. See [Sizing the TGE supply](#sizing-the-tge-supply). |
 | $T$​ | The number of periods in the look-back window for the moving average. | $120$​ | As the system is expected to mint 1 block every 30 seconds, this look-back window defines that the minting averages the fees burned in the last hour. |
 | $`\alpha_a`$​ | Denotes the control responsiveness to KPI average metrics. | $1$​ | This parameter drives the token emission from the burn rate. It must be one-to-one. |
 | $`\alpha_d`$​ | Denotes the control responsiveness to KPI deviation metrics. | $1/4$​ | See [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md), for details. |
 | $`w_i`$​ | Denotes the weight of the $i$-th KPI in the normalized deviation from target | $1$​ | There's only one KPI of this type in our system. |
-| $`D_{0,target}`$​ | Denotes the target value for the first KPI based on stake. | 3 billion LOGOS | $30\%$ of the token supply. |
-| $`D_{1,target}`$​ | Denotes the target value for the second KPI based on fees. | $10$ billon LOGOS | In the context of this KPI, this value behaves as a normalizer |
+| $`D_{0,target}`$​ | Denotes the target value for the first KPI based on stake. | 90 trillion LGO | $30\%$ of the token supply. |
+| $`D_{1,target}`$​ | Denotes the target value for the second KPI based on fees. | $300$ trillion LGO | Equal to $`S_{tge}`$; in the context of this KPI, this value behaves as a normalizer |
 | $`I_{max}`$​ | The maximum emission rate per year | $1\%$​ | This value guarantees that, when the total inferred stake reaches $`D_{0,target}`$, then the APY for validation is ~3.33%. |
 | $`I_{min}`$​ | The minimum emission rate per year | $0\%$​ | This avoids inflationary token emissions. |
 | $f$​ | The average number of block proposal within $`\Delta_{t}`$ units | $1$​ | The time step $`\Delta_t`$ was chosen so that $f$ equals to $1$. |
 | $`\Delta_t`$​ | Time step, the fraction of year in one time step (per e.g., epoch, block, or day) | $1/(365 \times 2880)$​ | The time step is 1 block every $30$ seconds; there are 2880 blocks of 30 seconds in a day. |
 
 The calibration of these parameters can be found in [\[Analysis\] Block Reward Parameter Calibration](analysis-block-reward-parameter-calibration.md).
+
+### Sizing the TGE supply
+
+The supply is not an arbitrary headline figure. Because one LGO is the smallest amount the protocol can represent, and because both fee markets price in whole LGO per byte and per unit of gas, the supply fixes what a transaction costs *as a fraction of everything that exists*. It therefore has to be sized against the fee schedule rather than chosen independently of it.
+
+The requirement comes from the three phases described in [Block Rewards](#block-rewards). The last of them — that when burning exceeds the maximum emission the supply becomes deflationary — is only reachable if a block can in fact burn more than a block can mint. A block mints at most $`I_{max} \cdot S_{tge} \cdot \Delta_t / f`$, which is proportional to the supply, while it burns the fees of the transactions it carries, which is not. Setting the supply too low makes the burn exceed the cap at every level of activity, so the emission controller is saturated from the first block and the system is permanently and violently deflationary; setting it too high puts the third phase beyond the reach of a full block, so the mechanism can never do what this specification says it does.
+
+Both failures are avoided by placing the transition where the fee market already places its own reference point. A block at the execution market's target utilisation should burn approximately what a block mints at the maximum emission rate. The price to evaluate that at is the one an unloaded market actually settles on rather than the floor beneath it: the downward step of each market has fixed points across the first several units, so a price falling under sustained disuse comes to rest a little above its floor and does not return to it. At an ordinary transaction of some five and a half thousand LGO at that resting level, half a full block of them, and 365 · 2880 blocks in a year, the condition gives a supply of the order of three hundred trillion LGO. Below the target the system is inflationary, at it the two balance, and above it the burn dominates — which is the behaviour described above, now reachable in all three parts.
+
+Choosing the resting price rather than the floor is the conservative direction. At any higher price the burn is larger, so the transition arrives at a lower utilisation and the third phase is more easily reached, not less; the supply derived here is therefore the smallest that keeps the phase reachable under the least favourable price the market sustains.
+
+The earlier value of ten billion did not satisfy this. Against the same fee schedule it put the transition at under a fiftieth of a transaction per block, meaning the burn exceeded the maximum emission at any activity whatever and the emission controller was saturated from the first block, while a single ordinary transaction cost about six parts in ten million of the entire supply.
+
+Two consequences of the new value are worth noting. The maximum minted block reward is no longer a small number of tokens but a little under three million of them, and although it remains a non-integer it is now one whose fractional part is negligible against its magnitude, so rounding it down loses a part in ten million rather than a part in seven hundred. And every quantity in this specification tree that is expressed as a percentage of the supply — the security target, the minimum stake, the reward pool seed — is unaffected in relative terms and scales with it automatically.
 
 ## Block Rewards
 
@@ -391,8 +406,8 @@ $$
 I_{\max}=10^{-2},\qquad
 T=120,\quad
 f=1,\quad R_\text{block} = D_{1,t}\\
-D_{0,\mathrm{target}}=3\cdot 10^9,\qquad
-D_{1,\mathrm{target}}=S_{\mathrm{tge}}=10^{10},\qquad
+D_{0,\mathrm{target}}=9\cdot 10^{13},\qquad
+D_{1,\mathrm{target}}=S_{\mathrm{tge}}=3\cdot 10^{14},\qquad
 \Delta_t=\frac{1}{365\cdot 2880},
 $$
 
@@ -416,10 +431,10 @@ $$
 \frac{1/4}{10^{-2}}\cdot \frac{D_{0,\mathrm{target}}-D_{0,t}}{D_{0,\mathrm{target}}}
 \\
 &=
-25\cdot \frac{3\cdot 10^9-D_{0,t}}{3\cdot 10^9}
+25\cdot \frac{9\cdot 10^{13}-D_{0,t}}{9\cdot 10^{13}}
 \\
 &=
-\frac{3\cdot 10^9-D_{0,t}}{12\cdot 10^7}.
+\frac{9\cdot 10^{13}-D_{0,t}}{36\cdot 10^{11}}.
 \end{aligned}
 $$
 
@@ -427,15 +442,15 @@ and
 
 $$
 \frac{\alpha_a}{I_{\max}}\gamma_t=\frac{1}{10^{-2}}\cdot \frac{1}{\Delta_t}\cdot \frac{1}{T}\sum_{\tau=t-T+1}^{t}\frac{D_{1,\tau}}{D_{1,\mathrm{target}}}=\\\frac{1}{10^{-2}}\cdot \frac{1}{\Delta_t}\cdot \frac{1}{T}\cdot\frac{1}{{D_{1,\mathrm{target}}}}\sum_{\tau=t-T+1}^{t}{D_{1,\tau}}=\\
-\\100\cdot \frac{1}{\frac{1}{365\cdot 2880}}\cdot \frac{1}{120}\cdot\frac{1}{10^{10}}\sum_{\tau=t-120+1}^{t}{D_{1,\tau}}=\\
-100\cdot \frac{365\cdot 2880}{120\cdot 10^{10}}\sum_{\tau=t-120+1}^{t} D_{1,\tau}=\\
-\frac{10512}{12\cdot 10^7}\sum_{\tau=t-120+1}^{t} D_{1,\tau}.
+\\100\cdot \frac{1}{\frac{1}{365\cdot 2880}}\cdot \frac{1}{120}\cdot\frac{1}{3\cdot 10^{14}}\sum_{\tau=t-120+1}^{t}{D_{1,\tau}}=\\
+100\cdot \frac{365\cdot 2880}{120\cdot 3\cdot 10^{14}}\sum_{\tau=t-120+1}^{t} D_{1,\tau}=\\
+\frac{10512}{36\cdot 10^{11}}\sum_{\tau=t-120+1}^{t} D_{1,\tau}.
 $$
 
 So we rewrite $`A_t`$ by
 
 $$
-A_t=\min\!\lbrace1,\max\!\lbrace0,\quad \frac{3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}}{12\cdot 10^7}\rbrace\rbrace.
+A_t=\min\!\lbrace1,\max\!\lbrace0,\quad \frac{9\cdot 10^{13}-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}}{36\cdot 10^{11}}\rbrace\rbrace.
 $$
 
 And by denoting
@@ -444,9 +459,9 @@ $$
 \begin{aligned}
 A_t'
 &=
-\min\!\lbrace12\cdot 10^7,\max\!\lbrace0,\quad3\cdot 10^9-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\rbrace\rbrace,
+\min\!\lbrace36\cdot 10^{11},\max\!\lbrace0,\quad9\cdot 10^{13}-D_{0,t}+10512\sum_{\tau=t-120+1}^{t}D_{1,\tau}\rbrace\rbrace,
 \\
-A_t&=\frac{A_t'}{12\cdot 10^7}.
+A_t&=\frac{A_t'}{36\cdot 10^{11}}.
 \end{aligned}
 $$
 
@@ -454,21 +469,21 @@ We can compute the block reward using only integers:
 
 $$
 \text{Rewards}_t= A_t \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-A_t) \cdot R_\text{block} =\\
-\frac{A_t'}{12\cdot 10^7} \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-\frac{A_t'}{12\cdot 10^7}) \cdot D_{1,t}
+\frac{A_t'}{36\cdot 10^{11}} \cdot \dfrac{I_{max} \cdot S_{tge} \cdot \Delta_t}{f} + (1-\frac{A_t'}{36\cdot 10^{11}}) \cdot D_{1,t}
 $$
 
 and
 
 $$
-\frac{I_{\max} \cdot S_{\mathrm{tge}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 10^{10}}{365\cdot 2880}=\frac{10^8}{1051200}=\frac{62500}{657}.
+\frac{I_{\max} \cdot S_{\mathrm{tge}}\cdot \Delta_t}{f}=\frac{10^{-2}\cdot 3\cdot 10^{14}}{365\cdot 2880}=\frac{3\cdot 10^{12}}{1051200}=\frac{625000000}{219}.
 $$
 
 So:
 
 $$
 \text{Rewards}_t=
-\frac{A_t'}{12\cdot 10^7} \cdot \frac{62500}{657} + (1-\frac{A_t'}{12\cdot 10^7})\cdot D_{1,t} =\\
-\frac{62500\cdot A_t' + 657\cdot(12\cdot 10^7-A_t')\cdot D_{1,t}}{657\cdot 12\cdot 10^7}
+\frac{A_t'}{36\cdot 10^{11}} \cdot \frac{625000000}{219} + (1-\frac{A_t'}{36\cdot 10^{11}})\cdot D_{1,t} =\\
+\frac{625000000\cdot A_t' + 219\cdot(36\cdot 10^{11}-A_t')\cdot D_{1,t}}{219\cdot 36\cdot 10^{11}}
 .
 $$
 
