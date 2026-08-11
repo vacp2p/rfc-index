@@ -56,10 +56,10 @@ A proof attesting that for the following public values derived from blockchain p
 
 ```python
 class ProofOfQuotaPublic:
-    core_quota: int       # Allowed messages per epoch for core nodes (20 bits)
-    leader_quota: int     # Allowed messages per epoch for potential leaders (20 bits)
+    core_quota: int       # Allowed blending operations per epoch for core nodes (20 bits)
+    leader_quota: int     # Allowed blending operations per election win (20 bits)
     core_root: zkhash     # Merkle root of zk_id of the core nodes
-    pow_quota: int        # Allowed messages per proof of work solution (20 bits)
+    pow_quota: int        # Allowed blending operations per proof of work solution (20 bits)
     pol_ledger_aged: zkhash # Merkle root of the PoL eligible notes
     K_part_one: int       # First part of the signature public key (16 bytes)
     K_part_two: int       # Second part of the signature public key (16 bytes)
