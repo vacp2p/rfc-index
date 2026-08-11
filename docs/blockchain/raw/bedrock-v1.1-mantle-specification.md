@@ -2044,15 +2044,21 @@ class Note:
 
 ### Denomination
 
-Every quantity of type `TokenValue` — note values, balances, fees, prices and pool balances — is counted in the smallest amount the protocol can represent. How many of those go to one LGO is **not settled by this specification**; it is a tree-wide decision affecting the fee markets and the emission model as much as this document, and it is being made separately.
+Every quantity of type `TokenValue` — note values, balances, fees, prices and pool balances — is counted in **base units**, and
 
-Two things about it are fixed here, because [Proof of Work Operations](#proof-of-work-operations) depends on both.
+```python
+BASE_UNITS_PER_LGO: uint64 = 100_000_000   # 10**8
+```
 
-The first is a bound. `TokenValue` is a 64-bit unsigned integer, so the largest representable amount is $`2^{64}-1 \approx 1.84 \times 10^{19}`$. Against the launch supply of $`10^{10}`$ LGO given in [Block Rewards](block-rewards.md), no more than about $`1.84 \times 10^{9}`$ of the smallest unit may go to one LGO, and a value close to that bound leaves no margin for the supply to grow.
+so one LGO is a hundred million base units and a base unit is the smallest amount the protocol can represent, transfer or price. Amounts given in LGO anywhere in this specification tree are a human-readable convenience; the protocol arithmetic is over base units throughout.
 
-The second is that **one LGO cannot itself be the smallest unit**. The maximum block reward derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, which is not a whole number, so the emission model already requires a finer unit than one LGO. Independently, both fee markets have an effective floor of one unit of `TokenValue` per unit of gas, and neither rests at that floor: the downward step of each has fixed points across the first several units, so an idle market settles a little above it. Were that unit one LGO, the claim transaction described in [CLAIM_POW_REWARD](#claim_pow_reward) would cost 952 LGO at the cheapest price either market could ever offer — ten times the entire maximum block reward — and several times that at the level the markets actually rest at. The reward pool would have to hold more than the total token supply for a claim to cover its own fee, and claiming could not work at any endowment.
+The value is bounded above by the type. `TokenValue` is a 64-bit unsigned integer, so the largest representable amount is $`2^{64}-1 \approx 1.84 \times 10^{19}`$ base units. Against the launch supply of $`10^{10}`$ LGO given in [Block Rewards](block-rewards.md), $`10^{8}`$ places the entire supply at $`10^{18}`$ base units, leaving a factor of eighteen before a single `TokenValue` could no longer hold it — some three centuries at the protocol's maximum emission rate. A value of $`10^{9}`$ would leave a factor of under two, and fewer than a hundred years, which is not a sensible margin for a quantity that cannot be changed after genesis.
 
-Where amounts appear in LGO in this specification they are a human-readable convenience. The genesis reward pool is given as a fraction of the launch supply for the same reason, in [Genesis](#genesis).
+It is bounded below by the need for the fee markets to have room to price. Both round their updates upwards and therefore cannot go below one base unit per unit of gas, and neither rests at that floor: the downward step of each has fixed points across the first several units, so an idle market settles a little above it. That floor exists to stop zero becoming an absorbing state, and it should sit far enough below any price the market would actually discover that it never binds. Eight decimal places puts the smallest expressible transaction fee many orders of magnitude below any economically meaningful amount, which is what allows the floor to be a safety net rather than a price.
+
+**One LGO could not itself have been the smallest unit.** The maximum block reward derived in [Block Rewards](block-rewards.md) is $`62500/657`$ LGO, not a whole number, so the emission model already requires a finer unit. And at a floor of one LGO per byte and per gas, the claim transaction described in [CLAIM_POW_REWARD](#claim_pow_reward) would cost 952 LGO — ten times the entire maximum block reward, and several times that again at the level the markets rest at — while the reward pool would have to hold more than the total token supply for a claim to cover its own fee.
+
+**The denomination does not determine what a transaction costs.** The fee is the transaction's size and gas multiplied by prices the two markets set, and those prices are initialised by genesis governance and discovered thereafter. The denomination fixes only how finely a price can be expressed and how large a value can be represented.
 
 ### Note Id
 
