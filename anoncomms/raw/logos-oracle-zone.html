@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/800635f21a472cdf6153976be37353d016a32065/docs/anoncomms/raw/logos-oracle-zone.md"><code>800635f</code></a> — docs(anoncomms): Proposer selection mechanism for Logos Oracle Zone (#388)</li>
 <li><strong>2026-07-21</strong> — <a href="https://github.com/logos-co/logos-lips/blob/0ab178356cb7cecb1f732b19cda5fbc73c7c276f/docs/anoncomms/raw/logos-oracle-zone.md"><code>0ab1783</code></a> — docs(anoncomms): commit the initial Logos Oracle Zone RFC (#366)</li>
 </ul>
 <!-- timeline:end -->
@@ -457,7 +458,125 @@ and the membership tree stores these public keys directly.</p>
 <p>During aggregation, every indexer discards observations whose <code>membership_proof</code> does not verify,
 so observations from non-members never enter the median.
 On the dispute path the LEZ contract checks the same proofs against its own membership root,
-so only registered nodes count toward the disputed value.</p>
+so only registered nodes count toward the disputed value.
+For proposer rotation the LEZ contract uses the root frozen at the cycle start, <a href="#indexer-proposing">see Indexer Proposing section</a>.</p>
+<h2 id="indexer-proposing"><a class="header" href="#indexer-proposing">Indexer Proposing</a></h2>
+<p>Each round, only one indexer MUST propose the attestation to LEZ.
+This section specifies how an indexer can be chosen among all indexers.
+Since an optimistic approach is used here, correctness does not depend on who proposes.
+So a simple round-robin-ish rotation mechanism is enough.</p>
+<p>Each round has three eligible writers enforced by the LEZ contract,
+a primary and two backups, derived from a formula every indexer computes off-chain.
+Three is an optimum balance.
+Fewer writers put liveness at risk, since one or two offline nodes can leave a round with no writer.
+No enforcement at all opens the whole set to a race,
+since any node could write and gas is the only thing separating the winner from the rest.
+In practice, all three candidates can write the attestation,
+but the reward is arranged so the primary earns more, to encourage it to write first.</p>
+<h3 id="rotation-cycle"><a class="header" href="#rotation-cycle">Rotation cycle</a></h3>
+<p>A rotation cycle consists of <code>AOS_cycle</code> rounds.
+That is one full turn over the indexer set.</p>
+<pre><code class="language-protobuf">syntax = "proto3";
+
+message RotationState {
+  bytes  root_cycle        = 1;  // 32 bytes, membership root frozen for the cycle
+  uint32 seed_cycle         = 2;  // permutation seed for the cycle
+  uint32 permA              = 3;  // permutation multiplier, coprime with AOS_cycle
+  uint32 AOS_cycle          = 4;  // set size frozen for the cycle
+  int64  cycleStartRound    = 5;  // first round of the current cycle and assigned zero (0) when it is deployed 
+  int64  lastAcceptedRound  = 6;  // last round written
+}
+</code></pre>
+<p>At the start of a cycle the contract freezes three values.</p>
+<ul>
+<li><code>AOS_cycle</code>, the number of registered indexers.</li>
+<li><code>root_cycle</code>, the membership root.</li>
+<li><code>permA</code>, the permutation multiplier, derived below.</li>
+</ul>
+<pre><code>slot    = (round - cycleStartRound) mod AOS_cycle
+primary = (permA * slot + seed_cycle) mod AOS_cycle
+backup1 = (primary + 1) mod AOS_cycle
+backup2 = (primary + 2) mod AOS_cycle
+</code></pre>
+<p><code>primary</code>, <code>backup1</code>, <code>backup2</code> are indices into <code>root_cycle</code>.</p>
+<p>Cycle opening, run once when a new cycle starts:</p>
+<pre><code>AOS_cycle   = current registered indexer count
+root_cycle  = current membership root
+seed_cycle  = SHA-256(cycleStartRound, root_cycle) mod AOS_cycle
+permA       = smallest k &gt;= 1 such that
+              k &gt;= SHA-256(cycleStartRound, root_cycle, "permA") mod AOS_cycle
+              and gcd(k, AOS_cycle) == 1
+              (search upward, wrap to 1 if it exceeds AOS_cycle)
+</code></pre>
+<p>Note that <code>permA</code> MUST be coprime with <code>AOS_cycle</code>.
+If they are not coprime, some indices repeat and others never appear,
+so some nodes would be primary more than once per cycle and others never.
+The <code>gcd(k, AOS_cycle) == 1</code> check in the formula above is exactly what prevents this.</p>
+<p>The hash type is SHA-256 over the byte concatenation of the arguments in listed order,
+where <code>cycleStartRound</code> is encoded as an 8-byte big-endian integer, <code>root_cycle</code> as its raw 32 bytes,
+and the string tag <code>"permA"</code> as its UTF-8 bytes.
+The 256-bit output is interpreted as a big-endian unsigned integer before the <code>mod AOS_cycle</code> reduction.</p>
+<h3 id="write-path-checks-in-order-on-lez-contract"><a class="header" href="#write-path-checks-in-order-on-lez-contract">Write path, checks in order on LEZ Contract</a></h3>
+<p>A writing message from proposer to LEZ contract carries the <code>round</code>,
+the attested price, the observations with their membership proofs,
+and the sender's own membership proof.
+Then, LEZ contract does these checks and computations.</p>
+<ul>
+<li><strong>Cycle.</strong> <code>cycleStartRound + AOS_cycle</code> is the round the current cycle ends at.
+If <code>round</code> has reached or passed it, the cycle is over: set <code>cycleStartRound = round</code>,
+and recompute <code>AOS_cycle</code>, <code>root_cycle</code>, <code>seed_cycle</code>, <code>permA</code> as above.</li>
+<li><strong>Membership.</strong> Verify sender's proof against <code>root_cycle</code>, recover <code>index</code>. Fail and revert.</li>
+<li><strong>Freshness.</strong> Require <code>round &gt; lastAcceptedRound</code>. Fail and revert.</li>
+<li><strong>Turn.</strong> Compute <code>primary</code>, <code>backup1</code>, <code>backup2</code> for <code>round</code>.
+Require <code>index</code> equals one of the three. Fail and revert.</li>
+<li><strong>Accept.</strong> Store <code>AttestedPrice</code>. Set <code>lastAcceptedRound = round</code>.
+Open <code>W_dispute</code>.</li>
+</ul>
+<h3 id="offchain-calculations-for-indexers"><a class="header" href="#offchain-calculations-for-indexers">Offchain Calculations for Indexers</a></h3>
+<p>Each indexer computes as follows:</p>
+<ul>
+<li>Compute <code>slot</code>, <code>primary</code>, <code>backup1</code>, <code>backup2</code> for the current round.
+This is the same formula the contract uses in the write path,
+over the same <code>cycleStartRound</code>, <code>AOS_cycle</code>, <code>seed_cycle</code>, and <code>permA</code>.</li>
+<li>If primary: write immediately.</li>
+<li>If backup1: wait 2 LEZ blocks, read <code>lastAcceptedRound</code>, write only if still <code>&lt; round</code>.</li>
+<li>If backup2: wait 4 LEZ blocks, same check.</li>
+<li>If none of the three: do not write.</li>
+</ul>
+<p>Note that the LEZ block time is around one second.
+Also, these waiting times are not enforced directly by the contract.
+In the next section, the reward adjustment is what tries to prioritize the primary first, then backup1, then backup2.
+This is a trade-off between fairness, liveness and DoS protection.</p>
+<h3 id="reward-partition"><a class="header" href="#reward-partition">Reward Partition</a></h3>
+<p>The reward computed by the mechanism in <a href="#rewards-and-revenue">Rewards and Revenue</a>
+is adjusted here to discourage racing.
+The adjustment depends on which of the three wrote the round.</p>
+<div class="table-wrapper"><table><thead><tr><th>Writer</th><th>Share</th></tr></thead><tbody>
+<tr><td><code>primary</code></td><td>100%</td></tr>
+<tr><td><code>backup1</code></td><td>75%</td></tr>
+<tr><td><code>backup2</code></td><td>50%</td></tr>
+</tbody></table>
+</div>
+<p>The contract already knows which one.
+So the share costs nothing extra to apply.</p>
+<p>The wait is a convention, not something the contract checks.
+A backup that skips the wait and writes immediately is still accepted,
+since the contract only checks that the sender is one of the three eligible indices.
+Doing this repeatedly is visible off-chain, since who wrote each round and at what share is public.
+The share is recorded per round when the dispute window closes and the attestation is finalized.
+The recorded share is applied at the epoch boundary
+when the indexer builds the reward table committed to the LEZ settlement contract.</p>
+<h3 id="edge-cases"><a class="header" href="#edge-cases">Edge cases</a></h3>
+<ul>
+<li><strong>Two writes race:</strong> contract takes the first by transaction order,
+rejects the rest so they still pay gas.</li>
+<li><strong>All three miss:</strong> no price for <code>round</code>.
+Next round proceeds normally by iterating primary.
+This round stays empty until the next Bedrock block arrives.</li>
+<li><strong>Node registers mid-cycle:</strong> excluded from <code>root_cycle</code> until next cycle opens.</li>
+<li><strong>Node unbonds mid-cycle:</strong> still included in <code>root_cycle</code>, may still be scheduled,
+backups cover if it does not write.</li>
+</ul>
 <h2 id="incentivization"><a class="header" href="#incentivization">Incentivization</a></h2>
 <p>The Oracle Zone has no execution environment of its own,
 so it custodies no stake and runs no slashing logic.
@@ -521,7 +640,10 @@ and MAY be paired with a challenge window.</p>
 The number of observations finalized in a round is fixed and provable from the immutable Bedrock inscriptions,
 so a challenger proves that fewer than <code>N</code> observations existed when the proposer attested.
 The fault is objective and cheaply proven.
-The proposed price is rejected and the proposer is slashed.</p>
+The proposed price is rejected and the proposer is slashed.
+This also covers a round number far ahead of the current one.
+No oracle node can have signed observations for a round that has not happened yet,
+so the count for such a round is trivially below <code>N</code>.</p>
 </li>
 <li>
 <p><strong>Wrong median.</strong> A proposer attests a value that is not the median of the valid observations of the round,
