@@ -76,7 +76,7 @@ SDP_DECLARE_GAS               = 646
 SDP_WITHDRAW_GAS              = 590
 SDP_ACTIVE_GAS                = 590
 LEADER_CLAIM_GAS              = 580
-CLAIM_POW_REWARD_GAS          = TBD
+CLAIM_POW_REWARD_GAS          = 56
 ```
 
 and come from our implementation observations as described in [Gas determination from measures](#gas-determination-from-measures).  To get these numbers, we based our calculations on the following measures:
@@ -239,9 +239,13 @@ Execution: dominated by one hash over three field elements. Every other step is 
 - Insertion of the note in the ledger: negligible.
 - Derivation of the note identifiers: negligible.
 
-Unlike every other Operation in this document, this one verifies no proof and no signature, so it has no batch-verification component and no term proportional to a number of proofs. Its cost is therefore expected to be small — below `LEADER_CLAIM_GAS`, which is dominated by a 580,000 cycle proof verification this Operation does not perform.
+Unlike every other Operation in this document, this one verifies no proof and no signature, so it has no batch-verification component and no term proportional to a number of proofs. Every step it performs falls into a category this document already treats as negligible, and the only real work is a single hash.
 
-The value is nonetheless **TBD**, and deliberately so: it must come from measurement on the same basis as the others rather than from the reasoning above. It also matters more than its size suggests. Because a claim is intended to pay its own fee out of the reward it creates, this gas value sets the floor below which the per-claim reward makes claiming pointless, so it constrains the reward parameters rather than merely pricing the Operation.
+It is therefore **not** comparable to `LEADER_CLAIM`, whose 580 is entirely the 580,000 cycle Proof of Claim verification that this Operation does not perform. The comparable Operations are the channel ones at 56, whose cost is one Eddsa25519 signature verification — and this Operation does not verify a signature either.
+
+`CLAIM_POW_REWARD_GAS` is set to **56**, adopting that tier as a conservative over-estimate rather than pricing the Operation at zero. It should be confirmed by measurement on the same basis as the others.
+
+The value matters more than its size suggests. A claim is intended to pay its own fee out of the reward it creates, so this gas sets part of the floor below which the per-claim reward makes claiming pointless, and it constrains the reward parameters rather than merely pricing the Operation. Pricing it at `LEADER_CLAIM_GAS` would nearly double the claim transaction's execution gas, since the transaction already carries a `TRANSFER` at 590.
 
 # Annex
 

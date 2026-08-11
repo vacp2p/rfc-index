@@ -1770,7 +1770,7 @@ The reward per claim is a fixed fraction of the pool, divided by the number of c
 ```python
 EPOCH_POW_DISTRIBUTION_RATE_NUM: uint64   # rho, as a fraction NUM / DEN
 EPOCH_POW_DISTRIBUTION_RATE_DEN: uint64
-TARGET_CLAIMS_PER_BLOCK: uint64           # T
+TARGET_CLAIMS_PER_BLOCK: uint64 = 50      # T
 EXPECTED_BLOCKS_PER_EPOCH: uint64         # N_b
 
 def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
@@ -1781,6 +1781,10 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
 ```
 
 `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
+
+Its value is chosen as a fraction of what a block can carry. A block holds at most `MAX_BLOCK_TXS` transactions, and the execution fee market steers gas usage toward a target of half its per-block limit; at that target the transaction count is the binding cap rather than the gas. Setting the claim target to 50 makes claims roughly one twentieth of a full block, leaving the remainder to ordinary traffic while keeping the count high enough that the rate a block observes is not dominated by chance — the relative variation in a Poisson count of `T` is `1/√T`.
+
+It is stated as an absolute count rather than as a proportion of the transactions a block actually carries. A proportion would let claim throughput follow demand, and would keep the reward per claim in a fixed relation to the fee at any level of usage; it would also make the target vary block by block, which the reward computation above and the controller below both assume it does not. The absolute form is specified here.
 
 At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the rewards accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
 
@@ -1796,7 +1800,9 @@ Fixing the reward for the whole epoch is what allows a wallet to compute a rewar
 
 Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, and $`\sigma_e`$ is the pool's fraction $`\rho`$ divided by $`T \cdot N_b`$, an epoch running at the target rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target rate is set to. The target claim rate therefore governs how many participants share the epoch's distribution and how much each receives, not how much is distributed in total.
 
-None of the parameters governing the pool have been calibrated. `TARGET_CLAIMS_PER_BLOCK`, `EPOCH_POW_DISTRIBUTION_RATE`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` are all open, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are chosen, and until `EXECUTION_CLAIM_POW_REWARD_GAS` is determined, it cannot be established that a claim is worth more than the fee required to submit it — which is the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
+`EPOCH_POW_DISTRIBUTION_RATE`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` remain to be chosen, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are, it cannot be established that a claim is worth more than the fee required to submit it — the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
+
+The relationship those three must satisfy is that a claim's reward exceeds its fee. Once the network is mature enough that block rewards consist mostly of recycled fees rather than newly minted tokens, the reward per claim and the fee are both proportional to the fee level, so the comparison reduces to one between the mining share and the claim rate: a claim covers its own fee when the transactions a block carries exceed `TARGET_CLAIMS_PER_BLOCK` divided by `POW_SHARE`'s fraction of the block reward. While the network is young and block rewards are dominated by minting instead, that relation does not hold and the pool is drawn from its genesis endowment, which is what the endowment is for.
 
 ### Genesis
 
@@ -2121,9 +2127,11 @@ From the [[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md
 | EXECUTION_SDP_WITHDRAW_GAS | 590 |
 | EXECUTION_SDP_ACTIVE_GAS | 590 |
 | EXECUTION_LEADER_CLAIM_GAS | 580 |
-| EXECUTION_CLAIM_POW_REWARD_GAS | TBD |
+| EXECUTION_CLAIM_POW_REWARD_GAS | 56 |
 
-`EXECUTION_CLAIM_POW_REWARD_GAS` has not been determined. Its value bounds the fee a claim transaction must pay, and therefore decides whether a claim is worth making at all: a claim whose fee exceeds its reward is never submitted. It must be derived alongside the other Execution Gas values in [\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md) before claiming can be enabled.
+`EXECUTION_CLAIM_POW_REWARD_GAS` is the cost of an Operation that verifies no proof and no signature: it re-derives a hash, compares it against a threshold, and performs a few lookups and insertions. It is priced with the other Operations whose cost is a single signature verification, which is a conservative over-estimate here, and is derived in [\[Analysis\] Gas Cost Determination](analysis-gas-cost-determination.md).
+
+The value bounds the fee a claim transaction must pay, and therefore bears on whether a claim is worth making at all: a claim whose fee exceeds its reward is never submitted.
 
 ## Zero Knowledge Signature Scheme (ZkSignature)
 
