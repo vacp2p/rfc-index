@@ -1780,6 +1780,8 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
     return (pow_reward_pool * EPOCH_POW_DISTRIBUTION_RATE_NUM) // denominator
 ```
 
+`TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
+
 At each epoch boundary, before any block of the new epoch is processed, the pool is credited with the rewards accrued over the previous epoch and the per-claim reward is then recomputed from the refilled pool:
 
 ```python
@@ -1794,7 +1796,7 @@ Fixing the reward for the whole epoch is what allows a wallet to compute a rewar
 
 Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, and $`\sigma_e`$ is the pool's fraction $`\rho`$ divided by $`T \cdot N_b`$, an epoch running at the target rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target rate is set to. The target claim rate therefore governs how many participants share the epoch's distribution and how much each receives, not how much is distributed in total.
 
-None of the parameters governing the pool have been calibrated. `EPOCH_POW_DISTRIBUTION_RATE`, `TARGET_CLAIMS_PER_BLOCK`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` are all open, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are chosen, and until `EXECUTION_CLAIM_POW_REWARD_GAS` is determined, it cannot be established that a claim is worth more than the fee required to submit it — which is the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
+None of the parameters governing the pool have been calibrated. `TARGET_CLAIMS_PER_BLOCK`, `EPOCH_POW_DISTRIBUTION_RATE`, `POW_SHARE` and `POW_REWARD_POOL_GENESIS` are all open, and together they determine both the reward a claim yields at launch and the level it settles at. Until they are chosen, and until `EXECUTION_CLAIM_POW_REWARD_GAS` is determined, it cannot be established that a claim is worth more than the fee required to submit it — which is the condition on which the whole mechanism depends. Setting `POW_SHARE` to zero disables refilling, and a pool small enough that `epoch_pow_reward` rounds to zero disables claiming entirely.
 
 ### Genesis
 
