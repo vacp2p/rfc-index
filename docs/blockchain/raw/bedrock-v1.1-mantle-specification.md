@@ -210,7 +210,9 @@ Validation and execution are **interleaved**: each Operation is validated, its c
 
 The reason for the change is that a note created by one Operation must be spendable by a later Operation in the same transaction. Under the previous ordering such a note did not exist at the time any Operation was validated, so it could not be referenced, and an Operation that issues a note could not have that note spent to pay the transaction's own fee. Interleaving is what makes that possible, and it is a general property of Mantle rather than one specific to any single Operation.
 
-Two consequences follow, and both are load-bearing.
+Interleaving has a second effect, distinct from the one it was introduced for: an Operation validated against a protocol-maintained reserve sees that reserve as the Operations before it have left it. A transaction carrying several claims against the proof of work reward pool therefore has each of them checked against the pool net of its predecessors, rather than all of them checked against the pool as it stood before the transaction began. Under the previous ordering every such claim would have passed a check the pool could not actually satisfy, and the shortfall would have surfaced only as a failed subtraction during execution. This is a consequence of interleaving rather than a reason for it, but it is what makes the pool guard in [CLAIM_POW_REWARD](#claim_pow_reward) sound within a transaction as well as between them.
+
+Two further consequences follow, and both are load-bearing.
 
 The first is that the balance must be **accumulated as the Operations execute** rather than computed from the ledger afterwards. A `TRANSFER` consumes its input notes when it executes, so by the time the last Operation has run those notes are gone and their values can no longer be looked up. Computing the balance after the fact would therefore fail for every transaction that spends anything, not merely for those that spend a note created within the transaction.
 
@@ -1683,7 +1685,7 @@ def pow_nullifier(claim: ClaimPowRewardOp) -> zkhash:
 
   This Operation performs no fee or balance check of its own. The transaction's fee is settled at the transaction level as normal.
 
-  The first condition is what prevents the pool being drawn negative. Note that of its two clauses only the first can bind in practice: `epoch_pow_reward` is a small fraction of `pow_reward_pool` by construction, so any pool large enough to be positive can cover one reward. The operative condition is `epoch_pow_reward > 0`, which fails once the pool falls below the point where the division in [Reward Pool](#reward-pool) rounds down to zero. Claiming therefore stops abruptly at that point rather than tapering.
+  The first condition is what prevents the pool being drawn negative, and its two clauses fail in different circumstances. `epoch_pow_reward > 0` fails once the pool has fallen, over many epochs, below the point where the division in [Reward Pool](#reward-pool) rounds down to zero. `pow_reward_pool >= epoch_pow_reward` fails when the pool has been drained within a single epoch to less than one reward, which is possible because the reward is held fixed for the epoch while the pool it is paid from shrinks with every claim. Both are evaluated per claim, against the pool as it stands at that point in the block, so claiming stops the moment either fails and resumes only when the condition holds again. [Reward Pool](#reward-pool) sets out what each requires and how claiming recovers.
 
   The epoch nonce in step 3 is the Cryptarchia epoch nonce $`\eta`$ defined in [Epoch Nonce](cryptarchia-v1-protocol.md#epoch-nonce), the same value the consensus lottery uses. A claim built against any other epoch is rejected, so a solution is usable only within the epoch it was found in and must be re-mined afterwards.
 
@@ -1810,6 +1812,16 @@ The share is set to a tenth, and it is bounded from both directions. From below,
 All arithmetic here is checked, in accordance with [Arithmetic](#arithmetic). The pool must not saturate: saturating at the maximum representable value would create tokens that were never allocated, which is precisely the failure the checked-arithmetic rule exists to prevent.
 
 Fixing the reward for the whole epoch is what allows a wallet to compute a reward note's identifier before submitting a claim, and therefore what makes a self-funding claim possible at all. The pool is drawn down by claims within the epoch, but the per-claim value is not recomputed until the next boundary.
+
+#### Exhaustion within an epoch
+
+**The distribution rate is not a spending cap.** $`\rho`$ divides the pool by the number of claims an epoch is *expected* to accept; it does not limit how many are accepted. Nothing stops a block from carrying more claims than the target, and nothing stops an epoch from paying out more than the fraction $`\rho`$ of its pool. Claims are paid, one after another, for as long as the pool can cover the next one, and are rejected from the moment it cannot.
+
+The rejection is not a special case. It is the first condition of [Validation](#claim_pow_reward) above, evaluated for every claim against the pool as it stands at that point in the block, so a block may contain claims that were accepted followed by claims that were rejected, and a claim that fails only because the pool is exhausted is simply an invalid Operation and its transaction is rejected whole.
+
+Exhausting the pool this way requires the claim rate to exceed the target by a factor of $`1/\rho`$ for a whole epoch, because a claim pays $`\rho`$ of the pool divided by the target claim count. At the values specified here that is `TARGET_CLAIMS_PER_BLOCK` divided by $`\rho`$, or a thousand claims in every block for seven and a half days, against a `MAX_BLOCK_TXS` of 1024. **It is therefore only just out of reach rather than impossible by construction**, and what keeps it out of reach is the reward difficulty controller, which would have to be defeated by two orders of magnitude and held there for the whole epoch. The condition exists so that if that ever happens the result is that claiming stops, rather than that the pool goes negative or the protocol pays out tokens it does not hold.
+
+Claiming recovers by itself. At the next epoch boundary the refill is credited and `epoch_pow_reward` is recomputed from the refilled pool, so a pool that was drained to a fraction of one reward yields a correspondingly smaller reward in the epoch that follows, and claiming resumes at that lower value. The mechanism degrades to a smaller reward rather than stopping permanently, and it stops permanently only when the pool falls so far that the recomputed reward rounds down to zero.
 
 Because the payout at the target claim rate is $`T \cdot N_b \cdot \sigma_e`$, and $`\sigma_e`$ is the pool's fraction $`\rho`$ divided by $`T \cdot N_b`$, an epoch running at the target rate distributes exactly the fraction $`\rho`$ of the pool, whatever the target rate is set to. The target claim rate therefore governs how many participants share the epoch's distribution and how much each receives, not how much is distributed in total.
 
