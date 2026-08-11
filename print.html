@@ -21943,6 +21943,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 </div><!-- timeline:start -->
 <h2 id="timeline-84"><a class="header" href="#timeline-84">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-11</strong> — <a href="https://github.com/logos-co/logos-lips/blob/91e5486791d2ad854029d3fb8ec16b1c5426b059/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>91e5486</code></a> — docs(blockchain): assert all inputs to be non empty (#399)</li>
 <li><strong>2026-08-07</strong> — <a href="https://github.com/logos-co/logos-lips/blob/4c22190fd0df0e7b10018fe6774a772fd7578c39/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>4c22190</code></a> — docs(blockchain): require checked arithmetic in Mantle spec (#369)</li>
 <li><strong>2026-08-05</strong> — <a href="https://github.com/logos-co/logos-lips/blob/b4388aae3549e5ebf0307258b825e766efcb9c38/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>b4388aa</code></a> — docs(blockchain): round the leader reward share down and align the voucher DST (#395)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-mantle-specification.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
@@ -21969,6 +21970,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 <tr><td>1.9.0</td><td>Update the execution of <code>CHANNEL_DEPOSIT</code> to consume the inputs and recreate them in the channel, updating their NoteId avoid replay attacks in case of withdraw after a deposit</td><td>2026-07-27</td></tr>
 <tr><td>1.9.1</td><td>Rename the excess balance left after the mandatory fees into <code>tx_priority_tip</code> and convert it back into a <code>TokenValue</code> explicitly</td><td>2026-08-05</td></tr>
 <tr><td>1.9.2</td><td>Required checked arithmetic for all token value, balance, gas, and fee computations.</td><td>2026-08-06</td></tr>
+<tr><td>1.10.0</td><td>Enforce non empty inputs for every operation not only transfer moving the assertion in the validation of input spendability</td><td>2026-08-11</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-23"><a class="header" href="#introduction-23">Introduction</a></h1>
@@ -23203,11 +23205,6 @@ ledger: Ledger
 <p><em>Validate</em></p>
 <ol>
 <li>
-<p>Ensure the Transfer in non-empty</p>
-<pre><code class="language-python">assert len(transfer.inputs) &gt; 0
-</code></pre>
-</li>
-<li>
 <p>Ensure all inputs are spendable and not in a channel.</p>
 <pre><code class="language-python">ledger.assert_spendable(transfer.inputs)
 </code></pre>
@@ -23300,6 +23297,9 @@ def derive_note_id(op_id: Hash, output_number: int, note: Note) -&gt; NoteId:
 <p>A note is spendable if and only if it exists, it is not spent or locked. The following function validates that an input of notes can be consumed:</p>
 <pre><code class="language-python">class Ledger:
     def assert_spendable(inputs: list[NoteId], channel_id: ChannelId | None):
+		# Assert inputs are empty
+		assert len(inputs) &gt; 0
+
         ## Check there is no duplicate
         assert len(inputs) == len(set(inputs))
 
