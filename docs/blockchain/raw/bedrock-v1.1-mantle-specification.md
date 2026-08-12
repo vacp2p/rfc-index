@@ -1879,6 +1879,8 @@ def compute_new_reward_difficulty(claims_in_block: uint64,
     return min(new_target, p - 1)
 ```
 
+The ordering is part of consensus. Every claim in a block is validated against the target produced by the previous block's update; the update from a block's own accepted count is applied after the block is processed and governs the next block. Genesis supplies the value the first block is validated against.
+
 The controller holds no state of its own beyond the current target. Rather than remembering a running estimate of demand, it reconstructs one from the target in force, on the assumption that the target was calibrated to the intended rate. This is what keeps it a single value in consensus state.
 
 Two properties follow, and both matter for its safety. When a block accepts exactly the target number of claims the target is unchanged, so the intended rate is a fixed point. When a block accepts none, the numerator is floored at 1 and the target moves up by a factor of $`P/F`$ — bounded, and in the direction of making claiming easier, so a period without claims cannot lock the mechanism. The smoothing means a single unusual block moves the target only slightly, so no separate per-block clamp is required.
