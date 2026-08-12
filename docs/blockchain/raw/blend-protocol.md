@@ -422,7 +422,7 @@ For a complete description of the processing logic, refer to [Processing](#proce
 
 Every payload that is added to the broadcasting queue is processed as follows:
 
-1. The correctness of the payload content is verified; that is, the payload must contain a valid structure for its type — a block proposal or a transaction. The content itself is not validated; otherwise, it is discarded.
+1. The payload is checked to be structurally well formed for its declared type: it must parse as a block proposal or as a transaction. A payload that fails this check is discarded. Whether the parsed content is *valid* — whether the proposal or the transaction would be accepted — is not evaluated here; that judgement belongs to the consensus and mempool logic the content is handed to in the next step.
 2. The content is extracted from the payload and is broadcasted to the Logos Blockchain broadcasting channel after a random delay. A transaction is additionally submitted to the node's mempool.
 
 For a complete description of the processing logic, refer to [Broadcasting](#broadcasting).
@@ -666,7 +666,7 @@ It is a per epoch value, held constant for the whole epoch and identical for eve
 
 The control objective for $`d_{blend}`$ belongs to this protocol, because what it regulates is the health of the anonymity set. When genuine traffic is plentiful the network already provides a large set to hide in, so permissionless admission can be restricted more tightly without harming privacy; when traffic is thin, admission should be made easier so that proof of work backed messages contribute to the set rather than being excluded from it. A threshold that is too tight starves the anonymity set; one that is too loose exposes the network to flooding by participants who need no stake to send.
 
-The value itself is a consensus quantity: it must be agreed by every node, so it is derived from on-chain observations and held in consensus state. It is computed once at each epoch boundary from the transaction load of the previous epoch, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), which also states the bounds that make the value resistant to manipulation.
+The value itself is a consensus quantity: it must be agreed by every node, so it is derived from on-chain observations and held in consensus state. It is computed once per epoch, fixed at the same snapshot as the epoch's nonce during the preceding epoch and taking as input the load of the last epoch complete at that snapshot, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), which also states the bounds that make the value resistant to manipulation. Publishing it together with the nonce is what keeps the proof precomputation window usable, since both are public inputs to the same proof.
 
 ### Quota Application
 
@@ -867,7 +867,7 @@ The relaying logic is defined as follows:
     1. If the neighbor is a core node, then update the message counter for the neighbor.
     2. If the neighbor is an edge node, then close the connection with the neighbor.
     3. If the header of the message is incorrect, then discard the message and mark the neighbor as malicious and close the connection. We assume that an adversary cannot inject any spoofed message to the connection.
-    4. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message was already seen, then the message is a duplicate and must be discarded. The PoQ nullifiers are valid during a single epoch, therefore, they need to be stored for the duration of the current epoch and during the  [Transition Period](#transition-period).
+    4. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message is already in the nullifier cache, then the message is a duplicate and must be discarded. **This step only reads the cache; it never writes it.** The nullifier is inserted into the cache only after steps 1.5 and 1.6 have both passed, at the moment the message is accepted for relaying. Cached entries are retained for the duration of the current epoch and the [Transition Period](#transition-period).
     5. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded, and the neighbor must be marked malicious.
     6. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header is invalid, then the message must be discarded and must not be relayed. The sender must be marked as spammy and its connection closed, in the same manner as for any other spam detected by the connectivity maintenance logic.
 2. Release the message according to the [Releasing](#releasing) logic.
@@ -879,13 +879,13 @@ The reason for the reversal is that deferral makes relaying free for the sender 
 
 The cost of this ordering is latency. A proof verification is now on the path between receiving a message and relaying it, at every hop rather than none, and the end-to-end delay of a message rises accordingly. This is accepted deliberately. Two properties keep it bounded: verification need not block the node's other work and may be performed concurrently with it, so the cost is one verification's latency per hop rather than a serialization of all traffic through a single verifier; and the number of hops is itself bounded by $`\beta_{max}`$. The resulting delay budget is accounted for in [Delaying](#delaying), where the maximum delay $`\Delta_{max}`$ already dominates the per-hop verification time.
 
-Deduplication by nullifier, step 1.4, is deliberately ordered before this check and must remain so. A duplicate is detected by a lookup, while an invalid proof is detected by a verification, and there is no reason to pay the more expensive check for a message the cheaper one has already rejected.
+Deduplication by nullifier, step 1.4, remains before this check, but only as a **lookup**: insertion happens strictly after the proof has verified. The order of the two operations is load-bearing. If a nullifier were cached before its proof was verified, an adversary that has observed a nullifier — every relayed message exposes its nullifier in the public header — could race a copy carrying a valid signature under its own key but a garbage proof, poison the cache, and cause the genuine message to be discarded as a duplicate when it arrives. With insertion gated on verification, a cache entry attests that a fully verified message already used that nullifier, so a lookup hit is a true duplicate; the adversary's raced copy fails step 1.6, inserts nothing, and the genuine message is unaffected. The lookup may still run first because reading the cache is cheap and a hit — which only a verified message can have produced — makes the expensive verification unnecessary.
 
 What this ordering does **not** address is a flood of messages whose proofs are valid. Such messages pass every check in step 1 and are relayed normally, so verifying earlier does not reduce their cost; it only ensures the network is paying to carry messages someone genuinely paid to create. Nor does the [Blend Difficulty](#blend-difficulty) controller respond to them: it is driven by transactions that reach a block, and messages sent only to consume capacity never do, so admission does not tighten however many are sent. Verifying before relaying therefore bounds the amplification an invalid proof can achieve, and does not by itself bound the volume a determined participant can generate.
 
 Closing that gap requires an admission cost each node can raise on its own in response to the resources it is actually spending, rather than one derived from a value the whole network agrees on and which lags what any individual node observes. Such a mechanism is not specified here.
 
-The node must cache the PoQ nullifiers ($`\nu_i`$) for every message it relays for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
+The node must cache the PoQ nullifiers ($`\nu_i`$) of every message it relays — and only of messages it relays, insertion being gated on proof verification as stated above — for a duration of a single epoch plus the [Transition Period](#transition-period) (TP). Then the node can clear the cache.  That means that the size of the cache must be at least:
 
 $$
 \begin{aligned}
@@ -925,7 +925,7 @@ When a message $`\mathbf M`$ is received by the node, then it is processed by th
 
     4. Else:
         1. Examine the decapsulated public header:
-            1. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message was already seen, then the node was not allowed to use the same PoQ nullifier and the message must be discarded. The retention period is the one given in [Relaying](#relaying): a single epoch plus the [Transition Period](#transition-period). Retaining them only for the epoch would let a message generated against the previous epoch's public inputs, and legitimately still in flight during the Transition Period, be replayed.
+            1. If the PoQ nullifier $`\nu_i \in \mathbf H`$ from the public header of the message was already seen, then the node was not allowed to use the same PoQ nullifier and the message must be discarded. The cache consulted here is the one maintained by [Relaying](#relaying), whose entries are inserted only after proof verification, so a hit is a true duplicate. The retention period is the one given there: a single epoch plus the [Transition Period](#transition-period). Retaining them only for the epoch would let a message generated against the previous epoch's public inputs, and legitimately still in flight during the Transition Period, be replayed.
             2. If the signature $`\sigma_{K^{n}_{i}}(\mathbf P_i) \in \mathbf H`$ from the public header of the message is invalid, then the message must be discarded.
             3. If the proof of quota $`\pi^{K^{n}_i}_{Q} \in \mathbf H`$ from the public header of the message is not correct, then the message must be discarded.
         2. Format the message according to the [Message Formatting](message-formatting.md).

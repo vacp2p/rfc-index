@@ -57,6 +57,9 @@ A proof attesting that for the following public values derived from blockchain p
 
 ```python
 class ProofOfQuotaPublic:
+    # Output (the first public signal):
+    key_nullifier: zkhash   # derived from epoch, private index and the private branch secret
+    # Public inputs, in signal order:
     core_quota: int       # Allowed blending operations per epoch for core nodes (20 bits)
     leader_quota: int     # Allowed blending operations per election win (20 bits)
     core_root: zkhash     # Merkle root of zk_id of the core nodes
@@ -68,11 +71,9 @@ class ProofOfQuotaPublic:
     pol_epoch_nonce: int  # PoL Epoch nonce
     pol_t0: int           # PoL constant t0
     pol_t1: int           # PoL constant t1
-    # Outputs:
-    key_nullifier: zkhash   # derived from epoch, private index and private sk
 ```
 
-The declaration order above is normative: it is the order in which the values appear in the proof's public signal vector, with the output `key_nullifier` first, followed by the eleven public inputs. A verifier that assembles them in any other order rejects valid proofs.
+The declaration order above is normative and is exactly the proof's public signal vector: the output `key_nullifier` first, followed by the eleven public inputs. A verifier that assembles them in any other order rejects valid proofs.
 
 `pow_blend_difficulty` is a per-epoch protocol value, identical for every proof produced in that epoch, so it carries no branch-specific signal and a verifier cannot infer from it which branch a given proof used. How its value is set for each epoch is not defined here; it is a consensus quantity supplied to the circuit, and its derivation is specified alongside the other Blend parameters.
 
@@ -238,7 +239,7 @@ The proof of work branch places no bound on how old a solution may be. The only 
 
 That value does not become known when its epoch starts. It is fixed at the beginning of the lottery constants finalization phase of the *preceding* epoch, as specified in [Epoch](cryptarchia-v1-protocol.md#epoch), and is public from that moment. An epoch is $`10\lfloor k/f \rfloor`$ slots and the nonce is fixed $`6\lfloor k/f \rfloor`$ slots into the preceding epoch, so it is known for the final $`4\lfloor k/f \rfloor`$ slots of that epoch — with the parameters in [Cryptarchia](cryptarchia-v1-protocol.md#constants), roughly three days of a seven and a half day epoch.
 
-A prover may therefore mine solutions for an epoch throughout that window and hold them until the epoch opens. Admission to the Blend network over the proof of work branch is consequently limited by the total work a prover can perform in that window and by `pow_quota`, rather than by any rate at which solutions may be presented. Setting `pow_blend_difficulty` for an epoch has to account for this, since the work available to a prover before the epoch begins is not observable when the threshold is chosen.
+`pow_blend_difficulty` for the epoch is fixed at the same snapshot as the nonce, as specified in [Blend Difficulty](bedrock-v1.1-mantle-specification.md#blend-difficulty), so the whole window has every public input of the proof available, and complete proofs — not only solutions — may be prepared ahead of the epoch. Binding solutions to anything finer than an epoch, such as a recent block hash, would close exactly this window, and for the core and leadership branches would forfeit the ahead-of-time proving they rely on; the absence of a sub-epoch bound here is deliberate, and the reward path's freshness is enforced independently by its own acceptance window. A prover may therefore mine solutions for an epoch throughout that window and hold them until the epoch opens. Admission to the Blend network over the proof of work branch is consequently limited by the total work a prover can perform in that window and by `pow_quota`, rather than by any rate at which solutions may be presented. Setting `pow_blend_difficulty` for an epoch has to account for this, since the work available to a prover before the epoch begins is not observable when the threshold is chosen.
 
 ## Proof Compression
 

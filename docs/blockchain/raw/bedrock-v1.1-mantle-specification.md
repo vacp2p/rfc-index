@@ -1777,7 +1777,7 @@ The reward per claim is a fixed fraction of the pool, divided by the number of c
 EPOCH_POW_DISTRIBUTION_RATE_NUM: uint64 = 1     # rho, as a fraction NUM / DEN
 EPOCH_POW_DISTRIBUTION_RATE_DEN: uint64 = 100
 TARGET_CLAIMS_PER_BLOCK: uint64 = 10      # T
-EXPECTED_BLOCKS_PER_EPOCH: uint64         # N_b
+EXPECTED_BLOCKS_PER_EPOCH: uint64 = 21_600      # N_b, derived below
 
 def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
     denominator = (EPOCH_POW_DISTRIBUTION_RATE_DEN
@@ -1785,6 +1785,8 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
                    * EXPECTED_BLOCKS_PER_EPOCH)
     return (pow_reward_pool * EPOCH_POW_DISTRIBUTION_RATE_NUM) // denominator
 ```
+
+`EXPECTED_BLOCKS_PER_EPOCH` is not a free choice: it is the epoch length in slots multiplied by the active-slot rate, $`648{,}000 \cdot f = 648{,}000/30 = 21{,}600`$, with both inputs taken from [Cryptarchia](cryptarchia-v1-protocol.md). A network configured with a different epoch length or block rate derives it the same way. More generally, the constant values throughout this section are **mainnet values**; a test network may substitute values sized to its expected activity, provided the relations this section derives between them are preserved.
 
 The division rounds down, and what the flooring withholds is not lost: it simply remains in the pool, to be counted again at the next boundary. `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
 
@@ -1906,7 +1908,9 @@ Since being wrong in one direction costs tokens and in the other costs minutes, 
 
 The two difficulties are independent. They gate different things, are computed from different observations, and neither implies the other: a solution may satisfy one, both, or neither. Coupling them would force one objective to distort the other, since they are steering unrelated quantities.
 
-Unlike the reward difficulty, `difficulty_blend` is recomputed **once per epoch**, at the boundary, and held fixed for the whole epoch. This is required rather than a simplification: the value is a public input to the proof, so a value that changed within an epoch would partition that epoch's proofs into distinguishable classes and leak which participants produced which messages.
+Unlike the reward difficulty, `difficulty_blend` is recomputed **once per epoch** and held fixed for the whole epoch. This is required rather than a simplification: the value is a public input to the proof, so a value that changed within an epoch would partition that epoch's proofs into distinguishable classes and leak which participants produced which messages.
+
+**When it is computed matters as much as how.** The value for epoch $`N`$ is fixed at the same moment as epoch $`N`$'s nonce — the lottery-constants snapshot taken during epoch $`N-1`$, as specified in [Epoch](cryptarchia-v1-protocol.md#epoch) — and its input is the transaction load of epoch $`N-2`$, the last epoch complete at that snapshot. Fixing it at the boundary instead, from epoch $`N-1`$'s full load, would leave the [precomputation window](proof-of-quota.md#precomputation-of-proof-of-work-solutions) that the epoch nonce deliberately opens without one of its public inputs: a prover can grind solutions for an epoch from the moment its nonce is public, and can do so only if the threshold those solutions must meet is public at the same moment. The price is one further epoch of lag in the controller's input, which the per-epoch clamp makes immaterial — the response was already gradual by design. For the first two epochs no complete input epoch exists, so `difficulty_blend` is `BLEND_DIFFICULTY_BASE` for epochs 0 and 1, and the schedule begins with epoch 2, computed during epoch 1 from epoch 0's load.
 
 The control objective is transaction load, for the anonymity-set reason given in [Blend Difficulty](blend-protocol.md#blend-difficulty). At the reference load the threshold sits at a baseline; above it admission tightens, below it admission loosens.
 
@@ -1917,8 +1921,8 @@ BLEND_DAMPING_NUM: uint64 = 1                   # a, where the exponent is alpha
 BLEND_DAMPING_DEN: uint64 = 2                   # b, with 0 < a <= b so that alpha <= 1
 BLEND_MAX_STEP: uint64 = 2                      # Max factor the threshold may move per epoch
 
-def compute_epoch_blend_difficulty(epoch_blocks: list[Block],
-                                   previous: PowTarget) -> PowTarget:
+def compute_epoch_blend_difficulty(epoch_blocks: list[Block],   # the blocks of epoch N-2
+                                   previous: PowTarget) -> PowTarget:  # d_blend of epoch N-1
     # All quantities here are canonical integer representatives of their field
     # elements; the arithmetic is over unbounded integers per [Arithmetic], and
     # the capped result converts back to a field element without reduction.
@@ -1940,11 +1944,20 @@ def compute_epoch_blend_difficulty(epoch_blocks: list[Block],
     # Every quantity is an integer and only the final root is floored, so the
     # result is at most one unit away from the exact value.
     a, b = BLEND_DAMPING_NUM, BLEND_DAMPING_DEN
+    # The radicand reaches roughly 2**487 and is computed over unbounded
+    # integers, per [Arithmetic]; no fixed-width type can carry it.
     radicand = (BLEND_DIFFICULTY_BASE ** b * den ** a) // num ** a
     return clamp(integer_nth_root(radicand, b), lo, hi)
+
+def integer_nth_root(x: int, n: int) -> int:
+    # The floor of the real n-th root: the largest integer r with r**n <= x.
+    # Any exact method serves; binary search over [0, x] is sufficient.
+    ...
 ```
 
-Applied once at the boundary, before any block of the new epoch is processed.
+The clamp interval is never empty: every stored value is capped below $`p`$, so `previous` is at most $`p-1`$ and `lo = previous // BLEND_MAX_STEP` is at most $`(p-1)/2`$, strictly below the $`p-1`$ ceiling of `hi`.
+
+Computed once per epoch at the nonce snapshot of the preceding epoch, and applied from the first block of its epoch. `previous` is the value computed one snapshot earlier, so the chain of values is well defined without reference to any boundary state.
 
 The upper clamp is capped at $`p-1`$ in addition to the per-epoch step bound. Without the cap, an idle network — every epoch observing no load and returning `hi` — would double the threshold each epoch and pass the field modulus after a few months of empty epochs, at which point every ticket would satisfy it and admission would be free. The reward controller bounds its result for the same reason, and the two failure modes are the same one.
 

@@ -76,7 +76,7 @@ The PWN must be sampled with full entropy from the scalar field rather than enum
 
 A PWN is bound to the epoch it was found in, since the epoch nonce enters the ticket derivation. It cannot be carried into the following epoch and must be found again.
 
-The relationship between a PWN and an ESK is worth stating explicitly, because it is easy to assume a binding that does not exist. They are unrelated: the PWN proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. A node holding one PWN generates a distinct ESK for each message it sends against that solution's quota.
+The relationship between a PWN and an ESK is worth stating explicitly, because it is easy to assume a binding that does not exist. They are unrelated: the PWN proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. What enforces the quota is not the ESK but the nullifier: each encapsulation consumes one `index` against the solution and yields a distinct key nullifier derived from the PWN, so reusing an index reveals itself as a duplicate. The ESK is a separate key that is fresh per encapsulation by its own definition above, not because the quota requires it.
 
 ## Non-ephemeral Encryption Key
 
