@@ -1573,7 +1573,7 @@ pow_nullifiers: set[zkhash]      # Spent solutions, retained for the acceptance 
 block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the window check
 ```
 
-`PowTarget` is a scalar field element. A puzzle ticket is accepted when it is strictly below the target, so a **smaller** target is a **harder** puzzle.
+`PowTarget` is a scalar field element, and every operation on one is defined over its **canonical integer representative** in $`[0, p-1]`$. A field has no order and no floor division, so neither the comparison below nor the controller arithmetic in [Reward Difficulty](#reward-difficulty) and [Blend Difficulty](#blend-difficulty) is field arithmetic: a ticket is accepted when its representative is strictly below the target's, targets are multiplied and floor-divided as unbounded integers in accordance with [Arithmetic](#arithmetic), and each controller caps its result below $`p`$, so the representative converts back to a field element without modular reduction ever occurring. A **smaller** target is a **harder** puzzle.
 
 The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the fees collected over the previous epoch, as specified in [Reward Pool](#reward-pool). It is not minted on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
 
@@ -1867,6 +1867,9 @@ EMA_SMOOTHING_PRECISION: uint64 = 10  # P, the scale F is expressed against; F <
 
 def compute_new_reward_difficulty(claims_in_block: uint64,
                                   current_target: PowTarget) -> PowTarget:
+    # `current_target` and the result are canonical integer representatives of
+    # their field elements; the arithmetic is over unbounded integers per
+    # [Arithmetic], and the capped result converts back without reduction.
     # The demand implied by this block, reconstructed from the target that
     # produced it, then smoothed against the target rate. Floored at 1 so the
     # division below is always defined, including when no claims arrived.
