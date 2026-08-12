@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0 | Add the proof of work case to the Proof of Quota generation procedure | 2026-08-10 |
-| 1.2.0 | Rename the ground secret to the proof of work nonce in the proof generation recipe | 2026-08-12 |
+| 1.1.1 | Rename the ground secret to the proof of work nonce in the proof generation recipe | 2026-08-12 |
 
 # Introduction
 

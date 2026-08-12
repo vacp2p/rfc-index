@@ -27,7 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0 | Add the Proof of Work Key | 2026-08-10 |
-| 1.2.0 | Replace the proof of work key with a proof of work nonce: no public counterpart, no key structure, the nonce itself is the secret | 2026-08-12 |
+| 1.1.1 | Rename the proof of work key to the proof of work nonce; it is a secret with no public counterpart, and its generation is unchanged | 2026-08-12 |
 
 # Introduction
 
