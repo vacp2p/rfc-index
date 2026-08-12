@@ -310,21 +310,28 @@ Two operational consequences follow:
 
 This section defines the procedure followed by a Logos Blockchain node to validate a received block proposal.
 
-Given a `proposal`, a proposed block consisting of a `header`, `references` and a `signature`. This block proposal is considered valid if the following conditions are met, checked **in the order given** so that the cheapest checks discard a malformed or unauthenticated proposal first:
+Given a `proposal`, a proposed block consisting of a `header`, `references` and a `signature`. This block proposal is considered valid if the following conditions are met, checked **in the order given** so that the cheapest checks discard a malformed or unauthenticated proposal first.
+
+The order is constrained as well as economical. [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) is defined over a block $`B = (header, transactions)`$, but a proposal carries `references` rather than transactions, so the rules that range over `transactions` cannot be evaluated until reconstruction has produced them. They are therefore applied in the step where their operand exists, and each is named below.
 
 1. **Decoding**
-  The received bytes must decode to a `proposal` under [Canonical Encoding](#canonical-encoding): the frame must be consumed exactly, with no trailing bytes, and the `references` element count must not exceed `MAX_BLOCK_TXS`. This check precedes any allocation proportional to the count and any mempool lookup.
+  The received bytes must decode to a `proposal` under [Canonical Encoding](#canonical-encoding): the frame must be consumed exactly, with no trailing bytes, and the `references` element count must not exceed `MAX_BLOCK_TXS`. This check precedes any allocation proportional to the count and any mempool lookup. Because a proposal references each transaction exactly once, this also discharges rule 3 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), `length(transactions) <= MAX_BLOCK_TXS`.
 
-2. **Block Validation**
-  The `proposal` must satisfy the rules defined in [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation).
+2. **Header Validation**
+  The `header` must satisfy the rules of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) that range over the header and the block tree alone: the bedrock version, the slot ordering against the parent, the wallclock check, the presence of the parent in the block tree, the height against the latest immutable block, and the leader's right to propose — that is, rules 1 and 5 through 9. These need no mempool access, and rule 9 covers `signature` and the proof of leadership, so an unauthenticated proposal is discarded here, before any mempool scanning.
 
 3. **Block Proposal Reconstruction**
-  Every `references` prefix must resolve to a local mempool transaction, and the resolved set must reproduce `header.block_root`, as defined in [Reference Resolution](#reference-resolution).
+  Every `references` prefix must resolve to a local mempool transaction, and the resolved set must reproduce `header.block_root`, as defined in [Reference Resolution](#reference-resolution). This step produces `transactions` and, in reproducing `block_root`, discharges rule 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation).
 
-4. **Mempool Transactions Validation**
+4. **Block Body Validation**
+  With `transactions` now available, the remaining rule of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) applies: rule 2, `bytes(transactions) <= MAX_BLOCK_SIZE`.
+
+5. **Mempool Transactions Validation**
   `mempool_transactions` must refer to a valid sequence of Mantle Transactions from the mempool. Each transaction must be valid according to the rules defined in the [Mantle](bedrock-v1.1-mantle-specification.md). In order to verify ZK proofs, they are batched for verification as explained in [Batch verification of ZK proofs](#batch-verification-of-zk-proofs) to get better performance.
 
-If any of the above checks fail, the block proposal must be rejected.
+If any of the above checks fail, the block proposal must be rejected, subject to the distinction in [Reference Resolution](#reference-resolution) between a failure to reconstruct and a finding of invalidity.
+
+This ordering is specific to the proposal path. A block received in full through chain synchronisation carries its transactions from the start, so [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation) applies to it as written, with no ordering constraint.
 
 ## Block Execution
 
