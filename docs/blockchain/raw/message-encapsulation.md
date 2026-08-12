@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0 | Add the proof of work case to the Proof of Quota generation procedure | 2026-08-10 |
+| 1.2.0 | Rename the ground secret to the proof of work nonce in the proof generation recipe | 2026-08-12 |
 
 # Introduction
 
@@ -263,7 +264,7 @@ The first step is to generate a set of keys alongside all necessary proofs that 
         3. If the node is using a proof of work solution then:
             1. The `selector=2` value must be specified.
             2. The `index` counts the blending operations already drawn against this solution and must be below `pow_quota`. Since `pow_quota` is the per-message blending count, one solution's indices are consumed by a single message.
-            3. The `pow_sk` is the secret key the node ground to obtain the solution.
+            3. The `pow_nonce` is the private nonce the node ground to obtain the solution.
             4. The rest of the `ProofOfQuotaWitness` is filled with arbitrary data.
         3. The `ProofOfQuotaPublic` and `ProofOfQuotaWitness` are passed to the zero-knowledge circuits that generate the proof $`\pi^{K^{n}_{l}}_{Q}`$ which derives the `key_nullifier` ($`\nu_e`$) from `pol_epoch_nonce`, private `index`, private secret key during proof generation.
 

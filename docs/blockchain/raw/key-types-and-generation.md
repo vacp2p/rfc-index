@@ -27,6 +27,7 @@
 | 1.0.0 | Initial revision. | 2026-04-09 |
 | 1.0.1 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.1.0 | Add the Proof of Work Key | 2026-08-10 |
+| 1.2.0 | Replace the proof of work key with a proof of work nonce: no public counterpart, no key structure, the nonce itself is the secret | 2026-08-12 |
 
 # Introduction
 
@@ -39,7 +40,7 @@ This document ensures that the keys are used and generated in a common manner, w
 - **Non-ephemeral Quota Key (NQK)** — used for proving that a node is a core node.
 - **Non-ephemeral Signing Key (NSK)** — used to authenticate the node on the network level and derive the Non-ephemeral Encryption Key.
 - **Ephemeral Signing Key (ESK)** — used for signing Blend messages, one per encapsulation.
-- **Proof of Work Key (PWK)** — used for proving that a node holds a proof of work solution, one per solution.
+- **Proof of Work Nonce (PWN)** — used for proving that a node holds a proof of work solution, one per solution. It is a secret, not a key: no public counterpart is ever derived from it.
 - **Non-ephemeral Encryption Key (NEK)** — used for deriving shared secrets for message encryption.
 - **Ephemeral Encryption Key (EEK)** — used for encrypting Blend messages, one per encapsulation.
 
@@ -67,15 +68,15 @@ The key must not be reused. Otherwise, the messages that reuse the same key can 
 
 ## Proof of Work Key
 
-A node generates a Proof of Work Key (PWK) by searching for a secret key whose puzzle ticket falls below the Blend threshold for the epoch, as defined in [Proof of Quota](proof-of-quota.md). Unlike the other keys, it is not chosen but found: the node generates candidates until one satisfies the threshold, and the work of doing so is what the key represents.
+A node obtains a Proof of Work Nonce (PWN) by searching for a nonce whose puzzle ticket falls below the Blend threshold for the epoch, as defined in [Proof of Quota](proof-of-quota.md). Unlike the keys above, it is not chosen but found: the node generates candidates until one satisfies the threshold, and the work of doing so is what the nonce represents.
 
-A PWK entitles its holder to a quota of Blend messages for the epoch it was found in. It is not a signing key and is never used to sign anything. It is supplied to the PoQ circuit as a private witness and never appears in a message.
+It is not a key at all. No public counterpart is derived from it, it signs nothing, and no key structure is required of it: the branch relies only on the preimage of a winning ticket being known and never revealed. The nonce is supplied to the PoQ circuit as a private witness and never appears in a message. It also stands in the secret's position of the nullifier derivation, which is what binds the solution's quota to whoever holds the nonce.
 
-The PWK must be sampled with full entropy from the scalar field rather than enumerated from a starting point. Because the key remains secret and is the sole basis on which the quota is granted, a predictable generation procedure would let an observer reconstruct it and consume the remaining quota.
+The PWN must be sampled with full entropy from the scalar field rather than enumerated from a starting point. Because the nonce remains secret and is the sole basis on which the quota is granted, a predictable generation procedure would let an observer reconstruct it and consume the remaining quota.
 
-A PWK is bound to the epoch it was found in, since the epoch nonce enters the ticket derivation. It cannot be carried into the following epoch and must be found again.
+A PWN is bound to the epoch it was found in, since the epoch nonce enters the ticket derivation. It cannot be carried into the following epoch and must be found again.
 
-The relationship between a PWK and an ESK is worth stating explicitly, because it is easy to assume a binding that does not exist. They are separate keys: the PWK proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. A node holding one PWK generates a distinct ESK for each message it sends against that solution's quota.
+The relationship between a PWN and an ESK is worth stating explicitly, because it is easy to assume a binding that does not exist. They are unrelated: the PWN proves entitlement, the ESK signs the message, and the circuit does not constrain any relation between them. A node holding one PWN generates a distinct ESK for each message it sends against that solution's quota.
 
 ## Non-ephemeral Encryption Key
 
