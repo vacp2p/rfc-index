@@ -134,6 +134,8 @@ def checked_int128(value: int) -> int:
 
 Proof of work targets are the deliberate exception. `PowTarget` values are field-sized, and the two difficulty controllers multiply them before dividing: the reward retarget's intermediate product reaches about $`2^{261}`$, and the Blend retarget's radicand about $`2^{487}`$. Those computations are specified over unbounded integers — an implementation must carry them in arbitrary-precision or sufficiently wide arithmetic, and the checked bounds above do not apply to them. What is bounded instead is each controller's *result*, which is capped below the field modulus so that it remains a meaningful threshold.
 
+Token values need no such exception, including where this specification sums fees over whole epochs: conservation bounds every such aggregate, since no set of transactions can pay more in fees than the tokens that exist, and the supply of $`10^{19}`$ lepta is below the `uint64` maximum. The checked arithmetic above is therefore sufficient for every token-denominated quantity, and a violation of it indicates a fault rather than a foreseeable overflow.
+
 ## Mantle Transaction Fee
 
 The transaction mandatory fee is a sum of two components: the multiplication of the total Execution Gas by the `execution_base_fee`, and the total size of the encoded signed Mantle Transaction multiplied by the `permanent_storage_gas_price`. The execution base fee and the permanent storage gas price are protocol-determined values that are the same for every Mantle Transaction in a block. They are derived following [[Execution Market](execution-market.md) and [Storage Markets](storage-markets.md).
