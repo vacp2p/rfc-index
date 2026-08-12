@@ -184,7 +184,7 @@ def get_pow_pool_refill(e: epoch): # refill for the epoch e
     return refill
 ```
 
-where `get_collected_fees(b)` is the total Execution base fees and Permanent Storage fees paid by the transactions of block `b`, and `POW_SHARE / SHARE_DEN` is the fraction diverted. The share is computed with integer division, which rounds down, so the amount diverted is never more than the stated fraction.
+where `get_collected_fees(b)` is the total Execution base fees and Permanent Storage fees paid by the transactions of block `b`, and `POW_SHARE / SHARE_DEN` is the fraction diverted. The share is computed with integer division, which rounds down, so the amount diverted is never more than the stated fraction; the sub-lepton residue of each flooring stays with the remainder and is burnt.
 
 Fees rather than block rewards, because the two scale differently with usage. The block reward is governed by the emission model of [Block Rewards](block-rewards.md), which caps it whatever the level of activity; the fees a block collects have no such cap and grow with the traffic it carries. A share of the block reward would therefore hold the reward per claim near a fixed ceiling however busy the network became, while the fee a claim must itself pay would keep rising with that traffic — and above some level of usage the claim would cost more than it pays. A share of the fees moves with the same quantity that sets the fee, so the ratio between the two is a function of the parameters rather than of how busy the network happens to be.
 

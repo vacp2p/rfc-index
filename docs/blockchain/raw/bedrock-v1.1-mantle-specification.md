@@ -1784,7 +1784,7 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
     return (pow_reward_pool * EPOCH_POW_DISTRIBUTION_RATE_NUM) // denominator
 ```
 
-`TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
+The division rounds down, and what the flooring withholds is not lost: it simply remains in the pool, to be counted again at the next boundary. `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
 
 Its value does not determine how much an epoch distributes. As shown below, an epoch running at the target rate pays out the fraction $`\rho`$ of the pool whatever the target is, so the target divides a fixed amount into a chosen number of parts rather than setting the amount. What it determines is how much of that amount survives being divided.
 
@@ -1849,7 +1849,7 @@ The pool is seeded once, at genesis, with `POW_REWARD_POOL_GENESIS`, as specifie
 
 The seed is **five thousandths of the supply at network launch**. Two floors bound it from below. The first is the pool size at which a claim stops covering its own fee, which is the fee multiplied by the target claim rate and the blocks in an epoch, divided by $`\rho`$; nothing smaller is a working endowment at all. The second is larger and is what actually decides the value: the pool must stay above that floor for as long as it takes the fee inflow to grow into sustaining the reward by itself, and since the pool drains at $`\rho`$ throughout that period, a slower arrival of traffic costs disproportionately more. How long the seed lasts depends on the fee level the markets discover, because the floor it must stay above is proportional to the fee: while prices sit near their lepton-denominated floor the seed would sustain claiming for decades with no traffic at all, and the constraint tightens only as discovered prices rise toward the ceiling below.
 
-It is stated as a fraction of the launch supply rather than as a quantity of base units because that is the form in which it is a decision about how the initial supply is divided, which is what it is. The opening reward per claim follows from the fraction, $`\rho`$ and the target claim rate alone.
+It is stated as a fraction of the launch supply rather than as a count of lepta because that is the form in which it is a decision about how the initial supply is divided, which is what it is. The opening reward per claim follows from the fraction, $`\rho`$ and the target claim rate alone.
 
 Whether that reward is generous enough is a separate question, and it is settled by the **price level the two fee markets discover**, since the fee a claim pays is its size and gas multiplied by those prices. A seed of five thousandths yields an opening reward that exceeds twice the claim's fee for as long as the fee is at or below $`1.157 \times 10^{-10}`$ of the launch supply; the constraint is stated as a fraction of supply so that it is independent of the unit. At the markets' resting floor a claim's fee is under $`10^{-15}`$ of supply — 6,664 lepta against $`10^{19}`$ — so the ceiling binds only if discovered prices rise some five orders of magnitude above the floor. It is a bound on how far price discovery can run before claiming stops paying for itself, not a launch-day check. A larger seed relaxes it in proportion.
 
