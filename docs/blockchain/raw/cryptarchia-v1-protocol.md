@@ -28,7 +28,7 @@
 | 1.0.1 | Replaced Logos Blockchain name with Logos Blockchain | 2026-04-17 |
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
-| 1.2.0 | Scope the Proof of Stake vs. Proof of Work annex to leader election, and state that proof of work does not enter fork choice | 2026-08-10 |
+| 1.2.0 | Scope the Proof of Stake vs. Proof of Work annex to leader election, state that proof of work does not enter fork choice, and define the expected number of blocks in an epoch | 2026-08-10 |
 
 # Introduction
 
@@ -142,6 +142,8 @@ An epoch is divided into 3 phases, as outlined below.
 | Lottery Constants Finalization | $`s+\lfloor\frac{k}{f}\rfloor=4\lfloor\frac{k}{f}\rfloor`$ slots | On the $`2s^{th}`$ slot into the epoch, the epoch nonce $`\eta`$ and the inferred total stake $`D`$ can be computed. We wait another $`4\frac{k}{f}`$ slots for these values to finalize. |
 
 The **epoch length** is the sum of the individual phases: $`3\lfloor \frac{k}{f} \rfloor + 3\lfloor \frac{k}{f} \rfloor + 4\lfloor \frac{k}{f} \rfloor =10 \lfloor \frac{k}{f} \rfloor`$ slots.
+
+Since a fraction $`f`$ of slots carries a block in expectation, the **expected number of blocks in an epoch** follows directly: $`10 \lfloor \frac{k}{f} \rfloor \cdot f = 10k = 21{,}600`$ blocks, the simplification being exact because $`k/f`$ is an integer at the specified constants. Specifications that need this quantity — the reward pool arithmetic in [Mantle](bedrock-v1.1-mantle-specification.md#reward-pool), the quota derivations in [Blend Protocol](blend-protocol.md#leadership-quota) — take it from here rather than re-deriving it.
 
 ### Epoch State
 
