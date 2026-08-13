@@ -111,7 +111,7 @@ Where:
 - `bedrock_version` is the version of the proposal message structure that supports other protocols defined in linked reference; its size is 1 byte and is fixed to `0x01`.
 - `parent_block` is the block ID ([Cryptarchia Protocol](cryptarchia-v1-protocol.md)) of the parent block, validated and accepted by the block builder. It is used for the derivation of the `AgedLedger` and `LatestLedger` values necessary for validating the PoL; the size of the `hash` is 32 bytes.
 - `slot` is the consensus slot number; the size of the `SlotNumber` type is 8 bytes.
-- `body_root` is the commitment to the block body — both the carried `uncle_headers` and the transactions. It is computed as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), which combines a hash of the serialized `uncle_headers` list with the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) — the same hashes used for constructing the `references` list in the `mempool_ransactions`; the size of the `hash` is 32 bytes. Since the block ID is taken over the header, committing the uncle headers here is what makes two blocks with the same ID identical byte for byte.
+- `body_root` is the commitment to the block body — both the carried `uncle_headers` and the transactions. It is computed as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation), which combines the serialized `uncle_headers` list with the root of the Merkle tree constructed from transaction hashes (defined in [Mantle Transaction](bedrock-v1.1-mantle-specification.md#mantle-transaction)) — the same hashes used for constructing the `references` list in the `mempool_transactions`; the size of the `hash` is 32 bytes. Since the block ID is taken over the header, committing the uncle headers here is what makes two blocks with the same ID identical byte for byte.
 - `proof_of_leadership` is the proof confirming that the sender is the leader; defined below: [Proof of Leadership](#proof-of-leadership).
 
 ### References
@@ -207,7 +207,7 @@ Only after the PoL is generated can the block proposal be constructed (see [Proo
 references: list[hash] = [mantle_txhash(tx) for tx in mempool_transactions]
 ```
 
-4. Compute the `header.body_root` over both parts of the body, as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation): the hash of the serialized `uncle_headers` list from step 1, combined with the root of the Merkle tree constructed from the `mempool_transactions` transactions used to build `references`. This step therefore comes after both uncle selection and transaction selection.
+4. Compute the `header.body_root` over both parts of the body, as defined in step 4 of [Block Header Validation](cryptarchia-v1-protocol.md#block-header-validation): the serialized `uncle_headers` list from step 1, combined with the root of the Merkle tree constructed from the `mempool_transactions` transactions used to build `references`. This step therefore comes after both uncle selection and transaction selection.
 5. Sign the block proposal header.
 ```text
 signature = Ed25519.sign(leader_secret_key, header)

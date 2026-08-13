@@ -408,12 +408,12 @@ We say $`\textbf{valid\_header}(B)`$ returns True if all of the following constr
   def body_root(uncle_headers: list[SignedHeader], transactions: list[SignedMantleTx]) -> hash:
       return hash(
           b"BODY_ROOT_V1",
-          hash(b"UNCLE_HEADERS_V1", serialize(uncle_headers)),  # 1-byte count, then the entries
+          serialize(uncle_headers),  # 1-byte count, then the fixed 361-byte entries
           merkle_root(transactions),
       )
   ```
 
-  where $`\textbf{merkle\_root}`$ is the root of the Merkle tree built from transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, using `0` to represent the hash of an empty transaction and padding the leaves to the closest power of two, and $`\textbf{serialize}`$ is the list encoding of [Block Proposal](bedrock-v1.1-block-construction.md#block-proposal) — a 1-byte little-endian element count followed by that many entries, so an empty list encodes as a single zero byte. Because the signatures of the carried uncle headers are inside $`\textbf{serialize}(uncle\_headers)`$, they are committed here and hence in the [Block ID](#block-id); a copy of a block that differs in any of those bytes has a different ID and is a different block.
+  where $`\textbf{merkle\_root}`$ is the root of the Merkle tree built from transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, using `0` to represent the hash of an empty transaction and padding the leaves to the closest power of two, and $`\textbf{serialize}`$ is the list encoding of [Block Proposal](bedrock-v1.1-block-construction.md#block-proposal) — a 1-byte little-endian element count followed by that many entries, so an empty list encodes as a single zero byte. The serialized list is committed directly, with no inner hash: the element count and the fixed 361-byte entries keep the flat preimage unambiguous, and the single `BODY_ROOT_V1` tag versions the whole construction. Because the signatures of the carried uncle headers are inside $`\textbf{serialize}(uncle\_headers)`$, they are committed here and hence in the [Block ID](#block-id); a copy of a block that differs in any of those bytes has a different ID and is a different block.
 
 5. $`header.\text{slot} \gt \textbf{fetch\_header}(header.\text{parent\_block}).\text{slot}`$
   Ensure the block’s slot comes after the parent block’s slot.
@@ -548,9 +548,9 @@ Cryptarchia depends on honest nodes having relatively in-sync clocks. We are cur
 
 ## Test Vectors
 
-The operations used to derive the transaction Merkle root are the same as those defined in Test Vectors. That root is no longer a header field on its own: it is one of the two inputs to the `body_root` defined in step 4 of [Block Header Validation](#block-header-validation), alongside the hash of the carried `uncle_headers`.
+The operations used to derive the transaction Merkle root are the same as those defined in Test Vectors. That root is no longer a header field on its own: it is one of the two inputs to the `body_root` defined in step 4 of [Block Header Validation](#block-header-validation), alongside the serialized carried `uncle_headers`.
 
-> **Note:** The last two vectors below are **not yet regenerated** for the `body_root` construction and must not be relied on. The two Merkle-root vectors are unaffected — that operation is unchanged — but every value downstream of it changes, because `body_root` wraps the Merkle root together with the uncle-header hash and the block ID is taken over a header that now carries `body_root`.
+> **Note:** The last two vectors below are **not yet regenerated** for the `body_root` construction and must not be relied on. The two Merkle-root vectors are unaffected — that operation is unchanged — but every value downstream of it changes, because `body_root` wraps the Merkle root together with the serialized uncle headers and the block ID is taken over a header that now carries `body_root`.
 
 | Input | Output |
 |-|-|
