@@ -81,7 +81,6 @@ The `Max_Body_Length` parameter defines the maximum length of the `body`. Curren
 
 **A transaction carried over the Blend network must not exceed `Max_Body_Length` once encoded.** The body is a fixed-size field, so a longer payload cannot be represented at all: there is no fragmentation across messages and no larger body type. A transaction that does not fit is not sendable over this protocol and must reach the network by other means. A node must check the encoded length before constructing the message rather than discovering the limit at encapsulation, and must discard on receipt any payload whose `body_length` exceeds `Max_Body_Length`, since a well-formed message can never carry one.
 
-The receiving-side check is not specific to transactions: every body type is bounded the same way, the check is applied at deserialization, and a peer that delivers an over-length payload is marked as malicious and its connection closed, in the same manner as any other malformed message.
 
 The limit is not restrictive in practice: `Max_Body_Length` is derived from the size of a block proposal, which is far larger than any single transaction, and a transaction is separately bounded by the block it must eventually fit into.
 

@@ -132,7 +132,7 @@ def checked_int128(value: int) -> int:
         return value
 ```
 
-Proof of work targets are the deliberate exception. `PowTarget` values are field-sized, and the two difficulty controllers multiply them before dividing: the reward retarget's intermediate product reaches about $`2^{261}`$, and the Blend retarget's radicand about $`2^{487}`$. Those computations are specified over unbounded integers — an implementation must carry them in arbitrary-precision or sufficiently wide arithmetic, and the checked bounds above do not apply to them. What is bounded instead is each controller's *result*, which is capped below the field modulus so that it remains a meaningful threshold.
+Proof of work targets are the deliberate exception. `PowTarget` values are field-sized, and the two difficulty controllers multiply them before dividing: the reward retarget's intermediate product reaches about $`2^{261}`$, and the Blend retarget's radicand about $`2^{487}`$. Those computations are specified over **arbitrary-precision integers** — a big-integer type in practice: the field element is converted to its canonical integer representative, all arithmetic is performed in the big-integer type, and only the capped result is converted back. The checked fixed-width bounds above do not apply to them. What is bounded instead is each controller's *result*, which is capped below the field modulus so that it remains a meaningful threshold and converts back without reduction.
 
 Token values need no such exception, including where this specification sums fees over whole epochs: conservation bounds every such aggregate, since no set of transactions can pay more in fees than the tokens that exist, and the supply of $`10^{19}`$ lepta is below the `uint64` maximum. The checked arithmetic above is therefore sufficient for every token-denominated quantity, and a violation of it indicates a fault rather than a foreseeable overflow.
 
@@ -1573,7 +1573,7 @@ pow_nullifiers: set[zkhash]      # Spent solutions, retained for the acceptance 
 block_slots: dict[hash, SlotNumber]  # Slots of recently seen blocks, for the window check
 ```
 
-`PowTarget` is a scalar field element, and every operation on one is defined over its **canonical integer representative** in $`[0, p-1]`$. A field has no order and no floor division, so neither the comparison below nor the controller arithmetic in [Reward Difficulty](#reward-difficulty) and [Blend Difficulty](#blend-difficulty) is field arithmetic: a ticket is accepted when its representative is strictly below the target's, targets are multiplied and floor-divided as unbounded integers in accordance with [Arithmetic](#arithmetic), and each controller caps its result below $`p`$, so the representative converts back to a field element without modular reduction ever occurring. A **smaller** target is a **harder** puzzle.
+`PowTarget` is a scalar field element, and every operation on one is defined over its **canonical integer representative** in $`[0, p-1]`$. A field has no order and no floor division, so neither the comparison below nor the controller arithmetic in [Reward Difficulty](#reward-difficulty) and [Blend Difficulty](#blend-difficulty) is field arithmetic: a ticket is accepted when its representative is strictly below the target's, targets are multiplied and floor-divided as arbitrary-precision integers in accordance with [Arithmetic](#arithmetic), and each controller caps its result below $`p`$, so the representative converts back to a field element without modular reduction ever occurring. A **smaller** target is a **harder** puzzle.
 
 The reward pool is a reserve of tokens the protocol pays claims from. It is seeded once at genesis and refilled at each epoch boundary from a share of the fees collected over the previous epoch, as specified in [Reward Pool](#reward-pool). It is not minted on demand: a claim transfers tokens that already exist into circulation, and cannot be executed if the pool cannot cover it.
 
@@ -1786,7 +1786,7 @@ def compute_epoch_pow_reward(pow_reward_pool: TokenValue) -> TokenValue:
     return (pow_reward_pool * EPOCH_POW_DISTRIBUTION_RATE_NUM) // denominator
 ```
 
-`EXPECTED_BLOCKS_PER_EPOCH` is not a free choice: it is the epoch length in slots multiplied by the active-slot rate, $`648{,}000 \cdot f = 648{,}000/30 = 21{,}600`$, with both inputs taken from [Cryptarchia](cryptarchia-v1-protocol.md). A network configured with a different epoch length or block rate derives it the same way. More generally, the constant values throughout this section are **mainnet values**; a test network may substitute values sized to its expected activity, provided the relations this section derives between them are preserved.
+`EXPECTED_BLOCKS_PER_EPOCH` is not a free choice: it is the epoch length in slots multiplied by the active-slot rate, $`648{,}000 \cdot f = 648{,}000/30 = 21{,}600`$, with both inputs taken from [Cryptarchia](cryptarchia-v1-protocol.md). It is stated here, rather than only referenced, because this is where it enters consensus arithmetic; it defines nothing new, and a change to either Cryptarchia input changes it. The same derived quantity appears as the expected leader count in [Blend Protocol](blend-protocol.md#leadership-quota). A network configured with a different epoch length or block rate derives it the same way. More generally, the constant values throughout this section are **mainnet values**; a test network may substitute values sized to its expected activity, provided the relations this section derives between them are preserved.
 
 The division rounds down, and what the flooring withholds is not lost: it simply remains in the pool, to be counted again at the next boundary. `TARGET_CLAIMS_PER_BLOCK` is the same value the reward difficulty steers toward, so the two uses are consistent by construction: the reward is sized for the rate the controller is targeting.
 
@@ -1870,7 +1870,7 @@ EMA_SMOOTHING_PRECISION: uint64 = 10  # P, the scale F is expressed against; F <
 def compute_new_reward_difficulty(claims_in_block: uint64,
                                   current_target: PowTarget) -> PowTarget:
     # `current_target` and the result are canonical integer representatives of
-    # their field elements; the arithmetic is over unbounded integers per
+    # their field elements; the arithmetic is over arbitrary-precision integers per
     # [Arithmetic], and the capped result converts back without reduction.
     # The demand implied by this block, reconstructed from the target that
     # produced it, then smoothed against the target rate. Floored at 1 so the
@@ -1924,7 +1924,7 @@ BLEND_MAX_STEP: uint64 = 2                      # Max factor the threshold may m
 def compute_epoch_blend_difficulty(epoch_blocks: list[Block],   # the blocks of epoch N-2
                                    previous: PowTarget) -> PowTarget:  # d_blend of epoch N-1
     # All quantities here are canonical integer representatives of their field
-    # elements; the arithmetic is over unbounded integers per [Arithmetic], and
+    # elements; the arithmetic is over arbitrary-precision integers per [Arithmetic], and
     # the capped result converts back to a field element without reduction.
     # Observed load as an exact ratio, never divided: num == den at the reference load.
     num = sum(num_transactions(b) for b in epoch_blocks)
@@ -1951,8 +1951,16 @@ def compute_epoch_blend_difficulty(epoch_blocks: list[Block],   # the blocks of 
 
 def integer_nth_root(x: int, n: int) -> int:
     # The floor of the real n-th root: the largest integer r with r**n <= x.
-    # Any exact method serves; binary search over [0, x] is sufficient.
-    ...
+    # Any exact method serves; this reference is a binary search over
+    # arbitrary-precision integers.
+    lo, hi = 0, 1 << (x.bit_length() // n + 1)   # hi**n > x by construction
+    while lo < hi - 1:
+        mid = (lo + hi) // 2
+        if mid ** n <= x:
+            lo = mid
+        else:
+            hi = mid
+    return lo
 ```
 
 The clamp interval is never empty: every stored value is capped below $`p`$, so `previous` is at most $`p-1`$ and `lo = previous // BLEND_MAX_STEP` is at most $`(p-1)/2`$, strictly below the $`p-1`$ ceiling of `hi`.
