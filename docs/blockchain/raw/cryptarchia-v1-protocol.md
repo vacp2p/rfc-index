@@ -97,7 +97,7 @@ Our design starts from the solid foundation provided by Ouroboros Crypsinous: Pr
 | *none* | slot length | The duration of a single slot. | 1 second |
 | MAX_BLOCK_SIZE | max block size | The maximum size of the block body (not including the header) | 2 MiB (2,097,152 bytes) |
 | MAX_BLOCK_TXS | max block transactions | The maximum number of transactions in a block | 1024 |
-| $`W`$ | window absorption parameter | The width of the [uncle reference window](#uncle-references) in expected block-intervals (each of $`f^{-1}`$ slots): the slot of the **parent** of a referenced uncle must precede the slot of the referencing block by at most $`W\cdot f^{-1}`$ slots (360 at $`W=12`$). Anchoring the window to the parent bounds how far back the referencing chain must be retained to verify the uncle; a virtual upper bound on $`W`$ applies (see the note in [Uncle Selection](#uncle-selection)). | 12 |
+| $`W`$ | uncle reference window | The window width in expected block-intervals (each of $`f^{-1}`$ slots): the slot of the **parent** of a referenced [uncle](#uncle-references) must precede the slot of the referencing block by at most $`W\cdot f^{-1}`$ slots (360 at $`W=12`$). Anchoring the window to the parent bounds how far back the referencing chain must be retained to verify the uncle; a virtual upper bound on $`W`$ applies (see the note in [Uncle Selection](#uncle-selection)). | 12 |
 | MAX_UNCLES | max uncle references | The maximum number of [uncles](#uncle-references) a block may reference. | 4 |
 
 ## Notation
