@@ -192,6 +192,7 @@
 </div><!-- timeline:start -->
 <h2 id="timeline"><a class="header" href="#timeline">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/07f9412e82fd50bd07ba8eccd7510a545728818c/docs/anoncomms/raw/logos-service-discovery.md"><code>07f9412</code></a> — docs(service-discovery): define identical-ad and one-ad-per-service semantics (#377)</li>
 <li><strong>2026-07-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/6d7d58e216d38f2122f913cd6a2672ff3103f72f/docs/anoncomms/raw/logos-service-discovery.md"><code>6d7d58e</code></a> — Clarify lower bound enforcement and update logic for waiting time (#322)</li>
 <li><strong>2026-07-17</strong> — <a href="https://github.com/logos-co/logos-lips/blob/15f7006506f8d518c22737f5b658a5f0daccafc0/docs/anoncomms/raw/logos-service-discovery.md"><code>15f7006</code></a> — docs(service-discovery): fix bucket index formula in Distance section (#374)</li>
 <li><strong>2026-06-12</strong> — <a href="https://github.com/logos-co/logos-lips/blob/124f8957915f349347532d802d9e4bb5cc2a5ce7/docs/anoncomms/raw/logos-service-discovery.md"><code>124f895</code></a> — chore: fix broken links (#357)</li>
@@ -373,10 +374,15 @@ For a single advertisement object we use <code>ad</code>.</p>
 <p>An advertisement logically represents:</p>
 <ul>
 <li><strong>Service identification</strong>: Which service the node participates in (via <code>service_id_hash</code>)</li>
-<li><strong>Peer identification</strong>: The advertiser's unique peer ID</li>
-<li><strong>Network addresses</strong>: How to reach the advertiser (multiaddrs)</li>
-<li><strong>Authentication</strong>: Cryptographic proof that the advertiser controls the peer ID</li>
+<li><strong>Peer identification</strong>: The node's unique peer ID</li>
+<li><strong>Network addresses</strong>: How to reach the node (multiaddrs)</li>
+<li><strong>Authentication</strong>: Cryptographic proof that the node controls the peer ID</li>
 </ul>
+<blockquote>
+<p>Ads are authenticated but the containing information can still be false.
+It is trivial to create valid ads that refer to nodes that don't exist.
+Similarly, the advertiser's IP and peer ID should not be confused with the ad's, they may be different.</p>
+</blockquote>
 <p>Implementations are RECOMMENDED to use ExtensiblePeerRecord (XPR) encoding for advertisements.
 See the <a href="#advertisement-encoding">Advertisement Encoding</a> section
 in the wire protocol specification for transmission format details.</p>
@@ -530,8 +536,8 @@ message Message {
         GET_PROVIDERS = 3;
         FIND_NODE = 4;
         PING = 5;
-        REGISTER = 6; // New DISC-NG capability discovery type
-        GET_ADS = 7; // New DISC-NG capability discovery type
+        REGISTER = 6; // New
+        GET_ADS = 7; // New
     }
 
     enum ConnectionType {
@@ -606,6 +612,15 @@ to avoid coupling the protocol to specific formats</li>
 <p>Advertisements in the <code>Register.advertisement</code> and <code>GetAds.advertisements</code> fields are encoded as <code>bytes</code>. Implementations are RECOMMENDED to use <a href="extensible-peer-records.html">ExtensiblePeerRecord (XPR)</a> encoding.</p>
 <p>Alternative encodings MAY be used if they provide equivalent functionality
 and can be verified by discoverers.</p>
+<p>Where the encoding carries a services field (e.g. XPR's <code>services</code>), it
+MUST include the <code>ServiceInfo</code> entry for the <code>service_id_hash</code> being
+registered; it MAY also list <code>ServiceInfo</code> entries for other services
+the advertiser supports (see
+<a href="#advertisement-signature-verification">Advertisement Signature Verification</a>
+for how those other entries are treated).
+Per <a href="#advertisement">Advertisement</a>,
+each <code>REGISTER</code> is still scoped to
+exactly one <code>service_id_hash</code>.</p>
 <h3 id="register-message"><a class="header" href="#register-message">REGISTER Message</a></h3>
 <p>Used by advertisers to register their advertisements with registrars.</p>
 <h4 id="register-request"><a class="header" href="#register-request">REGISTER Request</a></h4>
@@ -642,6 +657,12 @@ and can be verified by discoverers.</p>
     }
 }
 </code></pre>
+<p>Each <code>REGISTER</code> request MUST register an advertisement against exactly one
+<code>service_id_hash</code> - the request's <code>key</code> field - and the resulting
+<code>ad_cache</code> entry is scoped to that one service
+(see <a href="#advertisement-cache">Advertisement Cache</a>).
+The advertisement's content MAY encode any further service information
+as required by the discovering application.</p>
 <h4 id="register-response"><a class="header" href="#register-response">REGISTER Response</a></h4>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Usage</th><th>Value</th></tr></thead><tbody>
 <tr><td><code>type</code></td><td>REQUIRED</td><td><code>REGISTER</code> (6)</td></tr>
@@ -655,7 +676,7 @@ and can be verified by discoverers.</p>
 <ul>
 <li><code>CONFIRMED</code>: Advertisement stored in cache</li>
 <li><code>WAIT</code>: Not yet accepted, wait and retry with ticket</li>
-<li><code>REJECTED</code>: Invalid signature, duplicate, or error</li>
+<li><code>REJECTED</code>: Invalid signature, invalid ticket, or error</li>
 </ul>
 <p><strong>Example (WAIT):</strong></p>
 <pre><code class="language-protobuf">Message {
@@ -753,7 +774,6 @@ Discoverers MUST verify signatures before accepting.</p>
 </li>
 <li>Advertisement signature is valid
 (see <a href="#advertisement-signature-verification">Advertisement Signature Verification</a>)</li>
-<li>Advertisement not already in <code>ad_cache</code></li>
 </ol>
 <p>Respond with <code>register.status = REJECTED</code> if validation fails.</p>
 <h4 id="get_ads-request-validation"><a class="header" href="#get_ads-request-validation">GET_ADS Request Validation</a></h4>
@@ -784,6 +804,16 @@ For XPR-encoded advertisements:</p>
     assert(service_found)
 </code></pre>
 <p>Discard advertisements with invalid signatures or that don't advertise the requested service.</p>
+<blockquote>
+<p><strong>Note:</strong> The loop over <code>xpr.services</code> above is a signature-binding check,
+confirming the requested <code>service_id_hash</code>
+is among the services the advertiser signed.
+An advertisement supports exactly the <code>service_id_hash</code>
+it was registered or queried against.
+Any other entries in <code>xpr.services</code> are opaque to registrars and
+discoverers - they are meaningful only to the application that
+ultimately receives the advertisement.</p>
+</blockquote>
 <blockquote>
 <p><strong>Note:</strong> ExtensiblePeerRecord uses protocol strings (e.g., <code>/waku/store/1.0.0</code>) in <code>ServiceInfo.id</code>.
 Logos discovery uses <code>service_id_hash = SHA256(ServiceInfo.id)</code> for routing.
@@ -822,7 +852,8 @@ centered on that <code>service_id_hash</code>.
 The advertiser MAY bootstrap <code>AdvT(service_id_hash)</code>
 from the <code>KadDHT(peerID)</code> routing table using the formula
 described in the <a href="#distance">Distance section</a>.</p>
-<p>The advertiser SHOULD try to maintain up to <code>K_register</code>
+<p>Each registration is scoped to one <code>service_id_hash</code>.
+The advertiser SHOULD try to maintain up to <code>K_register</code>
 active registrations per bucket.
 It does so by selecting random registrars
 from each bucket of <code>AdvT(service_id_hash)</code>.
@@ -978,9 +1009,9 @@ and serve cached advertisements,
 by handling <code>GET_ADS</code> requests.
 Registrars MUST maintain a cache of advertisements, <code>ad_cache</code>,
 that associates each <code>advertisement</code>
-to its <code>service_id</code>,
-and an expiry timestamp based on admission time plus configured expiry time, <code>E</code>.
-Once an <code>ad</code> has expired, it SHOULD be removed from the <code>ad_cache</code></p>
+to only one advertiser's <code>peer_id</code>, <code>service_id</code>
+and expiry timestamp based on admission time plus configured expiry time, <code>E</code>.
+Once an <code>ad</code> has expired, it SHOULD be removed from the <code>ad_cache</code>.</p>
 <h3 id="handling-register-requests"><a class="header" href="#handling-register-requests">Handling REGISTER requests</a></h3>
 <p>When a registrar node receives a <code>REGISTER</code> request from an advertiser node
 to admit its <code>ad</code> for a service into the <code>ad_cache</code>,
@@ -991,11 +1022,7 @@ using the algorithm described in <a href="#peer-table-updates">Peer Table Update
 <p>To populate the rest of the response, the registrar MUST:</p>
 <ol>
 <li>
-<p>If an identical <code>ad</code> already exists in the <code>ad_cache</code>,
-reject the request and respond with status <code>Rejected</code>.</p>
-</li>
-<li>
-<p>Calculate (or recalculate, if this is a resubmission) a waiting time for the <code>ad</code>, <code>t_wait</code>,
+<p>Calculate a waiting time for the <code>ad</code>, <code>t_wait</code>,
 using the formula in <a href="#waiting-time-calculation">Waiting Time Calculation</a>.</p>
 </li>
 <li>
@@ -1028,7 +1055,8 @@ This ensures advertisers accumulate waiting time across retries</p>
 <li>
 <p>If <code>t_remaining ≤ 0</code>, add the <code>ad</code> to the <code>ad_cache</code>,
 with an expiry timestamp set to <code>current_time + E</code>.
-The registrar SHOULD return a response with status <code>Confirmed</code>.</p>
+If an entry for this <code>peer_id</code> and <code>service_id</code> already exists,
+this replaces it.</p>
 </li>
 <li>
 <p>If <code>t_remaining &gt; 0</code>, issue a new signed <code>ticket</code>
@@ -1041,7 +1069,6 @@ The registrar SHOULD return the signed <code>ticket</code> in a response with st
 <p>The following pseudocode block shows one way of implementing the algorithm to handle register requests.
 Registrars MAY follow this example.</p>
 <pre><code class="language-text">procedure REGISTER(ad, ticket):
-    assert(ad not in ad_cache)
     response.ticket.ad ← ad
     t_wait ← CALCULATE_WAITING_TIME(ad)
 
@@ -1052,13 +1079,16 @@ Registrars MAY follow this example.</p>
     else:
         assert(ticket.hasValidSignature())
         assert(ticket.ad = ad)
-        assert(ad.notInAdCache())
         t_scheduled ← ticket.t_mod + ticket.t_wait_for
         assert(t_scheduled ≤ NOW() ≤ t_scheduled + δ)
         t_remaining ← t_wait - (NOW() - ticket.t_init)
     end if
     if t_remaining ≤ 0:
-        ad_cache.add(ad)
+        if ad_cache.contains(ad.peer_id, ad.service_id_hash):
+            ad_cache.replace(ad)
+        else:
+            ad_cache.add(ad)
+        end if
         response.status ← Confirmed
     else:
         response.status ← Wait
@@ -1165,17 +1195,17 @@ while still learning rare peers in buckets close to <code>service_id_hash</code>
 <h3 id="formula"><a class="header" href="#formula">Formula</a></h3>
 <p>The waiting time is the time advertisers have to
 wait before their <code>ad</code> is admitted to the <code>ad_cache</code>.
-The waiting time is given based on the <code>ad</code> itself
+The waiting time is given based on the <code>ad</code> itself, the advertiser
 and the current state of the registrar’s <code>ad_cache</code>.</p>
 <p>The waiting time for an advertisement MUST be calculated using:</p>
-<pre><code class="language-text">w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(ad.addrs)) + G)
+<pre><code class="language-text">w(ad) = E × (1/(1 - c/C)^P_occ) × (c(ad.service_id_hash)/C + score(getIP(advertiser.addrs)) + G)
 </code></pre>
 <ul>
 <li><code>c</code>: Current cache occupancy</li>
 <li><code>c(ad.service_id_hash)</code>: Number of advertisements for <code>service_id_hash</code> in cache</li>
-<li><code>getIP(ad.addrs)</code> is a function to get the IP address
-from the multiaddress of the advertisement.</li>
-<li><code>score(getIP(ad.addrs))</code>: IP similarity score (0 to 1).
+<li><code>getIP(advertiser.addrs)</code> is a function to get the IP addresses
+from the multiaddresses of the advertiser's connection information.</li>
+<li><code>score(getIP(advertiser.addrs))</code>: IP similarity score (0 to 1).
 Refer to the <a href="#ip-similarity-score">IP Similarity Score section</a></li>
 </ul>
 <p>Section <a href="#system-parameters">System Parameters</a> can be referred
@@ -1210,20 +1240,24 @@ Implementations should consider this while setting the value for <code>P_occ</co
 </ul>
 <h3 id="ip-similarity-score"><a class="header" href="#ip-similarity-score">IP Similarity Score</a></h3>
 <p>The IP similarity score is used to detect and limit
-Sybil attacks where malicious actors create multiple advertisements
+Sybil attacks where malicious advertisers create multiple advertisement requests
 from the same network or IP prefix.</p>
+<blockquote>
+<p>The IP being refered to here is NOT the ad's but the one from the advertiser connection information.</p>
+</blockquote>
 <p>Registrars MUST use an IP similarity score to
-limit the number of <code>ads</code> coming from the same subnetwork
+limit the number of requests coming from the same subnetwork
 by increasing their waiting time.
 The IP similarity mechanism MUST:</p>
 <ul>
 <li>Calculate a score (0-1): higher scores indicate similar IP prefixes (potential Sybil attacks)</li>
-<li>Track IP addresses of <code>ads</code> currently in the <code>ad_cache</code>.</li>
-<li>MUST update its tracking structure when:
+<li>Track IP addresses as a multiset: each IP is counted once per
+<code>ad_cache</code> entry that uses it
+(see <a href="#advertisement-cache">Advertisement Cache</a> for what constitutes an entry)</li>
+<li>MUST update the count once per <code>ad_cache</code> entry, when:
 <ul>
-<li>A new <code>ad</code> is admitted to the <code>ad_cache</code>: MUST add the IP</li>
-<li>An <code>ad</code> expires after time <code>E</code>:
-MUST remove IP if there are no other active <code>ads</code> from the same IP</li>
+<li>A new entry is admitted to the <code>ad_cache</code>: MUST increment the count for that IP</li>
+<li>An entry expires after time <code>E</code>: MUST decrement the count for that IP</li>
 </ul>
 </li>
 <li>Recalculate score for each registration attempt</li>
@@ -1232,28 +1266,30 @@ MUST remove IP if there are no other active <code>ads</code> from the same IP</l
 <p>We RECOMMEND using an IP tree data structure
 to efficiently track and calculate IP similarity scores.
 An IP tree is a binary tree that stores
-IPs used by <code>ads</code> currently present in the <code>ad_cache</code>.
+IPs used by advertiser currently present in the <code>ad_cache</code>.
 This data structure provides logarithmic time complexity
 for insertion, deletion, and score calculation.
 Implementations MAY use alternative data structures
 as long as they satisfy the requirements specified above.
 Apart from root, the IP tree is a 32-level binary tree where:</p>
 <ul>
-<li>Each vertex stores <code>IP_counter</code> (number of IPs passing through).
-It is initially set to 0.</li>
+<li>Each vertex stores <code>IP_counter</code>, a count of <code>ad_cache</code> entries whose
+IP passes through it. It is initially set to 0.</li>
 <li>Edges represent bits (0/1) in IPv4 binary representation</li>
-<li>When an <code>ad</code> is admitted to the <code>ad_cache</code>,
-its IPv4 address is added to the IP tracking structure
-using the <a href="#add_ip_to_tree-algorithm"><code>ADD_IP_TO_TREE()</code> algorithm</a>.</li>
+<li>When an entry is admitted to the <code>ad_cache</code>, its IPv4 address
+increments the counters along its path once for that entry, using the
+<a href="#add_ip_to_tree-algorithm"><code>ADD_IP_TO_TREE()</code> algorithm</a> - a multi-service
+advertiser's IP is incremented once per service, one entry per service.</li>
 <li>Every time a waiting time is calculated for a registration attempt,
 the registrar calculates the IP similarity score for the advertiser's IP address.
 using <a href="#calculate_ip_score-algorithm"><code>CALCULATE_IP_SCORE()</code> algorithm</a>.</li>
-<li>When an <code>ad</code> is removed from the <code>ad_cache</code> after <code>E</code>,
-The registrar also removes the IP from IP tracking structure
-using the <a href="#remove_from_ip_tree-algorithm"><code>REMOVE_FROM_IP_TREE()</code> algorithm</a>
-if there are no other active <code>ad</code> in <code>ad_cache</code> from the same IP.</li>
+<li>When an entry is removed from the <code>ad_cache</code> after <code>E</code>, the registrar
+decrements the counters along its IP's path once for that entry, using the
+<a href="#remove_from_ip_tree-algorithm"><code>REMOVE_FROM_IP_TREE()</code> algorithm</a> -
+the IP's effect on the score reaches zero only once every entry using
+it has been removed.</li>
 <li>All the algorithms work efficiently with O(32) time complexity.</li>
-<li>The root <code>IP_counter</code> tracks total IPs currently in <code>ad_cache</code></li>
+<li>The root <code>IP_counter</code> tracks the total count of <code>ad_cache</code> entries</li>
 </ul>
 <h4 id="add_ip_to_tree-algorithm"><a class="header" href="#add_ip_to_tree-algorithm"><code>ADD_IP_TO_TREE()</code> algorithm</a></h4>
 <p>The algorithm traverses the tree following the IP's binary representation,
@@ -1624,9 +1660,8 @@ Implementations should consider these trade-offs carefully when selecting approp
 <h4 id="register-algorithm-explanation"><a class="header" href="#register-algorithm-explanation"><code>REGISTER()</code> algorithm explanation</a></h4>
 <p>Refer to the <a href="#example-register-algorithm">Register Algorithm section</a> for the pseudocode</p>
 <ol>
-<li>Make sure this advertisement <code>ad</code> is not already in the registrar’s advertisement cache <code>ad_cache</code>.</li>
 <li>Prepare a response ticket <code>response.ticket</code> linked to this <code>ad</code>.</li>
-<li>Then calculate how long the advertiser should wait <code>t_wait</code> before being admitted.
+<li>Calculate how long the advertiser should wait <code>t_wait</code> before being admitted.
 Refer to the <a href="#waiting-time-calculation">Waiting Time Calculation section</a> for details.</li>
 <li>Check if this is the first registration attempt (no ticket yet):
 <ol>
@@ -1634,8 +1669,8 @@ Refer to the <a href="#waiting-time-calculation">Waiting Time Calculation sectio
 The ticket’s creation time <code>t_init</code> and last-modified time <code>t_mod</code> are both set to <code>NOW()</code>.</li>
 <li>If no, then this is a retry, so a previous ticket exists.
 <ol>
-<li>Validate that the ticket is properly signed by the registrar,
-belongs to this same advertisement and that the <code>ad</code> is still not already in the <code>ad_cache</code>.</li>
+<li>Validate that the ticket is properly signed by the registrar
+and belongs to this same advertisement.</li>
 <li>Ensure the retry is happening within the allowed time window <code>δ</code> after the scheduled time.
 If the advertiser waits too long or too short, the ticket is invalid.</li>
 <li>Calculate how much waiting time is left <code>t_remaining</code>
@@ -1646,16 +1681,18 @@ by subtracting how long the advertiser has already waited
 </ol>
 </li>
 <li>Check if the remaining waiting time <code>t_remaining</code> is less than or equal to 0.
-This means  the waiting time is over.
+This means the waiting time is over.
 <code>t_remaining</code> can be 0 also when the registrar decides that
 the advertiser doesn’t have to wait for admission to the <code>ad_cache</code>(waiting time <code>t_wait</code> is 0).
 <ol>
 <li>If yes, add the <code>ad</code> to <code>ad_cache</code> and confirm registration.
+If an entry for this <code>peer_id</code> and <code>service_id</code> already exists,
+this replaces it.
 The advertisement is now officially registered.</li>
 <li>If no, then there is still time to wait.
 In this case registrar does not store <code>ad</code> but instead issues a ticket.
 <ol>
-<li>set <code>reponse.status</code> to <code>wait</code></li>
+<li>set <code>response.status</code> to <code>wait</code></li>
 <li>Update the ticket with the new remaining waiting time <code>t_wait_for</code></li>
 <li>Update the ticket last modification time <code>t_mod</code></li>
 <li>Sign the ticket again. The advertiser will retry later using this new ticket.</li>
