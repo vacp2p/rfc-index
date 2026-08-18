@@ -1375,7 +1375,7 @@ Once the destination responds with a reply message, the Exit Layer MUST perform 
 
 3. **Assemble and Transmit Reply Packet**
 
-   Assemble the Sphinx packet using the SURB header $(α, β, γ)$ and encrypted payload $δ$ from step 2, following the packet format defined in [Section 8.5.2](#852-construction-steps) Step 3.e. Serialize and transmit packet to $\mathrm{hop}_0$ (retrieved from the SURB) via a libp2p stream negotiated under the `"/mix/1.0.0"` protocol identifier.
+   Assemble the Sphinx packet using the SURB header $(α, β, γ)$ and encrypted payload $δ$ from step 2, following the packet format defined in [Section 8.5.2](#852-construction-steps) Step 3.e. Serialize the packet, then apply the randomized pre-send delay defined in [Section 8.5.2](#852-construction-steps) Step 3.f before transmitting it to $\mathrm{hop}_0$ (retrieved from the SURB) via a libp2p stream negotiated under the `"/mix/1.0.0"` protocol identifier. Without this delay, reply transmissions would be distinguishable from locally originated transmissions, which jitter their first-hop writes.
    Discard the SURB.
 
 #### 8.7.4 SURB Reply Processing
