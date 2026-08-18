@@ -30,7 +30,7 @@
 | 1.1.1 | [[RFC] Simplify Mantle Transaction and Refactor Ledger Operations](mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.md) | 2026-05-06 |
 | 1.1.2 | Precise that the maximum block size applies to the block body only. | 2026-07-27 |
 | 1.1.3 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
-| 1.2.0 | Added the `uncle_headers` field, carrying the signed headers of the referenced uncles, to the [Proposal](#block-proposal) and to the newly defined [Block](#block) structure, due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). Replaced `block_root` with `body_root` in the [Header](#header), which commits to `uncle_headers` — signatures included — as well as to the transactions; the header stays 297 bytes and the proposal grows to 33130..34574 bytes. Added the carried-header well-formedness check to [Block Proposal Validation](#block-proposal-validation). | 2026-08-06 |
+| 1.2.0 | Added the `uncle_headers` field — the signed headers of the referenced uncles — to the [Proposal](#block-proposal) and to the newly defined [Block](#block), and replaced `block_root` with `body_root` in the [Header](#header), which commits to them, signatures included, as well as to the transactions. Due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md) (uncle references). | 2026-08-06 |
 
 # Introduction
 

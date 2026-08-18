@@ -29,7 +29,7 @@
 | 1.0.2 | Added details for block root computation | 2026-05-26 |
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
 | 1.1.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
-| 1.2.0 | Added [uncle references](#uncle-references): a block carries the signed headers of the fork blocks it references, the validity of each is a condition of the block's own validity (step 10 of [Block Header Validation](#block-header-validation)), and the [Total Stake Inference](#total-stake-inference) counts their slots alongside those of the canonical blocks, for the uncles referenced by the blocks lying in its observation window. Added the uncle reference window — anchored to the slot of the uncle's parent, which bounds how far back the referencing chain must be retained — spanning $`W`$ expected block-intervals, together with `MAX_UNCLES` and the [Uncle Selection](#uncle-selection) procedure. Replaced `block_root` with `body_root`, which commits to the carried headers as well as to the transactions. Clarified that a block signature is verified over the header rather than over its block ID. | 2026-08-06 |
+| 1.2.0 | Added [uncle references](#uncle-references): a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the [Total Stake Inference](#total-stake-inference) counts their slots. Replaced `block_root` with `body_root`, which commits to those headers as well as to the transactions. | 2026-08-06 |
 
 # Introduction
 

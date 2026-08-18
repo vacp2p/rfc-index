@@ -25,7 +25,7 @@
 | **Version** | **Changes** | **Date** |
 | --- | --- | --- |
 | 1.0.0 | Initial revision. | 2026-01-20 |
-| 1.1.0 | Changed `density_over_slots` to count **distinct occupied slots** instead of blocks, counting the slots of the [uncles](cryptarchia-v1-protocol.md#uncle-references) referenced by the blocks of the honest chain that lie in the observation period, alongside the slots of those blocks themselves, due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md). | 2026-08-06 |
+| 1.1.0 | Changed `density_over_slots` to count **distinct occupied slots** instead of blocks, including the slots of the [uncles](cryptarchia-v1-protocol.md#uncle-references) referenced by the honest chain's in-period blocks, due to updated [Cryptarchia Protocol](cryptarchia-v1-protocol.md). | 2026-08-06 |
 
 # Introduction
 
