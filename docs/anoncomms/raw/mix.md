@@ -1582,7 +1582,7 @@ Applications using the Mix Protocol MUST treat delivery as probabilistic.
 To improve reliability, the sender MAY:
 
 - Use parallel transmission across `D` disjoint paths.
-- Estimate end-to-end delay bounds based on chosen per-hop delays (defined in [Section 6.2](#62-delay-strategy)), and retry using different paths if a response is not received within the expected window.
+- Estimate end-to-end delay bounds based on chosen per-hop delays (defined in [Section 6.2](#62-delay-strategy)) plus the pre-send delays applied at the initiating node ([Section 8.5.2](#852-construction-steps) Step 3.f) and at the exit for SURB replies ([Section 8.7.3](#873-using-a-surb)), and retry using different paths if a response is not received within the expected window.
 
 These strategies MUST be implemented at the origin protocol layer or through Mix integration logic and are not enforced by the Mix Protocol itself.
 

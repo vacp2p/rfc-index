@@ -374,9 +374,10 @@ have already been deducted, so their slots are unavailable to any later claim.
 > 1. Wait for the next emission event as determined by the configured strategy.
 > 2. If the strategy schedules an emission **and** `cover_queue` is non-empty:
 >    - a. Dequeue the head of `cover_queue` and decrement `slots_remaining`.
->    - b. Validate the proof per [§6.5](#65-pre-computed-proof-validation-at-send-time).
->    - c. Sample a pre-send delay from the same distribution used for locally originated sends
+>    - b. Sample a pre-send delay from the same distribution used for locally originated sends
 >      ([mix.md §8.5.2](mix.md#852-construction-steps) Step 3.f) and wait for it to elapse.
+>    - c. Validate the proof per [§6.5](#65-pre-computed-proof-validation-at-send-time).
+>      Validation happens after the delay so the staleness window between validation and transmission stays minimal.
 >    - d. Transmit the `packet` field of [`PrebuiltCoverPacket`](#55-data-structures) to the first hop
 >      (other fields are internal and MUST NOT be sent).
 > 3. If `cover_queue` is empty for the remainder of the epoch
@@ -676,6 +677,8 @@ Poisson-Rate, where emission times are sampled at runtime, cannot support pre-sc
 Note that pre-scheduled slots would require changes to the mixing delay strategy
 in the Mix Protocol, as forwarded packets would need to be held until their assigned slot time
 rather than forwarded after the sampled delay elapses.
+The pre-send delays ([mix.md §8.5.2](mix.md#852-construction-steps) Step 3.f, [§6.2](#62-cover-emission))
+would likewise be superseded by slot assignment.
 
 ### 11.4 Budget Model for Sender-Generated Proofs
 
