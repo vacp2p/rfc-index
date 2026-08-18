@@ -389,7 +389,9 @@ Locally originated packets and SURB replies apply a sampled pre-send delay befor
 Cover transmissions MUST apply the same delay, sampled from the same distribution:
 a packet class that departs exactly on the strategy schedule while every other class jitters
 would be identifiable by the absence of jitter alone.
-This blurs individual emissions off the strategy grid but does not provide timing unobservability
+This blurs individual emissions off the strategy grid,
+restoring the separability baseline from before non-cover traffic jittered;
+it does not provide timing unobservability
 ([§10.4](#104-timing-separability-of-cover-and-non-cover-packets)).
 
 ### 6.3 Locally Originated Message Sending
@@ -611,7 +613,8 @@ The default Constant-Rate strategy ([§7.1](#71-constant-rate-cover-traffic))
 schedules cover packets on a fixed grid while forwarded packets are dispatched at arrival time plus mixing delay.
 The pre-send delay applied at emission ([§6.2](#62-cover-emission)) removes exact grid alignment,
 but the constant underlying spacing survives averaging:
-with enough observations, a passive adversary can still classify individual packets by timing alone,
+with enough observations, a passive adversary can recover the emission schedule
+and classify packets near grid points with high confidence,
 regardless of forwarding load.
 
 Constant-Rate therefore provides volume unobservability but not timing unobservability.
