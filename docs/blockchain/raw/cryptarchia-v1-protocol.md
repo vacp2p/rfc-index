@@ -30,6 +30,7 @@
 | 1.1.0 | Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be <= 1024 | 2026-07-27 |
 | 1.1.1 | Corrected `MAX_BLOCK_SIZE` to 2 MiB, to match the implementation. | 2026-08-05 |
 | 1.2.0 | Added [uncle references](#uncle-references): a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the [Total Stake Inference](#total-stake-inference) counts their slots. Replaced `block_root` with `body_root`, which commits to those headers as well as to the transactions. | 2026-08-06 |
+| 1.2.1 | Reordered the `ProofOfLeadership` fields to the wire order defined by the [Canonical Encoding](bedrock-v1.1-block-construction.md#canonical-encoding), and noted that the [Block ID](#block-id) preimage absorbs the same fields in a different order by design. The `Header` layout and the `block_id` preimage are otherwise unchanged. | 2026-08-19 |
 
 # Introduction
 
