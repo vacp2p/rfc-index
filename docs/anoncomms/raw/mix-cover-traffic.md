@@ -262,6 +262,11 @@ Cover packets emitted near epoch end may arrive at later hops in a subsequent ep
 The DoS protection mechanism is responsible for accepting proofs within a configurable epoch window
 (_e.g.,_ the `max_epoch_gap` parameter in [Mix RLN DoS Protection](mix-spam-protection-rln.md)).
 
+A cover packet whose pre-send delay ([§6.2](#62-cover-emission)) is still elapsing at the boundary
+is discarded rather than transmitted:
+its slot was claimed from the previous epoch's pool,
+so transmitting it in the new epoch would exceed the fresh budget by one packet.
+
 ### 5.4 Cover Packet Reception
 
 **Trigger:** The Mix Protocol completes [exit processing](mix.md#864-exit-processing) on a received Sphinx packet
@@ -372,13 +377,21 @@ have already been deducted, so their slots are unavailable to any later claim.
 > The following steps repeat continuously throughout each epoch:
 >
 > 1. Wait for the next emission event as determined by the configured strategy.
+>    Emission events occur at fixed times independent of when previous transmissions completed;
+>    the pre-send delay of step 2.b MUST NOT shift subsequent emission events.
 > 2. If the strategy schedules an emission **and** `cover_queue` is non-empty:
 >    - a. Dequeue the head of `cover_queue` and decrement `slots_remaining`.
 >    - b. Sample a pre-send delay from the same distribution used for locally originated sends
->      ([mix.md §8.5.2](mix.md#852-construction-steps) Step 3.f) and wait for it to elapse.
->    - c. Validate the proof per [§6.5](#65-pre-computed-proof-validation-at-send-time).
+>      ([mix.md §8.5.2](mix.md#852-construction-steps) Step 3.f)
+>      and schedule steps 2.c–2.e to run once it elapses, without blocking step 1.
+>      Otherwise, a delay longer than the emission interval would compress the gap
+>      between consecutive transmits to the delay itself — a cover timing signature.
+>    - c. If the epoch changed while the delay elapsed, discard the packet:
+>      its slot was claimed from a pool that has since been discarded ([§5.3](#53-epoch-boundary)),
+>      and transmitting would exceed the new epoch's budget by one packet.
+>    - d. Validate the proof per [§6.5](#65-pre-computed-proof-validation-at-send-time).
 >      Validation happens after the delay so the staleness window between validation and transmission stays minimal.
->    - d. Transmit the `packet` field of [`PrebuiltCoverPacket`](#55-data-structures) to the first hop
+>    - e. Transmit the `packet` field of [`PrebuiltCoverPacket`](#55-data-structures) to the first hop
 >      (other fields are internal and MUST NOT be sent).
 > 3. If `cover_queue` is empty for the remainder of the epoch
 >    (because pre-built packets were exhausted by emission or reclaimed under heavy non-cover load),
