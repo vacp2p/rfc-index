@@ -18088,6 +18088,7 @@ print("Final Prob:", delta)
 </div><!-- timeline:start -->
 <h2 id="timeline-70"><a class="header" href="#timeline-70">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/analysis-total-stake-inference.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/analysis-total-stake-inference.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/analysis-total-stake-inference.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/analysis-total-stake-inference.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -18099,6 +18100,9 @@ print("Final Prob:", delta)
 </tbody></table>
 </div>
 <h1 id="introduction-9"><a class="header" href="#introduction-9">Introduction</a></h1>
+<blockquote>
+<p><strong>Note:</strong> This analysis covers the total stake inference design without <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle references</a>. The analyzed block count includes only the blocks of the honest chain and does not include the referenced uncles that were later added to <a href="blockchain/raw/cryptarchia-total-stake-inference.html">Total Stake Inference</a>. Therefore, the results below apply to the design without uncle references. Re-analyzing the algorithm with the block count that includes referenced uncles is an open task.</p>
+</blockquote>
 <p>Cryptarchia consensus leadership is determined by a lottery in which the chances of winning are higher for eligible nodes with a greater stake relative to the total active stake. At the same time, the true total active stake cannot be known by participants due to the privacy properties of Logos Blockchain notes. This tension is resolved in Cryptarchia by having the network estimate the total active stake based on the observed activity of the network.</p>
 <h2 id="goals"><a class="header" href="#goals">Goals</a></h2>
 <p>The Cryptarchia total stake inference algorithm must satisfy the following criteria:</p>
@@ -18497,6 +18501,7 @@ print("Final Prob:", delta)
 </div><!-- timeline:start -->
 <h2 id="timeline-71"><a class="header" href="#timeline-71">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/cryptarchia-v1-bootstr-sync.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/cryptarchia-v1-bootstr-sync.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/cryptarchia-v1-bootstr-sync.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/cryptarchia-v1-bootstr-sync.md"><code>58b5698</code></a> — chore(blockchain): migrate contributor emails to @logos.co (#338)</li>
@@ -18507,6 +18512,7 @@ print("Final Prob:", delta)
 <h1 id="revision-history-7"><a class="header" href="#revision-history-7">Revision History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-02-17</td></tr>
+<tr><td>1.0.1</td><td>Noted that a streamed <code>Block</code> carries the signed headers of the uncles it references, which is what lets a synchronizing node validate those blocks and reproduce the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> without ever seeing their proposals, due to updated <a href="blockchain/raw/cryptarchia-v1-protocol.html">Cryptarchia Protocol</a> (uncle references).</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-10"><a class="header" href="#introduction-10">Introduction</a></h1>
@@ -18675,6 +18681,7 @@ class DownloadBlocksResponse:
     # A requester can read the stream until the stream returns "NoMoreBlock".
     blocks: Stream[Block | "NoMoreBlock"]
 </code></pre>
+<p>Each streamed <code>Block</code> carries the signed headers of the uncles it references, in its <code>uncle_headers</code> field (<a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block Construction, Validation and Execution</a>). This is what lets a synchronizing node apply the validity rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a> to every downloaded block, and then reproduce the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> of every past epoch from the uncles those blocks carry, even though it never receives the proposals the blocks were reconstructed from.</p>
 <p>The responding peer uses <code>KnownBlocks</code> to determine the optimal starting block for the response stream, aiming to minimize the number of blocks to be returned. The requesting node can include any block it believes could assist in this process to the <code>KnownBlocks.additional_blocks</code>. To avoid spamming responders, the size of <code>KnownBlocks.additional_blocks</code> is limited to 5.</p>
 <p>The responding peer finds the latest common ancestor (i.e. LCA) between the <code>target_block</code> and each of the known blocks. Then, it returns a stream of blocks, starting from the highest LCA. To mitigate malicious downloading requests, the peer limits the number of blocks to be returned. The detailed implementation is up to implementers, depending on their internal architecture (e.g. storage design).</p>
 <p><img src="blockchain/raw/cryptarchia-v1-bootstr-sync/assets/1fd261aa-09df-8138-b041-c737c9e0071c.png" alt="Diagram" /></p>
@@ -18804,6 +18811,7 @@ paths:
 </div><!-- timeline:start -->
 <h2 id="timeline-72"><a class="header" href="#timeline-72">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/fork-choice.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/fork-choice.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/fork-choice.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/fork-choice.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -18816,6 +18824,7 @@ paths:
 <h1 id="revision-history-8"><a class="header" href="#revision-history-8">Revision History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-02-17</td></tr>
+<tr><td>1.1.0</td><td>Clarified that <code>density</code> counts only the blocks of the chain being measured and excludes the <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle references</a> those blocks carry, since uncles carry no fork-choice weight.</td><td>2026-07-09</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-11"><a class="header" href="#introduction-11">Introduction</a></h1>
@@ -18868,7 +18877,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 </li>
 <li>
 <p><span class="math-inline" data-tex="\textbf{density}(b_i, d, s_{gen})"></span>
-<em>Returns the number of blocks produced in the</em> <span class="math-inline" data-tex="s"></span> slots following block <span class="math-inline" data-tex="b_{i-d}"></span>.</p>
+<em>Returns the number of blocks produced in the</em> <span class="math-inline" data-tex="s"></span> slots following block <span class="math-inline" data-tex="b_{i-d}"></span>. Only the blocks of the chain being measured are counted; the <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle references</a> carried by those blocks give no weight to the chain and are excluded from this count.</p>
 <p>For example, in the following diagram, count the number of blocks produced in the <span class="math-inline" data-tex="s_{gen}"></span> slots of the highlighted area.</p>
 </li>
 </ul>
@@ -18930,6 +18939,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 </div><!-- timeline:start -->
 <h2 id="timeline-73"><a class="header" href="#timeline-73">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-20</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5b20a2d59691c12392d091a6d7352d3de719ad61/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>5b20a2d</code></a> — docs(blockchain) Channel Participation in PoS (#364)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/cryptarchia-v1-protocol.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
@@ -18943,6 +18953,8 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <tr><td>1.0.1</td><td>Replaced Logos Blockchain name with Logos Blockchain</td><td>2026-04-17</td></tr>
 <tr><td>1.0.2</td><td>Added details for block root computation</td><td>2026-05-26</td></tr>
 <tr><td>1.1.0</td><td>Precise and make clearer that the max block size is the max body size, and fix the verification of the number of transaction per block to be &lt;= 1024</td><td>2026-07-27</td></tr>
+<tr><td>1.1.1</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
+<tr><td>1.2.0</td><td>Added <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle references</a>: a block carries the signed headers of the fork blocks it references, every carried entry must be valid for the block itself to be valid, and the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> counts their slots. Replaced <code>block_root</code> with <code>body_root</code>, which commits to those headers as well as to the transactions.</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-12"><a class="header" href="#introduction-12">Introduction</a></h1>
@@ -18984,8 +18996,10 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <tr><td><span class="math-inline" data-tex="f"></span></td><td>slot activation coefficient</td><td>The target rate of occupied slots. Not all slots contain blocks, many are empty.   (see <a href="blockchain/raw/analysis-block-times-blend-network.html">ANALYSIS-BLOCK-TIMES-BLEND-NETWORK</a> for analysis leading to the choice of value)</td><td>1/30</td></tr>
 <tr><td><span class="math-inline" data-tex="k"></span></td><td>security parameter</td><td>Block depth finality. Blocks deeper than <span class="math-inline" data-tex="k"></span> on any given chain are considered immutable.</td><td>2160 blocks</td></tr>
 <tr><td><em>none</em></td><td>slot length</td><td>The duration of a single slot.</td><td>1 second</td></tr>
-<tr><td>MAX_BLOCK_SIZE</td><td>max block size</td><td>The maximum size of the block body (not including the header)</td><td>1 MB</td></tr>
+<tr><td>MAX_BLOCK_SIZE</td><td>max block size</td><td>The maximum size of the block body (not including the header)</td><td>2 MiB (2,097,152 bytes)</td></tr>
 <tr><td>MAX_BLOCK_TXS</td><td>max block transactions</td><td>The maximum number of transactions in a block</td><td>1024</td></tr>
+<tr><td><span class="math-inline" data-tex="W"></span></td><td>uncle reference window</td><td>The window width in expected block-intervals (each of <span class="math-inline" data-tex="f^{-1}"></span> slots): the slot of the <strong>parent</strong> of a referenced <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle</a> must precede the slot of the referencing block by at most <span class="math-inline" data-tex="W\cdot f^{-1}"></span> slots (360 at <span class="math-inline" data-tex="W=12"></span>). Anchoring the window to the parent bounds how far back the referencing chain must be retained to verify the uncle; a virtual upper bound on <span class="math-inline" data-tex="W"></span> applies (see the note in <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-selection">Uncle Selection</a>).</td><td>12</td></tr>
+<tr><td>MAX_UNCLES</td><td>max uncle references</td><td>The maximum number of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncles</a> a block may reference.</td><td>4</td></tr>
 </tbody></table>
 </div>
 <h2 id="notation"><a class="header" href="#notation">Notation</a></h2>
@@ -19047,7 +19061,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <p>where <span class="math-inline" data-tex="D_{\mathrm{epoch}}"></span> is the domain separator <code>EPOCH_NONCE_V1</code>, <span class="math-inline" data-tex="\mathrm{Fr}(sl)"></span> maps the slot number to the corresponding scalser in Poseidon’s scalar field and <span class="math-inline" data-tex="\mathrm{zkHASH}(..)"></span> is Poseidon2 as specified in <a href="blockchain/raw/common-cryptographic-components.html">Common Cryptographic Components</a> .</p>
 <p>The epoch nonce used in the next epoch is <span class="math-inline" data-tex="\eta_{B&#x27;}"></span> where <span class="math-inline" data-tex="B&#x27;"></span> is the last block before the start of the “Lottery Constants Finalization” phase in the epoch schedule.</p>
 <h3 id="total-stake-inference"><a class="header" href="#total-stake-inference">Total Stake Inference</a></h3>
-<p>Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The details can be found in the following document:</p>
+<p>Given that stake is private in Cryptarchia, and that we want to maintain an approximately constant block rate, we must therefore adjust the difficulty of the slot lottery somehow based on the level of participation. The inference counts the number of <strong>occupied slots</strong> of the honest chain — the slots holding a canonical block or one of the <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle</a> blocks it references. Therefore, lottery wins lost to forks still contribute to the estimate, and each slot is counted once however many blocks fall in it. The details can be found in the following document:</p>
 <p><a href="blockchain/raw/cryptarchia-total-stake-inference.html">Total Stake Inference</a></p>
 <h3 id="epoch-state-pseudocode"><a class="header" href="#epoch-state-pseudocode">Epoch State Pseudocode</a></h3>
 <p>At the start of each epoch, each validator must derive the new epoch state variables. This is done through the following protocol:</p>
@@ -19075,9 +19089,15 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 </blockquote>
 <p>    <span class="math-inline" data-tex="(\_,\_,D^{ep-1}) \coloneqq \textbf{compute\_epoch\_state}(ep-1,tip)"></span></p>
 <blockquote>
-<p>The number of blocks produced during the first <span class="math-inline" data-tex="6\frac{k}{f}"></span> slots of the previous epoch</p>
+<p>The number of distinct occupied slots during the first <span class="math-inline" data-tex="6\frac{k}{f}"></span> slots of the previous epoch: a slot counts if it holds a block of the chain of <span class="math-inline" data-tex="tip"></span> and/or one or more <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncles</a> referenced by the blocks of that chain <strong>that themselves lie in the window</strong>, and each slot is counted at most once. Referenced uncles are genuine lottery wins that were lost to forks; counting them gives a more accurate estimate of consensus participation. No filtering is needed here: an uncle carried by a block of the chain was validated as a condition of that block's acceptance (see <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a>), so every node holding the chain counts exactly the same uncles.</p>
 </blockquote>
-<p>    <span class="math-inline" data-tex="N_\text{BLOCKS}^{ep-1} \coloneqq |\{B \in T | sl_{ep - 1} \le sl_B \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor\}|"></span></p>
+<p>    <span class="math-inline" data-tex="\textbf{in\_window}(sl) \coloneqq sl_{ep - 1} \le sl \lt sl_{ep-1}+\lfloor 6\frac{k}{f} \rfloor"></span></p>
+<p>    <span class="math-inline" data-tex="\textbf{chain} \coloneqq \textbf{ancestors}(tip)"></span></p>
+<blockquote>
+<p>The referenced uncles are the headers carried in the <code>uncle_headers</code> field of the blocks of the chain that fall inside the window. A block outside the window contributes nothing — neither its own slot nor the slots of the uncles it carries — so the count of a window is closed the moment that window ends: no block proposed afterwards can alter the estimate of a past epoch, however far back an uncle it carries may reach. Each entry was checked against the rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a> when its referencing block was validated — the parent of the uncle lies on the chain while the uncle itself does not, the uncle precedes its referencer and its parent does so by at most <span class="math-inline" data-tex="W\cdot f^{-1}"></span> slots, its Proof of Leadership verifies against inputs derived from the chain, and its signature verifies over its header — so no entry needs to be re-examined or skipped here.</p>
+</blockquote>
+<p>    <span class="math-inline" data-tex="\textbf{referenced\_uncles} \coloneqq \{\, U : A \in \textbf{chain},\ \textbf{in\_window}(sl_A),\ (U, \sigma_U) \in A.\text{uncle\_headers} \,\}"></span></p>
+<p>    <span class="math-inline" data-tex="N_\text{BLOCKS}^{ep-1} \coloneqq \left|\ \{sl_B : B \in \textbf{chain},\ \textbf{in\_window}(sl_B)\}\ \cup\ \{sl_U : U \in \textbf{referenced\_uncles},\ \textbf{in\_window}(sl_U)\}\ \right|"></span></p>
 <p>    <span class="math-inline" data-tex="D^{ep} \coloneqq \textbf{infer\_total\_active\_stake}(D^{ep-1}, N_\text{BLOCKS}^{ep-1})"></span></p>
 <p>    <span class="math-inline" data-tex="\textbf{return}\space (\mathbb{C}_\text{LEAD}^{ep}, \eta^{ep}, D^{ep})"></span></p>
 <h2 id="leadership-lottery"><a class="header" href="#leadership-lottery">Leadership Lottery</a></h2>
@@ -19093,14 +19113,14 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
 <p>After bootstrapping we commit to the most honest looking chain we found and switch to a fork choice rule that rejects chains that diverge by more than <span class="math-inline" data-tex="k"></span> blocks</p>
 <p><a href="blockchain/raw/fork-choice.html">Cryptarchia Fork Choice Rule</a></p>
 <h3 id="block-id"><a class="header" href="#block-id">Block ID</a></h3>
-<p>Block ID is defined by the hash of the block header <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header">Block Header</a>, where <code>hash</code> is Blake2b as specified in <a href="blockchain/raw/common-cryptographic-components.html">Common Cryptographic Components</a></p>
+<p>Block ID is defined by the hash of the block header <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header">Block Header</a>, where <code>hash</code> is Blake2b as specified in <a href="blockchain/raw/common-cryptographic-components.html">Common Cryptographic Components</a>. The header commits to the whole block body through <span class="math-inline" data-tex="body\_root"></span> (see <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Block Construction, Validation and Execution</a>), so the block ID transitively commits to the signed uncle headers the block carries as well as to its transactions: two blocks with the same ID are identical byte for byte.</p>
 <pre><code class="language-python">def block_id(header: Header) -&gt; hash
     return hash(
         b"BLOCK_ID_V1",
         header.bedrock_version,
         header.parent_block,
         header.slot.to_bytes(8, byteorder='little'),
-        header.block_root,
+        header.body_root,
         # PoL fields
         header.proof_of_leadership.leader_voucher,
         header.proof_of_leadership.entropy_contribution,
@@ -19113,7 +19133,7 @@ i.e. <span class="math-inline" data-tex="4^{th}\text{-grandparent}(b_2)=b_1"></s
     bedrock_version: byte                    # 1 bytes
     parent_block: hash                       # 32 bytes
     slot: int                                # 8 bytes
-    block_root: hash                         # 32 bytes
+    body_root: hash                          # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 
 class ProofOfLeadership:                     # 224 bytes
@@ -19124,10 +19144,74 @@ class ProofOfLeadership:                     # 224 bytes
 </code></pre>
 <h3 id="block"><a class="header" href="#block">Block</a></h3>
 <p><a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a></p>
+<h3 id="uncle-references"><a class="header" href="#uncle-references">Uncle References</a></h3>
+<p>A block may reference up to <code>MAX_UNCLES</code> <strong>uncles</strong> (see <a href="blockchain/raw/cryptarchia-v1-protocol.html#constants">Constants</a>). An uncle is a valid fork block that is not part of the chain of the referencing block but shares a common ancestor with it. A block references an uncle by carrying its full signed header in the <code>uncle_headers</code> field of both the block proposal and the reconstructed block (<a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block Construction, Validation and Execution</a>); the block ID of an uncle is derived from the carried header as <span class="math-inline" data-tex="\textbf{block\_id}(U)"></span> and is not recorded separately. Following the list convention of the <a href="blockchain/raw/mantle-transaction-encoding.html">Mantle Transaction Encoding</a> — <em>"Any lists are length-prefixed with fixed width uints"</em> — the list is serialized as a 1-byte little-endian element count followed by that many fixed-size entries (one byte suffices for the <code>MAX_UNCLES</code> bound), so it carries its own length. The header holds no uncle data of its own and is fixed-size; it commits to the carried entries — signatures included — through <span class="math-inline" data-tex="body\_root"></span>, and hence so does the <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-id">Block ID</a>. Any node holding a block therefore also holds the signed headers of the uncles it references, however it obtained that block, and cannot hold a variant of them. The size of a proposal varies with the number of referenced uncles; the indistinguishability of proposals required by the <a href="blockchain/raw/blend-protocol.html">Blend Protocol</a> is preserved at the message layer instead: <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a> fixes every dispersed payload body to the maximum payload size <code>Max_Body_Length</code> — set from the maximum proposal size — padding shorter proposals with random data.</p>
+<p>The only purpose of an uncle reference is to feed the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a>, which infers the total active stake from the number of <strong>occupied slots</strong> — the slots in which at least one leader won the lottery. A referenced uncle is a genuine lottery win, backed by a valid Proof of Leadership, that was lost to a fork (predominantly caused by network delays); its slot was occupied, but without the reference the canonical chain would not observe it. Counting the slots of the referenced uncles alongside those of the canonical blocks recovers those occupied slots and gives a more accurate estimate of the total active stake.</p>
+<p>At the moment a block is produced it is not yet known which branch of a fork will become canonical: some nodes build on one branch and some on the other. By referencing the blocks of the competing branches as uncles, whichever branch ultimately becomes canonical still counts the lottery wins of the branches that lost. This is the intent of uncle references — to let each branch count its counterpart branches — and it is what improves the total stake estimate.</p>
+<p><strong>A block is valid only if every uncle it carries is valid.</strong> The rules below are validity conditions, checked as step 10 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>: a block carrying an entry that fails any of them is rejected, exactly as one carrying an invalid Proof of Leadership is. Gating validity this way is safe because every rule is a function of the chain being extended and of the carried entry alone — never of the block tree <span class="math-inline" data-tex="T"></span>, the node's pruning state, or the node's network history. All nodes therefore reach the same verdict on the same block; no node can be starved of the inputs needed to decide, since the entry travels inside the very block whose validity depends on it; and an adversary manipulating which fork blocks are visible can neither make a block valid for some nodes and invalid for others nor thereby influence block inclusion. Requiring validity also keeps fabricated uncles out of the chain permanently, instead of leaving every node that ever synchronizes to detect and discard the same entries again.</p>
+<p>An entry <span class="math-inline" data-tex="(U, \sigma_U)"></span> of the <code>uncle_headers</code> list of a block <span class="math-inline" data-tex="A"></span> is <strong>valid</strong> — we say <span class="math-inline" data-tex="\textbf{valid\_uncle}(U, \sigma_U, A)"></span> holds — only if all of the following hold:</p>
+<ul>
+<li>The parent of the uncle is part of the chain of the referencing block: <span class="math-inline" data-tex="U.\text{parent\_block} \in \textbf{ancestors}(A)"></span>. Hence the uncle is the <strong>first block of its fork</strong>, and its chain is a prefix of the chain of <span class="math-inline" data-tex="A"></span>. Blocks deeper in a fork branch cannot be referenced: verifying their Proof of Leadership requires the ledger state of the fork branch, which cannot be reconstructed from the chain of <span class="math-inline" data-tex="A"></span> (see the verification rule below).</li>
+<li>The uncle itself is not part of the chain of the referencing block: <span class="math-inline" data-tex="\lnot\,\textbf{is\_ancestor}(U, A)"></span> — equivalently, <span class="math-inline" data-tex="U"></span> is not the block of the chain of <span class="math-inline" data-tex="A"></span> at slot <span class="math-inline" data-tex="sl_U"></span>.</li>
+<li>The uncle precedes the referencing block, and the <strong>parent</strong> of the uncle lies within the uncle reference window (see <a href="blockchain/raw/cryptarchia-v1-protocol.html#constants">Constants</a>): <span class="math-inline" data-tex="sl_A \gt sl_U"></span> and <span class="math-inline" data-tex="sl_A - sl_{\textbf{parent}(U)} \le W\cdot f^{-1}"></span>. The window is anchored to the parent rather than to the uncle itself because the parent is the block whose historical state the remaining checks need: <span class="math-inline" data-tex="ledger_\text{LATEST}"></span> as of <span class="math-inline" data-tex="U.\text{parent\_block}"></span> is required to verify the Proof of Leadership below, and anchoring here bounds how far back the chain of <span class="math-inline" data-tex="A"></span> must be retained to supply it. Anchoring to <span class="math-inline" data-tex="sl_U"></span> would not bound it: a leader may build on a stale tip, so <span class="math-inline" data-tex="sl_U - sl_{\textbf{parent}(U)}"></span> is unbounded and a block could demand a ledger root arbitrarily deep in the chain. The anchor also matches <a href="blockchain/raw/cryptarchia-v1-protocol.html#fork-pruning">Fork Pruning</a>, which prunes by divergence depth — and the parent of a first-fork block is exactly that divergence point. Since <span class="math-inline" data-tex="sl_U \gt sl_{\textbf{parent}(U)}"></span> by step 5 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>, this rule implies <span class="math-inline" data-tex="0 \lt sl_A - sl_U \lt W\cdot f^{-1}"></span>: the uncle's own slot falls inside the window as a consequence, not as a separate condition.</li>
+<li>The <a href="blockchain/raw/cryptarchia-proof-of-leadership.html">Proof of Leadership</a> of <span class="math-inline" data-tex="U"></span> verifies against public inputs derived from the chain of <span class="math-inline" data-tex="A"></span>: the slot, <span class="math-inline" data-tex="P_\text{LEAD}"></span> and <span class="math-inline" data-tex="\rho_\text{LEAD}"></span> taken from the header of <span class="math-inline" data-tex="U"></span>; the epoch state <span class="math-inline" data-tex="(\mathbb{C}_\text{LEAD}, \eta, D)"></span> of the epoch of <span class="math-inline" data-tex="sl_U"></span> as derived on the chain of <span class="math-inline" data-tex="A"></span>; and <span class="math-inline" data-tex="ledger_\text{LATEST}"></span> as of <span class="math-inline" data-tex="U.\text{parent\_block}"></span>, which is a historical ledger root of the chain of <span class="math-inline" data-tex="A"></span> because the parent lies on that chain. Since the chain of the uncle is a prefix of the chain of <span class="math-inline" data-tex="A"></span>, a genuine fork win was proven against exactly these values and verifies; a fabricated header does not. These are the same inputs a node derives to validate the Proofs of Leadership of the canonical blocks themselves; in particular <span class="math-inline" data-tex="ledger_\text{LATEST}"></span> is a function of the <strong>executed</strong> chain, so this check requires a full node's possession of the chain — headers alone do not suffice, exactly as they do not suffice to validate canonical blocks.</li>
+<li>The carried signature verifies over the header of <span class="math-inline" data-tex="U"></span>: <span class="math-inline" data-tex="\textbf{verify\_signature}(U, \sigma_U, P_\text{LEAD})=True"></span>, with <span class="math-inline" data-tex="P_\text{LEAD}"></span> taken from that header — the same binding required of a canonical proposal by step 9 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>. This ensures the uncle is a block authorized by the leader who won the lottery, not a fabricated header wrapped around a replayed proof.</li>
+</ul>
+<p>A proposer can always determine in advance whether an entry will be accepted: the chain of <span class="math-inline" data-tex="A"></span> is fixed the moment it selects the parent of <span class="math-inline" data-tex="A"></span>, and every rule reads only that chain and the entry itself, so proposer and validators evaluate identically and a well-implemented proposer never builds a block that others reject. For the same reason all nodes — including a node bootstrapping from genesis — accept exactly the same blocks and, having accepted them, count exactly the same uncles and derive exactly the same estimate. A carried uncle is checked exactly as a received proposal is — the Proof of Leadership and the signature binding it to the header — minus the chain-context steps that do not apply to a fork block. One caveat is recorded for honesty: the signature proves that the winning leader authorized this header, not that the block was published in its slot — the owner of a winning note can fabricate and self-sign such a header later. This is benign: the Proof of Leadership still attests a genuine lottery win at that slot, which is precisely the signal the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> measures, and the count is taken per distinct slot, so neither replay nor self-wrapping can add occupied slots beyond genuine wins.</p>
+<p>Uncle references are <strong>not</strong> required to be unique, and duplicates are permitted — the same uncle may be referenced by more than one block on the canonical chain, and a single block may carry the same entry twice. Each occurrence is validated on its own and a duplicate passes the rules above exactly as the first occurrence does; it merely wastes one of the <code>MAX_UNCLES</code> entries. Duplication is harmless because the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> counts <strong>occupied slots</strong>, not references: it forms the set of slots occupied by the canonical chain together with the slots of the uncles that chain references, and counts each slot once. A slot therefore contributes at most once to the estimate no matter how many blocks fall in it — the same uncle referenced several times, two distinct uncles that share a slot, and an uncle that shares its slot with a canonical block each add a single occupied slot, or none if that slot is already counted. This matches the slot lottery, which activates a slot with probability <span class="math-inline" data-tex="f"></span> regardless of how many leaders win it.</p>
+<h4 id="uncle-selection"><a class="header" href="#uncle-selection">Uncle Selection</a></h4>
+<p>When constructing a block <span class="math-inline" data-tex="B"></span> at slot <span class="math-inline" data-tex="sl_B"></span>, the proposer fills the <code>uncle_headers</code> field by selecting from the accepted fork blocks in its block tree <span class="math-inline" data-tex="T"></span> that are valid uncles for <span class="math-inline" data-tex="B"></span> — the first blocks of the competing branches that <span class="math-inline" data-tex="B"></span>'s own chain does not contain. Only a block whose parent is on <span class="math-inline" data-tex="B"></span>'s chain qualifies (see the validity rules above), so only such blocks are candidates; carrying anything else would make <span class="math-inline" data-tex="B"></span> itself invalid. Because the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> counts occupied slots, the proposer further narrows the candidate set to only the uncles that would add a <strong>new</strong> occupied slot: it excludes any uncle whose slot is already occupied on the <strong>chain that <span class="math-inline" data-tex="B"></span> extends</strong> (the ancestors of <span class="math-inline" data-tex="B"></span>) — whether that slot holds a canonical block or an uncle the chain already references — since referencing it would waste one of the <span class="math-inline" data-tex="\texttt{MAX\_UNCLES}"></span> entries without changing the count. This last narrowing is a best-effort optimization and is <strong>not</strong> a validity rule: a proposer that references an already-occupied slot produces a block that is still valid, merely one entry poorer. The preceding conditions are not optional — validation enforces every one of them.</p>
+<p>An uncle is <strong>not</strong> excluded because some <em>other</em> branch referenced it, nor because its slot is occupied on some other branch. The Total Stake Inference counts only the slots occupied by the canonical chain and its uncles, and at production time it is unknown which branch will become canonical. If a competing branch referenced an uncle but that branch is later discarded, its reference does not count; <span class="math-inline" data-tex="B"></span> must therefore remain free to reference the same uncle, so that its lottery win is still counted should <span class="math-inline" data-tex="B"></span>'s branch win.</p>
+<pre><code class="language-python">def uncle_candidates(B) -&gt; Set[Block]:
+    # Slots already occupied on the chain B extends: the slots of B's ancestors (canonical
+    # blocks) and the slots of the uncles those ancestors already reference. The Total Stake
+    # Inference counts occupied slots, so an uncle whose slot is already occupied adds nothing —
+    # referencing it would waste an entry. Slots occupied on *other* branches are deliberately
+    # not excluded: they do not count unless that branch becomes canonical.
+    referenced_uncles = { U for A in ancestors(B) for (U, _) in A.uncle_headers }
+    occupied = { sl_A for A in ancestors(B) } | { sl_U for U in referenced_uncles }
+
+    # Accepted fork blocks that are valid uncles for B and would add a new occupied slot
+    # (see the validity rules in Uncle References).
+    return { U for U in T if
+               parent(U) in ancestors(B)          # first block of its fork: the only referenceable kind
+               and not is_ancestor(U, B)          # a fork, not on B's chain
+               and sl_B &gt; sl_U                    # the uncle precedes B
+               and sl_B - sl_parent(U) &lt;= W / f   # its parent is within the uncle window
+               and sl_U not in occupied           # its slot is not already occupied on B's chain
+           }
+</code></pre>
+<p>The proposer then selects at most <span class="math-inline" data-tex="\texttt{MAX\_UNCLES}"></span> of these candidates by deterministically taking those with the oldest parent first. A candidate leaves the window when its <strong>parent</strong> ages out of it, so ordering by parent slot is ordering by time to expiry:</p>
+<pre><code class="language-python">def select_uncles_oldest(B) -&gt; array[SignedHeader]:   # at most MAX_UNCLES entries, in selection order
+    ordered = sorted(uncle_candidates(B), key=lambda U: (sl_parent(U), sl_U, block_id(U)))
+    selected, slots = [], set()
+    for U in ordered:
+        if len(selected) == MAX_UNCLES:
+            break
+        if sl_U in slots:              # at most one uncle per slot: a second adds no occupied slot
+            continue
+        slots.add(sl_U)
+        selected.append(signed_header(U))   # header of U with the signature it arrived under
+    return selected                    # the list carries its own length; no padding entries
+</code></pre>
+<p>This deterministic rule is simple and, without communication between proposers, robust. Two non-communicating proposers with the same candidate set produce the same selection, but they also tend to produce <strong>competing blocks</strong> that extend the same tip, of which only one becomes part of the canonical chain — the <a href="blockchain/raw/fork-choice.html">Fork Choice Rule</a> discards the rest. The identical uncle references on the discarded competitors therefore cost nothing, and along a single canonical chain, excluding the slots already occupied on a block's own chain keeps successive blocks from re-counting a slot.</p>
+<p><em>Which</em> candidates a proposer selects is proposer-local: it may reference fewer uncles than it could, or pass over a candidate for another, and its block remains valid. <em>What</em> it may reference is not — every carried entry must satisfy the validity rules above, and a block carrying one that does not is rejected (see <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>). The procedure given here is therefore a recommendation for filling the entries well, not a consensus rule. Because uncle references carry no fork-choice weight and grant no reward, a proposer has no incentive to deviate from it, and deviating within the rules only affects the accuracy of the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a>.</p>
+<p>A referenced uncle never becomes part of the chain:</p>
+<ul>
+<li>The transactions of the uncle are not executed and have no effect on the ledger state (see <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-execution">Block Execution</a>).</li>
+<li>The uncle carries no weight in the <a href="blockchain/raw/fork-choice.html">Fork Choice Rule</a>.</li>
+<li>The uncle grants no block reward.</li>
+</ul>
+<p>The only effect of a referenced uncle is its contribution to the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a>. Nothing further gates it: an uncle carried by a block of the chain has already been verified as a condition of that block's validity, so the inference counts its slot — whenever that slot and its referencing block both fall in the observation window — without re-examining the entry.</p>
+<blockquote>
+<p><strong>Note:</strong> The uncle reference window spans <span class="math-inline" data-tex="W"></span> expected block-intervals — <span class="math-inline" data-tex="W\cdot f^{-1}"></span> slots, 360 at the default <span class="math-inline" data-tex="W=12"></span> and <span class="math-inline" data-tex="f=1/30"></span> — and <code>MAX_UNCLES</code> is 4. Forks are predominantly caused by network delays and resolve within a few slots, so this window comfortably captures the forks worth referencing. <span class="math-inline" data-tex="W"></span> carries a <strong>virtual upper bound</strong> of <span class="math-inline" data-tex="\lfloor 0.6\,k \rfloor"></span> — equivalently <span class="math-inline" data-tex="W\cdot f^{-1} \le 0.6\frac{k}{f} = \frac{s}{5}"></span> — virtual in that no validation rule evaluates it: it constrains the choice of the constant itself, limiting the expense of lineage checking — how far back the chain of a referencing block must be reachable to verify an uncle — and any retuning of <span class="math-inline" data-tex="W"></span> must stay within it. The bound keeps the window strictly inside the finalization window, which is what the proposer needs: a candidate whose parent is within the window is still present in its block tree, since only forks that diverged deeper than the latest immutable block — at most <span class="math-inline" data-tex="s"></span> slots back — are pruned (see <a href="blockchain/raw/cryptarchia-v1-protocol.html#fork-pruning">Fork Pruning</a>); because the window is anchored to the parent, which is the divergence point, the two conditions are stated over the same quantity. The <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> needs no such bound: it counts only the blocks of its observation window and the uncles those blocks carry, so the count of a past window is closed once the window ends whatever the value of <span class="math-inline" data-tex="W"></span>, and recomputing <span class="math-inline" data-tex="N_\text{BLOCKS}"></span> for a past epoch always yields the same value.</p>
+<p><strong>Note:</strong> The validity rules are functions only of the referencing chain and the carried entry, and the signed headers are carried inside the blocks themselves (the <code>uncle_headers</code> field of <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block Construction, Validation and Execution</a>) — availability is structural, and referencing an uncle is inseparable from publishing its signed header. Every node therefore accepts exactly the same blocks and, from them, computes the same <span class="math-inline" data-tex="N_\text{BLOCKS}"></span> and the same <span class="math-inline" data-tex="D"></span>, at any time; a bootstrapping node reproduces the estimate of every past epoch from the chain data alone. An adversary manipulating the visibility of fork blocks can thus affect neither block inclusion nor the agreement of the estimate — only whether its own lottery wins are referenced at all. Because a block carrying an unverifiable entry is rejected outright, no such entry ever becomes chain data, and the cost of checking one is paid once by the receiving node rather than by every node that later synchronizes. The carried signed headers are retained as part of the chain data, bounded by <code>MAX_UNCLES</code> entries per block.</p>
+</blockquote>
 <h3 id="block-header-validation"><a class="header" href="#block-header-validation">Block Header Validation</a></h3>
-<p>Given block <span class="math-inline" data-tex="B=(header, transactions)"></span> and the block tree <span class="math-inline" data-tex="T"></span> where:</p>
+<p>Given block <span class="math-inline" data-tex="B=(header, uncle\_headers, transactions)"></span> and the block tree <span class="math-inline" data-tex="T"></span> where:</p>
 <ul>
 <li><span class="math-inline" data-tex="header"></span> is the header defined in <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Header</a></li>
+<li><span class="math-inline" data-tex="uncle\_headers"></span> is the list of signed headers of the uncles the block references, defined in <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block</a></li>
 <li><span class="math-inline" data-tex="transactions"></span> is the sequence of transactions in the block</li>
 </ul>
 <p>We say <span class="math-inline" data-tex="\textbf{valid\_header}(B)"></span> returns True if all of the following constraints hold, otherwise it returns False.</p>
@@ -19145,9 +19229,19 @@ Ensure the block body, i.e. the serialized sequence of transactions, does not ex
 Ensure the number of transactions in the block does not exceed the limit.</p>
 </li>
 <li>
-<p><span class="math-inline" data-tex="\textbf{merkle\_root}(transactions) = header.\text{block\_root}"></span>
-Ensure block root is over the transaction list. Compute the block root by using transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, and <code>0</code> to represent the hash of an empty transaction, padding leaves to the closest power of two.</p>
+<p><span class="math-inline" data-tex="\textbf{body\_root}(uncle\_headers, transactions) = header.\text{body\_root}"></span>
+Ensure the body root commits to both parts of the block body. It is computed as</p>
 </li>
+</ol>
+<pre><code class="language-python">def body_root(uncle_headers: list[SignedHeader], transactions: list[SignedMantleTx]) -&gt; hash:
+    return hash(
+        b"BODY_ROOT_V1",
+        serialize(uncle_headers),  # 1-byte count, then the fixed 361-byte entries
+        merkle_root(transactions),
+    )
+</code></pre>
+<p>where <span class="math-inline" data-tex="\textbf{merkle\_root}"></span> is the root of the Merkle tree built from transaction hashes (see Mantle - Mantle Transaction Hash) as leaves, using <code>0</code> to represent the hash of an empty transaction and padding the leaves to the closest power of two, and <span class="math-inline" data-tex="\textbf{serialize}"></span> is the list encoding of <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal">Block Proposal</a> — a 1-byte little-endian element count followed by that many entries, so an empty list encodes as a single zero byte. The serialized list is committed directly, with no inner hash: the element count and the fixed 361-byte entries keep the flat preimage unambiguous, and the single <code>BODY_ROOT_V1</code> tag versions the whole construction. Because the signatures of the carried uncle headers are inside <span class="math-inline" data-tex="\textbf{serialize}(uncle\_headers)"></span>, they are committed here and hence in the <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-id">Block ID</a>; a copy of a block that differs in any of those bytes has a different ID and is a different block.</p>
+<ol start="5">
 <li>
 <p><span class="math-inline" data-tex="header.\text{slot} \gt \textbf{fetch\_header}(header.\text{parent\_block}).\text{slot}"></span>
 Ensure the block’s slot comes after the parent block’s slot.</p>
@@ -19177,9 +19271,15 @@ Given leadership proof <span class="math-inline" data-tex="\pi_\text{LEAD} = (\p
 <p>A leaders proposal is valid if</p>
 <ul>
 <li><span class="math-inline" data-tex="\textbf{verify\_PoL}(T, parent,sl,P_\text{LEAD}, \pi_\text{PoL})=True"></span></li>
-<li><span class="math-inline" data-tex="\textbf{verify\_signature}(\textbf{block\_id}(H), \sigma, P_\text{LEAD})=True"></span>
+<li><span class="math-inline" data-tex="\textbf{verify\_signature}(H, \sigma, P_\text{LEAD})=True"></span>
 Ensure that the leader who won the lottery is actually proposing this block since PoL’s are not bound to blocks directly.</li>
 </ul>
+<ol start="10">
+<li><span class="math-inline" data-tex="\forall\,(U, \sigma_U) \in uncle\_headers:\ \textbf{valid\_uncle}(U, \sigma_U, B) = True"></span>
+Ensure every carried uncle is valid, as defined by the rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a>: the parent of <span class="math-inline" data-tex="U"></span> lies on the chain of <span class="math-inline" data-tex="B"></span>, <span class="math-inline" data-tex="U"></span> itself does not, <span class="math-inline" data-tex="U"></span> precedes <span class="math-inline" data-tex="B"></span> and the slot of its parent precedes <span class="math-inline" data-tex="sl_B"></span> by at most <span class="math-inline" data-tex="W\cdot f^{-1}"></span>, its Proof of Leadership verifies against inputs derived from the chain of <span class="math-inline" data-tex="B"></span>, and <span class="math-inline" data-tex="\sigma_U"></span> verifies over <span class="math-inline" data-tex="U"></span> under the <span class="math-inline" data-tex="P_\text{LEAD}"></span> of that header. A block carrying an entry that fails any of these is rejected.</li>
+</ol>
+<p>The list bound <code>len(uncle_headers) &lt;= MAX_UNCLES</code> is a constraint of the serialization schema, rejected at decode time (a block that does not parse is no block), and so is not restated here. Duplicate entries are permitted: each is validated independently and a repeat passes exactly as the first occurrence does.</p>
+<p>Every input to these checks comes from the chain of <span class="math-inline" data-tex="B"></span> or from the carried entry itself, both of which any node validating <span class="math-inline" data-tex="B"></span> necessarily has — the entries travel inside <span class="math-inline" data-tex="B"></span> and are committed by its <span class="math-inline" data-tex="body\_root"></span>. Validity is therefore a function of the block and the chain it extends alone, so all nodes agree on it and an adversary influencing what nodes know of forks cannot influence block inclusion.</p>
 <h3 id="chain-maintenance"><a class="header" href="#chain-maintenance">Chain Maintenance</a></h3>
 <p>We define the chain maintenance procedure <span class="math-inline" data-tex="\textbf{on\_block}(state,B)"></span> that governs how the block tree <span class="math-inline" data-tex="T"></span> is updated.</p>
 <p><strong>Note:</strong> It’s assumed that block contents have already been validated by the execution layer w.r.t. the parent block’s execution state.</p>
@@ -19245,11 +19345,13 @@ Ensure that the leader who won the lottery is actually proposing this block sinc
 <li>Ouroboros Chronos: Permissionless Clock Synchronization via Proof-of-Stake  <a href="https://eprint.iacr.org/2019/838.pdf">eprint.iacr.org</a></li>
 </ol>
 <h2 id="test-vectors-2"><a class="header" href="#test-vectors-2">Test Vectors</a></h2>
-<p>The operations used to derive the <code>block_root</code> are the same as those defined in Test Vectors.</p>
+<p>The operations used to derive the transaction Merkle root are the same as those defined in Test Vectors. That root is no longer a header field on its own: it is one of the two inputs to the <code>body_root</code> defined in step 4 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>, alongside the serialized carried <code>uncle_headers</code>. The vectors below are generated by the implementation's <code>generate_body_root_test_vectors</code> (<code>core/src/header/mod.rs</code>) at commit <code>fca0fc6e</code>.</p>
 <div class="table-wrapper"><table><thead><tr><th>Input</th><th>Output</th></tr></thead><tbody>
-<tr><td>empty block (no transaction)</td><td><code>block_root</code>: 0x0000000000000000000000000000000000000000000000000000000000000000</td></tr>
-<tr><td>one transaction per operation kind: <br />- <code>leaf[0]</code>: 0x6ab0046084f3ce8dad90eb28afe5692ad92d5d0588a4e868ad38d0d841d7a60e (Transfer)<br />- <code>leaf[1]</code>: 0xd3a1aa9d2df8383e389dba072b1397f5e7fc290f884e04147c787619f60493cf (ChannelConfig) <br />- <code>leaf[2]</code>: 0x50e5674eea7fa17f531a51159ea7c3cab843fb1c8e8bf9bd5518a8aad08865d3 (ChannelInscribe)<br />- <code>leaf[3]</code>: 0xd52da59d9db42391363d6c4f96447536e5dfff747b91b88320310b07581a8dee (ChannelDeposit)<br />- <code>leaf[4]</code>: 0x6f57c77dc872cc3f01380fbd57a97e9f7998a1cd8b24e84594ceba796cfa0822 (ChannelWithdraw)<br />- <code>leaf[5]</code>: 0x2c04be946507e2b8c239b85b03cf476a8be5af8e4de853660d0447a46ea460fc (ChannelTransfer)<br />- <code>leaf[6]</code>: 0x9ce9fa694b4c801eca6c9a1d3dca6401952404bda8c144fb16e03e3872fd475e (SDPDeclare)<br />- <code>leaf[7]</code>: 0x3555b3d8f5d05ea5d69efb17aab7639474738bcb4bfee8d354107433d781ef9c (SDPWithdraw)<br />- <code>leaf[8]</code>: 0x0a91ab8271016f212061e6b45ea35c95cfa0f9a70c5225508f284b2657f4d931 (SDPActive)<br />- <code>leaf[9]</code>: 0xc992f1a63a7ea665a3766fae6b032df3db12ef386caf0ef1f3654afedbc51c6c (LeaderClaim)</td><td><code>block_root</code>: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3</td></tr>
-<tr><td><code>Header</code>:<br />- <code>bedrock_version</code>: 0x01<br />- <code>parent_block</code>: 0x1111111111111111111111111111111111111111111111111111111111111111<br />- <code>slot</code>: 0x42<br />- <code>block_root</code>: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3 <br />- <code>leader_voucher</code>: 0x4444000000000000000000000000000000000000000000000000000000000000<br />- <code>entropy_contribution</code>: 0x5555000000000000000000000000000000000000000000000000000000000000<br />- <code>proof</code>: 0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />- <code>leader_key</code>: 0x17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce</td><td><code>block_id</code>: 0x ec351be5585023f3e96140b8903baba40028f222037b1dd12e1dbc1884788071</td></tr>
+<tr><td>empty block (no transaction)</td><td><code>merkle_root(transactions)</code>: 0x0000000000000000000000000000000000000000000000000000000000000000</td></tr>
+<tr><td>one transaction per operation kind: <br />- <code>leaf[0]</code>: 0x6ab0046084f3ce8dad90eb28afe5692ad92d5d0588a4e868ad38d0d841d7a60e (Transfer)<br />- <code>leaf[1]</code>: 0xd3a1aa9d2df8383e389dba072b1397f5e7fc290f884e04147c787619f60493cf (ChannelConfig) <br />- <code>leaf[2]</code>: 0x50e5674eea7fa17f531a51159ea7c3cab843fb1c8e8bf9bd5518a8aad08865d3 (ChannelInscribe)<br />- <code>leaf[3]</code>: 0xd52da59d9db42391363d6c4f96447536e5dfff747b91b88320310b07581a8dee (ChannelDeposit)<br />- <code>leaf[4]</code>: 0x6f57c77dc872cc3f01380fbd57a97e9f7998a1cd8b24e84594ceba796cfa0822 (ChannelWithdraw)<br />- <code>leaf[5]</code>: 0x2c04be946507e2b8c239b85b03cf476a8be5af8e4de853660d0447a46ea460fc (ChannelTransfer)<br />- <code>leaf[6]</code>: 0x9ce9fa694b4c801eca6c9a1d3dca6401952404bda8c144fb16e03e3872fd475e (SDPDeclare)<br />- <code>leaf[7]</code>: 0x3555b3d8f5d05ea5d69efb17aab7639474738bcb4bfee8d354107433d781ef9c (SDPWithdraw)<br />- <code>leaf[8]</code>: 0x0a91ab8271016f212061e6b45ea35c95cfa0f9a70c5225508f284b2657f4d931 (SDPActive)<br />- <code>leaf[9]</code>: 0xc992f1a63a7ea665a3766fae6b032df3db12ef386caf0ef1f3654afedbc51c6c (LeaderClaim)</td><td><code>merkle_root(transactions)</code>: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3</td></tr>
+<tr><td><code>uncle_headers</code>: empty list (encoded as the single byte 0x00)<br />- <code>merkle_root(transactions)</code>: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3</td><td><code>body_root</code>: 0x12fecd1a7be7764cf1ac15cd034736f9b78832ea4f3fd5006ceb61c60569775a</td></tr>
+<tr><td><code>uncle_headers</code>: 2 entries (encoded as the count byte 0x02 followed by the two 361-byte entries below, each a 297-byte header and its 64-byte signature)<br />- <code>uncle_headers[0]</code>: 0x016666666666666666666666666666666666666666666666666666666666666666660000000000000066666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666660000000000000000000000000000000000000000000000000000000000000034b4d9043156cb6dcf0beb0a2949b7559c940d2bcb6dbe8c53a9b30278e3a7466600000000000000000000000000000000000000000000000000000000000000563913f1ba7ad4129a077acd56278e743fd45120226dd315fa49f3a9c5d07af6a174ab84d4555a279afe053e79c8bb794be3f7d2e71e92b8da1b490687cb8306<br />- <code>uncle_headers[1]</code>: 0x0177777777777777777777777777777777777777777777777777777777777777777700000000000000777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777700000000000000000000000000000000000000000000000000000000000000c853ad0f0cd2b619aea92ceec4fd56a24d6499d584ce79257e45cfd8139b60a77700000000000000000000000000000000000000000000000000000000000000ad17e45d503a16fb41c25c4b3025956c63b31015871e957f3562b47cebce784e5b392ce3dd05214afe09102e0d2ed8211a83b81f18231963a226198fd528df0c<br />- <code>merkle_root(transactions)</code>: 0xcfbf83500e534669d039d09ec9ada459970610bb03b2ce06f944df72833c7de3</td><td><code>body_root</code>: 0x40aacc6d9d7fced681980e3ed51d3046330e8fe4698095e0d88ba3999b6589d5</td></tr>
+<tr><td><code>Header</code>:<br />- <code>bedrock_version</code>: 0x01<br />- <code>parent_block</code>: 0x1111111111111111111111111111111111111111111111111111111111111111<br />- <code>slot</code>: 42 (0x2a; encoded little-endian)<br />- <code>body_root</code>: 0x12fecd1a7be7764cf1ac15cd034736f9b78832ea4f3fd5006ceb61c60569775a (the empty-<code>uncle_headers</code> value above)<br />- <code>leader_voucher</code>: 0x4444000000000000000000000000000000000000000000000000000000000000<br />- <code>entropy_contribution</code>: 0x5555000000000000000000000000000000000000000000000000000000000000<br />- <code>proof</code>: 0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222<br />- <code>leader_key</code>: 0x17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce</td><td><code>block_id</code>: 0xd97592227b832c6f1b8fb3556e22fc22149d5a5d51bdc2d1fd82a71e68518dd8</td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><h1 id="proof-of-leadership-1"><a class="header" href="#proof-of-leadership-1">PROOF-OF-LEADERSHIP</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
@@ -19607,6 +19709,7 @@ No circuit-level mitigation is strictly necessary given the above.</p>
 </div><!-- timeline:start -->
 <h2 id="timeline-75"><a class="header" href="#timeline-75">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/cryptarchia-total-stake-inference.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/cryptarchia-total-stake-inference.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/cryptarchia-total-stake-inference.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 <li><strong>2026-05-18</strong> — <a href="https://github.com/logos-co/logos-lips/blob/58b56988429f4d69a9e10a9fc118725e229e37c5/docs/blockchain/raw/cryptarchia-total-stake-inference.md"><code>58b5698</code></a> — chore(blockchain): migrate contributor emails to @logos.co (#338)</li>
@@ -19617,6 +19720,7 @@ No circuit-level mitigation is strictly necessary given the above.</p>
 <h1 id="revision-history-11"><a class="header" href="#revision-history-11">Revision History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-01-20</td></tr>
+<tr><td>1.1.0</td><td>Changed <code>density_over_slots</code> to count <strong>distinct occupied slots</strong> instead of blocks, including the slots of the <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncles</a> referenced by the honest chain's in-period blocks, due to updated <a href="blockchain/raw/cryptarchia-v1-protocol.html">Cryptarchia Protocol</a>.</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-14"><a class="header" href="#introduction-14">Introduction</a></h1>
@@ -19624,6 +19728,7 @@ No circuit-level mitigation is strictly necessary given the above.</p>
 <h1 id="overview-11"><a class="header" href="#overview-11">Overview</a></h1>
 <p>The total active stake can be inferred by observing the slot occupancy rate: a higher fraction of occupied slots implies more stake participating in consensus. By observing the rate of occupied slots from the previous epoch and knowing the total stake estimate used during that period, we can infer a correction to the total stake estimate to compensate for any changes in consensus participation. This inference process is done by each node following the chain. Leaders will use this <em>total stake estimate</em> to calculate their <em>relative stake</em> as part of the leadership lottery <em>without revealing their stake</em> to others.</p>
 <p>The stake inference algorithm adjusts the previous total stake estimate based on the difference between the empirical slot activation rate (measured as the growth rate of the honest chain) and the expected slot activation rate. A large difference serves as an indicator that the total stake estimate is not accurate and must be adjusted.</p>
+<p>To measure the slot activation rate more accurately, the block count also includes the <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncle blocks</a> referenced by the honest chain. An uncle is a genuine lottery win, backed by a valid Proof of Leadership, that was lost to a fork instead of becoming part of the honest chain. Each block may reference several uncles, and the same uncle may be referenced by more than one block; the count is taken over distinct occupied slots, so each slot — whether occupied by a canonical block, a referenced uncle, or both — is counted only once. Without uncle references, these occupied slots would not be observed and the inference would underestimate the participation. Every uncle referenced from within the observation period contributes to the count, with no verification-based filtering: the signed headers are carried with the referencing blocks, and their validity is a condition of those blocks' own validity, so an uncle present in the chain has already been verified and every node holding the chain counts exactly the same set. Since forks are predominantly caused by network delays, counting referenced uncles also mitigates the accuracy loss under increased network delays noted below.</p>
 <p>This algorithm has been analyzed and shown to have good accuracy, precision and convergence speed. A caveat to note is that accuracy decreases with increased network delays. The analysis can be found in <a href="blockchain/raw/analysis-total-stake-inference.html">[Analysis] Total Stake Inference</a>.</p>
 <h1 id="construction-1"><a class="header" href="#construction-1">Construction</a></h1>
 <h2 id="definitions-9"><a class="header" href="#definitions-9">Definitions</a></h2>
@@ -19638,7 +19743,7 @@ No circuit-level mitigation is strictly necessary given the above.</p>
 <h3 id="functions"><a class="header" href="#functions">Functions</a></h3>
 <ul>
 <li><span class="math-inline" data-tex="\textbf{density\_over\_slots}(s, p)"></span>
-<em>Returns the number of blocks produced in the</em> <span class="math-inline" data-tex="p"></span> <em>slots following slot</em> <span class="math-inline" data-tex="s"></span> <em>in the honest chain.</em></li>
+<em>Returns the number of distinct occupied slots among the</em> <span class="math-inline" data-tex="p"></span> <em>slots following slot</em> <span class="math-inline" data-tex="s"></span><em>: a slot in</em> <span class="math-inline" data-tex="[s, s+p)"></span> <em>counts if it holds a block of the honest chain and/or one or more</em> <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">uncles</a> <em>referenced by the blocks of the honest chain that lie in</em> <span class="math-inline" data-tex="[s, s+p)"></span> <em>themselves, and each slot is counted at most once — a slot that holds both a canonical block and a referenced uncle, or several referenced uncles, still counts once. A block outside the range contributes neither its own slot nor the slots of the uncles it references, so the value for a past range is closed once that range ends.</em></li>
 </ul>
 <h2 id="algorithm-1"><a class="header" href="#algorithm-1">Algorithm</a></h2>
 <p>For a current epoch’s estimate <code>total_stake_estimate</code> and the epoch’s first slot <code>epoch_slot</code>, the next epoch’s estimate is calculated as shown below:</p>
@@ -21402,6 +21507,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 </div><!-- timeline:start -->
 <h2 id="timeline-82"><a class="header" href="#timeline-82">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/bedrock-genesis-block.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-08-06</strong> — <a href="https://github.com/logos-co/logos-lips/blob/5ead1e7184b9072d70e34d8c1f7f25e709ea3e16/docs/blockchain/raw/bedrock-genesis-block.md"><code>5ead1e7</code></a> — docs(blockchain): encode genesis_time as u32 unix timestamp (#370)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-genesis-block.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-genesis-block.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -21416,6 +21522,7 @@ This coordination requirement is the main trade-off of synchronous messaging: it
 <tr><td>1.1.0</td><td><a href="blockchain/raw/mantle-transaction-encoding/appendices/rfc-make-ledger-transaction-an-operation.html">[RFC] Make Ledger Transaction an Operation</a> Renamed Nomos to Logos Blockchain Remove notions of DA Minor fix in gas price</td><td>2026-03-27</td></tr>
 <tr><td>1.1.1</td><td><a href="blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html">[RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></td><td>2026-05-06</td></tr>
 <tr><td>1.1.2</td><td>Encode <code>genesis_time</code> as a u32 unix timestamp instead of an ISO 8601 datetime. Encode the <code>chain_id</code> length prefix as a u8 instead of a u64.</td><td>2026-07-06</td></tr>
+<tr><td>1.1.3</td><td>Replaced the <code>block_root</code> header field with <code>body_root</code>, taken over an empty uncle header list and the initial transaction, due to updated <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>.</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-21"><a class="header" href="#introduction-21">Introduction</a></h1>
@@ -21533,7 +21640,7 @@ Once all above entropy contributions, i.e., <span class="math-inline" data-tex="
 <li><code>bedrock_version</code>: Protocol version (e.g., 1).</li>
 <li><code>parent_block</code>: 0 (as this is the first block).</li>
 <li><code>slot</code>: 0 (the Genesis slot).</li>
-<li><code>block_root</code>: Block Merkle root over the (single) initial transaction.</li>
+<li><code>body_root</code>: the body commitment over an empty <code>uncle_headers</code> list (as the Genesis Block references no uncle, it encodes as a zero element count) and the Merkle root over the (single) initial transaction.</li>
 <li><code>proof_of_leadership</code>: Stubbed leadership proof.
 <ul>
 <li><code>leader_voucher</code>: 0 (as there is no leader block reward for the initial block).</li>
@@ -21548,7 +21655,7 @@ Once all above entropy contributions, i.e., <span class="math-inline" data-tex="
     bedrock_version=1,
     parent_block=0,
     slot=0,
-    block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+    body_root=body_root([], [GENESIS_MANTLE_TX]),
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),
         entropy_contribution=bytes(32),
@@ -21607,7 +21714,7 @@ GENESIS_HEADER = Header(
     bedrock_version=1,
     parent_block=bytes(32),
     slot=0,
-    block_root=block_merkle_root([GENESIS_MANTLE_TX]),
+    body_root=body_root([], [GENESIS_MANTLE_TX]),
     proof_of_leadership=ProofOfLeadership(
         leader_voucher=bytes(32),
         entropy_contribution=bytes(32),
@@ -21657,6 +21764,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 </div><!-- timeline:start -->
 <h2 id="timeline-83"><a class="header" href="#timeline-83">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-27</strong> — <a href="https://github.com/logos-co/logos-lips/blob/628684e3b9df9972526e388212d87de16f023ff4/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>628684e</code></a> — docs(blockchain): fix CHANNEL_DEPOSIT execution, block limits and storage market formatting (#381)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/bedrock-v1.1-block-construction.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
@@ -21672,10 +21780,12 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <tr><td>1.1.0</td><td>Removed <code>service_rewards</code> due to updated <a href="blockchain/raw/bedrock-service-reward-distribution.html">SERVICE-REWARD-DISTRIBUTION-PROTOCOL</a>. Extended the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-execution">Block Execution</a> logic with rewards distribution due to updated <a href="blockchain/raw/bedrock-service-reward-distribution.html">SERVICE-REWARD-DISTRIBUTION-PROTOCOL</a>. Removed <strong>Block Samples</strong> subsection of the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a> from the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#annex">Annex</a>. Reordered the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-execution">Block Execution</a> steps to enable immediate use of reward notes as inputs for transactions included in the proposal.</td><td>2026-03-27</td></tr>
 <tr><td>1.1.1</td><td><a href="blockchain/raw/mantle-transaction-encoding/appendices/rfc-simplify-mantle-transaction-and-refactor-ledger-operations.html">[RFC] Simplify Mantle Transaction and Refactor Ledger Operations</a></td><td>2026-05-06</td></tr>
 <tr><td>1.1.2</td><td>Precise that the maximum block size applies to the block body only.</td><td>2026-07-27</td></tr>
+<tr><td>1.1.3</td><td>Corrected <code>MAX_BLOCK_SIZE</code> to 2 MiB, to match the implementation.</td><td>2026-08-05</td></tr>
+<tr><td>1.2.0</td><td>Added the <code>uncle_headers</code> field — the signed headers of the referenced uncles — to the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal">Proposal</a> and to the newly defined <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block</a>, and replaced <code>block_root</code> with <code>body_root</code> in the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Header</a>, which commits to them, signatures included, as well as to the transactions. Due to updated <a href="blockchain/raw/cryptarchia-v1-protocol.html">Cryptarchia Protocol</a> (uncle references).</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-22"><a class="header" href="#introduction-22">Introduction</a></h1>
-<p>In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to <code>MAX_BLOCK_SIZE</code>, which is 1 MB and covers the transactions only, and the proposal compresses its size down to 33 kB, which saves the bandwidth necessary to broadcast new blocks.</p>
+<p>In this document, we present the specification defining the construction of the block proposal, its validation, and execution. We define the block proposal construction that contains references to transactions (from the mempool) instead of a complete transaction to limit its length. The raw block body increases with the size of transactions it contains up to <code>MAX_BLOCK_SIZE</code>, which is 2 MiB and covers the transactions only, and the proposal compresses its size down to 33 kB, which saves the bandwidth necessary to broadcast new blocks.</p>
 <h1 id="overview-19"><a class="header" href="#overview-19">Overview</a></h1>
 <p>For the consensus protocol to make progress, a new <strong>leader</strong> is elected through the leader lottery. The new leader is in possession of a proof of leadership (PoL) that confirms that it is indeed the leader. The main objective of the leader is to construct a new block, hence becoming a <strong>block builder,</strong> and share it with other members of the network as a <strong>block proposer</strong>. The block must be correctly constructed; otherwise, it will be rejected by the consensus nodes who are validating every block. Only validated blocks are executed, which means that the transactions included in the block are interpreted by all nodes, and the state of the chain is modified according to the instructions embedded in the transactions.</p>
 <h2 id="high-level-flow"><a class="header" href="#high-level-flow">High-level Flow</a></h2>
@@ -21731,17 +21841,25 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <h2 id="hash"><a class="header" href="#hash">Hash</a></h2>
 <p>We are using two hashing algorithms that have the same output length of 256 bits (32 bytes) that are <a href="blockchain/raw/common-cryptographic-components.html">Poseidon2 and Blake2b</a>.</p>
 <h2 id="block-proposal"><a class="header" href="#block-proposal">Block Proposal</a></h2>
-<p>A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. Therefore, the size of the proposal is constant and it is 33129 bytes.</p>
+<p>A block proposal, instead of containing complete Mantle Transactions of an unlimited size, contains references of fixed size to the transactions. The proposal also carries the full signed headers of the uncles it references, so that every node holding the block holds those headers as well. The size of the proposal varies with the number of referenced uncles: from 33130 bytes (no uncles) up to the maximum of 34574 bytes (<code>MAX_UNCLES</code> referenced uncles). The indistinguishability of proposals required by the <a href="blockchain/raw/blend-protocol.html">Blend Protocol</a> is provided at the message layer: every dispersed proposal is padded up to the maximum payload size <code>Max_Body_Length = 34574</code> bytes — set from the maximum proposal size — by <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a>.</p>
 <p>We define the following message structure:</p>
-<pre><code class="language-python">class Proposal:                              # 33129 bytes
-    header: Header                           # 297 bytes
-    references: References                   # 32768 bytes
-    signature: Ed25519Signature              # 64 bytes
+<pre><code class="language-python">class Proposal:                                     # 33130..34574 bytes
+    header: Header                                  # 297 bytes
+    uncle_headers: list[SignedHeader]               # 1 + n × 361 bytes
+    references: References                          # 32768 bytes
+    signature: Ed25519Signature                     # 64 bytes
+
+class SignedHeader:                                 # 361 bytes
+    header: Header                                  # 297 bytes
+    signature: Ed25519Signature                     # 64 bytes
 </code></pre>
 <p>Where:</p>
 <ul>
 <li>
 <p><code>header</code> is the header of the proposal; defined below: <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Header</a>.</p>
+</li>
+<li>
+<p><code>uncle_headers</code> is a variable-size list carrying the full signed headers of the referenced uncles, with at most <code>MAX_UNCLES</code> entries. Each entry holds an uncle block header together with the signature of that header under its <code>leader_key</code> — the header and signature as originally received with the uncle's own proposal. This list <em>is</em> the reference: the block ID (<a href="blockchain/raw/cryptarchia-v1-protocol.html#block-id">Cryptarchia Protocol</a>) of an uncle is derived from its carried header and is not recorded separately. Like every list, it is serialized as a 1-byte little-endian element count followed by that many entries, and a decoder must reject a count exceeding <code>MAX_UNCLES</code>. The <code>uncles</code> field having been removed from the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Header</a>, each entry is a fixed 361 bytes — a 297-byte header plus a 64-byte signature — so the list of carried headers parses unambiguously from its element count alone. The whole list, signatures included, is committed by <code>header.body_root</code> and therefore by the block ID, so no two blocks sharing an ID can differ in a carried signature. The proposal length reveals how many uncles are referenced — proposal indistinguishability is provided by the message-layer padding of <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a>, not by the encoding. The proposer chooses which uncles to reference according to <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-selection">Uncle Selection</a>, and every entry must satisfy the validity rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a> or the block is rejected. The same list is carried over into the reconstructed <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block</a>, which is what makes every referenced uncle structurally available: those rules can be evaluated by any node holding the chain, including nodes bootstrapping from genesis that never receive the proposal.</p>
 </li>
 <li>
 <p><code>references</code> is a set of 1024 references to transactions of a <code>hash</code> type; the size of the <code>hash</code> type is 32 bytes and is the transaction hash as defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#mantle-transaction">Mantle Transaction</a>.</p>
@@ -21756,7 +21874,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
     bedrock_version: byte                    # 1 byte
     parent_block: hash                       # 32 bytes
     slot: SlotNumber                         # 8 bytes
-    block_root: hash                         # 32 bytes
+    body_root: hash                          # 32 bytes
     proof_of_leadership: ProofOfLeadership   # 224 bytes
 </code></pre>
 <p>Where:</p>
@@ -21764,7 +21882,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <li><code>bedrock_version</code> is the version of the proposal message structure that supports other protocols defined in linked reference; its size is 1 byte and is fixed to <code>0x01</code>.</li>
 <li><code>parent_block</code> is the block ID (<a href="blockchain/raw/cryptarchia-v1-protocol.html">Cryptarchia Protocol</a>) of the parent block, validated and accepted by the block builder. It is used for the derivation of the <code>AgedLedger</code> and <code>LatestLedger</code> values necessary for validating the PoL; the size of the <code>hash</code> is 32 bytes.</li>
 <li><code>slot</code> is the consensus slot number; the size of the <code>SlotNumber</code> type is 8 bytes.</li>
-<li><code>block_root</code> is the root of the Merkle tree constructed from transaction hashes (defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#mantle-transaction">Mantle Transaction</a>) used for constructing the <code>references</code> list in the <code>mempool_ransactions</code>; the size of the <code>hash</code> is 32 bytes.</li>
+<li><code>body_root</code> is the commitment to the block body — both the carried <code>uncle_headers</code> and the transactions. It is computed as defined in step 4 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>, which combines the serialized <code>uncle_headers</code> list with the root of the Merkle tree constructed from transaction hashes (defined in <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html#mantle-transaction">Mantle Transaction</a>) — the same hashes used for constructing the <code>references</code> list in the <code>mempool_transactions</code>; the size of the <code>hash</code> is 32 bytes. Since the block ID is taken over the header, committing the uncle headers here is what makes two blocks with the same ID identical byte for byte.</li>
 <li><code>proof_of_leadership</code> is the proof confirming that the sender is the leader; defined below: <a href="blockchain/raw/bedrock-v1.1-block-construction.html#proof-of-leadership">Proof of Leadership</a>.</li>
 </ul>
 <h3 id="references-55"><a class="header" href="#references-55">References</a></h3>
@@ -21786,6 +21904,23 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <li><code>proof</code> is the proof confirming that the proposal is constructed by the leader; the size of the <code>ProofOfLeadership</code> type is 128 bytes (2 compressed <span class="math-inline" data-tex="\mathbb{G}_1"></span>and 1 compressed <span class="math-inline" data-tex="\mathbb{G}_2"></span> BN256 elements).</li>
 <li><code>leader_key</code> is the one-time <code>Ed25519PublicKey</code> used for signing the <code>Proposal</code>. This binds the content of the proposal with the <code>ProofOfLeadership</code>; the size of the <code>Ed25519PublicKey</code> type is 32 bytes.</li>
 </ul>
+<h2 id="block-1"><a class="header" href="#block-1">Block</a></h2>
+<p>A <strong>block</strong> is what a proposal becomes once its references have been resolved against the mempool, and it is the unit that nodes store, execute and serve to their peers — in particular over <a href="blockchain/raw/cryptarchia-v1-bootstr-sync.html#downloading-blocks">Downloading Blocks</a> during synchronization, where proposals are never transferred.</p>
+<pre><code class="language-python">class Block:
+    header: Header                           # 297 bytes
+    signature: Ed25519Signature              # 64 bytes
+    uncle_headers: list[SignedHeader]        # 1 + n × 361 bytes, n &lt;= MAX_UNCLES
+    transactions: list[SignedMantleTx]       # up to MAX_BLOCK_SIZE
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><code>header</code> is the header of the proposal the block was reconstructed from, unchanged; defined above: <a href="blockchain/raw/bedrock-v1.1-block-construction.html#header">Header</a>.</li>
+<li><code>signature</code> is the proposal signature over that <code>header</code>, carried over unchanged. It is retained because <code>block_id</code> commits to the header alone and therefore does not cover the signature, so a node that receives the block without ever seeing the proposal — as happens during synchronization — would otherwise have nothing to check against step 9 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>; the size of the <code>Ed25519Signature</code> type is 64 bytes.</li>
+<li><code>uncle_headers</code> is the list carried over verbatim from the proposal, defined above: <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal">Block Proposal</a>. It is committed by <code>header.body_root</code>, so it cannot be altered, reordered or truncated without changing the block ID, and every entry must satisfy the validity rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a> for the block to be valid.</li>
+<li><code>transactions</code> is the sequence of Mantle Transactions resolved from <code>references</code> during <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal-reconstruction">Block Proposal Reconstruction</a>.</li>
+</ul>
+<p>The <code>uncle_headers</code> list is part of the block rather than only of the proposal because both <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a> and the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> need it. A node that obtained the chain by synchronizing from its peers — which transfers blocks, not proposals — would otherwise hold no record of the referenced uncles at all: it could not apply the validity rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a> to the blocks it downloads, could not compute <span class="math-inline" data-tex="N_\text{BLOCKS}"></span>, and therefore could not derive the difficulty <span class="math-inline" data-tex="D"></span> that gates Proof-of-Leadership validity in the following epoch. Carrying the list in the block makes both the validation and the inference reproducible from chain data alone, for a bootstrapping node exactly as for a node that followed the chain live.</p>
+<p>As with the header, <code>uncle_headers</code> does not count towards <code>MAX_BLOCK_SIZE</code>, which bounds the block body — the serialized <code>transactions</code> — only. The uncle payload is bounded independently by <code>MAX_UNCLES</code> entries per block.</p>
 <h2 id="proposal-construction"><a class="header" href="#proposal-construction">Proposal Construction</a></h2>
 <p>In this section, we explain how the block proposal structure presented above is populated by the consensus leader.</p>
 <p>The block proposal is constructed by the leader of the current slot. The node becomes a leader only after successfully generating a valid PoL for a given <code>(Epoch, Slot)</code>.</p>
@@ -21808,7 +21943,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <li><code>bedrock_version</code></li>
 <li><code>parent_block</code></li>
 <li><code>slot</code></li>
-<li><code>block_root</code></li>
+<li><code>body_root</code> — left unset here; it is computed in step 4, once both parts of the body are known</li>
 <li><code>proof_of_leadership</code>:
 <ul>
 <li><code>leader_voucher</code></li>
@@ -21819,6 +21954,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 </li>
 </ul>
 </li>
+<li><code>uncle_headers</code>: the full signed headers — header and signature as received with the uncle's own proposal — of the uncles chosen by <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-selection">Uncle Selection</a>, in selection order. Every entry must satisfy the validity rules of <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a> against the chain the proposal extends, or the resulting block will be rejected; because those rules read only that chain and the entry itself, the proposer can verify this before publishing.</li>
 </ul>
 <ol start="2">
 <li>
@@ -21843,7 +21979,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <pre><code class="language-python">references: list[hash] = [mantle_txhash(tx) for tx in mempool_transactions]
 </code></pre>
 <ol start="4">
-<li>Compute the <code>header.block_root</code> as the root of the Merkle tree constructed from the <code>mempool_transactions</code> transactions used to build <code>references</code>.</li>
+<li>Compute the <code>header.body_root</code> over both parts of the body, as defined in step 4 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>: the serialized <code>uncle_headers</code> list from step 1, combined with the root of the Merkle tree constructed from the <code>mempool_transactions</code> transactions used to build <code>references</code>. This step therefore comes after both uncle selection and transaction selection.</li>
 <li>Sign the block proposal header.</li>
 </ol>
 <pre><code class="language-text">signature = Ed25519.sign(leader_secret_key, header)
@@ -21853,6 +21989,7 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 </ol>
 <pre><code class="language-python">proposal = Proposal(
     header,
+    uncle_headers,
     references,
     signature
 )
@@ -21876,13 +22013,18 @@ GENESIS_BLOCK = (GENESIS_HEADER, [GENESIS_MANTLE_TX])
 <li>If any transaction is missing, the entire proposal is rejected.</li>
 <li>If all transactions are present, the block proposal is reconstructed and proceeds to further validation steps.</li>
 </ol>
+<p>Reconstruction assembles the <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block">Block</a> from the proposal's <code>header</code> and <code>signature</code>, its <code>uncle_headers</code> copied over verbatim, and the transactions resolved from <code>references</code> in the order the references appear. The <code>uncle_headers</code> list is retained rather than discarded: it is not recoverable from the mempool, it is committed by <code>header.body_root</code> and so cannot be dropped without invalidating the block, and once the proposal has been consumed the block is the only carrier of the signed uncle headers that <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a> and the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a> need.</p>
 <h2 id="block-proposal-validation"><a class="header" href="#block-proposal-validation">Block Proposal Validation</a></h2>
 <p>This section defines the procedure followed by a Logos Blockchain node to validate a received block proposal.</p>
-<p>Given a <code>proposal</code>, a proposed block consisting of a <code>header</code> and <code>references</code>. This block proposal is considered valid if the following conditions are met:</p>
+<p>Given a <code>proposal</code>, a proposed block consisting of a <code>header</code>, <code>uncle_headers</code> and <code>references</code>. This block proposal is considered valid if the following conditions are met:</p>
 <ol>
 <li>
 <p><strong>Block Validation</strong>
-The <code>proposal</code> must satisfy the rules defined in <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>.</p>
+The <code>proposal</code> must satisfy the rules defined in <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a>. This includes step 10, which requires every entry of <code>uncle_headers</code> to be a valid uncle of the block (see <a href="blockchain/raw/cryptarchia-v1-protocol.html#uncle-references">Uncle References</a>).</p>
+</li>
+<li>
+<p><strong>Body Root Consistency</strong>
+<code>header.body_root</code> must equal the body root computed over the carried <code>uncle_headers</code> and the transactions the <code>references</code> resolve to. This restates step 4 of <a href="blockchain/raw/cryptarchia-v1-protocol.html#block-header-validation">Block Header Validation</a> at the message level, because the consequence of failing it here is different: a mismatch means the message was corrupted in transit or malformed by its proposer, not that the block it names is invalid. The block ID is taken over the header, so a corrupted copy and the genuine block share no identity, and well-formed bytes exist and are held by the proposer and by every node that accepted the block. Such a proposal must be discarded and may be re-requested from any other holder, and no verdict about the underlying block may be recorded from it. Once <code>body_root</code> matches, the <code>uncle_headers</code> are exactly the bytes the proposer committed to, and step 10 decides the block on their merits.</p>
 </li>
 <li>
 <p><strong>Block Proposal Reconstruction</strong>
@@ -21902,6 +22044,7 @@ The <code>references</code> must refer to existing <code>mempool_transaction</co
 <li>Execute the reward distribution protocol defined in <a href="blockchain/raw/bedrock-service-reward-distribution.html"><strong>Service Reward Distribution Protocol</strong></a> to generate reward notes locally and include them in the ledger.</li>
 <li>Execute the Mantle Transactions included in the block sequentially, using the execution rules defined in the <a href="blockchain/raw/bedrock-v1.1-mantle-specification.html">Mantle</a>.</li>
 </ol>
+<p>The carried <code>uncle_headers</code> are not executed. A referenced uncle is not part of the chain; therefore, its transactions have no effect on the ledger state. The uncles are used only as evidence of consensus participation for the <a href="blockchain/raw/cryptarchia-v1-protocol.html#total-stake-inference">Total Stake Inference</a>.</p>
 <h1 id="annex-6"><a class="header" href="#annex-6">Annex</a></h1>
 <h2 id="batch-verification-of-zk-proofs"><a class="header" href="#batch-verification-of-zk-proofs">Batch verification of ZK proofs</a></h2>
 <h3 id="proofs-of-claim"><a class="header" href="#proofs-of-claim">Proofs of Claim</a></h3>
@@ -39797,6 +39940,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </div><!-- timeline:start -->
 <h2 id="timeline-130"><a class="header" href="#timeline-130">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/blend-protocol.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/blend-protocol.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-29</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67e498e2d65e447d954e213ea89bbe3b9b285a8a/docs/blockchain/raw/blend-protocol.md"><code>67e498e</code></a> — chore: fix math issues (#350)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/15f410b414da7e5cc1d5e2e742c81a2510ee6c68/docs/blockchain/raw/blend-protocol.md"><code>15f410b</code></a> — chore: fix math issue (#349)</li>
@@ -39807,6 +39951,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-09</td></tr>
 <tr><td>1.1.0</td><td>[RFC] Remove Concept of a Session</td><td>2026-06-22</td></tr>
+<tr><td>1.1.1</td><td>Updated the block proposal message size to 34574 bytes in the encapsulation-overhead calculation, following the addition of carried uncle headers in <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>.</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-70"><a class="header" href="#introduction-70">Introduction</a></h1>
@@ -40553,7 +40698,7 @@ We are interested in the random variable <span class="math-inline" data-tex="c_i
 </li>
 </ol>
 <blockquote>
-<p><strong>Encapsulation Overhead Calculation:</strong> Assuming that we use Groth16 SNARKs as a proving system, we need <span class="math-inline" data-tex="160"></span> bytes per PoQ (<span class="math-inline" data-tex="128"></span> for proof and <span class="math-inline" data-tex="32"></span> for nullifier) quota. Which gives us <span class="math-inline" data-tex="289"></span> bytes per hop (proof of quota <span class="math-inline" data-tex="160"></span> bytes + proof of selection <span class="math-inline" data-tex="32"></span> bytes + public key <span class="math-inline" data-tex="32"></span> bytes + signature <span class="math-inline" data-tex="64"></span> bytes + last flag <span class="math-inline" data-tex="1"></span> byte) plus <span class="math-inline" data-tex="256"></span> bytes for the public header. Which for <span class="math-inline" data-tex="3"></span> hops gives us <span class="math-inline" data-tex="1123"></span> bytes in total. That increases the block proposal message defined in <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>, of <span class="math-inline" data-tex="33129"></span> bytes by <span class="math-inline" data-tex="\approx 3\%"></span>.</p>
+<p><strong>Encapsulation Overhead Calculation:</strong> Assuming that we use Groth16 SNARKs as a proving system, we need <span class="math-inline" data-tex="160"></span> bytes per PoQ (<span class="math-inline" data-tex="128"></span> for proof and <span class="math-inline" data-tex="32"></span> for nullifier) quota. Which gives us <span class="math-inline" data-tex="289"></span> bytes per hop (proof of quota <span class="math-inline" data-tex="160"></span> bytes + proof of selection <span class="math-inline" data-tex="32"></span> bytes + public key <span class="math-inline" data-tex="32"></span> bytes + signature <span class="math-inline" data-tex="64"></span> bytes + last flag <span class="math-inline" data-tex="1"></span> byte) plus <span class="math-inline" data-tex="256"></span> bytes for the public header. Which for <span class="math-inline" data-tex="3"></span> hops gives us <span class="math-inline" data-tex="1123"></span> bytes in total. That increases the block proposal message defined in <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>, of <span class="math-inline" data-tex="34574"></span> bytes (the padded <code>Max_Body_Length</code> of <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a>) by <span class="math-inline" data-tex="\approx 3\%"></span>.</p>
 </blockquote>
 <h3 id="formatting"><a class="header" href="#formatting">Formatting</a></h3>
 <p>The payload of the message must be formatted according to the following document: <a href="blockchain/raw/message-formatting.html">Message Formatting</a></p>
@@ -41931,6 +42076,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt;
 </div><!-- timeline:start -->
 <h2 id="timeline-133"><a class="header" href="#timeline-133">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/message-formatting.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/message-formatting.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/message-formatting.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 </ul>
@@ -41938,6 +42084,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt;
 <h1 id="revision-history-49"><a class="header" href="#revision-history-49">Revision History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-09</td></tr>
+<tr><td>1.0.1</td><td>Corrected <code>Max_Payload_Length</code> to 34577 bytes, so that it again matches the <code>Max_Body_Length</code> of <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a> plus the 3-byte payload header.</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-73"><a class="header" href="#introduction-73">Introduction</a></h1>
@@ -41994,7 +42141,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt;
 <h3 id="payload-14"><a class="header" href="#payload-14">Payload</a></h3>
 <p>The <code>payload</code> must be formatted according to the <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a>. The formatted <code>payload</code> must be generated as the outcome of the <a href="blockchain/raw/message-encapsulation.html">Message Encapsulation Mechanism</a>.</p>
 <h2 id="maximum-payload-length"><a class="header" href="#maximum-payload-length">Maximum Payload Length</a></h2>
-<p>The <code>Max_Payload_Length</code> parameter defines the maximum length of the <code>payload</code>, which for version 1 of the Blend Protocol is fixed as <code>Max_Payload_Length=34003</code>. That is, 34kB for the payload body (<code>Max_Body_Length</code>) and 3 bytes for the payload header. More information about payload formatting can be found in <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a>.</p>
+<p>The <code>Max_Payload_Length</code> parameter defines the maximum length of the <code>payload</code>, which for version 1 of the Blend Protocol is fixed as <code>Max_Payload_Length=34577</code>. That is, 34574 bytes for the payload body (<code>Max_Body_Length</code>) and 3 bytes for the payload header. More information about payload formatting can be found in <a href="blockchain/raw/payload-formatting.html">Payload Formatting</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="payload-formatting"><a class="header" href="#payload-formatting">PAYLOAD-FORMATTING</a></h1>
 <div class="table-wrapper"><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>
 <tr><td>Name</td><td>Payload Formatting</td></tr>
@@ -42007,6 +42154,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt;
 </div><!-- timeline:start -->
 <h2 id="timeline-134"><a class="header" href="#timeline-134">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-19</strong> — <a href="https://github.com/logos-co/logos-lips/blob/a2a85cbe444e9727ae7f42b2f6d6f4c6bf8d63e9/docs/blockchain/raw/payload-formatting.md"><code>a2a85cb</code></a> — RFC Bedrock: Cryptarchia with uncle references (#385)</li>
 <li><strong>2026-07-03</strong> — <a href="https://github.com/logos-co/logos-lips/blob/709cf7f1662affa6efa094e2fb066e9b530b5aaa/docs/blockchain/raw/payload-formatting.md"><code>709cf7f</code></a> — Bedrock-RFC: Remove Concept of a Session (#365)</li>
 <li><strong>2026-05-28</strong> — <a href="https://github.com/logos-co/logos-lips/blob/d45eed23b04b2375a566bfa406bc621e7b7899c5/docs/blockchain/raw/payload-formatting.md"><code>d45eed2</code></a> — Chore: mirror blochain specs into github/mdbook (#347)</li>
 </ul>
@@ -42014,6 +42162,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt;
 <h1 id="revision-history-50"><a class="header" href="#revision-history-50">Revision History</a></h1>
 <div class="table-wrapper"><table><thead><tr><th><strong>Version</strong></th><th><strong>Changes</strong></th><th><strong>Date</strong></th></tr></thead><tbody>
 <tr><td>1.0.0</td><td>Initial revision.</td><td>2026-04-09</td></tr>
+<tr><td>1.1.0</td><td>Updated <code>Max_Body_Length</code> to 34574 bytes, the maximum block proposal size once a proposal carries the signed headers of the uncles it references (see <a href="blockchain/raw/bedrock-v1.1-block-construction.html">Block Construction, Validation and Execution</a>).</td><td>2026-08-06</td></tr>
 </tbody></table>
 </div>
 <h1 id="introduction-74"><a class="header" href="#introduction-74">Introduction</a></h1>
@@ -42043,7 +42192,7 @@ def signing_body(private_header: PrivateHeader, payload: EncryptedPayload) -&gt;
 <h3 id="length"><a class="header" href="#length">Length</a></h3>
 <p>We define the <code>body_length</code> as uint16 (encoded as little-endian). Therefore, the theoretical limit of the length of the <code>body</code> is 65535 bytes. The <code>body_length</code> must be set to the length of the body of the payload message (<code>body_length=len(raw_message)</code>).</p>
 <h2 id="body"><a class="header" href="#body">Body</a></h2>
-<p>The <code>Max_Body_Length</code> parameter defines the maximum length of the <code>body</code>. Currently, we assume that the maximal length of a raw data message is 33129 (<a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal">Block Proposal</a>), so the <code>Max_Body_Length=33129</code>.</p>
+<p>The <code>Max_Body_Length</code> parameter defines the maximum length of the <code>body</code>. The maximal length of a raw data message is the maximum size of a <a href="blockchain/raw/bedrock-v1.1-block-construction.html#block-proposal">Block Proposal</a> — 34574 bytes, reached when the proposal carries <code>MAX_UNCLES</code> signed uncle headers — so the <code>Max_Body_Length=34574</code>. Because the padding below fixes every <code>body</code> to this length, the variable size of a proposal (which depends on the number of referenced uncles) is not observable on the wire, which is what preserves the indistinguishability of proposals required by the <a href="blockchain/raw/blend-protocol.html">Blend Protocol</a>.</p>
 <p>The <code>body</code> length is fixed to <code>Max_Body_Length</code> bytes. Therefore, if the length of the raw message is shorter than the <code>Max_Body_Length</code>, then it must be padded with random data.</p>
 <p>If the <code>body</code> length is less than the <code>Max_Body_Length</code>, then the last <code>Max_Body_Length - len(Raw_Message)</code> bytes must be filled with random data.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="proof-of-quota-1"><a class="header" href="#proof-of-quota-1">PROOF-OF-QUOTA</a></h1>
