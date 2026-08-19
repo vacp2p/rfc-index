@@ -30,6 +30,7 @@
 | 1.3.0 | [RFC] Remove Concept of a Session | 2026-06-22 |
 | 1.3.1 | [RFC] One canonical encoding for `ServiceType` and `Locator` | 2026-08-14 |
 | 1.3.2 | Pinned the encoding of `epoch_number` in the reward `op_id` preimage to the 4 bytes of an [`EpochNumber`](cryptarchia-v1-protocol.md#epoch) | 2026-08-25 |
+| 1.3.3 | Exactly one reward note per `zk_id`; rewards sharing a `zk_id` are not merged | 2026-09-01 |
 
 # Introduction
 
@@ -85,7 +86,7 @@ The reward must:
 
   - Transfer the correct reward amount according to [Service Reward Calculation](#service-reward-calculation).2
   - Be sent to the public key `zk_id` of the validator registered during [declaration of the service](bedrock-service-declaration-protocol.md).
-  - Be distributed into a single note if several rewards share the same `zk_id`.
+  - Be distributed as exactly one note per rewarded `zk_id`. Rewards are never summed or merged into a shared note: a distribution covers one service, and a `zk_id` is bound to at most one declaration per service (see [Identifier Uniqueness](bedrock-service-declaration-protocol.md#identifier-uniqueness)).
   - Be executed identically by every node processing the first block of epoch N+2. This happens by inserting notes in the ledger in ascending order of `zk_id`.
 
 Nodes indirectly verify the correct inclusion of rewards because all consensus-validating nodes must maintain the same ledger view to derive the latest ledger root, which serves as input for verifying the [Proof of Leadership](cryptarchia-proof-of-leadership.md).
