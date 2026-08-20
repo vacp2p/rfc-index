@@ -123,7 +123,10 @@ The cost that decides it is the validator's per-proposal mempool rehash, which c
 
 The ~6.4× gap is architectural rather than a property of this CPU: a 32-byte input costs SipHash four ARX absorption rounds, while Blake2b pays a full 12-round 128-byte-block compression however short the input is. Blake2b's *native keyed mode* is the worst option of the four, not the best — with a 16-byte key and a 32-byte message it processes two blocks where prefix-absorption processes one. SipHash-1-3's extra 2× buys nothing at 13 ms and has a thinner security margin, so 2-4 is chosen. Blake2b remains the only cryptographic hash in the construction; SipHash is a performance component keyed from it, as in BIP-152 (which derives its SipHash keys from SHA256 of the header).
 
-> **TODO (author):** the benchmark and its report exist in the research repository working tree at `simulations/block-proposal/bench-shortid` and `reports/block-proposal/SipHash-vs-Blake2b-Short-IDs.md` but are **not yet committed**. Commit and link them before this PR leaves Draft.
+The benchmark and its report live in the research repository, on branch `block-proposal-shortid-bench` (pinned below to commit [`6dbc2cb`](https://github.com/logos-blockchain/research/commit/6dbc2cb49474a8eacdaffe40daf5578543f75ea3)):
+
+- **Report** — [SipHash-vs-Blake2b-Short-IDs.md](https://github.com/logos-blockchain/research/blob/6dbc2cb49474a8eacdaffe40daf5578543f75ea3/reports/block-proposal/SipHash-vs-Blake2b-Short-IDs.md)
+- **Benchmark** — [simulations/block-proposal/bench-shortid](https://github.com/logos-blockchain/research/tree/6dbc2cb49474a8eacdaffe40daf5578543f75ea3/simulations/block-proposal/bench-shortid) (`cargo run --release`; `Cargo.lock` is committed, so the figures reproduce against the exact `siphasher` 1.0.3 and `blake2` 0.10.6 that produced them)
 
 ## Why the key excludes `body_root`
 
