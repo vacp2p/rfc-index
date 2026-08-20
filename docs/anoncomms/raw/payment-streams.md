@@ -854,16 +854,18 @@ Off-chain vault resolution derives the same `VaultConfig` PDA from
 `VaultProof.vault_id` and the LEZ account identifier for
 `VaultProof.owner_public_key`.
 
-#### Deposit and claim asset paths
+#### Deposit, claim, and withdraw asset paths
 
-Deposit moves vault funds
+`Deposit` MUST move funds into `VaultHolding`
 by composing with the platform program for the vault token:
 authenticated-transfer for native,
 Token program for non-native.
 
-Claim and both withdraw paths credit the destination
-in the payment-streams guest.
-`VaultHolding` is program-owned.
+`Claim`, `WithdrawToOwner`, and `Withdraw` MUST debit `VaultHolding`
+and credit the destination in this guest
+(the stream provider, the vault owner, and `to`, respectively).
+These three instructions MUST NOT compose with authenticated-transfer
+or the Token program to credit the destination.
 
 For `PseudonymousFunding` vaults,
 `Deposit` MUST debit the vault owner private account.
