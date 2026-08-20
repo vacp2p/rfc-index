@@ -856,10 +856,14 @@ Off-chain vault resolution derives the same `VaultConfig` PDA from
 
 #### Deposit and claim asset paths
 
-Deposit, withdraw, and claim move vault funds
+Deposit moves vault funds
 by composing with the platform program for the vault token:
 authenticated-transfer for native,
 Token program for non-native.
+
+Claim and both withdraw paths credit the destination
+in the payment-streams guest.
+`VaultHolding` is program-owned.
 
 For `PseudonymousFunding` vaults,
 `Deposit` MUST debit the vault owner private account.
@@ -876,7 +880,8 @@ On LEZ that account is a signing account.
 | --- | --- | --- |
 | Initialize vault | `InitializeVault` | Vault owner |
 | Deposit | `Deposit` | Vault owner |
-| Withdraw unallocated | `Withdraw` | Vault owner |
+| Withdraw unallocated to owner | `WithdrawToOwner` | Vault owner |
+| Withdraw unallocated (explicit `to`) | `Withdraw` | Vault owner |
 | Create stream | `CreateStream` | Vault owner |
 | Pause stream | `PauseStream` | Vault owner |
 | Resume stream | `ResumeStream` | Vault owner |
@@ -890,6 +895,12 @@ LEZ encodes that policy as two reference instructions.
 `CloseStreamByOwner` uses the vault owner as the signing authorizer.
 `CloseStreamByProvider` and `Claim` MUST include `VaultConfig.owner` as an
 explicit non-signing account.
+
+When `to` is the vault owner, LEZ encodes a three-slot instruction
+that credits the owner slot (`WithdrawToOwner`).
+When `to` is a different account, LEZ encodes a four-slot instruction
+(`Withdraw`).
+The same account id MUST NOT appear twice in one instruction.
 
 When a private account is included in a transaction
 as a signing account or as a required non-signing account,
@@ -1125,6 +1136,9 @@ event Deposited(uint256 amount);
 event Withdrawn(uint256 amount, address indexed to);
 
 function deposit(uint256 amount) external;
+/// @notice Withdraw unallocated vault funds to `to`
+/// @dev When `to` is the vault owner, LEZ maps this to WithdrawToOwner.
+///      A distinct `to` maps to Withdraw.
 function withdraw(uint256 amount, address to) external;
 ```
 
