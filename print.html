@@ -11975,6 +11975,7 @@ Without proper authentication during initialization, an adversary could perform 
 </div><!-- timeline:start -->
 <h2 id="timeline-38"><a class="header" href="#timeline-38">Timeline</a></h2>
 <ul>
+<li><strong>2026-08-21</strong> — <a href="https://github.com/logos-co/logos-lips/blob/67f3e0b3741c5a869caf464c076b12d50204800b/docs/messaging/application/raw/reliable-channel-api.md"><code>67f3e0b</code></a> — make rate limit manager section clearer (#409)</li>
 <li><strong>2026-06-16</strong> — <a href="https://github.com/logos-co/logos-lips/blob/16e8af10af316557eda5813b6039c0bdf435baa1/docs/messaging/application/raw/reliable-channel-api.md"><code>16e8af1</code></a> — Chore/separate messaging specs (#361)</li>
 <li><strong>2026-06-13</strong> — <a href="https://github.com/logos-co/logos-lips/blob/bb48a0d21352b37eec6f595cecf1cdb36409e5d0/docs/messaging/raw/reliable-channel-api.md"><code>bb48a0d</code></a> — Improvement : MessageId must be unique per segment (#356)</li>
 <li><strong>2026-06-12</strong> — <a href="https://github.com/logos-co/logos-lips/blob/124f8957915f349347532d802d9e4bb5cc2a5ce7/docs/messaging/raw/reliable-channel-api.md"><code>124f895</code></a> — chore: fix broken links (#357)</li>
@@ -12106,7 +12107,7 @@ which are handled by higher layers.</p>
 <p>The Rate Limit Manager ensures compliance with <a href="https://lip.logos.co/messaging/draft/17/rln-relay.html">RLN</a> rate constraints.</p>
 <ul>
 <li>It tracks how many messages have been sent in the current epoch.</li>
-<li>When the limit is approached, segment dispatch MUST be delayed to the next epoch.</li>
+<li>When the number of messages sent in the current epoch has reached the limit, further segment dispatch MUST be delayed until the next epoch.</li>
 <li>The epoch size MUST match the <code>[epochPeriodSec](https://lip.logos.co/messaging/draft/17/rln-relay.html#epoch-length)</code> configured in <code>RateLimitConfig</code>.</li>
 </ul>
 <h3 id="encryption-hook"><a class="header" href="#encryption-hook">Encryption Hook</a></h3>
